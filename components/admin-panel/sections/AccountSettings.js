@@ -27,7 +27,7 @@ const AccountSettings = ({ account }) => {
     skip: !LoggedInUser,
   });
   const collective = data?.Collective;
-  const [editCollective, { data: mutateData }] = useMutation(editCollectiveMutation);
+  const [editCollective] = useMutation(editCollectiveMutation);
 
   const handleEditCollective = async updatedCollective => {
     const collective = { ...updatedCollective };
@@ -97,8 +97,8 @@ const AccountSettings = ({ account }) => {
     CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long', 'country']);
     setState({ ...state, status: 'loading' });
     try {
-      await editCollective({ variables: { collective: CollectiveInputType } });
-      const updatedCollective = mutateData.editCollective;
+      const response = await editCollective({ variables: { collective: CollectiveInputType } });
+      const updatedCollective = response.data.editCollective;
       setState({ ...state, status: 'saved', result: { error: null } });
       const currentSlug = router.query.slug;
       if (currentSlug !== updatedCollective.slug) {
@@ -119,7 +119,9 @@ const AccountSettings = ({ account }) => {
         message: <FormattedMessage id="Settings.Updated" defaultMessage="Settings updated." />,
       });
     } catch (err) {
-      const errorMsg = getErrorFromGraphqlException(err).message;
+      const errorMsg = getErrorFromGraphqlException(err)?.message || (
+        <FormattedMessage id="Settings.Updated.Fail" defaultMessage="Update failed." />
+      );
       addToast({
         type: TOAST_TYPE.ERROR,
         message: errorMsg,

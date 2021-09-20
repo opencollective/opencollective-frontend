@@ -18,6 +18,7 @@ const MenuLinkContainer = styled.li`
     font-weight: 500;
     font-size: 13px;
     line-height: 16px;
+    line-height: 22px;
     padding: 4px 12px;
     border-radius: 100px;
     cursor: pointer;
@@ -32,7 +33,6 @@ const MenuLinkContainer = styled.li`
         color: ${props => props.theme.colors.primary[700]};
         font-weight: 700;
         font-size: 15px;
-        line-height: 22px;
       `}
     ${props =>
       props.isStrong &&
@@ -44,22 +44,14 @@ const MenuLinkContainer = styled.li`
   }
 `;
 
-export const MenuLink = ({
-  collective,
-  section,
-  selectedSection,
-  children,
-  onClick,
-  isSelected,
-  isStrong,
-  if: conditional,
-}) => {
+export const MenuLink = ({ collective, section, children, onClick, isSelected, isStrong, if: conditional }) => {
   const router = useRouter();
   const { formatMessage } = useIntl();
   if (conditional === false) {
     return null;
   }
 
+  const selectedSection = router.query?.section;
   const href = `${collective?.slug}/admin/${section}`;
   const handleClick = e => {
     e.preventDefault();
@@ -149,7 +141,7 @@ export const MenuContainer = styled.ul`
 
 export const MenuGroup = ({ if: conditional, children, ...props }) => {
   return conditional === false ? null : (
-    <Box as="li" {...props}>
+    <Box as="ul" {...props}>
       {children}
     </Box>
   );
@@ -164,14 +156,12 @@ export const useSubmenu = () => {
   const [submenuContent, setSubmenu] = React.useState();
   const menuContent = submenuContent && (
     <React.Fragment>
-      <li>
-        <ul>
-          <MenuLink onClick={() => setSubmenu(undefined)}>
-            <span>&larr; Back</span>
-          </MenuLink>
-        </ul>
-        {submenuContent}
-      </li>
+      <ul>
+        <MenuLink onClick={() => setSubmenu(undefined)}>
+          <span>&larr; Back</span>
+        </MenuLink>
+      </ul>
+      {submenuContent}
     </React.Fragment>
   );
   const SubMenu = ({ label, children, if: conditional }) => {

@@ -21,7 +21,7 @@ const isType = (c, collectiveType) => c.type === collectiveType;
 const isOneOfTypes = (c, collectiveTypes) => collectiveTypes.includes(c.type);
 const isHost = c => c.isHost === true;
 
-const Menu = ({ collective, selectedSection }) => {
+const Menu = ({ collective }) => {
   const { menuContent, SubMenu } = useSubmenu();
 
   if (menuContent) {
@@ -33,22 +33,10 @@ const Menu = ({ collective, selectedSection }) => {
           <MenuSectionHeader>
             <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
           </MenuSectionHeader>
-          <MenuLink collective={collective} section={HOST_SECTIONS.EXPENSES} selectedSection={selectedSection} />
-          <MenuLink
-            collective={collective}
-            section={HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS}
-            selectedSection={selectedSection}
-          />
-          <MenuLink
-            collective={collective}
-            section={HOST_SECTIONS.PENDING_APPLICATIONS}
-            selectedSection={selectedSection}
-          />
-          <MenuLink
-            collective={collective}
-            section={HOST_SECTIONS.HOSTED_COLLECTIVES}
-            selectedSection={selectedSection}
-          />
+          <MenuLink collective={collective} section={HOST_SECTIONS.EXPENSES} />
+          <MenuLink collective={collective} section={HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS} />
+          <MenuLink collective={collective} section={HOST_SECTIONS.PENDING_APPLICATIONS} />
+          <MenuLink collective={collective} section={HOST_SECTIONS.HOSTED_COLLECTIVES} />
         </MenuGroup>
         <MenuGroup if={isHost(collective) || isType(collective, ORGANIZATION)}>
           <MenuSectionHeader>
@@ -56,7 +44,7 @@ const Menu = ({ collective, selectedSection }) => {
           </MenuSectionHeader>
           <SubMenu
             label={<FormattedMessage id="AdminPanel.OrganizationSettings" defaultMessage="Organization Settings" />}
-            if={isType(collective, ORGANIZATION)}
+            if={isType(collective, ORGANIZATION) || isHost(collective)}
           >
             <MenuLink collective={collective} section={ABOUT_ORG_SECTIONS.INFO} />
             <MenuLink collective={collective} section={ABOUT_ORG_SECTIONS.COLLECTIVE_PAGE} />
@@ -76,7 +64,7 @@ const Menu = ({ collective, selectedSection }) => {
           </SubMenu>
           <SubMenu
             label={<FormattedMessage id="AdminPanel.FiscalHostSettings" defaultMessage="Fiscal Host Settings" />}
-            if={isType(collective, ORGANIZATION) || (isType(collective, USER) && isHost(collective))}
+            if={isHost(collective) || (isType(collective, USER) && isHost(collective))}
           >
             <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.FISCAL_HOSTING} />
             <MenuGroup if={isHost(collective)}>
@@ -188,7 +176,6 @@ const Menu = ({ collective, selectedSection }) => {
 };
 
 Menu.propTypes = {
-  selectedSection: PropTypes.string,
   collective: PropTypes.shape({
     slug: PropTypes.string,
     name: PropTypes.string,

@@ -75,11 +75,14 @@ const AdminPanelPage = ({ router }) => {
   const { slug } = router.query;
   const intl = useIntl();
   const { LoggedInUser } = useUser();
-  const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
+  const { data, loading } = useQuery(adminPanelQuery, {
+    context: API_V2_CONTEXT,
+    variables: { slug },
+  });
   const section = router.query.section || 'info';
   const account = data?.account;
 
-  const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(account);
+  const canEditCollective = LoggedInUser?.canEditCollective(account);
   const notification = {};
   if (account?.isArchived && account?.type === 'USER') {
     notification.title = intl.formatMessage(messages['user.isArchived']);
