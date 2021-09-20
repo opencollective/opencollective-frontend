@@ -796,6 +796,7 @@
   "Error.FieldCheckRequired": "This must be checked",
   "Error.FieldRequired": "This field is required",
   "error.goBack": "Go back to the previous page",
+  "Error.LegalNameNotMatchBankAccountName": "The legal name should match the bank account holder name",
   "error.name.invalid": "Name is required",
   "Error.Network": "S'ha produït un error en la xarxa. Intenteu-ho més tard",
   "error.reload": "Torna a carregar la pàgina",

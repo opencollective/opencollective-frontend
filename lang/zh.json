@@ -796,6 +796,7 @@
   "Error.FieldCheckRequired": "This must be checked",
   "Error.FieldRequired": "此字段是必填项",
   "error.goBack": "返回到上一页",
+  "Error.LegalNameNotMatchBankAccountName": "The legal name should match the bank account holder name",
   "error.name.invalid": "Name is required",
   "Error.Network": "出现网络错误，请重试",
   "error.reload": "重载页面",

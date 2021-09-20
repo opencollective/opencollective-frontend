@@ -796,6 +796,7 @@
   "Error.FieldCheckRequired": "Це необхідно перевірити",
   "Error.FieldRequired": "Це поле обов'язкове",
   "error.goBack": "Повернутися на попередню сторінку",
+  "Error.LegalNameNotMatchBankAccountName": "The legal name should match the bank account holder name",
   "error.name.invalid": "Ім’я обовʼязкове",
   "Error.Network": "Сталася помилка мережі, спробуйте ще раз",
   "error.reload": "Перезавантажити сторінку",

@@ -229,29 +229,35 @@ const ExpenseFormPayeeStep = ({
             )}
           </Field>
           {values.payee?.legalName && (
-            <StyledInputField
-              label={
-                <React.Fragment>
-                  <FormattedMessage id="LegalName" defaultMessage="Legal Name" />
-                  &nbsp;
-                  <StyledTooltip
-                    content={() => (
-                      <FormattedMessage
-                        id="ExpenseForm.legalName.tooltip"
-                        defaultMessage="The legal name of the payee. This can be changed in your profile settings."
-                      />
-                    )}
-                  >
-                    <InfoCircle size={16} />
-                  </StyledTooltip>
-                </React.Fragment>
-              }
-              labelFontSize="13px"
-              flex="1"
-              mt={3}
-            >
-              <StyledInput value={values.payee.legalName} disabled />
-            </StyledInputField>
+            <Field name="legalName">
+              {({ field }) => (
+                <StyledInputField
+                  name={field.name}
+                  label={
+                    <React.Fragment>
+                      <FormattedMessage id="LegalName" defaultMessage="Legal Name" />
+                      &nbsp;
+                      <StyledTooltip
+                        content={() => (
+                          <FormattedMessage
+                            id="ExpenseForm.legalName.tooltip"
+                            defaultMessage="The legal name of the payee. This can be changed in your profile settings."
+                          />
+                        )}
+                      >
+                        <InfoCircle size={16} />
+                      </StyledTooltip>
+                    </React.Fragment>
+                  }
+                  labelFontSize="13px"
+                  flex="1"
+                  mt={3}
+                  error={formatFormErrorMessage(intl, errors.payoutMethod?.legalName)}
+                >
+                  {({ error }) => <StyledInput value={values.payee.legalName} disabled error={error} />}
+                </StyledInputField>
+              )}
+            </Field>
           )}
           {requiresAddress && (
             <Fragment>

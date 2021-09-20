@@ -796,6 +796,7 @@
   "Error.FieldCheckRequired": "This must be checked",
   "Error.FieldRequired": "This field is required",
   "error.goBack": "Go back to the previous page",
+  "Error.LegalNameNotMatchBankAccountName": "The legal name should match the bank account holder name",
   "error.name.invalid": "Name is required",
   "Error.Network": "A network error occured, please try again",
   "error.reload": "Znovu načíst stránku",

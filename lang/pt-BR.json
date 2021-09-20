@@ -796,6 +796,7 @@
   "Error.FieldCheckRequired": "Isso deve ser verificado",
   "Error.FieldRequired": "Este campo é obrigatório",
   "error.goBack": "Voltar à página anterior",
+  "Error.LegalNameNotMatchBankAccountName": "The legal name should match the bank account holder name",
   "error.name.invalid": "O nome é obrigatório",
   "Error.Network": "Ocorreu um erro de rede, por favor, tente novamente",
   "error.reload": "Recarregue a página",

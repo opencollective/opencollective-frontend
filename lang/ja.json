@@ -796,6 +796,7 @@
   "Error.FieldCheckRequired": "This must be checked",
   "Error.FieldRequired": "このフィールドは入力必須です",
   "error.goBack": "Go back to the previous page",
+  "Error.LegalNameNotMatchBankAccountName": "The legal name should match the bank account holder name",
   "error.name.invalid": "名前が必須です",
   "Error.Network": "A network error occured, please try again",
   "error.reload": "ページをリロード",
