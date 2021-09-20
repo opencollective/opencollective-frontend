@@ -4,7 +4,7 @@ import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { displayPayeeNameWithLegalName } from '../../lib/collective.lib';
+import { concatenateDisplayNameWithLegalName } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -93,7 +93,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             )}
             <Flex flexDirection="column" ml={2} css={{ overflow: 'hidden' }}>
               <Span color="black.900" fontWeight="bold" truncateOverflow>
-                {displayPayeeNameWithLegalName(payee.legalName, payee.organization?.name || payee.name)}
+                {concatenateDisplayNameWithLegalName(payee.legalName, payee.organization?.name || payee.name)}
               </Span>
               {payee.type !== CollectiveType.VENDOR && (
                 <Span color="black.900" fontSize="11px" truncateOverflow>
@@ -164,13 +164,13 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
               <Avatar collective={host} radius={24} />
               <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
                 {collective && (collective.isApproved || collective.id === host.id) ? (
-                  displayPayeeNameWithLegalName(host.legalName, host.name)
+                  concatenateDisplayNameWithLegalName(host.legalName, host.name)
                 ) : (
                   <FormattedMessage
                     id="Fiscalhost.pending"
                     defaultMessage="{host} (pending)"
                     values={{
-                      host: displayPayeeNameWithLegalName(host.legalName, host.name),
+                      host: concatenateDisplayNameWithLegalName(host.legalName, host.name),
                     }}
                   />
                 )}
