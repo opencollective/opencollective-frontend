@@ -57,19 +57,19 @@ const Square = styled(Container)`
 const transactionsOverviewQuery = gqlV2/* GraphQL */ `
   query TransactionsOverviewQuery(
     $hostSlug: String!
-    $accounts: [AccountReferenceInput!]
-    $dateFrom: String
-    $dateTo: String
+    $account: [AccountReferenceInput!]
+    $dateFrom: DateTime
+    $dateTo: DateTime
   ) {
     host(slug: $hostSlug) {
       id
-      contributionStats(accounts: $accounts, from: $dateFrom, to: $dateTo) {
+      contributionStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
         numContributions
         numOneTime
         numRecurring
         dailyAvgIncome
       }
-      expenseStats(accounts: $accounts, from: $dateFrom, to: $dateTo) {
+      expenseStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
         numExpenses
         dailyAverage
         numInvoices
@@ -86,7 +86,7 @@ const TransactionsOverviewSection = ({ hostSlug, currency }) => {
   const [collectives, setCollectives] = useState(null);
 
   const { data, loading, refetch } = useQuery(transactionsOverviewQuery, {
-    variables: { hostSlug, dateFrom, dateTo, accounts: collectives },
+    variables: { hostSlug, dateFrom, dateTo, account: collectives },
     context: API_V2_CONTEXT,
   });
   const contributionStats = data?.host.contributionStats;
