@@ -5065,33 +5065,33 @@ type Host implements Account & AccountWithContributions {
     """
     A collection of accounts for which the contribution stats should be returned.
     """
-    accounts: [AccountReferenceInput!]
+    account: [AccountReferenceInput!]
 
     """
     Inferior date limit in which we're calculating the contribution stats
     """
-    from: String
+    dateFrom: DateTime
 
     """
     Superior date limit in which we're calculating the contribution stats
     """
-    to: String
+    dateTo: DateTime
   ): ContributionStats!
   expenseStats(
     """
     A collection of accounts for which the expense stats should be returned.
     """
-    accounts: [AccountReferenceInput!]
+    account: [AccountReferenceInput!]
 
     """
     Inferior date limit in which we're calculating the expense stats
     """
-    from: String
+    dateFrom: DateTime
 
     """
     Superior date limit in which we're calculating the expense stats
     """
-    to: String
+    dateTo: DateTime
   ): ExpenseStats!
 }
 
