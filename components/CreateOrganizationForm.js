@@ -5,6 +5,7 @@ import { trim } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import slugify from 'slugify';
+import { isURL } from 'validator';
 
 import { BackButton } from './create-collective/CreateCollectiveForm';
 import OnboardingProfileCard from './onboarding-modal/OnboardingProfileCard';
@@ -101,11 +102,15 @@ const CreateOrganizationForm = props => {
     if (values.description.length > 150) {
       errors.description = intl.formatMessage(orgMessages.errorDescription);
     }
-    const regexExp = /[-a-zA-Z0-9@:%._/+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_/+.~#?&//=]*)?/gi;
 
-    if ((values.website && !values.website.match(new RegExp(regexExp))) || values.website.startsWith('http')) {
-      errors.website = intl.formatMessage(orgMessages.errorWebsite);
+    if (values.website) {
+      // Prepend https:// before validation if the URL doesn't start with a protocol
+      const websiteUrl = values.website.match(/^\w+:\/\/.*/) ? values.website : `https://${values.website}`;
+      if (!isURL(websiteUrl)) {
+        errors.website = intl.formatMessage(orgMessages.errorWebsite);
+      }
     }
+
     return errors;
   };
   const submit = values => {
