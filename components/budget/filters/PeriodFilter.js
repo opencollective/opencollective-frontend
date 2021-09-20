@@ -169,13 +169,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
     >
       {({ setOpen }) => (
         <Box mx="8px" my="16px" width="190px">
-          <StyledInputField
-            data-cy="download-csv-start-date"
-            label="Start Date"
-            name="dateFrom"
-            mt="12px"
-            labelFontSize="13px"
-          >
+          <StyledInputField label="Start Date" name="dateFrom" mt="12px" labelFontSize="13px">
             {inputProps => (
               <StyledInput
                 {...inputProps}
@@ -190,13 +184,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
               />
             )}
           </StyledInputField>
-          <StyledInputField
-            data-cy="download-csv-end-date"
-            label="End Date"
-            name="dateTo"
-            mt="12px"
-            labelFontSize="13px"
-          >
+          <StyledInputField label="End Date" name="dateTo" mt="12px" labelFontSize="13px">
             {inputProps => (
               <StyledInput
                 {...inputProps}
