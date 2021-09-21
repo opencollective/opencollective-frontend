@@ -2887,7 +2887,17 @@ type Credit implements Transaction {
   group: String!
   type: TransactionType!
   kind: TransactionKind
-  description: String
+  description(
+    """
+    Wether to generate the description dynamically.
+    """
+    dynamic: Boolean = false
+
+    """
+    Wether to generate the full description when using dynamic.
+    """
+    full: Boolean = false
+  ): String
   amount: Amount!
   amountInHostCurrency: Amount!
   netAmount(
@@ -3172,7 +3182,17 @@ type Debit implements Transaction {
   group: String!
   type: TransactionType!
   kind: TransactionKind
-  description: String
+  description(
+    """
+    Wether to generate the description dynamically.
+    """
+    dynamic: Boolean = false
+
+    """
+    Wether to generate the full description when using dynamic.
+    """
+    full: Boolean = false
+  ): String
   amount: Amount!
   amountInHostCurrency: Amount!
   netAmount(
@@ -8652,7 +8672,17 @@ interface Transaction {
   group: String!
   type: TransactionType!
   kind: TransactionKind
-  description: String
+  description(
+    """
+    Wether to generate the description dynamically.
+    """
+    dynamic: Boolean = false
+
+    """
+    Wether to generate the full description when using dynamic.
+    """
+    full: Boolean = false
+  ): String
   amount: Amount!
   amountInHostCurrency: Amount!
   netAmount(

@@ -68,13 +68,13 @@ const transactionsOverviewQuery = gqlV2/* GraphQL */ `
         oneTimeContributionsCount
         recurringContributionsCount
         dailyAverageIncomeAmount {
-          value
+          valueInCents
         }
       }
       expenseStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
         expensesCount
         dailyAverageAmount {
-          value
+          valueInCents
         }
         invoicesCount
         reimbursementsCount
@@ -188,7 +188,7 @@ const TransactionsOverviewSection = ({ hostSlug, currency }) => {
                 </Span>{' '}
                 | <FormattedMessage id="DailyAverage" defaultMessage="Daily avg" />
                 {': '}
-                <Span fontWeight="700">{formatCurrency(dailyAverageIncomeAmount.value, currency)}</Span>
+                <Span fontWeight="700">{formatCurrency(dailyAverageIncomeAmount.valueInCents, currency)}</Span>
               </P>
             </TotalFundsLabel>
             <TotalFundsLabel
@@ -203,7 +203,7 @@ const TransactionsOverviewSection = ({ hostSlug, currency }) => {
                 </Span>{' '}
                 | <FormattedMessage id="DailyAverage" defaultMessage="Daily avg" />
                 {': '}
-                <Span fontWeight="700">{formatCurrency(dailyAverageAmount.value, currency)}</Span>
+                <Span fontWeight="700">{formatCurrency(dailyAverageAmount.valueInCents, currency)}</Span>
               </P>
             </TotalFundsLabel>
           </FundAmounts>
