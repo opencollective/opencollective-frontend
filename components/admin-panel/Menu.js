@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
+import { getCollectiveTypeKey } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import { HOST_SECTIONS } from '../host-dashboard/constants';
@@ -17,8 +18,8 @@ import {
 import { MenuGroup, MenuLink, MenuSectionHeader, useSubmenu } from './MenuComponents';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
-const isType = (c, collectiveType) => c.type === collectiveType;
-const isOneOfTypes = (c, collectiveTypes) => collectiveTypes.includes(c.type);
+const isType = (c, collectiveType) => getCollectiveTypeKey(c.type) === collectiveType;
+const isOneOfTypes = (c, collectiveTypes) => collectiveTypes.includes(getCollectiveTypeKey(c.type));
 const isHost = c => c.isHost === true;
 
 const Menu = ({ collective }) => {
@@ -101,11 +102,7 @@ const Menu = ({ collective }) => {
             <FormattedMessage id="AdminPanel.CollectiveSettings" defaultMessage="Collective Settings" />
           </MenuSectionHeader>
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.INFO} />
-          <MenuLink
-            collective={collective}
-            section={COLLECTIVE_SECTIONS.COLLECTIVE_PAGE}
-            if={isOneOfTypes(collective, [COLLECTIVE, FUND])}
-          />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.COLLECTIVE_PAGE} />
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.COLLECTIVE_GOALS}
@@ -163,12 +160,12 @@ const Menu = ({ collective }) => {
             section={COLLECTIVE_SECTIONS.WEBHOOKS}
             if={isOneOfTypes(collective, [COLLECTIVE, USER, EVENT])}
           />
-          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ADVANCED} />
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH}
             if={isType(collective, USER)}
           />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ADVANCED} />
         </MenuGroup>
       </React.Fragment>
     );
