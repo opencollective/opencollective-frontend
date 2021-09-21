@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import PeriodFilter from '../../budget/filters/PeriodFilter';
+import PeriodFilter, { encodePeriod, getDateRangeFromPeriod } from '../../budget/filters/PeriodFilter';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import { Flex } from '../../Grid';
@@ -63,6 +63,8 @@ const transactionsOverviewQuery = gqlV2/* GraphQL */ `
   ) {
     host(slug: $hostSlug) {
       id
+      legacyId
+      currency
       contributionStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
         contributionsCount
         oneTimeContributionsCount
@@ -84,7 +86,7 @@ const transactionsOverviewQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const TransactionsOverviewSection = ({ hostSlug, currency }) => {
+const TransactionsOverviewSection = ({ hostSlug }) => {
   const [dateFrom, setDateFrom] = useState(null);
   const [dateTo, setDateTo] = useState(null);
   const [collectives, setCollectives] = useState(null);
@@ -93,10 +95,16 @@ const TransactionsOverviewSection = ({ hostSlug, currency }) => {
     variables: { hostSlug, dateFrom, dateTo, account: collectives },
     context: API_V2_CONTEXT,
   });
-  const contributionStats = data?.host.contributionStats;
-  const expenseStats = data?.host.expenseStats;
+  const host = data?.host;
+  const currency = host?.currency;
+  const contributionStats = host?.contributionStats;
+  const expenseStats = host?.expenseStats;
 
   useEffect(() => {
+    // Prevent running the effect on initial mount
+    if (!dateFrom && !dateTo && !collectives) {
+      return;
+    }
     refetch();
   }, [dateFrom, dateTo, collectives]);
 
@@ -104,45 +112,10 @@ const TransactionsOverviewSection = ({ hostSlug, currency }) => {
     contributionStats || 0;
   const { expensesCount, invoicesCount, reimbursementsCount, grantsCount, dailyAverageAmount } = expenseStats || 0;
 
-  const setDate = dateRange => {
-    if (!dateRange) {
-      setDateFrom(null);
-      setDateTo(null);
-      refetch();
-      return;
-    }
-    const dates = dateRange.split('→');
-    const dateFrom = dates[0];
-    const dateTo = dates[1];
-    if (dateFrom === 'all') {
-      setDateFrom(null);
-    } else {
-      setDateFrom(new Date(dateFrom));
-    }
-    if (dateTo === 'all') {
-      setDateTo(null);
-    } else {
-      setDateTo(new Date(dateTo));
-    }
-  };
-
-  const getDateString = () => {
-    let dateString;
-    if (!dateFrom && !dateTo) {
-      return;
-    }
-    if (dateFrom) {
-      dateString = `${dateFrom}→`;
-    } else {
-      dateString = 'all→';
-    }
-
-    if (dateTo) {
-      dateString += dateTo;
-    } else {
-      dateString += 'all';
-    }
-    return dateString;
+  const setDate = period => {
+    const [dateFrom, dateTo] = getDateRangeFromPeriod(period);
+    setDateFrom(dateFrom || null);
+    setDateTo(dateTo || null);
   };
 
   const setCollectiveFilter = collectives => {
@@ -161,7 +134,10 @@ const TransactionsOverviewSection = ({ hostSlug, currency }) => {
           <FilterLabel htmlFor="transactions-period-filter">
             <FormattedMessage id="TransactionsOverviewSection.PeriodFilter" defaultMessage="Filter by Date" />
           </FilterLabel>
-          <PeriodFilter onChange={value => setDate(value)} value={getDateString()} />
+          <PeriodFilter
+            onChange={value => setDate(value)}
+            value={encodePeriod({ dateInterval: { from: dateFrom, to: dateTo } })}
+          />
         </Container>
         <Container width={[1, 1, 1 / 2]}>
           <FilterLabel htmlFor="transactions-collective-filter">
@@ -172,6 +148,7 @@ const TransactionsOverviewSection = ({ hostSlug, currency }) => {
             data-cy="transactions-collective-filter"
             types={['COLLECTIVE']}
             isMulti
+            hostCollectiveIds={[host?.legacyId]}
             onChange={value => setCollectiveFilter(value)}
           />
         </Container>
