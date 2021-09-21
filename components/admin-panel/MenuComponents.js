@@ -32,7 +32,7 @@ const MenuLinkContainer = styled.li`
         background: ${props => props.theme.colors.primary[50]};
         color: ${props => props.theme.colors.primary[700]};
         font-weight: 700;
-        font-size: 15px;
+        font-size: 14px;
       `}
     ${props =>
       props.isStrong &&
