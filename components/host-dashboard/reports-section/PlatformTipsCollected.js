@@ -106,8 +106,7 @@ const PlatformTipsCollected = ({ hostSlug }) => {
       <P fontSize="12px" lineHeight="18px" color="black.700">
         <FormattedMessage
           id="Host.PlatformTip.description"
-          defaultMessage="Tips for Open Collective collected from contributions to your collectives, they are deposited along with
-the transaction to your organization's bank account, and we claim them at the end of each month with an expense."
+          defaultMessage="Tips for Open Collective are collected from contributions to your collectives. They are deposited along with the transaction to your organization's bank account, and we claim them at the end of each month with an expense."
         />
       </P>
     </Container>
