@@ -55,7 +55,7 @@ export const getDateRangeFromPeriod = strValue => {
  * Opposite of `getDateRangeFromPeriod`: takes an object like {dateFrom, dateTo} and returns a string
  * like "dateFrom→dateTo".
  */
-const encodePeriod = dateInterval => {
+export const encodePeriod = dateInterval => {
   const stringifyDate = date => (!date ? 'all' : date);
   if (!dateInterval.from && !dateInterval.to) {
     return '';
