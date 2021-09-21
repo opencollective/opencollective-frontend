@@ -63,6 +63,7 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => (
                     TOSLink: getI18nLink({
                       href: 'https://docs.opencollective.foundation/about/our-terms-and-conditions',
                       openInNewTabNoFollow: true,
+                      onClick: e => e.stopPropagation(), // don't check the checkbox when clicking on the link
                     }),
                   }}
                 />

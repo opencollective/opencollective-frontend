@@ -574,6 +574,7 @@ const ApplicationForm = ({
                                         TOSLink: getI18nLink({
                                           href: '/tos',
                                           openInNewTab: true,
+                                          onClick: e => e.stopPropagation(), // don't check the checkbox when clicking on the link
                                         }),
                                       }}
                                     />
