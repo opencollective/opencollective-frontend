@@ -549,11 +549,11 @@ class EditCollectiveForm extends React.Component {
 
       // 2FA
       case EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH:
-        return <UserTwoFactorAuth slug={collective.slug} userEmail={LoggedInUser.email} />;
+        return <UserTwoFactorAuth slug={collective.slug} userEmail={LoggedInUser.email} contentOnly={contentOnly} />;
 
       // Payment Receipts
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS:
-        return <PaymentReceipts collective={collective} />;
+        return <PaymentReceipts collective={collective} contentOnly={contentOnly} />;
 
       // Policies and moderation
       case EDIT_COLLECTIVE_SECTIONS.POLICIES:
