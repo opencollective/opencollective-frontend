@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { isPastEvent } from '../lib/events';
+import { getSettingsRoute } from '../lib/url-helpers';
 
 import Avatar from './Avatar';
 import { Box, Flex } from './Grid';
@@ -60,7 +61,7 @@ const MembershipLine = ({ user, membership }) => {
       {Boolean(user?.canEditCollective(membership.collective)) && (
         <StyledLink
           as={Link}
-          href={`/${membership.collective.slug}/edit`}
+          href={getSettingsRoute(membership.collective, user)}
           ml={1}
           color="black.500"
           title={intl.formatMessage(messages.settings)}
