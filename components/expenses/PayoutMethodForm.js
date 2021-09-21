@@ -53,7 +53,11 @@ export const validatePayoutMethod = (payoutMethod, legalName) => {
     if (!payoutMethod.data.accountHolderName) {
       set(errors, 'data.accountHolderName', createError(ERROR.FORM_FIELD_REQUIRED));
     }
-    if (!compareNames(payoutMethod.data.accountHolderName, legalName)) {
+    if (
+      payoutMethod.data.accountHolderName &&
+      legalName &&
+      !compareNames(payoutMethod.data.accountHolderName, legalName)
+    ) {
       set(errors, 'legalName', createError(ERROR.LEGAL_NAME_NOT_MATCH_BANK_ACCOUNT_NAME));
     }
   } else if (payoutMethod.type === PayoutMethodType.OTHER) {
