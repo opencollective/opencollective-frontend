@@ -5,6 +5,7 @@ import { get, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
+import { compareNames } from '../../lib/collective.lib';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
@@ -52,33 +53,8 @@ export const validatePayoutMethod = (payoutMethod, legalName) => {
     if (!payoutMethod.data.accountHolderName) {
       set(errors, 'data.accountHolderName', createError(ERROR.FORM_FIELD_REQUIRED));
     }
-    /*
-     * Validate the account holder name against the legal name. Following cases are considered a match,
-     *
-     * 1) Punctuation are ignored; "Evil Corp, Inc" and "Evil Corp, Inc." are considered a match.
-     * 2) Accents are ignored; "François" and "Francois" are considered a match.
-     * 3) The first name and last name order is ignored; "Benjamin Piouffle" and "Piouffle Benjamin" is considered a match.
-     */
-    if (payoutMethod.data.accountHolderName && legalName) {
-      const namesArray = legalName.split(' ');
-      let legalNameReversed;
-      if (namesArray.length === 2) {
-        const firstName = namesArray[0];
-        const lastName = namesArray[1];
-        legalNameReversed = `${lastName} ${firstName}`;
-      }
-      if (
-        payoutMethod.data.accountHolderName.localeCompare(legalName, undefined, {
-          sensitivity: 'base',
-          ignorePunctuation: true,
-        }) &&
-        payoutMethod.data.accountHolderName.localeCompare(legalNameReversed, undefined, {
-          sensitivity: 'base',
-          ignorePunctuation: true,
-        })
-      ) {
-        set(errors, 'legalName', createError(ERROR.LEGAL_NAME_NOT_MATCH_BANK_ACCOUNT_NAME));
-      }
+    if (!compareNames(payoutMethod.data.accountHolderName, legalName)) {
+      set(errors, 'legalName', createError(ERROR.LEGAL_NAME_NOT_MATCH_BANK_ACCOUNT_NAME));
     }
   } else if (payoutMethod.type === PayoutMethodType.OTHER) {
     const content = get(payoutMethod, 'data.content');

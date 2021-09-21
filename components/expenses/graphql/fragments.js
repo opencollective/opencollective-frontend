@@ -35,6 +35,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
           imageUrl
           type
           name
+          legalName
           isActive
           ... on AccountWithHost {
             host {
