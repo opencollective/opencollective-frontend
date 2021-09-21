@@ -20,12 +20,12 @@ import StyledSpinner from '../../StyledSpinner';
 import { P } from '../../Text';
 
 const mainReportsQuery = gqlV2/* GraphQL */ `
-  query ReportsPageQuery($hostSlug: String!, $startDate: DateTime!, $endDate: DateTime!) {
+  query ReportsPageQuery($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
     host(slug: $hostSlug) {
       id
       createdAt
       currency
-      hostMetricsTimeSeries(startDate: $startDate, endDate: $endDate, timeUnit: MONTH) {
+      hostMetricsTimeSeries(dateFrom: $dateFrom, dateTo: $dateTo, timeUnit: MONTH) {
         hostFees {
           nodes {
             date
@@ -167,8 +167,8 @@ const getActiveYearsOptions = host => {
 const getQueryVariables = (hostSlug, year) => {
   return {
     hostSlug,
-    startDate: `${year}-01-01T00:00:00Z`,
-    endDate: `${year}-12-31T23:59:59Z`,
+    dateFrom: `${year}-01-01T00:00:00Z`,
+    dateTo: `${year}-12-31T23:59:59Z`,
   };
 };
 

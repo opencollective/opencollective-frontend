@@ -66,8 +66,8 @@ const encodePeriod = dateInterval => {
 
 const DEFAULT_INTERVAL = { from: '', to: '' };
 
-const getDefaultState = value => {
-  const intervalFromValue = getDateRangeFromPeriod(value);
+const getDateRangeFromValue = value => {
+  const intervalFromValue = Array.isArray(value) ? value : getDateRangeFromPeriod(value);
   return {
     from: intervalFromValue[0] || DEFAULT_INTERVAL.from,
     to: intervalFromValue[1] || DEFAULT_INTERVAL.to,
@@ -148,14 +148,14 @@ const getNewInterval = (interval, changeField, newValue) => {
 };
 
 const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
-  const [dateInterval, setDateInterval] = React.useState(() => getDefaultState(value));
+  const [dateInterval, setDateInterval] = React.useState(getDateRangeFromValue(value));
   const formattedMin = stripTime(minDate);
   const setDate = (changeField, date) => setDateInterval(getNewInterval(dateInterval, changeField, date));
 
   return (
     <PopupMenu
       placement="bottom-end"
-      onClose={() => setDateInterval(getDefaultState(value))}
+      onClose={() => setDateInterval(getDateRangeFromValue(value))}
       Button={({ onClick }) => (
         <TriggerContainer onClick={onClick} id={inputId} data-cy="period-filter" {...props}>
           <Flex justifyContent="space-between" alignItems="center">
@@ -243,7 +243,8 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
 
 PeriodFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
+  /** The value, either as a string with the `dateFrom→dateTo` format or an array like [dateFromIsoStr, dateToIsoStr] */
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   inputId: PropTypes.string,
   minDate: PropTypes.string,
 };

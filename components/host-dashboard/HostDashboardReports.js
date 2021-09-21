@@ -17,10 +17,11 @@ import StyledTooltip from '../StyledTooltip';
 import { H1, H2 } from '../Text';
 
 import HostFeesSection from './reports-section/HostFeesSection';
+import PlatformTipsCollected from './reports-section/PlatformTipsCollected';
 import TotalMoneyManagedSection from './reports-section/TotalMoneyManagedSection';
 
-const mainReportsQuery = gqlV2/* GraphQL */ `
-  query ReportsPageQuery($hostSlug: String!) {
+const hostReportPageQuery = gqlV2/* GraphQL */ `
+  query HostReportsPage($hostSlug: String!) {
     host(slug: $hostSlug) {
       id
       legacyId
@@ -87,7 +88,7 @@ SectionTitle.propTypes = {
 };
 
 const HostDashboardReports = ({ hostSlug }) => {
-  const { data, loading, error } = useQuery(mainReportsQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
+  const { data, loading, error } = useQuery(hostReportPageQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
   if (loading) {
     return <Loading />;
   } else if (error) {
@@ -138,6 +139,9 @@ const HostDashboardReports = ({ hostSlug }) => {
           </SectionTitle>
           <StyledCard height={200} />
         </Container>
+        <Box mb={4}>
+          <PlatformTipsCollected hostSlug={hostSlug} />
+        </Box>
         <Container>
           <SectionTitle>
             <FormattedMessage id="Downloads" defaultMessage="Downloads" />
