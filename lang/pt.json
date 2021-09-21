@@ -2126,7 +2126,7 @@
   "VirtualCards.CollectiveFilter.AllCollectives": "All Collectives",
   "VirtualCards.CollectiveFilter.SpecificCollectives": "Specific Collective(s)",
   "VirtualCards.CVV": "CVV",
-  "VirtualCards.Description": "Use a virtual card to spend your collective's budget. You can request multiple ones. You Fiscal Host will create them for you and assign a limit and a merchant to them. <learnMoreLink>Learn more</learnMoreLink>",
+  "VirtualCards.Description": "Use a virtual card to spend from your collective's budget. You can request multiple cards (review the host's policy to see how many). Your fiscal host will create the card for you and assign it a limit and a merchant. You will be notified by email once the card is assigned. <learnMoreLink>Learn more</learnMoreLink>",
   "VirtualCards.DisplayDetails": "View Card Details",
   "VirtualCards.EditCardDetails": "Edit Card Details",
   "VirtualCards.ExpireDate": "MM/YYYY",
