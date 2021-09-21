@@ -72,7 +72,7 @@ const PlatformTipsCollected = ({ hostSlug }) => {
             <LoadingPlaceholder height={26} maxWidth={200} />
           </Flex>
         ) : (
-          <P fontSize="14px" color="black.700">
+          <P fontSize="14px" color="black.700" textTransform="capitalize">
             <FormattedMessage
               id="AmountCollected"
               defaultMessage="{amount} collected"
