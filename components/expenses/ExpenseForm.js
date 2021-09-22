@@ -151,7 +151,7 @@ const validate = expense => {
     // CHARGE expenses have VirtualCard and do not have PayoutMethod
     isCardCharge
   ) {
-    const payoutMethodErrors = validatePayoutMethod(expense.payoutMethod);
+    const payoutMethodErrors = validatePayoutMethod(expense.payoutMethod, expense.payee?.legalName);
     if (!isEmpty(payoutMethodErrors)) {
       errors.payoutMethod = payoutMethodErrors;
     }
@@ -335,7 +335,8 @@ const ExpenseFormBody = ({
         loggedInAccount={loggedInAccount}
         onNext={() => {
           const shouldSkipValidation = isOnBehalf && isEmpty(values.payoutMethod);
-          const validation = !shouldSkipValidation && validatePayoutMethod(values.payoutMethod);
+          const validation =
+            !shouldSkipValidation && validatePayoutMethod(values.payoutMethod, values.payee?.legalName);
           if (isEmpty(validation)) {
             setStep(STEPS.EXPENSE);
           } else {

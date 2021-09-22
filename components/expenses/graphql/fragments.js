@@ -9,6 +9,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
     imageUrl
     type
     name
+    legalName
     location {
       address
       country
@@ -34,6 +35,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
           imageUrl
           type
           name
+          legalName
           isActive
           ... on AccountWithHost {
             host {
@@ -67,6 +69,7 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
   fragment ExpenseHostFields on Host {
     id
     name
+    legalName
     slug
     type
     currency
@@ -126,6 +129,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       id
       slug
       name
+      legalName
       type
       isAdmin
       location {

@@ -5,6 +5,7 @@ import { get, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
+import { compareNames } from '../../lib/collective.lib';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
@@ -33,7 +34,7 @@ const msg = defineMessages({
 });
 
 /** Use this function to validate the payout method */
-export const validatePayoutMethod = payoutMethod => {
+export const validatePayoutMethod = (payoutMethod, legalName) => {
   const errors = {};
 
   if (!payoutMethod || !payoutMethod.type) {
@@ -51,6 +52,13 @@ export const validatePayoutMethod = payoutMethod => {
     }
     if (!payoutMethod.data.accountHolderName) {
       set(errors, 'data.accountHolderName', createError(ERROR.FORM_FIELD_REQUIRED));
+    }
+    if (
+      payoutMethod.data.accountHolderName &&
+      legalName &&
+      !compareNames(payoutMethod.data.accountHolderName, legalName)
+    ) {
+      set(errors, 'legalName', createError(ERROR.LEGAL_NAME_NOT_MATCH_BANK_ACCOUNT_NAME));
     }
   } else if (payoutMethod.type === PayoutMethodType.OTHER) {
     const content = get(payoutMethod, 'data.content');
