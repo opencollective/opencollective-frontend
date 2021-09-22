@@ -272,7 +272,7 @@
   "collective.edit.backToProfile": "ver página {type}",
   "collective.edit.host.findHost.description": "You won't need to hold funds or set up a legal entity and bank account for your project. The Fiscal Host will take care of accounting, invoices, taxes, admin, payments, and liability. Most hosts charge a fee for this service (which you can review before choosing a Host).",
   "collective.edit.host.findHost.title": "Aplicar para un sponsor fiscal existente",
-  "collective.edit.host.legalName.info": "Please set the legal name of the host in the Info section under <SettingsLink>your settings</SettingsLink>. This is required if your legal name is different than your display name for tax and accounting purposes.",
+  "collective.edit.host.legalName.info": "Please set the legal name {isSelfHosted, select, false {of the host} other {}} in the Info section of <SettingsLink>the settings</SettingsLink>. This is required if the legal name is different than the display name for tax and accounting purposes.",
   "collective.edit.host.noHost.description": "No puedes recibir contribuciones económicas si usar las características de presupuesto. Aún así, puedes editar la página de tu perfil, enviar gastos para ser pagados luego y publicar actualizaciones.",
   "collective.edit.host.noHost.title": "Nadie",
   "collective.edit.host.selfHost.description": "Simplemente conecte una cuenta bancaria para un solo Colectivo. Serás responsable de la contabilidad, los impuestos, los pagos y las obligaciones.",

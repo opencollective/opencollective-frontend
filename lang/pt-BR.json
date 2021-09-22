@@ -272,7 +272,7 @@
   "collective.edit.backToProfile": "ver página {type}",
   "collective.edit.host.findHost.description": "Você não precisará manter fundos ou configurar uma entidade jurídica e uma conta bancária para o seu projeto. O administrador fiscal cuidará da contabilidade, faturas, impostos, administradores, pagamentos e responsabilidades. A maioria dos administradores cobram uma taxa para esse serviço (que você pode rever antes de escolher um administrador).",
   "collective.edit.host.findHost.title": "Aplicar para uma posição existende de Administrador Fiscal",
-  "collective.edit.host.legalName.info": "Please set the legal name of the host in the Info section under <SettingsLink>your settings</SettingsLink>. This is required if your legal name is different than your display name for tax and accounting purposes.",
+  "collective.edit.host.legalName.info": "Please set the legal name {isSelfHosted, select, false {of the host} other {}} in the Info section of <SettingsLink>the settings</SettingsLink>. This is required if the legal name is different than the display name for tax and accounting purposes.",
   "collective.edit.host.noHost.description": "Você não pode receber contribuições financeiras ou usar os recursos do orçamento. Você ainda pode editar a sua página de perfil, enviar despesas para serem pagas posteriormente e publicar atualizações.",
   "collective.edit.host.noHost.title": "Ninguém",
   "collective.edit.host.selfHost.description": "Basta conectar uma conta bancária para um único Coletivo. Você será responsável pela contabilidade, impostos, pagamentos e responsabilidade.",
