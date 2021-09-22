@@ -166,8 +166,7 @@ exports.REWRITES = [
 
   // New Create Collective Flow
   {
-    source:
-      '/:hostCollectiveSlug?/:verb(create)/:version(v2)?/:category(opensource|community|climate|covid-19)?/:step(form)?',
+    source: '/:hostCollectiveSlug?/:verb(create)/:version(v2)?/:category(opensource|community|climate)?/:step(form)?',
     destination: '/create-collective',
   },
   // Events and Projects using collective page
