@@ -15,6 +15,7 @@ import { Span } from '../../Text';
 export const getDefaultKinds = () => {
   return [
     TransactionKind.ADDED_FUNDS,
+    TransactionKind.BALANCE_TRANSFER,
     TransactionKind.CONTRIBUTION,
     TransactionKind.EXPENSE,
     TransactionKind.PLATFORM_TIP,
