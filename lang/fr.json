@@ -413,6 +413,7 @@
   "CollectiveType.Collective": "{count, plural, one {Collectif} other {Collectifs}}",
   "CollectiveType.Event": "{count, plural, one {Événement} other {Événements}}",
   "CollectiveType.Organization": "{count, plural, one {Organisation} other {Organisations}}",
+  "CollectiveType.Project": "{count, plural, one {Project} other {Projects}}",
   "CollectiveType.User": "{count, plural, one {Utilisateur} other {Utilisateurs}}",
   "comment.actions": "Actions",
   "Comment.DeleteConfirmTitle": "Supprimer ce commentaire ?",

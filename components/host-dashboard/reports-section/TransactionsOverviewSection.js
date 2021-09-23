@@ -4,6 +4,7 @@ import { useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
@@ -146,7 +147,7 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
           <CollectivePickerAsync
             inputId="TransactionsCollectiveFilter"
             data-cy="transactions-collective-filter"
-            types={['COLLECTIVE']}
+            types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.PROJECT]}
             isMulti
             hostCollectiveIds={[host?.legacyId]}
             onChange={value => setCollectiveFilter(value)}

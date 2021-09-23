@@ -413,6 +413,7 @@
   "CollectiveType.Collective": "{count, plural, one {Колектив} few {Колективи} other {Колективів}}",
   "CollectiveType.Event": "{count, plural, one {Подія} few {Події} other {Подій}}",
   "CollectiveType.Organization": "{count, plural, one {Організація} few {Організації} other {Організацій}}",
+  "CollectiveType.Project": "{count, plural, one {Project} other {Projects}}",
   "CollectiveType.User": "{count, plural, one {Користувач} few {Користувачі} other {Користувачів}}",
   "comment.actions": "Дії з коментарями",
   "Comment.DeleteConfirmTitle": "Видалити цей коментар?",
