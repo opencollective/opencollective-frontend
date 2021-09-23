@@ -393,6 +393,7 @@
   "CollectiveType.Collective": "{count, plural, one {Collective} other {Collectives}}",
   "CollectiveType.Event": "{count, plural, one {Event} other {Events}}",
   "CollectiveType.Organization": "{count, plural, one {Organization} other {Organizations}}",
+  "CollectiveType.Project": "{count, plural, one {Project} other {Projects}}",
   "CollectiveType.User": "{count, plural, one {User} other {Users}}",
   "comment.actions": "Comment Actions",
   "Comment.DeleteConfirmTitle": "이 댓글을 삭제하시겠습니까?",

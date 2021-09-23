@@ -393,6 +393,7 @@
   "CollectiveType.Collective": "{count, plural, one {Коллектив} few {Коллектива} many {Коллективов} other {Коллективов}}",
   "CollectiveType.Event": "{count, plural, one {Событие} few {События} many {Событий} other {Событий}}",
   "CollectiveType.Organization": "{count, plural, one {Организация} few {Организации} many {Организаций} other {Организаций}}",
+  "CollectiveType.Project": "{count, plural, one {Project} other {Projects}}",
   "CollectiveType.User": "{count, plural, one {Пользователь} few {Пользователя} many {Пользователей} other {Пользователей}}",
   "comment.actions": "Действия",
   "Comment.DeleteConfirmTitle": "Удалить этот комментарий?",
