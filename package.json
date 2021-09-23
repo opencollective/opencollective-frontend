@@ -60,7 +60,7 @@
     "file-saver": "2.0.5",
     "focus-trap-react": "8.7.1",
     "formik": "2.2.9",
-    "glob": "7.1.7",
+    "glob": "7.2.0",
     "graphql": "15.6.0",
     "helmet": "4.6.0",
     "i18n-iso-countries": "6.8.0",
