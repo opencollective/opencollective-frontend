@@ -133,7 +133,7 @@ describe('host dashboard', () => {
       cy.get('[data-cy="section-budget"]').contains('cypress test - add funds');
       cy.visit('opencollectivehost');
       scrollToSection(Sections.TRANSACTIONS);
-      cy.get('[data-cy="section-transactions"]').contains('Financial contribution to Open Collective');
+      cy.get('[data-cy="section-transactions"]').contains('Platform Tip from BrusselsTogether ASBL');
     });
   });
 });
