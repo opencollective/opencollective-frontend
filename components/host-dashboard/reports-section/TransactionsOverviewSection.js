@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { FormattedMessage } from 'react-intl';
+import {FormattedMessage, useIntl} from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -14,6 +14,9 @@ import Container from '../../Container';
 import { Flex } from '../../Grid';
 import Loading from '../../Loading';
 import { P, Span } from '../../Text';
+import dynamic from "next/dynamic";
+import {days} from "../../../lib/utils";
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const FilterLabel = styled.label`
   font-weight: 500;
@@ -87,7 +90,75 @@ const transactionsOverviewQuery = gqlV2/* GraphQL */ `
   }
 `;
 
+const getChartOptions = (intl, startDate, endDate) => {
+  return {
+    chart: {
+      id: "chart-transactions-overview",
+    },
+    legend: {
+      show: true,
+      horizontalAlign: 'left',
+    },
+    colors: ['#29CC75', '#F55882'],
+    grid: {
+      xaxis: { lines: { show: true } },
+      yaxis: { lines: { show: false } },
+    },
+    stroke: {
+      curve: 'straight',
+      width: 1.5,
+    },
+    dataLabels: {
+      enabled: false,
+    },
+
+    xaxis: {
+      categories: getCategories(intl, startDate, endDate),
+    },
+    yaxis: {
+      labels: {
+        formatter: function (value) {
+          return value < 1000 ? value : `${Math.round(value / 1000)}k`;
+        },
+      },
+    },
+  }
+}
+
+const getNumberOfDays = (startDate, endDate) => {
+  const startTimeOfStatistics = new Date(2015, 0, 1);
+  let numberOfDays;
+  if (startDate && endDate) {
+    numberOfDays = days(new Date(startDate), new Date(endDate));
+  } else if (startDate) {
+    numberOfDays = days(new Date(startDate));
+  } else if (endDate) {
+    numberOfDays = days(startTimeOfStatistics, new Date(endDate));
+  } else {
+    numberOfDays = days(startTimeOfStatistics);
+  }
+  return numberOfDays;
+};
+
+const getCategories = (intl, startDate, endDate) => {
+  const numberOfDays = getNumberOfDays(startDate, endDate);
+  if(numberOfDays <= 7) {
+    return [...new Array(7)].map(
+      (_, idx) => `${intl.formatDate(new Date(0, 0, idx), { weekday: 'long' }).toUpperCase()}`,
+    );
+  } else if (numberOfDays <= 30) {
+    return [...new Array(12)].map(
+      (_, idx) => `${intl.formatDate(new Date(0, idx), { month: 'short' }).toUpperCase()}`,
+    );
+  } else {
+   return [...new Array(6)].map(
+      (_, idx) => `${intl.formatDate(new Date((new Date().getFullYear() - 5) + idx, 0), { year: 'numeric' }).toUpperCase()}`,
+    );
+  }
+}
+
 const TransactionsOverviewSection = ({ hostSlug }) => {
+  const intl = useIntl();
   const [dateFrom, setDateFrom] = useState(null);
   const [dateTo, setDateTo] = useState(null);
   const [collectives, setCollectives] = useState(null);
@@ -100,6 +171,17 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
   const currency = host?.currency;
   const contributionStats = host?.contributionStats;
   const expenseStats = host?.expenseStats;
+
+  const series = [
+    {
+      name: "Contributions",
+      data: [30, 40, 45, 50, 49, 60, 70]
+    },
+    {
+      name: "Expenses",
+      data: [40, 60, 34, 23, 54, 89, 22]
+    }
+  ]
 
   const { contributionsCount, recurringContributionsCount, oneTimeContributionsCount, dailyAverageIncomeAmount } =
     contributionStats || 0;
@@ -203,6 +285,9 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
               {` ${grantsCount} `}
               <FormattedMessage id="TransactionsOverviewSection.Grants" defaultMessage="Grants" />
             </Span>
+          </Container>
+          <Container mt={2}>
+            <Chart type="area" width="100%" height="250px" options={getChartOptions(intl, dateFrom, dateTo)} series={series} />
           </Container>
         </Flex>
       )}
