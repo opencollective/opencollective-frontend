@@ -173,7 +173,7 @@ ReceiptCard.propTypes = {
 };
 
 const Receipts = ({ invoices }) => {
-  const { loading: loadingInvoice, call: downloadInvoice } = useAsyncCall(saveInvoice);
+  const { loading: loadingInvoice, call: downloadInvoice } = useAsyncCall(saveInvoice, { useErrorToast: true });
   const byMonthYear = groupBy(invoices, invoice => `${invoice.month}-${invoice.year}`);
 
   return Object.keys(byMonthYear).map(monthYear => {

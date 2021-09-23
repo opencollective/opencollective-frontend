@@ -84,7 +84,7 @@ const DetailsContainer = styled(Flex)`
 
 const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) => {
   const intl = useIntl();
-  const { loading: loadingInvoice, callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice);
+  const { loading: loadingInvoice, callWith: downloadInvoiceWith } = useAsyncCall(saveInvoice, { useErrorToast: true });
   const {
     id,
     type,
