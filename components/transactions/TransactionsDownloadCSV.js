@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import dayjs from 'dayjs';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
+import { i18nGraphqlException } from '../../lib/errors';
 import { exportFile } from '../../lib/export_file';
 import { transactionsQuery } from '../../lib/graphql/queries';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
@@ -13,6 +14,7 @@ import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { getDefaultKinds } from '../transactions/filters/TransactionsKindFilter';
 
 const transformResultInCSV = json => {
@@ -74,6 +76,9 @@ const transformResultInCSV = json => {
 };
 
 const TransactionsDownloadCSV = ({ collective, client, query }) => {
+  const intl = useIntl();
+  const [loading, setLoading] = React.useState(null);
+  const { addToast } = useToasts();
   let dateFrom, dateTo;
   if (query.period) {
     [dateFrom, dateTo] = query.period.split('→');
@@ -84,30 +89,37 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
   const kinds = query.kind ? query.kind.split(',') : getDefaultKinds();
 
   const download = async () => {
-    const result = await client.query({
-      query: transactionsQuery,
-      variables: {
-        dateFrom: dateFrom,
-        // Extend to end of day
-        dateTo: dateTo && dayjs(dateTo).set('hour', 23).set('minute', 59).set('second', 59).toISOString(),
-        CollectiveId: collective.legacyId,
-        type: type,
-        kinds: kinds,
-      },
-    });
-    const csv = transformResultInCSV(result.data.allTransactions);
+    try {
+      setLoading('v1');
+      const result = await client.query({
+        query: transactionsQuery,
+        variables: {
+          dateFrom: dateFrom,
+          // Extend to end of day
+          dateTo: dateTo && dayjs(dateTo).set('hour', 23).set('minute', 59).set('second', 59).toISOString(),
+          CollectiveId: collective.legacyId,
+          type: type,
+          kinds: kinds,
+        },
+      });
+      const csv = transformResultInCSV(result.data.allTransactions);
 
-    // Don't prompt the file download unless there's data coming
-    if (csv === '') {
-      return;
+      // Don't prompt the file download unless there's data coming
+      if (csv === '') {
+        return;
+      }
+
+      // Helper to prepare date values to be part of the file name
+      const format = d => dayjs(d).format('YYYY-MM-DD');
+      let fileName = `${collective.slug}-from-`;
+      fileName += `${format(dateFrom)}-to-`;
+      fileName += `${format(dateTo)}.csv`;
+      return exportFile('text/plain;charset=utf-8', fileName, csv);
+    } catch (error) {
+      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, error) });
+    } finally {
+      setLoading(null);
     }
-
-    // Helper to prepare date values to be part of the file name
-    const format = d => dayjs(d).format('YYYY-MM-DD');
-    let fileName = `${collective.slug}-from-`;
-    fileName += `${format(dateFrom)}-to-`;
-    fileName += `${format(dateTo)}.csv`;
-    return exportFile('text/plain;charset=utf-8', fileName, csv);
   };
 
   const downloadV2 = async event => {
@@ -119,14 +131,20 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
 
     event.preventDefault();
 
-    const csv = await fetch(downloadUrl(), {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }).then(response => response.text());
-
-    return exportFile('text/csv;charset=utf-8', `${collective.slug}-transactions.csv`, csv);
+    try {
+      setLoading('v2');
+      const csv = await fetch(downloadUrl(), {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }).then(response => response.text());
+      return exportFile('text/csv;charset=utf-8', `${collective.slug}-transactions.csv`, csv);
+    } catch (error) {
+      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, error) });
+    } finally {
+      setLoading(null);
+    }
   };
 
   const downloadUrl = () => {
@@ -212,11 +230,27 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
           </small>
           <br />
           <Link onClick={downloadV2} href={downloadUrl()} openInNewTab={true}>
-            <StyledButton data-cy="download-csv-download-v2" buttonSize="tiny" buttonStyle="primary" mt="12px">
+            <StyledButton
+              data-cy="download-csv-download-v2"
+              buttonSize="tiny"
+              buttonStyle="primary"
+              mt="12px"
+              loading={loading === 'v2'}
+              disabled={Boolean(loading) && loading !== 'v2'}
+              minWidth={115}
+            >
               <FormattedMessage id="Download" defaultMessage="Download" /> (v2)
             </StyledButton>
           </Link>
-          <StyledButton data-cy="download-csv-download" buttonSize="tiny" onClick={download} mt="12px">
+          <StyledButton
+            data-cy="download-csv-download"
+            buttonSize="tiny"
+            onClick={download}
+            mt="12px"
+            loading={loading === 'v1'}
+            disabled={Boolean(loading) && loading !== 'v1'}
+            minWidth={115}
+          >
             <FormattedMessage id="Download" defaultMessage="Download" /> (v1)
           </StyledButton>
         </Box>
