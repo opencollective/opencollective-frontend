@@ -376,8 +376,7 @@ const availableCurrenciesQuery = gqlV2/* GraphQL */ `
  *
  * In (1) we pass the host where the expense is submitted and fixedCurrency is never set.
  *   * If Wise is configured on that host, `availableCurrencies` should normally be available.
- *   * If Wise is configured on that host, but `availableCurrencies` is not available we fetch `availableCurrencies` using host Wise account.
- *   * If Wise is not configured on the host, we'll have to fetch `availableCurrencies` from the Platform Wise account.
+ *   * If it's not, we'll have to fetch `availableCurrencies` from the Platform Wise account
  *
  * In (2) and (3), we never pass an `host` and `fixedCurrency` is sometimes set.
  *   * If `fixedCurrency` is set, we don't need `availableCurrencies`
@@ -386,7 +385,7 @@ const availableCurrenciesQuery = gqlV2/* GraphQL */ `
 const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, ignoreBlockedCurrencies, optional }) => {
   const { data, loading } = useQuery(availableCurrenciesQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: host?.transferwise ? host.slug : TW_API_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
+    variables: { slug: TW_API_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
     // Skip fetching/loading if the currency is fixed (2) (3)
     // Or if availableCurrencies is already available. Expense Flow + Host with Wise configured (1)
     skip: Boolean(fixedCurrency || host?.transferwise?.availableCurrencies),
