@@ -22,7 +22,7 @@ describe('Account Deletion', () => {
   });
 
   it('Should delete user', () => {
-    const userParams = { firstName: 'New', lastName: 'Tester' };
+    const userParams = { name: 'New Tester' };
     const visitParams = { onBeforeLoad: mockRecaptcha };
     cy.signup({ user: userParams, visitParams }).then(user => {
       cy.visit(`/${user.username}/edit/advanced`);
