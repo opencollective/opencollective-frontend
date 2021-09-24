@@ -54,6 +54,10 @@ We may also obtain information from other sources.  For example, if you connect 
 </div>
   </div>
   <div style="display:flex;flex-direction: column;margin-top:1.5em">
+    <div style="font-weight:bold;font-size:2.2rem;">Objections, Right To Be Forgotten, and Data Removal</div>
+    <div style="display:flex;flex-direction:column;">If you are unhappy with your information being processed, shared or stored in line with the content of this policy please email <a href="mailto:support@opencollective.com">support@opencollective.com</a> and we will work to remove public references to your activity on the site. Note that in order to maintain our accounting, tax and legal obligations we may be required to retain some private information about you once this process is complete. </div>
+  </div>
+  <div style="display:flex;flex-direction: column;margin-top:1.5em">
     <div style="font-weight:bold;font-size:2.2rem;">Social Sharing Features</div>
     <div style="display:flex;flex-direction:column;">The Services may offer social sharing features and other integrated tools, which let you share actions you take on our Services with other media, and vice versa.  Your use of such features enables the sharing of information with your friends or the public, depending on the settings you establish with the entity that provides the social sharing feature.  For more information about the purpose and scope of data collection and processing in connection with social sharing features, please visit the privacy policies of the entities that provide these features.</div>
   </div>
