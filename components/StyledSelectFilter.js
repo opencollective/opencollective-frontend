@@ -3,10 +3,12 @@ import PropTypes from 'prop-types';
 
 import StyledSelect from './StyledSelect';
 
-const SelectStyles = {
+const getSelectStyles = stylesFromProps => ({
+  ...stylesFromProps,
   control: (baseStyles, state) => {
     const styles = {
       ...baseStyles,
+      ...stylesFromProps?.control?.(baseStyles, state),
       borderRadius: 100,
       background: '#F7F8FA',
       padding: '0 8px',
@@ -24,22 +26,16 @@ const SelectStyles = {
 
     return styles;
   },
-};
+});
 
 /**
  * A superset of `StyledSelect` with custom styles, to use for selects that contains
  * filters for lists.
  */
 export const StyledSelectFilter = props => {
+  const styles = React.useMemo(() => getSelectStyles(props.styles), [props.styles]);
   return (
-    <StyledSelect
-      minWidth={80}
-      fontSize="12px"
-      lineHeight="14px"
-      isSearchable={false}
-      styles={SelectStyles}
-      {...props}
-    />
+    <StyledSelect minWidth={80} fontSize="12px" lineHeight="14px" isSearchable={false} {...props} styles={styles} />
   );
 };
 
@@ -52,4 +48,6 @@ StyledSelectFilter.propTypes = {
   placeholder: PropTypes.node,
   /** Whether the component is disabled */
   disabled: PropTypes.bool,
+  /** Additional styles for the component */
+  styles: PropTypes.object,
 };

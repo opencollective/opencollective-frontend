@@ -1,46 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { stripTime } from '../../../lib/date-utils';
 import dayjs from '../../../lib/dayjs';
 
+import { DateRange } from '../../DateRange';
 import { Box, Flex } from '../../Grid';
+import PeriodFilterPresetsSelect from '../../PeriodFilterPresetsSelect';
 import PopupMenu from '../../PopupMenu';
 import StyledButton from '../../StyledButton';
 import StyledButtonSet from '../../StyledButtonSet';
 import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
-import { StyledSelectFilter } from '../../StyledSelectFilter';
+import StyledTooltip from '../../StyledTooltip';
+import { Span } from '../../Text';
 
-/**
- * Normalize a date coming from the user input, adjusting the time to either the beginning of the day
- * or the end of the day.
- */
-const normalizeDate = (date, isEndOfDay = false, timezoneType = 'local') => {
-  if (!date) {
-    return null;
-  } else {
-    const resultDate = isEndOfDay ? dayjs(date).endOf('day') : dayjs(date).startOf('day');
-    if (!timezoneType === 'UTC') {
-      resultDate.tz('UTC', true); // Change timezone to UTC, but don't change the time
-    }
-
-    return resultDate.toISOString();
-  }
-};
-
-/**
- * Takes a date and returns it as a string in the format YYYY-MM-DD
- */
-const stripTime = date => {
-  if (!date) {
-    return '';
-  } else {
-    return dayjs(date).format('YYYY-MM-DD');
-  }
-};
+const DEFAULT_INTERVAL = { from: '', to: '' };
 
 /**
  * Parse `strValue` in a "dateFrom→dateTo" format and returns an array like [dateFrom, dateTo].
@@ -58,59 +37,71 @@ export const getDateRangeFromPeriod = strValue => {
 };
 
 /**
- * Opposite of `getDateRangeFromPeriod`: takes an object like {dateFrom, dateTo} and returns a string
- * like "dateFrom→dateTo".
+ * Opposite of `getDateRangeFromPeriod`: takes an object like {from, to} and returns a string
+ * like "from→to".
  */
-const encodePeriod = dateInterval => {
-  const stringifyDate = date => (!date ? 'all' : date);
-  if (!dateInterval.from && !dateInterval.to) {
+const encodePeriod = interval => {
+  if (!interval.from && !interval.to) {
     return '';
-  } else if (dateInterval.timezoneType === 'local') {
-    return `${stringifyDate(dateInterval.from)}→${stringifyDate(dateInterval.to)}`;
-  } else if (dateInterval.timezoneType === 'UTC') {
-    return `${stringifyDate(dateInterval.from)}→${stringifyDate(dateInterval.to)}~UTC`;
   }
+
+  const isUTC = interval.timezoneType === 'UTC';
+  const encodeDate = (date, isEndOfDay) => {
+    if (!date) {
+      return 'all';
+    } else {
+      const dayjsTimeMethod = isEndOfDay ? 'endOf' : 'startOf';
+      const result = isUTC ? dayjs.utc(date) : dayjs(date);
+      return result[dayjsTimeMethod]('day').toISOString();
+    }
+  };
+
+  const baseResult = `${encodeDate(interval.from, false)}→${encodeDate(interval.to, true)}`;
+  return isUTC ? `${baseResult}~UTC` : baseResult;
 };
 
-const DEFAULT_INTERVAL = { from: '', to: '' };
-
+/**
+ * Get a date range as stored internally from a `value` prop, that can be either an array
+ * like [from, to] or a stringified value (see `encodePeriod`).
+ */
 const getDateRangeFromValue = value => {
   const intervalFromValue = Array.isArray(value) ? value : getDateRangeFromPeriod(value);
   const strInterval = typeof value === 'string' ? value : '';
   return {
-    from: intervalFromValue[0] || DEFAULT_INTERVAL.from,
-    to: intervalFromValue[1] || DEFAULT_INTERVAL.to,
+    from: stripTime(intervalFromValue[0] || DEFAULT_INTERVAL.from),
+    to: stripTime(intervalFromValue[1] || DEFAULT_INTERVAL.to),
     timezoneType: strInterval.endsWith('~UTC') ? 'UTC' : 'local',
   };
 };
 
-const DateRange = ({ from, to }) => {
-  if (!from && !to) {
-    return <FormattedMessage id="DateRange.All" defaultMessage="All" />;
-  } else if (from && to) {
-    return (
-      <FormattedMessage
-        id="Date.DateRange"
-        defaultMessage="{dateFrom, date, short} to {dateTo, date, short}"
-        values={{ dateFrom: new Date(from), dateTo: new Date(to) }}
-      />
-    );
-  } else if (from) {
-    return (
-      <FormattedMessage
-        id="Date.SinceShort"
-        defaultMessage="Since {date, date, short}"
-        values={{ date: new Date(from) }}
-      />
-    );
+/**
+ * Update `interval` with a new value for `from` or `to` and return the updated interval
+ * as a new object.
+ */
+const getNewInterval = (interval, changeField, newValue) => {
+  const newInterval = { ...interval };
+  newInterval[changeField] = stripTime(newValue);
+
+  // Reset interval in case fromDate is after toDate
+  if (newInterval.from && newInterval.to && newInterval.from > newInterval.to) {
+    const fieldToReset = changeField === 'from' ? 'to' : 'from';
+    newInterval[fieldToReset] = '';
+  }
+
+  return newInterval;
+};
+
+const getTimeZoneTypeName = (intl, timezone) => {
+  if (timezone === 'local') {
+    try {
+      return intl.timeZone || dayjs.tz.guess();
+    } catch {
+      return '';
+    }
+  } else if (timezone === 'UTC') {
+    return 'Coordinated Universal Time';
   } else {
-    return (
-      <FormattedMessage
-        id="Date.BeforeShort"
-        defaultMessage="Before {date, date, short}"
-        values={{ date: new Date(to) }}
-      />
-    );
+    return '';
   }
 };
 
@@ -144,107 +135,6 @@ const TriggerContainer = styled(StyledButton)`
   }
 `;
 
-const getNewInterval = (interval, changeField, newValue) => {
-  const newInterval = { ...interval };
-
-  if (interval.timezoneType === 'UTC') {
-    newInterval[changeField] = normalizeDate(newValue, changeField === 'to'); // TODO user timezone
-  } else if (interval.timezoneType === 'local') {
-    newInterval[changeField] = normalizeDate(newValue, changeField === 'to');
-  }
-
-  // Reset interval in case fromDate is after toDate
-  if (newInterval.from && newInterval.to && newInterval.from > newInterval.to) {
-    const fieldToReset = changeField === 'from' ? 'to' : 'from';
-    newInterval[fieldToReset] = '';
-  }
-
-  return newInterval;
-};
-
-const updateIntervalWithTimezone = (interval, timezoneType) => {
-  const convertDate =
-    timezoneType === 'UTC'
-      ? date => (date ? dayjs(date).tz('UTC', true).toISOString() : null) // Convert to local time
-      : date => (date ? dayjs(date.replace(/Z$/, '')).toISOString() : null); // Convert to local time
-
-  return {
-    from: convertDate(interval.from),
-    to: convertDate(interval.to),
-    timezoneType,
-  };
-};
-
-const PERIOD_FILTER_PRESETS = defineMessages({
-  today: {
-    id: 'Today',
-    defaultMessage: 'Today',
-  },
-  thisWeek: {
-    id: 'ThisWeek',
-    defaultMessage: 'This week',
-  },
-  lastMonth: {
-    id: 'LastMonth',
-    defaultMessage: 'Last month',
-  },
-});
-
-const PeriodFilterPresetsSelect = ({ onChange }) => {
-  const intl = useIntl();
-  const options = React.useMemo(() => {
-    return Object.keys(PERIOD_FILTER_PRESETS).map(presetKey => ({
-      value: presetKey,
-      label: intl.formatMessage(PERIOD_FILTER_PRESETS[presetKey]),
-    }));
-  }, [intl]);
-
-  return (
-    <StyledSelectFilter
-      options={options}
-      onChange={({ value }) => {
-        switch (value) {
-          case 'today':
-            return onChange({
-              from: dayjs().startOf('day'),
-              to: dayjs(),
-            });
-          case 'thisWeek':
-            return onChange({
-              from: dayjs().subtract(7, 'day').startOf('day'),
-              to: dayjs(),
-            });
-          case 'lastMonth':
-            return onChange({
-              from: dayjs().subtract(1, 'month').startOf('day'),
-              to: dayjs().subtract(1, 'month').endOf('month'),
-            });
-          default:
-            throw new Error(`Period filter not implemented: ${value}`);
-        }
-      }}
-    />
-  );
-};
-
-PeriodFilterPresetsSelect.propTypes = {
-  onChange: PropTypes.func.isRequired,
-};
-
-const getTimeZoneTypeName = (intl, timezone) => {
-  if (timezone === 'local') {
-    try {
-      return intl.timeZone || dayjs.tz.guess();
-    } catch {
-      return '';
-    }
-  } else if (timezone === 'UTC') {
-    return 'Coordinated Universal Time';
-  } else {
-    return '';
-  }
-};
-
 const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
   const intl = useIntl();
   const [dateInterval, setDateInterval] = React.useState(getDateRangeFromValue(value));
@@ -256,25 +146,29 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
 
   return (
     <PopupMenu
-      placement="bottom-end"
+      placement="bottom-start"
       onClose={() => setDateInterval(getDateRangeFromValue(value))}
       Button={({ onClick }) => (
         <TriggerContainer onClick={onClick} id={inputId} data-cy="period-filter" {...props}>
           <Flex justifyContent="space-between" alignItems="center">
-            <span>
-              <DateRange from={dateInterval.from} to={dateInterval.to} />
-              {dateInterval.timezoneType === 'local' ? null : ` (${dateInterval.timezoneType})`}
-            </span>
+            <DateRange from={dateInterval.from} to={dateInterval.to} isUTC={dateInterval.timezoneType === 'UTC'} />
             <ChevronDown size={25} color="#cccccc" />
           </Flex>
         </TriggerContainer>
       )}
     >
       {({ setOpen }) => (
-        <Box mx="8px" my="16px" width="190px">
-          <PeriodFilterPresetsSelect onChange={setDateInterval} />
+        <Box mx="8px" my="8px" width="190px">
+          <Box mb={3}>
+            <PeriodFilterPresetsSelect
+              inputId={`${inputId}-presets-select`}
+              onChange={setDateInterval}
+              interval={dateInterval}
+            />
+          </Box>
           <StyledInputField
             label={<FormattedMessage defaultMessage="Start date" />}
+            labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
             name="dateFrom"
             mt="12px"
             labelFontSize="13px"
@@ -295,6 +189,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
           </StyledInputField>
           <StyledInputField
             label={<FormattedMessage defaultMessage="End date" />}
+            labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
             name="dateTo"
             mt="12px"
             labelFontSize="13px"
@@ -316,21 +211,34 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
           </StyledInputField>
           <StyledInputField
             data-cy="download-csv-end-date"
-            label={<FormattedMessage defaultMessage="Timezone" />}
-            name="dateTo"
+            name="timezoneType"
             mt="12px"
             labelFontSize="13px"
+            label={
+              <Flex alignItems="center">
+                <StyledTooltip
+                  content={
+                    <FormattedMessage defaultMessage="By default, all dates are filtered and displayed using your local timezone. You can switch to UTC to indicate that the dates provided above use the Coordinated Universal Time format, which matches how email reports are generated" />
+                  }
+                >
+                  <InfoCircle size={16} />
+                </StyledTooltip>
+                <Span ml={1}>
+                  <FormattedMessage defaultMessage="Timezone" />
+                </Span>
+              </Flex>
+            }
           >
             {inputProps => (
               <StyledButtonSet
                 {...inputProps}
                 size="tiny"
                 items={['local', 'UTC']}
-                buttonProps={{ p: 1 }}
+                buttonProps={{ p: 1, fontSize: '11px' }}
                 selected={dateInterval.timezoneType}
                 buttonPropsBuilder={({ item }) => ({ title: getTimeZoneTypeName(intl, item) })}
-                onChange={timezone => {
-                  setDateInterval(updateIntervalWithTimezone(dateInterval, timezone));
+                onChange={timezoneType => {
+                  setDateInterval({ ...dateInterval, timezoneType });
                 }}
               >
                 {({ item }) => {
@@ -349,6 +257,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
               buttonSize="tiny"
               mr={2}
               mt="12px"
+              flex="1"
               onClick={() => {
                 setDateInterval(DEFAULT_INTERVAL);
                 setOpen(false);
@@ -362,6 +271,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
               buttonStyle="primary"
               mt="12px"
               data-cy="btn-apply-period-filter"
+              flex="1"
               onClick={() => {
                 onChange(encodePeriod(dateInterval));
                 setOpen(false);

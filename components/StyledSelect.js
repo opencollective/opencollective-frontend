@@ -131,6 +131,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     components,
     isSearchable,
     menuPortalTarget,
+    selectTheme,
   }) => ({
     menuPortalTarget: menuPortalTarget === null || typeof document === 'undefined' ? undefined : document.body,
     isDisabled: disabled || isDisabled,
@@ -139,6 +140,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     noOptionsMessage: () => intl.formatMessage(Messages.noOptions),
     components: getComponents(components, useSearchIcon),
     instanceId: instanceId ? instanceId : inputId,
+    theme: selectTheme,
     styles: {
       control: (baseStyles, state) => {
         const customStyles = { borderColor: theme.colors.black[300] };
@@ -182,7 +184,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
           customStyles['&:hover'] = { backgroundColor: theme.colors.primary[100] };
         }
 
-        return { ...baseStyles, ...customStyles };
+        return { ...baseStyles, ...customStyles, ...styles?.option };
       },
       singleValue: baseStyles => ({
         ...baseStyles,
@@ -212,7 +214,13 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
         cursor: 'pointer',
       }),
       dropdownIndicator: baseStyles => {
-        return hideDropdownIndicator ? STYLES_DISPLAY_NONE : baseStyles;
+        if (hideDropdownIndicator) {
+          return STYLES_DISPLAY_NONE;
+        } else if (styles?.dropdownIndicator) {
+          return { ...baseStyles, ...styles.dropdownIndicator };
+        } else {
+          return baseStyles;
+        }
       },
       menuPortal: baseStyles => ({
         ...baseStyles,
