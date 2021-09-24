@@ -5,6 +5,7 @@ import { FastField, Field } from 'formik';
 import { first, get, isEmpty, omit, partition, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { compareNames } from '../../lib/collective.lib';
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -21,6 +22,7 @@ import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
 import I18nAddressFields from '../I18nAddressFields';
 import InputTypeCountry from '../InputTypeCountry';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
@@ -252,9 +254,18 @@ const ExpenseFormPayeeStep = ({
                   labelFontSize="13px"
                   flex="1"
                   mt={3}
-                  error={formatFormErrorMessage(intl, errors.payoutMethod?.legalName)}
                 >
-                  {({ error }) => <StyledInput value={values.payee.legalName} disabled error={error} />}
+                  <StyledInput value={values.payee.legalName} disabled />
+                  {values.payoutMethod?.data.accountHolderName &&
+                    values.payee.legalName &&
+                    !compareNames(values.payoutMethod.data.accountHolderName, values.payee.legalName) && (
+                      <MessageBox mt={2} fontSize="12px" type="warning" withIcon>
+                        <FormattedMessage
+                          id="Warning.LegalNameNotMatchBankAccountName"
+                          defaultMessage="The legal name should match the bank account holder name"
+                        />
+                      </MessageBox>
+                    )}
                 </StyledInputField>
               )}
             </Field>

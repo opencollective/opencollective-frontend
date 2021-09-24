@@ -2862,7 +2862,17 @@ type Credit implements Transaction {
   group: String!
   type: TransactionType!
   kind: TransactionKind
-  description: String
+  description(
+    """
+    Wether to generate the description dynamically.
+    """
+    dynamic: Boolean = false
+
+    """
+    Wether to generate the full description when using dynamic.
+    """
+    full: Boolean = false
+  ): String
   amount: Amount!
   amountInHostCurrency: Amount!
   netAmount(
@@ -3147,7 +3157,17 @@ type Debit implements Transaction {
   group: String!
   type: TransactionType!
   kind: TransactionKind
-  description: String
+  description(
+    """
+    Wether to generate the description dynamically.
+    """
+    dynamic: Boolean = false
+
+    """
+    Wether to generate the full description when using dynamic.
+    """
+    full: Boolean = false
+  ): String
   amount: Amount!
   amountInHostCurrency: Amount!
   netAmount(
@@ -6705,6 +6725,13 @@ type Order {
   Data related to the order
   """
   data: JSON
+
+  """
+  Custom data related to the order, based on the fields described by
+  tier.customFields. Must be authenticated as an admin of the fromAccount or
+  toAccount (returns null otherwise)
+  """
+  customData: JSON
 }
 
 """
@@ -6849,6 +6876,11 @@ input OrderReferenceInput {
   The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
   """
   id: String
+
+  """
+  The legacy public id identifying the order (ie: 4242)
+  """
+  legacyId: Int
 }
 
 """
@@ -8565,7 +8597,17 @@ interface Transaction {
   group: String!
   type: TransactionType!
   kind: TransactionKind
-  description: String
+  description(
+    """
+    Wether to generate the description dynamically.
+    """
+    dynamic: Boolean = false
+
+    """
+    Wether to generate the full description when using dynamic.
+    """
+    full: Boolean = false
+  ): String
   amount: Amount!
   amountInHostCurrency: Amount!
   netAmount(
