@@ -1,5 +1,6 @@
 .next
 .env
+.env.*
 node_modules
 npm-debug.log.*
 ./report.*.json
