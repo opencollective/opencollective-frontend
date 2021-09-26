@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import {FormattedMessage, useIntl} from 'react-intl';
+import dynamic from 'next/dynamic';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { days } from '../../../lib/utils';
 
 import PeriodFilter, { encodePeriod, getDateRangeFromPeriod } from '../../budget/filters/PeriodFilter';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
@@ -14,8 +16,6 @@ import Container from '../../Container';
 import { Flex } from '../../Grid';
 import Loading from '../../Loading';
 import { P, Span } from '../../Text';
-import dynamic from "next/dynamic";
-import {days} from "../../../lib/utils";
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const FilterLabel = styled.label`
@@ -93,7 +93,7 @@ const transactionsOverviewQuery = gqlV2/* GraphQL */ `
 const getChartOptions = (intl, startDate, endDate) => {
   return {
     chart: {
-      id: "chart-transactions-overview",
+      id: 'chart-transactions-overview',
     },
     legend: {
       show: true,
@@ -122,8 +122,8 @@ const getChartOptions = (intl, startDate, endDate) => {
         },
       },
     },
-  }
-}
+  };
+};
 
 const getNumberOfDays = (startDate, endDate) => {
   const startTimeOfStatistics = new Date(2015, 0, 1);
@@ -142,20 +142,19 @@ const getNumberOfDays = (startDate, endDate) => {
 
 const getCategories = (intl, startDate, endDate) => {
   const numberOfDays = getNumberOfDays(startDate, endDate);
-  if(numberOfDays <= 7) {
+  if (numberOfDays <= 7) {
     return [...new Array(7)].map(
       (_, idx) => `${intl.formatDate(new Date(0, 0, idx), { weekday: 'long' }).toUpperCase()}`,
     );
   } else if (numberOfDays <= 30) {
-    return [...new Array(12)].map(
-      (_, idx) => `${intl.formatDate(new Date(0, idx), { month: 'short' }).toUpperCase()}`,
-    );
+    return [...new Array(12)].map((_, idx) => `${intl.formatDate(new Date(0, idx), { month: 'short' }).toUpperCase()}`);
   } else {
-   return [...new Array(6)].map(
-      (_, idx) => `${intl.formatDate(new Date((new Date().getFullYear() - 5) + idx, 0), { year: 'numeric' }).toUpperCase()}`,
+    return [...new Array(6)].map(
+      (_, idx) =>
+        `${intl.formatDate(new Date(new Date().getFullYear() - 5 + idx, 0), { year: 'numeric' }).toUpperCase()}`,
     );
   }
-}
+};
 
 const TransactionsOverviewSection = ({ hostSlug }) => {
   const intl = useIntl();
@@ -174,14 +173,14 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
 
   const series = [
     {
-      name: "Contributions",
-      data: [30, 40, 45, 50, 49, 60, 70]
+      name: 'Contributions',
+      data: [30, 40, 45, 50, 49, 60, 70],
     },
     {
-      name: "Expenses",
-      data: [40, 60, 34, 23, 54, 89, 22]
-    }
-  ]
+      name: 'Expenses',
+      data: [40, 60, 34, 23, 54, 89, 22],
+    },
+  ];
 
   const { contributionsCount, recurringContributionsCount, oneTimeContributionsCount, dailyAverageIncomeAmount } =
     contributionStats || 0;
@@ -287,7 +286,13 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
             </Span>
           </Container>
           <Container mt={2}>
-            <Chart type="area" width="100%" height="250px" options={getChartOptions(intl, dateFrom, dateTo)} series={series} />
+            <Chart
+              type="area"
+              width="100%"
+              height="250px"
+              options={getChartOptions(intl, dateFrom, dateTo)}
+              series={series}
+            />
           </Container>
         </Flex>
       )}
