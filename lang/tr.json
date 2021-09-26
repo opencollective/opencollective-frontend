@@ -72,7 +72,7 @@
   "Amount.RangeFrom": "{minAmount} ve üstü",
   "Amount.RangeFromTo": "{minAmount} ila {maxAmount}",
   "AmountBalance": "{amount} bakiye",
-  "AmountCollected": "{amount} collected",
+  "AmountCollected": "Toplanabilir {{amount}}",
   "AmountContributed": "Katkıda bulunulmuş",
   "AmountInterval": "{amount} {currencyCode} / {interval, select, month {mo.} year {yr.} other{}}",
   "AmountIntervalLong": "{amount} {currencyCode} / {interval, select, month {month} year {year} other {}}",
