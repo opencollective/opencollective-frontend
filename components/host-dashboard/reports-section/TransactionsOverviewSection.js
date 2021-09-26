@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
@@ -92,7 +92,7 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
   const [dateTo, setDateTo] = useState(null);
   const [collectives, setCollectives] = useState(null);
 
-  const { data, loading, refetch } = useQuery(transactionsOverviewQuery, {
+  const { data, loading } = useQuery(transactionsOverviewQuery, {
     variables: { hostSlug, dateFrom, dateTo, account: collectives },
     context: API_V2_CONTEXT,
   });
@@ -100,14 +100,6 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
   const currency = host?.currency;
   const contributionStats = host?.contributionStats;
   const expenseStats = host?.expenseStats;
-
-  useEffect(() => {
-    // Prevent running the effect on initial mount
-    if (!dateFrom && !dateTo && !collectives) {
-      return;
-    }
-    refetch();
-  }, [dateFrom, dateTo, collectives]);
 
   const { contributionsCount, recurringContributionsCount, oneTimeContributionsCount, dailyAverageIncomeAmount } =
     contributionStats || 0;
