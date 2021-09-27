@@ -4,11 +4,11 @@ import PropTypes from 'prop-types';
 import StyledSelect from './StyledSelect';
 
 const getSelectStyles = stylesFromProps => ({
-  ...stylesFromProps,
+  ...(stylesFromProps || null),
   control: (baseStyles, state) => {
     const styles = {
       ...baseStyles,
-      ...stylesFromProps?.control?.(baseStyles, state),
+      ...(stylesFromProps?.control || null),
       borderRadius: 100,
       background: '#F7F8FA',
       padding: '0 8px',

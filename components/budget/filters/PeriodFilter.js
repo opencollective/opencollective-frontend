@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
+import { has } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -26,18 +27,22 @@ const DEFAULT_INTERVAL = { from: '', to: '' };
  * Each value in the array will be `undefined` if there's no filter for it. We consider that all values passed
  * in this string are using UTC timezone.
  */
-export const getDateRangeFromPeriod = strValue => {
-  const parsedValue = strValue?.match(/([^→]+)(→(.+?(?=~UTC)))?(~UTC)?/);
+export const parseDateRange = strValue => {
+  const parsedValue = strValue?.match(/^(?<from>[^→]+)(→(?<to>.+?(?=~UTC|$)))?(~(?<timezoneType>UTC))?$/);
   if (parsedValue) {
     const getDateIsoString = dateStr => (!dateStr || dateStr === 'all' ? undefined : dateStr);
-    return [getDateIsoString(parsedValue[1]), getDateIsoString(parsedValue[3])];
+    return {
+      from: getDateIsoString(parsedValue.groups.from),
+      to: getDateIsoString(parsedValue.groups.to),
+      timezoneType: parsedValue.groups.timezoneType || 'local',
+    };
+  } else {
+    return { from: undefined, to: undefined, timezoneType: 'local' };
   }
-
-  return [];
 };
 
 /**
- * Opposite of `getDateRangeFromPeriod`: takes an object like {from, to} and returns a string
+ * Opposite of `parseDateRange`: takes an object like {from, to} and returns a string
  * like "from→to".
  */
 const encodePeriod = interval => {
@@ -64,13 +69,18 @@ const encodePeriod = interval => {
  * Get a date range as stored internally from a `value` prop, that can be either an array
  * like [from, to] or a stringified value (see `encodePeriod`).
  */
-const getDateRangeFromValue = value => {
-  const intervalFromValue = Array.isArray(value) ? value : getDateRangeFromPeriod(value);
-  const strInterval = typeof value === 'string' ? value : '';
+const getIntervalFromValue = value => {
+  const isIntervalObject = value => typeof value === 'object' && has(value, 'from') && has(value, 'to');
+  const intervalFromValue = isIntervalObject(value) ? value : parseDateRange(value);
+  if (intervalFromValue.timezoneType === 'UTC') {
+    intervalFromValue.from = dayjs.utc(intervalFromValue.from, true);
+    intervalFromValue.to = dayjs.utc(intervalFromValue.to, true);
+  }
+
   return {
-    from: stripTime(intervalFromValue[0] || DEFAULT_INTERVAL.from),
-    to: stripTime(intervalFromValue[1] || DEFAULT_INTERVAL.to),
-    timezoneType: strInterval.endsWith('~UTC') ? 'UTC' : 'local',
+    from: stripTime(intervalFromValue.from),
+    to: stripTime(intervalFromValue.to),
+    timezoneType: intervalFromValue.timezoneType || 'local',
   };
 };
 
@@ -137,7 +147,7 @@ const TriggerContainer = styled(StyledButton)`
 
 const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
   const intl = useIntl();
-  const [dateInterval, setDateInterval] = React.useState(getDateRangeFromValue(value));
+  const [dateInterval, setDateInterval] = React.useState(getIntervalFromValue(value));
   const formattedMin = stripTime(minDate);
 
   const setDate = (changeField, date) => {
@@ -147,7 +157,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
   return (
     <PopupMenu
       placement="bottom-start"
-      onClose={() => setDateInterval(getDateRangeFromValue(value))}
+      onClose={() => setDateInterval(getIntervalFromValue(value))}
       Button={({ onClick }) => (
         <TriggerContainer onClick={onClick} id={inputId} data-cy="period-filter" {...props}>
           <Flex justifyContent="space-between" alignItems="center">
@@ -288,8 +298,14 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
 
 PeriodFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
-  /** The value, either as a string with the `dateFrom→dateTo` format or an array like [dateFromIsoStr, dateToIsoStr] */
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+  /** The value, either as a string with the `dateFrom→dateTo` format or an object like { from, to }*/
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.shape({
+      from: PropTypes.string,
+      to: PropTypes.string,
+    }),
+  ]),
   inputId: PropTypes.string,
   minDate: PropTypes.string,
 };

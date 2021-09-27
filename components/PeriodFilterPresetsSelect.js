@@ -44,23 +44,18 @@ const PERIOD_FILTER_SELECT_STYLES = {
 };
 
 const getSelectedPeriodOptionFromInterval = ({ from, to }) => {
-  const existingPreset = Object.keys(PERIOD_FILTER_PRESETS).find(preset => {
+  const isSameDay = (dayjsDate, otherDate) => (!dayjsDate && !otherDate) || dayjsDate?.isSame(otherDate, 'day');
+  const preset = Object.keys(PERIOD_FILTER_PRESETS).find(preset => {
     const presetDetails = PERIOD_FILTER_PRESETS[preset];
     const presetInterval = presetDetails.getInterval();
-    const isSameDay = (dayjsDate, otherDate) =>
-      (!dayjsDate && !otherDate) || (dayjsDate && dayjsDate.isSame(otherDate, 'day'));
-
-    if (isSameDay(presetInterval.from, from) && isSameDay(presetInterval.to, to)) {
-      return true;
-    }
+    return isSameDay(presetInterval.from, from) && isSameDay(presetInterval.to, to);
   });
 
-  if (existingPreset) {
-    const presetDetails = PERIOD_FILTER_PRESETS[existingPreset];
-    return { label: presetDetails.label, value: existingPreset };
+  if (preset) {
+    return { label: PERIOD_FILTER_PRESETS[preset].label, value: preset };
+  } else {
+    return { label: 'Custom', value: 'custom' };
   }
-
-  return { label: 'Custom', value: 'custom' };
 };
 
 const periodSelectThemeBuilder = theme => ({ ...theme, spacing: { ...theme.spacing, controlHeight: 28 } });

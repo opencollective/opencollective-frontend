@@ -10,7 +10,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
-import { getDateRangeFromPeriod } from '../budget/filters/PeriodFilter';
+import { parseDateRange } from '../budget/filters/PeriodFilter';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -104,7 +104,7 @@ const isValidStatus = status => {
 
 const getVariablesFromQuery = (query, forcedStatus) => {
   const amountRange = parseAmountRange(query.amount);
-  const [dateFrom, dateTo] = getDateRangeFromPeriod(query.period);
+  const { from: dateFrom, to: dateTo } = parseDateRange(query.period);
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || ORDERS_PER_PAGE,
