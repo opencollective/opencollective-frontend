@@ -74,15 +74,16 @@ export async function getServerSideProps({ res }) {
 const AdminPanelPage = ({ router }) => {
   const { slug } = router.query;
   const intl = useIntl();
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser, loadingLoggedInUser } = useUser();
   const { data, loading } = useQuery(adminPanelQuery, {
     context: API_V2_CONTEXT,
     variables: { slug },
+    skip: loadingLoggedInUser,
   });
   const section = router.query.section || 'info';
   const account = data?.account;
 
-  const canEditCollective = LoggedInUser?.canEditCollective(account);
+  const canEditAccount = LoggedInUser?.canEditCollective(account);
   const notification = {};
   if (account?.isArchived && account?.type === 'USER') {
     notification.title = intl.formatMessage(messages['user.isArchived']);
@@ -101,7 +102,7 @@ const AdminPanelPage = ({ router }) => {
   return (
     <AuthenticatedPage>
       <AdminPanelTopBar
-        isLoading={loading}
+        isLoading={loading || loadingLoggedInUser}
         collective={data?.account}
         collectiveSlug={slug}
         selectedSection={section}
@@ -114,7 +115,7 @@ const AdminPanelPage = ({ router }) => {
           description={notification.description}
         />
       )}
-      {!canEditCollective ? (
+      {!loadingLoggedInUser && account && !canEditAccount ? (
         <Box className="login" my={6}>
           <p>
             <FormattedMessage
