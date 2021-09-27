@@ -72,7 +72,7 @@
   "Amount.RangeFrom": "{minAmount} y más",
   "Amount.RangeFromTo": "{minAmount} hasta {maxAmount}",
   "AmountBalance": "{amount}",
-  "AmountCollected": "{amount} collected",
+  "AmountCollected": "https://crowdin.com/translate/opencollective/136/en-es#21853",
   "AmountContributed": "Contribuido",
   "AmountInterval": "{amount} {currencyCode} / {interval, select, month {mo.} year {yr.} other{}}",
   "AmountIntervalLong": "{amount} {currencyCode} / {interval, select, month {month} year {year} other {}}",
