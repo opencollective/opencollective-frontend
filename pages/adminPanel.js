@@ -65,14 +65,6 @@ const messages = defineMessages({
   },
 });
 
-export async function getServerSideProps({ res }) {
-  res.setHeader('Cache-Control', 'no-cache');
-
-  return {
-    props: {},
-  };
-}
-
 const getDefaultSectionForAccount = account => {
   if (account && isHost(account)) {
     return 'expenses';
