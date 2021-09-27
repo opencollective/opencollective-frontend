@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { formatCurrency } from '../../../lib/currency-utils';
 
 import Container from '../../Container';
-import { Flex } from '../../Grid';
+import { Box, Flex } from '../../Grid';
 import StyledCard from '../../StyledCard';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
@@ -87,7 +87,7 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
               defaultMessage="My Organization and My Collectives"
             />
           </Span>
-          <Span ml={1}>
+          <Box ml={1}>
             <StyledTooltip
               content={() => (
                 <FormattedMessage
@@ -98,7 +98,7 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
             >
               <InfoCircle size={14} />
             </StyledTooltip>
-          </Span>
+          </Box>
         </P>
         <Container mt={18} mb={12}>
           <FundAmounts>
