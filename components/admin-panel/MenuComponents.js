@@ -1,7 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import { ChevronDown } from '@styled-icons/fa-solid/ChevronDown';
-// import { ChevronRight } from '@styled-icons/fa-solid/ChevronRight';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -87,30 +85,6 @@ MenuLink.propTypes = {
     slug: PropTypes.string,
   }),
 };
-
-// const SubUl = styled.ul`
-//   > li {
-//     margin-left: 14px;
-//   }
-// `;
-
-// export const MenuCollapseSubSection = ({ label, children }) => {
-//   const [open, setOpen] = React.useState(false);
-//   return (
-//     <React.Fragment>
-//       <MenuLink onClick={() => setOpen(!open)} isSelected={open} isStrong={true}>
-//         <span>{label}</span>
-//         <span>{open ? <ChevronDown size="10px" /> : <ChevronRight size="10px" />}</span>
-//       </MenuLink>
-//       {open && <SubUl>{children}</SubUl>}
-//     </React.Fragment>
-//   );
-// };
-
-// MenuCollapseSubSection.propTypes = {
-//   label: PropTypes.node,
-//   children: PropTypes.node,
-// };
 
 export const MenuSectionHeader = styled.div`
   font-weight: 700;
