@@ -247,7 +247,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
       );
     } else {
       // eslint-disable-next-line no-console
-      console.warning('Could not fetch requiredFields through Wise.');
+      console.warn('Could not fetch requiredFields through Wise.');
       return;
     }
   }
@@ -420,7 +420,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
       );
     } else {
       // eslint-disable-next-line no-console
-      console.warning('Could not fetch availableCurrencies through Wise.');
+      console.warn('Could not fetch availableCurrencies through Wise.');
       return;
     }
   }
