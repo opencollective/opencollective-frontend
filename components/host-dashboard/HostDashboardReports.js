@@ -16,6 +16,7 @@ import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
 import { H1, H2 } from '../Text';
 
+import HostDownloadsSection from './reports-section/HostDownloadsSection';
 import HostFeesSection from './reports-section/HostFeesSection';
 import PlatformTipsCollected from './reports-section/PlatformTipsCollected';
 import TotalMoneyManagedSection from './reports-section/TotalMoneyManagedSection';
@@ -146,7 +147,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           <SectionTitle>
             <FormattedMessage id="Downloads" defaultMessage="Downloads" />
           </SectionTitle>
-          <StyledCard height={200} />
+          <HostDownloadsSection hostSlug={hostSlug} />
         </Container>
       </StyledCard>
     </Box>

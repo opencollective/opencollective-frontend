@@ -397,6 +397,7 @@ class CollectivePicker extends React.PureComponent {
 }
 
 CollectivePicker.propTypes = {
+  ...StyledSelect.propTypes,
   /** The id of the search input */
   inputId: PropTypes.string.isRequired,
   /** The list of collectives to display */
