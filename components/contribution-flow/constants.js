@@ -134,4 +134,154 @@ export const CRYPTO_CURRENCIES = [
     labelWithoutImage: 'ZRX (Ox)',
     value: 'ZRX',
   },
+  {
+    label: (
+      <Flex>
+        <Image alt="DOGE (Dogecoin)" width={18} height={18} src="/static/images/crypto-logos/DOGE.svg" />
+        <Span ml={2}>DOGE (Dogecoin)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: 'DOGE (Dogecoin)',
+    value: 'DOGE',
+  },
+  {
+    label: (
+      <Flex>
+        <Image alt="COMP (Compound)" width={18} height={18} src="/static/images/crypto-logos/COMP.svg" />
+        <Span ml={2}>COMP (Compound)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: 'COMP (Compound)',
+    value: 'COMP',
+  },
+  {
+    label: (
+      <Flex>
+        <Image alt="SNX (Synthetix)" width={18} height={18} src="/static/images/crypto-logos/SNX.svg" />
+        <Span ml={2}>SNX (Synthetix)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: 'SNX (Synthetix)',
+    value: 'SNX',
+  },
+  {
+    label: (
+      <Flex>
+        <Image alt="AAVE (Aave)" width={18} height={18} src="/static/images/crypto-logos/AAVE.svg" />
+        <Span ml={2}>AAVE (Aave)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: 'AAVE (Aave)',
+    value: 'AAVE',
+  },
+  {
+    label: (
+      <Flex>
+        <Image alt="GRT (The Graph)" width={18} height={18} src="/static/images/crypto-logos/GRT.svg" />
+        <Span ml={2}>GRT (The Graph)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: 'GRT (The Graph)',
+    value: 'GRT',
+  },
+  {
+    label: (
+      <Flex>
+        <Image alt="BNT (Bancor)" width={18} height={18} src="/static/images/crypto-logos/BNT.svg" />
+        <Span ml={2}>BNT (Bancor)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: 'BNT (Bancor)',
+    value: 'BNT',
+  },
+  {
+    label: (
+      <Flex>
+        <Image alt="SUSHI (SushiSwap)" width={18} height={18} src="/static/images/crypto-logos/SUSHI.svg" />
+        <Span ml={2}>SUSHI (SushiSwap)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: 'SUSHI (SushiSwap)',
+    value: 'SUSHI',
+  },
+  {
+    label: (
+      <Flex>
+        <Image alt="UNI (Uniswap)" width={18} height={18} src="/static/images/crypto-logos/UNI.svg" />
+        <Span ml={2}>UNI (Uniswap)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: 'UNI (Uniswap)',
+    value: 'UNI',
+  },
+  {
+    label: (
+      <Flex>
+        <Image alt="MATIC (Polygon)" width={18} height={18} src="/static/images/crypto-logos/MATIC.svg" />
+        <Span ml={2}>MATIC (Polygon)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: 'MATIC (Polygon)',
+    value: 'MATIC',
+  },
+  {
+    label: (
+      <Flex>
+        <Image alt="GUSD (Gemini Dollar)" width={18} height={18} src="/static/images/crypto-logos/GUSD.svg" />
+        <Span ml={2}>GUSD (Gemini Dollar)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: 'GUSD (Gemini Dollar)',
+    value: 'GUSD',
+  },
+  {
+    label: (
+      <Flex>
+        <Image alt="CRV (Curve DAO Token)" width={18} height={18} src="/static/images/crypto-logos/CRV.svg" />
+        <Span ml={2}>CRV (Curve DAO Token)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: 'CRV (Curve DAO Token)',
+    value: 'CRV',
+  },
+  {
+    label: (
+      <Flex>
+        <Image alt="1INCH (1inch)" width={18} height={18} src="/static/images/crypto-logos/1INCH.svg" />
+        <Span ml={2}>1INCH (1inch)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: '1INCH (1inch)',
+    value: '1INCH',
+  },
+  {
+    label: (
+      <Flex>
+        <Image alt="BAL (Balancer)" width={18} height={18} src="/static/images/crypto-logos/BAL.svg" />
+        <Span ml={2}>BAL (Balancer)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: 'BAL (Balancer)',
+    value: 'BAL',
+  },
+  {
+    label: (
+      <Flex>
+        <Image alt="UMA (UMA)" width={18} height={18} src="/static/images/crypto-logos/UMA.svg" />
+        <Span ml={2}>UMA (UMA)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: 'UMA (UMA)',
+    value: 'UMA',
+  },
+  {
+    label: (
+      <Flex>
+        <Image alt="YFI (Yearn Finance)" width={18} height={18} src="/static/images/crypto-logos/YFI.svg" />
+        <Span ml={2}>YFI (Yearn Finance)</Span>
+      </Flex>
+    ),
+    labelWithoutImage: 'YFI (Yearn Finance)',
+    value: 'YFI',
+  },
 ];
