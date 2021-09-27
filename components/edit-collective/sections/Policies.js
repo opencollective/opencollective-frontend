@@ -84,7 +84,7 @@ const messages = defineMessages({
   },
 });
 
-const Policies = ({ collective, showOnlyExpensePolicy }) => {
+const Policies = ({ collective, showOnlyExpensePolicy, contentOnly }) => {
   const { formatMessage } = useIntl();
   const [selected, setSelected] = React.useState([]);
 
@@ -176,7 +176,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
   return (
     <Flex flexDirection="column">
       {!showOnlyExpensePolicy && (
-        <SettingsTitle>
+        <SettingsTitle contentOnly={contentOnly}>
           <FormattedMessage id="editCollective.menu.policies" defaultMessage="Policies" />
         </SettingsTitle>
       )}
@@ -314,6 +314,7 @@ Policies.propTypes = {
     slug: PropTypes.string,
   }),
   showOnlyExpensePolicy: PropTypes.bool,
+  contentOnly: PropTypes.bool,
 };
 
 export default Policies;

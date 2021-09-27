@@ -214,7 +214,7 @@ class ExpensePage extends React.Component {
               <Box flex="1 1 500px" minWidth={300} maxWidth={792} mr={[0, 3, 5]} mb={5}>
                 <Flex>
                   <H1 fontSize="32px" lineHeight="40px" mb={24} py={2} fontWeight="normal">
-                    <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
+                    <FormattedMessage id="Expenses" defaultMessage="Expenses" />
                   </H1>
                   <Box mx="auto" />
                   <SearchFormContainer p={2}>

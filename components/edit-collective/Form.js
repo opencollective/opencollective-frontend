@@ -64,6 +64,8 @@ class EditCollectiveForm extends React.Component {
     router: PropTypes.object, // from withRouter
     intl: PropTypes.object.isRequired, // from injectIntl
     query: PropTypes.object, // passed from Page/Router through index/EditCollective
+    // If true, hides menu and headers
+    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -378,24 +380,26 @@ class EditCollectiveForm extends React.Component {
   }
 
   renderSection(section) {
-    const { collective, LoggedInUser } = this.props;
+    const { collective, contentOnly, LoggedInUser } = this.props;
 
     switch (section) {
       case EDIT_COLLECTIVE_SECTIONS.INFO:
         return null;
 
       case EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS:
-        return <CollectiveGoals collective={collective} currency={collective.currency} />;
+        return <CollectiveGoals collective={collective} currency={collective.currency} contentOnly={contentOnly} />;
 
       case EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE:
-        return <EditCollectivePage collective={collective} />;
+        return <EditCollectivePage collective={collective} contentOnly={contentOnly} />;
 
       case EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS:
         return (
           <div>
-            <SettingsTitle mb={4}>
-              <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
-            </SettingsTitle>
+            {!contentOnly && (
+              <SettingsTitle mb={4}>
+                <FormattedMessage id="editCollective.menu.connectedAccounts" defaultMessage="Connected Accounts" />
+              </SettingsTitle>
+            )}
             <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />
           </div>
         );
@@ -404,18 +408,23 @@ class EditCollectiveForm extends React.Component {
         return null;
 
       case EDIT_COLLECTIVE_SECTIONS.EXPORT:
-        return <Export collective={collective} />;
+        return <Export collective={collective} contentOnly={contentOnly} />;
 
       case EDIT_COLLECTIVE_SECTIONS.HOST:
         return (
-          <Host collective={collective} LoggedInUser={LoggedInUser} editCollectiveMutation={this.props.onSubmit} />
+          <Host
+            collective={collective}
+            LoggedInUser={LoggedInUser}
+            editCollectiveMutation={this.props.onSubmit}
+            contentOnly={contentOnly}
+          />
         );
 
       case EDIT_COLLECTIVE_SECTIONS.MEMBERS:
-        return <Members collective={collective} />;
+        return <Members collective={collective} contentOnly={contentOnly} />;
 
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS:
-        return <PaymentMethods collectiveSlug={collective.slug} />;
+        return <PaymentMethods collectiveSlug={collective.slug} contentOnly={contentOnly} />;
 
       case EDIT_COLLECTIVE_SECTIONS.TIERS:
         return (
@@ -427,6 +436,7 @@ class EditCollectiveForm extends React.Component {
             currency={collective.currency}
             onChange={tiers => this.setState({ tiers, modified: true })}
             defaultType="TIER"
+            contentOnly={contentOnly}
           />
         );
 
@@ -444,7 +454,7 @@ class EditCollectiveForm extends React.Component {
         );
 
       case EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS:
-        return <GiftCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
+        return <GiftCards collectiveId={collective.id} collectiveSlug={collective.slug} contentOnly={contentOnly} />;
 
       case 'gift-cards-create':
       case 'gift-cards-send':
@@ -485,14 +495,16 @@ class EditCollectiveForm extends React.Component {
         );
 
       case EDIT_COLLECTIVE_SECTIONS.WEBHOOKS:
-        return <Webhooks collectiveSlug={collective.slug} />;
+        return <Webhooks collectiveSlug={collective.slug} contentOnly={contentOnly} />;
 
       case EDIT_COLLECTIVE_SECTIONS.ADVANCED:
         return (
           <Box>
-            <SettingsTitle mb={4}>
-              <FormattedMessage id="Account.AdvancedSettings" defaultMessage="Advanced settings" />
-            </SettingsTitle>
+            {!contentOnly && (
+              <SettingsTitle mb={4}>
+                <FormattedMessage id="Account.AdvancedSettings" defaultMessage="Advanced settings" />
+              </SettingsTitle>
+            )}
             {collective.type === CollectiveType.USER && <EditUserEmailForm />}
             {[CollectiveType.FUND, CollectiveType.COLLECTIVE, CollectiveType.PROJECT, CollectiveType.EVENT].includes(
               collective.type,
@@ -508,16 +520,16 @@ class EditCollectiveForm extends React.Component {
         return <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />;
 
       case EDIT_COLLECTIVE_SECTIONS.HOST_PLAN:
-        return <HostPlan collective={collective} />;
+        return <HostPlan collective={collective} contentOnly={contentOnly} />;
 
       case EDIT_COLLECTIVE_SECTIONS.HOST_METRICS:
-        return <HostMetrics collective={collective} />;
+        return <HostMetrics collective={collective} contentOnly={contentOnly} />;
 
       case EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS:
-        return <InvoicesReceipts collective={collective} />;
+        return <InvoicesReceipts collective={collective} contentOnly={contentOnly} />;
 
       case EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY:
-        return <ReceivingMoney collective={collective} />;
+        return <ReceivingMoney collective={collective} contentOnly={contentOnly} />;
 
       case EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS:
         return (
@@ -530,28 +542,28 @@ class EditCollectiveForm extends React.Component {
         );
 
       case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
-        return <SendingMoney collective={collective} />;
+        return <SendingMoney collective={collective} contentOnly={contentOnly} />;
 
       case EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH:
-        return <HostTwoFactorAuth collective={collective} />;
+        return <HostTwoFactorAuth collective={collective} contentOnly={contentOnly} />;
 
       // 2FA
       case EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH:
-        return <UserTwoFactorAuth slug={collective.slug} userEmail={LoggedInUser.email} />;
+        return <UserTwoFactorAuth slug={collective.slug} userEmail={LoggedInUser.email} contentOnly={contentOnly} />;
 
       // Payment Receipts
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS:
-        return <PaymentReceipts collective={collective} />;
+        return <PaymentReceipts collective={collective} contentOnly={contentOnly} />;
 
       // Policies and moderation
       case EDIT_COLLECTIVE_SECTIONS.POLICIES:
-        return <Policies collective={collective} />;
+        return <Policies collective={collective} contentOnly={contentOnly} />;
 
       case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS:
-        return <HostVirtualCards collective={collective} />;
+        return <HostVirtualCards collective={collective} contentOnly={contentOnly} />;
 
       case EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS:
-        return <VirtualCards collective={collective} />;
+        return <VirtualCards collective={collective} contentOnly={contentOnly} />;
 
       default:
         return null;
@@ -618,7 +630,7 @@ class EditCollectiveForm extends React.Component {
   };
 
   render() {
-    const { collective, status, intl, router } = this.props;
+    const { collective, status, intl, router, contentOnly } = this.props;
 
     const section = get(router, 'query.section', 'info');
 
@@ -839,13 +851,13 @@ class EditCollectiveForm extends React.Component {
     });
 
     const fields = (this.fields[section] || []).filter(field => !field.when || field.when());
-
     return (
       <div className="EditCollectiveForm">
         <Flex flexWrap="wrap">
-          <Menu collective={collective} selectedSection={this.getMenuSelectedSection(section)} />
+          {contentOnly ? null : <Menu collective={collective} selectedSection={this.getMenuSelectedSection(section)} />}
+
           <Flex flexDirection="column" css={{ flexGrow: 10, flexBasis: 600 }}>
-            {section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && (
+            {section === EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING && !contentOnly && (
               <SettingsTitle>
                 <FormattedMessage id="editCollective.fiscalHosting" defaultMessage={'Fiscal Hosting'} />
               </SettingsTitle>

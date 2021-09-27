@@ -267,7 +267,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, Lo
 /**
  * Returns the main CTA that should be displayed as a button outside of the action menu in this component.
  */
-const getMainAction = (collective, callsToAction) => {
+const getMainAction = (collective, callsToAction, LoggedInUser) => {
   if (!collective || !callsToAction) {
     return null;
   }
@@ -277,7 +277,7 @@ const getMainAction = (collective, callsToAction) => {
     return {
       type: NAVBAR_ACTION_TYPE.SETTINGS,
       component: (
-        <Link href={getSettingsRoute(collective)} data-cy="edit-collective-btn">
+        <Link href={getSettingsRoute(collective, LoggedInUser)} data-cy="edit-collective-btn">
           <ActionButton tabIndex="-1">
             <Settings size="1em" />
             <Span ml={2}>
@@ -429,7 +429,7 @@ const CollectiveNavbar = ({
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
-  const mainAction = getMainAction(collective, actionsArray);
+  const mainAction = getMainAction(collective, actionsArray, LoggedInUser);
   const secondAction = actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type));
   const navbarRef = useRef();
   const mainContainerRef = useRef();
@@ -571,6 +571,7 @@ const CollectiveNavbar = ({
                   collective={collective}
                   callsToAction={callsToAction}
                   hiddenActionForNonMobile={mainAction?.type}
+                  LoggedInUser={LoggedInUser}
                 />
               )}
               {!onlyInfos && (

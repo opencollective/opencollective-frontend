@@ -10,6 +10,7 @@ import { createGlobalStyle } from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
+import { getSettingsRoute } from '../lib/url-helpers';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
@@ -79,7 +80,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
           ) : null
         }
       </Query>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/edit`}>
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={getSettingsRoute(LoggedInUser.collective, LoggedInUser)}>
         <FormattedMessage id="Settings" defaultMessage="Settings" />
       </UserMenuLinkEntry>
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.username}/recurring-contributions`}>

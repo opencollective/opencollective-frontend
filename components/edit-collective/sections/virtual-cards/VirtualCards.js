@@ -124,7 +124,7 @@ const VirtualCards = props => {
 
   return (
     <Box width={['366px', '764px']}>
-      <SettingsTitle>
+      <SettingsTitle contentOnly={props.contentOnly}>
         <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
       </SettingsTitle>
 
@@ -195,6 +195,7 @@ VirtualCards.propTypes = {
     virtualCardMerchants: PropTypes.array,
     host: PropTypes.object,
   }),
+  contentOnly: PropTypes.bool,
   hideTopsection: PropTypes.func,
 };
 

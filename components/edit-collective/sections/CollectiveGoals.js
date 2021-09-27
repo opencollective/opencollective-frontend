@@ -34,6 +34,7 @@ class CollectiveGoals extends React.Component {
     intl: PropTypes.object.isRequired,
     editCollectiveSettings: PropTypes.func.isRequired,
     title: PropTypes.string,
+    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -236,6 +237,7 @@ class CollectiveGoals extends React.Component {
       <Container>
         <Container borderBottom={BORDER} mb={4} pb={4}>
           <SettingsTitle
+            contentOnly={this.props.contentOnly}
             subtitle={
               <FormattedMessage
                 id="EditGoals.Instructions"
