@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { getCollectiveTypeKey } from '../../lib/collective-sections';
-import { CollectiveType } from '../../lib/constants/collectives';
+import { CollectiveType, isHost, isOneOfTypes, isType } from '../../lib/collective-sections';
 
 import { HOST_SECTIONS } from '../host-dashboard/constants';
 
@@ -18,9 +17,6 @@ import {
 import { MenuGroup, MenuLink, MenuSectionHeader, useSubmenu } from './MenuComponents';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
-const isType = (c, collectiveType) => getCollectiveTypeKey(c.type) === collectiveType;
-const isOneOfTypes = (c, collectiveTypes) => collectiveTypes.includes(getCollectiveTypeKey(c.type));
-const isHost = c => c.isHost === true;
 
 const Menu = ({ collective }) => {
   const { menuContent, SubMenu } = useSubmenu();
@@ -99,7 +95,11 @@ const Menu = ({ collective }) => {
 
         <MenuGroup if={!isHost(collective) && !isType(collective, ORGANIZATION)}>
           <MenuSectionHeader>
-            <FormattedMessage id="AdminPanel.CollectiveSettings" defaultMessage="Collective Settings" />
+            {isType(collective, USER) ? (
+              <FormattedMessage id="AdminPanel.UserSettings" defaultMessage="User Settings" />
+            ) : (
+              <FormattedMessage id="AdminPanel.CollectiveSettings" defaultMessage="Collective Settings" />
+            )}
           </MenuSectionHeader>
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.INFO} />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.COLLECTIVE_PAGE} />
