@@ -83,6 +83,8 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
   if (query.period) {
     [dateFrom, dateTo] = query.period.split('→');
   }
+  dateFrom = dateFrom === 'all' ? null : dateFrom;
+  dateTo = dateTo === 'all' ? null : dateTo;
 
   const type = query.type;
 
@@ -209,6 +211,13 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
     }
     if (!query.ignoreChildrenTransactions) {
       url.searchParams.set('includeChildrenTransactions', '1');
+    }
+
+    if (dateFrom) {
+      // Is the diff between dateFrom and dateTo (or today) less than 62 days?
+      if (dayjs(dateTo || undefined).unix() - dayjs(dateFrom).unix() < 62 * 24 * 60 * 60) {
+        url.searchParams.set('fetchAll', '1');
+      }
     }
 
     return url.toString();
