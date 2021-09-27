@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { withRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { isHost } from '../lib/collective-sections';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import AdminPanelSection from '../components/admin-panel/AdminPanelSection';
@@ -63,6 +64,7 @@ const messages = defineMessages({
     defaultMessage: 'This account has been archived is no longer active.',
   },
 });
+
 export async function getServerSideProps({ res }) {
   res.setHeader('Cache-Control', 'no-cache');
 
@@ -71,8 +73,16 @@ export async function getServerSideProps({ res }) {
   };
 }
 
-const AdminPanelPage = ({ router }) => {
-  const { slug } = router.query;
+const getDefaultSectionForAccount = account => {
+  if (account && isHost(account)) {
+    return 'expenses';
+  }
+  return 'info';
+};
+
+const AdminPanelPage = () => {
+  const router = useRouter();
+  const { slug, section } = router.query;
   const intl = useIntl();
   const { LoggedInUser, loadingLoggedInUser } = useUser();
   const { data, loading } = useQuery(adminPanelQuery, {
@@ -80,7 +90,14 @@ const AdminPanelPage = ({ router }) => {
     variables: { slug },
     skip: loadingLoggedInUser,
   });
-  const section = router.query.section || 'info';
+
+  React.useEffect(() => {
+    if (!router.query.section && data?.account) {
+      const section = getDefaultSectionForAccount(account);
+      router.replace(`/${slug}/admin/${section}`);
+    }
+  }, [router.query.section, data?.account]);
+
   const account = data?.account;
 
   const canEditAccount = LoggedInUser?.canEditCollective(account);
@@ -158,4 +175,4 @@ AdminPanelPage.propTypes = {
   router: PropTypes.object,
 };
 
-export default withRouter(AdminPanelPage);
+export default AdminPanelPage;
