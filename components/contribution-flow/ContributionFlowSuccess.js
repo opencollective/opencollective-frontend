@@ -18,7 +18,7 @@ import { facebookShareURL, tweetURL } from '../../lib/url-helpers';
 import Container from '../../components/Container';
 import { formatAccountDetails } from '../../components/edit-collective/utils';
 import { Box, Flex } from '../../components/Grid';
-import I18nFormatters, { getI18nLink } from '../../components/I18nFormatters';
+import I18nFormatters, { getI18nLink, I18nBold } from '../../components/I18nFormatters';
 import Loading from '../../components/Loading';
 import MessageBox from '../../components/MessageBox';
 import StyledLink from '../../components/StyledLink';
@@ -294,7 +294,7 @@ class ContributionFlowSuccess extends React.Component {
                       defaultMessage="You are now supporting <link>{collective}</link>."
                       values={{
                         collective: order.toAccount.name,
-                        link: value => <Link href={{ pathname: order.toAccount.slug }}>{value}</Link>,
+                        link: isEmbed ? I18nBold : getI18nLink({ href: `/${order.toAccount.slug}`, as: Link }),
                       }}
                     />
                   </P>
@@ -302,7 +302,7 @@ class ContributionFlowSuccess extends React.Component {
                 {isEmbed ? (
                   <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
                 ) : (
-                  <StyledLink as={Link} color="black.800" href={{ pathname: order.toAccount.slug }}>
+                  <StyledLink as={Link} color="black.800" href={`/${order.toAccount.slug}`}>
                     <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
                   </StyledLink>
                 )}
