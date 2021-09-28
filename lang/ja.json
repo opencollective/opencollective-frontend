@@ -1,5 +1,6 @@
 {
   "2FA.PleaseEnterCode": "二段階認証を有効化しました。コードを入力してください。",
+  "9kdoVP": "Local time: {localTime}{newLine}UTC time: {utcTime}",
   "Accept": "許可",
   "acceptContributions.addBankAccount": "銀行口座を追加",
   "acceptContributions.bankAccount.info": "銀行振込による貢献を受け入れます。予算は、資金の受領を確認すると更新されます。",

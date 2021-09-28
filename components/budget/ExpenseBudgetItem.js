@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
 import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
 import { get, includes, size } from 'lodash';
-import { FormattedDate, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import expenseStatus from '../../lib/constants/expense-status';
@@ -12,6 +12,7 @@ import { toPx } from '../../lib/theme/helpers';
 
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
+import DateTime from '../DateTime';
 import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
 import ExpenseFilesPreviewModal from '../expenses/ExpenseFilesPreviewModal';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
@@ -158,7 +159,7 @@ const ExpenseBudgetItem = ({
                   />
                 )}
                 {' • '}
-                <FormattedDate value={expense.createdAt} year="numeric" month="long" day="2-digit" />
+                <DateTime value={expense.createdAt} />
                 {isAdminView && (
                   <React.Fragment>
                     {' • '}
