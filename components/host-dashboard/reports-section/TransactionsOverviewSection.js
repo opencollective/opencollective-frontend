@@ -64,21 +64,42 @@ const transactionsOverviewQuery = gqlV2/* GraphQL */ `
     $account: [AccountReferenceInput!]
     $dateFrom: DateTime
     $dateTo: DateTime
+    $timeUnit: TimeUnit
   ) {
     host(slug: $hostSlug) {
       id
       legacyId
       currency
-      contributionStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
+      contributionStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo, timeUnit: $timeUnit) {
         contributionsCount
+        contributionAmountOverTime {
+          nodes {
+            date
+            amount {
+              value
+              valueInCents
+              currency
+            }
+          }
+        }
         oneTimeContributionsCount
         recurringContributionsCount
         dailyAverageIncomeAmount {
           valueInCents
         }
       }
-      expenseStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
+      expenseStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo, timeUnit: $timeUnit) {
         expensesCount
+        expenseAmountOverTime {
+          nodes {
+            date
+            amount {
+              value
+              valueInCents
+              currency
+            }
+          }
+        }
         dailyAverageAmount {
           valueInCents
         }
@@ -143,11 +164,15 @@ const getNumberOfDays = (startDate, endDate) => {
 const getCategories = (intl, startDate, endDate) => {
   const numberOfDays = getNumberOfDays(startDate, endDate);
   if (numberOfDays <= 7) {
+    const currentDay = new Date().getDay();
     return [...new Array(7)].map(
-      (_, idx) => `${intl.formatDate(new Date(0, 0, idx), { weekday: 'long' }).toUpperCase()}`,
+      (_, idx) => `${intl.formatDate(new Date(0, 0, idx + currentDay), { weekday: 'long' }).toUpperCase()}`,
     );
-  } else if (numberOfDays <= 30) {
-    return [...new Array(12)].map((_, idx) => `${intl.formatDate(new Date(0, idx), { month: 'short' }).toUpperCase()}`);
+  } else if (numberOfDays <= 365) {
+    const currentMonth = new Date().getMonth();
+    return [...new Array(12)].map(
+      (_, idx) => `${intl.formatDate(new Date(0, idx + currentMonth + 1), { month: 'short' }).toUpperCase()}`,
+    );
   } else {
     return [...new Array(6)].map(
       (_, idx) =>
@@ -156,14 +181,57 @@ const getCategories = (intl, startDate, endDate) => {
   }
 };
 
+const getCategoryType = (startDate, endDate) => {
+  const numberOfDays = getNumberOfDays(startDate, endDate);
+  if (numberOfDays <= 7) {
+    return 'WEEK';
+  } else if (numberOfDays <= 365) {
+    return 'MONTH';
+  } else {
+    return 'YEAR';
+  }
+};
+
+const constructDataPointObjects = (category, dataPoints) => {
+  let dataPointObject;
+  if (category === 'YEAR') {
+    dataPointObject = new Array(6).fill(0);
+    const currentYear = new Date().getFullYear();
+    dataPoints.forEach(dataPoint => {
+      const year = new Date(dataPoint.date).getFullYear();
+      if (year > currentYear - 6) {
+        dataPointObject[5 - (currentYear - year)] = dataPoint.amount.value;
+      }
+    });
+  } else if (category === 'MONTH') {
+    dataPointObject = new Array(12).fill(0);
+    dataPoints.forEach(dataPoint => {
+      const date = new Date(dataPoint.date);
+      const today = new Date();
+      if (today.getFullYear() - date.getFullYear() === 0) {
+        dataPointObject[date.getMonth() + (12 - today.getMonth())] = dataPoint.amount.value;
+      }
+      // } else if (today.getFullYear() - date.getFullYear() === 1) {
+      //
+      // }
+    });
+  } else if (category === 'WEEK') {
+    dataPointObject = new Array(7).fill(0);
+  }
+
+  return dataPointObject;
+};
+
 const TransactionsOverviewSection = ({ hostSlug }) => {
   const intl = useIntl();
   const [dateFrom, setDateFrom] = useState(null);
   const [dateTo, setDateTo] = useState(null);
   const [collectives, setCollectives] = useState(null);
 
+  const categoryType = getCategoryType(dateFrom, dateTo);
+
   const { data, loading } = useQuery(transactionsOverviewQuery, {
-    variables: { hostSlug, dateFrom, dateTo, account: collectives },
+    variables: { hostSlug, dateFrom, dateTo, account: collectives, timeUnit: categoryType },
     context: API_V2_CONTEXT,
   });
   const host = data?.host;
@@ -171,20 +239,28 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
   const contributionStats = host?.contributionStats;
   const expenseStats = host?.expenseStats;
 
+  const {
+    contributionsCount,
+    recurringContributionsCount,
+    oneTimeContributionsCount,
+    dailyAverageIncomeAmount,
+    contributionAmountOverTime,
+  } = contributionStats || 0;
+  const { expensesCount, invoicesCount, reimbursementsCount, grantsCount, dailyAverageAmount, expenseAmountOverTime } =
+    expenseStats || 0;
+
   const series = [
     {
       name: 'Contributions',
-      data: [30, 40, 45, 50, 49, 60, 70],
+      data: contributionAmountOverTime
+        ? constructDataPointObjects(categoryType, contributionAmountOverTime.nodes)
+        : null,
     },
     {
       name: 'Expenses',
-      data: [40, 60, 34, 23, 54, 89, 22],
+      data: expenseAmountOverTime ? constructDataPointObjects(categoryType, expenseAmountOverTime.nodes) : null,
     },
   ];
-
-  const { contributionsCount, recurringContributionsCount, oneTimeContributionsCount, dailyAverageIncomeAmount } =
-    contributionStats || 0;
-  const { expensesCount, invoicesCount, reimbursementsCount, grantsCount, dailyAverageAmount } = expenseStats || 0;
 
   const setDate = period => {
     const [dateFrom, dateTo] = getDateRangeFromPeriod(period);
