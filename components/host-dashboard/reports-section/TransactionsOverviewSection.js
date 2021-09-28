@@ -164,9 +164,9 @@ const getNumberOfDays = (startDate, endDate) => {
 const getCategories = (intl, startDate, endDate) => {
   const numberOfDays = getNumberOfDays(startDate, endDate);
   if (numberOfDays <= 7) {
-    const currentDay = new Date().getDay();
+    const startDay = new Date(startDate).getDay();
     return [...new Array(7)].map(
-      (_, idx) => `${intl.formatDate(new Date(0, 0, idx + currentDay), { weekday: 'long' }).toUpperCase()}`,
+      (_, idx) => `${intl.formatDate(new Date(0, 0, idx + startDay), { weekday: 'long' }).toUpperCase()}`,
     );
   } else if (numberOfDays <= 365) {
     const currentMonth = new Date().getMonth();
@@ -208,15 +208,19 @@ const constructDataPointObjects = (category, dataPoints) => {
     dataPoints.forEach(dataPoint => {
       const date = new Date(dataPoint.date);
       const today = new Date();
-      if (today.getFullYear() - date.getFullYear() === 0) {
-        dataPointObject[date.getMonth() + (12 - today.getMonth())] = dataPoint.amount.value;
+      if (today.getFullYear() - date.getFullYear() <= 1) {
+        dataPointObject[(date.getMonth() + (12 - today.getMonth())) % 12] = dataPoint.amount.value;
       }
-      // } else if (today.getFullYear() - date.getFullYear() === 1) {
-      //
-      // }
     });
   } else if (category === 'WEEK') {
     dataPointObject = new Array(7).fill(0);
+    dataPoints.forEach(dataPoint => {
+      const date = new Date(dataPoint.date);
+      const today = new Date();
+      if (today.getFullYear() === date.getFullYear() && today.getMonth() === date.getMonth()) {
+        dataPointObject[date.getDay() % 7] = dataPoint.amount.value;
+      }
+    });
   }
 
   return dataPointObject;
