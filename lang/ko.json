@@ -1,5 +1,6 @@
 {
   "2FA.PleaseEnterCode": "Two-factor authentication enabled: please enter your code.",
+  "9kdoVP": "Local time: {localTime}{newLine}UTC time: {utcTime}",
   "Accept": "동의",
   "acceptContributions.addBankAccount": "은행 계좌 추가",
   "acceptContributions.bankAccount.info": "은행 송금을 통해 기부를 수락합니다. 자금 수령을 확인하면 예산이 업데이트됩니다.",
