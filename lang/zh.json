@@ -687,7 +687,6 @@
   "Crypto": "加密货币",
   "Currency": "货币",
   "currency": "货币",
-  "D9cpsc": "Legal Name (Optional)",
   "Date.BeforeShort": "在 {date, date, short} 之前",
   "Date.DateRange": "{dateFrom, date, short} 至 {dateTo, date, short}",
   "Date.SinceShort": "自 {date, date, short}",

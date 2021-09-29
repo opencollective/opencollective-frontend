@@ -63,7 +63,8 @@ const msg = defineMessages({
     defaultMessage: 'Organization name',
   },
   legalName: {
-    defaultMessage: 'Legal Name (Optional)',
+    id: 'LegalName',
+    defaultMessage: 'Legal Name',
   },
   fullName: {
     id: 'User.FullName',
@@ -330,6 +331,7 @@ const CreateCollectiveMiniForm = ({
                 <StyledInputField
                   name="legalName"
                   htmlFor="legalName"
+                  required={false}
                   label={formatMessage(msg.legalName)}
                   mt={3}
                   value={values.legalName}
