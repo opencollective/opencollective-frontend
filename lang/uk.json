@@ -1,5 +1,6 @@
 {
   "2FA.PleaseEnterCode": "Увімкнено двоетапну перевірку: введіть свій код.",
+  "9kdoVP": "Local time: {localTime}{newLine}UTC time: {utcTime}",
   "Accept": "Прийняти",
   "acceptContributions.addBankAccount": "Додати банківський рахунок",
   "acceptContributions.bankAccount.info": "Приймайте внески за допомогою банківського переказу. Бюджет оновиться, коли ви підтвердите отримання коштів.",
