@@ -7,6 +7,7 @@ import Select, { components as ReactSelectComponents } from 'react-select';
 import styled from 'styled-components';
 import { layout, space, typography } from 'styled-system';
 
+import Container from './Container';
 import { Flex } from './Grid';
 import SearchIcon from './SearchIcon';
 import StyledHr from './StyledHr';
@@ -45,18 +46,25 @@ const SelectContainer = ({ innerProps, ...props }) => (
   />
 );
 
-// eslint-disable-next-line react/prop-types
-const MultiValue = ({ children, removeProps }) => {
+/* eslint-disable react/prop-types */
+const MultiValue = ({ children, removeProps, ...props }) => {
   if (typeof children === 'string') {
     children = truncate(children, { maxLength: 32 });
   }
 
   return (
     <StyledTag m="4px" variant="rounded-right" maxHeight="none" closeButtonProps={removeProps}>
-      {children}
+      {props.selectProps.useCompactMode ? (
+        <Container maxWidth={28} overflow="hidden" title={props.data.label}>
+          {children}
+        </Container>
+      ) : (
+        children
+      )}
     </StyledTag>
   );
 };
+/* eslint-enable react/prop-types */
 
 const STYLES_DISPLAY_NONE = { display: 'none' };
 
@@ -270,11 +278,14 @@ StyledSelect.propTypes = {
   styles: PropTypes.object,
   /** To render menu in a portal */
   menuPortalTarget: PropTypes.any,
+  /** Compact mode for rending multiple selections correctly **/
+  useCompactMode: PropTypes.bool,
 };
 
 StyledSelect.defaultProps = {
   fontSize: '14px',
   styles: {},
+  useCompactMode: false,
 };
 
 /** @component */
