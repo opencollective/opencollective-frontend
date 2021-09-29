@@ -1,5 +1,6 @@
 {
   "2FA.PleaseEnterCode": "Two-factor authentication enabled: please enter your code.",
+  "9kdoVP": "Local time: {localTime}{newLine}UTC time: {utcTime}",
   "Accept": "Accepta",
   "acceptContributions.addBankAccount": "Afegir el compte bancari",
   "acceptContributions.bankAccount.info": "Accept contributions via bank transfer. The budget will update when you confirm receipt of funds.",
