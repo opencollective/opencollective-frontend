@@ -20,7 +20,7 @@ import StyledInputField from '../../StyledInputField';
 import StyledTooltip from '../../StyledTooltip';
 import { Span } from '../../Text';
 
-const DEFAULT_INTERVAL = { from: '', to: '' };
+const DEFAULT_INTERVAL = { from: '', to: '', timezoneType: 'local' };
 
 /**
  * Parse `strValue` in a "dateFrom→dateTo" format and returns an array like [dateFrom, dateTo].
