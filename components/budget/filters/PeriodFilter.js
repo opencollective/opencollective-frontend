@@ -148,21 +148,26 @@ const TriggerContainer = styled(StyledButton)`
 
 const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
   const intl = useIntl();
-  const [dateInterval, setDateInterval] = React.useState(getIntervalFromValue(value));
+  const intervalFromValue = React.useMemo(() => getIntervalFromValue(value), [value]);
+  const [tmpDateInterval, setTmpDateInterval] = React.useState(intervalFromValue);
   const formattedMin = stripTime(minDate);
 
   const setDate = (changeField, date) => {
-    setDateInterval(getNewInterval(dateInterval, changeField, date));
+    setTmpDateInterval(getNewInterval(tmpDateInterval, changeField, date));
   };
 
   return (
     <PopupMenu
       placement="bottom-start"
-      onClose={() => setDateInterval(getIntervalFromValue(value))}
+      onClose={() => setTmpDateInterval(intervalFromValue)}
       Button={({ onClick }) => (
         <TriggerContainer onClick={onClick} id={inputId} data-cy="period-filter" {...props}>
           <Flex justifyContent="space-between" alignItems="center">
-            <DateRange from={dateInterval.from} to={dateInterval.to} isUTC={dateInterval.timezoneType === 'UTC'} />
+            <DateRange
+              from={intervalFromValue.from}
+              to={intervalFromValue.to}
+              isUTC={intervalFromValue.timezoneType === 'UTC'}
+            />
             <ChevronDown size={25} color="#cccccc" />
           </Flex>
         </TriggerContainer>
@@ -173,8 +178,8 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
           <Box mb={3}>
             <PeriodFilterPresetsSelect
               inputId={`${inputId}-presets-select`}
-              onChange={setDateInterval}
-              interval={dateInterval}
+              onChange={setTmpDateInterval}
+              interval={tmpDateInterval}
             />
           </Box>
           <StyledInputField
@@ -192,7 +197,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
                 closeOnSelect
                 lineHeight={1}
                 fontSize="13px"
-                value={stripTime(dateInterval.from)}
+                value={stripTime(tmpDateInterval.from)}
                 min={formattedMin}
                 onChange={e => setDate('from', e.target.value)}
               />
@@ -213,7 +218,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
                 closeOnSelect
                 lineHeight={1}
                 fontSize="13px"
-                value={stripTime(dateInterval.to)}
+                value={stripTime(tmpDateInterval.to)}
                 min={formattedMin}
                 max={stripTime(new Date())}
                 onChange={e => setDate('to', e.target.value)}
@@ -245,10 +250,10 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
                 size="tiny"
                 items={['local', 'UTC']}
                 buttonProps={{ p: 1, fontSize: '11px' }}
-                selected={dateInterval.timezoneType}
+                selected={tmpDateInterval.timezoneType}
                 buttonPropsBuilder={({ item }) => ({ title: getTimeZoneTypeName(intl, item) })}
                 onChange={timezoneType => {
-                  setDateInterval({ ...dateInterval, timezoneType });
+                  setTmpDateInterval({ ...tmpDateInterval, timezoneType });
                 }}
               >
                 {({ item }) => {
@@ -269,7 +274,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
               mt="12px"
               flex="1"
               onClick={() => {
-                setDateInterval(DEFAULT_INTERVAL);
+                setTmpDateInterval(DEFAULT_INTERVAL);
                 setOpen(false);
                 onChange('');
               }}
@@ -283,7 +288,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
               data-cy="btn-apply-period-filter"
               flex="1"
               onClick={() => {
-                onChange(encodePeriod(dateInterval));
+                onChange(encodePeriod(tmpDateInterval));
                 setOpen(false);
               }}
             >
