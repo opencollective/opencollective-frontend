@@ -1,5 +1,6 @@
 {
   "2FA.PleaseEnterCode": "İki faktörlü kimlik doğrulama etkin: lütfen kodunuzu girin.",
+  "9kdoVP": "Local time: {localTime}{newLine}UTC time: {utcTime}",
   "Accept": "Kabut Et",
   "acceptContributions.addBankAccount": "Banka Hesabı Ekle",
   "acceptContributions.bankAccount.info": "Banka havalesi yoluyla katkıları kabul edin. Paranın alındığını onayladığınızda bütçe güncellenecektir.",
