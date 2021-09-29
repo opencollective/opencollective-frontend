@@ -220,7 +220,6 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
             )}
           </StyledInputField>
           <StyledInputField
-            data-cy="download-csv-end-date"
             name="timezoneType"
             mt="12px"
             labelFontSize="13px"
