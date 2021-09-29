@@ -687,6 +687,7 @@
   "Crypto": "Crypto",
   "Currency": "Currency",
   "currency": "divisa",
+  "D9cpsc": "Legal Name (Optional)",
   "Date.BeforeShort": "Before {date, date, short}",
   "Date.DateRange": "{dateFrom, date, short} to {dateTo, date, short}",
   "Date.SinceShort": "Since {date, date, short}",

@@ -63,8 +63,7 @@ const msg = defineMessages({
     defaultMessage: 'Organization name',
   },
   legalName: {
-    id: 'LegalName',
-    defaultMessage: 'Legal Name',
+    defaultMessage: 'Legal Name (Optional)',
   },
   fullName: {
     id: 'User.FullName',

@@ -687,6 +687,7 @@
   "Crypto": "Crypto",
   "Currency": "Валюта",
   "currency": "валюта",
+  "D9cpsc": "Legal Name (Optional)",
   "Date.BeforeShort": "До {date, date, short}",
   "Date.DateRange": "З {dateFrom, date, short} до {dateTo, date, short}",
   "Date.SinceShort": "З {date, date, short}",

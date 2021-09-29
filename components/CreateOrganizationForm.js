@@ -25,7 +25,7 @@ import { withUser } from './UserProvider';
 
 const orgMessages = defineMessages({
   nameLabel: { id: 'Organization.Name', defaultMessage: 'Organization name' },
-  legalNameLabel: { id: 'LegalName', defaultMessage: 'Legal Name' },
+  legalNameLabel: { defaultMessage: 'Legal Name (Optional)' },
   slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
   descriptionPlaceholder: {
     id: 'create.collective.placeholder',

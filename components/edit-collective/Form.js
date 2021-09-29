@@ -105,7 +105,7 @@ class EditCollectiveForm extends React.Component {
         defaultMessage:
           'Display names are public and used wherever this profile appears publicly, like contributions, comments on updates, public info on expenses, etc.',
       },
-      'legalName.label': { id: 'LegalName', defaultMessage: 'Legal Name' },
+      'legalName.label': { defaultMessage: 'Legal Name (Optional)' },
       'legalName.description': {
         id: 'editCollective.legalName.description',
         defaultMessage:
