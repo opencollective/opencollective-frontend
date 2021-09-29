@@ -21,11 +21,11 @@ import TimezonePicker from './TimezonePicker';
 
 // Dynamic imports: this components have a huge impact on bundle size and are externalized
 // We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
-let DateTime;
+let DateTimePicker;
 if (process.env.DYNAMIC_IMPORT) {
-  DateTime = dynamic(() => import(/* webpackChunkName: 'DateTime' */ './DateTime'));
+  DateTimePicker = dynamic(() => import(/* webpackChunkName: 'DateTimePicker' */ './DateTimePicker'));
 } else {
-  DateTime = require('./DateTime').default;
+  DateTimePicker = require('./DateTimePicker').default;
 }
 
 const Label = ({ label, isPrivate }) => (
@@ -318,7 +318,7 @@ class InputField extends React.Component {
                   <label>{capitalize(field.label)}</label>
                 </Box>
                 <Box width={[1, 10 / 12]}>
-                  <DateTime
+                  <DateTimePicker
                     name={field.name}
                     timeFormat={field.timeFormat || timeFormat}
                     date={this.state.value || field.defaultValue}
@@ -338,7 +338,7 @@ class InputField extends React.Component {
                   </Box>
                 )}
                 <Box width={1}>
-                  <DateTime
+                  <DateTimePicker
                     name={field.name}
                     timeFormat={field.timeFormat || timeFormat}
                     date={this.state.value || field.defaultValue}

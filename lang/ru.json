@@ -1,5 +1,6 @@
 {
   "2FA.PleaseEnterCode": "Двухфакторная аутентификация включена: пожалуйста, введите ваш код.",
+  "9kdoVP": "Local time: {localTime}{newLine}UTC time: {utcTime}",
   "Accept": "Принять",
   "acceptContributions.addBankAccount": "Добавить банковский счет",
   "acceptContributions.bankAccount.info": "Принимайте взносы посредством банковского перевода. Бюджет будет обновляться после подтверждения получения средств.",

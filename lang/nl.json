@@ -1,5 +1,6 @@
 {
   "2FA.PleaseEnterCode": "Two-factor authentication enabled: please enter your code.",
+  "9kdoVP": "Local time: {localTime}{newLine}UTC time: {utcTime}",
   "Accept": "Accepteren",
   "acceptContributions.addBankAccount": "Bankrekening toevoegen",
   "acceptContributions.bankAccount.info": "Accepteer bijdragen via bankoverschrijving. Het budget wordt bijgewerkt wanneer je het ontvangen van bedragen accepteert.",

@@ -1,5 +1,6 @@
 {
   "2FA.PleaseEnterCode": "双重身份验证已启用：请输入您的密码。",
+  "9kdoVP": "Local time: {localTime}{newLine}UTC time: {utcTime}",
   "Accept": "接受",
   "acceptContributions.addBankAccount": "添加银行账户",
   "acceptContributions.bankAccount.info": "接受通过银行转账的捐款。当您确认收到资金时，预算将更新。",

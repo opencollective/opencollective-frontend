@@ -4,7 +4,7 @@ import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { MessageSquare } from '@styled-icons/feather/MessageSquare';
 import { truncate } from 'lodash';
-import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
@@ -14,6 +14,7 @@ import { i18nTransactionKind, i18nTransactionType } from '../../lib/i18n/transac
 import Avatar from '../Avatar';
 import { CreditItem, DebitItem } from '../budget/DebitCreditList';
 import Container from '../Container';
+import DateTime from '../DateTime';
 import DefinedTerm, { Terms } from '../DefinedTerm';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTags from '../expenses/ExpenseTags';
@@ -186,11 +187,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   </React.Fragment>
                 )}
                 {INFO_SEPARATOR}
-                <span data-cy="transaction-date">
-                  <time title={createdAt}>
-                    <FormattedDate value={createdAt} year="numeric" month="long" day="2-digit" />
-                  </time>
-                </span>
+                <DateTime value={createdAt} data-cy="transaction-date" />
                 {hasExpense && expense.comments?.totalCount > 0 && (
                   <React.Fragment>
                     {INFO_SEPARATOR}

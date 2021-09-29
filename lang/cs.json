@@ -1,5 +1,6 @@
 {
   "2FA.PleaseEnterCode": "Dvoufaktorové ověření povoleno: zadejte prosím svůj kód.",
+  "9kdoVP": "Local time: {localTime}{newLine}UTC time: {utcTime}",
   "Accept": "Přijato",
   "acceptContributions.addBankAccount": "Přidat bankovní účet",
   "acceptContributions.bankAccount.info": "Přijímat příspěvky prostřednictvím bankovního převodu. Rozpočet se aktualizuje, když potvrdíte příjem prostředků.",
