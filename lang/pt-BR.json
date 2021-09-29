@@ -1,5 +1,6 @@
 {
   "2FA.PleaseEnterCode": "Autenticação de dois fatores ativada: por favor, digite seu código.",
+  "9kdoVP": "Local time: {localTime}{newLine}UTC time: {utcTime}",
   "Accept": "Aceitar",
   "acceptContributions.addBankAccount": "Adicionar conta bancária",
   "acceptContributions.bankAccount.info": "Aceite contribuições por transferência bancária. O orçamento será atualizado quando você confirmar o recebimento dos fundos.",
