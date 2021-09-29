@@ -1,5 +1,6 @@
 {
   "2FA.PleaseEnterCode": "Uwierzytelnianie dwuskładnikowe jest włączone: wprowadź swój kod.",
+  "9kdoVP": "Local time: {localTime}{newLine}UTC time: {utcTime}",
   "Accept": "Akceptuj",
   "acceptContributions.addBankAccount": "Dodaj konto bankowe",
   "acceptContributions.bankAccount.info": "Akceptuj wpłaty przez przelew bankowy. Budżet zostanie zaktualizowany po potwierdzeniu otrzymania środków.",
