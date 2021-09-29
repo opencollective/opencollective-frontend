@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { has } from 'lodash';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { stripTime } from '../../../lib/date-utils';
@@ -101,6 +101,7 @@ const getNewInterval = (interval, changeField, newValue) => {
   return newInterval;
 };
 
+const UTC_LABEL = defineMessage({ defaultMessage: 'Coordinated Universal Time' });
 const getTimeZoneTypeName = (intl, timezone) => {
   if (timezone === 'local') {
     try {
@@ -109,7 +110,7 @@ const getTimeZoneTypeName = (intl, timezone) => {
       return '';
     }
   } else if (timezone === 'UTC') {
-    return 'Coordinated Universal Time';
+    return intl.formatMessage(UTC_LABEL);
   } else {
     return '';
   }
