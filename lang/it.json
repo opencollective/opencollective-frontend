@@ -1,5 +1,6 @@
 {
   "2FA.PleaseEnterCode": "Autenticazione a due fattori abilitata: sei pregato di inserire il tuo codice.",
+  "9kdoVP": "Local time: {localTime}{newLine}UTC time: {utcTime}",
   "Accept": "Accetta",
   "acceptContributions.addBankAccount": "Aggiungi conto bancario",
   "acceptContributions.bankAccount.info": "Accetta i contributi tramite bonifico bancario. Il budget verrà aggiornato quando avrai confermato la ricezione dell'importo.",
