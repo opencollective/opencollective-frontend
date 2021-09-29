@@ -23,6 +23,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'BTC (Bitcoin)',
     value: 'BTC',
+    minDonation: 0.00001,
   },
   {
     label: (
@@ -33,6 +34,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'ETH (Ethereum)',
     value: 'ETH',
+    minDonation: 0.001,
   },
   {
     label: (
@@ -43,6 +45,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'BCH (Bitcoin Cash)',
     value: 'BCH',
+    minDonation: 0.001,
   },
   {
     label: (
@@ -53,6 +56,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'LTC (Litecoin)',
     value: 'LTC',
+    minDonation: 0.01,
   },
   {
     label: (
@@ -63,6 +67,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'ZEC (Zcash)',
     value: 'ZEC',
+    minDonation: 0.001,
   },
   {
     label: (
@@ -73,6 +78,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'LINK (Chainlink)',
     value: 'LINK',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -83,6 +89,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'BAT (Basic Attention Token)',
     value: 'BAT',
+    minDonation: 1,
   },
   {
     label: (
@@ -93,6 +100,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'DAI (Dai)',
     value: 'DAI',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -103,6 +111,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'OXT (Orchid)',
     value: 'OXT',
+    minDonation: 1,
   },
   {
     label: (
@@ -113,6 +122,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'STORJ (Storj)',
     value: 'STORJ',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -123,6 +133,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'AMP (Amp)',
     value: 'AMP',
+    minDonation: 10,
   },
   {
     label: (
@@ -133,6 +144,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'ZRX (Ox)',
     value: 'ZRX',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -143,6 +155,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'DOGE (Dogecoin)',
     value: 'DOGE',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -153,6 +166,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'COMP (Compound)',
     value: 'COMP',
+    minDonation: 0.001,
   },
   {
     label: (
@@ -163,6 +177,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'SNX (Synthetix)',
     value: 'SNX',
+    minDonation: 0.01,
   },
   {
     label: (
@@ -173,6 +188,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'AAVE (Aave)',
     value: 'AAVE',
+    minDonation: 0.001,
   },
   {
     label: (
@@ -183,6 +199,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'GRT (The Graph)',
     value: 'GRT',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -193,6 +210,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'BNT (Bancor)',
     value: 'BNT',
+    minDonation: 0.01,
   },
   {
     label: (
@@ -203,6 +221,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'SUSHI (SushiSwap)',
     value: 'SUSHI',
+    minDonation: 0.01,
   },
   {
     label: (
@@ -213,6 +232,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'UNI (Uniswap)',
     value: 'UNI',
+    minDonation: 0.01,
   },
   {
     label: (
@@ -223,6 +243,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'MATIC (Polygon)',
     value: 'MATIC',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -233,6 +254,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'GUSD (Gemini Dollar)',
     value: 'GUSD',
+    minDonation: 0.000001,
   },
   {
     label: (
@@ -243,6 +265,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'CRV (Curve DAO Token)',
     value: 'CRV',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -253,6 +276,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: '1INCH (1inch)',
     value: '1INCH',
+    minDonation: 0.01,
   },
   {
     label: (
@@ -263,6 +287,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'BAL (Balancer)',
     value: 'BAL',
+    minDonation: 0.01,
   },
   {
     label: (
@@ -273,6 +298,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'UMA (UMA)',
     value: 'UMA',
+    minDonation: 0.01,
   },
   {
     label: (
@@ -283,6 +309,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'YFI (Yearn Finance)',
     value: 'YFI',
+    minDonation: 0.00001,
   },
   {
     label: (
@@ -293,6 +320,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'ALCX (Alchemix)',
     value: 'ALCX',
+    minDonation: 0.00001,
   },
   {
     label: (
@@ -303,6 +331,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'SAND (Sandbox)',
     value: 'SAND',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -313,6 +342,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'INJ (Injective Protocol)',
     value: 'INJ',
+    minDonation: 0.01,
   },
   {
     label: (
@@ -323,6 +353,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'PAXG (PAX Gold)',
     value: 'PAXG',
+    minDonation: 0.0001,
   },
   {
     label: (
@@ -333,6 +364,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'ENJ (Enjin Coin)',
     value: 'ENJ',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -343,6 +375,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'FIL (Filecoin)',
     value: 'FIL',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -353,6 +386,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'ANKR (Ankr)',
     value: 'ANKR',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -363,6 +397,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'XTZ (Tezos)',
     value: 'XTZ',
+    minDonation: 0.02,
   },
   {
     label: (
@@ -373,6 +408,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'MKR (Maker)',
     value: 'MKR',
+    minDonation: 0.001,
   },
   {
     label: (
@@ -383,6 +419,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'LRC (Loopring)',
     value: 'LRC',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -393,6 +430,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'BOND (BarnBridge)',
     value: 'BOND',
+    minDonation: 0.001,
   },
   {
     label: (
@@ -403,6 +441,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'SKL (Skale)',
     value: 'SKL',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -413,6 +452,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'MIR (Mirror Protocol)',
     value: 'MIR',
+    minDonation: 0.001,
   },
   {
     label: (
@@ -423,6 +463,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'LPT (Livepeer)',
     value: 'LPT',
+    minDonation: 0.001,
   },
   {
     label: (
@@ -433,6 +474,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'MANA (Mana)',
     value: 'MANA',
+    minDonation: 1,
   },
   {
     label: (
@@ -443,6 +485,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'FTM (Fantom)',
     value: 'FTM',
+    minDonation: 0.03,
   },
   {
     label: (
@@ -453,6 +496,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'KNC (Kyber)',
     value: 'KNC',
+    minDonation: 0.1,
   },
   {
     label: (
@@ -463,6 +507,7 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'CUBE (Cube)',
     value: 'CUBE',
+    minDonation: 0.01,
   },
   {
     label: (
@@ -473,5 +518,6 @@ export const CRYPTO_CURRENCIES = [
     ),
     labelWithoutImage: 'REN (Ren)',
     value: 'REN',
+    minDonation: 0.1,
   },
 ];
