@@ -18,7 +18,7 @@ Watch this 2 minute explainer video about what we do and why we are passionate a
 
 ## We think you’d be great at this if you:
 
-- Are comfortable in a remote environment that is at the same time highly collaborative (we [apply](https://github.com/opencollective/opencollective/issues/2267) a [seeking feedback process](http://www.reinventingorganizationswiki.com/Decision_Making)) and autonomous (you can run a feature end to end on your own!)
+- Are comfortable in a remote environment that is at the same time highly collaborative (we [apply](https://github.com/opencollective/opencollective/issues/2267) a [seeking feedback process](https://reinventingorganizationswiki.com/theory/decision-making/)) and autonomous (you can run a feature end to end on your own!)
 
 - Are based in Europe:
 
