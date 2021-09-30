@@ -15,7 +15,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import Body from '../components/Body';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
-import { getDateRangeFromPeriod } from '../components/budget/filters/PeriodFilter';
+import { parseDateRange } from '../components/budget/filters/PeriodFilter';
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
@@ -106,7 +106,7 @@ const EXPENSES_PER_PAGE = 15;
 
 const getVariablesFromQuery = query => {
   const amountRange = parseAmountRange(query.amount);
-  const [dateFrom, dateTo] = getDateRangeFromPeriod(query.period);
+  const { from: dateFrom, to: dateTo } = parseDateRange(query.period);
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || EXPENSES_PER_PAGE,

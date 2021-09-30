@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import PeriodFilter, { getDateRangeFromPeriod } from '../../budget/filters/PeriodFilter';
+import PeriodFilter, { parseDateRange } from '../../budget/filters/PeriodFilter';
 import Container from '../../Container';
 import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../../FormattedMoneyAmount';
 import { Box, Flex } from '../../Grid';
@@ -40,9 +40,8 @@ const platformTipsQuery = gqlV2/* GraphQL */ `
 const AMOUNT_STYLES = { ...DEFAULT_AMOUNT_STYLES, fontSize: '18px', lineHeight: '26px' };
 
 const PlatformTipsCollected = ({ hostSlug }) => {
-  const [dateRange, setDateRange] = React.useState([]);
-  const [dateFrom, dateTo] = dateRange;
-  const variables = { hostSlug, dateFrom, dateTo };
+  const [dateRange, setDateRange] = React.useState({ from: null, to: null });
+  const variables = { hostSlug, dateFrom: dateRange.from, dateTo: dateRange.to };
   const { data, loading, error } = useQuery(platformTipsQuery, { variables, context: API_V2_CONTEXT });
 
   if (error) {
@@ -60,7 +59,7 @@ const PlatformTipsCollected = ({ hostSlug }) => {
         </Flex>
         <PeriodFilter
           minWidth={185}
-          onChange={encodedValue => setDateRange(getDateRangeFromPeriod(encodedValue))}
+          onChange={encodedValue => setDateRange(parseDateRange(encodedValue))}
           value={dateRange}
         />
       </Flex>

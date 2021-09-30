@@ -10,7 +10,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { useLazyGraphQLPaginatedResults } from '../../lib/hooks/useLazyGraphQLPaginatedResults';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
-import { getDateRangeFromPeriod } from '../budget/filters/PeriodFilter';
+import { parseDateRange } from '../budget/filters/PeriodFilter';
 import DismissibleMessage from '../DismissibleMessage';
 import ExpensesFilters from '../expenses/ExpensesFilters';
 import ExpensesList from '../expenses/ExpensesList';
@@ -124,7 +124,7 @@ const isValidStatus = status => {
 
 const getVariablesFromQuery = query => {
   const amountRange = parseAmountRange(query.amount);
-  const [dateFrom, dateTo] = getDateRangeFromPeriod(query.period);
+  const { from: dateFrom, to: dateTo } = parseDateRange(query.period);
   return {
     offset: parseInt(query.offset) || 0,
     limit: (parseInt(query.limit) || NB_EXPENSES_DISPLAYED) * 2,

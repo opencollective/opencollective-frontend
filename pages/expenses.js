@@ -17,7 +17,7 @@ import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
-import { getDateRangeFromPeriod } from '../components/budget/filters/PeriodFilter';
+import { parseDateRange } from '../components/budget/filters/PeriodFilter';
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
@@ -429,7 +429,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
 const addExpensesPageData = graphql(expensesPageQuery, {
   options: props => {
     const amountRange = parseAmountRange(props.query.amount);
-    const [dateFrom, dateTo] = getDateRangeFromPeriod(props.query.period);
+    const { from: dateFrom, to: dateTo } = parseDateRange(props.query.period);
     return {
       context: API_V2_CONTEXT,
       variables: {
