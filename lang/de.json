@@ -1,7 +1,9 @@
 {
   "+n7iNv": "Past Month",
   "2FA.PleaseEnterCode": "Zwei-Faktor-Authentifizierung aktiviert: Bitte geben Sie Ihren Code ein.",
+  "7nUCu9": "Timezone",
   "8J1GQR": "Generate report",
+  "94IjMb": "Coordinated Universal Time",
   "9kdoVP": "Local time: {localTime}{newLine}UTC time: {utcTime}",
   "9sbPks": "By default, all dates are filtered and displayed using your local timezone. You can switch to UTC to indicate that the dates provided above use the Coordinated Universal Time format, which matches how email reports are generated",
   "Accept": "Akzeptieren",
