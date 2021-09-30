@@ -2,6 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { getDateFromValue } from '../lib/date-utils';
+import dayjs from '../lib/dayjs';
+
 const getMessage = (from, to) => {
   if (!from && !to) {
     return <FormattedMessage id="DateRange.All" defaultMessage="All" />;
@@ -10,7 +13,7 @@ const getMessage = (from, to) => {
       <FormattedMessage
         id="Date.DateRange"
         defaultMessage="{dateFrom, date, short} to {dateTo, date, short}"
-        values={{ dateFrom: new Date(from), dateTo: new Date(to) }}
+        values={{ dateFrom: getDateFromValue(from), dateTo: getDateFromValue(to) }}
       />
     );
   } else if (from) {
@@ -18,7 +21,7 @@ const getMessage = (from, to) => {
       <FormattedMessage
         id="Date.SinceShort"
         defaultMessage="Since {date, date, short}"
-        values={{ date: new Date(from) }}
+        values={{ date: getDateFromValue(from) }}
       />
     );
   } else {
@@ -26,7 +29,7 @@ const getMessage = (from, to) => {
       <FormattedMessage
         id="Date.BeforeShort"
         defaultMessage="Before {date, date, short}"
-        values={{ date: new Date(to) }}
+        values={{ date: getDateFromValue(to) }}
       />
     );
   }
@@ -52,7 +55,7 @@ export const DateRange = ({ from, to, isUTC }) => {
 };
 
 DateRange.propTypes = {
-  from: PropTypes.string,
-  to: PropTypes.string,
+  from: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date), PropTypes.instanceOf(dayjs)]),
+  to: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date), PropTypes.instanceOf(dayjs)]),
   isUTC: PropTypes.bool,
 };

@@ -102,6 +102,20 @@ const getNewInterval = (interval, changeField, newValue) => {
   return newInterval;
 };
 
+/**
+ * Date is locally stored as '2020-01-01'. We need to force the time to make sure it's not modified
+ * by timezones when parsed.
+ */
+const parseDateForDateRange = (dateStr, isEndOfDay) => {
+  if (!dateStr) {
+    return null;
+  } else if (!isEndOfDay) {
+    return new Date(`${dateStr}T00:00:00`);
+  } else {
+    return new Date(`${dateStr}T23:59:59`);
+  }
+};
+
 const UTC_LABEL = defineMessage({ defaultMessage: 'Coordinated Universal Time' });
 const getTimeZoneTypeName = (intl, timezone) => {
   if (timezone === 'local') {
@@ -165,8 +179,8 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
         <TriggerContainer onClick={onClick} id={inputId} data-cy="period-filter" {...props}>
           <Flex justifyContent="space-between" alignItems="center">
             <DateRange
-              from={intervalFromValue.from}
-              to={intervalFromValue.to}
+              from={parseDateForDateRange(intervalFromValue.from, false)}
+              to={parseDateForDateRange(intervalFromValue.to, true)}
               isUTC={intervalFromValue.timezoneType === 'UTC'}
             />
             <ChevronDown size={25} color="#cccccc" />
