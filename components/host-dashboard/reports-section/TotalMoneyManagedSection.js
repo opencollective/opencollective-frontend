@@ -80,8 +80,8 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
             <FormattedMessage id="TotalMoneyManagedSection.projected" defaultMessage="Projected" />
           </Span>
         </Flex>
-        <P minHeight="12px" fontSize="11px" fontWeight="700" lineHeight="12px" textTransform="uppercase">
-          <Span style={{ verticalAlign: 'middle' }}>
+        <Container display="flex" fontSize="11px" fontWeight="700" lineHeight="12px" alignItems="center">
+          <Span textTransform="uppercase">
             <FormattedMessage
               id="TotalMoneyManagedSection.subHeading"
               defaultMessage="My Organization and My Collectives"
@@ -99,7 +99,7 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
               <InfoCircle size={14} />
             </StyledTooltip>
           </Box>
-        </P>
+        </Container>
         <Container mt={18} mb={12}>
           <FundAmounts>
             <TotalFundsLabel minWidth="210px">
