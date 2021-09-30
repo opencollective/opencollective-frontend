@@ -14,6 +14,7 @@ import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
 import Link from '../../Link';
+import { PERIOD_FILTER_PRESETS } from '../../PeriodFilterPresetsSelect';
 import StyledButton from '../../StyledButton';
 import StyledInputField from '../../StyledInputField';
 
@@ -53,9 +54,22 @@ const FieldLabel = styled.span`
   color: ${props => props.theme.colors.black[700]};
 `;
 
+/**
+ * Gets the default time interval for the CSV report. The default is intended to match the last
+ * monthly host report received, which is why we use UTC.
+ */
+const getDefaultDateInterval = () => {
+  const interval = PERIOD_FILTER_PRESETS.pastMonth.getInterval();
+  return {
+    timezoneType: 'UTC', // To match the monthly host report sent by email
+    from: interval.from.tz('UTC', true).toISOString(),
+    to: interval.to.tz('UTC', true).toISOString(),
+  };
+};
+
 const HostDownloadsSection = ({ hostSlug }) => {
   const [collectiveOptions, setCollectiveOptions] = React.useState(null);
-  const [dateInterval, setDateInterval] = React.useState(null); // TODO: Value = last month preset
+  const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
   const variables = { hostSlug };
   const { loading, data } = useQuery(hostReportDownloadsSectionQuery, { variables, context: API_V2_CONTEXT });
   const host = data?.host;

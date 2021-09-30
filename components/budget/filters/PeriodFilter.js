@@ -73,7 +73,7 @@ const getIntervalFromValue = value => {
   const isIntervalObject = value => typeof value === 'object' && has(value, 'from') && has(value, 'to');
   const intervalFromValue = isIntervalObject(value) ? value : parseDateRange(value);
   if (intervalFromValue.timezoneType === 'UTC') {
-    const toUTC = date => (date ? dayjs.utc(date, true) : null);
+    const toUTC = date => (date ? dayjs.utc(date) : null);
     intervalFromValue.from = toUTC(intervalFromValue.from);
     intervalFromValue.to = toUTC(intervalFromValue.to);
   }
