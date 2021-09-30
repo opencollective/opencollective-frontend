@@ -331,6 +331,7 @@ const CreateCollectiveMiniForm = ({
                 <StyledInputField
                   name="legalName"
                   htmlFor="legalName"
+                  required={false}
                   label={formatMessage(msg.legalName)}
                   mt={3}
                   value={values.legalName}

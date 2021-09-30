@@ -105,11 +105,15 @@ class EditCollectiveForm extends React.Component {
         defaultMessage:
           'Display names are public and used wherever this profile appears publicly, like contributions, comments on updates, public info on expenses, etc.',
       },
-      'legalName.label': { id: 'LegalName', defaultMessage: 'Legal Name' },
+      legalName: { id: 'LegalName', defaultMessage: 'Legal Name' },
       'legalName.description': {
         id: 'editCollective.legalName.description',
         defaultMessage:
           'Legal names are private and used in receipts, tax forms, payment details on expenses, and other non-public contexts. Legal names are only visible to admins.',
+      },
+      optional: {
+        id: 'OptionalFieldLabel',
+        defaultMessage: '{field} (optional)',
       },
       examples: {
         id: 'examples',
@@ -658,6 +662,9 @@ class EditCollectiveForm extends React.Component {
         },
         {
           name: 'legalName',
+          label: intl.formatMessage(this.messages.optional, {
+            field: intl.formatMessage(this.messages.legalName),
+          }),
           placeholder: intl.formatMessage(this.messages.examples, {
             examples: isUser ? 'Maria Garcia' : 'Salesforce, Inc., Airbnb, Inc.',
           }),
