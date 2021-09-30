@@ -146,8 +146,9 @@ class NewContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, step, LoggedInUser } = this.props;
+    const { data = {}, step, paymentMethod, LoggedInUser } = this.props;
     const { account, tier } = data;
+    const isCrypto = paymentMethod === 'crypto';
 
     if (data.loading) {
       return (
@@ -157,11 +158,17 @@ class NewContributionFlowPage extends React.Component {
       );
     }
 
-    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
+    const contributionBlocker = getContributionBlocker(
+      LoggedInUser,
+      account,
+      tier,
+      Boolean(this.props.tierId),
+      isCrypto,
+    );
     if (contributionBlocker) {
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
-      return <ContributionFlowSuccess collective={account} isCrypto={this.props.paymentMethod === 'crypto'} isEmbed />;
+      return <ContributionFlowSuccess collective={account} isCrypto={isCrypto} isEmbed />;
     } else {
       return (
         <Box height="100%" pt={3}>
