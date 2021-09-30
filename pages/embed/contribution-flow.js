@@ -86,7 +86,7 @@ class NewContributionFlowPage extends React.Component {
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
-    paymentMethod: PropTypes.string,
+    donationMethod: PropTypes.string,
     verb: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
@@ -146,9 +146,9 @@ class NewContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, step, paymentMethod, LoggedInUser } = this.props;
+    const { data = {}, step, donationMethod, LoggedInUser } = this.props;
     const { account, tier } = data;
-    const isCrypto = paymentMethod === 'crypto';
+    const isCrypto = donationMethod === 'crypto';
 
     if (data.loading) {
       return (

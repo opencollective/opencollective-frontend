@@ -219,7 +219,7 @@ exports.REWRITES = [
   },
   // New Routes -> New flow
   {
-    source: `/:collectiveSlug/:verb(donate)/:paymentMethod(crypto)?/:step(${contributionFlowSteps})?`,
+    source: `/:collectiveSlug/:verb(donate)/:donationMethod(crypto)?/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
   {

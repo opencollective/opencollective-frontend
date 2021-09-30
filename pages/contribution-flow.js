@@ -63,7 +63,7 @@ class NewContributionFlowPage extends React.Component {
       description: query.description ? decodeURIComponent(query.description) : undefined,
       interval: query.interval,
       verb: query.verb,
-      paymentMethod: query.paymentMethod,
+      donationMethod: query.donationMethod,
       redirect: query.redirect,
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
@@ -79,7 +79,7 @@ class NewContributionFlowPage extends React.Component {
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
     verb: PropTypes.string,
-    paymentMethod: PropTypes.string,
+    donationMethod: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
     disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
@@ -130,9 +130,9 @@ class NewContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, step, paymentMethod, LoggedInUser, error } = this.props;
+    const { data = {}, step, donationMethod, LoggedInUser, error } = this.props;
     const { account, tier } = data;
-    const isCrypto = paymentMethod === 'crypto';
+    const isCrypto = donationMethod === 'crypto';
 
     if (data.loading) {
       return (
@@ -164,7 +164,7 @@ class NewContributionFlowPage extends React.Component {
           tier={tier}
           step={step}
           verb={this.props.verb}
-          paymentMethod={this.props.paymentMethod}
+          donationMethod={donationMethod}
           redirect={this.props.redirect}
           description={this.props.description}
           defaultQuantity={this.props.quantity}
