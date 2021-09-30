@@ -197,7 +197,7 @@ class TopBarProfileMenu extends React.Component {
         borderRadius={[0, 12]}
         boxShadow="0 4px 8px 0 rgba(61,82,102,0.08)"
         minWidth="170px"
-        maxWidth="500px"
+        maxWidth="560px"
         width="100%"
         position="absolute"
         right={[0, 16]}
@@ -282,6 +282,7 @@ class TopBarProfileMenu extends React.Component {
               <Box
                 order={[1, 2]}
                 flex="1 1 50%"
+                minWidth="296px"
                 width={[1, 1, 1 / 2]}
                 p={[1, 3]}
                 maxHeight={['100%', '450px']}
