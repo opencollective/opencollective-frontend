@@ -13,7 +13,7 @@ import { compose, parseToBoolean } from '../../lib/utils';
 
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';
 import Container from '../../components/Container';
-import { STEPS } from '../../components/contribution-flow/constants';
+import { DONATION_METHOD, STEPS } from '../../components/contribution-flow/constants';
 import ContributionBlocker, { getContributionBlocker } from '../../components/contribution-flow/ContributionBlocker';
 import ContributionFlowSuccess from '../../components/contribution-flow/ContributionFlowSuccess';
 import {
@@ -148,7 +148,7 @@ class NewContributionFlowPage extends React.Component {
   renderPageContent() {
     const { data = {}, step, donationMethod, LoggedInUser } = this.props;
     const { account, tier } = data;
-    const isCrypto = donationMethod === 'crypto';
+    const isCrypto = donationMethod === DONATION_METHOD.CRYPTO;
 
     if (data.loading) {
       return (

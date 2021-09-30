@@ -13,6 +13,10 @@ export const STEPS = {
   CHECKOUT: 'checkout',
 };
 
+export const DONATION_METHOD = {
+  CRYPTO: 'crypto',
+};
+
 export const CRYPTO_CURRENCIES = [
   {
     label: (

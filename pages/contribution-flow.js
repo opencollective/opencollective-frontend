@@ -11,7 +11,7 @@ import { floatAmountToCents } from '../lib/math';
 import { compose, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
-import { STEPS } from '../components/contribution-flow/constants';
+import { DONATION_METHOD, STEPS } from '../components/contribution-flow/constants';
 import ContributionBlocker, {
   CONTRIBUTION_BLOCKER,
   getContributionBlocker,
@@ -132,7 +132,7 @@ class NewContributionFlowPage extends React.Component {
   renderPageContent() {
     const { data = {}, step, donationMethod, LoggedInUser, error } = this.props;
     const { account, tier } = data;
-    const isCrypto = donationMethod === 'crypto';
+    const isCrypto = donationMethod === DONATION_METHOD.CRYPTO;
 
     if (data.loading) {
       return (
