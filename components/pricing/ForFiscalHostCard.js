@@ -88,11 +88,11 @@ const Card = styled(Container)`
 `;
 
 const messages = defineMessages({
-  HostDashboard: {
+  'pricing.dashboard': {
     id: 'HostDashboard',
     defaultMessage: 'Host Dashboard',
   },
-  'HostDashboard.description': {
+  'pricing.dashboard.description': {
     id: 'HostDashboard.description',
     defaultMessage:
       'A host dashboard to easily manage budgets and expenses across all your Collectives, including one-click payouts via Paypal and TransferWise.',
