@@ -28,7 +28,7 @@ const getHostReportURL = (hostSlug, params) => {
     url.searchParams.set('dateTo', dateTo);
   }
   if (accountsSlugs?.length) {
-    url.searchParams.set('hostedAccount', accountsSlugs.join(','));
+    url.searchParams.set('account', accountsSlugs.join(','));
   }
 
   return url.toString();
