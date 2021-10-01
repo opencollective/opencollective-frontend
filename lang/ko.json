@@ -1,5 +1,5 @@
 {
-  "0LQMM3": "Organizations can be used to contribute to other collectives, and get tax-exempt receipts",
+  "+n7iNv": "Past Month",
   "2FA.PleaseEnterCode": "Two-factor authentication enabled: please enter your code.",
   "7nUCu9": "Timezone",
   "94IjMb": "Coordinated Universal Time",
@@ -201,6 +201,7 @@
   "CancelEdit": "변경 취소",
   "Captcha.Button.Verified": "Verified Human.",
   "Captcha.Button.Verify": "I'm not a Robot.",
+  "CBITv6": "A profile representing a company or organization instead of an individual",
   "ChangelogNotification.firstLine": "We have new stuff for you!",
   "ChangelogNotification.secondLine": "Click on the {image} to take a look",
   "ChangelogTrigger.tooltip.content": "What's new with Open Collective",
@@ -1436,6 +1437,7 @@
   "mustBeLoggedInWithLink": "You must be <login-link>logged in</login-link>",
   "mustBeMemberOfCollective": "You must be a member of the collective to see this page",
   "MZB6HL": "Create a collective to collect and spend money transparently",
+  "n5QvJy": "Start date",
   "NavBar.ThisIsCollective": "This is {collectiveName}'s page",
   "NCP.SectionFetchError": "We encountered an error while retrieving the data for this section.",
   "NetAmountFor": "Net amount for {name}",
@@ -1487,7 +1489,6 @@
   "notFound": "찾을 수 없음",
   "notFound.search": "{term} 검색",
   "NoThankYou": "No thank you",
-  "nqYxAL": "Discover collectives to contribute",
   "OC.tagline": "지속 가능한 커뮤니티를 만드세요. 투명하게 자금을 모으고 사용하세요.",
   "OC.tos.label": "I agree with the <TOSLink>terms of service</TOSLink> of Open Collective.",
   "OCE.description": "EU에 위치한 단체 전용",
@@ -2186,6 +2187,7 @@
   "welcome": "환영합니다",
   "widget.contributeOnOpenCollective": "Contribute on Open Collective",
   "withColon": "{item}:",
+  "WM71Ho": "Discover Collectives to Support",
   "YearlyBudget": "연간 예산",
   "yes": "예",
   "zWgbGg": "Today"

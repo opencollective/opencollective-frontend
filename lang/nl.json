@@ -1,5 +1,5 @@
 {
-  "0LQMM3": "Organizations can be used to contribute to other collectives, and get tax-exempt receipts",
+  "+n7iNv": "Past Month",
   "2FA.PleaseEnterCode": "Two-factor authentication enabled: please enter your code.",
   "7nUCu9": "Timezone",
   "94IjMb": "Coordinated Universal Time",
@@ -201,6 +201,7 @@
   "CancelEdit": "Bewerking annuleren",
   "Captcha.Button.Verified": "Verified Human.",
   "Captcha.Button.Verify": "I'm not a Robot.",
+  "CBITv6": "A profile representing a company or organization instead of an individual",
   "ChangelogNotification.firstLine": "We have new stuff for you!",
   "ChangelogNotification.secondLine": "Click on the {image} to take a look",
   "ChangelogTrigger.tooltip.content": "What's new with Open Collective",
@@ -1436,6 +1437,7 @@
   "mustBeLoggedInWithLink": "You must be <login-link>logged in</login-link>",
   "mustBeMemberOfCollective": "You must be a member of the collective to see this page",
   "MZB6HL": "Create a collective to collect and spend money transparently",
+  "n5QvJy": "Start date",
   "NavBar.ThisIsCollective": "This is {collectiveName}'s page",
   "NCP.SectionFetchError": "We encountered an error while retrieving the data for this section.",
   "NetAmountFor": "Net amount for {name}",
@@ -1487,7 +1489,6 @@
   "notFound": "Not found",
   "notFound.search": "Search for {term}",
   "NoThankYou": "No thank you",
-  "nqYxAL": "Discover collectives to contribute",
   "OC.tagline": "Make your community sustainable. Collect and spend money transparently.",
   "OC.tos.label": "I agree with the <TOSLink>terms of service</TOSLink> of Open Collective.",
   "OCE.description": "For EU-based groups",
@@ -2186,6 +2187,7 @@
   "welcome": "Welcome",
   "widget.contributeOnOpenCollective": "Contribute on Open Collective",
   "withColon": "{item}:",
+  "WM71Ho": "Discover Collectives to Support",
   "YearlyBudget": "Yearly budget",
   "yes": "Yes",
   "zWgbGg": "Today"

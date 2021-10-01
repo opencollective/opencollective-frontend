@@ -150,7 +150,7 @@ const MENU_SECTIONS = {
   [CollectiveType.ORGANIZATION]: {
     title: defineMessage({ id: 'organization', defaultMessage: 'My Organizations' }),
     emptyMessage: defineMessage({
-      defaultMessage: 'Organizations can be used to contribute to other collectives, and get tax-exempt receipts',
+      defaultMessage: 'A profile representing a company or organization instead of an individual',
     }),
     plusButton: {
       text: defineMessage({ id: 'host.organization.create', defaultMessage: 'Create an Organization' }),
@@ -252,7 +252,7 @@ const ProfileMenuMemberships = ({ user }) => {
       {hasNoMemberships && (
         <P textAlign="center" mb={2}>
           <StyledLink as={Link} href="/discover" color="blue.900">
-            <FormattedMessage defaultMessage="Discover collectives to contribute" />
+            <FormattedMessage defaultMessage="Discover Collectives to Support" />
           </StyledLink>
         </P>
       )}

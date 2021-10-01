@@ -1,5 +1,5 @@
 {
-  "0LQMM3": "Organizations can be used to contribute to other collectives, and get tax-exempt receipts",
+  "+n7iNv": "Past Month",
   "2FA.PleaseEnterCode": "Увімкнено двоетапну перевірку: введіть свій код.",
   "7nUCu9": "Timezone",
   "94IjMb": "Coordinated Universal Time",
@@ -201,6 +201,7 @@
   "CancelEdit": "Скасувати зміни",
   "Captcha.Button.Verified": "Verified Human.",
   "Captcha.Button.Verify": "I'm not a Robot.",
+  "CBITv6": "A profile representing a company or organization instead of an individual",
   "ChangelogNotification.firstLine": "Маємо для вас новинки!",
   "ChangelogNotification.secondLine": "Натисніть на {image}, щоб подивитися",
   "ChangelogTrigger.tooltip.content": "Що нового в Open Collective",
@@ -1436,6 +1437,7 @@
   "mustBeLoggedInWithLink": "Ви повинні <login-link>увійти</login-link>",
   "mustBeMemberOfCollective": "Ви повинні бути учасником колективу, щоб переглянути цю сторінку",
   "MZB6HL": "Create a collective to collect and spend money transparently",
+  "n5QvJy": "Start date",
   "NavBar.ThisIsCollective": "Це сторінка {collectiveName}",
   "NCP.SectionFetchError": "Ми зіткнулися з помилкою під час отримання даних для цього розділу.",
   "NetAmountFor": "Чиста сума для {name}",
@@ -1487,7 +1489,6 @@
   "notFound": "Не знайдено",
   "notFound.search": "Шукати {term}",
   "NoThankYou": "Ні, дякую",
-  "nqYxAL": "Discover collectives to contribute",
   "OC.tagline": "Зробіть вашу спільноту стійкою. Збирайте та витрачайте гроші прозоро.",
   "OC.tos.label": "Я згоден з <TOSLink>умовами користування</TOSLink> Open Collective.",
   "OCE.description": "Для груп з ЄС",
@@ -2186,6 +2187,7 @@
   "welcome": "Вітаємо",
   "widget.contributeOnOpenCollective": "Допомогти на Open Collective",
   "withColon": "{item}:",
+  "WM71Ho": "Discover Collectives to Support",
   "YearlyBudget": "Річний бюджет",
   "yes": "Так",
   "zWgbGg": "Today"
