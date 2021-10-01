@@ -124,7 +124,7 @@ const AdminPanelPage = () => {
           description={notification.description}
         />
       )}
-      {!loadingLoggedInUser && account && !canEditAccount ? (
+      {account && !canEditAccount ? (
         <Box className="login" my={6}>
           <p>
             <FormattedMessage
@@ -150,12 +150,11 @@ const AdminPanelPage = () => {
         >
           <AdminPanelSideBar
             isLoading={loading}
-            collective={data?.account}
-            collectiveSlug={slug}
+            collective={account}
             selectedSection={section}
             display={['none', null, 'block']}
           />
-          <AdminPanelSection section={section} isLoading={loading} collective={data?.account} />
+          <AdminPanelSection section={section} isLoading={loading} collective={account} />
         </Grid>
       )}
       ;

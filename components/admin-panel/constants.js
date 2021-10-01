@@ -1,5 +1,9 @@
 import { defineMessages } from 'react-intl';
 
+import { CollectiveType } from '../../lib/collective-sections';
+
+const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
+
 export const HOST_DASHBOARD_SECTIONS = {
   // New Host Dashboard
   BUDGET_MANAGEMENT: 'budget',
@@ -74,6 +78,15 @@ export const ALL_SECTIONS = {
   ...FISCAL_HOST_SECTIONS,
   ...HOST_DASHBOARD_SECTIONS,
 };
+
+export const PAGE_TITLES = defineMessages({
+  [USER]: { id: 'AdminPanel.UserSettings', defaultMessage: 'User Settings' },
+  [ORGANIZATION]: { id: 'AdminPanel.OrganizationSettings', defaultMessage: 'Organization Settings' },
+  [COLLECTIVE]: { id: 'AdminPanel.CollectiveSettings', defaultMessage: 'Collective Settings' },
+  [FUND]: { id: 'AdminPanel.FundSettings', defaultMessage: 'Fund Settings' },
+  [EVENT]: { id: 'AdminPanel.EventSettings', defaultMessage: 'Event Settings' },
+  [PROJECT]: { id: 'AdminPanel.ProjectSettings', defaultMessage: 'Project Settings' },
+});
 
 export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.EXPENSES]: {

@@ -9,7 +9,6 @@ import { Box } from '../Grid';
 import HostDashboardExpenses from '../host-dashboard/HostDashboardExpenses';
 import HostDashboardHostedCollectives from '../host-dashboard/HostDashboardHostedCollectives';
 import PendingApplications from '../host-dashboard/PendingApplications';
-import Loading from '../Loading';
 import NotFound from '../NotFound';
 
 import AccountSettings from './sections/AccountSettings';
@@ -33,11 +32,7 @@ const AdminPanelSection = ({ collective, isLoading, section }) => {
   const { formatMessage } = useIntl();
 
   if (isLoading) {
-    return (
-      <Container display="flex" justifyContent="center" alignItems="center">
-        <Loading />
-      </Container>
-    );
+    return <Container display="flex" justifyContent="center" alignItems="center"></Container>;
   }
 
   // Host Dashboard

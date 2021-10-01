@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { CollectiveType, isHost, isOneOfTypes, isType } from '../../lib/collective-sections';
+import { CollectiveType, getCollectiveTypeKey, isHost, isOneOfTypes, isType } from '../../lib/collective-sections';
 
 import { HOST_SECTIONS } from '../host-dashboard/constants';
 
@@ -13,12 +13,14 @@ import {
   COLLECTIVE_SECTIONS,
   FISCAL_HOST_SECTIONS,
   ORG_BUDGET_SECTIONS,
+  PAGE_TITLES,
 } from './constants';
 import { MenuGroup, MenuLink, MenuSectionHeader, useSubmenu } from './MenuComponents';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
 const Menu = ({ collective }) => {
+  const { formatMessage } = useIntl();
   const { menuContent, SubMenu } = useSubmenu();
 
   if (menuContent) {
@@ -40,13 +42,7 @@ const Menu = ({ collective }) => {
             <FormattedMessage id="Settings" defaultMessage="Settings" />
           </MenuSectionHeader>
           <SubMenu
-            label={
-              isType(collective, USER) ? (
-                <FormattedMessage id="AdminPanel.UserSettings" defaultMessage="User Settings" />
-              ) : (
-                <FormattedMessage id="AdminPanel.OrganizationSettings" defaultMessage="Organization Settings" />
-              )
-            }
+            label={formatMessage(PAGE_TITLES[getCollectiveTypeKey(collective.type)])}
             if={isType(collective, ORGANIZATION) || isHost(collective)}
           >
             <MenuLink collective={collective} section={ABOUT_ORG_SECTIONS.INFO} />
@@ -100,13 +96,7 @@ const Menu = ({ collective }) => {
         </MenuGroup>
 
         <MenuGroup if={!isHost(collective) && !isType(collective, ORGANIZATION)}>
-          <MenuSectionHeader>
-            {isType(collective, USER) ? (
-              <FormattedMessage id="AdminPanel.UserSettings" defaultMessage="User Settings" />
-            ) : (
-              <FormattedMessage id="AdminPanel.CollectiveSettings" defaultMessage="Collective Settings" />
-            )}
-          </MenuSectionHeader>
+          <MenuSectionHeader>{formatMessage(PAGE_TITLES[getCollectiveTypeKey(collective.type)])}</MenuSectionHeader>
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.INFO} />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.COLLECTIVE_PAGE} />
           <MenuLink
@@ -185,7 +175,6 @@ Menu.propTypes = {
     type: PropTypes.string,
     isHost: PropTypes.bool,
   }),
-  collectiveSlug: PropTypes.string,
 };
 
 export default Menu;
