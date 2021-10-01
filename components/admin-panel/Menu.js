@@ -96,7 +96,6 @@ const Menu = ({ collective }) => {
         </MenuGroup>
 
         <MenuGroup if={!isHost(collective) && !isType(collective, ORGANIZATION)}>
-          <MenuSectionHeader>{formatMessage(PAGE_TITLES[getCollectiveTypeKey(collective.type)])}</MenuSectionHeader>
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.INFO} />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.COLLECTIVE_PAGE} />
           <MenuLink
