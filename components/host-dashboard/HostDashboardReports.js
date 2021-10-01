@@ -11,6 +11,7 @@ import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
+import NotFound from '../NotFound';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
@@ -94,7 +95,9 @@ const HostDashboardReports = ({ hostSlug }) => {
     return <Loading />;
   } else if (error) {
     return <MessageBoxGraphqlError error={error} maxWidth={500} m="0 auto" />;
-  } else if (data.host && !data.host.isActive) {
+  } else if (!data?.host) {
+    return <NotFound />;
+  } else if (!data.host.isActive) {
     return (
       <MessageBox withIcon type="error" maxWidth={400} m="0 auto">
         <FormattedMessage id="host.onlyActive" defaultMessage="This page is only available for active fiscal hosts" />
@@ -102,8 +105,7 @@ const HostDashboardReports = ({ hostSlug }) => {
     );
   }
 
-  const currency = data?.host.currency;
-  const hostMetrics = data?.host.hostMetrics;
+  const { host } = data;
   return (
     <Box maxWidth={800} m="0 auto" px={2}>
       <Flex alignItems="center" mb={24} flexWrap="wrap">
@@ -124,7 +126,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           >
             <FormattedMessage id="Host.Metrics.TotalMoneyManages" defaultMessage="Total Money Managed" />
           </SectionTitle>
-          <TotalMoneyManagedSection currency={currency} hostMetrics={hostMetrics} />
+          <TotalMoneyManagedSection currency={host.currency} hostMetrics={host.hostMetrics} />
         </Container>
         <Container mb={38}>
           <SectionTitle>
@@ -147,7 +149,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           <SectionTitle>
             <FormattedMessage id="Downloads" defaultMessage="Downloads" />
           </SectionTitle>
-          <HostDownloadsSection hostSlug={hostSlug} />
+          <HostDownloadsSection hostSlug={hostSlug} hostLegacyId={host.legacyId} />
         </Container>
       </StyledCard>
     </Box>

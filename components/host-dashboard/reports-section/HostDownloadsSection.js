@@ -1,12 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { fetchCSVFileFromRESTService } from '../../../lib/api';
 import dayjs from '../../../lib/dayjs';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
 
 import PeriodFilter from '../../budget/filters/PeriodFilter';
@@ -36,15 +34,6 @@ const getHostReportURL = (hostSlug, params) => {
   return url.toString();
 };
 
-const hostReportDownloadsSectionQuery = gqlV2/* GraphQL */ `
-  query HostReportDownloadsSection($hostSlug: String!) {
-    host(slug: $hostSlug) {
-      id
-      legacyId
-    }
-  }
-`;
-
 const FieldLabel = styled.span`
   font-weight: 500;
   font-size: 12px;
@@ -67,12 +56,9 @@ const getDefaultDateInterval = () => {
   };
 };
 
-const HostDownloadsSection = ({ hostSlug }) => {
+const HostDownloadsSection = ({ hostSlug, hostLegacyId }) => {
   const [collectiveOptions, setCollectiveOptions] = React.useState(null);
   const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
-  const variables = { hostSlug };
-  const { loading, data } = useQuery(hostReportDownloadsSectionQuery, { variables, context: API_V2_CONTEXT });
-  const host = data?.host;
   const accountsSlugs = collectiveOptions?.map(c => c.value.slug);
   const hostReportUrl = getHostReportURL(hostSlug, { ...dateInterval, accountsSlugs });
   const { loading: isFetching, call: downloadCSV } = useAsyncCall(
@@ -116,8 +102,7 @@ const HostDownloadsSection = ({ hostSlug }) => {
               <CollectivePickerAsync
                 inputId={id}
                 onChange={setCollectiveOptions}
-                hostCollectiveIds={host ? [host.legacyId] : null}
-                disabled={loading}
+                hostCollectiveIds={[hostLegacyId]}
                 isMulti
               />
             )}
@@ -150,6 +135,7 @@ const HostDownloadsSection = ({ hostSlug }) => {
 
 HostDownloadsSection.propTypes = {
   hostSlug: PropTypes.string.isRequired,
+  hostLegacyId: PropTypes.number.isRequired,
 };
 
 export default HostDownloadsSection;
