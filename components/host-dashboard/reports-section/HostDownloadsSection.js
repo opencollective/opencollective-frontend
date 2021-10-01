@@ -76,7 +76,7 @@ const HostDownloadsSection = ({ hostSlug, hostLegacyId }) => {
 
   return (
     <Container bg="black.50" borderRadius={8} p={3}>
-      <Grid gridTemplateColumns={['1fr', '1fr 2fr auto']} gridGap="8px">
+      <Grid gridTemplateColumns={['1fr', 'minmax(200px, 1fr) 2fr auto']} gridGap="8px">
         <Box>
           <StyledInputField
             name="download-host-report-period"
