@@ -1,4 +1,5 @@
 import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import { cloneDeep, update } from 'lodash';
 import TopBar from '../../components/TopBar';
 import { UserContext } from '../../components/UserProvider';
 import theme from '../../lib/theme';
@@ -35,6 +36,23 @@ export const LoggedInStory = props => (
 );
 
 <Story name="Logged in (new user)">{LoggedInStory.bind({})}</Story>
+
+## Logged in (simple collective admin)
+
+export const LoggedInCollectiveAdmin = props => (
+  <UserContext.Provider
+    value={{
+      loadingLoggedInUser: false,
+      LoggedInUser: update(cloneDeep(loggedInUser), 'memberOf', memberOf =>
+        memberOf.filter(m => m.role === 'ADMIN' && m.collective.type === 'COLLECTIVE').slice(0, 3),
+      ),
+    }}
+  >
+    <TopBar {...props} />
+  </UserContext.Provider>
+);
+
+<Story name="Logged in (collective admin)">{LoggedInCollectiveAdmin.bind({})}</Story>
 
 ## Logged in (power user)
 
