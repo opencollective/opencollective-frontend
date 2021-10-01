@@ -102,6 +102,13 @@ export const MenuContainer = styled.ul`
   margin-bottom: 100px;
   width: 256px;
 
+  a {
+    color: ${props => props.theme.colors.black[900]};
+    &:hover {
+      color: ${props => props.theme.colors.black[700]};
+    }
+  }
+
   &,
   & ul {
     list-style-type: none;
