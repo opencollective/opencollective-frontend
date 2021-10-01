@@ -13,7 +13,7 @@ export const STEPS = {
   CHECKOUT: 'checkout',
 };
 
-export const DONATION_METHOD = {
+export const PAYMENT_FLOW = {
   CRYPTO: 'crypto',
 };
 

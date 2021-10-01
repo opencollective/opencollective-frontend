@@ -11,7 +11,7 @@ import { floatAmountToCents } from '../lib/math';
 import { compose, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
-import { DONATION_METHOD, STEPS } from '../components/contribution-flow/constants';
+import { PAYMENT_FLOW, STEPS } from '../components/contribution-flow/constants';
 import ContributionBlocker, {
   CONTRIBUTION_BLOCKER,
   getContributionBlocker,
@@ -63,7 +63,7 @@ class NewContributionFlowPage extends React.Component {
       description: query.description ? decodeURIComponent(query.description) : undefined,
       interval: query.interval,
       verb: query.verb,
-      donationMethod: query.donationMethod,
+      paymentFlow: query.paymentFlow,
       redirect: query.redirect,
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
@@ -79,7 +79,7 @@ class NewContributionFlowPage extends React.Component {
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
     verb: PropTypes.string,
-    donationMethod: PropTypes.string,
+    paymentFlow: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
     disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
@@ -130,9 +130,9 @@ class NewContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, step, donationMethod, LoggedInUser, error } = this.props;
+    const { data = {}, step, paymentFlow, LoggedInUser, error } = this.props;
     const { account, tier } = data;
-    const isCrypto = donationMethod === DONATION_METHOD.CRYPTO;
+    const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
 
     if (data.loading) {
       return (
@@ -164,7 +164,7 @@ class NewContributionFlowPage extends React.Component {
           tier={tier}
           step={step}
           verb={this.props.verb}
-          donationMethod={donationMethod}
+          paymentFlow={paymentFlow}
           redirect={this.props.redirect}
           description={this.props.description}
           defaultQuantity={this.props.quantity}
