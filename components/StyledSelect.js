@@ -52,16 +52,46 @@ const MultiValue = ({ children, removeProps, ...props }) => {
     children = truncate(children, { maxLength: 32 });
   }
 
-  return (
-    <StyledTag m="4px" variant="rounded-right" maxHeight="none" closeButtonProps={removeProps}>
-      {props.selectProps.useCompactMode ? (
-        <Container maxWidth={28} overflow="hidden" title={props.data.label}>
+  if (props.selectProps.useCompactMode) {
+    return (
+      <StyledTag m="4px" variant="rounded" maxHeight="24px" closeButtonProps={removeProps}>
+        <Container maxWidth={16} overflow="hidden" title={props.data.label}>
           {children}
         </Container>
-      ) : (
-        children
+      </StyledTag>
+    );
+  } else {
+    return (
+      <StyledTag m="4px" variant="rounded-right" maxHeight="none" closeButtonProps={removeProps}>
+        {children}
+      </StyledTag>
+    );
+  }
+};
+/* eslint-enable react/prop-types */
+
+/* eslint-disable react/prop-types */
+const ValueContainer = ({ children, ...rest }) => {
+  const selectedCount = rest.getValue().length;
+  const isTruncate = selectedCount > 3;
+
+  let firstChild = [];
+  let elementNames;
+
+  if (isTruncate) {
+    firstChild = [children[0].shift(), children[1]];
+    elementNames = children[0].map(child => child.props.data.label).join(', ');
+  }
+
+  return (
+    <ReactSelectComponents.ValueContainer {...rest}>
+      {!isTruncate ? children : firstChild}
+      {isTruncate && (
+        <span title={elementNames}>
+          <u>{` and ${selectedCount - 1} others`}</u>
+        </span>
       )}
-    </StyledTag>
+    </ReactSelectComponents.ValueContainer>
   );
 };
 /* eslint-enable react/prop-types */
@@ -106,7 +136,7 @@ const GroupHeading = ({ children, ...props }) => (
 /**
  * A map to override the default components of react-select
  */
-export const customComponents = { SelectContainer, Option, MultiValue, GroupHeading };
+export const customComponents = { SelectContainer, Option, MultiValue, GroupHeading, ValueContainer };
 export const searchableCustomComponents = { ...customComponents, DropdownIndicator: DropdownSearchIndicator };
 
 const getComponents = (components, useSearchIcon) => {

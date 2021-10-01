@@ -60,7 +60,7 @@ const CollectiveLabelTextContainer = styled.div`
  */
 export const DefaultCollectiveLabel = ({ value: collective }) => (
   <Flex alignItems="center">
-    <Avatar collective={collective} radius={28} />
+    <Avatar collective={collective} radius={16} />
     <CollectiveLabelTextContainer>
       <Span fontSize="12px" fontWeight="500" lineHeight="18px" color="black.700">
         {truncate(collective.name, { length: 40 })}
