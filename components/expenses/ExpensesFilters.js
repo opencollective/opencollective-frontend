@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import AmountFilter from '../budget/filters/AmountFilter';
-import PeriodFilter from '../budget/filters/PeriodFilter';
+import PeriodFilter, { encodePeriod } from '../budget/filters/PeriodFilter';
 import { Flex } from '../Grid';
 
 import ExpensesPayoutTypeFilter from './filters/ExpensesPayoutTypeFilter';
@@ -29,11 +29,12 @@ const FilterLabel = styled.label`
 `;
 
 const ExpensesFilters = ({ collective, filters, onChange }) => {
-  const getFilterProps = name => ({
+  const getFilterProps = (name, valueModifier) => ({
     inputId: `expenses-filter-${name}`,
     value: filters?.[name],
     onChange: value => {
-      onChange({ ...filters, [name]: value === 'ALL' ? null : value });
+      const preparedValue = valueModifier ? valueModifier(value) : value;
+      onChange({ ...filters, [name]: value === 'ALL' ? null : preparedValue });
     },
   });
 
@@ -55,7 +56,7 @@ const ExpensesFilters = ({ collective, filters, onChange }) => {
         <FilterLabel htmlFor="expenses-filter-period">
           <FormattedMessage id="Period" defaultMessage="Period" />
         </FilterLabel>
-        <PeriodFilter {...getFilterProps('period')} minDate={collective.createdAt} />
+        <PeriodFilter {...getFilterProps('period', encodePeriod)} minDate={collective.createdAt} />
       </FilterContainer>
       <FilterContainer>
         <FilterLabel htmlFor="expenses-filter-amount">

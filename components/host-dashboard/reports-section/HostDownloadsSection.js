@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import dayjs from 'dayjs';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { fetchCSVFileFromRESTService } from '../../../lib/api';
-import dayjs from '../../../lib/dayjs';
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
 
-import PeriodFilter from '../../budget/filters/PeriodFilter';
+import PeriodFilter, { periodDateToISOString } from '../../budget/filters/PeriodFilter';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
@@ -17,15 +17,14 @@ import StyledButton from '../../StyledButton';
 import StyledInputField from '../../StyledInputField';
 
 const getHostReportURL = (hostSlug, params) => {
-  const { from, to, accountsSlugs, format = 'txt' } = params || {};
+  const { dateFrom, dateTo, accountsSlugs, format = 'txt' } = params || {};
   const url = new URL(`${process.env.REST_URL}/v2/${hostSlug}/hostTransactions.${format}`);
-  url.searchParams.set('reportType', 'hostTransactions');
 
-  if (from) {
-    url.searchParams.set('dateFrom', from);
+  if (dateFrom) {
+    url.searchParams.set('dateFrom', dateFrom);
   }
-  if (to) {
-    url.searchParams.set('dateTo', to);
+  if (dateTo) {
+    url.searchParams.set('dateTo', dateTo);
   }
   if (accountsSlugs?.length) {
     url.searchParams.set('hostedAccount', accountsSlugs.join(','));
@@ -51,22 +50,33 @@ const getDefaultDateInterval = () => {
   const interval = PERIOD_FILTER_PRESETS.pastMonth.getInterval();
   return {
     timezoneType: 'UTC', // To match the monthly host report sent by email
-    from: interval.from.tz('UTC', true).toISOString(),
-    to: interval.to.tz('UTC', true).toISOString(),
+    from: interval.from.format('YYYY-MM-DD'),
+    to: interval.to.format('YYYY-MM-DD'),
   };
 };
 
-const HostDownloadsSection = ({ hostSlug, hostLegacyId }) => {
+const prepareDateArgs = dateInterval => {
+  if (!dateInterval) {
+    return {};
+  } else {
+    return {
+      dateFrom: periodDateToISOString(dateInterval.from, false, dateInterval.timezoneType),
+      dateTo: periodDateToISOString(dateInterval.to, true, dateInterval.timezoneType),
+    };
+  }
+};
+
+const HostDownloadsSection = ({ host }) => {
   const [collectiveOptions, setCollectiveOptions] = React.useState(null);
   const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
   const accountsSlugs = collectiveOptions?.map(c => c.value.slug);
-  const hostReportUrl = getHostReportURL(hostSlug, { ...dateInterval, accountsSlugs });
+  const hostReportUrl = getHostReportURL(host.slug, { ...prepareDateArgs(dateInterval), accountsSlugs });
   const { loading: isFetching, call: downloadCSV } = useAsyncCall(
     () => {
-      const formatDate = d => dayjs(d).format('YYYY-MM-DD');
-      let filename = `host-${hostSlug}-transactions`;
+      let filename = `host-${host.slug}-transactions`;
       if (dateInterval?.from) {
-        filename += `-${formatDate(dateInterval.from)}-${formatDate(dateInterval.to)}`;
+        const until = dateInterval.to || dayjs().format('YYYY-MM-DD');
+        filename += `-${dateInterval.from}-${until}`;
       }
 
       return fetchCSVFileFromRESTService(hostReportUrl, filename);
@@ -86,7 +96,9 @@ const HostDownloadsSection = ({ hostSlug, hostLegacyId }) => {
               </FieldLabel>
             }
           >
-            {({ id }) => <PeriodFilter inputId={id} onChange={setDateInterval} value={dateInterval} />}
+            {({ id }) => (
+              <PeriodFilter inputId={id} onChange={setDateInterval} value={dateInterval} minDate={host.createdAt} />
+            )}
           </StyledInputField>
         </Box>
         <Box>
@@ -102,7 +114,7 @@ const HostDownloadsSection = ({ hostSlug, hostLegacyId }) => {
               <CollectivePickerAsync
                 inputId={id}
                 onChange={setCollectiveOptions}
-                hostCollectiveIds={[hostLegacyId]}
+                hostCollectiveIds={[host.legacyId]}
                 isMulti
               />
             )}
@@ -134,8 +146,11 @@ const HostDownloadsSection = ({ hostSlug, hostLegacyId }) => {
 };
 
 HostDownloadsSection.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
-  hostLegacyId: PropTypes.number.isRequired,
+  host: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+    legacyId: PropTypes.number.isRequired,
+    createdAt: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default HostDownloadsSection;

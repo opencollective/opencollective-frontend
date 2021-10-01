@@ -42,27 +42,34 @@ export const parseDateRange = strValue => {
 };
 
 /**
- * Opposite of `parseDateRange`: takes an object like {from, to} and returns a string
+ * From a simple period date as '2020-01-01', returns a string like '2020-01-01T00:00:00Z'.
+ */
+export const periodDateToISOString = (date, isEndOfDay, timezoneType) => {
+  if (!date) {
+    return null;
+  } else {
+    const isUTC = timezoneType === 'UTC';
+    const dayjsTimeMethod = isEndOfDay ? 'endOf' : 'startOf';
+    const result = isUTC ? dayjs.utc(date) : dayjs(date);
+    return result[dayjsTimeMethod]('day').toISOString();
+  }
+};
+
+/**
+ * Opposite of `parseDateRange`: takes an object like {from, to, timezoneType} and returns a string
  * like "from→to".
  */
-const encodePeriod = interval => {
-  if (!interval.from && !interval.to) {
+export const encodePeriod = interval => {
+  if (!interval || (!interval.from && !interval.to)) {
     return '';
   }
 
-  const isUTC = interval.timezoneType === 'UTC';
   const encodeDate = (date, isEndOfDay) => {
-    if (!date) {
-      return 'all';
-    } else {
-      const dayjsTimeMethod = isEndOfDay ? 'endOf' : 'startOf';
-      const result = isUTC ? dayjs.utc(date) : dayjs(date);
-      return result[dayjsTimeMethod]('day').toISOString();
-    }
+    return periodDateToISOString(date, isEndOfDay, interval.timezoneType) || 'all';
   };
 
   const baseResult = `${encodeDate(interval.from, false)}→${encodeDate(interval.to, true)}`;
-  return isUTC ? `${baseResult}~UTC` : baseResult;
+  return interval.timezoneType === 'UTC' ? `${baseResult}~UTC` : baseResult;
 };
 
 /**
@@ -71,7 +78,7 @@ const encodePeriod = interval => {
  */
 const getIntervalFromValue = value => {
   const isIntervalObject = value => typeof value === 'object' && has(value, 'from') && has(value, 'to');
-  const intervalFromValue = isIntervalObject(value) ? value : parseDateRange(value);
+  const intervalFromValue = isIntervalObject(value) ? { ...value } : parseDateRange(value);
   if (intervalFromValue.timezoneType === 'UTC') {
     const toUTC = date => (date ? dayjs.utc(date) : null);
     intervalFromValue.from = toUTC(intervalFromValue.from);
@@ -291,7 +298,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
               onClick={() => {
                 setTmpDateInterval(DEFAULT_INTERVAL);
                 setOpen(false);
-                onChange('');
+                onChange(null);
               }}
             >
               <FormattedMessage id="Reset" defaultMessage="Reset" />
@@ -303,7 +310,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
               data-cy="btn-apply-period-filter"
               flex="1"
               onClick={() => {
-                onChange(encodePeriod(tmpDateInterval));
+                onChange(tmpDateInterval);
                 setOpen(false);
               }}
             >
@@ -324,6 +331,7 @@ PeriodFilter.propTypes = {
     PropTypes.shape({
       from: PropTypes.string,
       to: PropTypes.string,
+      timezoneType: PropTypes.string,
     }),
   ]),
   inputId: PropTypes.string,

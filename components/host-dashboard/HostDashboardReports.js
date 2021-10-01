@@ -33,6 +33,7 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
       isHost
       isActive
       type
+      createdAt
       hostFeePercent
       hostMetrics {
         hostFees {
@@ -149,7 +150,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           <SectionTitle>
             <FormattedMessage id="Downloads" defaultMessage="Downloads" />
           </SectionTitle>
-          <HostDownloadsSection hostSlug={hostSlug} hostLegacyId={host.legacyId} />
+          <HostDownloadsSection host={host} />
         </Container>
       </StyledCard>
     </Box>
