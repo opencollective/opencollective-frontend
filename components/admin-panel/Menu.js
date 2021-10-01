@@ -40,7 +40,13 @@ const Menu = ({ collective }) => {
             <FormattedMessage id="Settings" defaultMessage="Settings" />
           </MenuSectionHeader>
           <SubMenu
-            label={<FormattedMessage id="AdminPanel.OrganizationSettings" defaultMessage="Organization Settings" />}
+            label={
+              isType(collective, USER) ? (
+                <FormattedMessage id="AdminPanel.UserSettings" defaultMessage="User Settings" />
+              ) : (
+                <FormattedMessage id="AdminPanel.OrganizationSettings" defaultMessage="Organization Settings" />
+              )
+            }
             if={isType(collective, ORGANIZATION) || isHost(collective)}
           >
             <MenuLink collective={collective} section={ABOUT_ORG_SECTIONS.INFO} />
