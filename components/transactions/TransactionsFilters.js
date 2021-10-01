@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { encodeDateInterval } from '../../lib/date-utils';
+
 import AmountFilter from '../budget/filters/AmountFilter';
-import PeriodFilter, { encodePeriod } from '../budget/filters/PeriodFilter';
+import PeriodFilter from '../budget/filters/PeriodFilter';
 import { Box, Flex } from '../Grid';
 
 import TransactionsKindFilter from './filters/TransactionsKindFilter';
@@ -45,7 +47,7 @@ const TransactionsFilters = ({ collective, filters, kinds, onChange }) => {
         <FilterLabel htmlFor="transactions-filter-period">
           <FormattedMessage id="Period" defaultMessage="Period" />
         </FilterLabel>
-        <PeriodFilter {...getFilterProps('period', encodePeriod)} minDate={collective.createdAt} />
+        <PeriodFilter {...getFilterProps('period', encodeDateInterval)} minDate={collective.createdAt} />
       </FilterContainer>
       <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
         <FilterLabel htmlFor="transactions-filter-amount">

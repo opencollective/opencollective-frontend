@@ -4,7 +4,9 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import PeriodFilter, { encodePeriod } from '../../../budget/filters/PeriodFilter';
+import { encodeDateInterval } from '../../../../lib/date-utils';
+
+import PeriodFilter from '../../../budget/filters/PeriodFilter';
 import Container from '../../../Container';
 import { Box, Flex } from '../../../Grid';
 import RequestVirtualCardBtn from '../../../RequestVirtualCardBtn';
@@ -84,7 +86,7 @@ const VirtualCardFilters = ({
             <FilterLabel htmlFor="virtual-card-filter-period">
               <FormattedMessage id="Period" defaultMessage="Period" />
             </FilterLabel>
-            <PeriodFilter {...getFilterProps('period', encodePeriod)} />
+            <PeriodFilter {...getFilterProps('period', encodeDateInterval)} />
           </FilterContainer>
         )}
         <FilterContainer mr={[0, '8px']} mb={['8px', 0]} width={[1, filterWidth]}>

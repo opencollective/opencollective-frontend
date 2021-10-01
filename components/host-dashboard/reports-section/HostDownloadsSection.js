@@ -5,9 +5,10 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { fetchCSVFileFromRESTService } from '../../../lib/api';
+import { simpleDateToISOString } from '../../../lib/date-utils';
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
 
-import PeriodFilter, { periodDateToISOString } from '../../budget/filters/PeriodFilter';
+import PeriodFilter from '../../budget/filters/PeriodFilter';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
@@ -60,8 +61,8 @@ const prepareDateArgs = dateInterval => {
     return {};
   } else {
     return {
-      dateFrom: periodDateToISOString(dateInterval.from, false, dateInterval.timezoneType),
-      dateTo: periodDateToISOString(dateInterval.to, true, dateInterval.timezoneType),
+      dateFrom: simpleDateToISOString(dateInterval.from, false, dateInterval.timezoneType),
+      dateTo: simpleDateToISOString(dateInterval.to, true, dateInterval.timezoneType),
     };
   }
 };

@@ -6,7 +6,7 @@ import { has } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { stripTime } from '../../../lib/date-utils';
+import { parseDateInterval, stripTime } from '../../../lib/date-utils';
 import dayjs from '../../../lib/dayjs';
 
 import { DateRange } from '../../DateRange';
@@ -23,62 +23,12 @@ import { Span } from '../../Text';
 const DEFAULT_INTERVAL = { from: '', to: '', timezoneType: 'local' };
 
 /**
- * Parse `strValue` in a "dateFrom→dateTo" format and returns an array like [dateFrom, dateTo].
- * Each value in the array will be `undefined` if there's no filter for it. We consider that all values passed
- * in this string are using UTC timezone.
- */
-export const parseDateRange = strValue => {
-  const parsedValue = strValue?.match(/^(?<from>[^→]+)(→(?<to>.+?(?=~UTC|$)))?(~(?<timezoneType>UTC))?$/);
-  if (parsedValue) {
-    const getDateIsoString = dateStr => (!dateStr || dateStr === 'all' ? undefined : dateStr);
-    return {
-      from: getDateIsoString(parsedValue.groups.from),
-      to: getDateIsoString(parsedValue.groups.to),
-      timezoneType: parsedValue.groups.timezoneType || 'local',
-    };
-  } else {
-    return { from: undefined, to: undefined, timezoneType: 'local' };
-  }
-};
-
-/**
- * From a simple period date as '2020-01-01', returns a string like '2020-01-01T00:00:00Z'.
- */
-export const periodDateToISOString = (date, isEndOfDay, timezoneType) => {
-  if (!date) {
-    return null;
-  } else {
-    const isUTC = timezoneType === 'UTC';
-    const dayjsTimeMethod = isEndOfDay ? 'endOf' : 'startOf';
-    const result = isUTC ? dayjs.utc(date) : dayjs(date);
-    return result[dayjsTimeMethod]('day').toISOString();
-  }
-};
-
-/**
- * Opposite of `parseDateRange`: takes an object like {from, to, timezoneType} and returns a string
- * like "from→to".
- */
-export const encodePeriod = interval => {
-  if (!interval || (!interval.from && !interval.to)) {
-    return '';
-  }
-
-  const encodeDate = (date, isEndOfDay) => {
-    return periodDateToISOString(date, isEndOfDay, interval.timezoneType) || 'all';
-  };
-
-  const baseResult = `${encodeDate(interval.from, false)}→${encodeDate(interval.to, true)}`;
-  return interval.timezoneType === 'UTC' ? `${baseResult}~UTC` : baseResult;
-};
-
-/**
- * Get a date range as stored internally from a `value` prop, that can be either an array
- * like [from, to] or a stringified value (see `encodePeriod`).
+ * Get a date range as stored internally from a `value` prop, that can be either an object
+ * like { from, to } or a stringified value (see `encodeDateInterval`).
  */
 const getIntervalFromValue = value => {
   const isIntervalObject = value => typeof value === 'object' && has(value, 'from') && has(value, 'to');
-  const intervalFromValue = isIntervalObject(value) ? { ...value } : parseDateRange(value);
+  const intervalFromValue = isIntervalObject(value) ? { ...value } : parseDateInterval(value);
   if (intervalFromValue.timezoneType === 'UTC') {
     const toUTC = date => (date ? dayjs.utc(date) : null);
     intervalFromValue.from = toUTC(intervalFromValue.from);

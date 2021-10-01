@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { encodeDateInterval } from '../../lib/date-utils';
+
 import AmountFilter from '../budget/filters/AmountFilter';
-import PeriodFilter, { encodePeriod } from '../budget/filters/PeriodFilter';
+import PeriodFilter from '../budget/filters/PeriodFilter';
 import { Flex } from '../Grid';
 
 import ExpensesPayoutTypeFilter from './filters/ExpensesPayoutTypeFilter';
@@ -56,7 +58,7 @@ const ExpensesFilters = ({ collective, filters, onChange }) => {
         <FilterLabel htmlFor="expenses-filter-period">
           <FormattedMessage id="Period" defaultMessage="Period" />
         </FilterLabel>
-        <PeriodFilter {...getFilterProps('period', encodePeriod)} minDate={collective.createdAt} />
+        <PeriodFilter {...getFilterProps('period', encodeDateInterval)} minDate={collective.createdAt} />
       </FilterContainer>
       <FilterContainer>
         <FilterLabel htmlFor="expenses-filter-amount">

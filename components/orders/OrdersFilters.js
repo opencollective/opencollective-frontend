@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { encodeDateInterval } from '../../lib/date-utils';
+
 import AmountFilter from '../budget/filters/AmountFilter';
-import PeriodFilter, { encodePeriod } from '../budget/filters/PeriodFilter';
+import PeriodFilter from '../budget/filters/PeriodFilter';
 import { Flex } from '../Grid';
 
 import OrderStatusFilter from './OrderStatusFilter';
@@ -42,7 +44,7 @@ const ExpensesFilters = ({ currency, filters, hasStatus, onChange }) => {
         <FilterLabel htmlFor="orders-filter-period">
           <FormattedMessage id="Period" defaultMessage="Period" />
         </FilterLabel>
-        <PeriodFilter {...getFilterProps('period', encodePeriod)} />
+        <PeriodFilter {...getFilterProps('period', encodeDateInterval)} />
       </FilterContainer>
       <FilterContainer>
         <FilterLabel htmlFor="orders-filter-amount">

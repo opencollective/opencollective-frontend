@@ -5,9 +5,10 @@ import { get } from 'lodash';
 import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 
+import { simpleDateToISOString } from '../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import PeriodFilter, { periodDateToISOString } from '../../budget/filters/PeriodFilter';
+import PeriodFilter from '../../budget/filters/PeriodFilter';
 import Container from '../../Container';
 import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../../FormattedMoneyAmount';
 import { Box, Flex } from '../../Grid';
@@ -46,8 +47,8 @@ const prepareDateArgs = dateInterval => {
     return {};
   } else {
     return {
-      dateFrom: periodDateToISOString(dateInterval.from, false, dateInterval.timezoneType),
-      dateTo: periodDateToISOString(dateInterval.to, true, dateInterval.timezoneType),
+      dateFrom: simpleDateToISOString(dateInterval.from, false, dateInterval.timezoneType),
+      dateTo: simpleDateToISOString(dateInterval.to, true, dateInterval.timezoneType),
     };
   }
 };
