@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Undo } from '@styled-icons/fa-solid/Undo';
 import { Field, FieldArray, Form, Formik } from 'formik';
 import { first, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -67,10 +68,15 @@ const msg = defineMessages({
     id: 'ExpenseForm.StepExpenseFundingRequest',
     defaultMessage: 'Set grant details',
   },
-
   stepPayee: {
     id: 'ExpenseForm.StepPayeeInvoice',
     defaultMessage: 'Payee information',
+  },
+  resetExpense: {
+    defaultMessage: 'Reset Form',
+  },
+  confirmResetExpense: {
+    defaultMessage: 'Do you really want to reset the expense form?',
   },
 });
 
@@ -195,7 +201,7 @@ const ExpenseFormBody = ({
   const intl = useIntl();
   const { formatMessage } = intl;
   const formRef = React.useRef();
-  const { values, handleChange, errors, setValues, dirty, touched, setErrors } = formik;
+  const { values, handleChange, handleReset, errors, setValues, dirty, touched, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
@@ -570,6 +576,29 @@ const ExpenseFormBody = ({
                     {errors.payoutMethod.data.currency.toString()}
                   </Box>
                 )}
+                <StyledHr flex="1" borderColor="#ffffff" mx={2} />
+                <StyledButton
+                  type="button"
+                  buttonStyle="borderless"
+                  width={['100%', 'auto']}
+                  color="red.500"
+                  mt={1}
+                  mx={[2, 0]}
+                  mr={[null, 3]}
+                  whiteSpace="nowrap"
+                  onClick={() => {
+                    if (window.confirm(formatMessage(msg.confirmResetExpense))) {
+                      handleReset();
+                      setStep(STEPS.PAYEE);
+                      if (formPersister) {
+                        formPersister.clearValues();
+                      }
+                    }
+                  }}
+                >
+                  <Undo size={11} />
+                  <Span mx={1}>{formatMessage(msg.resetExpense)}</Span>
+                </StyledButton>
               </Flex>
             </HiddenFragment>
           </HiddenFragment>
