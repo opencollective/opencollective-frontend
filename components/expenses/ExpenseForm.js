@@ -576,7 +576,7 @@ const ExpenseFormBody = ({
                     {errors.payoutMethod.data.currency.toString()}
                   </Box>
                 )}
-                <StyledHr flex="1" borderColor="#ffffff" mx={2} />
+                <StyledHr flex="1" borderColor="white.full" mx={2} />
                 <StyledButton
                   type="button"
                   buttonStyle="borderless"
