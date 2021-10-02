@@ -592,6 +592,7 @@ const ExpenseFormBody = ({
                       setStep(STEPS.PAYEE);
                       if (formPersister) {
                         formPersister.clearValues();
+                        window.scrollTo(0, 0);
                       }
                     }
                   }}
