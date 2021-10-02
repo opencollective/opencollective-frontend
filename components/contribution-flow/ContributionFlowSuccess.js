@@ -216,7 +216,7 @@ class ContributionFlowSuccess extends React.Component {
             values={I18nFormatters}
           />
           {` `}
-          {['BTC', 'ETH', 'BCH', 'LTC', 'ZEC'].includes(pledgeCurrency) &&
+          {['BTC', 'ETH', 'BCH', 'LTC', 'ZEC', 'DOGE'].includes(pledgeCurrency) &&
             this.props.intl.formatMessage(
               {
                 id: 'ContributionFlowSuccess.Crypto.BlockchainExplorer',
