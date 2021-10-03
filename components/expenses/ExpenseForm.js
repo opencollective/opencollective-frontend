@@ -13,6 +13,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { requireFields } from '../../lib/form-utils';
 import { flattenObjectDeep } from '../../lib/utils';
 
+import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
 import { serializeAddress } from '../I18nAddressFields';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
@@ -201,7 +202,7 @@ const ExpenseFormBody = ({
   const intl = useIntl();
   const { formatMessage } = intl;
   const formRef = React.useRef();
-  const { values, handleChange, handleReset, errors, setValues, dirty, touched, setErrors } = formik;
+  const { values, handleChange, errors, setValues, dirty, touched, resetForm, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
@@ -219,6 +220,7 @@ const ExpenseFormBody = ({
   const [step, setStep] = React.useState(stepOneCompleted || isCreditCardCharge ? STEPS.EXPENSE : STEPS.PAYEE);
   // Only true when logged in and drafting the expense
   const [isOnBehalf, setOnBehalf] = React.useState(false);
+  const [showModal, setShowModal] = React.useState(false);
 
   // Scroll to top when step changes
   React.useEffect(() => {
@@ -577,29 +579,40 @@ const ExpenseFormBody = ({
                   </Box>
                 )}
                 <StyledHr flex="1" borderColor="white.full" mx={2} />
-                <StyledButton
-                  type="button"
-                  buttonStyle="borderless"
-                  width={['100%', 'auto']}
-                  color="red.500"
-                  mt={1}
-                  mx={[2, 0]}
-                  mr={[null, 3]}
-                  whiteSpace="nowrap"
-                  onClick={() => {
-                    if (window.confirm(formatMessage(msg.confirmResetExpense))) {
-                      handleReset();
+                {showModal ? (
+                  <ConfirmationModal
+                    show
+                    onClose={() => setShowModal(false)}
+                    header={<FormattedMessage defaultMessage="Reset form" />}
+                    body={formatMessage(msg.confirmResetExpense)}
+                    continueHandler={() => {
                       setStep(STEPS.PAYEE);
                       if (formPersister) {
+                        resetForm({ values: {} });
                         formPersister.clearValues();
                         window.scrollTo(0, 0);
+                      } else {
+                        resetForm();
                       }
-                    }
-                  }}
-                >
-                  <Undo size={11} />
-                  <Span mx={1}>{formatMessage(msg.resetExpense)}</Span>
-                </StyledButton>
+                      setShowModal(false);
+                    }}
+                  />
+                ) : (
+                  <StyledButton
+                    type="button"
+                    buttonStyle="borderless"
+                    width={['100%', 'auto']}
+                    color="red.500"
+                    mt={1}
+                    mx={[2, 0]}
+                    mr={[null, 3]}
+                    whiteSpace="nowrap"
+                    onClick={() => setShowModal(true)}
+                  >
+                    <Undo size={11} />
+                    <Span mx={1}>{formatMessage(msg.resetExpense)}</Span>
+                  </StyledButton>
+                )}
               </Flex>
             </HiddenFragment>
           </HiddenFragment>
