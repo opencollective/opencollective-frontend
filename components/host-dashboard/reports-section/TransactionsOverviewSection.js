@@ -8,7 +8,7 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import PeriodFilter, { encodePeriod, getDateRangeFromPeriod } from '../../budget/filters/PeriodFilter';
+import PeriodFilter, { encodePeriod, parseDateRange } from '../../budget/filters/PeriodFilter';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import { Flex } from '../../Grid';
@@ -106,9 +106,9 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
   const { expensesCount, invoicesCount, reimbursementsCount, grantsCount, dailyAverageAmount } = expenseStats || 0;
 
   const setDate = period => {
-    const [dateFrom, dateTo] = getDateRangeFromPeriod(period);
-    setDateFrom(dateFrom || null);
-    setDateTo(dateTo || null);
+    const { from, to } = parseDateRange(period);
+    setDateFrom(from || null);
+    setDateTo(to || null);
   };
 
   const setCollectiveFilter = collectives => {
