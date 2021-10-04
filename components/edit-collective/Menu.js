@@ -5,7 +5,6 @@ import styled, { css } from 'styled-components';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { CollectiveType } from '../../lib/constants/collectives';
-import { isPastEvent } from '../../lib/events';
 
 import { Flex } from '../Grid';
 import Link from '../Link';
