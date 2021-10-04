@@ -68,7 +68,6 @@ const ExpenseSummary = ({
   const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
   const expenseItems = expense?.items.length > 0 ? expense.items : expense?.draft?.items || [];
 
-  console.log('exp', expense);
   return (
     <StyledCard
       p={borderless ? 0 : [16, 24, 32]}

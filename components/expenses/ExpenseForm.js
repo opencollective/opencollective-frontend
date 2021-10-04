@@ -77,7 +77,7 @@ const msg = defineMessages({
     defaultMessage: 'Reset Form',
   },
   confirmResetExpense: {
-    defaultMessage: 'Do you really want to reset the expense form?',
+    defaultMessage: 'Are you sure you want to reset the expense form?',
   },
 });
 
