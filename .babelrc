@@ -20,7 +20,8 @@
       "babel-plugin-formatjs",
       {
         "ast": true,
-        "idInterpolationPattern": "[sha512:contenthash:base64:6]"
+        "idInterpolationPattern": "[sha512:contenthash:base64:6]",
+        "removeDefaultMessage": true
       }
     ]
   ],
