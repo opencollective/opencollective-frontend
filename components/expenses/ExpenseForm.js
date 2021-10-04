@@ -190,6 +190,7 @@ const ExpenseFormBody = ({
   formik,
   payoutProfiles,
   collective,
+  expense,
   autoFocusTitle,
   onCancel,
   formPersister,
@@ -587,12 +588,10 @@ const ExpenseFormBody = ({
                     body={formatMessage(msg.confirmResetExpense)}
                     continueHandler={() => {
                       setStep(STEPS.PAYEE);
+                      resetForm({ values: expense || getDefaultExpense(collective) });
                       if (formPersister) {
-                        resetForm({ values: {} });
                         formPersister.clearValues();
                         window.scrollTo(0, 0);
-                      } else {
-                        resetForm();
                       }
                       setShowModal(false);
                     }}
@@ -652,6 +651,18 @@ ExpenseFormBody.propTypes = {
     settings: PropTypes.object,
     isApproved: PropTypes.bool,
   }).isRequired,
+  expense: PropTypes.shape({
+    type: PropTypes.oneOf(Object.values(expenseTypes)),
+    description: PropTypes.string,
+    status: PropTypes.string,
+    payee: PropTypes.object,
+    draft: PropTypes.object,
+    items: PropTypes.arrayOf(
+      PropTypes.shape({
+        url: PropTypes.string,
+      }),
+    ),
+  }),
 };
 
 /**
@@ -661,6 +672,7 @@ const ExpenseForm = ({
   onSubmit,
   collective,
   expense,
+  originalExpense,
   payoutProfiles,
   autoFocusTitle,
   onCancel,
@@ -702,6 +714,7 @@ const ExpenseForm = ({
           formik={formik}
           payoutProfiles={payoutProfiles}
           collective={collective}
+          expense={originalExpense}
           autoFocusTitle={autoFocusTitle}
           onCancel={onCancel}
           formPersister={formPersister}
@@ -741,6 +754,19 @@ ExpenseForm.propTypes = {
   }).isRequired,
   /** If editing */
   expense: PropTypes.shape({
+    type: PropTypes.oneOf(Object.values(expenseTypes)),
+    description: PropTypes.string,
+    status: PropTypes.string,
+    payee: PropTypes.object,
+    draft: PropTypes.object,
+    items: PropTypes.arrayOf(
+      PropTypes.shape({
+        url: PropTypes.string,
+      }),
+    ),
+  }),
+  /** To reset form */
+  originalExpense: PropTypes.shape({
     type: PropTypes.oneOf(Object.values(expenseTypes)),
     description: PropTypes.string,
     status: PropTypes.string,
