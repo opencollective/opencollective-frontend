@@ -41,7 +41,7 @@ import { withUser } from '../UserProvider';
 
 import { orderResponseFragment } from './graphql/fragments';
 import CollectiveTitleContainer from './CollectiveTitleContainer';
-import { CRYPTO_CURRENCIES, STEPS } from './constants';
+import { CRYPTO_CURRENCIES, PAYMENT_FLOW, STEPS } from './constants';
 import ContributionFlowButtons from './ContributionFlowButtons';
 import ContributionFlowHeader from './ContributionFlowHeader';
 import ContributionFlowStepContainer from './ContributionFlowStepContainer';
@@ -124,7 +124,7 @@ class ContributionFlow extends React.Component {
     redirect: PropTypes.string,
     tags: PropTypes.arrayOf(PropTypes.string),
     verb: PropTypes.string,
-    paymentMethod: PropTypes.string,
+    paymentFlow: PropTypes.string,
     error: PropTypes.string,
     contributeAs: PropTypes.string,
     defaultEmail: PropTypes.string,
@@ -155,7 +155,7 @@ class ContributionFlow extends React.Component {
       stepDetails: {
         quantity: 1,
         interval: props.fixedInterval || getDefaultInterval(props.tier),
-        amount: props.paymentMethod === 'crypto' ? '' : props.fixedAmount || getDefaultTierAmount(props.tier),
+        amount: props.paymentFlow === PAYMENT_FLOW.CRYPTO ? '' : props.fixedAmount || getDefaultTierAmount(props.tier),
         platformContribution: props.platformContribution,
         currency: CRYPTO_CURRENCIES[0],
       },
@@ -186,7 +186,7 @@ class ContributionFlow extends React.Component {
           order: {
             quantity: stepDetails.quantity,
             amount:
-              this.props.paymentMethod === 'crypto'
+              this.props.paymentFlow === PAYMENT_FLOW.CRYPTO
                 ? { valueInCents: 100 } // Insert dummy value for crypto contribution until the transaction is reconciled
                 : { valueInCents: stepDetails.amount },
             frequency: getGQLV2FrequencyFromInterval(stepDetails.interval),
@@ -194,7 +194,7 @@ class ContributionFlow extends React.Component {
             fromAccount,
             toAccount: pick(this.props.collective, ['id']),
             customData:
-              this.props.paymentMethod === 'crypto'
+              this.props.paymentFlow === PAYMENT_FLOW.CRYPTO
                 ? {
                     pledgeAmount: stepDetails.amount,
                     pledgeCurrency: stepDetails.currency.value,
@@ -231,7 +231,7 @@ class ContributionFlow extends React.Component {
 
     if (stripeError) {
       return this.handleStripeError(order, stripeError, email, guestToken);
-    } else if (this.props.paymentMethod === 'crypto') {
+    } else if (this.props.paymentFlow === PAYMENT_FLOW.CRYPTO) {
       this.setState({ isSubmitted: true, isSubmitting: false, createdOrder: order });
     } else {
       return this.handleSuccess(order);
@@ -450,7 +450,7 @@ class ContributionFlow extends React.Component {
     this.setState({ showSignIn: false });
     // To create an order we need a payment method to be set. This is normally set at final stage but for crypto flow we
     // need to set this before the final step of the flow
-    if (this.props.paymentMethod === 'crypto') {
+    if (this.props.paymentFlow === PAYMENT_FLOW.CRYPTO) {
       this.setState({
         stepPayment: {
           key: 'crypto',
@@ -517,7 +517,7 @@ class ContributionFlow extends React.Component {
     } else if (verb === 'contribute' || verb === 'new-contribute') {
       // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
       route = `/${collective.slug}/donate/${step}`;
-    } else if (verb === 'donate' && this.props.paymentMethod === 'crypto') {
+    } else if (verb === 'donate' && this.props.paymentFlow === PAYMENT_FLOW.CRYPTO) {
       route = `/${collective.slug}/donate/crypto/${step}`;
     }
 
@@ -560,13 +560,13 @@ class ContributionFlow extends React.Component {
 
   /** Returns the steps list */
   getSteps() {
-    const { intl, fixedInterval, fixedAmount, collective, host, tier, LoggedInUser, paymentMethod } = this.props;
+    const { intl, fixedInterval, fixedAmount, collective, host, tier, LoggedInUser, paymentFlow } = this.props;
     const { stepDetails, stepProfile, stepPayment, stepSummary } = this.state;
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
     const minAmount = this.getTierMinAmount(tier);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
     const isStepProfileCompleted = Boolean((stepProfile && LoggedInUser) || stepProfile?.isGuest);
-    const isCrypto = paymentMethod === 'crypto';
+    const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
 
     const steps = [
       {
@@ -732,11 +732,11 @@ class ContributionFlow extends React.Component {
       loadingLoggedInUser,
       skipStepDetails,
       isEmbed,
-      paymentMethod,
+      paymentFlow,
       error: backendError,
     } = this.props;
     const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
-    const isCrypto = paymentMethod === 'crypto';
+    const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
     const currency = isCrypto ? stepDetails.currency.value : tier?.amount.currency || collective.currency;
     const isLoading = isCrypto ? isSubmitting : isSubmitted || isSubmitting;
     const pastEvent = collective.type === CollectiveType.EVENT && isPastEvent(collective);
