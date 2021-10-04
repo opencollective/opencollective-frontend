@@ -584,7 +584,7 @@ const ExpenseFormBody = ({
                   <ConfirmationModal
                     show
                     onClose={() => setShowModal(false)}
-                    header={<FormattedMessage defaultMessage="Reset form" />}
+                    header={formatMessage(msg.resetExpense)}
                     body={formatMessage(msg.confirmResetExpense)}
                     continueHandler={() => {
                       setStep(STEPS.PAYEE);
