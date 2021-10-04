@@ -74,7 +74,16 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     return { reason: CONTRIBUTION_BLOCKER.NO_CRYPTO_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
   } else if (account.settings.disableCustomContributions && !isCrypto && !tier) {
     return { reason: CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
-  } else if (tierHasFixedInterval(tier) && !canContributeRecurring(account, loggedInUser)) {
+    /*
+     * The no payment warning is shown if,
+     * a) The host has no payment methods configured.
+     * b) If this tier has a fixed interval but the collective doesn't support recurring contributions (i.e: say the
+     *    collective has only bank transfer payment method).
+     */
+  } else if (
+    account.host.supportedPaymentMethods?.length === 0 ||
+    (tierHasFixedInterval(tier) && !canContributeRecurring(account, loggedInUser))
+  ) {
     return {
       reason: CONTRIBUTION_BLOCKER.NO_PAYMENT_PROVIDER,
       type: 'warning',
