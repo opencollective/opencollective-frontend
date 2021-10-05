@@ -29,7 +29,7 @@ import StyledSpinner from '../../StyledSpinner';
 import { P, Span } from '../../Text';
 
 const mainReportsQuery = gqlV2/* GraphQL */ `
-  query ReportsPageQuery($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
+  query HostFeeTimeline($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
     host(slug: $hostSlug) {
       id
       createdAt
@@ -55,6 +55,24 @@ const mainReportsQuery = gqlV2/* GraphQL */ `
               currency
             }
           }
+        }
+      }
+    }
+  }
+`;
+
+const hostMetricsQuery = gqlV2/* GraphQL */ `
+  query HostFeeSummary($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
+    host(slug: $hostSlug) {
+      id
+      hostMetrics(dateFrom: $dateFrom, dateTo: $dateTo) {
+        hostFees {
+          valueInCents
+          currency
+        }
+        hostFeeShare {
+          valueInCents
+          currency
         }
       }
     }
@@ -209,9 +227,26 @@ const HostFeesSection = ({ hostSlug }) => {
   const [dateTo, setDateTo] = useState(null);
   const [collectives, setCollectives] = useState(null);
   const [showHostFeeChart, setShowHostFeeChart] = useState(true);
+  const currentYear = new Date().getFullYear();
+  const { loading: loadingHostMetrics, data: hostMetricsData } = useQuery(hostMetricsQuery, {
+    variables: {
+      dateFrom: dateFrom ? dateFrom : `${currentYear}-01-01T00:00:00Z`,
+      dateTo: dateTo ? dateTo : `${currentYear}-12-31T23:59:59Z`,
+      hostSlug,
+    },
+    context: API_V2_CONTEXT,
+  });
 
   if (loading && !host) {
     return <Loading />;
+  }
+
+  let totalHostFees, profit, sharedRevenue;
+  if (!loadingHostMetrics) {
+    const { hostFees, hostFeeShare } = hostMetricsData.host.hostMetrics;
+    totalHostFees = hostFees.valueInCents;
+    sharedRevenue = hostFeeShare.valueInCents;
+    profit = totalHostFees - sharedRevenue;
   }
 
   const setDate = period => {
@@ -256,43 +291,56 @@ const HostFeesSection = ({ hostSlug }) => {
         </Container>
       </Flex>
       <StyledCard minHeight={200} px={3} css={{ background: '#F6F5FF' }}>
-        <Flex flexWrap="wrap">
-          <Container width={[1, 1, '230px']} px={2}>
-            <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
-              <Span mr={10}>
-                <Image width={14} height={7} src="/static/images/host-fees-timeline.svg" />
-              </Span>
-              <FormattedMessage defaultMessage="Total Host Fees" />
-            </P>
-            <P fontSize="12px" fontWeight="400" mt="10px">
-              <FormattedMessage defaultMessage="Host Fees charged each month, which will be added to the Host budget at the end of the month." />
-            </P>
-          </Container>
-          <Container display={['none', 'none', 'flex']} borderLeft="1px solid #6B5D99" height="88px" mt="39px" />
-          <Container width={[1, 1, '230px']} px={2}>
-            <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
-              <Span mr={10}>
-                <Image width={6.5} height={12} mr={10} src="/static/images/host-fees-money-sign.svg" />
-              </Span>
-              <FormattedMessage defaultMessage="Your Profit" />
-            </P>
-            <P fontSize="12px" fontWeight="400" mt="10px">
-              <FormattedMessage defaultMessage="The profit as an organization resulting of the host fees you collect without the shared revenue for the use of the platform." />
-            </P>
-          </Container>
-          <Container display={['none', 'none', 'flex']} borderLeft="1px solid #6B5D99" height="88px" mt="39px" />
-          <Container width={[1, 1, '230px']} px={2}>
-            <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
-              <Span mr={10}>
-                <Image width={9.42} height={12} mr={10} src="/static/images/host-fees-oc.svg" />
-              </Span>
-              <FormattedMessage defaultMessage="Shared Revenue" />
-            </P>
-            <P fontSize="12px" fontWeight="400" mt="10px">
-              <FormattedMessage defaultMessage="The cost of using the platform. It is collected each month with a settlement invoice uploaded to you as an expense." />
-            </P>
-          </Container>
-        </Flex>
+        {loadingHostMetrics ? (
+          <Loading />
+        ) : (
+          <Flex flexWrap="wrap">
+            <Container width={[1, 1, '230px']} px={2}>
+              <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
+                <Span mr={10}>
+                  <Image width={14} height={7} src="/static/images/host-fees-timeline.svg" />
+                </Span>
+                <FormattedMessage defaultMessage="Total Host Fees" />
+              </P>
+              <Box pt="12px" pb="10px" fontSize="18px" fontWeight="500">
+                {formatCurrency(totalHostFees, host.currency)}
+              </Box>
+              <P fontSize="12px" fontWeight="400" mt="10px">
+                <FormattedMessage defaultMessage="Host Fees charged each month, which will be added to the Host budget at the end of the month." />
+              </P>
+            </Container>
+            <Container display={['none', 'none', 'flex']} borderLeft="1px solid #6B5D99" height="88px" mt="39px" />
+            <Container width={[1, 1, '230px']} px={2}>
+              <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
+                <Span mr={10}>
+                  <Image width={6.5} height={12} mr={10} src="/static/images/host-fees-money-sign.svg" />
+                </Span>
+                <FormattedMessage defaultMessage="Your Profit" />
+              </P>
+              <Box pt="12px" pb="10px" fontSize="18px" fontWeight="500">
+                {formatCurrency(profit, host.currency)}
+              </Box>
+              <P fontSize="12px" fontWeight="400" mt="10px">
+                <FormattedMessage defaultMessage="The profit as an organization resulting of the host fees you collect without the shared revenue for the use of the platform." />
+              </P>
+            </Container>
+            <Container display={['none', 'none', 'flex']} borderLeft="1px solid #6B5D99" height="88px" mt="39px" />
+            <Container width={[1, 1, '230px']} px={2}>
+              <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
+                <Span mr={10}>
+                  <Image width={9.42} height={12} mr={10} src="/static/images/host-fees-oc.svg" />
+                </Span>
+                <FormattedMessage defaultMessage="Shared Revenue" />
+              </P>
+              <Box pt="12px" pb="10px" fontSize="18px" fontWeight="500">
+                {formatCurrency(sharedRevenue, host.currency)}
+              </Box>
+              <P fontSize="12px" fontWeight="400" mt="10px">
+                <FormattedMessage defaultMessage="The cost of using the platform. It is collected each month with a settlement invoice uploaded to you as an expense." />
+              </P>
+            </Container>
+          </Flex>
+        )}
         <Flex flexWrap="wrap">
           <Container width={[1, 1, 3 / 4]} px={2}>
             <P fontSize="12px" fontWeight="400" mt="16px">
