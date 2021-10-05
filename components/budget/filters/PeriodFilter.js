@@ -6,7 +6,7 @@ import { has } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { stripTime } from '../../../lib/date-utils';
+import { parseDateInterval, stripTime } from '../../../lib/date-utils';
 import dayjs from '../../../lib/dayjs';
 
 import { DateRange } from '../../DateRange';
@@ -23,57 +23,14 @@ import { Span } from '../../Text';
 const DEFAULT_INTERVAL = { from: '', to: '', timezoneType: 'local' };
 
 /**
- * Parse `strValue` in a "dateFrom→dateTo" format and returns an array like [dateFrom, dateTo].
- * Each value in the array will be `undefined` if there's no filter for it. We consider that all values passed
- * in this string are using UTC timezone.
- */
-export const parseDateRange = strValue => {
-  const parsedValue = strValue?.match(/^(?<from>[^→]+)(→(?<to>.+?(?=~UTC|$)))?(~(?<timezoneType>UTC))?$/);
-  if (parsedValue) {
-    const getDateIsoString = dateStr => (!dateStr || dateStr === 'all' ? undefined : dateStr);
-    return {
-      from: getDateIsoString(parsedValue.groups.from),
-      to: getDateIsoString(parsedValue.groups.to),
-      timezoneType: parsedValue.groups.timezoneType || 'local',
-    };
-  } else {
-    return { from: undefined, to: undefined, timezoneType: 'local' };
-  }
-};
-
-/**
- * Opposite of `parseDateRange`: takes an object like {from, to} and returns a string
- * like "from→to".
- */
-const encodePeriod = interval => {
-  if (!interval.from && !interval.to) {
-    return '';
-  }
-
-  const isUTC = interval.timezoneType === 'UTC';
-  const encodeDate = (date, isEndOfDay) => {
-    if (!date) {
-      return 'all';
-    } else {
-      const dayjsTimeMethod = isEndOfDay ? 'endOf' : 'startOf';
-      const result = isUTC ? dayjs.utc(date) : dayjs(date);
-      return result[dayjsTimeMethod]('day').toISOString();
-    }
-  };
-
-  const baseResult = `${encodeDate(interval.from, false)}→${encodeDate(interval.to, true)}`;
-  return isUTC ? `${baseResult}~UTC` : baseResult;
-};
-
-/**
- * Get a date range as stored internally from a `value` prop, that can be either an array
- * like [from, to] or a stringified value (see `encodePeriod`).
+ * Get a date range as stored internally from a `value` prop, that can be either an object
+ * like { from, to } or a stringified value (see `encodeDateInterval`).
  */
 const getIntervalFromValue = value => {
   const isIntervalObject = value => typeof value === 'object' && has(value, 'from') && has(value, 'to');
-  const intervalFromValue = isIntervalObject(value) ? value : parseDateRange(value);
+  const intervalFromValue = isIntervalObject(value) ? { ...value } : parseDateInterval(value);
   if (intervalFromValue.timezoneType === 'UTC') {
-    const toUTC = date => (date ? dayjs.utc(date, true) : null);
+    const toUTC = date => (date ? dayjs.utc(date) : null);
     intervalFromValue.from = toUTC(intervalFromValue.from);
     intervalFromValue.to = toUTC(intervalFromValue.to);
   }
@@ -291,7 +248,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
               onClick={() => {
                 setTmpDateInterval(DEFAULT_INTERVAL);
                 setOpen(false);
-                onChange('');
+                onChange(null);
               }}
             >
               <FormattedMessage id="Reset" defaultMessage="Reset" />
@@ -303,7 +260,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
               data-cy="btn-apply-period-filter"
               flex="1"
               onClick={() => {
-                onChange(encodePeriod(tmpDateInterval));
+                onChange(tmpDateInterval);
                 setOpen(false);
               }}
             >
@@ -324,6 +281,7 @@ PeriodFilter.propTypes = {
     PropTypes.shape({
       from: PropTypes.string,
       to: PropTypes.string,
+      timezoneType: PropTypes.string,
     }),
   ]),
   inputId: PropTypes.string,

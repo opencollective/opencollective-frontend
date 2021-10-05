@@ -11,11 +11,13 @@ import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
+import NotFound from '../NotFound';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
 import { H1, H2 } from '../Text';
 
+import HostDownloadsSection from './reports-section/HostDownloadsSection';
 import HostFeesSection from './reports-section/HostFeesSection';
 import PlatformTipsCollected from './reports-section/PlatformTipsCollected';
 import TotalMoneyManagedSection from './reports-section/TotalMoneyManagedSection';
@@ -31,6 +33,7 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
       isHost
       isActive
       type
+      createdAt
       hostFeePercent
       hostMetrics {
         hostFees {
@@ -93,7 +96,9 @@ const HostDashboardReports = ({ hostSlug }) => {
     return <Loading />;
   } else if (error) {
     return <MessageBoxGraphqlError error={error} maxWidth={500} m="0 auto" />;
-  } else if (data.host && !data.host.isActive) {
+  } else if (!data?.host) {
+    return <NotFound />;
+  } else if (!data.host.isActive) {
     return (
       <MessageBox withIcon type="error" maxWidth={400} m="0 auto">
         <FormattedMessage id="host.onlyActive" defaultMessage="This page is only available for active fiscal hosts" />
@@ -101,8 +106,7 @@ const HostDashboardReports = ({ hostSlug }) => {
     );
   }
 
-  const currency = data?.host.currency;
-  const hostMetrics = data?.host.hostMetrics;
+  const { host } = data;
   return (
     <Box maxWidth={800} m="0 auto" px={2}>
       <Flex alignItems="center" mb={24} flexWrap="wrap">
@@ -123,7 +127,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           >
             <FormattedMessage id="Host.Metrics.TotalMoneyManages" defaultMessage="Total Money Managed" />
           </SectionTitle>
-          <TotalMoneyManagedSection currency={currency} hostMetrics={hostMetrics} />
+          <TotalMoneyManagedSection currency={host.currency} hostMetrics={host.hostMetrics} />
         </Container>
         <Container mb={38}>
           <SectionTitle>
@@ -146,7 +150,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           <SectionTitle>
             <FormattedMessage id="Downloads" defaultMessage="Downloads" />
           </SectionTitle>
-          <StyledCard height={200} />
+          <HostDownloadsSection host={host} />
         </Container>
       </StyledCard>
     </Box>

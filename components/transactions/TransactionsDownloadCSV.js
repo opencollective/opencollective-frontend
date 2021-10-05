@@ -5,7 +5,8 @@ import { Download as IconDownload } from '@styled-icons/feather/Download';
 import dayjs from 'dayjs';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { createError, ERROR, formatErrorMessage, i18nGraphqlException } from '../../lib/errors';
+import { fetchCSVFileFromRESTService } from '../../lib/api';
+import { formatErrorMessage, i18nGraphqlException } from '../../lib/errors';
 import { exportFile } from '../../lib/export_file';
 import { transactionsQuery } from '../../lib/graphql/queries';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
@@ -135,24 +136,7 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
 
     try {
       setLoading('v2');
-      let response;
-      try {
-        response = await fetch(downloadUrl(), {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-      } catch {
-        throw createError(ERROR.NETWORK);
-      }
-
-      const content = response && (await response.text());
-      if (!response?.ok) {
-        throw new createError(ERROR.UNKNOWN, { message: content });
-      }
-
-      return exportFile('text/csv;charset=utf-8', `${collective.slug}-transactions.csv`, content);
+      await fetchCSVFileFromRESTService(downloadUrl(), `${collective.slug}-transactions`);
     } catch (error) {
       addToast({ type: TOAST_TYPE.ERROR, message: formatErrorMessage(intl, error) });
     } finally {

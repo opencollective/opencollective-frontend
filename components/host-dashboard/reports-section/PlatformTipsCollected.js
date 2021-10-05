@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { get } from 'lodash';
 import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 
+import { simpleDateToISOString } from '../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import PeriodFilter, { parseDateRange } from '../../budget/filters/PeriodFilter';
+import PeriodFilter from '../../budget/filters/PeriodFilter';
 import Container from '../../Container';
 import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../../FormattedMoneyAmount';
 import { Box, Flex } from '../../Grid';
@@ -23,6 +25,7 @@ const platformTipsQuery = gqlV2/* GraphQL */ `
     host(slug: $hostSlug) {
       id
       currency
+      createdAt
       hostMetrics(dateFrom: $dateFrom, dateTo: $dateTo) {
         platformTips {
           valueInCents
@@ -39,9 +42,20 @@ const platformTipsQuery = gqlV2/* GraphQL */ `
 
 const AMOUNT_STYLES = { ...DEFAULT_AMOUNT_STYLES, fontSize: '18px', lineHeight: '26px' };
 
+const prepareDateArgs = dateInterval => {
+  if (!dateInterval) {
+    return {};
+  } else {
+    return {
+      dateFrom: simpleDateToISOString(dateInterval.from, false, dateInterval.timezoneType),
+      dateTo: simpleDateToISOString(dateInterval.to, true, dateInterval.timezoneType),
+    };
+  }
+};
+
 const PlatformTipsCollected = ({ hostSlug }) => {
   const [dateRange, setDateRange] = React.useState({ from: null, to: null });
-  const variables = { hostSlug, dateFrom: dateRange.from, dateTo: dateRange.to };
+  const variables = { hostSlug, ...prepareDateArgs(dateRange) };
   const { data, loading, error } = useQuery(platformTipsQuery, { variables, context: API_V2_CONTEXT });
 
   if (error) {
@@ -59,8 +73,9 @@ const PlatformTipsCollected = ({ hostSlug }) => {
         </Flex>
         <PeriodFilter
           minWidth={185}
-          onChange={encodedValue => setDateRange(parseDateRange(encodedValue))}
+          onChange={value => setDateRange(value)}
           value={dateRange}
+          minDate={get(data, 'host.createdAt')}
         />
       </Flex>
       <Box mt={20} mb={10}>
