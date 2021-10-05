@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { fetchCSVFileFromRESTService } from '../../lib/api';
+import { parseDateInterval } from '../../lib/date-utils';
 import { formatErrorMessage, i18nGraphqlException } from '../../lib/errors';
 import { exportFile } from '../../lib/export_file';
 import { transactionsQuery } from '../../lib/graphql/queries';
@@ -82,10 +83,8 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
   const { addToast } = useToasts();
   let dateFrom, dateTo;
   if (query.period) {
-    [dateFrom, dateTo] = query.period.split('→');
+    ({ from: dateFrom, to: dateTo } = parseDateInterval(query.period));
   }
-  dateFrom = dateFrom === 'all' ? null : dateFrom;
-  dateTo = dateTo === 'all' ? null : dateTo;
 
   const type = query.type;
 
@@ -98,8 +97,7 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
         query: transactionsQuery,
         variables: {
           dateFrom: dateFrom,
-          // Extend to end of day
-          dateTo: dateTo && dayjs(dateTo).set('hour', 23).set('minute', 59).set('second', 59).toISOString(),
+          dateTo: dateTo,
           CollectiveId: collective.legacyId,
           type: type,
           kinds: kinds,
