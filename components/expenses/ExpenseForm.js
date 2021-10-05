@@ -221,7 +221,7 @@ const ExpenseFormBody = ({
   const [step, setStep] = React.useState(stepOneCompleted || isCreditCardCharge ? STEPS.EXPENSE : STEPS.PAYEE);
   // Only true when logged in and drafting the expense
   const [isOnBehalf, setOnBehalf] = React.useState(false);
-  const [showModal, setShowModal] = React.useState(false);
+  const [showResetModal, setShowResetModal] = React.useState(false);
 
   // Scroll to top when step changes
   React.useEffect(() => {
@@ -580,10 +580,10 @@ const ExpenseFormBody = ({
                   </Box>
                 )}
                 <StyledHr flex="1" borderColor="white.full" mx={2} />
-                {showModal ? (
+                {showResetModal ? (
                   <ConfirmationModal
                     show
-                    onClose={() => setShowModal(false)}
+                    onClose={() => setShowResetModal(false)}
                     header={formatMessage(msg.resetExpense)}
                     body={formatMessage(msg.confirmResetExpense)}
                     continueHandler={() => {
@@ -593,7 +593,7 @@ const ExpenseFormBody = ({
                         formPersister.clearValues();
                         window.scrollTo(0, 0);
                       }
-                      setShowModal(false);
+                      setShowResetModal(false);
                     }}
                   />
                 ) : (
@@ -606,7 +606,7 @@ const ExpenseFormBody = ({
                     mx={[2, 0]}
                     mr={[null, 3]}
                     whiteSpace="nowrap"
-                    onClick={() => setShowModal(true)}
+                    onClick={() => setShowResetModal(true)}
                   >
                     <Undo size={11} />
                     <Span mx={1}>{formatMessage(msg.resetExpense)}</Span>
