@@ -61,10 +61,10 @@ const MembershipLine = ({ user, membership }) => {
       {Boolean(user?.canEditCollective(membership.collective)) && (
         <StyledLink
           as={Link}
-          href={getSettingsRoute(membership.collective, user)}
           ml={1}
           color="black.500"
           title={intl.formatMessage(messages.settings)}
+          {...getSettingsRoute(membership.collective, null, user)}
         >
           <Settings opacity="0" size="1.2em" />
         </StyledLink>

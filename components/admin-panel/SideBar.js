@@ -19,21 +19,25 @@ const AdminPanelSideBar = ({ collective, isLoading, selectedSection, onRoute, ..
       <MenuContainer>
         <Box mb={32}>
           {isLoading ? (
-            <LoadingPlaceholder height={56} width={56} />
+            <LoadingPlaceholder height={56} width={56} borderRadius="50%" />
           ) : (
             <Link href={pageUrl}>
               <Avatar collective={collective} radius={56} />
             </Link>
           )}
           <H1 fontSize="16px" lineHeight="24px" fontWeight="700" letterSpacing="0.04px" mb={16} mt={12}>
-            {isLoading ? <LoadingPlaceholder height={24} /> : <Link href={pageUrl}>{collective.name}</Link>}
+            {isLoading ? (
+              <LoadingPlaceholder height={24} maxWidth="75%" />
+            ) : (
+              <Link href={pageUrl}>{collective.name}</Link>
+            )}
           </H1>
         </Box>
 
         {isLoading ? (
           [...Array(5).keys()].map(i => (
             <li key={i}>
-              <LoadingPlaceholder height={24} mb={2} borderRadius={8} />
+              <LoadingPlaceholder height={24} mb={2} borderRadius={8} maxWidth="80%" />
             </li>
           ))
         ) : (

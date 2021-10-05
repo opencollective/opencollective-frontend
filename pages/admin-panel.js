@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -8,12 +7,14 @@ import { isHost } from '../lib/collective-sections';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import AdminPanelSection from '../components/admin-panel/AdminPanelSection';
+import { ALL_SECTIONS } from '../components/admin-panel/constants';
 import AdminPanelSideBar from '../components/admin-panel/SideBar';
 import AdminPanelTopBar from '../components/admin-panel/TopBar';
-import AuthenticatedPage from '../components/AuthenticatedPage';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
-import { Box, Grid } from '../components/Grid';
+import { Flex, Grid } from '../components/Grid';
+import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
+import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { useUser } from '../components/UserProvider';
 
@@ -29,9 +30,7 @@ const adminPanelQuery = gqlV2`
       isArchived
       features {
         ...NavbarFields
-      }
-      virtualCards {
-        totalCount
+        VIRTUAL_CARDS
       }
       ... on AccountWithHost {
         hostFeePercent
@@ -46,98 +45,85 @@ const adminPanelQuery = gqlV2`
   }
   ${collectiveNavbarFieldsFragment}
 `;
+
 const messages = defineMessages({
-  'collective.isArchived': {
+  collectiveIsArchived: {
     id: 'collective.isArchived',
     defaultMessage: '{name} has been archived.',
   },
-  'collective.isArchived.edit.description': {
+  collectiveIsArchivedDescription: {
     id: 'collective.isArchived.edit.description',
     defaultMessage: 'This {type} has been archived and is no longer active.',
   },
-  'user.isArchived': {
+  userIsArchived: {
     id: 'user.isArchived',
     defaultMessage: 'Account has been archived.',
   },
-  'user.isArchived.edit.description': {
+  userIsArchivedDescription: {
     id: 'user.isArchived.edit.description',
     defaultMessage: 'This account has been archived is no longer active.',
   },
 });
 
-const getDefaultSectionForAccount = account => {
-  if (account && isHost(account)) {
-    return 'expenses';
+export const getDefaultSectionForAccount = account => {
+  return account && isHost(account) ? ALL_SECTIONS.EXPENSES : ALL_SECTIONS.INFO;
+};
+
+const getNotification = (intl, account) => {
+  if (account?.isArchived) {
+    const notification = { status: 'collectiveArchived' };
+    if (account.type === 'USER') {
+      return {
+        ...notification,
+        title: intl.formatMessage(messages.userIsArchived),
+        description: intl.formatMessage(messages.userIsArchivedDescription),
+      };
+    } else {
+      return {
+        ...notification,
+        title: intl.formatMessage(messages.collectiveIsArchived, { name: account.name }),
+        description: intl.formatMessage(messages.collectiveIsArchivedDescription, {
+          type: account.type.toLowerCase(),
+        }),
+      };
+    }
   }
-  return 'info';
 };
 
 const AdminPanelPage = () => {
   const router = useRouter();
-  const { slug, section } = router.query;
+  const { slug } = router.query;
   const intl = useIntl();
   const { LoggedInUser, loadingLoggedInUser } = useUser();
-  const { data, loading } = useQuery(adminPanelQuery, {
-    context: API_V2_CONTEXT,
-    variables: { slug },
-    skip: loadingLoggedInUser,
-  });
-
-  React.useEffect(() => {
-    if (!router.query.section && data?.account) {
-      const section = getDefaultSectionForAccount(account);
-      router.replace(`/${slug}/admin/${section}`);
-    }
-  }, [router.query.section, data?.account]);
+  const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
 
   const account = data?.account;
-
-  const canEditAccount = LoggedInUser?.canEditCollective(account);
-  const notification = {};
-  if (account?.isArchived && account?.type === 'USER') {
-    notification.title = intl.formatMessage(messages['user.isArchived']);
-    notification.description = intl.formatMessage(messages['user.isArchived.edit.description']);
-    notification.status = 'collectiveArchived';
-  } else if (account?.isArchived) {
-    notification.title = intl.formatMessage(messages['collective.isArchived'], {
-      name: account.name,
-    });
-    notification.description = intl.formatMessage(messages['collective.isArchived.edit.description'], {
-      type: account.type.toLowerCase(),
-    });
-    notification.status = 'collectiveArchived';
-  }
-
+  const notification = getNotification(intl, account);
+  const section = router.query.section || getDefaultSectionForAccount(account);
+  const isLoading = loading || loadingLoggedInUser;
   return (
-    <AuthenticatedPage>
+    <Page>
       <AdminPanelTopBar
-        isLoading={loading || loadingLoggedInUser}
+        isLoading={isLoading}
         collective={data?.account}
         collectiveSlug={slug}
         selectedSection={section}
         display={['flex', null, 'none']}
       />
-      {data?.account?.isArchived && (
+      {Boolean(notification) && (
         <NotificationBar
           status={notification.status}
           title={notification.title}
           description={notification.description}
         />
       )}
-      {account && !canEditAccount ? (
-        <Box className="login" my={6}>
-          <p>
-            <FormattedMessage
-              id="RecurringContributions.permissionError"
-              defaultMessage="You need to be logged in as the admin of this account to view this page."
-            />
-          </p>
-          {!LoggedInUser && (
-            <Box mt={5}>
-              <SignInOrJoinFree />
-            </Box>
-          )}
-        </Box>
+      {account && LoggedInUser && !LoggedInUser?.canEditCollective(account) ? (
+        <Flex flexDirection="column" alignItems="center" my={6}>
+          <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
+            <FormattedMessage id="authorization.loginRequired" defaultMessage="You need to be logged in to continue." />
+          </MessageBox>
+          <SignInOrJoinFree form="signin" disableSignup />
+        </Flex>
       ) : (
         <Grid
           gridTemplateColumns={['1fr', null, '208px 1fr']}
@@ -149,21 +135,17 @@ const AdminPanelPage = () => {
           py={4}
         >
           <AdminPanelSideBar
-            isLoading={loading}
+            isLoading={isLoading}
             collective={account}
             selectedSection={section}
             display={['none', null, 'block']}
           />
-          <AdminPanelSection section={section} isLoading={loading} collective={account} />
+          <AdminPanelSection section={section} isLoading={isLoading} collective={account} />
         </Grid>
       )}
       ;
-    </AuthenticatedPage>
+    </Page>
   );
-};
-
-AdminPanelPage.propTypes = {
-  router: PropTypes.object,
 };
 
 export default AdminPanelPage;

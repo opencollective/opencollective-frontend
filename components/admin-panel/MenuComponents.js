@@ -4,13 +4,19 @@ import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { getSettingsRoute } from '../../lib/url-helpers';
+
+import { getDefaultSectionForAccount } from '../../pages/admin-panel';
 import { Box } from '../Grid';
+import Link from '../Link';
+import StyledLink from '../StyledLink';
 
 import { SECTION_LABELS } from './constants';
 
 const MenuLinkContainer = styled.li`
   margin: 4px -8px 0px;
-  a {
+  a,
+  ${StyledLink} {
     display: flex;
     justify-content: space-between;
     font-weight: 500;
@@ -49,25 +55,20 @@ export const MenuLink = ({ collective, section, children, onClick, isSelected, i
     return null;
   }
 
-  const selectedSection = router.query?.section;
-  const href = `${collective?.slug}/admin/${section}`;
-  const handleClick = e => {
-    e.preventDefault();
-    if (onClick) {
-      onClick();
-    } else {
-      router.push(href);
-    }
-  };
+  const selectedSection = router.query?.section || getDefaultSectionForAccount(collective);
   if (!children && SECTION_LABELS[section]) {
     children = formatMessage(SECTION_LABELS[section]);
   }
 
   return (
     <MenuLinkContainer isSelected={isSelected || (section && selectedSection === section)} isStrong={isStrong}>
-      <a href={href} onClick={handleClick}>
-        {children}
-      </a>
+      {onClick ? (
+        <StyledLink as="button" onClick={onClick}>
+          {children}
+        </StyledLink>
+      ) : (
+        <Link {...getSettingsRoute(collective, section, true)}>{children}</Link>
+      )}
     </MenuLinkContainer>
   );
 };
