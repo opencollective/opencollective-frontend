@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { ChevronDown } from '@styled-icons/fa-solid/ChevronDown/ChevronDown';
+import { ChevronUp } from '@styled-icons/fa-solid/ChevronUp/ChevronUp';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -18,11 +20,13 @@ import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { Box, Flex } from '../../Grid';
+import Image from '../../Image';
 import Loading from '../../Loading';
 import StyledCard from '../../StyledCard';
+import StyledLinkButton from '../../StyledLinkButton';
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 import StyledSpinner from '../../StyledSpinner';
-import { P } from '../../Text';
+import { P, Span } from '../../Text';
 
 const mainReportsQuery = gqlV2/* GraphQL */ `
   query ReportsPageQuery($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
@@ -204,6 +208,7 @@ const HostFeesSection = ({ hostSlug }) => {
   const [dateFrom, setDateFrom] = useState(null);
   const [dateTo, setDateTo] = useState(null);
   const [collectives, setCollectives] = useState(null);
+  const [showHostFeeChart, setShowHostFeeChart] = useState(true);
 
   if (loading && !host) {
     return <Loading />;
@@ -250,30 +255,90 @@ const HostFeesSection = ({ hostSlug }) => {
           />
         </Container>
       </Flex>
-      <StyledCard minHeight={200}>
-        <Box py={3} css={{ background: '#F6F5FF' }}>
-          <Flex alignItems="center" px={3} mb={2}>
-            <P fontSize="11px" fontWeight="700" mr={3} textTransform="uppercase">
-              <FormattedMessage id="HostFeesSection.Title" defaultMessage="Collected host fees per year" />
+      <StyledCard minHeight={200} px={3} css={{ background: '#F6F5FF' }}>
+        <Flex flexWrap="wrap">
+          <Container width={[1, 1, '230px']} px={2}>
+            <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
+              <Span mr={10}>
+                <Image width={14} height={7} src="/static/images/host-fees-timeline.svg" />
+              </Span>
+              <FormattedMessage defaultMessage="Total Host Fees" />
             </P>
-            <StyledSelectFilter
-              inputId="host-report-host-fees-year-select"
-              options={yearsOptions}
-              defaultValue={{ value: selectedYear, label: selectedYear }}
-              onChange={({ value }) => setSelectedYear(value)}
-              isSearchable={false}
-              minWidth={100}
-            />
-          </Flex>
-          <ChartWrapper>
-            {loading && (
-              <ContainerOverlay>
-                <StyledSpinner size={64} />
-              </ContainerOverlay>
-            )}
-            <Chart type="bar" width="100%" height="250px" options={chartOptions} series={series} />
-          </ChartWrapper>
-        </Box>
+            <P fontSize="12px" fontWeight="400" mt="10px">
+              <FormattedMessage defaultMessage="Host Fees charged each month, which will be added to the Host budget at the end of the month." />
+            </P>
+          </Container>
+          <Container display={['none', 'none', 'flex']} borderLeft="1px solid #6B5D99" height="88px" mt="39px" />
+          <Container width={[1, 1, '230px']} px={2}>
+            <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
+              <Span mr={10}>
+                <Image width={6.5} height={12} mr={10} src="/static/images/host-fees-money-sign.svg" />
+              </Span>
+              <FormattedMessage defaultMessage="Your Profit" />
+            </P>
+            <P fontSize="12px" fontWeight="400" mt="10px">
+              <FormattedMessage defaultMessage="The profit as an organization resulting of the host fees you collect without the shared revenue for the use of the platform." />
+            </P>
+          </Container>
+          <Container display={['none', 'none', 'flex']} borderLeft="1px solid #6B5D99" height="88px" mt="39px" />
+          <Container width={[1, 1, '230px']} px={2}>
+            <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
+              <Span mr={10}>
+                <Image width={9.42} height={12} mr={10} src="/static/images/host-fees-oc.svg" />
+              </Span>
+              <FormattedMessage defaultMessage="Shared Revenue" />
+            </P>
+            <P fontSize="12px" fontWeight="400" mt="10px">
+              <FormattedMessage defaultMessage="The cost of using the platform. It is collected each month with a settlement invoice uploaded to you as an expense." />
+            </P>
+          </Container>
+        </Flex>
+        <Flex flexWrap="wrap">
+          <Container width={[1, 1, 3 / 4]} px={2}>
+            <P fontSize="12px" fontWeight="400" mt="16px">
+              <FormattedMessage defaultMessage="How is you organization's doing using Open Collective?" />
+            </P>
+          </Container>
+          <Container width={[1, 1, 1 / 4]} px={2} textAlign="right">
+            <StyledLinkButton asLink onClick={() => setShowHostFeeChart(!showHostFeeChart)}>
+              <P fontSize="12px" fontWeight="400" mt="16px">
+                <FormattedMessage defaultMessage="See historical" />
+                <Span pl="8px">
+                  {showHostFeeChart ? (
+                    <ChevronUp size={12} color="#46347F" />
+                  ) : (
+                    <ChevronDown fontVariant="solid" size={12} color="#46347F" />
+                  )}
+                </Span>
+              </P>
+            </StyledLinkButton>
+          </Container>
+        </Flex>
+        {showHostFeeChart && (
+          <Box py={3}>
+            <Flex alignItems="center" px={2} mb={2}>
+              <P fontSize="11px" fontWeight="700" mr={3} textTransform="uppercase">
+                <FormattedMessage id="HostFeesSection.Title" defaultMessage="Collected host fees per year" />
+              </P>
+              <StyledSelectFilter
+                inputId="host-report-host-fees-year-select"
+                options={yearsOptions}
+                defaultValue={{ value: selectedYear, label: selectedYear }}
+                onChange={({ value }) => setSelectedYear(value)}
+                isSearchable={false}
+                minWidth={100}
+              />
+            </Flex>
+            <ChartWrapper>
+              {loading && (
+                <ContainerOverlay>
+                  <StyledSpinner size={64} />
+                </ContainerOverlay>
+              )}
+              <Chart type="bar" width="100%" height="250px" options={chartOptions} series={series} />
+            </ChartWrapper>
+          </Box>
+        )}
       </StyledCard>
     </React.Fragment>
   );
