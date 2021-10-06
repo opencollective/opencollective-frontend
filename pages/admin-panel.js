@@ -18,7 +18,7 @@ import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { useUser } from '../components/UserProvider';
 
-const adminPanelQuery = gqlV2`
+const adminPanelQuery = gqlV2/* GraphQL */ `
   query AdminPanel($slug: String!) {
     account(slug: $slug) {
       id
@@ -32,6 +32,12 @@ const adminPanelQuery = gqlV2`
         ...NavbarFields
         VIRTUAL_CARDS
       }
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+        }
+      }
       ... on AccountWithHost {
         hostFeePercent
         host {
@@ -40,7 +46,7 @@ const adminPanelQuery = gqlV2`
           name
           settings
         }
-    }
+      }
     }
   }
   ${collectiveNavbarFieldsFragment}
