@@ -107,6 +107,7 @@
   "ApplyToHost.PickCollective": "Which account is applying to {hostName}?",
   "ApplyToHost.WriteMessage": "Message to the Fiscal Host",
   "appRejectionReason.placeholder": "Proč je tato žádost zamítnuta?",
+  "AQNF/n": "You need to be logged in as an admin",
   "archive.account.confirmation": "Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "Archivovat {name}",
   "Attachment.Private": "Tato příloha je soukromá",

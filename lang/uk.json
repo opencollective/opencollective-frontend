@@ -107,6 +107,7 @@
   "ApplyToHost.PickCollective": "Який обліковий запис застосовується до {hostName}?",
   "ApplyToHost.WriteMessage": "Повідомлення Скарбнику",
   "appRejectionReason.placeholder": "Чому ця заявка відхиляється?",
+  "AQNF/n": "You need to be logged in as an admin",
   "archive.account.confirmation": "Ви впевнені, що хочете архівувати {type, select, EVENT {цю Подію} PROJECT {цей Проєкт} FUND {цей Збір коштів} COLLECTIVE {цей колектив} ORGANIZATION {цю Організацію} other {цей обліковий запис}}?",
   "archive.modal.header": "Архівувати {name}",
   "Attachment.Private": "Це вкладення приватне",

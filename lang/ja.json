@@ -107,6 +107,7 @@
   "ApplyToHost.PickCollective": "どのアカウントが {hostName} に申し込んでいますか？",
   "ApplyToHost.WriteMessage": "財政ホストへのメッセージ",
   "appRejectionReason.placeholder": "なぜこの申請は拒否されるのですか?",
+  "AQNF/n": "You need to be logged in as an admin",
   "archive.account.confirmation": "Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "{name}をアーカイブ",
   "Attachment.Private": "この添付ファイルは非公開です",

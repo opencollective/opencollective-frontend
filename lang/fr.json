@@ -107,6 +107,7 @@
   "ApplyToHost.PickCollective": "Quel compte candidate à {hostName} ?",
   "ApplyToHost.WriteMessage": "Message pour l'hôte fiscal",
   "appRejectionReason.placeholder": "Pourquoi cette demande est-elle rejetée ?",
+  "AQNF/n": "You need to be logged in as an admin",
   "archive.account.confirmation": "Êtes-vous sûr de vouloir archiver {type, select, EVENT {cet Événement} PROJECT {ce Projet} FUND {ce Fonds} COLLECTIVE {ce Collectif} ORGANIZATION {cette Organization} other {ce compte}} ?",
   "archive.modal.header": "Archiver {name}",
   "Attachment.Private": "Cette pièce jointe est privée",

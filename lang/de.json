@@ -107,6 +107,7 @@
   "ApplyToHost.PickCollective": "Welches Konto gilt für {hostName}?",
   "ApplyToHost.WriteMessage": "Nachricht an den steuerlichen Gastgeber",
   "appRejectionReason.placeholder": "Warum wird dieser Antrag abgelehnt?",
+  "AQNF/n": "You need to be logged in as an admin",
   "archive.account.confirmation": "Bist du sicher, dass du {type, select, EVENT {diese Veranstaltung} PROJECT {dieses Projekt} FUND {diesen Fonds} COLLECTIVE {dieses Kollektiv} ORGANIZATION {diese Organisation} other {dieses Konto}} archivieren möchtest?",
   "archive.modal.header": "Archiviere {name}",
   "Attachment.Private": "Dieser Anhang ist privat",
