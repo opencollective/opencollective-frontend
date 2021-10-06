@@ -14,30 +14,27 @@ import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
 
 const FundAmounts = styled.div`
-  width: 100%;
   height: 48px;
   border-radius: 10px;
-  background-color: #9a7bf1;
-  border-right: 350px solid #46347f;
   padding-top: 10px;
   padding-left: 5px;
+  background: linear-gradient(to right, #9a7bf1 50%, #46347f 50%);
 
-  @media (max-width: 1025px) {
+  @media (max-width: 832px) {
     height: 130px;
-    background-color: #9a7bf1;
     border-right: 0px;
-    border-bottom: 40px solid #46347f;
+    background: linear-gradient(to bottom, #9a7bf1 50%, #46347f 50%);
   }
 `;
 
 const TotalFundsLabel = styled(Container)`
+  font-size: 12px;
   display: table-cell;
   padding-left: 10px;
   height: 26px;
   border-radius: 5px;
   background-color: white;
   opacity: 80%;
-  vertical-align: middle;
 `;
 
 const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
@@ -102,23 +99,20 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
         </Container>
         <Container mt={18} mb={12}>
           <FundAmounts>
-            <TotalFundsLabel minWidth="210px">
-              <P>
-                <Span fontWeight="700">{formatCurrency(totalCollectiveFunds, currency)}</Span> |{' '}
-                <FormattedMessage id="Collectives" defaultMessage="Collectives" />
-              </P>
-            </TotalFundsLabel>
-            <TotalFundsLabel
-              minWidth="230px"
-              position="relative"
-              left={['-210px', '-210px', '-210px', '320px']}
-              top={['85px', '85px', '85px', '0px']}
-            >
-              <P>
-                <Span fontWeight="700">{formatCurrency(totalHostFunds, currency)}</Span> |{' '}
-                <FormattedMessage id="TotalMoneyManagedSection.hostOrganization" defaultMessage="Host Organization" />
-              </P>
-            </TotalFundsLabel>
+            <Flex flexWrap="wrap">
+              <Box width={[1, 1, 1 / 2]}>
+                <TotalFundsLabel minWidth="210px" style={{ verticalAlign: 'middle' }}>
+                  <Span fontWeight="700">{formatCurrency(totalCollectiveFunds, currency)}</Span> |{' '}
+                  <FormattedMessage id="Collectives" defaultMessage="Collectives" />
+                </TotalFundsLabel>
+              </Box>
+              <Box width={[1, 1, 1 / 2]} pt={['35px', '35px', 0]}>
+                <TotalFundsLabel minWidth="230px" style={{ verticalAlign: 'middle' }}>
+                  <Span fontWeight="700">{formatCurrency(totalHostFunds, currency)}</Span> |{' '}
+                  <FormattedMessage id="TotalMoneyManagedSection.hostOrganization" defaultMessage="Host Organization" />
+                </TotalFundsLabel>
+              </Box>
+            </Flex>
           </FundAmounts>
         </Container>
         <P minHeight="18px" fontSize="12px" fontWeight="400" lineHeight="18px" pt={12} pb={16}>
