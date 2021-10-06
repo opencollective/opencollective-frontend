@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getSettingsRoute } from '../../lib/url-helpers';
@@ -115,10 +115,6 @@ export const MenuContainer = styled.ul`
     list-style-type: none;
     padding: 0;
   }
-
-  ul {
-    margin: 0;
-  }
 `;
 
 export const MenuGroup = ({ if: conditional, children, ...props }) => {
@@ -140,7 +136,10 @@ export const useSubmenu = () => {
     <React.Fragment>
       <ul>
         <MenuLink onClick={() => setSubmenu(undefined)}>
-          <span>&larr; Back</span>
+          <span>
+            &larr;&nbsp;
+            <FormattedMessage id="Back" defaultMessage="Back" />
+          </span>
         </MenuLink>
       </ul>
       {submenuContent}
@@ -160,7 +159,7 @@ export const useSubmenu = () => {
           )
         }
       >
-        <span>{label}</span>
+        <span>{label}</span>&nbsp;
         <span>&rarr;</span>
       </MenuLink>
     );
