@@ -11,10 +11,11 @@ import { get, groupBy } from 'lodash';
 import styled from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
+import {encodeDateInterval} from "../../../lib/date-utils";
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { i18nTransactionSettlementStatus } from '../../../lib/i18n/transaction';
 
-import PeriodFilter, { encodePeriod, parseDateRange } from '../../budget/filters/PeriodFilter';
+import PeriodFilter from "../../budget/filters/PeriodFilter";
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { Box, Flex } from '../../Grid';
@@ -227,8 +228,8 @@ const HostFeesSection = ({ hostSlug }) => {
   const currentYear = new Date().getFullYear();
   const { loading: loadingHostMetrics, data: hostMetricsData } = useQuery(hostMetricsQuery, {
     variables: {
-      dateFrom: dateFrom ? dateFrom : `${currentYear}-01-01T00:00:00Z`,
-      dateTo: dateTo ? dateTo : `${currentYear}-12-31T23:59:59Z`,
+      dateFrom: dateFrom ? new Date(dateFrom) : `${currentYear}-01-01T00:00:00Z`,
+      dateTo: dateTo ? new Date(dateTo) : `${currentYear}-12-31T23:59:59Z`,
       hostSlug,
     },
     context: API_V2_CONTEXT,
@@ -247,9 +248,8 @@ const HostFeesSection = ({ hostSlug }) => {
   }
 
   const setDate = period => {
-    const { from, to } = parseDateRange(period);
-    setDateFrom(from || null);
-    setDateTo(to || null);
+    setDateFrom(period.from || null);
+    setDateTo(period.to || null);
   };
 
   return (
@@ -261,7 +261,7 @@ const HostFeesSection = ({ hostSlug }) => {
           </FilterLabel>
           <PeriodFilter
             onChange={value => setDate(value)}
-            value={encodePeriod({ dateInterval: { from: dateFrom, to: dateTo } })}
+            value={encodeDateInterval({ from: dateFrom, to: dateTo })}
           />
         </Container>
       </Flex>
