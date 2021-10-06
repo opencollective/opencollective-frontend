@@ -10,13 +10,11 @@ const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import { get, groupBy } from 'lodash';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { i18nTransactionSettlementStatus } from '../../../lib/i18n/transaction';
 
 import PeriodFilter, { encodePeriod, parseDateRange } from '../../budget/filters/PeriodFilter';
-import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { Box, Flex } from '../../Grid';
@@ -225,7 +223,6 @@ const HostFeesSection = ({ hostSlug }) => {
   const chartOptions = React.useMemo(() => getChartOptions(intl, host?.currency), [host?.currency]);
   const [dateFrom, setDateFrom] = useState(null);
   const [dateTo, setDateTo] = useState(null);
-  const [collectives, setCollectives] = useState(null);
   const [showHostFeeChart, setShowHostFeeChart] = useState(true);
   const currentYear = new Date().getFullYear();
   const { loading: loadingHostMetrics, data: hostMetricsData } = useQuery(hostMetricsQuery, {
@@ -255,15 +252,6 @@ const HostFeesSection = ({ hostSlug }) => {
     setDateTo(to || null);
   };
 
-  const setCollectiveFilter = collectives => {
-    if (collectives.length === 0) {
-      setCollectives(null);
-    } else {
-      const collectiveIds = collectives.map(collective => ({ legacyId: collective.value.id }));
-      setCollectives(collectiveIds);
-    }
-  };
-
   return (
     <React.Fragment>
       <Flex flexWrap="wrap" mt="16px" mb="16px">
@@ -274,19 +262,6 @@ const HostFeesSection = ({ hostSlug }) => {
           <PeriodFilter
             onChange={value => setDate(value)}
             value={encodePeriod({ dateInterval: { from: dateFrom, to: dateTo } })}
-          />
-        </Container>
-        <Container width={[1, 1, 1 / 2]}>
-          <FilterLabel htmlFor="transactions-collective-filter">
-            <FormattedMessage id="TransactionsOverviewSection.CollectiveFilter" defaultMessage="Filter by Collective" />
-          </FilterLabel>
-          <CollectivePickerAsync
-            inputId="TransactionsCollectiveFilter"
-            data-cy="transactions-collective-filter"
-            types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.PROJECT]}
-            isMulti
-            hostCollectiveIds={[host?.legacyId]}
-            onChange={value => setCollectiveFilter(value)}
           />
         </Container>
       </Flex>
