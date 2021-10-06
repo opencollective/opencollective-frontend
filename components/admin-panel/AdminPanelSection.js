@@ -54,7 +54,7 @@ const AdminPanelSection = ({ collective, isLoading, section }) => {
   if (AdminSectionComponent) {
     return (
       <Container width="100%">
-        <AdminSectionComponent hostSlug={collective.slug} />
+        <AdminSectionComponent hostSlug={collective.slug} isNewAdmin />
       </Container>
     );
   }

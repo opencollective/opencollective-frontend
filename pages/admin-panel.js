@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { isHost } from '../lib/collective-sections';
+import { isHostAccount } from '../lib/collective.lib';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import AdminPanelSection from '../components/admin-panel/AdminPanelSection';
@@ -72,7 +72,7 @@ const messages = defineMessages({
 });
 
 export const getDefaultSectionForAccount = account => {
-  return account && isHost(account) ? ALL_SECTIONS.EXPENSES : ALL_SECTIONS.INFO;
+  return account && isHostAccount(account) ? ALL_SECTIONS.EXPENSES : ALL_SECTIONS.INFO;
 };
 
 const getNotification = (intl, account) => {
@@ -126,7 +126,7 @@ const AdminPanelPage = () => {
       {account && LoggedInUser && !LoggedInUser?.canEditCollective(account) ? (
         <Flex flexDirection="column" alignItems="center" my={6}>
           <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
-            <FormattedMessage id="authorization.loginRequired" defaultMessage="You need to be logged in to continue." />
+            <FormattedMessage defaultMessage="You need to be logged in as an admin" />
           </MessageBox>
           <SignInOrJoinFree form="signin" disableSignup />
         </Flex>

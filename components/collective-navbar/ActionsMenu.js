@@ -214,9 +214,9 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SETTINGS}>
                         <StyledLink
                           as={Link}
+                          href={getSettingsRoute(collective, null, LoggedInUser)}
                           p={ITEM_PADDING}
                           data-cy="edit-collective-btn"
-                          {...getSettingsRoute(collective, null, LoggedInUser)}
                         >
                           <Settings size={20} />
                           <FormattedMessage id="Settings" defaultMessage="Settings" />

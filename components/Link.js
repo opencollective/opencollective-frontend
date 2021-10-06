@@ -10,7 +10,6 @@ class Link extends React.Component {
     target: PropTypes.string,
     animate: PropTypes.object,
     className: PropTypes.string,
-    linkAs: PropTypes.string,
     title: PropTypes.string,
     onClick: PropTypes.func,
     openInNewTab: PropTypes.bool,
@@ -60,7 +59,7 @@ class Link extends React.Component {
       );
     } else {
       return (
-        <NextLink {...pick(this.props, ['href', 'scroll'])} as={this.props.linkAs}>
+        <NextLink {...pick(this.props, ['href', 'scroll'])}>
           {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
           <a
             className={className}
