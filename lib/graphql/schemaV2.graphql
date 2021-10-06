@@ -244,7 +244,11 @@ interface Account {
     The offset to use to fetch
     """
     offset: Int! = 0
-    onlyPublishedUpdates: Boolean
+
+    """
+    Only return published updates. You must be an admin of the account to see unpublished updates.
+    """
+    onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -472,6 +476,16 @@ interface AccountWithHost {
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
+}
+
+"""
+An account that has a parent account
+"""
+interface AccountWithParent {
+  """
+  The Account parenting this account
+  """
+  parent: Account
 }
 
 """
@@ -825,7 +839,11 @@ type Bot implements Account {
     The offset to use to fetch
     """
     offset: Int! = 0
-    onlyPublishedUpdates: Boolean
+
+    """
+    Only return published updates. You must be an admin of the account to see unpublished updates.
+    """
+    onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -1125,7 +1143,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The offset to use to fetch
     """
     offset: Int! = 0
-    onlyPublishedUpdates: Boolean
+
+    """
+    Only return published updates. You must be an admin of the account to see unpublished updates.
+    """
+    onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -3261,7 +3283,7 @@ type EmojiReactionResponse {
 """
 This represents an Event account
 """
-type Event implements Account & AccountWithHost & AccountWithContributions {
+type Event implements Account & AccountWithHost & AccountWithContributions & AccountWithParent {
   id: String
   legacyId: Int
 
@@ -3481,7 +3503,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
-    onlyPublishedUpdates: Boolean
+
+    """
+    Only return published updates. You must be an admin of the account to see unpublished updates.
+    """
+    onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -3589,7 +3615,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions {
   contributionPolicy: String
 
   """
-  The Account hosting this Event
+  The Account parenting this account
   """
   parent: Account
 
@@ -4474,7 +4500,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
-    onlyPublishedUpdates: Boolean
+
+    """
+    Only return published updates. You must be an admin of the account to see unpublished updates.
+    """
+    onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -4843,7 +4873,11 @@ type Host implements Account & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
-    onlyPublishedUpdates: Boolean
+
+    """
+    Only return published updates. You must be an admin of the account to see unpublished updates.
+    """
+    onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -5480,7 +5514,11 @@ type Individual implements Account {
     The offset to use to fetch
     """
     offset: Int! = 0
-    onlyPublishedUpdates: Boolean
+
+    """
+    Only return published updates. You must be an admin of the account to see unpublished updates.
+    """
+    onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -6642,6 +6680,7 @@ type Mutation {
 
 input NewAccountOrganizationInput {
   name: String
+  legalName: String
   slug: String
   description: String
   website: String
@@ -6663,6 +6702,7 @@ input NewAccountOrReferenceInput {
   """
   slug: String
   name: String
+  legalName: String
   email: String
   organization: NewAccountOrganizationInput
   newsletterOptIn: Boolean
@@ -7179,7 +7219,11 @@ type Organization implements Account & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
-    onlyPublishedUpdates: Boolean
+
+    """
+    Only return published updates. You must be an admin of the account to see unpublished updates.
+    """
+    onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -7542,7 +7586,7 @@ enum ProcessOrderAction {
 """
 This represents an Project account
 """
-type Project implements Account & AccountWithHost & AccountWithContributions {
+type Project implements Account & AccountWithHost & AccountWithContributions & AccountWithParent {
   id: String
   legacyId: Int
 
@@ -7762,7 +7806,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
-    onlyPublishedUpdates: Boolean
+
+    """
+    Only return published updates. You must be an admin of the account to see unpublished updates.
+    """
+    onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -7870,7 +7918,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions {
   contributionPolicy: String
 
   """
-  The Account hosting this Project
+  The Account parenting this account
   """
   parent: Account
 }
@@ -8258,9 +8306,9 @@ type Query {
     fromAccount: AccountReferenceInput
 
     """
-    Reference of the account assigned to the main side of the transaction (CREDIT -> recipient, DEBIT -> sender)
+    Reference of the account(s) assigned to the main side of the transaction (CREDIT -> recipient, DEBIT -> sender)
     """
-    account: AccountReferenceInput
+    account: [AccountReferenceInput!]
 
     """
     Reference of the host accounting the transaction
@@ -9168,7 +9216,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
-    onlyPublishedUpdates: Boolean
+
+    """
+    Only return published updates. You must be an admin of the account to see unpublished updates.
+    """
+    onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String

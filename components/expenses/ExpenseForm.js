@@ -108,7 +108,7 @@ export const prepareExpenseForSubmit = expenseData => {
   const isFundingRequest = expenseData.type === expenseTypes.FUNDING_REQUEST;
   const payee =
     expenseData.payee?.isNewUser || expenseData.payee?.isInvite
-      ? pick(expenseData.payee, ['name', 'email', 'organization', 'newsletterOptIn'])
+      ? pick(expenseData.payee, ['name', 'email', 'legalName', 'organization', 'newsletterOptIn'])
       : { [payeeIdField]: expenseData.payee.id };
 
   const payeeLocation = isInvoice ? pick(expenseData.payeeLocation, ['address', 'country', 'structured']) : null;
