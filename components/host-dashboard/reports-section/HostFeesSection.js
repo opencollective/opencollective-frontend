@@ -26,8 +26,8 @@ import { StyledSelectFilter } from '../../StyledSelectFilter';
 import StyledSpinner from '../../StyledSpinner';
 import { P, Span } from '../../Text';
 
-const mainReportsQuery = gqlV2/* GraphQL */ `
-  query HostFeeTimeline($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
+const hostFeeSectionQuery = gqlV2/* GraphQL */ `
+  query HostFeeSectionQuery($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
     host(slug: $hostSlug) {
       id
       createdAt
@@ -215,7 +215,7 @@ const HostFeesSection = ({ hostSlug }) => {
   const intl = useIntl();
   const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
   const variables = getQueryVariables(hostSlug, selectedYear);
-  const { loading, data, previousData } = useQuery(mainReportsQuery, { variables, context: API_V2_CONTEXT });
+  const { loading, data, previousData } = useQuery(hostFeeSectionQuery, { variables, context: API_V2_CONTEXT });
   const host = loading && !data ? previousData?.host : data?.host;
   const timeSeries = host?.hostMetricsTimeSeries;
   const series = useMemo(() => getSeriesFromData(intl, timeSeries), [timeSeries]);
