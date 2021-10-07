@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import dynamic from 'next/dynamic';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 import { get, groupBy } from 'lodash';
@@ -138,6 +138,11 @@ const getHostFeesWithoutShare = (hostFeeNodes, hostFeeShareNodes) => {
   });
 };
 
+const SERIES_NAMES = defineMessages({
+  hostRevenue: { defaultMessage: 'Host revenue' },
+  hostFeeShare: { id: 'Transaction.kind.HOST_FEE_SHARE', defaultMessage: 'Host fee share' },
+});
+
 const getSeriesFromData = (intl, timeSeries) => {
   const dataToSeries = data => {
     const series = new Array(12).fill(0); // = 12 months
@@ -147,11 +152,13 @@ const getSeriesFromData = (intl, timeSeries) => {
 
   const hostFeeNodes = get(timeSeries, 'hostFees.nodes', []);
   const hostFeeShareNodes = get(timeSeries, 'hostFeeShare.nodes', []);
-  // TODO(HostReport): I18n the series names
   return [
-    { name: 'Host profit', data: dataToSeries(getHostFeesWithoutShare(hostFeeNodes, hostFeeShareNodes)) },
+    {
+      name: intl.formatMessage(SERIES_NAMES.hostRevenue),
+      data: dataToSeries(getHostFeesWithoutShare(hostFeeNodes, hostFeeShareNodes)),
+    },
     ...Object.entries(groupBy(hostFeeShareNodes, 'settlementStatus')).map(([status, nodes]) => ({
-      name: `Host fee share (${i18nTransactionSettlementStatus(intl, status)})`,
+      name: `${intl.formatMessage(SERIES_NAMES.hostFeeShare)} (${i18nTransactionSettlementStatus(intl, status)})`,
       data: dataToSeries(nodes),
     })),
   ];
