@@ -8,12 +8,14 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import PeriodFilter, { encodePeriod, parseDateRange } from '../../budget/filters/PeriodFilter';
+import PeriodFilter from '../../budget/filters/PeriodFilter';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import { Flex } from '../../Grid';
 import Loading from '../../Loading';
 import { P, Span } from '../../Text';
+
+import { prepareDateArgs } from './HostDownloadsSection';
 
 const FilterLabel = styled.label`
   font-weight: 500;
@@ -88,12 +90,11 @@ const transactionsOverviewQuery = gqlV2/* GraphQL */ `
 `;
 
 const TransactionsOverviewSection = ({ hostSlug }) => {
-  const [dateFrom, setDateFrom] = useState(null);
-  const [dateTo, setDateTo] = useState(null);
   const [collectives, setCollectives] = useState(null);
+  const [dateInterval, setDateInterval] = useState(null);
 
   const { data, loading } = useQuery(transactionsOverviewQuery, {
-    variables: { hostSlug, dateFrom, dateTo, account: collectives },
+    variables: { hostSlug, ...prepareDateArgs(dateInterval), account: collectives },
     context: API_V2_CONTEXT,
   });
   const host = data?.host;
@@ -104,12 +105,6 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
   const { contributionsCount, recurringContributionsCount, oneTimeContributionsCount, dailyAverageIncomeAmount } =
     contributionStats || 0;
   const { expensesCount, invoicesCount, reimbursementsCount, grantsCount, dailyAverageAmount } = expenseStats || 0;
-
-  const setDate = period => {
-    const { from, to } = parseDateRange(period);
-    setDateFrom(from || null);
-    setDateTo(to || null);
-  };
 
   const setCollectiveFilter = collectives => {
     if (collectives.length === 0) {
@@ -127,10 +122,7 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
           <FilterLabel htmlFor="transactions-period-filter">
             <FormattedMessage id="TransactionsOverviewSection.PeriodFilter" defaultMessage="Filter by Date" />
           </FilterLabel>
-          <PeriodFilter
-            onChange={value => setDate(value)}
-            value={encodePeriod({ dateInterval: { from: dateFrom, to: dateTo } })}
-          />
+          <PeriodFilter onChange={setDateInterval} value={dateInterval} minDate={host?.createdAt} />
         </Container>
         <Container width={[1, 1, 1 / 2]}>
           <FilterLabel htmlFor="transactions-collective-filter">
