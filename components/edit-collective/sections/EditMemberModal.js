@@ -98,10 +98,10 @@ const EditMemberModal = props => {
     context: API_V2_CONTEXT,
   });
 
-  const [
-    editMemberInvitationAccount,
-    { loading: isEditingMemberInvitation },
-  ] = useMutation(editMemberInvitationMutation, { context: API_V2_CONTEXT });
+  const [editMemberInvitationAccount, { loading: isEditingMemberInvitation }] = useMutation(
+    editMemberInvitationMutation,
+    { context: API_V2_CONTEXT },
+  );
 
   const [removeMemberAccount] = useMutation(removeMemberMutation, {
     context: API_V2_CONTEXT,
