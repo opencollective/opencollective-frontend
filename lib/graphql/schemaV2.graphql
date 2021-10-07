@@ -6680,6 +6680,7 @@ type Mutation {
 
 input NewAccountOrganizationInput {
   name: String
+  legalName: String
   slug: String
   description: String
   website: String
@@ -6701,6 +6702,7 @@ input NewAccountOrReferenceInput {
   """
   slug: String
   name: String
+  legalName: String
   email: String
   organization: NewAccountOrganizationInput
   newsletterOptIn: Boolean

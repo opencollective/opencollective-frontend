@@ -46,6 +46,7 @@ const msg = defineMessages({
     id: `ExpenseForm.inviteeLabel`,
     defaultMessage: 'Who will receive the money for this expense?',
   },
+  legalName: { id: 'LegalName', defaultMessage: 'Legal Name' },
   emailLabel: {
     id: 'Form.yourEmail',
     defaultMessage: 'Your email address',
@@ -310,6 +311,21 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
           </Span>
         </Box>
         <Box>
+          <Box>
+            <Field name={payeeType === PAYEE_TYPE.ORG ? 'payee.organization.legalName' : 'payee.legalName'}>
+              {({ field }) => (
+                <StyledInputField name={field.name} label={formatMessage(msg.legalName)} labelFontSize="13px" mt={3}>
+                  {inputProps => <StyledInput {...inputProps} {...field} />}
+                </StyledInputField>
+              )}
+            </Field>
+            <Span fontSize="11px" lineHeight="16px" color="black.600">
+              <FormattedMessage
+                id="legalName.description"
+                defaultMessage="The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name."
+              />
+            </Span>
+          </Box>
           <FastField name="payeeLocation.country">
             {({ field }) => (
               <StyledInputField
