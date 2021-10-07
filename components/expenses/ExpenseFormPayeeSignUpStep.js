@@ -310,7 +310,13 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
           <Box>
             <Field name={payeeType === PAYEE_TYPE.ORG ? 'payee.organization.legalName' : 'payee.legalName'}>
               {({ field }) => (
-                <StyledInputField name={field.name} label={formatMessage(msg.legalName)} labelFontSize="13px" mt={3}>
+                <StyledInputField
+                  name={field.name}
+                  isPrivate
+                  label={formatMessage(msg.legalName)}
+                  labelFontSize="13px"
+                  mt={3}
+                >
                   {inputProps => <StyledInput {...inputProps} {...field} />}
                 </StyledInputField>
               )}
