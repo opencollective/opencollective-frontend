@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { ChevronDown } from '@styled-icons/fa-solid/ChevronDown/ChevronDown';
@@ -11,11 +11,10 @@ import { get, groupBy } from 'lodash';
 import styled from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
-import {encodeDateInterval} from "../../../lib/date-utils";
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { i18nTransactionSettlementStatus } from '../../../lib/i18n/transaction';
 
-import PeriodFilter from "../../budget/filters/PeriodFilter";
+import PeriodFilter from '../../budget/filters/PeriodFilter';
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { Box, Flex } from '../../Grid';
@@ -214,22 +213,20 @@ const getQueryVariables = (hostSlug, year) => {
 
 const HostFeesSection = ({ hostSlug }) => {
   const intl = useIntl();
-  const [selectedYear, setSelectedYear] = React.useState(() => new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
   const variables = getQueryVariables(hostSlug, selectedYear);
   const { loading, data, previousData } = useQuery(mainReportsQuery, { variables, context: API_V2_CONTEXT });
   const host = loading && !data ? previousData?.host : data?.host;
   const timeSeries = host?.hostMetricsTimeSeries;
-  const series = React.useMemo(() => getSeriesFromData(intl, timeSeries), [timeSeries]);
-  const yearsOptions = React.useMemo(() => getActiveYearsOptions(host), [host]);
-  const chartOptions = React.useMemo(() => getChartOptions(intl, host?.currency), [host?.currency]);
-  const [dateFrom, setDateFrom] = useState(null);
-  const [dateTo, setDateTo] = useState(null);
+  const series = useMemo(() => getSeriesFromData(intl, timeSeries), [timeSeries]);
+  const yearsOptions = useMemo(() => getActiveYearsOptions(host), [host]);
+  const chartOptions = useMemo(() => getChartOptions(intl, host?.currency), [host?.currency]);
+  const [dateInterval, setDateInterval] = useState(null);
   const [showHostFeeChart, setShowHostFeeChart] = useState(true);
-  const currentYear = new Date().getFullYear();
   const { loading: loadingHostMetrics, data: hostMetricsData } = useQuery(hostMetricsQuery, {
     variables: {
-      dateFrom: dateFrom ? new Date(dateFrom) : `${currentYear}-01-01T00:00:00Z`,
-      dateTo: dateTo ? new Date(dateTo) : `${currentYear}-12-31T23:59:59Z`,
+      dateFrom: dateInterval?.from ? new Date(dateInterval.from) : variables.dateFrom,
+      dateTo: dateInterval?.to ? new Date(dateInterval.to) : variables.dateTo,
       hostSlug,
     },
     context: API_V2_CONTEXT,
@@ -247,11 +244,6 @@ const HostFeesSection = ({ hostSlug }) => {
     profit = totalHostFees - sharedRevenue;
   }
 
-  const setDate = period => {
-    setDateFrom(period.from || null);
-    setDateTo(period.to || null);
-  };
-
   return (
     <React.Fragment>
       <Flex flexWrap="wrap" mt="16px" mb="16px">
@@ -259,10 +251,7 @@ const HostFeesSection = ({ hostSlug }) => {
           <FilterLabel htmlFor="transactions-period-filter">
             <FormattedMessage id="TransactionsOverviewSection.PeriodFilter" defaultMessage="Filter by Date" />
           </FilterLabel>
-          <PeriodFilter
-            onChange={value => setDate(value)}
-            value={encodeDateInterval({ from: dateFrom, to: dateTo })}
-          />
+          <PeriodFilter onChange={setDateInterval} value={dateInterval} minDate={host?.createdAt} />
         </Container>
       </Flex>
       <StyledCard minHeight={200} px={3} css={{ background: '#F6F5FF' }}>
