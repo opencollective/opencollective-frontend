@@ -10,11 +10,13 @@ const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import { get, groupBy } from 'lodash';
 import styled from 'styled-components';
 
+import { CollectiveType } from '../../../lib/collective-sections';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { i18nTransactionSettlementStatus } from '../../../lib/i18n/transaction';
 
 import PeriodFilter from '../../budget/filters/PeriodFilter';
+import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { Box, Flex } from '../../Grid';
@@ -30,6 +32,7 @@ const hostFeeSectionQuery = gqlV2/* GraphQL */ `
   query HostFeeSectionQuery($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
     host(slug: $hostSlug) {
       id
+      legacyId
       createdAt
       currency
       hostMetricsTimeSeries(dateFrom: $dateFrom, dateTo: $dateTo, timeUnit: MONTH) {
@@ -60,10 +63,15 @@ const hostFeeSectionQuery = gqlV2/* GraphQL */ `
 `;
 
 const hostMetricsQuery = gqlV2/* GraphQL */ `
-  query HostFeeSummary($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
+  query HostFeeSummary(
+    $hostSlug: String!
+    $dateFrom: DateTime!
+    $dateTo: DateTime!
+    $account: [AccountReferenceInput!]
+  ) {
     host(slug: $hostSlug) {
       id
-      hostMetrics(dateFrom: $dateFrom, dateTo: $dateTo) {
+      hostMetrics(dateFrom: $dateFrom, dateTo: $dateTo, account: $account) {
         hostFees {
           valueInCents
           currency
@@ -223,10 +231,12 @@ const HostFeesSection = ({ hostSlug }) => {
   const chartOptions = useMemo(() => getChartOptions(intl, host?.currency), [host?.currency]);
   const [dateInterval, setDateInterval] = useState(null);
   const [showHostFeeChart, setShowHostFeeChart] = useState(true);
+  const [collectives, setCollectives] = useState(null);
   const { loading: loadingHostMetrics, data: hostMetricsData } = useQuery(hostMetricsQuery, {
     variables: {
       dateFrom: dateInterval?.from ? new Date(dateInterval.from) : variables.dateFrom,
       dateTo: dateInterval?.to ? new Date(dateInterval.to) : variables.dateTo,
+      account: collectives,
       hostSlug,
     },
     context: API_V2_CONTEXT,
@@ -244,6 +254,15 @@ const HostFeesSection = ({ hostSlug }) => {
     profit = totalHostFees - sharedRevenue;
   }
 
+  const setCollectiveFilter = collectives => {
+    if (collectives.length === 0) {
+      setCollectives(null);
+    } else {
+      const collectiveIds = collectives.map(collective => ({ legacyId: collective.value.id }));
+      setCollectives(collectiveIds);
+    }
+  };
+
   return (
     <React.Fragment>
       <Flex flexWrap="wrap" mt="16px" mb="16px">
@@ -252,6 +271,19 @@ const HostFeesSection = ({ hostSlug }) => {
             <FormattedMessage id="TransactionsOverviewSection.PeriodFilter" defaultMessage="Filter by Date" />
           </FilterLabel>
           <PeriodFilter onChange={setDateInterval} value={dateInterval} minDate={host?.createdAt} />
+        </Container>
+        <Container width={[1, 1, 1 / 2]}>
+          <FilterLabel htmlFor="transactions-collective-filter">
+            <FormattedMessage id="TransactionsOverviewSection.CollectiveFilter" defaultMessage="Filter by Collective" />
+          </FilterLabel>
+          <CollectivePickerAsync
+            inputId="TransactionsCollectiveFilter"
+            data-cy="transactions-collective-filter"
+            types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.PROJECT]}
+            isMulti
+            hostCollectiveIds={[host?.legacyId]}
+            onChange={value => setCollectiveFilter(value)}
+          />
         </Container>
       </Flex>
       <StyledCard minHeight={200} px={3} css={{ background: '#F6F5FF' }}>
