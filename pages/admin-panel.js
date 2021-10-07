@@ -28,6 +28,7 @@ const adminPanelQuery = gqlV2/* GraphQL */ `
       type
       settings
       isArchived
+      isIncognito
       features {
         ...NavbarFields
         VIRTUAL_CARDS
@@ -96,6 +97,18 @@ const getNotification = (intl, account) => {
   }
 };
 
+function getBlocker(LoggedInUser, account) {
+  if (!LoggedInUser) {
+    return <FormattedMessage id="mustBeLoggedIn" defaultMessage="You must be logged in to see this page" />;
+  } else if (!account) {
+    return <FormattedMessage defaultMessage="This account doesn't exist" />;
+  } else if (account.isIncognito) {
+    return <FormattedMessage defaultMessage="You cannot edit this collective" />;
+  } else if (!LoggedInUser.canEditCollective(account)) {
+    return <FormattedMessage defaultMessage="You need to be logged in as an admin" />;
+  }
+}
+
 const AdminPanelPage = () => {
   const router = useRouter();
   const { slug } = router.query;
@@ -107,15 +120,18 @@ const AdminPanelPage = () => {
   const notification = getNotification(intl, account);
   const section = router.query.section || getDefaultSectionForAccount(account);
   const isLoading = loading || loadingLoggedInUser;
+  const blocker = !isLoading && getBlocker(LoggedInUser, account);
   return (
     <Page>
-      <AdminPanelTopBar
-        isLoading={isLoading}
-        collective={data?.account}
-        collectiveSlug={slug}
-        selectedSection={section}
-        display={['flex', null, 'none']}
-      />
+      {!blocker && (
+        <AdminPanelTopBar
+          isLoading={isLoading}
+          collective={data?.account}
+          collectiveSlug={slug}
+          selectedSection={section}
+          display={['flex', null, 'none']}
+        />
+      )}
       {Boolean(notification) && (
         <NotificationBar
           status={notification.status}
@@ -123,12 +139,12 @@ const AdminPanelPage = () => {
           description={notification.description}
         />
       )}
-      {account && LoggedInUser && !LoggedInUser?.canEditCollective(account) ? (
+      {blocker ? (
         <Flex flexDirection="column" alignItems="center" my={6}>
           <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
-            <FormattedMessage defaultMessage="You need to be logged in as an admin" />
+            {blocker}
           </MessageBox>
-          <SignInOrJoinFree form="signin" disableSignup />
+          {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
         </Flex>
       ) : (
         <Grid
