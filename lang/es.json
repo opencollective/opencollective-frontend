@@ -1407,7 +1407,7 @@
   "Members.DefinedInParent": "Los miembros del equipo están definidos en la configuración de {parentName}",
   "members.edit.description": "Nota: solo los administradores del Colectivo pueden editar este Colectivo y aprobar gastos.",
   "members.pending.details": "Esta persona no ha aceptado su invitación aún",
-  "members.remove": "Delete Member",
+  "members.remove": "Remove",
   "members.remove.cantRemoveLast": "No se puede eliminar el último administrador. Por favor, añade otro administrador primero.",
   "members.remove.confirm": "¿Estás seguro que quieres eliminar a {name} @{slug} {hasEmail, select, 1 {({email})} other {}}?",
   "members.role.label": "Role",

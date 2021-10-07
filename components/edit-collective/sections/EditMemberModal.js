@@ -281,7 +281,7 @@ const EditMemberModal = props => {
                 >
                   <Flex alignItems="center">
                     <Delete height={25} />
-                    <FormattedMessage id="members.remove" defaultMessage="Delete Member" />
+                    <FormattedMessage id="members.remove" defaultMessage="Remove" />
                   </Flex>
                 </StyledButton>
               </StyledTooltip>
@@ -296,7 +296,7 @@ const EditMemberModal = props => {
               >
                 <Flex alignItems="center">
                   <Delete height={25} />
-                  <FormattedMessage id="members.remove" defaultMessage="Delete Member" />
+                  <FormattedMessage id="members.remove" defaultMessage="Remove" />
                 </Flex>
               </StyledButton>
             )}
