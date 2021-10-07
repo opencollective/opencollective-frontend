@@ -139,8 +139,7 @@ class NotificationBar extends React.Component {
       slug: PropTypes.string,
     }),
     LoggedInUser: PropTypes.shape({
-      roles: PropTypes.arrayOf(PropTypes.node),
-      isHostAdmin: PropTypes.bool.isRequired,
+      isHostAdmin: PropTypes.func.isRequired,
     }),
   };
 

@@ -148,11 +148,12 @@ const hasParams = query => {
   });
 };
 
-const HostDashboardExpenses = ({ hostSlug }) => {
+const HostDashboardExpenses = ({ hostSlug, isNewAdmin }) => {
   const router = useRouter() || {};
   const query = router.query;
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const hasFilters = React.useMemo(() => hasParams(query), [query]);
+  const pageRoute = isNewAdmin ? `/${hostSlug}/admin/expenses` : `/${hostSlug}/dashboard/expenses`;
   const expenses = useQuery(hostDashboardExpensesQuery, {
     variables: { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) },
     context: API_V2_CONTEXT,
@@ -161,7 +162,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
   React.useEffect(() => {
     if (query.paypalApprovalError && !paypalPreApprovalError) {
       setPaypalPreApprovalError(query.paypalApprovalError);
-      router.replace(`/${hostSlug}/dashboard/expenses`, omit(query, 'paypalApprovalError'), { shallow: true });
+      router.replace(pageRoute, omit(query, 'paypalApprovalError'), { shallow: true });
     }
   }, [query.paypalApprovalError]);
 
@@ -182,7 +183,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             defaultValue={query.searchTerm}
             onSubmit={searchTerm =>
               router.push({
-                pathname: `/${hostSlug}/dashboard/expenses`,
+                pathname: pageRoute,
                 query: getQueryParams({ searchTerm, offset: null }),
               })
             }
@@ -239,7 +240,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
                 mr={1}
                 onClick={() => {
                   router.push({
-                    pathname: `/${hostSlug}/dashboard/expenses`,
+                    pathname: pageRoute,
                     query: getQueryParams({ status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', offset: null }),
                   });
                 }}
@@ -257,7 +258,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
             filters={query}
             onChange={queryParams =>
               router.push({
-                pathname: `/${hostSlug}/dashboard/expenses`,
+                pathname: pageRoute,
                 query: getQueryParams({ ...queryParams, offset: null }),
               })
             }
@@ -300,7 +301,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           />
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route={`/${hostSlug}/dashboard/expenses`}
+              route={pageRoute}
               total={paginatedExpenses.totalCount}
               limit={paginatedExpenses.limit}
               offset={paginatedExpenses.offset}
@@ -316,6 +317,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
 
 HostDashboardExpenses.propTypes = {
   hostSlug: PropTypes.string.isRequired,
+  isNewAdmin: PropTypes.bool,
 };
 
 export default HostDashboardExpenses;

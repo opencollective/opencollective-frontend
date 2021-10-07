@@ -8,12 +8,16 @@ import { createPortal } from 'react-dom';
 import { useIntl } from 'react-intl';
 import styled, { createGlobalStyle } from 'styled-components';
 
+import { getCollectiveTypeKey } from '../../lib/collective-sections';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
+
 import Avatar from '../Avatar';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import { fadeIn } from '../StyledKeyframes';
 
-import { SECTION_LABELS } from './constants';
+import { PAGE_TITLES, SECTION_LABELS } from './constants';
 import SideBar from './SideBar';
 
 const MenuWrapper = styled(Flex)`
@@ -101,7 +105,7 @@ const MenuLink = styled.div`
   }
 `;
 
-const AdminPanelTopBar = ({ collectiveSlug, collective, selectedSection, ...props }) => {
+const AdminPanelTopBar = ({ collective, selectedSection, isLoading, ...props }) => {
   const { formatMessage } = useIntl();
   const router = useRouter();
   const [isMenuOpen, setMenuOpen] = React.useState(false);
@@ -125,16 +129,28 @@ const AdminPanelTopBar = ({ collectiveSlug, collective, selectedSection, ...prop
         </MenuLink>
       </Box>
       <Box mr="20px">
-        <Link href={`/${collectiveSlug}`}>
-          <Avatar collective={collective} radius={40} />
-        </Link>
+        {isLoading ? (
+          <LoadingPlaceholder height={40} width={40} />
+        ) : (
+          <Link href={getCollectivePageRoute(collective)}>
+            <Avatar collective={collective} radius={40} />
+          </Link>
+        )}
       </Box>
       <Flex alignItems="center" overflow="hidden">
-        <Title>Host Dashboard</Title>
+        {isLoading ? (
+          <LoadingPlaceholder height={16} width={120} />
+        ) : (
+          <Title>{formatMessage(PAGE_TITLES[getCollectiveTypeKey(collective.type)])}</Title>
+        )}
         {SECTION_LABELS[selectedSection] && (
           <React.Fragment>
             <Separator mx="8px">/</Separator>
-            <Section>{formatMessage(SECTION_LABELS[selectedSection])}</Section>
+            {isLoading ? (
+              <LoadingPlaceholder height={16} width={80} />
+            ) : (
+              <Section>{formatMessage(SECTION_LABELS[selectedSection])}</Section>
+            )}
           </React.Fragment>
         )}
       </Flex>
@@ -177,7 +193,6 @@ AdminPanelTopBar.propTypes = {
     type: PropTypes.string,
     isHost: PropTypes.bool,
   }),
-  collectiveSlug: PropTypes.string,
 };
 
 export default AdminPanelTopBar;

@@ -3977,8 +3977,8 @@ type UserDetails {
   CollectiveId: Int
   collective: CollectiveInterface
   username: String
-  firstName: String
-  lastName: String
+  firstName: String @deprecated(reason: "2021-09-24: Use \"name\"")
+  lastName: String @deprecated(reason: "2021-09-24: Use \"name\"")
   name: String
   image: String
   email: String

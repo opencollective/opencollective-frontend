@@ -88,7 +88,10 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
           ) : null
         }
       </Query>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={getSettingsRoute(LoggedInUser.collective, LoggedInUser)}>
+      <UserMenuLinkEntry
+        isMobileMenuLink={isMobileView}
+        href={getSettingsRoute(LoggedInUser.collective, null, LoggedInUser)}
+      >
         <FormattedMessage id="Settings" defaultMessage="Settings" />
       </UserMenuLinkEntry>
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.username}/recurring-contributions`}>
