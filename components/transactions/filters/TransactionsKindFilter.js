@@ -84,6 +84,7 @@ const TransactionsKindFilter = ({ onChange, value, kinds, ...props }) => {
   return (
     <StyledSelectFilter
       isSearchable={false}
+      isClearable={false}
       onChange={options => onChange(optionsToQueryString(options))}
       value={selectedOptions}
       options={options}
