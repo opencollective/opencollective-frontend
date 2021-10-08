@@ -1,0 +1,52 @@
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import Toast from '../../components/Toast';
+import { TOAST_TYPE } from '../../components/ToastProvider';
+import theme from '../../lib/theme';
+
+<Meta
+  title="Design system/Toast"
+  component={Toast}
+  argTypes={{
+    variant: { options: ['light', 'dark'], defaultValue: 'dark', control: { type: 'radio' } },
+    toast: {
+      defaultValue: {
+        id: 'Test',
+        type: 'ERROR',
+        title: 'A toast title',
+        createdAt: Date.now(),
+        message: (
+          <p style={{ margin: 0 }}>
+            A toast message that can have <a href="https://opencollective.com">links</a> or <i>text formatting</i> --
+            it's pretty flexible!
+          </p>
+        ),
+      },
+    },
+  }}
+/>
+
+# Toast
+
+## Default
+
+export const DefaultStory = props => <Toast {...props} />;
+
+<Story name="Default">{DefaultStory.bind({})}</Story>
+
+<ArgsTable story="Default" />
+
+# All types
+
+<Canvas>
+  <Story name="All types" parameters={{ controls: false }}>
+    {props => {
+      return Object.keys(TOAST_TYPE).map(type => (
+        <div key={type} style={{ marginBottom: '12px' }}>
+          <Toast {...props} toast={{ ...props.toast, type }} />
+        </div>
+      ));
+    }}
+  </Story>
+</Canvas>
+
+<ArgsTable story="All types" />
