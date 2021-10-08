@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/fa-solid/Check';
-import { Info } from '@styled-icons/fa-solid/Info';
 import { Times } from '@styled-icons/fa-solid/Times';
 import { Close } from '@styled-icons/material/Close';
 import { defineMessages, useIntl } from 'react-intl';
@@ -63,8 +62,8 @@ const variantType = variant({
       [CloseButton]: { color: 'black.500' },
 
       '&[data-type="INFO"]': {
-        [IconContainer]: { bg: 'blue.500' },
-        [Separator]: { bg: 'blue.500' },
+        [IconContainer]: { bg: 'blue.600' },
+        [Separator]: { bg: 'blue.600' },
       },
       '&[data-type="ERROR"]': {
         [IconContainer]: { bg: 'red.500' },
@@ -82,20 +81,26 @@ const variantType = variant({
 
       [ToastTitle]: { color: '#FFFFFF' },
       [ToastMessage]: { color: 'black.300' },
-      [CloseButton]: { color: 'black.200', '&:hover': { color: 'black.800' } },
-      [IconContainer]: { border: '2px solid' },
+      [CloseButton]: {
+        color: 'black.200',
+        '&:hover': { color: 'black.800', boxShadow: '4px 4px 4px #505050' },
+      },
 
       '&[data-type="INFO"]': {
-        [IconContainer]: { color: 'blue.200' },
-        [Separator]: { bg: 'blue.200' },
+        [IconContainer]: { bg: 'blue.500' },
+        [Separator]: { bg: 'blue.500' },
       },
       '&[data-type="ERROR"]': {
-        [IconContainer]: { color: 'red.500' },
+        [IconContainer]: { bg: 'red.500' },
         [Separator]: { bg: 'red.500' },
       },
       '&[data-type="SUCCESS"]': {
-        [IconContainer]: { color: 'green.500' },
+        [IconContainer]: { bg: 'green.500' },
         [Separator]: { bg: 'green.500' },
+      },
+      a: {
+        color: 'white.full',
+        textDecoration: 'underline',
       },
     },
   },
@@ -164,12 +169,10 @@ const getIcon = toast => {
   }
 
   switch (toast.type) {
-    case TOAST_TYPE.SUCCESS:
-      return <Check size={12} />;
     case TOAST_TYPE.ERROR:
       return <Times size={12} />;
     default:
-      return <Info size={12} />;
+      return <Check size={12} />;
   }
 };
 
@@ -210,10 +213,12 @@ Toast.propTypes = {
     id: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.values(TOAST_TYPE)).isRequired,
     title: PropTypes.node,
+    icon: PropTypes.node,
     message: PropTypes.node,
     createdAt: PropTypes.number,
   }).isRequired,
   onClose: PropTypes.func,
+  /** The time left before the toast disappears */
   timeLeft: PropTypes.number,
   variant: PropTypes.oneOf(['light', 'dark']),
 };

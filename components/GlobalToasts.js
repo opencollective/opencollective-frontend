@@ -112,7 +112,7 @@ class GlobalToasts extends PureComponent {
         position="fixed"
         bottom={[15, 40]}
         right={[15, 40]}
-        maxWidth={306}
+        maxWidth={318}
         width="100%"
         onMouseEnter={this.pause}
         onMouseLeave={this.startAfterDelay}

@@ -1,6 +1,7 @@
 import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
 import Toast from '../../components/Toast';
 import { TOAST_TYPE } from '../../components/ToastProvider';
+import PayPalIcon from '../../components/icons/PayPal';
 import theme from '../../lib/theme';
 
 <Meta
@@ -8,6 +9,7 @@ import theme from '../../lib/theme';
   component={Toast}
   argTypes={{
     variant: { options: ['light', 'dark'], defaultValue: 'dark', control: { type: 'radio' } },
+    timeLeft: { defaultValue: 10000, control: { type: 'range', min: 0, max: 60000, step: 1000 } },
     toast: {
       defaultValue: {
         id: 'Test',
@@ -50,3 +52,19 @@ export const DefaultStory = props => <Toast {...props} />;
 </Canvas>
 
 <ArgsTable story="All types" />
+
+# Custom icon
+
+export const CustomIconStory = props => (
+  <Toast
+    {...props}
+    toast={{
+      ...props.toast,
+      icon: <PayPalIcon size={14} />,
+    }}
+  />
+);
+
+<Story name="Custom icon">{CustomIconStory.bind()}</Story>
+
+<ArgsTable story="Custom icon" />
