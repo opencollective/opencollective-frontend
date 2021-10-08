@@ -98,7 +98,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
                   payee.organization?.name || payee.name,
                 )}
               </Span>
-              {payee.type !== CollectiveType.VENDOR && (
+              {payee.type !== CollectiveType.VENDOR && (payee.organization?.slug || payee.slug) && (
                 <Span color="black.900" fontSize="11px" truncateOverflow>
                   @{payee.organization?.slug || payee.slug}
                 </Span>
