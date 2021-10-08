@@ -102,9 +102,9 @@ const PlatformTipsCollected = ({ hostSlug }) => {
             />
             <Span mx={2}>{' / '}</Span>
             <FormattedMessage
-              id="AmountOwed"
-              defaultMessage="{amount} owed"
+              defaultMessage="{amount} owed to {account}"
               values={{
+                account: 'Open Collective',
                 amount: (
                   <FormattedMoneyAmount
                     amount={data.host.hostMetrics.pendingPlatformTips.valueInCents}
