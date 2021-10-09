@@ -1,0 +1,71 @@
+Frontend colectivo abierto
+Estado de dependencia Crowdin
+
+Babel - Colectivo Abierto
+
+Prefacio
+Si ve un paso a continuación que podría mejorarse (o está desactualizado), actualice las instrucciones. Rara vez pasamos por este proceso nosotros mismos, por lo que su nuevo par de ojos y su experiencia reciente con él, lo convierte en el mejor candidato para mejorarlos para otros usuarios. ¡Gracias!
+
+Desarrollo
+Requisito previo
+Asegúrese de tener la versión de Node.js> = 14.
+Recomendamos el uso de NVM : nvm use.
+Instalar en pc
+Recomendamos clonar el repositorio en una carpeta dedicada a opencollectiveproyectos.
+
+git clone git@github.com:opencollective/opencollective-frontend.git opencollective/frontend
+cd opencollective/frontend
+npm install
+Variables de entorno
+Este proyecto requiere acceso a la API Open Collective.
+
+De forma predeterminada, intentará conectarse a la API de ensayo de Open Collective, no tiene que cambiar nada .
+
+En caso de que desee conectarse a la API Open Collective que se ejecuta localmente:
+
+clonar, instalar e iniciar opencollective-api
+en este proyecto, copie el siguiente contenido en un .envarchivo:
+API_URL=http://localhost:3060
+API_KEY=dvl-1510egmf4a23d80342403fb599qd
+Comienzo
+npm run dev
+Pruebas
+Para ejecutar las pruebas:
+
+para el uso de páginas y componentes npm test
+Para las pruebas de un extremo a otro (e2e) con Cypress, consulte nuestra guía dedicada .
+Actualizar:
+
+Instantáneas de broma: ejecutar npm run test:update
+Archivos de traducción: ejecutar npm run langs:update
+Esquema GraphQL para ESLint: ejecutar npm run graphql:update
+Guía de estilo
+Utilizamos Libro de cuentos para desarrollar y documentar nuestro Reaccionar componentes de forma aislada con componentes de estilo y sistema de estilo .
+
+Más información: docs / styleguide.md
+
+Localización
+Traducir la interfaz no requiere ninguna habilidad técnica, puede ir a https://crowdin.com/project/opencollective y comenzar a traducir de inmediato.
+
+Actualmente estamos buscando contribuciones para los siguientes idiomas:
+
+francés
+Español
+japonés
+¿Quiere agregar un nuevo idioma para Open Collective? ¡Contáctanos , estaremos encantados de ayudarte a configurarlo!
+
+Contribuyendo
+¿Estilo de código? ¿Comprometerse con la convención? Consulte nuestras pautas de contribución .
+
+TL; DR: usamos Prettier y ESLint , nos gustan los grandes mensajes de confirmación y el historial de Git limpio.
+
+Recompensas
+Este repositorio es parte del programa de recompensas Open Collective. ¡Reciba dinero para contribuir al código abierto! El equipo de ingeniería de Open Collective es pequeño y siempre estamos buscando nuevos colaboradores para nuestras bases de código Open Source. Nuestro programa Bounty es una oportunidad para resolver problemas que de otro modo podrían pasarse por alto. Los contribuyentes que solucionen estos problemas serán recompensados ​​económicamente. Consulte nuestros documentos para obtener más información: https://docs.opencollective.com/help/contributing/development/bounties
+
+Despliegue
+Este proyecto está actualmente implementado para la puesta en escena y la producción con Heroku . Para implementar, debe ser un miembro principal del equipo de Open Collective.
+
+Más información: docs / deployment.md
+
+Discusión
+Si tiene alguna pregunta, envíenos un ping en Slack ( https://slack.opencollective.com ) o en Twitter ( @opencollect ).
