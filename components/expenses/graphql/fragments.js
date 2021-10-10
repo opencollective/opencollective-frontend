@@ -1,7 +1,5 @@
 import { gqlV2 } from '../../../lib/graphql/helpers';
 
-import { commentFieldsFragment } from '../../conversations/graphql';
-
 export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
   fragment LoggedInAccountExpensePayoutFields on Individual {
     id
@@ -252,11 +250,6 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       name
       last4
     }
-    comments(limit: 300) {
-      nodes {
-        ...CommentFields
-      }
-    }
     permissions {
       id
       canEdit
@@ -287,7 +280,6 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
     }
   }
 
-  ${commentFieldsFragment}
   ${expenseHostFields}
 `;
 

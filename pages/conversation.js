@@ -38,7 +38,7 @@ import { H2, H4 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
 const conversationPageQuery = gqlV2/* GraphQL */ `
-  query ConversationPage($collectiveSlug: String!, $id: String!) {
+  query ConversationPage($collectiveSlug: String!, $id: String!, $offset: Int) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
       slug
@@ -69,7 +69,8 @@ const conversationPageQuery = gqlV2/* GraphQL */ `
       body {
         ...CommentFields
       }
-      comments {
+      comments(limit: 100, offset: $offset) {
+        totalCount
         nodes {
           ...CommentFields
         }
@@ -122,6 +123,8 @@ class ConversationPage extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
+      refetch: PropTypes.func,
+      fetchMore: PropTypes.func,
       account: PropTypes.shape({
         name: PropTypes.string.isRequired,
         description: PropTypes.string,
@@ -185,6 +188,7 @@ class ConversationPage extends React.Component {
     // Add comment to cache if not already fetched
     const [data, query, variables] = this.clonePageQueryCacheData();
     update(data, 'conversation.comments.nodes', comments => uniqBy([...comments, comment], 'id'));
+    update(data, 'conversation.comments.totalCount', totalCount => totalCount + 1);
     this.props.client.writeQuery({ query, variables, data });
 
     // Commenting subscribes the user, update Follow button to reflect that
@@ -207,6 +211,7 @@ class ConversationPage extends React.Component {
   onCommentDeleted = comment => {
     const [data, query, variables] = this.clonePageQueryCacheData();
     update(data, 'conversation.comments.nodes', comments => comments.filter(c => c.id !== comment.id));
+    update(data, 'conversation.comments.totalCount', totalCount => totalCount - 1);
     this.props.client.writeQuery({ query, variables, data });
   };
 
@@ -250,6 +255,33 @@ class ConversationPage extends React.Component {
     }
   };
 
+  fetchMore = async () => {
+    const { collectiveSlug, id, data } = this.props;
+
+    // refetch before fetching more as comments added to the cache can change the offset
+    await data.refetch();
+    await data.fetchMore({
+      variables: { collectiveSlug, id, offset: get(data, 'conversation.comments.nodes').length },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) {
+          return prev;
+        }
+
+        const newValues = {};
+
+        newValues.conversation = {
+          ...prev.conversation,
+          comments: {
+            ...fetchMoreResult.conversation.comments,
+            nodes: [...prev.conversation.comments.nodes, ...fetchMoreResult.conversation.comments.nodes],
+          },
+        };
+
+        return Object.assign({}, prev, newValues);
+      },
+    });
+  };
+
   render() {
     const { collectiveSlug, data, LoggedInUser } = this.props;
 
@@ -268,6 +300,7 @@ class ConversationPage extends React.Component {
     const body = conversation && conversation.body;
     const conversationReactions = get(conversation, 'body.reactions', []);
     const comments = get(conversation, 'comments.nodes', []);
+    const totalCommentsCount = get(conversation, 'comments.totalCount', 0);
     const followers = get(conversation, 'followers');
     const hasFollowers = followers && followers.nodes && followers.nodes.length > 0;
     const canEdit = LoggedInUser && body && LoggedInUser.canEditComment(body);
@@ -331,7 +364,13 @@ class ConversationPage extends React.Component {
                         </Container>
                         {comments.length > 0 && (
                           <Box mb={3} pt={3}>
-                            <Thread collective={collective} items={comments} onCommentDeleted={this.onCommentDeleted} />
+                            <Thread
+                              collective={collective}
+                              items={comments}
+                              hasMore={totalCommentsCount > comments.length}
+                              fetchMore={this.fetchMore}
+                              onCommentDeleted={this.onCommentDeleted}
+                            />
                           </Box>
                         )}
                         <Flex mt="40px">
