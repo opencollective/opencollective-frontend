@@ -6,9 +6,11 @@ import styled from 'styled-components';
 
 import { formatAccountName } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
+import { getCurrencySymbol } from '../../lib/currency-utils';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payout-method';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -18,6 +20,8 @@ import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import LocationAddress from '../LocationAddress';
 import StyledLink from '../StyledLink';
+import StyledTooltip from '../StyledTooltip';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { H4, P, Span } from '../Text';
 
 import PayoutMethodData from './PayoutMethodData';
@@ -91,7 +95,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             ) : (
               <Avatar collective={payee} radius={24} />
             )}
-            <Flex flexDirection="column" ml={2} css={{ overflow: 'hidden' }}>
+            <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
               <Span color="black.900" fontWeight="bold" truncateOverflow>
                 {formatAccountName(
                   payee.organization?.legalName || payee.legalName,
@@ -104,8 +108,47 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
                 </Span>
               )}
             </Flex>
+            <StyledTooltip
+              content={() => (
+                <FormattedMessage
+                  id="Expense.PayeeTotalPayoutSum"
+                  defaultMessage="Total expense payouts this calendar year ({totalExpensePayoutCurrentYear}):
+                    Invoices: {invoices}; Receipts {receipts}; Grants {grants}"
+                  values={{
+                    totalExpensePayoutCurrentYear: (
+                      <Span>
+                        <FormattedMoneyAmount
+                          amount={collective.stats.totalAmountReceived.value}
+                          currency={collective.stats.totalAmountReceived.currency}
+                          precision={0}
+                          amountStyles={null}
+                        />
+                      </Span>
+                    ),
+                    invoices: (
+                      <Span>
+                        `{getCurrencySymbol(expense.currency)}y ${expense.currency}`
+                      </Span>
+                    ),
+                    grants: (
+                      <Span>
+                        `{getCurrencySymbol(expense.currency)}z ${expense.currency}`
+                      </Span>
+                    ),
+                    receipts: (
+                      <Span>
+                        `{getCurrencySymbol(expense.currency)}y ${expense.currency}`
+                      </Span>
+                    ),
+                  }}
+                />
+              )}
+            >
+              <InfoCircle size={16} />
+            </StyledTooltip>
           </Flex>
         </LinkCollective>
+
         {payeeLocation && isInvoice && (
           <Container whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
             <LocationAddress location={payeeLocation} isLoading={isLoadingLoggedInUser} />
