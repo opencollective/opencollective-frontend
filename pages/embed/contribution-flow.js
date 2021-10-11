@@ -67,6 +67,7 @@ class NewContributionFlowPage extends React.Component {
       description: query.description ? decodeURIComponent(query.description) : undefined,
       interval: query.interval,
       verb: query.verb,
+      hideCreditCardPostalCode: parseToBoolean(query.hideCreditCardPostalCode),
       redirect: query.redirect,
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
@@ -103,6 +104,7 @@ class NewContributionFlowPage extends React.Component {
     defaultEmail: PropTypes.string,
     defaultName: PropTypes.string,
     skipStepDetails: PropTypes.bool,
+    hideCreditCardPostalCode: PropTypes.bool,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
@@ -190,6 +192,7 @@ class NewContributionFlowPage extends React.Component {
             platformContribution={this.props.platformContribution}
             customData={this.props.customData}
             skipStepDetails={this.props.skipStepDetails}
+            hideCreditCardPostalCode={this.props.hideCreditCardPostalCode}
             contributeAs={this.props.contributeAs}
             defaultEmail={this.props.defaultEmail}
             defaultName={this.props.defaultName}

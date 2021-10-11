@@ -119,6 +119,7 @@ class ContributionFlow extends React.Component {
     skipStepDetails: PropTypes.bool,
     hideHeader: PropTypes.bool,
     loadingLoggedInUser: PropTypes.bool,
+    hideCreditCardPostalCode: PropTypes.bool,
     isEmbed: PropTypes.bool,
     step: PropTypes.string,
     redirect: PropTypes.string,
@@ -495,6 +496,7 @@ class ContributionFlow extends React.Component {
         'defaultName',
         'useTheme',
         'hideHeader',
+        'hideCreditCardPostalCode',
       ]),
       ...queryParams,
     };
@@ -844,6 +846,7 @@ class ContributionFlow extends React.Component {
                     isSubmitting={isValidating || isLoading}
                     order={this.state.createdOrder}
                     disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
+                    hideCreditCardPostalCode={this.props.hideCreditCardPostalCode}
                   />
                   <Box mt={40}>
                     <ContributionFlowButtons

@@ -64,6 +64,7 @@ class NewContributionFlowPage extends React.Component {
       interval: query.interval,
       verb: query.verb,
       paymentFlow: query.paymentFlow,
+      hideCreditCardPostalCode: parseToBoolean(query.hideCreditCardPostalCode),
       redirect: query.redirect,
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
@@ -92,6 +93,7 @@ class NewContributionFlowPage extends React.Component {
     error: PropTypes.string,
     contributeAs: PropTypes.string,
     skipStepDetails: PropTypes.bool,
+    hideCreditCardPostalCode: PropTypes.bool,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
@@ -174,6 +176,7 @@ class NewContributionFlowPage extends React.Component {
           platformContribution={this.props.platformContribution}
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
+          hideCreditCardPostalCode={this.props.hideCreditCardPostalCode}
           contributeAs={this.props.contributeAs}
           tags={this.props.tags}
           error={error}

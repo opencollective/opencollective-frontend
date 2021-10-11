@@ -141,7 +141,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     return (
       <Flex flexDirection="column">
         <StyledCardElement
-          hidePostalCode={hidePostalCode}
+          options={{ hidePostalCode }}
           onReady={input => input.focus()}
           onChange={this.onCardChange}
           onBlur={() => this.setState({ showAllErrors: true })}
