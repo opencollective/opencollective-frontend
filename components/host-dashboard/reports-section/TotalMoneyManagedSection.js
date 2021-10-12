@@ -100,13 +100,13 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
         <Container mt={18} mb={12}>
           <FundAmounts>
             <Flex flexWrap="wrap">
-              <Box width={[1, 1, 1 / 2]}>
+              <Box width={[1, 1, 1 / 2]} pl="8px">
                 <TotalFundsLabel minWidth="210px" style={{ verticalAlign: 'middle' }}>
                   <Span fontWeight="700">{formatCurrency(totalCollectiveFunds, currency)}</Span> |{' '}
                   <FormattedMessage id="Collectives" defaultMessage="Collectives" />
                 </TotalFundsLabel>
               </Box>
-              <Box width={[1, 1, 1 / 2]} pt={['35px', '35px', 0]}>
+              <Box width={[1, 1, 1 / 2]} pt={['35px', '35px', 0]} pl="8px">
                 <TotalFundsLabel minWidth="230px" style={{ verticalAlign: 'middle' }}>
                   <Span fontWeight="700">{formatCurrency(totalHostFunds, currency)}</Span> |{' '}
                   <FormattedMessage id="TotalMoneyManagedSection.hostOrganization" defaultMessage="Host Organization" />
