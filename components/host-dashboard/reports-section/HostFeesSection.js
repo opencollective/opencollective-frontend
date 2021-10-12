@@ -29,7 +29,7 @@ import StyledSpinner from '../../StyledSpinner';
 import { P, Span } from '../../Text';
 
 const hostFeeSectionQuery = gqlV2/* GraphQL */ `
-  query HostFeeSectionQuery($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
+  query HostFeeSection($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
     host(slug: $hostSlug) {
       id
       legacyId
@@ -62,8 +62,8 @@ const hostFeeSectionQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const hostMetricsQuery = gqlV2/* GraphQL */ `
-  query HostFeeSummary(
+const hostFeeSectionTimeSeriesQuery = gqlV2/* GraphQL */ `
+  query HostFeeSectionTimeSeries(
     $hostSlug: String!
     $dateFrom: DateTime!
     $dateTo: DateTime!
@@ -230,9 +230,9 @@ const HostFeesSection = ({ hostSlug }) => {
   const yearsOptions = useMemo(() => getActiveYearsOptions(host), [host]);
   const chartOptions = useMemo(() => getChartOptions(intl, host?.currency), [host?.currency]);
   const [dateInterval, setDateInterval] = useState(null);
-  const [showHostFeeChart, setShowHostFeeChart] = useState(true);
+  const [showHostFeeChart, setShowHostFeeChart] = useState(false);
   const [collectives, setCollectives] = useState(null);
-  const { loading: loadingHostMetrics, data: hostMetricsData } = useQuery(hostMetricsQuery, {
+  const { loading: loadingHostMetrics, data: hostMetricsData } = useQuery(hostFeeSectionTimeSeriesQuery, {
     variables: {
       dateFrom: dateInterval?.from ? new Date(dateInterval.from) : variables.dateFrom,
       dateTo: dateInterval?.to ? new Date(dateInterval.to) : variables.dateTo,
