@@ -61,7 +61,6 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
 })``;
 
 const PayeeTotalPayoutSumTooltip = ({ stats }) => {
-  const currentYear = new Date().getFullYear().toString();
   if (stats.totalExpensesReceived === undefined) {
     return '';
   }
@@ -70,9 +69,8 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
       content={() => (
         <FormattedMessage
           id="Expense.PayeeTotalPayoutSum"
-          defaultMessage="Total expense payouts this calendar year ({currentYear}): {totalExpensesReceived}"
+          defaultMessage="Total expense payouts (all time): {totalExpensesReceived}"
           values={{
-            currentYear: <Span>{currentYear}</Span>,
             totalExpensesReceived: (
               <FormattedMoneyAmount
                 amount={stats.totalExpensesReceived.valueInCents}
@@ -93,7 +91,7 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
 const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLoggedInUser, isDraft, collective }) => {
   const payeeLocation = expense?.payeeLocation || expense?.draft?.payeeLocation;
   const payee = isDraft ? expense?.draft?.payee : expense?.payee;
-  const payeeStats = payee.stats;
+  const payeeStats = payee ? payee.stats : null;
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === expenseStatus.PAID;
