@@ -265,7 +265,6 @@ const ExpenseSummary = ({
       </Flex>
       <ExpensePayeeDetails
         isLoading={isLoading}
-        host={host}
         expense={expense}
         collective={collective}
         isDraft={!isEditing && expense?.status === expenseStatus.DRAFT}

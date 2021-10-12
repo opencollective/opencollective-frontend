@@ -56,7 +56,7 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
   lineHeight: '15px',
 })``;
 
-const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLoggedInUser, isDraft, collective }) => {
+const ExpensePayeeDetails = ({ expense, isLoading, borderless, isLoadingLoggedInUser, isDraft, collective }) => {
   const payeeLocation = expense?.payeeLocation || expense?.draft?.payeeLocation;
   const payee = isDraft ? expense?.draft?.payee : expense?.payee;
   const isInvoice = expense?.type === expenseTypes.INVOICE;
@@ -153,7 +153,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
           )}
         </Container>
       </PrivateInfoColumn>
-      {host && (
+      {expense.host && (
         <PrivateInfoColumn data-cy="expense-summary-host" borderless={borderless}>
           <PrivateInfoColumnHeader>
             {isPaid ? (
@@ -162,33 +162,33 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
               <FormattedMessage id="expense.PayFromFiscalhost" defaultMessage="Pay from Fiscal Host" />
             )}
           </PrivateInfoColumnHeader>
-          <LinkCollective collective={host}>
+          <LinkCollective collective={expense.host}>
             <Flex alignItems="center">
-              <Avatar collective={host} radius={24} />
+              <Avatar collective={expense.host} radius={24} />
               <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
-                {collective && (collective.isApproved || collective.id === host.id) ? (
-                  formatAccountName(host.legalName, host.name)
+                {collective && (collective.isApproved || collective.id === expense.host.id) ? (
+                  formatAccountName(expense.host.legalName, expense.host.name)
                 ) : (
                   <FormattedMessage
                     id="Fiscalhost.pending"
                     defaultMessage="{host} (pending)"
                     values={{
-                      host: formatAccountName(host.legalName, host.name),
+                      host: formatAccountName(expense.host.legalName, expense.host.name),
                     }}
                   />
                 )}
               </Span>
             </Flex>
           </LinkCollective>
-          {host.location && (
+          {expense.host.location && (
             <P whiteSpace="pre-wrap" fontSize="11px" mt={2}>
-              {host.location.address}
+              {expense.host.location.address}
             </P>
           )}
-          {host.website && (
+          {expense.host.website && (
             <P mt={2} fontSize="11px">
-              <StyledLink href={host.website} openInNewTab>
-                {host.website}
+              <StyledLink href={expense.host.website} openInNewTab>
+                {expense.host.website}
               </StyledLink>
             </P>
           )}
@@ -205,18 +205,6 @@ ExpensePayeeDetails.propTypes = {
   isDraft: PropTypes.bool,
   /** Set this to true if the logged in user is currenltly loading */
   isLoadingLoggedInUser: PropTypes.bool,
-  host: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    legalName: PropTypes.string,
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    website: PropTypes.string,
-    location: PropTypes.shape({
-      address: PropTypes.string,
-      country: PropTypes.string,
-    }),
-  }),
   /** Must be provided if isLoading is false */
   expense: PropTypes.shape({
     id: PropTypes.string,
@@ -252,6 +240,18 @@ ExpensePayeeDetails.propTypes = {
       name: PropTypes.string,
       slug: PropTypes.string,
       type: PropTypes.string,
+    }),
+    host: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      legalName: PropTypes.string,
+      slug: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      website: PropTypes.string,
+      location: PropTypes.shape({
+        address: PropTypes.string,
+        country: PropTypes.string,
+      }),
     }),
     payoutMethod: PropTypes.shape({
       id: PropTypes.string,
