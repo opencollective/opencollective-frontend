@@ -1,19 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { formatAccountName } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
-import { getCurrencySymbol } from '../../lib/currency-utils';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payout-method';
-import FormattedMoneyAmount from '../FormattedMoneyAmount';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LinkCollective from '../LinkCollective';
@@ -21,7 +21,6 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import LocationAddress from '../LocationAddress';
 import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
-import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { H4, P, Span } from '../Text';
 
 import PayoutMethodData from './PayoutMethodData';
@@ -233,6 +232,10 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
   );
 };
 
+PayeeTotalPayoutSumTooltip.propTypes = {
+  stats: PropTypes.object,
+};
+
 ExpensePayeeDetails.propTypes = {
   /** Set this to true if the expense is not loaded yet */
   isLoading: PropTypes.bool,
@@ -277,6 +280,7 @@ ExpensePayeeDetails.propTypes = {
       type: PropTypes.string,
       isAdmin: PropTypes.bool,
       isInvite: PropTypes.bool,
+      stats: PropTypes.object,
     }),
     payeeLocation: PropTypes.shape({
       address: PropTypes.string,
