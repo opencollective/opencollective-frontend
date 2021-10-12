@@ -60,9 +60,40 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
   lineHeight: '15px',
 })``;
 
+const PayeeTotalPayoutSumTooltip = ({ stats }) => {
+  const currentYear = new Date().getFullYear().toString();
+  if (stats.totalExpensesReceived === undefined) {
+    return '';
+  }
+  return (
+    <StyledTooltip
+      content={() => (
+        <FormattedMessage
+          id="Expense.PayeeTotalPayoutSum"
+          defaultMessage="Total expense payouts this calendar year ({currentYear}): {totalExpensesReceived}"
+          values={{
+            currentYear: <Span>{currentYear}</Span>,
+            totalExpensesReceived: (
+              <FormattedMoneyAmount
+                amount={stats.totalExpensesReceived.valueInCents}
+                currency={stats.totalExpensesReceived.currency}
+                precision={2}
+                amountStyles={null}
+              />
+            ),
+          }}
+        />
+      )}
+    >
+      <InfoCircle size={16} />
+    </StyledTooltip>
+  );
+};
+
 const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLoggedInUser, isDraft, collective }) => {
   const payeeLocation = expense?.payeeLocation || expense?.draft?.payeeLocation;
   const payee = isDraft ? expense?.draft?.payee : expense?.payee;
+  const payeeStats = payee.stats;
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === expenseStatus.PAID;
@@ -108,44 +139,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
                 </Span>
               )}
             </Flex>
-            <StyledTooltip
-              content={() => (
-                <FormattedMessage
-                  id="Expense.PayeeTotalPayoutSum"
-                  defaultMessage="Total expense payouts this calendar year ({totalExpensePayoutCurrentYear}):
-                    Invoices: {invoices}; Receipts {receipts}; Grants {grants}"
-                  values={{
-                    totalExpensePayoutCurrentYear: (
-                      <Span>
-                        <FormattedMoneyAmount
-                          amount={collective.stats.totalAmountReceived.value}
-                          currency={collective.stats.totalAmountReceived.currency}
-                          precision={0}
-                          amountStyles={null}
-                        />
-                      </Span>
-                    ),
-                    invoices: (
-                      <Span>
-                        `{getCurrencySymbol(expense.currency)}y ${expense.currency}`
-                      </Span>
-                    ),
-                    grants: (
-                      <Span>
-                        `{getCurrencySymbol(expense.currency)}z ${expense.currency}`
-                      </Span>
-                    ),
-                    receipts: (
-                      <Span>
-                        `{getCurrencySymbol(expense.currency)}y ${expense.currency}`
-                      </Span>
-                    ),
-                  }}
-                />
-              )}
-            >
-              <InfoCircle size={16} />
-            </StyledTooltip>
+            {payeeStats && <PayeeTotalPayoutSumTooltip stats={payeeStats} />}
           </Flex>
         </LinkCollective>
 

@@ -141,6 +141,13 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         data
         isSaved
       }
+      stats {
+        totalExpensesReceived {
+          value
+          valueInCents
+          currency
+        }
+      }
 
       # For Collectives, Funds, Events and Projects
       ... on AccountWithHost {

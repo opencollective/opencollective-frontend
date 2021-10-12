@@ -893,7 +893,7 @@
   "expense.pay.error.noHost": "Expenses cannot be paid without a Fiscal Host",
   "expense.pay.error.payee.noHost": "Unable to pay because payee Collective does not have a Fiscal Host.",
   "expense.pay.error.payee.sameHost": "Payer and payee must have the same Fiscal Host to pay this way.",
-  "Expense.PayeeTotalPayoutSum": "Total expense payouts this calendar year ({totalExpensePayoutCurrentYear}): Invoices: {invoices}; Receipts {receipts}; Grants {grants}",
+  "Expense.PayeeTotalPayoutSum": "Total expense payouts this calendar year ({currentYear}): {totalExpensesReceived}",
   "expense.PayFromFiscalhost": "Pay from Fiscal Host",
   "expense.paymentProcessorFeeInCollectiveCurrency": "payment processor fee",
   "expense.payoutMethod": "payout method",
