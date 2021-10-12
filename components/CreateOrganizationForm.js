@@ -225,8 +225,8 @@ const CreateOrganizationForm = props => {
                         data-cy="cof-form-legalName"
                         hint={
                           <FormattedMessage
-                            id="legalName.description"
-                            defaultMessage="The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name."
+                            id="editCollective.legalName.description"
+                            defaultMessage="Legal names are private and used in receipts, tax forms, payment details on expenses, and other non-public contexts. Legal names are only visible to admins."
                           />
                         }
                       >
