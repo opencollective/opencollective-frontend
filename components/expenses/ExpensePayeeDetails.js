@@ -64,7 +64,6 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
     <StyledTooltip
       content={() => (
         <FormattedMessage
-          id="Expense.PayeeTotalPayoutSum"
           defaultMessage="Total expense payouts (all time): {totalExpensesReceived}"
           values={{
             totalExpensesReceived: (
