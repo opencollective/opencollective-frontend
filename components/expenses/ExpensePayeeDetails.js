@@ -60,9 +60,6 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
 })``;
 
 const PayeeTotalPayoutSumTooltip = ({ stats }) => {
-  if (stats.totalExpensesReceived === undefined) {
-    return '';
-  }
   return (
     <StyledTooltip
       content={() => (
@@ -90,7 +87,7 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
 const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLoggedInUser, isDraft, collective }) => {
   const payeeLocation = expense?.payeeLocation || expense?.draft?.payeeLocation;
   const payee = isDraft ? expense?.draft?.payee : expense?.payee;
-  const payeeStats = payee ? payee.stats : null;
+  const payeeStats = payee && !isDraft ? payee.stats : null; // stats not available for drafts
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === expenseStatus.PAID;
@@ -233,7 +230,12 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
 };
 
 PayeeTotalPayoutSumTooltip.propTypes = {
-  stats: PropTypes.object,
+  stats: PropTypes.shape({
+    totalExpensesReceived: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }).isRequired,
+  }),
 };
 
 ExpensePayeeDetails.propTypes = {
@@ -280,7 +282,12 @@ ExpensePayeeDetails.propTypes = {
       type: PropTypes.string,
       isAdmin: PropTypes.bool,
       isInvite: PropTypes.bool,
-      stats: PropTypes.object,
+      stats: PropTypes.shape({
+        totalExpensesReceived: PropTypes.shape({
+          valueInCents: PropTypes.number,
+          currency: PropTypes.string,
+        }),
+      }),
     }),
     payeeLocation: PropTypes.shape({
       address: PropTypes.string,
