@@ -94,7 +94,7 @@ export default class IntlDocument extends Document {
 
   clientAnalyticsCode() {
     const lines = [];
-    lines.push(`var _paq = window._paq || [];`);
+    lines.push(`var _paq = window._paq = window._paq || [];`);
     if (this.props.clientAnalytics.customUrl) {
       lines.push(`_paq.push(['setCustomUrl', '${this.props.clientAnalytics.customUrl}']);`);
     }
@@ -105,7 +105,7 @@ export default class IntlDocument extends Document {
       _paq.push(['setTrackerUrl', u+'matomo.php']);
       _paq.push(['setSiteId', '${this.props.clientAnalytics.siteId}']);
       var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-      g.type='text/javascript'; g.async=true; g.defer=true; g.src='https://cdn.matomo.cloud/opencollective.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
+      g.async=true; g.src='//cdn.matomo.cloud/opencollective.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
     })();`);
     return lines.join('\n');
   }
