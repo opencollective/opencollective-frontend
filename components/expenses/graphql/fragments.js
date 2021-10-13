@@ -142,7 +142,11 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isSaved
       }
       stats {
-        totalExpensesReceived {
+        totalAmountReceived: totalAmountReceived {
+          valueInCents
+          currency
+        }
+        totalExpensesReceived: totalAmountReceived(kind: [EXPENSE]) {
           valueInCents
           currency
         }

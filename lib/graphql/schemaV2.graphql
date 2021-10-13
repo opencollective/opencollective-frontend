@@ -2235,22 +2235,7 @@ type AccountStats {
   """
   Net amount received
   """
-  totalAmountReceived: Amount!
-
-  """
-  Net amount expenses received
-  """
-  totalExpensesReceived(
-    """
-    Only return transactions that were created after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Only return transactions that were created before this date
-    """
-    dateTo: DateTime
-  ): Amount!
+  totalAmountReceived(kind: [TransactionKind]): Amount!
   yearlyBudget: Amount!
   yearlyBudgetManaged: Amount!
 }
