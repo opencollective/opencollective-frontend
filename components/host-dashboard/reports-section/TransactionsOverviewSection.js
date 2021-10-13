@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
+import { simpleDateToISOString } from '../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import PeriodFilter from '../../budget/filters/PeriodFilter';
@@ -14,8 +15,6 @@ import Container from '../../Container';
 import { Flex } from '../../Grid';
 import Loading from '../../Loading';
 import { P, Span } from '../../Text';
-
-import { prepareDateArgs } from './HostDownloadsSection';
 
 const FilterLabel = styled.label`
   font-weight: 500;
@@ -92,6 +91,17 @@ const transactionsOverviewQuery = gqlV2/* GraphQL */ `
 const TransactionsOverviewSection = ({ hostSlug }) => {
   const [collectives, setCollectives] = useState(null);
   const [dateInterval, setDateInterval] = useState(null);
+
+  const prepareDateArgs = dateInterval => {
+    if (!dateInterval) {
+      return {};
+    } else {
+      return {
+        dateFrom: simpleDateToISOString(dateInterval.from, false, dateInterval.timezoneType),
+        dateTo: simpleDateToISOString(dateInterval.to, true, dateInterval.timezoneType),
+      };
+    }
+  };
 
   const { data, loading } = useQuery(transactionsOverviewQuery, {
     variables: { hostSlug, ...prepareDateArgs(dateInterval), account: collectives },

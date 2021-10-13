@@ -56,7 +56,7 @@ const getDefaultDateInterval = () => {
   };
 };
 
-export const prepareDateArgs = dateInterval => {
+const prepareDateArgs = dateInterval => {
   if (!dateInterval) {
     return {};
   } else {
