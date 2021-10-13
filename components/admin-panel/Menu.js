@@ -134,11 +134,7 @@ const Menu = ({ collective }) => {
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.VIRTUAL_CARDS}
-            if={
-              isOneOfTypes(collective, [COLLECTIVE, FUND]) &&
-              hasFeature(collective.host, FEATURES.PRIVACY_VCC) &&
-              collective.features?.VIRTUAL_CARDS === 'ACTIVE'
-            }
+            if={isOneOfTypes(collective, [COLLECTIVE, FUND]) && hasFeature(collective.host, FEATURES.PRIVACY_VCC)}
           />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.TICKETS} if={isType(collective, EVENT)} />
           <MenuLink
