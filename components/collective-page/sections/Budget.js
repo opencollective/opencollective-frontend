@@ -34,7 +34,6 @@ export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
     transactions(
       account: { slug: $slug }
       limit: $limit
-      hasExpense: false
       kind: $kind
       includeIncognitoTransactions: true
       includeGiftCardTransactions: true
@@ -90,7 +89,11 @@ const getBudgetItems = (transactions, expenses, filter) => {
   } else if (filter === 'transactions') {
     return transactions;
   } else {
-    return orderBy([...transactions, ...expenses], 'createdAt', 'desc').slice(0, 3);
+    const expenseIds = expenses.map(expense => expense.id);
+    const transactionsWithoutMatchingExpense = transactions.filter(
+      transaction => !expenseIds.includes(transaction.expense?.id),
+    );
+    return orderBy([...transactionsWithoutMatchingExpense, ...expenses], 'createdAt', 'desc').slice(0, 3);
   }
 };
 
