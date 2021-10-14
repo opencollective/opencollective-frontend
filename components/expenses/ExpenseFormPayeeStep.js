@@ -262,7 +262,7 @@ const ExpenseFormPayeeStep = ({
                       <MessageBox mt={2} fontSize="12px" type="warning" withIcon>
                         <FormattedMessage
                           id="Warning.LegalNameNotMatchBankAccountName"
-                          defaultMessage="The legal name should match the bank account holder name"
+                          defaultMessage="The legal name should match the bank account holder name in most cases. Otherwise payments may be delayed. If the payment is to an organization, please select or create that organization's profile instead of your individual profile as the payee."
                         />
                       </MessageBox>
                     )}
