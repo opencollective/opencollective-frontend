@@ -158,7 +158,13 @@ const ExpenseItemForm = ({
           >
             {inputProps =>
               isRichText ? (
-                <Field as={RichTextEditor} {...inputProps} inputName={inputProps.name} withBorders />
+                <Field
+                  as={RichTextEditor}
+                  {...inputProps}
+                  inputName={inputProps.name}
+                  withBorders
+                  version="simplified"
+                />
               ) : (
                 <Field as={StyledInput} {...inputProps} />
               )
