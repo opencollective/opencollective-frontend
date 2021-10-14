@@ -2235,7 +2235,14 @@ type AccountStats {
   """
   Net amount received
   """
-  totalAmountReceived(kind: [TransactionKind]): Amount!
+  totalAmountReceived(
+    kind: [TransactionKind]
+
+    """
+    Start date
+    """
+    dateFrom: DateTime
+  ): Amount!
   yearlyBudget: Amount!
   yearlyBudgetManaged: Amount!
 }
