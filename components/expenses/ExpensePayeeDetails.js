@@ -60,11 +60,12 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
 })``;
 
 const PayeeTotalPayoutSumTooltip = ({ stats }) => {
+  const currentYear = new Date().getFullYear().toString();
   return (
     <StyledTooltip
       content={() => (
         <FormattedMessage
-          defaultMessage="Total expense payouts (all time): {totalExpensesReceived}"
+          defaultMessage="Total expense payouts ({currentYear}): {totalExpensesReceived}"
           values={{
             totalExpensesReceived: (
               <FormattedMoneyAmount
@@ -74,6 +75,7 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
                 amountStyles={null}
               />
             ),
+            currentYear: <Span>{currentYear}</Span>,
           }}
         />
       )}
