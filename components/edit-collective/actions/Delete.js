@@ -8,6 +8,7 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 
 import Container from '../../Container';
+import { getI18nLink } from '../../I18nFormatters';
 import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
@@ -35,6 +36,7 @@ const DeleteCollective = ({ collective, ...props }) => {
   const [deleteStatus, setDeleteStatus] = useState({ deleting: false, error: null });
   const [deleteCollective] = useMutation(deleteCollectiveMutation);
   const [deleteUserCollective] = useMutation(deleteUserCollectiveMutation);
+  const isSelfHosted = collective.host?.id === collective.id;
 
   const handleDelete = async () => {
     try {
@@ -97,13 +99,21 @@ const DeleteCollective = ({ collective, ...props }) => {
       </StyledButton>
       {collective.isHost && (
         <P color="rgb(224, 183, 0)" my={1}>
-          <FormattedMessage
-            id="collective.delete.isHost"
-            defaultMessage={
-              "You can't delete {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings)."
-            }
-            values={{ type: collective.type }}
-          />{' '}
+          {isSelfHosted ? (
+            <FormattedMessage
+              id="collective.delete.selfHost"
+              defaultMessage={`To delete this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
+              values={{ SettingsLink: getI18nLink({ href: `/${collective.host?.slug}/edit/host` }) }}
+            />
+          ) : (
+            <FormattedMessage
+              id="collective.delete.isHost"
+              defaultMessage={
+                "You can't delete {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings)."
+              }
+              values={{ type: collective.type }}
+            />
+          )}{' '}
         </P>
       )}
       {!collective.isDeletable &&
