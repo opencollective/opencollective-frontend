@@ -28,6 +28,10 @@ import FeesOnTopInput from './FeesOnTopInput';
 import TierCustomFields from './TierCustomFields';
 import { getTotalAmount } from './utils';
 
+const getCustomFields = (collective, tier) => {
+  return [...(tier?.customFields || []), ...(collective.host?.settings?.contributionFlow?.customFields || [])];
+};
+
 const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }) => {
   const intl = useIntl();
   const amount = data?.amount;
@@ -39,20 +43,27 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
   const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
   const { LoggedInUser } = useUser();
+  const customFields = getCustomFields(collective, tier);
+  const currency = tier?.amount.currency || collective.currency;
+  const selectedInterval = data?.interval !== INTERVALS.flexible ? data?.interval : null;
+  const accountSupportsRecurring = canContributeRecurring(collective, LoggedInUser);
+  const isFixedInterval = tier?.interval && tier.interval !== INTERVALS.flexible;
+
   const dispatchChange = (field, value) => {
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
 
-  const customFields = [
-    ...(tier?.customFields || []),
-    ...(collective.host?.settings?.contributionFlow?.customFields || []),
-  ];
-  const currency = tier?.amount.currency || collective.currency;
-  const selectedInterval = data?.interval !== INTERVALS.flexible ? data?.interval : null;
+  // If an interval has been set (either from the tier defaults, or form an URL param) and the
+  // collective doesn't support it, we reset the interval
+  React.useEffect(() => {
+    if (selectedInterval && !isFixedInterval && !accountSupportsRecurring) {
+      dispatchChange('interval', null);
+    }
+  }, [selectedInterval, isFixedInterval, accountSupportsRecurring]);
 
   return (
     <Box width={1}>
-      {(!tier || tier.interval === 'flexible') && canContributeRecurring(collective, LoggedInUser) && (
+      {!isFixedInterval && accountSupportsRecurring && (
         <StyledButtonSet
           id="interval"
           justifyContent="center"
