@@ -1,11 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
+import { CaretUp } from '@styled-icons/fa-solid/CaretUp';
 import { getLuminance } from 'polished';
 import { FormattedMessage } from 'react-intl';
 import sanitizeHtml from 'sanitize-html';
 import styled, { css } from 'styled-components';
 import { space, typography } from 'styled-system';
+
+import { truncate } from '../lib/utils';
 
 /**
  * React-Quill usually saves something like `<p><br/></p` when saving with an empty
@@ -28,8 +31,6 @@ export const isEmptyValue = value => {
     return cleanStr.length === 0;
   }
 };
-
-const getFirstSentenceFromHTML = html => html.split?.(/<\/?\w+>/).filter(a => a.length)[0] || '';
 
 const ReadFullLink = styled.a`
   cursor: pointer;
@@ -57,15 +58,15 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
   if (!content) {
     return <div {...props} />;
   }
+  const truncatedContent = truncate(content, 100);
   let __html = sanitize ? sanitizeHtml(content) : content;
 
   if (collapsable && !isOpen) {
-    const firstSentence = getFirstSentenceFromHTML(__html);
     // Hide "Read full description" if we can display everything in the firstSentence
-    if (firstSentence === __html) {
+    if (!truncatedContent.endsWith('…')) {
       collapsable = false;
     }
-    __html = firstSentence;
+    __html = truncatedContent;
   }
 
   return (
@@ -84,9 +85,25 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
             }
           }}
         >
-          &nbsp;
           <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />
           <CaretDown size="10px" />
+        </ReadFullLink>
+      )}
+      {isOpen && collapsable && (
+        <ReadFullLink
+          onClick={() => setOpen(false)}
+          {...props}
+          role="button"
+          tabIndex={0}
+          onKeyDown={event => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              setOpen(false);
+            }
+          }}
+        >
+          <FormattedMessage defaultMessage="Read Summary" />
+          <CaretUp size="10px" />
         </ReadFullLink>
       )}
     </div>
@@ -171,7 +188,7 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
 
   ${typography}
   ${space}
-  
+
   // Apply custom theme if the color is safe to apply
 
   ${props => {
