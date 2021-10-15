@@ -232,10 +232,6 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
 
 PayeeTotalPayoutSumTooltip.propTypes = {
   stats: PropTypes.shape({
-    totalAmountReceived: PropTypes.shape({
-      valueInCents: PropTypes.number,
-      currency: PropTypes.string,
-    }),
     totalExpensesReceived: PropTypes.shape({
       valueInCents: PropTypes.number,
       currency: PropTypes.string,
@@ -288,10 +284,6 @@ ExpensePayeeDetails.propTypes = {
       isAdmin: PropTypes.bool,
       isInvite: PropTypes.bool,
       stats: PropTypes.shape({
-        totalAmountReceived: PropTypes.shape({
-          valueInCents: PropTypes.number,
-          currency: PropTypes.string,
-        }),
         totalExpensesReceived: PropTypes.shape({
           valueInCents: PropTypes.number,
           currency: PropTypes.string,
