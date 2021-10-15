@@ -56,7 +56,6 @@ const getVariableFromProps = props => {
     legacyExpenseId: props.legacyExpenseId,
     draftKey: props.draftKey,
     totalExpensesReceivedDateFrom: firstOfCurrentYear,
-    collectiveSlug: props.collectiveSlug,
   };
 };
 
@@ -67,7 +66,7 @@ const messages = defineMessages({
   },
 });
 
-const expensePageQuery = gqlV2/* GraphQL */ /* eslint-disable-next-line graphql/template-strings */ `
+const expensePageQuery = gqlV2/* GraphQL */ `
   query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalExpensesReceivedDateFrom: DateTime) {
     expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
       ...ExpensePageExpenseFields
@@ -75,6 +74,20 @@ const expensePageQuery = gqlV2/* GraphQL */ /* eslint-disable-next-line graphql/
         totalCount
         nodes {
           ...CommentFields
+        }
+      }
+    }
+
+    # As it uses a dedicated variable this needs to be separated from the ExpensePageExpenseFields fragment
+    expensePayeeStats: expense(expense: { legacyId: $legacyExpenseId }) {
+      id
+      payee {
+        id
+        stats {
+          totalExpensesReceived: totalAmountReceived(kind: [EXPENSE], dateFrom: $totalExpensesReceivedDateFrom) {
+            valueInCents
+            currency
+          }
         }
       }
     }
@@ -445,7 +458,10 @@ class ExpensePage extends React.Component {
       }
     }
 
-    const expense = data.expense;
+    const expense = cloneDeep(data.expense);
+    if (expense && data.expensePayeeStats) {
+      expense.payee.stats = data.expensePayeeStats.payee.stats;
+    }
     const loggedInAccount = data.loggedInAccount;
     const collective = expense?.account;
     const host = collective?.host;
