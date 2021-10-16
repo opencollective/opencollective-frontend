@@ -336,7 +336,7 @@ class Host extends React.Component {
         <H4 fontSize="15px" mb={3}>
           <FormattedMessage
             id="acceptContributions.picker.subtitle"
-            defaultMessage="Who will hold money on behalf of the Collective?"
+            defaultMessage="Who will hold money on behalf of this Collective?"
           />
         </H4>
         <div id="noHost">
@@ -377,12 +377,16 @@ class Host extends React.Component {
             </Box>
             <Box mb={4}>
               <OptionLabel htmlFor="host-radio-selfHost">
-                <FormattedMessage id="acceptContributions.picker.ourselves" defaultMessage="Ourselves" />
+                <FormattedMessage id="acceptContributions.picker.ourselves" defaultMessage="Independent Collective" />
               </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.selfHost.description"
                 defaultMessage="Simply connect a bank account for a single Collective. You will be responsible for accounting, taxes, payments, and liability."
               />
+              &nbsp;
+              <a href="https://docs.opencollective.com/help/independent-collectives/">
+                <FormattedMessage id="moreInfo" defaultMessage="More info" />
+              </a>
               {selectedOption === 'selfHost' && LoggedInUser && (
                 <Flex
                   flexDirection={['column', 'row', 'row']}
@@ -398,7 +402,7 @@ class Host extends React.Component {
                     >
                       <FormattedMessage
                         id="host.selfHost.confirm"
-                        defaultMessage="Yes, hold money for one Collective in our own bank account"
+                        defaultMessage="Yes, Activate Independent Collective"
                       />
                     </StyledButton>
                   </Box>
@@ -433,17 +437,16 @@ class Host extends React.Component {
             </Box>
             <Box mb={4}>
               <OptionLabel htmlFor="host-radio-ownHost">
-                <FormattedMessage id="acceptContributions.organization.subtitle" defaultMessage="Our organization" />
+                <FormattedMessage id="acceptContributions.organization.subtitle" defaultMessage="Our Own Fiscal Host" />
               </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.useOwn.description"
-                defaultMessage="Create or select a Fiscal Host that you manage, to hold funds for multiple Collectives. The organization will be responsible for accounting, taxes, payments, and liability."
+                defaultMessage="Select or create your own Fiscal Host, which you manage to hold funds for multiple Collectives, to hold funds and do associated admin for this Collective."
               />
               &nbsp;
               <a href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host">
                 <FormattedMessage id="moreInfo" defaultMessage="More info" />
               </a>
-              .
               {selectedOption === 'ownHost' && LoggedInUser && (
                 <CreateHostFormWithData
                   collective={collective}
@@ -469,14 +472,11 @@ class Host extends React.Component {
             </Box>
             <Box mb={4}>
               <OptionLabel htmlFor="host-radio-findHost">
-                <FormattedMessage
-                  id="collective.edit.host.findHost.title"
-                  defaultMessage="Apply to an existing Fiscal Host"
-                />
+                <FormattedMessage id="collective.edit.host.findHost.title" defaultMessage="Apply to a Fiscal Host" />
               </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.findHost.description"
-                defaultMessage="You won't need to hold funds or set up a legal entity and bank account for your project. The Fiscal Host will take care of accounting, invoices, taxes, admin, payments, and liability. Most hosts charge a fee for this service (which you can review before choosing a Host)."
+                defaultMessage="Join an existing Fiscal Host who will hold funds on your behalf and take care of accounting, taxes, banking, admin, payments, and liability. Most Hosts charge a fee for this service (you can review the details before choosing a Host)."
               />
               {selectedOption === 'findHost' && (
                 <div>

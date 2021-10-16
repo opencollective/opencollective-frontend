@@ -55,7 +55,7 @@ const HoverImage = styled.img`
   }
 `;
 
-const moreInfoHostsLink = 'https://docs.opencollective.com/help/collectives/add-or-change-fiscal-host';
+const moreInfoHostsLink = 'https://opencollective.com/fiscal-hosting';
 
 class ContributionCategoryPicker extends React.Component {
   static propTypes = {
@@ -78,19 +78,19 @@ class ContributionCategoryPicker extends React.Component {
       },
       ourselves: {
         id: 'acceptContributions.picker.ourselves',
-        defaultMessage: 'Ourselves',
+        defaultMessage: 'Independent Collective',
       },
       ourselvesInfo: {
         id: 'acceptContributions.picker.ourselvesInfo',
         defaultMessage:
           'Simply connect a bank account to your Collective. You will be responsible for accounting, taxes, payments, and liability. Choose this option if you have a single Collective and want to hold funds for it yourself.',
       },
-      host: { id: 'acceptContributions.picker.host', defaultMessage: 'A Fiscal Host' },
+      host: { id: 'acceptContributions.picker.host', defaultMessage: 'My Own Fiscal Host' },
       organization: { id: 'acceptContributions.organization.subtitle', defaultMessage: 'Our organization' },
       organizationInfo: {
         id: 'acceptContributions.picker.organizationInfo',
         defaultMessage:
-          'Create a Fiscal Host to hold funds for multiple Collectives, or select a one that you already manage. Choose this option if you have a legal entity set up to handle accounting, taxes, payments, and liability for multiple Collectives.',
+          'Select or create your own Fiscal Host, which you manage. Choose this option if you have a legal entity set up to handle accounting, taxes, payments, and liability for multiple Collectives.',
       },
     });
   }
