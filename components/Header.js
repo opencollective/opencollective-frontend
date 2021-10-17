@@ -70,7 +70,9 @@ class Header extends React.Component {
     const title = this.props.title || (collective && collective.name);
     const image = this.props.image || (collective && getCollectiveImage(collective));
     const description = this.props.description || collective?.description || collective?.longDescription;
-    const metaTitle = title ? `${title} - Open Collective` : 'Open Collective';
+    const metaTitle = title
+      ? `${title} - ${collective && this.props.title !== collective.name ? collective.name : 'Open Collective'}`
+      : 'Open Collective';
     const defaultImage = `https://opencollective.com/static/images/opencollective-og-default.png`;
 
     const metas = [
