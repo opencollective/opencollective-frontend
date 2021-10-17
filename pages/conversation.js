@@ -9,6 +9,7 @@ import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { stripHTML } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
@@ -63,6 +64,7 @@ const conversationPageQuery = gqlV2/* GraphQL */ `
     conversation(id: $id) {
       id
       slug
+      summary
       title
       createdAt
       tags
@@ -165,9 +167,9 @@ class ConversationPage extends React.Component {
 
   static MAX_NB_FOLLOWERS_AVATARS = 4;
 
-  getPageMetaData(collective) {
-    if (collective) {
-      return { title: `${collective.name}'s conversations` };
+  getPageMetaData(conversation) {
+    if (conversation) {
+      return { title: conversation.title, description: stripHTML(conversation.summary) };
     } else {
       return { title: 'Conversations' };
     }
@@ -273,7 +275,7 @@ class ConversationPage extends React.Component {
     const canEdit = LoggedInUser && body && LoggedInUser.canEditComment(body);
     const canDelete = canEdit || (LoggedInUser && LoggedInUser.canEditCollective(collective));
     return (
-      <Page collective={collective} {...this.getPageMetaData(collective)}>
+      <Page collective={collective} {...this.getPageMetaData(conversation)}>
         {data.loading ? (
           <Container>
             <Loading />
