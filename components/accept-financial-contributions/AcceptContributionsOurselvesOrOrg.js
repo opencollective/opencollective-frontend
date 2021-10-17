@@ -232,7 +232,10 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
               <Fragment>
                 <Image src={acceptOrganizationIllustration} alt="" />
                 <H2 fontSize="20px" fontWeight="bold" color="black.900" textAlign="center">
-                  <FormattedMessage id="acceptContributions.organization.subtitle" defaultMessage="Our organization" />
+                  <FormattedMessage
+                    id="acceptContributions.organization.subtitle"
+                    defaultMessage="Our Own Fiscal Host"
+                  />
                 </H2>
               </Fragment>
             ) : (
