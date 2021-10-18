@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import propTypes from '@styled-system/prop-types';
 import { isNil, omitBy, truncate } from 'lodash';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import Select, { components as ReactSelectComponents } from 'react-select';
 import styled from 'styled-components';
 import { layout, space, typography } from 'styled-system';
@@ -79,8 +79,11 @@ const ValueContainer = ({ children, ...rest }) => {
   let elementNames;
 
   if (isTruncate) {
-    firstChild = [children[0].shift(), children[1]];
-    elementNames = children[0].map(child => child.props.data.label).join(', ');
+    firstChild = [children[0][0], children[1]];
+    elementNames = children[0]
+      .slice(1)
+      .map(child => child.props.data.label)
+      .join(', ');
   }
 
   return (
@@ -88,7 +91,12 @@ const ValueContainer = ({ children, ...rest }) => {
       {!isTruncate ? children : firstChild}
       {isTruncate && (
         <span title={elementNames}>
-          <u>{` and ${selectedCount - 1} others`}</u>
+          <u>
+            <FormattedMessage
+              defaultMessage="and {selectedCount} others"
+              values={{ selectedCount: selectedCount - 1 }}
+            />
+          </u>
         </span>
       )}
     </ReactSelectComponents.ValueContainer>
