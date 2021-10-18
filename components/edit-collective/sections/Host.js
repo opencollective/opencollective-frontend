@@ -384,13 +384,9 @@ class Host extends React.Component {
                 defaultMessage="Simply connect a bank account for a single Collective. You will be responsible for accounting, taxes, payments, and liability."
               />
               &nbsp;
-              <a
-                href="https://docs.opencollective.com/help/independent-collectives/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <StyledLink href="https://docs.opencollective.com/help/independent-collectives" openInNewTab>
                 <FormattedMessage id="moreInfo" defaultMessage="More info" />
-              </a>
+              </StyledLink>
               {selectedOption === 'selfHost' && LoggedInUser && (
                 <Flex
                   flexDirection={['column', 'row', 'row']}
@@ -448,13 +444,9 @@ class Host extends React.Component {
                 defaultMessage="Select or create your own Fiscal Host, which you manage to hold funds for multiple Collectives, to hold funds and do associated admin for this Collective."
               />
               &nbsp;
-              <a
-                href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <StyledLink href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host" openInNewTab>
                 <FormattedMessage id="moreInfo" defaultMessage="More info" />
-              </a>
+              </StyledLink>
               {selectedOption === 'ownHost' && LoggedInUser && (
                 <CreateHostFormWithData
                   collective={collective}
