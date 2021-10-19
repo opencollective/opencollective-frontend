@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import propTypes from '@styled-system/prop-types';
 import { isNil, omitBy, truncate } from 'lodash';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import Select, { components as ReactSelectComponents } from 'react-select';
 import styled from 'styled-components';
 import { layout, space, typography } from 'styled-system';
 
+import Container from './Container';
 import { Flex } from './Grid';
 import SearchIcon from './SearchIcon';
 import StyledHr from './StyledHr';
@@ -45,18 +46,63 @@ const SelectContainer = ({ innerProps, ...props }) => (
   />
 );
 
-// eslint-disable-next-line react/prop-types
-const MultiValue = ({ children, removeProps }) => {
+/* eslint-disable react/prop-types */
+const MultiValue = ({ children, removeProps, ...props }) => {
   if (typeof children === 'string') {
     children = truncate(children, { maxLength: 32 });
   }
 
+  if (props.selectProps.useCompactMode) {
+    return (
+      <StyledTag m="4px" variant="rounded" maxHeight="24px" closeButtonProps={removeProps}>
+        <Container maxWidth={16} overflow="hidden" title={props.data.label}>
+          {children}
+        </Container>
+      </StyledTag>
+    );
+  } else {
+    return (
+      <StyledTag m="4px" variant="rounded-right" maxHeight="none" closeButtonProps={removeProps}>
+        {children}
+      </StyledTag>
+    );
+  }
+};
+/* eslint-enable react/prop-types */
+
+/* eslint-disable react/prop-types */
+const ValueContainer = ({ children, ...rest }) => {
+  const selectedCount = rest.getValue().length;
+  const isTruncate = selectedCount > 3;
+
+  let firstChild = [];
+  let elementNames;
+
+  if (isTruncate) {
+    firstChild = [children[0][0], children[1]];
+    elementNames = children[0]
+      .slice(1)
+      .map(child => child.props.data.label)
+      .join(', ');
+  }
+
   return (
-    <StyledTag m="4px" variant="rounded-right" maxHeight="none" closeButtonProps={removeProps}>
-      {children}
-    </StyledTag>
+    <ReactSelectComponents.ValueContainer {...rest}>
+      {!isTruncate ? children : firstChild}
+      {isTruncate && (
+        <span title={elementNames}>
+          <u>
+            <FormattedMessage
+              defaultMessage="and {selectedCount} others"
+              values={{ selectedCount: selectedCount - 1 }}
+            />
+          </u>
+        </span>
+      )}
+    </ReactSelectComponents.ValueContainer>
   );
 };
+/* eslint-enable react/prop-types */
 
 const STYLES_DISPLAY_NONE = { display: 'none' };
 
@@ -98,7 +144,7 @@ const GroupHeading = ({ children, ...props }) => (
 /**
  * A map to override the default components of react-select
  */
-export const customComponents = { SelectContainer, Option, MultiValue, GroupHeading };
+export const customComponents = { SelectContainer, Option, MultiValue, GroupHeading, ValueContainer };
 export const searchableCustomComponents = { ...customComponents, DropdownIndicator: DropdownSearchIndicator };
 
 const getComponents = (components, useSearchIcon) => {
@@ -270,11 +316,14 @@ StyledSelect.propTypes = {
   styles: PropTypes.object,
   /** To render menu in a portal */
   menuPortalTarget: PropTypes.any,
+  /** Compact mode for rending multiple selections correctly **/
+  useCompactMode: PropTypes.bool,
 };
 
 StyledSelect.defaultProps = {
   fontSize: '14px',
   styles: {},
+  useCompactMode: false,
 };
 
 /** @component */
