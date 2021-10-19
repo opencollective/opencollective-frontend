@@ -85,7 +85,7 @@ class UpdatePage extends React.Component {
     const { account, update } = data;
     const comments = get(update, 'comments.nodes', []);
     return (
-      <Page collective={account} title={update.title} description={stripHTML(update.summary)}>
+      <Page collective={account} title={`${update.title} - ${account.name}`} description={stripHTML(update.summary)}>
         <CollectiveNavbar
           collective={account}
           isAdmin={LoggedInUser && LoggedInUser.canEditCollective(account)}
