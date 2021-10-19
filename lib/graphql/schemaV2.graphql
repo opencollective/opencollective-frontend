@@ -9155,6 +9155,11 @@ input OrderCreateInput {
   tier: TierReferenceInput
 
   """
+  Data related to this order
+  """
+  data: JSON
+
+  """
   If the tier has some "customFields", use this field to set their values
   """
   customData: JSON
