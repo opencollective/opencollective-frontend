@@ -1,5 +1,6 @@
 {
   "+n7iNv": "上个月",
+  "23P2mL": "You can view the status of your transaction at the Blockchain explorer: {link}",
   "2FA.PleaseEnterCode": "双重身份验证已启用：请输入您的密码。",
   "3ABdi3": "此帐户不存在",
   "7nUCu9": "时区",
@@ -2179,6 +2180,7 @@
   "VirtualCards.Policy.Reminder": "{hostName} Virtual Card use Policy",
   "VirtualCards.RequestCardButton": "Request card",
   "VirtualCards.Title": "Virtual Cards",
+  "vpMxUJ": "and {selectedCount} others",
   "W4SaxY": "Local",
   "warning.discardUnsavedChanges": "Are you sure you want to discard your unsaved changes?",
   "Warning.Important": "重要信息",
@@ -2212,6 +2214,7 @@
   "wtrPbi": "Are you sure you want to reset the expense form?",
   "YearlyBudget": "年度预算",
   "yes": "是的",
+  "yVPYIH": "Hosted",
   "ZonfjV": "You cannot edit this collective",
   "zWgbGg": "Today"
 }
