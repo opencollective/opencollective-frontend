@@ -5107,8 +5107,11 @@ type VirtualCard {
   data: JSONObject
   privateData: JSONObject
   provider: String
+<<<<<<< HEAD
   spendingLimitAmount: Int
   spendingLimitInterval: String
+=======
+>>>>>>> send provider info with virtual card assign
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -9476,12 +9479,16 @@ input VirtualCardInput {
   last4: String
   data: JSONObject
   privateData: JSONObject
+<<<<<<< HEAD
   provider: VirtualCardProvider
 }
 
 enum VirtualCardProvider {
   PRIVACY
   STRIPE
+=======
+  provider: String
+>>>>>>> send provider info with virtual card assign
 }
 
 input VirtualCardUpdateInput {

@@ -61,6 +61,7 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
           last4
           data
           privateData
+          provider
           createdAt
           account {
             id
