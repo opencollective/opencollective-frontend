@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field } from 'formik';
-import { get, isEmpty } from 'lodash';
+import { escape, get, isEmpty, unescape } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isURL } from 'validator';
 
@@ -166,7 +166,15 @@ const ExpenseItemForm = ({
                   version="simplified"
                 />
               ) : (
-                <Field as={StyledInput} {...inputProps} />
+                <Field name={inputProps.name}>
+                  {({ field, form: { setFieldValue } }) => (
+                    <StyledInput
+                      {...inputProps}
+                      value={unescape(field.value)}
+                      onChange={e => setFieldValue(inputProps.name, escape(e.target.value))}
+                    />
+                  )}
+                </Field>
               )
             }
           </StyledInputField>
