@@ -594,11 +594,15 @@ const ExpenseFormBody = ({
                         : formatMessage(msg.confirmClearExpenseForm)
                     }
                     continueHandler={() => {
-                      setStep(STEPS.PAYEE);
-                      resetForm({ values: expense || getDefaultExpense(collective) });
-                      if (formPersister) {
-                        formPersister.clearValues();
-                        window.scrollTo(0, 0);
+                      if (editingExpense) {
+                        onCancel();
+                      } else {
+                        setStep(STEPS.PAYEE);
+                        resetForm({ values: getDefaultExpense(collective) });
+                        if (formPersister) {
+                          formPersister.clearValues();
+                          window.scrollTo(0, 0);
+                        }
                       }
                       setShowResetModal(false);
                     }}
