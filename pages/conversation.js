@@ -169,7 +169,11 @@ class ConversationPage extends React.Component {
 
   getPageMetaData(collective, conversation) {
     if (collective && conversation) {
-      return { title: `${conversation.title} - ${collective.name}`, description: stripHTML(conversation.summary) };
+      return {
+        title: conversation.title,
+        description: stripHTML(conversation.summary),
+        metaTitle: `${conversation.title} - ${collective.name}`,
+      };
     } else {
       return { title: 'Conversations' };
     }
