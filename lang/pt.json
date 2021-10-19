@@ -1,5 +1,6 @@
 {
   "+n7iNv": "Past Month",
+  "23P2mL": "You can view the status of your transaction at the Blockchain explorer: {link}",
   "2FA.PleaseEnterCode": "Two-factor authentication enabled: please enter your code.",
   "3ABdi3": "This account doesn't exist",
   "7nUCu9": "Timezone",
@@ -540,7 +541,6 @@
   "ContributionFlow.PublicContribution": "Your name and contribution will be public.",
   "ContributionFlow.recurringAccountInfo": "Please provide a valid email. We need to create an account so you can manage your contribution.",
   "ContributionFlow.YourInfo": "Your info",
-  "ContributionFlowSuccess.Crypto.BlockchainExplorer": "You can view the status of your transaction at the Blockchain explorer: {link}",
   "Contributions": "Contribuições",
   "contributions.startAccepting": "Comece a aceitar contribuições",
   "contributions.subtitle": "To accept financial contributions, you need to complete your setup and decide where your funds will be held.",

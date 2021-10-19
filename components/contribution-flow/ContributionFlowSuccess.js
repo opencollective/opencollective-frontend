@@ -216,21 +216,19 @@ class ContributionFlowSuccess extends React.Component {
             values={I18nFormatters}
           />
           {` `}
-          {['BTC', 'ETH', 'BCH', 'LTC', 'ZEC', 'DOGE'].includes(pledgeCurrency) &&
-            this.props.intl.formatMessage(
-              {
-                id: 'ContributionFlowSuccess.Crypto.BlockchainExplorer',
-                defaultMessage: 'You can view the status of your transaction at the Blockchain explorer: {link}',
-              },
-              {
+          {['BTC', 'ETH', 'BCH', 'LTC', 'ZEC', 'DOGE'].includes(pledgeCurrency) && (
+            <FormattedMessage
+              defaultMessage="You can view the status of your transaction at the Blockchain explorer: {link}"
+              values={{
                 link: (
                   <StyledLink
                     openInNewTab
                     href={`https://blockchair.com/search?q=${depositAddress}`}
                   >{`https://blockchair.com/search?q=${depositAddress}`}</StyledLink>
                 ),
-              },
-            )}
+              }}
+            />
+          )}
         </MessageBox>
         <Flex px={3} mt={2}>
           <P fontSize="16px" color="black.700">
