@@ -227,12 +227,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     defaultMessage="Part of: {parentName}"
                     values={{
                       parentName: (
-                        <StyledLink
-                          as={LinkCollective}
-                          collective={collective.parentCollective}
-                          data-cy="parentCollectiveName"
-                          noTitle
-                        >
+                        <StyledLink as={LinkCollective} collective={collective.parentCollective} noTitle>
                           <TruncatedTextWithTooltip value={collective.parentCollective.name} cursor="pointer" />
                         </StyledLink>
                       ),
