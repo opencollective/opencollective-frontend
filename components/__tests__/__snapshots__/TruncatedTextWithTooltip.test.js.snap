@@ -14,6 +14,7 @@ exports[`TruncatedTextWithTooltip component renders default options 2`] = `
 
 <div
   className="c0"
+  cursor="help"
   display="inline-block"
   onMouseEnter={[Function]}
   onMouseLeave={[Function]}
