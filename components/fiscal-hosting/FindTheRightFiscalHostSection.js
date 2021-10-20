@@ -43,9 +43,8 @@ const messages = defineMessages({
     defaultMessage: 'Services offered',
   },
   'fiscalHosting.serviceOffered.description': {
-    id: 'fiscalHosting.legalStructure.description',
     defaultMessage:
-      'Do you want your host to be a charity, a company, a cooperative, or something else? E.g. a charity structure can enable tax-deductible donations, but may also have more restrictions on allowed activities.',
+      'Some Fiscal Hosts are very light-touch, while others provide significant support or programming and options like employment and insurance. Fiscal Hosts with a specific focus, such as open source projects or climate movement groups, may offer services specifically tailored to that community.',
   },
   'fiscalHosting.fees': {
     id: 'fiscalHosting.fees',
