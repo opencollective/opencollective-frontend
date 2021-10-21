@@ -208,8 +208,6 @@ const ExpenseSummary = ({
                           content={attachment.description}
                           fontSize="12px"
                           data-cy="comment-body"
-                          sanitize
-                          collapsable
                           color="black.900"
                           fontWeight="500"
                         />

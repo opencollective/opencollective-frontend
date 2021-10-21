@@ -1,6 +1,5 @@
 {
   "+n7iNv": "Past Month",
-  "/+PmtL": "Read Summary",
   "2FA.PleaseEnterCode": "Two-factor authentication enabled: please enter your code.",
   "3ABdi3": "This account doesn't exist",
   "7nUCu9": "Timezone",
@@ -2170,6 +2169,7 @@
   "VirtualCards.Policy.Reminder": "{hostName} Virtual Card use Policy",
   "VirtualCards.RequestCardButton": "Request card",
   "VirtualCards.Title": "Virtual Cards",
+  "W/V6+Y": "Collapse",
   "W4SaxY": "Local",
   "warning.discardUnsavedChanges": "Are you sure you want to discard your unsaved changes?",
   "Warning.Important": "중요",

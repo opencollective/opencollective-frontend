@@ -1,14 +1,11 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
 import { CaretUp } from '@styled-icons/fa-solid/CaretUp';
 import { getLuminance } from 'polished';
 import { FormattedMessage } from 'react-intl';
-import sanitizeHtml from 'sanitize-html';
 import styled, { css } from 'styled-components';
 import { space, typography } from 'styled-system';
-
-import { truncate } from '../lib/utils';
 
 /**
  * React-Quill usually saves something like `<p><br/></p` when saving with an empty
@@ -40,8 +37,13 @@ const ReadFullLink = styled.a`
   }
 `;
 
-const DisplayBox = styled.div`
+const InlineDisplayBox = styled.div`
   display: inline;
+`;
+
+const CollapsedDisplayBox = styled.div`
+  overflow-y: hidden;
+  max-height: 20px;
 `;
 
 /**
@@ -53,25 +55,26 @@ const DisplayBox = styled.div`
  * ⚠️ Be careful! This component will pass content to `dangerouslySetInnerHTML` so
  * always ensure `content` is properly sanitized!
  */
-const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
+const HTMLContent = styled(({ content, ...props }) => {
   const [isOpen, setOpen] = React.useState(false);
+  const [collapsable, setCollapsable] = React.useState(false);
+  const contentRef = useRef();
+
+  const DisplayBox = isOpen && collapsable ? InlineDisplayBox : CollapsedDisplayBox;
+
+  useEffect(() => {
+    if (contentRef?.current?.textContent?.length > 60) {
+      setCollapsable(true);
+    }
+  }, [content]);
+
   if (!content) {
     return <div {...props} />;
-  }
-  const truncatedContent = truncate(content, 100);
-  let __html = sanitize ? sanitizeHtml(content) : content;
-
-  if (collapsable && !isOpen) {
-    // Hide "Read full description" if we can display everything in the firstSentence
-    if (!truncatedContent.endsWith('…')) {
-      collapsable = false;
-    }
-    __html = truncatedContent;
   }
 
   return (
     <div>
-      <DisplayBox collapsed={collapsable && !isOpen} dangerouslySetInnerHTML={{ __html }} {...props} />
+      <DisplayBox ref={contentRef} dangerouslySetInnerHTML={{ __html: content }} {...props} />
       {!isOpen && collapsable && (
         <ReadFullLink
           onClick={() => setOpen(true)}
@@ -102,7 +105,7 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
             }
           }}
         >
-          <FormattedMessage defaultMessage="Read Summary" />
+          <FormattedMessage defaultMessage="Collapse" />
           <CaretUp size="10px" />
         </ReadFullLink>
       )}
