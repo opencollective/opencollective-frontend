@@ -266,11 +266,14 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                           parentName: (
                             <StyledLink
                               as={LinkCollective}
-                              collective={firstConnectedAccount}
+                              collective={firstConnectedAccount.collective}
                               noTitle
                               color="black.700"
                             >
-                              <TruncatedTextWithTooltip value={firstConnectedAccount.name} cursor="pointer" />
+                              <TruncatedTextWithTooltip
+                                value={firstConnectedAccount.collective.name}
+                                cursor="pointer"
+                              />
                             </StyledLink>
                           ),
                         }}

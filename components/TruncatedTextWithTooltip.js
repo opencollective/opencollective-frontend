@@ -10,7 +10,7 @@ import { Span } from './Text';
  * provided length.
  */
 const TruncatedTextWithTooltip = ({ value, cursor, length = 30 }) => {
-  if (value.length <= length) {
+  if (value?.length <= length) {
     return value;
   } else {
     return (
