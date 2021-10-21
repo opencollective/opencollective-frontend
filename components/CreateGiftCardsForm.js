@@ -577,6 +577,7 @@ class CreateGiftCardsForm extends Component {
                     defaultValue={values.limitedToHosts}
                     onChange={options => this.onChange('limitedToHosts', options)}
                     isMulti
+                    useCompactMode
                   />
                 </InlineField>
               </Entry>

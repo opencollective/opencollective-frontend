@@ -60,6 +60,7 @@ const CollectiveFilter = ({ onChange, virtualCardCollectives }) => {
         <StyledSelect
           inputId="virtual-card-collective-picker"
           isMulti={true}
+          useCompactMode
           options={getAllCollectives()}
           value={findCollectiveFilters()}
           onChange={selectedValues => {

@@ -1856,6 +1856,38 @@ type Host implements Account & AccountWithContributions {
   ): VirtualCardCollection!
   hostedVirtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   hostedVirtualCardCollectives(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+  contributionStats(
+    """
+    A collection of accounts for which the contribution stats should be returned.
+    """
+    account: [AccountReferenceInput!]
+
+    """
+    Calculate contribution statistics beginning from this date.
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate contribution statistics until this date.
+    """
+    dateTo: DateTime
+  ): ContributionStats!
+  expenseStats(
+    """
+    A collection of accounts for which the expense stats should be returned.
+    """
+    account: [AccountReferenceInput!]
+
+    """
+    Calculate expense statistics beginning from this date.
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate expense statistics until this date.
+    """
+    dateTo: DateTime
+  ): ExpenseStats!
 }
 
 """
@@ -2662,6 +2694,61 @@ enum HostApplicationStatus {
   APPROVED
   REJECTED
   EXPIRED
+}
+
+"""
+Contribution statistics related to the given accounts
+"""
+type ContributionStats {
+  """
+  The total number of contributions
+  """
+  contributionsCount: Int!
+
+  """
+  Number of one time contributions
+  """
+  oneTimeContributionsCount: Int!
+
+  """
+  Number of recurring contributions
+  """
+  recurringContributionsCount: Int!
+
+  """
+  The daily average income
+  """
+  dailyAverageIncomeAmount: Amount!
+}
+
+"""
+Expense statistics related to the given accounts
+"""
+type ExpenseStats {
+  """
+  The total number of expenses
+  """
+  expensesCount: Int!
+
+  """
+  The daily average paid in expenses
+  """
+  dailyAverageAmount: Amount!
+
+  """
+  Number of invoices
+  """
+  invoicesCount: Int!
+
+  """
+  Number of reimbursements
+  """
+  reimbursementsCount: Int!
+
+  """
+  Number of grants
+  """
+  grantsCount: Int!
 }
 
 type OrderTax {
@@ -8731,6 +8818,7 @@ input NewAccountOrReferenceInput {
   """
   slug: String
   name: String
+  legalName: String
   email: String
   organization: NewAccountOrganizationInput
   newsletterOptIn: Boolean
@@ -8738,6 +8826,7 @@ input NewAccountOrReferenceInput {
 
 input NewAccountOrganizationInput {
   name: String
+  legalName: String
   slug: String
   description: String
   website: String
@@ -9064,6 +9153,11 @@ input OrderCreateInput {
   The tier you are contributing to
   """
   tier: TierReferenceInput
+
+  """
+  Data related to this order
+  """
+  data: JSON
 
   """
   If the tier has some "customFields", use this field to set their values

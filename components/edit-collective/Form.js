@@ -448,12 +448,10 @@ class EditCollectiveForm extends React.Component {
         return (
           <Tickets
             title="Tickets"
-            types={['TICKET']}
             tiers={this.state.tickets}
             collective={collective}
             currency={collective.currency}
             onChange={tickets => this.setState({ tickets, modified: true })}
-            defaultType="TICKET"
           />
         );
 

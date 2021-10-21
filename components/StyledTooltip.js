@@ -6,6 +6,8 @@ import styled from 'styled-components';
 import { verticalAlign } from 'styled-system';
 import { v4 as uuid } from 'uuid';
 
+import { cursor } from '../lib/styled-system-custom-properties';
+
 const StyledTooltipContainer = styled(`div`)`
   max-width: 320px;
   z-index: 1000000;
@@ -85,7 +87,7 @@ const Arrow = styled('div')`
 const ChildrenContainer = styled.div`
   display: ${props => props.display};
   ${verticalAlign}
-  cursor: help;
+  ${cursor}
   button:disabled {
     pointer-events: none;
   }
@@ -145,6 +147,7 @@ class StyledTooltip extends React.Component {
     display: PropTypes.string,
     /** Vertical alignment of the container */
     containerVerticalAlign: PropTypes.string,
+    containerCursor: PropTypes.string,
     delayHide: PropTypes.number,
     /** The component that will be used as a container for the children */
     childrenContainer: PropTypes.any,
@@ -160,6 +163,7 @@ class StyledTooltip extends React.Component {
     place: 'top',
     delayHide: 500,
     display: 'inline-block',
+    containerCursor: 'help',
   };
 
   state = { id: null, isHovered: false, showPopup: false }; // We only set `id` on the client to avoid mismatches with SSR
@@ -211,6 +215,7 @@ class StyledTooltip extends React.Component {
                   onMouseEnter={this.onMouseEnter}
                   onMouseLeave={this.onMouseLeave}
                   verticalAlign={this.props.containerVerticalAlign}
+                  cursor={this.props.containerCursor}
                 >
                   {this.props.children}
                 </ChildrenContainer>

@@ -223,13 +223,11 @@ const HTMLContent = styled(({ content, ...props }) => {
 HTMLContent.propTypes = {
   /** The HTML string. Makes sure this is sanitized properly! */
   content: PropTypes.string,
-  sanitize: PropTypes.bool,
   collapsable: PropTypes.bool,
 };
 
 HTMLContent.defaultProps = {
   fontSize: '14px',
-  sanitize: false,
 };
 
 export default HTMLContent;

@@ -203,19 +203,12 @@ const ExpenseSummary = ({
                 <Flex justifyContent="space-between" alignItems="baseline" flex="1">
                   <Flex flexDirection="column" justifyContent="center" flexGrow="1">
                     {attachment.description ? (
-                      isFundingRequest ? (
-                        <HTMLContent
-                          content={attachment.description}
-                          fontSize="12px"
-                          data-cy="comment-body"
-                          color="black.900"
-                          fontWeight="500"
-                        />
-                      ) : (
-                        <Span as="div" color="black.900" fontWeight="500">
-                          {attachment.description}
-                        </Span>
-                      )
+                      <HTMLContent
+                        content={attachment.description}
+                        fontSize="12px"
+                        color="black.900"
+                        fontWeight="500"
+                      />
                     ) : (
                       <Span color="black.500" fontStyle="italic">
                         <FormattedMessage id="NoDescription" defaultMessage="No description provided" />

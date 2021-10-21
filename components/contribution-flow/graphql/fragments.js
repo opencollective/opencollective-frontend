@@ -112,6 +112,7 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
     legacyId
     status
     frequency
+    data
     amount {
       value
       valueInCents

@@ -194,13 +194,16 @@ class ContributionFlow extends React.Component {
             guestInfo,
             fromAccount,
             toAccount: pick(this.props.collective, ['id']),
-            customData:
+            data:
               this.props.paymentFlow === PAYMENT_FLOW.CRYPTO
                 ? {
-                    pledgeAmount: stepDetails.amount,
-                    pledgeCurrency: stepDetails.currency.value,
+                    thegivingblock: {
+                      pledgeAmount: stepDetails.amount,
+                      pledgeCurrency: stepDetails.currency.value,
+                    },
                   }
-                : stepDetails.customData,
+                : null,
+            customData: stepDetails.customData,
             paymentMethod: await this.getPaymentMethod(),
             platformContributionAmount: getGQLV2AmountInput(stepDetails.platformContribution, undefined),
             tier: this.props.tier && { legacyId: this.props.tier.legacyId },
