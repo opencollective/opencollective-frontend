@@ -221,9 +221,7 @@ const HTMLContent = styled(({ content, ...props }) => {
 `;
 
 HTMLContent.propTypes = {
-  /** The HTML string. Makes sure this is sanitized properly! */
   content: PropTypes.string,
-  collapsable: PropTypes.bool,
 };
 
 HTMLContent.defaultProps = {
