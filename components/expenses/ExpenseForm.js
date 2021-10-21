@@ -343,11 +343,8 @@ const ExpenseFormBody = ({
         payoutProfiles={payoutProfiles}
         loggedInAccount={loggedInAccount}
         onNext={() => {
-          // TODO: Remove the console.logs here once the issue is resolved
           const shouldSkipValidation = isOnBehalf && isEmpty(values.payoutMethod);
-          console.log('Expense Form > Payee step: Going next', { shouldSkipValidation });
           const validation = !shouldSkipValidation && validatePayoutMethod(values.payoutMethod);
-          console.log('Expense Form > Payee step: Validation result', validation);
           if (isEmpty(validation)) {
             setStep(STEPS.EXPENSE);
           } else {
