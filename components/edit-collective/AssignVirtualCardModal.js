@@ -243,7 +243,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label="Which collective will be assigned to this card?"
+              label={<FormattedMessage defaultMessage="Which collective will be assigned to this card?" />}
               htmlFor="collective"
               error={formik.touched.collective && formik.errors.collective}
             >
@@ -269,7 +269,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label="Which user will be responsible for this card?"
+              label={<FormattedMessage defaultMessage="Which user will be responsible for this card?" />}
               htmlFor="assignee"
               error={formik.touched.assignee && formik.errors.assignee}
             >
@@ -314,7 +314,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label="Card number"
+              label={<FormattedMessage defaultMessage="Card number" />}
               htmlFor="number"
               error={formik.touched.cardNumber && formik.errors.cardNumber}
             >
@@ -364,7 +364,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
             </StyledInputField>
             <StyledInputField
               labelFontSize="13px"
-              label="Expire date"
+              label={<FormattedMessage defaultMessage="Expire date" />}
               htmlFor="expireDate"
               error={formik.touched.expireDate && formik.errors.expireDate}
             >
@@ -384,7 +384,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
             </StyledInputField>
             <StyledInputField
               labelFontSize="13px"
-              label="CVV/CVC"
+              label={<FormattedMessage defaultMessage="CVV/CVC" />}
               htmlFor="cvv"
               error={formik.touched.cvv && formik.errors.cvv}
             >
