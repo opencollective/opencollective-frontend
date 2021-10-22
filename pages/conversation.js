@@ -261,7 +261,7 @@ class ConversationPage extends React.Component {
     // refetch before fetching more as comments added to the cache can change the offset
     await data.refetch();
     await data.fetchMore({
-      variables: { collectiveSlug, id, offset: get(data, 'conversation.comments.nodes').length },
+      variables: { collectiveSlug, id, offset: get(data, 'conversation.comments.nodes', []).length },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) {
           return prev;

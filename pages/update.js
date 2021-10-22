@@ -82,7 +82,7 @@ class UpdatePage extends React.Component {
     // refetch before fetching more as comments added to the cache can change the offset
     await data.refetch();
     await data.fetchMore({
-      variables: { collectiveSlug, updateSlug, offset: get(data, 'update.comments.nodes').length },
+      variables: { collectiveSlug, updateSlug, offset: get(data, 'update.comments.nodes', []).length },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) {
           return prev;

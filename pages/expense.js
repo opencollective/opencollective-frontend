@@ -368,7 +368,7 @@ class ExpensePage extends React.Component {
     // refetch before fetching more as comments added to the cache can change the offset
     await data.refetch();
     await data.fetchMore({
-      variables: { legacyExpenseId, draftKey, offset: get(data, 'expense.comments.nodes').length },
+      variables: { legacyExpenseId, draftKey, offset: get(data, 'expense.comments.nodes', []).length },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) {
           return prev;
