@@ -18,6 +18,7 @@ import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
 import Container from '../components/Container';
 import CommentForm from '../components/conversations/CommentForm';
+import { commentFieldsFragment } from '../components/conversations/graphql';
 import Thread from '../components/conversations/Thread';
 import ErrorPage from '../components/ErrorPage';
 import ExpenseAdminActions from '../components/expenses/ExpenseAdminActions';
@@ -57,9 +58,15 @@ const messages = defineMessages({
 });
 
 const expensePageQuery = gqlV2/* GraphQL */ `
-  query ExpensePage($legacyExpenseId: Int!, $draftKey: String) {
+  query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int) {
     expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
       ...ExpensePageExpenseFields
+      comments(limit: 100, offset: $offset) {
+        totalCount
+        nodes {
+          ...CommentFields
+        }
+      }
     }
 
     loggedInAccount {
@@ -69,6 +76,7 @@ const expensePageQuery = gqlV2/* GraphQL */ `
 
   ${loggedInAccountExpensePayoutFieldsFragment}
   ${expensePageExpenseFieldsFragment}
+  ${commentFieldsFragment}
 `;
 
 const editExpenseMutation = gqlV2/* GraphQL */ `
@@ -343,13 +351,42 @@ class ExpensePage extends React.Component {
     // Add comment to cache if not already fetched
     const [data, query, variables] = this.clonePageQueryCacheData();
     update(data, 'expense.comments.nodes', comments => uniqBy([...comments, comment], 'id'));
+    update(data, 'expense.comments.totalCount', totalCount => totalCount + 1);
     this.props.client.writeQuery({ query, variables, data });
   };
 
   onCommentDeleted = comment => {
     const [data, query, variables] = this.clonePageQueryCacheData();
     update(data, 'expense.comments.nodes', comments => comments.filter(c => c.id !== comment.id));
+    update(data, 'expense.comments.totalCount', totalCount => totalCount - 1);
     this.props.client.writeQuery({ query, variables, data });
+  };
+
+  fetchMore = async () => {
+    const { legacyExpenseId, draftKey, data } = this.props;
+
+    // refetch before fetching more as comments added to the cache can change the offset
+    await data.refetch();
+    await data.fetchMore({
+      variables: { legacyExpenseId, draftKey, offset: get(data, 'expense.comments.nodes', []).length },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) {
+          return prev;
+        }
+
+        const newValues = {};
+
+        newValues.expense = {
+          ...prev.expense,
+          comments: {
+            ...fetchMoreResult.expense.comments,
+            nodes: [...prev.expense.comments.nodes, ...fetchMoreResult.expense.comments.nodes],
+          },
+        };
+
+        return Object.assign({}, prev, newValues);
+      },
+    });
   };
 
   getPayoutProfiles = memoizeOne(loggedInAccount => {
@@ -416,6 +453,12 @@ class ExpensePage extends React.Component {
     const skipSummary = isMissingReceipt && status === PAGE_STATUS.EDIT;
 
     const payoutProfiles = this.getPayoutProfiles(loggedInAccount);
+
+    let threadItems;
+
+    if (expense) {
+      threadItems = this.getThreadItems(expense.comments?.nodes, expense.activities);
+    }
 
     return (
       <Page collective={collective} {...this.getPageMetaData(expense)}>
@@ -669,7 +712,9 @@ class ExpensePage extends React.Component {
               <Box mb={3} pt={3}>
                 <Thread
                   collective={collective}
-                  items={this.getThreadItems(expense.comments?.nodes, expense.activities)}
+                  hasMore={expense.comments?.totalCount > threadItems.length}
+                  items={threadItems}
+                  fetchMore={this.fetchMore}
                   onCommentDeleted={this.onCommentDeleted}
                 />
               </Box>

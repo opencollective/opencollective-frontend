@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 import styled, { css, withTheme } from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import CommentIconLib from '../icons/CommentIcon';
+import StyledButton from '../StyledButton';
 import { withUser } from '../UserProvider';
 
 import Comment from './Comment';
@@ -32,12 +34,21 @@ const ItemContainer = styled.div`
 /**
  * A thread is meant to display comments and activities in a chronological order.
  */
-const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme }) => {
+const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasMore, fetchMore }) => {
+  const [loading, setLoading] = React.useState(false);
+
   if (!items || items.length === 0) {
     return null;
   }
 
   const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(collective);
+
+  const handleLoadMore = async () => {
+    setLoading(true);
+    await fetchMore();
+    setLoading(false);
+  };
+
   return (
     <div data-cy="thread">
       {items.map((item, idx) => {
@@ -84,6 +95,13 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme }) =>
         }
       })}
       <hr />
+      {hasMore && fetchMore && (
+        <Container margin="1rem">
+          <StyledButton onClick={handleLoadMore} loading={loading} textTransform="capitalize">
+            <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
+          </StyledButton>
+        </Container>
+      )}
     </div>
   );
 };
@@ -102,6 +120,10 @@ Thread.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string,
   }).isRequired,
+  /** Indicate whether there are more comments to fetch */
+  hasMore: PropTypes.bool,
+  /** function to fetch more comments */
+  fetchMore: PropTypes.func,
   /** @ignore from withUser */
   LoggedInUser: PropTypes.object,
   /** @ignore from withTheme */
