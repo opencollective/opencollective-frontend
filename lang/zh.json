@@ -2182,6 +2182,7 @@
   "VirtualCards.Title": "Virtual Cards",
   "vpMxUJ": "and {selectedCount} others",
   "W4SaxY": "Local",
+  "Warning.AccountHolderNameNotValid": "Please make sure this name matches exactly what is written on your bank account details, otherwise the payment might fail.",
   "warning.discardUnsavedChanges": "Are you sure you want to discard your unsaved changes?",
   "Warning.Important": "重要信息",
   "Warning.LegalNameNotMatchBankAccountName": "The legal name should match the bank account holder name in most cases. Otherwise payments may be delayed. If the payment is to an organization, please select or create that organization's profile instead of your individual profile as the payee.",
