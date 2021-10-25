@@ -296,7 +296,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                           fontSize="12px"
                           mr={2}
                         >
-                          <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal sponsorship" />
+                          <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal hosting" />
                         </StyledLink>
                       )}
                       <Container ml={2} mr={3} color="black.700" fontSize="12px">

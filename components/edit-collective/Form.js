@@ -122,7 +122,7 @@ class EditCollectiveForm extends React.Component {
       'tags.label': { id: 'Tags', defaultMessage: 'Tags' },
       'tos.label': {
         id: 'host.tos',
-        defaultMessage: 'Terms of fiscal sponsorship',
+        defaultMessage: 'Terms of fiscal hosting',
       },
       'tos.description': {
         id: 'collective.tos.description',

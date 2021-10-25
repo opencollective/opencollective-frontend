@@ -1318,7 +1318,7 @@
   "host.platformFee.help": "The Platform fee is what Open Collective charges for use of the software.",
   "Host.PlatformTip.description": "Tips for Open Collective are collected from contributions to your collectives. They are deposited along with the transaction to your organization's bank account, and we claim them at the end of each month with an expense.",
   "host.selfHost.confirm": "Yes, Activate Independent Collective",
-  "host.tos": "Conditions de l'hôte fiscal",
+  "host.tos": "Terms of fiscal hosting",
   "Host.TOSCheckbox": "J'accepte les <TOSLink>conditions d'utilisation</TOSLink> de {hostName}",
   "host.types.label": "Select Host type",
   "host.types.organization.label": "An Organization",

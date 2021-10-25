@@ -1318,7 +1318,7 @@
   "host.platformFee.help": "A Taxa da Plataforma é o que a Open Collective cobra pelo uso do software.",
   "Host.PlatformTip.description": "Tips for Open Collective are collected from contributions to your collectives. They are deposited along with the transaction to your organization's bank account, and we claim them at the end of each month with an expense.",
   "host.selfHost.confirm": "Yes, Activate Independent Collective",
-  "host.tos": "Termos do patrocínio fiscal",
+  "host.tos": "Terms of fiscal hosting",
   "Host.TOSCheckbox": "Eu concordo com os <TOSLink>termos de serviço</TOSLink> de {hostName}",
   "host.types.label": "Selecionar tipo de Host",
   "host.types.organization.label": "Uma Organização",
