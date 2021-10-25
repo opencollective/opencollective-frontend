@@ -19,8 +19,10 @@ import { display } from 'styled-system';
 import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
 import { getFilteredSectionsForCollective, isSectionEnabled, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
+import { getEnvVar } from '../../lib/env-utils';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import { getSettingsRoute } from '../../lib/url-helpers';
+import { parseToBoolean } from '../../lib/utils';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -272,6 +274,8 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return null;
   }
 
+  const hasNewAdminPanel = parseToBoolean(getEnvVar('NEW_ADMIN_DASHBOARD'));
+
   // Order of the condition defines main call to action: first match gets displayed
   if (callsToAction.includes(NAVBAR_ACTION_TYPE.SETTINGS)) {
     return {
@@ -281,13 +285,17 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
           <ActionButton tabIndex="-1">
             <Settings size="1em" />
             <Span ml={2}>
-              <FormattedMessage id="Settings" defaultMessage="Settings" />
+              {collective.isHost && hasNewAdminPanel ? (
+                <FormattedMessage defaultMessage="Admin panel" />
+              ) : (
+                <FormattedMessage id="Settings" defaultMessage="Settings" />
+              )}
             </Span>
           </ActionButton>
         </Link>
       ),
     };
-  } else if (callsToAction.includes('hasDashboard')) {
+  } else if (callsToAction.includes('hasDashboard') && !hasNewAdminPanel) {
     return {
       type: NAVBAR_ACTION_TYPE.DASHBOARD,
       component: (
