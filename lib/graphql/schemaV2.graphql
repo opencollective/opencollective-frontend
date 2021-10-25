@@ -1888,6 +1888,11 @@ type Host implements Account & AccountWithContributions {
     """
     dateTo: DateTime
   ): ExpenseStats!
+
+  """
+  Returns whether the host is trusted or not
+  """
+  isTrustedHost: Boolean!
 }
 
 """
@@ -2377,6 +2382,8 @@ type CollectiveFeatures {
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
   ALIPAY: CollectiveFeatureStatus
+  USE_PAYMENT_METHODS: CollectiveFeatureStatus
+  EMIT_GIFT_CARDS: CollectiveFeatureStatus
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
 }
