@@ -9,6 +9,7 @@ const hostTermsQuery = gqlV2/* GraphQL */ `
     host(slug: $hostCollectiveSlug) {
       id
       settings
+      isTrustedHost
     }
   }
 `;
@@ -21,8 +22,15 @@ const TermsOfFiscalSponsorship = ({ hostCollectiveSlug }) => {
     skip: !hostCollectiveSlug,
   });
 
-  if (!loading && data.host.settings.tos) {
-    router.push({ pathname: '/external-redirect', query: { url: data.host.settings.tos } });
+  const termsOfService = data?.host?.settings?.tos;
+  const isTrustedHost = data?.host?.isTrustedHost;
+
+  if (!loading && termsOfService) {
+    if (isTrustedHost) {
+      router.push(data.host.settings.tos);
+    } else {
+      router.push({ pathname: '/external-redirect', query: { url: termsOfService } });
+    }
   }
 
   return null;
