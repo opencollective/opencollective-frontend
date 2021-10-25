@@ -38,12 +38,13 @@ const ReadFullLink = styled.a`
 `;
 
 const InlineDisplayBox = styled.div`
-  display: inline;
+  overflow-y: hidden;
 `;
 
-const CollapsedDisplayBox = styled.div`
-  overflow-y: hidden;
-  max-height: 20px;
+const CollapsedDisplayBox = styled(InlineDisplayBox)`
+  max-height: 40px;
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 `;
 
 /**
@@ -60,10 +61,17 @@ const HTMLContent = styled(({ content, ...props }) => {
   const [collapsable, setCollapsable] = React.useState(false);
   const contentRef = useRef();
 
-  const DisplayBox = isOpen && collapsable ? InlineDisplayBox : CollapsedDisplayBox;
+  let DisplayBox;
+  if (!collapsable) {
+    DisplayBox = InlineDisplayBox;
+  } else if (collapsable && isOpen) {
+    DisplayBox = InlineDisplayBox;
+  } else if (collapsable && !isOpen) {
+    DisplayBox = CollapsedDisplayBox;
+  }
 
   useEffect(() => {
-    if (contentRef?.current?.clientHeight >= 20) {
+    if (contentRef?.current?.clientHeight > 21) {
       setCollapsable(true);
     }
   }, [content]);
