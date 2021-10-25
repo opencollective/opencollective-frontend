@@ -109,7 +109,11 @@ const Menu = ({ collective }) => {
             section={COLLECTIVE_SECTIONS.POLICIES}
             if={isOneOfTypes(collective, [COLLECTIVE, FUND])}
           />
-          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.EXPORT} if={isType(collective, COLLECTIVE)} />
+          <MenuLink
+            collective={collective}
+            section={COLLECTIVE_SECTIONS.EXPORT}
+            if={isOneOfTypes(collective, [COLLECTIVE, EVENT])}
+          />
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.HOST}
