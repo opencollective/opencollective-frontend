@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { clamp, isNil, round } from 'lodash';
@@ -13,6 +13,7 @@ import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
+import StyledCheckbox from '../StyledCheckbox';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../StyledModal';
 import StyledRadioList from '../StyledRadioList';
@@ -38,7 +39,13 @@ const getDefaultFee = (collective, host) => {
 };
 
 const editAccountFeeStructureMutation = gqlV2/* GraphQL */ `
-  mutation EditAccountFeesStructure($account: AccountReferenceInput!, $hostFeePercent: Float!, $isCustomFee: Boolean!) {
+  mutation EditAccountFeesStructure(
+    $account: AccountReferenceInput!
+    $hostFeePercent: Float!
+    $isCustomFee: Boolean!
+    $key: AccountSettingsKey!
+    $value: JSON!
+  ) {
     editAccountFeeStructure(account: $account, hostFeePercent: $hostFeePercent, isCustomFee: $isCustomFee) {
       id
       ... on AccountWithHost {
@@ -46,23 +53,65 @@ const editAccountFeeStructureMutation = gqlV2/* GraphQL */ `
         hostFeePercent
       }
     }
+
+    editAccountSetting(account: $account, key: $key, value: $value) {
+      id
+      settings
+    }
   }
 `;
 
 const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
   const intl = useIntl();
-  const [hostFeePercent, setHostFeePercent] = React.useState(getDefaultFee(collective, host));
-  const [selectedOption, setSelectedOption] = React.useState(
+  const [hostFeePercent, setHostFeePercent] = useState(getDefaultFee(collective, host));
+  const [selectedOption, setSelectedOption] = useState(
     hostFeePercent === host.hostFeePercent ? HOST_FEE_STRUCTURE.DEFAULT : HOST_FEE_STRUCTURE.CUSTOM_FEE,
   );
+  const [isInvoice, setIsInvoice] = useState(collective?.settings?.expenseTypes?.isInvoice || true);
+  const [isReimbursement, setIsReimbursement] = useState(collective?.settings?.expenseTypes?.isReimbursement || true);
+  const [isGrant, setIsGrant] = useState(collective?.settings?.expenseTypes?.isGrant || false);
   const [submitFeesStructure, { loading, error }] = useMutation(editAccountFeeStructureMutation, {
     context: API_V2_CONTEXT,
   });
+  console.log(isInvoice);
 
   return (
     <StyledModal show maxWidth={432} trapFocus {...props}>
       <CollectiveModalHeader collective={collective} mb={3} />
       <ModalBody>
+        <P fontSize="16px" lineHeight="24px" fontWeight="500" mb={2}>
+          <FormattedMessage defaultMessage="Expense types" />
+        </P>
+        <Flex mb="23px" mx="8px" justifyContent="space-between">
+          <StyledCheckbox
+            name="invoice"
+            fontSize="12px"
+            defaultChecked={isInvoice}
+            label={<FormattedMessage defaultMessage="Invoice" />}
+            onChange={({ checked }) => {
+              setIsInvoice(checked);
+            }}
+          />
+          <StyledCheckbox
+            name="reimbursement"
+            fontSize="12px"
+            defaultChecked={isReimbursement}
+            label={<FormattedMessage defaultMessage="Reimbursement" />}
+            onChange={({ checked }) => {
+              setIsReimbursement(checked);
+            }}
+          />
+          <StyledCheckbox
+            name="grant"
+            fontSize="12px"
+            defaultChecked={isGrant}
+            label={<FormattedMessage defaultMessage="Grant" />}
+            onChange={({ checked }) => {
+              setIsGrant(checked);
+            }}
+          />
+        </Flex>
+
         <P fontSize="16px" lineHeight="24px" fontWeight="500" mb={2}>
           <FormattedMessage id="CollectiveFeesForm.Title" defaultMessage="Set fee structure" />
         </P>
@@ -134,6 +183,8 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
                   account: { id: collective.id },
                   hostFeePercent: isCustomFee ? hostFeePercent : host.hostFeePercent,
                   isCustomFee,
+                  key: 'expenseTypes',
+                  value: { isInvoice, isReimbursement, isGrant },
                 },
               }).then(props.onClose);
             }}
@@ -154,6 +205,7 @@ CollectiveFeesStructureModal.propTypes = {
   collective: PropTypes.shape({
     id: PropTypes.string,
     hostFeePercent: PropTypes.number,
+    settings: PropTypes.object,
   }).isRequired,
   host: PropTypes.shape({
     slug: PropTypes.string,

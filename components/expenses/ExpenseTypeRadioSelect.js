@@ -153,18 +153,22 @@ const ExpenseTypeRadioSelect = ({ name, onChange, value, options = {} }) => {
     <StyledCard>
       <Fieldset onChange={onChange}>
         <Flex flexDirection={['column', 'row']} overflow="hidden">
-          <ExpenseTypeOption
-            name={name}
-            type={expenseTypes.RECEIPT}
-            isChecked={value === expenseTypes.RECEIPT}
-            onChange={onChange}
-          />
-          <ExpenseTypeOption
-            name={name}
-            type={expenseTypes.INVOICE}
-            isChecked={value === expenseTypes.INVOICE}
-            onChange={onChange}
-          />
+          {options.invoice && (
+            <ExpenseTypeOption
+              name={name}
+              type={expenseTypes.RECEIPT}
+              isChecked={value === expenseTypes.RECEIPT}
+              onChange={onChange}
+            />
+          )}
+          {options.reimbursement && (
+            <ExpenseTypeOption
+              name={name}
+              type={expenseTypes.INVOICE}
+              isChecked={value === expenseTypes.INVOICE}
+              onChange={onChange}
+            />
+          )}
           {options.fundingRequest && (
             <ExpenseTypeOption
               name={name}
