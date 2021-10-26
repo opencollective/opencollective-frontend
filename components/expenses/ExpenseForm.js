@@ -6,7 +6,6 @@ import { first, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../../lib/constants/collectives';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -373,11 +372,7 @@ const ExpenseFormBody = ({
           options={{
             invoice: collective.settings?.expenseTypes?.isInvoice !== false,
             reimbursement: collective.settings?.expenseTypes?.isReimbursement !== false,
-            fundingRequest:
-              [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type) ||
-              collective.settings?.fundingRequest === true ||
-              collective.host?.settings?.fundingRequest === true ||
-              collective.settings?.expenseTypes?.isGrant === true,
+            fundingRequest: collective.settings?.expenseTypes?.isGrant === true,
           }}
         />
       )}

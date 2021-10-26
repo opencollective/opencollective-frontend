@@ -67,8 +67,8 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
   const [selectedOption, setSelectedOption] = useState(
     hostFeePercent === host.hostFeePercent ? HOST_FEE_STRUCTURE.DEFAULT : HOST_FEE_STRUCTURE.CUSTOM_FEE,
   );
-  const [isInvoice, setIsInvoice] = useState(collective?.settings?.expenseTypes?.isInvoice || true);
-  const [isReimbursement, setIsReimbursement] = useState(collective?.settings?.expenseTypes?.isReimbursement || true);
+  const [isInvoice, setIsInvoice] = useState(collective?.settings?.expenseTypes?.isInvoice || false);
+  const [isReimbursement, setIsReimbursement] = useState(collective?.settings?.expenseTypes?.isReimbursement || false);
   const [isGrant, setIsGrant] = useState(collective?.settings?.expenseTypes?.isGrant || false);
   const [submitFeesStructure, { loading, error }] = useMutation(editAccountFeeStructureMutation, {
     context: API_V2_CONTEXT,

@@ -153,7 +153,7 @@ const ExpenseTypeRadioSelect = ({ name, onChange, value, options = {} }) => {
     <StyledCard>
       <Fieldset onChange={onChange}>
         <Flex flexDirection={['column', 'row']} overflow="hidden">
-          {options.invoice && (
+          {options.reimbursement && (
             <ExpenseTypeOption
               name={name}
               type={expenseTypes.RECEIPT}
@@ -161,7 +161,7 @@ const ExpenseTypeRadioSelect = ({ name, onChange, value, options = {} }) => {
               onChange={onChange}
             />
           )}
-          {options.reimbursement && (
+          {options.invoice && (
             <ExpenseTypeOption
               name={name}
               type={expenseTypes.INVOICE}
