@@ -63,11 +63,13 @@ export const MenuLink = ({ collective, section, children, onClick, isSelected, i
   return (
     <MenuLinkContainer isSelected={isSelected || (section && selectedSection === section)} isStrong={isStrong}>
       {onClick ? (
-        <StyledLink as="button" onClick={onClick}>
+        <StyledLink as="button" onClick={onClick} data-cy={`menu-item-${section}`}>
           {children}
         </StyledLink>
       ) : (
-        <Link href={getSettingsRoute(collective, section, true)}>{children}</Link>
+        <Link href={getSettingsRoute(collective, section, true)} data-cy={`menu-item-${section}`}>
+          {children}
+        </Link>
       )}
     </MenuLinkContainer>
   );
