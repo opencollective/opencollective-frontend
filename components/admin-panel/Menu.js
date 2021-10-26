@@ -20,8 +20,32 @@ import { MenuGroup, MenuLink, MenuSectionHeader, useSubmenu } from './MenuCompon
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
+const OrganizationSettingsMenuLinks = ({ collective }) => {
+  return (
+    <React.Fragment>
+      <MenuLink collective={collective} section={ABOUT_ORG_SECTIONS.INFO} />
+      <MenuLink collective={collective} section={ABOUT_ORG_SECTIONS.COLLECTIVE_PAGE} />
+      <MenuLink collective={collective} section={ABOUT_ORG_SECTIONS.CONNECTED_ACCOUNTS} />
+      <MenuLink collective={collective} section={ABOUT_ORG_SECTIONS.TEAM} />
+      <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.PAYMENT_METHODS} />
+      <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.PAYMENT_RECEIPTS} />
+      <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} />
+      <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
+      <MenuLink collective={collective} section={ALL_SECTIONS.WEBHOOKS} />
+      <MenuLink collective={collective} section={ALL_SECTIONS.ADVANCED} />
+      {!isHostAccount(collective) && <MenuLink collective={collective} section={ALL_SECTIONS.FISCAL_HOSTING} />}
+    </React.Fragment>
+  );
+};
+
+OrganizationSettingsMenuLinks.propTypes = {
+  collective: PropTypes.object,
+};
+
 const Menu = ({ collective }) => {
   const { formatMessage } = useIntl();
+  const isHost = isHostAccount(collective);
+  const isSimpleOrg = collective.type === 'ORGANIZATION' && !isHost;
   const { menuContent, SubMenu } = useSubmenu();
 
   if (menuContent) {
@@ -29,7 +53,7 @@ const Menu = ({ collective }) => {
   } else {
     return (
       <React.Fragment>
-        <MenuGroup if={isHostAccount(collective)} mb={24}>
+        <MenuGroup if={isHost} mb={24}>
           <MenuSectionHeader>
             <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
           </MenuSectionHeader>
@@ -38,31 +62,22 @@ const Menu = ({ collective }) => {
           <MenuLink collective={collective} section={HOST_SECTIONS.PENDING_APPLICATIONS} />
           <MenuLink collective={collective} section={HOST_SECTIONS.HOSTED_COLLECTIVES} />
         </MenuGroup>
-        <MenuGroup if={isHostAccount(collective) || isType(collective, ORGANIZATION)}>
+        <MenuGroup if={isHost || isType(collective, ORGANIZATION)}>
           <MenuSectionHeader>
             <FormattedMessage id="Settings" defaultMessage="Settings" />
           </MenuSectionHeader>
           <SubMenu
             label={formatMessage(PAGE_TITLES[getCollectiveTypeKey(collective.type)])}
-            if={isType(collective, ORGANIZATION) || isHostAccount(collective)}
+            if={isType(collective, ORGANIZATION) && isHost}
           >
-            <MenuLink collective={collective} section={ABOUT_ORG_SECTIONS.INFO} />
-            <MenuLink collective={collective} section={ABOUT_ORG_SECTIONS.COLLECTIVE_PAGE} />
-            <MenuLink collective={collective} section={ABOUT_ORG_SECTIONS.CONNECTED_ACCOUNTS} />
-            <MenuLink collective={collective} section={ABOUT_ORG_SECTIONS.TEAM} />
-            <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.PAYMENT_METHODS} />
-            <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.PAYMENT_RECEIPTS} />
-            <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} />
-            <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
-            <MenuLink collective={collective} section={ALL_SECTIONS.WEBHOOKS} />
-            <MenuLink collective={collective} section={ALL_SECTIONS.ADVANCED} />
+            <OrganizationSettingsMenuLinks collective={collective} />
           </SubMenu>
           <SubMenu
             label={<FormattedMessage id="AdminPanel.FiscalHostSettings" defaultMessage="Fiscal Host Settings" />}
-            if={isHostAccount(collective) || (isType(collective, USER) && isHostAccount(collective))}
+            if={isHost || (isType(collective, USER) && isHost)}
           >
             <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.FISCAL_HOSTING} />
-            <MenuGroup if={isHostAccount(collective)}>
+            <MenuGroup if={isHost}>
               <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS} />
               <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.RECEIVING_MONEY} />
               <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />
@@ -91,7 +106,13 @@ const Menu = ({ collective }) => {
           </SubMenu>
         </MenuGroup>
 
-        <MenuGroup if={!isHostAccount(collective) && !isType(collective, ORGANIZATION)}>
+        {/** General organization settings */}
+        <MenuGroup if={isSimpleOrg}>
+          <OrganizationSettingsMenuLinks collective={collective} />
+        </MenuGroup>
+
+        {/** General settings for other (non-host) profiles */}
+        <MenuGroup if={!isHost && !isType(collective, ORGANIZATION)}>
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.INFO} />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.COLLECTIVE_PAGE} />
           <MenuLink
