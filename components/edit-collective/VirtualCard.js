@@ -177,12 +177,20 @@ ActionsButton.propTypes = {
   editHandler: PropTypes.func,
 };
 
-const getLimitString = ({ spend_limit, spend_limit_duration }) => {
-  const value = formatCurrency(spend_limit, 'USD');
-  if (spend_limit === 0) {
+const getLimitString = ({ spendingLimitAmount, spendingLimitInterval }) => {
+  const value = formatCurrency(spendingLimitAmount, 'USD');
+  if (!spendingLimitAmount) {
     return <FormattedMessage id="VirtualCards.NoLimit" defaultMessage="No Limit" />;
   }
-  switch (spend_limit_duration) {
+  switch (spendingLimitInterval) {
+    case 'DAILY':
+      return (
+        <Fragment>
+          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
+          &nbsp;
+          {value}/<FormattedMessage id="Frequency.Daily.Short" defaultMessage="day" />
+        </Fragment>
+      );
     case 'MONTHLY':
       return (
         <Fragment>
@@ -287,7 +295,7 @@ const VirtualCard = props => {
                 }}
               />
               &nbsp;&middot;&nbsp;
-              {getLimitString(props.data)}
+              {getLimitString(props)}
             </P>
           </React.Fragment>
         )}
@@ -342,6 +350,8 @@ VirtualCard.propTypes = {
   name: PropTypes.string,
   data: PropTypes.object,
   privateData: PropTypes.object,
+  spendingLimitAmount: PropTypes.number,
+  spendingLimitInterval: PropTypes.string,
   createdAt: PropTypes.string,
 };
 
