@@ -8,7 +8,7 @@ const hostTermsQuery = gqlV2/* GraphQL */ `
   query HostTermsQuery($hostCollectiveSlug: String!) {
     host(slug: $hostCollectiveSlug) {
       id
-      settings
+      termsUrl
       isTrustedHost
     }
   }
@@ -22,12 +22,12 @@ const TermsOfFiscalSponsorship = ({ hostCollectiveSlug }) => {
     skip: !hostCollectiveSlug,
   });
 
-  const termsOfService = data?.host?.settings?.tos;
+  const termsOfService = data?.host?.termsUrl;
   const isTrustedHost = data?.host?.isTrustedHost;
 
   if (!loading && termsOfService) {
     if (isTrustedHost) {
-      router.push(data.host.settings.tos);
+      router.push(termsOfService);
     } else {
       router.push({ pathname: '/external-redirect', query: { url: termsOfService } });
     }
