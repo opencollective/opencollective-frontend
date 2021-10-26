@@ -56,16 +56,16 @@ const CollapsedDisplayBox = styled(InlineDisplayBox)`
  * ⚠️ Be careful! This component will pass content to `dangerouslySetInnerHTML` so
  * always ensure `content` is properly sanitized!
  */
-const HTMLContent = styled(({ content, ...props }) => {
+const HTMLContent = styled(({ content, collapsable = false, ...props }) => {
   const [isOpen, setOpen] = React.useState(false);
-  const [collapsable, setCollapsable] = React.useState(false);
+  const [isCollapsed, setIsCollapsed] = React.useState(collapsable);
   const contentRef = useRef();
 
-  const DisplayBox = !collapsable || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
+  const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
 
   useEffect(() => {
-    if (contentRef?.current?.clientHeight > 21) {
-      setCollapsable(true);
+    if (collapsable && contentRef?.current?.clientHeight > 21) {
+      setIsCollapsed(true);
     }
   }, [content]);
 
@@ -223,6 +223,7 @@ const HTMLContent = styled(({ content, ...props }) => {
 
 HTMLContent.propTypes = {
   content: PropTypes.string,
+  collapsable: PropTypes.bool,
 };
 
 HTMLContent.defaultProps = {
