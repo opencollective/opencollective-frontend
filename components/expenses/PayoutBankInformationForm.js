@@ -73,8 +73,6 @@ const Input = props => {
           return `${input.name} is required`;
         } else if (!matches && value) {
           return input.validationError || `Invalid ${input.name}`;
-        } else if (isAccountHolderName && (!value || value.match(/^[^\s]{1}\b/))) {
-          return 'Your full name is required';
         }
       };
     }
@@ -89,16 +87,29 @@ const Input = props => {
               error={(meta.touched || disabled) && meta.error}
               hint={input.hint}
             >
-              {() => (
-                <StyledInput
-                  {...field}
-                  placeholder={input.example}
-                  error={(meta.touched || disabled) && meta.error}
-                  disabled={disabled}
-                  width="100%"
-                  value={get(formik.values, field.name) || ''}
-                />
-              )}
+              {() => {
+                const inputValue = get(formik.values, field.name);
+                return (
+                  <React.Fragment>
+                    <StyledInput
+                      {...field}
+                      placeholder={input.example}
+                      error={(meta.touched || disabled) && meta.error}
+                      disabled={disabled}
+                      width="100%"
+                      value={inputValue || ''}
+                    />
+                    {isAccountHolderName && inputValue && inputValue.match(/^[^\s]{1}\b/) && (
+                      <MessageBox mt={2} fontSize="12px" type="warning" withIcon>
+                        <FormattedMessage
+                          id="Warning.AccountHolderNameNotValid"
+                          defaultMessage="Please make sure this name matches exactly what is written on your bank account details, otherwise the payment might fail."
+                        />
+                      </MessageBox>
+                    )}
+                  </React.Fragment>
+                );
+              }}
             </StyledInputField>
           )}
         </Field>
