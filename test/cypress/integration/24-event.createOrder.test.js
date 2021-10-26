@@ -114,7 +114,7 @@ describe('event.createOrder page', () => {
 
   it('makes an order for tickets with VAT', () => {
     // Activate VAT for collective
-    cy.visit(`${collectiveSlug}/edit`);
+    cy.visit(`${collectiveSlug}/admin`);
     cy.contains('[data-cy="country-select"]', 'Please select your country').click();
     cy.contains('[data-cy="select-option"]', 'Belgium - BE').click();
     cy.getByDataCy('VAT').click();

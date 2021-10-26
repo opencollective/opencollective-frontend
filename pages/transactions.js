@@ -298,7 +298,7 @@ class TransactionsPage extends React.Component {
               <Flex>
                 {canDownloadInvoices && (
                   <Box mr="8px">
-                    <Link href={`/${collective.slug}/edit/payment-receipts`}>
+                    <Link href={`/${collective.slug}/admin/payment-receipts`}>
                       <StyledButton buttonSize="small" minWidth={140} isBorderless flexGrow={1}>
                         <FormattedMessage id="transactions.downloadinvoicesbutton" defaultMessage="Download Receipts" />
                         <IconDownload size="13px" style={{ marginLeft: '8px' }} />

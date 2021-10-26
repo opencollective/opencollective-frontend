@@ -340,7 +340,7 @@ class Members extends React.Component {
             id="Members.DefinedInParent"
             defaultMessage="Team members are defined in the settings of {parentName}"
             values={{
-              parentName: <Link href={`/${parent.slug}/edit/members`}>{parent.name}</Link>,
+              parentName: <Link href={`/${parent.slug}/admin/members`}>{parent.name}</Link>,
             }}
           />
         </MessageBox>

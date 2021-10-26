@@ -15,7 +15,7 @@ const COMMON_DIRECTIVES = {
     process.env.NEXT_IMAGES_URL,
     'data:',
     '*.paypal.com',
-    'opencollective.com', // for widgets on /edit/export
+    'opencollective.com', // for widgets on /admin/export
     'blob:', // For upload images previews
   ].filter(Boolean),
   workerSrc: [
