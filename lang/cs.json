@@ -25,7 +25,7 @@
   "acceptContributions.organization.myOrgs": "Moje organizace",
   "acceptContributions.organization.subtitle": "Our Own Fiscal Host",
   "acceptContributions.picker.header": "Přijmout finanční příspěvky",
-  "acceptContributions.picker.host": "My Own Fiscal Host",
+  "acceptContributions.picker.host": "Join a Fiscal Host",
   "acceptContributions.picker.hostInfo": "Apply to join a Fiscal Host, who will hold money on behalf of your Collective. Choose this option if you want someone else to take care of banking, accounting, taxes, payments, and liability. <MoreInfoLink>More info</MoreInfoLink>",
   "acceptContributions.picker.organizationInfo": "Select or create your own Fiscal Host, which you manage. Choose this option if you have a legal entity set up to handle accounting, taxes, payments, and liability for multiple Collectives. <MoreInfoLink>More info</MoreInfoLink>",
   "acceptContributions.picker.ourselves": "Independent Collective",
