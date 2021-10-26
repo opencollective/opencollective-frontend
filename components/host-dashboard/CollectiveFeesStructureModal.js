@@ -67,13 +67,10 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
   const [selectedOption, setSelectedOption] = useState(
     hostFeePercent === host.hostFeePercent ? HOST_FEE_STRUCTURE.DEFAULT : HOST_FEE_STRUCTURE.CUSTOM_FEE,
   );
-  const [isInvoice, setIsInvoice] = useState(collective?.settings?.expenseTypes?.isInvoice || false);
-  const [isReimbursement, setIsReimbursement] = useState(collective?.settings?.expenseTypes?.isReimbursement || false);
   const [isGrant, setIsGrant] = useState(collective?.settings?.expenseTypes?.isGrant || false);
   const [submitFeesStructure, { loading, error }] = useMutation(editAccountFeeStructureMutation, {
     context: API_V2_CONTEXT,
   });
-  console.log(isInvoice);
 
   return (
     <StyledModal show maxWidth={432} trapFocus {...props}>
@@ -84,28 +81,14 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
         </P>
         <Flex mb="23px" mx="8px" justifyContent="space-between">
           <StyledCheckbox
-            name="invoice"
-            fontSize="12px"
-            defaultChecked={isInvoice}
-            label={<FormattedMessage defaultMessage="Invoice" />}
-            onChange={({ checked }) => {
-              setIsInvoice(checked);
-            }}
-          />
-          <StyledCheckbox
-            name="reimbursement"
-            fontSize="12px"
-            defaultChecked={isReimbursement}
-            label={<FormattedMessage defaultMessage="Reimbursement" />}
-            onChange={({ checked }) => {
-              setIsReimbursement(checked);
-            }}
-          />
-          <StyledCheckbox
             name="grant"
             fontSize="12px"
             defaultChecked={isGrant}
-            label={<FormattedMessage defaultMessage="Grant" />}
+            label={
+              <P fontWeight="500">
+                <FormattedMessage defaultMessage="Enable grants" />
+              </P>
+            }
             onChange={({ checked }) => {
               setIsGrant(checked);
             }}
@@ -184,7 +167,7 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
                   hostFeePercent: isCustomFee ? hostFeePercent : host.hostFeePercent,
                   isCustomFee,
                   key: 'expenseTypes',
-                  value: { isInvoice, isReimbursement, isGrant },
+                  value: { isGrant },
                 },
               }).then(props.onClose);
             }}

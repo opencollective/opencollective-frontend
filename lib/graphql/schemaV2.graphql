@@ -1903,11 +1903,6 @@ type Host implements Account & AccountWithContributions {
     """
     dateTo: DateTime
   ): ExpenseStats!
-
-  """
-  Returns whether the host is trusted or not
-  """
-  isTrustedHost: Boolean!
 }
 
 """
@@ -2255,19 +2250,7 @@ type AccountStats {
   """
   Net amount received
   """
-  totalAmountReceived(
-    kind: [TransactionKind]
-
-    """
-    Calculate total amount received before this date
-    """
-    dateTo: DateTime
-
-    """
-    Calculate total amount received after this date
-    """
-    dateFrom: DateTime
-  ): Amount!
+  totalAmountReceived: Amount!
   yearlyBudget: Amount!
   yearlyBudgetManaged: Amount!
 }
