@@ -15,7 +15,9 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getContributeRoute } from '../../lib/collective.lib';
+import { getEnvVar } from '../../lib/env-utils';
 import { getSettingsRoute } from '../../lib/url-helpers';
+import { parseToBoolean } from '../../lib/utils';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -177,6 +179,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
+  const hasNewAdminPanel = parseToBoolean(getEnvVar('NEW_ADMIN_DASHBOARD'));
 
   // Do not render the menu if there are no available CTAs
   if (isEmpty) {
@@ -223,7 +226,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         </StyledLink>
                       </MenuItem>
                     )}
-                    {callsToAction.hasDashboard && (
+                    {callsToAction.hasDashboard && !hasNewAdminPanel && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.DASHBOARD}>
                         <StyledLink as={Link} href={`/${collective.slug}/dashboard`}>
                           <Container p={ITEM_PADDING}>
