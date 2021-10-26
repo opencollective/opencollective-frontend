@@ -240,8 +240,8 @@ const VirtualCard = props => {
         {displayDetails ? (
           <React.Fragment>
             <P mt="27px" fontSize="18px" fontWeight="700" lineHeight="26px">
-              {props.privateData.cardNumber}{' '}
-              <Action color="black" ml={2} onClick={handleCopy(props.privateData.cardNumber.replace(/\s/g, ''))}>
+              {props.privateData.cardNumber.replace(/\d{4}(?=.)/g, '$& ')}{' '}
+              <Action color="black" ml={2} onClick={handleCopy(props.privateData.cardNumber)}>
                 <Copy size="18px" />
               </Action>
             </P>

@@ -105,7 +105,13 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
       collective: collective || virtualCard?.account,
     },
     async onSubmit(values) {
-      const { collective, assignee, provider, ...privateData } = values;
+      const { collective, assignee, provider } = values;
+      const privateData = {
+        cardNumber: values.cardNumber.replace(/\s+/g, ''),
+        cvv: values.cvv,
+        expireDate: values.expireDate,
+      };
+
       if (isEditing) {
         try {
           await editVirtualCard({
