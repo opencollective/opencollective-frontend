@@ -61,14 +61,7 @@ const HTMLContent = styled(({ content, ...props }) => {
   const [collapsable, setCollapsable] = React.useState(false);
   const contentRef = useRef();
 
-  let DisplayBox;
-  if (!collapsable) {
-    DisplayBox = InlineDisplayBox;
-  } else if (collapsable && isOpen) {
-    DisplayBox = InlineDisplayBox;
-  } else if (collapsable && !isOpen) {
-    DisplayBox = CollapsedDisplayBox;
-  }
+  const DisplayBox = !collapsable || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
 
   useEffect(() => {
     if (contentRef?.current?.clientHeight > 21) {
