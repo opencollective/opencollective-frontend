@@ -118,7 +118,7 @@ const VirtualCards = props => {
 
   const handleUpdateFilters = queryParams => {
     return router.push({
-      pathname: `/${props.collective.slug}/edit/virtual-cards`,
+      pathname: `/${props.collective.slug}/admin/virtual-cards`,
       query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
     });
   };
@@ -177,7 +177,7 @@ const VirtualCards = props => {
       </Grid>
       <Flex mt={5} justifyContent="center">
         <Pagination
-          route={`/${props.collective.slug}/edit/virtual-cards`}
+          route={`/${props.collective.slug}/admin/virtual-cards`}
           total={data.account.virtualCards.totalCount}
           limit={VIRTUAL_CARDS_PER_PAGE}
           offset={offset}

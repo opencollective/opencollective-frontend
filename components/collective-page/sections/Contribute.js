@@ -351,7 +351,7 @@ class SectionContribute extends React.PureComponent {
                   ))}
                   {isAdmin && (
                     <ContributeCardContainer minHeight={150}>
-                      <CreateNew route={`/${collective.parentCollective.slug}/events/${collective.slug}/edit/tickets`}>
+                      <CreateNew route={`/${collective.parentCollective.slug}/events/${collective.slug}/admin/tickets`}>
                         <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
                       </CreateNew>
                     </ContributeCardContainer>

@@ -80,7 +80,9 @@ class GiftCards extends React.Component {
         display="block"
       >
         {({ item, isSelected }) => (
-          <Link href={{ pathname: `/${this.props.collectiveSlug}/edit/gift-cards`, query: { ...query, filter: item } }}>
+          <Link
+            href={{ pathname: `/${this.props.collectiveSlug}/admin/gift-cards`, query: { ...query, filter: item } }}
+          >
             <P p="0.5em 1em" color={isSelected ? 'white.full' : 'black.800'} style={{ margin: 0 }}>
               {item === 'all' && <FormattedMessage id="giftCards.filterAll" defaultMessage="All" />}
               {item === 'redeemed' && <FormattedMessage id="giftCards.filterRedeemed" defaultMessage="Redeemed" />}
@@ -95,7 +97,7 @@ class GiftCards extends React.Component {
   renderNoGiftCardMessage(onlyConfirmed) {
     if (onlyConfirmed === undefined) {
       return (
-        <Link href={`/${this.props.collectiveSlug}/edit/gift-cards-create`}>
+        <Link href={`/${this.props.collectiveSlug}/admin/gift-cards-create`}>
           <FormattedMessage id="giftCards.createFirst" defaultMessage="Create your first gift card!" />
         </Link>
       );
@@ -148,7 +150,7 @@ class GiftCards extends React.Component {
             >
               {this.renderFilters(onlyConfirmed)}
               <Flex justifyContent="center">
-                <Link href={`/${collectiveSlug}/edit/gift-cards-create`}>
+                <Link href={`/${collectiveSlug}/admin/gift-cards-create`}>
                   <StyledButton buttonStyle="primary" buttonSize="medium">
                     <Add size="1em" />
                     {'  '}
@@ -164,7 +166,7 @@ class GiftCards extends React.Component {
                   options={batchesOptions}
                   onChange={({ value }) =>
                     this.props.router.push({
-                      pathname: `/${collectiveSlug}/edit/gift-cards`,
+                      pathname: `/${collectiveSlug}/admin/gift-cards`,
                       query: this.getQueryParams(['filter', 'batch'], { batch: value }),
                     })
                   }

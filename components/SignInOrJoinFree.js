@@ -197,7 +197,7 @@ class SignInOrJoinFree extends React.Component {
               if (recoveryCode) {
                 const user = await this.props.submitRecoveryCode(recoveryCode);
                 return this.props.router.replace({
-                  pathname: '/[slug]/edit/two-factor-auth',
+                  pathname: '/[slug]/admin/two-factor-auth',
                   query: { slug: user.collective.slug },
                 });
               } else {

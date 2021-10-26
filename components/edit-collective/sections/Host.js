@@ -67,7 +67,7 @@ class Host extends React.Component {
 
   updateSelectedOption(option) {
     this.props.router.push({
-      pathname: `/${this.props.collective.slug}/edit/host`,
+      pathname: `/${this.props.collective.slug}/admin/host`,
       query: {
         selectedOption: option,
       },
@@ -96,7 +96,7 @@ class Host extends React.Component {
           id="collective.edit.host.legalName.info"
           defaultMessage="Please set the legal name {isSelfHosted, select, false {of the host} other {}} in the Info section of <SettingsLink>the settings</SettingsLink>. This is required if the legal name is different than the display name for tax and accounting purposes."
           values={{
-            SettingsLink: getI18nLink({ href: `/${collective.host?.slug}/edit` }),
+            SettingsLink: getI18nLink({ href: `/${collective.host?.slug}/admin` }),
             isSelfHosted: collective.id === collective.host?.id,
           }}
         />
@@ -236,7 +236,7 @@ class Host extends React.Component {
                         values={{
                           type: collective.type,
                           emptyBalanceLink: (
-                            <Link href={`/${collective.slug}/edit/advanced`}>
+                            <Link href={`/${collective.slug}/admin/advanced`}>
                               <FormattedMessage id="emptyBalance" defaultMessage="Empty Balance" />
                             </Link>
                           ),
@@ -412,7 +412,7 @@ class Host extends React.Component {
                         collective={collective}
                         service="stripe"
                         options={{
-                          redirect: `${process.env.WEBSITE_URL}/${collective.slug}/edit/host?selectedOption=selfHost`,
+                          redirect: `${process.env.WEBSITE_URL}/${collective.slug}/admin/host?selectedOption=selfHost`,
                         }}
                       />
                     </Box>
