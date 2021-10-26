@@ -26,6 +26,7 @@ export const ABOUT_ORG_SECTIONS = {
 
 export const ORG_BUDGET_SECTIONS = {
   GIFT_CARDS: 'gift-cards',
+  CREATE_GIFT_CARDS: 'gift-cards-create',
   PAYMENT_METHODS: 'payment-methods',
   PAYMENT_RECEIPTS: 'payment-receipts',
   PENDING_ORDERS: 'pending-orders',
