@@ -4,7 +4,9 @@ import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
+import { adminPanelQuery } from '../../../pages/admin-panel';
 import Container from '../../Container';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
@@ -41,8 +43,11 @@ const ArchiveCollective = ({ collective }) => {
   const defaultAction = isArchived ? 'Archive' : 'Unarchive';
   const [modal, setModal] = useState({ type: defaultAction, show: false });
 
-  const [archiveCollective] = useMutation(archiveCollectiveMutation);
-  const [unarchiveCollective] = useMutation(unarchiveCollectiveMutation);
+  const adminPanelMutationParams = {
+    refetchQueries: [{ query: adminPanelQuery, variables: { slug: collective.slug }, context: API_V2_CONTEXT }],
+  };
+  const [archiveCollective] = useMutation(archiveCollectiveMutation, adminPanelMutationParams);
+  const [unarchiveCollective] = useMutation(unarchiveCollectiveMutation, adminPanelMutationParams);
 
   const handleArchiveCollective = async ({ id }) => {
     setModal({ type: 'Archive', show: false });
