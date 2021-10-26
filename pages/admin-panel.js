@@ -18,7 +18,7 @@ import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { useUser } from '../components/UserProvider';
 
-const adminPanelQuery = gqlV2/* GraphQL */ `
+export const adminPanelQuery = gqlV2/* GraphQL */ `
   query AdminPanel($slug: String!) {
     account(slug: $slug) {
       id
