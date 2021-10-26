@@ -1376,6 +1376,7 @@
   "join.becomeAHost": "ホストになる",
   "join.becomeASponsor": "スポンサーになる",
   "join.findAFiscalHost": "財政ホストを見つける",
+  "kKyqet": "Total expense payouts ({currentYear}): {totalExpensesReceived}",
   "LearnMore": "Learn more",
   "LearnMoreAboutServiceFees": "Learn more about {service} fees",
   "LegalName": "Legal Name",

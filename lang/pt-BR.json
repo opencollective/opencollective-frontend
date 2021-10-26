@@ -1376,6 +1376,7 @@
   "join.becomeAHost": "Torne-se um Administrador",
   "join.becomeASponsor": "Torne-se um patrocinador",
   "join.findAFiscalHost": "Encontre um Administrador Fiscal",
+  "kKyqet": "Total expense payouts ({currentYear}): {totalExpensesReceived}",
   "LearnMore": "Saiba mais",
   "LearnMoreAboutServiceFees": "Saiba mais sobre {service} tarifas",
   "LegalName": "Legal Name",

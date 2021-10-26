@@ -1376,6 +1376,7 @@
   "join.becomeAHost": "Werde ein Träger",
   "join.becomeASponsor": "Sponsor werden",
   "join.findAFiscalHost": "Finde einen Steuerträger",
+  "kKyqet": "Total expense payouts ({currentYear}): {totalExpensesReceived}",
   "LearnMore": "Learn more",
   "LearnMoreAboutServiceFees": "Learn more about {service} fees",
   "LegalName": "Legal Name",

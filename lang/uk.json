@@ -1376,6 +1376,7 @@
   "join.becomeAHost": "Стати скарбником",
   "join.becomeASponsor": "Стати спонсором",
   "join.findAFiscalHost": "Знайти скарбника",
+  "kKyqet": "Total expense payouts ({currentYear}): {totalExpensesReceived}",
   "LearnMore": "Докладніше",
   "LearnMoreAboutServiceFees": "Докладніше про платню для {service}",
   "LegalName": "Legal Name",

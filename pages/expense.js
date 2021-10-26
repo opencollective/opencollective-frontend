@@ -50,6 +50,15 @@ import { H1, H5, Span } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
+const getVariableFromProps = props => {
+  const firstOfCurrentYear = new Date(new Date().getFullYear(), 0, 1).toISOString();
+  return {
+    legacyExpenseId: props.legacyExpenseId,
+    draftKey: props.draftKey,
+    totalExpensesReceivedDateFrom: firstOfCurrentYear,
+  };
+};
+
 const messages = defineMessages({
   title: {
     id: 'ExpensePage.title',
@@ -58,13 +67,27 @@ const messages = defineMessages({
 });
 
 const expensePageQuery = gqlV2/* GraphQL */ `
-  query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int) {
+  query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalExpensesReceivedDateFrom: DateTime) {
     expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
       ...ExpensePageExpenseFields
       comments(limit: 100, offset: $offset) {
         totalCount
         nodes {
           ...CommentFields
+        }
+      }
+    }
+
+    # As it uses a dedicated variable this needs to be separated from the ExpensePageExpenseFields fragment
+    expensePayeeStats: expense(expense: { legacyId: $legacyExpenseId }) {
+      id
+      payee {
+        id
+        stats {
+          totalExpensesReceived: totalAmountReceived(kind: [EXPENSE], dateFrom: $totalExpensesReceivedDateFrom) {
+            valueInCents
+            currency
+          }
         }
       }
     }
@@ -338,9 +361,9 @@ class ExpensePage extends React.Component {
   }
 
   clonePageQueryCacheData() {
-    const { client, legacyExpenseId, collectiveSlug } = this.props;
+    const { client } = this.props;
     const query = expensePageQuery;
-    const variables = { collectiveSlug, legacyExpenseId };
+    const variables = getVariableFromProps(this.props);
     const data = cloneDeep(client.readQuery({ query, variables }));
     return [data, query, variables];
   }
@@ -435,7 +458,10 @@ class ExpensePage extends React.Component {
       }
     }
 
-    const expense = data.expense;
+    const expense = cloneDeep(data.expense);
+    if (expense && data.expensePayeeStats) {
+      expense.payee.stats = data.expensePayeeStats.payee.stats;
+    }
     const loggedInAccount = data.loggedInAccount;
     const collective = expense?.account;
     const host = collective?.host;
@@ -757,7 +783,12 @@ class ExpensePage extends React.Component {
 }
 
 const addExpensePageData = graphql(expensePageQuery, {
-  options: { context: API_V2_CONTEXT },
+  options(props) {
+    return {
+      variables: getVariableFromProps(props),
+      context: API_V2_CONTEXT,
+    };
+  },
 });
 
 const addEditExpenseMutation = graphql(editExpenseMutation, {
