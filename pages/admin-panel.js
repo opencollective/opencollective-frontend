@@ -32,6 +32,8 @@ const adminPanelQuery = gqlV2/* GraphQL */ `
       features {
         ...NavbarFields
         VIRTUAL_CARDS
+        USE_PAYMENT_METHODS
+        EMIT_GIFT_CARDS
       }
       ... on AccountWithParent {
         parent {

@@ -123,14 +123,18 @@ const Menu = ({ collective }) => {
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.PAYMENT_METHODS}
-            if={isType(collective, USER)}
+            if={['ACTIVE', 'AVAILABLE'].includes(collective.features.USE_PAYMENT_METHODS)}
           />
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS}
             if={isType(collective, USER)}
           />
-
+          <MenuLink
+            collective={collective}
+            section={ORG_BUDGET_SECTIONS.GIFT_CARDS}
+            if={['ACTIVE', 'AVAILABLE'].includes(collective.features.EMIT_GIFT_CARDS)}
+          />
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.VIRTUAL_CARDS}
