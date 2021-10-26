@@ -120,7 +120,7 @@ const ActionsButton = props => {
         <Reference>
           {({ ref }) => (
             <Action ref={ref} onClick={() => setDisplayActions(true)}>
-              <FormattedMessage id="VirtualCards.Actions" defaultMessage="Actions" />
+              <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
             </Action>
           )}
         </Reference>

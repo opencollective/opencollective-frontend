@@ -5,6 +5,7 @@ import { trim } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import slugify from 'slugify';
+import { isURL } from 'validator';
 
 import { BackButton } from './create-collective/CreateCollectiveForm';
 import OnboardingProfileCard from './onboarding-modal/OnboardingProfileCard';
@@ -58,13 +59,13 @@ const orgMessages = defineMessages({
   },
   errorWebsite: {
     id: 'createOrg.form.error.website',
-    defaultMessage: 'Enter a valid website, e.g. www.example.com or example.org',
+    defaultMessage: 'Enter a valid website, e.g., www.example.com or example.org',
   },
 });
 
 const placeholders = {
-  name: { id: 'placeholder.name', defaultMessage: 'e.g. Salesforce, Airbnb' },
-  examples: { id: 'examples', defaultMessage: 'e.g. {examples}' },
+  name: { id: 'placeholder.name', defaultMessage: 'e.g., Salesforce, Airbnb' },
+  examples: { id: 'examples', defaultMessage: 'e.g., {examples}' },
   slug: { id: 'placeholder.slug', defaultMessage: 'Airbnb' },
   description: { id: 'placeholderdescription', defaultMessage: 'Making a world a better place' },
   website: { id: 'placeholder.website', defaultMessage: 'www.example.com' },
@@ -101,11 +102,15 @@ const CreateOrganizationForm = props => {
     if (values.description.length > 150) {
       errors.description = intl.formatMessage(orgMessages.errorDescription);
     }
-    const regexExp = /[-a-zA-Z0-9@:%._/+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_/+.~#?&//=]*)?/gi;
 
-    if ((values.website && !values.website.match(new RegExp(regexExp))) || values.website.startsWith('http')) {
-      errors.website = intl.formatMessage(orgMessages.errorWebsite);
+    if (values.website) {
+      // Prepend https:// before validation if the URL doesn't start with a protocol
+      const websiteUrl = values.website.match(/^\w+:\/\/.*/) ? values.website : `https://${values.website}`;
+      if (!isURL(websiteUrl)) {
+        errors.website = intl.formatMessage(orgMessages.errorWebsite);
+      }
     }
+
     return errors;
   };
   const submit = values => {
@@ -220,8 +225,8 @@ const CreateOrganizationForm = props => {
                         data-cy="cof-form-legalName"
                         hint={
                           <FormattedMessage
-                            id="legalName.description"
-                            defaultMessage="The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit and expense. This name is not displayed publicly and it must be your legal name."
+                            id="editCollective.legalName.description"
+                            defaultMessage="Legal names are private and used in receipts, tax forms, payment details on expenses, and other non-public contexts. Legal names are only visible to admins."
                           />
                         }
                       >
@@ -400,10 +405,7 @@ const CreateOrganizationForm = props => {
                       required
                       fontSize="12px"
                       label={
-                        <FormattedMessage
-                          id="createorganization.authorization.label"
-                          defaultMessage="I verify that I am authorized to represent this organization."
-                        />
+                        <FormattedMessage defaultMessage="I certify that I am authorized to represent this organization" />
                       }
                       onChange={({ checked }) => {
                         setAuthorization(checked);

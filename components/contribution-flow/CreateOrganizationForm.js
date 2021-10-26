@@ -48,7 +48,7 @@ const CreateOrganizationForm = ({ values, onChange }) => {
           <StyledInput
             {...inputProps}
             width="100%"
-            placeholder="e.g. AirBnb, TripleByte"
+            placeholder="e.g., AirBnb, TripleByte"
             value={values.name}
             minLength={2}
             onChange={dispatchChange('name')}
@@ -66,7 +66,7 @@ const CreateOrganizationForm = ({ values, onChange }) => {
         {inputProps => (
           <StyledInput
             {...inputProps}
-            placeholder="e.g. opencollective.com"
+            placeholder="e.g., opencollective.com"
             width="100%"
             value={values.website}
             onChange={dispatchChange('website')}
@@ -77,7 +77,7 @@ const CreateOrganizationForm = ({ values, onChange }) => {
         {inputProps => (
           <StyledInput
             {...inputProps}
-            placeholder="e.g. @opencollect"
+            placeholder="e.g., @opencollect"
             width="100%"
             value={values.twitterHandle}
             onChange={dispatchChange('twitterHandle')}

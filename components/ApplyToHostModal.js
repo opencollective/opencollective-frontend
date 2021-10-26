@@ -403,6 +403,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                       href: host.termsUrl,
                                       openInNewTabNoFollow: true,
                                       ...(isOCFHost && { color: '#396C6F' }),
+                                      onClick: e => e.stopPropagation(), // don't check the checkbox when clicking on the link
                                     }),
                                   }}
                                 />

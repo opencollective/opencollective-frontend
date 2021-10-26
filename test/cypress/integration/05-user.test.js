@@ -70,7 +70,7 @@ describe('New users profiles', () => {
         .contains('monthly recurring subscription');
       cy.get('[data-cy="transaction-item"]')
         .first()
-        .get('[data-cy=transaction-details] > span[data-cy=transaction-date]')
+        .get('[data-cy=transaction-details] > [data-cy=transaction-date]')
         .contains('November 30, 2017');
       cy.get('[data-cy="transaction-item"]').first().get('[data-cy=transaction-amount] > span').eq(0).contains('-');
       cy.get('[data-cy="transaction-item"]')

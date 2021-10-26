@@ -4,6 +4,8 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { encodeDateInterval } from '../../../../lib/date-utils';
+
 import PeriodFilter from '../../../budget/filters/PeriodFilter';
 import Container from '../../../Container';
 import { Box, Flex } from '../../../Grid';
@@ -39,12 +41,13 @@ const VirtualCardFilters = ({
 }) => {
   const allowRequestVirtualCard = get(host, 'settings.virtualcards.requestcard');
 
-  const getFilterProps = name => {
+  const getFilterProps = (name, valueModifier) => {
     return {
       inputId: `virtual-cards-filter-${name}`,
       value: filters?.[name],
       onChange: value => {
-        onChange({ ...filters, [name]: value === 'ALL' ? null : value });
+        const preparedValue = valueModifier ? valueModifier(value) : value;
+        onChange({ ...filters, [name]: value === 'ALL' ? null : preparedValue });
       },
     };
   };
@@ -63,7 +66,7 @@ const VirtualCardFilters = ({
       {isCollectiveFilter && (
         <FilterContainer mr={[0, '8px']} mb={['8px', 0]}>
           <FilterLabel htmlFor="virtual-card-filter-collective">
-            <FormattedMessage id="VirtualCard.Collective" defaultMessage="Collective" />
+            <FormattedMessage id="Collective" defaultMessage="Collective" />
           </FilterLabel>
           <CollectiveFilter
             {...getFilterProps('collectiveAccountIds')}
@@ -81,9 +84,9 @@ const VirtualCardFilters = ({
         {displayPeriodFilter && (
           <FilterContainer mr={[0, '8px']} mb={['8px', 0]} width={[1, filterWidth]}>
             <FilterLabel htmlFor="virtual-card-filter-period">
-              <FormattedMessage id="VirtualCard.Period" defaultMessage="Period" />
+              <FormattedMessage id="Period" defaultMessage="Period" />
             </FilterLabel>
-            <PeriodFilter {...getFilterProps('period')} />
+            <PeriodFilter {...getFilterProps('period', encodeDateInterval)} />
           </FilterContainer>
         )}
         <FilterContainer mr={[0, '8px']} mb={['8px', 0]} width={[1, filterWidth]}>

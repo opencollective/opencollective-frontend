@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field } from 'formik';
-import { get, isEmpty } from 'lodash';
+import { escape, get, isEmpty, unescape } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isURL } from 'validator';
 
@@ -125,18 +125,16 @@ const ExpenseItemForm = ({
                   label={<AttachmentLabel />}
                   data-cy="attachment-url-field"
                   required={!isOptional}
-                  error={
-                    meta.error?.type === ERROR.FORM_FIELD_REQUIRED
-                      ? formatMessage(msg.receiptRequired)
-                      : formatFormErrorMessage(intl, meta.error)
-                  }
+                  error={meta.error?.type !== ERROR.FORM_FIELD_REQUIRED && formatFormErrorMessage(intl, meta.error)}
                 >
                   <StyledDropzone
                     {...attachmentDropzoneParams}
                     data-cy={`${field.name}-dropzone`}
                     name={field.name}
                     isMulti={false}
-                    error={meta.error}
+                    error={
+                      meta.error?.type === ERROR.FORM_FIELD_REQUIRED ? formatMessage(msg.receiptRequired) : meta.error
+                    }
                     onSuccess={({ url }) => form.setFieldValue(field.name, url)}
                     mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=${attachmentKey}`}
                     fontSize="13px"
@@ -160,9 +158,23 @@ const ExpenseItemForm = ({
           >
             {inputProps =>
               isRichText ? (
-                <Field as={RichTextEditor} {...inputProps} inputName={inputProps.name} withBorders />
+                <Field
+                  as={RichTextEditor}
+                  {...inputProps}
+                  inputName={inputProps.name}
+                  withBorders
+                  version="simplified"
+                />
               ) : (
-                <Field as={StyledInput} {...inputProps} />
+                <Field name={inputProps.name}>
+                  {({ field, form: { setFieldValue } }) => (
+                    <StyledInput
+                      {...inputProps}
+                      value={unescape(field.value)}
+                      onChange={e => setFieldValue(inputProps.name, escape(e.target.value))}
+                    />
+                  )}
+                </Field>
               )
             }
           </StyledInputField>

@@ -48,6 +48,7 @@ class GiftCards extends React.Component {
     router: PropTypes.object,
     /** @ignore */
     intl: PropTypes.object,
+    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -133,7 +134,7 @@ class GiftCards extends React.Component {
 
     return (
       <div>
-        <SettingsTitle>
+        <SettingsTitle contentOnly={this.props.contentOnly}>
           <FormattedMessage id="editCollective.menu.giftCards" defaultMessage="Gift Cards" />
         </SettingsTitle>
         <Box mt={4}>

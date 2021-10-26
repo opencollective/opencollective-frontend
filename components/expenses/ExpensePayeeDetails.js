@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { formatAccountName } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -11,12 +13,14 @@ import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payo
 
 import Avatar from '../Avatar';
 import Container from '../Container';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import LocationAddress from '../LocationAddress';
 import StyledLink from '../StyledLink';
+import StyledTooltip from '../StyledTooltip';
 import { H4, P, Span } from '../Text';
 
 import PayoutMethodData from './PayoutMethodData';
@@ -55,9 +59,36 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
   lineHeight: '15px',
 })``;
 
+const PayeeTotalPayoutSumTooltip = ({ stats }) => {
+  const currentYear = new Date().getFullYear().toString();
+  return (
+    <StyledTooltip
+      content={() => (
+        <FormattedMessage
+          defaultMessage="Total expense payouts ({currentYear}): {totalExpensesReceived}"
+          values={{
+            totalExpensesReceived: (
+              <FormattedMoneyAmount
+                amount={stats.totalExpensesReceived.valueInCents}
+                currency={stats.totalExpensesReceived.currency}
+                precision={2}
+                amountStyles={null}
+              />
+            ),
+            currentYear: <Span>{currentYear}</Span>,
+          }}
+        />
+      )}
+    >
+      <InfoCircle size={16} />
+    </StyledTooltip>
+  );
+};
+
 const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLoggedInUser, isDraft, collective }) => {
   const payeeLocation = expense?.payeeLocation || expense?.draft?.payeeLocation;
   const payee = isDraft ? expense?.draft?.payee : expense?.payee;
+  const payeeStats = payee && !isDraft ? payee.stats : null; // stats not available for drafts
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === expenseStatus.PAID;
@@ -90,18 +121,23 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             ) : (
               <Avatar collective={payee} radius={24} />
             )}
-            <Flex flexDirection="column" ml={2} css={{ overflow: 'hidden' }}>
+            <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
               <Span color="black.900" fontWeight="bold" truncateOverflow>
-                {payee.organization?.name || payee.name}
+                {formatAccountName(
+                  payee.organization?.legalName || payee.legalName,
+                  payee.organization?.name || payee.name,
+                )}
               </Span>
-              {payee.type !== CollectiveType.VENDOR && (
+              {payee.type !== CollectiveType.VENDOR && (payee.organization?.slug || payee.slug) && (
                 <Span color="black.900" fontSize="11px" truncateOverflow>
                   @{payee.organization?.slug || payee.slug}
                 </Span>
               )}
             </Flex>
+            {payeeStats && <PayeeTotalPayoutSumTooltip stats={payeeStats} />}
           </Flex>
         </LinkCollective>
+
         {payeeLocation && isInvoice && (
           <Container whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
             <LocationAddress location={payeeLocation} isLoading={isLoadingLoggedInUser} />
@@ -163,13 +199,13 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
               <Avatar collective={host} radius={24} />
               <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
                 {collective && (collective.isApproved || collective.id === host.id) ? (
-                  host.name
+                  formatAccountName(host.legalName, host.name)
                 ) : (
                   <FormattedMessage
                     id="Fiscalhost.pending"
                     defaultMessage="{host} (pending)"
                     values={{
-                      host: host.name,
+                      host: formatAccountName(host.legalName, host.name),
                     }}
                   />
                 )}
@@ -194,6 +230,15 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
   );
 };
 
+PayeeTotalPayoutSumTooltip.propTypes = {
+  stats: PropTypes.shape({
+    totalExpensesReceived: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }).isRequired,
+  }),
+};
+
 ExpensePayeeDetails.propTypes = {
   /** Set this to true if the expense is not loaded yet */
   isLoading: PropTypes.bool,
@@ -204,6 +249,7 @@ ExpensePayeeDetails.propTypes = {
   host: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+    legalName: PropTypes.string,
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
     website: PropTypes.string,
@@ -237,6 +283,12 @@ ExpensePayeeDetails.propTypes = {
       type: PropTypes.string,
       isAdmin: PropTypes.bool,
       isInvite: PropTypes.bool,
+      stats: PropTypes.shape({
+        totalExpensesReceived: PropTypes.shape({
+          valueInCents: PropTypes.number,
+          currency: PropTypes.string,
+        }),
+      }),
     }),
     payeeLocation: PropTypes.shape({
       address: PropTypes.string,

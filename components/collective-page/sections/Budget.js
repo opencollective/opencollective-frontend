@@ -34,13 +34,14 @@ export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
     transactions(
       account: { slug: $slug }
       limit: $limit
-      hasExpense: false
       kind: $kind
+      includeIncognitoTransactions: true
       includeGiftCardTransactions: true
+      includeChildrenTransactions: true
     ) {
       ...TransactionsQueryCollectionFragment
     }
-    expenses(account: { slug: $slug }, limit: $limit) {
+    expenses(account: { slug: $slug }, limit: $limit, includeChildrenExpenses: true) {
       totalCount
       nodes {
         ...ExpensesListFieldsFragment
@@ -72,9 +73,9 @@ const geFilterLabel = filter => {
     case 'all':
       return <FormattedMessage id="SectionTransactions.All" defaultMessage="All" />;
     case 'expenses':
-      return <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />;
+      return <FormattedMessage id="Expenses" defaultMessage="Expenses" />;
     case 'transactions':
-      return <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />;
+      return <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />;
     default:
       return null;
   }
@@ -88,7 +89,11 @@ const getBudgetItems = (transactions, expenses, filter) => {
   } else if (filter === 'transactions') {
     return transactions;
   } else {
-    return orderBy([...transactions, ...expenses], 'createdAt', 'desc').slice(0, 3);
+    const expenseIds = expenses.map(expense => expense.id);
+    const transactionsWithoutMatchingExpense = transactions.filter(
+      transaction => !expenseIds.includes(transaction.expense?.id),
+    );
+    return orderBy([...transactionsWithoutMatchingExpense, ...expenses], 'createdAt', 'desc').slice(0, 3);
   }
 };
 

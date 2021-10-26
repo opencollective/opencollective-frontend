@@ -213,7 +213,12 @@ FieldGroup.propTypes = {
 const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   const { loading, error, data, refetch } = useQuery(requiredFieldsQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: host.slug, currency },
+    // A) If `fixedCurrency` was passed in PayoutBankInformationForm (2) (3)
+    //    then `host` is not set and we'll use the Platform Wise account
+    // B) If `host` is set, we expect to be in 2 cases:
+    //      * The Collective Host has Wise configured and we should be able to fetch `requiredFields` from it
+    //      * The Collective Host doesn't have Wise configured and `host` is already switched to the Platform account
+    variables: { slug: host ? host.slug : TW_API_COLLECTIVE_SLUG, currency },
   });
 
   if (loading && !data) {
@@ -231,9 +236,25 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     );
   }
 
+  // If at this point we don't have `requiredFields` available,
+  // we can display an error message, Wise is likely not configured on the platform
+  if (!data?.host?.transferwise?.requiredFields) {
+    if (process.env.OC_ENV === 'development') {
+      return (
+        <MessageBox fontSize="12px" type="warning">
+          Could not fetch requiredFields, Wise is likely not configured on the platform.
+        </MessageBox>
+      );
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn('Could not fetch requiredFields through Wise.');
+      return;
+    }
+  }
+
   const transactionTypeValues = data.host.transferwise.requiredFields.map(rf => ({ label: rf.title, value: rf.type }));
   // Some currencies offer different methods for the transaction
-  // e.g. USD allows ABA and SWIFT transactions.
+  // e.g., USD allows ABA and SWIFT transactions.
   const availableMethods = data.host.transferwise.requiredFields.find(
     method => method.type === get(formik.values, getFieldName(`data.type`)),
   );
@@ -347,33 +368,76 @@ const availableCurrenciesQuery = gqlV2/* GraphQL */ `
 
 /**
  * Form for payout bank information. Must be used with Formik.
+ *
+ * The main goal is to use this component in the Expense Flow (1) but it's also reused in:
+ *
+ * - Collective onboarding, AcceptContributionsOurselvesOrOrg.js (2)
+ * - In Collective/Host settings -> Receiving Money, BankTransfer.js (3)
+ *
+ * In (1) we pass the host where the expense is submitted and fixedCurrency is never set.
+ *   * If Wise is configured on that host, `availableCurrencies` should normally be available.
+ *   * If it's not, we'll have to fetch `availableCurrencies` from the Platform Wise account
+ *
+ * In (2) and (3), we never pass an `host` and `fixedCurrency` is sometimes set.
+ *   * If `fixedCurrency` is set, we don't need `availableCurrencies`
+ *   * If `fixedCurrency` is not set, we'll fetch `availableCurrencies` from the Platform Wise account
  */
 const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, ignoreBlockedCurrencies, optional }) => {
   const { data, loading } = useQuery(availableCurrenciesQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: host?.transferwise ? host.slug : TW_API_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
-    // Skip fetching/loading if the currency is fixed or availableCurrencies was pre-loaded
-    skip: Boolean(fixedCurrency || host.transferwise?.availableCurrencies),
+    variables: { slug: TW_API_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
+    // Skip fetching/loading if the currency is fixed (2) (3)
+    // Or if availableCurrencies is already available. Expense Flow + Host with Wise configured (1)
+    skip: Boolean(fixedCurrency || host?.transferwise?.availableCurrencies),
   });
   const formik = useFormikContext();
   const { formatMessage } = useIntl();
-  host = data?.host || host;
 
   // Display spinner if loading
   if (loading) {
     return <StyledSpinner />;
-  } else if (!host.transferwise?.availableCurrencies && !fixedCurrency) {
-    return null;
   }
 
-  const availableCurrencies = host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
-  const currencies = formatStringOptions(fixedCurrency ? [fixedCurrency] : availableCurrencies.map(c => c.code));
+  // Fiscal Host with Wise configured (1) OR Platform account as fallback (1) or default (2) (3)
+  // NOTE: If `fixedCurrency is set`, `wiseHost` will be null (at least today)
+  const wiseHost = data?.host || host;
+
+  const availableCurrencies = wiseHost?.transferwise?.availableCurrencies;
+
+  let currencies;
+  if (fixedCurrency) {
+    currencies = formatStringOptions([fixedCurrency]);
+  } else if (availableCurrencies) {
+    currencies = formatStringOptions(availableCurrencies.map(c => c.code));
+  } else {
+    // If at this point we don't have `fixedCurrency` or `availableCurrencies`,
+    // we can display an error message, Wise is likely not configured on the platform
+    if (process.env.OC_ENV === 'development') {
+      return (
+        <MessageBox fontSize="12px" type="warning">
+          Could not fetch availableCurrencies, Wise is likely not configured on the platform.
+        </MessageBox>
+      );
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn('Could not fetch availableCurrencies through Wise.');
+      return;
+    }
+  }
+
   if (optional) {
     currencies.unshift({ label: 'No selection', value: null });
   }
+
   const currencyFieldName = getFieldName('data.currency');
   const selectedCurrency = get(formik.values, currencyFieldName);
+
   const validateCurrencyMinimumAmount = () => {
+    // Skip if currency is fixed (2) (3)
+    // or if `availableCurrencies` is not set (but we're not supposed to be there anyway)
+    if (fixedCurrency || !availableCurrencies) {
+      return;
+    }
     // Only validate minimum amount if the form has items
     if (formik?.values?.items?.length > 0) {
       const invoiceTotalAmount = formik.values.items.reduce(
@@ -385,7 +449,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
       if (invoiceTotalAmount < minAmountForSelectedCurrency) {
         return `The minimum amount for transfering to ${selectedCurrency} is ${formatCurrency(
           minAmountForSelectedCurrency,
-          host.currency,
+          wiseHost.currency,
         )}`;
       }
     }
@@ -418,7 +482,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
           disabled={!isNew}
           formik={formik}
           getFieldName={getFieldName}
-          host={host}
+          host={wiseHost}
         />
       )}
       {!selectedCurrency && !currencies?.length && (

@@ -1851,7 +1851,7 @@
   "section.connect.info": "Start conversations with your community or share updates on how things are going.",
   "section.connect.subtitle": "Let’s get the ball rolling!",
   "section.contributors.title": "Contributors",
-  "section.expenses.title": "Expenses",
+  "Expenses": "Expenses",
   "section.tickets.title": "Tickets",
   "section.updates.subtitle": "Updates on our activities and progress.",
   "SectionAbout.MissingDescription": "{collectiveName} hasn't provided this information yet.",

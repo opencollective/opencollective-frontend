@@ -124,7 +124,7 @@ const messages = defineMessages({
     defaultMessage: 'Networking & solidarity',
   },
   'fiscalHosting.feature.networkingAndSolidarity.tabName': {
-    id: 'fiscalHosting.feature.networkingAndSolidarity.tabName',
+    id: 'fiscalHosting.feature.networkingAndSolidarity',
     defaultMessage: 'Networking & solidarity',
   },
   'fiscalHosting.feature.networkingAndSolidarity.description': {

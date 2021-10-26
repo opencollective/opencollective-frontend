@@ -328,7 +328,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                   <StyledInputFormikField
                     name="description"
                     htmlFor="addFunds-description"
-                    label={<FormattedMessage id="AddFundsModal.description" defaultMessage="Description" />}
+                    label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
                     mt={3}
                   >
                     {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
@@ -337,7 +337,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     <StyledInputFormikField
                       name="amount"
                       htmlFor="addFunds-amount"
-                      label={<FormattedMessage id="AddFundsModal.amount" defaultMessage="Amount" />}
+                      label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}
                       required
                       flex="1 1"
                     >
@@ -395,7 +395,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       <StyledInputFormikField
                         name="platformFeePercent"
                         htmlFor="addFunds-platformFeePercent"
-                        label={<FormattedMessage id="AddFundsModal.PlatformFee" defaultMessage="Platform fee" />}
+                        label={<FormattedMessage id="PlatformFee" defaultMessage="Platform fee" />}
                       >
                         {({ form, field }) => (
                           <StyledInputPercentage
@@ -411,7 +411,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     </Flex>
                   )}
                   <P fontSize="14px" lineHeight="17px" fontWeight="500" mt={4}>
-                    <FormattedMessage id="AddFundsModal.Details" defaultMessage="Details" />
+                    <FormattedMessage id="Details" defaultMessage="Details" />
                   </P>
                   <StyledHr my={2} borderColor="black.300" />
                   <AmountDetailsLine
@@ -478,10 +478,10 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       disabled={!dirty || !isValid}
                       loading={isSubmitting}
                     >
-                      <FormattedMessage id="AddFundsModal.addFunds" defaultMessage="Add Funds" />
+                      <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
                     </StyledButton>
                     <StyledButton mx={2} mb={1} minWidth={100} onClick={handleClose} type="button">
-                      <FormattedMessage id="AddFundsModal.cancel" defaultMessage="Cancel" />
+                      <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                     </StyledButton>
                   </Flex>
                 </ModalFooter>
@@ -581,12 +581,12 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       {selectedOption.value !== 0 ? (
                         <FormattedMessage id="AddFundsModal.tipAndFinish" defaultMessage="Tip and Finish" />
                       ) : (
-                        <FormattedMessage id="AddFundsModal.finish" defaultMessage="Finish" />
+                        <FormattedMessage id="Finish" defaultMessage="Finish" />
                       )}
                     </StyledButton>
                     {!fundDetails.showPlatformTipModal && (
                       <StyledButton mx={2} mb={1} minWidth={100} onClick={handleClose} type="button">
-                        <FormattedMessage id="AddFundsModal.cancel" defaultMessage="Cancel" />
+                        <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                       </StyledButton>
                     )}
                   </Flex>

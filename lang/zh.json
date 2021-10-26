@@ -1129,7 +1129,7 @@
   "getHelp": "获取帮助",
   "GiftCard": "礼品卡",
   "GiftCard.definition": "礼品卡使您的员工或社区成员能够支持他们喜欢的项目。<learn-more-link>了解更多</learn-more-link>。",
-  "GiftCard.Expired": "已过期",
+  "GiftCard.Expired": "Expired",
   "Giftcard.learnMore": "进一步了解礼品卡",
   "GiftCard.Limitations": "限制",
   "GiftCard.Limitinfo": "您的帐户目前限制为每天 {limit} 张礼品卡。如果您想要增加这个限制，请联系 <SupportLink></SupportLink>",

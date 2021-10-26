@@ -58,6 +58,7 @@ class Webhooks extends React.Component {
     data: PropTypes.object.isRequired,
     /** From intl */
     intl: PropTypes.object.isRequired,
+    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -240,7 +241,7 @@ class Webhooks extends React.Component {
 
     return (
       <div>
-        <SettingsTitle>
+        <SettingsTitle contentOnly={this.props.contentOnly}>
           <FormattedMessage id="editCollective.menu.webhooks" defaultMessage="Webhooks" />
         </SettingsTitle>
 

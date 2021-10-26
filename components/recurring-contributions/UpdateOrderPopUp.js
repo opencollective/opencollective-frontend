@@ -185,15 +185,16 @@ const getContributeOptions = (intl, contribution, tiers, disableCustomContributi
   return tierOptions;
 };
 
-const getDefaultContributeOption = (contribution, tiersOptions) => {
-  const customContribution = tiersOptions.find(option => option.isCustom);
+const geSelectedContributeOption = (contribution, tiersOptions) => {
+  const defaultContribution =
+    tiersOptions.find(option => option.isCustom) || tiersOptions.find(option => option.interval);
   if (!contribution.tier) {
-    return customContribution;
+    return defaultContribution;
   } else {
     // for some collectives if a tier has been deleted it won't have moved the contribution
     // to the custom 'null' tier so we have to check for that
     const matchedTierOption = tiersOptions.find(option => option.id === contribution.tier.id);
-    return !matchedTierOption ? customContribution : matchedTierOption;
+    return !matchedTierOption ? defaultContribution : matchedTierOption;
   }
 };
 
@@ -209,8 +210,16 @@ const useContributeOptions = (order, tiers, tiersLoading, disableCustomContribut
     return getContributeOptions(intl, order, tiers, disableCustomContributions);
   }, [intl, order, tiers, disableCustomContributions]);
 
+  if (!contributeOptions.length === 0) {
+    throw new Error('Could not compute at least one contribution option.');
+  }
+
   if (contributeOptions && !selectedContributeOption && !tiersLoading) {
-    setSelectedContributeOption(getDefaultContributeOption(order, contributeOptions));
+    const selectedContribution = geSelectedContributeOption(order, contributeOptions);
+    if (!selectedContribution) {
+      throw new Error('Could not compute a selected contribution option.');
+    }
+    setSelectedContributeOption(selectedContribution);
     setLoading(false);
   }
 

@@ -1,7 +1,18 @@
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
 const debug = require('debug');
 const dotenv = require('dotenv');
+const lodash = require('lodash');
+
+// Load extra env file on demand
+// e.g. `npm run dev production` -> `.env.production`
+const extraEnv = process.env.EXTRA_ENV || lodash.last(process.argv);
+const extraEnvPath = path.join(__dirname, `.env.${extraEnv}`);
+if (fs.existsSync(extraEnvPath)) {
+  dotenv.config({ path: extraEnvPath });
+}
 
 dotenv.config();
 debug.enable(process.env.DEBUG);
@@ -23,10 +34,6 @@ const defaults = {
   CAPTCHA_ENABLED: true,
   CAPTCHA_PROVIDER: 'HCAPTCHA',
   CLIENT_ANALYTICS_ENABLED: false,
-  ONBOARDING_MODAL: true,
-  NEW_HOST_APPLICATION_FLOW: false,
-  REJECT_CONTRIBUTION: false,
-  REJECTED_CATEGORIES: false,
   TW_API_COLLECTIVE_SLUG: 'opencollective-host',
   OC_APPLICATION: 'frontend',
   OC_ENV: process.env.NODE_ENV || 'development',

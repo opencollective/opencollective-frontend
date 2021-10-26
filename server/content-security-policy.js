@@ -32,6 +32,7 @@ const COMMON_DIRECTIVES = {
     SELF,
     process.env.API_URL,
     process.env.PDF_SERVICE_URL,
+    process.env.REST_URL,
     'wtfismyip.com',
     '*.paypal.com',
     '*.paypalobjects.com',
@@ -43,6 +44,7 @@ const COMMON_DIRECTIVES = {
     'https://hcaptcha.com',
     'https://*.hcaptcha.com',
     'https://www.google.com',
+    'https://api.cryptonator.com',
   ],
   scriptSrc: [
     SELF,

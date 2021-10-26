@@ -426,6 +426,7 @@ const hostFieldsFragment = gqlV2/* GraphQL */ `
   fragment CreateExpenseHostFields on Host {
     id
     name
+    legalName
     slug
     type
     expensePolicy

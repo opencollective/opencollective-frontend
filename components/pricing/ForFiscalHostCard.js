@@ -89,11 +89,11 @@ const Card = styled(Container)`
 
 const messages = defineMessages({
   'pricing.dashboard': {
-    id: 'pricing.dashboard',
+    id: 'HostDashboard',
     defaultMessage: 'Host Dashboard',
   },
   'pricing.dashboard.description': {
-    id: 'pricing.dashboard.description',
+    id: 'HostDashboard.description',
     defaultMessage:
       'A host dashboard to easily manage budgets and expenses across all your Collectives, including one-click payouts via Paypal and TransferWise.',
   },
@@ -104,7 +104,7 @@ const messages = defineMessages({
   'pricing.outsideFunds.description': {
     id: 'pricing.accessTo.manuallyCredit',
     defaultMessage:
-      "Manually credit Collective budgets with funds received outside the platform (e.g. payments you've invoiced, cash, or third party channels like a shop).",
+      "Manually credit Collective budgets with funds received outside the platform (e.g., payments you've invoiced, cash, or third party channels like a shop).",
   },
   'pricing.bankTransfer': {
     id: 'pricing.bankTransfer',

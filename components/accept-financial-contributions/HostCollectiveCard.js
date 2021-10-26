@@ -15,7 +15,7 @@ import { P } from '../Text';
 
 const messages = defineMessages({
   collectives: {
-    id: 'pricingTable.row.collectives',
+    id: 'Collectives',
     defaultMessage: 'Collectives',
   },
   managed: {
@@ -23,7 +23,7 @@ const messages = defineMessages({
     defaultMessage: 'Managed funds',
   },
   apply: {
-    id: 'host.apply.create.btn',
+    id: 'Apply',
     defaultMessage: 'Apply',
   },
 });

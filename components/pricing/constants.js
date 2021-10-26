@@ -5,13 +5,13 @@ export const PLANS = [
   {
     id: 'start',
     fee: 'Free',
-    actionLink: '/organization/new',
+    actionLink: '/organizations/new',
     actionType: 'joinAsFiscalHost',
   },
   {
     id: 'grow',
     fee: '15%',
-    actionLink: '/organization/new',
+    actionLink: '/organizations/new',
     actionType: 'joinAsFiscalHost',
   },
   {

@@ -8,13 +8,23 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Loading from '../Loading';
+import MessageBox from '../MessageBox';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
+import NotFound from '../NotFound';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
 import { H1, H2 } from '../Text';
 
-const mainReportsQuery = gqlV2/* GraphQL */ `
-  query ReportsPageQuery($hostSlug: String!) {
+import HostDownloadsSection from './reports-section/HostDownloadsSection';
+import HostFeesSection from './reports-section/HostFeesSection';
+import PlatformTipsCollected from './reports-section/PlatformTipsCollected';
+import TotalMoneyManagedSection from './reports-section/TotalMoneyManagedSection';
+import TransactionsOverviewSection from './reports-section/TransactionsOverviewSection';
+
+const hostReportPageQuery = gqlV2/* GraphQL */ `
+  query HostReportsPage($hostSlug: String!) {
     host(slug: $hostSlug) {
       id
       legacyId
@@ -22,8 +32,40 @@ const mainReportsQuery = gqlV2/* GraphQL */ `
       name
       currency
       isHost
+      isActive
       type
+      createdAt
       hostFeePercent
+      hostMetrics {
+        hostFees {
+          valueInCents
+          currency
+        }
+        platformFees {
+          valueInCents
+          currency
+        }
+        pendingPlatformFees {
+          valueInCents
+          currency
+        }
+        platformTips {
+          valueInCents
+          currency
+        }
+        pendingPlatformTips {
+          valueInCents
+          currency
+        }
+        pendingHostFeeShare {
+          valueInCents
+          currency
+        }
+        totalMoneyManaged {
+          valueInCents
+          currency
+        }
+      }
     }
   }
 `;
@@ -50,11 +92,24 @@ SectionTitle.propTypes = {
 };
 
 const HostDashboardReports = ({ hostSlug }) => {
-  // TODO: Use common data from this query with the hook below
-  useQuery(mainReportsQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
+  const { data, loading, error } = useQuery(hostReportPageQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
+  if (loading) {
+    return <Loading />;
+  } else if (error) {
+    return <MessageBoxGraphqlError error={error} maxWidth={500} m="0 auto" />;
+  } else if (!data?.host) {
+    return <NotFound />;
+  } else if (!data.host.isActive) {
+    return (
+      <MessageBox withIcon type="error" maxWidth={400} m="0 auto">
+        <FormattedMessage id="host.onlyActive" defaultMessage="This page is only available for active fiscal hosts" />
+      </MessageBox>
+    );
+  }
 
+  const { host } = data;
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
+    <Box maxWidth={800} m="0 auto" px={2}>
       <Flex alignItems="center" mb={24} flexWrap="wrap">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           <FormattedMessage id="Reports" defaultMessage="Reports" />
@@ -73,25 +128,37 @@ const HostDashboardReports = ({ hostSlug }) => {
           >
             <FormattedMessage id="Host.Metrics.TotalMoneyManages" defaultMessage="Total Money Managed" />
           </SectionTitle>
-          <StyledCard height={200} />
+          <TotalMoneyManagedSection currency={host.currency} hostMetrics={host.hostMetrics} />
         </Container>
         <Container mb={38}>
           <SectionTitle>
             <FormattedMessage id="Host.FeesCollective" defaultMessage="Host fees (collected)" />
           </SectionTitle>
-          <StyledCard height={200} />
+          <StyledCard minHeight={200}>
+            <HostFeesSection hostSlug={hostSlug} />
+          </StyledCard>
         </Container>
         <Container mb={38}>
-          <SectionTitle>
+          <SectionTitle
+            hint={
+              <FormattedMessage
+                id="HostDashboardReports.TransactionsOverview.description"
+                defaultMessage="Transactions related to contributions and expenses."
+              />
+            }
+          >
             <FormattedMessage id="TransactionsOverview" defaultMessage="Transactions overview" />
           </SectionTitle>
-          <StyledCard height={200} />
+          <TransactionsOverviewSection hostSlug={hostSlug} />
         </Container>
+        <Box mb={4}>
+          <PlatformTipsCollected hostSlug={hostSlug} />
+        </Box>
         <Container>
           <SectionTitle>
             <FormattedMessage id="Downloads" defaultMessage="Downloads" />
           </SectionTitle>
-          <StyledCard height={200} />
+          <HostDownloadsSection host={host} />
         </Container>
       </StyledCard>
     </Box>

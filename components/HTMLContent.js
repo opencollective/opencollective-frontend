@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
 import { getLuminance } from 'polished';
 import { FormattedMessage } from 'react-intl';
-import sanitizeHtml from 'sanitize-html';
 import styled, { css } from 'styled-components';
 import { space, typography } from 'styled-system';
 
@@ -52,25 +51,24 @@ const DisplayBox = styled.div`
  * ⚠️ Be careful! This component will pass content to `dangerouslySetInnerHTML` so
  * always ensure `content` is properly sanitized!
  */
-const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
+const HTMLContent = styled(({ content, collapsable, ...props }) => {
   const [isOpen, setOpen] = React.useState(false);
   if (!content) {
     return <div {...props} />;
   }
-  let __html = sanitize ? sanitizeHtml(content) : content;
 
   if (collapsable && !isOpen) {
-    const firstSentence = getFirstSentenceFromHTML(__html);
+    const firstSentence = getFirstSentenceFromHTML(content);
     // Hide "Read full description" if we can display everything in the firstSentence
-    if (firstSentence === __html) {
+    if (firstSentence === content) {
       collapsable = false;
     }
-    __html = firstSentence;
+    content = firstSentence;
   }
 
   return (
     <div>
-      <DisplayBox collapsed={collapsable && !isOpen} dangerouslySetInnerHTML={{ __html }} {...props} />
+      <DisplayBox collapsed={collapsable && !isOpen} dangerouslySetInnerHTML={{ __html: content }} {...props} />
       {!isOpen && collapsable && (
         <ReadFullLink
           onClick={() => setOpen(true)}
@@ -203,13 +201,11 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
 HTMLContent.propTypes = {
   /** The HTML string. Makes sure this is sanitized properly! */
   content: PropTypes.string,
-  sanitize: PropTypes.bool,
   collapsable: PropTypes.bool,
 };
 
 HTMLContent.defaultProps = {
   fontSize: '14px',
-  sanitize: false,
 };
 
 export default HTMLContent;

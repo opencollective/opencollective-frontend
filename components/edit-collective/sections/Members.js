@@ -75,6 +75,7 @@ class Members extends React.Component {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
     refetchLoggedInUser: PropTypes.func.isRequired,
+    contentOnly: PropTypes.bool,
     /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
     /** @ignore from Apollo */
@@ -232,6 +233,7 @@ class Members extends React.Component {
       <React.Fragment className="EditMembers">
         <Box className="members">
           <SettingsTitle
+            contentOnly={this.props.contentOnly}
             subtitle={
               collective.type === 'COLLECTIVE' && (
                 <FormattedMessage

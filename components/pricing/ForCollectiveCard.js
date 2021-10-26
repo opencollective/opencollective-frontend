@@ -86,7 +86,7 @@ const messages = defineMessages({
   'pricing.outsideFunds.description': {
     id: 'pricing.accessTo.manuallyCredit',
     defaultMessage:
-      "Manually credit Collective budgets with funds received outside the platform (e.g. payments you've invoiced, cash, or third party channels like a shop).",
+      "Manually credit Collective budgets with funds received outside the platform (e.g., payments you've invoiced, cash, or third party channels like a shop).",
   },
   'pricing.bankTransfer': {
     id: 'pricing.bankTransfer',
@@ -132,7 +132,7 @@ const ForCollectiveCard = () => {
             fontWeight="500"
             letterSpacing={[null, '-0.008em']}
           >
-            <FormattedMessage id="pricing.collectiveCard" defaultMessage="For Collectives" />
+            <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />
           </H3>
           <StyledHR my="8px" />
           <P fontSize="14px" lineHeight="20px" color="black.800">

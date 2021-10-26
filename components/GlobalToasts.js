@@ -10,8 +10,11 @@ import Toast from './Toast';
 import { TOAST_TYPE, withToasts } from './ToastProvider';
 
 const UPDATE_INTERVAL = 500; // milliseconds
-const DEFAULT_TOAST_DURATION = 15000; // milliseconds
+export const DEFAULT_TOAST_DURATION = 15000; // milliseconds
 
+/**
+ * A singleton component intended to display the toasts from ToastProvider.
+ */
 class GlobalToasts extends PureComponent {
   static propTypes = {
     removeToasts: PropTypes.func.isRequired,
@@ -22,6 +25,7 @@ class GlobalToasts extends PureComponent {
         title: PropTypes.string,
         message: PropTypes.string,
         createdAt: PropTypes.number,
+        duration: PropTypes.number,
         variant: PropTypes.string,
       }),
     ),
@@ -108,7 +112,7 @@ class GlobalToasts extends PureComponent {
         position="fixed"
         bottom={[15, 40]}
         right={[15, 40]}
-        maxWidth={306}
+        maxWidth={318}
         width="100%"
         onMouseEnter={this.pause}
         onMouseLeave={this.startAfterDelay}

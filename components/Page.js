@@ -16,6 +16,7 @@ const Page = ({
   loadingLoggedInUser,
   LoggedInUser,
   title,
+  metaTitle,
   noRobots,
   twitterHandle,
   showSearch,
@@ -38,6 +39,7 @@ const Page = ({
         twitterHandle={twitterHandle}
         description={description}
         image={image}
+        metaTitle={metaTitle}
         canonicalURL={canonicalURL}
         collective={collective}
         menuItems={menuItems}
@@ -63,6 +65,7 @@ Page.propTypes = {
   showSearch: PropTypes.bool,
   noRobots: PropTypes.bool,
   title: PropTypes.string,
+  metaTitle: PropTypes.string,
   twitterHandle: PropTypes.string,
   collective: PropTypes.object,
   menuItems: PropTypes.object,

@@ -28,7 +28,7 @@ const I18nFilters = defineMessages({
     defaultMessage: 'All',
   },
   [FILTERS.EXPENSES]: {
-    id: 'section.expenses.title',
+    id: 'Expenses',
     defaultMessage: 'Expenses',
   },
   [FILTERS.CONTRIBUTIONS]: {
@@ -51,7 +51,9 @@ export const transactionsSectionQuery = gqlV2/* GraphQL */ `
       hasOrder: $hasOrder
       hasExpense: $hasExpense
       kind: $kind
+      includeIncognitoTransactions: true
       includeGiftCardTransactions: true
+      includeChildrenTransactions: true
     ) {
       ...TransactionsQueryCollectionFragment
     }
@@ -95,7 +97,7 @@ const SectionTransactions = props => {
           fontSize={['20px', '24px', '32px']}
           color="black.700"
         >
-          <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
+          <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
         </SectionTitle>
         {collectiveHasNoTransactions && (
           <MessageBox type="info" withIcon>

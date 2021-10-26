@@ -5,14 +5,14 @@ import { Camera } from '@styled-icons/feather/Camera';
 import { Github } from '@styled-icons/feather/Github';
 import { Globe } from '@styled-icons/feather/Globe';
 import { Twitter } from '@styled-icons/feather/Twitter';
-import { get } from 'lodash';
+import { first, get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { githubProfileUrl, twitterProfileUrl } from '../../../lib/url_helpers';
+import { githubProfileUrl, twitterProfileUrl } from '../../../lib/url-helpers';
 
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
@@ -26,6 +26,7 @@ import StyledLink from '../../StyledLink';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import { H1, Span } from '../../Text';
+import TruncatedTextWithTooltip from '../../TruncatedTextWithTooltip';
 import UserCompany from '../../UserCompany';
 import ContainerSectionContent from '../ContainerSectionContent';
 
@@ -85,6 +86,9 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const isEvent = collective.type === CollectiveType.EVENT;
   const isProject = collective.type === CollectiveType.PROJECT;
   const isFund = collective.type === CollectiveType.FUND;
+  const parentIsHost = host && collective.parentCollective?.id === host.id;
+  const firstConnectedAccount = first(collective.connectedTo);
+  const connectedAccountIsHost = firstConnectedAccount && firstConnectedAccount.collective.id === host.id;
 
   const handleHeroMessage = msg => {
     if (!msg) {
@@ -216,18 +220,16 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                   </StyledLink>
                 )}
               </Flex>
-              {collective.parentCollective && (
+              {Boolean(!parentIsHost && collective.parentCollective) && (
                 <Container mx={1} color="black.700" my="12px">
                   <FormattedMessage
                     id="Collective.Hero.ParentCollective"
                     defaultMessage="Part of: {parentName}"
                     values={{
                       parentName: (
-                        <LinkCollective collective={collective.parentCollective}>
-                          <Span data-cy="parentCollectiveName" color="black.700">
-                            {collective.parentCollective.name}
-                          </Span>
-                        </LinkCollective>
+                        <StyledLink as={LinkCollective} collective={collective.parentCollective} noTitle>
+                          <TruncatedTextWithTooltip value={collective.parentCollective.name} cursor="pointer" />
+                        </StyledLink>
                       ),
                     }}
                   />
@@ -242,27 +244,37 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       values={{
                         FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} color="black.700" />,
                         hostName: (
-                          <LinkCollective collective={host}>
-                            <Span data-cy="fiscalHostName" color="black.700">
-                              {host.name}
-                            </Span>
-                          </LinkCollective>
+                          <StyledLink
+                            as={LinkCollective}
+                            collective={host}
+                            data-cy="fiscalHostName"
+                            noTitle
+                            color="black.700"
+                          >
+                            <TruncatedTextWithTooltip value={host.name} cursor="pointer" />
+                          </StyledLink>
                         ),
                       }}
                     />
                   </Container>
-                  {collective.connectedTo.length !== 0 && (
+                  {Boolean(!connectedAccountIsHost && firstConnectedAccount) && (
                     <Container mx={1} color="black.700" my="12px">
                       <FormattedMessage
                         id="Collective.Hero.ParentCollective"
                         defaultMessage="Part of: {parentName}"
                         values={{
                           parentName: (
-                            <LinkCollective collective={collective.connectedTo[0].collective}>
-                              <Span data-cy="parentCollectiveName" color="black.700">
-                                {collective.connectedTo[0].collective.name}
-                              </Span>
-                            </LinkCollective>
+                            <StyledLink
+                              as={LinkCollective}
+                              collective={firstConnectedAccount.collective}
+                              noTitle
+                              color="black.700"
+                            >
+                              <TruncatedTextWithTooltip
+                                value={firstConnectedAccount.collective.name}
+                                cursor="pointer"
+                              />
+                            </StyledLink>
                           ),
                         }}
                       />
@@ -366,6 +378,7 @@ Hero.propTypes = {
       }),
     ),
     parentCollective: PropTypes.shape({
+      id: PropTypes.number,
       name: PropTypes.string,
       slug: PropTypes.string,
     }),

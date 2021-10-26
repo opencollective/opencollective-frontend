@@ -66,7 +66,7 @@ const TranslatedTags = defineMessages({
     defaultMessage: 'Fund',
   },
   [CollectiveCategory.PROJECT]: {
-    id: 'Tags.PROJECT',
+    id: 'ContributionType.Project',
     defaultMessage: 'Project',
   },
 });

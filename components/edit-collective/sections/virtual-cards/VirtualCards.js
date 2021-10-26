@@ -5,6 +5,7 @@ import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
+import { parseDateInterval } from '../../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 
 import Collapse from '../../../Collapse';
@@ -97,7 +98,7 @@ const VirtualCards = props => {
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
   const { state, merchant, period } = routerQuery;
-
+  const { from: dateFrom, to: dateTo } = parseDateInterval(period);
   const { loading, data } = useQuery(virtualCardsQuery, {
     context: API_V2_CONTEXT,
     variables: {
@@ -106,8 +107,8 @@ const VirtualCards = props => {
       offset,
       state,
       merchantAccount: { slug: merchant },
-      dateFrom: period?.split('→')[0],
-      dateTo: period?.split('→')[1] !== 'all' ? period?.split('→')[1] : null,
+      dateFrom: dateFrom,
+      dateTo: dateTo,
     },
   });
 
@@ -124,7 +125,7 @@ const VirtualCards = props => {
 
   return (
     <Box width={['366px', '764px']}>
-      <SettingsTitle>
+      <SettingsTitle contentOnly={props.contentOnly}>
         <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
       </SettingsTitle>
 
@@ -132,7 +133,7 @@ const VirtualCards = props => {
         <P>
           <FormattedMessage
             id="VirtualCards.Description"
-            defaultMessage="Use a virtual card to spend your collective's budget. You can request multiple ones. You Fiscal Host will create them for you and assign a limit and a merchant to them. <learnMoreLink>Learn more</learnMoreLink>"
+            defaultMessage="Use a virtual card to spend from your collective's budget. You can request multiple cards (review the host's policy to see how many). Your fiscal host will create the card for you and assign it a limit and a merchant. You will be notified by email once the card is assigned. <learnMoreLink>Learn more</learnMoreLink>"
             values={{
               learnMoreLink: getI18nLink({
                 href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
@@ -195,6 +196,7 @@ VirtualCards.propTypes = {
     virtualCardMerchants: PropTypes.array,
     host: PropTypes.object,
   }),
+  contentOnly: PropTypes.bool,
   hideTopsection: PropTypes.func,
 };
 

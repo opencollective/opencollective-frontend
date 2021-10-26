@@ -13,7 +13,7 @@ import { compose, parseToBoolean } from '../../lib/utils';
 
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';
 import Container from '../../components/Container';
-import { STEPS } from '../../components/contribution-flow/constants';
+import { PAYMENT_FLOW, STEPS } from '../../components/contribution-flow/constants';
 import ContributionBlocker, { getContributionBlocker } from '../../components/contribution-flow/ContributionBlocker';
 import ContributionFlowSuccess from '../../components/contribution-flow/ContributionFlowSuccess';
 import {
@@ -67,6 +67,7 @@ class NewContributionFlowPage extends React.Component {
       description: query.description ? decodeURIComponent(query.description) : undefined,
       interval: query.interval,
       verb: query.verb,
+      hideCreditCardPostalCode: parseToBoolean(query.hideCreditCardPostalCode),
       redirect: query.redirect,
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
@@ -86,7 +87,7 @@ class NewContributionFlowPage extends React.Component {
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
-    paymentMethod: PropTypes.string,
+    paymentFlow: PropTypes.string,
     verb: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
@@ -103,6 +104,7 @@ class NewContributionFlowPage extends React.Component {
     defaultEmail: PropTypes.string,
     defaultName: PropTypes.string,
     skipStepDetails: PropTypes.bool,
+    hideCreditCardPostalCode: PropTypes.bool,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
@@ -146,8 +148,9 @@ class NewContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, step, LoggedInUser } = this.props;
+    const { data = {}, step, paymentFlow, LoggedInUser } = this.props;
     const { account, tier } = data;
+    const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
 
     if (data.loading) {
       return (
@@ -157,11 +160,17 @@ class NewContributionFlowPage extends React.Component {
       );
     }
 
-    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
+    const contributionBlocker = getContributionBlocker(
+      LoggedInUser,
+      account,
+      tier,
+      Boolean(this.props.tierId),
+      isCrypto,
+    );
     if (contributionBlocker) {
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
-      return <ContributionFlowSuccess collective={account} isCrypto={this.props.paymentMethod === 'crypto'} isEmbed />;
+      return <ContributionFlowSuccess collective={account} isCrypto={isCrypto} isEmbed />;
     } else {
       return (
         <Box height="100%" pt={3}>
@@ -183,6 +192,7 @@ class NewContributionFlowPage extends React.Component {
             platformContribution={this.props.platformContribution}
             customData={this.props.customData}
             skipStepDetails={this.props.skipStepDetails}
+            hideCreditCardPostalCode={this.props.hideCreditCardPostalCode}
             contributeAs={this.props.contributeAs}
             defaultEmail={this.props.defaultEmail}
             defaultName={this.props.defaultName}

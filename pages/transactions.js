@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get, omitBy } from 'lodash';
+import { Download as IconDownload } from '@styled-icons/feather/Download';
+import { get, isNil, omitBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -9,12 +10,12 @@ import styled from 'styled-components';
 import { isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
+import { parseDateInterval } from '../lib/date-utils';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import Body from '../components/Body';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
-import { getDateRangeFromPeriod } from '../components/budget/filters/PeriodFilter';
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
@@ -29,12 +30,13 @@ import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import Pagination from '../components/Pagination';
 import SearchBar from '../components/SearchBar';
+import StyledButton from '../components/StyledButton';
+import StyledCheckbox from '../components/StyledCheckbox';
 import StyledHr from '../components/StyledHr';
 import { H1 } from '../components/Text';
 import { getDefaultKinds, parseTransactionKinds } from '../components/transactions/filters/TransactionsKindFilter';
 import { transactionsQueryCollectionFragment } from '../components/transactions/graphql/fragments';
 import TransactionsDownloadCSV from '../components/transactions/TransactionsDownloadCSV';
-import TransactionsDownloadInvoices from '../components/transactions/TransactionsDownloadInvoices';
 import TransactionsFilters from '../components/transactions/TransactionsFilters';
 import TransactionsList from '../components/transactions/TransactionsList';
 import { withUser } from '../components/UserProvider';
@@ -51,6 +53,9 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
     $dateTo: DateTime
     $searchTerm: String
     $kind: [TransactionKind]
+    $includeIncognitoTransactions: Boolean
+    $includeGiftCardsTransactions: Boolean
+    $includeChildrenTransactions: Boolean
   ) {
     account(slug: $slug) {
       id
@@ -58,6 +63,7 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       slug
       name
       type
+      createdAt
       imageUrl(height: 256)
       currency
       features {
@@ -75,8 +81,9 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       dateTo: $dateTo
       searchTerm: $searchTerm
       kind: $kind
-      includeIncognitoTransactions: true
-      includeGiftCardTransactions: true
+      includeIncognitoTransactions: $includeIncognitoTransactions
+      includeGiftCardTransactions: $includeGiftCardsTransactions
+      includeChildrenTransactions: $includeChildrenTransactions
       includeDebts: true
     ) {
       ...TransactionsQueryCollectionFragment
@@ -99,7 +106,7 @@ const EXPENSES_PER_PAGE = 15;
 
 const getVariablesFromQuery = query => {
   const amountRange = parseAmountRange(query.amount);
-  const [dateFrom, dateTo] = getDateRangeFromPeriod(query.period);
+  const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || EXPENSES_PER_PAGE,
@@ -113,6 +120,9 @@ const getVariablesFromQuery = query => {
     dateTo,
     searchTerm: query.searchTerm,
     kind: query.kind ? parseTransactionKinds(query.kind) : getDefaultKinds(),
+    includeIncognitoTransactions: !query.ignoreIncognitoTransactions,
+    includeGiftCardsTransactions: !query.ignoreGiftCardsTransactions,
+    includeChildrenTransactions: !query.ignoreChildrenTransactions,
   };
 };
 
@@ -125,14 +135,21 @@ class TransactionsPage extends React.Component {
     slug: PropTypes.string, // from getInitialProps, for addCollectiveNavbarData
     data: PropTypes.shape({
       account: PropTypes.object,
-      transactions: PropTypes.object,
+      transactions: PropTypes.shape({
+        nodes: PropTypes.array,
+      }),
       variables: PropTypes.object,
       loading: PropTypes.bool,
       refetch: PropTypes.func,
       error: PropTypes.any,
     }).isRequired, // from withData
     LoggedInUser: PropTypes.object,
-    query: PropTypes.object,
+    query: PropTypes.shape({
+      searchTerm: PropTypes.string,
+      ignoreIncognitoTransactions: PropTypes.string,
+      ignoreGiftCardsTransactions: PropTypes.string,
+      ignoreChildrenTransactions: PropTypes.string,
+    }),
     router: PropTypes.object,
   };
 
@@ -155,6 +172,30 @@ class TransactionsPage extends React.Component {
     const currentCollective = get(this.props, 'data.account');
     if (currentCollective && get(oldProps, 'data.account') !== currentCollective) {
       this.setState({ Collective: currentCollective });
+    }
+
+    const hasChildren =
+      (this.props.data?.transactions?.nodes || []).some(
+        el =>
+          el.fromAccount?.parent?.id === currentCollective.id ||
+          el.toAccount?.parent?.id === this.props.data?.account?.id,
+      ) || this.props.query.ignoreChildrenTransactions;
+    if (isNil(this.state.hasChildren) && hasChildren) {
+      this.setState({ hasChildren });
+    }
+
+    const hasGiftCards =
+      (this.props.data?.transactions?.nodes || []).some(el => el.giftCardEmitterAccount?.id) ||
+      this.props.query.ignoreGiftCardsTransactions;
+    if (isNil(this.state.hasGiftCards) && hasGiftCards) {
+      this.setState({ hasGiftCards });
+    }
+
+    const hasIncognito =
+      (this.props.data?.transactions?.nodes || []).some(el => el.account?.isIncognito) ||
+      this.props.query.ignoreIncognitoTransactions;
+    if (isNil(this.state.hasIncognito) && hasIncognito) {
+      this.setState({ hasIncognito });
     }
 
     // Refetch to get permissions with the currently logged in user
@@ -230,7 +271,7 @@ class TransactionsPage extends React.Component {
           <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} py={[0, 5]} mt={3} data-cy="transactions-page-content">
             <Flex justifyContent="space-between">
               <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal" display={['none', 'block']}>
-                <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />
+                <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
               </H1>
               <Box p={2} flexGrow={[1, 0]}>
                 <SearchBar
@@ -240,8 +281,9 @@ class TransactionsPage extends React.Component {
               </Box>
             </Flex>
             <StyledHr my="24px" mx="8px" borderWidth="0.5px" />
+
             <Flex
-              mb={['8px', '46px']}
+              mb={['8px', '23px']}
               mx="8px"
               justifyContent="space-between"
               flexDirection={['column', 'row']}
@@ -256,12 +298,63 @@ class TransactionsPage extends React.Component {
               <Flex>
                 {canDownloadInvoices && (
                   <Box mr="8px">
-                    <TransactionsDownloadInvoices collective={collective} />
+                    <Link href={`/${collective.slug}/edit/payment-receipts`}>
+                      <StyledButton buttonSize="small" minWidth={140} isBorderless flexGrow={1}>
+                        <FormattedMessage id="transactions.downloadinvoicesbutton" defaultMessage="Download Receipts" />
+                        <IconDownload size="13px" style={{ marginLeft: '8px' }} />
+                      </StyledButton>
+                    </Link>
                   </Box>
                 )}
                 <TransactionsDownloadCSV collective={collective} query={this.props.query} />
               </Flex>
             </Flex>
+
+            <Flex
+              mb={['8px', '23px']}
+              mx="8px"
+              justifyContent="space-between"
+              flexDirection={['column', 'row']}
+              alignItems={['stretch', 'flex-end']}
+            >
+              {this.state.hasChildren && (
+                <StyledCheckbox
+                  checked={this.props.query.ignoreChildrenTransactions ? true : false}
+                  onChange={({ checked }) => this.updateFilters({ ignoreChildrenTransactions: checked })}
+                  label={
+                    <FormattedMessage
+                      id="transactions.excludeChildren"
+                      defaultMessage="Exclude transactions from Projects and Events"
+                    />
+                  }
+                />
+              )}
+              {this.state.hasGiftCards && (
+                <StyledCheckbox
+                  checked={this.props.query.ignoreGiftCardsTransactions ? true : false}
+                  onChange={({ checked }) => this.updateFilters({ ignoreGiftCardsTransactions: checked })}
+                  label={
+                    <FormattedMessage
+                      id="transactions.excludeGiftCards"
+                      defaultMessage="Exclude Gift Card transactions"
+                    />
+                  }
+                />
+              )}
+              {this.state.hasIncognito && (
+                <StyledCheckbox
+                  checked={this.props.query.ignoreIncognitoTransactions ? true : false}
+                  onChange={({ checked }) => this.updateFilters({ ignoreIncognitoTransactions: checked })}
+                  label={
+                    <FormattedMessage
+                      id="transactions.excludeIncognito"
+                      defaultMessage="Exclude Incognito transactions"
+                    />
+                  }
+                />
+              )}
+            </Flex>
+
             {error ? (
               <MessageBox type="error" withIcon>
                 {getErrorFromGraphqlException(error).message}

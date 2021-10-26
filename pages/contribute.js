@@ -24,6 +24,7 @@ import ContributeCustom from '../components/contribute-cards/ContributeCustom';
 import ContributeEvent from '../components/contribute-cards/ContributeEvent';
 import ContributeProject from '../components/contribute-cards/ContributeProject';
 import ContributeTier from '../components/contribute-cards/ContributeTier';
+import { PAYMENT_FLOW } from '../components/contribution-flow/constants';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import { Box, Flex, Grid } from '../components/Grid';
@@ -111,7 +112,7 @@ class TiersPage extends React.Component {
               stats: collective.stats.backers,
             },
           });
-        } else if (tier === 'crypto') {
+        } else if (tier === PAYMENT_FLOW.CRYPTO) {
           waysToContribute.push({
             ContributeCardComponent: ContributeCrypto,
             key: 'contribute-tier-crypto',

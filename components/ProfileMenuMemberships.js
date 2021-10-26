@@ -1,17 +1,18 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Plus } from '@styled-icons/boxicons-regular';
 import { Settings } from '@styled-icons/feather/Settings';
 import { groupBy, isEmpty, uniqBy } from 'lodash';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { isPastEvent } from '../lib/events';
+import { getSettingsRoute } from '../lib/url-helpers';
 
 import Avatar from './Avatar';
+import Container from './Container';
 import { Box, Flex } from './Grid';
-import Image from './Image';
 import Link from './Link';
 import ListItem from './ListItem';
 import StyledButton from './StyledButton';
@@ -60,7 +61,7 @@ const MembershipLine = ({ user, membership }) => {
       {Boolean(user?.canEditCollective(membership.collective)) && (
         <StyledLink
           as={Link}
-          href={`/${membership.collective.slug}/edit`}
+          href={getSettingsRoute(membership.collective, null, user)}
           ml={1}
           color="black.500"
           title={intl.formatMessage(messages.settings)}
@@ -116,141 +117,144 @@ MembershipsList.propTypes = {
   memberships: PropTypes.array,
 };
 
-const EmptyMemberships = () => {
+/**
+ * Keys must be collective types, as they're used to filter the `groupedMemberships`.
+ * The order of the keys in this object defines order in the menu.
+ *
+ * Properties:
+ * - title: i18n string for the title
+ * - emptyMessage: (optional) i18n string for the message when there are no memberships. If not provided, the section will not be shown.
+ * - plusButton: (optional) properties to display a (+) button next to the title
+ *  - href: link to the page to open when the button is clicked
+ *  - text: i18n alt string for the button (accessibility)
+ */
+const MENU_SECTIONS = {
+  [CollectiveType.COLLECTIVE]: {
+    title: defineMessage({ id: 'collective', defaultMessage: 'My Collectives' }),
+    emptyMessage: defineMessage({ defaultMessage: 'Create a collective to collect and spend money transparently' }),
+    plusButton: {
+      text: defineMessage({ id: 'home.create', defaultMessage: 'Create a Collective' }),
+      href: '/create',
+    },
+  },
+  [CollectiveType.EVENT]: {
+    title: defineMessage({ id: 'events', defaultMessage: 'My Events' }),
+  },
+  [CollectiveType.FUND]: {
+    title: defineMessage({ id: 'funds', defaultMessage: 'My Funds' }),
+    plusButton: {
+      text: defineMessage({ id: 'createFund.create', defaultMessage: 'Create a Fund' }),
+      href: '/fund/create',
+    },
+  },
+  [CollectiveType.ORGANIZATION]: {
+    title: defineMessage({ id: 'organization', defaultMessage: 'My Organizations' }),
+    emptyMessage: defineMessage({
+      defaultMessage: 'A profile representing a company or organization instead of an individual',
+    }),
+    plusButton: {
+      text: defineMessage({ id: 'host.organization.create', defaultMessage: 'Create an Organization' }),
+      href: '/organizations/new',
+    },
+  },
+};
+
+const MenuSectionHeader = ({ section, hidePlusIcon }) => {
+  const intl = useIntl();
+  const { title, plusButton } = MENU_SECTIONS[section];
   return (
-    <Flex flexDirection="column" alignItems="center" justifyContent="center" width="100%" height="100%">
-      <Image src="/static/images/empty-user-menu.png" width={216} height={146} />
-      <P color="blue.900" fontSize="20px" lineHeight="28px" fontWeight="700" mt={30} textAlign="center">
-        <FormattedMessage id="ProfileMenuMemberships.Empty" defaultMessage="Make the most out of Open Collective" />
+    <Flex alignItems="center">
+      <P
+        color="black.700"
+        fontSize="12px"
+        fontWeight="500"
+        letterSpacing="0.06em"
+        pr={2}
+        textTransform="uppercase"
+        whiteSpace="nowrap"
+      >
+        {intl.formatMessage(title)}
       </P>
-      <Box mt={30}>
-        <Link href="/create">
-          <StyledButton buttonStyle="primary" buttonSize="tiny" width="100%">
-            <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-          </StyledButton>
+      <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+      {Boolean(!hidePlusIcon && plusButton) && (
+        <Link href={plusButton.href} title={intl.formatMessage(plusButton.text)}>
+          <StyledRoundButton ml={2} size={24} color="#C4C7CC">
+            <Plus size={12} color="#76777A" />
+          </StyledRoundButton>
         </Link>
-        <Link href="/discover">
-          <StyledButton buttonSize="tiny" width="100%" mt={3}>
-            <FormattedMessage id="home.discoverCollectives" defaultMessage="Discover Collectives" />
-          </StyledButton>
-        </Link>
-      </Box>
+      )}
     </Flex>
   );
 };
 
-const ProfileMenuMemberships = ({ user }) => {
-  const memberships = filterMemberships(user.memberOf);
-  if (isEmpty(memberships)) {
-    return <EmptyMemberships />;
-  }
+MenuSectionHeader.propTypes = {
+  section: PropTypes.oneOf(Object.keys(MENU_SECTIONS)).isRequired,
+  hidePlusIcon: PropTypes.bool,
+};
 
+const ProfileMenuMemberships = ({ user }) => {
+  const intl = useIntl();
+  const memberships = filterMemberships(user.memberOf);
   const groupedMemberships = groupBy(memberships, m => m.collective.type);
+  const hasNoMemberships = isEmpty(memberships);
+  const shouldDisplaySection = section => {
+    return MENU_SECTIONS[section].emptyMessage || !isEmpty(groupedMemberships[section]);
+  };
+
   return (
     <React.Fragment>
-      <Flex alignItems="center">
-        <P
-          color="black.700"
-          fontSize="12px"
-          fontWeight="500"
-          letterSpacing="0.06em"
-          pr={2}
-          textTransform="uppercase"
-          whiteSpace="nowrap"
-        >
-          <FormattedMessage id="collective" defaultMessage="My Collectives" />
+      {hasNoMemberships && (
+        <P color="blue.900" fontSize="20px" lineHeight="28px" fontWeight="bold" mt="8px" mb="12px">
+          <FormattedMessage id="ProfileMenuMemberships.Empty" defaultMessage="Make the most out of Open Collective" />
         </P>
-        <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-        <Link href="/create">
-          <StyledRoundButton ml={2} size={24} color="#C4C7CC">
-            <Plus size={12} color="#76777A" />
-          </StyledRoundButton>
-        </Link>
-      </Flex>
-      <MembershipsList memberships={groupedMemberships[CollectiveType.COLLECTIVE]} user={user} />
-      {isEmpty(groupedMemberships[CollectiveType.COLLECTIVE]) && (
-        <Box my={2}>
-          <P color="#9399A3" fontSize="1rem" letterSpacing="0.5px">
-            <em>
-              <FormattedMessage id="menu.collective.none" defaultMessage="No Collectives yet" />
-            </em>
-          </P>
-        </Box>
       )}
-      {!isEmpty(groupedMemberships[CollectiveType.EVENT]) && (
-        <div>
-          <Flex alignItems="center" mt={3}>
-            <P
-              color="#4E5052"
-              fontFamily="montserratlight, arial"
-              fontSize="1rem"
-              fontWeight="600"
-              letterSpacing="1px"
-              pr={2}
-              textTransform="uppercase"
-              whiteSpace="nowrap"
-            >
-              <FormattedMessage id="events" defaultMessage="My Events" />
-            </P>
-            <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-          </Flex>
-          <MembershipsList memberships={groupedMemberships[CollectiveType.EVENT]} user={user} />
-        </div>
-      )}
-      {!isEmpty(groupedMemberships[CollectiveType.FUND]) && (
-        <Fragment>
-          <Flex alignItems="center" mt={3}>
-            <P
-              color="#4E5052"
-              fontFamily="montserratlight, arial"
-              fontSize="1rem"
-              fontWeight="600"
-              letterSpacing="1px"
-              pr={2}
-              textTransform="uppercase"
-              whiteSpace="nowrap"
-            >
-              <FormattedMessage id="funds" defaultMessage="My Funds" />
-            </P>
-            <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-            <StyledRoundButton ml={2} size={24} color="#C4C7CC">
-              <Link href="/fund/create">
-                <Plus size={12} color="#76777A" />
-              </Link>
-            </StyledRoundButton>
-          </Flex>
-          <MembershipsList memberships={groupedMemberships[CollectiveType.FUND]} user={user} />
-        </Fragment>
-      )}
-      <Flex alignItems="center" mt={3}>
-        <P
-          color="#4E5052"
-          fontFamily="montserratlight, arial"
-          fontSize="1rem"
-          fontWeight="600"
-          letterSpacing="1px"
-          pr={2}
-          textTransform="uppercase"
-          whiteSpace="nowrap"
-        >
-          <FormattedMessage id="organization" defaultMessage="My Organizations" />
+      {Object.keys(MENU_SECTIONS)
+        .filter(shouldDisplaySection)
+        .map(accountType => {
+          const memberships = groupedMemberships[accountType];
+          const sectionIsEmpty = isEmpty(memberships);
+          const sectionData = MENU_SECTIONS[accountType];
+          return (
+            <Box key={accountType} mb={3}>
+              <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} />
+              {sectionIsEmpty ? (
+                <Box my={2}>
+                  <P fontSize="12px" lineHeight="18px" color="black.700">
+                    {intl.formatMessage(sectionData.emptyMessage)}
+                  </P>
+                  {Boolean(sectionData.plusButton) && (
+                    <Link href={sectionData.plusButton.href}>
+                      <StyledButton mt="12px" mb="16px" borderRadius="8px" width="100%" fontSize="12px">
+                        <Flex alignItems="center" justifyContent="center">
+                          <Container
+                            display="flex"
+                            justifyContent="center"
+                            alignItems="center"
+                            borderRadius="100%"
+                            border="1px solid #C4C7CC"
+                            mr="16px"
+                            size="24px"
+                          >
+                            <Plus size={12} />
+                          </Container>
+                          <span>{intl.formatMessage(sectionData.plusButton.text)}</span>
+                        </Flex>
+                      </StyledButton>
+                    </Link>
+                  )}
+                </Box>
+              ) : (
+                <MembershipsList memberships={memberships} user={user} />
+              )}
+            </Box>
+          );
+        })}
+      {hasNoMemberships && (
+        <P textAlign="center" mb={2}>
+          <StyledLink as={Link} href="/discover" color="blue.900">
+            <FormattedMessage defaultMessage="Discover Collectives to Support" />
+          </StyledLink>
         </P>
-        <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-        <Link href="/organizations/new">
-          <StyledRoundButton ml={2} size={24} color="#C4C7CC">
-            <Plus size={12} color="#76777A" />
-          </StyledRoundButton>
-        </Link>
-      </Flex>
-      <MembershipsList memberships={groupedMemberships[CollectiveType.ORGANIZATION]} user={user} />
-      {isEmpty(groupedMemberships[CollectiveType.ORGANIZATION]) && (
-        <Box my={2}>
-          <P color="#9399A3" fontSize="1rem" letterSpacing="0.5px">
-            <em>
-              <FormattedMessage id="menu.organizations.none" defaultMessage="No Organizations yet" />
-            </em>
-          </P>
-        </Box>
       )}
     </React.Fragment>
   );

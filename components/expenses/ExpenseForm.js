@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Undo } from '@styled-icons/fa-solid/Undo';
 import { Field, FieldArray, Form, Formik } from 'formik';
 import { first, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -12,6 +13,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { requireFields } from '../../lib/form-utils';
 import { flattenObjectDeep } from '../../lib/utils';
 
+import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
 import { serializeAddress } from '../I18nAddressFields';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
@@ -41,7 +43,7 @@ const msg = defineMessages({
   },
   grantSubjectPlaceholder: {
     id: `ExpenseForm.GrantSubjectPlaceholder`,
-    defaultMessage: 'e.g. research, software development, etc...',
+    defaultMessage: 'e.g., research, software development, etc...',
   },
   addNewReceipt: {
     id: 'ExpenseForm.AddReceipt',
@@ -67,10 +69,15 @@ const msg = defineMessages({
     id: 'ExpenseForm.StepExpenseFundingRequest',
     defaultMessage: 'Set grant details',
   },
-
   stepPayee: {
     id: 'ExpenseForm.StepPayeeInvoice',
     defaultMessage: 'Payee information',
+  },
+  resetExpense: {
+    defaultMessage: 'Reset Form',
+  },
+  confirmResetExpense: {
+    defaultMessage: 'Are you sure you want to reset the expense form?',
   },
 });
 
@@ -101,7 +108,7 @@ export const prepareExpenseForSubmit = expenseData => {
   const isFundingRequest = expenseData.type === expenseTypes.FUNDING_REQUEST;
   const payee =
     expenseData.payee?.isNewUser || expenseData.payee?.isInvite
-      ? pick(expenseData.payee, ['name', 'email', 'organization', 'newsletterOptIn'])
+      ? pick(expenseData.payee, ['name', 'email', 'legalName', 'organization', 'newsletterOptIn'])
       : { [payeeIdField]: expenseData.payee.id };
 
   const payeeLocation = isInvoice ? pick(expenseData.payeeLocation, ['address', 'country', 'structured']) : null;
@@ -183,6 +190,7 @@ const ExpenseFormBody = ({
   formik,
   payoutProfiles,
   collective,
+  expense,
   autoFocusTitle,
   onCancel,
   formPersister,
@@ -195,7 +203,7 @@ const ExpenseFormBody = ({
   const intl = useIntl();
   const { formatMessage } = intl;
   const formRef = React.useRef();
-  const { values, handleChange, errors, setValues, dirty, touched, setErrors } = formik;
+  const { values, handleChange, errors, setValues, dirty, touched, resetForm, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
@@ -213,6 +221,7 @@ const ExpenseFormBody = ({
   const [step, setStep] = React.useState(stepOneCompleted || isCreditCardCharge ? STEPS.EXPENSE : STEPS.PAYEE);
   // Only true when logged in and drafting the expense
   const [isOnBehalf, setOnBehalf] = React.useState(false);
+  const [showResetModal, setShowResetModal] = React.useState(false);
 
   // Scroll to top when step changes
   React.useEffect(() => {
@@ -570,6 +579,39 @@ const ExpenseFormBody = ({
                     {errors.payoutMethod.data.currency.toString()}
                   </Box>
                 )}
+                <StyledHr flex="1" borderColor="white.full" mx={2} />
+                {showResetModal ? (
+                  <ConfirmationModal
+                    show
+                    onClose={() => setShowResetModal(false)}
+                    header={formatMessage(msg.resetExpense)}
+                    body={formatMessage(msg.confirmResetExpense)}
+                    continueHandler={() => {
+                      setStep(STEPS.PAYEE);
+                      resetForm({ values: expense || getDefaultExpense(collective) });
+                      if (formPersister) {
+                        formPersister.clearValues();
+                        window.scrollTo(0, 0);
+                      }
+                      setShowResetModal(false);
+                    }}
+                  />
+                ) : (
+                  <StyledButton
+                    type="button"
+                    buttonStyle="borderless"
+                    width={['100%', 'auto']}
+                    color="red.500"
+                    mt={1}
+                    mx={[2, 0]}
+                    mr={[null, 3]}
+                    whiteSpace="nowrap"
+                    onClick={() => setShowResetModal(true)}
+                  >
+                    <Undo size={11} />
+                    <Span mx={1}>{formatMessage(msg.resetExpense)}</Span>
+                  </StyledButton>
+                )}
               </Flex>
             </HiddenFragment>
           </HiddenFragment>
@@ -609,6 +651,18 @@ ExpenseFormBody.propTypes = {
     settings: PropTypes.object,
     isApproved: PropTypes.bool,
   }).isRequired,
+  expense: PropTypes.shape({
+    type: PropTypes.oneOf(Object.values(expenseTypes)),
+    description: PropTypes.string,
+    status: PropTypes.string,
+    payee: PropTypes.object,
+    draft: PropTypes.object,
+    items: PropTypes.arrayOf(
+      PropTypes.shape({
+        url: PropTypes.string,
+      }),
+    ),
+  }),
 };
 
 /**
@@ -618,6 +672,7 @@ const ExpenseForm = ({
   onSubmit,
   collective,
   expense,
+  originalExpense,
   payoutProfiles,
   autoFocusTitle,
   onCancel,
@@ -659,6 +714,7 @@ const ExpenseForm = ({
           formik={formik}
           payoutProfiles={payoutProfiles}
           collective={collective}
+          expense={originalExpense}
           autoFocusTitle={autoFocusTitle}
           onCancel={onCancel}
           formPersister={formPersister}
@@ -698,6 +754,19 @@ ExpenseForm.propTypes = {
   }).isRequired,
   /** If editing */
   expense: PropTypes.shape({
+    type: PropTypes.oneOf(Object.values(expenseTypes)),
+    description: PropTypes.string,
+    status: PropTypes.string,
+    payee: PropTypes.object,
+    draft: PropTypes.object,
+    items: PropTypes.arrayOf(
+      PropTypes.shape({
+        url: PropTypes.string,
+      }),
+    ),
+  }),
+  /** To reset form */
+  originalExpense: PropTypes.shape({
     type: PropTypes.oneOf(Object.values(expenseTypes)),
     description: PropTypes.string,
     status: PropTypes.string,

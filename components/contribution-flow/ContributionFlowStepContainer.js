@@ -34,6 +34,7 @@ class ContributionFlowStepContainer extends React.Component {
     defaultName: PropTypes.string,
     disabledPaymentMethodTypes: PropTypes.array,
     isSubmitting: PropTypes.bool,
+    hideCreditCardPostalCode: PropTypes.bool,
     taxes: PropTypes.array,
     step: PropTypes.shape({
       name: PropTypes.string,
@@ -138,7 +139,7 @@ class ContributionFlowStepContainer extends React.Component {
             showFeesOnTop={this.props.showFeesOnTop}
           />
         ) : (
-          <StepDetailsCrypto onChange={this.props.onChange} data={stepDetails} />
+          <StepDetailsCrypto onChange={this.props.onChange} data={stepDetails} collective={collective} />
         );
       case 'profile': {
         const personalProfile = this.getPersonalProfile();
@@ -175,6 +176,9 @@ class ContributionFlowStepContainer extends React.Component {
             isEmbed={isEmbed}
             isCrypto={isCrypto}
             disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
+            hideCreditCardPostalCode={
+              this.props.hideCreditCardPostalCode || Boolean(collective.settings?.hideCreditCardPostalCode)
+            }
           />
         );
       case 'checkout':

@@ -1,0 +1,24 @@
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import PeriodFilter from '../../components/budget/filters/PeriodFilter';
+
+<Meta
+  title="Filters/PeriodFilter"
+  component={PeriodFilter}
+  argTypes={{
+    value: { control: { disable: true } },
+    minDate: { control: { type: 'date' } },
+  }}
+  parameters={{
+    actions: {
+      handles: ['onChange'],
+    },
+  }}
+/>
+
+## Default
+
+export const DefaultStory = props => <PeriodFilter {...props} />;
+
+<Story name="Default">{DefaultStory.bind({})}</Story>
+
+<ArgsTable story="Default" />

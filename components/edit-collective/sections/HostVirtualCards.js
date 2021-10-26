@@ -218,7 +218,7 @@ const HostVirtualCards = props => {
 
   return (
     <Fragment>
-      <SettingsTitle>
+      <SettingsTitle contentOnly={props.contentOnly}>
         <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
       </SettingsTitle>
       <Box>
@@ -302,7 +302,7 @@ const HostVirtualCards = props => {
 
       <Box mt={4}>
         <SettingsSectionTitle>
-          <FormattedMessage id="Host.VirtualCards.List.Title" defaultMessage="Virtual Cards" />
+          <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
         </SettingsSectionTitle>
         <P>
           <FormattedMessage
@@ -398,6 +398,7 @@ HostVirtualCards.propTypes = {
       }),
     }),
   }),
+  contentOnly: PropTypes.bool,
   hideTopsection: PropTypes.func,
 };
 

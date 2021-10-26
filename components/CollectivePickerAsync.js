@@ -137,6 +137,7 @@ const CollectivePickerAsync = ({
 };
 
 CollectivePickerAsync.propTypes = {
+  ...CollectivePicker.propTypes,
   /** The id of the search input */
   inputId: PropTypes.string.isRequired,
   /** The types of collectives to retrieve */
