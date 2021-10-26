@@ -408,7 +408,7 @@
   "CollectivePicker.InviteMenu.Description": "Não encontrado. Pode convidar ou criar um novo perfil.",
   "CollectivePicker.InviteNew": "Convidar novo",
   "CollectiveProjects": "Projetos de {collectiveName}",
-  "Collectives": "Coletivos",
+  "Collectives": "Collectives",
   "collectives.create.error.HostNotOpenToApplications": "Este Anfitrião Fiscal não está aberto a aplicações",
   "Collectives.MostRecent": "Most recent",
   "Collectives.Oldest": "Oldest",

@@ -408,7 +408,7 @@
   "CollectivePicker.InviteMenu.Description": "Not found. You can invite or create a new profile.",
   "CollectivePicker.InviteNew": "Pozvat nové",
   "CollectiveProjects": "{collectiveName}'s projects",
-  "Collectives": "Kolektivy",
+  "Collectives": "Collectives",
   "collectives.create.error.HostNotOpenToApplications": "This Fiscal Host is not open to applications",
   "Collectives.MostRecent": "Most recent",
   "Collectives.Oldest": "Oldest",

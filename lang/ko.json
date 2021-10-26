@@ -408,7 +408,7 @@
   "CollectivePicker.InviteMenu.Description": "Not found. You can invite or create a new profile.",
   "CollectivePicker.InviteNew": "새로 초대",
   "CollectiveProjects": "{collectiveName}'s projects",
-  "Collectives": "콜렉티브",
+  "Collectives": "Collectives",
   "collectives.create.error.HostNotOpenToApplications": "This Fiscal Host is not open to applications",
   "Collectives.MostRecent": "최신순",
   "Collectives.Oldest": "오래된 순",
