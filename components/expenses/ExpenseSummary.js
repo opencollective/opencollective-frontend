@@ -206,7 +206,6 @@ const ExpenseSummary = ({
                       <HTMLContent
                         content={attachment.description}
                         fontSize="12px"
-                        collapsable
                         color="black.900"
                         fontWeight="500"
                       />
