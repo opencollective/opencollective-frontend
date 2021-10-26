@@ -82,7 +82,7 @@ class ContributionCategoryPicker extends React.Component {
         id: 'acceptContributions.picker.ourselves',
         defaultMessage: 'Independent Collective',
       },
-      host: { id: 'acceptContributions.picker.host', defaultMessage: 'My Own Fiscal Host' },
+      host: { id: 'acceptContributions.picker.host', defaultMessage: 'Join a Fiscal Host' },
       organization: { id: 'acceptContributions.organization.subtitle', defaultMessage: 'Our Own Fiscal Host' },
     });
   }
