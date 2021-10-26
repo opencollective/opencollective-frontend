@@ -8,6 +8,7 @@
   "94IjMb": "Temps universel coordonné",
   "9Iwj+r": "Admin panel",
   "9kdoVP": "Heure locale: {localTime}{newLine}Heure UTC : {utcTime}",
+  "9MpOZn": "Support the event or buy tickets.",
   "9sbPks": "By default, all dates are filtered and displayed using your local timezone. You can switch to UTC to indicate that the dates provided above use the Coordinated Universal Time format, which matches how email reports are generated",
   "Accept": "Accepter",
   "acceptContributions.addBankAccount": "Ajouter un compte bancaire",
@@ -1372,6 +1373,7 @@
   "inviteAdmin": "Invite co-admin",
   "InviteOnItsWay": "Votre invitation est en route",
   "InviteUser": "Inviter un utilisateur",
+  "iUxV8v": "Get Involved",
   "Jkxa7F": "View Profile",
   "join": "Rejoindre",
   "join.aboutFiscalHosting": "About Fiscal Hosting",
@@ -2221,5 +2223,6 @@
   "yes": "Oui",
   "yVPYIH": "Hosted",
   "ZonfjV": "You cannot edit this collective",
+  "ZvWD3X": "Support the event or buy tickets to attend.",
   "zWgbGg": "Today"
 }

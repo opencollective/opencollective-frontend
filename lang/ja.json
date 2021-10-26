@@ -8,6 +8,7 @@
   "94IjMb": "Coordinated Universal Time",
   "9Iwj+r": "Admin panel",
   "9kdoVP": "Local time: {localTime}{newLine}UTC time: {utcTime}",
+  "9MpOZn": "Support the event or buy tickets.",
   "9sbPks": "By default, all dates are filtered and displayed using your local timezone. You can switch to UTC to indicate that the dates provided above use the Coordinated Universal Time format, which matches how email reports are generated",
   "Accept": "許可",
   "acceptContributions.addBankAccount": "銀行口座を追加",
@@ -1372,6 +1373,7 @@
   "inviteAdmin": "Invite co-admin",
   "InviteOnItsWay": "Your invite is on its way",
   "InviteUser": "Invite user",
+  "iUxV8v": "Get Involved",
   "Jkxa7F": "View Profile",
   "join": "参加する",
   "join.aboutFiscalHosting": "About Fiscal Hosting",
@@ -2221,5 +2223,6 @@
   "yes": "Yes",
   "yVPYIH": "Hosted",
   "ZonfjV": "You cannot edit this collective",
+  "ZvWD3X": "Support the event or buy tickets to attend.",
   "zWgbGg": "Today"
 }
