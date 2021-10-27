@@ -42,7 +42,7 @@ const InlineDisplayBox = styled.div`
 `;
 
 const CollapsedDisplayBox = styled(InlineDisplayBox)`
-  max-height: 40px;
+  max-height: ${props => props.maxHeight + 20}px;
   -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 `;
@@ -56,7 +56,7 @@ const CollapsedDisplayBox = styled(InlineDisplayBox)`
  * ⚠️ Be careful! This component will pass content to `dangerouslySetInnerHTML` so
  * always ensure `content` is properly sanitized!
  */
-const HTMLContent = styled(({ content, collapsable = false, ...props }) => {
+const HTMLContent = styled(({ content, collapsable = false, maxCollapsedHeight = 20, ...props }) => {
   const [isOpen, setOpen] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState(collapsable);
   const contentRef = useRef();
@@ -64,7 +64,7 @@ const HTMLContent = styled(({ content, collapsable = false, ...props }) => {
   const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
 
   useEffect(() => {
-    if (collapsable && contentRef?.current?.clientHeight > 21) {
+    if (collapsable && contentRef?.current?.clientHeight > maxCollapsedHeight + 1) {
       setIsCollapsed(true);
     }
   }, [content]);
@@ -75,7 +75,12 @@ const HTMLContent = styled(({ content, collapsable = false, ...props }) => {
 
   return (
     <div>
-      <DisplayBox ref={contentRef} dangerouslySetInnerHTML={{ __html: content }} {...props} />
+      <DisplayBox
+        ref={contentRef}
+        maxHeight={maxCollapsedHeight}
+        dangerouslySetInnerHTML={{ __html: content }}
+        {...props}
+      />
       {!isOpen && collapsable && (
         <ReadFullLink
           onClick={() => setOpen(true)}
@@ -224,6 +229,7 @@ const HTMLContent = styled(({ content, collapsable = false, ...props }) => {
 HTMLContent.propTypes = {
   content: PropTypes.string,
   collapsable: PropTypes.bool,
+  maxCollapsedHeight: PropTypes.number,
 };
 
 HTMLContent.defaultProps = {
