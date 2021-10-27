@@ -58,7 +58,7 @@ const CollapsedDisplayBox = styled(InlineDisplayBox)`
  */
 const HTMLContent = styled(({ content, collapsable = false, maxCollapsedHeight = 20, ...props }) => {
   const [isOpen, setOpen] = React.useState(false);
-  const [isCollapsed, setIsCollapsed] = React.useState(collapsable);
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
   const contentRef = useRef();
 
   const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
@@ -81,7 +81,7 @@ const HTMLContent = styled(({ content, collapsable = false, maxCollapsedHeight =
         dangerouslySetInnerHTML={{ __html: content }}
         {...props}
       />
-      {!isOpen && collapsable && (
+      {!isOpen && isCollapsed && (
         <ReadFullLink
           onClick={() => setOpen(true)}
           {...props}
@@ -98,7 +98,7 @@ const HTMLContent = styled(({ content, collapsable = false, maxCollapsedHeight =
           <CaretDown size="10px" />
         </ReadFullLink>
       )}
-      {isOpen && collapsable && (
+      {isOpen && isCollapsed && (
         <ReadFullLink
           onClick={() => setOpen(false)}
           {...props}
