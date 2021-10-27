@@ -616,6 +616,11 @@ type Expense {
   createdByAccount: Account
 
   """
+  The account from where the expense was paid
+  """
+  host: Account
+
+  """
   The payout method to use for this expense
   """
   payoutMethod: PayoutMethod

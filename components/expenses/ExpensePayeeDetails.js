@@ -92,6 +92,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === expenseStatus.PAID;
+  const displayedHost = expense?.host ?? host;
 
   return isLoading ? (
     <LoadingPlaceholder height={150} mt={3} />
@@ -185,7 +186,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
           )}
         </Container>
       </PrivateInfoColumn>
-      {host && (
+      {displayedHost && (
         <PrivateInfoColumn data-cy="expense-summary-host" borderless={borderless}>
           <PrivateInfoColumnHeader>
             {isPaid ? (
@@ -194,33 +195,33 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
               <FormattedMessage id="expense.PayFromFiscalhost" defaultMessage="Pay from Fiscal Host" />
             )}
           </PrivateInfoColumnHeader>
-          <LinkCollective collective={host}>
+          <LinkCollective collective={displayedHost}>
             <Flex alignItems="center">
-              <Avatar collective={host} radius={24} />
+              <Avatar collective={displayedHost} radius={24} />
               <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
-                {collective && (collective.isApproved || collective.id === host.id) ? (
-                  formatAccountName(host.legalName, host.name)
+                {collective && (collective.isApproved || collective.id === displayedHost.id) ? (
+                  formatAccountName(displayedHost.legalName, displayedHost.name)
                 ) : (
                   <FormattedMessage
                     id="Fiscalhost.pending"
                     defaultMessage="{host} (pending)"
                     values={{
-                      host: formatAccountName(host.legalName, host.name),
+                      host: formatAccountName(displayedHost.legalName, displayedHost.name),
                     }}
                   />
                 )}
               </Span>
             </Flex>
           </LinkCollective>
-          {host.location && (
+          {displayedHost.location && (
             <P whiteSpace="pre-wrap" fontSize="11px" mt={2}>
-              {host.location.address}
+              {displayedHost.location.address}
             </P>
           )}
-          {host.website && (
+          {displayedHost.website && (
             <P mt={2} fontSize="11px">
-              <StyledLink href={host.website} openInNewTab>
-                {host.website}
+              <StyledLink href={displayedHost.website} openInNewTab>
+                {displayedHost.website}
               </StyledLink>
             </P>
           )}
@@ -299,6 +300,18 @@ ExpensePayeeDetails.propTypes = {
       name: PropTypes.string,
       slug: PropTypes.string,
       type: PropTypes.string,
+    }),
+    host: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      legalName: PropTypes.string,
+      slug: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      website: PropTypes.string,
+      location: PropTypes.shape({
+        address: PropTypes.string,
+        country: PropTypes.string,
+      }),
     }),
     payoutMethod: PropTypes.shape({
       id: PropTypes.string,
