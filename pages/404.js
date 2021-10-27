@@ -30,6 +30,10 @@ export default function Custom404() {
             </Flex>
           </Flex>
         </Container>
+<div> 
+<h4> This is to inform you that you got an error. So 404 is error when something is not found. So try to fix the issue. </h4>
+<p> Hope not to see you again :\ </p> 
+</div>
       </Body>
       <Footer />
     </div>
