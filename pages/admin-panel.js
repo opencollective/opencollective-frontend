@@ -172,4 +172,10 @@ const AdminPanelPage = () => {
   );
 };
 
+AdminPanelPage.getInitialProps = () => {
+  return {
+    scripts: { googleMaps: true }, // TODO: This should be enabled only for events
+  };
+};
+
 export default AdminPanelPage;
