@@ -164,11 +164,7 @@ class SectionContribute extends React.PureComponent {
     const { collective, contributors, contributorsStats, isAdmin } = this.props;
     const hasNoContributor = !this.hasContributors(contributors);
     const canContribute = collective.isActive && (!isPastEvent(collective) || isAdmin);
-    const hasCustomContribution = !get(
-      collective,
-      'settings.disableCustomContributions',
-      collective.type === CollectiveType.EVENT,
-    );
+    const hasCustomContribution = !get(collective, 'settings.disableCustomContributions', false);
     const hasCryptoContribution =
       !get(collective, 'settings.disableCryptoContributions', true) &&
       get(collective, 'host.settings.cryptoEnabled', false);
@@ -228,11 +224,7 @@ class SectionContribute extends React.PureComponent {
     const isEvent = collective.type === CollectiveType.EVENT;
     const isProject = collective.type === CollectiveType.PROJECT;
     const isFund = collective.type === CollectiveType.FUND;
-    const hasCustomContribution = !get(
-      collective,
-      'settings.disableCustomContributions',
-      collective.type === CollectiveType.EVENT,
-    );
+    const hasCustomContribution = !get(collective, 'settings.disableCustomContributions', false);
     const hasCryptoContribution =
       !get(collective, 'settings.disableCryptoContributions', true) &&
       get(collective, 'host.settings.cryptoEnabled', false);

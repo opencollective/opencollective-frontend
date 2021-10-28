@@ -6,7 +6,6 @@ import { first, get, last, startCase } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../../lib/collective-sections';
 import INTERVALS from '../../lib/constants/intervals';
 import { PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
 import { AmountTypes } from '../../lib/constants/tiers-types';
@@ -293,11 +292,7 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
   const { addToast } = useToasts();
   const { isSubmittingOrder, updateOrder } = useUpdateOrder({ contribution, onSuccess: onCloseEdit });
   const tiers = get(data, 'account.tiers.nodes', null);
-  const disableCustomContributions = get(
-    data,
-    'account.settings.disableCustomContributions',
-    data?.account?.type === CollectiveType.EVENT,
-  );
+  const disableCustomContributions = get(data, 'account.settings.disableCustomContributions', false);
   const contributeOptionsState = useContributeOptions(contribution, tiers, tiersLoading, disableCustomContributions);
   const {
     amountOptions,

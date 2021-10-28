@@ -448,11 +448,7 @@ class Tiers extends React.Component {
 
   render() {
     const { intl, collective, defaultType = TICKET } = this.props;
-    const hasCustomContributionsDisabled = get(
-      collective,
-      'settings.disableCustomContributions',
-      collective.type === CollectiveType.EVENT,
-    );
+    const hasCustomContributionsDisabled = get(collective, 'settings.disableCustomContributions', false);
     const hasCryptoContributionsDisabled = get(collective, 'settings.disableCryptoContributions', true);
     const cryptoContributionsEnabledByHost = get(collective, 'host.settings.cryptoEnabled', false);
     const displayContributionSettings = collective.id && defaultType !== TICKET;
