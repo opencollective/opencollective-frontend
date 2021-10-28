@@ -370,7 +370,7 @@ const ExpenseFormBody = ({
           }}
           value={values.type}
           options={{
-            fundingRequest: collective.settings?.expenseTypes?.isGrant === true,
+            fundingRequest: collective.settings?.expenseTypes?.hasGrant === true,
           }}
         />
       )}

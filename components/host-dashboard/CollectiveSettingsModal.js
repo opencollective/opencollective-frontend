@@ -38,8 +38,8 @@ const getDefaultFee = (collective, host) => {
   }
 };
 
-const editAccountFeeStructureMutation = gqlV2/* GraphQL */ `
-  mutation EditAccountFeesStructure(
+const editAccountSettingsMutation = gqlV2/* GraphQL */ `
+  mutation EditAccountSettings(
     $account: AccountReferenceInput!
     $hostFeePercent: Float!
     $isCustomFee: Boolean!
@@ -61,14 +61,14 @@ const editAccountFeeStructureMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
+const CollectiveSettingsModal = ({ host, collective, ...props }) => {
   const intl = useIntl();
   const [hostFeePercent, setHostFeePercent] = useState(getDefaultFee(collective, host));
   const [selectedOption, setSelectedOption] = useState(
     hostFeePercent === host.hostFeePercent ? HOST_FEE_STRUCTURE.DEFAULT : HOST_FEE_STRUCTURE.CUSTOM_FEE,
   );
-  const [isGrant, setIsGrant] = useState(collective?.settings?.expenseTypes?.isGrant || false);
-  const [submitFeesStructure, { loading, error }] = useMutation(editAccountFeeStructureMutation, {
+  const [hasGrant, setHasGrant] = useState(collective?.settings?.expenseTypes?.hasGrant || false);
+  const [submitFeesStructure, { loading, error }] = useMutation(editAccountSettingsMutation, {
     context: API_V2_CONTEXT,
   });
 
@@ -83,14 +83,14 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
           <StyledCheckbox
             name="grant"
             fontSize="12px"
-            defaultChecked={isGrant}
+            defaultChecked={hasGrant}
             label={
               <P fontWeight="500">
                 <FormattedMessage defaultMessage="Enable grants" />
               </P>
             }
             onChange={({ checked }) => {
-              setIsGrant(checked);
+              setHasGrant(checked);
             }}
           />
         </Flex>
@@ -167,7 +167,7 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
                   hostFeePercent: isCustomFee ? hostFeePercent : host.hostFeePercent,
                   isCustomFee,
                   key: 'expenseTypes',
-                  value: { isGrant },
+                  value: { hasGrant },
                 },
               }).then(props.onClose);
             }}
@@ -183,7 +183,7 @@ const CollectiveFeesStructureModal = ({ host, collective, ...props }) => {
   );
 };
 
-CollectiveFeesStructureModal.propTypes = {
+CollectiveSettingsModal.propTypes = {
   onClose: PropTypes.func,
   collective: PropTypes.shape({
     id: PropTypes.string,
@@ -196,4 +196,4 @@ CollectiveFeesStructureModal.propTypes = {
   }).isRequired,
 };
 
-export default CollectiveFeesStructureModal;
+export default CollectiveSettingsModal;
