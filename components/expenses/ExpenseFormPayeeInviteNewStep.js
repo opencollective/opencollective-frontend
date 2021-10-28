@@ -87,7 +87,9 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onBack, onNext }) =
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, errors } = formik;
-  const stepOneCompleted = values.payee?.name && values.payee?.email && isEmail(values.payee.email);
+  const isValidEmail = values.payee?.email && isEmail(values.payee.email);
+  const stepOneCompleted = values.payee?.name && isValidEmail;
+  const emailError = !isValidEmail ? intl.formatMessage({ defaultMessage: 'Please enter a valid email' }) : null;
 
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
   const [showAdditionalInfo, setAdditionalInfo] = React.useState(false);
@@ -125,7 +127,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onBack, onNext }) =
                 name={field.name}
                 label={formatMessage(msg.emailTitle)}
                 labelFontSize="13px"
-                error={errors.payee?.email}
+                error={formik.touched.payee?.email && (errors.payee?.email || emailError)}
                 mt={3}
                 hideOptionalLabel
                 required
