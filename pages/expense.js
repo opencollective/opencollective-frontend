@@ -84,6 +84,7 @@ const expensePageQuery = gqlV2/* GraphQL */ `
       payee {
         id
         stats {
+          id
           totalExpensesReceived: totalAmountReceived(kind: [EXPENSE], dateFrom: $totalExpensesReceivedDateFrom) {
             valueInCents
             currency
@@ -459,8 +460,8 @@ class ExpensePage extends React.Component {
     }
 
     const expense = cloneDeep(data.expense);
-    if (expense && data.expensePayeeStats) {
-      expense.payee.stats = data.expensePayeeStats.payee.stats;
+    if (expense && data.expensePayeeStats?.payee?.stats) {
+      expense.payee.stats = data.expensePayeeStats?.payee?.stats;
     }
     const loggedInAccount = data.loggedInAccount;
     const collective = expense?.account;
