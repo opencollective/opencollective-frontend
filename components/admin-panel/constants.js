@@ -29,7 +29,7 @@ export const ORG_BUDGET_SECTIONS = {
   CREATE_GIFT_CARDS: 'gift-cards-create',
   PAYMENT_METHODS: 'payment-methods',
   PAYMENT_RECEIPTS: 'payment-receipts',
-  PENDING_ORDERS: 'pending-orders',
+  FINANCIAL_CONTRIBUTIONS: 'orders',
   TIERS: 'tiers',
   // Manage Contributions
 };
@@ -173,10 +173,6 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.RECEIVING_MONEY]: {
     id: 'editCollective.receivingMoney',
     defaultMessage: 'Receiving Money',
-  },
-  [ALL_SECTIONS.PENDING_ORDERS]: {
-    id: 'PendingBankTransfers',
-    defaultMessage: 'Pending bank transfers',
   },
   [ALL_SECTIONS.SENDING_MONEY]: {
     id: 'editCollective.sendingMoney',

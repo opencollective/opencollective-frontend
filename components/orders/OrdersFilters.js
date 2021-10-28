@@ -28,7 +28,7 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const ExpensesFilters = ({ currency, filters, hasStatus, onChange }) => {
+const OrdersFilters = ({ currency, filters, hasStatus, onChange }) => {
   const getFilterProps = (name, valueModifier) => ({
     inputId: `orders-filter-${name}`,
     value: filters?.[name],
@@ -64,11 +64,11 @@ const ExpensesFilters = ({ currency, filters, hasStatus, onChange }) => {
   );
 };
 
-ExpensesFilters.propTypes = {
+OrdersFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
   currency: PropTypes.string,
   hasStatus: PropTypes.bool,
 };
 
-export default React.memo(ExpensesFilters);
+export default React.memo(OrdersFilters);

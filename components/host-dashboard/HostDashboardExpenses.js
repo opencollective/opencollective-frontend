@@ -140,7 +140,7 @@ const getVariablesFromQuery = query => {
   };
 };
 
-const ROUTE_PARAMS = ['hostCollectiveSlug', 'view'];
+const ROUTE_PARAMS = ['hostCollectiveSlug', 'view', 'slug', 'section'];
 
 const hasParams = query => {
   return Object.entries(query).some(([key, value]) => {
@@ -276,7 +276,7 @@ const HostDashboardExpenses = ({ hostSlug, isNewAdmin }) => {
               values={{
                 ResetLink(text) {
                   return (
-                    <Link data-cy="reset-expenses-filters" href={{ pathname: `/${data.host.slug}/dashboard` }}>
+                    <Link data-cy="reset-expenses-filters" href={{ pathname: pageRoute }}>
                       {text}
                     </Link>
                   );

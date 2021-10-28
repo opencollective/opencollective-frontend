@@ -110,7 +110,7 @@ const getVariablesFromQuery = query => {
   };
 };
 
-const ROUTE_PARAMS = ['hostCollectiveSlug', 'view'];
+const ROUTE_PARAMS = ['hostCollectiveSlug', 'slug', 'section', 'view'];
 
 const updateQuery = (router, newParams) => {
   const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
@@ -184,7 +184,6 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
           </Grid>
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route={`/${hostSlug}/dashboard/hosted-collectives`}
               total={hostedMemberships?.totalCount}
               limit={variables.limit}
               offset={variables.offset}
