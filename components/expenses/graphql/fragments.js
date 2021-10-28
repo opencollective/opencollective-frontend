@@ -209,6 +209,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       }
 
       stats {
+        id
         balanceWithBlockedFunds {
           valueInCents
           currency
