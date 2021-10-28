@@ -344,7 +344,7 @@ const HostFeesSection = ({ hostSlug }) => {
             </P>
           </Container>
           <Container width={[1, 1, 1 / 4]} px={2} textAlign="right">
-            <StyledLinkButton asLink onClick={() => setShowHostFeeChart(!showHostFeeChart)}>
+            <StyledLinkButton asLink color="#46347F" onClick={() => setShowHostFeeChart(!showHostFeeChart)}>
               <P fontSize="12px" fontWeight="400" mt="16px">
                 <FormattedMessage defaultMessage="See historical" />
                 <Span pl="8px">
