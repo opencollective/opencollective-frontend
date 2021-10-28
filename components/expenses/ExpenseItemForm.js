@@ -55,7 +55,7 @@ export const msg = defineMessages({
 /** Validates a single expense item, one field at a time (doesn't return multiple errors) */
 export const validateExpenseItem = (expense, item) => {
   const requiredFields = ['description', 'amount'];
-  if (expense.type !== expenseTypes.FUNDING_REQUEST) {
+  if (expense.type !== expenseTypes.FUNDING_REQUEST && expense.type !== expenseTypes.GRANT) {
     requiredFields.push('incurredAt');
   }
   const errors = requireFields(item, requiredFields);

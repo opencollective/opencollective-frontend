@@ -105,7 +105,7 @@ export const prepareExpenseForSubmit = expenseData => {
   // The collective picker still uses API V1 for when creating a new profile on the fly
   const payeeIdField = typeof expenseData.payee?.id === 'string' ? 'id' : 'legacyId';
   const isInvoice = expenseData.type === expenseTypes.INVOICE;
-  const isFundingRequest = expenseData.type === expenseTypes.FUNDING_REQUEST;
+  const isFundingRequest = expenseData.type === expenseTypes.FUNDING_REQUEST || expenseData.type === expenseTypes.GRANT;
   const payee =
     expenseData.payee?.isNewUser || expenseData.payee?.isInvite
       ? pick(expenseData.payee, ['name', 'email', 'legalName', 'organization', 'newsletterOptIn'])
@@ -208,7 +208,7 @@ const ExpenseFormBody = ({
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
   const isReceipt = values.type === expenseTypes.RECEIPT;
-  const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST;
+  const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT;
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
   const stepOneCompleted =
     values.payoutMethod &&
@@ -403,7 +403,7 @@ const ExpenseFormBody = ({
                 lineHeight="24px"
                 fontWeight="bold"
               >
-                {values.type === expenseTypes.FUNDING_REQUEST ? (
+                {values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT ? (
                   <FormattedMessage
                     id="Expense.EnterRequestSubject"
                     defaultMessage="Enter grant subject <small>(Public)</small>"
@@ -456,7 +456,7 @@ const ExpenseFormBody = ({
               width="100%"
               withOutline
               placeholder={
-                values.type === expenseTypes.FUNDING_REQUEST
+                values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT
                   ? formatMessage(msg.grantSubjectPlaceholder)
                   : formatMessage(msg.descriptionPlaceholder)
               }
@@ -516,21 +516,22 @@ const ExpenseFormBody = ({
                 <FieldArray name="items" component={ExpenseFormItems} />
               </Box>
 
-              {values.type === expenseTypes.FUNDING_REQUEST && (
-                <Box my={40}>
-                  <ExpenseAttachedFilesForm
-                    title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}
-                    description={
-                      <FormattedMessage
-                        id="UploadDocumentationDescription"
-                        defaultMessage="If you want to include any documentation, you can upload it here."
-                      />
-                    }
-                    onChange={files => formik.setFieldValue('attachedFiles', files)}
-                    defaultValue={values.attachedFiles}
-                  />
-                </Box>
-              )}
+              {values.type === expenseTypes.FUNDING_REQUEST ||
+                (values.type === expenseTypes.GRANT && (
+                  <Box my={40}>
+                    <ExpenseAttachedFilesForm
+                      title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}
+                      description={
+                        <FormattedMessage
+                          id="UploadDocumentationDescription"
+                          defaultMessage="If you want to include any documentation, you can upload it here."
+                        />
+                      }
+                      onChange={files => formik.setFieldValue('attachedFiles', files)}
+                      defaultValue={values.attachedFiles}
+                    />
+                  </Box>
+                ))}
 
               <StyledHr flex="1" mt={4} borderColor="black.300" />
               <Flex mt={3} flexWrap="wrap" alignItems="center">
