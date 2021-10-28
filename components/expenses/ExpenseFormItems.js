@@ -125,7 +125,7 @@ class ExpenseFormItems extends React.PureComponent {
   render() {
     const { values, errors } = this.props.form;
     const requireFile = attachmentRequiresFile(values.type);
-    const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT;
+    const isGrant = values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT;
     const isCreditCardCharge = values.type === expenseTypes.CHARGE;
     const items = values.items || [];
     const hasItems = items.length > 0;
@@ -167,8 +167,8 @@ class ExpenseFormItems extends React.PureComponent {
             errors={errors}
             onRemove={onRemove}
             requireFile={requireFile}
-            requireDate={!isFundingRequest}
-            isRichText={isFundingRequest}
+            requireDate={!isGrant}
+            isRichText={isGrant}
             onUploadError={e => this.setState({ uploadErrors: [e] })}
             isOptional={values.payee?.isInvite}
             editOnlyDescriptiveInfo={isCreditCardCharge}
