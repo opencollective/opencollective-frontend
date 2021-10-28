@@ -465,6 +465,7 @@ const contributePageQuery = gql`
         description
         image
         isActive
+        isArchived
         backgroundImageUrl(height: 208)
         contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER]) {
           id
