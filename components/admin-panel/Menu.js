@@ -185,7 +185,7 @@ const Menu = ({ collective }) => {
           <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />
           <MenuLink
             collective={collective}
-            section={ORG_BUDGET_SECTIONS.PENDING_ORDERS}
+            section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
             if={isType(collective, COLLECTIVE)}
           />
           <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.HOST_TWO_FACTOR_AUTH} />

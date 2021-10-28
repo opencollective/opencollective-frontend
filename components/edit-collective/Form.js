@@ -857,7 +857,7 @@ class EditCollectiveForm extends React.Component {
 
     const fields = (this.fields[section] || []).filter(field => !field.when || field.when());
     return (
-      <div className="EditCollectiveForm">
+      <div>
         <Flex flexWrap="wrap">
           {contentOnly ? null : <Menu collective={collective} selectedSection={this.getMenuSelectedSection(section)} />}
 

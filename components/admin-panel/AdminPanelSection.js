@@ -15,9 +15,9 @@ import NotFound from '../NotFound';
 import AccountSettings from './sections/AccountSettings';
 import FinancialContributions from './sections/FinancialContributions';
 import {
+  ALL_SECTIONS,
   HOST_DASHBOARD_SECTIONS,
   LEGACY_COLLECTIVE_SETTINGS_SECTIONS,
-  ORG_BUDGET_SECTIONS,
   SECTION_LABELS,
 } from './constants';
 
@@ -35,7 +35,7 @@ const Title = styled(Box)`
 `;
 
 // Some sections include their own title
-const IGNORED_SECTION_TITLES = [ORG_BUDGET_SECTIONS.PENDING_ORDERS];
+const IGNORED_SECTION_TITLES = [ALL_SECTIONS.FINANCIAL_CONTRIBUTIONS, ALL_SECTIONS.HOST];
 
 const AdminPanelSection = ({ collective, isLoading, section }) => {
   const { formatMessage } = useIntl();
