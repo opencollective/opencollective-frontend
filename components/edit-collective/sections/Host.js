@@ -62,6 +62,7 @@ class Host extends React.Component {
       collective: props.collective,
       showModal: false,
       action: '',
+      isSubmitting: false,
     };
   }
 
@@ -80,12 +81,18 @@ class Host extends React.Component {
     if (newHost.id === get(collective, 'host.id')) {
       return;
     }
-    await this.props.editCollectiveMutation({
-      id: collective.id,
-      HostCollectiveId: newHost.id,
-    });
-    if (!newHost.id) {
-      this.updateSelectedOption('noHost');
+
+    this.setState({ isSubmitting: true });
+    try {
+      await this.props.editCollectiveMutation({
+        id: collective.id,
+        HostCollectiveId: newHost.id,
+      });
+      if (!newHost.id) {
+        this.updateSelectedOption('noHost');
+      }
+    } finally {
+      this.setState({ isSubmitting: false });
     }
   }
 
@@ -155,7 +162,8 @@ class Host extends React.Component {
                   buttonStyle="primary"
                   type="submit"
                   onClick={() => this.changeHost()}
-                  className="removeHostBtn"
+                  minWidth={200}
+                  loading={this.state.isSubmitting}
                 >
                   <FormattedMessage id="editCollective.selfHost.removeBtn" defaultMessage="Reset Fiscal Host" />
                 </StyledButton>
@@ -197,7 +205,6 @@ class Host extends React.Component {
                       buttonStyle="primary"
                       type="submit"
                       onClick={() => this.setState({ showModal: true, action: 'Withdraw' })}
-                      className="removeHostBtn"
                     >
                       <FormattedMessage
                         id="editCollective.host.cancelApplicationBtn"
@@ -251,7 +258,6 @@ class Host extends React.Component {
                           buttonStyle="primary"
                           type="submit"
                           onClick={() => this.setState({ showModal: true, action: 'Remove' })}
-                          className="removeHostBtn"
                         >
                           <FormattedMessage id="editCollective.host.removeBtn" defaultMessage="Remove Host" />
                         </StyledButton>
@@ -399,6 +405,8 @@ class Host extends React.Component {
                       buttonStyle="primary"
                       type="submit"
                       onClick={() => this.changeHost({ id: collective.id })}
+                      loading={this.state.isSubmitting}
+                      minWidth={200}
                     >
                       <FormattedMessage
                         id="host.selfHost.confirm"
