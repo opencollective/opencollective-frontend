@@ -30,8 +30,8 @@ describe('host dashboard', () => {
       cy.wait(300);
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
-      cy.login({ redirect: '/brusselstogetherasbl/dashboard' });
-      cy.get('[data-cy="host-dashboard-menu-bar"]').contains('Pending applications').click();
+      cy.login({ redirect: '/brusselstogetherasbl/admin' });
+      cy.get('[data-cy="menu-item-pending-applications"]').click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
       cy.contains(`[data-cy="host-application"]`, 'Approved');
     });
@@ -39,7 +39,7 @@ describe('host dashboard', () => {
 
   describe('Orders', () => {
     it('mark pending order as paid', () => {
-      cy.login({ redirect: '/brusselstogetherasbl/dashboard/donations' });
+      cy.login({ redirect: '/brusselstogetherasbl/admin/orders' });
       cy.get('[data-cy="MARK_AS_PAID-button"]:first').click();
       cy.getByDataCy('confirmation-modal-continue').click();
       cy.contains('[data-cy="order-status-msg"]:first', 'Paid');
@@ -59,7 +59,7 @@ describe('host dashboard', () => {
     });
 
     it('Process expense', () => {
-      cy.login({ redirect: '/brusselstogetherasbl/dashboard/expenses' });
+      cy.login({ redirect: '/brusselstogetherasbl/admin/expenses' });
       cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
 
       // Defaults to pending, approve it
@@ -101,14 +101,14 @@ describe('host dashboard', () => {
 
   describe('Add funds modal', () => {
     it('Cannot submit incomplete form', () => {
-      cy.login({ redirect: '/brusselstogetherasbl/dashboard/hosted-collectives' });
+      cy.login({ redirect: '/brusselstogetherasbl/admin/hosted-collectives' });
       cy.get('[data-cy="hosted-collective-add-funds-btn"]').first().click();
       cy.wait(300);
       cy.get('[data-cy="add-funds-submit-btn"]').should('be.disabled');
     });
 
     it('Can add funds and platform tip as collective host', () => {
-      cy.login({ redirect: '/brusselstogetherasbl/dashboard/hosted-collectives' });
+      cy.login({ redirect: '/brusselstogetherasbl/admin/hosted-collectives' });
       cy.get('[data-cy="hosted-collective-add-funds-btn"]').first().click();
       cy.wait(300);
       cy.get('[data-cy="add-funds-amount"]').type('20');

@@ -72,7 +72,7 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
         title: 'Insufficient Paypal balance',
         message: (
           <React.Fragment>
-            <Link href={`/${host.slug}/dashboard`}>
+            <Link href={`/${host.slug}/admin`}>
               <FormattedMessage
                 id="PayExpenseModal.RefillBalanceError"
                 defaultMessage="Refill your balance from the Host dashboard"
