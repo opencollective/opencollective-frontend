@@ -75,12 +75,16 @@ const HTMLContent = styled(({ content, collapsable = false, maxCollapsedHeight =
 
   return (
     <div>
-      <DisplayBox
-        ref={contentRef}
-        maxHeight={maxCollapsedHeight}
-        dangerouslySetInnerHTML={{ __html: content }}
-        {...props}
-      />
+      {!isCollapsed || isOpen ? (
+        <InlineDisplayBox ref={contentRef} dangerouslySetInnerHTML={{ __html: content }} {...props} />
+      ) : (
+        <DisplayBox
+          ref={contentRef}
+          maxHeight={maxCollapsedHeight}
+          dangerouslySetInnerHTML={{ __html: content }}
+          {...props}
+        />
+      )}
       {!isOpen && isCollapsed && (
         <ReadFullLink
           onClick={() => setOpen(true)}
