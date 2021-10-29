@@ -815,6 +815,7 @@ class EditCollectiveForm extends React.Component {
           name: 'hostFeePercent',
           type: 'number',
           className: 'horizontal',
+          step: '0.01',
           post: '%',
           defaultValue: get(this.state.collective, 'hostFeePercent'),
           when: () =>
@@ -890,6 +891,7 @@ class EditCollectiveForm extends React.Component {
                       disabled={field.disabled}
                       maxLength={field.maxLength}
                       isPrivate={field.isPrivate}
+                      step={field.step}
                     />
                   ))}
                 </div>
