@@ -749,6 +749,11 @@ enum Currency {
   HUF
 
   """
+  Rupiah
+  """
+  IDR
+
+  """
   Indian Rupee
   """
   INR
@@ -1759,7 +1764,7 @@ type Host implements Account & AccountWithContributions {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
-  hostFeePercent: Int
+  hostFeePercent: Float
   totalHostedCollectives: Int
   isOpenToApplications: Boolean
   termsUrl: URL
@@ -2220,7 +2225,7 @@ enum ConnectedAccountService {
 Stats for the Account
 """
 type AccountStats {
-  id: Int
+  id: String
 
   """
   Amount of money in cents in the currency of the collective currently available to spend
