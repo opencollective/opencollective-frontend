@@ -512,8 +512,7 @@ const ExpenseFormBody = ({
                 <FieldArray name="items" component={ExpenseFormItems} />
               </Box>
 
-              {values.type === expenseTypes.FUNDING_REQUEST ||
-                (values.type === expenseTypes.GRANT && (
+              {(values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT) && (
                   <Box my={40}>
                     <ExpenseAttachedFilesForm
                       title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}
