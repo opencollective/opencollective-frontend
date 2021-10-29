@@ -513,20 +513,20 @@ const ExpenseFormBody = ({
               </Box>
 
               {(values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT) && (
-                  <Box my={40}>
-                    <ExpenseAttachedFilesForm
-                      title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}
-                      description={
-                        <FormattedMessage
-                          id="UploadDocumentationDescription"
-                          defaultMessage="If you want to include any documentation, you can upload it here."
-                        />
-                      }
-                      onChange={files => formik.setFieldValue('attachedFiles', files)}
-                      defaultValue={values.attachedFiles}
-                    />
-                  </Box>
-                ))}
+                <Box my={40}>
+                  <ExpenseAttachedFilesForm
+                    title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}
+                    description={
+                      <FormattedMessage
+                        id="UploadDocumentationDescription"
+                        defaultMessage="If you want to include any documentation, you can upload it here."
+                      />
+                    }
+                    onChange={files => formik.setFieldValue('attachedFiles', files)}
+                    defaultValue={values.attachedFiles}
+                  />
+                </Box>
+              )}
 
               <StyledHr flex="1" mt={4} borderColor="black.300" />
               <Flex mt={3} flexWrap="wrap" alignItems="center">
