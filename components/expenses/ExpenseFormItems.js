@@ -67,7 +67,7 @@ class ExpenseFormItems extends React.PureComponent {
     const { values, touched } = this.props.form;
 
     if (oldProps.form.values.type !== values.type) {
-    if ([expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST, expenseTypes.GRANT].includes(values.type)) {
+      if ([expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST, expenseTypes.GRANT].includes(values.type)) {
         this.addDefaultItem();
       } else if (!touched.items && values.items?.length === 1) {
         const firstItem = values.items[0];
