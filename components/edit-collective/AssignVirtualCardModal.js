@@ -301,8 +301,8 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
                   inputId="provider"
                   placeholder="Select"
                   options={[
-                    { key: 'privacy', value: 'privacy', label: 'Privacy' },
-                    { key: 'stripe', value: 'stripe', label: 'Stripe' },
+                    { key: 'PRIVACY', value: 'PRIVACY', label: 'Privacy' },
+                    { key: 'STRIPE', value: 'STRIPE', label: 'Stripe' },
                   ]}
                   isSearchable={false}
                   disabled={isBusy || isEditing}
