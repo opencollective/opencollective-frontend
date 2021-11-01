@@ -1712,6 +1712,7 @@
   "pledge.stats": "{orgCount, plural, =0 {} one {# organization} other {# organizations}} {both, plural, =0 {} other { and }} {userCount, plural, =0 {} one {# individual } other {# individuals }} {totalCount, plural, one {has } other {have }} already pledged a total of {amount} {currency}",
   "PledgeCard.HasPledged": "A promis :",
   "pledgedCollective": "Collectifs demandés",
+  "prBAWB": "Please enter a valid email",
   "Prepaid": "Prepaid Card",
   "pricing.accessTo.bankTransfer": "Activez les paiements par transfert bancaire pour fournir automatiquement aux contributeurs financiers des instructions et un numéro de référence pour le suivi.",
   "pricing.accessTo.manuallyCredit": "Manually credit Collective budgets with funds received outside the platform (e.g., payments you've invoiced, cash, or third party channels like a shop).",
