@@ -1,17 +1,28 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
-import { FormattedMessage } from 'react-intl';
+import { ChevronDown } from '@styled-icons/fa-solid/ChevronDown/ChevronDown';
+import { ChevronUp } from '@styled-icons/fa-solid/ChevronUp/ChevronUp';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
+
+import dynamic from 'next/dynamic';
 
 import { formatCurrency } from '../../../lib/currency-utils';
 
 import Container from '../../Container';
+import ContainerOverlay from '../../ContainerOverlay';
 import { Box, Flex } from '../../Grid';
 import StyledCard from '../../StyledCard';
+import StyledLinkButton from '../../StyledLinkButton';
+import { StyledSelectFilter } from '../../StyledSelectFilter';
+import StyledSpinner from '../../StyledSpinner';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
+
+import { getActiveYearsOptions } from './HostFeesSection';
 
 const FundAmounts = styled.div`
   height: 48px;
@@ -37,7 +48,51 @@ const TotalFundsLabel = styled(Container)`
   opacity: 80%;
 `;
 
-const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
+const ChartWrapper = styled.div`
+  position: relative;
+
+  .apexcharts-legend-series {
+    background: white;
+    padding: 8px;
+    border-radius: 10px;
+    & > span {
+      vertical-align: middle;
+    }
+  }
+
+  .apexcharts-legend-marker {
+    margin-right: 8px;
+  }
+`;
+
+const getChartOptions = intl => ({
+  chart: {
+    id: 'chart-host-report-money-managed',
+  },
+  stroke: {
+    curve: 'straight',
+    width: 2,
+  },
+  markers: {
+    size: 4,
+  },
+  colors: ['#46347F'],
+  xaxis: {
+    categories: [...new Array(12)].map(
+      (_, idx) => `${intl.formatDate(new Date(0, idx), { month: 'short' }).toUpperCase()}`,
+    ),
+  },
+});
+
+const TotalMoneyManagedSection = ({ currency, hostMetrics, hostSlug }) => {
+  const intl = useIntl();
+  const [showMoneyManagedChart, setShowMoneyManagedChart] = useState(false);
+  const yearsOptions = useMemo(() => getActiveYearsOptions(null), [null]);
+  const chartOptions = useMemo(() => getChartOptions(intl, currency), [currency]);
+  const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
+
+  const series = [{ data: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120] }];
+
   const {
     totalMoneyManaged,
     pendingPlatformFees,
@@ -115,12 +170,52 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
             </Flex>
           </FundAmounts>
         </Container>
-        <P minHeight="18px" fontSize="12px" fontWeight="400" lineHeight="18px" pt={12} pb={16}>
-          <FormattedMessage
-            id="Host.Metrics.TotalMoneyManages.description"
-            defaultMessage="Total amount held in your bank account for the Host and its Collectives."
-          />
-        </P>
+        <Flex flexWrap="wrap">
+          <Container width={[1, 1, 3 / 4]} px={2}>
+            <P fontSize="12px" fontWeight="400" mt="16px">
+              <FormattedMessage defaultMessage="Total amount held in your bank account for the Host and its Collectives." />
+            </P>
+          </Container>
+          <Container width={[1, 1, 1 / 4]} px={2} textAlign="right">
+            <StyledLinkButton color="#46347F" asLink onClick={() => setShowMoneyManagedChart(!showMoneyManagedChart)}>
+              <P fontSize="12px" fontWeight="400" mt="16px">
+                <FormattedMessage defaultMessage="See historical" />
+                <Span pl="8px">
+                  {showMoneyManagedChart ? (
+                    <ChevronUp size={12} color="#46347F" />
+                  ) : (
+                    <ChevronDown fontVariant="solid" size={12} color="#46347F" />
+                  )}
+                </Span>
+              </P>
+            </StyledLinkButton>
+          </Container>
+        </Flex>
+        {showMoneyManagedChart && (
+          <Box py={3}>
+            <Flex alignItems="center" px={2} mb={2}>
+              <P fontSize="11px" fontWeight="700" mr={3} textTransform="uppercase">
+                <FormattedMessage defaultMessage="Total money managed per year" />
+              </P>
+              <StyledSelectFilter
+                inputId="host-report-money-managed-year-select"
+                options={yearsOptions}
+                defaultValue={{ value: selectedYear, label: selectedYear }}
+                onChange={({ value }) => setSelectedYear(value)}
+                isSearchable={false}
+                minWidth={100}
+              />
+            </Flex>
+            <ChartWrapper>
+              {false && (
+                <ContainerOverlay>
+                  <StyledSpinner size={64} />
+                </ContainerOverlay>
+              )}
+              <Chart type="line" width="100%" height="250px" options={chartOptions} series={series} />
+            </ChartWrapper>
+          </Box>
+        )}
       </Container>
     </StyledCard>
   );
