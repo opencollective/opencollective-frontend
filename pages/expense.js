@@ -183,7 +183,10 @@ class ExpensePage extends React.Component {
     this.state = {
       isRefetchingDataForUser: false,
       error: null,
-      status: this.props.draftKey ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
+      status:
+        this.props.draftKey && this.props.data.expense?.status === expenseStatus.DRAFT
+          ? PAGE_STATUS.EDIT
+          : PAGE_STATUS.VIEW,
       editedExpense: null,
       isSubmitting: false,
       isPoolingEnabled: true,
