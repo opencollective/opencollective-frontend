@@ -8,6 +8,7 @@
   "94IjMb": "Всесвітній координований час",
   "9Iwj+r": "Admin panel",
   "9kdoVP": "Місцевий час: {localTime}{newLine}UTC: {utcTime}",
+  "9MpOZn": "Support the event or buy tickets.",
   "9sbPks": "By default, all dates are filtered and displayed using your local timezone. You can switch to UTC to indicate that the dates provided above use the Coordinated Universal Time format, which matches how email reports are generated",
   "Accept": "Прийняти",
   "acceptContributions.addBankAccount": "Додати банківський рахунок",
@@ -1372,6 +1373,7 @@
   "inviteAdmin": "Запросити співадміністратора",
   "InviteOnItsWay": "Ваше запрошення вже в дорозі",
   "InviteUser": "Запросити користувача",
+  "iUxV8v": "Get Involved",
   "Jkxa7F": "View Profile",
   "join": "Приєднатися",
   "join.aboutFiscalHosting": "Про фіскальні вузли",
@@ -2222,5 +2224,6 @@
   "yes": "Так",
   "yVPYIH": "Hosted",
   "ZonfjV": "You cannot edit this collective",
+  "ZvWD3X": "Support the event or buy tickets to attend.",
   "zWgbGg": "Today"
 }
