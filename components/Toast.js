@@ -8,10 +8,10 @@ import styled, { css } from 'styled-components';
 import { variant } from 'styled-system';
 
 import { Flex } from './Grid';
-import StyledButton from './StyledButton';
+import StyledRoundButton from './StyledButton';
 import { TOAST_TYPE } from './ToastProvider';
 
-const CloseButton = styled(StyledButton).attrs({
+const CloseButton = styled(StyledRoundButton).attrs({
   'data-cy': 'dismiss-toast-btn',
   buttonSize: 'tiny',
   isBorderless: true,
@@ -196,14 +196,17 @@ const Toast = ({ toast, timeLeft, onClose, variant }) => {
           {toast.message && <ToastMessage>{toast.message}</ToastMessage>}
         </Flex>
       </Flex>
-      <CloseButton
-        onClick={() => {
-          setClosing(true);
-          onClose();
-        }}
-      >
-        <Close size={12} />
-      </CloseButton>
+      <Flex alignItems="center">
+        <CloseButton
+          size={42}
+          onClick={() => {
+            setClosing(true);
+            onClose();
+          }}
+        >
+          <Close size={12} />
+        </CloseButton>
+      </Flex>
     </StyledToast>
   );
 };
