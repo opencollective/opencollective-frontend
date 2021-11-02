@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
+import dayjs from 'dayjs';
 import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
@@ -51,7 +52,7 @@ import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
 const getVariableFromProps = props => {
-  const firstOfCurrentYear = new Date(new Date().getFullYear(), 0, 1).toISOString();
+  const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1)).utc(true).toISOString();
   return {
     legacyExpenseId: props.legacyExpenseId,
     draftKey: props.draftKey,
