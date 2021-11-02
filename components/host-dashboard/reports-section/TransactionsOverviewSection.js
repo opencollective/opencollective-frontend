@@ -14,6 +14,7 @@ import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import { Flex } from '../../Grid';
 import Loading from '../../Loading';
+import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import { P, Span } from '../../Text';
 
 const FilterLabel = styled.label`
@@ -103,15 +104,19 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
     }
   };
 
-  const { data, loading } = useQuery(transactionsOverviewQuery, {
+  const { data, loading, error } = useQuery(transactionsOverviewQuery, {
     variables: { hostSlug, ...prepareDateArgs(dateInterval), account: collectives },
     context: API_V2_CONTEXT,
   });
+
+  if (error) {
+    return <MessageBoxGraphqlError error={error} />;
+  }
+
   const host = data?.host;
   const currency = host?.currency;
   const contributionStats = host?.contributionStats;
   const expenseStats = host?.expenseStats;
-
   const { contributionsCount, recurringContributionsCount, oneTimeContributionsCount, dailyAverageIncomeAmount } =
     contributionStats || 0;
   const { expensesCount, invoicesCount, reimbursementsCount, grantsCount, dailyAverageAmount } = expenseStats || 0;
