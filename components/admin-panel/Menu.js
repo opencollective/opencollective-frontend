@@ -75,7 +75,7 @@ const Menu = ({ collective }) => {
           </SubMenu>
           <SubMenu
             label={<FormattedMessage id="AdminPanel.FiscalHostSettings" defaultMessage="Fiscal Host Settings" />}
-            if={isHost || (isIndividual && isHost)}
+            if={isHost}
           >
             <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.FISCAL_HOSTING} />
             <MenuGroup if={isHost}>
