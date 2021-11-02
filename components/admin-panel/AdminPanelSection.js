@@ -8,6 +8,7 @@ import Container from '../Container';
 import { Box } from '../Grid';
 import HostDashboardExpenses from '../host-dashboard/HostDashboardExpenses';
 import HostDashboardHostedCollectives from '../host-dashboard/HostDashboardHostedCollectives';
+import HostDashboardReports from '../host-dashboard/HostDashboardReports';
 import PendingApplications from '../host-dashboard/PendingApplications';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
@@ -26,6 +27,7 @@ const HOST_ADMIN_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS]: FinancialContributions,
   [HOST_DASHBOARD_SECTIONS.EXPENSES]: HostDashboardExpenses,
   [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: PendingApplications,
+  [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
 };
 
 const Title = styled(Box)`
