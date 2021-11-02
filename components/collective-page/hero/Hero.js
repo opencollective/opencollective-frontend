@@ -88,7 +88,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const isFund = collective.type === CollectiveType.FUND;
   const parentIsHost = host && collective.parentCollective?.id === host.id;
   const firstConnectedAccount = first(collective.connectedTo);
-  const connectedAccountIsHost = firstConnectedAccount && firstConnectedAccount.collective.id === host.id;
+  const connectedAccountIsHost = firstConnectedAccount && host && firstConnectedAccount.collective.id === host.id;
 
   const handleHeroMessage = msg => {
     if (!msg) {
