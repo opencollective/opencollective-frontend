@@ -48,7 +48,7 @@ const MenuLinkContainer = styled.li`
   }
 `;
 
-export const MenuLink = ({ collective, section, children, onClick, isSelected, isStrong, if: conditional }) => {
+export const MenuLink = ({ collective, section, children, onClick, isSelected, isStrong, if: conditional, isBeta }) => {
   const router = useRouter();
   const { formatMessage } = useIntl();
   if (conditional === false) {
@@ -65,10 +65,12 @@ export const MenuLink = ({ collective, section, children, onClick, isSelected, i
       {onClick ? (
         <StyledLink as="button" onClick={onClick} data-cy={`menu-item-${section}`}>
           {children}
+          {isBeta ? ' (Beta)' : ''}
         </StyledLink>
       ) : (
         <Link href={getSettingsRoute(collective, section, true)} data-cy={`menu-item-${section}`}>
           {children}
+          {isBeta ? ' (Beta)' : ''}
         </Link>
       )}
     </MenuLinkContainer>
@@ -81,6 +83,7 @@ MenuLink.propTypes = {
   selectedSection: PropTypes.string,
   children: PropTypes.node,
   isSelected: PropTypes.bool,
+  isBeta: PropTypes.bool,
   isStrong: PropTypes.bool,
   onClick: PropTypes.func,
   afterClick: PropTypes.func,

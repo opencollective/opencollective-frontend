@@ -61,6 +61,7 @@ const Menu = ({ collective }) => {
           <MenuLink collective={collective} section={HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS} />
           <MenuLink collective={collective} section={HOST_SECTIONS.PENDING_APPLICATIONS} />
           <MenuLink collective={collective} section={HOST_SECTIONS.HOSTED_COLLECTIVES} />
+          <MenuLink collective={collective} section={HOST_SECTIONS.REPORTS} isBeta />
         </MenuGroup>
         <MenuGroup if={isHost || isType(collective, ORGANIZATION)}>
           <MenuSectionHeader>
