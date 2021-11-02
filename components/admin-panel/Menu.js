@@ -107,13 +107,13 @@ const Menu = ({ collective }) => {
           </SubMenu>
         </MenuGroup>
 
-        {/** General organization settings */}
+        {/** General non-host organization settings (hosts organizations have a dedicated sub-menu) */}
         <MenuGroup if={isSimpleOrg}>
           <OrganizationSettingsMenuLinks collective={collective} />
         </MenuGroup>
 
-        {/** General settings for other profiles */}
-        <MenuGroup if={!isType(collective, ORGANIZATION) && (!isHost || isIndividual)}>
+        {/** General settings for everyone except organizations */}
+        <MenuGroup if={!isType(collective, ORGANIZATION)}>
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.INFO} />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.COLLECTIVE_PAGE} />
           <MenuLink
