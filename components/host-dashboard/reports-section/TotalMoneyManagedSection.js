@@ -8,9 +8,12 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
+import { useQuery } from '@apollo/client';
+import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 
 import { formatCurrency } from '../../../lib/currency-utils';
+import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
@@ -84,14 +87,65 @@ const getChartOptions = intl => ({
   },
 });
 
+const totalMoneyManagedQuery = gqlV2/* GraphQL */ `
+  query TotalMoneyManagedQuery($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
+    host(slug: $hostSlug) {
+      id
+      hostMetricsTimeSeries(dateFrom: $dateFrom, dateTo: $dateTo, timeUnit: MONTH) {
+        totalMoneyManagedProgress {
+          nodes {
+            date
+            amount {
+              value
+              valueInCents
+              currency
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const getQueryVariables = (hostSlug, year) => {
+  return {
+    hostSlug,
+    dateFrom: `${year}-01-01T00:00:00Z`,
+    dateTo: `${year}-12-31T23:59:59Z`,
+  };
+};
+
+const getSeriesFromData = (intl, timeSeries) => {
+  const dataToSeries = data => {
+    const series = new Array(12).fill(0); // = 12 months
+    data?.forEach(({ date, amount }) => (series[new Date(date).getMonth() + 1] = amount.value));
+    return series;
+  };
+
+  const totalMoneyManagedProgressNodes = get(timeSeries, 'totalMoneyManagedProgress.nodes', []);
+  return [
+    {
+      name: intl.formatMessage({ defaultMessage: 'Total Managed Amount' }),
+      data: dataToSeries(totalMoneyManagedProgressNodes),
+    },
+  ];
+};
+
 const TotalMoneyManagedSection = ({ currency, hostMetrics, hostSlug }) => {
   const intl = useIntl();
   const [showMoneyManagedChart, setShowMoneyManagedChart] = useState(false);
   const yearsOptions = useMemo(() => getActiveYearsOptions(null), [null]);
   const chartOptions = useMemo(() => getChartOptions(intl, currency), [currency]);
   const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
-
-  const series = [{ data: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120] }];
+  const variables = getQueryVariables(hostSlug, selectedYear);
+  const { loading, data, previousData } = useQuery(totalMoneyManagedQuery, {
+    variables,
+    context: API_V2_CONTEXT,
+    skip: !showMoneyManagedChart,
+  });
+  const host = loading && !data ? previousData?.host : data?.host;
+  const timeSeries = host?.hostMetricsTimeSeries;
+  const series = React.useMemo(() => getSeriesFromData(intl, timeSeries), [timeSeries]);
 
   const {
     totalMoneyManaged,
@@ -207,7 +261,7 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics, hostSlug }) => {
               />
             </Flex>
             <ChartWrapper>
-              {false && (
+              {loading && (
                 <ContainerOverlay>
                   <StyledSpinner size={64} />
                 </ContainerOverlay>
@@ -222,6 +276,7 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics, hostSlug }) => {
 };
 
 TotalMoneyManagedSection.propTypes = {
+  hostSlug: PropTypes.string,
   currency: PropTypes.string,
   hostMetrics: PropTypes.object,
 };
