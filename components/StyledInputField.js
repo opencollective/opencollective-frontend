@@ -10,7 +10,7 @@ import { P, Span } from './Text';
 const PrivateIconWithSpace = () => (
   <React.Fragment>
     &nbsp;
-    <PrivateInfoIcon tooltipProps={{ containerVerticalAlign: 'text-bottom' }} />
+    <PrivateInfoIcon tooltipProps={{ containerVerticalAlign: 'text-top' }} />
   </React.Fragment>
 );
 
@@ -37,12 +37,16 @@ const StyledInputField = ({
   isPrivate,
   ...props
 }) => {
-  const labelContent = label && <Span color={labelColor}>{label}</Span>;
   const isCheckbox = inputType === 'checkbox';
   htmlFor = htmlFor || (name ? `input-${name}` : undefined);
-
   const displayOptionalLabel = hideOptionalLabel ? false : required === false;
   const displayRequiredLabel = useRequiredLabel ? required === true : false;
+  const labelContent = label && (
+    <Span color={labelColor} fontSize={labelFontSize} fontWeight={labelFontWeight}>
+      {label}
+    </Span>
+  );
+
   return (
     <Box {...props}>
       <Flex flexDirection={isCheckbox ? 'row-reverse' : 'column'} justifyContent="flex-end">
@@ -50,7 +54,8 @@ const StyledInputField = ({
           <P
             as="label"
             htmlFor={htmlFor}
-            display="block"
+            display="flex"
+            alignItems="center"
             fontSize={labelFontSize}
             fontWeight={labelFontWeight}
             mb={isCheckbox ? 0 : 2}
@@ -60,7 +65,7 @@ const StyledInputField = ({
             {...labelProps}
           >
             {displayOptionalLabel && !isCheckbox ? (
-              <Span color="black.500">
+              <Span color="black.700" fontWeight="normal">
                 <FormattedMessage
                   id="OptionalFieldLabel"
                   defaultMessage="{field} (optional)"
@@ -69,7 +74,7 @@ const StyledInputField = ({
                 {isPrivate && <PrivateIconWithSpace />}
               </Span>
             ) : displayRequiredLabel ? (
-              <Span color="black.500">
+              <Span color="black.700">
                 {labelContent} * {isPrivate && <PrivateIconWithSpace />}
               </Span>
             ) : (
@@ -101,8 +106,8 @@ const StyledInputField = ({
         </Box>
       )}
       {hint && !error && (
-        <Box pt={0}>
-          <Span ml={1} fontSize="12px" color="black.500" css={{ verticalAlign: 'middle' }}>
+        <Box mt="6px">
+          <Span fontSize="12px" color="black.700" css={{ verticalAlign: 'middle' }}>
             {hint}
           </Span>
         </Box>

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
-import { verticalAlign } from 'styled-system';
+import { lineHeight, verticalAlign } from 'styled-system';
 import { v4 as uuid } from 'uuid';
 
 import { cursor } from '../lib/styled-system-custom-properties';
@@ -88,6 +88,7 @@ const ChildrenContainer = styled.div`
   display: ${props => props.display};
   ${verticalAlign}
   ${cursor}
+  ${lineHeight}
   button:disabled {
     pointer-events: none;
   }
@@ -147,6 +148,7 @@ class StyledTooltip extends React.Component {
     display: PropTypes.string,
     /** Vertical alignment of the container */
     containerVerticalAlign: PropTypes.string,
+    containerLineHeight: PropTypes.string,
     containerCursor: PropTypes.string,
     delayHide: PropTypes.number,
     /** The component that will be used as a container for the children */
@@ -215,6 +217,7 @@ class StyledTooltip extends React.Component {
                   onMouseEnter={this.onMouseEnter}
                   onMouseLeave={this.onMouseLeave}
                   verticalAlign={this.props.containerVerticalAlign}
+                  lineHeight={this.props.containerLineHeight}
                   cursor={this.props.containerCursor}
                 >
                   {this.props.children}
