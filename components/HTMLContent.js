@@ -64,7 +64,7 @@ const HTMLContent = styled(({ content, collapsable = false, maxCollapsedHeight =
   const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
 
   useEffect(() => {
-    if (collapsable && contentRef?.current?.clientHeight > maxCollapsedHeight + 1) {
+    if (collapsable && contentRef?.current?.clientHeight > maxCollapsedHeight * 3) {
       setIsCollapsed(true);
     }
   }, [content]);
