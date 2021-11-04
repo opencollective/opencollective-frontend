@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isNil } from 'lodash';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Span } from '../Text';
@@ -8,11 +9,18 @@ import { Span } from '../Text';
  * Displays the total amount for all the expense items.
  */
 const ExpenseItemsTotalAmount = ({ items, currency }) => {
-  const totalAmount = items.reduce((amount, attachment) => amount + (attachment.amount || 0), 0);
-  const isValid = items.every(item => item.amount);
+  const isValid = items.every(item => !isNil(item.amount));
   return (
     <Span color="black.500" fontSize="16px" letterSpacing={0} data-cy="expense-items-total-amount">
-      {isValid ? <FormattedMoneyAmount amount={totalAmount} precision={2} currency={currency} /> : '--.--'}
+      {isValid ? (
+        <FormattedMoneyAmount
+          amount={items.reduce((amount, item) => amount + (item.amount || 0), 0)}
+          precision={2}
+          currency={currency}
+        />
+      ) : (
+        '--.--'
+      )}
     </Span>
   );
 };
