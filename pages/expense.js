@@ -1,3 +1,4 @@
+/* eslint-disable graphql/template-strings */
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
