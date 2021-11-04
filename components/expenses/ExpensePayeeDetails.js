@@ -65,12 +65,28 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
     <StyledTooltip
       content={() => (
         <FormattedMessage
-          defaultMessage="Total expense payouts ({currentYear}): {totalExpensesReceived}"
+          defaultMessage="Total expense payouts ({currentYear}): Invoices: {totalPaidExpenseInvoices}; Receipts: {totalPaidExpenseReceipts}; Grants: {totalPaidExpenseGrants}"
           values={{
-            totalExpensesReceived: (
+            totalPaidExpenseInvoices: (
               <FormattedMoneyAmount
-                amount={stats.totalExpensesReceived.valueInCents}
-                currency={stats.totalExpensesReceived.currency}
+                amount={stats.totalPaidExpenseInvoices.valueInCents}
+                currency={stats.totalPaidExpenseInvoices.currency}
+                precision={2}
+                amountStyles={null}
+              />
+            ),
+            totalPaidExpenseReceipts: (
+              <FormattedMoneyAmount
+                amount={stats.totalPaidExpenseReceipts.valueInCents}
+                currency={stats.totalPaidExpenseReceipts.currency}
+                precision={2}
+                amountStyles={null}
+              />
+            ),
+            totalPaidExpenseGrants: (
+              <FormattedMoneyAmount
+                amount={stats.totalPaidExpenseGrants.valueInCents}
+                currency={stats.totalPaidExpenseGrants.currency}
                 precision={2}
                 amountStyles={null}
               />
@@ -237,6 +253,18 @@ PayeeTotalPayoutSumTooltip.propTypes = {
       valueInCents: PropTypes.number,
       currency: PropTypes.string,
     }).isRequired,
+    totalPaidExpenseInvoices: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }).isRequired,
+    totalPaidExpenseReceipts: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }).isRequired,
+    totalPaidExpenseGrants: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }).isRequired,
   }),
 };
 
@@ -289,6 +317,18 @@ ExpensePayeeDetails.propTypes = {
           valueInCents: PropTypes.number,
           currency: PropTypes.string,
         }),
+        totalPaidExpenseInvoices: PropTypes.shape({
+          valueInCents: PropTypes.number,
+          currency: PropTypes.string,
+        }).isRequired,
+        totalPaidExpenseReceipts: PropTypes.shape({
+          valueInCents: PropTypes.number,
+          currency: PropTypes.string,
+        }).isRequired,
+        totalPaidExpenseGrants: PropTypes.shape({
+          valueInCents: PropTypes.number,
+          currency: PropTypes.string,
+        }).isRequired,
       }),
     }),
     payeeLocation: PropTypes.shape({
