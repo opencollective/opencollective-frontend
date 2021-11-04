@@ -1782,6 +1782,11 @@ type Host implements Account & AccountWithContributions {
   plan: HostPlan!
   hostMetrics(
     """
+    A collection of accounts for which the metrics should be returned.
+    """
+    account: [AccountReferenceInput!]
+
+    """
     Inferior date limit in which we're calculating the metrics
     """
     from: String @deprecated(reason: "2020-09-20: Use dateFrom")
