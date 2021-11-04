@@ -321,8 +321,8 @@ const HostVirtualCards = props => {
             isCollectiveFilter={true}
             filters={routerQuery}
             collective={props.collective}
-            virtualCardMerchants={data.host.hostedVirtualCardMerchants.nodes}
-            virtualCardCollectives={data.host.hostedVirtualCardCollectives.nodes}
+            virtualCardMerchants={data?.host?.hostedVirtualCardMerchants.nodes}
+            virtualCardCollectives={data?.host?.hostedVirtualCardCollectives.nodes}
             onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
           />
         </Flex>
@@ -348,7 +348,7 @@ const HostVirtualCards = props => {
             <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />
           </Box>
         </AddCardPlaceholder>
-        {data.host.hostedVirtualCards.nodes.map(vc => (
+        {data?.host?.hostedVirtualCards.nodes.map(vc => (
           <VirtualCard
             key={vc.id}
             {...vc}
@@ -361,13 +361,13 @@ const HostVirtualCards = props => {
       <Flex mt={5} alignItems="center" flexDirection="column" justifyContent="center">
         <Pagination
           route={`/${props.collective.slug}/admin/host-virtual-cards`}
-          total={data.host.hostedVirtualCards.totalCount}
+          total={data?.host?.hostedVirtualCards.totalCount}
           limit={VIRTUAL_CARDS_PER_PAGE}
           offset={offset}
           ignoredQueryParams={['slug', 'section']}
         />
         <P mt={1} fontSize="12px">
-          <FormattedMessage id="TotalItems" defaultMessage="Total Items" />: {data.host.hostedVirtualCards.totalCount}
+          <FormattedMessage id="TotalItems" defaultMessage="Total Items" />: {data?.host?.hostedVirtualCards.totalCount}
         </P>
       </Flex>
       {(displayAssignCardModal || editingVirtualCard) && (

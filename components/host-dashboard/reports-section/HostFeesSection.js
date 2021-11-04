@@ -16,6 +16,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { i18nTransactionSettlementStatus } from '../../../lib/i18n/transaction';
 
 import PeriodFilter from '../../budget/filters/PeriodFilter';
+import { ChartWrapper } from '../../ChartWrapper';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
@@ -27,6 +28,8 @@ import StyledLinkButton from '../../StyledLinkButton';
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 import StyledSpinner from '../../StyledSpinner';
 import { P, Span } from '../../Text';
+
+import { getActiveYearsOptions } from './helpers';
 
 const hostFeeSectionQuery = gqlV2/* GraphQL */ `
   query HostFeeSection($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
@@ -82,23 +85,6 @@ const hostFeeSectionTimeSeriesQuery = gqlV2/* GraphQL */ `
         }
       }
     }
-  }
-`;
-
-const ChartWrapper = styled.div`
-  position: relative;
-
-  .apexcharts-legend-series {
-    background: white;
-    padding: 8px;
-    border-radius: 10px;
-    & > span {
-      vertical-align: middle;
-    }
-  }
-
-  .apexcharts-legend-marker {
-    margin-right: 8px;
   }
 `;
 
@@ -202,13 +188,6 @@ const getSeriesFromData = (intl, timeSeries) => {
       data: dataToSeries(nodes),
     })),
   ];
-};
-
-export const getActiveYearsOptions = host => {
-  const currentYear = new Date().getFullYear();
-  const firstYear = host ? parseInt(host.createdAt.split('-')[0]) : currentYear;
-  const activeYears = [...Array(currentYear - firstYear + 1).keys()].map(year => year + firstYear);
-  return activeYears.map(year => ({ value: year, label: year }));
 };
 
 const getQueryVariables = (hostSlug, year) => {

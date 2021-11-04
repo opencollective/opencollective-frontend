@@ -15,6 +15,7 @@ import dynamic from 'next/dynamic';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
+import { ChartWrapper } from '../../ChartWrapper';
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { Box, Flex } from '../../Grid';
@@ -25,7 +26,7 @@ import StyledSpinner from '../../StyledSpinner';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
 
-import { getActiveYearsOptions } from './HostFeesSection';
+import { getActiveYearsOptions } from './helpers';
 
 const FundAmounts = styled.div`
   height: 48px;
@@ -49,23 +50,6 @@ const TotalFundsLabel = styled(Container)`
   border-radius: 5px;
   background-color: white;
   opacity: 80%;
-`;
-
-const ChartWrapper = styled.div`
-  position: relative;
-
-  .apexcharts-legend-series {
-    background: white;
-    padding: 8px;
-    border-radius: 10px;
-    & > span {
-      vertical-align: middle;
-    }
-  }
-
-  .apexcharts-legend-marker {
-    margin-right: 8px;
-  }
 `;
 
 const getChartOptions = intl => ({
