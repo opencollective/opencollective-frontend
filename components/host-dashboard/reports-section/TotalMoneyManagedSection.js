@@ -14,7 +14,6 @@ const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency) =>
   return [
     {
       key: 'my-collectives',
-      percentage: 0.5,
       color: 'primary.500',
       label: (
         <P fontSize="12px" lineHeight="18px">
@@ -28,7 +27,6 @@ const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency) =>
     },
     {
       key: 'organization',
-      percentage: 0.5,
       color: 'primary.800',
       label: (
         <P fontSize="12px" lineHeight="18px" color="black.700">

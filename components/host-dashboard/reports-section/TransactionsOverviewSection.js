@@ -12,9 +12,10 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import PeriodFilter from '../../budget/filters/PeriodFilter';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
-import { Flex } from '../../Grid';
-import Loading from '../../Loading';
+import { Box, Flex } from '../../Grid';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
+import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
 
 const FilterLabel = styled.label`
@@ -22,39 +23,6 @@ const FilterLabel = styled.label`
   text-transform: uppercase;
   margin-bottom: 8px;
   color: #4e5052;
-`;
-
-const FundAmounts = styled.div`
-  width: 100%;
-  height: 48px;
-  border-radius: 10px;
-  background-color: #29cc75;
-  border-right: 360px solid #e03f6a;
-  padding-top: 10px;
-  padding-left: 5px;
-  @media (max-width: 1025px) {
-    height: 130px;
-    background-color: #29cc75;
-    border-right: 0px;
-    border-bottom: 40px solid #e03f6a;
-  }
-`;
-
-const TotalFundsLabel = styled(Container)`
-  display: table-cell;
-  padding-left: 10px;
-  height: 26px;
-  border-radius: 5px;
-  background-color: white;
-  opacity: 80%;
-  vertical-align: middle;
-`;
-
-const Square = styled(Container)`
-  width: 8px;
-  height: 8px;
-  display: inline-block;
-  background-color: ${props => props.color};
 `;
 
 const transactionsOverviewQuery = gqlV2/* GraphQL */ `
@@ -89,37 +57,160 @@ const transactionsOverviewQuery = gqlV2/* GraphQL */ `
   }
 `;
 
+const getTransactionsAreaChartData = host => {
+  if (!host) {
+    return [];
+  }
+
+  const currency = host.currency;
+  const { contributionsCount, dailyAverageIncomeAmount } = host.contributionStats;
+  const { expensesCount, dailyAverageAmount } = host.expenseStats;
+  return [
+    {
+      key: 'contributions',
+      percentage: 0.5,
+      color: 'green.500',
+      label: (
+        <P fontSize="12px" lineHeight="18px">
+          <FormattedMessage
+            defaultMessage="{count, plural, one {# contribution} other {# contributions}}"
+            values={{ count: contributionsCount }}
+          />
+          <Span mx="6px" color="black.600">
+            {' | '}
+          </Span>
+          <FormattedMessage
+            defaultMessage="Daily average: {amount}"
+            values={{
+              amount: <strong>{formatCurrency(dailyAverageIncomeAmount.valueInCents, currency)}</strong>,
+            }}
+          />
+        </P>
+      ),
+    },
+    {
+      key: 'expenses',
+      percentage: 0.5,
+      color: 'red.500',
+      label: (
+        <P fontSize="12px" lineHeight="18px">
+          <FormattedMessage
+            defaultMessage="{count, plural, one {# expense} other {# expenses}}"
+            values={{ count: expensesCount }}
+          />
+          <Span mx="6px" color="black.600">
+            {' | '}
+          </Span>
+          <FormattedMessage
+            defaultMessage="Daily average: {amount}"
+            values={{
+              amount: <strong>{formatCurrency(dailyAverageAmount.valueInCents, currency)}</strong>,
+            }}
+          />
+        </P>
+      ),
+    },
+  ];
+};
+
+const getTransactionsBreakdownChartData = host => {
+  if (!host) {
+    return [];
+  }
+
+  const contributionStats = host?.contributionStats;
+  const expenseStats = host?.expenseStats;
+  const { recurringContributionsCount, oneTimeContributionsCount } = contributionStats;
+  const { invoicesCount, reimbursementsCount, grantsCount } = expenseStats;
+  const hasGrants = grantsCount > 0;
+  const areas = [
+    {
+      key: 'one-time',
+      percentage: 0.25,
+      color: 'green.400',
+      legend: (
+        <FormattedMessage
+          defaultMessage="{count, plural, one {# One-time} other {# One-time}}"
+          values={{ count: oneTimeContributionsCount }}
+        />
+      ),
+    },
+    {
+      key: 'recurring',
+      percentage: 0.25,
+      color: 'green.300',
+      legend: (
+        <FormattedMessage
+          defaultMessage="{count, plural, one {# Recurring} other {# Recurring}}"
+          values={{ count: recurringContributionsCount }}
+        />
+      ),
+    },
+    {
+      key: 'invoices',
+      percentage: hasGrants ? 0.166 : 0.25,
+      color: 'red.600',
+      legend: (
+        <FormattedMessage
+          defaultMessage="{count, plural, one {# Invoice} other {# Invoices}}"
+          values={{ count: invoicesCount }}
+        />
+      ),
+    },
+    {
+      key: 'receipts',
+      percentage: hasGrants ? 0.166 : 0.25,
+      color: 'red.400',
+      legend: (
+        <FormattedMessage
+          defaultMessage="{count, plural, one {# Reimbursement} other {# Reimbursements}}"
+          values={{ count: reimbursementsCount }}
+        />
+      ),
+    },
+  ];
+
+  // Grants are only enabled for a few hosts/collectives, we only display the metric if active
+  if (hasGrants) {
+    areas.push({
+      key: 'grants',
+      percentage: 0.166,
+      color: 'red.300',
+      legend: (
+        <FormattedMessage
+          defaultMessage="{count, plural, one {# Grant} other {# Grants}}"
+          values={{ count: grantsCount }}
+        />
+      ),
+    });
+  }
+
+  return areas;
+};
+
+const prepareDateArgs = dateInterval => {
+  if (!dateInterval) {
+    return {};
+  } else {
+    return {
+      dateFrom: simpleDateToISOString(dateInterval.from, false, dateInterval.timezoneType),
+      dateTo: simpleDateToISOString(dateInterval.to, true, dateInterval.timezoneType),
+    };
+  }
+};
+
 const TransactionsOverviewSection = ({ hostSlug }) => {
   const [collectives, setCollectives] = useState(null);
   const [dateInterval, setDateInterval] = useState(null);
-
-  const prepareDateArgs = dateInterval => {
-    if (!dateInterval) {
-      return {};
-    } else {
-      return {
-        dateFrom: simpleDateToISOString(dateInterval.from, false, dateInterval.timezoneType),
-        dateTo: simpleDateToISOString(dateInterval.to, true, dateInterval.timezoneType),
-      };
-    }
-  };
-
-  const { data, loading, error } = useQuery(transactionsOverviewQuery, {
-    variables: { hostSlug, ...prepareDateArgs(dateInterval), account: collectives },
-    context: API_V2_CONTEXT,
-  });
+  const variables = { hostSlug, ...prepareDateArgs(dateInterval), account: collectives };
+  const { data, loading, error } = useQuery(transactionsOverviewQuery, { variables, context: API_V2_CONTEXT });
+  const host = data?.host;
+  const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host), [host]);
+  const transactionBreakdownChart = React.useMemo(() => getTransactionsBreakdownChartData(host), [host]);
 
   if (error) {
     return <MessageBoxGraphqlError error={error} />;
   }
-
-  const host = data?.host;
-  const currency = host?.currency;
-  const contributionStats = host?.contributionStats;
-  const expenseStats = host?.expenseStats;
-  const { contributionsCount, recurringContributionsCount, oneTimeContributionsCount, dailyAverageIncomeAmount } =
-    contributionStats || 0;
-  const { expensesCount, invoicesCount, reimbursementsCount, grantsCount, dailyAverageAmount } = expenseStats || 0;
 
   const setCollectiveFilter = collectives => {
     if (collectives.length === 0) {
@@ -153,66 +244,16 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
           />
         </Container>
       </Flex>
-      {loading ? (
-        <Loading />
-      ) : (
-        <Flex flexWrap="wrap" mt={18} mb={12}>
-          <FundAmounts>
-            <TotalFundsLabel minWidth="280px">
-              <P>
-                <Span fontWeight="500">
-                  {contributionsCount} <FormattedMessage id="Contributions" defaultMessage="Contributions" />
-                </Span>{' '}
-                | <FormattedMessage id="DailyAverage" defaultMessage="Daily avg" />
-                {': '}
-                <Span fontWeight="700">{formatCurrency(dailyAverageIncomeAmount.valueInCents, currency)}</Span>
-              </P>
-            </TotalFundsLabel>
-            <TotalFundsLabel
-              minWidth="250px"
-              position="relative"
-              left={['-280px', '-280px', '-280px', '100px']}
-              top={['85px', '85px', '85px', '0px']}
-            >
-              <P>
-                <Span fontWeight="500">
-                  {expensesCount} <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
-                </Span>{' '}
-                | <FormattedMessage id="DailyAverage" defaultMessage="Daily avg" />
-                {': '}
-                <Span fontWeight="700">{formatCurrency(dailyAverageAmount.valueInCents, currency)}</Span>
-              </P>
-            </TotalFundsLabel>
-          </FundAmounts>
-          <Container mt={2}>
-            <Span mr={3}>
-              <Square color="#51E094" />
-              {` ${oneTimeContributionsCount} `}
-              <FormattedMessage id="Frequency.OneTime" defaultMessage="One time" />
-            </Span>
-            <Span mr={['10px', '10px', '10px', '200px']}>
-              <Square color="#BEFADA" />
-              {` ${recurringContributionsCount} `}
-              <FormattedMessage id="TransactionsOverviewSection.Recurring" defaultMessage="Recurring" />
-            </Span>
-            <Span mr={3}>
-              <Square color="#CC2955" />
-              {` ${invoicesCount} `}
-              <FormattedMessage id="TransactionsOverviewSection.Invoices" defaultMessage="Invoices" />
-            </Span>
-            <Span mr={3}>
-              <Square color="#F55882" />
-              {` ${reimbursementsCount} `}
-              <FormattedMessage id="TransactionsOverviewSection.Reimbursements" defaultMessage="Reimbursements" />
-            </Span>
-            <Span mr={3}>
-              <Square color="#FFC2D2" />
-              {` ${grantsCount} `}
-              <FormattedMessage id="TransactionsOverviewSection.Grants" defaultMessage="Grants" />
-            </Span>
-          </Container>
-        </Flex>
-      )}
+      <Box mt={18} mb={12}>
+        {loading ? (
+          <LoadingPlaceholder height="98px" borderRadius="8px" />
+        ) : (
+          <div>
+            <ProportionalAreaChart areas={areaChartData} borderRadius="6px 6px 0 0" />
+            <ProportionalAreaChart areas={transactionBreakdownChart} borderRadius="0 0 6px 6px" />
+          </div>
+        )}
+      </Box>
     </React.Fragment>
   );
 };
