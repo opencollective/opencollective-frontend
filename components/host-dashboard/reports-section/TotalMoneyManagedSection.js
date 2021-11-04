@@ -5,7 +5,7 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { formatCurrency } from '../../../lib/currency-utils';
+import { formatCurrency, getCurrencySymbol } from '../../../lib/currency-utils';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -57,72 +57,54 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
     totalMoneyManaged.valueInCents - platformTips.valueInCents - platformFees.valueInCents - hostFees.valueInCents;
   const totalHostFunds = hostFees.valueInCents;
   return (
-    <StyledCard borderColor="#46347F">
-      <Container pl={27} pr={24} pt={16} pb={16} backgroundColor="#F6F5FF">
-        <P minHeight="16px" fontSize="12px" fontWeight="500" lineHeight="16px" textTransform="uppercase">
-          <Dollar size={14} color="#1300AB" />
-          <FormattedMessage id="Host.Metrics.TotalMoneyManages" defaultMessage="Total Money Managed" />
-        </P>
-        <Flex flexWrap="wrap" mt={12} mb={14}>
-          <Span fontSize={18} fontWeight="500">
-            {formatCurrency(currentAmount, currency)}
-          </Span>
-          <Span fontSize={17} fontWeight="500" lineHeight="20px" ml="8px" mr="8px">
-            /
-          </Span>
-          <Span fontSize={15} fontWeight="500" lineHeight="25px">
-            {formatCurrency(projectedAmount, currency)}
-          </Span>
-          <Span fontSize={12} fontWeight="500" lineHeight="27px" ml="8px">
-            <FormattedMessage id="TotalMoneyManagedSection.projected" defaultMessage="Projected" />
-          </Span>
-        </Flex>
-        <Container display="flex" fontSize="11px" fontWeight="700" lineHeight="12px" alignItems="center">
-          <Span textTransform="uppercase">
-            <FormattedMessage
-              id="TotalMoneyManagedSection.subHeading"
-              defaultMessage="My Organization and My Collectives"
-            />
-          </Span>
-          <Box ml={1}>
-            <StyledTooltip
-              content={() => (
-                <FormattedMessage
-                  id="Host.Metrics.TotalMoneyManages.description"
-                  defaultMessage="Total amount held in your bank account for the Host and its Collectives."
-                />
-              )}
-            >
-              <InfoCircle size={14} />
-            </StyledTooltip>
-          </Box>
-        </Container>
-        <Container mt={18} mb={12}>
-          <FundAmounts>
-            <Flex flexWrap="wrap">
-              <Box width={[1, 1, 1 / 2]} pl="8px">
-                <TotalFundsLabel minWidth="210px" style={{ verticalAlign: 'middle' }}>
-                  <Span fontWeight="700">{formatCurrency(totalCollectiveFunds, currency)}</Span> |{' '}
-                  <FormattedMessage id="Collectives" defaultMessage="Collectives" />
-                </TotalFundsLabel>
-              </Box>
-              <Box width={[1, 1, 1 / 2]} pt={['35px', '35px', 0]} pl="8px">
-                <TotalFundsLabel minWidth="230px" style={{ verticalAlign: 'middle' }}>
-                  <Span fontWeight="700">{formatCurrency(totalHostFunds, currency)}</Span> |{' '}
-                  <FormattedMessage id="TotalMoneyManagedSection.hostOrganization" defaultMessage="Host Organization" />
-                </TotalFundsLabel>
-              </Box>
-            </Flex>
-          </FundAmounts>
-        </Container>
-        <P minHeight="18px" fontSize="12px" fontWeight="400" lineHeight="18px" pt={12} pb={16}>
+    <div>
+      <Flex flexWrap="wrap" my={14} alignItems="baseline">
+        <Span fontSize={18} fontWeight="500">
+          {formatCurrency(currentAmount, currency)}
+        </Span>
+        <Span fontSize={15} fontWeight="500" lineHeight="20px" ml="8px" mr="8px">
+          /
+        </Span>
+        <Span fontSize={15} fontWeight="500" lineHeight="25px">
+          {formatCurrency(projectedAmount, currency)}
+        </Span>
+        <Span fontSize={12} fontWeight="500" lineHeight="27px" ml="8px">
+          <FormattedMessage id="TotalMoneyManagedSection.projected" defaultMessage="Projected" />
+        </Span>
+      </Flex>
+      <Container display="flex" fontSize="11px" fontWeight="700" lineHeight="12px" alignItems="center">
+        <Span textTransform="uppercase">
           <FormattedMessage
-            id="Host.Metrics.TotalMoneyManages.description"
-            defaultMessage="Total amount held in your bank account for the Host and its Collectives."
+            id="TotalMoneyManagedSection.subHeading"
+            defaultMessage="My Organization and My initiatives"
           />
-        </P>
+        </Span>
       </Container>
-    </StyledCard>
+      <Container mt={18} mb={12}>
+        <FundAmounts>
+          <Flex flexWrap="wrap">
+            <Box width={[1, 1, 1 / 2]} pl="8px">
+              <TotalFundsLabel minWidth="210px" style={{ verticalAlign: 'middle' }}>
+                <Span fontWeight="700">{formatCurrency(totalCollectiveFunds, currency)}</Span> |{' '}
+                <FormattedMessage id="Collectives" defaultMessage="Collectives" />
+              </TotalFundsLabel>
+            </Box>
+            <Box width={[1, 1, 1 / 2]} pt={['35px', '35px', 0]} pl="8px">
+              <TotalFundsLabel minWidth="230px" style={{ verticalAlign: 'middle' }}>
+                <Span fontWeight="700">{formatCurrency(totalHostFunds, currency)}</Span> |{' '}
+                <FormattedMessage id="TotalMoneyManagedSection.hostOrganization" defaultMessage="Host Organization" />
+              </TotalFundsLabel>
+            </Box>
+          </Flex>
+        </FundAmounts>
+      </Container>
+      <P minHeight="18px" fontSize="12px" fontWeight="400" lineHeight="18px" pt={12} pb={16}>
+        <FormattedMessage
+          id="Host.Metrics.TotalMoneyManages.description"
+          defaultMessage="Total amount held in your bank account for the Host and its Collectives."
+        />
+      </P>
+    </div>
   );
 };
 

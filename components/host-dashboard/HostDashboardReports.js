@@ -109,13 +109,14 @@ const HostDashboardReports = ({ hostSlug }) => {
 
   const { host } = data;
   return (
-    <Box maxWidth={800} m="0 auto" px={2}>
+    <Box m="0 auto" px={2}>
       <Flex alignItems="center" mb={24} flexWrap="wrap">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           <FormattedMessage id="Reports" defaultMessage="Reports" />
         </H1>
         <Box mx="auto" />
       </Flex>
+      <StyledHr mb={26} borderWidth="0.5px" />
       <StyledCard mb={5} borderRadius="12px" padding="32px 24px" borderColor="black.400">
         <Container mb={38}>
           <SectionTitle
