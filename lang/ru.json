@@ -1,5 +1,6 @@
 {
   "+n7iNv": "Прошлый месяц",
+  "/hhSWy": "Total amount held in your bank account for the Host and its Collectives.",
   "/k+sys": "Host Fees charged each month, which will be added to the Host budget at the end of the month.",
   "23P2mL": "Вы можете просмотреть статус вашей транзакции в обозревателе блокчейна: {link}",
   "2FA.PleaseEnterCode": "Двухфакторная аутентификация включена: пожалуйста, введите ваш код.",
@@ -1369,6 +1370,7 @@
   "hosts.title": "Представители Open Collective",
   "HostSince": "Представитель с",
   "Humfno": "End date",
+  "hx2hjA": "Total money managed per year",
   "Image.Replace": "Заменить",
   "InputTypeCountry.placeholder": "Пожалуйста, выберите вашу страну",
   "InvalidURL": "Invalid URL. It must start with http:// or https://.",
