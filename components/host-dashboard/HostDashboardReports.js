@@ -36,6 +36,12 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
       type
       createdAt
       hostFeePercent
+      stats {
+        balance {
+          valueInCents
+          currency
+        }
+      }
       hostMetrics {
         hostFees {
           valueInCents
@@ -129,7 +135,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           >
             <FormattedMessage id="Host.Metrics.TotalMoneyManages" defaultMessage="Total Money Managed" />
           </SectionTitle>
-          <TotalMoneyManagedSection currency={host.currency} hostMetrics={host.hostMetrics} />
+          <TotalMoneyManagedSection host={host} />
         </Container>
         <Container mb={38}>
           <SectionTitle>

@@ -1,72 +1,73 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
-import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
+import { pick, sumBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
-import { formatCurrency, getCurrencySymbol } from '../../../lib/currency-utils';
+import { formatCurrency } from '../../../lib/currency-utils';
 
 import Container from '../../Container';
-import { Box, Flex } from '../../Grid';
-import StyledCard from '../../StyledCard';
-import StyledTooltip from '../../StyledTooltip';
+import { Flex } from '../../Grid';
+import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
 
-const FundAmounts = styled.div`
-  height: 48px;
-  border-radius: 10px;
-  padding-top: 10px;
-  padding-left: 5px;
-  background: linear-gradient(to right, #9a7bf1 50%, #46347f 50%);
+const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency) => {
+  return [
+    {
+      key: 'my-collectives',
+      percentage: 0.5,
+      color: 'primary.500',
+      label: (
+        <P fontSize="12px" lineHeight="18px">
+          <Span fontWeight="700">{formatCurrency(collectivesBalance, currency)}</Span>{' '}
+          <Span mx="6px" color="black.600">
+            {' | '}
+          </Span>
+          <FormattedMessage id="Collectives" defaultMessage="Collectives" />
+        </P>
+      ),
+    },
+    {
+      key: 'organization',
+      percentage: 0.5,
+      color: 'primary.800',
+      label: (
+        <P fontSize="12px" lineHeight="18px" color="black.700">
+          <Span fontWeight="bold">{formatCurrency(hostBalance, currency)}</Span>
+          <Span mx="6px" color="black.600">
+            {' | '}
+          </Span>
+          <FormattedMessage id="TotalMoneyManagedSection.hostOrganization" defaultMessage="Host Organization" />
+        </P>
+      ),
+    },
+  ];
+};
 
-  @media (max-width: 832px) {
-    height: 130px;
-    border-right: 0px;
-    background: linear-gradient(to bottom, #9a7bf1 50%, #46347f 50%);
-  }
-`;
+const TotalMoneyManagedSection = ({ host }) => {
+  // Compute some general stats
+  const { totalMoneyManaged } = host.hostMetrics;
+  const fees = pick(host.hostMetrics, ['platformTips', 'platformFees', 'hostFees']);
+  const pendingFees = pick(host.hostMetrics, ['pendingPlatformTips', 'pendingPlatformFees', 'pendingHostFeeShare']);
+  const totalFees = sumBy(Object.values(fees), 'valueInCents');
+  const totalPendingFees = sumBy(Object.values(pendingFees));
+  const collectivesBalance = totalMoneyManaged.valueInCents - totalFees;
+  const hostBalance = host.stats.balance.valueInCents;
 
-const TotalFundsLabel = styled(Container)`
-  font-size: 12px;
-  display: table-cell;
-  padding-left: 10px;
-  height: 26px;
-  border-radius: 5px;
-  background-color: white;
-  opacity: 80%;
-`;
+  // Generate graph data (memoized for performances)
+  const chartArgs = [collectivesBalance, hostBalance, host.currency];
+  const chartAreas = React.useMemo(() => getMoneyManagedChartAreas(...chartArgs), chartArgs);
 
-const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
-  const {
-    totalMoneyManaged,
-    pendingPlatformFees,
-    pendingPlatformTips,
-    pendingHostFeeShare,
-    platformTips,
-    hostFees,
-    platformFees,
-  } = hostMetrics;
-  const currentAmount = totalMoneyManaged.valueInCents;
-  const projectedAmount =
-    totalMoneyManaged.valueInCents +
-    pendingPlatformFees.valueInCents +
-    pendingPlatformTips.valueInCents +
-    pendingHostFeeShare.valueInCents;
-  const totalCollectiveFunds =
-    totalMoneyManaged.valueInCents - platformTips.valueInCents - platformFees.valueInCents - hostFees.valueInCents;
-  const totalHostFunds = hostFees.valueInCents;
   return (
     <div>
       <Flex flexWrap="wrap" my={14} alignItems="baseline">
         <Span fontSize={18} fontWeight="500">
-          {formatCurrency(currentAmount, currency)}
+          {formatCurrency(totalMoneyManaged.valueInCents, host.currency)}
         </Span>
         <Span fontSize={15} fontWeight="500" lineHeight="20px" ml="8px" mr="8px">
           /
         </Span>
         <Span fontSize={15} fontWeight="500" lineHeight="25px">
-          {formatCurrency(projectedAmount, currency)}
+          {formatCurrency(totalMoneyManaged.valueInCents + totalPendingFees, host.currency)}
         </Span>
         <Span fontSize={12} fontWeight="500" lineHeight="27px" ml="8px">
           <FormattedMessage id="TotalMoneyManagedSection.projected" defaultMessage="Projected" />
@@ -81,22 +82,7 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
         </Span>
       </Container>
       <Container mt={18} mb={12}>
-        <FundAmounts>
-          <Flex flexWrap="wrap">
-            <Box width={[1, 1, 1 / 2]} pl="8px">
-              <TotalFundsLabel minWidth="210px" style={{ verticalAlign: 'middle' }}>
-                <Span fontWeight="700">{formatCurrency(totalCollectiveFunds, currency)}</Span> |{' '}
-                <FormattedMessage id="Collectives" defaultMessage="Collectives" />
-              </TotalFundsLabel>
-            </Box>
-            <Box width={[1, 1, 1 / 2]} pt={['35px', '35px', 0]} pl="8px">
-              <TotalFundsLabel minWidth="230px" style={{ verticalAlign: 'middle' }}>
-                <Span fontWeight="700">{formatCurrency(totalHostFunds, currency)}</Span> |{' '}
-                <FormattedMessage id="TotalMoneyManagedSection.hostOrganization" defaultMessage="Host Organization" />
-              </TotalFundsLabel>
-            </Box>
-          </Flex>
-        </FundAmounts>
+        <ProportionalAreaChart areas={chartAreas} />
       </Container>
       <P minHeight="18px" fontSize="12px" fontWeight="400" lineHeight="18px" pt={12} pb={16}>
         <FormattedMessage
@@ -109,8 +95,11 @@ const TotalMoneyManagedSection = ({ currency, hostMetrics }) => {
 };
 
 TotalMoneyManagedSection.propTypes = {
-  currency: PropTypes.string,
-  hostMetrics: PropTypes.object,
+  host: PropTypes.shape({
+    stats: PropTypes.shape({ balance: PropTypes.shape({ valueInCents: PropTypes.number }) }).isRequired,
+    hostMetrics: PropTypes.object.isRequired,
+    currency: PropTypes.string,
+  }).isRequired,
 };
 
 export default TotalMoneyManagedSection;
