@@ -357,7 +357,7 @@ const HostVirtualCards = props => {
             {...vc}
             onSuccess={refetch}
             editHandler={() => setEditingVirtualCard(vc)}
-            // Edit card action need to be reworked
+            // TODO: Edit card action need to be reworked
             // hasActions
           />
         ))}

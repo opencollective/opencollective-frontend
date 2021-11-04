@@ -186,9 +186,9 @@ const getLimitString = ({ spendingLimitAmount, spendingLimitInterval }) => {
     case 'DAILY':
       return (
         <Fragment>
-          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
+          <FormattedMessage defaultMessage="Limited to" />
           &nbsp;
-          {value}/<FormattedMessage id="Frequency.Daily.Short" defaultMessage="day" />
+          {value}/<FormattedMessage defaultMessage="day" />
         </Fragment>
       );
     case 'MONTHLY':

@@ -290,7 +290,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label="What provider do you use for this card?"
+              label="What payment provider do you use for this card?"
               htmlFor="provider"
               error={formik.touched.provider && formik.errors.provider}
             >
