@@ -127,6 +127,7 @@
   "AudienceBreakdown.organizationAdmins": "Les administrateurs de {count} {count, plural, one {organisation} other {organisations}}",
   "AuthenticatedPage.RootOnly": "This page is limited to site administrators",
   "authorization.loginRequired": "Veuillez vous authentifier pour pouvoir continuer.",
+  "aVqg31": "day",
   "B0DOrM": "Année Passée",
   "Back": "Retour",
   "BalanceAmount": "Solde {balance}",
