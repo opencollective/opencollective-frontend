@@ -47,7 +47,7 @@ const TotalMoneyManagedSection = ({ host }) => {
   const fees = pick(host.hostMetrics, ['platformTips', 'platformFees', 'hostFees']);
   const pendingFees = pick(host.hostMetrics, ['pendingPlatformTips', 'pendingPlatformFees', 'pendingHostFeeShare']);
   const totalFees = sumBy(Object.values(fees), 'valueInCents');
-  const totalPendingFees = sumBy(Object.values(pendingFees));
+  const totalPendingFees = sumBy(Object.values(pendingFees), 'valueInCents');
   const collectivesBalance = totalMoneyManaged.valueInCents - totalFees;
   const hostBalance = host.stats.balance.valueInCents;
 

@@ -22,7 +22,6 @@ import ContainerOverlay from '../../ContainerOverlay';
 import { Box, Flex } from '../../Grid';
 import Image from '../../Image';
 import Loading from '../../Loading';
-import StyledCard from '../../StyledCard';
 import StyledLinkButton from '../../StyledLinkButton';
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 import StyledSpinner from '../../StyledSpinner';
