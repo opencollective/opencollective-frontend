@@ -6,7 +6,6 @@ import { first, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../../lib/constants/collectives';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -105,7 +104,7 @@ export const prepareExpenseForSubmit = expenseData => {
   // The collective picker still uses API V1 for when creating a new profile on the fly
   const payeeIdField = typeof expenseData.payee?.id === 'string' ? 'id' : 'legacyId';
   const isInvoice = expenseData.type === expenseTypes.INVOICE;
-  const isFundingRequest = expenseData.type === expenseTypes.FUNDING_REQUEST;
+  const isGrant = expenseData.type === expenseTypes.FUNDING_REQUEST || expenseData.type === expenseTypes.GRANT;
   const payee =
     expenseData.payee?.isNewUser || expenseData.payee?.isInvite
       ? pick(expenseData.payee, ['name', 'email', 'legalName', 'organization', 'newsletterOptIn'])
@@ -123,7 +122,7 @@ export const prepareExpenseForSubmit = expenseData => {
     items: expenseData.items.map(item => {
       return pick(item, [
         ...(item.__isNew ? [] : ['id']),
-        ...(isInvoice || isFundingRequest ? [] : ['url']), // never submit URLs for invoices or requests
+        ...(isInvoice || isGrant ? [] : ['url']), // never submit URLs for invoices or requests
         'description',
         'incurredAt',
         'amount',
@@ -208,7 +207,7 @@ const ExpenseFormBody = ({
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
   const isReceipt = values.type === expenseTypes.RECEIPT;
-  const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST;
+  const isGrant = values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT;
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
   const stepOneCompleted =
     values.payoutMethod &&
@@ -371,10 +370,7 @@ const ExpenseFormBody = ({
           }}
           value={values.type}
           options={{
-            fundingRequest:
-              [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type) ||
-              collective.settings?.fundingRequest === true ||
-              collective.host?.settings?.fundingRequest === true,
+            fundingRequest: collective.settings?.expenseTypes?.hasGrant === true,
           }}
         />
       )}
@@ -403,7 +399,7 @@ const ExpenseFormBody = ({
                 lineHeight="24px"
                 fontWeight="bold"
               >
-                {values.type === expenseTypes.FUNDING_REQUEST ? (
+                {values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT ? (
                   <FormattedMessage
                     id="Expense.EnterRequestSubject"
                     defaultMessage="Enter grant subject <small>(Public)</small>"
@@ -456,7 +452,7 @@ const ExpenseFormBody = ({
               width="100%"
               withOutline
               placeholder={
-                values.type === expenseTypes.FUNDING_REQUEST
+                values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT
                   ? formatMessage(msg.grantSubjectPlaceholder)
                   : formatMessage(msg.descriptionPlaceholder)
               }
@@ -493,9 +489,7 @@ const ExpenseFormBody = ({
 
               <Flex alignItems="center" my={24}>
                 <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
-                  {formatMessage(
-                    isReceipt ? msg.stepReceipt : isFundingRequest ? msg.stepFundingRequest : msg.stepInvoice,
-                  )}
+                  {formatMessage(isReceipt ? msg.stepReceipt : isGrant ? msg.stepFundingRequest : msg.stepInvoice)}
                 </Span>
                 <StyledHr flex="1" borderColor="black.300" mx={2} />
                 <StyledButton
@@ -507,16 +501,14 @@ const ExpenseFormBody = ({
                   disabled={isCreditCardCharge}
                 >
                   +&nbsp;
-                  {formatMessage(
-                    isReceipt ? msg.addNewReceipt : isFundingRequest ? msg.addNewGrantItem : msg.addNewItem,
-                  )}
+                  {formatMessage(isReceipt ? msg.addNewReceipt : isGrant ? msg.addNewGrantItem : msg.addNewItem)}
                 </StyledButton>
               </Flex>
               <Box>
                 <FieldArray name="items" component={ExpenseFormItems} />
               </Box>
 
-              {values.type === expenseTypes.FUNDING_REQUEST && (
+              {(values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT) && (
                 <Box my={40}>
                   <ExpenseAttachedFilesForm
                     title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}

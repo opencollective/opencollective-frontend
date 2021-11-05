@@ -4,7 +4,6 @@ import dayjs from 'dayjs';
 import { FormattedMessage } from 'react-intl';
 
 import {
-  GQLV2_PAYMENT_METHOD_LEGACY_TYPES,
   GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES,
   PAYMENT_METHOD_SERVICE,
   PAYMENT_METHOD_TYPE,
@@ -65,10 +64,6 @@ const AddPaymentMethod = ({ onStripeReady, onPaypalSuccess, setNewPaymentMethodI
             onError={e => addToast({ type: TOAST_TYPE.ERROR, title: e.message })}
             onSuccess={({ subscriptionId }) => {
               onPaypalSuccess({
-                // TODO(paymentMethodType): remove deprecated form
-                // Deprecated but current form
-                providerType: GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PAYPAL,
-                // Future proof form
                 service: PAYMENT_METHOD_SERVICE.PAYPAL,
                 type: PAYMENT_METHOD_TYPE.SUBSCRIPTION,
                 paypalInfo: {

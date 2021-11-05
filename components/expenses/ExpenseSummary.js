@@ -63,7 +63,7 @@ const ExpenseSummary = ({
 }) => {
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
-  const isFundingRequest = expense?.type === expenseTypes.FUNDING_REQUEST;
+  const isGrant = expense?.type === expenseTypes.FUNDING_REQUEST || expense?.type === expenseTypes.GRANT;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
   const expenseItems = expense?.items.length > 0 ? expense.items : expense?.draft?.items || [];
@@ -154,7 +154,7 @@ const ExpenseSummary = ({
           </React.Fragment>
         )}
       </Flex>
-      {isFundingRequest && expense.longDescription && (
+      {isGrant && expense.longDescription && (
         <Fragment>
           <Flex alignItems="center" mt={4}>
             <Span fontWeight="bold" fontSize="16px">
@@ -173,7 +173,7 @@ const ExpenseSummary = ({
           <Span fontWeight="bold" fontSize="16px">
             {isReceipt || isCreditCardCharge ? (
               <FormattedMessage id="Expense.AttachedReceipts" defaultMessage="Attached receipts" />
-            ) : isFundingRequest ? (
+            ) : isGrant ? (
               <FormattedMessage id="Expense.RequestDetails" defaultMessage="Request Details" />
             ) : (
               <FormattedMessage id="Expense.InvoiceItems" defaultMessage="Invoice items" />
@@ -207,6 +207,7 @@ const ExpenseSummary = ({
                         content={attachment.description}
                         fontSize="12px"
                         color="black.900"
+                        collapsable
                         fontWeight="500"
                       />
                     ) : (
@@ -214,7 +215,7 @@ const ExpenseSummary = ({
                         <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
                       </Span>
                     )}
-                    {!isFundingRequest && (
+                    {!isGrant && (
                       <Span mt={1} fontSize="12px" color="black.500">
                         <FormattedMessage
                           id="withColon"

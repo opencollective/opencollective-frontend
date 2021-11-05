@@ -168,7 +168,6 @@ class HostDashboardPage extends React.Component {
               boxShadow="0px 7px 10px 3px #E6E8EB"
               minHeight={60}
               flexWrap="wrap"
-              data-cy="host-dashboard-menu-bar"
             >
               <Link href={`/${slug}/dashboard/expenses`}>
                 <LinkContainer isActive={view === 'expenses'}>

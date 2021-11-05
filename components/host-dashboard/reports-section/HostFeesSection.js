@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { ChevronDown } from '@styled-icons/fa-solid/ChevronDown/ChevronDown';
+import { ChevronUp } from '@styled-icons/fa-solid/ChevronUp/ChevronUp';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -8,21 +10,29 @@ const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import { get, groupBy } from 'lodash';
 import styled from 'styled-components';
 
+import { CollectiveType } from '../../../lib/collective-sections';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { i18nTransactionSettlementStatus } from '../../../lib/i18n/transaction';
 
+import PeriodFilter from '../../budget/filters/PeriodFilter';
+import CollectivePickerAsync from '../../CollectivePickerAsync';
+import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { Box, Flex } from '../../Grid';
+import Image from '../../Image';
 import Loading from '../../Loading';
+import StyledCard from '../../StyledCard';
+import StyledLinkButton from '../../StyledLinkButton';
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 import StyledSpinner from '../../StyledSpinner';
-import { P } from '../../Text';
+import { P, Span } from '../../Text';
 
-const mainReportsQuery = gqlV2/* GraphQL */ `
-  query ReportsPageQuery($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
+const hostFeeSectionQuery = gqlV2/* GraphQL */ `
+  query HostFeeSection($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
     host(slug: $hostSlug) {
       id
+      legacyId
       createdAt
       currency
       hostMetricsTimeSeries(dateFrom: $dateFrom, dateTo: $dateTo, timeUnit: MONTH) {
@@ -52,6 +62,29 @@ const mainReportsQuery = gqlV2/* GraphQL */ `
   }
 `;
 
+const hostFeeSectionTimeSeriesQuery = gqlV2/* GraphQL */ `
+  query HostFeeSectionTimeSeries(
+    $hostSlug: String!
+    $dateFrom: DateTime!
+    $dateTo: DateTime!
+    $account: [AccountReferenceInput!]
+  ) {
+    host(slug: $hostSlug) {
+      id
+      hostMetrics(dateFrom: $dateFrom, dateTo: $dateTo, account: $account) {
+        hostFees {
+          valueInCents
+          currency
+        }
+        hostFeeShare {
+          valueInCents
+          currency
+        }
+      }
+    }
+  }
+`;
+
 const ChartWrapper = styled.div`
   position: relative;
 
@@ -67,6 +100,13 @@ const ChartWrapper = styled.div`
   .apexcharts-legend-marker {
     margin-right: 8px;
   }
+`;
+
+const FilterLabel = styled.label`
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  color: #4e5052;
 `;
 
 const getChartOptions = (intl, hostCurrency) => ({
@@ -181,43 +221,170 @@ const getQueryVariables = (hostSlug, year) => {
 
 const HostFeesSection = ({ hostSlug }) => {
   const intl = useIntl();
-  const [selectedYear, setSelectedYear] = React.useState(() => new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
   const variables = getQueryVariables(hostSlug, selectedYear);
-  const { loading, data, previousData } = useQuery(mainReportsQuery, { variables, context: API_V2_CONTEXT });
+  const { loading, data, previousData } = useQuery(hostFeeSectionQuery, { variables, context: API_V2_CONTEXT });
   const host = loading && !data ? previousData?.host : data?.host;
   const timeSeries = host?.hostMetricsTimeSeries;
-  const series = React.useMemo(() => getSeriesFromData(intl, timeSeries), [timeSeries]);
-  const yearsOptions = React.useMemo(() => getActiveYearsOptions(host), [host]);
-  const chartOptions = React.useMemo(() => getChartOptions(intl, host?.currency), [host?.currency]);
+  const series = useMemo(() => getSeriesFromData(intl, timeSeries), [timeSeries]);
+  const yearsOptions = useMemo(() => getActiveYearsOptions(host), [host]);
+  const chartOptions = useMemo(() => getChartOptions(intl, host?.currency), [host?.currency]);
+  const [dateInterval, setDateInterval] = useState(null);
+  const [showHostFeeChart, setShowHostFeeChart] = useState(false);
+  const [collectives, setCollectives] = useState(null);
+  const { loading: loadingHostMetrics, data: hostMetricsData } = useQuery(hostFeeSectionTimeSeriesQuery, {
+    variables: {
+      dateFrom: dateInterval?.from ? new Date(dateInterval.from) : variables.dateFrom,
+      dateTo: dateInterval?.to ? new Date(dateInterval.to) : variables.dateTo,
+      account: collectives,
+      hostSlug,
+    },
+    context: API_V2_CONTEXT,
+  });
 
   if (loading && !host) {
     return <Loading />;
   }
 
+  let totalHostFees, profit, sharedRevenue;
+  if (!loadingHostMetrics) {
+    const { hostFees, hostFeeShare } = hostMetricsData.host.hostMetrics;
+    totalHostFees = hostFees.valueInCents;
+    sharedRevenue = hostFeeShare.valueInCents;
+    profit = totalHostFees - sharedRevenue;
+  }
+
+  const setCollectiveFilter = collectives => {
+    if (collectives.length === 0) {
+      setCollectives(null);
+    } else {
+      const collectiveIds = collectives.map(collective => ({ legacyId: collective.value.id }));
+      setCollectives(collectiveIds);
+    }
+  };
+
   return (
-    <Box py={3} css={{ background: '#F6F5FF' }}>
-      <Flex alignItems="center" px={3} mb={2}>
-        <P fontSize="11px" fontWeight="700" mr={3} textTransform="uppercase">
-          <FormattedMessage id="HostFeesSection.Title" defaultMessage="Collected host fees per year" />
-        </P>
-        <StyledSelectFilter
-          inputId="host-report-host-fees-year-select"
-          options={yearsOptions}
-          defaultValue={{ value: selectedYear, label: selectedYear }}
-          onChange={({ value }) => setSelectedYear(value)}
-          isSearchable={false}
-          minWidth={100}
-        />
+    <React.Fragment>
+      <Flex flexWrap="wrap" mt="16px" mb="16px">
+        <Container width={[1, 1, 1 / 2]} pr={2} mb={[3, 3, 0, 0]}>
+          <FilterLabel htmlFor="transactions-period-filter">
+            <FormattedMessage id="TransactionsOverviewSection.PeriodFilter" defaultMessage="Filter by Date" />
+          </FilterLabel>
+          <PeriodFilter onChange={setDateInterval} value={dateInterval} minDate={host?.createdAt} />
+        </Container>
+        <Container width={[1, 1, 1 / 2]}>
+          <FilterLabel htmlFor="transactions-collective-filter">
+            <FormattedMessage id="TransactionsOverviewSection.CollectiveFilter" defaultMessage="Filter by Collective" />
+          </FilterLabel>
+          <CollectivePickerAsync
+            inputId="TransactionsCollectiveFilter"
+            data-cy="transactions-collective-filter"
+            types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.PROJECT]}
+            isMulti
+            hostCollectiveIds={[host?.legacyId]}
+            onChange={value => setCollectiveFilter(value)}
+          />
+        </Container>
       </Flex>
-      <ChartWrapper>
-        {loading && (
-          <ContainerOverlay>
-            <StyledSpinner size={64} />
-          </ContainerOverlay>
+      <StyledCard minHeight={200} px={3} css={{ background: '#F6F5FF' }}>
+        {loadingHostMetrics ? (
+          <Loading />
+        ) : (
+          <Flex flexWrap="wrap">
+            <Container width={[1, 1, '230px']} px={2}>
+              <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
+                <Span mr={10}>
+                  <Image width={14} height={7} src="/static/images/host-fees-timeline.svg" />
+                </Span>
+                <FormattedMessage defaultMessage="Total Host Fees" />
+              </P>
+              <Box pt="12px" pb="10px" fontSize="18px" fontWeight="500">
+                {formatCurrency(totalHostFees, host.currency)}
+              </Box>
+              <P fontSize="12px" fontWeight="400" mt="10px">
+                <FormattedMessage defaultMessage="Host Fees charged each month, which will be added to the Host budget at the end of the month." />
+              </P>
+            </Container>
+            <Container display={['none', 'none', 'flex']} borderLeft="1px solid #6B5D99" height="88px" mt="39px" />
+            <Container width={[1, 1, '230px']} px={2}>
+              <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
+                <Span mr={10}>
+                  <Image width={6.5} height={12} mr={10} src="/static/images/host-fees-money-sign.svg" />
+                </Span>
+                <FormattedMessage defaultMessage="Your Profit" />
+              </P>
+              <Box pt="12px" pb="10px" fontSize="18px" fontWeight="500">
+                {formatCurrency(profit, host.currency)}
+              </Box>
+              <P fontSize="12px" fontWeight="400" mt="10px">
+                <FormattedMessage defaultMessage="The profit as an organization resulting of the host fees you collect without the shared revenue for the use of the platform." />
+              </P>
+            </Container>
+            <Container display={['none', 'none', 'flex']} borderLeft="1px solid #6B5D99" height="88px" mt="39px" />
+            <Container width={[1, 1, '230px']} px={2}>
+              <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
+                <Span mr={10}>
+                  <Image width={9.42} height={12} mr={10} src="/static/images/host-fees-oc.svg" />
+                </Span>
+                <FormattedMessage defaultMessage="Shared Revenue" />
+              </P>
+              <Box pt="12px" pb="10px" fontSize="18px" fontWeight="500">
+                {formatCurrency(sharedRevenue, host.currency)}
+              </Box>
+              <P fontSize="12px" fontWeight="400" mt="10px">
+                <FormattedMessage defaultMessage="The cost of using the platform. It is collected each month with a settlement invoice uploaded to you as an expense." />
+              </P>
+            </Container>
+          </Flex>
         )}
-        <Chart type="bar" width="100%" height="250px" options={chartOptions} series={series} />
-      </ChartWrapper>
-    </Box>
+        <Flex flexWrap="wrap">
+          <Container width={[1, 1, 3 / 4]} px={2}>
+            <P fontSize="12px" fontWeight="400" mt="16px">
+              <FormattedMessage defaultMessage="How is you organization's doing using Open Collective?" />
+            </P>
+          </Container>
+          <Container width={[1, 1, 1 / 4]} px={2} textAlign="right">
+            <StyledLinkButton asLink color="#46347F" onClick={() => setShowHostFeeChart(!showHostFeeChart)}>
+              <P fontSize="12px" fontWeight="400" mt="16px">
+                <FormattedMessage defaultMessage="See historical" />
+                <Span pl="8px">
+                  {showHostFeeChart ? (
+                    <ChevronUp size={12} color="#46347F" />
+                  ) : (
+                    <ChevronDown fontVariant="solid" size={12} color="#46347F" />
+                  )}
+                </Span>
+              </P>
+            </StyledLinkButton>
+          </Container>
+        </Flex>
+        {showHostFeeChart && (
+          <Box py={3}>
+            <Flex alignItems="center" px={2} mb={2}>
+              <P fontSize="11px" fontWeight="700" mr={3} textTransform="uppercase">
+                <FormattedMessage id="HostFeesSection.Title" defaultMessage="Collected host fees per year" />
+              </P>
+              <StyledSelectFilter
+                inputId="host-report-host-fees-year-select"
+                options={yearsOptions}
+                defaultValue={{ value: selectedYear, label: selectedYear }}
+                onChange={({ value }) => setSelectedYear(value)}
+                isSearchable={false}
+                minWidth={100}
+              />
+            </Flex>
+            <ChartWrapper>
+              {loading && (
+                <ContainerOverlay>
+                  <StyledSpinner size={64} />
+                </ContainerOverlay>
+              )}
+              <Chart type="bar" width="100%" height="250px" options={chartOptions} series={series} />
+            </ChartWrapper>
+          </Box>
+        )}
+      </StyledCard>
+    </React.Fragment>
   );
 };
 

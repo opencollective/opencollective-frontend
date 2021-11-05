@@ -128,7 +128,7 @@ const ExpenseFormPayeeStep = ({
   const requiresAddress =
     values.payee &&
     !values.payee.isInvite &&
-    [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST].includes(values.type);
+    [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST, expenseTypes.GRANT].includes(values.type);
   const canInvite = !values?.status;
   const profileOptions = payoutProfiles.map(value => ({
     value,

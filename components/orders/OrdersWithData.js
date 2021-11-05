@@ -134,7 +134,7 @@ const hasParams = query => {
   });
 };
 
-const ROUTE_PARAMS = ['hostCollectiveSlug', 'collectiveSlug', 'view'];
+const ROUTE_PARAMS = ['hostCollectiveSlug', 'collectiveSlug', 'view', 'slug', 'section'];
 
 const updateQuery = (router, newParams) => {
   const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));

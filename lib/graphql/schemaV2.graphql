@@ -492,6 +492,11 @@ interface Transaction {
     """
     kind: [TransactionKind]
   ): [Transaction]!
+
+  """
+  Merchant id related to the Transaction (Stripe, PayPal, Wise, Privacy)
+  """
+  merchantId: String
 }
 
 """
@@ -614,6 +619,11 @@ type Expense {
   The account who created this expense
   """
   createdByAccount: Account
+
+  """
+  The account from where the expense was paid
+  """
+  host: Account
 
   """
   The payout method to use for this expense
@@ -744,6 +754,11 @@ enum Currency {
   HUF
 
   """
+  Rupiah
+  """
+  IDR
+
+  """
   Indian Rupee
   """
   INR
@@ -847,6 +862,11 @@ enum ExpenseType {
   Funding Request: Request funding for a project or initiative.
   """
   FUNDING_REQUEST
+
+  """
+  Grant: Request funding for a project or initiative.
+  """
+  GRANT
 
   """
   Unclassified expense
@@ -1209,6 +1229,7 @@ enum ActivityType {
   ORDERS_SUSPICIOUS
   BACKYOURSTACK_DISPATCH_CONFIRMED
   ACTIVATED_COLLECTIVE_AS_HOST
+  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
   DEACTIVATED_COLLECTIVE_AS_HOST
   VIRTUAL_CARD_REQUESTED
   ADDED_FUND_TO_ORG
@@ -1754,12 +1775,17 @@ type Host implements Account & AccountWithContributions {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
-  hostFeePercent: Int
+  hostFeePercent: Float
   totalHostedCollectives: Int
   isOpenToApplications: Boolean
   termsUrl: URL
   plan: HostPlan!
   hostMetrics(
+    """
+    A collection of accounts for which the metrics should be returned.
+    """
+    account: [AccountReferenceInput!]
+
     """
     Inferior date limit in which we're calculating the metrics
     """
@@ -2215,7 +2241,7 @@ enum ConnectedAccountService {
 Stats for the Account
 """
 type AccountStats {
-  id: Int
+  id: String
 
   """
   Amount of money in cents in the currency of the collective currently available to spend
@@ -3559,6 +3585,11 @@ type Credit implements Transaction {
     """
     kind: [TransactionKind]
   ): [Transaction]!
+
+  """
+  Merchant id related to the Transaction (Stripe, PayPal, Wise, Privacy)
+  """
+  merchantId: String
 }
 
 """
@@ -3652,6 +3683,11 @@ type Debit implements Transaction {
     """
     kind: [TransactionKind]
   ): [Transaction]!
+
+  """
+  Merchant id related to the Transaction (Stripe, PayPal, Wise, Privacy)
+  """
+  merchantId: String
 }
 
 """
@@ -5070,6 +5106,9 @@ type VirtualCard {
   last4: String
   data: JSONObject
   privateData: JSONObject
+  provider: String
+  spendingLimitAmount: Int
+  spendingLimitInterval: String
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -9437,6 +9476,12 @@ input VirtualCardInput {
   last4: String
   data: JSONObject
   privateData: JSONObject
+  provider: VirtualCardProvider
+}
+
+enum VirtualCardProvider {
+  PRIVACY
+  STRIPE
 }
 
 input VirtualCardUpdateInput {

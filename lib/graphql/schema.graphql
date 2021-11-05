@@ -60,7 +60,7 @@ interface CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  hostFeePercent: Int
+  hostFeePercent: Float
   platformFeePercent: Int
   currency: String
   image: String
@@ -1366,7 +1366,7 @@ type Collective implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  hostFeePercent: Int
+  hostFeePercent: Float
   platformFeePercent: Int
   currency: String
   image: String
@@ -1602,7 +1602,7 @@ type Event implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  hostFeePercent: Int
+  hostFeePercent: Float
   platformFeePercent: Int
   currency: String
   image: String
@@ -1838,7 +1838,7 @@ type Fund implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  hostFeePercent: Int
+  hostFeePercent: Float
   platformFeePercent: Int
   currency: String
   image: String
@@ -2074,7 +2074,7 @@ type Organization implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  hostFeePercent: Int
+  hostFeePercent: Float
   platformFeePercent: Int
   currency: String
   image: String
@@ -2311,7 +2311,7 @@ type Project implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  hostFeePercent: Int
+  hostFeePercent: Float
   platformFeePercent: Int
   currency: String
   image: String
@@ -2727,7 +2727,7 @@ type User implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  hostFeePercent: Int
+  hostFeePercent: Float
   platformFeePercent: Int
   currency: String
   image: String
@@ -2967,7 +2967,7 @@ type Vendor implements CollectiveInterface {
   startsAt: DateString
   endsAt: DateString
   timezone: String
-  hostFeePercent: Int
+  hostFeePercent: Float
   platformFeePercent: Int
   currency: String
   image: String
@@ -3842,7 +3842,7 @@ input CollectiveInputType {
   members: [MemberInputType]
   notifications: [NotificationInputType]
   HostCollectiveId: Int
-  hostFeePercent: Int
+  hostFeePercent: Float
   ParentCollectiveId: Int
   email: String
   firstName: String @deprecated(reason: "2021-09-24: Use \"name\"")
