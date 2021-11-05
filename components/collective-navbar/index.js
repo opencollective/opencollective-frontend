@@ -247,7 +247,6 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, Lo
     return {};
   }
 
-  const isFund = collective.type === CollectiveType.FUND;
   const { features, settings, host } = collective;
   return {
     hasContribute: getHasContribute(collective, sections, isAdmin),
@@ -258,7 +257,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, Lo
     hasManageSubscriptions: isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE',
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     hasRequestGrant:
-      (isFund || get(settings, 'fundingRequest') === true) && expenseSubmissionAllowed(collective, LoggedInUser),
+      get(settings, 'expenseTypes.hasGrant') === true && expenseSubmissionAllowed(collective, LoggedInUser),
     addFunds: isHostAdmin,
     assignVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
     requestVirtualCard: isAdmin && isFeatureAvailable(collective, 'REQUEST_VIRTUAL_CARDS'),
