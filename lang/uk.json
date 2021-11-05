@@ -1136,7 +1136,7 @@
   "getHelp": "Отримати допомогу",
   "GiftCard": "Подарункова картка",
   "GiftCard.definition": "Подарункові картки дарують своїм працівникам або учасникам спільноти для підтримки улюблених проєктів. <learn-more-link>Докладніше</learn-more-link>.",
-  "GiftCard.Expired": "Expired",
+  "GiftCard.Expired": "Термін дії минув",
   "Giftcard.learnMore": "Дізнайтеся більше про подарункові картки",
   "GiftCard.Limitations": "Обмеження",
   "GiftCard.Limitinfo": "Your account is currently limited to {limit} gift cards per day. If you want to increase that limit, please contact <SupportLink></SupportLink>.",
