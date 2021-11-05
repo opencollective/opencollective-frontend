@@ -114,7 +114,7 @@ export const prepareExpenseForSubmit = expenseData => {
   const payeeLocation = isInvoice ? pick(expenseData.payeeLocation, ['address', 'country', 'structured']) : null;
 
   return {
-    ...pick(expenseData, ['id', 'description', 'longDescription', 'type', 'privateMessage', 'invoiceInfo', 'tags', 'status']),
+    ...pick(expenseData, ['id', 'description', 'longDescription', 'type', 'privateMessage', 'invoiceInfo', 'tags']),
     payee,
     payeeLocation,
     payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),

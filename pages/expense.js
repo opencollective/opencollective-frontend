@@ -327,7 +327,10 @@ class ExpensePage extends React.Component {
         editedExpense.payee.newsletterOptIn = this.state.newsletterOptIn;
       }
       await this.props.editExpense({
-        variables: { expense: prepareExpenseForSubmit(editedExpense), draftKey: this.props.draftKey },
+        variables: {
+          expense: prepareExpenseForSubmit(editedExpense),
+          draftKey: this.props.data.expense?.status === expenseStatus.DRAFT ? this.props.draftKey : null,
+        },
       });
       if (this.props.data.expense?.type === expenseTypes.CHARGE) {
         await this.props.data.refetch();
