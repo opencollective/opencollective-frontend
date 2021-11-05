@@ -2267,6 +2267,9 @@ type AccountStats {
   Net amount received
   """
   totalAmountReceived(
+    """
+    Filter by kind
+    """
     kind: [TransactionKind]
 
     """
@@ -2278,6 +2281,31 @@ type AccountStats {
     Calculate total amount received after this date
     """
     dateFrom: DateTime
+  ): Amount!
+
+  """
+  Total of paid expenses, filter per expensetype
+  """
+  totalPaidExpenses(
+    """
+    Filter by ExpenseType
+    """
+    expenseType: [ExpenseType]
+
+    """
+    Calculate total amount received before this date
+    """
+    dateTo: DateTime
+
+    """
+    Calculate total amount received after this date
+    """
+    dateFrom: DateTime
+
+    """
+    An optional currency. If not provided, will use the collective currency.
+    """
+    currency: Currency
   ): Amount!
   yearlyBudget: Amount!
   yearlyBudgetManaged: Amount!
