@@ -2286,7 +2286,7 @@ type AccountStats {
   """
   Total of paid expenses, filter per expensetype
   """
-  totalPaidExpense(
+  totalPaidExpenses(
     """
     Filter by ExpenseType
     """
@@ -2305,7 +2305,7 @@ type AccountStats {
     """
     An optional currency. If not provided, will use the collective currency.
     """
-    currency: String
+    currency: Currency
   ): Amount!
   yearlyBudget: Amount!
   yearlyBudgetManaged: Amount!

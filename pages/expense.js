@@ -57,7 +57,7 @@ const getVariableFromProps = props => {
   return {
     legacyExpenseId: props.legacyExpenseId,
     draftKey: props.draftKey,
-    totalPaidExpenseDateFrom: firstOfCurrentYear,
+    totalPaidExpensesDateFrom: firstOfCurrentYear,
   };
 };
 
@@ -69,7 +69,7 @@ const messages = defineMessages({
 });
 
 const expensePageQuery = gqlV2/* GraphQL */ `
-  query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalPaidExpenseDateFrom: DateTime) {
+  query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalPaidExpensesDateFrom: DateTime) {
     expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
       ...ExpensePageExpenseFields
       comments(limit: 100, offset: $offset) {
@@ -87,15 +87,15 @@ const expensePageQuery = gqlV2/* GraphQL */ `
         id
         stats {
           id
-          totalPaidExpenseInvoices: totalPaidExpense(expenseType: [INVOICE], dateFrom: $totalPaidExpenseDateFrom) {
+          totalPaidInvoices: totalPaidExpenses(expenseType: [INVOICE], dateFrom: $totalPaidExpensesDateFrom) {
             valueInCents
             currency
           }
-          totalPaidExpenseReceipts: totalPaidExpense(expenseType: [RECEIPT], dateFrom: $totalPaidExpenseDateFrom) {
+          totalPaidReceipts: totalPaidExpenses(expenseType: [RECEIPT], dateFrom: $totalPaidExpensesDateFrom) {
             valueInCents
             currency
           }
-          totalPaidExpenseGrants: totalPaidExpense(expenseType: [GRANT], dateFrom: $totalPaidExpenseDateFrom) {
+          totalPaidGrants: totalPaidExpenses(expenseType: [GRANT], dateFrom: $totalPaidExpensesDateFrom) {
             valueInCents
             currency
           }
