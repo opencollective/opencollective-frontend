@@ -42,6 +42,10 @@ OrganizationSettingsMenuLinks.propTypes = {
   collective: PropTypes.object,
 };
 
+const HOST_REPORTS_ENABLED_FOR_HOSTS = ['production'].includes(process.env.OC_ENV)
+  ? ['opensource', 'foundation', 'opencollective', 'paris']
+  : null;
+
 const Menu = ({ collective }) => {
   const { formatMessage } = useIntl();
   const isHost = isHostAccount(collective);
@@ -62,7 +66,12 @@ const Menu = ({ collective }) => {
           <MenuLink collective={collective} section={HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS} />
           <MenuLink collective={collective} section={HOST_SECTIONS.PENDING_APPLICATIONS} />
           <MenuLink collective={collective} section={HOST_SECTIONS.HOSTED_COLLECTIVES} />
-          <MenuLink collective={collective} section={HOST_SECTIONS.REPORTS} isBeta />
+          <MenuLink
+            collective={collective}
+            section={HOST_SECTIONS.REPORTS}
+            isBeta
+            if={!HOST_REPORTS_ENABLED_FOR_HOSTS || HOST_REPORTS_ENABLED_FOR_HOSTS.includes(collective.slug)}
+          />
         </MenuGroup>
         <MenuGroup if={isHost || isType(collective, ORGANIZATION)}>
           <MenuSectionHeader>

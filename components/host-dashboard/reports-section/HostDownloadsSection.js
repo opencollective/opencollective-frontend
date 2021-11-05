@@ -137,7 +137,7 @@ const HostDownloadsSection = ({ host }) => {
               minWidth={140}
               loading={isFetching}
             >
-              <FormattedMessage defaultMessage="Generate report" />
+              <FormattedMessage defaultMessage="Generate CSV report" />
             </StyledButton>
           </Link>
         </Flex>
