@@ -61,6 +61,9 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
           last4
           data
           privateData
+          provider
+          spendingLimitAmount
+          spendingLimitInterval
           createdAt
           account {
             id
@@ -354,7 +357,8 @@ const HostVirtualCards = props => {
             {...vc}
             onSuccess={refetch}
             editHandler={() => setEditingVirtualCard(vc)}
-            hasActions
+            // TODO: Edit card action need to be reworked
+            // hasActions
           />
         ))}
       </Grid>

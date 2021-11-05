@@ -177,12 +177,20 @@ ActionsButton.propTypes = {
   editHandler: PropTypes.func,
 };
 
-const getLimitString = ({ spend_limit, spend_limit_duration }) => {
-  const value = formatCurrency(spend_limit, 'USD');
-  if (spend_limit === 0) {
+const getLimitString = ({ spendingLimitAmount, spendingLimitInterval }) => {
+  const value = formatCurrency(spendingLimitAmount, 'USD');
+  if (!spendingLimitAmount) {
     return <FormattedMessage id="VirtualCards.NoLimit" defaultMessage="No Limit" />;
   }
-  switch (spend_limit_duration) {
+  switch (spendingLimitInterval) {
+    case 'DAILY':
+      return (
+        <Fragment>
+          <FormattedMessage defaultMessage="Limited to" />
+          &nbsp;
+          {value}/<FormattedMessage defaultMessage="day" />
+        </Fragment>
+      );
     case 'MONTHLY':
       return (
         <Fragment>
@@ -232,8 +240,8 @@ const VirtualCard = props => {
         {displayDetails ? (
           <React.Fragment>
             <P mt="27px" fontSize="18px" fontWeight="700" lineHeight="26px">
-              {props.privateData.cardNumber}{' '}
-              <Action color="black" ml={2} onClick={handleCopy(props.privateData.cardNumber.replace(/\s/g, ''))}>
+              {props.privateData.cardNumber.replace(/\d{4}(?=.)/g, '$& ')}{' '}
+              <Action color="black" ml={2} onClick={handleCopy(props.privateData.cardNumber)}>
                 <Copy size="18px" />
               </Action>
             </P>
@@ -287,7 +295,7 @@ const VirtualCard = props => {
                 }}
               />
               &nbsp;&middot;&nbsp;
-              {getLimitString(props.data)}
+              {getLimitString(props)}
             </P>
           </React.Fragment>
         )}
@@ -342,6 +350,8 @@ VirtualCard.propTypes = {
   name: PropTypes.string,
   data: PropTypes.object,
   privateData: PropTypes.object,
+  spendingLimitAmount: PropTypes.number,
+  spendingLimitInterval: PropTypes.string,
   createdAt: PropTypes.string,
 };
 
