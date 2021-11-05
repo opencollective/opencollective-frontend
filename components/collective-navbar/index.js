@@ -286,7 +286,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
             <Settings size="1em" />
             <Span ml={2}>
               {collective.isHost && hasNewAdminPanel ? (
-                <FormattedMessage defaultMessage="Admin panel" />
+                <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
               ) : (
                 <FormattedMessage id="Settings" defaultMessage="Settings" />
               )}
