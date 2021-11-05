@@ -65,12 +65,28 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
     <StyledTooltip
       content={() => (
         <FormattedMessage
-          defaultMessage="Total expense payouts ({currentYear}): {totalExpensesReceived}"
+          defaultMessage="Total expense payouts ({currentYear}): Invoices: {totalPaidInvoices}; Receipts: {totalPaidReceipts}; Grants: {totalPaidGrants}"
           values={{
-            totalExpensesReceived: (
+            totalPaidInvoices: (
               <FormattedMoneyAmount
-                amount={stats.totalExpensesReceived.valueInCents}
-                currency={stats.totalExpensesReceived.currency}
+                amount={stats.totalPaidInvoices.valueInCents}
+                currency={stats.totalPaidInvoices.currency}
+                precision={2}
+                amountStyles={null}
+              />
+            ),
+            totalPaidReceipts: (
+              <FormattedMoneyAmount
+                amount={stats.totalPaidReceipts.valueInCents}
+                currency={stats.totalPaidReceipts.currency}
+                precision={2}
+                amountStyles={null}
+              />
+            ),
+            totalPaidGrants: (
+              <FormattedMoneyAmount
+                amount={stats.totalPaidGrants.valueInCents}
+                currency={stats.totalPaidGrants.currency}
                 precision={2}
                 amountStyles={null}
               />
@@ -233,7 +249,15 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
 
 PayeeTotalPayoutSumTooltip.propTypes = {
   stats: PropTypes.shape({
-    totalExpensesReceived: PropTypes.shape({
+    totalPaidInvoices: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }).isRequired,
+    totalPaidReceipts: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }).isRequired,
+    totalPaidGrants: PropTypes.shape({
       valueInCents: PropTypes.number,
       currency: PropTypes.string,
     }).isRequired,
@@ -285,10 +309,18 @@ ExpensePayeeDetails.propTypes = {
       isAdmin: PropTypes.bool,
       isInvite: PropTypes.bool,
       stats: PropTypes.shape({
-        totalExpensesReceived: PropTypes.shape({
+        totalPaidInvoices: PropTypes.shape({
           valueInCents: PropTypes.number,
           currency: PropTypes.string,
-        }),
+        }).isRequired,
+        totalPaidReceipts: PropTypes.shape({
+          valueInCents: PropTypes.number,
+          currency: PropTypes.string,
+        }).isRequired,
+        totalPaidGrants: PropTypes.shape({
+          valueInCents: PropTypes.number,
+          currency: PropTypes.string,
+        }).isRequired,
       }),
     }),
     payeeLocation: PropTypes.shape({

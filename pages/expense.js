@@ -1,3 +1,4 @@
+/* eslint-disable graphql/template-strings */
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
@@ -56,7 +57,7 @@ const getVariableFromProps = props => {
   return {
     legacyExpenseId: props.legacyExpenseId,
     draftKey: props.draftKey,
-    totalExpensesReceivedDateFrom: firstOfCurrentYear,
+    totalPaidExpensesDateFrom: firstOfCurrentYear,
   };
 };
 
@@ -68,7 +69,7 @@ const messages = defineMessages({
 });
 
 const expensePageQuery = gqlV2/* GraphQL */ `
-  query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalExpensesReceivedDateFrom: DateTime) {
+  query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalPaidExpensesDateFrom: DateTime) {
     expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
       ...ExpensePageExpenseFields
       comments(limit: 100, offset: $offset) {
@@ -86,7 +87,15 @@ const expensePageQuery = gqlV2/* GraphQL */ `
         id
         stats {
           id
-          totalExpensesReceived: totalAmountReceived(kind: [EXPENSE], dateFrom: $totalExpensesReceivedDateFrom) {
+          totalPaidInvoices: totalPaidExpenses(expenseType: [INVOICE], dateFrom: $totalPaidExpensesDateFrom) {
+            valueInCents
+            currency
+          }
+          totalPaidReceipts: totalPaidExpenses(expenseType: [RECEIPT], dateFrom: $totalPaidExpensesDateFrom) {
+            valueInCents
+            currency
+          }
+          totalPaidGrants: totalPaidExpenses(expenseType: [GRANT], dateFrom: $totalPaidExpensesDateFrom) {
             valueInCents
             currency
           }
