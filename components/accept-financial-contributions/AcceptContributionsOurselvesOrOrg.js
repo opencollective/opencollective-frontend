@@ -124,7 +124,7 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
   submitBankAccountInformation = async payoutMethodData => {
     // prepare objects
     const account = {
-      legacyId: this.state.organization ? this.state.organization.id : this.props.LoggedInUser.CollectiveId,
+      legacyId: this.state.organization ? this.state.organization.id : this.props.collective.id,
     };
 
     // try mutation
