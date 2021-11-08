@@ -96,7 +96,7 @@
     "react-window": "1.8.6",
     "redis": "3.1.2",
     "sanitize-html": "2.5.3",
-    "slugify": "1.6.1",
+    "slugify": "1.6.2",
     "speakeasy": "2.0.0",
     "styled-components": "5.3.1",
     "styled-system": "5.1.5",
