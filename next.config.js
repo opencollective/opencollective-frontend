@@ -95,9 +95,7 @@ const nextConfig = {
     // Configuration for static/marketing pages
     config.module.rules.unshift({
       test: /public[\\/].*\.(html)$/,
-      use: {
-        loader: 'html-loader',
-      },
+      loader: 'html-loader',
     });
 
     // Load images in base64
