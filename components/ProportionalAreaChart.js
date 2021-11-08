@@ -102,7 +102,7 @@ ProportionalAreaChart.propTypes = {
   areas: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
-      label: PropTypes.node.isRequired,
+      label: PropTypes.node,
       /** How much space should be taken by this area. Defaults to proportional (100 / numberOfAreas)% */
       percentage: PropTypes.number,
       color: PropTypes.string,
