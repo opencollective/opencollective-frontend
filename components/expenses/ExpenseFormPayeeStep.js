@@ -256,7 +256,7 @@ const ExpenseFormPayeeStep = ({
                   mt={3}
                 >
                   <StyledInput value={values.payee.legalName} disabled />
-                  {values.payoutMethod?.data.accountHolderName &&
+                  {values.payoutMethod?.data?.accountHolderName &&
                     values.payee.legalName &&
                     !compareNames(values.payoutMethod.data.accountHolderName, values.payee.legalName) && (
                       <MessageBox mt={2} fontSize="12px" type="warning" withIcon>
