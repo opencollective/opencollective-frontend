@@ -2643,7 +2643,7 @@ type HostMetricsTimeSeries {
   """
   History of the total money managed by this host
   """
-  totalMoneyManagedTimeSeries: TimeSeriesAmount!
+  totalMoneyManaged: TimeSeriesAmount!
 }
 
 """

@@ -78,7 +78,7 @@ const totalMoneyManagedQuery = gqlV2/* GraphQL */ `
     host(slug: $hostSlug) {
       id
       hostMetricsTimeSeries(dateFrom: $dateFrom, dateTo: $dateTo, timeUnit: MONTH) {
-        totalMoneyManagedTimeSeries {
+        totalMoneyManaged {
           nodes {
             date
             amount {
@@ -108,7 +108,7 @@ const getSeriesFromData = (intl, timeSeries) => {
     return series;
   };
 
-  const totalMoneyManagedProgressNodes = get(timeSeries, 'totalMoneyManagedTimeSeries.nodes', []);
+  const totalMoneyManagedProgressNodes = get(timeSeries, 'totalMoneyManaged.nodes', []);
   return [
     {
       name: intl.formatMessage({ defaultMessage: 'Total Managed Amount' }),
