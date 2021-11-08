@@ -108,9 +108,12 @@ const YourInitiativeIsNearlyThere = () => (
           mr="24px"
         >
           <Box width="80px" height="80px">
-            <NextIllustration alt="Chrome logo" src="/static/images/ocf-host-application/chrome-logo.png" />
-            width={80}
-            height={80}
+            <NextIllustration
+              alt="Chrome logo"
+              src="/static/images/ocf-host-application/chrome-logo.png"
+              width={80}
+              height={80}
+            />
           </Box>
           <Box width="176px" textAlign="center">
             <H3 fontSize="20px" color="black.900" lineHeight="28px" my={2}>
@@ -133,9 +136,12 @@ const YourInitiativeIsNearlyThere = () => (
           flexDirection="column"
         >
           <Box width="80px" height="80px">
-            <NextIllustration alt="CVKey logo" src="/static/images/ocf-host-application/cvKey-logo.png" />
-            width={80}
-            height={80}
+            <NextIllustration
+              alt="CVKey logo"
+              src="/static/images/ocf-host-application/cvKey-logo.png"
+              width={80}
+              height={80}
+            />
           </Box>
           <Box width="176px" textAlign="center">
             <H3 fontSize="20px" color="black.900" lineHeight="28px" my={2}>
@@ -159,9 +165,12 @@ const YourInitiativeIsNearlyThere = () => (
           ml="24px"
         >
           <Box width="80px" height="80px">
-            <NextIllustration alt="WTV logo" src="/static/images/ocf-host-application/wtv-logo.svg" />
-            width={80}
-            height={80}
+            <NextIllustration
+              alt="WTV logo"
+              src="/static/images/ocf-host-application/wtv-logo.svg"
+              width={80}
+              height={80}
+            />
           </Box>
           <Box width="176px" textAlign="center">
             <H3 fontSize="20px" color="black.900" lineHeight="28px" my={2}>
