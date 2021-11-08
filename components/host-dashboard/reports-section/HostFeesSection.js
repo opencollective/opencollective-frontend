@@ -290,12 +290,14 @@ const HostFeesSection = ({ hostSlug }) => {
       ) : (
         <Flex flexWrap="wrap">
           <Container flex="1 1 230px" px={3}>
-            <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
-              <Span mr={10}>
+            <Container mt="24px">
+              <Flex alignItems="center">
                 <Image width={14} height={7} src="/static/images/host-fees-timeline.svg" />
-              </Span>
-              <FormattedMessage defaultMessage="Total Host Fees" />
-            </P>
+                <Span ml="10px" fontSize="12px" fontWeight="500" textTransform="uppercase">
+                  <FormattedMessage defaultMessage="Total Host Fees" />
+                </Span>
+              </Flex>
+            </Container>
             <Box pt="12px" pb="10px" fontSize="18px" fontWeight="500">
               {formatCurrency(totalHostFees, host.currency)}
             </Box>
@@ -311,12 +313,14 @@ const HostFeesSection = ({ hostSlug }) => {
             mt="39px"
           />
           <Container flex="1 1 230px" px={3}>
-            <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
-              <Span mr={10}>
+            <Container mt="24px">
+              <Flex alignItems="center">
                 <Image width={6.5} height={12} mr={10} src="/static/images/host-fees-money-sign.svg" />
-              </Span>
-              <FormattedMessage defaultMessage="Your Profit" />
-            </P>
+                <Span ml="10px" fontSize="12px" fontWeight="500" textTransform="uppercase">
+                  <FormattedMessage defaultMessage="Your Profit" />
+                </Span>
+              </Flex>
+            </Container>
             <Box pt="12px" pb="10px" fontSize="18px" fontWeight="500">
               {formatCurrency(profit, host.currency)}
             </Box>
@@ -332,12 +336,14 @@ const HostFeesSection = ({ hostSlug }) => {
             mt="39px"
           />
           <Container flex="1 1 230px" px={3}>
-            <P fontSize="12px" fontWeight="500" textTransform="uppercase" mt="24px">
-              <Span mr={10}>
+            <Container mt="24px">
+              <Flex alignItems="center">
                 <Image width={9.42} height={12} mr={10} src="/static/images/host-fees-oc.svg" />
-              </Span>
-              <FormattedMessage defaultMessage="Shared Revenue" />
-            </P>
+                <Span ml="10px" fontSize="12px" fontWeight="500" textTransform="uppercase">
+                  <FormattedMessage defaultMessage="Shared Revenue" />
+                </Span>
+              </Flex>
+            </Container>
             <Box pt="12px" pb="10px" fontSize="18px" fontWeight="500">
               {formatCurrency(sharedRevenue, host.currency)}
             </Box>
