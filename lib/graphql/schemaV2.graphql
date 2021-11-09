@@ -1897,6 +1897,11 @@ type Host implements Account & AccountWithContributions {
     Calculate contribution statistics until this date.
     """
     dateTo: DateTime
+
+    """
+    The time unit of the time series
+    """
+    timeUnit: TimeUnit! = YEAR
   ): ContributionStats!
   expenseStats(
     """
@@ -1913,6 +1918,11 @@ type Host implements Account & AccountWithContributions {
     Calculate expense statistics until this date.
     """
     dateTo: DateTime
+
+    """
+    The time unit of the time series
+    """
+    timeUnit: TimeUnit! = YEAR
   ): ExpenseStats!
 
   """
@@ -2779,6 +2789,11 @@ type ContributionStats {
   contributionsCount: Int!
 
   """
+  The contribution amounts over time
+  """
+  contributionAmountOverTime: TimeSeriesAmount!
+
+  """
   Number of one time contributions
   """
   oneTimeContributionsCount: Int!
@@ -2802,6 +2817,11 @@ type ExpenseStats {
   The total number of expenses
   """
   expensesCount: Int!
+
+  """
+  The total number of expenses over time
+  """
+  expenseAmountOverTime: TimeSeriesAmount!
 
   """
   The daily average paid in expenses

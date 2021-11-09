@@ -50,7 +50,7 @@ const triggerCSVDownload = (host, reportUrl, dateInterval) => {
 };
 
 const HostDownloadsSection = ({ host, collectives, dateInterval }) => {
-  const accountsSlugs = collectives?.map(c => c.value.slug);
+  const accountsSlugs = collectives?.map(c => c.value?.slug);
   const hostReportUrl = getHostReportURL(host?.slug, { ...prepareDateArgs(dateInterval), accountsSlugs });
   const { loading: isFetching, call: downloadCSV } = useAsyncCall(
     () => triggerCSVDownload(host, hostReportUrl, dateInterval),

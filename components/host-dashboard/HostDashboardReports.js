@@ -58,11 +58,31 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
         dailyAverageIncomeAmount {
           valueInCents
         }
+        contributionAmountOverTime {
+          nodes {
+            date
+            amount {
+              value
+              valueInCents
+              currency
+            }
+          }
+        }
       }
       expenseStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
         expensesCount
         dailyAverageAmount {
           valueInCents
+        }
+        expenseAmountOverTime {
+          nodes {
+            date
+            amount {
+              value
+              valueInCents
+              currency
+            }
+          }
         }
         invoicesCount
         reimbursementsCount
@@ -150,7 +170,15 @@ const getDefaultDateInterval = () => {
 const HostDashboardReports = ({ hostSlug }) => {
   const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
   const [collectives, setCollectives] = React.useState(null);
-  const { data, error, loading } = useQuery(hostReportPageQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
+  const { data, error, loading } = useQuery(hostReportPageQuery, {
+    variables: {
+      hostSlug,
+      dateFrom: new Date(dateInterval?.from),
+      dateTo: new Date(dateInterval?.to),
+      account: collectives,
+    },
+    context: API_V2_CONTEXT,
+  });
   const host = data?.host;
 
   if (!loading) {
@@ -228,7 +256,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           >
             <FormattedMessage id="TransactionsOverview" defaultMessage="Transactions overview" />
           </SectionTitle>
-          <TransactionsOverviewSection host={host} isLoading={loading} />
+          <TransactionsOverviewSection host={host} isLoading={loading} dateInterval={dateInterval} />
         </Container>
         <Box mb={4}>
           <PlatformTipsCollected host={host} isLoading={loading} />
