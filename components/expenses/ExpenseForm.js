@@ -2,10 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { Field, FieldArray, Form, Formik } from 'formik';
-import { first, get, isEmpty, omit, pick } from 'lodash';
+import { first, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { accountSupportsGrants } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/collective-sections';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -372,11 +373,8 @@ const ExpenseFormBody = ({
           value={values.type}
           options={{
             fundingRequest:
-              get(
-                collective.settings,
-                'expenseTypes.hasGrant',
-                get(collective?.host?.settings, 'disableGrantsByDefault', false),
-              ) || [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type),
+              accountSupportsGrants(collective.settings, collective?.host?.settings) ||
+              [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type),
           }}
         />
       )}

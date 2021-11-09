@@ -16,7 +16,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { display } from 'styled-system';
 
-import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
+import { accountSupportsGrants, expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
 import { getFilteredSectionsForCollective, isSectionEnabled, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { getEnvVar } from '../../lib/env-utils';
@@ -259,7 +259,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, Lo
     hasManageSubscriptions: isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE',
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     hasRequestGrant:
-      (get(settings, 'expenseTypes.hasGrant', get(hostSettings, 'disableGrantsByDefault', false)) || isProjectOrFund) &&
+      (accountSupportsGrants(settings, hostSettings) || isProjectOrFund) &&
       expenseSubmissionAllowed(collective, LoggedInUser),
     addFunds: isHostAdmin,
     assignVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
