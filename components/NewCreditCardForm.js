@@ -6,11 +6,7 @@ import { isUndefined } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import {
-  GQLV2_PAYMENT_METHOD_LEGACY_TYPES,
-  PAYMENT_METHOD_SERVICE,
-  PAYMENT_METHOD_TYPE,
-} from '../lib/constants/payment-methods';
+import { PAYMENT_METHOD_SERVICE, PAYMENT_METHOD_TYPE } from '../lib/constants/payment-methods';
 
 import { Flex } from './Grid';
 import { getI18nLink } from './I18nFormatters';
@@ -103,9 +99,6 @@ class NewCreditCardFormWithoutStripe extends React.Component {
         ({ value }) => ({
           value: {
             ...value,
-            // Deprecated but current form
-            providerType: GQLV2_PAYMENT_METHOD_LEGACY_TYPES.CREDIT_CARD,
-            // Future proof form
             service: PAYMENT_METHOD_SERVICE.STRIPE,
             type: PAYMENT_METHOD_TYPE.CREDITCARD,
             isSavedForLater: isUndefined(value?.isSavedForLater) || value.isSavedForLater ? defaultIsSaved : false,
@@ -141,7 +134,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     return (
       <Flex flexDirection="column">
         <StyledCardElement
-          hidePostalCode={hidePostalCode}
+          options={{ hidePostalCode }}
           onReady={input => input.focus()}
           onChange={this.onCardChange}
           onBlur={() => this.setState({ showAllErrors: true })}

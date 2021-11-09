@@ -1,6 +1,8 @@
+/* eslint-disable graphql/template-strings */
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
+import dayjs from 'dayjs';
 import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
@@ -18,6 +20,7 @@ import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
 import Container from '../components/Container';
 import CommentForm from '../components/conversations/CommentForm';
+import { commentFieldsFragment } from '../components/conversations/graphql';
 import Thread from '../components/conversations/Thread';
 import ErrorPage from '../components/ErrorPage';
 import ExpenseAdminActions from '../components/expenses/ExpenseAdminActions';
@@ -49,6 +52,15 @@ import { H1, H5, Span } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
+const getVariableFromProps = props => {
+  const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1)).utc(true).toISOString();
+  return {
+    legacyExpenseId: props.legacyExpenseId,
+    draftKey: props.draftKey,
+    totalPaidExpensesDateFrom: firstOfCurrentYear,
+  };
+};
+
 const messages = defineMessages({
   title: {
     id: 'ExpensePage.title',
@@ -57,9 +69,38 @@ const messages = defineMessages({
 });
 
 const expensePageQuery = gqlV2/* GraphQL */ `
-  query ExpensePage($legacyExpenseId: Int!, $draftKey: String) {
+  query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalPaidExpensesDateFrom: DateTime) {
     expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
       ...ExpensePageExpenseFields
+      comments(limit: 100, offset: $offset) {
+        totalCount
+        nodes {
+          ...CommentFields
+        }
+      }
+    }
+
+    # As it uses a dedicated variable this needs to be separated from the ExpensePageExpenseFields fragment
+    expensePayeeStats: expense(expense: { legacyId: $legacyExpenseId }) {
+      id
+      payee {
+        id
+        stats {
+          id
+          totalPaidInvoices: totalPaidExpenses(expenseType: [INVOICE], dateFrom: $totalPaidExpensesDateFrom) {
+            valueInCents
+            currency
+          }
+          totalPaidReceipts: totalPaidExpenses(expenseType: [RECEIPT], dateFrom: $totalPaidExpensesDateFrom) {
+            valueInCents
+            currency
+          }
+          totalPaidGrants: totalPaidExpenses(expenseType: [GRANT], dateFrom: $totalPaidExpensesDateFrom) {
+            valueInCents
+            currency
+          }
+        }
+      }
     }
 
     loggedInAccount {
@@ -69,6 +110,7 @@ const expensePageQuery = gqlV2/* GraphQL */ `
 
   ${loggedInAccountExpensePayoutFieldsFragment}
   ${expensePageExpenseFieldsFragment}
+  ${commentFieldsFragment}
 `;
 
 const editExpenseMutation = gqlV2/* GraphQL */ `
@@ -150,7 +192,10 @@ class ExpensePage extends React.Component {
     this.state = {
       isRefetchingDataForUser: false,
       error: null,
-      status: this.props.draftKey ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
+      status:
+        this.props.draftKey && this.props.data.expense?.status === expenseStatus.DRAFT
+          ? PAGE_STATUS.EDIT
+          : PAGE_STATUS.VIEW,
       editedExpense: null,
       isSubmitting: false,
       isPoolingEnabled: true,
@@ -291,7 +336,10 @@ class ExpensePage extends React.Component {
         editedExpense.payee.newsletterOptIn = this.state.newsletterOptIn;
       }
       await this.props.editExpense({
-        variables: { expense: prepareExpenseForSubmit(editedExpense), draftKey: this.props.draftKey },
+        variables: {
+          expense: prepareExpenseForSubmit(editedExpense),
+          draftKey: this.props.data.expense?.status === expenseStatus.DRAFT ? this.props.draftKey : null,
+        },
       });
       if (this.props.data.expense?.type === expenseTypes.CHARGE) {
         await this.props.data.refetch();
@@ -330,9 +378,9 @@ class ExpensePage extends React.Component {
   }
 
   clonePageQueryCacheData() {
-    const { client, legacyExpenseId, collectiveSlug } = this.props;
+    const { client } = this.props;
     const query = expensePageQuery;
-    const variables = { collectiveSlug, legacyExpenseId };
+    const variables = getVariableFromProps(this.props);
     const data = cloneDeep(client.readQuery({ query, variables }));
     return [data, query, variables];
   }
@@ -343,13 +391,42 @@ class ExpensePage extends React.Component {
     // Add comment to cache if not already fetched
     const [data, query, variables] = this.clonePageQueryCacheData();
     update(data, 'expense.comments.nodes', comments => uniqBy([...comments, comment], 'id'));
+    update(data, 'expense.comments.totalCount', totalCount => totalCount + 1);
     this.props.client.writeQuery({ query, variables, data });
   };
 
   onCommentDeleted = comment => {
     const [data, query, variables] = this.clonePageQueryCacheData();
     update(data, 'expense.comments.nodes', comments => comments.filter(c => c.id !== comment.id));
+    update(data, 'expense.comments.totalCount', totalCount => totalCount - 1);
     this.props.client.writeQuery({ query, variables, data });
+  };
+
+  fetchMore = async () => {
+    const { legacyExpenseId, draftKey, data } = this.props;
+
+    // refetch before fetching more as comments added to the cache can change the offset
+    await data.refetch();
+    await data.fetchMore({
+      variables: { legacyExpenseId, draftKey, offset: get(data, 'expense.comments.nodes', []).length },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) {
+          return prev;
+        }
+
+        const newValues = {};
+
+        newValues.expense = {
+          ...prev.expense,
+          comments: {
+            ...fetchMoreResult.expense.comments,
+            nodes: [...prev.expense.comments.nodes, ...fetchMoreResult.expense.comments.nodes],
+          },
+        };
+
+        return Object.assign({}, prev, newValues);
+      },
+    });
   };
 
   getPayoutProfiles = memoizeOne(loggedInAccount => {
@@ -398,7 +475,10 @@ class ExpensePage extends React.Component {
       }
     }
 
-    const expense = data.expense;
+    const expense = cloneDeep(data.expense);
+    if (expense && data.expensePayeeStats?.payee?.stats) {
+      expense.payee.stats = data.expensePayeeStats?.payee?.stats;
+    }
     const loggedInAccount = data.loggedInAccount;
     const collective = expense?.account;
     const host = collective?.host;
@@ -416,6 +496,12 @@ class ExpensePage extends React.Component {
     const skipSummary = isMissingReceipt && status === PAGE_STATUS.EDIT;
 
     const payoutProfiles = this.getPayoutProfiles(loggedInAccount);
+
+    let threadItems;
+
+    if (expense) {
+      threadItems = this.getThreadItems(expense.comments?.nodes, expense.activities);
+    }
 
     return (
       <Page collective={collective} {...this.getPageMetaData(expense)}>
@@ -635,6 +721,7 @@ class ExpensePage extends React.Component {
                     collective={collective}
                     loading={data.loading || loadingLoggedInUser || isRefetchingDataForUser}
                     expense={editedExpense || expense}
+                    originalExpense={expense}
                     expensesTags={this.getSuggestedTags(collective)}
                     payoutProfiles={payoutProfiles}
                     loggedInAccount={loggedInAccount}
@@ -668,7 +755,9 @@ class ExpensePage extends React.Component {
               <Box mb={3} pt={3}>
                 <Thread
                   collective={collective}
-                  items={this.getThreadItems(expense.comments?.nodes, expense.activities)}
+                  hasMore={expense.comments?.totalCount > threadItems.length}
+                  items={threadItems}
+                  fetchMore={this.fetchMore}
                   onCommentDeleted={this.onCommentDeleted}
                 />
               </Box>
@@ -711,7 +800,12 @@ class ExpensePage extends React.Component {
 }
 
 const addExpensePageData = graphql(expensePageQuery, {
-  options: { context: API_V2_CONTEXT },
+  options(props) {
+    return {
+      variables: getVariableFromProps(props),
+      context: API_V2_CONTEXT,
+    };
+  },
 });
 
 const addEditExpenseMutation = graphql(editExpenseMutation, {

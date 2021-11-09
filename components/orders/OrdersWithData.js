@@ -6,11 +6,11 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
+import { parseDateInterval } from '../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
-import { getDateRangeFromPeriod } from '../budget/filters/PeriodFilter';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -104,7 +104,7 @@ const isValidStatus = status => {
 
 const getVariablesFromQuery = (query, forcedStatus) => {
   const amountRange = parseAmountRange(query.amount);
-  const [dateFrom, dateTo] = getDateRangeFromPeriod(query.period);
+  const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || ORDERS_PER_PAGE,
@@ -134,7 +134,7 @@ const hasParams = query => {
   });
 };
 
-const ROUTE_PARAMS = ['hostCollectiveSlug', 'collectiveSlug', 'view'];
+const ROUTE_PARAMS = ['hostCollectiveSlug', 'collectiveSlug', 'view', 'slug', 'section'];
 
 const updateQuery = (router, newParams) => {
   const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
@@ -160,8 +160,8 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
 
   return (
     <Box maxWidth={1000} width="100%" m="0 auto" px={2}>
-      <Flex>
-        <H1 fontSize="32px" lineHeight="40px" mb={24} py={2} fontWeight="normal">
+      <Flex mb={24} alignItems="center" flexWrap="wrap">
+        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           {title || <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
         </H1>
         <Box mx="auto" />

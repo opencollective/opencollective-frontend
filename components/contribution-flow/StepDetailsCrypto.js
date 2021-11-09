@@ -15,15 +15,20 @@ import { CRYPTO_CURRENCIES } from './constants';
 const messages = defineMessages({
   cryptoCurrency: {
     id: `StepDetailsCrypto.cryptoCurrency`,
-    defaultMessage: 'Select your currency',
+    defaultMessage: 'Select your currency.',
   },
   donationAmount: {
     id: `StepDetailsCrypto.donationAmount`,
-    defaultMessage: 'Enter donation amount',
+    defaultMessage: 'Enter donation amount.',
   },
   invalidAmount: {
     id: `StepDetailsCrypto.invalidAmount`,
-    defaultMessage: 'Please select a valid currency amount',
+    defaultMessage: 'Please select a valid currency amount.',
+  },
+  lessThanMinimumAmount: {
+    id: `StepDetailsCrypto.lessThanMinimumAmount`,
+    defaultMessage:
+      '{cryptoCurrency} has a minimum contribution amount of {minimumAmount}. Please select a higher amount.',
   },
 });
 
@@ -47,6 +52,20 @@ const getCryptoExchangeRate = async (cryptoCurrency, collectiveCurrency) => {
     // eslint-disable-next-line no-console
     console.error(error);
     return null;
+  }
+};
+
+/*
+ * Validates the user entered crypto currency amount.
+ *
+ * 1) For invalid values such as negatives.
+ * 2) For values less than the minimum allowed amount for the specified Crypto currency by The Giving Block.
+ */
+const validateCryptoCurrencyAmount = (touched, amount, minimumAmount, cryptoCurrency, intl) => {
+  if (touched && amount <= 0) {
+    return intl.formatMessage(messages['invalidAmount']);
+  } else if (touched && amount < minimumAmount) {
+    return intl.formatMessage(messages['lessThanMinimumAmount'], { cryptoCurrency, minimumAmount });
   }
 };
 
@@ -106,13 +125,21 @@ const StepDetailsCrypto = ({ onChange, data, collective }) => {
         onChange={({ target }) => {
           const amount = parseFloat(target.value);
           setAmount(amount);
-          if (amount > 0) {
+          if (amount >= selectedCryptoCurrency.minDonation) {
             dispatchChange('amount', amount);
+          } else {
+            dispatchChange('amount', null);
           }
         }}
         onBlur={() => setTouched(true)}
         autoFocus
-        error={touched && amount <= 0 && intl.formatMessage(messages['invalidAmount'])}
+        error={validateCryptoCurrencyAmount(
+          touched,
+          amount,
+          selectedCryptoCurrency.minDonation,
+          selectedCryptoCurrency.labelWithoutImage,
+          intl,
+        )}
       />
       {convertedAmount !== null && convertedAmount > 0 && (
         <Box mt={2}>

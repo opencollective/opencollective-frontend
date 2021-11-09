@@ -1,7 +1,5 @@
 import { gqlV2 } from '../../../lib/graphql/helpers';
 
-import { commentFieldsFragment } from '../../conversations/graphql';
-
 export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
   fragment LoggedInAccountExpensePayoutFields on Individual {
     id
@@ -9,6 +7,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
     imageUrl
     type
     name
+    legalName
     location {
       address
       country
@@ -34,6 +33,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
           imageUrl
           type
           name
+          legalName
           isActive
           ... on AccountWithHost {
             host {
@@ -67,6 +67,7 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
   fragment ExpenseHostFields on Host {
     id
     name
+    legalName
     slug
     type
     currency
@@ -126,6 +127,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       id
       slug
       name
+      legalName
       type
       isAdmin
       location {
@@ -167,6 +169,18 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       type
       imageUrl
     }
+    host {
+      id
+      name
+      legalName
+      slug
+      type
+      website
+      location {
+        address
+        country
+      }
+    }
     requestedByAccount {
       id
       slug
@@ -195,6 +209,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       }
 
       stats {
+        id
         balanceWithBlockedFunds {
           valueInCents
           currency
@@ -248,11 +263,6 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       name
       last4
     }
-    comments(limit: 300) {
-      nodes {
-        ...CommentFields
-      }
-    }
     permissions {
       id
       canEdit
@@ -283,7 +293,6 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
     }
   }
 
-  ${commentFieldsFragment}
   ${expenseHostFields}
 `;
 

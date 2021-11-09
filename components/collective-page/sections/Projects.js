@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import css from '@styled-system/css';
+import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -48,9 +49,17 @@ class SectionProjects extends React.PureComponent {
     }
   }
 
-  render() {
-    const { collective, projects, isAdmin } = this.props;
+  filterProjects = memoizeOne((projects, isAdmin) => {
+    if (isAdmin) {
+      return projects;
+    } else {
+      return projects.filter(p => !p.isArchived);
+    }
+  });
 
+  render() {
+    const { collective, isAdmin } = this.props;
+    const projects = this.filterProjects(this.props.projects, isAdmin);
     if ((projects.length === 0 || !collective.isActive) && !isAdmin) {
       return null;
     }

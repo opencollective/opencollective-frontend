@@ -9,7 +9,7 @@ describe('Gift cards admin', () => {
   });
 
   it('start with empty gift cards list', () => {
-    cy.login({ redirect: `/${collectiveSlug}/edit/gift-cards` });
+    cy.login({ redirect: `/${collectiveSlug}/admin/gift-cards` });
     cy.getByDataCy('gift-cards-list').contains('Create your first gift card!');
   });
 
@@ -18,7 +18,7 @@ describe('Gift cards admin', () => {
     const paginationSize = 15;
     const numberOfPages = Math.trunc(numberOfGiftCards / paginationSize + 1);
 
-    cy.login({ redirect: `/${collectiveSlug}/edit/gift-cards-create` });
+    cy.login({ redirect: `/${collectiveSlug}/admin/gift-cards-create` });
 
     // Fill form
     cy.get('#giftcard-amount').type('42');
@@ -37,7 +37,7 @@ describe('Gift cards admin', () => {
     });
 
     // Links should also be added to gift cards list
-    cy.contains('a[href$="/edit/gift-cards"]', 'Back to Gift Cards list').click();
+    cy.contains('a[href$="/admin/gift-cards"]', 'Back to Gift Cards list').click();
     cy.getByDataCy('vc-details').should($giftCards => {
       expect($giftCards).to.have.length(paginationSize);
     });
@@ -47,7 +47,7 @@ describe('Gift cards admin', () => {
   });
 
   it('send gift cards by emails', () => {
-    cy.login({ redirect: `/${collectiveSlug}/edit/gift-cards-create` });
+    cy.login({ redirect: `/${collectiveSlug}/admin/gift-cards-create` });
 
     // Button should be disabled until we add emails
     checkSubmit(false, 'Create 0 gift cards');

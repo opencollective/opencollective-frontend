@@ -61,6 +61,9 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
           last4
           data
           privateData
+          provider
+          spendingLimitAmount
+          spendingLimitInterval
           createdAt
           account {
             id
@@ -178,7 +181,7 @@ const HostVirtualCards = props => {
   const handleUpdateFilters = queryParams => {
     return router.push(
       {
-        pathname: `/${props.collective.slug}/edit/host-virtual-cards`,
+        pathname: `/${props.collective.slug}/admin/host-virtual-cards`,
         query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
       },
       null,
@@ -218,7 +221,7 @@ const HostVirtualCards = props => {
 
   return (
     <Fragment>
-      <SettingsTitle>
+      <SettingsTitle contentOnly={props.contentOnly}>
         <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
       </SettingsTitle>
       <Box>
@@ -354,13 +357,14 @@ const HostVirtualCards = props => {
             {...vc}
             onSuccess={refetch}
             editHandler={() => setEditingVirtualCard(vc)}
-            hasActions
+            // TODO: Edit card action need to be reworked
+            // hasActions
           />
         ))}
       </Grid>
       <Flex mt={5} alignItems="center" flexDirection="column" justifyContent="center">
         <Pagination
-          route={`/${props.collective.slug}/edit/host-virtual-cards`}
+          route={`/${props.collective.slug}/admin/host-virtual-cards`}
           total={data.host.hostedVirtualCards.totalCount}
           limit={VIRTUAL_CARDS_PER_PAGE}
           offset={offset}
@@ -398,6 +402,7 @@ HostVirtualCards.propTypes = {
       }),
     }),
   }),
+  contentOnly: PropTypes.bool,
   hideTopsection: PropTypes.func,
 };
 

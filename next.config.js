@@ -27,6 +27,7 @@ const nextConfig = {
         SENTRY_DSN: null,
         TW_API_COLLECTIVE_SLUG: null,
         HOST_DASHBOARD_REPORTS: false,
+        NEW_ADMIN_DASHBOARD: false,
         WISE_ENVIRONMENT: 'sandbox',
         HCAPTCHA_SITEKEY: false,
         CAPTCHA_ENABLED: true,

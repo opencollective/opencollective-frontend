@@ -15,7 +15,7 @@ const COMMON_DIRECTIVES = {
     process.env.NEXT_IMAGES_URL,
     'data:',
     '*.paypal.com',
-    'opencollective.com', // for widgets on /edit/export
+    'opencollective.com', // for widgets on /admin/export
     'blob:', // For upload images previews
   ].filter(Boolean),
   workerSrc: [
@@ -32,6 +32,7 @@ const COMMON_DIRECTIVES = {
     SELF,
     process.env.API_URL,
     process.env.PDF_SERVICE_URL,
+    process.env.REST_URL,
     'wtfismyip.com',
     '*.paypal.com',
     '*.paypalobjects.com',

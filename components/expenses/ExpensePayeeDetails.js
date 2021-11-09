@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { formatAccountName } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -11,12 +13,14 @@ import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payo
 
 import Avatar from '../Avatar';
 import Container from '../Container';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import LocationAddress from '../LocationAddress';
 import StyledLink from '../StyledLink';
+import StyledTooltip from '../StyledTooltip';
 import { H4, P, Span } from '../Text';
 
 import PayoutMethodData from './PayoutMethodData';
@@ -55,12 +59,56 @@ const PrivateInfoColumnHeader = styled(H4).attrs({
   lineHeight: '15px',
 })``;
 
+const PayeeTotalPayoutSumTooltip = ({ stats }) => {
+  const currentYear = new Date().getFullYear().toString();
+  return (
+    <StyledTooltip
+      content={() => (
+        <FormattedMessage
+          defaultMessage="Total expense payouts ({currentYear}): Invoices: {totalPaidInvoices}; Receipts: {totalPaidReceipts}; Grants: {totalPaidGrants}"
+          values={{
+            totalPaidInvoices: (
+              <FormattedMoneyAmount
+                amount={stats.totalPaidInvoices.valueInCents}
+                currency={stats.totalPaidInvoices.currency}
+                precision={2}
+                amountStyles={null}
+              />
+            ),
+            totalPaidReceipts: (
+              <FormattedMoneyAmount
+                amount={stats.totalPaidReceipts.valueInCents}
+                currency={stats.totalPaidReceipts.currency}
+                precision={2}
+                amountStyles={null}
+              />
+            ),
+            totalPaidGrants: (
+              <FormattedMoneyAmount
+                amount={stats.totalPaidGrants.valueInCents}
+                currency={stats.totalPaidGrants.currency}
+                precision={2}
+                amountStyles={null}
+              />
+            ),
+            currentYear: <Span>{currentYear}</Span>,
+          }}
+        />
+      )}
+    >
+      <InfoCircle size={16} />
+    </StyledTooltip>
+  );
+};
+
 const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLoggedInUser, isDraft, collective }) => {
   const payeeLocation = expense?.payeeLocation || expense?.draft?.payeeLocation;
   const payee = isDraft ? expense?.draft?.payee : expense?.payee;
+  const payeeStats = payee && !isDraft ? payee.stats : null; // stats not available for drafts
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === expenseStatus.PAID;
+  const displayedHost = expense?.host ?? host;
 
   return isLoading ? (
     <LoadingPlaceholder height={150} mt={3} />
@@ -90,18 +138,23 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             ) : (
               <Avatar collective={payee} radius={24} />
             )}
-            <Flex flexDirection="column" ml={2} css={{ overflow: 'hidden' }}>
+            <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
               <Span color="black.900" fontWeight="bold" truncateOverflow>
-                {payee.organization?.name || payee.name}
+                {formatAccountName(
+                  payee.organization?.legalName || payee.legalName,
+                  payee.organization?.name || payee.name,
+                )}
               </Span>
-              {payee.type !== CollectiveType.VENDOR && (
+              {payee.type !== CollectiveType.VENDOR && (payee.organization?.slug || payee.slug) && (
                 <Span color="black.900" fontSize="11px" truncateOverflow>
                   @{payee.organization?.slug || payee.slug}
                 </Span>
               )}
             </Flex>
+            {payeeStats && <PayeeTotalPayoutSumTooltip stats={payeeStats} />}
           </Flex>
         </LinkCollective>
+
         {payeeLocation && isInvoice && (
           <Container whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
             <LocationAddress location={payeeLocation} isLoading={isLoadingLoggedInUser} />
@@ -149,7 +202,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
           )}
         </Container>
       </PrivateInfoColumn>
-      {host && (
+      {displayedHost && (
         <PrivateInfoColumn data-cy="expense-summary-host" borderless={borderless}>
           <PrivateInfoColumnHeader>
             {isPaid ? (
@@ -158,33 +211,33 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
               <FormattedMessage id="expense.PayFromFiscalhost" defaultMessage="Pay from Fiscal Host" />
             )}
           </PrivateInfoColumnHeader>
-          <LinkCollective collective={host}>
+          <LinkCollective collective={displayedHost}>
             <Flex alignItems="center">
-              <Avatar collective={host} radius={24} />
+              <Avatar collective={displayedHost} radius={24} />
               <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
-                {collective && (collective.isApproved || collective.id === host.id) ? (
-                  host.name
+                {collective && (collective.isApproved || collective.id === displayedHost.id) ? (
+                  formatAccountName(displayedHost.legalName, displayedHost.name)
                 ) : (
                   <FormattedMessage
                     id="Fiscalhost.pending"
                     defaultMessage="{host} (pending)"
                     values={{
-                      host: host.name,
+                      host: formatAccountName(displayedHost.legalName, displayedHost.name),
                     }}
                   />
                 )}
               </Span>
             </Flex>
           </LinkCollective>
-          {host.location && (
+          {displayedHost.location && (
             <P whiteSpace="pre-wrap" fontSize="11px" mt={2}>
-              {host.location.address}
+              {displayedHost.location.address}
             </P>
           )}
-          {host.website && (
+          {displayedHost.website && (
             <P mt={2} fontSize="11px">
-              <StyledLink href={host.website} openInNewTab>
-                {host.website}
+              <StyledLink href={displayedHost.website} openInNewTab>
+                {displayedHost.website}
               </StyledLink>
             </P>
           )}
@@ -192,6 +245,23 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
       )}
     </Flex>
   );
+};
+
+PayeeTotalPayoutSumTooltip.propTypes = {
+  stats: PropTypes.shape({
+    totalPaidInvoices: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }).isRequired,
+    totalPaidReceipts: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }).isRequired,
+    totalPaidGrants: PropTypes.shape({
+      valueInCents: PropTypes.number,
+      currency: PropTypes.string,
+    }).isRequired,
+  }),
 };
 
 ExpensePayeeDetails.propTypes = {
@@ -204,6 +274,7 @@ ExpensePayeeDetails.propTypes = {
   host: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+    legalName: PropTypes.string,
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
     website: PropTypes.string,
@@ -237,6 +308,20 @@ ExpensePayeeDetails.propTypes = {
       type: PropTypes.string,
       isAdmin: PropTypes.bool,
       isInvite: PropTypes.bool,
+      stats: PropTypes.shape({
+        totalPaidInvoices: PropTypes.shape({
+          valueInCents: PropTypes.number,
+          currency: PropTypes.string,
+        }).isRequired,
+        totalPaidReceipts: PropTypes.shape({
+          valueInCents: PropTypes.number,
+          currency: PropTypes.string,
+        }).isRequired,
+        totalPaidGrants: PropTypes.shape({
+          valueInCents: PropTypes.number,
+          currency: PropTypes.string,
+        }).isRequired,
+      }),
     }),
     payeeLocation: PropTypes.shape({
       address: PropTypes.string,
@@ -247,6 +332,18 @@ ExpensePayeeDetails.propTypes = {
       name: PropTypes.string,
       slug: PropTypes.string,
       type: PropTypes.string,
+    }),
+    host: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      legalName: PropTypes.string,
+      slug: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      website: PropTypes.string,
+      location: PropTypes.shape({
+        address: PropTypes.string,
+        country: PropTypes.string,
+      }),
     }),
     payoutMethod: PropTypes.shape({
       id: PropTypes.string,

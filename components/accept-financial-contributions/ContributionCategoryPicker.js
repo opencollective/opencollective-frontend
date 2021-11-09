@@ -7,9 +7,9 @@ import styled from 'styled-components';
 import CollectiveNavbar from '../collective-navbar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
-import StyledLink from '../StyledLink';
 import { H1, P } from '../Text';
 
 import acceptHostHoverIllustration from '../../public/static/images/create-collective/acceptContributionsHostHoverIllustration.png';
@@ -55,7 +55,9 @@ const HoverImage = styled.img`
   }
 `;
 
-const moreInfoHostsLink = 'https://docs.opencollective.com/help/collectives/add-or-change-fiscal-host';
+const independentCollectiveMoreInfo = 'https://docs.opencollective.com/help/independent-collectives';
+const ownFiscalHostMoreInfo = 'https://opencollective.com/become-a-fiscal-host';
+const applyFiscalHostMoreInfo = 'https://opencollective.com/fiscal-hosting';
 
 class ContributionCategoryPicker extends React.Component {
   static propTypes = {
@@ -74,24 +76,14 @@ class ContributionCategoryPicker extends React.Component {
       },
       subtitle: {
         id: 'acceptContributions.picker.subtitle',
-        defaultMessage: 'Who will hold money on behalf of the Collective?',
+        defaultMessage: 'Who will hold money on behalf of this Collective?',
       },
       ourselves: {
         id: 'acceptContributions.picker.ourselves',
-        defaultMessage: 'Ourselves',
+        defaultMessage: 'Independent Collective',
       },
-      ourselvesInfo: {
-        id: 'acceptContributions.picker.ourselvesInfo',
-        defaultMessage:
-          'Simply connect a bank account to your Collective. You will be responsible for accounting, taxes, payments, and liability. Choose this option if you have a single Collective and want to hold funds for it yourself.',
-      },
-      host: { id: 'acceptContributions.picker.host', defaultMessage: 'A Fiscal Host' },
-      organization: { id: 'acceptContributions.organization.subtitle', defaultMessage: 'Our organization' },
-      organizationInfo: {
-        id: 'acceptContributions.picker.organizationInfo',
-        defaultMessage:
-          'Create a Fiscal Host to hold funds for multiple Collectives, or select a one that you already manage. Choose this option if you have a legal entity set up to handle accounting, taxes, payments, and liability for multiple Collectives.',
-      },
+      host: { id: 'acceptContributions.picker.host', defaultMessage: 'Join a Fiscal Host' },
+      organization: { id: 'acceptContributions.organization.subtitle', defaultMessage: 'Our Own Fiscal Host' },
     });
   }
 
@@ -129,7 +121,7 @@ class ContributionCategoryPicker extends React.Component {
                       fontSize="13px"
                       buttonStyle="dark"
                       minHeight="36px"
-                      mt={[2, 3]}
+                      mt={[2, 4]}
                       mb={3}
                       minWidth={'145px'}
                       data-cy="afc-picker-myself-button"
@@ -139,7 +131,16 @@ class ContributionCategoryPicker extends React.Component {
                   </Link>
                   <Box minHeight={50} px={3}>
                     <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
-                      {intl.formatMessage(this.messages.ourselvesInfo)}
+                      <FormattedMessage
+                        id="acceptContributions.picker.ourselvesInfo"
+                        defaultMessage="Simply connect a bank account to your Collective. You will be responsible for accounting, taxes, payments, and liability. Choose this option if you have a single Collective and want to hold funds for it yourself. <MoreInfoLink>More info</MoreInfoLink>"
+                        values={{
+                          MoreInfoLink: getI18nLink({
+                            href: independentCollectiveMoreInfo,
+                            openInNewTab: true,
+                          }),
+                        }}
+                      />
                     </P>
                   </Box>
                 </Flex>
@@ -175,7 +176,16 @@ class ContributionCategoryPicker extends React.Component {
                   </Link>
                   <Box minHeight={50} px={3}>
                     <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
-                      {intl.formatMessage(this.messages.organizationInfo)}
+                      <FormattedMessage
+                        id="acceptContributions.picker.organizationInfo"
+                        defaultMessage="Select or create your own Fiscal Host, which you manage. Choose this option if you have a legal entity set up to handle accounting, taxes, payments, and liability for multiple Collectives. <MoreInfoLink>More info</MoreInfoLink>"
+                        values={{
+                          MoreInfoLink: getI18nLink({
+                            href: ownFiscalHostMoreInfo,
+                            openInNewTab: true,
+                          }),
+                        }}
+                      />
                     </P>
                   </Box>
                 </Flex>
@@ -209,13 +219,12 @@ class ContributionCategoryPicker extends React.Component {
                     <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
                       <FormattedMessage
                         id="acceptContributions.picker.hostInfo"
-                        defaultMessage="Apply to join a Fiscal Host, who will hold money on behalf of your Collective. Choose this option if you want someone else to take care of banking, accounting, taxes, payments, and liability. {moreInfo}"
+                        defaultMessage="Apply to join a Fiscal Host, who will hold money on behalf of your Collective. Choose this option if you want someone else to take care of banking, accounting, taxes, payments, and liability. <MoreInfoLink>More info</MoreInfoLink>"
                         values={{
-                          moreInfo: (
-                            <StyledLink href={moreInfoHostsLink} openInNewTab>
-                              More info
-                            </StyledLink>
-                          ),
+                          MoreInfoLink: getI18nLink({
+                            href: applyFiscalHostMoreInfo,
+                            openInNewTab: true,
+                          }),
                         }}
                       />
                     </P>

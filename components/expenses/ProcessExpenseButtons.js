@@ -72,7 +72,7 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
         title: 'Insufficient Paypal balance',
         message: (
           <React.Fragment>
-            <Link href={`/${host.slug}/dashboard`}>
+            <Link href={`/${host.slug}/admin`}>
               <FormattedMessage
                 id="PayExpenseModal.RefillBalanceError"
                 defaultMessage="Refill your balance from the Host dashboard"
@@ -91,7 +91,7 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
             values={{
               SettingsLink: getI18nLink({
                 as: Link,
-                href: `${LoggedInUser.collective.slug}/edit/${EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH}`,
+                href: `${LoggedInUser.collective.slug}/admin/${EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH}`,
                 openInNewTab: true,
               }),
             }}

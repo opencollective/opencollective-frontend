@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
+import { CaretUp } from '@styled-icons/fa-solid/CaretUp';
 import { getLuminance } from 'polished';
 import { FormattedMessage } from 'react-intl';
-import sanitizeHtml from 'sanitize-html';
 import styled, { css } from 'styled-components';
 import { space, typography } from 'styled-system';
 
@@ -29,8 +29,6 @@ export const isEmptyValue = value => {
   }
 };
 
-const getFirstSentenceFromHTML = html => html.split?.(/<\/?\w+>/).filter(a => a.length)[0] || '';
-
 const ReadFullLink = styled.a`
   cursor: pointer;
   font-size: 12px;
@@ -39,8 +37,14 @@ const ReadFullLink = styled.a`
   }
 `;
 
-const DisplayBox = styled.div`
-  display: inline;
+const InlineDisplayBox = styled.div`
+  overflow-y: hidden;
+`;
+
+const CollapsedDisplayBox = styled(InlineDisplayBox)`
+  max-height: ${props => props.maxHeight + 20}px;
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 `;
 
 /**
@@ -52,26 +56,36 @@ const DisplayBox = styled.div`
  * ⚠️ Be careful! This component will pass content to `dangerouslySetInnerHTML` so
  * always ensure `content` is properly sanitized!
  */
-const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
+const HTMLContent = styled(({ content, collapsable = false, maxCollapsedHeight = 20, ...props }) => {
   const [isOpen, setOpen] = React.useState(false);
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const contentRef = useRef();
+
+  const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
+
+  useEffect(() => {
+    if (collapsable && contentRef?.current?.clientHeight > maxCollapsedHeight + 1) {
+      setIsCollapsed(true);
+    }
+  }, [content]);
+
   if (!content) {
     return <div {...props} />;
-  }
-  let __html = sanitize ? sanitizeHtml(content) : content;
-
-  if (collapsable && !isOpen) {
-    const firstSentence = getFirstSentenceFromHTML(__html);
-    // Hide "Read full description" if we can display everything in the firstSentence
-    if (firstSentence === __html) {
-      collapsable = false;
-    }
-    __html = firstSentence;
   }
 
   return (
     <div>
-      <DisplayBox collapsed={collapsable && !isOpen} dangerouslySetInnerHTML={{ __html }} {...props} />
-      {!isOpen && collapsable && (
+      {!isCollapsed || isOpen ? (
+        <InlineDisplayBox ref={contentRef} dangerouslySetInnerHTML={{ __html: content }} {...props} />
+      ) : (
+        <DisplayBox
+          ref={contentRef}
+          maxHeight={maxCollapsedHeight}
+          dangerouslySetInnerHTML={{ __html: content }}
+          {...props}
+        />
+      )}
+      {!isOpen && isCollapsed && (
         <ReadFullLink
           onClick={() => setOpen(true)}
           {...props}
@@ -84,9 +98,25 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
             }
           }}
         >
-          &nbsp;
           <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />
           <CaretDown size="10px" />
+        </ReadFullLink>
+      )}
+      {isOpen && isCollapsed && (
+        <ReadFullLink
+          onClick={() => setOpen(false)}
+          {...props}
+          role="button"
+          tabIndex={0}
+          onKeyDown={event => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              setOpen(false);
+            }
+          }}
+        >
+          <FormattedMessage defaultMessage="Collapse" />
+          <CaretUp size="10px" />
         </ReadFullLink>
       )}
     </div>
@@ -171,7 +201,7 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
 
   ${typography}
   ${space}
-  
+
   // Apply custom theme if the color is safe to apply
 
   ${props => {
@@ -201,15 +231,13 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
 `;
 
 HTMLContent.propTypes = {
-  /** The HTML string. Makes sure this is sanitized properly! */
   content: PropTypes.string,
-  sanitize: PropTypes.bool,
   collapsable: PropTypes.bool,
+  maxCollapsedHeight: PropTypes.number,
 };
 
 HTMLContent.defaultProps = {
   fontSize: '14px',
-  sanitize: false,
 };
 
 export default HTMLContent;

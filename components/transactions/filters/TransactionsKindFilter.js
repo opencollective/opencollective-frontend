@@ -15,6 +15,7 @@ import { Span } from '../../Text';
 export const getDefaultKinds = () => {
   return [
     TransactionKind.ADDED_FUNDS,
+    TransactionKind.BALANCE_TRANSFER,
     TransactionKind.CONTRIBUTION,
     TransactionKind.EXPENSE,
     TransactionKind.PLATFORM_TIP,
@@ -83,6 +84,7 @@ const TransactionsKindFilter = ({ onChange, value, kinds, ...props }) => {
   return (
     <StyledSelectFilter
       isSearchable={false}
+      isClearable={false}
       onChange={options => onChange(optionsToQueryString(options))}
       value={selectedOptions}
       options={options}

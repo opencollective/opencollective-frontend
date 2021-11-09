@@ -5,6 +5,7 @@ import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
+import { parseDateInterval } from '../../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 
 import Collapse from '../../../Collapse';
@@ -97,7 +98,7 @@ const VirtualCards = props => {
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
   const { state, merchant, period } = routerQuery;
-
+  const { from: dateFrom, to: dateTo } = parseDateInterval(period);
   const { loading, data } = useQuery(virtualCardsQuery, {
     context: API_V2_CONTEXT,
     variables: {
@@ -106,8 +107,8 @@ const VirtualCards = props => {
       offset,
       state,
       merchantAccount: { slug: merchant },
-      dateFrom: period?.split('→')[0],
-      dateTo: period?.split('→')[1] !== 'all' ? period?.split('→')[1] : null,
+      dateFrom: dateFrom,
+      dateTo: dateTo,
     },
   });
 
@@ -117,14 +118,14 @@ const VirtualCards = props => {
 
   const handleUpdateFilters = queryParams => {
     return router.push({
-      pathname: `/${props.collective.slug}/edit/virtual-cards`,
+      pathname: `/${props.collective.slug}/admin/virtual-cards`,
       query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
     });
   };
 
   return (
     <Box width={['366px', '764px']}>
-      <SettingsTitle>
+      <SettingsTitle contentOnly={props.contentOnly}>
         <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
       </SettingsTitle>
 
@@ -176,7 +177,7 @@ const VirtualCards = props => {
       </Grid>
       <Flex mt={5} justifyContent="center">
         <Pagination
-          route={`/${props.collective.slug}/edit/virtual-cards`}
+          route={`/${props.collective.slug}/admin/virtual-cards`}
           total={data.account.virtualCards.totalCount}
           limit={VIRTUAL_CARDS_PER_PAGE}
           offset={offset}
@@ -195,6 +196,7 @@ VirtualCards.propTypes = {
     virtualCardMerchants: PropTypes.array,
     host: PropTypes.object,
   }),
+  contentOnly: PropTypes.bool,
   hideTopsection: PropTypes.func,
 };
 

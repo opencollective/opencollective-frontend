@@ -30,7 +30,7 @@ const titles = defineMessages({
     defaultMessage: 'Transactions',
   },
   EXPENSES: {
-    id: 'section.expenses.title',
+    id: 'Expenses',
     defaultMessage: 'Expenses',
   },
   UPDATES: {

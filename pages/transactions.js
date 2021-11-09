@@ -10,12 +10,12 @@ import styled from 'styled-components';
 import { isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
+import { parseDateInterval } from '../lib/date-utils';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import Body from '../components/Body';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
-import { getDateRangeFromPeriod } from '../components/budget/filters/PeriodFilter';
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
@@ -106,7 +106,7 @@ const EXPENSES_PER_PAGE = 15;
 
 const getVariablesFromQuery = query => {
   const amountRange = parseAmountRange(query.amount);
-  const [dateFrom, dateTo] = getDateRangeFromPeriod(query.period);
+  const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || EXPENSES_PER_PAGE,
@@ -298,7 +298,7 @@ class TransactionsPage extends React.Component {
               <Flex>
                 {canDownloadInvoices && (
                   <Box mr="8px">
-                    <Link href={`/${collective.slug}/edit/payment-receipts`}>
+                    <Link href={`/${collective.slug}/admin/payment-receipts`}>
                       <StyledButton buttonSize="small" minWidth={140} isBorderless flexGrow={1}>
                         <FormattedMessage id="transactions.downloadinvoicesbutton" defaultMessage="Download Receipts" />
                         <IconDownload size="13px" style={{ marginLeft: '8px' }} />

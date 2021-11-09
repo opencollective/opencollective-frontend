@@ -18,6 +18,7 @@ import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledInputMask from '../StyledInputMask';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
@@ -27,6 +28,7 @@ const initialValues = {
   expireDate: undefined,
   cvv: undefined,
   assignee: undefined,
+  provider: undefined,
 };
 
 const assignNewVirtualCardMutation = gqlV2/* GraphQL */ `
@@ -93,11 +95,23 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
 
   const formik = useFormik({
     initialValues: {
-      ...(virtualCard ? { ...virtualCard.privateData, assignee: virtualCard.assignee } : initialValues),
+      ...(virtualCard
+        ? {
+            ...virtualCard.privateData,
+            assignee: virtualCard.assignee,
+            provider: virtualCard.provider,
+          }
+        : initialValues),
       collective: collective || virtualCard?.account,
     },
     async onSubmit(values) {
-      const { collective, assignee, ...privateData } = values;
+      const { collective, assignee, provider } = values;
+      const privateData = {
+        cardNumber: values.cardNumber.replace(/\s+/g, ''),
+        cvv: values.cvv,
+        expireDate: values.expireDate,
+      };
+
       if (isEditing) {
         try {
           await editVirtualCard({
@@ -131,6 +145,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
             variables: {
               virtualCard: {
                 privateData,
+                provider,
               },
               assignee: { id: assignee.id },
               account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
@@ -164,6 +179,9 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
       }
       if (!values.collective) {
         errors.collective = 'Required';
+      }
+      if (!values.provider) {
+        errors.provider = 'Required';
       }
       if (!values.assignee) {
         errors.assignee = 'Required';
@@ -225,7 +243,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label="Which collective will be assigned to this card?"
+              label={<FormattedMessage defaultMessage="Which collective will be assigned to this card?" />}
               htmlFor="collective"
               error={formik.touched.collective && formik.errors.collective}
             >
@@ -251,7 +269,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label="Which user will be responsible for this card?"
+              label={<FormattedMessage defaultMessage="Which user will be responsible for this card?" />}
               htmlFor="assignee"
               error={formik.touched.assignee && formik.errors.assignee}
             >
@@ -268,10 +286,35 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
                 />
               )}
             </StyledInputField>
+
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label="Card number"
+              label="What payment provider do you use for this card?"
+              htmlFor="provider"
+              error={formik.touched.provider && formik.errors.provider}
+            >
+              {inputProps => (
+                <StyledSelect
+                  {...inputProps}
+                  id="provider"
+                  inputId="provider"
+                  placeholder="Select"
+                  options={[
+                    { key: 'PRIVACY', value: 'PRIVACY', label: 'Privacy' },
+                    { key: 'STRIPE', value: 'STRIPE', label: 'Stripe' },
+                  ]}
+                  isSearchable={false}
+                  disabled={isBusy || isEditing}
+                  onChange={option => formik.setFieldValue('provider', option.value)}
+                />
+              )}
+            </StyledInputField>
+
+            <StyledInputField
+              gridColumn="1/3"
+              labelFontSize="13px"
+              label={<FormattedMessage defaultMessage="Card number" />}
               htmlFor="number"
               error={formik.touched.cardNumber && formik.errors.cardNumber}
             >
@@ -321,7 +364,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
             </StyledInputField>
             <StyledInputField
               labelFontSize="13px"
-              label="Expire date"
+              label={<FormattedMessage defaultMessage="Expire date" />}
               htmlFor="expireDate"
               error={formik.touched.expireDate && formik.errors.expireDate}
             >
@@ -341,7 +384,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
             </StyledInputField>
             <StyledInputField
               labelFontSize="13px"
-              label="CVV/CVC"
+              label={<FormattedMessage defaultMessage="CVV/CVC" />}
               htmlFor="cvv"
               error={formik.touched.cvv && formik.errors.cvv}
             >
@@ -424,6 +467,7 @@ AssignVirtualCardModal.propTypes = {
       name: PropTypes.string,
       slug: PropTypes.string,
     },
+    provider: PropTypes.string,
   }),
 };
 

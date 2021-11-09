@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field } from 'formik';
-import { get, isEmpty } from 'lodash';
+import { escape, get, isEmpty, unescape } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isURL } from 'validator';
 
@@ -55,7 +55,7 @@ export const msg = defineMessages({
 /** Validates a single expense item, one field at a time (doesn't return multiple errors) */
 export const validateExpenseItem = (expense, item) => {
   const requiredFields = ['description', 'amount'];
-  if (expense.type !== expenseTypes.FUNDING_REQUEST) {
+  if (expense.type !== expenseTypes.FUNDING_REQUEST && expense.type !== expenseTypes.GRANT) {
     requiredFields.push('incurredAt');
   }
   const errors = requireFields(item, requiredFields);
@@ -158,9 +158,23 @@ const ExpenseItemForm = ({
           >
             {inputProps =>
               isRichText ? (
-                <Field as={RichTextEditor} {...inputProps} inputName={inputProps.name} withBorders />
+                <Field
+                  as={RichTextEditor}
+                  {...inputProps}
+                  inputName={inputProps.name}
+                  withBorders
+                  version="simplified"
+                />
               ) : (
-                <Field as={StyledInput} {...inputProps} />
+                <Field name={inputProps.name}>
+                  {({ field, form: { setFieldValue } }) => (
+                    <StyledInput
+                      {...inputProps}
+                      value={unescape(field.value)}
+                      onChange={e => setFieldValue(inputProps.name, escape(e.target.value))}
+                    />
+                  )}
+                </Field>
               )
             }
           </StyledInputField>

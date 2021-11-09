@@ -1,22 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
-import dynamic from 'next/dynamic';
-import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
-import { days } from '../../../lib/utils';
 
-import PeriodFilter, { encodePeriod, getDateRangeFromPeriod } from '../../budget/filters/PeriodFilter';
-import CollectivePickerAsync from '../../CollectivePickerAsync';
-import Container from '../../Container';
-import { Flex } from '../../Grid';
-import Loading from '../../Loading';
+import { Box } from '../../Grid';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
+import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
-const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const FilterLabel = styled.label`
   font-weight: 500;
@@ -226,7 +217,138 @@ const constructDataPointObjects = (category, dataPoints) => {
   return dataPointObject;
 };
 
-const TransactionsOverviewSection = ({ hostSlug }) => {
+const getTransactionsAreaChartData = host => {
+  if (!host) {
+    return [];
+  }
+
+  const currency = host.currency;
+  const { contributionsCount, dailyAverageIncomeAmount } = host.contributionStats;
+  const { expensesCount, dailyAverageAmount } = host.expenseStats;
+  return [
+    {
+      key: 'contributions',
+      percentage: 0.5,
+      color: 'green.500',
+      label: (
+        <P fontSize="12px" lineHeight="18px">
+          <FormattedMessage
+            defaultMessage="{count, plural, one {# contribution} other {# contributions}}"
+            values={{ count: contributionsCount }}
+          />
+          <Span mx="6px" color="black.600">
+            {' | '}
+          </Span>
+          <FormattedMessage
+            defaultMessage="Daily average: {amount}"
+            values={{
+              amount: <strong>{formatCurrency(dailyAverageIncomeAmount.valueInCents, currency)}</strong>,
+            }}
+          />
+        </P>
+      ),
+    },
+    {
+      key: 'expenses',
+      percentage: 0.5,
+      color: 'red.500',
+      label: (
+        <P fontSize="12px" lineHeight="18px">
+          <FormattedMessage
+            defaultMessage="{count, plural, one {# expense} other {# expenses}}"
+            values={{ count: expensesCount }}
+          />
+          <Span mx="6px" color="black.600">
+            {' | '}
+          </Span>
+          <FormattedMessage
+            defaultMessage="Daily average: {amount}"
+            values={{
+              amount: <strong>{formatCurrency(dailyAverageAmount.valueInCents, currency)}</strong>,
+            }}
+          />
+        </P>
+      ),
+    },
+  ];
+};
+
+const getTransactionsBreakdownChartData = host => {
+  if (!host) {
+    return [];
+  }
+
+  const contributionStats = host?.contributionStats;
+  const expenseStats = host?.expenseStats;
+  const { recurringContributionsCount, oneTimeContributionsCount } = contributionStats;
+  const { invoicesCount, reimbursementsCount, grantsCount } = expenseStats;
+  const hasGrants = grantsCount > 0;
+  const areas = [
+    {
+      key: 'one-time',
+      percentage: 0.25,
+      color: 'green.400',
+      legend: (
+        <FormattedMessage
+          defaultMessage="{count, plural, one {# One-time} other {# One-time}}"
+          values={{ count: oneTimeContributionsCount }}
+        />
+      ),
+    },
+    {
+      key: 'recurring',
+      percentage: 0.25,
+      color: 'green.300',
+      legend: (
+        <FormattedMessage
+          defaultMessage="{count, plural, one {# Recurring} other {# Recurring}}"
+          values={{ count: recurringContributionsCount }}
+        />
+      ),
+    },
+    {
+      key: 'invoices',
+      percentage: hasGrants ? 0.166 : 0.25,
+      color: 'red.600',
+      legend: (
+        <FormattedMessage
+          defaultMessage="{count, plural, one {# Invoice} other {# Invoices}}"
+          values={{ count: invoicesCount }}
+        />
+      ),
+    },
+    {
+      key: 'receipts',
+      percentage: hasGrants ? 0.166 : 0.25,
+      color: 'red.400',
+      legend: (
+        <FormattedMessage
+          defaultMessage="{count, plural, one {# Reimbursement} other {# Reimbursements}}"
+          values={{ count: reimbursementsCount }}
+        />
+      ),
+    },
+  ];
+
+  // Grants are only enabled for a few hosts/collectives, we only display the metric if active
+  if (hasGrants) {
+    areas.push({
+      key: 'grants',
+      percentage: 0.166,
+      color: 'red.300',
+      legend: (
+        <FormattedMessage
+          defaultMessage="{count, plural, one {# Grant} other {# Grants}}"
+          values={{ count: grantsCount }}
+        />
+      ),
+    });
+  }
+
+  return areas;
+};
+
+const TransactionsOverviewSection = ({ host, isLoading }) => {
   const intl = useIntl();
   const [dateFrom, setDateFrom] = useState(null);
   const [dateTo, setDateTo] = useState(null);
@@ -251,7 +373,7 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
     contributionAmountOverTime,
   } = contributionStats || 0;
   const { expensesCount, invoicesCount, reimbursementsCount, grantsCount, dailyAverageAmount, expenseAmountOverTime } =
-    expenseStats || 0;
+  expenseStats || 0;
 
   const series = [
     {
@@ -280,126 +402,140 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
       setCollectives(collectiveIds);
     }
   };
-
+  const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host), [host]);
+  const transactionBreakdownChart = React.useMemo(() => getTransactionsBreakdownChartData(host), [host]);
   return (
     <React.Fragment>
-      <Flex flexWrap="wrap">
-        <Container width={[1, 1, 1 / 2]} pr={2} mb={[3, 3, 0, 0]}>
-          <FilterLabel htmlFor="transactions-period-filter">
-            <FormattedMessage id="TransactionsOverviewSection.PeriodFilter" defaultMessage="Filter by Date" />
-          </FilterLabel>
-          <PeriodFilter
-            onChange={value => setDate(value)}
-            value={encodePeriod({ dateInterval: { from: dateFrom, to: dateTo } })}
-          />
-        </Container>
-        <Container width={[1, 1, 1 / 2]}>
-          <FilterLabel htmlFor="transactions-collective-filter">
-            <FormattedMessage id="TransactionsOverviewSection.CollectiveFilter" defaultMessage="Filter by Collective" />
-          </FilterLabel>
-          <CollectivePickerAsync
-            inputId="TransactionsCollectiveFilter"
-            data-cy="transactions-collective-filter"
-            types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.PROJECT]}
-            isMulti
-            hostCollectiveIds={[host?.legacyId]}
-            onChange={value => setCollectiveFilter(value)}
-          />
-        </Container>
-      </Flex>
-      {loading ? (
-        <Loading />
-      ) : (
-        <Flex flexWrap="wrap" mt={18} mb={12}>
-          <FundAmounts>
-            <TotalFundsLabel minWidth="280px">
-              <P>
-                <Span fontWeight="500">
-                  {contributionsCount} <FormattedMessage id="Contributions" defaultMessage="Contributions" />
-                </Span>{' '}
-                | <FormattedMessage id="DailyAverage" defaultMessage="Daily avg" />
-                {': '}
-                <Span fontWeight="700">{formatCurrency(dailyAverageIncomeAmount.valueInCents, currency)}</Span>
-              </P>
-            </TotalFundsLabel>
-            <TotalFundsLabel
-              minWidth="250px"
-              position="relative"
-              left={['-280px', '-280px', '-280px', '100px']}
-              top={['85px', '85px', '85px', '0px']}
-            >
-              <P>
-                <Span fontWeight="500">
-                  {expensesCount} <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
-                </Span>{' '}
-                | <FormattedMessage id="DailyAverage" defaultMessage="Daily avg" />
-                {': '}
-                <Span fontWeight="700">{formatCurrency(dailyAverageAmount.valueInCents, currency)}</Span>
-              </P>
-            </TotalFundsLabel>
-          </FundAmounts>
-          <Container mt={2}>
-            <Span mr={3}>
-              <Square color="#51E094" />
-              {` ${oneTimeContributionsCount} `}
-              <FormattedMessage id="Frequency.OneTime" defaultMessage="One time" />
-            </Span>
-            <Span mr={['10px', '10px', '10px', '200px']}>
-              <Square color="#BEFADA" />
-              {` ${recurringContributionsCount} `}
-              <FormattedMessage id="TransactionsOverviewSection.Recurring" defaultMessage="Recurring" />
-            </Span>
-            <Span mr={3}>
-              <Square color="#CC2955" />
-              {` ${invoicesCount} `}
-              <FormattedMessage id="TransactionsOverviewSection.Invoices" defaultMessage="Invoices" />
-            </Span>
-            <Span mr={3}>
-              <Square color="#F55882" />
-              {` ${reimbursementsCount} `}
-              <FormattedMessage id="TransactionsOverviewSection.Reimbursements" defaultMessage="Reimbursements" />
-            </Span>
-            <Span mr={3}>
-              <Square color="#FFC2D2" />
-              {` ${grantsCount} `}
-              <FormattedMessage id="TransactionsOverviewSection.Grants" defaultMessage="Grants" />
-            </Span>
+      <Box mt={18} mb={12}>
+        {isLoading ? (
+          <LoadingPlaceholder height="98px" borderRadius="8px" />
+        ) : (
+          <div>
+            <ProportionalAreaChart areas={areaChartData} borderRadius="6px 6px 0 0" />
+            <ProportionalAreaChart areas={transactionBreakdownChart} borderRadius="0 0 6px 6px" />
+          </div>
+        )}
+      </Box>
+      <Box>
+        <Flex flexWrap="wrap">
+          <Container width={[1, 1, 1 / 2]} pr={2} mb={[3, 3, 0, 0]}>
+            <FilterLabel htmlFor="transactions-period-filter">
+              <FormattedMessage id="TransactionsOverviewSection.PeriodFilter" defaultMessage="Filter by Date" />
+            </FilterLabel>
+            <PeriodFilter
+              onChange={value => setDate(value)}
+              value={encodePeriod({ dateInterval: { from: dateFrom, to: dateTo } })}
+            />
           </Container>
-          <Container mt={2}>
-            <Chart
-              type="area"
-              width="100%"
-              height="250px"
-              options={getChartOptions(intl, dateFrom, dateTo)}
-              series={series}
+          <Container width={[1, 1, 1 / 2]}>
+            <FilterLabel htmlFor="transactions-collective-filter">
+              <FormattedMessage id="TransactionsOverviewSection.CollectiveFilter" defaultMessage="Filter by Collective" />
+            </FilterLabel>
+            <CollectivePickerAsync
+              inputId="TransactionsCollectiveFilter"
+              data-cy="transactions-collective-filter"
+              types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.PROJECT]}
+              isMulti
+              hostCollectiveIds={[host?.legacyId]}
+              onChange={value => setCollectiveFilter(value)}
             />
           </Container>
         </Flex>
-      )}
+        {loading ? (
+          <Loading />
+        ) : (
+          <Flex flexWrap="wrap" mt={18} mb={12}>
+            <FundAmounts>
+              <TotalFundsLabel minWidth="280px">
+                <P>
+                  <Span fontWeight="500">
+                    {contributionsCount} <FormattedMessage id="Contributions" defaultMessage="Contributions" />
+                  </Span>{' '}
+                  | <FormattedMessage id="DailyAverage" defaultMessage="Daily avg" />
+                  {': '}
+                  <Span fontWeight="700">{formatCurrency(dailyAverageIncomeAmount.valueInCents, currency)}</Span>
+                </P>
+              </TotalFundsLabel>
+              <TotalFundsLabel
+                minWidth="250px"
+                position="relative"
+                left={['-280px', '-280px', '-280px', '100px']}
+                top={['85px', '85px', '85px', '0px']}
+              >
+                <P>
+                  <Span fontWeight="500">
+                    {expensesCount} <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
+                  </Span>{' '}
+                  | <FormattedMessage id="DailyAverage" defaultMessage="Daily avg" />
+                  {': '}
+                  <Span fontWeight="700">{formatCurrency(dailyAverageAmount.valueInCents, currency)}</Span>
+                </P>
+              </TotalFundsLabel>
+            </FundAmounts>
+            <Container mt={2}>
+              <Span mr={3}>
+                <Square color="#51E094" />
+                {` ${oneTimeContributionsCount} `}
+                <FormattedMessage id="Frequency.OneTime" defaultMessage="One time" />
+              </Span>
+              <Span mr={['10px', '10px', '10px', '200px']}>
+                <Square color="#BEFADA" />
+                {` ${recurringContributionsCount} `}
+                <FormattedMessage id="TransactionsOverviewSection.Recurring" defaultMessage="Recurring" />
+              </Span>
+              <Span mr={3}>
+                <Square color="#CC2955" />
+                {` ${invoicesCount} `}
+                <FormattedMessage id="TransactionsOverviewSection.Invoices" defaultMessage="Invoices" />
+              </Span>
+              <Span mr={3}>
+                <Square color="#F55882" />
+                {` ${reimbursementsCount} `}
+                <FormattedMessage id="TransactionsOverviewSection.Reimbursements" defaultMessage="Reimbursements" />
+              </Span>
+              <Span mr={3}>
+                <Square color="#FFC2D2" />
+                {` ${grantsCount} `}
+                <FormattedMessage id="TransactionsOverviewSection.Grants" defaultMessage="Grants" />
+              </Span>
+            </Container>
+            <Container mt={2}>
+              <Chart
+                type="area"
+                width="100%"
+                height="250px"
+                options={getChartOptions(intl, dateFrom, dateTo)}
+                series={series}
+              />
+            </Container>
+          </Flex>
+        )}
+      </Box>
     </React.Fragment>
   );
 };
 
 TransactionsOverviewSection.propTypes = {
-  hostSlug: PropTypes.string,
-  onChange: PropTypes.func,
-  filters: PropTypes.object,
-  currency: PropTypes.string,
-  contributionStats: PropTypes.shape({
-    contributionsCount: PropTypes.number,
-    oneTimeContributionsCount: PropTypes.number,
-    recurringContributionsCount: PropTypes.number,
-    dailyAverageIncomeAmount: PropTypes.shape({
-      value: PropTypes.number,
+  isLoading: PropTypes.bool,
+  host: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+    currency: PropTypes.string,
+    contributionStats: PropTypes.shape({
+      contributionsCount: PropTypes.number,
+      oneTimeContributionsCount: PropTypes.number,
+      recurringContributionsCount: PropTypes.number,
+      dailyAverageIncomeAmount: PropTypes.shape({
+        value: PropTypes.number,
+      }),
     }),
-  }),
-  expenseStats: PropTypes.shape({
-    expensesCount: PropTypes.number,
-    invoicesCount: PropTypes.number,
-    reimbursementsCount: PropTypes.number,
-    grantsCount: PropTypes.number,
-    dailyAverageAmount: PropTypes.shape({
-      value: PropTypes.number,
+    expenseStats: PropTypes.shape({
+      expensesCount: PropTypes.number,
+      invoicesCount: PropTypes.number,
+      reimbursementsCount: PropTypes.number,
+      grantsCount: PropTypes.number,
+      dailyAverageAmount: PropTypes.shape({
+        value: PropTypes.number,
+      }),
     }),
   }),
 };

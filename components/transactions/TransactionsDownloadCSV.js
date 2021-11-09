@@ -3,21 +3,21 @@ import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import dayjs from 'dayjs';
-import { omit } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
-import { TransactionKind } from '../../lib/constants/transactions';
+import { fetchCSVFileFromRESTService } from '../../lib/api';
+import { parseDateInterval } from '../../lib/date-utils';
+import { formatErrorMessage, i18nGraphqlException } from '../../lib/errors';
 import { exportFile } from '../../lib/export_file';
 import { transactionsQuery } from '../../lib/graphql/queries';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
-import MessageBox from '../MessageBox';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
-import StyledInput from '../StyledInput';
-import StyledInputField from '../StyledInputField';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { getDefaultKinds } from '../transactions/filters/TransactionsKindFilter';
 
 const transformResultInCSV = json => {
   const q = value => `"${value}"`; /* Quote value */
@@ -78,58 +78,49 @@ const transformResultInCSV = json => {
 };
 
 const TransactionsDownloadCSV = ({ collective, client, query }) => {
-  const [dateInterval, setDateInterval] = React.useState({});
-
-  const [isEmpty, setEmpty] = React.useState(false);
-  const [isLoading, setLoading] = React.useState(false);
-
-  // Extract dateFrom/dateTo from query
-  let period = {};
+  const intl = useIntl();
+  const [loading, setLoading] = React.useState(null);
+  const { addToast } = useToasts();
+  let dateFrom, dateTo;
   if (query.period) {
-    const [dateFrom, dateTo] = query.period.split('→');
-    period = { dateFrom, dateTo };
+    ({ from: dateFrom, to: dateTo } = parseDateInterval(query.period));
   }
 
-  // Default values for dateFrom/dateTo
-  const dateFrom = dateInterval.dateFrom || period.dateFrom || dayjs().subtract(1, 'month').format('YYYY-MM-DD');
-  const dateTo = dateInterval.dateTo || period.dateTo || dayjs().format('YYYY-MM-DD');
+  const type = query.type;
+
+  const kinds = query.kind ? query.kind.split(',') : getDefaultKinds();
 
   const download = async () => {
-    setLoading(true);
-    setEmpty(false);
-    const result = await client.query({
-      query: transactionsQuery,
-      variables: {
-        dateFrom,
-        // Extend to end of day
-        dateTo: dayjs(dateTo).set('hour', 23).set('minute', 59).set('second', 59).toISOString(),
-        CollectiveId: collective.legacyId,
-        kinds: Object.values(
-          omit(TransactionKind, [
-            'PLATFORM_FEE',
-            'PREPAID_PAYMENT_METHOD',
-            'PAYMENT_PROCESSOR_FEE',
-            'HOST_FEE',
-            'HOST_FEE_SHARE',
-          ]),
-        ),
-      },
-    });
-    const csv = transformResultInCSV(result.data.allTransactions);
+    try {
+      setLoading('v1');
+      const result = await client.query({
+        query: transactionsQuery,
+        variables: {
+          dateFrom: dateFrom,
+          dateTo: dateTo,
+          CollectiveId: collective.legacyId,
+          type: type,
+          kinds: kinds,
+        },
+      });
+      const csv = transformResultInCSV(result.data.allTransactions);
 
-    setLoading(false);
-    // Don't prompt the file download unless there's data coming
-    if (csv === '') {
-      setEmpty(true);
-      return;
+      // Don't prompt the file download unless there's data coming
+      if (csv === '') {
+        return;
+      }
+
+      // Helper to prepare date values to be part of the file name
+      const format = d => dayjs(d).format('YYYY-MM-DD');
+      let fileName = `${collective.slug}-from-`;
+      fileName += `${format(dateFrom)}-to-`;
+      fileName += `${format(dateTo)}.csv`;
+      return exportFile('text/plain;charset=utf-8', fileName, csv);
+    } catch (error) {
+      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, error) });
+    } finally {
+      setLoading(null);
     }
-
-    // Helper to prepare date values to be part of the file name
-    const format = d => dayjs(d).format('YYYY-MM-DD');
-    let fileName = `${collective.slug}-from-`;
-    fileName += `${format(dateFrom)}-to-`;
-    fileName += `${format(dateTo)}.csv`;
-    return exportFile('text/plain;charset=utf-8', fileName, csv);
   };
 
   const downloadV2 = async event => {
@@ -141,14 +132,14 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
 
     event.preventDefault();
 
-    const csv = await fetch(downloadUrl(), {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }).then(response => response.text());
-
-    return exportFile('text/csv;charset=utf-8', `${collective.slug}-transactions.csv`, csv);
+    try {
+      setLoading('v2');
+      await fetchCSVFileFromRESTService(downloadUrl(), `${collective.slug}-transactions`);
+    } catch (error) {
+      addToast({ type: TOAST_TYPE.ERROR, message: formatErrorMessage(intl, error) });
+    } finally {
+      setLoading(null);
+    }
   };
 
   const downloadUrl = () => {
@@ -158,10 +149,16 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
 
     if (query.kind) {
       url.searchParams.set('kind', query.kind);
+    } else {
+      url.searchParams.set('kind', getDefaultKinds().join(','));
     }
 
     if (query.type) {
       url.searchParams.set('type', query.type);
+    }
+
+    if (query.searchTerm) {
+      url.searchParams.set('searchTerm', query.searchTerm);
     }
 
     if (query.amount) {
@@ -198,6 +195,13 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
       url.searchParams.set('includeChildrenTransactions', '1');
     }
 
+    if (dateFrom) {
+      // Is the diff between dateFrom and dateTo (or today) less than 62 days?
+      if (dayjs(dateTo || undefined).unix() - dayjs(dateFrom).unix() < 62 * 24 * 60 * 60) {
+        url.searchParams.set('fetchAll', '1');
+      }
+    }
+
     return url.toString();
   };
 
@@ -205,11 +209,6 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
     <Flex flexWrap="wrap" my={['8px', 0]}>
       <PopupMenu
         placement="bottom-end"
-        onClose={() => {
-          setEmpty(false);
-          setLoading(false);
-          setDateInterval({});
-        }}
         Button={({ onClick }) => (
           <StyledButton
             data-cy="download-csv"
@@ -225,69 +224,37 @@ const TransactionsDownloadCSV = ({ collective, client, query }) => {
         )}
       >
         <Box mx="8px" my="16px" width="190px">
-          <StyledInputField
-            data-cy="download-csv-start-date"
-            label="Start Date"
-            name="dateFrom"
-            mt="12px"
-            labelFontSize="13px"
-          >
-            {inputProps => (
-              <StyledInput
-                {...inputProps}
-                type="date"
-                closeOnSelect
-                lineHeight={1}
-                fontSize="13px"
-                value={dateFrom}
-                onChange={e => setDateInterval({ ...dateInterval, dateFrom: e.target.value })}
-              />
-            )}
-          </StyledInputField>
-          <StyledInputField
-            data-cy="download-csv-end-date"
-            label="End Date"
-            name="dateTo"
-            mt="12px"
-            labelFontSize="13px"
-          >
-            {inputProps => (
-              <StyledInput
-                {...inputProps}
-                type="date"
-                closeOnSelect
-                lineHeight={1}
-                fontSize="13px"
-                value={dateTo}
-                onChange={e => setDateInterval({ ...dateInterval, dateTo: e.target.value })}
-              />
-            )}
-          </StyledInputField>
-          <StyledButton
-            data-cy="download-csv-download"
-            disabled={!dateFrom || !dateTo}
-            buttonSize="tiny"
-            buttonStyle="primary"
-            onClick={download}
-            loading={isLoading}
-            mt="12px"
-          >
-            Download
-          </StyledButton>
-          {isEmpty && (
-            <MessageBox data-cy="download-csv-error" type="info" fontSize="13px" mt="12px">
-              <FormattedMessage
-                id="transactions.emptysearch"
-                defaultMessage="There are no transactions in this date range."
-              />
-            </MessageBox>
-          )}
+          <small>
+            <FormattedMessage
+              id="Transactions.DownloadCSV.Description"
+              defaultMessage="Use the filters to define the transactions you would like to download."
+            />
+          </small>
           <br />
           <Link onClick={downloadV2} href={downloadUrl()} openInNewTab={true}>
-            <StyledButton data-cy="download-csv-download-v2" buttonSize="tiny" buttonStyle="primary" mt="12px">
-              Download v2 (beta!)
+            <StyledButton
+              data-cy="download-csv-download-v2"
+              buttonSize="tiny"
+              buttonStyle="primary"
+              mt="12px"
+              loading={loading === 'v2'}
+              disabled={Boolean(loading) && loading !== 'v2'}
+              minWidth={115}
+            >
+              <FormattedMessage id="Download" defaultMessage="Download" /> (v2)
             </StyledButton>
           </Link>
+          <StyledButton
+            data-cy="download-csv-download"
+            buttonSize="tiny"
+            onClick={download}
+            mt="12px"
+            loading={loading === 'v1'}
+            disabled={Boolean(loading) && loading !== 'v1'}
+            minWidth={115}
+          >
+            <FormattedMessage id="Download" defaultMessage="Download" /> (v1)
+          </StyledButton>
         </Box>
       </PopupMenu>
     </Flex>
@@ -303,7 +270,16 @@ TransactionsDownloadCSV.propTypes = {
     currency: PropTypes.string.isRequired,
   }).isRequired,
   client: PropTypes.object,
-  query: PropTypes.object,
+  query: PropTypes.shape({
+    type: PropTypes.string,
+    kind: PropTypes.string,
+    amount: PropTypes.string,
+    period: PropTypes.string,
+    searchTerm: PropTypes.string,
+    ignoreIncognitoTransactions: PropTypes.string,
+    ignoreGiftCardsTransactions: PropTypes.string,
+    ignoreChildrenTransactions: PropTypes.string,
+  }),
 };
 
 export default withApollo(TransactionsDownloadCSV);

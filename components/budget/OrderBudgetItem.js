@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
@@ -11,6 +11,7 @@ import { toPx } from '../../lib/theme/helpers';
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
 import Container from '../Container';
+import DateTime from '../DateTime';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
@@ -111,7 +112,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
                 />
 
                 {' • '}
-                <FormattedDate value={order.createdAt} />
+                <DateTime value={order.createdAt} />
               </P>
             </Box>
           )}

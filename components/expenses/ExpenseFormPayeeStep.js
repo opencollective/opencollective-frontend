@@ -1,9 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FastField, Field } from 'formik';
 import { first, get, isEmpty, omit, partition, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { compareNames } from '../../lib/collective.lib';
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -20,10 +22,13 @@ import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
 import I18nAddressFields from '../I18nAddressFields';
 import InputTypeCountry from '../InputTypeCountry';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
+import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledTextarea from '../StyledTextarea';
+import StyledTooltip from '../StyledTooltip';
 
 import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
@@ -123,7 +128,7 @@ const ExpenseFormPayeeStep = ({
   const requiresAddress =
     values.payee &&
     !values.payee.isInvite &&
-    [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST].includes(values.type);
+    [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST, expenseTypes.GRANT].includes(values.type);
   const canInvite = !values?.status;
   const profileOptions = payoutProfiles.map(value => ({
     value,
@@ -225,6 +230,46 @@ const ExpenseFormPayeeStep = ({
               </StyledInputField>
             )}
           </Field>
+          {values.payee?.legalName && (
+            <Field name="legalName">
+              {({ field }) => (
+                <StyledInputField
+                  name={field.name}
+                  label={
+                    <React.Fragment>
+                      <FormattedMessage id="LegalName" defaultMessage="Legal Name" />
+                      &nbsp;
+                      <StyledTooltip
+                        content={() => (
+                          <FormattedMessage
+                            id="ExpenseForm.legalName.tooltip"
+                            defaultMessage="The legal name of the payee. This can be changed in your profile settings."
+                          />
+                        )}
+                      >
+                        <InfoCircle size={16} />
+                      </StyledTooltip>
+                    </React.Fragment>
+                  }
+                  labelFontSize="13px"
+                  flex="1"
+                  mt={3}
+                >
+                  <StyledInput value={values.payee.legalName} disabled />
+                  {values.payoutMethod?.data?.accountHolderName &&
+                    values.payee.legalName &&
+                    !compareNames(values.payoutMethod.data.accountHolderName, values.payee.legalName) && (
+                      <MessageBox mt={2} fontSize="12px" type="warning" withIcon>
+                        <FormattedMessage
+                          id="Warning.LegalNameNotMatchBankAccountName"
+                          defaultMessage="The legal name should match the bank account holder name in most cases. Otherwise payments may be delayed. If the payment is to an organization, please select or create that organization's profile instead of your individual profile as the payee."
+                        />
+                      </MessageBox>
+                    )}
+                </StyledInputField>
+              )}
+            </Field>
+          )}
           {requiresAddress && (
             <Fragment>
               <FastField name="payeeLocation.country">
@@ -393,6 +438,7 @@ const ExpenseFormPayeeStep = ({
                   onNext?.();
                 } else {
                   // We use set touched here to display errors on fields that are not dirty.
+                  console.log('ExpenseFormPayeeStep > Validation failed', errors);
                   formik.setTouched(errors);
                   formik.setErrors(errors);
                 }

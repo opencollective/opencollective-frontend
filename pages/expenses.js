@@ -13,11 +13,11 @@ import { isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sec
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
+import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
-import { getDateRangeFromPeriod } from '../components/budget/filters/PeriodFilter';
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
@@ -214,7 +214,7 @@ class ExpensePage extends React.Component {
               <Box flex="1 1 500px" minWidth={300} maxWidth={792} mr={[0, 3, 5]} mb={5}>
                 <Flex>
                   <H1 fontSize="32px" lineHeight="40px" mb={24} py={2} fontWeight="normal">
-                    <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />
+                    <FormattedMessage id="Expenses" defaultMessage="Expenses" />
                   </H1>
                   <Box mx="auto" />
                   <SearchFormContainer p={2}>
@@ -429,7 +429,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
 const addExpensesPageData = graphql(expensesPageQuery, {
   options: props => {
     const amountRange = parseAmountRange(props.query.amount);
-    const [dateFrom, dateTo] = getDateRangeFromPeriod(props.query.period);
+    const { from: dateFrom, to: dateTo } = parseDateInterval(props.query.period);
     return {
       context: API_V2_CONTEXT,
       variables: {

@@ -4,8 +4,10 @@ import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import useKeyboardShortcut, { ENTER_KEY } from '../../../lib/hooks/useKeyboardKey';
 
+import { adminPanelQuery } from '../../../pages/admin-panel';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
@@ -93,8 +95,11 @@ const FiscalHosting = ({ collective }) => {
     show: false,
   });
 
-  const [activateCollectiveAsHost] = useMutation(activateCollectiveAsHostMutation);
-  const [deactivateCollectiveAsHost] = useMutation(deactivateCollectiveAsHostMutation);
+  const adminPanelMutationParams = {
+    refetchQueries: [{ query: adminPanelQuery, variables: { slug: collective.slug }, context: API_V2_CONTEXT }],
+  };
+  const [activateCollectiveAsHost] = useMutation(activateCollectiveAsHostMutation, adminPanelMutationParams);
+  const [deactivateCollectiveAsHost] = useMutation(deactivateCollectiveAsHostMutation, adminPanelMutationParams);
 
   const [activateBudget] = useMutation(activateBudgetMutation);
   const [deactivateBudget] = useMutation(deactivateBudgetMutation);

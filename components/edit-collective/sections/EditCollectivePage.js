@@ -298,7 +298,7 @@ MenuCategory.propTypes = {
   onSectionToggle: PropTypes.func,
 };
 
-const EditCollectivePage = ({ collective }) => {
+const EditCollectivePage = ({ collective, contentOnly }) => {
   const intl = useIntl();
   const [isDirty, setDirty] = React.useState(false);
   const [sections, setSections] = React.useState(null);
@@ -349,6 +349,7 @@ const EditCollectivePage = ({ collective }) => {
   return (
     <DndProviderHTML5Backend>
       <SettingsTitle
+        contentOnly={contentOnly}
         subtitle={
           <FormattedMessage
             id="EditCollectivePage.SectionsDescription"
@@ -451,6 +452,7 @@ EditCollectivePage.propTypes = {
     slug: PropTypes.string,
     type: PropTypes.string,
   }),
+  contentOnly: PropTypes.bool,
 };
 
 export default EditCollectivePage;

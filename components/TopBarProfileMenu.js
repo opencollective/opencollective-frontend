@@ -6,10 +6,11 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronRight } from '@styled-icons/boxicons-regular/ChevronRight';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
+import { getSettingsRoute } from '../lib/url-helpers';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
@@ -39,6 +40,14 @@ const HideGlobalScroll = createGlobalStyle`
     body {
       overflow: hidden;
     }
+  }
+`;
+
+const ViewProfileLink = styled(StyledLink)`
+  &:hover {
+    background-color: white;
+    border-color: black;
+    color: black;
   }
 `;
 
@@ -79,7 +88,10 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
           ) : null
         }
       </Query>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/edit`}>
+      <UserMenuLinkEntry
+        isMobileMenuLink={isMobileView}
+        href={getSettingsRoute(LoggedInUser.collective, null, LoggedInUser)}
+      >
         <FormattedMessage id="Settings" defaultMessage="Settings" />
       </UserMenuLinkEntry>
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.username}/recurring-contributions`}>
@@ -188,7 +200,7 @@ class TopBarProfileMenu extends React.Component {
         borderRadius={[0, 12]}
         boxShadow="0 4px 8px 0 rgba(61,82,102,0.08)"
         minWidth="170px"
-        maxWidth="500px"
+        maxWidth="560px"
         width="100%"
         position="absolute"
         right={[0, 16]}
@@ -236,12 +248,26 @@ class TopBarProfileMenu extends React.Component {
             <React.Fragment>
               <Box order={[2, 1]} flex="10 1 50%" width={[1, 1, 1 / 2]} p={3} display={['none', 'flex']} bg="#F7F8FA">
                 <Hide xs>
-                  <Avatar collective={LoggedInUser.collective} radius={56} mr={2} />
-                  <P mt={2} color="black.800" fontWeight="500" fontSize="14px" lineHeight="20px">
-                    {LoggedInUser.collective.name}
-                  </P>
-                  <P mt="2px" mb={5} wordBreak="break-all" color="black.700" fontSize="13px">
+                  <Link href={`/${LoggedInUser.collective.slug}`}>
+                    <Avatar collective={LoggedInUser.collective} radius={56} mr={2} />
+                    <P mt={2} color="black.800" fontWeight="500" fontSize="14px" lineHeight="20px">
+                      {LoggedInUser.collective.name}
+                    </P>
+                  </Link>
+                  <P mt="2px" wordBreak="break-all" color="black.700" fontSize="13px">
                     {LoggedInUser.email}
+                  </P>
+                  <P mb={4} mt={3} color="black.800">
+                    <ViewProfileLink
+                      as={Link}
+                      buttonSize="tiny"
+                      buttonStyle="standard"
+                      href={`/${LoggedInUser.collective.slug}`}
+                    >
+                      <Span css={{ verticalAlign: 'middle' }}>
+                        <FormattedMessage defaultMessage="View Profile" />
+                      </Span>
+                    </ViewProfileLink>
                   </P>
                   <P color="black.900" fontSize="12px" fontWeight="700" letterSpacing="1px" textTransform="uppercase">
                     <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
@@ -259,6 +285,7 @@ class TopBarProfileMenu extends React.Component {
               <Box
                 order={[1, 2]}
                 flex="1 1 50%"
+                minWidth="296px"
                 width={[1, 1, 1 / 2]}
                 p={[1, 3]}
                 maxHeight={['100%', '450px']}

@@ -19,8 +19,10 @@ import { display } from 'styled-system';
 import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
 import { getFilteredSectionsForCollective, isSectionEnabled, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
+import { getEnvVar } from '../../lib/env-utils';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import { getSettingsRoute } from '../../lib/url-helpers';
+import { parseToBoolean } from '../../lib/utils';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -267,27 +269,33 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, Lo
 /**
  * Returns the main CTA that should be displayed as a button outside of the action menu in this component.
  */
-const getMainAction = (collective, callsToAction) => {
+const getMainAction = (collective, callsToAction, LoggedInUser) => {
   if (!collective || !callsToAction) {
     return null;
   }
+
+  const hasNewAdminPanel = parseToBoolean(getEnvVar('NEW_ADMIN_DASHBOARD'));
 
   // Order of the condition defines main call to action: first match gets displayed
   if (callsToAction.includes(NAVBAR_ACTION_TYPE.SETTINGS)) {
     return {
       type: NAVBAR_ACTION_TYPE.SETTINGS,
       component: (
-        <Link href={getSettingsRoute(collective)} data-cy="edit-collective-btn">
+        <Link href={getSettingsRoute(collective, null, LoggedInUser)} data-cy="edit-collective-btn">
           <ActionButton tabIndex="-1">
             <Settings size="1em" />
             <Span ml={2}>
-              <FormattedMessage id="Settings" defaultMessage="Settings" />
+              {collective.isHost && hasNewAdminPanel ? (
+                <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
+              ) : (
+                <FormattedMessage id="Settings" defaultMessage="Settings" />
+              )}
             </Span>
           </ActionButton>
         </Link>
       ),
     };
-  } else if (callsToAction.includes('hasDashboard')) {
+  } else if (callsToAction.includes('hasDashboard') && !hasNewAdminPanel) {
     return {
       type: NAVBAR_ACTION_TYPE.DASHBOARD,
       component: (
@@ -429,7 +437,7 @@ const CollectiveNavbar = ({
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
-  const mainAction = getMainAction(collective, actionsArray);
+  const mainAction = getMainAction(collective, actionsArray, LoggedInUser);
   const secondAction = actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type));
   const navbarRef = useRef();
   const mainContainerRef = useRef();
@@ -571,6 +579,7 @@ const CollectiveNavbar = ({
                   collective={collective}
                   callsToAction={callsToAction}
                   hiddenActionForNonMobile={mainAction?.type}
+                  LoggedInUser={LoggedInUser}
                 />
               )}
               {!onlyInfos && (

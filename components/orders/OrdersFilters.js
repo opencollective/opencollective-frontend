@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { encodeDateInterval } from '../../lib/date-utils';
+
 import AmountFilter from '../budget/filters/AmountFilter';
 import PeriodFilter from '../budget/filters/PeriodFilter';
 import { Flex } from '../Grid';
@@ -26,12 +28,13 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const ExpensesFilters = ({ currency, filters, hasStatus, onChange }) => {
-  const getFilterProps = name => ({
+const OrdersFilters = ({ currency, filters, hasStatus, onChange }) => {
+  const getFilterProps = (name, valueModifier) => ({
     inputId: `orders-filter-${name}`,
     value: filters?.[name],
     onChange: value => {
-      onChange({ ...filters, [name]: value === 'ALL' ? null : value });
+      const preparedValue = valueModifier ? valueModifier(value) : value;
+      onChange({ ...filters, [name]: value === 'ALL' ? null : preparedValue });
     },
   });
 
@@ -41,7 +44,7 @@ const ExpensesFilters = ({ currency, filters, hasStatus, onChange }) => {
         <FilterLabel htmlFor="orders-filter-period">
           <FormattedMessage id="Period" defaultMessage="Period" />
         </FilterLabel>
-        <PeriodFilter {...getFilterProps('period')} />
+        <PeriodFilter {...getFilterProps('period', encodeDateInterval)} />
       </FilterContainer>
       <FilterContainer>
         <FilterLabel htmlFor="orders-filter-amount">
@@ -61,11 +64,11 @@ const ExpensesFilters = ({ currency, filters, hasStatus, onChange }) => {
   );
 };
 
-ExpensesFilters.propTypes = {
+OrdersFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
   currency: PropTypes.string,
   hasStatus: PropTypes.bool,
 };
 
-export default React.memo(ExpensesFilters);
+export default React.memo(OrdersFilters);
