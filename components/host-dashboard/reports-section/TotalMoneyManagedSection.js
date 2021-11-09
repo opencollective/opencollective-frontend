@@ -12,6 +12,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { ChartWrapper } from '../../ChartWrapper';
 import Container from '../../Container';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
 import ContainerOverlay from '../../ContainerOverlay';
 import { Box, Flex } from '../../Grid';
 import ProportionalAreaChart from '../../ProportionalAreaChart';
@@ -23,12 +24,14 @@ import { P, Span } from '../../Text';
 import { getActiveYearsOptions } from './helpers';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency) => {
+const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency, isLoading) => {
   return [
     {
       key: 'my-collectives',
       color: 'primary.500',
-      label: (
+      label: isLoading ? (
+        <LoadingPlaceholder width={165} height={16} />
+      ) : (
         <P fontSize="12px" lineHeight="18px">
           <Span fontWeight="700">{formatCurrency(collectivesBalance, currency)}</Span>{' '}
           <Span mx="6px" color="black.600">
@@ -41,7 +44,9 @@ const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency) =>
     {
       key: 'organization',
       color: 'primary.800',
-      label: (
+      label: isLoading ? (
+        <LoadingPlaceholder width={195} height={16} />
+      ) : (
         <P fontSize="12px" lineHeight="18px" color="black.700">
           <Span fontWeight="bold">{formatCurrency(hostBalance, currency)}</Span>
           <Span mx="6px" color="black.600">
@@ -117,7 +122,7 @@ const getSeriesFromData = (intl, timeSeries) => {
   ];
 };
 
-const TotalMoneyManagedSection = ({ host }) => {
+const TotalMoneyManagedSection = ({ host, isLoading }) => {
   const intl = useIntl();
   const [showMoneyManagedChart, setShowMoneyManagedChart] = useState(false);
   const yearsOptions = useMemo(() => getActiveYearsOptions(null), [null]);
@@ -134,33 +139,26 @@ const TotalMoneyManagedSection = ({ host }) => {
   const series = React.useMemo(() => getSeriesFromData(intl, timeSeries), [timeSeries]);
 
   // Compute some general stats
-  const { totalMoneyManaged } = host.hostMetrics;
-  const fees = pick(host.hostMetrics, ['platformTips', 'platformFees', 'hostFees']);
-  const pendingFees = pick(host.hostMetrics, ['pendingPlatformTips', 'pendingPlatformFees', 'pendingHostFeeShare']);
+  const hostMetrics = host?.hostMetrics;
+  const fees = pick(hostMetrics, ['platformTips', 'platformFees', 'hostFees']);
   const totalFees = sumBy(Object.values(fees), 'valueInCents');
-  const totalPendingFees = sumBy(Object.values(pendingFees), 'valueInCents');
-  const collectivesBalance = totalMoneyManaged.valueInCents - totalFees;
-  const hostBalance = host.stats.balance.valueInCents;
+  const collectivesBalance = hostMetrics?.totalMoneyManaged.valueInCents - totalFees;
+  const hostBalance = host?.stats.balance.valueInCents;
 
   // Generate graph data (memoized for performances)
-  const chartArgs = [collectivesBalance, hostBalance, host.currency];
+  const chartArgs = [collectivesBalance, hostBalance, host?.currency, isLoading];
   const chartAreas = React.useMemo(() => getMoneyManagedChartAreas(...chartArgs), chartArgs);
 
   return (
     <div>
       <Flex flexWrap="wrap" my={14} alignItems="baseline">
-        <Span fontSize={18} fontWeight="500">
-          {formatCurrency(totalMoneyManaged.valueInCents, host.currency)}
-        </Span>
-        <Span fontSize={15} fontWeight="500" lineHeight="20px" ml="8px" mr="8px">
-          /
-        </Span>
-        <Span fontSize={15} fontWeight="500" lineHeight="25px">
-          {formatCurrency(totalMoneyManaged.valueInCents + totalPendingFees, host.currency)}
-        </Span>
-        <Span fontSize={12} fontWeight="500" lineHeight="27px" ml="8px">
-          <FormattedMessage id="TotalMoneyManagedSection.projected" defaultMessage="Projected" />
-        </Span>
+        {isLoading ? (
+          <LoadingPlaceholder height={21} width={125} />
+        ) : (
+          <Span fontSize={18} fontWeight="500">
+            {formatCurrency(hostMetrics.totalMoneyManaged.valueInCents, host.currency)}
+          </Span>
+        )}
       </Flex>
       <Container display="flex" fontSize="11px" fontWeight="700" lineHeight="12px" alignItems="center">
         <Span textTransform="uppercase">
@@ -227,12 +225,13 @@ const TotalMoneyManagedSection = ({ host }) => {
 };
 
 TotalMoneyManagedSection.propTypes = {
+  isLoading: PropTypes.bool,
   host: PropTypes.shape({
     slug: PropTypes.string,
     stats: PropTypes.shape({ balance: PropTypes.shape({ valueInCents: PropTypes.number }) }).isRequired,
     hostMetrics: PropTypes.object.isRequired,
     currency: PropTypes.string,
-  }).isRequired,
+  }),
 };
 
 export default TotalMoneyManagedSection;

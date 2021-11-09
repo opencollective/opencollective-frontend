@@ -192,7 +192,10 @@ class ExpensePage extends React.Component {
     this.state = {
       isRefetchingDataForUser: false,
       error: null,
-      status: this.props.draftKey ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
+      status:
+        this.props.draftKey && this.props.data.expense?.status === expenseStatus.DRAFT
+          ? PAGE_STATUS.EDIT
+          : PAGE_STATUS.VIEW,
       editedExpense: null,
       isSubmitting: false,
       isPoolingEnabled: true,
@@ -333,7 +336,10 @@ class ExpensePage extends React.Component {
         editedExpense.payee.newsletterOptIn = this.state.newsletterOptIn;
       }
       await this.props.editExpense({
-        variables: { expense: prepareExpenseForSubmit(editedExpense), draftKey: this.props.draftKey },
+        variables: {
+          expense: prepareExpenseForSubmit(editedExpense),
+          draftKey: this.props.data.expense?.status === expenseStatus.DRAFT ? this.props.draftKey : null,
+        },
       });
       if (this.props.data.expense?.type === expenseTypes.CHARGE) {
         await this.props.data.refetch();
