@@ -56,72 +56,74 @@ const CollapsedDisplayBox = styled(InlineDisplayBox)`
  * ⚠️ Be careful! This component will pass content to `dangerouslySetInnerHTML` so
  * always ensure `content` is properly sanitized!
  */
-const HTMLContent = styled(({ content, collapsable = false, maxCollapsedHeight = 20, ...props }) => {
-  const [isOpen, setOpen] = React.useState(false);
-  const [isCollapsed, setIsCollapsed] = React.useState(false);
-  const contentRef = useRef();
+const HTMLContent = styled(
+  ({ content, collapsable = false, maxCollapsedHeight = 20, collapsePadding = 1, ...props }) => {
+    const [isOpen, setOpen] = React.useState(false);
+    const [isCollapsed, setIsCollapsed] = React.useState(false);
+    const contentRef = useRef();
 
-  const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
+    const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
 
-  useEffect(() => {
-    if (collapsable && contentRef?.current?.clientHeight > maxCollapsedHeight * 3) {
-      setIsCollapsed(true);
+    useEffect(() => {
+      if (collapsable && contentRef?.current?.clientHeight > maxCollapsedHeight + collapsePadding) {
+        setIsCollapsed(true);
+      }
+    }, [content]);
+
+    if (!content) {
+      return <div {...props} />;
     }
-  }, [content]);
 
-  if (!content) {
-    return <div {...props} />;
-  }
-
-  return (
-    <div>
-      {!isCollapsed || isOpen ? (
-        <InlineDisplayBox ref={contentRef} dangerouslySetInnerHTML={{ __html: content }} {...props} />
-      ) : (
-        <DisplayBox
-          ref={contentRef}
-          maxHeight={maxCollapsedHeight}
-          dangerouslySetInnerHTML={{ __html: content }}
-          {...props}
-        />
-      )}
-      {!isOpen && isCollapsed && (
-        <ReadFullLink
-          onClick={() => setOpen(true)}
-          {...props}
-          role="button"
-          tabIndex={0}
-          onKeyDown={event => {
-            if (event.key === 'Enter') {
-              event.preventDefault();
-              setOpen(true);
-            }
-          }}
-        >
-          <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />
-          <CaretDown size="10px" />
-        </ReadFullLink>
-      )}
-      {isOpen && isCollapsed && (
-        <ReadFullLink
-          onClick={() => setOpen(false)}
-          {...props}
-          role="button"
-          tabIndex={0}
-          onKeyDown={event => {
-            if (event.key === 'Enter') {
-              event.preventDefault();
-              setOpen(false);
-            }
-          }}
-        >
-          <FormattedMessage defaultMessage="Collapse" />
-          <CaretUp size="10px" />
-        </ReadFullLink>
-      )}
-    </div>
-  );
-})`
+    return (
+      <div>
+        {!isCollapsed || isOpen ? (
+          <InlineDisplayBox ref={contentRef} dangerouslySetInnerHTML={{ __html: content }} {...props} />
+        ) : (
+          <DisplayBox
+            ref={contentRef}
+            maxHeight={maxCollapsedHeight}
+            dangerouslySetInnerHTML={{ __html: content }}
+            {...props}
+          />
+        )}
+        {!isOpen && isCollapsed && (
+          <ReadFullLink
+            onClick={() => setOpen(true)}
+            {...props}
+            role="button"
+            tabIndex={0}
+            onKeyDown={event => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                setOpen(true);
+              }
+            }}
+          >
+            <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />
+            <CaretDown size="10px" />
+          </ReadFullLink>
+        )}
+        {isOpen && isCollapsed && (
+          <ReadFullLink
+            onClick={() => setOpen(false)}
+            {...props}
+            role="button"
+            tabIndex={0}
+            onKeyDown={event => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                setOpen(false);
+              }
+            }}
+          >
+            <FormattedMessage defaultMessage="Collapse" />
+            <CaretUp size="10px" />
+          </ReadFullLink>
+        )}
+      </div>
+    );
+  },
+)`
   /** Override global styles to match what we have in the editor */
   width: 100%;
   line-height: 1.75em;
@@ -232,8 +234,17 @@ const HTMLContent = styled(({ content, collapsable = false, maxCollapsedHeight =
 
 HTMLContent.propTypes = {
   content: PropTypes.string,
+  /* Whether the content is collapsible; adds a blur effect and a show/hide link. */
   collapsable: PropTypes.bool,
+  /* The maximum a height of the content before being collapsed. */
   maxCollapsedHeight: PropTypes.number,
+  /* The the padding to apply to the collapse blur; useful in the case of
+   *  making sure only the blur effect is not applied unnecessarily. For
+   *  example maxCollapsedHeight=20 and collapsePadding=22 ensure that
+   *  content is collapsed only when there's more than two lines and if there's
+   *  only two lines the blur effect is not applied.
+   */
+  collapsePadding: PropTypes.number,
 };
 
 HTMLContent.defaultProps = {
