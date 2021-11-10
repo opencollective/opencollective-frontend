@@ -126,9 +126,9 @@ const TotalMoneyManagedSection = ({ host, isLoading }) => {
   const intl = useIntl();
   const [showMoneyManagedChart, setShowMoneyManagedChart] = useState(false);
   const yearsOptions = useMemo(() => getActiveYearsOptions(null), [null]);
-  const chartOptions = useMemo(() => getChartOptions(intl, host.currency), [host.currency]);
+  const chartOptions = useMemo(() => getChartOptions(intl, host?.currency), [host?.currency]);
   const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
-  const variables = getQueryVariables(host.slug, selectedYear);
+  const variables = getQueryVariables(host?.slug, selectedYear);
   const { loading, data, previousData } = useQuery(totalMoneyManagedQuery, {
     variables,
     context: API_V2_CONTEXT,
