@@ -141,8 +141,8 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
               <Span color="black.900" fontWeight="bold" truncateOverflow>
                 {formatAccountName(
-                  payee.organization?.legalName || payee.legalName,
                   payee.organization?.name || payee.name,
+                  payee.organization?.legalName || payee.legalName,
                 )}
               </Span>
               {payee.type !== CollectiveType.VENDOR && (payee.organization?.slug || payee.slug) && (
@@ -216,13 +216,13 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
               <Avatar collective={displayedHost} radius={24} />
               <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
                 {collective && (collective.isApproved || collective.id === displayedHost.id) ? (
-                  formatAccountName(displayedHost.legalName, displayedHost.name)
+                  formatAccountName(displayedHost.name, displayedHost.legalName)
                 ) : (
                   <FormattedMessage
                     id="Fiscalhost.pending"
                     defaultMessage="{host} (pending)"
                     values={{
-                      host: formatAccountName(displayedHost.legalName, displayedHost.name),
+                      host: formatAccountName(displayedHost.name, displayedHost.legalName),
                     }}
                   />
                 )}
