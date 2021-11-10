@@ -1993,6 +1993,7 @@
   "tier.interval.label": "интервал",
   "tier.interval.month": "каждый месяц",
   "tier.interval.onetime": "один раз",
+  "tier.interval.week": "weekly",
   "tier.interval.year": "каждый год",
   "tier.limited": "LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}",
   "tier.maxQuantity.description": "Leave empty for unlimited",

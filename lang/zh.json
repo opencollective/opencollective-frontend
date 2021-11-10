@@ -1993,6 +1993,7 @@
   "tier.interval.label": "间隔",
   "tier.interval.month": "每月",
   "tier.interval.onetime": "一次性",
+  "tier.interval.week": "weekly",
   "tier.interval.year": "年度",
   "tier.limited": "LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}",
   "tier.maxQuantity.description": "Leave empty for unlimited",

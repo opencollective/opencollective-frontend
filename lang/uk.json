@@ -1993,6 +1993,7 @@
   "tier.interval.label": "проміжок",
   "tier.interval.month": "щомісячно",
   "tier.interval.onetime": "одноразово",
+  "tier.interval.week": "weekly",
   "tier.interval.year": "щорічно",
   "tier.limited": "LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}",
   "tier.maxQuantity.description": "Залиште поле порожнім, якщо не бажаєте встановлювати ліміт",

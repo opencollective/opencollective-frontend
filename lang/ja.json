@@ -1993,6 +1993,7 @@
   "tier.interval.label": "間隔",
   "tier.interval.month": "月間",
   "tier.interval.onetime": "ワンタイム",
+  "tier.interval.week": "weekly",
   "tier.interval.year": "年間",
   "tier.limited": "残り {availableQuantity} （上限： {maxQuantity} ）",
   "tier.maxQuantity.description": "Leave empty for unlimited",

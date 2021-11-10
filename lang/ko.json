@@ -1993,6 +1993,7 @@
   "tier.interval.label": "간격",
   "tier.interval.month": "월간",
   "tier.interval.onetime": "일회성",
+  "tier.interval.week": "weekly",
   "tier.interval.year": "연간",
   "tier.limited": "LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}",
   "tier.maxQuantity.description": "Leave empty for unlimited",

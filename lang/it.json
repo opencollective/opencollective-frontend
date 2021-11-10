@@ -1993,6 +1993,7 @@
   "tier.interval.label": "intervallo",
   "tier.interval.month": "mensilmente",
   "tier.interval.onetime": "una volta",
+  "tier.interval.week": "weekly",
   "tier.interval.year": "annualmente",
   "tier.limited": "LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}",
   "tier.maxQuantity.description": "Leave empty for unlimited",

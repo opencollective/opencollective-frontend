@@ -33,9 +33,9 @@ import { withUser } from '../components/UserProvider';
 class NewContributionFlowPage extends React.Component {
   static getInitialProps({ query }) {
     // Whitelist interval
-    if (['monthly', 'yearly'].includes(query.interval)) {
+    if (['weekly', 'monthly', 'yearly'].includes(query.interval)) {
       query.interval = query.interval.replace('ly', '');
-    } else if (!['month', 'year'].includes(query.interval)) {
+    } else if (!['week', 'month', 'year'].includes(query.interval)) {
       query.interval = null;
     }
 

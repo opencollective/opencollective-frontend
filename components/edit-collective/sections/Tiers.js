@@ -148,6 +148,7 @@ class Tiers extends React.Component {
         defaultMessage: 'flexible amount',
       },
       onetime: { id: 'tier.interval.onetime', defaultMessage: 'one time' },
+      week: { id: 'tier.interval.week', defaultMessage: 'weekly' },
       month: { id: 'tier.interval.month', defaultMessage: 'monthly' },
       year: { id: 'tier.interval.year', defaultMessage: 'yearly' },
       flexible: { id: 'tier.interval.flexible', defaultMessage: 'flexible' },
@@ -224,7 +225,7 @@ class Tiers extends React.Component {
       {
         name: 'interval',
         type: 'select',
-        options: getOptions(['onetime', 'month', 'year', 'flexible']),
+        options: getOptions(['onetime', 'week', 'month', 'year', 'flexible']),
         label: intl.formatMessage(this.messages['interval.label']),
         when: tier => !tier || [DONATION, MEMBERSHIP, TIER, SERVICE].includes(tier.type),
       },
