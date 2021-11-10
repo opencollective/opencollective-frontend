@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/collective-sections';
+import { simpleDateToISOString } from '../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import PeriodFilter from '../budget/filters/PeriodFilter';
@@ -150,7 +151,10 @@ const getDefaultDateInterval = () => {
 const HostDashboardReports = ({ hostSlug }) => {
   const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
   const [collectives, setCollectives] = React.useState(null);
-  const { data, error, loading } = useQuery(hostReportPageQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
+  const dateFrom = simpleDateToISOString(dateInterval.from, false, dateInterval.timezoneType);
+  const dateTo = simpleDateToISOString(dateInterval.to, true, dateInterval.timezoneType);
+  const variables = { hostSlug, account: collectives, dateFrom, dateTo };
+  const { data, error, loading } = useQuery(hostReportPageQuery, { variables, context: API_V2_CONTEXT });
   const host = data?.host;
 
   if (!loading) {
