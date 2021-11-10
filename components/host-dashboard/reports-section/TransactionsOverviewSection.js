@@ -8,13 +8,12 @@ import { days } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import Loading from '../../Loading';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const getChartOptions = (intl, startDate, endDate) => {
+const getChartOptions = (intl, startDate, endDate, hostCreatedAt) => {
   return {
     chart: {
       id: 'chart-transactions-overview',
@@ -37,7 +36,7 @@ const getChartOptions = (intl, startDate, endDate) => {
     },
 
     xaxis: {
-      categories: getCategories(intl, startDate, endDate),
+      categories: getCategories(intl, startDate, endDate, hostCreatedAt),
     },
     yaxis: {
       labels: {
@@ -49,25 +48,10 @@ const getChartOptions = (intl, startDate, endDate) => {
   };
 };
 
-const getNumberOfDays = (startDate, endDate) => {
-  const startTimeOfStatistics = new Date(2015, 0, 1);
-  let numberOfDays;
-  if (startDate && endDate) {
-    numberOfDays = days(new Date(startDate), new Date(endDate));
-  } else if (startDate) {
-    numberOfDays = days(new Date(startDate));
-  } else if (endDate) {
-    numberOfDays = days(startTimeOfStatistics, new Date(endDate));
-  } else {
-    numberOfDays = days(startTimeOfStatistics);
-  }
-  return numberOfDays;
-};
-
-const getCategories = (intl, startDate, endDate) => {
-  const numberOfDays = getNumberOfDays(startDate, endDate);
+const getCategories = (intl, startDate, endDate, hostCreatedAt) => {
+  const numberOfDays = days(startDate || hostCreatedAt, endDate);
   if (numberOfDays <= 7) {
-    const startDay = new Date(startDate).getDay();
+    const startDay = startDate.getDay();
     return [...new Array(7)].map(
       (_, idx) => `${intl.formatDate(new Date(0, 0, idx + startDay), { weekday: 'long' }).toUpperCase()}`,
     );
@@ -84,8 +68,8 @@ const getCategories = (intl, startDate, endDate) => {
   }
 };
 
-const getCategoryType = (startDate, endDate) => {
-  const numberOfDays = getNumberOfDays(startDate, endDate);
+const getCategoryType = (startDate, endDate, hostCreatedAt) => {
+  const numberOfDays = days(startDate || hostCreatedAt, endDate);
   if (numberOfDays <= 7) {
     return 'WEEK';
   } else if (numberOfDays <= 365) {
@@ -262,7 +246,7 @@ const getTransactionsBreakdownChartData = host => {
 
 const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
   const intl = useIntl();
-  const categoryType = getCategoryType(dateInterval?.from, dateInterval?.to);
+  const categoryType = getCategoryType(new Date(dateInterval?.from), new Date(dateInterval?.to), host?.createdAt);
 
   const contributionStats = host?.contributionStats;
   const expenseStats = host?.expenseStats;
@@ -299,7 +283,7 @@ const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
       </Box>
       <Box>
         {isLoading ? (
-          <Loading />
+          <LoadingPlaceholder height={21} width={125} />
         ) : (
           <Flex flexWrap="wrap" mt={18} mb={12}>
             <Container mt={2}>
@@ -307,7 +291,12 @@ const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
                 type="area"
                 width="100%"
                 height="250px"
-                options={getChartOptions(intl, dateInterval?.from, dateInterval?.to)}
+                options={getChartOptions(
+                  intl,
+                  new Date(dateInterval?.from),
+                  new Date(dateInterval?.to),
+                  host.createdAt,
+                )}
                 series={series}
               />
             </Container>
@@ -323,6 +312,7 @@ TransactionsOverviewSection.propTypes = {
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     currency: PropTypes.string,
+    createdAt: PropTypes.string,
     contributionStats: PropTypes.shape({
       contributionsCount: PropTypes.number,
       oneTimeContributionsCount: PropTypes.number,
