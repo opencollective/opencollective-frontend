@@ -1561,7 +1561,7 @@
   "OCFHostApplication.missionImpactExplanation.label": "Please explain how your initiative furthers one or more of our mission impact areas:",
   "OCFHostApplication.name.label": "이름",
   "OCFHostApplication.partnerProjects": "These projects are trusting us:",
-  "OCFHostApplication.readInfoGuideAndTOS": "Please take a moment to read our <InfoGuideLink>Info guide</InfoGuideLink> and <TOSLink>Terms and Conditions</TOSLink> before applying. We want to make this process as easy for you as possible; you will need to know a few things to have a smooth experience.",
+  "OCFHostApplication.readInfoGuideAndTOS": "Please take a moment to read our <InfoGuideLink>documentation</InfoGuideLink> and <TOSLink>Terms and Conditions</TOSLink> before applying. We want to make this process as easy for you as possible; you will need to know a few things to have a smooth experience.",
   "OCFHostApplication.title": "Apply with your initiative",
   "OCFHostApplication.tosCheckBoxLabel": "I agree with the <TOSLink>terms of fiscal sponsorship</TOSLink>.",
   "OCFHostApplication.totalAmountRaised.label": "If you have begun fundraising, how much money have you raised so far?",
