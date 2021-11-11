@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { pick, sumBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { formatCurrency } from '../../../lib/currency-utils';
@@ -49,10 +48,8 @@ const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency, is
 const TotalMoneyManagedSection = ({ host, isLoading }) => {
   // Compute some general stats
   const hostMetrics = host?.hostMetrics;
-  const fees = pick(hostMetrics, ['platformTips', 'platformFees', 'hostFees']);
-  const totalFees = sumBy(Object.values(fees), 'valueInCents');
-  const collectivesBalance = hostMetrics?.totalMoneyManaged.valueInCents - totalFees;
   const hostBalance = host?.stats.balance.valueInCents;
+  const collectivesBalance = hostMetrics?.totalMoneyManaged.valueInCents - hostBalance;
 
   // Generate graph data (memoized for performances)
   const chartArgs = [collectivesBalance, hostBalance, host?.currency, isLoading];
