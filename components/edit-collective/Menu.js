@@ -216,7 +216,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH]: () => false,
-  [EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS]: () => true,
+  [EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS]: () => false,
 };
 
 const shouldDisplaySection = (collective, section) => {
