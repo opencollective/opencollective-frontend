@@ -149,16 +149,6 @@ const getDefaultDateInterval = () => {
   };
 };
 
-const getHasFullBetaAccess = host => {
-  if (!host) {
-    return false;
-  } else if (['production'].includes(process.env.OC_ENV)) {
-    return host.isTrustedHost || ['opensource', 'foundation', 'opencollective', 'paris'].includes(host.slug);
-  } else {
-    return true;
-  }
-};
-
 const HostDashboardReports = ({ hostSlug }) => {
   const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
   const [collectives, setCollectives] = React.useState(null);
@@ -167,7 +157,6 @@ const HostDashboardReports = ({ hostSlug }) => {
   const variables = { hostSlug, account: collectives, dateFrom, dateTo };
   const { data, error, loading } = useQuery(hostReportPageQuery, { variables, context: API_V2_CONTEXT });
   const host = data?.host;
-  const hasFullBetaAccess = getHasFullBetaAccess(host);
 
   if (!loading) {
     if (error) {
@@ -249,12 +238,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           <SectionTitle>
             <FormattedMessage id="Host.FeesCollective" defaultMessage="Host fees (collected)" />
           </SectionTitle>
-          <HostFeesSection
-            host={host}
-            collectives={collectives}
-            isLoading={loading}
-            showHistorical={hasFullBetaAccess}
-          />
+          <HostFeesSection host={host} collectives={collectives} isLoading={loading} />
         </Container>
         <Container mb={38}>
           <SectionTitle
