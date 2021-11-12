@@ -78,10 +78,6 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
           valueInCents
           currency
         }
-        platformFees {
-          valueInCents
-          currency
-        }
         pendingPlatformFees {
           valueInCents
           currency
