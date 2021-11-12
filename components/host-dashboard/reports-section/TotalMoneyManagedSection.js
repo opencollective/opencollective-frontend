@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { ChevronDown } from '@styled-icons/fa-solid/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/fa-solid/ChevronUp/ChevronUp';
-import { get, pick, sumBy } from 'lodash';
+import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -12,9 +12,9 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { ChartWrapper } from '../../ChartWrapper';
 import Container from '../../Container';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import ContainerOverlay from '../../ContainerOverlay';
 import { Box, Flex } from '../../Grid';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
 import ProportionalAreaChart from '../../ProportionalAreaChart';
 import StyledLinkButton from '../../StyledLinkButton';
 import { StyledSelectFilter } from '../../StyledSelectFilter';
