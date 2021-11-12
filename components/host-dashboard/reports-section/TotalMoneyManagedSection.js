@@ -13,21 +13,6 @@ import { P, Span } from '../../Text';
 const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency, isLoading) => {
   return [
     {
-      key: 'my-collectives',
-      color: 'primary.500',
-      label: isLoading ? (
-        <LoadingPlaceholder width={165} height={16} />
-      ) : (
-        <P fontSize="12px" lineHeight="18px">
-          <Span fontWeight="700">{formatCurrency(collectivesBalance, currency)}</Span>{' '}
-          <Span mx="6px" color="black.600">
-            {' | '}
-          </Span>
-          <FormattedMessage id="Collectives" defaultMessage="Collectives" />
-        </P>
-      ),
-    },
-    {
       key: 'organization',
       color: 'primary.800',
       label: isLoading ? (
@@ -39,6 +24,21 @@ const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency, is
             {' | '}
           </Span>
           <FormattedMessage id="TotalMoneyManagedSection.hostOrganization" defaultMessage="Host Organization" />
+        </P>
+      ),
+    },
+    {
+      key: 'my-collectives',
+      color: 'primary.500',
+      label: isLoading ? (
+        <LoadingPlaceholder width={165} height={16} />
+      ) : (
+        <P fontSize="12px" lineHeight="18px">
+          <Span fontWeight="700">{formatCurrency(collectivesBalance, currency)}</Span>{' '}
+          <Span mx="6px" color="black.600">
+            {' | '}
+          </Span>
+          <FormattedMessage id="Collectives" defaultMessage="Collectives" />
         </P>
       ),
     },
