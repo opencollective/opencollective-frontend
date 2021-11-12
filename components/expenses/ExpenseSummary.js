@@ -209,6 +209,7 @@ const ExpenseSummary = ({
                         color="black.900"
                         collapsable
                         fontWeight="500"
+                        collapsePadding={22}
                       />
                     ) : (
                       <Span color="black.500" fontStyle="italic">

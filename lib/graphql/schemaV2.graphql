@@ -262,6 +262,7 @@ interface Account {
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -1719,6 +1720,7 @@ type Host implements Account & AccountWithContributions {
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -3148,6 +3150,7 @@ type Bot implements Account {
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -3404,6 +3407,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -3974,6 +3978,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -4340,6 +4345,7 @@ type Individual implements Account {
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -4666,6 +4672,7 @@ type Organization implements Account & AccountWithContributions {
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -5044,6 +5051,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -6909,6 +6917,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -7260,6 +7269,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!

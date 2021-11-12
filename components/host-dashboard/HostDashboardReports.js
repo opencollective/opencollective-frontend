@@ -6,12 +6,13 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/collective-sections';
+import { simpleDateToISOString } from '../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import PeriodFilter from '../budget/filters/PeriodFilter';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
-import { Box, Flex } from '../Grid';
+import { Box, Flex, Grid } from '../Grid';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import NotFound from '../NotFound';
@@ -21,7 +22,7 @@ import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
 import { H1, H2 } from '../Text';
 
-import HostDownloadsSection from './reports-section/HostDownloadsSection';
+import HostCSVDownloadButton from './reports-section/HostCSVDownloadButton';
 import HostFeesSection from './reports-section/HostFeesSection';
 import PlatformTipsCollected from './reports-section/PlatformTipsCollected';
 import TotalMoneyManagedSection from './reports-section/TotalMoneyManagedSection';
@@ -45,6 +46,7 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
       type
       createdAt
       hostFeePercent
+      isTrustedHost
       stats {
         balance {
           valueInCents
@@ -74,10 +76,6 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
           currency
         }
         hostFeeShare {
-          valueInCents
-          currency
-        }
-        platformFees {
           valueInCents
           currency
         }
@@ -150,7 +148,10 @@ const getDefaultDateInterval = () => {
 const HostDashboardReports = ({ hostSlug }) => {
   const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
   const [collectives, setCollectives] = React.useState(null);
-  const { data, error, loading } = useQuery(hostReportPageQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
+  const dateFrom = simpleDateToISOString(dateInterval.from, false, dateInterval.timezoneType);
+  const dateTo = simpleDateToISOString(dateInterval.to, true, dateInterval.timezoneType);
+  const variables = { hostSlug, account: collectives, dateFrom, dateTo };
+  const { data, error, loading } = useQuery(hostReportPageQuery, { variables, context: API_V2_CONTEXT });
   const host = data?.host;
 
   if (!loading) {
@@ -175,28 +176,46 @@ const HostDashboardReports = ({ hostSlug }) => {
         </H1>
         <Box mx="auto" />
       </Flex>
-      <Flex flexWrap="wrap" mt="16px" mb="24px">
-        <Container width={[1, 1, 1 / 2]} pr={2} mb={[3, 3, 0, 0]}>
-          <FilterLabel htmlFor="transactions-period-filter">
-            <FormattedMessage id="TransactionsOverviewSection.PeriodFilter" defaultMessage="Filter by Date" />
-          </FilterLabel>
-          <PeriodFilter onChange={setDateInterval} value={dateInterval} minDate={host?.createdAt} />
-        </Container>
-        <Container width={[1, 1, 1 / 2]}>
-          <FilterLabel htmlFor="transactions-collective-filter">
-            <FormattedMessage id="TransactionsOverviewSection.CollectiveFilter" defaultMessage="Filter by Collective" />
-          </FilterLabel>
-          <CollectivePickerAsync
-            inputId="TransactionsCollectiveFilter"
-            data-cy="transactions-collective-filter"
-            types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.PROJECT]}
-            isMulti
-            hostCollectiveIds={[host?.legacyId]}
-            onChange={value => setCollectives(prepareCollectivesForFilter(value))}
-            styles={{ control: baseStyles => ({ ...baseStyles, borderRadius: 16 }) }}
-          />
-        </Container>
-      </Flex>
+      <Container
+        position={['relative', 'sticky']}
+        top="0"
+        background="white"
+        zIndex="10"
+        py={3}
+        mb={4}
+        boxShadow="5px 12px 7px -10px #44444429"
+      >
+        <Grid gridTemplateColumns={['100%', '1fr 2fr auto']} gridGap={['8px', null, null, '28px']} width="100%">
+          <div>
+            <FilterLabel htmlFor="transactions-period-filter">
+              <FormattedMessage id="TransactionsOverviewSection.PeriodFilter" defaultMessage="Filter by Date" />
+            </FilterLabel>
+            <PeriodFilter onChange={setDateInterval} value={dateInterval} minDate={host?.createdAt} />
+          </div>
+          <div>
+            <FilterLabel htmlFor="transactions-collective-filter">
+              <FormattedMessage
+                id="TransactionsOverviewSection.CollectiveFilter"
+                defaultMessage="Filter by Collective"
+              />
+            </FilterLabel>
+            <CollectivePickerAsync
+              inputId="TransactionsCollectiveFilter"
+              data-cy="transactions-collective-filter"
+              types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.PROJECT]}
+              isMulti
+              hostCollectiveIds={[host?.legacyId]}
+              onChange={value => setCollectives(prepareCollectivesForFilter(value))}
+              styles={{ control: baseStyles => ({ ...baseStyles, borderRadius: 16 }) }}
+              isLoading={loading}
+              disabled={loading}
+            />
+          </div>
+          <Flex alignItems="flex-end" width="100%" mt={[24, 0]}>
+            <HostCSVDownloadButton host={host} collectives={collectives} dateInterval={dateInterval} />
+          </Flex>
+        </Grid>
+      </Container>
       <StyledCard mb={5} borderRadius="12px" padding="32px 24px" borderColor="black.400">
         <Container mb={38}>
           <SectionTitle
@@ -233,12 +252,6 @@ const HostDashboardReports = ({ hostSlug }) => {
         <Box mb={4}>
           <PlatformTipsCollected host={host} isLoading={loading} />
         </Box>
-        <Container>
-          <SectionTitle>
-            <FormattedMessage id="Downloads" defaultMessage="Downloads" />
-          </SectionTitle>
-          <HostDownloadsSection host={host} dateInterval={dateInterval} collectives={collectives} />
-        </Container>
       </StyledCard>
     </Box>
   );

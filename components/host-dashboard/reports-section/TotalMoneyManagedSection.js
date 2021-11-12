@@ -27,21 +27,6 @@ const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency, isLoading) => {
   return [
     {
-      key: 'my-collectives',
-      color: 'primary.500',
-      label: isLoading ? (
-        <LoadingPlaceholder width={165} height={16} />
-      ) : (
-        <P fontSize="12px" lineHeight="18px">
-          <Span fontWeight="700">{formatCurrency(collectivesBalance, currency)}</Span>{' '}
-          <Span mx="6px" color="black.600">
-            {' | '}
-          </Span>
-          <FormattedMessage id="Collectives" defaultMessage="Collectives" />
-        </P>
-      ),
-    },
-    {
       key: 'organization',
       color: 'primary.800',
       label: isLoading ? (
@@ -53,6 +38,21 @@ const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency, is
             {' | '}
           </Span>
           <FormattedMessage id="TotalMoneyManagedSection.hostOrganization" defaultMessage="Host Organization" />
+        </P>
+      ),
+    },
+    {
+      key: 'my-collectives',
+      color: 'primary.500',
+      label: isLoading ? (
+        <LoadingPlaceholder width={165} height={16} />
+      ) : (
+        <P fontSize="12px" lineHeight="18px">
+          <Span fontWeight="700">{formatCurrency(collectivesBalance, currency)}</Span>{' '}
+          <Span mx="6px" color="black.600">
+            {' | '}
+          </Span>
+          <FormattedMessage id="Collectives" defaultMessage="Collectives" />
         </P>
       ),
     },
@@ -140,10 +140,8 @@ const TotalMoneyManagedSection = ({ host, isLoading }) => {
 
   // Compute some general stats
   const hostMetrics = host?.hostMetrics;
-  const fees = pick(hostMetrics, ['platformTips', 'platformFees', 'hostFees']);
-  const totalFees = sumBy(Object.values(fees), 'valueInCents');
-  const collectivesBalance = hostMetrics?.totalMoneyManaged.valueInCents - totalFees;
   const hostBalance = host?.stats.balance.valueInCents;
+  const collectivesBalance = hostMetrics?.totalMoneyManaged.valueInCents - hostBalance;
 
   // Generate graph data (memoized for performances)
   const chartArgs = [collectivesBalance, hostBalance, host?.currency, isLoading];
