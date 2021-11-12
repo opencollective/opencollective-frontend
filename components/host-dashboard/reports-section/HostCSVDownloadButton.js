@@ -7,9 +7,9 @@ import { fetchCSVFileFromRESTService } from '../../../lib/api';
 import { simpleDateToISOString } from '../../../lib/date-utils';
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
 
-import Container from '../../Container';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
+import StyledLink from '../../StyledLink';
 
 const getHostReportURL = (hostSlug, params) => {
   const { dateFrom, dateTo, accountsSlugs, format = 'txt' } = params || {};
@@ -49,7 +49,7 @@ const triggerCSVDownload = (host, reportUrl, dateInterval) => {
   return fetchCSVFileFromRESTService(reportUrl, filename);
 };
 
-const HostDownloadsSection = ({ host, collectives, dateInterval }) => {
+const HostCSVDownloadButton = ({ host, collectives, dateInterval }) => {
   const accountsSlugs = collectives?.map(c => c.slug);
   const hostReportUrl = getHostReportURL(host?.slug, { ...prepareDateArgs(dateInterval), accountsSlugs });
   const { loading: isFetching, call: downloadCSV } = useAsyncCall(
@@ -58,30 +58,31 @@ const HostDownloadsSection = ({ host, collectives, dateInterval }) => {
   );
 
   return (
-    <Container>
-      <Link
-        href={hostReportUrl}
-        onClick={e => {
-          e.preventDefault();
-          downloadCSV();
-        }}
+    <StyledLink
+      as={Link}
+      width="100%"
+      href={hostReportUrl}
+      onClick={e => {
+        e.preventDefault();
+        downloadCSV();
+      }}
+    >
+      <StyledButton
+        buttonStyle="primary"
+        buttonSize="small"
+        py="7px"
+        minWidth={140}
+        width="100%"
+        loading={isFetching}
+        disabled={!host}
       >
-        <StyledButton
-          buttonStyle="primary"
-          buttonSize="small"
-          py="7px"
-          minWidth={140}
-          loading={isFetching}
-          disabled={!host}
-        >
-          <FormattedMessage defaultMessage="Generate CSV report" />
-        </StyledButton>
-      </Link>
-    </Container>
+        <FormattedMessage defaultMessage="Generate CSV report" />
+      </StyledButton>
+    </StyledLink>
   );
 };
 
-HostDownloadsSection.propTypes = {
+HostCSVDownloadButton.propTypes = {
   collectives: PropTypes.arrayOf(PropTypes.shape({ slug: PropTypes.string.isRequired })),
   dateInterval: PropTypes.object,
   host: PropTypes.shape({
@@ -91,4 +92,4 @@ HostDownloadsSection.propTypes = {
   }),
 };
 
-export default HostDownloadsSection;
+export default HostCSVDownloadButton;
