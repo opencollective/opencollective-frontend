@@ -116,7 +116,8 @@ const HostFeesSection = ({ host, collectives, isLoading }) => {
           </StyledLinkButton>
         </Container>
       </Flex>
-      {showHostFeeChart && <HostFeesSectionHistorical collectives={collectives} hostSlug={host.slug} />}
+      {showHostFeeChart && isLoading && <LoadingPlaceholder height={250} />}
+      {showHostFeeChart && !isLoading && <HostFeesSectionHistorical collectives={collectives} hostSlug={host.slug} />}
     </React.Fragment>
   );
 };
