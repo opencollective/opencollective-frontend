@@ -25,6 +25,8 @@ const getHostReportURL = (hostSlug, params) => {
     url.searchParams.set('account', accountsSlugs.join(','));
   }
 
+  url.searchParams.set('fetchAll', '1');
+
   return url.toString();
 };
 
