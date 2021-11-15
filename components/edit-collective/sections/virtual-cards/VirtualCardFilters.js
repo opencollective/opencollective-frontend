@@ -13,7 +13,6 @@ import RequestVirtualCardBtn from '../../../RequestVirtualCardBtn';
 import StyledButton from '../../../StyledButton';
 
 import CollectiveFilter from './filters/CollectiveFilter';
-import MerchantFilter from './filters/MerchantFilter';
 import StatusFilter from './filters/StatusFilter';
 
 const FilterContainer = styled(Box)`
@@ -32,7 +31,6 @@ const FilterLabel = styled.label`
 const VirtualCardFilters = ({
   filters,
   onChange,
-  virtualCardMerchants,
   isCollectiveFilter,
   virtualCardCollectives,
   collective,
@@ -89,12 +87,6 @@ const VirtualCardFilters = ({
             <PeriodFilter {...getFilterProps('period', encodeDateInterval)} />
           </FilterContainer>
         )}
-        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} width={[1, filterWidth]}>
-          <FilterLabel htmlFor="virtual-card-filter-amount">
-            <FormattedMessage id="VirtualCard.Merchant" defaultMessage="Merchant" />
-          </FilterLabel>
-          <MerchantFilter {...getFilterProps('merchant')} virtualCardMerchants={virtualCardMerchants} />
-        </FilterContainer>
         {allowRequestVirtualCard && (
           <RequestVirtualCardBtn collective={collective} host={host}>
             {btnProps => (
@@ -112,7 +104,6 @@ const VirtualCardFilters = ({
 VirtualCardFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
-  virtualCardMerchants: PropTypes.array,
   virtualCardCollectives: PropTypes.array,
   isCollectiveFilter: PropTypes.bool,
   host: PropTypes.object,
