@@ -70,9 +70,7 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
     hostFeePercent === host.hostFeePercent ? HOST_FEE_STRUCTURE.DEFAULT : HOST_FEE_STRUCTURE.CUSTOM_FEE,
   );
   const isProjectOrFund = [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type);
-  const [hasGrant, setHasGrant] = useState(
-    accountSupportsGrants(collective?.settings, host?.settings) || isProjectOrFund,
-  );
+  const [hasGrant, setHasGrant] = useState(accountSupportsGrants(collective, host) || isProjectOrFund);
   const [submitFeesStructure, { loading, error }] = useMutation(editAccountSettingsMutation, {
     context: API_V2_CONTEXT,
   });
