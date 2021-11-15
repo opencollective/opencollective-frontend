@@ -6,6 +6,8 @@ import { first, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { accountSupportsGrants } from '../../lib/collective.lib';
+import { CollectiveType } from '../../lib/collective-sections';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -370,7 +372,9 @@ const ExpenseFormBody = ({
           }}
           value={values.type}
           options={{
-            fundingRequest: collective.settings?.expenseTypes?.hasGrant === true,
+            fundingRequest:
+              accountSupportsGrants(collective.settings, collective?.host?.settings) ||
+              [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type),
           }}
         />
       )}
@@ -637,7 +641,7 @@ ExpenseFormBody.propTypes = {
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
       settings: PropTypes.shape({
-        fundingRequest: PropTypes.bool,
+        disableGrantsByDefault: PropTypes.bool,
       }),
     }),
     settings: PropTypes.object,

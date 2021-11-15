@@ -4,6 +4,8 @@ import { useMutation } from '@apollo/client';
 import { clamp, isNil, round } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { accountSupportsGrants } from '../../lib/collective.lib';
+import { CollectiveType } from '../../lib/constants/collectives';
 import { HOST_FEE_STRUCTURE } from '../../lib/constants/host-fee-structure';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
@@ -67,7 +69,10 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
   const [selectedOption, setSelectedOption] = useState(
     hostFeePercent === host.hostFeePercent ? HOST_FEE_STRUCTURE.DEFAULT : HOST_FEE_STRUCTURE.CUSTOM_FEE,
   );
-  const [hasGrant, setHasGrant] = useState(collective?.settings?.expenseTypes?.hasGrant || false);
+  const isProjectOrFund = [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type);
+  const [hasGrant, setHasGrant] = useState(
+    accountSupportsGrants(collective?.settings, host?.settings) || isProjectOrFund,
+  );
   const [submitFeesStructure, { loading, error }] = useMutation(editAccountSettingsMutation, {
     context: API_V2_CONTEXT,
   });
@@ -189,10 +194,14 @@ CollectiveSettingsModal.propTypes = {
     id: PropTypes.string,
     hostFeePercent: PropTypes.number,
     settings: PropTypes.object,
+    type: PropTypes.string,
   }).isRequired,
   host: PropTypes.shape({
     slug: PropTypes.string,
     hostFeePercent: PropTypes.number,
+    settings: PropTypes.shape({
+      disableGrantsByDefault: PropTypes.bool,
+    }),
   }).isRequired,
 };
 
