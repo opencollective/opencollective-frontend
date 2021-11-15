@@ -104,6 +104,7 @@ class ContributionFlow extends React.Component {
       }),
     }).isRequired,
     host: PropTypes.object.isRequired,
+    loggedInAccount: PropTypes.object,
     tier: PropTypes.object,
     intl: PropTypes.object,
     createOrder: PropTypes.func.isRequired,
@@ -707,6 +708,7 @@ class ContributionFlow extends React.Component {
     const {
       collective,
       host,
+      loggedInAccount,
       tier,
       LoggedInUser,
       loadingLoggedInUser,
@@ -753,7 +755,7 @@ class ContributionFlow extends React.Component {
           >
             {!this.props.hideHeader && (
               <Box px={[2, 3]} mb={4}>
-                <ContributionFlowHeader collective={collective} isEmbed={isEmbed} />
+                <ContributionFlowHeader collective={collective} loggedInAccount={loggedInAccount} isEmbed={isEmbed} />
               </Box>
             )}
             <StepsProgressBox mb={3} width={[1.0, 0.8]}>

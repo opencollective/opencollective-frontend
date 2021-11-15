@@ -16,6 +16,16 @@ export const contributionFlowAccountWithTierQuery = gqlV2/* GraphQL */ `
     account(slug: $collectiveSlug, throwIfMissing: false) {
       ...ContributionFlowAccountFields
     }
+    loggedInAccount {
+      memberOf(account: { slug: $collectiveSlug }) {
+        nodes {
+          id
+          totalDonations {
+            value
+          }
+        }
+      }
+    }
     tier(tier: $tier, throwIfMissing: false) {
       id
       legacyId

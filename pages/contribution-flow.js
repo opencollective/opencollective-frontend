@@ -20,6 +20,7 @@ import ContributionFlowSuccess from '../components/contribution-flow/Contributio
 import {
   contributionFlowAccountQuery,
   contributionFlowAccountWithTierQuery,
+  isLoggedInUserContributorQuery,
 } from '../components/contribution-flow/graphql/queries';
 import ContributionFlowContainer from '../components/contribution-flow/index';
 import { getContributionFlowMetadata } from '../components/contribution-flow/utils';
@@ -133,7 +134,7 @@ class NewContributionFlowPage extends React.Component {
 
   renderPageContent() {
     const { data = {}, step, paymentFlow, LoggedInUser, error } = this.props;
-    const { account, tier } = data;
+    const { account, loggedInAccount, tier } = data;
     const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
 
     if (data.loading) {
@@ -162,6 +163,7 @@ class NewContributionFlowPage extends React.Component {
       return (
         <ContributionFlowContainer
           collective={account}
+          loggedInAccount={loggedInAccount}
           host={account.host}
           tier={tier}
           step={step}
