@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
@@ -211,12 +211,6 @@ FieldGroup.propTypes = {
 };
 
 const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
-  const [accountDetails, setAccountDetails] = useState(null);
-  useEffect(() => {
-    const data = get({ ...formik.values }, getFieldName('data'));
-    setAccountDetails(data);
-  }, []);
-
   const { loading, error, data, refetch } = useQuery(requiredFieldsQuery, {
     context: API_V2_CONTEXT,
     // A) If `fixedCurrency` was passed in PayoutBankInformationForm (2) (3)
@@ -224,7 +218,11 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     // B) If `host` is set, we expect to be in 2 cases:
     //      * The Collective Host has Wise configured and we should be able to fetch `requiredFields` from it
     //      * The Collective Host doesn't have Wise configured and `host` is already switched to the Platform account
-    variables: { slug: host ? host.slug : TW_API_COLLECTIVE_SLUG, currency, accountDetails },
+    variables: {
+      slug: host ? host.slug : TW_API_COLLECTIVE_SLUG,
+      currency,
+      accountDetails: get(formik.values, getFieldName('data')),
+    },
   });
 
   if (loading && !data) {
