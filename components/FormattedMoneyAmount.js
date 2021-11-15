@@ -63,7 +63,7 @@ const FormattedMoneyAmount = ({
       <FormattedMessage
         id="AmountInterval"
         defaultMessage="{amount} {currencyCode} / {interval, select, month {mo.} year {yr.} other{}}"
-        values={{ amount: formattedAmount, interval: interval, currencyCode }}
+        values={{ amount: formattedAmount, interval: interval ?? '', currencyCode }}
       />
     );
   } else {
@@ -71,7 +71,7 @@ const FormattedMoneyAmount = ({
       <FormattedMessage
         id="AmountIntervalLong"
         defaultMessage="{amount} {currencyCode} / {interval, select, month {month} year {year} other {}}"
-        values={{ amount: formattedAmount, interval: interval, currencyCode }}
+        values={{ amount: formattedAmount, interval: interval ?? '', currencyCode }}
       />
     );
   }
