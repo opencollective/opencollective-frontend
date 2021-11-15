@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../lib/currency-utils';
-import { days } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -49,7 +49,7 @@ const getChartOptions = (intl, startDate, endDate, hostCreatedAt) => {
 };
 
 const getCategories = (intl, startDate, endDate, hostCreatedAt) => {
-  const numberOfDays = days(startDate || hostCreatedAt, endDate);
+  const numberOfDays = dayjs(startDate || hostCreatedAt).diff(dayjs(endDate), 'day');
   if (numberOfDays <= 7) {
     const startDay = startDate.getDay();
     return [...new Array(7)].map(
@@ -69,7 +69,7 @@ const getCategories = (intl, startDate, endDate, hostCreatedAt) => {
 };
 
 const getCategoryType = (startDate, endDate, hostCreatedAt) => {
-  const numberOfDays = days(startDate || hostCreatedAt, endDate);
+  const numberOfDays = dayjs(startDate || hostCreatedAt).diff(dayjs(endDate), 'day');
   if (numberOfDays <= 7) {
     return 'WEEK';
   } else if (numberOfDays <= 365) {
@@ -81,6 +81,9 @@ const getCategoryType = (startDate, endDate, hostCreatedAt) => {
 
 const constructDataPointObjects = (category, dataPoints) => {
   let dataPointObject;
+  /*
+   * Show data for the past 5 years form the current year.
+   */
   if (category === 'YEAR') {
     dataPointObject = new Array(6).fill(0);
     const currentYear = new Date().getFullYear();
@@ -90,6 +93,9 @@ const constructDataPointObjects = (category, dataPoints) => {
         dataPointObject[5 - (currentYear - year)] = dataPoint.amount.value;
       }
     });
+    /*
+     * Show data for the past the past 12 months from the current month.
+     */
   } else if (category === 'MONTH') {
     dataPointObject = new Array(12).fill(0);
     dataPoints.forEach(dataPoint => {
@@ -99,6 +105,9 @@ const constructDataPointObjects = (category, dataPoints) => {
         dataPointObject[(date.getMonth() + (12 - today.getMonth())) % 12] = dataPoint.amount.value;
       }
     });
+    /*
+     * Show data for past 7 days from the current day.
+     */
   } else if (category === 'WEEK') {
     dataPointObject = new Array(7).fill(0);
     dataPoints.forEach(dataPoint => {
