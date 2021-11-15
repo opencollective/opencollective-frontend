@@ -620,9 +620,7 @@ const ExpenseFormBody = ({
                     onClick={() => setShowResetModal(true)}
                   >
                     <Undo size={11} />
-                    <Span mx={1}>
-                      {editingExpense ? formatMessage(msg.cancelEditExpense) : formatMessage(msg.clearExpenseForm)}
-                    </Span>
+                    <Span mx={1}>{formatMessage(editingExpense ? msg.cancelEditExpense : msg.clearExpenseForm)}</Span>
                   </StyledButton>
                 )}
               </Flex>
