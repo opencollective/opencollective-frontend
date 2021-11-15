@@ -19,6 +19,7 @@ import { display } from 'styled-system';
 import { accountSupportsGrants, expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
 import { getFilteredSectionsForCollective, isSectionEnabled, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
+import roles from '../../lib/constants/roles';
 import { getEnvVar } from '../../lib/env-utils';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import { getSettingsRoute } from '../../lib/url-helpers';
@@ -242,7 +243,7 @@ const getHasContribute = (collective, sections, isAdmin) => {
   );
 };
 
-const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, LoggedInUser) => {
+const getDefaultCallsToActions = (collective, sections, isAdmin, isAccountant, isHostAdmin, LoggedInUser) => {
   if (!collective) {
     return {};
   }
@@ -260,7 +261,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isHostAdmin, Lo
     addFunds: isHostAdmin,
     assignVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
     requestVirtualCard: isAdmin && isFeatureAvailable(collective, 'REQUEST_VIRTUAL_CARDS'),
-    hasSettings: isAdmin,
+    hasSettings: isAdmin || isAccountant,
   };
 };
 
@@ -425,13 +426,14 @@ const CollectiveNavbar = ({
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
   const { LoggedInUser } = useUser();
+  const isAccountant = LoggedInUser?.hasRole(roles.ACCOUNTANT, collective);
   isAdmin = isAdmin || LoggedInUser?.canEditCollective(collective);
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
   const sections = React.useMemo(() => {
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
   callsToAction = {
-    ...getDefaultCallsToActions(collective, sections, isAdmin, isHostAdmin, LoggedInUser),
+    ...getDefaultCallsToActions(collective, sections, isAdmin, isAccountant, isHostAdmin, LoggedInUser),
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));

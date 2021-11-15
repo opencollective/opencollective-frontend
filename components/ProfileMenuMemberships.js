@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Plus } from '@styled-icons/boxicons-regular';
 import { Settings } from '@styled-icons/feather/Settings';
 import { groupBy, isEmpty, uniqBy } from 'lodash';
-import { defineMessage, defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
@@ -20,13 +20,6 @@ import StyledHr from './StyledHr';
 import StyledLink from './StyledLink';
 import StyledRoundButton from './StyledRoundButton';
 import { P } from './Text';
-
-const messages = defineMessages({
-  settings: {
-    id: 'Settings',
-    defaultMessage: 'Settings',
-  },
-});
 
 const CollectiveListItem = styled(ListItem)`
   @media (hover: hover) {
@@ -58,13 +51,13 @@ const MembershipLine = ({ user, membership }) => {
           </Flex>
         </Flex>
       </Link>
-      {Boolean(user?.canEditCollective(membership.collective)) && (
+      {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
         <StyledLink
           as={Link}
           href={getSettingsRoute(membership.collective, null, user)}
           ml={1}
           color="black.500"
-          title={intl.formatMessage(messages.settings)}
+          title={intl.formatMessage({ id: 'AdminPanel.button', defaultMessage: 'Admin' })}
         >
           <Settings opacity="0" size="1.2em" />
         </StyledLink>

@@ -80,6 +80,8 @@ export const ALL_SECTIONS = {
   ...HOST_DASHBOARD_SECTIONS,
 };
 
+export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [ALL_SECTIONS.REPORTS, ALL_SECTIONS.PAYMENT_RECEIPTS];
+
 export const PAGE_TITLES = defineMessages({
   [USER]: { id: 'AdminPanel.UserSettings', defaultMessage: 'User Settings' },
   [ORGANIZATION]: { id: 'AdminPanel.OrganizationSettings', defaultMessage: 'Organization Settings' },
