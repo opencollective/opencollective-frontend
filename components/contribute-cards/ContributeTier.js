@@ -94,7 +94,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
       minAmount: minAmount || 0,
       tierName: tier.name,
       minAmountWithCurrency: minAmount && formatCurrency(minAmount, currency),
-      interval: tier.interval,
+      interval: tier.interval ?? '',
     });
   }
 

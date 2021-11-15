@@ -143,7 +143,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
             id="contribute.tierDetails"
             defaultMessage="You’ll contribute {amount}{interval, select, month { monthly} year { yearly} other {}}."
             values={{
-              interval: tier.interval,
+              interval: tier.interval ?? '',
               amount: <FormattedMoneyAmount amount={getTotalAmount(data)} currency={currency} />,
             }}
           />
