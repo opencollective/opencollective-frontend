@@ -712,7 +712,6 @@
   "Crypto": "Криптовалюта",
   "Currency": "Валюта",
   "currency": "валюта",
-  "CW9iCu": "See historical",
   "Date.BeforeShort": "До {date, date, short}",
   "Date.DateRange": "З {dateFrom, date, short} до {dateTo, date, short}",
   "Date.SinceShort": "З {date, date, short}",
