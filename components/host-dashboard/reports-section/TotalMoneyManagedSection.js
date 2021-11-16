@@ -50,7 +50,7 @@ const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency, is
   ];
 };
 
-const TotalMoneyManagedSection = ({ host, isLoading }) => {
+const TotalMoneyManagedSection = ({ host, collectives, isLoading }) => {
   const [showMoneyManagedChart, setShowMoneyManagedChart] = useState(false);
 
   // Compute some general stats
@@ -104,7 +104,8 @@ const TotalMoneyManagedSection = ({ host, isLoading }) => {
           </StyledLinkButton>
         </Container>
       </Flex>
-      {showMoneyManagedChart && <TotalMoneyManagedHistorical host={host} />}
+      {isLoading && <LoadingPlaceholder height={250} />}
+      {!isLoading && showMoneyManagedChart && <TotalMoneyManagedHistorical host={host} collectives={collectives} />}
     </div>
   );
 };
@@ -117,6 +118,7 @@ TotalMoneyManagedSection.propTypes = {
     hostMetrics: PropTypes.object.isRequired,
     currency: PropTypes.string,
   }),
+  collectives: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default TotalMoneyManagedSection;
