@@ -229,7 +229,11 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     // B) If `host` is set, we expect to be in 2 cases:
     //      * The Collective Host has Wise configured and we should be able to fetch `requiredFields` from it
     //      * The Collective Host doesn't have Wise configured and `host` is already switched to the Platform account
-    variables: { slug: host ? host.slug : TW_API_COLLECTIVE_SLUG, currency },
+    variables: {
+      slug: host ? host.slug : TW_API_COLLECTIVE_SLUG,
+      currency,
+      accountDetails: get(formik.values, getFieldName('data')),
+    },
   });
 
   if (loading && !data) {
