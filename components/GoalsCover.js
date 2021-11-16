@@ -479,7 +479,7 @@ class GoalsCover extends React.Component {
               <div className="interval">
                 <FormattedMessage
                   id="tier.interval"
-                  defaultMessage="per {interval, select, month {month} year {year} other {}}"
+                  defaultMessage="per {interval, select, week {week} month {month} year {year} other {}}"
                   values={{ interval: 'year' }}
                 />
               </div>

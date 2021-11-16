@@ -29,6 +29,7 @@ const MainContainer = styled(Container)`
 
 const FILTERS = {
   ACTIVE: 'ACTIVE',
+  WEEKLY: 'WEEKLY',
   MONTHLY: 'MONTHLY',
   YEARLY: 'YEARLY',
   CANCELLED: 'CANCELLED',
@@ -37,6 +38,10 @@ const I18nFilters = defineMessages({
   [FILTERS.ACTIVE]: {
     id: 'Subscriptions.Active',
     defaultMessage: 'Active',
+  },
+  [FILTERS.WEEKLY]: {
+    id: 'Frequency.Weekly',
+    defaultMessage: 'Weekly',
   },
   [FILTERS.MONTHLY]: {
     id: 'Frequency.Monthly',
@@ -77,7 +82,7 @@ class recurringContributionsPage extends React.Component {
   render() {
     const { slug, data, intl, loadingLoggedInUser, LoggedInUser } = this.props;
 
-    const filters = ['ACTIVE', 'MONTHLY', 'YEARLY', 'CANCELLED'];
+    const filters = ['ACTIVE', 'WEEKLY', 'MONTHLY', 'YEARLY', 'CANCELLED'];
 
     if (!data?.loading && !loadingLoggedInUser && LoggedInUser) {
       if (!data || data.error) {

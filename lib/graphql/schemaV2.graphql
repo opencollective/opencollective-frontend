@@ -1382,6 +1382,7 @@ enum TierType {
 }
 
 enum TierInterval {
+  week
   month
   year
   flexible

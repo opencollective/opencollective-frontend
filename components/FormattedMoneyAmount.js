@@ -62,7 +62,7 @@ const FormattedMoneyAmount = ({
     return (
       <FormattedMessage
         id="AmountInterval"
-        defaultMessage="{amount} {currencyCode} / {interval, select, month {mo.} year {yr.} other{}}"
+        defaultMessage="{amount} {currencyCode} / {interval, select, week {wk.} month {mo.} year {yr.} other{}}"
         values={{ amount: formattedAmount, interval: interval, currencyCode }}
       />
     );
@@ -70,7 +70,7 @@ const FormattedMoneyAmount = ({
     return (
       <FormattedMessage
         id="AmountIntervalLong"
-        defaultMessage="{amount} {currencyCode} / {interval, select, month {month} year {year} other {}}"
+        defaultMessage="{amount} {currencyCode} / {interval, select, week {week} month {month} year {year} other {}}"
         values={{ amount: formattedAmount, interval: interval, currencyCode }}
       />
     );
@@ -89,9 +89,9 @@ FormattedMoneyAmount.propTypes = {
   /** How many numbers should we display after the comma */
   precision: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf(['auto'])]),
   /** An interval that goes with the amount */
-  interval: PropTypes.oneOf(['month', 'year']),
+  interval: PropTypes.oneOf(['week', 'month', 'year']),
   /** ContributionFrequency from GQLV2 */
-  frequency: PropTypes.oneOf(['MONTHLY', 'YEARLY', 'ONETIME']),
+  frequency: PropTypes.oneOf(['WEEKLY', 'MONTHLY', 'YEARLY', 'ONETIME']),
   /** Style for the amount (eg. `$10`). Doesn't apply on interval */
   amountStyles: PropTypes.object,
 };

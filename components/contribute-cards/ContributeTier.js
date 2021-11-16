@@ -26,7 +26,7 @@ const messages = defineMessages({
   fallbackDescription: {
     id: 'TierCard.DefaultDescription',
     defaultMessage:
-      '{tierName, select, backer {Become a backer} sponsor {Become a sponsor} other {Join us}}{minAmount, select, 0 {} other { for {minAmountWithCurrency} {interval, select, month {per month} year {per year} other {}}}} and support us',
+      '{tierName, select, backer {Become a backer} sponsor {Become a sponsor} other {Join us}}{minAmount, select, 0 {} other { for {minAmountWithCurrency} {interval, select, week {per week} month {per month} year {per year} other {}}}} and support us',
   },
 });
 

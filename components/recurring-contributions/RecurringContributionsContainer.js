@@ -26,6 +26,8 @@ const filterContributions = (contributions, filterName) => {
   switch (filterName) {
     case 'ACTIVE':
       return contributions.filter(isActive);
+    case 'WEEKLY':
+      return contributions.filter(contrib => isActive(contrib) && contrib.frequency === 'WEEKLY');
     case 'MONTHLY':
       return contributions.filter(contrib => isActive(contrib) && contrib.frequency === 'MONTHLY');
     case 'YEARLY':

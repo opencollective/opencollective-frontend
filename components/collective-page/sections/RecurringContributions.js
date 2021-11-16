@@ -18,6 +18,7 @@ import SectionTitle from '../SectionTitle';
 
 const FILTERS = {
   ACTIVE: 'ACTIVE',
+  WEEKLY: 'WEEKLY',
   MONTHLY: 'MONTHLY',
   YEARLY: 'YEARLY',
   CANCELLED: 'CANCELLED',
@@ -27,6 +28,10 @@ const I18nFilters = defineMessages({
   [FILTERS.ACTIVE]: {
     id: 'Subscriptions.Active',
     defaultMessage: 'Active',
+  },
+  [FILTERS.WEEKLY]: {
+    id: 'Frequency.Weekly',
+    defaultMessage: 'Weekly',
   },
   [FILTERS.MONTHLY]: {
     id: 'Frequency.Monthly',
@@ -65,7 +70,7 @@ class SectionRecurringContributions extends React.Component {
   render() {
     const { data, intl } = this.props;
 
-    const filters = ['ACTIVE', 'MONTHLY', 'YEARLY', 'CANCELLED'];
+    const filters = ['ACTIVE', 'WEEKLY', 'MONTHLY', 'YEARLY', 'CANCELLED'];
 
     if (data.loading) {
       return <LoadingPlaceholder height={600} borderRadius={0} />;
