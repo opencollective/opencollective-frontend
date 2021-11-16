@@ -90,7 +90,7 @@ const constructDataPointObjects = (category, dataPoints) => {
     dataPoints.forEach(dataPoint => {
       const year = new Date(dataPoint.date).getFullYear();
       if (year > currentYear - 6) {
-        dataPointObject[5 - (currentYear - year)] = dataPoint.amount.value;
+        dataPointObject[5 - (currentYear - year)] = Math.abs(dataPoint.amount.value);
       }
     });
     /*
@@ -102,7 +102,7 @@ const constructDataPointObjects = (category, dataPoints) => {
       const date = new Date(dataPoint.date);
       const today = new Date();
       if (today.getFullYear() - date.getFullYear() <= 1) {
-        dataPointObject[(date.getMonth() + (12 - today.getMonth())) % 12] = dataPoint.amount.value;
+        dataPointObject[(date.getMonth() + (12 - today.getMonth())) % 12] = Math.abs(dataPoint.amount.value);
       }
     });
     /*
@@ -114,7 +114,7 @@ const constructDataPointObjects = (category, dataPoints) => {
       const date = new Date(dataPoint.date);
       const today = new Date();
       if (today.getFullYear() === date.getFullYear() && today.getMonth() === date.getMonth()) {
-        dataPointObject[date.getDay() % 7] = dataPoint.amount.value;
+        dataPointObject[date.getDay() % 7] = Math.abs(dataPoint.amount.value);
       }
     });
   }
