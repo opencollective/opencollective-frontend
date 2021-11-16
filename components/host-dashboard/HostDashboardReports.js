@@ -209,6 +209,7 @@ const HostDashboardReports = ({ hostSlug }) => {
               styles={{ control: baseStyles => ({ ...baseStyles, borderRadius: 16 }) }}
               isLoading={loading}
               disabled={loading}
+              useCompactMode
             />
           </div>
           <Flex alignItems="flex-end" width="100%" mt={[24, 0]}>
