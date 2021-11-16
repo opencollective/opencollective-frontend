@@ -7,7 +7,6 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { accountSupportsGrants } from '../../lib/collective.lib';
-import { CollectiveType } from '../../lib/collective-sections';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -379,9 +378,7 @@ const ExpenseFormBody = ({
           }}
           value={values.type}
           options={{
-            fundingRequest:
-              accountSupportsGrants(collective.settings, collective?.host?.settings) ||
-              [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type),
+            fundingRequest: accountSupportsGrants(collective, collective?.host),
           }}
         />
       )}
