@@ -51,10 +51,6 @@ const msg = defineMessages({
     id: 'Form.yourEmail',
     defaultMessage: 'Your email address',
   },
-  inviteeType: {
-    id: 'ExpenseForm.inviteeIsOrganizationLabel',
-    defaultMessage: 'Are you submitting this expense for your organization (company)?',
-  },
   orgNameLabel: {
     id: 'ExpenseForm.inviteeOrgNameLabel',
     defaultMessage: "What's the name of the organization?",

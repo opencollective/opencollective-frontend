@@ -956,7 +956,6 @@
   "ExpenseForm.GrantSubjectPlaceholder": "e.g., research, software development, etc...",
   "ExpenseForm.inviteAdditionalInfo": "Want to enter payout details, such as a PayPal address or bank account?",
   "ExpenseForm.inviteAdditionalInfoBtn": "Add payout details",
-  "ExpenseForm.inviteeIsOrganizationLabel": "Você está enviando essa despesa para a sua organização (empresa)?",
   "ExpenseForm.inviteeLabel": "Quem receberá o dinheiro por esta despesa?",
   "ExpenseForm.inviteeOrgDescriptionLabel": "O que a sua organização faz?",
   "ExpenseForm.inviteeOrgNameLabel": "Qual é o nome da organização?",
