@@ -153,7 +153,7 @@ const AdminPanelPage = () => {
           gridTemplateColumns={['1fr', null, '208px 1fr']}
           maxWidth={1280}
           minHeight={600}
-          gridGap={64}
+          gridGap={56}
           m="0 auto"
           px={3}
           py={4}
