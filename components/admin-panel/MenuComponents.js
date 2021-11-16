@@ -107,6 +107,7 @@ export const MenuContainer = styled.ul`
   margin: 0;
   margin-bottom: 100px;
   width: 256px;
+  max-width: 100%;
 
   a {
     color: ${props => props.theme.colors.black[900]};
