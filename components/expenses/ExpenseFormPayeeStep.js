@@ -103,6 +103,50 @@ const refreshPayoutProfile = (formik, payoutProfiles) => {
   formik.setValues({ ...formik.values, draft: omit(formik.values.draft, ['payee']), payee });
 };
 
+const getPayeeOptions = (intl, payoutProfiles) => {
+  const profileOptions = payoutProfiles.map(value => ({
+    value,
+    label: value.name,
+    [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
+  }));
+
+  const [myself, myOrganizations] = partition(profileOptions, p => p.value.type === 'INDIVIDUAL');
+  myOrganizations.push({
+    label: null,
+    value: null,
+    isDisabled: true,
+    [FLAG_NEW_COLLECTIVE]: true,
+    types: [CollectiveType.ORGANIZATION],
+    __background__: 'white',
+  });
+
+  return [
+    { options: myself, label: intl.formatMessage({ defaultMessage: 'Myself' }) },
+    { options: myOrganizations, label: intl.formatMessage({ defaultMessage: 'My Organizations' }) },
+  ];
+};
+
+const checkStepOneCompleted = (values, isOnBehalf) => {
+  if (isOnBehalf) {
+    return Boolean(values.payee);
+  } else if (!isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod)))) {
+    return false; // There are some errors in the form
+  } else if (values.type !== expenseTypes.RECEIPT) {
+    // Require an address for non-receipt expenses
+    return Boolean(values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address);
+  } else {
+    return true;
+  }
+};
+
+const checkRequiresAddress = values => {
+  return (
+    values.payee &&
+    !values.payee.isInvite &&
+    [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST, expenseTypes.GRANT].includes(values.type)
+  );
+};
+
 const ExpenseFormPayeeStep = ({
   formik,
   payoutProfiles,
@@ -116,35 +160,13 @@ const ExpenseFormPayeeStep = ({
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, errors } = formik;
-  const stepOneCompleted = isOnBehalf
-    ? values.payee
-    : isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod))) &&
-      (values.type === expenseTypes.RECEIPT ||
-        (values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address));
-
+  const stepOneCompleted = checkStepOneCompleted(values, isOnBehalf);
   const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee), [values.payee]);
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
-  const requiresAddress =
-    values.payee &&
-    !values.payee.isInvite &&
-    [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST, expenseTypes.GRANT].includes(values.type);
+  const payeeOptions = React.useMemo(() => getPayeeOptions(intl, payoutProfiles), [payoutProfiles]);
+  const requiresAddress = checkRequiresAddress(values);
   const canInvite = !values?.status;
-  const profileOptions = payoutProfiles.map(value => ({
-    value,
-    label: value.name,
-    [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
-  }));
-  const [myself, myorganizations] = partition(profileOptions, p => p.value.type === 'INDIVIDUAL');
-
-  myorganizations.push({
-    label: null,
-    value: null,
-    isDisabled: true,
-    [FLAG_NEW_COLLECTIVE]: true,
-    types: [CollectiveType.ORGANIZATION],
-    __background__: 'white',
-  });
 
   const collectivePick = canInvite
     ? ({ id }) => (
@@ -182,10 +204,7 @@ const ExpenseFormPayeeStep = ({
               padding: '8px',
             },
           }}
-          emptyCustomOptions={[
-            { options: myself, label: 'Myself' },
-            { options: myorganizations, label: 'My Organizations' },
-          ]}
+          emptyCustomOptions={payeeOptions}
           customOptionsPosition={CUSTOM_OPTIONS_POSITION.BOTTOM}
           getDefaultOptions={build => values.payee && build(values.payee)}
           invitable
@@ -198,10 +217,7 @@ const ExpenseFormPayeeStep = ({
     : ({ id }) => (
         <CollectivePicker
           inputId={id}
-          customOptions={[
-            { options: myself, label: 'Myself' },
-            { options: myorganizations, label: 'My Organizations' },
-          ]}
+          customOptions={payeeOptions}
           getDefaultOptions={build => values.payee && build(values.payee)}
           data-cy="select-expense-payee"
           collective={values.payee}
