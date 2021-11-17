@@ -166,7 +166,9 @@ class TierPage extends Component {
   render() {
     const { collective, tier, contributors, contributorsStats, redirect, LoggedInUser } = this.props;
     const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
-    const amountRaised = tier.interval ? tier.stats.totalRecurringDonations : tier.stats.totalDonated;
+    const isFlexibleInterval = tier.interval === INTERVALS.flexible;
+    const amountRaisedKey = tier.interval && !isFlexibleInterval ? 'totalRecurringDonations' : 'totalDonated';
+    const amountRaised = tier.stats?.[amountRaisedKey] || 0;
     const shareBlock = this.renderShareBlock();
     const isPassed = isTierExpired(tier);
 
