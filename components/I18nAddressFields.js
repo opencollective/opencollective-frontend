@@ -1,17 +1,8 @@
-/** This component aims to create a responsive address form based on the user's country that they select.
- * Shopify has a good article about internationalising address forms: https://ux.shopify.com/designing-address-forms-for-everyone-everywhere-f481f6baf513
- * And they also have an API and npm package to tell you what address fields a country uses, and in what order https://github.com/Shopify/quilt/tree/master/packages/address
- * Additional material:
- * Shopify API country codes ("ISO 3166-1 alpha-2 country codes with some differences"): https://shopify.dev/docs/admin-api/graphql/reference/common-objects/countrycode
- * Shopify locale code uses ISO locale codes: https://shopify.dev/docs/admin-api/graphql/reference/translations/locale
- * How Etsy Localizes addresses https://codeascraft.com/2018/09/26/how-etsy-localizes-addresses/
- * Form i18n techniques https://medium.com/flexport-design/form-internationalization-techniques-3e4d394cd7e5 */
-
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import AddressFormatter from '@shopify/address';
 import { Field } from 'formik';
-import { get, isEmpty, isUndefined, orderBy, pick, truncate } from 'lodash';
+import { cloneDeep, get, isEmpty, isNil, isUndefined, orderBy, pick, set, truncate } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import LoadingPlaceholder from './LoadingPlaceholder';
@@ -67,24 +58,6 @@ const wrangleAddressData = addressInfo => {
   return addressFormFields;
 };
 
-/** Generates zone/province/state options for select */
-const getZoneLabel = zone => {
-  return `${truncate(zone.name, { length: 30 })} - ${zone.code}`;
-};
-
-const getZoneSelectOptions = zonesInfo => {
-  if (!zonesInfo) {
-    return null;
-  }
-  const zonesArray = zonesInfo[2];
-  const options = zonesArray.map(zone => ({
-    value: zone.name,
-    label: getZoneLabel(zone),
-  }));
-
-  return orderBy(options, 'label');
-};
-
 export const serializeAddress = address => {
   return Object.keys(address)
     .sort()
@@ -108,7 +81,160 @@ const getAddressFieldDifferences = (formAddressValues, addressFields) => {
   }
 };
 
-const I18nAddressFields = ({ selectedCountry, value, onChange, onCountryChange, required, prefix }) => {
+const buildZoneOption = zone => {
+  return { value: zone.name, label: `${truncate(zone.name, { length: 30 })} - ${zone.code}` };
+};
+
+const ZoneSelect = ({ info, required, value, name, label, onChange, id, error, ...props }) => {
+  const zones = info || [];
+  const zoneOptions = React.useMemo(() => orderBy(zones.map(buildZoneOption), 'label'), [zones]);
+
+  // Reset zone if not supported
+  React.useEffect(() => {
+    if (zoneOptions) {
+      const formValueZone = value;
+      if (formValueZone && !zoneOptions.find(option => option.value === formValueZone)) {
+        onChange({ name: name, value: null });
+      }
+    }
+  }, [zoneOptions]);
+
+  return (
+    <StyledSelect
+      {...{ name, required, ...props }}
+      inputId={id}
+      minWidth={150}
+      options={zoneOptions}
+      error={error}
+      placeholder={`Please select your ${label}`} // TODO i18n
+      data-cy={`payee-address-${name}`} // TODO: Should not be locked on payee-address
+      value={zoneOptions.find(option => option?.value === value) || null}
+      onChange={v => {
+        onChange({ target: { name: name, value: v.value } });
+      }}
+    />
+  );
+};
+
+ZoneSelect.propTypes = {
+  info: PropTypes.array.isRequired,
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  error: PropTypes.any,
+  required: PropTypes.bool,
+  id: PropTypes.string,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+};
+
+export const FormikLocationFieldRenderer = ({ name, label, required, prefix, info }) => {
+  const validate = required ? value => (value ? undefined : `${label} is required`) : undefined;
+  return (
+    <Field key={name} name={`${prefix}.${name}`} validate={validate}>
+      {({ field, meta }) => (
+        <StyledInputField name={field.name} label={label} labelFontSize="13px" mt={3} error={meta.error}>
+          {inputProps => {
+            switch (name) {
+              case 'zone':
+                return (
+                  <ZoneSelect
+                    id={inputProps.id}
+                    name={inputProps.name}
+                    required={required}
+                    label={label}
+                    info={info}
+                    {...field}
+                  />
+                );
+              default:
+                return <StyledInput {...inputProps} {...field} error={meta.error} data-cy={`payee-address-${name}`} />;
+            }
+          }}
+        </StyledInputField>
+      )}
+    </Field>
+  );
+};
+
+export const SimpleLocationFieldRenderer = ({ name, label, required, prefix, value, info, onChange, fieldProps }) => {
+  const [isTouched, setIsTouched] = React.useState(false);
+  const error = required && isTouched && isNil(value) ? `${label} is required` : undefined;
+  const inputName = prefix ? `${prefix}.${name}` : name;
+  const dispatchOnChange = e => {
+    onChange(e);
+    if (!isTouched) {
+      setIsTouched(true);
+    }
+  };
+
+  return (
+    <StyledInputField
+      key={name}
+      name={inputName}
+      label={label}
+      labelFontSize="13px"
+      mt={3}
+      error={error}
+      required={required}
+      {...fieldProps}
+    >
+      {inputProps => {
+        switch (name) {
+          case 'zone':
+            return (
+              <ZoneSelect
+                id={inputProps.id}
+                name={inputProps.name}
+                required={required}
+                label={label}
+                onChange={dispatchOnChange}
+                error={error}
+                info={info}
+                value={value}
+              />
+            );
+          default:
+            return <StyledInput {...inputProps} error={error} onChange={dispatchOnChange} />;
+        }
+      }}
+    </StyledInputField>
+  );
+};
+
+const fieldRenderPropTypes = {
+  info: PropTypes.array.isRequired,
+  name: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  label: PropTypes.string.isRequired,
+  value: PropTypes.string,
+  prefix: PropTypes.string,
+  required: PropTypes.bool,
+  fieldProps: PropTypes.object,
+};
+
+FormikLocationFieldRenderer.propTypes = fieldRenderPropTypes;
+SimpleLocationFieldRenderer.propTypes = fieldRenderPropTypes;
+
+/**
+ * This component aims to create a responsive address form based on the user's country that they select.
+ * Shopify has a good article about internationalizing address forms: https://ux.shopify.com/designing-address-forms-for-everyone-everywhere-f481f6baf513
+ * And they also have an API and npm package to tell you what address fields a country uses, and in what order https://github.com/Shopify/quilt/tree/master/packages/address
+ * Additional material:
+ * Shopify API country codes ("ISO 3166-1 alpha-2 country codes with some differences"): https://shopify.dev/docs/admin-api/graphql/reference/common-objects/countrycode
+ * Shopify locale code uses ISO locale codes: https://shopify.dev/docs/admin-api/graphql/reference/translations/locale
+ * How Etsy Localizes addresses https://codeascraft.com/2018/09/26/how-etsy-localizes-addresses/
+ * Form i18n techniques https://medium.com/flexport-design/form-internationalization-techniques-3e4d394cd7e5
+ */
+const I18nAddressFields = ({
+  selectedCountry,
+  value,
+  onCountryChange,
+  required,
+  prefix,
+  onLoadError,
+  Component,
+  fieldProps,
+}) => {
   const intl = useIntl();
   /** If country chosen from InputTypeCountry is one of missingCountries, use 'US' instead */
   const country = missingCountries.includes(selectedCountry) ? 'US' : selectedCountry;
@@ -136,6 +262,7 @@ const I18nAddressFields = ({ selectedCountry, value, onChange, onCountryChange, 
         setFields(addressFields);
         onCountryChange(getAddressFieldDifferences(value, addressFields));
       } catch (e) {
+        onLoadError?.();
         console.warn('Call to Shopify API failed. Falling back to plain address form. Error: ', e.message);
       } finally {
         setLoading(false);
@@ -144,31 +271,6 @@ const I18nAddressFields = ({ selectedCountry, value, onChange, onCountryChange, 
 
     fetchData();
   }, [selectedCountry]);
-
-  const zoneOptions = React.useMemo(() => {
-    if (!fields) {
-      return null;
-    }
-    const zoneFields = fields.find(field => field[0] === 'zone');
-    // If there are no zone fields for the country, return
-    if (isUndefined(zoneFields)) {
-      return null;
-    }
-    return getZoneSelectOptions(zoneFields);
-  }, [fields]);
-
-  const isFieldRequired = fieldName => {
-    return isUndefined(required) ? !Object.keys(data?.optionalLabels).includes(fieldName) : required;
-  };
-
-  React.useEffect(() => {
-    if (zoneOptions) {
-      const formValueZone = get(value, 'zone', undefined);
-      if (formValueZone && !zoneOptions.find(option => option.value === formValueZone)) {
-        onChange({ name: 'zone', value: null });
-      }
-    }
-  }, [zoneOptions]);
 
   if (!selectedCountry) {
     return null;
@@ -179,39 +281,23 @@ const I18nAddressFields = ({ selectedCountry, value, onChange, onCountryChange, 
   }
 
   return (
-    <Fragment>
-      {fields.map(([name, label]) => {
-        const required = isFieldRequired(name);
-        const validate = required ? value => (value ? undefined : `${label} is required`) : undefined;
-        return (
-          <Field key={name} name={`${prefix}.${name}`} validate={validate}>
-            {({ field, meta }) => (
-              <StyledInputField name={field.name} label={label} labelFontSize="13px" mt={3} error={meta.error}>
-                {name === 'zone'
-                  ? ({ id, name, required }) => (
-                      <StyledSelect
-                        {...{ name, required, ...field }}
-                        inputId={id}
-                        minWidth={150}
-                        options={zoneOptions}
-                        error={meta.error}
-                        placeholder={`Please select your ${label}`}
-                        data-cy={`payee-address-${name}`}
-                        onChange={v => {
-                          field.onChange({ target: { name: field.name, value: v.value } });
-                        }}
-                        value={zoneOptions.find(option => option?.value === field.value) || null}
-                      />
-                    )
-                  : inputProps => (
-                      <StyledInput {...inputProps} {...field} error={meta.error} data-cy={`payee-address-${name}`} />
-                    )}
-              </StyledInputField>
-            )}
-          </Field>
-        );
-      })}
-    </Fragment>
+    <React.Fragment>
+      {fields.map(([fieldName, fieldLabel, fieldInfo]) => (
+        <Component
+          key={fieldName}
+          prefix={prefix}
+          name={fieldName}
+          label={fieldLabel}
+          info={fieldInfo}
+          value={value?.[fieldName]}
+          required={!isUndefined(required) ? !Object.keys(data?.optionalLabels).includes(fieldName) : required}
+          fieldProps={fieldProps}
+          onChange={({ target: { name, value: fieldValue } }) =>
+            onCountryChange(set(cloneDeep(value || {}), name, fieldValue))
+          }
+        />
+      ))}
+    </React.Fragment>
   );
 };
 
@@ -223,8 +309,17 @@ I18nAddressFields.propTypes = {
   required: PropTypes.bool,
   /** String if using old address textarea; object if using new address fields. */
   value: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
-  onChange: PropTypes.func,
-  onCountryChange: PropTypes.func.isRequired,
+  onCountryChange: PropTypes.func.isRequired, // TODO Rename this prop, it's not doing what the name implies
+  /** Called when the call to the Shopify API fails */
+  onLoadError: PropTypes.func,
+  /** A function used to render the field */
+  Component: PropTypes.func,
+  /** Additional props to be passed to `Component` */
+  fieldProps: PropTypes.object,
+};
+
+I18nAddressFields.defaultProps = {
+  Component: FormikLocationFieldRenderer, // For legacy compatibility
 };
 
 export default I18nAddressFields;
