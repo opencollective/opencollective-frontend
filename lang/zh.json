@@ -14,6 +14,7 @@
   "7oAuzt": "Expense types",
   "94IjMb": "世界标准时间（UTC）",
   "9DioA1": "{count, plural, one {# Recurring} other {# Recurring}}",
+  "9FWGOh": "You need to be logged in as an admin or accountant to view this page",
   "9kdoVP": "本地时间: {localTime}{newLine}UTC 时间: {utcTime}",
   "9MpOZn": "Support the event or buy tickets.",
   "9sbPks": "页面上所有时间的处理和显示默认根据您本地的时区，而电子邮件的报告是以世界标准时间（UTC）来生成的。您可以切换页面时间至 UTC 来和邮件的时间保持一致",

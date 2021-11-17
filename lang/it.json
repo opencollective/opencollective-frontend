@@ -14,6 +14,7 @@
   "7oAuzt": "Expense types",
   "94IjMb": "Tempo Universale Coordinato",
   "9DioA1": "{count, plural, one {# Recurring} other {# Recurring}}",
+  "9FWGOh": "You need to be logged in as an admin or accountant to view this page",
   "9kdoVP": "Ora locale: {localTime}{newLine}ora UTC: {utcTime}",
   "9MpOZn": "Support the event or buy tickets.",
   "9sbPks": "Per impostazione predefinita, tutte le date sono filtrate e visualizzate utilizzando il fuso orario locale. È possibile passare a UTC per indicare che le date fornite sopra utilizzare il formato Coordinated Universal Time, che corrisponde a come vengono generati i report di posta elettronica",

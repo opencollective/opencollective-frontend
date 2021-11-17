@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getSettingsRoute } from '../../lib/url-helpers';
 
-import { getDefaultSectionForAccount } from '../../pages/admin-panel';
 import { Box } from '../Grid';
 import Link from '../Link';
 import StyledLink from '../StyledLink';
 
+import { AdminPanelContext } from './AdminPanelContext';
 import { SECTION_LABELS } from './constants';
 
 const MenuLinkContainer = styled.li`
@@ -49,13 +48,12 @@ const MenuLinkContainer = styled.li`
 `;
 
 export const MenuLink = ({ collective, section, children, onClick, isSelected, isStrong, if: conditional, isBeta }) => {
-  const router = useRouter();
+  const { selectedSection } = React.useContext(AdminPanelContext);
   const { formatMessage } = useIntl();
   if (conditional === false) {
     return null;
   }
 
-  const selectedSection = router.query?.section || getDefaultSectionForAccount(collective);
   if (!children && SECTION_LABELS[section]) {
     children = formatMessage(SECTION_LABELS[section]);
   }
