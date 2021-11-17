@@ -79,47 +79,42 @@ const getCategoryType = (startDate, endDate, hostCreatedAt) => {
   }
 };
 
-const constructDataPointObjects = (category, dataPoints) => {
-  let dataPointObject;
-  /*
-   * Show data for the past 5 years form the current year.
-   */
+const constructChartDataPoints = (category, dataPoints) => {
+  let chartDataPoints;
+
+  // Show data for the past 5 years from the current year.
   if (category === 'YEAR') {
-    dataPointObject = new Array(6).fill(0);
+    chartDataPoints = new Array(6).fill(0);
     const currentYear = new Date().getFullYear();
     dataPoints.forEach(dataPoint => {
       const year = new Date(dataPoint.date).getFullYear();
       if (year > currentYear - 6) {
-        dataPointObject[5 - (currentYear - year)] = Math.abs(dataPoint.amount.value);
+        chartDataPoints[5 - (currentYear - year)] = Math.abs(dataPoint.amount.value);
       }
     });
-    /*
-     * Show data for the past the past 12 months from the current month.
-     */
+    // Show data for the past 12 months
   } else if (category === 'MONTH') {
-    dataPointObject = new Array(12).fill(0);
+    chartDataPoints = new Array(12).fill(0);
     dataPoints.forEach(dataPoint => {
       const date = new Date(dataPoint.date);
       const today = new Date();
       if (today.getFullYear() - date.getFullYear() <= 1) {
-        dataPointObject[(date.getMonth() + (12 - today.getMonth())) % 12] = Math.abs(dataPoint.amount.value);
+        chartDataPoints[(date.getMonth() + (12 - today.getMonth())) % 12] = Math.abs(dataPoint.amount.value);
       }
     });
-    /*
-     * Show data for past 7 days from the current day.
-     */
+    // Show data for the past 7 days
   } else if (category === 'WEEK') {
-    dataPointObject = new Array(7).fill(0);
+    chartDataPoints = new Array(7).fill(0);
     dataPoints.forEach(dataPoint => {
       const date = new Date(dataPoint.date);
       const today = new Date();
       if (today.getFullYear() === date.getFullYear() && today.getMonth() === date.getMonth()) {
-        dataPointObject[date.getDay() % 7] = Math.abs(dataPoint.amount.value);
+        chartDataPoints[date.getDay() % 7] = Math.abs(dataPoint.amount.value);
       }
     });
   }
 
-  return dataPointObject;
+  return chartDataPoints;
 };
 
 const getTransactionsAreaChartData = host => {
@@ -267,12 +262,12 @@ const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
     {
       name: 'Contributions',
       data: contributionAmountOverTime
-        ? constructDataPointObjects(categoryType, contributionAmountOverTime.nodes)
+        ? constructChartDataPoints(categoryType, contributionAmountOverTime.nodes)
         : null,
     },
     {
       name: 'Expenses',
-      data: expenseAmountOverTime ? constructDataPointObjects(categoryType, expenseAmountOverTime.nodes) : null,
+      data: expenseAmountOverTime ? constructChartDataPoints(categoryType, expenseAmountOverTime.nodes) : null,
     },
   ];
 
