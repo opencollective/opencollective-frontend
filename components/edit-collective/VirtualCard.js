@@ -307,7 +307,7 @@ const VirtualCard = props => {
         color="black.900"
         minHeight="48px"
         px="24px"
-        justifyContent={props.hasActions ? 'space-between' : 'flex-end'}
+        justifyContent={'space-between'}
         alignItems="center"
         shrink={0}
       >
@@ -319,6 +319,7 @@ const VirtualCard = props => {
             editHandler={props.editHandler}
           />
         )}
+        <React.Fragment>{props.provider}</React.Fragment>
         <Action onClick={() => setDisplayDetails(!displayDetails)}>
           {displayDetails ? (
             <React.Fragment>
@@ -352,6 +353,7 @@ VirtualCard.propTypes = {
   name: PropTypes.string,
   data: PropTypes.object,
   privateData: PropTypes.object,
+  provider: PropTypes.string,
   spendingLimitAmount: PropTypes.number,
   spendingLimitInterval: PropTypes.string,
   createdAt: PropTypes.string,
