@@ -59,6 +59,7 @@ class EditCollectiveForm extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
     status: PropTypes.string, // loading, saved
+    section: PropTypes.string,
     onSubmit: PropTypes.func,
     LoggedInUser: PropTypes.object.isRequired,
     router: PropTypes.object, // from withRouter
@@ -634,7 +635,7 @@ class EditCollectiveForm extends React.Component {
   render() {
     const { collective, status, intl, router, contentOnly } = this.props;
 
-    const section = get(router, 'query.section', 'info');
+    const section = this.props.section || get(router, 'query.section', 'info');
 
     const isNew = !(collective && collective.id);
     let submitBtnMessageId = isNew ? 'event.create.btn' : 'save';

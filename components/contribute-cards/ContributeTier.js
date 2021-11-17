@@ -75,6 +75,18 @@ const TierTitle = ({ collective, tier }) => {
   }
 };
 
+TierTitle.propTypes = {
+  collective: PropTypes.shape({
+    slug: PropTypes.string,
+  }),
+  tier: PropTypes.shape({
+    id: PropTypes.string,
+    slug: PropTypes.string,
+    name: PropTypes.string,
+    useStandalonePage: PropTypes.bool,
+  }),
+};
+
 const ContributeTier = ({ intl, collective, tier, ...props }) => {
   const { stats } = tier;
   const currency = tier.currency || collective.currency;
@@ -94,7 +106,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
       minAmount: minAmount || 0,
       tierName: tier.name,
       minAmountWithCurrency: minAmount && formatCurrency(minAmount, currency),
-      interval: tier.interval,
+      interval: tier.interval ?? '',
     });
   }
 

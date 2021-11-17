@@ -106,21 +106,18 @@ const HostFeesSection = ({ host, collectives, isLoading }) => {
           </P>
         </Container>
         <Container px={2} textAlign="right">
-          <StyledLinkButton asLink color="#46347F" onClick={() => setShowHostFeeChart(!showHostFeeChart)}>
+          <StyledLinkButton asLink onClick={() => setShowHostFeeChart(!showHostFeeChart)}>
             <P fontSize="12px" fontWeight="400" mt="16px">
-              <FormattedMessage defaultMessage="See historical" />
+              <FormattedMessage defaultMessage="See historic" />
               <Span pl="8px">
-                {showHostFeeChart ? (
-                  <ChevronUp size={12} color="#46347F" />
-                ) : (
-                  <ChevronDown fontVariant="solid" size={12} color="#46347F" />
-                )}
+                {showHostFeeChart ? <ChevronUp size={12} /> : <ChevronDown fontVariant="solid" size={12} />}
               </Span>
             </P>
           </StyledLinkButton>
         </Container>
       </Flex>
-      {showHostFeeChart && <HostFeesSectionHistorical collectives={collectives} hostSlug={host.slug} />}
+      {showHostFeeChart && isLoading && <LoadingPlaceholder height={250} />}
+      {showHostFeeChart && !isLoading && <HostFeesSectionHistorical collectives={collectives} hostSlug={host.slug} />}
     </React.Fragment>
   );
 };

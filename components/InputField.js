@@ -98,6 +98,20 @@ function FieldGroup({ label, help, pre, post, after, button, className, isPrivat
   }
 }
 
+FieldGroup.propTypes = {
+  key: PropTypes.string,
+  name: PropTypes.string,
+  label: PropTypes.string,
+  help: PropTypes.string,
+  pre: PropTypes.string,
+  post: PropTypes.string,
+  after: PropTypes.string,
+  button: PropTypes.node,
+  className: PropTypes.string,
+  isPrivate: PropTypes.bool,
+  validationState: PropTypes.string,
+};
+
 const InputFieldContainer = styled.div`
   label {
     margin-top: 5px;

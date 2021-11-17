@@ -86,6 +86,11 @@ const ExpenseInvoicePreview = ({ isLoading, fileURL }) => {
   }
 };
 
+ExpenseInvoicePreview.propTypes = {
+  isLoading: PropTypes.bool,
+  fileURL: PropTypes.string,
+};
+
 const ExpenseFilesPreviewModal = ({ collective, expense, show, onClose }) => {
   const [invoiceFile, setInvoiceFile] = React.useState(false);
   const [invoiceBlob, setInvoiceBlob] = React.useState(null);
