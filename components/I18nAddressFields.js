@@ -77,7 +77,7 @@ const getAddressFieldDifferences = (formAddressValues, addressFields) => {
   if (differenceInAddressFields) {
     return pick(formAddressValues, addressFieldsArray);
   } else {
-    return null;
+    return formAddressValues;
   }
 };
 
@@ -194,7 +194,7 @@ export const SimpleLocationFieldRenderer = ({ name, label, required, prefix, val
               />
             );
           default:
-            return <StyledInput {...inputProps} error={error} onChange={dispatchOnChange} />;
+            return <StyledInput {...inputProps} value={value} error={error} onChange={dispatchOnChange} />;
         }
       }}
     </StyledInputField>
