@@ -77,6 +77,16 @@ const ItemTitleWrapper = ({ expense, children }) => {
   }
 };
 
+ItemTitleWrapper.propTypes = {
+  children: PropTypes.func.isRequired,
+  expense: PropTypes.shape({
+    legacyId: PropTypes.string,
+    account: PropTypes.shape({
+      slug: PropTypes.string,
+    }),
+  }),
+};
+
 const KindTag = styled(StyledTag).attrs({
   variant: 'rounded-left',
   type: 'grey',

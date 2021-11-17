@@ -283,6 +283,21 @@ const ContributionInterval = ({ tier, contribution }) => {
   }
 };
 
+ContributionInterval.propTypes = {
+  tier: PropTypes.shape({
+    id: PropTypes.string,
+    interval: PropTypes.string,
+  }),
+  contribution: PropTypes.shape({
+    tier: PropTypes.shape({
+      id: PropTypes.string,
+      interval: PropTypes.string,
+    }),
+    frequency: PropTypes.string,
+  }),
+  onCloseEdit: PropTypes.func,
+};
+
 const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
   // GraphQL mutations and queries
   const queryVariables = { slug: contribution.toAccount.slug };

@@ -94,6 +94,9 @@ FormattedMoneyAmount.propTypes = {
   frequency: PropTypes.oneOf(['MONTHLY', 'YEARLY', 'ONETIME']),
   /** Style for the amount (eg. `$10`). Doesn't apply on interval */
   amountStyles: PropTypes.object,
+  currencyCodeStyles: PropTypes.object,
+  formatWithSeparators: PropTypes.bool,
+  isCrypto: PropTypes.bool,
 };
 
 FormattedMoneyAmount.defaultProps = {

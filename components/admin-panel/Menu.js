@@ -195,6 +195,11 @@ Menu.propTypes = {
     name: PropTypes.string,
     type: PropTypes.string,
     isHost: PropTypes.bool,
+    host: PropTypes.object,
+    features: PropTypes.shape({
+      USE_PAYMENT_METHODS: PropTypes.string,
+      EMIT_GIFT_CARDS: PropTypes.string,
+    }),
   }),
 };
 

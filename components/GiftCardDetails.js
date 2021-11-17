@@ -48,6 +48,17 @@ const GiftCardStatus = ({ isConfirmed, collective, data }) => {
   }
 };
 
+GiftCardStatus.propTypes = {
+  isConfirmed: PropTypes.bool,
+  collective: PropTypes.shape({
+    slug: PropTypes.string,
+    name: PropTypes.string,
+  }),
+  data: PropTypes.shape({
+    email: PropTypes.string,
+  }),
+};
+
 /**
  * Render GiftCard details like its status (claimed or not), who claimed it,
  * when was it created... It is not meant to be show to all users, but just to
