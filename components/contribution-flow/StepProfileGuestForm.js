@@ -25,8 +25,10 @@ const shouldRequireAllInfo = amount => {
 
 export const validateGuestProfile = (stepProfile, stepDetails, showError) => {
   if (shouldRequireAllInfo(getTotalAmount(stepDetails))) {
-    const { location, name } = stepProfile;
-    if (!name || !location.country || !(location.address || location.structured)) {
+    const { name, legalName } = stepProfile;
+    const location = stepProfile.location || {};
+    const hasNameOrLegalName = name || legalName;
+    if (!hasNameOrLegalName || !location.country || !(location.address || location.structured)) {
       return false;
     }
   }
