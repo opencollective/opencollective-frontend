@@ -43,7 +43,7 @@ const messages = defineMessages({
   },
 });
 
-const Tab = ({ active, children, setActive }) => (
+const Tab = ({ active, children, setActive, 'data-cy': dataCy }) => (
   <Container
     bg={active ? 'white.full' : 'black.50'}
     color="black.700"
@@ -55,6 +55,7 @@ const Tab = ({ active, children, setActive }) => (
     tabIndex={0}
     onClick={setActive}
     onKeyDown={event => event.key === 'Enter' && setActive(event)}
+    data-cy={dataCy}
   >
     <P fontWeight={active ? '600' : 'normal'}>{children}</P>
   </Container>
@@ -64,6 +65,7 @@ Tab.propTypes = {
   active: PropTypes.bool,
   children: PropTypes.node,
   setActive: PropTypes.func,
+  'data-cy': PropTypes.string,
 };
 
 const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
@@ -174,7 +176,12 @@ const CreateProfile = ({
     <StyledCard width={1} maxWidth={480} {...props}>
       <Flex>
         {tabs.map(tab => (
-          <Tab key={tab} active={activeTab === tab} setActive={() => setActiveTab(tab)}>
+          <Tab
+            key={tab}
+            active={activeTab === tab}
+            setActive={() => setActiveTab(tab)}
+            data-cy={`createProfile-tab-${tab}`}
+          >
             {labels?.[tab] || DEFAULT_LABELS[tab]}
           </Tab>
         ))}

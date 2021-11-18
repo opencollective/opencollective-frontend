@@ -547,6 +547,7 @@
   "ContributionFlow.CollectiveProfile": "Profil du Collectif",
   "ContributionFlow.Contribution": "Contribution",
   "ContributionFlow.CreateOrganizationLabel": "Contribute as an organization",
+  "ContributionFlow.CreateUserLabel": "Contribute as an individual",
   "ContributionFlow.goBackToGuest": "Go back to contribute as a guest",
   "ContributionFlow.noSupportedPaymentMethods": "Aucun moyen de paiement disponible",
   "ContributionFlow.OrganizationProfile": "Profil de l'Organisation",
