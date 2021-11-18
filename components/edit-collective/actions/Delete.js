@@ -103,7 +103,7 @@ const DeleteCollective = ({ collective, ...props }) => {
             <FormattedMessage
               id="collective.delete.selfHost"
               defaultMessage={`To delete this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
-              values={{ SettingsLink: getI18nLink({ href: `/${collective.host?.slug}/edit/host` }) }}
+              values={{ SettingsLink: getI18nLink({ href: `/${collective.host?.slug}/admin/host` }) }}
             />
           ) : (
             <FormattedMessage

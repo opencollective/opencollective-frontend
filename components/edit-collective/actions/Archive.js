@@ -154,7 +154,7 @@ const ArchiveCollective = ({ collective }) => {
             <FormattedMessage
               id="collective.archive.selfHosted"
               defaultMessage={`To archive this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
-              values={{ SettingsLink: getI18nLink({ href: `/${collective.host?.slug}/edit/host` }) }}
+              values={{ SettingsLink: getI18nLink({ href: `/${collective.host?.slug}/admin/host` }) }}
             />
           ) : (
             <FormattedMessage
