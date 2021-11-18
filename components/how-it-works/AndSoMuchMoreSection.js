@@ -77,7 +77,7 @@ const MoreFeatures = () => (
           </H3>
           <P fontSize="18px" lineHeight="26px" color="black.700" fontWeight="500">
             <FormattedMessage
-              id="howItWorks.events.description"
+              id="howItWorks.projects.description"
               defaultMessage="Manage a grant or raise money for a specific purpose, with flexible tools for segregating your budget."
             />
           </P>
