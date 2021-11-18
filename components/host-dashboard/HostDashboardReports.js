@@ -148,8 +148,8 @@ const getDefaultDateInterval = () => {
 const HostDashboardReports = ({ hostSlug }) => {
   const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
   const [collectives, setCollectives] = React.useState(null);
-  const dateFrom = simpleDateToISOString(dateInterval.from, false, dateInterval.timezoneType);
-  const dateTo = simpleDateToISOString(dateInterval.to, true, dateInterval.timezoneType);
+  const dateFrom = simpleDateToISOString(dateInterval?.from, false, dateInterval?.timezoneType);
+  const dateTo = simpleDateToISOString(dateInterval?.to, true, dateInterval?.timezoneType);
   const variables = { hostSlug, account: collectives, dateFrom, dateTo };
   const { data, error, loading } = useQuery(hostReportPageQuery, { variables, context: API_V2_CONTEXT });
   const host = data?.host;
