@@ -257,7 +257,7 @@ exports.REWRITES = [
   },
   // Marketing Pages
   {
-    source: `/:pageSlug(how-it-works|gift-of-giving|gift-cards)`,
+    source: `/:pageSlug(gift-of-giving|gift-cards)`,
     destination: '/marketingPage',
   },
   // New accept financial contributions flow
@@ -304,6 +304,10 @@ exports.REWRITES = [
   {
     source: '/become-a-sponsor',
     destination: '/become-a-sponsor',
+  },
+  {
+    source: '/how-it-works',
+    destination: '/how-it-works',
   },
   {
     source: '/member-invitations',
