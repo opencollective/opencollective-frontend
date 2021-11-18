@@ -200,7 +200,7 @@ const PotentialUsers = ({ users }) => {
     <Wrapper
       gridTemplateColumns={['100%', 'repeat(2, 1fr)', null, null, 'repeat(3, 1fr)']}
       placeItems="center"
-      alignItems="center"
+      alignItems="flex-start"
     >
       {users.map(user => (
         <PotentialUser key={user.id} id={user.id} />
