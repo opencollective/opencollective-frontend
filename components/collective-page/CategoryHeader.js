@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Info } from '@styled-icons/feather/Info';
 import themeGet from '@styled-system/theme-get';
+import { find } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -14,7 +15,7 @@ import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
 import { P } from '../Text';
 
-import { Dimensions } from './_constants';
+import { Dimensions, Sections } from './_constants';
 import SectionTitle from './SectionTitle';
 
 import aboutSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconAbout.png';
@@ -98,35 +99,47 @@ const getCategoryData = (intl, collective, category) => {
           />
         ),
       };
-    case NAVBAR_CATEGORIES.CONTRIBUTE:
-      return {
-        img: contributeSectionHeaderIcon,
-        title:
-          collective.type === CollectiveType.EVENT ? (
-            <FormattedMessage defaultMessage="Get Involved" />
-          ) : (
-            i18nNavbarCategory(intl, category)
-          ),
-        subtitle:
-          collective.type === CollectiveType.EVENT ? (
-            <FormattedMessage defaultMessage="Support the event or buy tickets." />
-          ) : (
-            <FormattedMessage
-              id="CollectivePage.SectionContribute.Subtitle"
-              defaultMessage="Become a financial contributor."
-            />
-          ),
-        info:
-          collective.type === CollectiveType.EVENT ? (
-            <FormattedMessage defaultMessage="Support the event or buy tickets to attend." />
-          ) : (
-            <FormattedMessage
-              id="CollectivePage.SectionContribute.info"
-              defaultMessage="Support {collectiveName} by contributing to them once, monthly, or yearly."
-              values={{ collectiveName: collective.name }}
-            />
-          ),
-      };
+    case NAVBAR_CATEGORIES.CONTRIBUTE: {
+      const collectivePageSections = collective?.settings?.collectivePage?.sections;
+      const contributeCategory = find(collectivePageSections, { name: NAVBAR_CATEGORIES.CONTRIBUTE, type: 'CATEGORY' });
+      const contributeSection = find(contributeCategory?.sections, {
+        name: Sections.CONTRIBUTE,
+        type: 'SECTION',
+        isEnabled: true,
+      });
+      if (contributeCategory && contributeSection) {
+        return {
+          img: contributeSectionHeaderIcon,
+          title:
+            collective.type === CollectiveType.EVENT ? (
+              <FormattedMessage defaultMessage="Get Involved" />
+            ) : (
+              i18nNavbarCategory(intl, category)
+            ),
+          subtitle:
+            collective.type === CollectiveType.EVENT ? (
+              <FormattedMessage defaultMessage="Support the event or buy tickets." />
+            ) : (
+              <FormattedMessage
+                id="CollectivePage.SectionContribute.Subtitle"
+                defaultMessage="Become a financial contributor."
+              />
+            ),
+          info:
+            collective.type === CollectiveType.EVENT ? (
+              <FormattedMessage defaultMessage="Support the event or buy tickets to attend." />
+            ) : (
+              <FormattedMessage
+                id="CollectivePage.SectionContribute.info"
+                defaultMessage="Support {collectiveName} by contributing to them once, monthly, or yearly."
+                values={{ collectiveName: collective.name }}
+              />
+            ),
+        };
+      } else {
+        return null;
+      }
+    }
     case NAVBAR_CATEGORIES.CONTRIBUTIONS:
       return {
         img: contributeSectionHeaderIcon,
