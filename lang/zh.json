@@ -2175,6 +2175,7 @@
   "user.since.label": "Since",
   "UserCollective.incognito.description": "This user has decided to remain incognito",
   "UserCollective.incognito.title": "隐身的用户",
+  "v2j/7L": "An error ocurred while preparing the form for bank accounts. Please contact <I18nSupportLink>support</I18nSupportLink>",
   "VerifyButton": "Verify",
   "VerifyEmailAddress": "验证你的电子邮件地址",
   "VerifyEmailInstructions": "A verification email has been sent to {email}. Click the link to complete submitting this expense. If you have not received the email, please check your spam.",

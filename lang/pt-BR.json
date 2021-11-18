@@ -2175,6 +2175,7 @@
   "user.since.label": "Since",
   "UserCollective.incognito.description": "Este usuário decidiu permanecer anônimo",
   "UserCollective.incognito.title": "Usuário anônimo",
+  "v2j/7L": "An error ocurred while preparing the form for bank accounts. Please contact <I18nSupportLink>support</I18nSupportLink>",
   "VerifyButton": "Verificar",
   "VerifyEmailAddress": "Verifique seu endereço de e-mail",
   "VerifyEmailInstructions": "Um email de verificação foi enviado para {email}. Clique no link para concluir o envio desta despesa. Se você não recebeu o e-mail, por favor, verifique seu spam.",
