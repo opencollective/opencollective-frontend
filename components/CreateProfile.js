@@ -369,12 +369,6 @@ const CreateProfile = ({
               label={formatMessage(messages.legalName)}
               mt={3}
               isPrivate
-              hint={
-                <FormattedMessage
-                  id="legalName.description"
-                  defaultMessage="The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name."
-                />
-              }
             >
               {inputProps => (
                 <StyledInput

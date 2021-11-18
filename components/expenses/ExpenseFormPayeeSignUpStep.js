@@ -313,6 +313,7 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
                 <StyledInputField
                   name={field.name}
                   isPrivate
+                  required={false}
                   label={formatMessage(msg.legalName)}
                   labelFontSize="13px"
                   mt={3}
