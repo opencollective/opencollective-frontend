@@ -54,7 +54,7 @@ const getQueryVariables = (hostSlug, year, collectives) => {
 const getSeriesFromData = (intl, timeSeries) => {
   const dataToSeries = data => {
     const series = new Array(12).fill(0); // = 12 months
-    data?.forEach(({ date, amount }) => (series[new Date(date).getMonth() + 1] = Math.abs(amount.value)));
+    data?.forEach(({ date, amount }) => (series[new Date(date).getMonth() + 1] = amount.value));
     return series;
   };
 
