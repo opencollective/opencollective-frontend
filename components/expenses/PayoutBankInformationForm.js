@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
@@ -237,6 +237,10 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     //      * The Collective Host doesn't have Wise configured and `host` is already switched to the Platform account
     variables: { slug: host ? host.slug : TW_API_COLLECTIVE_SLUG, currency },
   });
+
+  useEffect(() => {
+    refetch({ accountDetails: get(formik.values, getFieldName('data')) });
+  }, []);
 
   if (loading && !data) {
     return <StyledSpinner />;
