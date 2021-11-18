@@ -259,7 +259,19 @@ const ApplicationForm = ({
                               defaultMessage="About you and your initiative {padlock} {questionMark}"
                               values={{
                                 padlock: <Lock size="12px" color="#9D9FA3" />,
-                                questionMark: <Question size="13px" color="#DADADA" />,
+                                questionMark: (
+                                  <Question
+                                    title={
+                                      <FormattedMessage
+                                        defaultMessage={
+                                          'Tell us more about your collective. This information is private and only used for internal purposes.'
+                                        }
+                                      />
+                                    }
+                                    size="13px"
+                                    color="#DADADA"
+                                  />
+                                ),
                               }}
                             />
                           </H4>
