@@ -238,6 +238,9 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     variables: { slug: host ? host.slug : TW_API_COLLECTIVE_SLUG, currency },
   });
 
+  // Make sure we load the form data on initial load. Otherwise certain form fields such
+  // as the state field in the "Recipient's Address" section might not be visible on first load
+  // and only be visible after the user reselect the country.
   useEffect(() => {
     refetch({ accountDetails: get(formik.values, getFieldName('data')) });
   }, []);
