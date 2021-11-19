@@ -24,6 +24,10 @@ const messages = defineMessages({
     id: 'User.FullName',
     defaultMessage: 'Full name',
   },
+  legalName: {
+    id: 'LegalName',
+    defaultMessage: 'Legal Name',
+  },
   orgName: {
     id: 'Organization.Name',
     defaultMessage: 'Organization name',
@@ -193,7 +197,7 @@ const CreateProfile = ({
           p={4}
           onSubmit={event => {
             event.preventDefault();
-            const data = pick(state, ['name', 'newsletterOptIn']);
+            const data = pick(state, ['name', 'legalName', 'newsletterOptIn']);
             onPersonalSubmit({ ...data, email });
           }}
           method="POST"
@@ -207,6 +211,26 @@ const CreateProfile = ({
             >
               {inputProps => (
                 <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g., John Doe" />
+              )}
+            </StyledInputField>
+          </Box>
+          <Box mb={24}>
+            <StyledInputField
+              name="legalName"
+              htmlFor="legalName"
+              required={false}
+              label={formatMessage(messages.legalName)}
+              mt={3}
+              isPrivate
+              hint={
+                <FormattedMessage
+                  id="legalName.description"
+                  defaultMessage="The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name."
+                />
+              }
+            >
+              {inputProps => (
+                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g., John Dawson" />
               )}
             </StyledInputField>
           </Box>
@@ -244,7 +268,7 @@ const CreateProfile = ({
             fontWeight="600"
             loading={submitting}
           >
-            <FormattedMessage id="contribution.createPersoProfile" defaultMessage="Create Personal Profile" />
+            {DEFAULT_LABELS.personal}
           </StyledButton>
         </Box>
       )}
@@ -257,7 +281,9 @@ const CreateProfile = ({
             event.preventDefault();
             const data = pick(state, [
               'name',
+              'legalName',
               'orgName',
+              'orgLegalName',
               'website',
               'githubHandle',
               'twitterHandle',
@@ -279,6 +305,26 @@ const CreateProfile = ({
             >
               {inputProps => (
                 <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g., John Doe" />
+              )}
+            </StyledInputField>
+          </Box>
+          <Box mb={24}>
+            <StyledInputField
+              name="legalName"
+              htmlFor="legalName"
+              required={false}
+              label={formatMessage(messages.legalName)}
+              mt={3}
+              isPrivate
+              hint={
+                <FormattedMessage
+                  id="legalName.description"
+                  defaultMessage="The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name."
+                />
+              }
+            >
+              {inputProps => (
+                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g., John Dawson" />
               )}
             </StyledInputField>
           </Box>
@@ -318,6 +364,24 @@ const CreateProfile = ({
                   {...getFieldProps(inputProps.name)}
                   placeholder="e.g., AirBnb, Women Who Code"
                   required
+                />
+              )}
+            </StyledInputField>
+          </Box>
+          <Box mb={24}>
+            <StyledInputField
+              name="orgLegalName"
+              htmlFor="orgLegalName"
+              required={false}
+              label={formatMessage(messages.legalName)}
+              mt={3}
+              isPrivate
+            >
+              {inputProps => (
+                <StyledInput
+                  {...inputProps}
+                  {...getFieldProps(inputProps.name)}
+                  placeholder="e.g., Open Collective Inc."
                 />
               )}
             </StyledInputField>
@@ -382,7 +446,7 @@ const CreateProfile = ({
             fontWeight="600"
             loading={submitting}
           >
-            <FormattedMessage id="contribution.createOrgProfile" defaultMessage="Create Organization Profile" />
+            {DEFAULT_LABELS.organization}
           </StyledButton>
         </Box>
       )}

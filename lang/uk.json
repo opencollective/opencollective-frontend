@@ -1403,6 +1403,7 @@
   "LearnMore": "Докладніше",
   "LearnMoreAboutServiceFees": "Докладніше про платню для {service}",
   "LegalName": "Юридично точне ім'я",
+  "legalName.description": "The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name.",
   "li7Ez6": "Past Week",
   "loading": "завантаження",
   "loadMore": "завантажити ще",
