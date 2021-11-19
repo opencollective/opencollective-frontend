@@ -340,15 +340,10 @@ class ContributionFlow extends React.Component {
 
       // PayPal
     } else if (stepPayment.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL) {
-      paymentMethod.paypalInfo = pick(stepPayment.paymentMethod.paypalInfo, [
-        'token',
-        'data',
-        'isNewApi',
-        'orderId',
-        'subscriptionId',
-      ]);
+      const paypalFields = ['token', 'data', 'orderId', 'subscriptionId'];
+      paymentMethod.paypalInfo = pick(stepPayment.paymentMethod.paypalInfo, paypalFields);
       // Define the right type (doesn't matter that much today, but make it future proof)
-      if (paymentMethod.paypalInfo.isNewApi && paymentMethod.paypalInfo.subscriptionId) {
+      if (paymentMethod.paypalInfo.subscriptionId) {
         paymentMethod.type === PAYMENT_METHOD_TYPE.SUBSCRIPTION;
       }
     }
@@ -665,7 +660,7 @@ class ContributionFlow extends React.Component {
                 paymentMethod: {
                   service: PAYMENT_METHOD_SERVICE.PAYPAL,
                   type: PAYMENT_METHOD_TYPE.PAYMENT,
-                  paypalInfo: { isNewApi: true, ...paypalInfo },
+                  paypalInfo,
                 },
               },
             }),
