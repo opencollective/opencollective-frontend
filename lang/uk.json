@@ -547,6 +547,7 @@
   "ContributionFlow.CollectiveProfile": "Профіль Колективу",
   "ContributionFlow.Contribution": "Внесок",
   "ContributionFlow.CreateOrganizationLabel": "Contribute as an organization",
+  "ContributionFlow.CreateUserLabel": "Contribute as an individual",
   "ContributionFlow.goBackToGuest": "Go back to contribute as a guest",
   "ContributionFlow.noSupportedPaymentMethods": "Немає доступного постачальника платежу",
   "ContributionFlow.OrganizationProfile": "Профіль організації",

@@ -547,6 +547,7 @@
   "ContributionFlow.CollectiveProfile": "Collective profile",
   "ContributionFlow.Contribution": "コントリビューション",
   "ContributionFlow.CreateOrganizationLabel": "Contribute as an organization",
+  "ContributionFlow.CreateUserLabel": "Contribute as an individual",
   "ContributionFlow.goBackToGuest": "Go back to contribute as a guest",
   "ContributionFlow.noSupportedPaymentMethods": "利用可能な支払いプロバイダがありません",
   "ContributionFlow.OrganizationProfile": "組織プロフィール",
