@@ -1,6 +1,7 @@
 {
   "+n7iNv": "上个月",
   "/k+sys": "Host Fees charged each month, which will be added to the Host budget at the end of the month.",
+  "03Q893": "This can be edited later",
   "23P2mL": "You can view the status of your transaction at the Blockchain explorer: {link}",
   "2FA.PleaseEnterCode": "双重身份验证已启用：请输入您的密码。",
   "2zdoiv": "Are you sure you want to clear the expense form?",
@@ -816,7 +817,6 @@
   "EditUserEmailForm.reSend": "重新发送确认",
   "EditUserEmailForm.submit": "确认新电子邮件",
   "EditUserEmailForm.success": "一封含有确认链接的电子邮件已发送至 {email}。请点击链接来验证您的电子邮件地址。",
-  "EIERMS": "Set your URL (This can be edited later)",
   "Email": "电子邮箱",
   "emptyBalance": "空余额",
   "EmptyCollectivePage": "{collective} is still working on its public profile. In the mean time you can check out some other Collectives!",
@@ -1527,6 +1527,7 @@
   "NoThankYou": "No thank you",
   "ntqqkx": "The display name is public and the legal name is private, appearing on receipts, invoices, and other official documentation used for tax and accounting purposes.",
   "NxdQhd": "Host revenue",
+  "o1Mxci": "Set your URL {questionMark}",
   "OC.tagline": "让你的社区可持续发展，透明地收集并使用资金。",
   "OC.tos.label": "I agree with the <TOSLink>terms of service</TOSLink> of Open Collective.",
   "OCE.description": "针对位于欧盟的团体",

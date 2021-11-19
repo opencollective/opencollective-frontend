@@ -1,6 +1,7 @@
 {
   "+n7iNv": "Прошлый месяц",
   "/k+sys": "Host Fees charged each month, which will be added to the Host budget at the end of the month.",
+  "03Q893": "This can be edited later",
   "23P2mL": "Вы можете просмотреть статус вашей транзакции в обозревателе блокчейна: {link}",
   "2FA.PleaseEnterCode": "Двухфакторная аутентификация включена: пожалуйста, введите ваш код.",
   "2zdoiv": "Are you sure you want to clear the expense form?",
@@ -816,7 +817,6 @@
   "EditUserEmailForm.reSend": "Выслать подтверждение повторно",
   "EditUserEmailForm.submit": "Подтвердить новый email",
   "EditUserEmailForm.success": "An email with a confirmation link has been sent to {email}. Please click the link to validate your email address.",
-  "EIERMS": "Set your URL (This can be edited later)",
   "Email": "Email",
   "emptyBalance": "Нулевой Баланс",
   "EmptyCollectivePage": "{collective} is still working on its public profile. In the mean time you can check out some other Collectives!",
@@ -1527,6 +1527,7 @@
   "NoThankYou": "Нет, спасибо",
   "ntqqkx": "The display name is public and the legal name is private, appearing on receipts, invoices, and other official documentation used for tax and accounting purposes.",
   "NxdQhd": "Host revenue",
+  "o1Mxci": "Set your URL {questionMark}",
   "OC.tagline": "Сделайте ваше сообщество устойчивым. Собирайте и тратите деньги прозрачно.",
   "OC.tos.label": "I agree with the <TOSLink>terms of service</TOSLink> of Open Collective.",
   "OCE.description": "Для групп в ЕС (Европейском Союзе)",

@@ -365,7 +365,20 @@ const ApplicationForm = ({
                           </Box>
                           <Box width={['256px', '234px', '324px']} my={2}>
                             <StyledInputFormikField
-                              label={i18nOCFApplicationFormLabel(intl, 'slug')}
+                              label={
+                                <FormattedMessage
+                                  defaultMessage="Set your URL {questionMark}"
+                                  values={{
+                                    questionMark: (
+                                      <Question
+                                        title={<FormattedMessage defaultMessage="This can be edited later" />}
+                                        size="13px"
+                                        color="#DADADA"
+                                      />
+                                    ),
+                                  }}
+                                />
+                              }
                               labelFontSize="13px"
                               labelColor="#4E5052"
                               labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -555,7 +568,7 @@ const ApplicationForm = ({
                             defaultMessage="If you have something to send us, please upload it to a storage service (Dropbox, Drive) and paste the sharing link here."
                           />
                         </P>
-                        <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
+                        <MessageBox type="info" withIcon fontSize="11px" lineHeight="16px" mt="20px">
                           <FormattedMessage
                             defaultMessage="Once your page is submitted, please be sure to have at least 2 admin (with First, Last Name) on your initiative's Team to ensure timely application processing. Instructions for adding admin <AdminAdditionDoc>here</AdminAdditionDoc>."
                             values={{
@@ -565,9 +578,9 @@ const ApplicationForm = ({
                               }),
                             }}
                           />
-                        </P>
+                        </MessageBox>
                       </Box>
-                      <Box width={['256px', '484px', '663px']} mb={2} mt="40px">
+                      <Box width={['256px', '484px', '663px']} mb={2} mt="20px">
                         <StyledHr />
                       </Box>
                       <Container
