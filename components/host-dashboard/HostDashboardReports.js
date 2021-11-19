@@ -48,7 +48,7 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
       hostFeePercent
       isTrustedHost
       stats {
-        balance {
+        balance(dateFrom: $dateFrom, dateTo: $dateTo) {
           valueInCents
           currency
         }
@@ -148,8 +148,8 @@ const getDefaultDateInterval = () => {
 const HostDashboardReports = ({ hostSlug }) => {
   const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
   const [collectives, setCollectives] = React.useState(null);
-  const dateFrom = simpleDateToISOString(dateInterval.from, false, dateInterval.timezoneType);
-  const dateTo = simpleDateToISOString(dateInterval.to, true, dateInterval.timezoneType);
+  const dateFrom = simpleDateToISOString(dateInterval?.from, false, dateInterval?.timezoneType);
+  const dateTo = simpleDateToISOString(dateInterval?.to, true, dateInterval?.timezoneType);
   const variables = { hostSlug, account: collectives, dateFrom, dateTo };
   const { data, error, loading } = useQuery(hostReportPageQuery, { variables, context: API_V2_CONTEXT });
   const host = data?.host;
@@ -209,6 +209,7 @@ const HostDashboardReports = ({ hostSlug }) => {
               styles={{ control: baseStyles => ({ ...baseStyles, borderRadius: 16 }) }}
               isLoading={loading}
               disabled={loading}
+              useCompactMode
             />
           </div>
           <Flex alignItems="flex-end" width="100%" mt={[24, 0]}>

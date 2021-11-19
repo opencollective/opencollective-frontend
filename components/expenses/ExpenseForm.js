@@ -6,6 +6,7 @@ import { first, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { accountSupportsGrants } from '../../lib/collective.lib';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -72,11 +73,17 @@ const msg = defineMessages({
     id: 'ExpenseForm.StepPayeeInvoice',
     defaultMessage: 'Payee information',
   },
-  resetExpense: {
-    defaultMessage: 'Reset Form',
+  cancelEditExpense: {
+    defaultMessage: 'Cancel Edit',
   },
-  confirmResetExpense: {
-    defaultMessage: 'Are you sure you want to reset the expense form?',
+  confirmCancelEditExpense: {
+    defaultMessage: 'Are you sure you want to cancel the edits?',
+  },
+  clearExpenseForm: {
+    defaultMessage: 'Clear Form',
+  },
+  confirmClearExpenseForm: {
+    defaultMessage: 'Are you sure you want to clear the expense form?',
   },
 });
 
@@ -221,6 +228,7 @@ const ExpenseFormBody = ({
   // Only true when logged in and drafting the expense
   const [isOnBehalf, setOnBehalf] = React.useState(false);
   const [showResetModal, setShowResetModal] = React.useState(false);
+  const editingExpense = expense !== undefined;
 
   // Scroll to top when step changes
   React.useEffect(() => {
@@ -370,7 +378,7 @@ const ExpenseFormBody = ({
           }}
           value={values.type}
           options={{
-            fundingRequest: collective.settings?.expenseTypes?.hasGrant === true,
+            fundingRequest: accountSupportsGrants(collective, collective?.host),
           }}
         />
       )}
@@ -576,14 +584,22 @@ const ExpenseFormBody = ({
                   <ConfirmationModal
                     show
                     onClose={() => setShowResetModal(false)}
-                    header={formatMessage(msg.resetExpense)}
-                    body={formatMessage(msg.confirmResetExpense)}
+                    header={editingExpense ? formatMessage(msg.cancelEditExpense) : formatMessage(msg.clearExpenseForm)}
+                    body={
+                      editingExpense
+                        ? formatMessage(msg.confirmCancelEditExpense)
+                        : formatMessage(msg.confirmClearExpenseForm)
+                    }
                     continueHandler={() => {
-                      setStep(STEPS.PAYEE);
-                      resetForm({ values: expense || getDefaultExpense(collective) });
-                      if (formPersister) {
-                        formPersister.clearValues();
-                        window.scrollTo(0, 0);
+                      if (editingExpense) {
+                        onCancel();
+                      } else {
+                        setStep(STEPS.PAYEE);
+                        resetForm({ values: getDefaultExpense(collective) });
+                        if (formPersister) {
+                          formPersister.clearValues();
+                          window.scrollTo(0, 0);
+                        }
                       }
                       setShowResetModal(false);
                     }}
@@ -601,7 +617,7 @@ const ExpenseFormBody = ({
                     onClick={() => setShowResetModal(true)}
                   >
                     <Undo size={11} />
-                    <Span mx={1}>{formatMessage(msg.resetExpense)}</Span>
+                    <Span mx={1}>{formatMessage(editingExpense ? msg.cancelEditExpense : msg.clearExpenseForm)}</Span>
                   </StyledButton>
                 )}
               </Flex>
@@ -637,7 +653,7 @@ ExpenseFormBody.propTypes = {
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
       settings: PropTypes.shape({
-        fundingRequest: PropTypes.bool,
+        disableGrantsByDefault: PropTypes.bool,
       }),
     }),
     settings: PropTypes.object,

@@ -47,6 +47,17 @@ const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, isCryp
   }
 };
 
+PrettyAmountFromStepDetails.propTypes = {
+  currency: PropTypes.string,
+  stepDetails: PropTypes.shape({
+    interval: PropTypes.string,
+    amount: PropTypes.number,
+    platformContribution: PropTypes.number,
+  }),
+  isFreeTier: PropTypes.bool,
+  isCrypto: PropTypes.bool,
+};
+
 const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, isFreeTier, currency, isCrypto }) => {
   if (step.name === STEPS.PROFILE) {
     if (stepProfile) {

@@ -12,6 +12,7 @@ describe('Contribution Flow: Sign In', () => {
     cy.get('button[data-cy="cf-next-step"]').click();
 
     cy.getByDataCy('cf-profile-signin-btn').click();
+    cy.contains('[data-cy="cf-content"] button', 'Join Free →').click();
     cy.contains('[data-cy="cf-content"] button', 'Sign In').click();
 
     cy.get('[data-cy="cf-content"] input[name=email]').type('zzzzzzzzzzzzz');
@@ -25,7 +26,6 @@ describe('Contribution Flow: Sign In', () => {
     cy.get('button[data-cy="cf-next-step"]').click();
 
     cy.getByDataCy('cf-profile-signin-btn').click();
-    cy.contains('[data-cy="cf-content"] button', 'Sign In').click();
 
     cy.get('[data-cy="cf-content"] input[name=email]').type(randomEmail());
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
@@ -37,7 +37,6 @@ describe('Contribution Flow: Sign In', () => {
     cy.get('button[data-cy="cf-next-step"]').click();
 
     cy.getByDataCy('cf-profile-signin-btn').click();
-    cy.contains('[data-cy="cf-content"] button', 'Sign In').click();
 
     cy.get('[data-cy="cf-content"] input[name=email]').type(validUserEmail);
     cy.get('[data-cy="cf-content"] button[type=submit]').click();

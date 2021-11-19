@@ -40,6 +40,7 @@ const hostedCollectivesQuery = gqlV2/* GraphQL */ `
       currency
       isHost
       type
+      settings
       hostFeePercent
       plan {
         id

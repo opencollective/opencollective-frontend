@@ -99,6 +99,7 @@ AddPaymentMethod.propTypes = {
     amount: PropTypes.object,
     frequency: PropTypes.string,
     toAccount: PropTypes.object,
+    tier: PropTypes.object,
   }),
 };
 

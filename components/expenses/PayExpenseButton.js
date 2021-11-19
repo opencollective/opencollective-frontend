@@ -71,6 +71,9 @@ const PayoutMethodTypeIcon = ({ type, host, ...props }) => {
 PayoutMethodTypeIcon.propTypes = {
   type: PropTypes.oneOf(Object.values(PayoutMethodType)),
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  host: PropTypes.shape({
+    transferwise: PropTypes.object,
+  }),
 };
 
 const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error, ...props }) => {

@@ -10,13 +10,14 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
+import { I18nSupportLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledSelect from '../StyledSelect';
 import StyledSpinner from '../StyledSpinner';
 import StyledTooltip from '../StyledTooltip';
-import { P } from '../Text';
+import { P, Span } from '../Text';
 
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
 const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => ({ label: name, value: key }));
@@ -59,8 +60,7 @@ const requiredFieldsQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const Input = props => {
-  const { input, getFieldName, disabled, currency, loading, refetch, formik, host } = props;
+const Input = ({ input, getFieldName, disabled, currency, loading, refetch, formik, host }) => {
   const isAccountHolderName = input.key === 'accountHolderName';
   const fieldName = isAccountHolderName ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
   let validate = input.required ? value => (value ? undefined : `${input.name} is required`) : undefined;
@@ -324,7 +324,9 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
       {Boolean(addressFields.length) && (
         <React.Fragment>
           <Box mt={3} flex="1" fontSize="14px" fontWeight="bold">
-            <FormattedMessage id="PayoutBankInformationForm.RecipientAddress" defaultMessage="Recipient's Address" />
+            <Span mr={2}>
+              <FormattedMessage id="PayoutBankInformationForm.RecipientAddress" defaultMessage="Recipient's Address" />
+            </Span>
             <StyledTooltip
               content={
                 <FormattedMessage
@@ -423,17 +425,14 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
   } else {
     // If at this point we don't have `fixedCurrency` or `availableCurrencies`,
     // we can display an error message, Wise is likely not configured on the platform
-    if (process.env.OC_ENV === 'development') {
-      return (
-        <MessageBox fontSize="12px" type="warning">
-          Could not fetch availableCurrencies, Wise is likely not configured on the platform.
-        </MessageBox>
-      );
-    } else {
-      // eslint-disable-next-line no-console
-      console.warn('Could not fetch availableCurrencies through Wise.');
-      return;
-    }
+    return (
+      <MessageBox fontSize="12px" type="warning">
+        <FormattedMessage
+          defaultMessage="An error ocurred while preparing the form for bank accounts. Please contact <I18nSupportLink>support</I18nSupportLink>"
+          values={{ I18nSupportLink }}
+        />
+      </MessageBox>
+    );
   }
 
   if (optional) {
@@ -458,7 +457,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
       const minAmountForSelectedCurrency =
         availableCurrencies.find(c => c.code === selectedCurrency)?.minInvoiceAmount * 100;
       if (invoiceTotalAmount < minAmountForSelectedCurrency) {
-        return `The minimum amount for transfering to ${selectedCurrency} is ${formatCurrency(
+        return `The minimum amount for transferring to ${selectedCurrency} is ${formatCurrency(
           minAmountForSelectedCurrency,
           wiseHost.currency,
         )}`;

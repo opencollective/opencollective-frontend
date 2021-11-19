@@ -4,10 +4,12 @@ import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { isHostAccount } from '../lib/collective.lib';
+import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
+import { AdminPanelContext } from '../components/admin-panel/AdminPanelContext';
 import AdminPanelSection from '../components/admin-panel/AdminPanelSection';
-import { ALL_SECTIONS } from '../components/admin-panel/constants';
+import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/admin-panel/constants';
 import AdminPanelSideBar from '../components/admin-panel/SideBar';
 import AdminPanelTopBar from '../components/admin-panel/TopBar';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
@@ -74,8 +76,19 @@ const messages = defineMessages({
   },
 });
 
-export const getDefaultSectionForAccount = account => {
-  return account && isHostAccount(account) ? ALL_SECTIONS.EXPENSES : ALL_SECTIONS.INFO;
+const getDefaultSectionForAccount = (account, loggedInUser) => {
+  if (!account) {
+    return ALL_SECTIONS.INFO;
+  }
+
+  const isAdmin = loggedInUser?.canEditCollective(account);
+  const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
+  const isAccountantOnly = !isAdmin && isAccountant;
+  if (isHostAccount(account)) {
+    return isAccountantOnly ? ALL_SECTIONS.REPORTS : ALL_SECTIONS.EXPENSES;
+  } else {
+    return isAccountantOnly ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.INFO;
+  }
 };
 
 const getNotification = (intl, account) => {
@@ -99,76 +112,91 @@ const getNotification = (intl, account) => {
   }
 };
 
-function getBlocker(LoggedInUser, account) {
+function getBlocker(LoggedInUser, account, section) {
   if (!LoggedInUser) {
     return <FormattedMessage id="mustBeLoggedIn" defaultMessage="You must be logged in to see this page" />;
   } else if (!account) {
     return <FormattedMessage defaultMessage="This account doesn't exist" />;
   } else if (account.isIncognito) {
     return <FormattedMessage defaultMessage="You cannot edit this collective" />;
-  } else if (!LoggedInUser.canEditCollective(account)) {
+  }
+
+  // Check permissions
+  const isAdmin = LoggedInUser.canEditCollective(account);
+  if (SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS.includes(section)) {
+    if (!isAdmin && !LoggedInUser.hasRole(roles.ACCOUNTANT, account)) {
+      return <FormattedMessage defaultMessage="You need to be logged in as an admin or accountant to view this page" />;
+    }
+  } else if (!isAdmin) {
     return <FormattedMessage defaultMessage="You need to be logged in as an admin" />;
   }
 }
 
+const getIsAccountantOnly = (LoggedInUser, account) => {
+  return LoggedInUser && !LoggedInUser.canEditCollective(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account);
+};
+
 const AdminPanelPage = () => {
   const router = useRouter();
-  const { slug } = router.query;
+  const { slug, section } = router.query;
   const intl = useIntl();
   const { LoggedInUser, loadingLoggedInUser } = useUser();
   const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
 
   const account = data?.account;
   const notification = getNotification(intl, account);
-  const section = router.query.section || getDefaultSectionForAccount(account);
+  const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
   const isLoading = loading || loadingLoggedInUser;
-  const blocker = !isLoading && getBlocker(LoggedInUser, account);
+  const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   return (
-    <Page>
-      {!blocker && (
-        <AdminPanelTopBar
-          isLoading={isLoading}
-          collective={data?.account}
-          collectiveSlug={slug}
-          selectedSection={section}
-          display={['flex', null, 'none']}
-        />
-      )}
-      {Boolean(notification) && (
-        <NotificationBar
-          status={notification.status}
-          title={notification.title}
-          description={notification.description}
-        />
-      )}
-      {blocker ? (
-        <Flex flexDirection="column" alignItems="center" my={6}>
-          <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
-            {blocker}
-          </MessageBox>
-          {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
-        </Flex>
-      ) : (
-        <Grid
-          gridTemplateColumns={['1fr', null, '208px 1fr']}
-          maxWidth={1280}
-          minHeight={600}
-          gridGap={64}
-          m="0 auto"
-          px={3}
-          py={4}
-        >
-          <AdminPanelSideBar
+    <AdminPanelContext.Provider value={{ selectedSection }}>
+      <Page>
+        {!blocker && (
+          <AdminPanelTopBar
             isLoading={isLoading}
-            collective={account}
-            selectedSection={section}
-            display={['none', null, 'block']}
+            collective={data?.account}
+            collectiveSlug={slug}
+            selectedSection={selectedSection}
+            display={['flex', null, 'none']}
           />
-          <AdminPanelSection section={section} isLoading={isLoading} collective={account} />
-        </Grid>
-      )}
-      ;
-    </Page>
+        )}
+        {Boolean(notification) && (
+          <NotificationBar
+            status={notification.status}
+            title={notification.title}
+            description={notification.description}
+          />
+        )}
+        {blocker ? (
+          <Flex flexDirection="column" alignItems="center" my={6}>
+            <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
+              {blocker}
+            </MessageBox>
+            {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
+          </Flex>
+        ) : (
+          <Grid
+            gridTemplateColumns={['1fr', null, '208px 1fr']}
+            maxWidth={1280}
+            minHeight={600}
+            gridGap={56}
+            m="0 auto"
+            px={3}
+            py={4}
+          >
+            <AdminPanelSideBar
+              isLoading={isLoading}
+              collective={account}
+              selectedSection={selectedSection}
+              display={['none', null, 'block']}
+              isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
+            />
+            <AdminPanelSection section={selectedSection} isLoading={isLoading} collective={account} />
+          </Grid>
+        )}
+        ;
+      </Page>
+    </AdminPanelContext.Provider>
   );
 };
 

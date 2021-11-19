@@ -33,26 +33,6 @@ const msg = defineMessages({
     id: 'User.EmailAddress',
     defaultMessage: 'Email address',
   },
-  inviteeType: {
-    id: 'ExpenseForm.inviteeIsOrganizationLabel',
-    defaultMessage: 'Are you submitting this expense for your organization (company)?',
-  },
-  orgNameLabel: {
-    id: 'ExpenseForm.inviteeOrgNameLabel',
-    defaultMessage: "What's the name of the organization?",
-  },
-  orgSlugLabel: {
-    id: 'createCollective.form.slugLabel',
-    defaultMessage: 'Set your URL',
-  },
-  orgWebsiteLabel: {
-    id: 'createOrg.form.websiteLabel',
-    defaultMessage: 'Organization website',
-  },
-  orgDescriptionLabel: {
-    id: 'ExpenseForm.inviteeOrgDescriptionLabel',
-    defaultMessage: 'What does your organization do?',
-  },
   payoutOptionLabel: {
     id: `ExpenseForm.PayoutOptionLabel`,
     defaultMessage: 'Payout method',
