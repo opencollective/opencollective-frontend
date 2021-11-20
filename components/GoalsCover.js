@@ -489,16 +489,15 @@ class GoalsCover extends React.Component {
           </div>
           <div className="amount">
             {amount}
-            {goal.type === 'yearlyBudget' ||
-              (goal.type === 'monthlyBudget' && (
-                <div className="interval">
-                  <FormattedMessage
-                    id="tier.interval"
-                    defaultMessage="per {interval, select, month {month} year {year} other {}}"
-                    values={{ interval: goal.type === 'yearlyBudget' ? 'year' : 'month' }}
-                  />
-                </div>
-              ))}
+            {(goal.type === 'yearlyBudget' || goal.type === 'monthlyBudget') && (
+              <div className="interval">
+                <FormattedMessage
+                  id="tier.interval"
+                  defaultMessage="per {interval, select, month {month} year {year} other {}}"
+                  values={{ interval: goal.type === 'yearlyBudget' ? 'year' : 'month' }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </GoalContainer>
