@@ -166,6 +166,10 @@ class GoalsCover extends React.Component {
         id: 'cover.bar.yearlyBudget',
         defaultMessage: 'Estimated Annual Budget',
       },
+      'bar.monthlyBudget': {
+        id: 'cover.bar.monthlyBudget',
+        defaultMessage: 'Estimated Monthly Budget',
+      },
     });
 
     const maxGoal = maxBy(get(props.collective, 'settings.goals', []), g => (g.title ? g.amount : 0));
@@ -242,7 +246,7 @@ class GoalsCover extends React.Component {
       }),
     ];
 
-    // Add yearly budget
+    // Add yearly and monthly budgets
     if (
       get(collective, 'stats.yearlyBudget') > 0 &&
       get(collective, 'stats.yearlyBudget') !== get(collective, 'stats.balance')
@@ -252,6 +256,16 @@ class GoalsCover extends React.Component {
           animateProgress: true,
           title: intl.formatMessage(this.messages['bar.yearlyBudget']),
           amount: get(collective, 'stats.yearlyBudget'),
+          precision: 0,
+          position: 'below',
+          isReached: true,
+        }),
+      );
+      goals.push(
+        this.createGoal('monthlyBudget', {
+          animateProgress: true,
+          title: intl.formatMessage(this.messages['bar.monthlyBudget']),
+          amount: get(collective, 'stats.yearlyBudget') / 12,
           precision: 0,
           position: 'below',
           isReached: true,
@@ -475,15 +489,16 @@ class GoalsCover extends React.Component {
           </div>
           <div className="amount">
             {amount}
-            {goal.type === 'yearlyBudget' && (
-              <div className="interval">
-                <FormattedMessage
-                  id="tier.interval"
-                  defaultMessage="per {interval, select, month {month} year {year} other {}}"
-                  values={{ interval: 'year' }}
-                />
-              </div>
-            )}
+            {goal.type === 'yearlyBudget' ||
+              (goal.type === 'monthlyBudget' && (
+                <div className="interval">
+                  <FormattedMessage
+                    id="tier.interval"
+                    defaultMessage="per {interval, select, month {month} year {year} other {}}"
+                    values={{ interval: goal.type === 'yearlyBudget' ? 'year' : 'month' }}
+                  />
+                </div>
+              ))}
           </div>
         </div>
       </GoalContainer>
