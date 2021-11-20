@@ -92,3 +92,5 @@ export default class CollectiveThemeProvider extends React.PureComponent {
     );
   }
 }
+
+export const { getTheme } = new CollectiveThemeProvider();

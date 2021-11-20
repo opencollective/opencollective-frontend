@@ -134,14 +134,59 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       }
       events(includePastEvents: true, includeInactive: true) {
         id
-        ...ContributeCardEventFields
+        slug
+        name
+        description
+        image
+        isActive
+        startsAt
+        endsAt
+        backgroundImageUrl(height: 208)
+        settings
+        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
+          id
+          image
+          collectiveSlug
+          name
+          type
+          isGuest
+        }
+        stats {
+          id
+          backers {
+            id
+            all
+            users
+            organizations
+          }
+        }
       }
       projects {
         id
-        ...ContributeCardProjectFields
-      }
-      admins: members(role: "ADMIN") {
-        id
+        slug
+        name
+        description
+        image
+        isActive
+        isArchived
+        backgroundImageUrl(height: 208)
+        settings
+        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER]) {
+          id
+          name
+          image
+          collectiveSlug
+          type
+        }
+        stats {
+          id
+          backers {
+            id
+            all
+            users
+            organizations
+          }
+        }
       }
       connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
         id
