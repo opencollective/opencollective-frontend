@@ -51,10 +51,19 @@ const getQueryVariables = (hostSlug, year, collectives) => {
   };
 };
 
-const getSeriesFromData = (intl, timeSeries) => {
+const getSeriesFromData = (intl, timeSeries, year) => {
+  const currentYear = new Date().getUTCFullYear();
+  const currentMonth = new Date().getUTCMonth();
   const dataToSeries = data => {
-    const series = new Array(12).fill(0); // = 12 months
-    data?.forEach(({ date, amount }) => (series[new Date(date).getMonth() + 1] = amount.value));
+    let series;
+    // For previous years we show all the months in the chart
+    if (year < currentYear) {
+      series = new Array(12).fill(0); // = 12 months
+      // For current year we only show upto the current month (as no data is available for future)
+    } else {
+      series = new Array(currentMonth + 1).fill(0); // = upto current month
+    }
+    data?.forEach(({ date, amount }) => (series[new Date(date).getUTCMonth()] = amount.value));
     return series;
   };
 
@@ -98,7 +107,7 @@ const TotalMoneyManagedHistorical = ({ host, collectives }) => {
   });
   const hostTimeSeriesData = loading && !data ? previousData?.host : data?.host;
   const timeSeries = hostTimeSeriesData?.hostMetricsTimeSeries;
-  const series = React.useMemo(() => getSeriesFromData(intl, timeSeries), [timeSeries]);
+  const series = React.useMemo(() => getSeriesFromData(intl, timeSeries, selectedYear), [timeSeries]);
   return (
     <Box py={3}>
       <Flex alignItems="center" px={2} mb={2}>
