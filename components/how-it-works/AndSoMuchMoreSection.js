@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
 import Illustration from '../home/HomeIllustration';
+import StyledLink from '../StyledLink';
 import { H2, H3, P } from '../Text';
 
 const MoreFeatures = () => (
@@ -132,6 +133,17 @@ const MoreFeatures = () => (
         </Box>
       </Container>
     </Grid>
+    <Box mt="74px">
+      <StyledLink
+        width="100%"
+        buttonStyle="standard"
+        buttonSize="medium"
+        href="https://docs.opencollective.com/help/"
+        fontWeight="500"
+      >
+        <FormattedMessage id="learnMore" defaultMessage="Learn more" />
+      </StyledLink>
+    </Box>
   </Flex>
 );
 

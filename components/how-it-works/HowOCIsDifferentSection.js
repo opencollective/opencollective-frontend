@@ -19,12 +19,12 @@ const Title = styled(H3)`
   ${display}
 
   @media screen and (min-width: 40em) {
-    font-size: 32px;
+    font-size: 24px;
     line-height: 32px;
   }
 
   @media screen and (min-width: 88em) {
-    font-size: 24px;
+    font-size: 32px;
     line-height: 40px;
   }
 `;
@@ -48,8 +48,8 @@ const HowOCIsDifferent = () => {
     <Flex mx={[3, 4]} my={4} mt={['88px', null, '120px']} flexDirection="column" alignItems="center" textAlign="center">
       <Box width={['288px', '100%']}>
         <H3
-          fontSize={['24px', '40px']}
-          lineHeight={['32px', '48px']}
+          fontSize={['32px', '40px']}
+          lineHeight={['40px', '48px']}
           letterSpacing={['-0.008em', '-0.04em']}
           color="black.900"
         >

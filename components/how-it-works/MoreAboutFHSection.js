@@ -32,13 +32,13 @@ const MoreAboutFiscalHosting = () => {
     <Flex flexDirection="column" justifyContent="center" alignItems="center" px="16px" my={[4, '100px']}>
       <Box mb={['24px', '56px']} width={['288px', 1]}>
         <H2
-          fontSize={['24px', '40px']}
-          lineHeight={['32px', '48px']}
+          fontSize={['32px', '40px']}
+          lineHeight={['40px', '48px']}
           letterSpacing={['-0.008em', '-0.04em']}
           color="black.900"
           textAlign="center"
         >
-          <FormattedMessage id="howItWorks.muchMore" defaultMessage="And so much more!" />
+          <FormattedMessage id="howItWorks.moreAboutFiscalHosting" defaultMessage="More about fiscal hosting" />
         </H2>
       </Box>
       <Flex flexDirection={['column', null, 'row']}>
@@ -46,9 +46,9 @@ const MoreAboutFiscalHosting = () => {
           <Wrapper color="black.900" mb={[3, null, 0]} width={['288px', '400px']}>
             <Box width={[null, '266px']}>
               <H3
-                fontSize="32px"
+                fontSize={['24px', '32px']}
                 textAlign={['center', 'left']}
-                lineHeight="40px"
+                lineHeight={['32px', '40px']}
                 letterSpacing="-0.008em"
                 mb={2}
                 fontWeight="bold"
@@ -66,9 +66,9 @@ const MoreAboutFiscalHosting = () => {
           <Wrapper color="black.900" ml={[null, null, 3]} width={['288px', '400px']}>
             <Box width={[null, '266px']}>
               <H3
-                fontSize="32px"
+                fontSize={['24px', '32px']}
                 textAlign={['center', 'left']}
-                lineHeight="40px"
+                lineHeight={['32px', '40px']}
                 letterSpacing="-0.008em"
                 mb={2}
                 fontWeight="bold"

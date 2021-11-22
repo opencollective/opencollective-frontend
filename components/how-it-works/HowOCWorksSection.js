@@ -4,6 +4,8 @@ import { FormattedMessage } from 'react-intl';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
+import Link from '../Link';
+import StyledButton from '../StyledButton';
 import { H1, P } from '../Text';
 
 const HowOCWorks = () => {
@@ -21,8 +23,8 @@ const HowOCWorks = () => {
         <Box mt={[3, 0]} mb={[3, null, null, null, '24px']} width={['288px', '344px', '413px', null, '555px']}>
           <H1
             letterSpacing="-0.04em"
-            fontSize={['40px', null, null, null, '52px']}
-            lineHeight={['48px', null, null, null, '56px']}
+            fontSize={['32px', '40px', null, null, '52px']}
+            lineHeight={['40px', '48px', null, null, '56px']}
             textAlign={['center', 'left']}
             color="black.900"
             whiteSpace={[null, null, 'pre-line']}
@@ -44,6 +46,11 @@ const HowOCWorks = () => {
             />
           </P>
         </Box>
+        <Link href="/create">
+          <StyledButton minWidth={158} mt={['56px', '24px']} buttonStyle="dark" whiteSpace="nowrap">
+            <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
+          </StyledButton>
+        </Link>
       </Container>
     </Flex>
   );
