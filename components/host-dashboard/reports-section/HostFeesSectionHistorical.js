@@ -17,6 +17,8 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 import { P } from '../../Text';
 
+import { getActiveYearsOptions } from './helpers';
+
 const hostFeeSectionTimeSeriesQuery = gqlV2/* GraphQL */ `
   query HostFeeSectionTimeSeries($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
     host(slug: $hostSlug) {
@@ -161,13 +163,6 @@ const getSeriesFromData = (intl, timeSeries) => {
       data: dataToSeries(nodes),
     })),
   ];
-};
-
-const getActiveYearsOptions = host => {
-  const currentYear = new Date().getFullYear();
-  const firstYear = host ? parseInt(host.createdAt.split('-')[0]) : currentYear;
-  const activeYears = [...Array(currentYear - firstYear + 1).keys()].map(year => year + firstYear);
-  return activeYears.map(year => ({ value: year, label: year })).reverse();
 };
 
 const getQueryVariables = (hostSlug, year) => {
