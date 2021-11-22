@@ -6,6 +6,7 @@ import * as nextImage from 'next/image';
 
 import UserProvider from '../components/UserProvider';
 import { initClient } from '../lib/apollo-client';
+import { withDesign } from 'storybook-addon-designs';
 
 import 'nprogress/nprogress.css';
 import 'react-datetime/css/react-datetime.css';
@@ -33,4 +34,5 @@ export const decorators = [
       </ThemeProvider>
     </ApolloProvider>
   ),
+  withDesign
 ];
