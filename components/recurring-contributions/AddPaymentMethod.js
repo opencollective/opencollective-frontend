@@ -66,10 +66,7 @@ const AddPaymentMethod = ({ onStripeReady, onPaypalSuccess, setNewPaymentMethodI
               onPaypalSuccess({
                 service: PAYMENT_METHOD_SERVICE.PAYPAL,
                 type: PAYMENT_METHOD_TYPE.SUBSCRIPTION,
-                paypalInfo: {
-                  subscriptionId,
-                  isNewApi: true,
-                },
+                paypalInfo: { subscriptionId },
               });
             }}
           />
