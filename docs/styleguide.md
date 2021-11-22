@@ -66,13 +66,12 @@ export const DefaultStory = props => <ComponentName {...props} />;
 
 It's nice to be able to access the relevant design files within Storybook itself. This is especially true when 
 we want to refer the design file for the relevant component in the future. We have [storybook-addon-designs](https://github.com/pocka/storybook-addon-designs) integrated to Storybook for this purpose. To link a design simply
-add a decorator to the `Meta` tag and the `design` parameter; 
+add the `design` parameter; 
 
 ```jsx
 import { Meta, Story } from '@storybook/addon-docs/blocks';
-import { withDesign } from 'storybook-addon-designs';
 
-<Meta title="My stories" decorators={[withDesign]}/>
+<Meta title="My stories" />
 
 <Story
   name="My story"

@@ -1,12 +1,10 @@
 import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
 import Hero from '../../components/collective-page/hero/Hero';
 import { webpackCollective, openSourceHost } from '../mocks/collectives';
-import { withDesign } from 'storybook-addon-designs';
 
 <Meta
   title="Collective Page/Hero"
   component={Hero}
-  decorators={[withDesign]}
   argTypes={{
     collective: { defaultValue: webpackCollective },
     host: { defaultValue: openSourceHost },
