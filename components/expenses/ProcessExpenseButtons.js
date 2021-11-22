@@ -18,6 +18,7 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { useUser } from '../UserProvider';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
+import DeleteExpenseButton from './DeleteExpenseButton';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
 
@@ -118,7 +119,16 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
  * All the buttons to process an expense, displayed in a React.Fragment to let the parent
  * in charge of the layout.
  */
-const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonProps, onSuccess }) => {
+const ProcessExpenseButtons = ({
+  expense,
+  collective,
+  host,
+  permissions,
+  buttonProps,
+  onSuccess,
+  onModalToggle,
+  onDelete,
+}) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
   const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
   const mutationOptions = { context: API_V2_CONTEXT, update: onUpdate };
@@ -234,6 +244,14 @@ const ProcessExpenseButtons = ({ expense, collective, host, permissions, buttonP
           }
         />
       )}
+      {permissions.canDelete && (
+        <DeleteExpenseButton
+          buttonProps={getButtonProps()}
+          expense={expense}
+          onModalToggle={onModalToggle}
+          onDelete={onDelete}
+        />
+      )}
     </React.Fragment>
   );
 };
@@ -247,6 +265,7 @@ ProcessExpenseButtons.propTypes = {
     canPay: PropTypes.bool,
     canMarkAsUnpaid: PropTypes.bool,
     canUnschedulePayment: PropTypes.bool,
+    canDelete: PropTypes.bool,
   }).isRequired,
   expense: PropTypes.shape({
     id: PropTypes.string,
@@ -259,6 +278,10 @@ ProcessExpenseButtons.propTypes = {
   buttonProps: PropTypes.object,
   showError: PropTypes.bool,
   onSuccess: PropTypes.func,
+  /** Called when the expense gets deleted */
+  onDelete: PropTypes.func,
+  /** Called when a modal is opened/closed with a boolean like (isOpen) */
+  onModalToggle: PropTypes.func,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {

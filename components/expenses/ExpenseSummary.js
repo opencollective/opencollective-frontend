@@ -109,10 +109,6 @@ const ExpenseSummary = ({
                 permissions={pick(expense.permissions, ['canSeeInvoiceInfo', 'canDelete'])}
                 buttonProps={{ size: 32, m: 1 }}
                 linkAction="link"
-                onDelete={() => {
-                  onClose?.();
-                  onDelete?.(expense);
-                }}
               />
             </Box>
           )}
@@ -282,12 +278,6 @@ const ExpenseSummary = ({
               permissions={expense?.permissions}
               buttonProps={{ size: 32, m: 1 }}
               linkAction="link"
-              onDelete={() => {
-                onClose();
-                if (onDelete) {
-                  onDelete(expense);
-                }
-              }}
               onError={error => onError({ error })}
               onEdit={onEdit}
             />
@@ -298,6 +288,10 @@ const ExpenseSummary = ({
               permissions={expense?.permissions}
               collective={collective}
               host={host}
+              onDelete={() => {
+                onDelete?.(expense);
+                onClose?.();
+              }}
             />
           </Flex>
         </Container>
