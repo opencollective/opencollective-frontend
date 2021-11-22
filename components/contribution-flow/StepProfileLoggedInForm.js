@@ -116,8 +116,7 @@ const NewContributionFlowStepProfileLoggedInForm = ({
                       </P>
                     ) : (
                       <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
-                        <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" /> -{' '}
-                        {value.email}
+                        <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" />
                       </P>
                     ))}
                   {value.type === 'COLLECTIVE' && (
