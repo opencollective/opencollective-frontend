@@ -14,6 +14,7 @@ import { Grid } from '../Grid';
 import CreditCard from '../icons/CreditCard';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
+import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledInputMask from '../StyledInputMask';
@@ -29,6 +30,7 @@ const initialValues = {
   cvv: undefined,
   assignee: undefined,
   provider: undefined,
+  cardName: undefined,
 };
 
 const assignNewVirtualCardMutation = gqlV2/* GraphQL */ `
@@ -100,12 +102,13 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
             ...virtualCard.privateData,
             assignee: virtualCard.assignee,
             provider: virtualCard.provider,
+            cardName: virtualCard.name,
           }
         : initialValues),
       collective: collective || virtualCard?.account,
     },
     async onSubmit(values) {
-      const { collective, assignee, provider } = values;
+      const { collective, assignee, provider, cardName } = values;
       const privateData = {
         cardNumber: values.cardNumber.replace(/\s+/g, ''),
         cvv: values.cvv,
@@ -146,6 +149,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
               virtualCard: {
                 privateData,
                 provider,
+                name: cardName,
               },
               assignee: { id: assignee.id },
               account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
@@ -182,6 +186,9 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
       }
       if (!values.provider) {
         errors.provider = 'Required';
+      }
+      if (!values.cardName) {
+        errors.cardName = 'Required';
       }
       if (!values.assignee) {
         errors.assignee = 'Required';
@@ -307,6 +314,26 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
                   isSearchable={false}
                   disabled={isBusy || isEditing}
                   onChange={option => formik.setFieldValue('provider', option.value)}
+                />
+              )}
+            </StyledInputField>
+
+            <StyledInputField
+              gridColumn="1/3"
+              labelFontSize="13px"
+              label={<FormattedMessage defaultMessage="Card name" />}
+              htmlFor="cardName"
+              error={formik.touched.cardName && formik.errors.cardName}
+            >
+              {inputProps => (
+                <StyledInput
+                  {...inputProps}
+                  name="cardName"
+                  id="cardName"
+                  onChange={formik.handleChange}
+                  value={formik.values.cardName}
+                  disabled={isBusy || isEditing}
+                  guide={false}
                 />
               )}
             </StyledInputField>
