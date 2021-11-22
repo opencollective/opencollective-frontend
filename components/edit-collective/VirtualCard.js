@@ -219,6 +219,8 @@ const VirtualCard = props => {
 
   const { addToast } = useToasts();
 
+  const isActive = props.data.state === 'OPEN' || props.data.status === 'active';
+
   const name = props.name || '';
   const cardNumber = `****  ****  ****  ${props.last4}`;
   const handleCopy = value => () => {
@@ -235,7 +237,7 @@ const VirtualCard = props => {
       <Box flexGrow={1} m="24px 24px 0 24px">
         <Flex fontSize="16px" lineHeight="24px" fontWeight="500" justifyContent="space-between">
           <Box>{name}</Box>
-          <StateLabel isActive={props.data.state === 'OPEN'}>{props.data.state}</StateLabel>
+          <StateLabel isActive={isActive}>{(props.data.state || props.data.status).toUpperCase()}</StateLabel>
         </Flex>
         {displayDetails ? (
           <React.Fragment>
@@ -305,7 +307,7 @@ const VirtualCard = props => {
         color="black.900"
         minHeight="48px"
         px="24px"
-        justifyContent={props.hasActions ? 'space-between' : 'flex-end'}
+        justifyContent={'space-between'}
         alignItems="center"
         shrink={0}
       >
@@ -317,6 +319,7 @@ const VirtualCard = props => {
             editHandler={props.editHandler}
           />
         )}
+        <React.Fragment>{props.provider}</React.Fragment>
         <Action onClick={() => setDisplayDetails(!displayDetails)}>
           {displayDetails ? (
             <React.Fragment>
@@ -350,6 +353,7 @@ VirtualCard.propTypes = {
   name: PropTypes.string,
   data: PropTypes.object,
   privateData: PropTypes.object,
+  provider: PropTypes.string,
   spendingLimitAmount: PropTypes.number,
   spendingLimitInterval: PropTypes.string,
   createdAt: PropTypes.string,
