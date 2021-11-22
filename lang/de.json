@@ -1404,6 +1404,7 @@
   "LearnMoreAboutServiceFees": "Learn more about {service} fees",
   "LegalName": "Legal Name",
   "legalName.description": "The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name.",
+  "LfwUBd": "When you contribute to a Collective we share your email address with the Administrators. If you wish to keep your contribution private choose the ‘incognito’ profile. Read our <PrivacyPolicyLink>privacy policy</PrivacyPolicyLink>.",
   "li7Ez6": "Past Week",
   "loading": "Lädt",
   "loadMore": "Mehr Anzeigen",
