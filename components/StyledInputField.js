@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
+import { Question } from '@styled-icons/remix-line/Question';
 import { FormattedMessage } from 'react-intl';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
@@ -11,6 +12,14 @@ const PrivateIconWithSpace = () => (
   <React.Fragment>
     &nbsp;
     <PrivateInfoIcon tooltipProps={{ containerVerticalAlign: 'text-top' }} />
+  </React.Fragment>
+);
+
+// eslint-disable-next-line react/prop-types
+const QuestionMarkIconWithSpace = ({ helpText, helpIconColor, helpIconSize }) => (
+  <React.Fragment>
+    &nbsp;
+    <Question title={helpText} size={helpIconSize} color={helpIconColor} />
   </React.Fragment>
 );
 
@@ -35,6 +44,9 @@ const StyledInputField = ({
   hideOptionalLabel,
   useRequiredLabel,
   isPrivate,
+  helpText,
+  helpIconSize,
+  helpIconColor,
   ...props
 }) => {
   const isCheckbox = inputType === 'checkbox';
@@ -82,6 +94,13 @@ const StyledInputField = ({
                 {labelContent}
                 {isPrivate && <PrivateIconWithSpace />}
               </React.Fragment>
+            )}
+            {helpText && (
+              <QuestionMarkIconWithSpace
+                helpText={helpText}
+                helpIconSize={helpIconSize}
+                helpIconColor={helpIconColor}
+              />
             )}
           </P>
         )}
@@ -148,6 +167,12 @@ StyledInputField.propTypes = {
   labelColor: PropTypes.string,
   /** Anything here will be passed down to label */
   labelProps: PropTypes.object,
+  /** Help text that will appear next to the label (a small question mark with help text shown when hovered) */
+  helpText: PropTypes.string,
+  /** Help text icon color **/
+  helpIconColor: PropTypes.string,
+  /** Help text icon size **/
+  helpIconSize: PropTypes.string,
   /** All props from `Box` */
   ...Box.propTypes,
 };

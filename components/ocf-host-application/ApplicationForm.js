@@ -365,20 +365,10 @@ const ApplicationForm = ({
                           </Box>
                           <Box width={['256px', '234px', '324px']} my={2}>
                             <StyledInputFormikField
-                              label={
-                                <FormattedMessage
-                                  defaultMessage="Set your URL {questionMark}"
-                                  values={{
-                                    questionMark: (
-                                      <Question
-                                        title={<FormattedMessage defaultMessage="This can be edited later" />}
-                                        size="13px"
-                                        color="#DADADA"
-                                      />
-                                    ),
-                                  }}
-                                />
-                              }
+                              label={i18nOCFApplicationFormLabel(intl, 'slug')}
+                              helpText={<FormattedMessage defaultMessage="This can be edited later" />}
+                              helpIconColor="#DADADA"
+                              helpIconSize="13px"
                               labelFontSize="13px"
                               labelColor="#4E5052"
                               labelProps={{ fontWeight: '600', lineHeight: '16px' }}
