@@ -113,7 +113,6 @@ class ContributionFlowSuccess extends React.Component {
     router: PropTypes.object,
     isEmbed: PropTypes.bool,
     data: PropTypes.object,
-    isCrypto: PropTypes.bool,
   };
 
   renderCallsToAction = () => {
@@ -203,59 +202,11 @@ class ContributionFlowSuccess extends React.Component {
     );
   };
 
-  renderCryptoInformation(order) {
-    const pledgeCurrency = order?.data?.thegivingblock?.pledgeCurrency;
-    const depositAddress = order?.paymentMethod?.data?.depositAddress;
-
-    return (
-      <Flex flexDirection="column" justifyContent="center" width={[1, 3 / 4]} px={[4, 0]} py={[2, 0]}>
-        <MessageBox type="warning" fontSize="12px" mb={2}>
-          <FormattedMessage
-            id="collective.user.orderProcessing.crypto"
-            defaultMessage="<strong>Your contribution is pending.</strong> Once the transaction is completed you will receive a confirmation email with the details."
-            values={I18nFormatters}
-          />
-          {` `}
-          {['BTC', 'ETH', 'BCH', 'LTC', 'ZEC', 'DOGE'].includes(pledgeCurrency) && (
-            <FormattedMessage
-              defaultMessage="You can view the status of your transaction at the Blockchain explorer: {link}"
-              values={{
-                link: (
-                  <StyledLink
-                    openInNewTab
-                    href={`https://blockchair.com/search?q=${depositAddress}`}
-                  >{`https://blockchair.com/search?q=${depositAddress}`}</StyledLink>
-                ),
-              }}
-            />
-          )}
-        </MessageBox>
-        <Flex px={3} mt={2}>
-          <P fontSize="16px" color="black.700">
-            <FormattedMessage
-              id="NewContributionFlow.InTheMeantime"
-              defaultMessage="In the meantime, you can see what {collective} is up to <CollectiveLink>on their Collective page</CollectiveLink>."
-              values={{
-                collective: this.props.data.order.toAccount.name,
-                CollectiveLink: getI18nLink({
-                  as: Link,
-                  href: `/${this.props.data.order.toAccount.slug}`,
-                }),
-              }}
-            />
-          </P>
-        </Flex>
-      </Flex>
-    );
-  }
-
   renderInfoByPaymentMethod() {
-    const { isCrypto, data } = this.props;
+    const { data } = this.props;
     const { order } = data;
     const isPendingBankTransfer = order?.status === ORDER_STATUS.PENDING && !order.paymentMethod;
-    if (isCrypto) {
-      return this.renderCryptoInformation(order);
-    } else if (isPendingBankTransfer) {
+    if (isPendingBankTransfer) {
       return this.renderBankTransferInformation();
     } else {
       return this.renderCallsToAction();

@@ -7,12 +7,56 @@ import { FormattedMessage } from 'react-intl';
 import useClipboard from '../../lib/hooks/useClipboard';
 
 import Container from '../Container';
-import { Box } from '../Grid';
+import { Box, Flex } from '../Grid';
+import I18nFormatters, { I18nSupportLink } from '../I18nFormatters';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
 import { P, Span } from '../Text';
 
 const StepCheckout = ({ stepDetails, order }) => {
   const { isCopied, copy } = useClipboard();
+
+  const renderCryptoInformation = order => {
+    const pledgeCurrency = order?.data?.thegivingblock?.pledgeCurrency;
+    const depositAddress = order?.paymentMethod?.data?.depositAddress;
+
+    return (
+      <Flex flexDirection="column" justifyContent="center" width={1} mt="24px">
+        <MessageBox type="info" fontSize="13px" mb={2}>
+          <FormattedMessage
+            id="collective.user.orderProcessing.crypto"
+            defaultMessage="<strong>Your contribution is pending.</strong> Once the transaction is completed you will receive a confirmation email with the details."
+            values={I18nFormatters}
+          />
+          {` `}
+          {['BTC', 'ETH', 'BCH', 'LTC', 'ZEC', 'DOGE'].includes(pledgeCurrency) && (
+            <FormattedMessage
+              defaultMessage="You can view the status of your transaction at the Blockchain explorer: {link}"
+              values={{
+                link: (
+                  <StyledLink
+                    openInNewTab
+                    href={`https://blockchair.com/search?q=${depositAddress}`}
+                  >{`https://blockchair.com/search?q=${depositAddress}`}</StyledLink>
+                ),
+              }}
+            />
+          )}
+        </MessageBox>
+        <Flex mt="24px">
+          <P fontSize="13px" color="black.700">
+            <FormattedMessage
+              defaultMessage="We also sent you these details to your email. You can <SupportLink>contact support</SupportLink> if something goes wrong."
+              values={{
+                SupportLink: I18nSupportLink,
+              }}
+            />
+          </P>
+        </Flex>
+      </Flex>
+    );
+  };
 
   return (
     <Container width={1}>
@@ -55,6 +99,7 @@ const StepCheckout = ({ stepDetails, order }) => {
               </Span>
               <IconLink size="20px" />
             </StyledButton>
+            {renderCryptoInformation(order)}
           </React.Fragment>
         )}
       </Box>

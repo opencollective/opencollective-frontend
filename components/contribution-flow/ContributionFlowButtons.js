@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import Currency from '../Currency';
@@ -22,6 +23,8 @@ class ContributionFlowButtons extends React.Component {
     totalAmount: PropTypes.number,
     currency: PropTypes.string,
     isCrypto: PropTypes.bool,
+    collective: PropTypes.object,
+    router: PropTypes.object,
   };
 
   state = { isLoadingNext: false };
@@ -48,7 +51,19 @@ class ContributionFlowButtons extends React.Component {
   }
 
   render() {
-    const { goBack, isValidating, prevStep, nextStep, paypalButtonProps, totalAmount, currency, isCrypto } = this.props;
+    const {
+      goBack,
+      isValidating,
+      step,
+      prevStep,
+      nextStep,
+      paypalButtonProps,
+      totalAmount,
+      currency,
+      isCrypto,
+      collective,
+      router,
+    } = this.props;
     return (
       <Flex flexWrap="wrap" justifyContent="center">
         <Fragment>
@@ -73,7 +88,7 @@ class ContributionFlowButtons extends React.Component {
               mx={[1, null, 2]}
               minWidth={!nextStep ? 185 : 145}
               buttonStyle="primary"
-              onClick={this.goNext}
+              onClick={isCrypto && step.name === 'checkout' ? () => router.push(`/${collective.slug}`) : this.goNext}
               disabled={isCrypto && totalAmount <= 0}
               loading={isValidating || this.state.isLoadingNext}
               data-cy="cf-next-step"
@@ -87,7 +102,10 @@ class ContributionFlowButtons extends React.Component {
                   &rarr;
                 </React.Fragment>
               ) : isCrypto ? (
-                <FormattedMessage id="Finish" defaultMessage="Finish" />
+                <FormattedMessage
+                  defaultMessage="Finish and go back to {CollectiveName}"
+                  values={{ CollectiveName: collective.name }}
+                />
               ) : totalAmount ? (
                 <FormattedMessage
                   id="contribute.amount"
@@ -111,4 +129,4 @@ class ContributionFlowButtons extends React.Component {
   }
 }
 
-export default ContributionFlowButtons;
+export default withRouter(ContributionFlowButtons);
