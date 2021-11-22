@@ -62,6 +62,31 @@ export const DefaultStory = props => <ComponentName {...props} />;
 </Canvas>
 ```
 
+6. Add and link design files:
+
+It's nice to be able to access the relevant design files within Storybook itself. This is especially true when 
+we want to refer the design file for the relevant component in the future. We have [storybook-addon-designs](https://github.com/pocka/storybook-addon-designs) integrated to Storybook for this purpose. To link a design simply
+add a decorator to the `Meta` tag and the `design` parameter; 
+
+```jsx
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { withDesign } from 'storybook-addon-designs';
+
+<Meta title="My stories" decorators={[withDesign]}/>
+
+<Story
+  name="My story"
+  parameters={{
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/Klm6pxIZSaJFiOMX5FpTul9F/storybook-addon-designs-sample'
+    }
+  }}
+/>
+```
+
+For more info refer to, https://pocka.github.io/storybook-addon-designs/?path=/docs/docs-quick-start--page
+
 You can also use features from `Storybook`, like `ArgsTable`, to provide a better documentation.
 See `StyledButton.stories.mdx` as an example.
 
