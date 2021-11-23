@@ -163,10 +163,7 @@ const checkStepOneCompleted = (values, isOnBehalf) => {
     return Boolean(values.payee);
   } else if (!isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod)))) {
     return false; // There are some errors in the form
-  } else if (
-    values.type !== expenseTypes.RECEIPT &&
-    ![CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION].includes(values.payee.type)
-  ) {
+  } else if (values.type !== expenseTypes.RECEIPT && values.payee.type !== CollectiveType.COLLECTIVE) {
     // Require an address for non-receipt expenses
     return Boolean(values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address);
   } else {
@@ -177,7 +174,7 @@ const checkStepOneCompleted = (values, isOnBehalf) => {
 const checkRequiresAddress = values => {
   return (
     values.payee &&
-    ![CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION].includes(values.payee.type) &&
+    values.payee.type !== CollectiveType.COLLECTIVE &&
     !values.payee.isInvite &&
     [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST, expenseTypes.GRANT].includes(values.type)
   );
