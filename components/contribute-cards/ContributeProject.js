@@ -22,7 +22,7 @@ const ContributeProject = ({ collective, project, ...props }) => {
       contributors={project.contributors}
       stats={project.stats.backers}
       image={project.backgroundImageUrl}
-      color={get(collective, 'settings.collectivePage.primaryColor')}
+      color={get(project, 'settings.collectivePage.primaryColor')}
       title={
         <StyledLink as={Link} color="black.800" href={`/${collective.slug}/projects/${project.slug}`}>
           {project.name}
