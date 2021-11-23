@@ -34,6 +34,7 @@ import StyledInputAmount from '../StyledInputAmount';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledTextarea from '../StyledTextarea';
+import StyledTooltip from '../StyledTooltip';
 import { H1, H4, P } from '../Text';
 
 import OCFPrimaryButton from './OCFPrimaryButton';
@@ -260,17 +261,17 @@ const ApplicationForm = ({
                               values={{
                                 padlock: <Lock size="12px" color="#9D9FA3" />,
                                 questionMark: (
-                                  <Question
-                                    title={
+                                  <StyledTooltip
+                                    content={
                                       <FormattedMessage
                                         defaultMessage={
                                           'Tell us more about your collective. This information is private and only used for internal purposes.'
                                         }
                                       />
                                     }
-                                    size="13px"
-                                    color="#DADADA"
-                                  />
+                                  >
+                                    <Question size="13px" color="#DADADA" />
+                                  </StyledTooltip>
                                 ),
                               }}
                             />
@@ -367,8 +368,6 @@ const ApplicationForm = ({
                             <StyledInputFormikField
                               label={i18nOCFApplicationFormLabel(intl, 'slug')}
                               helpText={<FormattedMessage defaultMessage="This can be edited later" />}
-                              helpIconColor="#DADADA"
-                              helpIconSize="13px"
                               labelFontSize="13px"
                               labelColor="#4E5052"
                               labelProps={{ fontWeight: '600', lineHeight: '16px' }}
