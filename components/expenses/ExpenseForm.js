@@ -7,6 +7,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { accountSupportsGrants } from '../../lib/collective.lib';
+import { CollectiveType } from '../../lib/constants/collectives';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -117,7 +118,10 @@ export const prepareExpenseForSubmit = expenseData => {
       ? pick(expenseData.payee, ['name', 'email', 'legalName', 'organization', 'newsletterOptIn'])
       : { [payeeIdField]: expenseData.payee.id };
 
-  const payeeLocation = isInvoice ? pick(expenseData.payeeLocation, ['address', 'country', 'structured']) : null;
+  const payeeLocation =
+    isInvoice || ![CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION].includes(expenseData.payee.type)
+      ? pick(expenseData.payeeLocation, ['address', 'country', 'structured'])
+      : null;
 
   return {
     ...pick(expenseData, ['id', 'description', 'longDescription', 'type', 'privateMessage', 'invoiceInfo', 'tags']),
@@ -149,7 +153,10 @@ const validate = expense => {
       : requireFields(expense, ['description', 'payee', 'payee.name', 'payee.email']);
   }
 
-  const errors = isCardCharge ? {} : requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
+  const errors =
+    isCardCharge || [CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION].includes(expense.payee.type)
+      ? {}
+      : requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
 
   if (expense.items.length > 0) {
     const itemsErrors = expense.items.map(item => validateExpenseItem(expense, item));
@@ -170,7 +177,10 @@ const validate = expense => {
     }
   }
 
-  if (expense.type === expenseTypes.INVOICE) {
+  if (
+    expense.type === expenseTypes.INVOICE &&
+    ![CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION].includes(expense.payee.type)
+  ) {
     Object.assign(errors, requireFields(expense, ['payeeLocation.country', 'payeeLocation.address']));
   }
 
@@ -219,7 +229,9 @@ const ExpenseFormBody = ({
   const stepOneCompleted =
     values.payoutMethod &&
     isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency'))) &&
-    (isReceipt ? true : values.payeeLocation?.country && values.payeeLocation?.address);
+    (isReceipt || [CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION].includes(values.payee.type)
+      ? true
+      : values.payeeLocation?.country && values.payeeLocation?.address);
   const stepTwoCompleted = isInvite
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
