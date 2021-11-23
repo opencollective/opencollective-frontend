@@ -2320,6 +2320,11 @@ type Host implements Account & AccountWithContributions {
   ): HostMetrics!
   hostMetricsTimeSeries(
     """
+    A collection of accounts for which the metrics should be returned.
+    """
+    account: [AccountReferenceInput!]
+
+    """
     The start date of the time series
     """
     dateFrom: DateTime!
@@ -3161,6 +3166,11 @@ type HostMetricsTimeSeries {
   History of the share of host fees collected owed to Open Collective Inc.
   """
   hostFeeShare: TimeSeriesAmountWithSettlement!
+
+  """
+  History of the total money managed by this host
+  """
+  totalMoneyManaged: TimeSeriesAmount!
 }
 
 """

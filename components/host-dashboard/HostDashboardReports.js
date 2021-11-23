@@ -229,7 +229,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           >
             <FormattedMessage id="Host.Metrics.TotalMoneyManages" defaultMessage="Total Money Managed" />
           </SectionTitle>
-          <TotalMoneyManagedSection host={host} isLoading={loading} />
+          <TotalMoneyManagedSection host={host} isLoading={loading} collectives={collectives} />
         </Container>
         <Container mb={38}>
           <SectionTitle>
