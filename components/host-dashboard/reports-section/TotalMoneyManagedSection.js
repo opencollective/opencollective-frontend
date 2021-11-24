@@ -15,7 +15,7 @@ import { P, Span } from '../../Text';
 
 import TotalMoneyManagedHistorical from './TotalMoneyManagedHistorical';
 
-const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency, isLoading) => {
+const getMoneyManagedChartAreas = (hostBalance, collectivesBalance, hostCurrency, isLoading) => {
   return [
     {
       key: 'organization',
@@ -24,7 +24,7 @@ const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency, is
         <LoadingPlaceholder width={195} height={16} />
       ) : (
         <P fontSize="12px" lineHeight="18px" color="black.700">
-          <Span fontWeight="bold">{formatCurrency(hostBalance, currency)}</Span>
+          <Span fontWeight="bold">{formatCurrency(hostBalance, hostCurrency)}</Span>
           <Span mx="6px" color="black.600">
             {' | '}
           </Span>
@@ -39,7 +39,7 @@ const getMoneyManagedChartAreas = (collectivesBalance, hostBalance, currency, is
         <LoadingPlaceholder width={165} height={16} />
       ) : (
         <P fontSize="12px" lineHeight="18px">
-          <Span fontWeight="700">{formatCurrency(collectivesBalance, currency)}</Span>{' '}
+          <Span fontWeight="700">{formatCurrency(collectivesBalance, hostCurrency)}</Span>{' '}
           <Span mx="6px" color="black.600">
             {' | '}
           </Span>
@@ -56,23 +56,31 @@ const TotalMoneyManagedSection = ({ host, collectives, isLoading }) => {
   // Compute some general stats
   const hostMetrics = host?.hostMetrics;
   const hostBalance = host?.stats.balance.valueInCents;
-  const collectivesBalance = hostMetrics?.totalMoneyManaged.valueInCents - hostBalance;
+
+  let collectivesBalance;
+  if (!collectives || collectives.length === 0) {
+    collectivesBalance = hostMetrics?.totalMoneyManaged.valueInCents - hostBalance;
+  } else {
+    collectivesBalance = hostMetrics?.totalMoneyManaged.valueInCents;
+  }
 
   // Generate graph data (memoized for performances)
-  const chartArgs = [collectivesBalance, hostBalance, host?.currency, isLoading];
+  const chartArgs = [hostBalance, collectivesBalance, host?.currency, isLoading];
   const chartAreas = React.useMemo(() => getMoneyManagedChartAreas(...chartArgs), chartArgs);
 
   return (
     <div>
-      <Flex flexWrap="wrap" my={14} alignItems="baseline">
-        {isLoading ? (
-          <LoadingPlaceholder height={21} width={125} />
-        ) : (
-          <Span fontSize={18} fontWeight="500">
-            {formatCurrency(hostMetrics.totalMoneyManaged.valueInCents, host.currency)}
-          </Span>
-        )}
-      </Flex>
+      {(!collectives || collectives.length === 0) && (
+        <Flex flexWrap="wrap" my={14} alignItems="baseline">
+          {isLoading ? (
+            <LoadingPlaceholder height={21} width={125} />
+          ) : (
+            <Span fontSize={18} fontWeight="500">
+              {formatCurrency(hostMetrics.totalMoneyManaged.valueInCents, host.currency)}
+            </Span>
+          )}
+        </Flex>
+      )}
       <Container display="flex" fontSize="11px" fontWeight="700" lineHeight="12px" alignItems="center">
         <Span textTransform="uppercase">
           <FormattedMessage
