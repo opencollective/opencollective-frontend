@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FastField, Field } from 'formik';
-import { first, get, isEmpty, omit, pick } from 'lodash';
+import { first, get, groupBy, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { compareNames } from '../../lib/collective.lib';
@@ -112,12 +112,10 @@ const getPayeeOptions = (intl, payoutProfiles) => {
     [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
   }));
 
-  const myself = profileOptions.filter(p => p.value.type === INDIVIDUAL);
-  const myOrganizations = profileOptions.filter(p => p.value.type === ORGANIZATION);
-  const myCollectives = profileOptions.filter(p => p.value.type === COLLECTIVE);
-  const myFunds = profileOptions.filter(p => p.value.type === FUND);
-  const myProjects = profileOptions.filter(p => p.value.type === PROJECT);
-  const myEvents = profileOptions.filter(p => p.value.type === EVENT);
+  const profilesByType = groupBy(profileOptions, p => p.value.type);
+
+  const myself = profilesByType[INDIVIDUAL] || [];
+  const myOrganizations = profilesByType[ORGANIZATION] || [];
 
   myOrganizations.push({
     label: null,
@@ -133,17 +131,29 @@ const getPayeeOptions = (intl, payoutProfiles) => {
     { options: myOrganizations, label: intl.formatMessage({ defaultMessage: 'My Organizations' }) },
   ];
 
-  if (myCollectives.length > 0) {
-    payeeOptions.push({ options: myCollectives, label: intl.formatMessage({ defaultMessage: 'My Collectives' }) });
+  if (profilesByType[COLLECTIVE]?.length) {
+    payeeOptions.push({
+      options: profilesByType[COLLECTIVE],
+      label: intl.formatMessage({ id: 'collective', defaultMessage: 'My Collectives' }),
+    });
   }
-  if (myFunds.length > 0) {
-    payeeOptions.push({ options: myFunds, label: intl.formatMessage({ defaultMessage: 'My Funds' }) });
+  if (profilesByType[FUND]?.length) {
+    payeeOptions.push({
+      options: profilesByType[FUND],
+      label: intl.formatMessage({ id: 'funds', defaultMessage: 'My Funds' }),
+    });
   }
-  if (myProjects.length > 0) {
-    payeeOptions.push({ options: myProjects, label: intl.formatMessage({ defaultMessage: 'My Projects' }) });
+  if (profilesByType[PROJECT]?.length) {
+    payeeOptions.push({
+      options: profilesByType[PROJECT],
+      label: intl.formatMessage({ defaultMessage: 'My Projects' }),
+    });
   }
-  if (myEvents.length > 0) {
-    payeeOptions.push({ options: myEvents, label: intl.formatMessage({ defaultMessage: 'My Events' }) });
+  if (profilesByType[EVENT]?.length) {
+    payeeOptions.push({
+      options: profilesByType[EVENT],
+      label: intl.formatMessage({ id: 'events', defaultMessage: 'My Events' }),
+    });
   }
 
   return payeeOptions;
@@ -386,7 +396,7 @@ const ExpenseFormPayeeStep = ({
             </Fragment>
           )}
         </Box>
-        <Box flexGrow="1" flexBasis="50%" display={allPayoutMethods ? 'block' : 'none'}>
+        <Box flexGrow="1" flexBasis="50%" display={values.payee ? 'block' : 'none'}>
           <Field name="payoutMethod">
             {({ field }) => (
               <StyledInputField

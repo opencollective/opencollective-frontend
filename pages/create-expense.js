@@ -257,24 +257,30 @@ class CreateExpensePage extends React.Component {
     return tagsStats && tagsStats.map(({ tag }) => tag);
   }
 
+  // This function is currently duplicated in expense.js
   getPayoutProfiles = memoizeOne(loggedInAccount => {
     if (!loggedInAccount) {
       return [];
     } else {
       const payoutProfiles = [loggedInAccount];
-      for (const { account } of get(loggedInAccount, 'adminMemberships.nodes', [])) {
+      for (const node of get(loggedInAccount, 'adminMemberships.nodes', [])) {
         if (
           // Organizations
-          [ORGANIZATION].includes(account.type) ||
+          [ORGANIZATION].includes(node.account.type) ||
+          // Independant Collectives
+          (node.account.isActive && node.account.id === node.account.host?.id)
+        ) {
+          // Push main account only
+          payoutProfiles.push(omit(node.account, ['childrenAccounts']));
+        } else if (
           // Same Host
-          (account.isActive && this.props.data?.account?.host?.id === account.host?.id) ||
-          // Self-hosted Collectives
-          (account.isActive && account.id === account.host?.id)
+          node.account.isActive &&
+          this.props.data?.account?.host?.id === node.account.host?.id
         ) {
           // Push main account
-          payoutProfiles.push(omit(account, ['childrenAccounts']));
+          payoutProfiles.push(omit(node.account, ['childrenAccounts']));
           // Push children
-          payoutProfiles.push(...account.childrenAccounts.nodes);
+          payoutProfiles.push(...node.account.childrenAccounts.nodes);
         }
       }
       return payoutProfiles;
