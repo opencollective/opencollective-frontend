@@ -33,11 +33,12 @@ export const parseAmountRange = strValue => {
 };
 
 const getOption = (intl, currency, minAmount, maxAmount) => {
+  const { locale } = intl;
   return {
     value: maxAmount ? `${minAmount}-${maxAmount}` : `${minAmount}+`,
     label: intl.formatMessage(OPTION_LABELS[maxAmount ? 'rangeFromTo' : 'rangeFrom'], {
-      minAmount: formatCurrency(minAmount * 100, currency, { precision: 0 }),
-      maxAmount: formatCurrency(maxAmount * 100, currency, { precision: 0 }),
+      minAmount: formatCurrency(minAmount * 100, currency, { precision: 0, locale }),
+      maxAmount: formatCurrency(maxAmount * 100, currency, { precision: 0, locale }),
     }),
   };
 };

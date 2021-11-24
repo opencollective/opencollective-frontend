@@ -116,7 +116,7 @@ const constructChartDataPoints = (category, dataPoints) => {
   return chartDataPoints;
 };
 
-const getTransactionsAreaChartData = host => {
+const getTransactionsAreaChartData = (host, locale) => {
   if (!host) {
     return [];
   }
@@ -141,7 +141,7 @@ const getTransactionsAreaChartData = host => {
           <FormattedMessage
             defaultMessage="Daily average: {amount}"
             values={{
-              amount: <strong>{formatCurrency(dailyAverageIncomeAmount.valueInCents, currency)}</strong>,
+              amount: <strong>{formatCurrency(dailyAverageIncomeAmount.valueInCents, currency, { locale })}</strong>,
             }}
           />
         </P>
@@ -163,7 +163,7 @@ const getTransactionsAreaChartData = host => {
           <FormattedMessage
             defaultMessage="Daily average: {amount}"
             values={{
-              amount: <strong>{formatCurrency(dailyAverageAmount.valueInCents, currency)}</strong>,
+              amount: <strong>{formatCurrency(dailyAverageAmount.valueInCents, currency, { locale })}</strong>,
             }}
           />
         </P>
@@ -249,6 +249,7 @@ const getTransactionsBreakdownChartData = host => {
 
 const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
   const intl = useIntl();
+  const { locale } = intl;
   const categoryType = getCategoryType(new Date(dateInterval?.from), new Date(dateInterval?.to), host?.createdAt);
 
   const contributionStats = host?.contributionStats;
@@ -270,7 +271,7 @@ const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
     },
   ];
 
-  const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host), [host]);
+  const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host, locale), [host, locale]);
   const transactionBreakdownChart = React.useMemo(() => getTransactionsBreakdownChartData(host), [host]);
   return (
     <React.Fragment>

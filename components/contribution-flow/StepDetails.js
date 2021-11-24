@@ -128,7 +128,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
                     id="contribution.minimumAmount"
                     defaultMessage="Minimum amount: {minAmount} {currency}"
                     values={{
-                      minAmount: formatCurrency(minAmount, currency),
+                      minAmount: formatCurrency(minAmount, currency, { locale: intl.locale }),
                       currency,
                     }}
                   />

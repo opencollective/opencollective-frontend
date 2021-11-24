@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/fa-solid/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/fa-solid/ChevronUp/ChevronUp';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../lib/currency-utils';
 
@@ -15,23 +15,24 @@ import { P, Span } from '../../Text';
 
 import { HostFeesSectionHistorical } from './HostFeesSectionHistorical';
 
-const getValuesToDisplay = (isLoading, host) => {
+const getValuesToDisplay = (isLoading, host, locale) => {
   if (isLoading) {
     const loadingComponent = <LoadingPlaceholder height={21} width={120} />;
     return { fees: loadingComponent, profit: loadingComponent, sharedRevenue: loadingComponent };
   } else {
     const { hostFees, hostFeeShare } = host.hostMetrics;
     return {
-      fees: formatCurrency(hostFees.valueInCents, host.currency),
-      sharedRevenue: formatCurrency(hostFeeShare.valueInCents, host.currency),
-      profit: formatCurrency(hostFees.valueInCents - hostFeeShare.valueInCents, host.currency),
+      fees: formatCurrency(hostFees.valueInCents, host.currency, { locale }),
+      sharedRevenue: formatCurrency(hostFeeShare.valueInCents, host.currency, { locale }),
+      profit: formatCurrency(hostFees.valueInCents - hostFeeShare.valueInCents, host.currency, { locale }),
     };
   }
 };
 
 const HostFeesSection = ({ host, collectives, isLoading }) => {
   const [showHostFeeChart, setShowHostFeeChart] = useState(false);
-  const valuesToDisplay = getValuesToDisplay(isLoading, host);
+  const { locale } = useIntl();
+  const valuesToDisplay = getValuesToDisplay(isLoading, host, locale);
   return (
     <React.Fragment>
       <Flex flexWrap="wrap">

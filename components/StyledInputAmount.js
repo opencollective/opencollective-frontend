@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { isNil, isUndefined } from 'lodash';
 
-import { getCurrencySymbol } from '../lib/currency-utils';
-import { floatAmountToCents } from '../lib/math';
+import { floatAmountToCents, getCurrencySymbol } from '../lib/currency-utils';
 
 import StyledInputGroup from './StyledInputGroup';
 

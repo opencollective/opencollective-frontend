@@ -2,7 +2,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Copy } from '@styled-icons/feather/Copy';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
 import { margin } from 'styled-system';
@@ -177,8 +177,8 @@ ActionsButton.propTypes = {
   editHandler: PropTypes.func,
 };
 
-const getLimitString = ({ spendingLimitAmount, spendingLimitInterval }) => {
-  const value = formatCurrency(spendingLimitAmount, 'USD');
+const getLimitString = (spendingLimitAmount, spendingLimitInterval, locale) => {
+  const value = formatCurrency(spendingLimitAmount, 'USD', { locale });
   if (!spendingLimitAmount) {
     return <FormattedMessage id="VirtualCards.NoLimit" defaultMessage="No Limit" />;
   }
@@ -216,7 +216,7 @@ const getLimitString = ({ spendingLimitAmount, spendingLimitInterval }) => {
 
 const VirtualCard = props => {
   const [displayDetails, setDisplayDetails] = React.useState(false);
-
+  const { locale } = useIntl();
   const { addToast } = useToasts();
 
   const isActive = props.data.state === 'OPEN' || props.data.status === 'active';
@@ -297,7 +297,7 @@ const VirtualCard = props => {
                 }}
               />
               &nbsp;&middot;&nbsp;
-              {getLimitString(props)}
+              {getLimitString(props.spendingLimitAmount, props.spendingLimitInterval, locale)}
             </P>
           </React.Fragment>
         )}

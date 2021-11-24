@@ -115,7 +115,7 @@ const getChartOptions = (intl, hostCurrency) => ({
   tooltip: {
     y: {
       formatter: function (value) {
-        return formatCurrency(value * 100, hostCurrency);
+        return formatCurrency(value * 100, hostCurrency, { locale: intl.locale });
       },
     },
   },

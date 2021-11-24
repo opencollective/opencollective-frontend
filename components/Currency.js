@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
 import { formatCurrency, getCurrencySymbol } from '../lib/currency-utils';
-import { formatCurrencyWithSeparators } from '../lib/math';
 
 import { Span } from './Text';
 
@@ -13,7 +12,7 @@ import { Span } from './Text';
  * ⚠️ Abbreviated mode is only for English at the moment. Abbreviated amount will not be internationalized.
  */
 const Currency = ({ formatWithSeparators, currency, precision, value, ...styles }) => {
-  const intl = useIntl();
+  const { locale } = useIntl();
   if (precision === 'auto') {
     precision = value % 100 === 0 ? 0 : 2;
   } else if (precision < 2 && value < 100) {
@@ -22,16 +21,18 @@ const Currency = ({ formatWithSeparators, currency, precision, value, ...styles 
   }
 
   if (formatWithSeparators) {
+    // TODO: This approach is not great because the position of the currency depends on the locale
+    const floatAmount = value / 100;
     return (
       <Span {...styles} whiteSpace="nowrap">
         {getCurrencySymbol(currency)}
-        {formatCurrencyWithSeparators(value / 100, intl.locale)}
+        {floatAmount.toLocaleString(locale)}
       </Span>
     );
   } else {
     return (
       <Span {...styles} whiteSpace="nowrap">
-        {formatCurrency(value, currency, { precision })}
+        {formatCurrency(value, currency, { precision, locale })}
       </Span>
     );
   }

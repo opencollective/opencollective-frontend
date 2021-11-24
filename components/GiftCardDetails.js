@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import themeGet from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
-import { FormattedDate, FormattedMessage } from 'react-intl';
+import { FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
@@ -72,6 +72,8 @@ class GiftCardDetails extends React.Component {
     collectiveSlug: PropTypes.string.isRequired,
     /** @ignore Provided by styled-component withTheme(...) */
     theme: PropTypes.object,
+    /** @ignore Provided by injectIntl */
+    intl: PropTypes.object,
   };
 
   constructor(props) {
@@ -144,21 +146,23 @@ class GiftCardDetails extends React.Component {
 
   renderValue() {
     const { initialBalance, currency, monthlyLimitPerMember } = this.props.giftCard;
+    const { locale } = this.props.intl;
 
     return monthlyLimitPerMember ? (
       <FormattedMessage
         id="giftCards.monthlyValue"
         defaultMessage="{value} monthly"
-        values={{ value: formatCurrency(monthlyLimitPerMember, currency) }}
+        values={{ value: formatCurrency(monthlyLimitPerMember, currency, { locale }) }}
       />
     ) : (
-      formatCurrency(initialBalance, currency)
+      formatCurrency(initialBalance, currency, { locale })
     );
   }
 
   render() {
     const { isConfirmed, collective, balance, currency, expiryDate, data } = this.props.giftCard;
     const isExpired = Boolean(expiryDate && new Date(expiryDate) < new Date());
+    const { locale } = this.props.intl;
 
     return (
       <Flex data-cy="vc-details">
@@ -190,7 +194,7 @@ class GiftCardDetails extends React.Component {
               <FormattedMessage
                 id="giftCards.balance"
                 defaultMessage="Balance: {balance}"
-                values={{ balance: formatCurrency(balance, currency) }}
+                values={{ balance: formatCurrency(balance, currency, { locale }) }}
               />
               {isExpired && (
                 <React.Fragment>
@@ -222,4 +226,4 @@ class GiftCardDetails extends React.Component {
   }
 }
 
-export default withTheme(GiftCardDetails);
+export default withTheme(injectIntl(GiftCardDetails));

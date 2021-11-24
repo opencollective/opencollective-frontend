@@ -160,7 +160,7 @@ class UpdatePaymentPage extends React.Component {
 
   render() {
     const { showCreditCardForm, submitting, error, success } = this.state;
-    const { LoggedInUser, loadingLoggedInUser, data } = this.props;
+    const { LoggedInUser, loadingLoggedInUser, data, intl } = this.props;
 
     if (!LoggedInUser && !loadingLoggedInUser) {
       return (
@@ -220,6 +220,7 @@ class UpdatePaymentPage extends React.Component {
                             {sub.collective.name}:{' '}
                             {formatCurrency(sub.totalAmount, sub.currency, {
                               precision: 2,
+                              locale: intl.locale,
                             })}{' '}
                             ({sub.interval}ly)
                           </li>

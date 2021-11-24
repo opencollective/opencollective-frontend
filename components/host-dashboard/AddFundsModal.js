@@ -185,7 +185,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     if (option.currency) {
       return (
         <span>
-          {formatCurrency(option.feeAmount, option.currency)}{' '}
+          {formatCurrency(option.feeAmount, option.currency, { locale: intl.locale })}{' '}
           <Span color="black.500">({option.percentage * 100}%)</Span>
         </span>
       );
@@ -461,7 +461,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     <FormattedMessage
                       id="AddFundsModal.disclaimer"
                       defaultMessage="By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective."
-                      values={{ amount: formatCurrency(values.amount, collective.currency) }}
+                      values={{ amount: formatCurrency(values.amount, collective.currency, { locale: intl.locale }) }}
                     />
                   </P>
                   {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
