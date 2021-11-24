@@ -9921,7 +9921,7 @@ input PaypalPaymentInput {
   data: JSON
   orderId: String
   subscriptionId: String
-  isNewApi: Boolean
+  isNewApi: Boolean @deprecated(reason: "2021-07-30: Not used anymore")
 }
 
 """
