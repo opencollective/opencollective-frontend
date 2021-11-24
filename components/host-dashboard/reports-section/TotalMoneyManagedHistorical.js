@@ -5,6 +5,7 @@ import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { ChartWrapper } from '../../ChartWrapper';
@@ -76,7 +77,7 @@ const getSeriesFromData = (intl, timeSeries, year) => {
   ];
 };
 
-const getChartOptions = intl => ({
+const getChartOptions = (intl, hostCurrency) => ({
   chart: {
     id: 'chart-host-report-money-managed',
   },
@@ -92,6 +93,21 @@ const getChartOptions = intl => ({
     categories: [...new Array(12)].map(
       (_, idx) => `${intl.formatDate(new Date(0, idx), { month: 'short' }).toUpperCase()}`,
     ),
+  },
+  yaxis: {
+    labels: {
+      minWidth: 38,
+      formatter: function (value) {
+        return value < 1000 ? value : `${Math.round(value / 1000)}k`;
+      },
+    },
+  },
+  tooltip: {
+    y: {
+      formatter: function (value) {
+        return formatCurrency(value * 100, hostCurrency);
+      },
+    },
   },
 });
 
