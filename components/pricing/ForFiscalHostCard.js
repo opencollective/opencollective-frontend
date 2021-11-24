@@ -13,7 +13,6 @@ import StyledHR from '../StyledHr';
 import { H3, H4, H5, P, Span } from '../Text';
 
 import { FISCAL_HOST_ACCESS } from './constants';
-import PlatformTip from './PlatformTip';
 
 const ListWrapper = styled(Box)`
   list-style: none;
@@ -160,7 +159,6 @@ const messages = defineMessages({
 
 const ForFiscalHosts = () => {
   const intl = useIntl();
-  const displayPlatformTipBox = false;
 
   return (
     <Card padding={['24px', null, '32px']} width={['288px', '636px']} borderRadius="8px" border="1px solid #DCDEE0">
@@ -195,7 +193,7 @@ const ForFiscalHosts = () => {
         fontWeight="500"
         letterSpacing="-0.008emd"
         color="blue.700"
-        mb={['16px', '0']}
+        mb="16px"
       >
         <FormattedMessage
           id="pricing.forFiscalHost.fees.header"
@@ -256,14 +254,6 @@ const ForFiscalHosts = () => {
               defaultMessage="(2) If your Host Fee is 10% and your Collectives bring in $1,000, the Host gets $100 and $15 (15%) is the Platform Share."
             />
           </P>
-          {displayPlatformTipBox && (
-            <PlatformTip
-              mt={[3, 4]}
-              my={4}
-              width={[null, null, null, '451px']}
-              display={['none', null, null, 'flex']}
-            />
-          )}
         </Box>
         <ListWrapper as="ul" mt={['16px', 0]}>
           <ListItem>
@@ -285,29 +275,18 @@ const ForFiscalHosts = () => {
             <FormattedMessage defaultMessage="Financial tracking and transparency means reporting writes itself" />
           </ListItem>
           <ListItem>
-            <FormattedMessage
-              id="pricing.expensePayOuts"
-              defaultMessage="Expense management and one-click payouts via Paypal and Wise"
-            />
+            <FormattedMessage defaultMessage="Expense management and one-click payouts via Paypal and Wise" />
           </ListItem>
         </ListWrapper>
       </Flex>
-      <PlatformTip mt={[3, 4]} my={4} width={[null, '588px']} display={['flex', null, null, 'none']} />
 
-      {/*
-         this button should fit below the above list as in ForCollectiveCard.js but I don't know how to format it correctly
-      */}
-      <Link href={plan.actionLink}>
-        <StyledButton px={3} py={2} buttonStyle="primary" width="148px" whiteSpace="nowrap" mb={4}>
-          {plan.actionType === 'joinAsFiscalHost' ? (
+      <Flex justifyContent={['center', 'left']} alignItems={['flex-start', 'center']} mt={10}>
+        <Link href="/organizations/new">
+          <StyledButton px={3} py={2} buttonStyle="primary" width="160px" whiteSpace="nowrap" mb={4}>
             <FormattedMessage id="pricing.joinAsFiscalHost" defaultMessage="Create a Fiscal Host" />
-          ) : (
-            <FormattedMessage id="pricing.contactUs" defaultMessage="Contact us" />
-          )}
-        </StyledButton>
-      </Link>
-
-      {/* end misplaced button */}
+          </StyledButton>
+        </Link>
+      </Flex>
 
       <H4
         mt="40px"

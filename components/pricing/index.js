@@ -169,7 +169,9 @@ const Pricing = () => {
         </Container>
       </Flex>
 
-      <PlatformTip width={[null, null, null, '451px']} minWidth={[null, null, '325px']} />
+      <Container display="flex" px="16px" mb="40px" justifyContent="center">
+        <PlatformTip width={[null, null, null, '451px']} minWidth={[null, null, '325px']} />
+      </Container>
 
       <Container
         display="flex"
@@ -266,7 +268,7 @@ const Pricing = () => {
             <Link href="/create">
               <StyledButton
                 buttonStyle="primary"
-                width={['224px', null, '139px']}
+                width={['224px', null, '160px']}
                 py="8px"
                 px={[null, null, 3]}
                 my="8px"
@@ -278,7 +280,7 @@ const Pricing = () => {
             </Link>
             <Link href="#collective">
               <StyledButton width={['224px', null, '139px']} py="8px" my="8px">
-                <FormattedMessage id="home.knowMore" defaultMessage="Learn more" /> <ArrowDown size="13px" />{' '}
+                <FormattedMessage defaultMessage="Learn more" /> <ArrowDown size="13px" />{' '}
               </StyledButton>
             </Link>
           </Container>
@@ -365,7 +367,7 @@ const Pricing = () => {
             <Link href="/organizations/new">
               <StyledButton
                 buttonStyle="primary"
-                width={['224px', null, '103px']}
+                width={['224px', null, '160px']}
                 py="8px"
                 px={[null, null, 3]}
                 my="8px"
@@ -377,7 +379,7 @@ const Pricing = () => {
             </Link>
             <Link href="#fiscalHost">
               <StyledButton width={['224px', null, '139px']} py="8px" my="8px">
-                <FormattedMessage id="home.knowMore" defaultMessage="Learn more" /> <ArrowDown size="13px" />{' '}
+                <FormattedMessage defaultMessage="Learn more" /> <ArrowDown size="13px" />{' '}
               </StyledButton>
             </Link>
           </Container>

@@ -13,7 +13,6 @@ import StyledHR from '../StyledHr';
 import { H3, H4, H5, P, Span } from '../Text';
 
 import { COLLECTIVE_ACCESS } from './constants';
-import PlatformTip from './PlatformTip';
 
 const ListWrapper = styled(Box)`
   list-style: none;
@@ -46,6 +45,7 @@ const FeeData = styled(Span)`
 
 const FeeDataNoWrap = styled(FeeData)`
   white-space: nowrap;
+  margin-right: 0px;
 `;
 
 const FeeDescription = styled(FeeData)`
@@ -108,8 +108,6 @@ const messages = defineMessages({
   },
 });
 
-const displayPlatformTipBox = false;
-
 const ForCollectiveCard = () => {
   const intl = useIntl();
 
@@ -169,7 +167,7 @@ const ForCollectiveCard = () => {
                 <FormattedMessage
                   id="pricing.payoutFees"
                   defaultMessage="{fee} No fees on outgoing payments"
-                  values={{ fee: <FeeData>0$</FeeData> }}
+                  values={{ fee: <FeeData>$0</FeeData> }}
                 />{' '}
                 ¹
               </FeeDescription>
@@ -178,9 +176,13 @@ const ForCollectiveCard = () => {
               <FeeDescription>
                 <FormattedMessage
                   id="pricing.forCollective.hostFees"
-                  defaultMessage="<Fee>Host fees</Fee> may apply depending on your <FiscalHostLink>Fiscal Host</FiscalHostLink>"
+                  defaultMessage="{hostFees} may apply depending on your <FiscalHostLink>Fiscal Host</FiscalHostLink>"
                   values={{
-                    Fee: FeeDataNoWrap,
+                    hostFees: (
+                      <FeeDataNoWrap>
+                        <FormattedMessage defaultMessage="Host fees" />
+                      </FeeDataNoWrap>
+                    ),
                     FiscalHostLink: getI18nLink({
                       href: 'https://opencollective.com/fiscal-hosting',
                       openInNewTab: true,
@@ -211,9 +213,6 @@ const ForCollectiveCard = () => {
               }}
             />
           </P>
-          {displayPlatformTipBox && (
-            <PlatformTip width={[null, null, null, '451px']} minWidth={[null, null, '325px']} />
-          )}
         </Container>
         <Box>
           <ListWrapper as="ul" mt={['32px', 0]}>
@@ -230,14 +229,14 @@ const ForCollectiveCard = () => {
               <FormattedMessage defaultMessage="Transparent budget" />
             </ListItem>
             <ListItem>
-              <FormattedMessage id="pricing.expensePayOuts" defaultMessage="Expense payouts in local currencies" />
+              <FormattedMessage defaultMessage="Expense payouts in local currencies" />
             </ListItem>
           </ListWrapper>
           <Container display="flex" flexDirection={['column', null, null, null, 'row']}>
             <Link href="/create">
               <StyledButton
                 buttonStyle="primary"
-                width={['224px', '226px', null, '237px', '139px']}
+                width={['224px', '226px', null, '237px', '160px']}
                 py="8px"
                 my="8px"
                 px={[null, null, '16px']}
