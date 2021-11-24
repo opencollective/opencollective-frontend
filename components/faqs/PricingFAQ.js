@@ -55,7 +55,7 @@ const PricingFAQ = props => (
     <Entry>
       <Title>
         <H4 fontWeight="500" fontSize="20px" lineHeight="28px" letterSpacing="-0.008em">
-          <FormattedMessage id="pricing.faq.platform.title" defaultMessage="How does platform tips work?" />
+          <FormattedMessage id="pricing.faq.platform.title" defaultMessage="How do platform tips work?" />
         </H4>
       </Title>
       <Content>

@@ -152,7 +152,7 @@ const Pricing = () => {
             color="black.900"
             mb="14px"
           >
-            <FormattedMessage id="pricing.title" defaultMessage="Our Pricing Structure" />
+            <FormattedMessage id="pricing.title" defaultMessage="Open Collective Pricing" />
           </H1>
           <P
             fontSize={['14px', '15px', '16px']}
@@ -162,7 +162,7 @@ const Pricing = () => {
           >
             <FormattedMessage
               id="pricing.description"
-              defaultMessage="We aim to transform the way we organize ourselves online in initiatives and communities. This is our sustainability model."
+              defaultMessage="The platform supports sustainability for communities, and communities support sustainability for the platform."
             />
           </P>
         </Container>
@@ -209,16 +209,7 @@ const Pricing = () => {
                 <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.800">
                   <FormattedMessage
                     id="pricing.collectiveCard.description"
-                    defaultMessage="<strong>Collect, spend and manage money transparently.</strong> Connect your bank account or apply to a Fiscal Host <br></br><a>Read more</a>"
-                    values={{
-                      a: getI18nLink({
-                        href: 'https://docs.opencollective.com/help/collectives/quick-start-guide',
-                        openInNewTab: true,
-                      }),
-                      // eslint-disable-next-line react/display-name
-                      br: () => <br />,
-                      strong: I18nBold,
-                    }}
+                    defaultMessage="<strong>Collect, spend and manage money transparently.</strong> Connect your bank account as an <a href='https://docs.opencollective.com/help/independent-collectives'>Independent Collective</a>, or apply to a <a href='https://opencollective.com/fiscal-hosting'>Fiscal Host</a>."
                   />
                 </P>
               </Box>
@@ -251,7 +242,7 @@ const Pricing = () => {
               <ListItem>
                 <FormattedMessage
                   id="pricing.collectiveCard.hostFees"
-                  defaultMessage="Host fees may apply depending on your host"
+                  defaultMessage="Fiscal Host fees may apply, if you opt to join one"
                 />
               </ListItem>
             </ListWrapper>
@@ -267,12 +258,12 @@ const Pricing = () => {
                 whiteSpace="nowrap"
                 mr={[null, null, 3]}
               >
-                <FormattedMessage id="collective.create" defaultMessage="Create Collective" />
+                <FormattedMessage id="collective.create" defaultMessage="Create a Collective" />
               </StyledButton>
             </Link>
             <Link href="#collective">
               <StyledButton width={['224px', null, '139px']} py="8px" my="8px">
-                <FormattedMessage id="home.knowMore" defaultMessage="Know more" /> <ArrowDown size="13px" />{' '}
+                <FormattedMessage id="home.knowMore" defaultMessage="Learn more" /> <ArrowDown size="13px" />{' '}
               </StyledButton>
             </Link>
           </Container>
@@ -312,7 +303,7 @@ const Pricing = () => {
                 <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.800">
                   <FormattedMessage
                     id="pricing.fiscalHostCard.description"
-                    defaultMessage="<strong>You hold funds on behalf of Collectives.</strong>You decide which Collectives to accept and <strong>what (if any) fees to charge them.</strong>"
+                    defaultMessage="As a <a href='https://opencollective.com/become-a-fiscal-host'>Fiscal Host</a>, you hold funds on behalf of Collectives. <strong>You decide what fees to charge</strong> (if any), and share revenue with the platform."
                     values={{
                       strong: I18nBold,
                     }}
@@ -337,16 +328,16 @@ const Pricing = () => {
               >
                 <FormattedMessage
                   id="pricing.fiscalHost.unlimited"
-                  defaultMessage="Host unlimited Collectives and access to all features"
+                  defaultMessage="Host unlimited Collectives and access all features"
                 />
               </ListItem>
               <ListItem>
-                <FormattedMessage id="pricing.fiscalHost.noFees" defaultMessage="FREE if you don't charge Host fees" />
+                <FormattedMessage id="pricing.fiscalHost.noFees" defaultMessage="FREE if you don't charge Host Fees" />
               </ListItem>
               <ListItem>
                 <FormattedMessage
                   id="pricing.fiscalHost.hostFees"
-                  defaultMessage="15% revenue share if you charge Host fees"
+                  defaultMessage="15% revenue share with the platform if you charge Host Fees"
                 />
               </ListItem>
             </ListWrapper>
@@ -362,12 +353,12 @@ const Pricing = () => {
                 whiteSpace="nowrap"
                 mr={[null, null, 3]}
               >
-                <FormattedMessage id="pricing.getStarted" defaultMessage="Get started" />
+                <FormattedMessage id="pricing.getStarted" defaultMessage="Create a Fiscal Host" />
               </StyledButton>
             </Link>
             <Link href="#fiscalHost">
               <StyledButton width={['224px', null, '139px']} py="8px" my="8px">
-                <FormattedMessage id="home.knowMore" defaultMessage="Know more" /> <ArrowDown size="13px" />{' '}
+                <FormattedMessage id="home.knowMore" defaultMessage="Learn more" /> <ArrowDown size="13px" />{' '}
               </StyledButton>
             </Link>
           </Container>
