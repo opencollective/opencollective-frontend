@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { compose, get, pick } from 'lodash';
+import { compose, get, omit, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -42,7 +42,7 @@ import { withUser } from '../components/UserProvider';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
 
-const { USER, ORGANIZATION } = CollectiveType;
+const { ORGANIZATION } = CollectiveType;
 
 class CreateExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, parentCollectiveSlug } }) {
@@ -261,17 +261,23 @@ class CreateExpensePage extends React.Component {
     if (!loggedInAccount) {
       return [];
     } else {
-      const accountsAdminOf = get(loggedInAccount, 'adminMemberships.nodes', [])
-        .map(member => member.account)
-        .filter(
-          account =>
-            [USER, ORGANIZATION].includes(account.type) ||
-            // Same Host
-            (account.isActive && this.props.data?.account?.host?.id === account.host?.id) ||
-            // Self-hosted Collectives
-            (account.isActive && account.id === account.host?.id),
-        );
-      return [loggedInAccount, ...accountsAdminOf];
+      const payoutProfiles = [loggedInAccount];
+      for (const { account } of get(loggedInAccount, 'adminMemberships.nodes', [])) {
+        if (
+          // Organizations
+          [ORGANIZATION].includes(account.type) ||
+          // Same Host
+          (account.isActive && this.props.data?.account?.host?.id === account.host?.id) ||
+          // Self-hosted Collectives
+          (account.isActive && account.id === account.host?.id)
+        ) {
+          // Push main account
+          payoutProfiles.push(omit(account, ['childrenAccounts']));
+          // Push children
+          payoutProfiles.push(...account.childrenAccounts.nodes);
+        }
+      }
+      return payoutProfiles;
     }
   });
 
