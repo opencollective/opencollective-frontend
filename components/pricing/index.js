@@ -18,6 +18,7 @@ import { H1, H4, P } from '../Text';
 import ForCollectiveCard from './ForCollectiveCard';
 import ForFiscalHosts from './ForFiscalHostCard';
 import Tabs from './Tabs';
+import PlatformTip from './PlatformTip';
 
 const GlobalStyles = createGlobalStyle`
   html {
@@ -167,6 +168,9 @@ const Pricing = () => {
           </P>
         </Container>
       </Flex>
+
+      <PlatformTip width={[null, null, null, '451px']} minWidth={[null, null, '325px']} />
+
       <Container
         display="flex"
         px="16px"

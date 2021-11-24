@@ -176,6 +176,7 @@ const messages = defineMessages({
 
 const ForFiscalHosts = () => {
   const intl = useIntl();
+  const displayPlatformTipBox = false;
 
   return (
     <Card padding={['24px', null, '32px']} width={['288px', '636px']} borderRadius="8px" border="1px solid #DCDEE0">
@@ -267,7 +268,9 @@ const ForFiscalHosts = () => {
               id="pricing.platformShareBreakdown"
               defaultMessage="(2) If your Host Fee is 10% and your Collectives bring in $1,000, the Host gets $100 and $15 (15%) is the Platform Share.">
           </P>
-          <PlatformTip mt={[3, 4]} my={4} width={[null, null, null, '451px']} display={['none', null, null, 'flex']} />
+          {displayPlatformTipBox && (
+            <PlatformTip mt={[3, 4]} my={4} width={[null, null, null, '451px']} display={['none', null, null, 'flex']} />
+          )}
         </Box>
         <ListWrapper as="ul" mt={['16px', 0]}>
           <ListItem>
