@@ -20,6 +20,7 @@ const ExpenseTypeFilter = ({ onChange, value, ...props }) => {
         getOption('ALL'),
         getOption(expenseTypes.RECEIPT),
         getOption(expenseTypes.INVOICE),
+        getOption(expenseTypes.GRANT),
         getOption(expenseTypes.CHARGE),
         getOption(expenseTypes.UNCLASSIFIED),
       ]}
