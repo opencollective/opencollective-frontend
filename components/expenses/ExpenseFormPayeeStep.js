@@ -7,12 +7,11 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { compareNames } from '../../lib/collective.lib';
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
-import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { flattenObjectDeep } from '../../lib/utils';
+import { checkRequiresAddress, flattenObjectDeep } from '../../lib/utils';
 
 import CollectivePicker, {
   CUSTOM_OPTIONS_POSITION,
@@ -163,21 +162,12 @@ const checkStepOneCompleted = (values, isOnBehalf) => {
     return Boolean(values.payee);
   } else if (!isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod)))) {
     return false; // There are some errors in the form
-  } else if (values.type !== expenseTypes.RECEIPT && values.payee.type !== CollectiveType.COLLECTIVE) {
+  } else if (checkRequiresAddress(values)) {
     // Require an address for non-receipt expenses
     return Boolean(values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address);
   } else {
     return true;
   }
-};
-
-const checkRequiresAddress = values => {
-  return (
-    values.payee &&
-    values.payee.type !== CollectiveType.COLLECTIVE &&
-    !values.payee.isInvite &&
-    [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST, expenseTypes.GRANT].includes(values.type)
-  );
 };
 
 const ExpenseFormPayeeStep = ({
