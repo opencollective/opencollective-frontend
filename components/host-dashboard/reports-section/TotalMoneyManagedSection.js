@@ -28,7 +28,7 @@ const getMoneyManagedChartAreas = (hostBalance, collectivesBalance, hostCurrency
           <Span mx="6px" color="black.600">
             {' | '}
           </Span>
-          <FormattedMessage id="TotalMoneyManagedSection.hostOrganization" defaultMessage="Host Organization" />
+          <FormattedMessage id="TotalMoneyManagedSection.hostBalance" defaultMessage="Host Organization balance" />
         </P>
       ),
     },
@@ -43,7 +43,7 @@ const getMoneyManagedChartAreas = (hostBalance, collectivesBalance, hostCurrency
           <Span mx="6px" color="black.600">
             {' | '}
           </Span>
-          <FormattedMessage id="Collectives" defaultMessage="Collectives" />
+          <FormattedMessage id="TotalMoneyManagedSection.collectivesBalance" defaultMessage="Collectives balance" />
         </P>
       ),
     },
@@ -82,6 +82,7 @@ const TotalMoneyManagedSection = ({ host, collectives, isLoading }) => {
           )}
         </Flex>
       )}
+      {/*
       <Container display="flex" fontSize="11px" fontWeight="700" lineHeight="12px" alignItems="center">
         <Span textTransform="uppercase">
           <FormattedMessage
@@ -90,16 +91,14 @@ const TotalMoneyManagedSection = ({ host, collectives, isLoading }) => {
           />
         </Span>
       </Container>
+      */}
       <Container mt={18} mb={12}>
         <ProportionalAreaChart areas={chartAreas} />
       </Container>
       <Flex flexWrap="wrap" justifyContent="space-between">
         <Container px={2}>
           <P fontSize="12px" fontWeight="400" mt="16px">
-            <FormattedMessage
-              id="Host.Metrics.TotalMoneyManages.description"
-              defaultMessage="Total amount held in your bank account for the Host and its Collectives."
-            />
+            <FormattedMessage defaultMessage="How much money is your Host managing over time?" />
           </P>
         </Container>
         <Container px={2} textAlign="right">
