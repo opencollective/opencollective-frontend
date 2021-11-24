@@ -34,6 +34,7 @@ import StyledInputAmount from '../StyledInputAmount';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledTextarea from '../StyledTextarea';
+import StyledTooltip from '../StyledTooltip';
 import { H1, H4, P } from '../Text';
 
 import OCFPrimaryButton from './OCFPrimaryButton';
@@ -259,7 +260,19 @@ const ApplicationForm = ({
                               defaultMessage="About you and your initiative {padlock} {questionMark}"
                               values={{
                                 padlock: <Lock size="12px" color="#9D9FA3" />,
-                                questionMark: <Question size="13px" color="#DADADA" />,
+                                questionMark: (
+                                  <StyledTooltip
+                                    content={
+                                      <FormattedMessage
+                                        defaultMessage={
+                                          'Tell us more about your collective. This information is private and only used for internal purposes.'
+                                        }
+                                      />
+                                    }
+                                  >
+                                    <Question size="13px" color="#DADADA" />
+                                  </StyledTooltip>
+                                ),
                               }}
                             />
                           </H4>
@@ -354,6 +367,7 @@ const ApplicationForm = ({
                           <Box width={['256px', '234px', '324px']} my={2}>
                             <StyledInputFormikField
                               label={i18nOCFApplicationFormLabel(intl, 'slug')}
+                              helpText={<FormattedMessage defaultMessage="This can be edited later" />}
                               labelFontSize="13px"
                               labelColor="#4E5052"
                               labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -543,8 +557,19 @@ const ApplicationForm = ({
                             defaultMessage="If you have something to send us, please upload it to a storage service (Dropbox, Drive) and paste the sharing link here."
                           />
                         </P>
+                        <MessageBox type="info" withIcon fontSize="11px" lineHeight="16px" mt="20px">
+                          <FormattedMessage
+                            defaultMessage="Once your page is submitted, please be sure to have at least 2 admin (with First, Last Name) on your initiative's Team to ensure timely application processing. Instructions for adding admin <AdminAdditionDoc>here</AdminAdditionDoc>."
+                            values={{
+                              AdminAdditionDoc: getI18nLink({
+                                href: 'https://docs.opencollective.com/help/collectives/collective-settings/core-contributors',
+                                openInNewTab: true,
+                              }),
+                            }}
+                          />
+                        </MessageBox>
                       </Box>
-                      <Box width={['256px', '484px', '663px']} mb={2} mt="40px">
+                      <Box width={['256px', '484px', '663px']} mb={2} mt="20px">
                         <StyledHr />
                       </Box>
                       <Container
