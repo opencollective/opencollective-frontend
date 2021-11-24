@@ -9,7 +9,7 @@ import Container from '../Container';
 import PricingFAQ from '../faqs/PricingFAQ';
 import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
-import { getI18nLink, I18nBold } from '../I18nFormatters';
+import I18nFormatters, { getI18nLink, I18nBold } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledHR from '../StyledHr';
@@ -17,8 +17,8 @@ import { H1, H4, P } from '../Text';
 
 import ForCollectiveCard from './ForCollectiveCard';
 import ForFiscalHosts from './ForFiscalHostCard';
-import Tabs from './Tabs';
 import PlatformTip from './PlatformTip';
+import Tabs from './Tabs';
 
 const GlobalStyles = createGlobalStyle`
   html {
@@ -213,7 +213,18 @@ const Pricing = () => {
                 <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.800">
                   <FormattedMessage
                     id="pricing.collectiveCard.description"
-                    defaultMessage="<strong>Collect, spend and manage money transparently.</strong> Connect your bank account as an <a href='https://docs.opencollective.com/help/independent-collectives'>Independent Collective</a>, or apply to a <a href='https://opencollective.com/fiscal-hosting'>Fiscal Host</a>."
+                    defaultMessage="<strong>Collect, spend and manage money transparently.</strong> Connect your bank account as an <IndependentCollectiveLink>Independent Collective</IndependentCollectiveLink>, or apply to a <FiscalHostLink>Fiscal Host</FiscalHostLink>."
+                    values={{
+                      ...I18nFormatters,
+                      IndependentCollectiveLink: getI18nLink({
+                        href: 'https://docs.opencollective.com/help/independent-collectives',
+                        openInNewTab: true,
+                      }),
+                      FiscalHostLink: getI18nLink({
+                        href: 'https://opencollective.com/fiscal-hosting',
+                        openInNewTab: true,
+                      }),
+                    }}
                   />
                 </P>
               </Box>
@@ -262,7 +273,7 @@ const Pricing = () => {
                 whiteSpace="nowrap"
                 mr={[null, null, 3]}
               >
-                <FormattedMessage id="collective.create" defaultMessage="Create a Collective" />
+                <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
               </StyledButton>
             </Link>
             <Link href="#collective">
@@ -307,9 +318,13 @@ const Pricing = () => {
                 <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.800">
                   <FormattedMessage
                     id="pricing.fiscalHostCard.description"
-                    defaultMessage="As a <a href='https://opencollective.com/become-a-fiscal-host'>Fiscal Host</a>, you hold funds on behalf of Collectives. <strong>You decide what fees to charge</strong> (if any), and share revenue with the platform."
+                    defaultMessage="As a <FiscalHostLink>Fiscal Host</FiscalHostLink>, you hold funds on behalf of Collectives. <strong>You decide what fees to charge</strong> (if any), and share revenue with the platform."
                     values={{
                       strong: I18nBold,
+                      FiscalHostLink: getI18nLink({
+                        href: 'https://opencollective.com/become-a-fiscal-host',
+                        openInNewTab: true,
+                      }),
                     }}
                   />
                 </P>

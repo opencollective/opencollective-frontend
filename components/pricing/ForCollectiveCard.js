@@ -44,6 +44,10 @@ const FeeData = styled(Span)`
   margin-right: 8px;
 `;
 
+const FeeDataNoWrap = styled(FeeData)`
+  white-space: nowrap;
+`;
+
 const FeeDescription = styled(FeeData)`
   color: ${themeGet('colors.black.900')};
 `;
@@ -84,25 +88,21 @@ const messages = defineMessages({
     defaultMessage: 'Outside funds',
   },
   'pricing.outsideFunds.description': {
-    id: 'pricing.accessTo.manuallyCredit',
     defaultMessage:
-      "Manually credit Collective budgets with funds received outside the platform (e.g., cash, historical transactions, or third party channels like a shop).",
+      'Manually credit Collective budgets with funds received outside the platform (e.g., cash, historical transactions, or third party channels like a shop).',
   },
   'pricing.bankTransfer': {
     id: 'pricing.bankTransfer',
     defaultMessage: 'Bank transfer payments',
   },
   'pricing.bankTransfer.description': {
-    id: 'pricing.accessTo.bankTransfer',
-    defaultMessage:
-      'Automatically provide wire instructions and a reference number for tracking transactions.',
+    defaultMessage: 'Automatically provide wire instructions and a reference number for tracking transactions.',
   },
   'pricing.creditCard': {
     id: 'pricing.creditCard',
     defaultMessage: 'Credit card processing',
   },
   'pricing.creditCard.description': {
-    id: 'pricing.creditCard.description',
     defaultMessage:
       'Receive financial contributions via credit card, automatically updating your budget for transparent tracking. *Stripe fees apply',
   },
@@ -136,10 +136,7 @@ const ForCollectiveCard = () => {
           </H3>
           <StyledHR my="8px" />
           <P fontSize="14px" lineHeight="20px" color="black.800">
-            <FormattedMessage
-              id="pricing.forCollective.description"
-              defaultMessage="Bring your initiative to life"
-            />
+            <FormattedMessage id="pricing.forCollective.description" defaultMessage="Bring your initiative to life" />
           </P>
         </Box>
       </Flex>
@@ -181,8 +178,14 @@ const ForCollectiveCard = () => {
               <FeeDescription>
                 <FormattedMessage
                   id="pricing.forCollective.hostFees"
-                  defaultMessage="{fee} may apply depending on your <a href='https://opencollective.com/fiscal-hosting'>Fiscal Host</a>"
-                  values={{ fee: <FeeData whiteSpace="nowrap">Host fees</FeeData> }}
+                  defaultMessage="<Fee>Host fees</Fee> may apply depending on your <FiscalHostLink>Fiscal Host</FiscalHostLink>"
+                  values={{
+                    Fee: FeeDataNoWrap,
+                    FiscalHostLink: getI18nLink({
+                      href: 'https://opencollective.com/fiscal-hosting',
+                      openInNewTab: true,
+                    }),
+                  }}
                 />
               </FeeDescription>
             </Flex>
@@ -215,22 +218,19 @@ const ForCollectiveCard = () => {
         <Box>
           <ListWrapper as="ul" mt={['32px', 0]}>
             <ListItem>
-              <FormattedMessage id="pricing.fundraising" defaultMessage="Fundraising and crowdfunding features" />
+              <FormattedMessage defaultMessage="Fundraising and crowdfunding features" />
             </ListItem>
             <ListItem>
-              <FormattedMessage id="pricing.addFunds" defaultMessage="Manually add funds from other platforms" />
+              <FormattedMessage id="pricing.addFunds" defaultMessage="Manually add funds from other channels" />
             </ListItem>
             <ListItem>
-              <FormattedMessage id="pricing.communicationTools" defaultMessage="Community engagement tools" />
+              <FormattedMessage defaultMessage="Community engagement tools" />
             </ListItem>
             <ListItem>
-              <FormattedMessage id="pricing.openFinance" defaultMessage="Transparent budget" />
+              <FormattedMessage defaultMessage="Transparent budget" />
             </ListItem>
             <ListItem>
-              <FormattedMessage
-                id="pricing.expensePayOuts"
-                defaultMessage="Expense payouts in local currencies"
-              />
+              <FormattedMessage id="pricing.expensePayOuts" defaultMessage="Expense payouts in local currencies" />
             </ListItem>
           </ListWrapper>
           <Container display="flex" flexDirection={['column', null, null, null, 'row']}>
@@ -244,7 +244,7 @@ const ForCollectiveCard = () => {
                 whiteSpace="nowrap"
                 mr={[null, null, null, null, 2]}
               >
-                <FormattedMessage id="collective.create" defaultMessage="Create a Collective" />
+                <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
               </StyledButton>
             </Link>
             <Link href="/hosts">

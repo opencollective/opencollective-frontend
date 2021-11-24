@@ -12,7 +12,7 @@ import StyledButton from '../StyledButton';
 import StyledHR from '../StyledHr';
 import { H3, H4, H5, P, Span } from '../Text';
 
-import { FEATURES, FISCAL_HOST_ACCESS, PLANS } from './constants';
+import { FISCAL_HOST_ACCESS } from './constants';
 import PlatformTip from './PlatformTip';
 
 const ListWrapper = styled(Box)`
@@ -61,18 +61,6 @@ const AccessToWrapper = styled(Container)`
   }
 `;
 
-const PlansWrapper = styled(Container)`
-  ${Flex}:not(:first-of-type, :last-of-type) {
-    margin-left: 32px;
-    margin-right: 32px;
-
-    @media screen and (min-width: 40em) {
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-`;
-
 const Card = styled(Container)`
   @media screen and (min-width: 52em) {
     width: 700px;
@@ -89,7 +77,6 @@ const Card = styled(Container)`
 
 const messages = defineMessages({
   'pricing.dashboard': {
-    id: 'HostDashboard',
     defaultMessage: 'Host Admin Dashboard',
   },
   'pricing.dashboard.description': {
@@ -102,16 +89,14 @@ const messages = defineMessages({
     defaultMessage: 'Outside funds',
   },
   'pricing.outsideFunds.description': {
-    id: 'pricing.accessTo.manuallyCredit',
     defaultMessage:
-      "Manually credit Collective budgets with funds received outside the platform, such as other e-commerce or fundraising tools.",
+      'Manually credit Collective budgets with funds received outside the platform, such as other e-commerce or fundraising tools.',
   },
   'pricing.bankTransfer': {
     id: 'pricing.bankTransfer',
     defaultMessage: 'Bank transfer payments',
   },
   'pricing.bankTransfer.description': {
-    id: 'pricing.accessTo.bankTransfer',
     defaultMessage:
       'Automatically provide wire instructions and a reference number for tracking. Confirm receipt of funds with one click.',
   },
@@ -120,7 +105,6 @@ const messages = defineMessages({
     defaultMessage: 'Credit card processing',
   },
   'pricing.creditCard.description': {
-    id: 'pricing.creditCard.description',
     defaultMessage:
       'Receive financial contributions via credit card, automatically updating each Collective budget. *Stripe fees apply',
   },
@@ -213,7 +197,10 @@ const ForFiscalHosts = () => {
         color="blue.700"
         mb={['16px', '0']}
       >
-        <FormattedMessage id="pricing.forFiscalHost.fees.header" defaultMessage="Free if you don't have revenue, sharing if you do" />
+        <FormattedMessage
+          id="pricing.forFiscalHost.fees.header"
+          defaultMessage="Free if you don't have revenue, sharing if you do"
+        />
       </H5>
       <Flex flexDirection={['column', 'row']} alignItems={['flex-start', 'center']}>
         <Box mr={[null, '33px', '72px']}>
@@ -266,27 +253,36 @@ const ForFiscalHosts = () => {
           <P fontSize="12px" lineHeight="18px" color="black.700">
             <FormattedMessage
               id="pricing.platformShareBreakdown"
-              defaultMessage="(2) If your Host Fee is 10% and your Collectives bring in $1,000, the Host gets $100 and $15 (15%) is the Platform Share.">
+              defaultMessage="(2) If your Host Fee is 10% and your Collectives bring in $1,000, the Host gets $100 and $15 (15%) is the Platform Share."
+            />
           </P>
           {displayPlatformTipBox && (
-            <PlatformTip mt={[3, 4]} my={4} width={[null, null, null, '451px']} display={['none', null, null, 'flex']} />
+            <PlatformTip
+              mt={[3, 4]}
+              my={4}
+              width={[null, null, null, '451px']}
+              display={['none', null, null, 'flex']}
+            />
           )}
         </Box>
         <ListWrapper as="ul" mt={['16px', 0]}>
           <ListItem>
-            <FormattedMessage id="pricing.fundraising" defaultMessage="Each Collective gets its own fundraising page" />
+            <FormattedMessage defaultMessage="Each Collective gets its own fundraising page" />
           </ListItem>
           <ListItem>
-            <FormattedMessage id="pricing.accounting" defaultMessage="No more messy spreadsheets! It's all automated, and your accountant will thank you" />
+            <FormattedMessage
+              id="pricing.accounting"
+              defaultMessage="No more messy spreadsheets! It's all automated, and your accountant will thank you"
+            />
           </ListItem>
           <ListItem>
-            <FormattedMessage id="pricing.addFunds" defaultMessage="Manually add funds from other channels, accurately tracking all budgets" />
+            <FormattedMessage defaultMessage="Manually add funds from other channels, accurately tracking all budgets" />
           </ListItem>
           <ListItem>
-            <FormattedMessage id="pricing.communicationTools" defaultMessage="Community engagement features" />
+            <FormattedMessage defaultMessage="Community engagement features" />
           </ListItem>
           <ListItem>
-            <FormattedMessage id="pricing.openFinance" defaultMessage="Financial tracking and transparency means reporting writes itself" />
+            <FormattedMessage defaultMessage="Financial tracking and transparency means reporting writes itself" />
           </ListItem>
           <ListItem>
             <FormattedMessage
@@ -297,7 +293,6 @@ const ForFiscalHosts = () => {
         </ListWrapper>
       </Flex>
       <PlatformTip mt={[3, 4]} my={4} width={[null, '588px']} display={['flex', null, null, 'none']} />
-
 
       {/*
          this button should fit below the above list as in ForCollectiveCard.js but I don't know how to format it correctly
