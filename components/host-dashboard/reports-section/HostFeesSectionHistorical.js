@@ -122,8 +122,8 @@ const getChartOptions = (intl, hostCurrency) => ({
 });
 
 const SERIES_NAMES = defineMessages({
-  hostRevenue: { defaultMessage: 'Host revenue' },
-  hostFeeShare: { id: 'Transaction.kind.HOST_FEE_SHARE', defaultMessage: 'Host fee share' },
+  hostRevenue: { defaultMessage: 'Net Host Fees' },
+  hostFeeShare: { id: 'Transaction.kind.HOST_FEE_SHARE', defaultMessage: 'Platform share' },
 });
 
 const getHostFeesWithoutShare = (hostFeeNodes, hostFeeShareNodes) => {

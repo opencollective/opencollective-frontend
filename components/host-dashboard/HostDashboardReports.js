@@ -233,11 +233,12 @@ const HostDashboardReports = ({ hostSlug }) => {
         </Container>
         <Container mb={38}>
           <SectionTitle>
-            <FormattedMessage id="Host.FeesCollective" defaultMessage="Host fees (collected)" />
+            <FormattedMessage id="Host.FeesCollective" defaultMessage="Collected Host Fees" />
           </SectionTitle>
           <HostFeesSection host={host} collectives={collectives} isLoading={loading} />
         </Container>
         <Container mb={38}>
+          {/*
           <SectionTitle
             hint={
               <FormattedMessage
@@ -246,7 +247,9 @@ const HostDashboardReports = ({ hostSlug }) => {
               />
             }
           >
-            <FormattedMessage id="TransactionsOverview" defaultMessage="Transactions overview" />
+          */}
+          <SectionTitle>
+            <FormattedMessage id="TransactionsOverview" defaultMessage="Contributions and Expenses" />
           </SectionTitle>
           <TransactionsOverviewSection host={host} isLoading={loading} />
         </Container>
