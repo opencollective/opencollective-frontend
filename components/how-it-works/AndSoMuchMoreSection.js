@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import Container from '../Container';
-import { Box, Flex, Grid } from '../Grid';
+import { Box, Flex } from '../Grid';
 import Illustration from '../home/HomeIllustration';
 import StyledLink from '../StyledLink';
 import { H2, H3, P } from '../Text';
@@ -42,12 +42,12 @@ const MoreFeatures = () => (
         </P>
       </Box>
     </Container>
-    <Grid
+    <Flex
       mx={3}
-      gridTemplateColumns={[null, 'repeat(2, 1fr)', null, null, 'repeat(3, 1fr)']}
       gridGap={['48px', '72px 40px', '72px 112px', null, '124px 112px']}
       placeSelf="center"
-      justifyItems="center"
+      justifyContent="center"
+      flexWrap="wrap"
       alignItems={['center', null, null, 'flex-start']}
       mt={['27px', '56px', null, null, '69px']}
       maxWidth="1200px"
@@ -132,7 +132,7 @@ const MoreFeatures = () => (
           </P>
         </Box>
       </Container>
-    </Grid>
+    </Flex>
     <Box mt="74px">
       <StyledLink
         width="100%"
