@@ -49,6 +49,6 @@ exports[`Currency renders default options 2`] = `
   fontSize="inherit"
   letterSpacing="-0.4px"
 >
-  $19,000
+  19 000 $
 </span>
 `;

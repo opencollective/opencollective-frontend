@@ -78,9 +78,9 @@ const ItemTitleWrapper = ({ expense, children }) => {
 };
 
 ItemTitleWrapper.propTypes = {
-  children: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired,
   expense: PropTypes.shape({
-    legacyId: PropTypes.string,
+    legacyId: PropTypes.number,
     account: PropTypes.shape({
       slug: PropTypes.string,
     }),
@@ -224,7 +224,9 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             >
               <TransactionSign isCredit={isCredit} />
               <Span fontWeight="bold" color="black.900" mr={1}>
-                {formatCurrency(Math.abs(displayedAmount.valueInCents), displayedAmount.currency)}
+                {formatCurrency(Math.abs(displayedAmount.valueInCents), displayedAmount.currency, {
+                  locale: intl.locale,
+                })}
               </Span>
               <Span color="black.700" textTransform="uppercase">
                 {displayedAmount.currency}

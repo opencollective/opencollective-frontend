@@ -457,6 +457,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
       const minAmountForSelectedCurrency =
         availableCurrencies.find(c => c.code === selectedCurrency)?.minInvoiceAmount * 100;
       if (invoiceTotalAmount < minAmountForSelectedCurrency) {
+        // TODO intl
         return `The minimum amount for transferring to ${selectedCurrency} is ${formatCurrency(
           minAmountForSelectedCurrency,
           wiseHost.currency,

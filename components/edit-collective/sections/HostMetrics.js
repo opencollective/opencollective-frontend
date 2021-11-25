@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl, useIntl } from 'react-intl';
 
 import { formatValueAsCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
@@ -67,6 +67,7 @@ const metricsQuery = gqlV2/* GraphQL */ `
 `;
 
 const HostMetrics = props => {
+  const { locale } = useIntl();
   const { loading, data, error } = useQuery(metricsQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: props.collective.slug },
@@ -127,7 +128,7 @@ const HostMetrics = props => {
                 <FormattedMessage id="Host.Metrics.TotalMoneyManages" defaultMessage="Total Money Managed" />
               </P>
               <P fontSize="20px" mt={1}>
-                {formatValueAsCurrency(data.host.hostMetrics.totalMoneyManaged)}{' '}
+                {formatValueAsCurrency(data.host.hostMetrics.totalMoneyManaged, { locale })}{' '}
                 <Span color="black.400">{data.host.hostMetrics.totalMoneyManaged.currency}</Span>
               </P>
               <P fontSize="10px">
@@ -144,7 +145,7 @@ const HostMetrics = props => {
                 <FormattedMessage id="Host.Metrics.HostFees" defaultMessage="Host Fees" />
               </P>
               <P fontSize="20px" mt={1}>
-                {formatValueAsCurrency(data.host.hostMetrics.hostFees)}{' '}
+                {formatValueAsCurrency(data.host.hostMetrics.hostFees, { locale })}{' '}
                 <Span color="black.400">{data.host.hostMetrics.hostFees.currency}</Span>
               </P>
               <P fontSize="10px">
@@ -162,7 +163,7 @@ const HostMetrics = props => {
                   <FormattedMessage id="Host.Metrics.PlatformFees" defaultMessage="Platform Fees" />
                 </P>
                 <P fontSize="20px" mt={1}>
-                  {formatValueAsCurrency(data.host.hostMetrics.platformFees)}{' '}
+                  {formatValueAsCurrency(data.host.hostMetrics.platformFees, { locale })}{' '}
                   <Span color="black.400">{data.host.hostMetrics.platformFees.currency}</Span>
                 </P>
                 <P fontSize="10px">
@@ -177,7 +178,7 @@ const HostMetrics = props => {
                   <FormattedMessage id="Host.Metrics.PendingPlatformFees" defaultMessage="Pending Platform Fees" />
                 </P>
                 <P fontSize="20px" mt={1}>
-                  {formatValueAsCurrency(data.host.hostMetrics.pendingPlatformFees)}{' '}
+                  {formatValueAsCurrency(data.host.hostMetrics.pendingPlatformFees, { locale })}{' '}
                   <Span color="black.400">{data.host.hostMetrics.pendingPlatformFees.currency}</Span>
                 </P>
                 <P fontSize="10px">
@@ -196,7 +197,7 @@ const HostMetrics = props => {
                   <FormattedMessage id="Host.Metrics.PlatformTips" defaultMessage="Platform Tips" />
                 </P>
                 <P fontSize="20px" mt={1}>
-                  {formatValueAsCurrency(data.host.hostMetrics.platformTips)}{' '}
+                  {formatValueAsCurrency(data.host.hostMetrics.platformTips, { locale })}{' '}
                   <Span color="black.400">{data.host.hostMetrics.platformTips.currency}</Span>
                 </P>
                 <P fontSize="10px">
@@ -211,7 +212,7 @@ const HostMetrics = props => {
                   <FormattedMessage id="Host.Metrics.PendingPlatformTips" defaultMessage="Pending Platform Tips" />
                 </P>
                 <P fontSize="20px" mt={1}>
-                  {formatValueAsCurrency(data.host.hostMetrics.pendingPlatformTips)}{' '}
+                  {formatValueAsCurrency(data.host.hostMetrics.pendingPlatformTips, { locale })}{' '}
                   <Span color="black.400">{data.host.hostMetrics.pendingPlatformTips.currency}</Span>
                 </P>
                 <P fontSize="10px">
@@ -234,7 +235,7 @@ const HostMetrics = props => {
                   />
                 </P>
                 <P fontSize="20px" mt={1}>
-                  {formatValueAsCurrency(data.host.hostMetrics.hostFeeShare)}{' '}
+                  {formatValueAsCurrency(data.host.hostMetrics.hostFeeShare, { locale })}{' '}
                   <Span color="black.400">{data.host.hostMetrics.hostFeeShare.currency}</Span>
                 </P>
                 <P fontSize="10px">
@@ -249,7 +250,7 @@ const HostMetrics = props => {
                   <FormattedMessage id="Host.Metrics.PendingHostFeeShare" defaultMessage="Pending Host Fee Share" />
                 </P>
                 <P fontSize="20px" mt={1}>
-                  {formatValueAsCurrency(data.host.hostMetrics.pendingHostFeeShare)}{' '}
+                  {formatValueAsCurrency(data.host.hostMetrics.pendingHostFeeShare, { locale })}{' '}
                   <Span color="black.400">{data.host.hostMetrics.pendingHostFeeShare.currency}</Span>
                 </P>
                 <P fontSize="10px">

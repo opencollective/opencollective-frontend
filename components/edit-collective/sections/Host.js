@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { get, groupBy } from 'lodash';
 import { withRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
@@ -52,6 +52,7 @@ class Host extends React.Component {
     LoggedInUser: PropTypes.object.isRequired,
     editCollectiveMutation: PropTypes.func.isRequired,
     router: PropTypes.object.isRequired, // from withRouter
+    intl: PropTypes.object.isRequired, // from injectIntl
   };
 
   constructor(props) {
@@ -112,8 +113,9 @@ class Host extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, collective, router } = this.props;
+    const { LoggedInUser, collective, router, intl } = this.props;
     const { showModal, action } = this.state;
+    const { locale } = intl;
 
     const selectedOption = get(router, 'query.selectedOption', 'noHost');
     const hostMembership = get(collective, 'members', []).find(m => m.role === 'HOST');
@@ -140,7 +142,7 @@ class Host extends React.Component {
                   id="editCollective.selfHost.balance"
                   defaultMessage="Current balance: {balance}."
                   values={{
-                    balance: formatCurrency(collective.stats.balance, collective.currency),
+                    balance: formatCurrency(collective.stats.balance, collective.currency, { locale }),
                     type: collective.type,
                   }}
                 />{' '}
@@ -229,7 +231,7 @@ class Host extends React.Component {
                         id="editCollective.host.balance"
                         defaultMessage="It currently holds {balance} on behalf of {type, select, COLLECTIVE {your Collective} FUND {your Fund} other {your Account}}."
                         values={{
-                          balance: formatCurrency(collective.stats.balance, collective.currency),
+                          balance: formatCurrency(collective.stats.balance, collective.currency, { locale }),
                           type: collective.type,
                         }}
                       />
@@ -530,4 +532,4 @@ class Host extends React.Component {
   }
 }
 
-export default withRouter(Host);
+export default withRouter(injectIntl(Host));

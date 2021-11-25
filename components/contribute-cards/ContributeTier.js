@@ -105,7 +105,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
     description = intl.formatMessage(messages.fallbackDescription, {
       minAmount: minAmount || 0,
       tierName: tier.name,
-      minAmountWithCurrency: minAmount && formatCurrency(minAmount, currency),
+      minAmountWithCurrency: minAmount && formatCurrency(minAmount, currency, { locale: intl.locale }),
       interval: tier.interval ?? '',
     });
   }

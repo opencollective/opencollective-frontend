@@ -5,9 +5,9 @@ import { get } from 'lodash';
 import { injectIntl } from 'react-intl';
 
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
+import { floatAmountToCents } from '../lib/currency-utils';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { floatAmountToCents } from '../lib/math';
 import { compose, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Calendar } from '@styled-icons/feather/Calendar';
 import { Expand } from '@styled-icons/ionicons-solid/Expand';
 import { ShowChart } from '@styled-icons/material/ShowChart';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -61,6 +61,7 @@ const StatContainer = styled.div`
 `;
 
 const BudgetStats = ({ collective, stats }) => {
+  const { locale } = useIntl();
   const monthlyRecurring =
     (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
   const isFund = collective.type === CollectiveType.FUND;
@@ -90,7 +91,7 @@ const BudgetStats = ({ collective, stats }) => {
                 <FormattedMessage
                   id="budgetSection-raised-total"
                   defaultMessage="Total contributed before fees: {amount}"
-                  values={{ amount: formatCurrency(stats?.totalAmountRaised || 0, collective.currency) }}
+                  values={{ amount: formatCurrency(stats?.totalAmountRaised || 0, collective.currency, { locale }) }}
                 />
               </Box>
             }
@@ -118,13 +119,15 @@ const BudgetStats = ({ collective, stats }) => {
                   <FormattedMessage
                     id="CollectivePage.SectionBudget.MonthlyRecurringAmount"
                     defaultMessage="Monthly recurring: {amount}"
-                    values={{ amount: formatCurrency(monthlyRecurring, collective.currency) }}
+                    values={{ amount: formatCurrency(monthlyRecurring, collective.currency, { locale }) }}
                   />
                   <br />
                   <FormattedMessage
                     id="CollectivePage.SectionBudget.TotalAmountReceived"
                     defaultMessage="Total received in the last 12 months: {amount}"
-                    values={{ amount: formatCurrency(stats?.totalAmountReceived || 0, collective.currency) }}
+                    values={{
+                      amount: formatCurrency(stats?.totalAmountReceived || 0, collective.currency, { locale }),
+                    }}
                   />
                 </Box>
               }

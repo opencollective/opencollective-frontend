@@ -478,9 +478,12 @@ class GoalsCover extends React.Component {
   }
 
   renderGoal(goal, index) {
-    const { collective } = this.props;
+    const { collective, intl } = this.props;
     const slug = goal.slug;
-    const amount = formatCurrency(goal.amount || 0, collective.currency, { precision: goal.precision || 0 });
+    const amount = formatCurrency(goal.amount || 0, collective.currency, {
+      precision: goal.precision || 0,
+      locale: intl.locale,
+    });
 
     return (
       <GoalContainer className={`goal ${goal.slug}`} key={slug} goal={goal} index={index}>

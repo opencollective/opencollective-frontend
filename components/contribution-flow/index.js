@@ -575,8 +575,8 @@ class ContributionFlow extends React.Component {
             const currency = tier?.amount.currency || collective.currency;
             return confirm(
               intl.formatMessage(OTHER_MESSAGES.tipLargerThanContributionWarning, {
-                contributionAmount: formatCurrency(stepDetails.amount, currency),
-                tipAmount: formatCurrency(stepDetails.platformContribution, currency),
+                contributionAmount: formatCurrency(stepDetails.amount, currency, { locale: intl.locale }),
+                tipAmount: formatCurrency(stepDetails.platformContribution, currency, { locale: intl.locale }),
                 accountName: collective.name,
                 newLine: '\n',
               }),

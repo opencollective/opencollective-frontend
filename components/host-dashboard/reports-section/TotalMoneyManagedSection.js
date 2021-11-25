@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/fa-solid/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/fa-solid/ChevronUp/ChevronUp';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../lib/currency-utils';
 
@@ -15,7 +15,7 @@ import { P, Span } from '../../Text';
 
 import TotalMoneyManagedHistorical from './TotalMoneyManagedHistorical';
 
-const getMoneyManagedChartAreas = (hostBalance, collectivesBalance, hostCurrency, isLoading) => {
+const getMoneyManagedChartAreas = (hostBalance, collectivesBalance, hostCurrency, isLoading, locale) => {
   return [
     {
       key: 'organization',
@@ -24,7 +24,7 @@ const getMoneyManagedChartAreas = (hostBalance, collectivesBalance, hostCurrency
         <LoadingPlaceholder width={195} height={16} />
       ) : (
         <P fontSize="12px" lineHeight="18px" color="black.700">
-          <Span fontWeight="bold">{formatCurrency(hostBalance, hostCurrency)}</Span>
+          <Span fontWeight="bold">{formatCurrency(hostBalance, hostCurrency, { locale })}</Span>
           <Span mx="6px" color="black.600">
             {' | '}
           </Span>
@@ -39,7 +39,7 @@ const getMoneyManagedChartAreas = (hostBalance, collectivesBalance, hostCurrency
         <LoadingPlaceholder width={165} height={16} />
       ) : (
         <P fontSize="12px" lineHeight="18px">
-          <Span fontWeight="700">{formatCurrency(collectivesBalance, hostCurrency)}</Span>{' '}
+          <Span fontWeight="700">{formatCurrency(collectivesBalance, hostCurrency, { locale })}</Span>{' '}
           <Span mx="6px" color="black.600">
             {' | '}
           </Span>
@@ -51,6 +51,7 @@ const getMoneyManagedChartAreas = (hostBalance, collectivesBalance, hostCurrency
 };
 
 const TotalMoneyManagedSection = ({ host, collectives, isLoading }) => {
+  const { locale } = useIntl();
   const [showMoneyManagedChart, setShowMoneyManagedChart] = useState(false);
 
   // Compute some general stats
@@ -65,7 +66,7 @@ const TotalMoneyManagedSection = ({ host, collectives, isLoading }) => {
   }
 
   // Generate graph data (memoized for performances)
-  const chartArgs = [hostBalance, collectivesBalance, host?.currency, isLoading];
+  const chartArgs = [hostBalance, collectivesBalance, host?.currency, isLoading, locale];
   const chartAreas = React.useMemo(() => getMoneyManagedChartAreas(...chartArgs), chartArgs);
 
   return (
@@ -76,7 +77,7 @@ const TotalMoneyManagedSection = ({ host, collectives, isLoading }) => {
             <LoadingPlaceholder height={21} width={125} />
           ) : (
             <Span fontSize={18} fontWeight="500">
-              {formatCurrency(hostMetrics.totalMoneyManaged.valueInCents, host.currency)}
+              {formatCurrency(hostMetrics.totalMoneyManaged.valueInCents, host.currency, { locale })}
             </Span>
           )}
         </Flex>

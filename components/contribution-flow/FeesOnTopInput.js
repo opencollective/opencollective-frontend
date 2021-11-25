@@ -68,7 +68,7 @@ const FeesOnTopInput = ({ currency, amount, quantity, fees, onChange }) => {
     if (option.currency) {
       return (
         <span>
-          {formatCurrency(option.feeAmount, option.currency)}{' '}
+          {formatCurrency(option.feeAmount, option.currency, { locale: intl.locale })}{' '}
           <Span color="black.500">({option.percentage * 100}%)</Span>
         </span>
       );
