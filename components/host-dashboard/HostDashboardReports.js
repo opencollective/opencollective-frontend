@@ -60,11 +60,31 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
         dailyAverageIncomeAmount {
           valueInCents
         }
+        contributionAmountOverTime {
+          nodes {
+            date
+            amount {
+              value
+              valueInCents
+              currency
+            }
+          }
+        }
       }
       expenseStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
         expensesCount
         dailyAverageAmount {
           valueInCents
+        }
+        expenseAmountOverTime {
+          nodes {
+            date
+            amount {
+              value
+              valueInCents
+              currency
+            }
+          }
         }
         invoicesCount
         reimbursementsCount
@@ -248,7 +268,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           >
             <FormattedMessage id="TransactionsOverview" defaultMessage="Transactions overview" />
           </SectionTitle>
-          <TransactionsOverviewSection host={host} isLoading={loading} />
+          <TransactionsOverviewSection host={host} isLoading={loading} dateInterval={dateInterval} />
         </Container>
         <Box mb={4}>
           <PlatformTipsCollected host={host} isLoading={loading} />

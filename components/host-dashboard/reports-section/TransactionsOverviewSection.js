@@ -1,13 +1,120 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import dayjs from 'dayjs';
+import dynamic from 'next/dynamic';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../lib/currency-utils';
 
-import { Box } from '../../Grid';
+import Container from '../../Container';
+import { Box, Flex } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
+
+const getChartOptions = (intl, startDate, endDate, hostCreatedAt) => {
+  return {
+    chart: {
+      id: 'chart-transactions-overview',
+    },
+    legend: {
+      show: true,
+      horizontalAlign: 'left',
+    },
+    colors: ['#29CC75', '#F55882'],
+    grid: {
+      xaxis: { lines: { show: true } },
+      yaxis: { lines: { show: false } },
+    },
+    stroke: {
+      curve: 'straight',
+      width: 1.5,
+    },
+    dataLabels: {
+      enabled: false,
+    },
+
+    xaxis: {
+      categories: getCategories(intl, startDate, endDate, hostCreatedAt),
+    },
+    yaxis: {
+      labels: {
+        formatter: function (value) {
+          return value < 1000 ? value : `${Math.round(value / 1000)}k`;
+        },
+      },
+    },
+  };
+};
+
+const getCategories = (intl, startDate, endDate, hostCreatedAt) => {
+  const numberOfDays = dayjs(startDate || hostCreatedAt).diff(dayjs(endDate), 'day');
+  if (numberOfDays <= 7) {
+    const startDay = startDate.getDay();
+    return [...new Array(7)].map((_, idx) =>
+      intl.formatDate(new Date(0, 0, idx + startDay), { weekday: 'long' }).toUpperCase(),
+    );
+  } else if (numberOfDays <= 365) {
+    const currentMonth = new Date().getMonth();
+    return [...new Array(12)].map((_, idx) =>
+      intl.formatDate(new Date(0, idx + currentMonth + 1), { month: 'short' }).toUpperCase(),
+    );
+  } else {
+    return [...new Array(6)].map((_, idx) =>
+      intl.formatDate(new Date(new Date().getFullYear() - 5 + idx, 0), { year: 'numeric' }).toUpperCase(),
+    );
+  }
+};
+
+const getCategoryType = (startDate, endDate, hostCreatedAt) => {
+  const numberOfDays = dayjs(startDate || hostCreatedAt).diff(dayjs(endDate), 'day');
+  if (numberOfDays <= 7) {
+    return 'WEEK';
+  } else if (numberOfDays <= 365) {
+    return 'MONTH';
+  } else {
+    return 'YEAR';
+  }
+};
+
+const constructChartDataPoints = (category, dataPoints) => {
+  let chartDataPoints;
+
+  // Show data for the past 5 years from the current year.
+  if (category === 'YEAR') {
+    chartDataPoints = new Array(6).fill(0);
+    const currentYear = new Date().getFullYear();
+    dataPoints.forEach(dataPoint => {
+      const year = new Date(dataPoint.date).getFullYear();
+      if (year > currentYear - 6) {
+        chartDataPoints[5 - (currentYear - year)] = Math.abs(dataPoint.amount.value);
+      }
+    });
+    // Show data for the past 12 months
+  } else if (category === 'MONTH') {
+    chartDataPoints = new Array(12).fill(0);
+    dataPoints.forEach(dataPoint => {
+      const date = new Date(dataPoint.date);
+      const today = new Date();
+      if (today.getFullYear() - date.getFullYear() <= 1) {
+        chartDataPoints[(date.getMonth() + (12 - today.getMonth())) % 12] = Math.abs(dataPoint.amount.value);
+      }
+    });
+    // Show data for the past 7 days
+  } else if (category === 'WEEK') {
+    chartDataPoints = new Array(7).fill(0);
+    dataPoints.forEach(dataPoint => {
+      const date = new Date(dataPoint.date);
+      const today = new Date();
+      if (today.getFullYear() === date.getFullYear() && today.getMonth() === date.getMonth()) {
+        chartDataPoints[date.getDay() % 7] = Math.abs(dataPoint.amount.value);
+      }
+    });
+  }
+
+  return chartDataPoints;
+};
 
 const getTransactionsAreaChartData = host => {
   if (!host) {
@@ -140,20 +247,66 @@ const getTransactionsBreakdownChartData = host => {
   return areas;
 };
 
-const TransactionsOverviewSection = ({ host, isLoading }) => {
+const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
+  const intl = useIntl();
+  const categoryType = getCategoryType(new Date(dateInterval?.from), new Date(dateInterval?.to), host?.createdAt);
+
+  const contributionStats = host?.contributionStats;
+  const expenseStats = host?.expenseStats;
+
+  const { contributionAmountOverTime } = contributionStats || 0;
+  const { expenseAmountOverTime } = expenseStats || 0;
+
+  const series = [
+    {
+      name: 'Contributions',
+      data: contributionAmountOverTime
+        ? constructChartDataPoints(categoryType, contributionAmountOverTime.nodes)
+        : null,
+    },
+    {
+      name: 'Expenses',
+      data: expenseAmountOverTime ? constructChartDataPoints(categoryType, expenseAmountOverTime.nodes) : null,
+    },
+  ];
+
   const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host), [host]);
   const transactionBreakdownChart = React.useMemo(() => getTransactionsBreakdownChartData(host), [host]);
   return (
-    <Box mt={18} mb={12}>
-      {isLoading ? (
-        <LoadingPlaceholder height="98px" borderRadius="8px" />
-      ) : (
-        <div>
-          <ProportionalAreaChart areas={areaChartData} borderRadius="6px 6px 0 0" />
-          <ProportionalAreaChart areas={transactionBreakdownChart} borderRadius="0 0 6px 6px" />
-        </div>
-      )}
-    </Box>
+    <React.Fragment>
+      <Box mt={18} mb={12}>
+        {isLoading ? (
+          <LoadingPlaceholder height="98px" borderRadius="8px" />
+        ) : (
+          <div>
+            <ProportionalAreaChart areas={areaChartData} borderRadius="6px 6px 0 0" />
+            <ProportionalAreaChart areas={transactionBreakdownChart} borderRadius="0 0 6px 6px" />
+          </div>
+        )}
+      </Box>
+      <Box>
+        {isLoading ? (
+          <LoadingPlaceholder height={21} width={125} />
+        ) : (
+          <Flex flexWrap="wrap" mt={18} mb={12}>
+            <Container mt={2}>
+              <Chart
+                type="area"
+                width="100%"
+                height="250px"
+                options={getChartOptions(
+                  intl,
+                  new Date(dateInterval?.from),
+                  new Date(dateInterval?.to),
+                  host.createdAt,
+                )}
+                series={series}
+              />
+            </Container>
+          </Flex>
+        )}
+      </Box>
+    </React.Fragment>
   );
 };
 
@@ -162,6 +315,7 @@ TransactionsOverviewSection.propTypes = {
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     currency: PropTypes.string,
+    createdAt: PropTypes.string,
     contributionStats: PropTypes.shape({
       contributionsCount: PropTypes.number,
       oneTimeContributionsCount: PropTypes.number,
@@ -180,6 +334,7 @@ TransactionsOverviewSection.propTypes = {
       }),
     }),
   }),
+  dateInterval: PropTypes.object,
 };
 
 export default TransactionsOverviewSection;
