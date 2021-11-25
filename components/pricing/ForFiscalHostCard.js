@@ -12,8 +12,7 @@ import StyledButton from '../StyledButton';
 import StyledHR from '../StyledHr';
 import { H3, H4, H5, P, Span } from '../Text';
 
-import { FEATURES, FISCAL_HOST_ACCESS, PLANS } from './constants';
-import PlatformTip from './PlatformTip';
+import { FISCAL_HOST_ACCESS } from './constants';
 
 const ListWrapper = styled(Box)`
   list-style: none;
@@ -61,18 +60,6 @@ const AccessToWrapper = styled(Container)`
   }
 `;
 
-const PlansWrapper = styled(Container)`
-  ${Flex}:not(:first-of-type, :last-of-type) {
-    margin-left: 32px;
-    margin-right: 32px;
-
-    @media screen and (min-width: 40em) {
-      margin-left: 0;
-      margin-right: 0;
-    }
-  }
-`;
-
 const Card = styled(Container)`
   @media screen and (min-width: 52em) {
     width: 700px;
@@ -89,40 +76,36 @@ const Card = styled(Container)`
 
 const messages = defineMessages({
   'pricing.dashboard': {
-    id: 'HostDashboard',
-    defaultMessage: 'Host Dashboard',
+    defaultMessage: 'Host Admin Dashboard',
   },
   'pricing.dashboard.description': {
     id: 'HostDashboard.description',
     defaultMessage:
-      'A host dashboard to easily manage budgets and expenses across all your Collectives, including one-click payouts via Paypal and TransferWise.',
+      'Easily manage budgets and expenses across all your Collectives, including automated credit card payments through Stripe and one-click payouts via Paypal and Wise.',
   },
   'pricing.outsideFunds': {
     id: 'pricing.outsideFunds',
     defaultMessage: 'Outside funds',
   },
   'pricing.outsideFunds.description': {
-    id: 'pricing.accessTo.manuallyCredit',
     defaultMessage:
-      "Manually credit Collective budgets with funds received outside the platform (e.g., payments you've invoiced, cash, or third party channels like a shop).",
+      'Manually credit Collective budgets with funds received outside the platform, such as other e-commerce or fundraising tools.',
   },
   'pricing.bankTransfer': {
     id: 'pricing.bankTransfer',
     defaultMessage: 'Bank transfer payments',
   },
   'pricing.bankTransfer.description': {
-    id: 'pricing.accessTo.bankTransfer',
     defaultMessage:
-      'Enable bank transfer payments to automatically provide financial contributors with wire instructions and a reference number for tracking.',
+      'Automatically provide wire instructions and a reference number for tracking. Confirm receipt of funds with one click.',
   },
   'pricing.creditCard': {
     id: 'pricing.creditCard',
     defaultMessage: 'Credit card processing',
   },
   'pricing.creditCard.description': {
-    id: 'pricing.creditCard.description',
     defaultMessage:
-      'Receive financial contributions to you via credit card, automatically updating your budget for transparent tracking. *Stripe fees apply',
+      'Receive financial contributions via credit card, automatically updating each Collective budget. *Stripe fees apply',
   },
   'pricing.plan.start': {
     id: 'table.head.start',
@@ -200,7 +183,7 @@ const ForFiscalHosts = () => {
           </H3>
           <StyledHR my="8px" />
           <P fontSize="14px" lineHeight="20px" color="black.800">
-            <FormattedMessage id="pricing.forFiscalHost.description" defaultMessage="Choose the right plan for you" />
+            <FormattedMessage id="pricing.forFiscalHost.description" defaultMessage="We succeed when you succeed" />
           </P>
         </Box>
       </Flex>
@@ -210,9 +193,12 @@ const ForFiscalHosts = () => {
         fontWeight="500"
         letterSpacing="-0.008emd"
         color="blue.700"
-        mb={['16px', '0']}
+        mb="16px"
       >
-        <FormattedMessage id="pricing.forFiscalHost.fees.header" defaultMessage="Valid for all plans" />
+        <FormattedMessage
+          id="pricing.forFiscalHost.fees.header"
+          defaultMessage="Free if you don't have revenue, sharing if you do"
+        />
       </H5>
       <Flex flexDirection={['column', 'row']} alignItems={['flex-start', 'center']}>
         <Box mr={[null, '33px', '72px']}>
@@ -220,10 +206,10 @@ const ForFiscalHosts = () => {
             <Flex mb={3}>
               <FeeDescription>
                 <FormattedMessage
-                  id="pricing.platformFees"
-                  defaultMessage="{fee} Platform Fees (on incoming contributions)"
+                  id="pricing.noHostFees"
+                  defaultMessage="{fee} if you don't charge Host Fees to your Collectives"
                   values={{
-                    fee: <FeeData>0$</FeeData>,
+                    fee: <FeeData>$0</FeeData>,
                   }}
                 />{' '}
                 ¹
@@ -232,20 +218,20 @@ const ForFiscalHosts = () => {
             <Flex my={3}>
               <FeeDescription>
                 <FormattedMessage
-                  id="pricing.payoutFees"
-                  defaultMessage="{fee} Payout Fees (on outgoing payments)"
+                  id="pricing.hostFees"
+                  defaultMessage="{revshare} Platform Share of your Host Fee revenue"
                   values={{
-                    fee: <FeeData>0$</FeeData>,
+                    revshare: <FeeData>15%</FeeData>,
                   }}
                 />{' '}
-                ¹
+                ²
               </FeeDescription>
             </Flex>
           </Box>
           <P fontSize="12px" lineHeight="18px" color="black.700">
             <FormattedMessage
               id="pricing.paymentProcessor"
-              defaultMessage="(1) Payment processor fees apply. See <stripeLink>stripe.com/pricing</stripeLink>, <paypalLink>paypal.com/pricing</paypalLink>, <transferwiseLink>transferwise.com/pricing</transferwiseLink>"
+              defaultMessage="(1) Payment processor fees apply when using <stripeLink>Stripe</stripeLink>, <paypalLink>Paypal</paypalLink>, or <transferwiseLink>Wise</transferwiseLink>."
               values={{
                 stripeLink: getI18nLink({
                   href: 'https://stripe.com/pricing',
@@ -256,143 +242,51 @@ const ForFiscalHosts = () => {
                   openInNewTab: true,
                 }),
                 transferwiseLink: getI18nLink({
-                  href: 'https://transferwise.com/pricing',
+                  href: 'https://wise.com/pricing',
                   openInNewTab: true,
                 }),
               }}
             />
           </P>
-          <PlatformTip mt={[3, 4]} my={4} width={[null, null, null, '451px']} display={['none', null, null, 'flex']} />
+          <P fontSize="12px" lineHeight="18px" color="black.700">
+            <FormattedMessage
+              id="pricing.platformShareBreakdown"
+              defaultMessage="(2) If your Host Fee is 10% and your Collectives bring in $1,000, the Host gets $100 and $15 (15%) is the Platform Share."
+            />
+          </P>
         </Box>
         <ListWrapper as="ul" mt={['16px', 0]}>
           <ListItem>
-            <FormattedMessage id="pricing.fundraising" defaultMessage="Fundraising capabilities" />
-          </ListItem>
-          <ListItem>
-            <FormattedMessage id="pricing.addFunds" defaultMessage="Manually add funds from other channels" />
-          </ListItem>
-          <ListItem>
-            <FormattedMessage id="pricing.addFunds" defaultMessage="Manually add funds from other channels" />
-          </ListItem>
-          <ListItem>
-            <FormattedMessage id="pricing.communicationTools" defaultMessage="Communication tools" />
-          </ListItem>
-          <ListItem>
-            <FormattedMessage id="pricing.openFinance" defaultMessage="Transparency and open finances tools" />
+            <FormattedMessage defaultMessage="Each Collective gets its own fundraising page" />
           </ListItem>
           <ListItem>
             <FormattedMessage
-              id="pricing.expensePayOuts"
-              defaultMessage="Expense payouts in local currency with one-click using the TransferWise integration."
+              id="pricing.accounting"
+              defaultMessage="No more messy spreadsheets! It's all automated, and your accountant will thank you"
             />
+          </ListItem>
+          <ListItem>
+            <FormattedMessage defaultMessage="Manually add funds from other channels, accurately tracking all budgets" />
+          </ListItem>
+          <ListItem>
+            <FormattedMessage defaultMessage="Community engagement features" />
+          </ListItem>
+          <ListItem>
+            <FormattedMessage defaultMessage="Financial tracking and transparency means reporting writes itself" />
+          </ListItem>
+          <ListItem>
+            <FormattedMessage defaultMessage="Expense management and one-click payouts via Paypal and Wise" />
           </ListItem>
         </ListWrapper>
       </Flex>
-      <PlatformTip mt={[3, 4]} my={4} width={[null, '588px']} display={['flex', null, null, 'none']} />
 
-      <PlansWrapper display="flex" overflow="auto" justifyContent="space-between">
-        {PLANS.map(plan => (
-          <Flex
-            key={plan.id}
-            flexDirection="column"
-            alignItems="flex-start"
-            maxWidth={['180px', '185px', null, '246px', '257px']}
-          >
-            <Box width="112px" height="112px" mb={3}>
-              <NextIllustration
-                alt={`${plan.id} illustration`}
-                src={`/static/images/pricing/${plan.id}-plan-illustration.svg`}
-                width={112}
-                height={112}
-              />
-            </Box>
-            <Container mb={4} minHeight="230px">
-              <P
-                fontSize="11px"
-                lineHeight="12px"
-                color="black.900"
-                letterSpacing="0.06em"
-                fontWeight="500"
-                mb={2}
-                textTransform="uppercase"
-              >
-                {intl.formatMessage(messages[`pricing.plan.${plan.id}`])}
-              </P>
-              <StyledHR width="156px" mb="40px" />
-              <P fontSize="28px" fontWeight="500" lineHeight="36px" letterSpacing="-0.008em" color="blue.700" mb={3}>
-                {plan.fee}
-              </P>
-              <P fontSize="15px" lineHeight="22px" color="black.900" mb={3}>
-                {intl.formatMessage(messages[`pricing.${plan.id}.fee`])}
-              </P>
-              <P fontSize="13px" lineHeight="16px" color="#76777A">
-                {intl.formatMessage(messages[`pricing.${plan.id}.feeNote`])}
-              </P>
-            </Container>
-            <Link href={plan.actionLink}>
-              <StyledButton px={3} py={2} buttonStyle="primary" width="148px" whiteSpace="nowrap" mb={4}>
-                {plan.actionType === 'joinAsFiscalHost' ? (
-                  <FormattedMessage id="pricing.joinAsFiscalHost" defaultMessage="Join as Fiscal Host" />
-                ) : (
-                  <FormattedMessage id="pricing.contactUs" defaultMessage="Contact us" />
-                )}
-              </StyledButton>
-            </Link>
-
-            <P
-              fontSize="11px"
-              lineHeight="12px"
-              color="black.900"
-              letterSpacing="0.06em"
-              fontWeight="400"
-              mb={2}
-              textTransform="uppercase"
-            >
-              <FormattedMessage id="newPricingTable.row.revenues" defaultMessage="Managed Funds" />
-            </P>
-            <StyledHR width="156px" mb={3} />
-            <P fontSize="13px" lineHeight="16px" color="black.900" mb={4}>
-              {plan.id === 'scale' ? (
-                <FormattedMessage
-                  id="pricing.totalRaised"
-                  defaultMessage="+{totalRaised} total raised"
-                  values={{ totalRaised: '$150,000' }}
-                />
-              ) : (
-                <FormattedMessage id="newPricingTable.row.noMinimum" defaultMessage="No minimum" />
-              )}
-            </P>
-            <P
-              fontSize="11px"
-              lineHeight="12px"
-              color="black.900"
-              letterSpacing="0.06em"
-              fontWeight="400"
-              mb={2}
-              textTransform="uppercase"
-            >
-              <FormattedMessage id="pricing.features" defaultMessage="Features" />
-            </P>
-            <StyledHR />
-            <ListWrapper>
-              {FEATURES.map(feature => (
-                <ListItem key={feature.id} uncheck={!feature.plans.includes(plan.id)}>
-                  {intl.formatMessage(messages[`pricing.${feature.id}`])}
-                </ListItem>
-              ))}
-            </ListWrapper>
-          </Flex>
-        ))}
-      </PlansWrapper>
-
-      <Box mb={4} mt="56px">
-        <P fontSize="12px" lineHeight="18px" color="black.700" mb="24px">
-          <FormattedMessage
-            id="pricing.hostFee.note"
-            defaultMessage="(1) If your host fee is 10% and your Collectives bring in $1,000, your revenue is $100 and from it you’ll pay $15 to the platform."
-          />
-        </P>
-      </Box>
+      <Flex justifyContent={['center', 'left']} alignItems={['flex-start', 'center']} mt={10}>
+        <Link href="/organizations/new">
+          <StyledButton px={3} py={2} buttonStyle="primary" width="160px" whiteSpace="nowrap" mb={4}>
+            <FormattedMessage id="pricing.joinAsFiscalHost" defaultMessage="Create a Fiscal Host" />
+          </StyledButton>
+        </Link>
+      </Flex>
 
       <H4
         mt="40px"

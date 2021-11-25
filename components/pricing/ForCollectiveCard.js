@@ -13,7 +13,6 @@ import StyledHR from '../StyledHr';
 import { H3, H4, H5, P, Span } from '../Text';
 
 import { COLLECTIVE_ACCESS } from './constants';
-import PlatformTip from './PlatformTip';
 
 const ListWrapper = styled(Box)`
   list-style: none;
@@ -42,6 +41,11 @@ const FeeData = styled(Span)`
   line-height: 22px;
   color: ${themeGet('colors.blue.700')};
   margin-right: 8px;
+`;
+
+const FeeDataNoWrap = styled(FeeData)`
+  white-space: nowrap;
+  margin-right: 0px;
 `;
 
 const FeeDescription = styled(FeeData)`
@@ -77,38 +81,32 @@ const messages = defineMessages({
   'pricing.collectivePage.description': {
     id: 'pricing.collectivePage.description',
     defaultMessage:
-      'A public page for your community to receive donations, manage expenses and keep in touch with your supporters, transparent by design.',
+      'A public page for your community to receive payments, manage expenses, and update supporters, transparent by design.',
   },
   'pricing.outsideFunds': {
     id: 'pricing.outsideFunds',
     defaultMessage: 'Outside funds',
   },
   'pricing.outsideFunds.description': {
-    id: 'pricing.accessTo.manuallyCredit',
     defaultMessage:
-      "Manually credit Collective budgets with funds received outside the platform (e.g., payments you've invoiced, cash, or third party channels like a shop).",
+      'Manually credit Collective budgets with funds received outside the platform (e.g., cash, historical transactions, or third party channels like a shop).',
   },
   'pricing.bankTransfer': {
     id: 'pricing.bankTransfer',
     defaultMessage: 'Bank transfer payments',
   },
   'pricing.bankTransfer.description': {
-    id: 'pricing.accessTo.bankTransfer',
-    defaultMessage:
-      'Enable bank transfer payments to automatically provide financial contributors with wire instructions and a reference number for tracking.',
+    defaultMessage: 'Automatically provide wire instructions and a reference number for tracking transactions.',
   },
   'pricing.creditCard': {
     id: 'pricing.creditCard',
     defaultMessage: 'Credit card processing',
   },
   'pricing.creditCard.description': {
-    id: 'pricing.creditCard.description',
     defaultMessage:
-      'Receive financial contributions to you via credit card, automatically updating your budget for transparent tracking. *Stripe fees apply',
+      'Receive financial contributions via credit card, automatically updating your budget for transparent tracking. *Stripe fees apply',
   },
 });
-
-const displayPlatformTipBox = false;
 
 const ForCollectiveCard = () => {
   const intl = useIntl();
@@ -136,10 +134,7 @@ const ForCollectiveCard = () => {
           </H3>
           <StyledHR my="8px" />
           <P fontSize="14px" lineHeight="20px" color="black.800">
-            <FormattedMessage
-              id="pricing.forCollective.description"
-              defaultMessage="Bring your initiative to life in no time"
-            />
+            <FormattedMessage id="pricing.forCollective.description" defaultMessage="Bring your initiative to life" />
           </P>
         </Box>
       </Flex>
@@ -152,16 +147,16 @@ const ForCollectiveCard = () => {
             color="blue.700"
             mb="16px"
           >
-            <FormattedMessage id="pricing.forCollective.fees.header" defaultMessage="We want to see you thrive" />
+            <FormattedMessage id="pricing.forCollective.fees.header" defaultMessage="We help you thrive" />
           </H5>
           <Box mb="16px">
             <Flex mb={3}>
               <FeeDescription>
                 <FormattedMessage
                   id="pricing.platformFees"
-                  defaultMessage="{fee} Platform Fees (on incoming contributions)"
+                  defaultMessage="{fee} No fees on incoming payments"
                   values={{
-                    fee: <FeeData>0$</FeeData>,
+                    fee: <FeeData>$0</FeeData>,
                   }}
                 />{' '}
                 ¹
@@ -171,8 +166,8 @@ const ForCollectiveCard = () => {
               <FeeDescription>
                 <FormattedMessage
                   id="pricing.payoutFees"
-                  defaultMessage="{fee} Payout Fees (on outgoing payments)"
-                  values={{ fee: <FeeData>0$</FeeData> }}
+                  defaultMessage="{fee} No fees on outgoing payments"
+                  values={{ fee: <FeeData>$0</FeeData> }}
                 />{' '}
                 ¹
               </FeeDescription>
@@ -181,8 +176,14 @@ const ForCollectiveCard = () => {
               <FeeDescription>
                 <FormattedMessage
                   id="pricing.forCollective.hostFees"
-                  defaultMessage="{fee} apply depending on your host"
-                  values={{ fee: <FeeData whiteSpace="nowrap">Host fees</FeeData> }}
+                  defaultMessage="<Fee>Host fees</Fee> may apply depending on your <FiscalHostLink>Fiscal Host</FiscalHostLink>"
+                  values={{
+                    hostFees: FeeDataNoWrap,
+                    FiscalHostLink: getI18nLink({
+                      href: 'https://opencollective.com/fiscal-hosting',
+                      openInNewTab: true,
+                    }),
+                  }}
                 />
               </FeeDescription>
             </Flex>
@@ -191,7 +192,7 @@ const ForCollectiveCard = () => {
             (1){' '}
             <FormattedMessage
               id="pricing.notes.paymentProcessor"
-              defaultMessage="Payment processor fees apply. See <stripeLink>stripe.com/pricing</stripeLink>, <paypalLink>paypal.com/pricing</paypalLink>, <transferwiseLink>transferwise.com/pricing</transferwiseLink>"
+              defaultMessage="Payment processor fees apply when using <stripeLink>Stripe</stripeLink>, <paypalLink>Paypal</paypalLink>, or <transferwiseLink>Wise</transferwiseLink>."
               values={{
                 stripeLink: getI18nLink({
                   href: 'https://stripe.com/pricing',
@@ -202,49 +203,43 @@ const ForCollectiveCard = () => {
                   openInNewTab: true,
                 }),
                 transferwiseLink: getI18nLink({
-                  href: 'https://transferwise.com/pricing',
+                  href: 'https://wise.com/pricing',
                   openInNewTab: true,
                 }),
               }}
             />
           </P>
-          {displayPlatformTipBox && (
-            <PlatformTip width={[null, null, null, '451px']} minWidth={[null, null, '325px']} />
-          )}
         </Container>
         <Box>
           <ListWrapper as="ul" mt={['32px', 0]}>
             <ListItem>
-              <FormattedMessage id="pricing.fundraising" defaultMessage="Fundraising capabilities" />
+              <FormattedMessage defaultMessage="Fundraising and crowdfunding features" />
             </ListItem>
             <ListItem>
               <FormattedMessage id="pricing.addFunds" defaultMessage="Manually add funds from other channels" />
             </ListItem>
             <ListItem>
-              <FormattedMessage id="pricing.communicationTools" defaultMessage="Communication tools" />
+              <FormattedMessage defaultMessage="Community engagement tools" />
             </ListItem>
             <ListItem>
-              <FormattedMessage id="pricing.openFinance" defaultMessage="Transparency and open finances tools" />
+              <FormattedMessage defaultMessage="Transparent budget" />
             </ListItem>
             <ListItem>
-              <FormattedMessage
-                id="pricing.expensePayOuts"
-                defaultMessage="Expense payouts in local currency with one-click using the TransferWise integration."
-              />
+              <FormattedMessage defaultMessage="Expense payouts in local currencies" />
             </ListItem>
           </ListWrapper>
           <Container display="flex" flexDirection={['column', null, null, null, 'row']}>
             <Link href="/create">
               <StyledButton
                 buttonStyle="primary"
-                width={['224px', '226px', null, '237px', '139px']}
+                width={['224px', '226px', null, '237px', '160px']}
                 py="8px"
                 my="8px"
                 px={[null, null, '16px']}
                 whiteSpace="nowrap"
                 mr={[null, null, null, null, 2]}
               >
-                <FormattedMessage id="collective.create" defaultMessage="Create Collective" />
+                <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
               </StyledButton>
             </Link>
             <Link href="/hosts">
@@ -256,7 +251,7 @@ const ForCollectiveCard = () => {
                 whiteSpace="nowrap"
                 width={['224px', '226px', null, '237px', '139px']}
               >
-                <FormattedMessage id="pricing.findHost" defaultMessage="Find fiscal host" />
+                <FormattedMessage id="pricing.findHost" defaultMessage="Find a Fiscal Host" />
               </StyledButton>
             </Link>
           </Container>
