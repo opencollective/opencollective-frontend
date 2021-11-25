@@ -52,18 +52,17 @@ const getCategories = (intl, startDate, endDate, hostCreatedAt) => {
   const numberOfDays = dayjs(startDate || hostCreatedAt).diff(dayjs(endDate), 'day');
   if (numberOfDays <= 7) {
     const startDay = startDate.getDay();
-    return [...new Array(7)].map(
-      (_, idx) => `${intl.formatDate(new Date(0, 0, idx + startDay), { weekday: 'long' }).toUpperCase()}`,
+    return [...new Array(7)].map((_, idx) =>
+      intl.formatDate(new Date(0, 0, idx + startDay), { weekday: 'long' }).toUpperCase(),
     );
   } else if (numberOfDays <= 365) {
     const currentMonth = new Date().getMonth();
-    return [...new Array(12)].map(
-      (_, idx) => `${intl.formatDate(new Date(0, idx + currentMonth + 1), { month: 'short' }).toUpperCase()}`,
+    return [...new Array(12)].map((_, idx) =>
+      intl.formatDate(new Date(0, idx + currentMonth + 1), { month: 'short' }).toUpperCase(),
     );
   } else {
-    return [...new Array(6)].map(
-      (_, idx) =>
-        `${intl.formatDate(new Date(new Date().getFullYear() - 5 + idx, 0), { year: 'numeric' }).toUpperCase()}`,
+    return [...new Array(6)].map((_, idx) =>
+      intl.formatDate(new Date(new Date().getFullYear() - 5 + idx, 0), { year: 'numeric' }).toUpperCase(),
     );
   }
 };
