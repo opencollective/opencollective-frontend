@@ -6,8 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../lib/currency-utils';
 
-import Container from '../../Container';
-import { Box, Flex } from '../../Grid';
+import { Box } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
@@ -272,6 +271,7 @@ const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
 
   const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host), [host]);
   const transactionBreakdownChart = React.useMemo(() => getTransactionsBreakdownChartData(host), [host]);
+  const hasHistorical = false;
   return (
     <React.Fragment>
       <Box mt={18} mb={12}>
@@ -284,28 +284,21 @@ const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
           </div>
         )}
       </Box>
-      <Box>
-        {isLoading ? (
-          <LoadingPlaceholder height={21} width={125} />
-        ) : (
-          <Flex flexWrap="wrap" mt={18} mb={12}>
-            <Container mt={2}>
-              <Chart
-                type="area"
-                width="100%"
-                height="250px"
-                options={getChartOptions(
-                  intl,
-                  new Date(dateInterval?.from),
-                  new Date(dateInterval?.to),
-                  host.createdAt,
-                )}
-                series={series}
-              />
-            </Container>
-          </Flex>
-        )}
-      </Box>
+      {hasHistorical && (
+        <Box mt="24px" mb="12px">
+          {isLoading ? (
+            <LoadingPlaceholder height={21} width="100%" borderRadius="8px" />
+          ) : (
+            <Chart
+              type="area"
+              width="100%"
+              height="250px"
+              options={getChartOptions(intl, new Date(dateInterval?.from), new Date(dateInterval?.to), host.createdAt)}
+              series={series}
+            />
+          )}
+        </Box>
+      )}
     </React.Fragment>
   );
 };
