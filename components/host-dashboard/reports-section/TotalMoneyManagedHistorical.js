@@ -98,7 +98,7 @@ const getChartOptions = (intl, hostCurrency) => ({
     labels: {
       minWidth: 38,
       formatter: function (value) {
-        return value < 1000 ? value : `${Math.round(value / 1000)}k`;
+        return value < 1000 ? value : `${Math.round(value / 1000).toLocaleString()}k`;
       },
     },
   },
