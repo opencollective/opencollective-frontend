@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { compose, get, pick } from 'lodash';
+import { compose, get, omit, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -42,7 +42,7 @@ import { withUser } from '../components/UserProvider';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
 
-const { USER, ORGANIZATION } = CollectiveType;
+const { ORGANIZATION } = CollectiveType;
 
 class CreateExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, parentCollectiveSlug } }) {
@@ -257,21 +257,33 @@ class CreateExpensePage extends React.Component {
     return tagsStats && tagsStats.map(({ tag }) => tag);
   }
 
+  // This function is currently duplicated in expense.js
   getPayoutProfiles = memoizeOne(loggedInAccount => {
     if (!loggedInAccount) {
       return [];
     } else {
-      const accountsAdminOf = get(loggedInAccount, 'adminMemberships.nodes', [])
-        .map(member => member.account)
-        .filter(
-          account =>
-            [USER, ORGANIZATION].includes(account.type) ||
-            // Same Host
-            (account.isActive && this.props.data?.account?.host?.id === account.host?.id) ||
-            // Self-hosted Collectives
-            (account.isActive && account.id === account.host?.id),
-        );
-      return [loggedInAccount, ...accountsAdminOf];
+      const payoutProfiles = [loggedInAccount];
+      for (const node of get(loggedInAccount, 'adminMemberships.nodes', [])) {
+        if (
+          // Organizations
+          [ORGANIZATION].includes(node.account.type) ||
+          // Independant Collectives
+          (node.account.isActive && node.account.id === node.account.host?.id)
+        ) {
+          // Push main account only
+          payoutProfiles.push(omit(node.account, ['childrenAccounts']));
+        } else if (
+          // Same Host
+          node.account.isActive &&
+          this.props.data?.account?.host?.id === node.account.host?.id
+        ) {
+          // Push main account
+          payoutProfiles.push(omit(node.account, ['childrenAccounts']));
+          // Push children
+          payoutProfiles.push(...node.account.childrenAccounts.nodes);
+        }
+      }
+      return payoutProfiles;
     }
   });
 
