@@ -120,6 +120,9 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   const hasBankInfoWithoutWise = payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
   const isScheduling = formik.values.action === 'SCHEDULE_FOR_PAYMENT';
+  const hasAutomaticManualPicker = ![PayoutMethodType.OTHER, PayoutMethodType.ACCOUNT_BALANCE].includes(
+    payoutMethodType,
+  );
 
   return (
     <StyledModal
@@ -144,7 +147,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
           <PayoutMethodTypeWithIcon type={payoutMethodType} />
         </Box>
         <PayoutMethodData payoutMethod={expense.payoutMethod} showLabel={false} />
-        {payoutMethodType !== PayoutMethodType.OTHER && !hasBankInfoWithoutWise && (
+        {hasAutomaticManualPicker && !hasBankInfoWithoutWise && (
           <StyledButtonSet
             items={['AUTO', 'MANUAL']}
             buttonProps={{ width: '50%' }}
