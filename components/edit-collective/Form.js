@@ -81,13 +81,13 @@ class EditCollectiveForm extends React.Component {
 
     const { collective } = this.state;
 
-    this.showEditTiers = ['COLLECTIVE', 'EVENT'].includes(collective.type);
-    this.showExpenses = collective.type === 'COLLECTIVE' || collective.isHost;
-    this.showEditGoals = collective.type === CollectiveType.COLLECTIVE;
-    this.showHost = collective.type === 'COLLECTIVE';
-    this.defaultTierType = collective.type === 'EVENT' ? 'TICKET' : 'TIER';
-    this.showEditMembers = ['COLLECTIVE', 'ORGANIZATION'].includes(collective.type);
-    this.showPaymentMethods = ['USER', 'ORGANIZATION'].includes(collective.type);
+    this.showEditTiers = [COLLECTIVE, EVENT].includes(collective.type);
+    this.showExpenses = collective.type === COLLECTIVE || collective.isHost;
+    this.showEditGoals = collective.type === COLLECTIVE;
+    this.showHost = collective.type === COLLECTIVE;
+    this.defaultTierType = collective.type === EVENT ? 'TICKET' : 'TIER';
+    this.showEditMembers = [COLLECTIVE, ORGANIZATION].includes(collective.type);
+    this.showPaymentMethods = [USER, ORGANIZATION].includes(collective.type);
 
     this.messages = defineMessages({
       loading: { id: 'loading', defaultMessage: 'loading' },
@@ -326,7 +326,7 @@ class EditCollectiveForm extends React.Component {
         set(collective, 'settings.apply', value);
       } else if (fieldname === 'application.message') {
         set(collective, 'settings.applyMessage', value);
-      } else if (fieldname === 'startsAt' && collective.type === CollectiveType.EVENT) {
+      } else if (fieldname === 'startsAt' && collective.type === EVENT) {
         collective[fieldname] = value;
         const endsAt = collective.endsAt;
         if (!endsAt || new Date(endsAt) < new Date(value)) {
@@ -510,10 +510,10 @@ class EditCollectiveForm extends React.Component {
                 <FormattedMessage id="Account.AdvancedSettings" defaultMessage="Advanced settings" />
               </SettingsTitle>
             )}
-            {collective.type === CollectiveType.USER && <EditUserEmailForm />}
-            {[CollectiveType.FUND, CollectiveType.COLLECTIVE, CollectiveType.PROJECT, CollectiveType.EVENT].includes(
-              collective.type,
-            ) && <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />}
+            {collective.type === USER && <EditUserEmailForm />}
+            {[COLLECTIVE, FUND, PROJECT, EVENT].includes(collective.type) && (
+              <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
+            )}
             <Archive collective={collective} />
             <Delete collective={collective} />
           </Box>
@@ -613,7 +613,7 @@ class EditCollectiveForm extends React.Component {
           defaultValue: get(collective, 'settings.VAT.number'),
           when: () => {
             const { collective } = this.state;
-            if (collective.type === CollectiveType.COLLECTIVE || collective.type === CollectiveType.EVENT) {
+            if (collective.type === COLLECTIVE || collective.type === EVENT) {
               // Collectives can set a VAT number if configured
               return get(collective, 'settings.VAT.type') === VAT_OPTIONS.OWN;
             } else {
@@ -645,8 +645,8 @@ class EditCollectiveForm extends React.Component {
       submitBtnMessageId = status;
     }
 
-    const isEvent = collective.type === CollectiveType.EVENT;
-    const isUser = collective.type === CollectiveType.USER;
+    const isEvent = collective.type === EVENT;
+    const isUser = collective.type === USER;
     const currencyOptions = Currency.map(c => ({ value: c, label: c }));
     const submitBtnLabel = this.messages[submitBtnMessageId] && intl.formatMessage(this.messages[submitBtnMessageId]);
     const defaultStartsAt = new Date();
@@ -670,7 +670,7 @@ class EditCollectiveForm extends React.Component {
             examples: isUser ? 'Maria Garcia' : 'Salesforce, Inc., Airbnb, Inc.',
           }),
           maxLength: 255,
-          when: () => isUser || collective.type === CollectiveType.ORGANIZATION || collective.isHost,
+          when: () => isUser || collective.type === ORGANIZATION || collective.isHost,
           isPrivate: true,
         },
         {
@@ -689,7 +689,7 @@ class EditCollectiveForm extends React.Component {
           name: 'slug',
           pre: 'https://opencollective.com/',
           placeholder: '',
-          when: () => collective.type !== CollectiveType.EVENT,
+          when: () => collective.type !== EVENT,
         },
         {
           name: 'twitterHandle',
@@ -698,7 +698,7 @@ class EditCollectiveForm extends React.Component {
           maxLength: 255,
           placeholder: '',
           label: 'Twitter',
-          when: () => collective.type !== CollectiveType.EVENT,
+          when: () => collective.type !== EVENT,
         },
         {
           name: 'githubHandle',
@@ -707,27 +707,27 @@ class EditCollectiveForm extends React.Component {
           maxLength: 39,
           placeholder: '',
           label: 'Github',
-          when: () => collective.type !== CollectiveType.EVENT,
+          when: () => collective.type !== EVENT,
         },
         {
           name: 'website',
           type: 'text',
           maxLength: 255,
           placeholder: '',
-          when: () => collective.type !== CollectiveType.EVENT,
+          when: () => collective.type !== EVENT,
         },
         {
           name: 'address',
           placeholder: '',
           maxLength: 255,
           type: 'textarea',
-          when: () => collective.type !== CollectiveType.EVENT,
+          when: () => collective.type !== EVENT,
         },
         {
           name: 'country',
           type: 'country',
           placeholder: 'Select country',
-          when: () => collective.type !== CollectiveType.EVENT,
+          when: () => collective.type !== EVENT,
         },
         {
           name: 'startsAt',
@@ -739,7 +739,7 @@ class EditCollectiveForm extends React.Component {
             yesterday.setDate(yesterday.getDate() - 1);
             return date.isAfter(yesterday);
           },
-          when: () => collective.type === CollectiveType.EVENT,
+          when: () => collective.type === EVENT,
         },
         {
           name: 'endsAt',
@@ -751,18 +751,18 @@ class EditCollectiveForm extends React.Component {
             yesterday.setDate(yesterday.getDate() - 1);
             return date.isAfter(yesterday);
           },
-          when: () => collective.type === CollectiveType.EVENT,
+          when: () => collective.type === EVENT,
         },
         {
           name: 'timezone',
           type: 'TimezonePicker',
-          when: () => collective.type === CollectiveType.EVENT,
+          when: () => collective.type === EVENT,
         },
         {
           name: 'location',
           placeholder: '',
           type: 'location',
-          when: () => collective.type === CollectiveType.EVENT,
+          when: () => collective.type === EVENT,
         },
         {
           name: 'privateInstructions',
@@ -770,7 +770,7 @@ class EditCollectiveForm extends React.Component {
           type: 'textarea',
           maxLength: 10000,
           defaultValue: collective.privateInstructions,
-          when: () => collective.type === CollectiveType.EVENT,
+          when: () => collective.type === EVENT,
         },
         {
           name: 'currency',
@@ -778,7 +778,7 @@ class EditCollectiveForm extends React.Component {
           defaultValue: get(this.state.collective, 'currency'),
           options: currencyOptions,
           description: collective.isHost ? intl.formatMessage(this.messages['currency.warning']) : null,
-          when: () => ![CollectiveType.EVENT, CollectiveType.PROJECT].includes(collective.type),
+          when: () => ![EVENT, PROJECT].includes(collective.type),
           // Active Collectives, Funds and Fiscal Hosts can't edit their currency.
           disabled:
             ([COLLECTIVE, FUND, PROJECT, EVENT].includes(collective.type) && collective.isActive) || collective.isHost
@@ -791,7 +791,7 @@ class EditCollectiveForm extends React.Component {
           maxLength: 128,
           type: 'tags',
           placeholder: 'meetup, javascript',
-          when: () => ![CollectiveType.EVENT, CollectiveType.PROJECT, CollectiveType.FUND].includes(collective.type),
+          when: () => ![EVENT, PROJECT, FUND].includes(collective.type),
         },
       ],
       'fiscal-hosting': [
@@ -800,8 +800,7 @@ class EditCollectiveForm extends React.Component {
           className: 'horizontal',
           type: 'switch',
           defaultValue: get(this.state.collective, 'settings.apply'),
-          when: () =>
-            collective.isHost && (collective.type === CollectiveType.ORGANIZATION || collective.settings.apply),
+          when: () => collective.isHost && (collective.type === ORGANIZATION || collective.settings.apply),
         },
         {
           name: 'application.message',
@@ -811,8 +810,7 @@ class EditCollectiveForm extends React.Component {
           placeholder: intl.formatMessage(this.messages['application.message.defaultValue']),
           disabled: !this.state.collective.settings?.apply,
           maxLength: 1000,
-          when: () =>
-            collective.isHost && (collective.type === CollectiveType.ORGANIZATION || collective.settings.apply),
+          when: () => collective.isHost && (collective.type === ORGANIZATION || collective.settings.apply),
         },
         {
           name: 'hostFeePercent',
@@ -823,7 +821,7 @@ class EditCollectiveForm extends React.Component {
           defaultValue: get(this.state.collective, 'hostFeePercent'),
           when: () =>
             collective.isHost &&
-            ((collective.plan?.name !== 'start-plan-2021' && collective.type === CollectiveType.ORGANIZATION) ||
+            ((collective.plan?.name !== 'start-plan-2021' && collective.type === ORGANIZATION) ||
               collective.hostFeePercent !== 0),
         },
         {
@@ -832,7 +830,7 @@ class EditCollectiveForm extends React.Component {
           placeholder: '',
           className: 'horizontal',
           defaultValue: get(this.state.collective, 'settings.tos'),
-          when: () => collective.isHost && (collective.type === CollectiveType.ORGANIZATION || collective.settings.tos),
+          when: () => collective.isHost && (collective.type === ORGANIZATION || collective.settings.tos),
         },
       ],
     };
