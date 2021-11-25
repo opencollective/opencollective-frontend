@@ -268,19 +268,16 @@ class CreateExpensePage extends React.Component {
           // Organizations
           [ORGANIZATION].includes(node.account.type) ||
           // Independant Collectives
-          (node.account.isActive && node.account.id === node.account.host?.id)
-        ) {
-          // Push main account only
-          payoutProfiles.push(omit(node.account, ['childrenAccounts']));
-        } else if (
+          (node.account.isActive && node.account.id === node.account.host?.id) ||
           // Same Host
-          node.account.isActive &&
-          this.props.data?.account?.host?.id === node.account.host?.id
+          (node.account.isActive && this.props.data?.account?.host?.id === node.account.host?.id)
         ) {
           // Push main account
           payoutProfiles.push(omit(node.account, ['childrenAccounts']));
-          // Push children
-          payoutProfiles.push(...node.account.childrenAccounts.nodes);
+          if (this.props.data?.account?.host?.id === node.account.host?.id) {
+            // Push children (Same Host)
+            payoutProfiles.push(...node.account.childrenAccounts.nodes);
+          }
         }
       }
       return payoutProfiles;
