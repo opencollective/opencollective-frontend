@@ -169,19 +169,22 @@ const Pricing = () => {
         </Container>
       </Flex>
 
-      <Container display="flex" px="16px" mb="40px" justifyContent="center">
-        <PlatformTip width={[null, null, null, '451px']} minWidth={[null, null, '325px']} />
-      </Container>
-
       <Container
         display="flex"
         px="16px"
-        mb="40px"
+        mb="20px"
         flexDirection={['column', 'row']}
         alignItems={['center', 'baseline', 'flex-start']}
         justifyContent="center"
       >
-        <Card border="1px solid #DCDEE0" borderRadius="8px" mb={['20px', 0]} mr={[null, '10px']} background="white">
+        <Card
+          border="1px solid #DCDEE0"
+          borderRadius="8px"
+          mb={['20px', 0]}
+          mr={[null, '10px']}
+          minHeight="500px"
+          background="white"
+        >
           <Flex flexDirection={['column', 'row']} alignItems="center">
             <Box width="144px" height="144px" display={['none', null, 'block']} mr={[null, null, '24px']}>
               <NextIllustration
@@ -285,7 +288,7 @@ const Pricing = () => {
             </Link>
           </Container>
         </Card>
-        <Card border="1px solid #DCDEE0" borderRadius="8px" ml={[null, '10px']} background="white">
+        <Card border="1px solid #DCDEE0" borderRadius="8px" ml={[null, '10px']} minHeight="500px" background="white">
           <Flex flexDirection={['column', null, 'row']}>
             <Box width="144px" height="144px" display={['none', null, 'block']} mr={[null, null, '24px']}>
               <NextIllustration
@@ -384,6 +387,9 @@ const Pricing = () => {
             </Link>
           </Container>
         </Card>
+      </Container>
+      <Container display="flex" justifyContent="center">
+        <PlatformTip width={['300px', '640px', '780px', '960px', '1000px']} />
       </Container>
       <Flex
         flexDirection={['column', null, null, 'row-reverse']}
