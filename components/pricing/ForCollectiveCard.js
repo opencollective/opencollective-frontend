@@ -178,7 +178,7 @@ const ForCollectiveCard = () => {
                   id="pricing.forCollective.hostFees"
                   defaultMessage="<Fee>Host fees</Fee> may apply depending on your <FiscalHostLink>Fiscal Host</FiscalHostLink>"
                   values={{
-                    hostFees: FeeDataNoWrap,
+                    Fee: msg => <FeeDataNoWrap>{msg}</FeeDataNoWrap>,
                     FiscalHostLink: getI18nLink({
                       href: 'https://opencollective.com/fiscal-hosting',
                       openInNewTab: true,
