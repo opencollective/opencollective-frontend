@@ -55,6 +55,8 @@ import EditUserEmailForm from './EditUserEmailForm';
 import Menu, { EDIT_COLLECTIVE_SECTIONS } from './Menu';
 import SettingsTitle from './SettingsTitle';
 
+const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, USER } = CollectiveType;
+
 class EditCollectiveForm extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
@@ -777,9 +779,9 @@ class EditCollectiveForm extends React.Component {
           options: currencyOptions,
           description: collective.isHost ? intl.formatMessage(this.messages['currency.warning']) : null,
           when: () => ![CollectiveType.EVENT, CollectiveType.PROJECT].includes(collective.type),
+          // Active Collectives, Funds and Fiscal Hosts can't edit their currency.
           disabled:
-            ([CollectiveType.PROJECT, CollectiveType.FUND].includes(collective.type) && collective.isActive) ||
-            collective.isHost
+            ([COLLECTIVE, FUND, PROJECT, EVENT].includes(collective.type) && collective.isActive) || collective.isHost
               ? true
               : false,
         },
