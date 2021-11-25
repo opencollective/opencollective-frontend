@@ -48,7 +48,7 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
       hostFeePercent
       isTrustedHost
       stats {
-        balance(dateFrom: $dateFrom, dateTo: $dateTo) {
+        balance(dateTo: $dateTo) {
           valueInCents
           currency
         }
