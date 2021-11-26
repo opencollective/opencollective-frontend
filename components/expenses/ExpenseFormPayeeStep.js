@@ -208,6 +208,7 @@ const ExpenseFormPayeeStep = ({
           data-cy="select-expense-payee"
           collective={values.payee}
           onChange={({ value }) => {
+            console.log('CollectivePickerAsync onChange', value);
             if (value) {
               const existingProfile = payoutProfiles.find(p => p.slug === value.slug);
               const isNewlyCreatedProfile = value.members?.some(
@@ -222,6 +223,8 @@ const ExpenseFormPayeeStep = ({
               if (isNewlyCreatedProfile) {
                 payee.payoutMethods = [];
               }
+
+              console.log('CollectivePickerAsync setFieldValue', payee);
 
               formik.setFieldValue('payee', payee);
               formik.setFieldValue('payoutMethod', null);

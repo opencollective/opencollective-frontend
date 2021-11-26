@@ -310,6 +310,8 @@ const ExpenseFormBody = ({
     }
   }, [formPersister, dirty, values]);
 
+  console.log({ isDraft, isOnBehalf, isNewUser });
+
   let payeeForm;
   if (loading) {
     payeeForm = <LoadingPlaceholder height={32} />;
@@ -328,6 +330,7 @@ const ExpenseFormBody = ({
         collective={collective}
         formik={formik}
         onBack={() => {
+          console.log('2 onBack');
           setStep(STEPS.PAYEE);
           setOnBehalf(false);
           formik.setFieldValue('payee', null);
@@ -335,6 +338,7 @@ const ExpenseFormBody = ({
           formik.setFieldValue('payeeLocation', null);
         }}
         onNext={() => {
+          console.log('2 onNext');
           formik.setFieldValue('payee', { ...values.payee, isInvite: true });
         }}
         payoutProfiles={payoutProfiles}
@@ -350,6 +354,7 @@ const ExpenseFormBody = ({
         payoutProfiles={payoutProfiles}
         loggedInAccount={loggedInAccount}
         onNext={() => {
+          console.log('3 onNext');
           const shouldSkipValidation = isOnBehalf && isEmpty(values.payoutMethod);
           const validation = !shouldSkipValidation && validatePayoutMethod(values.payoutMethod);
           if (isEmpty(validation)) {
@@ -359,6 +364,7 @@ const ExpenseFormBody = ({
           }
         }}
         onInvite={isInvite => {
+          console.log('3 onInvite', { isInvite });
           setOnBehalf(isInvite);
           formik.setFieldValue('payeeLocation', {});
           formik.setFieldValue('payee', {});
@@ -704,7 +710,12 @@ const ExpenseForm = ({
   return (
     <Formik
       initialValues={initialValues}
-      validate={hasValidate && validate}
+      validate={expense => {
+        console.log('validate', expense);
+        if (hasValidate) {
+          return validate(expense);
+        }
+      }}
       onSubmit={async (values, formik) => {
         // We initially let the browser do the validation. Then once users try to submit the
         // form at least once, we validate on each change to make sure they fix all the errors.
@@ -738,6 +749,7 @@ const ExpenseForm = ({
 };
 
 ExpenseForm.propTypes = {
+  onUpdate: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   autoFocusTitle: PropTypes.bool,
   validateOnChange: PropTypes.bool,

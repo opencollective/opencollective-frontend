@@ -22,6 +22,7 @@ import ErrorPage from '../components/ErrorPage';
 import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
+import ExpenseInviteExplanationBanner from '../components/expenses/ExpenseInviteExplanationBanner';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import {
@@ -162,6 +163,10 @@ class CreateExpensePage extends React.Component {
       });
     }
   }
+
+  onFormUpdate = async expense => {
+    console.log('onFormUpdate', expense);
+  };
 
   onFormSubmit = async expense => {
     try {
@@ -306,6 +311,8 @@ class CreateExpensePage extends React.Component {
 
     const payoutProfiles = this.getPayoutProfiles(loggedInAccount);
 
+    console.log('render', this.props, this.state);
+
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)}>
         {!expenseSubmissionAllowed(collective, LoggedInUser) ? (
@@ -350,11 +357,13 @@ class CreateExpensePage extends React.Component {
                     ) : (
                       <Box>
                         <CreateExpenseDismissibleIntro collectiveName={collective.name} />
+                        <ExpenseInviteExplanationBanner />
                         {step === STEPS.FORM && (
                           <ExpenseForm
                             collective={collective}
                             loading={loadingLoggedInUser}
                             loggedInAccount={loggedInAccount}
+                            onUpdate={this.onFormUpdate}
                             onSubmit={this.onFormSubmit}
                             expense={this.state.expense}
                             expensesTags={this.getSuggestedTags(collective)}
