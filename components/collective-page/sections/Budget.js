@@ -5,6 +5,7 @@ import { get, orderBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { EMPTY_ARRAY } from '../../../lib/constants/utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { DebitItem } from '../../budget/DebitCreditList';
@@ -80,8 +81,6 @@ const geFilterLabel = filter => {
       return null;
   }
 };
-
-const EMPTY_ARRAY = [];
 
 const getBudgetItems = (transactions, expenses, filter) => {
   if (filter === 'expenses') {

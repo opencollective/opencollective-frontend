@@ -4,6 +4,7 @@ import { FastField, Field } from 'formik';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
+import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 
@@ -21,8 +22,6 @@ import { P } from '../Text';
 
 import PayoutMethodForm from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
-
-const EMPTY_ARRAY = [];
 
 const msg = defineMessages({
   nameLabel: {

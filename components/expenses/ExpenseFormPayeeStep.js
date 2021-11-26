@@ -9,6 +9,7 @@ import { compareNames } from '../../lib/collective.lib';
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { flattenObjectDeep } from '../../lib/utils';
@@ -61,8 +62,6 @@ const msg = defineMessages({
     defaultMessage: 'Physical address',
   },
 });
-
-const EMPTY_ARRAY = [];
 
 const setLocationFromPayee = (formik, payee) => {
   formik.setFieldValue('payeeLocation.country', payee?.location?.country || null);
