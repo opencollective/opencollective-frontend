@@ -199,27 +199,44 @@ class PayoutMethodSelect extends React.Component {
     const hostSupportedPayoutMethods = this.props.collective.host?.supportedPayoutMethods || [PayoutMethodType.OTHER];
     const groupedPms = groupBy(payoutMethods, 'type');
     const payeeIsSelfHosted = payee && payee.id === payee.host?.id;
+    const payeeIsCrossHost = true;
     const payeeIsCollectiveFamilyType =
       payee &&
       AccountTypesWithHost.includes(payee.type) &&
       hostSupportedPayoutMethods.includes(PayoutMethodType.ACCOUNT_BALANCE);
 
-    // If the Account is of the "Collective" family, account balance should be the only option
-    const pmTypes =
+    let pmTypes;
+
+    if (payeeIsCollectiveFamilyType && !payeeIsSelfHosted) {
+      // If the Account is of the "Collective" family, account balance should be the only option
+      // But if it's across hosts, it should be bank account based
+      if (payeeIsCrossHost) {
+        pmTypes = [PayoutMethodType.BANK_ACCOUNT];
+      } else {
+        pmTypes = [PayoutMethodType.ACCOUNT_BALANCE];
+      }
+    } else {
+      pmTypes = Object.values(PayoutMethodType).filter(type => {
+        if (!hostSupportedPayoutMethods.includes(type)) {
+          return false;
+        }
+
+        if (
+          // Account Balance only on Same Host
+          type === PayoutMethodType.ACCOUNT_BALANCE &&
+          payee?.host?.id !== this.props.collective.host?.id
+        ) {
+          return false;
+        }
+
+        return true;
+      });
+    }
+
+    const creatablePmTypes =
       payeeIsCollectiveFamilyType && !payeeIsSelfHosted
-        ? [PayoutMethodType.ACCOUNT_BALANCE]
-        : Object.values(PayoutMethodType).filter(type => {
-            // Account Balance only on Same Host
-            if (
-              type === PayoutMethodType.ACCOUNT_BALANCE &&
-              hostSupportedPayoutMethods.includes(PayoutMethodType.ACCOUNT_BALANCE) &&
-              payee?.host?.id !== this.props.collective.host?.id
-            ) {
-              return false;
-            } else {
-              return hostSupportedPayoutMethods.includes(type);
-            }
-          });
+        ? []
+        : pmTypes.filter(pmType => pmType !== PayoutMethodType.ACCOUNT_BALANCE);
 
     return pmTypes.map(pmType => ({
       label: i18nPayoutMethodType(this.props.intl, pmType),
@@ -227,7 +244,7 @@ class PayoutMethodSelect extends React.Component {
         // Add existing payout methods for this type
         ...get(groupedPms, pmType, []).map(this.getOptionFromPayoutMethod),
         // Add "+ Create new ..." for this payment type
-        pmType !== PayoutMethodType.ACCOUNT_BALANCE
+        creatablePmTypes.includes(pmType)
           ? this.getOptionFromPayoutMethod({
               type: pmType,
               isSaved: true,

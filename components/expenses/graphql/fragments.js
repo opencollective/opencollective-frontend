@@ -35,6 +35,13 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
           ... on AccountWithHost {
             host {
               id
+              payoutMethods {
+                id
+                type
+                name
+                data
+                isSaved
+              }
             }
           }
           ... on Organization {

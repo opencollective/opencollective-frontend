@@ -270,7 +270,8 @@ class CreateExpensePage extends React.Component {
           // Independant Collectives
           (node.account.isActive && node.account.id === node.account.host?.id) ||
           // Same Host
-          (node.account.isActive && this.props.data?.account?.host?.id === node.account.host?.id)
+          (node.account.isActive && this.props.data?.account?.host?.id === node.account.host?.id) ||
+          true
         ) {
           // Push main account
           payoutProfiles.push(omit(node.account, ['childrenAccounts']));

@@ -86,13 +86,20 @@ const getPayoutMethodsFromPayee = payee => {
         isSaved: true,
       });
     }
+    if (!filteredPms.find(pm => pm.type === PayoutMethodType.BANK_ACCOUNT)) {
+      const hostPayoutMethods = get(payee, 'host.payoutMethods') || EMPTY_ARRAY;
+      const hostBankAccountPayoutMethods = hostPayoutMethods.filter(
+        pm => pm.isSaved && pm.type === PayoutMethodType.BANK_ACCOUNT,
+      );
+      filteredPms.unshift(...hostBankAccountPayoutMethods);
+    }
   }
 
   // If the Payee is in the "Collective" family (Collective, Fund, Event, Project)
   // Then the Account Balance should be its only option
-  if (payee && AccountTypesWithHost.includes(payee.type) && payee.id !== payee.host?.id) {
-    filteredPms = filteredPms.filter(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE);
-  }
+  // if (payee && AccountTypesWithHost.includes(payee.type) && payee.id !== payee.host?.id) {
+  //   // filteredPms = filteredPms.filter(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE);
+  // }
 
   return filteredPms.length > 0 ? filteredPms : EMPTY_ARRAY;
 };
