@@ -197,46 +197,30 @@ class PayoutMethodSelect extends React.Component {
 
   getOptions = memoizeOne((payoutMethods, payee) => {
     const hostSupportedPayoutMethods = this.props.collective.host?.supportedPayoutMethods || [PayoutMethodType.OTHER];
-    const groupedPms = groupBy(payoutMethods, 'type');
+
+    const payeeIsSameHost = payee && payee.host?.id === this.props.collective.host?.id;
     const payeeIsSelfHosted = payee && payee.id === payee.host?.id;
-    const payeeIsCrossHost = true;
-    const payeeIsCollectiveFamilyType =
-      payee &&
-      AccountTypesWithHost.includes(payee.type) &&
-      hostSupportedPayoutMethods.includes(PayoutMethodType.ACCOUNT_BALANCE);
+    const payeeIsCollectiveFamilyType = payee && AccountTypesWithHost.includes(payee.type);
 
     let pmTypes;
 
-    if (payeeIsCollectiveFamilyType && !payeeIsSelfHosted) {
-      // If the Account is of the "Collective" family, account balance should be the only option
-      // But if it's across hosts, it should be bank account based
-      if (payeeIsCrossHost) {
-        pmTypes = [PayoutMethodType.BANK_ACCOUNT];
-      } else {
-        pmTypes = [PayoutMethodType.ACCOUNT_BALANCE];
-      }
+    if (payeeIsSameHost) {
+      pmTypes = [PayoutMethodType.ACCOUNT_BALANCE];
     } else {
-      pmTypes = Object.values(PayoutMethodType).filter(type => {
-        if (!hostSupportedPayoutMethods.includes(type)) {
-          return false;
-        }
+      pmTypes = hostSupportedPayoutMethods
+        .filter(type => type !== PayoutMethodType.CREDIT_CARD)
+        .filter(type => type !== PayoutMethodType.ACCOUNT_BALANCE);
 
-        if (
-          // Account Balance only on Same Host
-          type === PayoutMethodType.ACCOUNT_BALANCE &&
-          payee?.host?.id !== this.props.collective.host?.id
-        ) {
-          return false;
-        }
-
-        return true;
-      });
+      pmTypes.push(PayoutMethodType.OTHER);
     }
 
+    // No New Payout Methods for Collectives
     const creatablePmTypes =
       payeeIsCollectiveFamilyType && !payeeIsSelfHosted
         ? []
         : pmTypes.filter(pmType => pmType !== PayoutMethodType.ACCOUNT_BALANCE);
+
+    const groupedPms = groupBy(payoutMethods, 'type');
 
     return pmTypes.map(pmType => ({
       label: i18nPayoutMethodType(this.props.intl, pmType),

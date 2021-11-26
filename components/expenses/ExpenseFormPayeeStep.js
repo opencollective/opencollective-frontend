@@ -71,37 +71,40 @@ const setLocationFromPayee = (formik, payee) => {
 };
 
 const getPayoutMethodsFromPayee = payee => {
-  const basePms = get(payee, 'payoutMethods') || EMPTY_ARRAY;
-  let filteredPms = basePms.filter(({ isSaved }) => isSaved);
+  console.log('getPayoutMethodsFromPayee', payee);
+
+  const payoutMethods = get(payee, 'payoutMethods', EMPTY_ARRAY).filter(({ isSaved }) => isSaved);
 
   // If the Payee is active (can manage a budget and has a balance). This is usually:
   // - a "Collective" family (Collective, Fund, Event, Project) with an host
   // - an "Host" Organization with budget activated
   if (payee?.isActive) {
-    if (!filteredPms.find(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)) {
-      filteredPms.unshift({
+    if (!payoutMethods.find(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)) {
+      payoutMethods.unshift({
         id: 'new',
         data: {},
         type: PayoutMethodType.ACCOUNT_BALANCE,
         isSaved: true,
       });
     }
-    if (!filteredPms.find(pm => pm.type === PayoutMethodType.BANK_ACCOUNT)) {
-      const hostPayoutMethods = get(payee, 'host.payoutMethods') || EMPTY_ARRAY;
-      const hostBankAccountPayoutMethods = hostPayoutMethods.filter(
-        pm => pm.isSaved && pm.type === PayoutMethodType.BANK_ACCOUNT,
-      );
-      filteredPms.unshift(...hostBankAccountPayoutMethods);
-    }
   }
 
   // If the Payee is in the "Collective" family (Collective, Fund, Event, Project)
-  // Then the Account Balance should be its only option
-  // if (payee && AccountTypesWithHost.includes(payee.type) && payee.id !== payee.host?.id) {
-  //   // filteredPms = filteredPms.filter(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE);
-  // }
+  // But not the Host itself
+  // Then we should add BANK_ACCOUNT of the Host as an option
+  if (payee && AccountTypesWithHost.includes(payee.type) && payee.id !== payee.host?.id) {
+    if (!payoutMethods.find(pm => pm.type === PayoutMethodType.BANK_ACCOUNT)) {
+      const hostPayoutMethods = get(payee, 'host.payoutMethods', EMPTY_ARRAY);
+      const hostBankAccountPayoutMethods = hostPayoutMethods.filter(
+        pm => pm.isSaved && pm.type === PayoutMethodType.BANK_ACCOUNT,
+      );
+      payoutMethods.unshift(...hostBankAccountPayoutMethods);
+    }
+  }
 
-  return filteredPms.length > 0 ? filteredPms : EMPTY_ARRAY;
+  console.log('getPayoutMethodsFromPayee payoutMethods', payoutMethods);
+
+  return payoutMethods.length > 0 ? payoutMethods : EMPTY_ARRAY;
 };
 
 const refreshPayoutProfile = (formik, payoutProfiles) => {

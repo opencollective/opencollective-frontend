@@ -9,6 +9,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { expenseSubmissionAllowed, getCollectiveTypeForUrl } from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
+import { PayoutMethodType } from '../lib/constants/payout-method';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import FormPersister from '../lib/form-persister';
@@ -271,7 +272,8 @@ class CreateExpensePage extends React.Component {
           (node.account.isActive && node.account.id === node.account.host?.id) ||
           // Same Host
           (node.account.isActive && this.props.data?.account?.host?.id === node.account.host?.id) ||
-          true
+          // Host supporting Bank Account payouts
+          (node.account.host?.payoutMethods || []).find(pm => pm.isSaved && pm.type === PayoutMethodType.BANK_ACCOUNT)
         ) {
           // Push main account
           payoutProfiles.push(omit(node.account, ['childrenAccounts']));
