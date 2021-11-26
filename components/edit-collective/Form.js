@@ -777,13 +777,14 @@ class EditCollectiveForm extends React.Component {
           type: 'select',
           defaultValue: get(this.state.collective, 'currency'),
           options: currencyOptions,
-          description: collective.isHost ? intl.formatMessage(this.messages['currency.warning']) : null,
+          description:
+            ([COLLECTIVE, FUND].includes(collective.type) && collective.isActive) || collective.isHost
+              ? intl.formatMessage(this.messages['currency.warning'])
+              : null,
           when: () => ![EVENT, PROJECT].includes(collective.type),
           // Active Collectives, Funds and Fiscal Hosts can't edit their currency.
           disabled:
-            ([COLLECTIVE, FUND, PROJECT, EVENT].includes(collective.type) && collective.isActive) || collective.isHost
-              ? true
-              : false,
+            ([COLLECTIVE, FUND].includes(collective.type) && collective.isActive) || collective.isHost ? true : false,
         },
         ...this.getApplicableTaxesFields(),
         {
