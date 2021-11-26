@@ -48,6 +48,7 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
       hostFeePercent
       isTrustedHost
       stats {
+        id
         balance(dateTo: $dateTo) {
           valueInCents
           currency
@@ -61,6 +62,7 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
           valueInCents
         }
         contributionAmountOverTime {
+          timeUnit
           nodes {
             date
             amount {

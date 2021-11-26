@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -12,7 +11,7 @@ import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const getChartOptions = (intl, startDate, endDate, hostCreatedAt) => {
+const getChartOptions = (intl, category) => {
   return {
     chart: {
       id: 'chart-transactions-overview',
@@ -35,7 +34,7 @@ const getChartOptions = (intl, startDate, endDate, hostCreatedAt) => {
     },
 
     xaxis: {
-      categories: getCategories(intl, startDate, endDate, hostCreatedAt),
+      categories: getCategories(intl, category),
     },
     yaxis: {
       labels: {
@@ -47,33 +46,18 @@ const getChartOptions = (intl, startDate, endDate, hostCreatedAt) => {
   };
 };
 
-const getCategories = (intl, startDate, endDate, hostCreatedAt) => {
-  const numberOfDays = dayjs(startDate || hostCreatedAt).diff(dayjs(endDate), 'day');
-  if (numberOfDays <= 7) {
-    const startDay = startDate.getDay();
-    return [...new Array(7)].map((_, idx) =>
-      intl.formatDate(new Date(0, 0, idx + startDay), { weekday: 'long' }).toUpperCase(),
-    );
-  } else if (numberOfDays <= 365) {
+const getCategories = (intl, category) => {
+  if (category === 'WEEK') {
+    return [...new Array(7)].map((_, idx) => intl.formatDate(new Date(0, 0, idx), { weekday: 'long' }).toUpperCase());
+  } else if (category === 'MONTH') {
     const currentMonth = new Date().getMonth();
     return [...new Array(12)].map((_, idx) =>
       intl.formatDate(new Date(0, idx + currentMonth + 1), { month: 'short' }).toUpperCase(),
     );
-  } else {
+  } else if (category === 'YEAR') {
     return [...new Array(6)].map((_, idx) =>
       intl.formatDate(new Date(new Date().getFullYear() - 5 + idx, 0), { year: 'numeric' }).toUpperCase(),
     );
-  }
-};
-
-const getCategoryType = (startDate, endDate, hostCreatedAt) => {
-  const numberOfDays = dayjs(startDate || hostCreatedAt).diff(dayjs(endDate), 'day');
-  if (numberOfDays <= 7) {
-    return 'WEEK';
-  } else if (numberOfDays <= 365) {
-    return 'MONTH';
-  } else {
-    return 'YEAR';
   }
 };
 
@@ -246,16 +230,16 @@ const getTransactionsBreakdownChartData = host => {
   return areas;
 };
 
-const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
+const TransactionsOverviewSection = ({ host, isLoading }) => {
   const intl = useIntl();
   const { locale } = intl;
-  const categoryType = getCategoryType(new Date(dateInterval?.from), new Date(dateInterval?.to), host?.createdAt);
 
   const contributionStats = host?.contributionStats;
   const expenseStats = host?.expenseStats;
 
   const { contributionAmountOverTime } = contributionStats || 0;
   const { expenseAmountOverTime } = expenseStats || 0;
+  const categoryType = contributionAmountOverTime?.timeUnit;
 
   const series = [
     {
@@ -272,7 +256,6 @@ const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
 
   const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host, locale), [host, locale]);
   const transactionBreakdownChart = React.useMemo(() => getTransactionsBreakdownChartData(host), [host]);
-  const hasHistorical = false;
   return (
     <React.Fragment>
       <Box mt={18} mb={12}>
@@ -285,21 +268,19 @@ const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
           </div>
         )}
       </Box>
-      {hasHistorical && (
-        <Box mt="24px" mb="12px">
-          {isLoading ? (
-            <LoadingPlaceholder height={21} width="100%" borderRadius="8px" />
-          ) : (
-            <Chart
-              type="area"
-              width="100%"
-              height="250px"
-              options={getChartOptions(intl, new Date(dateInterval?.from), new Date(dateInterval?.to), host.createdAt)}
-              series={series}
-            />
-          )}
-        </Box>
-      )}
+      <Box mt="24px" mb="12px">
+        {isLoading ? (
+          <LoadingPlaceholder height={21} width="100%" borderRadius="8px" />
+        ) : (
+          <Chart
+            type="area"
+            width="100%"
+            height="250px"
+            options={getChartOptions(intl, categoryType)}
+            series={series}
+          />
+        )}
+      </Box>
     </React.Fragment>
   );
 };
