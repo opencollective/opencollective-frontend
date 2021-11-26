@@ -7127,6 +7127,31 @@ type Mutation {
   ): VirtualCard!
 
   """
+  Create new virtual card for existing hosted collective
+  """
+  createVirtualCard(
+    """
+    Virtual card name
+    """
+    name: String!
+
+    """
+    Virtual card monthly limit
+    """
+    monthlyLimit: AmountInput!
+
+    """
+    Account where the virtual card will be associated
+    """
+    account: AccountReferenceInput!
+
+    """
+    Individual account responsible for the card
+    """
+    assignee: AccountReferenceInput!
+  ): VirtualCard!
+
+  """
   Edit existing Virtual Card information
   """
   editVirtualCard(

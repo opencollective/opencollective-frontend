@@ -21,6 +21,7 @@ import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import AssignVirtualCardModal from '../AssignVirtualCardModal';
+import CreateVirtualCardModal from '../CreateVirtualCardModal';
 import SettingsTitle from '../SettingsTitle';
 import VirtualCard from '../VirtualCard';
 
@@ -132,7 +133,7 @@ const AddCardPlaceholder = styled(Flex)`
   ${props => `border: 1px dashed ${props.theme.colors.primary[500]};`}
 `;
 
-const VIRTUAL_CARDS_PER_PAGE = 5;
+const VIRTUAL_CARDS_PER_PAGE = 6;
 
 const HostVirtualCards = props => {
   const router = useRouter();
@@ -173,6 +174,7 @@ const HostVirtualCards = props => {
     },
   });
   const [displayAssignCardModal, setAssignCardModalDisplay] = React.useState(false);
+  const [displayCreateVirtualCardModal, setCreateVirtualCardModalDisplay] = React.useState(false);
   const [editingVirtualCard, setEditingVirtualCard] = React.useState(undefined);
   const [virtualCardPolicy, setVirtualCardPolicy] = React.useState(
     props.collective.settings?.virtualcards?.policy || '',
@@ -198,6 +200,14 @@ const HostVirtualCards = props => {
     });
     setAssignCardModalDisplay(false);
     setEditingVirtualCard(undefined);
+    refetch();
+  };
+  const handleCreateVirtualCardSuccess = message => {
+    addToast({
+      type: TOAST_TYPE.SUCCESS,
+      message: message || <FormattedMessage defaultMessage="Virtual card successfully created" />,
+    });
+    setCreateVirtualCardModalDisplay(false);
     refetch();
   };
   const handleSettingsUpdate = key => async value => {
@@ -343,6 +353,26 @@ const HostVirtualCards = props => {
             buttonStyle="primary"
             buttonSize="round"
             data-cy="confirmation-modal-continue"
+            onClick={() => setCreateVirtualCardModalDisplay(true)}
+          >
+            +
+          </StyledButton>
+          <Box mt="10px">
+            <FormattedMessage defaultMessage="Create virtual card" />
+          </Box>
+        </AddCardPlaceholder>
+        <AddCardPlaceholder
+          width="366px"
+          height="248px"
+          justifyContent="center"
+          alignItems="center"
+          flexDirection="column"
+        >
+          <StyledButton
+            my={1}
+            buttonStyle="primary"
+            buttonSize="round"
+            data-cy="confirmation-modal-continue"
             onClick={() => setAssignCardModalDisplay(true)}
           >
             +
@@ -383,6 +413,16 @@ const HostVirtualCards = props => {
             setEditingVirtualCard(undefined);
           }}
           virtualCard={editingVirtualCard}
+          show
+        />
+      )}
+      {displayCreateVirtualCardModal && (
+        <CreateVirtualCardModal
+          host={data.host}
+          onSuccess={handleCreateVirtualCardSuccess}
+          onClose={() => {
+            setCreateVirtualCardModalDisplay(false);
+          }}
           show
         />
       )}
