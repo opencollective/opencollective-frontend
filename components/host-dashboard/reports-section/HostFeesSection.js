@@ -18,13 +18,13 @@ import { HostFeesSectionHistorical } from './HostFeesSectionHistorical';
 const getValuesToDisplay = (isLoading, host, locale) => {
   if (isLoading) {
     const loadingComponent = <LoadingPlaceholder height={21} width={120} />;
-    return { fees: loadingComponent, profit: loadingComponent, sharedRevenue: loadingComponent };
+    return { fees: loadingComponent, netHostFee: loadingComponent, sharedRevenue: loadingComponent };
   } else {
     const { hostFees, hostFeeShare } = host.hostMetrics;
     return {
       fees: formatCurrency(hostFees.valueInCents, host.currency, { locale }),
       sharedRevenue: formatCurrency(hostFeeShare.valueInCents, host.currency, { locale }),
-      profit: formatCurrency(hostFees.valueInCents - hostFeeShare.valueInCents, host.currency, { locale }),
+      netHostFee: formatCurrency(hostFees.valueInCents - hostFeeShare.valueInCents, host.currency, { locale }),
     };
   }
 };
@@ -64,15 +64,15 @@ const HostFeesSection = ({ host, collectives, isLoading }) => {
             <Flex alignItems="center">
               <Image width={6.5} height={12} mr={10} src="/static/images/host-fees-money-sign.svg" />
               <Span ml="10px" fontSize="12px" fontWeight="500" textTransform="uppercase">
-                <FormattedMessage defaultMessage="Your Profit" />
+                <FormattedMessage defaultMessage="Net host fee" />
               </Span>
             </Flex>
           </Container>
           <Box pt="12px" pb="10px" fontSize="18px" fontWeight="500">
-            {valuesToDisplay.profit}
+            {valuesToDisplay.netHostFee}
           </Box>
           <P fontSize="12px" fontWeight="400" mt="10px">
-            <FormattedMessage defaultMessage="The profit as an organization resulting of the host fees you collect without the shared revenue for the use of the platform." />
+            <FormattedMessage defaultMessage="The net host fee as an organization resulting of the host fees you collect without the platform share for the use of the platform." />
           </P>
         </Container>
         <Container
@@ -87,7 +87,7 @@ const HostFeesSection = ({ host, collectives, isLoading }) => {
             <Flex alignItems="center">
               <Image width={9.42} height={12} mr={10} src="/static/images/host-fees-oc.svg" />
               <Span ml="10px" fontSize="12px" fontWeight="500" textTransform="uppercase">
-                <FormattedMessage defaultMessage="Shared Revenue" />
+                <FormattedMessage defaultMessage="Platform share" />
               </Span>
             </Flex>
           </Container>
