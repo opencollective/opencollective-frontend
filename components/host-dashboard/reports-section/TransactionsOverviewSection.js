@@ -50,13 +50,13 @@ const getCategories = (intl, category) => {
   if (category === 'WEEK') {
     return [...new Array(7)].map((_, idx) => intl.formatDate(new Date(0, 0, idx), { weekday: 'long' }).toUpperCase());
   } else if (category === 'MONTH') {
-    const currentMonth = new Date().getMonth();
+    const currentMonth = new Date().getUTCMonth();
     return [...new Array(12)].map((_, idx) =>
       intl.formatDate(new Date(0, idx + currentMonth + 1), { month: 'short' }).toUpperCase(),
     );
   } else if (category === 'YEAR') {
     return [...new Array(6)].map((_, idx) =>
-      intl.formatDate(new Date(new Date().getFullYear() - 5 + idx, 0), { year: 'numeric' }).toUpperCase(),
+      intl.formatDate(new Date(new Date().getUTCFullYear() - 5 + idx, 0), { year: 'numeric' }).toUpperCase(),
     );
   }
 };
@@ -67,9 +67,9 @@ const constructChartDataPoints = (category, dataPoints) => {
   // Show data for the past 5 years from the current year.
   if (category === 'YEAR') {
     chartDataPoints = new Array(6).fill(0);
-    const currentYear = new Date().getFullYear();
+    const currentYear = new Date().getUTCFullYear();
     dataPoints.forEach(dataPoint => {
-      const year = new Date(dataPoint.date).getFullYear();
+      const year = new Date(dataPoint.date).getUTCFullYear();
       if (year > currentYear - 6) {
         chartDataPoints[5 - (currentYear - year)] = Math.abs(dataPoint.amount.value);
       }
@@ -79,10 +79,7 @@ const constructChartDataPoints = (category, dataPoints) => {
     chartDataPoints = new Array(12).fill(0);
     dataPoints.forEach(dataPoint => {
       const date = new Date(dataPoint.date);
-      const today = new Date();
-      if (today.getFullYear() - date.getFullYear() <= 1) {
-        chartDataPoints[(date.getMonth() + (12 - today.getMonth())) % 12] = Math.abs(dataPoint.amount.value);
-      }
+      chartDataPoints[(date.getUTCMonth() + 1) % 12] = Math.abs(dataPoint.amount.value);
     });
     // Show data for the past 7 days
   } else if (category === 'WEEK') {
@@ -90,8 +87,8 @@ const constructChartDataPoints = (category, dataPoints) => {
     dataPoints.forEach(dataPoint => {
       const date = new Date(dataPoint.date);
       const today = new Date();
-      if (today.getFullYear() === date.getFullYear() && today.getMonth() === date.getMonth()) {
-        chartDataPoints[date.getDay() % 7] = Math.abs(dataPoint.amount.value);
+      if (today.getUTCFullYear() === date.getFullYear() && today.getUTCMonth() === date.getUTCMonth()) {
+        chartDataPoints[date.getUTCDay() % 7] = Math.abs(dataPoint.amount.value);
       }
     });
   }
