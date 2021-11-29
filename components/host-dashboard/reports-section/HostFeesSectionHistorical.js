@@ -17,7 +17,7 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 import { P } from '../../Text';
 
-import { getActiveYearsOptions } from './helpers';
+import { formatChartYAxisLabels, getActiveYearsOptions } from './helpers';
 
 const hostFeeSectionTimeSeriesQuery = gqlV2/* GraphQL */ `
   query HostFeeSectionTimeSeries($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
@@ -107,9 +107,7 @@ const getChartOptions = (intl, hostCurrency) => ({
   yaxis: {
     labels: {
       minWidth: 38,
-      formatter: function (value) {
-        return value < 1000 ? value : `${Math.round(value / 1000)}k`;
-      },
+      formatter: formatChartYAxisLabels,
     },
   },
   tooltip: {
