@@ -71,16 +71,14 @@ const setLocationFromPayee = (formik, payee) => {
 };
 
 const getPayoutMethodsFromPayee = payee => {
-  console.log('getPayoutMethodsFromPayee', payee);
-
   const payoutMethods = get(payee, 'payoutMethods', EMPTY_ARRAY).filter(({ isSaved }) => isSaved);
 
   // If the Payee is active (can manage a budget and has a balance). This is usually:
-  // - a "Collective" family (Collective, Fund, Event, Project) with an host
-  // - an "Host" Organization with budget activated
+  // - a "Collective" family (Collective, Fund, Event, Project) with an host or Self Hosted
+  // - an "Host" Organization with budget activated (new default)
   if (payee?.isActive) {
     if (!payoutMethods.find(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)) {
-      payoutMethods.unshift({
+      payoutMethods.push({
         id: 'new',
         data: {},
         type: PayoutMethodType.ACCOUNT_BALANCE,
@@ -90,19 +88,17 @@ const getPayoutMethodsFromPayee = payee => {
   }
 
   // If the Payee is in the "Collective" family (Collective, Fund, Event, Project)
-  // But not the Host itself
-  // Then we should add BANK_ACCOUNT of the Host as an option
+  // But not the Host itself (Self Hosted)
+  // Then we should add BANK_ACCOUNT and PAYPAL of the Host as an option
   if (payee && AccountTypesWithHost.includes(payee.type) && payee.id !== payee.host?.id) {
     if (!payoutMethods.find(pm => pm.type === PayoutMethodType.BANK_ACCOUNT)) {
       const hostPayoutMethods = get(payee, 'host.payoutMethods', EMPTY_ARRAY);
       const hostBankAccountPayoutMethods = hostPayoutMethods.filter(
-        pm => pm.isSaved && pm.type === PayoutMethodType.BANK_ACCOUNT,
+        pm => pm.isSaved && [PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.PAYPAL].includes(pm.type),
       );
-      payoutMethods.unshift(...hostBankAccountPayoutMethods);
+      payoutMethods.push(...hostBankAccountPayoutMethods);
     }
   }
-
-  console.log('getPayoutMethodsFromPayee payoutMethods', payoutMethods);
 
   return payoutMethods.length > 0 ? payoutMethods : EMPTY_ARRAY;
 };
