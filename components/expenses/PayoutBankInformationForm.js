@@ -167,7 +167,7 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
                     formik.setFieldValue(field.name, value);
                     if (input.refreshRequirementsOnChange) {
                       refetch({
-                        slug: host.slug,
+                        slug: host ? host.slug : TW_API_COLLECTIVE_SLUG,
                         currency,
                         accountDetails: get(set({ ...formik.values }, field.name, value), getFieldName('data')),
                       });
