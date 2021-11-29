@@ -7,7 +7,6 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { accountSupportsGrants } from '../../lib/collective.lib';
-import { CollectiveType } from '../../lib/constants/collectives';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -152,14 +151,7 @@ const validate = expense => {
       : requireFields(expense, ['description', 'payee', 'payee.name', 'payee.email']);
   }
 
-  let errors;
-  if (expense.payee.type === CollectiveType.COLLECTIVE) {
-    errors = requireFields(expense, ['description', 'payoutMethod', 'currency']);
-  } else if (isCardCharge) {
-    errors = {};
-  } else {
-    errors = requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
-  }
+  const errors = isCardCharge ? {} : requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
 
   if (expense.items.length > 0) {
     const itemsErrors = expense.items.map(item => validateExpenseItem(expense, item));
