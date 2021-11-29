@@ -654,6 +654,11 @@ type Expense {
   invoiceInfo: String
 
   """
+  The fees payer for this expense
+  """
+  feesPayer: FeesPayer!
+
+  """
   The permissions given to current logged in user for this expense
   """
   permissions: ExpensePermissions!
@@ -1594,6 +1599,21 @@ type ExpenseItem {
   """
   description: String
   url: URL
+}
+
+"""
+All supported expense types
+"""
+enum FeesPayer {
+  """
+  The collective will be responsible for paying the fees
+  """
+  COLLECTIVE
+
+  """
+  The payee will be responsible for paying the fees (they'll be deduced from the total amount)
+  """
+  PAYEE
 }
 
 """
@@ -9568,6 +9588,11 @@ input ProcessExpensePaymentParams {
   2FA code for if the host account has 2FA for payouts turned on.
   """
   twoFactorAuthenticatorCode: String
+
+  """
+  2FA code for if the host account has 2FA for payouts turned on.
+  """
+  feesPayer: FeesPayer = COLLECTIVE
 }
 
 input ExpenseInviteDraftInput {
