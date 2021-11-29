@@ -12,17 +12,8 @@ import { withUser } from '../components/UserProvider';
 
 import giftCardPageStyle from '!css-loader!../public/gift-cards-page/stylesheets/style.css'; // eslint-disable-line
 import holidayGiftCardPageStyle from '!css-loader!../public/holiday-gift-card/stylesheets/style.css'; // eslint-disable-line
-import howItWorksPageStyle from '!css-loader!../public/how-it-works-page/stylesheets/styles.css'; // eslint-disable-line
-
-import howItWorksPageScript from '!file-loader?publicPath=/_next/static/js/&outputPath=static/js/&name=[name]-[hash].[ext]!../public/how-it-works-page/javascripts/scripts.js'; // eslint-disable-line
 
 const PAGES = {
-  'how-it-works': {
-    pageContents: importAll(require.context('../public/how-it-works-page', false, /\.(html)$/)),
-    css: howItWorksPageStyle,
-    js: howItWorksPageScript,
-    className: 'mkt-page-how-it-works',
-  },
   'gift-of-giving': {
     pageContents: importAll(require.context('../public/holiday-gift-card', false, /\.(html)$/)),
     css: holidayGiftCardPageStyle,
@@ -42,12 +33,8 @@ function importAll(r) {
   return map;
 }
 
-function getmenuItem(pageSlug) {
-  if ('how-it-works' === pageSlug) {
-    return { pricing: true, howItWorks: true };
-  } else {
-    return { pricing: false, howItWorks: false };
-  }
+function getmenuItem() {
+  return { pricing: false, howItWorks: false };
 }
 
 class MarketingPage extends React.Component {
@@ -98,7 +85,7 @@ class MarketingPage extends React.Component {
     return (
       <Fragment>
         <div>
-          <Header LoggedInUser={LoggedInUser} menuItems={getmenuItem(pageSlug)} />
+          <Header LoggedInUser={LoggedInUser} menuItems={getmenuItem()} />
           <Body>
             <style type="text/css" dangerouslySetInnerHTML={{ __html: style }} />
             <div className={className} dangerouslySetInnerHTML={{ __html: html }} />
