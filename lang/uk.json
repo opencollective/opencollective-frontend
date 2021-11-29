@@ -2212,7 +2212,6 @@
   "VirtualCard.Paused": "Призупинені",
   "VirtualCard.PendingActivation": "Очікує активацію",
   "VirtualCard.PendingFulfillment": "Очікує заповнення",
-  "VirtualCard.Status": "Стан",
   "VirtualCards.AssignedOn": "Assigned on {createdAt, date, short}",
   "VirtualCards.CardNumber": "Номер картки",
   "VirtualCards.CVV": "CVV-код",

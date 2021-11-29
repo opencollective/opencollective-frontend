@@ -2212,7 +2212,6 @@
   "VirtualCard.Paused": "Paused",
   "VirtualCard.PendingActivation": "Pending Activation",
   "VirtualCard.PendingFulfillment": "Pending Fulfillment",
-  "VirtualCard.Status": "Status",
   "VirtualCards.AssignedOn": "Assigned on {createdAt, date, short}",
   "VirtualCards.CardNumber": "Card Number",
   "VirtualCards.CVV": "CVV",

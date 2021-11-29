@@ -121,6 +121,9 @@ const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => 
       if (!values.monthlyLimit) {
         errors.monthlyLimit = 'Required';
       }
+      if (values.monthlyLimit > 100000) {
+        errors.monthlyLimit = 'MonthlyLimit should not exceed 1000$';
+      }
       return errors;
     },
   });
