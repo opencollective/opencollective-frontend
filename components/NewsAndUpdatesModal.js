@@ -48,6 +48,7 @@ const newsAndUpdatesQuery = gqlV2/* GraphQL */ `
           slug
           publishedAt
           title
+          html
           summary
         }
       }
@@ -90,20 +91,28 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
               </StyledLink>
             </Flex>
             <Flex pb={1}>
-              <HTMLContent color="black.800" mt={1} fontSize="16px" content={update.summary} />
+              <Container width="100%">
+                <HTMLContent
+                  collapsable
+                  maxCollapsedHeight={480}
+                  color="black.800"
+                  mt={1}
+                  fontSize="16px"
+                  content={update.html}
+                  hideViewMoreLink
+                />
+              </Container>
             </Flex>
-            <Flex pb={3}>
-              {update.summary.endsWith('...') && (
-                <StyledLink
-                  onClick={onClose}
-                  as={Link}
-                  href={`/opencollective/updates/${update.slug}`}
-                  fontSize="14px"
-                  display="flex"
-                >
-                  <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
-                </StyledLink>
-              )}
+            <Flex pt={1} pb={3}>
+              <StyledLink
+                onClick={onClose}
+                as={Link}
+                href={`/opencollective/updates/${update.slug}`}
+                fontSize="14px"
+                display="flex"
+              >
+                <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
+              </StyledLink>
             </Flex>
           </Container>
         ))}

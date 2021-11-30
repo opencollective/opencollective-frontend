@@ -57,7 +57,14 @@ const CollapsedDisplayBox = styled(InlineDisplayBox)`
  * always ensure `content` is properly sanitized!
  */
 const HTMLContent = styled(
-  ({ content, collapsable = false, maxCollapsedHeight = 20, collapsePadding = 1, ...props }) => {
+  ({
+    content,
+    collapsable = false,
+    maxCollapsedHeight = 20,
+    collapsePadding = 1,
+    hideViewMoreLink = false,
+    ...props
+  }) => {
     const [isOpen, setOpen] = React.useState(false);
     const [isCollapsed, setIsCollapsed] = React.useState(false);
     const contentRef = useRef();
@@ -86,7 +93,7 @@ const HTMLContent = styled(
             {...props}
           />
         )}
-        {!isOpen && isCollapsed && (
+        {!isOpen && isCollapsed && !hideViewMoreLink && (
           <ReadFullLink
             onClick={() => setOpen(true)}
             {...props}
@@ -245,6 +252,8 @@ HTMLContent.propTypes = {
    *  only two lines the blur effect is not applied.
    */
   collapsePadding: PropTypes.number,
+  /* Hides the "Read full description/collapse" link */
+  hideViewMoreLink: PropTypes.bool,
 };
 
 HTMLContent.defaultProps = {
