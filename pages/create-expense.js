@@ -9,7 +9,6 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { expenseSubmissionAllowed, getCollectiveTypeForUrl } from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
-import { PayoutMethodType } from '../lib/constants/payout-method';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import FormPersister from '../lib/form-persister';
@@ -264,22 +263,18 @@ class CreateExpensePage extends React.Component {
       return [];
     } else {
       const payoutProfiles = [loggedInAccount];
-      for (const node of get(loggedInAccount, 'adminMemberships.nodes', [])) {
+      for (const membership of get(loggedInAccount, 'adminMemberships.nodes', [])) {
         if (
           // Organizations
-          [ORGANIZATION].includes(node.account.type) ||
-          // Independant Collectives
-          (node.account.isActive && node.account.id === node.account.host?.id) ||
-          // Same Host
-          (node.account.isActive && this.props.data?.account?.host?.id === node.account.host?.id) ||
-          // Host supporting Bank Account payouts
-          (node.account.host?.payoutMethods || []).find(pm => pm.isSaved && pm.type === PayoutMethodType.BANK_ACCOUNT)
+          [ORGANIZATION].includes(membership.account.type) ||
+          // Relax available accounts
+          membership.account.isActive
         ) {
           // Push main account
-          payoutProfiles.push(omit(node.account, ['childrenAccounts']));
-          if (this.props.data?.account?.host?.id === node.account.host?.id) {
-            // Push children (Same Host)
-            payoutProfiles.push(...node.account.childrenAccounts.nodes);
+          payoutProfiles.push(omit(membership.account, ['childrenAccounts']));
+          // Push children and add Host if missing
+          for (const childrenAccount of membership.account.childrenAccounts.nodes) {
+            payoutProfiles.push({ host: membership.account.host, ...childrenAccount });
           }
         }
       }
@@ -453,6 +448,7 @@ const hostFieldsFragment = gqlV2/* GraphQL */ `
       availableCurrencies
     }
     supportedPayoutMethods
+    isTrustedHost
   }
 `;
 

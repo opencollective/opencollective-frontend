@@ -8,11 +8,13 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { AccountTypesWithHost } from '../../lib/constants/collectives';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
+import MessageBox from '../MessageBox';
 import StyledRoundButton from '../StyledRoundButton';
 import StyledSelect from '../StyledSelect';
 import { Span } from '../Text';
@@ -81,6 +83,7 @@ class PayoutMethodSelect extends React.Component {
         id: PropTypes.string,
         connectedAccounts: PropTypes.arrayOf(PropTypes.shape({ service: PropTypes.string })),
         supportedPayoutMethods: PropTypes.array,
+        isTrustedHost: PropTypes.bool,
       }),
     }).isRequired,
     /** The Acccount being paid with the expense */
@@ -167,10 +170,14 @@ class PayoutMethodSelect extends React.Component {
 
   formatOptionLabel = ({ value }, { context }) => {
     const isMenu = context === 'menu';
+
+    const isDeletable =
+      value.isDeletable === undefined ? value.type !== PayoutMethodType.ACCOUNT_BALANCE : value.isDeletable;
+
     return (
       <Flex justifyContent="space-between" alignItems="center">
         <Span fontSize={isMenu ? '13px' : '14px'}>{this.getPayoutMethodLabel(value)}</Span>
-        {isMenu && value.id && value.type !== PayoutMethodType.ACCOUNT_BALANCE && this.props.onRemove && (
+        {isMenu && value.id && isDeletable && this.props.onRemove && (
           <StyledRoundButton
             size={20}
             ml={2}
@@ -195,29 +202,37 @@ class PayoutMethodSelect extends React.Component {
     title: this.getPayoutMethodTitle(pm),
   });
 
-  getOptions = memoizeOne((payoutMethods, payee) => {
-    const hostSupportedPayoutMethods = this.props.collective.host?.supportedPayoutMethods || [PayoutMethodType.OTHER];
+  getPayerHostSupportedPayoutMethods = () => {
+    return this.props.collective.host?.supportedPayoutMethods || EMPTY_ARRAY;
+  };
 
-    const payeeIsSameHost = payee && payee.host?.id === this.props.collective.host?.id;
+  getOptions = memoizeOne((payoutMethods, payee) => {
+    const payerHostSupportedPayoutMethods = this.getPayerHostSupportedPayoutMethods();
+
     const payeeIsSelfHosted = payee && payee.id === payee.host?.id;
     const payeeIsCollectiveFamilyType = payee && AccountTypesWithHost.includes(payee.type);
+    const payeeIsSameHost = payee && payee.host?.id === this.props.collective.host?.id;
 
     let pmTypes;
 
     if (payeeIsSameHost) {
       pmTypes = [PayoutMethodType.ACCOUNT_BALANCE];
     } else {
-      pmTypes = hostSupportedPayoutMethods
+      pmTypes = payerHostSupportedPayoutMethods
         // Credit Card (Virtual Card) is generally not a Payout Method acceptable on the Frontend
         // Should it be completely removed?
         .filter(type => type !== PayoutMethodType.CREDIT_CARD)
         // Account Balance is not possible on different Hosts
         .filter(type => type !== PayoutMethodType.ACCOUNT_BALANCE);
 
-      pmTypes.push(PayoutMethodType.OTHER);
+      // Other not available for regular Collectives, Funds, Projects, Events
+      if (!payeeIsCollectiveFamilyType || payeeIsSelfHosted) {
+        pmTypes.push(PayoutMethodType.OTHER);
+      }
     }
 
     // No "New" Payout Methods for Collectives unless Self Hosted
+    // TODO: maybe we should not filter when the loggedInAccount is an admin of the payee's host
     const creatablePmTypes =
       payeeIsCollectiveFamilyType && !payeeIsSelfHosted
         ? []
@@ -243,16 +258,58 @@ class PayoutMethodSelect extends React.Component {
   });
 
   render() {
-    const { payoutMethods, defaultPayoutMethod, payoutMethod, ...props } = this.props;
+    const { payoutMethods, defaultPayoutMethod, payoutMethod, payee, collective, ...props } = this.props;
+
     const { removingPayoutMethod } = this.state;
     const value = !isEmpty(payoutMethod) && this.getOptionFromPayoutMethod(payoutMethod);
+
+    const payeeIsCollectiveFamilyType = payee && AccountTypesWithHost.includes(payee.type);
+    const payeeIsSameHost = payee && payee.host?.id === collective.host?.id;
+
+    const styledSelectOptions = this.getOptions(payoutMethods, payee);
+    const hasSuitablePayoutMethodOption = styledSelectOptions.find(({ options }) => options.length > 0) ? true : false;
+
+    if (payeeIsCollectiveFamilyType && !payeeIsSameHost) {
+      if (!collective?.host?.isTrustedHost) {
+        return (
+          <MessageBox type="error" mt={2} mb={3} fontSize="12px">
+            <FormattedMessage defaultMessage="This Expense is between different Hosts but the Payer Host is not allowed for this yet." />
+            &nbsp;
+            <FormattedMessage defaultMessage="If it's an issue, contact the Host or Open Collective support." />
+          </MessageBox>
+        );
+      }
+      if (!hasSuitablePayoutMethodOption) {
+        return (
+          <MessageBox type="error" mt={2} mb={3} fontSize="12px">
+            <FormattedMessage
+              defaultMessage="This Expense is between different Hosts but the recipient Host doesn't have a suitable Payout Method available ({payoutMethodTypes})."
+              values={{
+                payoutMethodTypes: Object.values(styledSelectOptions)
+                  .map(option => option.label)
+                  .join(', '),
+              }}
+            />
+            &nbsp;
+            <FormattedMessage defaultMessage="If it's an issue, contact the Host or Open Collective support." />
+          </MessageBox>
+        );
+      }
+    }
+
     return (
       <React.Fragment>
+        {payeeIsCollectiveFamilyType && !payeeIsSameHost && (
+          <MessageBox type="warning" mt={2} mb={3} fontSize="12px">
+            <FormattedMessage defaultMessage="This Expense is between different Hosts. Pick a Payout Method from the recipient Host." />
+          </MessageBox>
+        )}
+
         <StyledSelect
           inputId="payout-method-select"
           data-cy="payout-method-select"
           {...props}
-          options={this.getOptions(payoutMethods, props.payee)}
+          options={styledSelectOptions}
           defaultValue={defaultPayoutMethod ? this.getOptionFromPayoutMethod(defaultPayoutMethod) : undefined}
           value={typeof value === 'undefined' ? undefined : value}
           formatOptionLabel={this.formatOptionLabel}

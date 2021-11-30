@@ -435,20 +435,18 @@ class ExpensePage extends React.Component {
       return [];
     } else {
       const payoutProfiles = [loggedInAccount];
-      for (const node of get(loggedInAccount, 'adminMemberships.nodes', [])) {
+      for (const membership of get(loggedInAccount, 'adminMemberships.nodes', [])) {
         if (
           // Organizations
-          [ORGANIZATION].includes(node.account.type) ||
-          // Independant Collectives
-          (node.account.isActive && node.account.id === node.account.host?.id) ||
-          // Same Host
-          (node.account.isActive && this.props.data?.expense?.account?.host?.id === node.account.host?.id)
+          [ORGANIZATION].includes(membership.account.type) ||
+          // Relax available accounts
+          membership.account.isActive
         ) {
           // Push main account
-          payoutProfiles.push(omit(node.account, ['childrenAccounts']));
-          // Push children (Same Host)
-          if (this.props.data?.expense?.account?.host?.id === node.account.host?.id) {
-            payoutProfiles.push(...node.account.childrenAccounts.nodes);
+          payoutProfiles.push(omit(membership.account, ['childrenAccounts']));
+          // Push children and add Host if missing
+          for (const childrenAccount of membership.account.childrenAccounts.nodes) {
+            payoutProfiles.push({ host: membership.account.host, ...childrenAccount });
           }
         }
       }

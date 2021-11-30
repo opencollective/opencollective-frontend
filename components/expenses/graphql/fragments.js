@@ -69,11 +69,6 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
               type
               name
               isActive
-              ... on AccountWithHost {
-                host {
-                  id
-                }
-              }
             }
           }
         }

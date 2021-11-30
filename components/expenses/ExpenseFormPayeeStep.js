@@ -71,7 +71,7 @@ const setLocationFromPayee = (formik, payee) => {
 };
 
 const getPayoutMethodsFromPayee = payee => {
-  const payoutMethods = get(payee, 'payoutMethods', EMPTY_ARRAY).filter(({ isSaved }) => isSaved);
+  const payoutMethods = (get(payee, 'payoutMethods') || EMPTY_ARRAY).filter(({ isSaved }) => isSaved);
 
   // If the Payee is active (can manage a budget and has a balance). This is usually:
   // - a "Collective" family (Collective, Fund, Event, Project) with an host or Self Hosted
@@ -92,10 +92,11 @@ const getPayoutMethodsFromPayee = payee => {
   // Then we should add BANK_ACCOUNT and PAYPAL of the Host as an option
   if (payee && AccountTypesWithHost.includes(payee.type) && payee.id !== payee.host?.id) {
     if (!payoutMethods.find(pm => pm.type === PayoutMethodType.BANK_ACCOUNT)) {
-      const hostPayoutMethods = get(payee, 'host.payoutMethods', EMPTY_ARRAY);
-      const hostBankAccountPayoutMethods = hostPayoutMethods.filter(
-        pm => pm.isSaved && [PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.PAYPAL].includes(pm.type),
-      );
+      const hostPayoutMethods = get(payee, 'host.payoutMethods') || EMPTY_ARRAY;
+      const hostBankAccountPayoutMethods = hostPayoutMethods
+        .filter(pm => pm.isSaved && [PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.PAYPAL].includes(pm.type))
+        .map(payoutMethod => ({ ...payoutMethod, isDeletable: false }));
+      // TODO: maybe isDeletable should be true if the loggedInAccount is an admin of the host
       payoutMethods.push(...hostBankAccountPayoutMethods);
     }
   }
@@ -134,7 +135,7 @@ const getPayeeOptions = (intl, payoutProfiles) => {
 
   const payeeOptions = [
     { options: myself, label: intl.formatMessage({ defaultMessage: 'Myself' }) },
-    { options: myOrganizations, label: intl.formatMessage({ defaultMessage: 'My Organizations' }) },
+    { options: myOrganizations, label: intl.formatMessage({ id: 'organization', defaultMessage: 'My Organizations' }) },
   ];
 
   if (profilesByType[COLLECTIVE]?.length) {
