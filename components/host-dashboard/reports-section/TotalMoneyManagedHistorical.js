@@ -15,7 +15,7 @@ import { StyledSelectFilter } from '../../StyledSelectFilter';
 import StyledSpinner from '../../StyledSpinner';
 import { P } from '../../Text';
 
-import { formatChartYAxisLabels, getActiveYearsOptions } from './helpers';
+import { formatAmountForLegend, getActiveYearsOptions } from './helpers';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const totalMoneyManagedQuery = gqlV2/* GraphQL */ `
@@ -97,7 +97,7 @@ const getChartOptions = (intl, hostCurrency) => ({
   yaxis: {
     labels: {
       minWidth: 38,
-      formatter: formatChartYAxisLabels,
+      formatter: formatAmountForLegend,
     },
   },
   tooltip: {

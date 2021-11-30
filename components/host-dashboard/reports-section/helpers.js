@@ -5,6 +5,6 @@ export const getActiveYearsOptions = host => {
   return activeYears.map(year => ({ value: year, label: year })).reverse();
 };
 
-export const formatChartYAxisLabels = value => {
+export const formatAmountForLegend = value => {
   return value < 1000 ? value : `${Math.round(value / 1000).toLocaleString()}k`;
 };
