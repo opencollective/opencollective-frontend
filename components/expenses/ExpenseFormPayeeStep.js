@@ -11,7 +11,8 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { checkRequiresAddress, flattenObjectDeep } from '../../lib/utils';
+import { flattenObjectDeep } from '../../lib/utils';
+import { checkRequiresAddress } from './lib/utils';
 
 import CollectivePicker, {
   CUSTOM_OPTIONS_POSITION,

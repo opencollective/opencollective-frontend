@@ -11,7 +11,8 @@ import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { requireFields } from '../../lib/form-utils';
-import { checkRequiresAddress, flattenObjectDeep } from '../../lib/utils';
+import { flattenObjectDeep } from '../../lib/utils';
+import { checkRequiresAddress } from './lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
