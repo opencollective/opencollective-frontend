@@ -2216,7 +2216,6 @@
   "UploadInvoiceDescription": "Se você já tem um documento de fatura, você pode enviá-lo aqui.",
   "user.create": "Criar novo usuário",
   "User.EmailAddress": "Endereço de e-mail",
-  "User.FullName": "Nome completo",
   "User.InviteNew": "Convidar novo usuário",
   "user.isArchived": "A conta foi arquivada.",
   "user.isArchived.edit.description": "Esta conta foi arquivada e não está mais ativa.",

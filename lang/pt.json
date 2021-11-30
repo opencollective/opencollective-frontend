@@ -2216,7 +2216,6 @@
   "UploadInvoiceDescription": "If you already have an invoice document, you can upload it here.",
   "user.create": "Create new user",
   "User.EmailAddress": "Email address",
-  "User.FullName": "Nome completo",
   "User.InviteNew": "Invite new User",
   "user.isArchived": "Esta conta foi arquivada.",
   "user.isArchived.edit.description": "This account has been archived is no longer active.",

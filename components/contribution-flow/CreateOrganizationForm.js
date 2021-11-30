@@ -7,9 +7,9 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 
 const msg = defineMessages({
-  organizationName: {
-    id: 'Organization.Name',
-    defaultMessage: 'Organization name',
+  displayName: {
+    id: 'Fields.displayName',
+    defaultMessage: 'Display name',
   },
   website: {
     id: 'Fields.website',
@@ -36,14 +36,7 @@ const CreateOrganizationForm = ({ values, onChange }) => {
   const dispatchChange = field => e => onChange({ ...values, [field]: e.target.value });
   return (
     <div>
-      <StyledInputField
-        autoFocus
-        name="name"
-        htmlFor="name"
-        label={formatMessage(msg.organizationName)}
-        mt={3}
-        required
-      >
+      <StyledInputField autoFocus name="name" htmlFor="name" label={formatMessage(msg.displayName)} mt={3} required>
         {inputProps => (
           <StyledInput
             {...inputProps}

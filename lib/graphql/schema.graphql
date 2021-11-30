@@ -4129,9 +4129,14 @@ input GuestInfoInput {
   email: String
 
   """
-  Full name of the user
+  Display name of the user
   """
   name: String
+
+  """
+  Legal name of the user
+  """
+  legalName: String
 
   """
   The unique guest token
