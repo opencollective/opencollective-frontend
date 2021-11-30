@@ -13,7 +13,6 @@ import RequestVirtualCardBtn from '../../../RequestVirtualCardBtn';
 import StyledButton from '../../../StyledButton';
 
 import CollectiveFilter from './filters/CollectiveFilter';
-import StatusFilter from './filters/StatusFilter';
 
 const FilterContainer = styled(Box)`
   margin-bottom: 8px;
@@ -73,12 +72,6 @@ const VirtualCardFilters = ({
         </FilterContainer>
       )}
       <Flex flexWrap="wrap">
-        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} width={[1, filterWidth]}>
-          <FilterLabel htmlFor="virtual-card-filter-status">
-            <FormattedMessage id="VirtualCard.Status" defaultMessage="Status" />
-          </FilterLabel>
-          <StatusFilter {...getFilterProps('state')} />
-        </FilterContainer>
         {displayPeriodFilter && (
           <FilterContainer mr={[0, '8px']} mb={['8px', 0]} width={[1, filterWidth]}>
             <FilterLabel htmlFor="virtual-card-filter-period">
