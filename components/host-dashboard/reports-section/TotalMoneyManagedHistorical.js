@@ -5,6 +5,7 @@ import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { ChartWrapper } from '../../ChartWrapper';
@@ -14,7 +15,7 @@ import { StyledSelectFilter } from '../../StyledSelectFilter';
 import StyledSpinner from '../../StyledSpinner';
 import { P } from '../../Text';
 
-import { getActiveYearsOptions } from './helpers';
+import { formatAmountForLegend, getActiveYearsOptions } from './helpers';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const totalMoneyManagedQuery = gqlV2/* GraphQL */ `
@@ -76,7 +77,7 @@ const getSeriesFromData = (intl, timeSeries, year) => {
   ];
 };
 
-const getChartOptions = intl => ({
+const getChartOptions = (intl, hostCurrency) => ({
   chart: {
     id: 'chart-host-report-money-managed',
   },
@@ -92,6 +93,19 @@ const getChartOptions = intl => ({
     categories: [...new Array(12)].map(
       (_, idx) => `${intl.formatDate(new Date(0, idx), { month: 'short' }).toUpperCase()}`,
     ),
+  },
+  yaxis: {
+    labels: {
+      minWidth: 38,
+      formatter: formatAmountForLegend,
+    },
+  },
+  tooltip: {
+    y: {
+      formatter: function (value) {
+        return formatCurrency(value * 100, hostCurrency);
+      },
+    },
   },
 });
 
