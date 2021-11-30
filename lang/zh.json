@@ -2216,7 +2216,6 @@
   "UploadInvoiceDescription": "If you already have an invoice document, you can upload it here.",
   "user.create": "创建新用户",
   "User.EmailAddress": "电子邮箱地址",
-  "User.FullName": "全名",
   "User.InviteNew": "邀请新用户",
   "user.isArchived": "帐户已被归档。",
   "user.isArchived.edit.description": "This account has been archived is no longer active.",

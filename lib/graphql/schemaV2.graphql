@@ -3323,7 +3323,7 @@ type ContributionStats {
   """
   The contribution amounts over time
   """
-  contributionAmountOverTime: TimeSeriesAmount!
+  contributionAmountOverTime: TimeSeriesAmount
 
   """
   Number of one time contributions
@@ -3353,7 +3353,7 @@ type ExpenseStats {
   """
   The total number of expenses over time
   """
-  expenseAmountOverTime: TimeSeriesAmount!
+  expenseAmountOverTime: TimeSeriesAmount
 
   """
   The daily average paid in expenses
@@ -9836,9 +9836,14 @@ input GuestInfoInput {
   email: EmailAddress!
 
   """
-  Full name of the user
+  Display name of the user
   """
   name: String
+
+  """
+  Legal name of the user
+  """
+  legalName: String
 
   """
   The unique guest token
@@ -9941,7 +9946,7 @@ input PaypalPaymentInput {
   data: JSON
   orderId: String
   subscriptionId: String
-  isNewApi: Boolean
+  isNewApi: Boolean @deprecated(reason: "2021-07-30: Not used anymore")
 }
 
 """

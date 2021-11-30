@@ -2216,7 +2216,6 @@
   "UploadInvoiceDescription": "Якщо у вас уже є рахунок-фактура, його можна завантажити тут.",
   "user.create": "Створити нового користувача",
   "User.EmailAddress": "Адреса електронної пошти",
-  "User.FullName": "Повне ім'я",
   "User.InviteNew": "Запросити нового користувача",
   "user.isArchived": "Обліковий запис архівовано.",
   "user.isArchived.edit.description": "Цей обліковий запис більше не активний.",

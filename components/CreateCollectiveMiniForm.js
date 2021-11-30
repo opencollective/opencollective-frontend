@@ -54,21 +54,13 @@ const msg = defineMessages({
     id: 'NewOrganization.Admin.Name',
     defaultMessage: 'Admin name',
   },
-  name: {
-    id: 'Fields.name',
-    defaultMessage: 'Name',
-  },
-  organizationName: {
-    id: 'Organization.Name',
-    defaultMessage: 'Organization name',
-  },
   legalName: {
     id: 'LegalName',
     defaultMessage: 'Legal Name',
   },
-  fullName: {
-    id: 'User.FullName',
-    defaultMessage: 'Full name',
+  displayName: {
+    id: 'Fields.displayName',
+    defaultMessage: 'Display name',
   },
   website: {
     id: 'Fields.website',
@@ -306,7 +298,7 @@ const CreateCollectiveMiniForm = ({
                 autoFocus
                 name="name"
                 htmlFor="name"
-                label={formatMessage(isUser ? msg.fullName : isOrganization ? msg.organizationName : msg.name)}
+                label={formatMessage(msg.displayName)}
                 error={touched.name && errors.name}
                 mt={3}
                 value={values.name}

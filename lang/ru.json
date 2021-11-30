@@ -2216,7 +2216,6 @@
   "UploadInvoiceDescription": "If you already have an invoice document, you can upload it here.",
   "user.create": "Создать нового пользователя",
   "User.EmailAddress": "Адрес электронной почты",
-  "User.FullName": "Полное имя",
   "User.InviteNew": "Invite new User",
   "user.isArchived": "Аккаунт был перемещён в архив.",
   "user.isArchived.edit.description": "This account has been archived is no longer active.",

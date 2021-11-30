@@ -172,7 +172,7 @@ class ContributionFlow extends React.Component {
 
     let fromAccount, guestInfo;
     if (stepProfile.isGuest) {
-      guestInfo = pick(stepProfile, ['email', 'name', 'location', 'captcha']);
+      guestInfo = pick(stepProfile, ['email', 'name', 'legalName', 'location', 'captcha']);
     } else {
       fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
     }

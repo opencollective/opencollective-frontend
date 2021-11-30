@@ -21,8 +21,8 @@ const messages = defineMessages({
     defaultMessage: 'Receive our monthly newsletter',
   },
   nameLabel: {
-    id: 'User.FullName',
-    defaultMessage: 'Full name',
+    id: 'Fields.displayName',
+    defaultMessage: 'Display name',
   },
   legalName: {
     id: 'LegalName',
