@@ -61,7 +61,7 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => (
                   defaultMessage="I agree with the <TOSLink>terms of fiscal sponsorship</TOSLink>."
                   values={{
                     TOSLink: getI18nLink({
-                      href: 'https://docs.opencollective.foundation/about/our-terms-and-conditions',
+                      href: 'https://docs.opencollective.foundation/getting-started/terms',
                       openInNewTabNoFollow: true,
                       onClick: e => e.stopPropagation(), // don't check the checkbox when clicking on the link
                     }),

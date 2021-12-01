@@ -30,6 +30,7 @@ LinkContributor.propTypes = {
     collectiveSlug: PropTypes.string,
     name: PropTypes.string,
     isIncognito: PropTypes.bool,
+    isGuest: PropTypes.bool,
   }).isRequired,
   /** By default we show the name in the link. Use this prop to override this */
   children: PropTypes.node,

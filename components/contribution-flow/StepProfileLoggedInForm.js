@@ -5,6 +5,9 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Avatar from '../Avatar';
 import { Box, Flex } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
+import Link from '../Link';
+import MessageBox from '../MessageBox';
 import StyledRadioList from '../StyledRadioList';
 import { P } from '../Text';
 
@@ -116,8 +119,7 @@ const NewContributionFlowStepProfileLoggedInForm = ({
                       </P>
                     ) : (
                       <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
-                        <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" /> -{' '}
-                        {value.email}
+                        <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" />
                       </P>
                     ))}
                   {value.type === 'COLLECTIVE' && (
@@ -142,6 +144,12 @@ const NewContributionFlowStepProfileLoggedInForm = ({
           )}
         </StyledRadioList>
       </Box>
+      <MessageBox type="info" fontSize="13px" lineHeight="20px">
+        <FormattedMessage
+          defaultMessage="When you contribute to a Collective we share your email address with the Administrators. If you wish to keep your contribution private choose the ‘incognito’ profile. Read our <PrivacyPolicyLink>privacy policy</PrivacyPolicyLink>."
+          values={{ PrivacyPolicyLink: getI18nLink({ href: '/privacypolicy', openInNewTab: true, as: Link }) }}
+        />
+      </MessageBox>
     </Fragment>
   );
 };

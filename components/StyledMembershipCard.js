@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage, injectIntl, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
 import { formatCurrency } from '../lib/currency-utils';
@@ -15,6 +15,7 @@ import { P, Span } from './Text';
  * A card to show a user's membership.
  */
 const StyledMembershipCard = ({ membership, intl, ...props }) => {
+  const { locale } = useIntl();
   const { account, since, role } = membership;
   return (
     <StyledCollectiveCard collective={account} {...props}>
@@ -48,6 +49,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
                       the API only returns the total amount in collective's currency. */
                   formatCurrency(membership.totalDonations.valueInCents, membership.totalDonations.currency || 'USD', {
                     precision: 0,
+                    locale,
                   })
                 }
               </Span>

@@ -17,7 +17,7 @@ import Loading from '../../Loading';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import { useUser } from '../../UserProvider';
 
-const AccountSettings = ({ account }) => {
+const AccountSettings = ({ account, section }) => {
   const { LoggedInUser, refetchLoggedInUser } = useUser();
   const router = useRouter();
   const [state, setState] = React.useState({ status: undefined, result: undefined });
@@ -150,12 +150,14 @@ const AccountSettings = ({ account }) => {
       onSubmit={handleEditCollective}
       status={state.status}
       contentOnly={true}
+      section={section}
     />
   );
 };
 
 AccountSettings.propTypes = {
   account: PropTypes.object,
+  section: PropTypes.string,
 };
 
 export default AccountSettings;

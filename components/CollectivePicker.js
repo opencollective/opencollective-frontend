@@ -312,6 +312,7 @@ class CollectivePicker extends React.PureComponent {
                 onMenuClose={this.closeMenu}
                 value={this.getValue()}
                 onChange={this.onChange}
+                noOptionsMessage={searchText ? undefined : () => null}
                 formatOptionLabel={(option, context) => {
                   if (option[FLAG_COLLECTIVE_PICKER_COLLECTIVE]) {
                     return formatOptionLabel(option, context);

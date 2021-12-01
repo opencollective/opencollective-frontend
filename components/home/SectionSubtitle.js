@@ -22,6 +22,7 @@ SectionTitle.defaultProps = {
   lineHeight: '24px',
   color: 'black.700',
   mb: 3,
+  mt: 0,
 };
 
 export default SectionTitle;

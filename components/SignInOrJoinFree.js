@@ -144,12 +144,14 @@ class SignInOrJoinFree extends React.Component {
     if (this.state.submitting) {
       return false;
     }
-    const user = pick(data, ['email', 'name', 'newsletterOptIn']);
-    const organizationData = pick(data, ['orgName', 'githubHandle', 'twitterHandle', 'website']);
+    const user = pick(data, ['email', 'name', 'legalName', 'newsletterOptIn']);
+    const organizationData = pick(data, ['orgName', 'orgLegalName', 'githubHandle', 'twitterHandle', 'website']);
     const organization = Object.keys(organizationData).length > 0 ? organizationData : null;
     if (organization) {
       organization.name = organization.orgName;
+      organization.legalName = organization.orgLegalName;
       delete organization.orgName;
+      delete organization.orgLegalName;
     }
 
     this.setState({ submitting: true, error: null });

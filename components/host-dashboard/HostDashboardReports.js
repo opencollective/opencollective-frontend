@@ -3,28 +3,38 @@ import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { Question } from '@styled-icons/remix-line/Question';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
+import { CollectiveType } from '../../lib/collective-sections';
+import { simpleDateToISOString } from '../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
+import PeriodFilter from '../budget/filters/PeriodFilter';
+import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
-import { Box, Flex } from '../Grid';
-import Loading from '../Loading';
+import { Box, Flex, Grid } from '../Grid';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import NotFound from '../NotFound';
+import { PERIOD_FILTER_PRESETS } from '../PeriodFilterPresetsSelect';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
 import { H1, H2 } from '../Text';
 
-import HostDownloadsSection from './reports-section/HostDownloadsSection';
+import HostCSVDownloadButton from './reports-section/HostCSVDownloadButton';
 import HostFeesSection from './reports-section/HostFeesSection';
 import PlatformTipsCollected from './reports-section/PlatformTipsCollected';
 import TotalMoneyManagedSection from './reports-section/TotalMoneyManagedSection';
 import TransactionsOverviewSection from './reports-section/TransactionsOverviewSection';
 
 const hostReportPageQuery = gqlV2/* GraphQL */ `
-  query HostReportsPage($hostSlug: String!) {
+  query HostReportsPage(
+    $hostSlug: String!
+    $account: [AccountReferenceInput!]
+    $dateFrom: DateTime
+    $dateTo: DateTime
+  ) {
     host(slug: $hostSlug) {
       id
       legacyId
@@ -36,18 +46,56 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
       type
       createdAt
       hostFeePercent
+      isTrustedHost
       stats {
-        balance {
+        balance(dateTo: $dateTo) {
           valueInCents
           currency
         }
       }
-      hostMetrics {
+      contributionStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
+        contributionsCount
+        oneTimeContributionsCount
+        recurringContributionsCount
+        dailyAverageIncomeAmount {
+          valueInCents
+        }
+        contributionAmountOverTime {
+          nodes {
+            date
+            amount {
+              value
+              valueInCents
+              currency
+            }
+          }
+        }
+      }
+      expenseStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
+        expensesCount
+        dailyAverageAmount {
+          valueInCents
+        }
+        expenseAmountOverTime {
+          nodes {
+            date
+            amount {
+              value
+              valueInCents
+              currency
+            }
+          }
+        }
+        invoicesCount
+        reimbursementsCount
+        grantsCount
+      }
+      hostMetrics(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
         hostFees {
           valueInCents
           currency
         }
-        platformFees {
+        hostFeeShare {
           valueInCents
           currency
         }
@@ -97,23 +145,49 @@ SectionTitle.propTypes = {
   hint: PropTypes.node,
 };
 
+const FilterLabel = styled.label`
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  color: #4e5052;
+`;
+
+const prepareCollectivesForFilter = collectives => {
+  return !collectives?.length ? null : collectives.map(collective => ({ legacyId: collective.value.id }));
+};
+
+const getDefaultDateInterval = () => {
+  const interval = PERIOD_FILTER_PRESETS.thisMonth.getInterval();
+  return {
+    timezoneType: 'UTC', // To match the monthly host report sent by email
+    from: interval.from.format('YYYY-MM-DD'),
+    to: interval.to.format('YYYY-MM-DD'),
+  };
+};
+
 const HostDashboardReports = ({ hostSlug }) => {
-  const { data, loading, error } = useQuery(hostReportPageQuery, { variables: { hostSlug }, context: API_V2_CONTEXT });
-  if (loading) {
-    return <Loading />;
-  } else if (error) {
-    return <MessageBoxGraphqlError error={error} maxWidth={500} m="0 auto" />;
-  } else if (!data?.host) {
-    return <NotFound />;
-  } else if (!data.host.isActive) {
-    return (
-      <MessageBox withIcon type="error" maxWidth={400} m="0 auto">
-        <FormattedMessage id="host.onlyActive" defaultMessage="This page is only available for active fiscal hosts" />
-      </MessageBox>
-    );
+  const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
+  const [collectives, setCollectives] = React.useState(null);
+  const dateFrom = simpleDateToISOString(dateInterval?.from, false, dateInterval?.timezoneType);
+  const dateTo = simpleDateToISOString(dateInterval?.to, true, dateInterval?.timezoneType);
+  const variables = { hostSlug, account: collectives, dateFrom, dateTo };
+  const { data, error, loading } = useQuery(hostReportPageQuery, { variables, context: API_V2_CONTEXT });
+  const host = data?.host;
+
+  if (!loading) {
+    if (error) {
+      return <MessageBoxGraphqlError error={error} maxWidth={500} m="0 auto" />;
+    } else if (!host) {
+      return <NotFound />;
+    } else if (!host.isActive) {
+      return (
+        <MessageBox withIcon type="error" maxWidth={400} m="0 auto">
+          <FormattedMessage id="host.onlyActive" defaultMessage="This page is only available for active fiscal hosts" />
+        </MessageBox>
+      );
+    }
   }
 
-  const { host } = data;
   return (
     <Box m="0 auto" px={2}>
       <Flex alignItems="center" mb={24} flexWrap="wrap">
@@ -122,7 +196,47 @@ const HostDashboardReports = ({ hostSlug }) => {
         </H1>
         <Box mx="auto" />
       </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" />
+      <Container
+        position={['relative', 'sticky']}
+        top="0"
+        background="white"
+        zIndex="10"
+        py={3}
+        mb={4}
+        boxShadow="5px 12px 7px -10px #44444429"
+      >
+        <Grid gridTemplateColumns={['100%', '1fr 2fr auto']} gridGap={['8px', null, null, '28px']} width="100%">
+          <div>
+            <FilterLabel htmlFor="transactions-period-filter">
+              <FormattedMessage id="TransactionsOverviewSection.PeriodFilter" defaultMessage="Filter by Date" />
+            </FilterLabel>
+            <PeriodFilter onChange={setDateInterval} value={dateInterval} minDate={host?.createdAt} />
+          </div>
+          <div>
+            <FilterLabel htmlFor="transactions-collective-filter">
+              <FormattedMessage
+                id="TransactionsOverviewSection.CollectiveFilter"
+                defaultMessage="Filter by Collective"
+              />
+            </FilterLabel>
+            <CollectivePickerAsync
+              inputId="TransactionsCollectiveFilter"
+              data-cy="transactions-collective-filter"
+              types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.PROJECT]}
+              isMulti
+              hostCollectiveIds={[host?.legacyId]}
+              onChange={value => setCollectives(prepareCollectivesForFilter(value))}
+              styles={{ control: baseStyles => ({ ...baseStyles, borderRadius: 16 }) }}
+              isLoading={loading}
+              disabled={loading}
+              useCompactMode
+            />
+          </div>
+          <Flex alignItems="flex-end" width="100%" mt={[24, 0]}>
+            <HostCSVDownloadButton host={host} collectives={collectives} dateInterval={dateInterval} />
+          </Flex>
+        </Grid>
+      </Container>
       <StyledCard mb={5} borderRadius="12px" padding="32px 24px" borderColor="black.400">
         <Container mb={38}>
           <SectionTitle
@@ -135,13 +249,13 @@ const HostDashboardReports = ({ hostSlug }) => {
           >
             <FormattedMessage id="Host.Metrics.TotalMoneyManages" defaultMessage="Total Money Managed" />
           </SectionTitle>
-          <TotalMoneyManagedSection host={host} />
+          <TotalMoneyManagedSection host={host} isLoading={loading} collectives={collectives} />
         </Container>
         <Container mb={38}>
           <SectionTitle>
             <FormattedMessage id="Host.FeesCollective" defaultMessage="Host fees (collected)" />
           </SectionTitle>
-          <HostFeesSection hostSlug={hostSlug} />
+          <HostFeesSection host={host} collectives={collectives} isLoading={loading} />
         </Container>
         <Container mb={38}>
           <SectionTitle
@@ -154,17 +268,11 @@ const HostDashboardReports = ({ hostSlug }) => {
           >
             <FormattedMessage id="TransactionsOverview" defaultMessage="Transactions overview" />
           </SectionTitle>
-          <TransactionsOverviewSection hostSlug={hostSlug} />
+          <TransactionsOverviewSection host={host} isLoading={loading} dateInterval={dateInterval} />
         </Container>
         <Box mb={4}>
-          <PlatformTipsCollected hostSlug={hostSlug} />
+          <PlatformTipsCollected host={host} isLoading={loading} />
         </Box>
-        <Container>
-          <SectionTitle>
-            <FormattedMessage id="Downloads" defaultMessage="Downloads" />
-          </SectionTitle>
-          <HostDownloadsSection host={host} />
-        </Container>
       </StyledCard>
     </Box>
   );

@@ -6,9 +6,9 @@ import { injectIntl } from 'react-intl';
 import { isEmail, isHexColor } from 'validator';
 
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import { floatAmountToCents } from '../../lib/currency-utils';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { floatAmountToCents } from '../../lib/math';
 import { compose, parseToBoolean } from '../../lib/utils';
 
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';

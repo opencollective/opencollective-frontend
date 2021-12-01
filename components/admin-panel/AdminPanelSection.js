@@ -70,7 +70,7 @@ const AdminPanelSection = ({ collective, isLoading, section }) => {
             <Title>{formatMessage(SECTION_LABELS[section])}</Title>
           </Box>
         )}
-        <AccountSettings account={collective} />
+        <AccountSettings account={collective} section={section} />
       </Container>
     );
   }

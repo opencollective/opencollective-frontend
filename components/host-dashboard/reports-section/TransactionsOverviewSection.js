@@ -1,63 +1,121 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
-import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import dayjs from 'dayjs';
+import dynamic from 'next/dynamic';
+import { FormattedMessage, useIntl } from 'react-intl';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
-import { simpleDateToISOString } from '../../../lib/date-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import PeriodFilter from '../../budget/filters/PeriodFilter';
-import CollectivePickerAsync from '../../CollectivePickerAsync';
-import Container from '../../Container';
-import { Box, Flex } from '../../Grid';
+import { Box } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
-import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const FilterLabel = styled.label`
-  font-weight: 500;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-  color: #4e5052;
-`;
+const getChartOptions = (intl, startDate, endDate, hostCreatedAt) => {
+  return {
+    chart: {
+      id: 'chart-transactions-overview',
+    },
+    legend: {
+      show: true,
+      horizontalAlign: 'left',
+    },
+    colors: ['#29CC75', '#F55882'],
+    grid: {
+      xaxis: { lines: { show: true } },
+      yaxis: { lines: { show: false } },
+    },
+    stroke: {
+      curve: 'straight',
+      width: 1.5,
+    },
+    dataLabels: {
+      enabled: false,
+    },
 
-const transactionsOverviewQuery = gqlV2/* GraphQL */ `
-  query TransactionsOverviewQuery(
-    $hostSlug: String!
-    $account: [AccountReferenceInput!]
-    $dateFrom: DateTime
-    $dateTo: DateTime
-  ) {
-    host(slug: $hostSlug) {
-      id
-      legacyId
-      currency
-      contributionStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
-        contributionsCount
-        oneTimeContributionsCount
-        recurringContributionsCount
-        dailyAverageIncomeAmount {
-          valueInCents
-        }
-      }
-      expenseStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
-        expensesCount
-        dailyAverageAmount {
-          valueInCents
-        }
-        invoicesCount
-        reimbursementsCount
-        grantsCount
-      }
-    }
+    xaxis: {
+      categories: getCategories(intl, startDate, endDate, hostCreatedAt),
+    },
+    yaxis: {
+      labels: {
+        formatter: function (value) {
+          return value < 1000 ? value : `${Math.round(value / 1000)}k`;
+        },
+      },
+    },
+  };
+};
+
+const getCategories = (intl, startDate, endDate, hostCreatedAt) => {
+  const numberOfDays = dayjs(startDate || hostCreatedAt).diff(dayjs(endDate), 'day');
+  if (numberOfDays <= 7) {
+    const startDay = startDate.getDay();
+    return [...new Array(7)].map((_, idx) =>
+      intl.formatDate(new Date(0, 0, idx + startDay), { weekday: 'long' }).toUpperCase(),
+    );
+  } else if (numberOfDays <= 365) {
+    const currentMonth = new Date().getMonth();
+    return [...new Array(12)].map((_, idx) =>
+      intl.formatDate(new Date(0, idx + currentMonth + 1), { month: 'short' }).toUpperCase(),
+    );
+  } else {
+    return [...new Array(6)].map((_, idx) =>
+      intl.formatDate(new Date(new Date().getFullYear() - 5 + idx, 0), { year: 'numeric' }).toUpperCase(),
+    );
   }
-`;
+};
 
-const getTransactionsAreaChartData = host => {
+const getCategoryType = (startDate, endDate, hostCreatedAt) => {
+  const numberOfDays = dayjs(startDate || hostCreatedAt).diff(dayjs(endDate), 'day');
+  if (numberOfDays <= 7) {
+    return 'WEEK';
+  } else if (numberOfDays <= 365) {
+    return 'MONTH';
+  } else {
+    return 'YEAR';
+  }
+};
+
+const constructChartDataPoints = (category, dataPoints) => {
+  let chartDataPoints;
+
+  // Show data for the past 5 years from the current year.
+  if (category === 'YEAR') {
+    chartDataPoints = new Array(6).fill(0);
+    const currentYear = new Date().getFullYear();
+    dataPoints.forEach(dataPoint => {
+      const year = new Date(dataPoint.date).getFullYear();
+      if (year > currentYear - 6) {
+        chartDataPoints[5 - (currentYear - year)] = Math.abs(dataPoint.amount.value);
+      }
+    });
+    // Show data for the past 12 months
+  } else if (category === 'MONTH') {
+    chartDataPoints = new Array(12).fill(0);
+    dataPoints.forEach(dataPoint => {
+      const date = new Date(dataPoint.date);
+      const today = new Date();
+      if (today.getFullYear() - date.getFullYear() <= 1) {
+        chartDataPoints[(date.getMonth() + (12 - today.getMonth())) % 12] = Math.abs(dataPoint.amount.value);
+      }
+    });
+    // Show data for the past 7 days
+  } else if (category === 'WEEK') {
+    chartDataPoints = new Array(7).fill(0);
+    dataPoints.forEach(dataPoint => {
+      const date = new Date(dataPoint.date);
+      const today = new Date();
+      if (today.getFullYear() === date.getFullYear() && today.getMonth() === date.getMonth()) {
+        chartDataPoints[date.getDay() % 7] = Math.abs(dataPoint.amount.value);
+      }
+    });
+  }
+
+  return chartDataPoints;
+};
+
+const getTransactionsAreaChartData = (host, locale) => {
   if (!host) {
     return [];
   }
@@ -82,7 +140,7 @@ const getTransactionsAreaChartData = host => {
           <FormattedMessage
             defaultMessage="Daily average: {amount}"
             values={{
-              amount: <strong>{formatCurrency(dailyAverageIncomeAmount.valueInCents, currency)}</strong>,
+              amount: <strong>{formatCurrency(dailyAverageIncomeAmount.valueInCents, currency, { locale })}</strong>,
             }}
           />
         </P>
@@ -104,7 +162,7 @@ const getTransactionsAreaChartData = host => {
           <FormattedMessage
             defaultMessage="Daily average: {amount}"
             values={{
-              amount: <strong>{formatCurrency(dailyAverageAmount.valueInCents, currency)}</strong>,
+              amount: <strong>{formatCurrency(dailyAverageAmount.valueInCents, currency, { locale })}</strong>,
             }}
           />
         </P>
@@ -188,64 +246,37 @@ const getTransactionsBreakdownChartData = host => {
   return areas;
 };
 
-const prepareDateArgs = dateInterval => {
-  if (!dateInterval) {
-    return {};
-  } else {
-    return {
-      dateFrom: simpleDateToISOString(dateInterval.from, false, dateInterval.timezoneType),
-      dateTo: simpleDateToISOString(dateInterval.to, true, dateInterval.timezoneType),
-    };
-  }
-};
+const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
+  const intl = useIntl();
+  const { locale } = intl;
+  const categoryType = getCategoryType(new Date(dateInterval?.from), new Date(dateInterval?.to), host?.createdAt);
 
-const TransactionsOverviewSection = ({ hostSlug }) => {
-  const [collectives, setCollectives] = useState(null);
-  const [dateInterval, setDateInterval] = useState(null);
-  const variables = { hostSlug, ...prepareDateArgs(dateInterval), account: collectives };
-  const { data, loading, error } = useQuery(transactionsOverviewQuery, { variables, context: API_V2_CONTEXT });
-  const host = data?.host;
-  const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host), [host]);
+  const contributionStats = host?.contributionStats;
+  const expenseStats = host?.expenseStats;
+
+  const { contributionAmountOverTime } = contributionStats || 0;
+  const { expenseAmountOverTime } = expenseStats || 0;
+
+  const series = [
+    {
+      name: 'Contributions',
+      data: contributionAmountOverTime
+        ? constructChartDataPoints(categoryType, contributionAmountOverTime.nodes)
+        : null,
+    },
+    {
+      name: 'Expenses',
+      data: expenseAmountOverTime ? constructChartDataPoints(categoryType, expenseAmountOverTime.nodes) : null,
+    },
+  ];
+
+  const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host, locale), [host, locale]);
   const transactionBreakdownChart = React.useMemo(() => getTransactionsBreakdownChartData(host), [host]);
-
-  if (error) {
-    return <MessageBoxGraphqlError error={error} />;
-  }
-
-  const setCollectiveFilter = collectives => {
-    if (collectives.length === 0) {
-      setCollectives(null);
-    } else {
-      const collectiveIds = collectives.map(collective => ({ legacyId: collective.value.id }));
-      setCollectives(collectiveIds);
-    }
-  };
-
+  const hasHistorical = false;
   return (
     <React.Fragment>
-      <Flex flexWrap="wrap">
-        <Container width={[1, 1, 1 / 2]} pr={2} mb={[3, 3, 0, 0]}>
-          <FilterLabel htmlFor="transactions-period-filter">
-            <FormattedMessage id="TransactionsOverviewSection.PeriodFilter" defaultMessage="Filter by Date" />
-          </FilterLabel>
-          <PeriodFilter onChange={setDateInterval} value={dateInterval} minDate={host?.createdAt} />
-        </Container>
-        <Container width={[1, 1, 1 / 2]}>
-          <FilterLabel htmlFor="transactions-collective-filter">
-            <FormattedMessage id="TransactionsOverviewSection.CollectiveFilter" defaultMessage="Filter by Collective" />
-          </FilterLabel>
-          <CollectivePickerAsync
-            inputId="TransactionsCollectiveFilter"
-            data-cy="transactions-collective-filter"
-            types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.PROJECT]}
-            isMulti
-            hostCollectiveIds={[host?.legacyId]}
-            onChange={value => setCollectiveFilter(value)}
-          />
-        </Container>
-      </Flex>
       <Box mt={18} mb={12}>
-        {loading ? (
+        {isLoading ? (
           <LoadingPlaceholder height="98px" borderRadius="8px" />
         ) : (
           <div>
@@ -254,32 +285,50 @@ const TransactionsOverviewSection = ({ hostSlug }) => {
           </div>
         )}
       </Box>
+      {hasHistorical && (
+        <Box mt="24px" mb="12px">
+          {isLoading ? (
+            <LoadingPlaceholder height={21} width="100%" borderRadius="8px" />
+          ) : (
+            <Chart
+              type="area"
+              width="100%"
+              height="250px"
+              options={getChartOptions(intl, new Date(dateInterval?.from), new Date(dateInterval?.to), host.createdAt)}
+              series={series}
+            />
+          )}
+        </Box>
+      )}
     </React.Fragment>
   );
 };
 
 TransactionsOverviewSection.propTypes = {
-  hostSlug: PropTypes.string,
-  onChange: PropTypes.func,
-  filters: PropTypes.object,
-  currency: PropTypes.string,
-  contributionStats: PropTypes.shape({
-    contributionsCount: PropTypes.number,
-    oneTimeContributionsCount: PropTypes.number,
-    recurringContributionsCount: PropTypes.number,
-    dailyAverageIncomeAmount: PropTypes.shape({
-      value: PropTypes.number,
+  isLoading: PropTypes.bool,
+  host: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+    currency: PropTypes.string,
+    createdAt: PropTypes.string,
+    contributionStats: PropTypes.shape({
+      contributionsCount: PropTypes.number,
+      oneTimeContributionsCount: PropTypes.number,
+      recurringContributionsCount: PropTypes.number,
+      dailyAverageIncomeAmount: PropTypes.shape({
+        value: PropTypes.number,
+      }),
+    }),
+    expenseStats: PropTypes.shape({
+      expensesCount: PropTypes.number,
+      invoicesCount: PropTypes.number,
+      reimbursementsCount: PropTypes.number,
+      grantsCount: PropTypes.number,
+      dailyAverageAmount: PropTypes.shape({
+        value: PropTypes.number,
+      }),
     }),
   }),
-  expenseStats: PropTypes.shape({
-    expensesCount: PropTypes.number,
-    invoicesCount: PropTypes.number,
-    reimbursementsCount: PropTypes.number,
-    grantsCount: PropTypes.number,
-    dailyAverageAmount: PropTypes.shape({
-      value: PropTypes.number,
-    }),
-  }),
+  dateInterval: PropTypes.object,
 };
 
 export default TransactionsOverviewSection;

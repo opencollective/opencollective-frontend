@@ -154,7 +154,7 @@ class ContributionFlowSuccess extends React.Component {
     const platformContributionAmount = get(this.props.data, 'order.platformContributionAmount.valueInCents', 0);
     const totalAmount = amount + platformContributionAmount;
     const currency = get(this.props.data, 'order.amount.currency');
-    const formattedAmount = formatCurrency(totalAmount, currency);
+    const formattedAmount = formatCurrency(totalAmount, currency, { locale: this.props.intl.locale });
 
     const formatValues = {
       account: bankAccount ? formatAccountDetails(bankAccount) : '',

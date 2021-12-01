@@ -24,6 +24,10 @@ export const PERIOD_FILTER_PRESETS = {
     label: <FormattedMessage defaultMessage="Today" />,
     getInterval: () => ({ from: dayjs().startOf('day'), to: dayjs().endOf('day') }),
   },
+  thisMonth: {
+    label: <FormattedMessage defaultMessage="This Month" />,
+    getInterval: () => ({ from: dayjs().startOf('month'), to: dayjs().endOf('day') }),
+  },
   pastWeek: {
     label: <FormattedMessage defaultMessage="Past Week" />,
     getInterval: () => getPastDateInterval('week'),

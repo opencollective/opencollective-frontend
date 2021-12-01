@@ -55,7 +55,7 @@ describe('Contribution Flow: Order', () => {
     const routeBase = '/apex/contribute';
 
     cy.waitUntil(() =>
-      cy.signup({ user: userParams, redirect: `${routeBase}/sponsors-470/checkout`, visitParams }).then(user => {
+      cy.signup({ user: userParams, redirect: `${routeBase}/sponsors-470/checkout`, visitParams }).then(() => {
         // Mock clock so we can check next contribution date in a consistent way
         cy.clock(Date.parse('2042/05/03'));
 
@@ -79,7 +79,6 @@ describe('Contribution Flow: Order', () => {
         // Personnal account must be the first entry, and it must be checked
         const userName = userParams.name;
         cy.contains('[data-cy="ContributionProfile"] > label:first', userName);
-        cy.contains('[data-cy="ContributionProfile"] > label:first', user.email);
         cy.get('[data-cy="ContributionProfile"] > label:first input[type=radio]').should('be.checked');
 
         cy.getByDataCy('progress-step-profile').contains(userName);

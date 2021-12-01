@@ -9,7 +9,7 @@ import {
 } from '@opencollective/taxes';
 import { Close } from '@styled-icons/material/Close';
 import { get } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import tiersTypes from '../../lib/constants/tiers-types';
@@ -42,6 +42,7 @@ const Label = styled.span`
 `;
 
 const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMethod, currency }) => {
+  const { locale } = useIntl();
   const platformFee = amount * (platformFeePercent / 100);
   const hostFee = amount * ((hostFeePercent || 0) / 100);
   const pmFeeInfo = getPaymentMethodFees(paymentMethod, amount, currency);
@@ -54,7 +55,7 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
           <FormattedMessage id="contribution.netAmountForCollective" defaultMessage="Net amount for Collective" />
         </Label>
         <Span fontSize="16px" fontWeight={500} color="black.700">
-          {formatCurrency(netAmountForCollective, currency)}
+          {formatCurrency(netAmountForCollective, currency, { locale })}
         </Span>
       </AmountLine>
       {Boolean(platformFee) && (
@@ -64,7 +65,7 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
             {` (-${platformFeePercent}%)`}
           </Label>
           <Span fontSize="16px" color="black.500">
-            {formatCurrency(platformFee, currency)}
+            {formatCurrency(platformFee, currency, { locale })}
           </Span>
         </AmountLine>
       )}
@@ -75,7 +76,7 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
             {` (-${hostFeePercent}%)`}
           </Label>
           <Span fontSize="16px" color="black.500">
-            {formatCurrency(hostFee, currency)}
+            {formatCurrency(hostFee, currency, { locale })}
           </Span>
         </AmountLine>
       )}
@@ -95,7 +96,7 @@ const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMeth
           </Label>
           <Span fontSize="16px" color="black.500">
             {!pmFeeInfo.isExact && '~ '}
-            {formatCurrency(pmFeeInfo.fee, currency)}
+            {formatCurrency(pmFeeInfo.fee, currency, { locale })}
           </Span>
         </AmountLine>
       )}
@@ -151,6 +152,7 @@ const getTaxPerentageForProfile = (taxes, tierType, hostCountry, collectiveCount
 };
 
 const VATInputs = ({ currency, taxInfo, dispatchChange, setFormState, formState }) => {
+  const { locale } = useIntl();
   const hasConfirmedTaxID = taxInfo.number && taxInfo.isReady;
   const vatShortLabel = <FormattedMessage id="tax.vatShort" defaultMessage="VAT" />;
 
@@ -277,7 +279,7 @@ const VATInputs = ({ currency, taxInfo, dispatchChange, setFormState, formState 
           )}
         </Flex>
         <Span fontSize="16px" pt={2}>
-          {taxInfo.isReady && `+ ${formatCurrency(taxInfo.amount, currency)}`}
+          {taxInfo.isReady && `+ ${formatCurrency(taxInfo.amount, currency, { locale })}`}
         </Span>
       </AmountLine>
     </React.Fragment>
@@ -307,6 +309,7 @@ const StepSummary = ({
   onChange,
   tier,
 }) => {
+  const { locale } = useIntl();
   const { amount, quantity } = stepDetails;
   const tierType = tier?.type;
   const hostCountry = get(collective.host, 'location.country');
@@ -362,7 +365,11 @@ const StepSummary = ({
               <FormattedMessage id="contribution.itemPrice" defaultMessage="Item price" />
             </Label>
             <Span fontSize="16px">
-              {amount ? formatCurrency(amount, currency) : <FormattedMessage id="Amount.Free" defaultMessage="Free" />}
+              {amount ? (
+                formatCurrency(amount, currency, { locale })
+              ) : (
+                <FormattedMessage id="Amount.Free" defaultMessage="Free" />
+              )}
             </Span>
           </AmountLine>
         </React.Fragment>
@@ -371,7 +378,7 @@ const StepSummary = ({
         <Label fontWeight="bold">
           <FormattedMessage id="contribution.your" defaultMessage="Your contribution" />
         </Label>
-        <Span fontSize="16px">{formatCurrency(amount * quantity, currency)}</Span>
+        <Span fontSize="16px">{formatCurrency(amount * quantity, currency, { locale })}</Span>
       </AmountLine>
       {applyTaxes && amount > 0 && (
         <div>
@@ -390,7 +397,7 @@ const StepSummary = ({
                 GST ({taxPercentage}%)
               </Span>
               <Span fontSize="16px" pt={2}>
-                {`+ ${formatCurrency(taxInfo.amount, currency)}`}
+                {`+ ${formatCurrency(taxInfo.amount, currency, { locale })}`}
               </Span>
             </AmountLine>
           )}
@@ -402,7 +409,7 @@ const StepSummary = ({
           <FormattedMessage id="contribution.total" defaultMessage="TOTAL" />
         </Label>
         <Span fontWeight="bold" fontSize="16px" color={taxInfo.isReady ? 'black.800' : 'black.400'}>
-          {formatCurrency(amount * quantity + (taxInfo.isReady ? taxInfo.amount : 0), currency)}
+          {formatCurrency(amount * quantity + (taxInfo.isReady ? taxInfo.amount : 0), currency, { locale })}
         </Span>
       </AmountLine>
     </Box>

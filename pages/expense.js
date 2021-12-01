@@ -3,7 +3,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import dayjs from 'dayjs';
-import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
+import { cloneDeep, debounce, get, includes, omit, sortBy, uniqBy, update } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -146,7 +146,7 @@ const PrivateNoteLabel = () => {
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
 const SIDE_MARGIN_WIDTH = 'calc((100% - 1200px) / 2)';
 
-const { USER, ORGANIZATION } = CollectiveType;
+const { ORGANIZATION } = CollectiveType;
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query: { parentCollectiveSlug, collectiveSlug, ExpenseId, key, edit } }) {
@@ -192,7 +192,10 @@ class ExpensePage extends React.Component {
     this.state = {
       isRefetchingDataForUser: false,
       error: null,
-      status: this.props.draftKey ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
+      status:
+        this.props.draftKey && this.props.data.expense?.status === expenseStatus.DRAFT
+          ? PAGE_STATUS.EDIT
+          : PAGE_STATUS.VIEW,
       editedExpense: null,
       isSubmitting: false,
       isPoolingEnabled: true,
@@ -333,7 +336,10 @@ class ExpensePage extends React.Component {
         editedExpense.payee.newsletterOptIn = this.state.newsletterOptIn;
       }
       await this.props.editExpense({
-        variables: { expense: prepareExpenseForSubmit(editedExpense), draftKey: this.props.draftKey },
+        variables: {
+          expense: prepareExpenseForSubmit(editedExpense),
+          draftKey: this.props.data.expense?.status === expenseStatus.DRAFT ? this.props.draftKey : null,
+        },
       });
       if (this.props.data.expense?.type === expenseTypes.CHARGE) {
         await this.props.data.refetch();
@@ -423,19 +429,30 @@ class ExpensePage extends React.Component {
     });
   };
 
+  // This function is currently a duplicate of the one in create-expense.js
   getPayoutProfiles = memoizeOne(loggedInAccount => {
     if (!loggedInAccount) {
       return [];
     } else {
-      const accountsAdminOf = get(loggedInAccount, 'adminMemberships.nodes', [])
-        .map(member => member.account)
-        .filter(
-          account =>
-            [USER, ORGANIZATION].includes(account.type) ||
-            // Same Host
-            (account.isActive && this.props.data?.expense?.account?.host?.id === account.host?.id),
-        );
-      return [loggedInAccount, ...accountsAdminOf];
+      const payoutProfiles = [loggedInAccount];
+      for (const node of get(loggedInAccount, 'adminMemberships.nodes', [])) {
+        if (
+          // Organizations
+          [ORGANIZATION].includes(node.account.type) ||
+          // Independant Collectives
+          (node.account.isActive && node.account.id === node.account.host?.id) ||
+          // Same Host
+          (node.account.isActive && this.props.data?.expense?.account?.host?.id === node.account.host?.id)
+        ) {
+          // Push main account
+          payoutProfiles.push(omit(node.account, ['childrenAccounts']));
+          // Push children (Same Host)
+          if (this.props.data?.expense?.account?.host?.id === node.account.host?.id) {
+            payoutProfiles.push(...node.account.childrenAccounts.nodes);
+          }
+        }
+      }
+      return payoutProfiles;
     }
   });
 
@@ -522,7 +539,6 @@ class ExpensePage extends React.Component {
                   permissions={expense?.permissions}
                   onError={error => this.setState({ error })}
                   onEdit={this.onEditBtnClick}
-                  onDelete={this.onDelete}
                 />
               )}
             </Flex>

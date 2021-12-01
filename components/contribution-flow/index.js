@@ -172,7 +172,7 @@ class ContributionFlow extends React.Component {
 
     let fromAccount, guestInfo;
     if (stepProfile.isGuest) {
-      guestInfo = pick(stepProfile, ['email', 'name', 'location', 'captcha']);
+      guestInfo = pick(stepProfile, ['email', 'name', 'legalName', 'location', 'captcha']);
     } else {
       fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
     }
@@ -340,15 +340,10 @@ class ContributionFlow extends React.Component {
 
       // PayPal
     } else if (stepPayment.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL) {
-      paymentMethod.paypalInfo = pick(stepPayment.paymentMethod.paypalInfo, [
-        'token',
-        'data',
-        'isNewApi',
-        'orderId',
-        'subscriptionId',
-      ]);
+      const paypalFields = ['token', 'data', 'orderId', 'subscriptionId'];
+      paymentMethod.paypalInfo = pick(stepPayment.paymentMethod.paypalInfo, paypalFields);
       // Define the right type (doesn't matter that much today, but make it future proof)
-      if (paymentMethod.paypalInfo.isNewApi && paymentMethod.paypalInfo.subscriptionId) {
+      if (paymentMethod.paypalInfo.subscriptionId) {
         paymentMethod.type === PAYMENT_METHOD_TYPE.SUBSCRIPTION;
       }
     }
@@ -580,8 +575,8 @@ class ContributionFlow extends React.Component {
             const currency = tier?.amount.currency || collective.currency;
             return confirm(
               intl.formatMessage(OTHER_MESSAGES.tipLargerThanContributionWarning, {
-                contributionAmount: formatCurrency(stepDetails.amount, currency),
-                tipAmount: formatCurrency(stepDetails.platformContribution, currency),
+                contributionAmount: formatCurrency(stepDetails.amount, currency, { locale: intl.locale }),
+                tipAmount: formatCurrency(stepDetails.platformContribution, currency, { locale: intl.locale }),
                 accountName: collective.name,
                 newLine: '\n',
               }),
@@ -665,7 +660,7 @@ class ContributionFlow extends React.Component {
                 paymentMethod: {
                   service: PAYMENT_METHOD_SERVICE.PAYPAL,
                   type: PAYMENT_METHOD_TYPE.PAYMENT,
-                  paypalInfo: { isNewApi: true, ...paypalInfo },
+                  paypalInfo,
                 },
               },
             }),

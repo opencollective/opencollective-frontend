@@ -4,6 +4,7 @@ import { FastField, Field } from 'formik';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
+import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 
@@ -22,8 +23,6 @@ import { P } from '../Text';
 import PayoutMethodForm from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
 
-const EMPTY_ARRAY = [];
-
 const msg = defineMessages({
   nameLabel: {
     id: `ExpenseForm.inviteeLabel`,
@@ -32,26 +31,6 @@ const msg = defineMessages({
   emailTitle: {
     id: 'User.EmailAddress',
     defaultMessage: 'Email address',
-  },
-  inviteeType: {
-    id: 'ExpenseForm.inviteeIsOrganizationLabel',
-    defaultMessage: 'Are you submitting this expense for your organization (company)?',
-  },
-  orgNameLabel: {
-    id: 'ExpenseForm.inviteeOrgNameLabel',
-    defaultMessage: "What's the name of the organization?",
-  },
-  orgSlugLabel: {
-    id: 'createCollective.form.slugLabel',
-    defaultMessage: 'Set your URL',
-  },
-  orgWebsiteLabel: {
-    id: 'createOrg.form.websiteLabel',
-    defaultMessage: 'Organization website',
-  },
-  orgDescriptionLabel: {
-    id: 'ExpenseForm.inviteeOrgDescriptionLabel',
-    defaultMessage: 'What does your organization do?',
   },
   payoutOptionLabel: {
     id: `ExpenseForm.PayoutOptionLabel`,

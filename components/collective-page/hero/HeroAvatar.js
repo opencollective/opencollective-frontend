@@ -288,12 +288,14 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
 
 HeroAvatar.propTypes = {
   collective: PropTypes.shape({
+    id: PropTypes.string,
     type: PropTypes.string,
     image: PropTypes.string,
     imageUrl: PropTypes.string,
   }).isRequired,
   isAdmin: PropTypes.bool,
   intl: PropTypes.object,
+  handleHeroMessage: PropTypes.func,
 };
 
 export default injectIntl(HeroAvatar);

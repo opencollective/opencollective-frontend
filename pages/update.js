@@ -4,6 +4,7 @@ import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, uniqBy, update } from 'lodash';
 
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { stripHTML } from '../lib/utils';
 
@@ -17,7 +18,6 @@ import Thread from '../components/conversations/Thread';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
 import CommentIcon from '../components/icons/CommentIcon';
-import NotFound from '../components/NotFound';
 import Page from '../components/Page';
 import StyledUpdate from '../components/StyledUpdate';
 import { withUser } from '../components/UserProvider';
@@ -109,7 +109,7 @@ class UpdatePage extends React.Component {
     if (!data?.account) {
       return <ErrorPage data={data} />;
     } else if (!data.update) {
-      return <NotFound />;
+      return <ErrorPage error={{ type: ERROR.NOT_FOUND }} />;
     }
 
     const { account, update } = data;

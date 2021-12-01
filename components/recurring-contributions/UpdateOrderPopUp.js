@@ -140,9 +140,9 @@ const useUpdateOrder = ({ contribution, onSuccess }) => {
   };
 };
 
-const getTierAmountOptions = (selectedTier, contribution) => {
+const getTierAmountOptions = (selectedTier, contribution, locale) => {
   const currency = contribution.amount.currency;
-  const buildOptionFromAmount = amount => ({ label: formatCurrency(amount, currency), value: amount });
+  const buildOptionFromAmount = amount => ({ label: formatCurrency(amount, currency, { locale }), value: amount });
   if (selectedTier && !selectedTier?.flexible) {
     return [buildOptionFromAmount(selectedTier.amount)];
   } else {
@@ -225,7 +225,7 @@ const useContributeOptions = (order, tiers, tiersLoading, disableCustomContribut
 
   useEffect(() => {
     if (selectedContributeOption !== null) {
-      const options = getTierAmountOptions(selectedContributeOption, order);
+      const options = getTierAmountOptions(selectedContributeOption, order, intl.locale);
       setAmountOptions(options);
 
       let option;
@@ -283,12 +283,28 @@ const ContributionInterval = ({ tier, contribution }) => {
   }
 };
 
+ContributionInterval.propTypes = {
+  tier: PropTypes.shape({
+    id: PropTypes.string,
+    interval: PropTypes.string,
+  }),
+  contribution: PropTypes.shape({
+    tier: PropTypes.shape({
+      id: PropTypes.string,
+      interval: PropTypes.string,
+    }),
+    frequency: PropTypes.string,
+  }),
+  onCloseEdit: PropTypes.func,
+};
+
 const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
   // GraphQL mutations and queries
   const queryVariables = { slug: contribution.toAccount.slug };
   const { data, loading: tiersLoading } = useQuery(tiersQuery, { variables: queryVariables, context: API_V2_CONTEXT });
 
   // state management
+  const { locale } = useIntl();
   const { addToast } = useToasts();
   const { isSubmittingOrder, updateOrder } = useUpdateOrder({ contribution, onSuccess: onCloseEdit });
   const tiers = get(data, 'account.tiers.nodes', null);
@@ -389,7 +405,7 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
                               defaultMessage="Min. amount: {minAmount}"
                               id="RecurringContributions.minAmount"
                               values={{
-                                minAmount: formatCurrency(minimumAmount, currency),
+                                minAmount: formatCurrency(minimumAmount, currency, { locale }),
                               }}
                             />
                           </P>

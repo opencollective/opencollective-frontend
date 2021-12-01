@@ -100,9 +100,6 @@ class StaticPage extends React.Component {
     pageSlug: PropTypes.string,
     title: PropTypes.string.isRequired,
     content: PropTypes.string.isRequired,
-  };
-
-  static propTypes = {
     LoggedInUser: PropTypes.object,
     data: PropTypes.object,
     query: PropTypes.object,

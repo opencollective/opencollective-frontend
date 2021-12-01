@@ -12,7 +12,7 @@ import { H1 } from '../Text';
 import Menu from './Menu';
 import { MenuContainer } from './MenuComponents';
 
-const AdminPanelSideBar = ({ collective, isLoading, selectedSection, onRoute, ...props }) => {
+const AdminPanelSideBar = ({ collective, isAccountantOnly, isLoading, selectedSection, onRoute, ...props }) => {
   const pageUrl = getCollectivePageRoute(collective);
   return (
     <Box {...props}>
@@ -41,7 +41,7 @@ const AdminPanelSideBar = ({ collective, isLoading, selectedSection, onRoute, ..
             </li>
           ))
         ) : (
-          <Menu {...{ collective, selectedSection, onRoute }} />
+          <Menu {...{ collective, selectedSection, onRoute, isAccountantOnly }} />
         )}
       </MenuContainer>
     </Box>
@@ -57,6 +57,7 @@ AdminPanelSideBar.propTypes = {
     type: PropTypes.string,
     isHost: PropTypes.bool,
   }),
+  isAccountantOnly: PropTypes.bool,
   onRoute: PropTypes.func,
 };
 

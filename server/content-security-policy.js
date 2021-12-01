@@ -38,6 +38,7 @@ const COMMON_DIRECTIVES = {
     '*.paypalobjects.com',
     'sentry.io',
     '*.sentry.io',
+    'atlas.shopifycloud.com',
     'country-service.shopifycloud.com',
     'https://transferwise.com',
     'https://sandbox.transferwise.tech',

@@ -1,49 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Mutation } from '@apollo/client/react/components';
 import { Check } from '@styled-icons/feather/Check';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { Edit as IconEdit } from '@styled-icons/feather/Edit';
 import { Link as IconLink } from '@styled-icons/feather/Link';
-import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { FormattedMessage } from 'react-intl';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import useClipboard from '../../lib/hooks/useClipboard';
 
-import ConfirmationModal from '../ConfirmationModal';
 import Link from '../Link';
 import StyledRoundButton from '../StyledRoundButton';
 import StyledTooltip from '../StyledTooltip';
 
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
-
-const deleteExpenseMutation = gqlV2/* GraphQL */ `
-  mutation DeleteExpense($id: String!) {
-    deleteExpense(expense: { id: $id }) {
-      id
-    }
-  }
-`;
-
-const removeExpenseFromCache = (cache, { data: { deleteExpense } }) => {
-  cache.modify({
-    fields: {
-      expenses(existingExpenses, { readField }) {
-        if (!existingExpenses?.nodes) {
-          return existingExpenses;
-        } else {
-          return {
-            ...existingExpenses,
-            totalCount: existingExpenses.totalCount - 1,
-            nodes: existingExpenses.nodes.filter(expense => deleteExpense.id !== readField('id', expense)),
-          };
-        }
-      },
-    },
-  });
-};
 
 const ButtonWithLabel = ({ label, icon, size, tooltipPosition, ...props }) => {
   return (
@@ -81,9 +51,7 @@ const ExpenseAdminActions = ({
   isDisabled,
   buttonProps,
   linkAction,
-  onDelete,
 }) => {
-  const [hasDeleteConfirm, showDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
 
   return (
@@ -141,44 +109,6 @@ const ExpenseAdminActions = ({
           {...buttonProps}
         />
       )}
-      {permissions?.canDelete && (
-        <React.Fragment>
-          <ButtonWithLabel
-            buttonStyle="danger"
-            data-cy="delete-expense-button"
-            disabled={isDisabled}
-            onClick={() => showDeleteConfirm(true)}
-            icon={<IconTrash size="50%" />}
-            label={<FormattedMessage id="actions.delete" defaultMessage="Delete" />}
-            {...buttonProps}
-          />
-          {hasDeleteConfirm && (
-            <Mutation mutation={deleteExpenseMutation} context={API_V2_CONTEXT} update={removeExpenseFromCache}>
-              {deleteExpense => (
-                <ConfirmationModal
-                  isDanger
-                  show
-                  type="delete"
-                  onClose={() => showDeleteConfirm(false)}
-                  header={<FormattedMessage id="actions.delete" defaultMessage="Delete" />}
-                  continueHandler={async () => {
-                    await deleteExpense({ variables: { id: expense.id } });
-                    if (onDelete) {
-                      await onDelete(expense);
-                    }
-                    showDeleteConfirm(false);
-                  }}
-                >
-                  <FormattedMessage
-                    id="Expense.DeleteDetails"
-                    defaultMessage="This will permanently delete the expense and all attachments and comments."
-                  />
-                </ConfirmationModal>
-              )}
-            </Mutation>
-          )}
-        </React.Fragment>
-      )}
     </React.Fragment>
   );
 };
@@ -199,13 +129,11 @@ ExpenseAdminActions.propTypes = {
   }),
   permissions: PropTypes.shape({
     canEdit: PropTypes.bool,
-    canDelete: PropTypes.bool,
     canSeeInvoiceInfo: PropTypes.bool,
   }),
   /** Called with an error if anything wrong happens */
   onError: PropTypes.func,
   onEdit: PropTypes.func,
-  onDelete: PropTypes.func,
   buttonProps: PropTypes.object,
   tooltipPosition: PropTypes.string,
   linkAction: PropTypes.oneOf(['link', 'copy']),

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Delete } from '@styled-icons/material/Delete';
 import { get } from 'lodash';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import roles from '../../../lib/constants/roles';
@@ -103,7 +104,7 @@ const EditMemberModal = props => {
     { context: API_V2_CONTEXT },
   );
 
-  const [removeMemberAccount] = useMutation(removeMemberMutation, {
+  const [removeMemberAccount, { loading: isRemovingMember }] = useMutation(removeMemberMutation, {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
@@ -232,6 +233,7 @@ const EditMemberModal = props => {
         });
 
         if (get(member, 'account.slug') === get(LoggedInUser, 'collective.slug')) {
+          await props.router.push({ pathname: `/${get(collective, 'slug')}` });
           await refetchLoggedInUser();
         }
 
@@ -293,6 +295,7 @@ const EditMemberModal = props => {
                 buttonStyle="dangerSecondary"
                 data-cy="remove-member"
                 onClick={handleRemoveMemberMutation}
+                loading={isRemovingMember}
               >
                 <Flex alignItems="center">
                   <Delete height={25} />
@@ -309,7 +312,7 @@ const EditMemberModal = props => {
               my={1}
               autoFocus
               onClick={cancelHandler}
-              disabled={isEditingMember || isEditingMemberInvitation}
+              disabled={isEditingMember || isEditingMemberInvitation || isRemovingMember}
               data-cy="confirmation-modal-cancel"
             >
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
@@ -319,6 +322,7 @@ const EditMemberModal = props => {
               buttonStyle="primary"
               data-cy="confirmation-modal-continue"
               loading={isEditingMember || isEditingMemberInvitation}
+              disabled={isRemovingMember}
               onClick={handleSubmitForm}
             >
               <FormattedMessage id="save" defaultMessage="Save" />
@@ -339,6 +343,7 @@ EditMemberModal.propTypes = {
   LoggedInUser: PropTypes.object.isRequired,
   refetchLoggedInUser: PropTypes.func.isRequired,
   show: PropTypes.bool,
+  router: PropTypes.object,
 };
 
-export default EditMemberModal;
+export default withRouter(EditMemberModal);

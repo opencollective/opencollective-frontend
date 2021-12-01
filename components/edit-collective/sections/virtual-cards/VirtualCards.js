@@ -66,6 +66,8 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
           data
           privateData
           createdAt
+          spendingLimitAmount
+          spendingLimitInterval
           account {
             id
             name

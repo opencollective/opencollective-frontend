@@ -20,11 +20,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
       data
       isSaved
     }
-    adminMemberships: memberOf(
-      role: ADMIN
-      includeIncognito: false
-      accountType: [ORGANIZATION, COLLECTIVE, EVENT, FUND, PROJECT, INDIVIDUAL]
-    ) {
+    adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION, COLLECTIVE, FUND]) {
       nodes {
         id
         account {
@@ -56,6 +52,21 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
             name
             data
             isSaved
+          }
+          childrenAccounts {
+            nodes {
+              id
+              slug
+              imageUrl
+              type
+              name
+              isActive
+              ... on AccountWithHost {
+                host {
+                  id
+                }
+              }
+            }
           }
         }
       }

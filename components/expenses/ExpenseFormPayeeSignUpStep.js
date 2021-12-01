@@ -9,6 +9,7 @@ import styled from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective.lib';
 import expenseTypes from '../../lib/constants/expenseTypes';
+import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -30,8 +31,6 @@ import { Span } from '../Text';
 import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
 
-const EMPTY_ARRAY = [];
-
 const validateSlugQuery = gqlV2/* GraphQL */ `
   query ValidateSlugQuery($slug: String) {
     account(slug: $slug, throwIfMissing: false) {
@@ -50,10 +49,6 @@ const msg = defineMessages({
   emailLabel: {
     id: 'Form.yourEmail',
     defaultMessage: 'Your email address',
-  },
-  inviteeType: {
-    id: 'ExpenseForm.inviteeIsOrganizationLabel',
-    defaultMessage: 'Are you submitting this expense for your organization (company)?',
   },
   orgNameLabel: {
     id: 'ExpenseForm.inviteeOrgNameLabel',
@@ -314,7 +309,14 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
           <Box>
             <Field name={payeeType === PAYEE_TYPE.ORG ? 'payee.organization.legalName' : 'payee.legalName'}>
               {({ field }) => (
-                <StyledInputField name={field.name} label={formatMessage(msg.legalName)} labelFontSize="13px" mt={3}>
+                <StyledInputField
+                  name={field.name}
+                  isPrivate
+                  required={false}
+                  label={formatMessage(msg.legalName)}
+                  labelFontSize="13px"
+                  mt={3}
+                >
                   {inputProps => <StyledInput {...inputProps} {...field} />}
                 </StyledInputField>
               )}

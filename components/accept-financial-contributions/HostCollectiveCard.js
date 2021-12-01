@@ -30,7 +30,7 @@ const messages = defineMessages({
 
 const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
   const [show, setShow] = useState(false);
-  const { formatMessage } = useIntl();
+  const { formatMessage, locale } = useIntl();
 
   return (
     <Fragment>
@@ -46,7 +46,7 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
           </Flex>
           <Flex data-cy="caption" mb={2} alignItems="flex-end">
             <P fontSize="16px" fontWeight="bold">
-              {formatCurrency(host.stats.yearlyBudgetManaged.value * 100, host.currency, { precision: 0 })}
+              {formatCurrency(host.stats.yearlyBudgetManaged.value * 100, host.currency, { precision: 0, locale })}
             </P>
             <P ml={2} fontSize="12px">
               {host.currency} {formatMessage(messages.managed)}

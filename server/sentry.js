@@ -22,6 +22,8 @@ Sentry.init({
     /\[Please ignore this error\]/, // See `IgnorableError`
     'Non-Error promise rejection captured with value: Object Not Found Matching Id', // See https://forum.sentry.io/t/unhandledrejection-non-error-promise-rejection-captured-with-value/14062/17
     'Non-Error promise rejection captured with value: null', // See https://forum.sentry.io/t/unhandledrejection-non-error-promise-rejection-captured-with-value/14062/17
+    /instantSearchSDKJSBridgeClearHighlight/, // Bug on Edge for IOS, see https://stackoverflow.com/questions/69261499/what-is-instantsearchsdkjsbridgeclearhighlight
+    /^No collective found with slug/, // We throw exceptions for these, but they're not really errors
   ],
   blacklistUrls: [
     // Chrome extensions

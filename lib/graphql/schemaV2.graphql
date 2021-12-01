@@ -262,6 +262,7 @@ interface Account {
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -684,6 +685,41 @@ All supported currencies
 """
 enum Currency {
   """
+  US Dollar
+  """
+  USD
+
+  """
+  UAE Dirham
+  """
+  AED
+
+  """
+  Afghani
+  """
+  AFN
+
+  """
+  Lek
+  """
+  ALL
+
+  """
+  Armenian Dram
+  """
+  AMD
+
+  """
+  Netherlands Antillean Guilder
+  """
+  ANG
+
+  """
+  Kwanza
+  """
+  AOA
+
+  """
   Argentine Peso
   """
   ARS
@@ -692,6 +728,26 @@ enum Currency {
   Australian Dollar
   """
   AUD
+
+  """
+  Aruban Florin
+  """
+  AWG
+
+  """
+  Azerbaijanian Manat
+  """
+  AZN
+
+  """
+  Convertible Mark
+  """
+  BAM
+
+  """
+  Barbados Dollar
+  """
+  BBD
 
   """
   Taka
@@ -704,9 +760,49 @@ enum Currency {
   BGN
 
   """
+  Burundi Franc
+  """
+  BIF
+
+  """
+  Bermudian Dollar
+  """
+  BMD
+
+  """
+  Brunei Dollar
+  """
+  BND
+
+  """
+  Boliviano
+  """
+  BOB
+
+  """
   Brazilian Real
   """
   BRL
+
+  """
+  Bahamian Dollar
+  """
+  BSD
+
+  """
+  Pula
+  """
+  BWP
+
+  """
+  Belarussian Ruble
+  """
+  BYN
+
+  """
+  Belize Dollar
+  """
+  BZD
 
   """
   Canadian Dollar
@@ -714,9 +810,39 @@ enum Currency {
   CAD
 
   """
+  Congolese Franc
+  """
+  CDF
+
+  """
   Swiss Franc
   """
   CHF
+
+  """
+  Chilean Peso
+  """
+  CLP
+
+  """
+  Yuan Renminbi
+  """
+  CNY
+
+  """
+  Colombian Peso
+  """
+  COP
+
+  """
+  Costa Rican Colon
+  """
+  CRC
+
+  """
+  Cabo Verde Escudo
+  """
+  CVE
 
   """
   Czech Koruna
@@ -724,9 +850,34 @@ enum Currency {
   CZK
 
   """
+  Djibouti Franc
+  """
+  DJF
+
+  """
   Danish Krone
   """
   DKK
+
+  """
+  Dominican Peso
+  """
+  DOP
+
+  """
+  Algerian Dinar
+  """
+  DZD
+
+  """
+  Egyptian Pound
+  """
+  EGP
+
+  """
+  Ethiopian Birr
+  """
+  ETB
 
   """
   Euro
@@ -734,9 +885,49 @@ enum Currency {
   EUR
 
   """
+  Fiji Dollar
+  """
+  FJD
+
+  """
+  Falkland Islands Pound
+  """
+  FKP
+
+  """
   Pound Sterling
   """
   GBP
+
+  """
+  Lari
+  """
+  GEL
+
+  """
+  Gibraltar Pound
+  """
+  GIP
+
+  """
+  Dalasi
+  """
+  GMD
+
+  """
+  Guinea Franc
+  """
+  GNF
+
+  """
+  Quetzal
+  """
+  GTQ
+
+  """
+  Guyana Dollar
+  """
+  GYD
 
   """
   Hong Kong Dollar
@@ -744,9 +935,19 @@ enum Currency {
   HKD
 
   """
+  Lempira
+  """
+  HNL
+
+  """
   Kuna
   """
   HRK
+
+  """
+  Gourde
+  """
+  HTG
 
   """
   Forint
@@ -759,6 +960,11 @@ enum Currency {
   IDR
 
   """
+  New Israeli Sheqel
+  """
+  ILS
+
+  """
   Indian Rupee
   """
   INR
@@ -769,9 +975,124 @@ enum Currency {
   ISK
 
   """
+  Jamaican Dollar
+  """
+  JMD
+
+  """
   Yen
   """
   JPY
+
+  """
+  Kenyan Shilling
+  """
+  KES
+
+  """
+  Som
+  """
+  KGS
+
+  """
+  Riel
+  """
+  KHR
+
+  """
+  Comoro Franc
+  """
+  KMF
+
+  """
+  Won
+  """
+  KRW
+
+  """
+  Cayman Islands Dollar
+  """
+  KYD
+
+  """
+  Tenge
+  """
+  KZT
+
+  """
+  Kip
+  """
+  LAK
+
+  """
+  Lebanese Pound
+  """
+  LBP
+
+  """
+  Sri Lanka Rupee
+  """
+  LKR
+
+  """
+  Liberian Dollar
+  """
+  LRD
+
+  """
+  Loti
+  """
+  LSL
+
+  """
+  Moroccan Dirham
+  """
+  MAD
+
+  """
+  Moldovan Leu
+  """
+  MDL
+
+  """
+  Malagasy Ariary
+  """
+  MGA
+
+  """
+  Denar
+  """
+  MKD
+
+  """
+  Kyat
+  """
+  MMK
+
+  """
+  Tugrik
+  """
+  MNT
+
+  """
+  Pataca
+  """
+  MOP
+
+  """
+  Mauritius Rupee
+  """
+  MUR
+
+  """
+  Rufiyaa
+  """
+  MVR
+
+  """
+  Kwacha
+  """
+  MWK
 
   """
   Mexican Peso
@@ -784,9 +1105,24 @@ enum Currency {
   MYR
 
   """
+  Mozambique Metical
+  """
+  MZN
+
+  """
+  Namibia Dollar
+  """
+  NAD
+
+  """
   Naira
   """
   NGN
+
+  """
+  Cordoba Oro
+  """
+  NIO
 
   """
   Norwegian Krone
@@ -804,14 +1140,79 @@ enum Currency {
   NZD
 
   """
+  Balboa
+  """
+  PAB
+
+  """
+  Nuevo Sol
+  """
+  PEN
+
+  """
+  Kina
+  """
+  PGK
+
+  """
+  Philippine Peso
+  """
+  PHP
+
+  """
+  Pakistan Rupee
+  """
+  PKR
+
+  """
   Zloty
   """
   PLN
 
   """
+  Guarani
+  """
+  PYG
+
+  """
+  Qatari Rial
+  """
+  QAR
+
+  """
   Romanian Leu
   """
   RON
+
+  """
+  Serbian Dinar
+  """
+  RSD
+
+  """
+  Russian Ruble
+  """
+  RUB
+
+  """
+  Rwanda Franc
+  """
+  RWF
+
+  """
+  Saudi Riyal
+  """
+  SAR
+
+  """
+  Solomon Islands Dollar
+  """
+  SBD
+
+  """
+  Seychelles Rupee
+  """
+  SCR
 
   """
   Swedish Krona
@@ -824,14 +1225,74 @@ enum Currency {
   SGD
 
   """
+  Saint Helena Pound
+  """
+  SHP
+
+  """
+  Leone
+  """
+  SLL
+
+  """
+  Somali Shilling
+  """
+  SOS
+
+  """
+  Surinam Dollar
+  """
+  SRD
+
+  """
+  Lilangeni
+  """
+  SZL
+
+  """
+  Baht
+  """
+  THB
+
+  """
+  Somoni
+  """
+  TJS
+
+  """
+  Pa’anga
+  """
+  TOP
+
+  """
+  Turkish Lira
+  """
+  TRY
+
+  """
+  Trinidad and Tobago Dollar
+  """
+  TTD
+
+  """
+  New Taiwan Dollar
+  """
+  TWD
+
+  """
+  Tanzanian Shilling
+  """
+  TZS
+
+  """
   Hryvnia
   """
   UAH
 
   """
-  US Dollar
+  Uganda Shilling
   """
-  USD
+  UGX
 
   """
   Peso Uruguayo
@@ -839,9 +1300,59 @@ enum Currency {
   UYU
 
   """
+  Uzbekistan Sum
+  """
+  UZS
+
+  """
+  Dong
+  """
+  VND
+
+  """
+  Vatu
+  """
+  VUV
+
+  """
+  Tala
+  """
+  WST
+
+  """
+  CFA Franc BEAC
+  """
+  XAF
+
+  """
+  East Caribbean Dollar
+  """
+  XCD
+
+  """
+  CFA Franc BCEAO
+  """
+  XOF
+
+  """
+  CFP Franc
+  """
+  XPF
+
+  """
+  Yemeni Rial
+  """
+  YER
+
+  """
   Rand
   """
   ZAR
+
+  """
+  Zambian Kwacha
+  """
+  ZMW
 }
 
 """
@@ -1719,6 +2230,7 @@ type Host implements Account & AccountWithContributions {
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -1807,6 +2319,11 @@ type Host implements Account & AccountWithContributions {
     dateTo: DateTime
   ): HostMetrics!
   hostMetricsTimeSeries(
+    """
+    A collection of accounts for which the metrics should be returned.
+    """
+    account: [AccountReferenceInput!]
+
     """
     The start date of the time series
     """
@@ -1897,6 +2414,11 @@ type Host implements Account & AccountWithContributions {
     Calculate contribution statistics until this date.
     """
     dateTo: DateTime
+
+    """
+    The time unit of the time series
+    """
+    timeUnit: TimeUnit! = YEAR
   ): ContributionStats!
   expenseStats(
     """
@@ -1913,6 +2435,11 @@ type Host implements Account & AccountWithContributions {
     Calculate expense statistics until this date.
     """
     dateTo: DateTime
+
+    """
+    The time unit of the time series
+    """
+    timeUnit: TimeUnit! = YEAR
   ): ExpenseStats!
 
   """
@@ -2251,7 +2778,17 @@ type AccountStats {
   """
   Amount of money in cents in the currency of the collective
   """
-  balance: Amount!
+  balance(
+    """
+    Calculate balance beginning from this date.
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate balance until this date.
+    """
+    dateTo: DateTime
+  ): Amount!
 
   """
   Average amount spent per month based on the last 90 days
@@ -2639,6 +3176,11 @@ type HostMetricsTimeSeries {
   History of the share of host fees collected owed to Open Collective Inc.
   """
   hostFeeShare: TimeSeriesAmountWithSettlement!
+
+  """
+  History of the total money managed by this host
+  """
+  totalMoneyManaged: TimeSeriesAmount!
 }
 
 """
@@ -2779,6 +3321,11 @@ type ContributionStats {
   contributionsCount: Int!
 
   """
+  The contribution amounts over time
+  """
+  contributionAmountOverTime: TimeSeriesAmount
+
+  """
   Number of one time contributions
   """
   oneTimeContributionsCount: Int!
@@ -2802,6 +3349,11 @@ type ExpenseStats {
   The total number of expenses
   """
   expensesCount: Int!
+
+  """
+  The total number of expenses over time
+  """
+  expenseAmountOverTime: TimeSeriesAmount
 
   """
   The daily average paid in expenses
@@ -3143,6 +3695,7 @@ type Bot implements Account {
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -3399,6 +3952,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -3969,6 +4523,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -4335,6 +4890,7 @@ type Individual implements Account {
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -4661,6 +5217,7 @@ type Organization implements Account & AccountWithContributions {
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -5039,6 +5596,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -6569,6 +7127,31 @@ type Mutation {
   ): VirtualCard!
 
   """
+  Create new virtual card for existing hosted collective
+  """
+  createVirtualCard(
+    """
+    Virtual card name
+    """
+    name: String!
+
+    """
+    Virtual card monthly limit
+    """
+    monthlyLimit: AmountInput!
+
+    """
+    Account where the virtual card will be associated
+    """
+    account: AccountReferenceInput!
+
+    """
+    Individual account responsible for the card
+    """
+    assignee: AccountReferenceInput!
+  ): VirtualCard!
+
+  """
   Edit existing Virtual Card information
   """
   editVirtualCard(
@@ -6904,6 +7487,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -7255,6 +7839,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Only return expenses that were created before this date
     """
     dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
@@ -9276,9 +9861,14 @@ input GuestInfoInput {
   email: EmailAddress!
 
   """
-  Full name of the user
+  Display name of the user
   """
   name: String
+
+  """
+  Legal name of the user
+  """
+  legalName: String
 
   """
   The unique guest token
@@ -9381,7 +9971,7 @@ input PaypalPaymentInput {
   data: JSON
   orderId: String
   subscriptionId: String
-  isNewApi: Boolean
+  isNewApi: Boolean @deprecated(reason: "2021-07-30: Not used anymore")
 }
 
 """

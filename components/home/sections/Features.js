@@ -260,17 +260,21 @@ Feature.propTypes = {
   learnMoreLink: PropTypes.string,
 };
 
-const Features = () => {
+const Features = ({ sectionTitle, sectionSubtitle }) => {
   const [activeFeature, setActiveFeature] = useState(features[0]);
   const intl = useIntl();
 
   return (
     <Flex mx={[3, 4]} flexDirection="column" textAlign="center" my={[4, null, 0]}>
       <SectionTitle>
-        <FormattedMessage id="home.featureSection.title" defaultMessage="How to use Open Collective" />
+        {sectionTitle || (
+          <FormattedMessage id="home.featureSection.title" defaultMessage="How to use Open Collective" />
+        )}
       </SectionTitle>
       <SectionSubtitle>
-        <FormattedMessage id="home.featureSection.subTitle" defaultMessage="Discover our features." />
+        {sectionSubtitle || (
+          <FormattedMessage id="home.featureSection.subTitle" defaultMessage="Discover our features." />
+        )}
       </SectionSubtitle>
       <Flex
         flexDirection={['column', 'row-reverse']}
@@ -304,6 +308,11 @@ const Features = () => {
       </Flex>
     </Flex>
   );
+};
+
+Features.propTypes = {
+  sectionTitle: PropTypes.string,
+  sectionSubtitle: PropTypes.string,
 };
 
 export default Features;
