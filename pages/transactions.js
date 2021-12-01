@@ -185,8 +185,9 @@ class TransactionsPage extends React.Component {
     }
 
     const hasGiftCards =
-      (this.props.data?.transactions?.nodes || []).some(el => el.giftCardEmitterAccount?.id) ||
-      this.props.query.ignoreGiftCardsTransactions;
+      (this.props.data?.transactions?.nodes || []).some(
+        el => el.giftCardEmitterAccount?.id && el.giftCardEmitterAccount?.id === this.props.data?.account?.id,
+      ) || this.props.query.ignoreGiftCardsTransactions;
     if (isNil(this.state.hasGiftCards) && hasGiftCards) {
       this.setState({ hasGiftCards });
     }
