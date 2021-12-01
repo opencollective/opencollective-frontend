@@ -54,7 +54,7 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
     $searchTerm: String
     $kind: [TransactionKind]
     $includeIncognitoTransactions: Boolean
-    $includeGiftCardsTransactions: Boolean
+    $includeGiftCardTransactions: Boolean
     $includeChildrenTransactions: Boolean
   ) {
     account(slug: $slug) {
@@ -82,7 +82,7 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       searchTerm: $searchTerm
       kind: $kind
       includeIncognitoTransactions: $includeIncognitoTransactions
-      includeGiftCardTransactions: $includeGiftCardsTransactions
+      includeGiftCardTransactions: $includeGiftCardTransactions
       includeChildrenTransactions: $includeChildrenTransactions
       includeDebts: true
     ) {
@@ -121,7 +121,7 @@ const getVariablesFromQuery = query => {
     searchTerm: query.searchTerm,
     kind: query.kind ? parseTransactionKinds(query.kind) : getDefaultKinds(),
     includeIncognitoTransactions: !query.ignoreIncognitoTransactions,
-    includeGiftCardsTransactions: !query.ignoreGiftCardsTransactions,
+    includeGiftCardTransactions: !query.ignoreGiftCardsTransactions,
     includeChildrenTransactions: !query.ignoreChildrenTransactions,
   };
 };
@@ -185,8 +185,9 @@ class TransactionsPage extends React.Component {
     }
 
     const hasGiftCards =
-      (this.props.data?.transactions?.nodes || []).some(el => el.giftCardEmitterAccount?.id) ||
-      this.props.query.ignoreGiftCardsTransactions;
+      (this.props.data?.transactions?.nodes || []).some(
+        el => el.giftCardEmitterAccount?.id && el.giftCardEmitterAccount?.id === this.props.data?.account?.id,
+      ) || this.props.query.ignoreGiftCardsTransactions;
     if (isNil(this.state.hasGiftCards) && hasGiftCards) {
       this.setState({ hasGiftCards });
     }
