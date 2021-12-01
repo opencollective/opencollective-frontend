@@ -54,7 +54,7 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
     $searchTerm: String
     $kind: [TransactionKind]
     $includeIncognitoTransactions: Boolean
-    $includeGiftCardsTransactions: Boolean
+    $includeGiftCardTransactions: Boolean
     $includeChildrenTransactions: Boolean
   ) {
     account(slug: $slug) {
@@ -82,7 +82,7 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       searchTerm: $searchTerm
       kind: $kind
       includeIncognitoTransactions: $includeIncognitoTransactions
-      includeGiftCardTransactions: $includeGiftCardsTransactions
+      includeGiftCardTransactions: $includeGiftCardTransactions
       includeChildrenTransactions: $includeChildrenTransactions
       includeDebts: true
     ) {
@@ -121,7 +121,7 @@ const getVariablesFromQuery = query => {
     searchTerm: query.searchTerm,
     kind: query.kind ? parseTransactionKinds(query.kind) : getDefaultKinds(),
     includeIncognitoTransactions: !query.ignoreIncognitoTransactions,
-    includeGiftCardsTransactions: !query.ignoreGiftCardsTransactions,
+    includeGiftCardTransactions: !query.ignoreGiftCardsTransactions,
     includeChildrenTransactions: !query.ignoreChildrenTransactions,
   };
 };
