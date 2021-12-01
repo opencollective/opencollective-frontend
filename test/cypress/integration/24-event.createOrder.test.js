@@ -7,13 +7,13 @@ describe('event.createOrder page', () => {
     // Create event
     cy.visit(`${collectiveSlug}/events/new`);
     cy.get('.inputs input[name="name"]').type(name);
-    cy.get('.inputs .startsAt input[type="text"]')
+    cy.get('.inputs .startsAt input[type="datetime-local"]')
       .clear()
-      .type(`${dayjs().format('MM/DD/YYYY')} 7:00 PM`)
+      .type(`${dayjs().format('YYYY-MM-DD')}T19:00`)
       .blur();
-    cy.get('.inputs .endsAt input[type="text"]')
+    cy.get('.inputs .endsAt input[type="datetime-local"]')
       .clear()
-      .type(`${dayjs().add(1, 'day').format('MM/DD/YYYY')} 7:00 PM`)
+      .type(`${dayjs().add(1, 'day').format('YYYY-MM-DD')}T19:00`)
       .blur();
     cy.contains('button', 'Create Event').click();
   };

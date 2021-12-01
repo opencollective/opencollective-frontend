@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import dayjs from 'dayjs';
 import { set } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 
@@ -111,6 +112,14 @@ class EditEventForm extends React.Component {
     this.props.onSubmit({ ...this.state.event, tiers: this.state.tiers });
   }
 
+  getFieldDefaultValue(field) {
+    if (field.name === 'startsAt' || field.name === 'endsAt') {
+      return field.defaultValue;
+    } else {
+      return this.state.event[field.name] || field.defaultValue;
+    }
+  }
+
   render() {
     const { event, loading, intl } = this.props;
 
@@ -138,9 +147,9 @@ class EditEventForm extends React.Component {
       },
       {
         name: 'startsAt',
-        type: 'datetime',
+        type: 'datetime-local',
         placeholder: '',
-        defaultValue: defaultStartsAt,
+        defaultValue: dayjs(this.state.event['startsAt'] || defaultStartsAt).format('YYYY-MM-DDTHH:mm'),
         validate: date => {
           const yesterday = new Date();
           yesterday.setDate(yesterday.getDate() - 1);
@@ -149,7 +158,10 @@ class EditEventForm extends React.Component {
       },
       {
         name: 'endsAt',
-        type: 'datetime',
+        type: 'datetime-local',
+        defaultValue: this.state.event['endsAt']
+          ? dayjs(this.state.event['endsAt']).format('YYYY-MM-DDTHH:mm')
+          : undefined,
         options: { timezone: event.timezone },
         placeholder: '',
         validate: date => {
@@ -202,7 +214,7 @@ class EditEventForm extends React.Component {
               ) : (
                 <InputField
                   key={field.name}
-                  defaultValue={this.state.event[field.name] || field.defaultValue}
+                  defaultValue={this.getFieldDefaultValue(field)}
                   validate={field.validate}
                   ref={field.name}
                   name={field.name}

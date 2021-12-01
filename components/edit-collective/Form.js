@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
+import dayjs from 'dayjs';
 import { cloneDeep, find, get, set } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -731,9 +732,9 @@ class EditCollectiveForm extends React.Component {
         },
         {
           name: 'startsAt',
-          type: 'datetime',
+          type: 'datetime-local',
           placeholder: '',
-          defaultValue: collective.startsAt || defaultStartsAt,
+          defaultValue: dayjs(collective.startsAt || defaultStartsAt).format('YYYY-MM-DDTHH:mm'),
           validate: date => {
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
@@ -743,7 +744,10 @@ class EditCollectiveForm extends React.Component {
         },
         {
           name: 'endsAt',
-          type: 'datetime',
+          type: 'datetime-local',
+          defaultValue: this.state.collective['endsAt']
+            ? dayjs(this.state.collective['endsAt']).format('YYYY-MM-DDTHH:mm')
+            : undefined,
           options: { timezone: collective.timezone },
           placeholder: '',
           validate: date => {
