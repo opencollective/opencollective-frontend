@@ -4,6 +4,7 @@ import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, uniqBy, update } from 'lodash';
 
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { stripHTML } from '../lib/utils';
 
@@ -17,7 +18,6 @@ import Thread from '../components/conversations/Thread';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
 import CommentIcon from '../components/icons/CommentIcon';
-import NotFound from '../components/NotFound';
 import Page from '../components/Page';
 import StyledUpdate from '../components/StyledUpdate';
 import { withUser } from '../components/UserProvider';
@@ -36,6 +36,7 @@ class UpdatePage extends React.Component {
       account: PropTypes.object,
       update: PropTypes.object,
       refetch: PropTypes.func,
+      fetchMore: PropTypes.func,
     }).isRequired, // from withData
   };
 
@@ -64,13 +65,42 @@ class UpdatePage extends React.Component {
     // Add comment to cache if not already fetched
     const [data, query, variables] = this.clonePageQueryCacheData();
     update(data, 'update.comments.nodes', comments => uniqBy([...comments, comment], 'id'));
+    update(data, 'update.comments.totalCount', totalCount => totalCount + 1);
     this.props.client.writeQuery({ query, variables, data });
   };
 
   onCommentDeleted = comment => {
     const [data, query, variables] = this.clonePageQueryCacheData();
     update(data, 'update.comments.nodes', comments => comments.filter(c => c.id !== comment.id));
+    update(data, 'update.comments.totalCount', totalCount => totalCount - 1);
     this.props.client.writeQuery({ query, variables, data });
+  };
+
+  fetchMore = async () => {
+    const { collectiveSlug, updateSlug, data } = this.props;
+
+    // refetch before fetching more as comments added to the cache can change the offset
+    await data.refetch();
+    await data.fetchMore({
+      variables: { collectiveSlug, updateSlug, offset: get(data, 'update.comments.nodes', []).length },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) {
+          return prev;
+        }
+
+        const newValues = {};
+
+        newValues.update = {
+          ...prev.update,
+          comments: {
+            ...fetchMoreResult.update.comments,
+            nodes: [...prev.update.comments.nodes, ...fetchMoreResult.update.comments.nodes],
+          },
+        };
+
+        return Object.assign({}, prev, newValues);
+      },
+    });
   };
 
   render() {
@@ -79,13 +109,20 @@ class UpdatePage extends React.Component {
     if (!data?.account) {
       return <ErrorPage data={data} />;
     } else if (!data.update) {
-      return <NotFound />;
+      return <ErrorPage error={{ type: ERROR.NOT_FOUND }} />;
     }
 
     const { account, update } = data;
     const comments = get(update, 'comments.nodes', []);
+    const totalCommentsCount = get(update, 'comments.totalCount', 0);
+
     return (
-      <Page collective={account} title={update.title} description={stripHTML(update.summary)}>
+      <Page
+        collective={account}
+        title={update.title}
+        description={stripHTML(update.summary)}
+        metaTitle={`${update.title} - ${account.name}`}
+      >
         <CollectiveNavbar
           collective={account}
           isAdmin={LoggedInUser && LoggedInUser.canEditCollective(account)}
@@ -108,7 +145,13 @@ class UpdatePage extends React.Component {
             <Box pl={[0, 5]}>
               {comments.length > 0 && (
                 <Container mb={3} pt={3} maxWidth={700} borderTop="1px solid #eee">
-                  <Thread collective={account} items={comments} onCommentDeleted={this.onCommentDeleted} />
+                  <Thread
+                    collective={account}
+                    hasMore={comments.length < totalCommentsCount}
+                    fetchMore={this.fetchMore}
+                    items={comments}
+                    onCommentDeleted={this.onCommentDeleted}
+                  />
                 </Container>
               )}
               {update.publishedAt && (
@@ -130,7 +173,7 @@ class UpdatePage extends React.Component {
 }
 
 const updateQuery = gqlV2/* GraphQL */ `
-  query Update($collectiveSlug: String, $updateSlug: String!) {
+  query Update($collectiveSlug: String, $updateSlug: String!, $offset: Int) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
       slug
@@ -178,7 +221,8 @@ const updateQuery = gqlV2/* GraphQL */ `
         type
         name
       }
-      comments {
+      comments(limit: 100, offset: $offset) {
+        totalCount
         nodes {
           ...CommentFields
         }

@@ -150,7 +150,6 @@ const WhatCanYouDo = () => {
             height={350}
             src="/static/images/home/managemoney-illustration-lg.png"
             alt="Manage money"
-            display={['block', null, null, 'none']}
           />
         </Box>
         <Box width={[null, '224px', '274px', null, '408px']} textAlign="left" ml={[null, 4, 0, 5]}>

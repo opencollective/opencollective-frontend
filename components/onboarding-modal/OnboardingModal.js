@@ -15,7 +15,7 @@ import { compose } from '../../lib/utils';
 import Container from '../../components/Container';
 import MessageBox from '../../components/MessageBox';
 import StyledButton from '../../components/StyledButton';
-import Modal, { ModalBody, ModalFooter, ModalHeader, ModalOverlay } from '../../components/StyledModal';
+import Modal, { CloseIcon, ModalBody, ModalFooter, ModalHeader, ModalOverlay } from '../../components/StyledModal';
 import { H1, P } from '../../components/Text';
 
 import { Box, Flex } from '../Grid';
@@ -59,6 +59,9 @@ const ResponsiveModalHeader = styled(ModalHeader)`
     svg {
       display: none;
     }
+  }
+  ${CloseIcon} {
+    margin-top: -100px;
   }
 `;
 

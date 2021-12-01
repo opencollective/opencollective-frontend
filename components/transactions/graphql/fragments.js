@@ -5,6 +5,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
     totalCount
     offset
     limit
+    kinds
     nodes {
       id
       uuid
@@ -97,6 +98,10 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         slug
         type
         imageUrl
+      }
+      account {
+        id
+        isIncognito
       }
       giftCardEmitterAccount {
         id

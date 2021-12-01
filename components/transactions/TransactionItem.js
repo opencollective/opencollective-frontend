@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { MessageSquare } from '@styled-icons/feather/MessageSquare';
 import { truncate } from 'lodash';
-import { FormattedDate, FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
 
-import { TransactionTypes } from '../../lib/constants/transactions';
+import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
+import { i18nTransactionKind, i18nTransactionType } from '../../lib/i18n/transaction';
 
 import Avatar from '../Avatar';
 import { CreditItem, DebitItem } from '../budget/DebitCreditList';
 import Container from '../Container';
+import DateTime from '../DateTime';
 import DefinedTerm, { Terms } from '../DefinedTerm';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTags from '../expenses/ExpenseTags';
@@ -21,6 +24,7 @@ import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
+import StyledTag from '../StyledTag';
 import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
@@ -28,6 +32,8 @@ import TransactionStatusTag from '../TransactionStatusTag';
 import { useUser } from '../UserProvider';
 
 import TransactionDetails from './TransactionDetails';
+
+const { CONTRIBUTION, ADDED_FUNDS } = TransactionKind;
 
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' • ';
@@ -71,6 +77,26 @@ const ItemTitleWrapper = ({ expense, children }) => {
   }
 };
 
+ItemTitleWrapper.propTypes = {
+  children: PropTypes.node.isRequired,
+  expense: PropTypes.shape({
+    legacyId: PropTypes.number,
+    account: PropTypes.shape({
+      slug: PropTypes.string,
+    }),
+  }),
+};
+
+const KindTag = styled(StyledTag).attrs({
+  variant: 'rounded-left',
+  type: 'grey',
+  mb: '4px',
+  mr: '10px',
+  textTransform: 'uppercase',
+  fontSize: '10px',
+  fontWeight: '600',
+})``;
+
 const TransactionItem = ({ displayActions, collective, transaction, onMutationSuccess }) => {
   const {
     toAccount,
@@ -85,15 +111,19 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
     isRefund,
     isOrderRejected,
   } = transaction;
+
   const { LoggedInUser } = useUser();
   const [isExpanded, setExpanded] = React.useState(false);
+  const intl = useIntl();
+
   const hasOrder = order !== null;
   const hasExpense = expense !== null;
   const isCredit = type === TransactionTypes.CREDIT;
   const Item = isCredit ? CreditItem : DebitItem;
   const legacyCollectiveId = collective.legacyId || collective.id;
   const isOwnUserProfile = LoggedInUser && LoggedInUser.CollectiveId === legacyCollectiveId;
-  const avatarCollective = hasOrder ? (isCredit ? fromAccount : toAccount) : isCredit ? fromAccount : toAccount;
+  const avatarCollective = isCredit ? fromAccount : toAccount;
+
   const displayedAmount = getDisplayedAmount(transaction, collective);
 
   return (
@@ -134,19 +164,25 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 )}
               </Container>
               <P mt="4px" fontSize="12px" lineHeight="20px" color="black.700" data-cy="transaction-details">
-                {hasOrder ? (
+                {i18nTransactionType(intl, transaction.type)}
+                &nbsp;
+                {
+                  <Fragment>
+                    <FormattedMessage
+                      id="Transaction.from"
+                      defaultMessage="from {name}"
+                      values={{ name: <StyledLink as={LinkCollective} collective={fromAccount} /> }}
+                    />
+                    &nbsp;
+                  </Fragment>
+                }
+                {
                   <FormattedMessage
-                    id="Transaction.from"
-                    defaultMessage="from {name}"
-                    values={{ name: <StyledLink as={LinkCollective} collective={fromAccount} /> }}
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="CreatedBy"
-                    defaultMessage="by {name}"
+                    id="Transaction.to"
+                    defaultMessage="to {name}"
                     values={{ name: <StyledLink as={LinkCollective} collective={toAccount} /> }}
                   />
-                )}
+                }
                 {giftCardEmitterAccount && (
                   <React.Fragment>
                     &nbsp;
@@ -161,11 +197,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   </React.Fragment>
                 )}
                 {INFO_SEPARATOR}
-                <span data-cy="transaction-date">
-                  <time title={createdAt}>
-                    <FormattedDate value={createdAt} year="numeric" month="long" day="2-digit" />
-                  </time>
-                </span>
+                <DateTime value={createdAt} data-cy="transaction-date" />
                 {hasExpense && expense.comments?.totalCount > 0 && (
                   <React.Fragment>
                     {INFO_SEPARATOR}
@@ -192,7 +224,9 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             >
               <TransactionSign isCredit={isCredit} />
               <Span fontWeight="bold" color="black.900" mr={1}>
-                {formatCurrency(Math.abs(displayedAmount.valueInCents), displayedAmount.currency)}
+                {formatCurrency(Math.abs(displayedAmount.valueInCents), displayedAmount.currency, {
+                  locale: intl.locale,
+                })}
               </Span>
               <Span color="black.700" textTransform="uppercase">
                 {displayedAmount.currency}
@@ -211,8 +245,11 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             {hasExpense && <ExpenseStatusTag status={expense.status} fontSize="9px" px="6px" py="2px" />}
           </Flex>
         </Flex>
-        {hasOrder && (
+        {hasOrder && [CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
           <Container borderTop={['1px solid #E8E9EB', 'none']} mt={3} pt={[2, 0]}>
+            {[CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
+              <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
+            )}
             <StyledButton
               data-cy="transaction-details"
               buttonSize="tiny"
@@ -243,6 +280,11 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
         {hasExpense && (
           <Container mt={3} pt={[2, 0]}>
             <ExpenseTags expense={expense} />
+          </Container>
+        )}
+        {!hasExpense && (!hasOrder || ![CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind)) && (
+          <Container mt={3} pt={[2, 0]}>
+            <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
           </Container>
         )}
       </Box>
@@ -303,7 +345,8 @@ TransactionItem.propTypes = {
     }),
     id: PropTypes.string,
     uuid: PropTypes.string,
-    type: PropTypes.string,
+    type: PropTypes.oneOf(Object.values(TransactionTypes)),
+    kind: PropTypes.oneOf(Object.values(TransactionKind)),
     currency: PropTypes.string,
     description: PropTypes.string,
     createdAt: PropTypes.string,

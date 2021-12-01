@@ -4,6 +4,7 @@ import { FastField, Field } from 'formik';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
+import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 
@@ -22,8 +23,6 @@ import { P } from '../Text';
 import PayoutMethodForm from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
 
-const EMPTY_ARRAY = [];
-
 const msg = defineMessages({
   nameLabel: {
     id: `ExpenseForm.inviteeLabel`,
@@ -32,26 +31,6 @@ const msg = defineMessages({
   emailTitle: {
     id: 'User.EmailAddress',
     defaultMessage: 'Email address',
-  },
-  inviteeType: {
-    id: 'ExpenseForm.inviteeIsOrganizationLabel',
-    defaultMessage: 'Are you submitting this expense for your organization (company)?',
-  },
-  orgNameLabel: {
-    id: 'ExpenseForm.inviteeOrgNameLabel',
-    defaultMessage: "What's the name of the organization?",
-  },
-  orgSlugLabel: {
-    id: 'createCollective.form.slugLabel',
-    defaultMessage: 'Set your URL',
-  },
-  orgWebsiteLabel: {
-    id: 'createOrg.form.webstiteLabel',
-    defaultMessage: 'Organization website',
-  },
-  orgDescriptionLabel: {
-    id: 'ExpenseForm.inviteeOrgDescriptionLabel',
-    defaultMessage: 'What does your organization do?',
   },
   payoutOptionLabel: {
     id: `ExpenseForm.PayoutOptionLabel`,
@@ -79,7 +58,7 @@ const msg = defineMessages({
   },
   additionalInfo: {
     id: 'ExpenseForm.inviteAdditionalInfo',
-    defaultMessage: 'If you have additional information about the payment details, you can add them by clicking below.',
+    defaultMessage: 'Want to enter payout details, such as a PayPal address or bank account?',
   },
 });
 
@@ -87,7 +66,9 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onBack, onNext }) =
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, errors } = formik;
-  const stepOneCompleted = values.payee?.name && values.payee?.email && isEmail(values.payee.email);
+  const isValidEmail = values.payee?.email && isEmail(values.payee.email);
+  const stepOneCompleted = values.payee?.name && isValidEmail;
+  const emailError = !isValidEmail ? intl.formatMessage({ defaultMessage: 'Please enter a valid email' }) : null;
 
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
   const [showAdditionalInfo, setAdditionalInfo] = React.useState(false);
@@ -125,7 +106,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onBack, onNext }) =
                 name={field.name}
                 label={formatMessage(msg.emailTitle)}
                 labelFontSize="13px"
-                error={errors.payee?.email}
+                error={formik.touched.payee?.email && (errors.payee?.email || emailError)}
                 mt={3}
                 hideOptionalLabel
                 required
@@ -142,7 +123,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onBack, onNext }) =
               <P fontSize="12px">{formatMessage(msg.additionalInfo)}</P>
               <P fontSize="12px" mt={2}>
                 <StyledLinkButton onClick={() => setAdditionalInfo(true)}>
-                  <FormattedMessage id="ExpenseForm.inviteAdditionalInfoBtn" defaultMessage="Add Additional Details" />
+                  <FormattedMessage id="ExpenseForm.inviteAdditionalInfoBtn" defaultMessage="Add payout details" />
                 </StyledLinkButton>
               </P>
             </MessageBox>

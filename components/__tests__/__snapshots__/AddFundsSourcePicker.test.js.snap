@@ -14,11 +14,15 @@ exports[`AddFundsSourcePicker component renders default options 1`] = `
   className="c0"
 >
   <div
-    className="c1 css-2b097c-container"
+    className="c1 css-b62m3t-container"
     data-cy="select"
     id="sourcePicker"
     onKeyDown={[Function]}
   >
+    <span
+      className="css-1f43avz-a11yText-A11yText"
+      id="react-select-sourcePicker-live-region"
+    />
     <span
       aria-atomic="false"
       aria-live="polite"
@@ -26,74 +30,61 @@ exports[`AddFundsSourcePicker component renders default options 1`] = `
       className="css-1f43avz-a11yText-A11yText"
     />
     <div
-      className=" css-1lipood-control"
+      className=" css-p2fiel-control"
       onMouseDown={[Function]}
       onTouchEnd={[Function]}
     >
       <div
-        className=" css-g1d714-ValueContainer"
+        className=" css-319lph-ValueContainer"
       >
         <div
-          className=" css-1wa3eu0-placeholder"
+          className=" css-14el2xx-placeholder"
+          id="react-select-sourcePicker-placeholder"
         >
           Search for Users or Organizations
         </div>
         <div
-          className="css-b8ldur-Input"
+          className=" css-6j8wv5-Input"
+          data-value=""
         >
-          <div
+          <input
+            aria-autocomplete="list"
+            aria-controls="react-select-sourcePicker-listbox"
+            aria-describedby="react-select-sourcePicker-placeholder"
+            aria-expanded={false}
+            aria-haspopup={true}
+            aria-owns="react-select-sourcePicker-listbox"
+            autoCapitalize="none"
+            autoComplete="off"
+            autoCorrect="off"
             className=""
+            disabled={false}
+            id="sourcePicker"
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            role="combobox"
+            spellCheck="false"
             style={
               Object {
-                "display": "inline-block",
+                "background": 0,
+                "border": 0,
+                "color": "inherit",
+                "font": "inherit",
+                "gridArea": "1 / 2",
+                "label": "input",
+                "margin": 0,
+                "minWidth": "2px",
+                "opacity": 1,
+                "outline": 0,
+                "padding": 0,
+                "width": "100%",
               }
             }
-          >
-            <input
-              aria-autocomplete="list"
-              autoCapitalize="none"
-              autoComplete="off"
-              autoCorrect="off"
-              disabled={false}
-              id="sourcePicker"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              spellCheck="false"
-              style={
-                Object {
-                  "background": 0,
-                  "border": 0,
-                  "boxSizing": "content-box",
-                  "color": "inherit",
-                  "fontSize": "inherit",
-                  "label": "input",
-                  "opacity": 1,
-                  "outline": 0,
-                  "padding": 0,
-                  "width": "1px",
-                }
-              }
-              tabIndex="0"
-              type="text"
-              value=""
-            />
-            <div
-              style={
-                Object {
-                  "height": 0,
-                  "left": 0,
-                  "overflow": "scroll",
-                  "position": "absolute",
-                  "top": 0,
-                  "visibility": "hidden",
-                  "whiteSpace": "pre",
-                }
-              }
-            >
-              
-            </div>
-          </div>
+            tabIndex={0}
+            type="text"
+            value=""
+          />
         </div>
       </div>
       <div
@@ -145,11 +136,15 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
   className="c0"
 >
   <div
-    className="c1 css-2b097c-container"
+    className="c1 css-b62m3t-container"
     data-cy="select"
     id="sourcePicker"
     onKeyDown={[Function]}
   >
+    <span
+      className="css-1f43avz-a11yText-A11yText"
+      id="react-select-sourcePicker-live-region"
+    />
     <span
       aria-atomic="false"
       aria-live="polite"
@@ -157,74 +152,61 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
       className="css-1f43avz-a11yText-A11yText"
     />
     <div
-      className=" css-1lipood-control"
+      className=" css-p2fiel-control"
       onMouseDown={[Function]}
       onTouchEnd={[Function]}
     >
       <div
-        className=" css-g1d714-ValueContainer"
+        className=" css-319lph-ValueContainer"
       >
         <div
-          className=" css-1wa3eu0-placeholder"
+          className=" css-14el2xx-placeholder"
+          id="react-select-sourcePicker-placeholder"
         >
           Search for Users or Organizations
         </div>
         <div
-          className="css-b8ldur-Input"
+          className=" css-6j8wv5-Input"
+          data-value=""
         >
-          <div
+          <input
+            aria-autocomplete="list"
+            aria-controls="react-select-sourcePicker-listbox"
+            aria-describedby="react-select-sourcePicker-placeholder"
+            aria-expanded={false}
+            aria-haspopup={true}
+            aria-owns="react-select-sourcePicker-listbox"
+            autoCapitalize="none"
+            autoComplete="off"
+            autoCorrect="off"
             className=""
+            disabled={false}
+            id="sourcePicker"
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            role="combobox"
+            spellCheck="false"
             style={
               Object {
-                "display": "inline-block",
+                "background": 0,
+                "border": 0,
+                "color": "inherit",
+                "font": "inherit",
+                "gridArea": "1 / 2",
+                "label": "input",
+                "margin": 0,
+                "minWidth": "2px",
+                "opacity": 1,
+                "outline": 0,
+                "padding": 0,
+                "width": "100%",
               }
             }
-          >
-            <input
-              aria-autocomplete="list"
-              autoCapitalize="none"
-              autoComplete="off"
-              autoCorrect="off"
-              disabled={false}
-              id="sourcePicker"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              spellCheck="false"
-              style={
-                Object {
-                  "background": 0,
-                  "border": 0,
-                  "boxSizing": "content-box",
-                  "color": "inherit",
-                  "fontSize": "inherit",
-                  "label": "input",
-                  "opacity": 1,
-                  "outline": 0,
-                  "padding": 0,
-                  "width": "1px",
-                }
-              }
-              tabIndex="0"
-              type="text"
-              value=""
-            />
-            <div
-              style={
-                Object {
-                  "height": 0,
-                  "left": 0,
-                  "overflow": "scroll",
-                  "position": "absolute",
-                  "top": 0,
-                  "visibility": "hidden",
-                  "whiteSpace": "pre",
-                }
-              }
-            >
-              
-            </div>
-          </div>
+            tabIndex={0}
+            type="text"
+            value=""
+          />
         </div>
       </div>
       <div
@@ -276,11 +258,15 @@ exports[`AddFundsSourcePicker component renders host name as first option 1`] = 
   className="c0"
 >
   <div
-    className="c1 css-2b097c-container"
+    className="c1 css-b62m3t-container"
     data-cy="select"
     id="sourcePicker"
     onKeyDown={[Function]}
   >
+    <span
+      className="css-1f43avz-a11yText-A11yText"
+      id="react-select-sourcePicker-live-region"
+    />
     <span
       aria-atomic="false"
       aria-live="polite"
@@ -288,74 +274,61 @@ exports[`AddFundsSourcePicker component renders host name as first option 1`] = 
       className="css-1f43avz-a11yText-A11yText"
     />
     <div
-      className=" css-1lipood-control"
+      className=" css-p2fiel-control"
       onMouseDown={[Function]}
       onTouchEnd={[Function]}
     >
       <div
-        className=" css-g1d714-ValueContainer"
+        className=" css-319lph-ValueContainer"
       >
         <div
-          className=" css-1wa3eu0-placeholder"
+          className=" css-14el2xx-placeholder"
+          id="react-select-sourcePicker-placeholder"
         >
           Search for Users or Organizations
         </div>
         <div
-          className="css-b8ldur-Input"
+          className=" css-6j8wv5-Input"
+          data-value=""
         >
-          <div
+          <input
+            aria-autocomplete="list"
+            aria-controls="react-select-sourcePicker-listbox"
+            aria-describedby="react-select-sourcePicker-placeholder"
+            aria-expanded={false}
+            aria-haspopup={true}
+            aria-owns="react-select-sourcePicker-listbox"
+            autoCapitalize="none"
+            autoComplete="off"
+            autoCorrect="off"
             className=""
+            disabled={false}
+            id="sourcePicker"
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            role="combobox"
+            spellCheck="false"
             style={
               Object {
-                "display": "inline-block",
+                "background": 0,
+                "border": 0,
+                "color": "inherit",
+                "font": "inherit",
+                "gridArea": "1 / 2",
+                "label": "input",
+                "margin": 0,
+                "minWidth": "2px",
+                "opacity": 1,
+                "outline": 0,
+                "padding": 0,
+                "width": "100%",
               }
             }
-          >
-            <input
-              aria-autocomplete="list"
-              autoCapitalize="none"
-              autoComplete="off"
-              autoCorrect="off"
-              disabled={false}
-              id="sourcePicker"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              spellCheck="false"
-              style={
-                Object {
-                  "background": 0,
-                  "border": 0,
-                  "boxSizing": "content-box",
-                  "color": "inherit",
-                  "fontSize": "inherit",
-                  "label": "input",
-                  "opacity": 1,
-                  "outline": 0,
-                  "padding": 0,
-                  "width": "1px",
-                }
-              }
-              tabIndex="0"
-              type="text"
-              value=""
-            />
-            <div
-              style={
-                Object {
-                  "height": 0,
-                  "left": 0,
-                  "overflow": "scroll",
-                  "position": "absolute",
-                  "top": 0,
-                  "visibility": "hidden",
-                  "whiteSpace": "pre",
-                }
-              }
-            >
-              
-            </div>
-          </div>
+            tabIndex={0}
+            type="text"
+            value=""
+          />
         </div>
       </div>
       <div
@@ -407,11 +380,15 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
   className="c0"
 >
   <div
-    className="c1 css-2b097c-container"
+    className="c1 css-b62m3t-container"
     data-cy="select"
     id="sourcePicker"
     onKeyDown={[Function]}
   >
+    <span
+      className="css-1f43avz-a11yText-A11yText"
+      id="react-select-sourcePicker-live-region"
+    />
     <span
       aria-atomic="false"
       aria-live="polite"
@@ -419,74 +396,61 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
       className="css-1f43avz-a11yText-A11yText"
     />
     <div
-      className=" css-1lipood-control"
+      className=" css-p2fiel-control"
       onMouseDown={[Function]}
       onTouchEnd={[Function]}
     >
       <div
-        className=" css-g1d714-ValueContainer"
+        className=" css-319lph-ValueContainer"
       >
         <div
-          className=" css-1wa3eu0-placeholder"
+          className=" css-14el2xx-placeholder"
+          id="react-select-sourcePicker-placeholder"
         >
           Search for Users or Organizations
         </div>
         <div
-          className="css-b8ldur-Input"
+          className=" css-6j8wv5-Input"
+          data-value=""
         >
-          <div
+          <input
+            aria-autocomplete="list"
+            aria-controls="react-select-sourcePicker-listbox"
+            aria-describedby="react-select-sourcePicker-placeholder"
+            aria-expanded={false}
+            aria-haspopup={true}
+            aria-owns="react-select-sourcePicker-listbox"
+            autoCapitalize="none"
+            autoComplete="off"
+            autoCorrect="off"
             className=""
+            disabled={false}
+            id="sourcePicker"
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            role="combobox"
+            spellCheck="false"
             style={
               Object {
-                "display": "inline-block",
+                "background": 0,
+                "border": 0,
+                "color": "inherit",
+                "font": "inherit",
+                "gridArea": "1 / 2",
+                "label": "input",
+                "margin": 0,
+                "minWidth": "2px",
+                "opacity": 1,
+                "outline": 0,
+                "padding": 0,
+                "width": "100%",
               }
             }
-          >
-            <input
-              aria-autocomplete="list"
-              autoCapitalize="none"
-              autoComplete="off"
-              autoCorrect="off"
-              disabled={false}
-              id="sourcePicker"
-              onBlur={[Function]}
-              onChange={[Function]}
-              onFocus={[Function]}
-              spellCheck="false"
-              style={
-                Object {
-                  "background": 0,
-                  "border": 0,
-                  "boxSizing": "content-box",
-                  "color": "inherit",
-                  "fontSize": "inherit",
-                  "label": "input",
-                  "opacity": 1,
-                  "outline": 0,
-                  "padding": 0,
-                  "width": "1px",
-                }
-              }
-              tabIndex="0"
-              type="text"
-              value=""
-            />
-            <div
-              style={
-                Object {
-                  "height": 0,
-                  "left": 0,
-                  "overflow": "scroll",
-                  "position": "absolute",
-                  "top": 0,
-                  "visibility": "hidden",
-                  "whiteSpace": "pre",
-                }
-              }
-            >
-              
-            </div>
-          </div>
+            tabIndex={0}
+            type="text"
+            value=""
+          />
         </div>
       </div>
       <div
@@ -531,11 +495,15 @@ exports[`AddFundsSourcePickerForUser component render host options 1`] = `
 
 <div>
   <div
-    className="c0 css-2b097c-container"
+    className="c0 css-b62m3t-container"
     data-cy="select"
     id="sourcePicker"
     onKeyDown={[Function]}
   >
+    <span
+      className="css-1f43avz-a11yText-A11yText"
+      id="react-select-sourcePicker-live-region"
+    />
     <span
       aria-atomic="false"
       aria-live="polite"
@@ -543,28 +511,36 @@ exports[`AddFundsSourcePickerForUser component render host options 1`] = `
       className="css-1f43avz-a11yText-A11yText"
     />
     <div
-      className=" css-sfspwo-control"
+      className=" css-13ncb8r-control"
       onMouseDown={[Function]}
       onTouchEnd={[Function]}
     >
       <div
-        className=" css-g1d714-ValueContainer"
+        className=" css-319lph-ValueContainer"
       >
         <div
-          className=" css-1wa3eu0-placeholder"
+          className=" css-14el2xx-placeholder"
+          id="react-select-sourcePicker-placeholder"
         >
           Select
         </div>
         <input
           aria-autocomplete="list"
-          className="css-wmatm6-dummyInput-DummyInput"
+          aria-controls="react-select-sourcePicker-listbox"
+          aria-describedby="react-select-sourcePicker-placeholder"
+          aria-expanded={false}
+          aria-haspopup={true}
+          aria-owns="react-select-sourcePicker-listbox"
+          aria-readonly={true}
+          className="css-mohuvp-dummyInput-DummyInput"
           disabled={false}
           id="sourcePicker"
+          inputMode="none"
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          readOnly={true}
-          tabIndex="0"
+          role="combobox"
+          tabIndex={0}
           value=""
         />
       </div>
@@ -606,11 +582,15 @@ exports[`AddFundsSourcePickerForUser component renders default options 1`] = `
 
 <div>
   <div
-    className="c0 css-2b097c-container"
+    className="c0 css-b62m3t-container"
     data-cy="select"
     id="sourcePicker"
     onKeyDown={[Function]}
   >
+    <span
+      className="css-1f43avz-a11yText-A11yText"
+      id="react-select-sourcePicker-live-region"
+    />
     <span
       aria-atomic="false"
       aria-live="polite"
@@ -618,28 +598,36 @@ exports[`AddFundsSourcePickerForUser component renders default options 1`] = `
       className="css-1f43avz-a11yText-A11yText"
     />
     <div
-      className=" css-sfspwo-control"
+      className=" css-13ncb8r-control"
       onMouseDown={[Function]}
       onTouchEnd={[Function]}
     >
       <div
-        className=" css-g1d714-ValueContainer"
+        className=" css-319lph-ValueContainer"
       >
         <div
-          className=" css-1wa3eu0-placeholder"
+          className=" css-14el2xx-placeholder"
+          id="react-select-sourcePicker-placeholder"
         >
           Select
         </div>
         <input
           aria-autocomplete="list"
-          className="css-wmatm6-dummyInput-DummyInput"
+          aria-controls="react-select-sourcePicker-listbox"
+          aria-describedby="react-select-sourcePicker-placeholder"
+          aria-expanded={false}
+          aria-haspopup={true}
+          aria-owns="react-select-sourcePicker-listbox"
+          aria-readonly={true}
+          className="css-mohuvp-dummyInput-DummyInput"
           disabled={false}
           id="sourcePicker"
+          inputMode="none"
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          readOnly={true}
-          tabIndex="0"
+          role="combobox"
+          tabIndex={0}
           value=""
         />
       </div>

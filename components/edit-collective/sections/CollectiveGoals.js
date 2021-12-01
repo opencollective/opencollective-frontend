@@ -34,6 +34,7 @@ class CollectiveGoals extends React.Component {
     intl: PropTypes.object.isRequired,
     editCollectiveSettings: PropTypes.func.isRequired,
     title: PropTypes.string,
+    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -58,6 +59,7 @@ class CollectiveGoals extends React.Component {
       remove: { id: 'Remove', defaultMessage: 'Remove' },
       type: { id: 'goal.type.label', defaultMessage: 'Type' },
       balance: { id: 'goal.balance.label', defaultMessage: 'Balance' },
+      monthlyBudget: { id: 'MonthlyBudget', defaultMessage: 'Monthly budget' },
       yearlyBudget: { id: 'YearlyBudget', defaultMessage: 'Yearly budget' },
       title: { id: 'goal.title.label', defaultMessage: 'Title' },
       description: { id: 'Fields.description', defaultMessage: 'Description' },
@@ -81,7 +83,7 @@ class CollectiveGoals extends React.Component {
       {
         name: 'type',
         type: 'select',
-        options: getOptions(['balance', 'yearlyBudget']),
+        options: getOptions(['balance', 'monthlyBudget', 'yearlyBudget']),
         label: intl.formatMessage(this.messages.type),
       },
       {
@@ -236,6 +238,7 @@ class CollectiveGoals extends React.Component {
       <Container>
         <Container borderBottom={BORDER} mb={4} pb={4}>
           <SettingsTitle
+            contentOnly={this.props.contentOnly}
             subtitle={
               <FormattedMessage
                 id="EditGoals.Instructions"

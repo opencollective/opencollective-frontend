@@ -16,6 +16,7 @@ const { USER } = CollectiveType;
 class ReceivingMoney extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
+    contentOnly: PropTypes.bool,
   };
 
   state = {
@@ -37,7 +38,7 @@ class ReceivingMoney extends React.Component {
       <Fragment>
         {!this.state.hideTopsection && (
           <React.Fragment>
-            <SettingsTitle mb={4}>
+            <SettingsTitle contentOnly={this.props.contentOnly} mb={4}>
               <FormattedMessage id="editCollective.receivingMoney" defaultMessage="Receiving Money" />
             </SettingsTitle>
             <ConnectedAccounts

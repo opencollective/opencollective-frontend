@@ -4,7 +4,7 @@ describe('Unarchive collective', () => {
   before(() => {
     cy.createCollective({ type: 'ORGANIZATION' }).then(({ slug }) => {
       orgSlug = slug;
-      cy.login({ redirect: `/${orgSlug}/edit/advanced` });
+      cy.login({ redirect: `/${orgSlug}/admin/advanced` });
     });
   });
 

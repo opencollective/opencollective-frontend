@@ -52,7 +52,7 @@ const ScreenshotPreview = styled.div`
   }
 `;
 
-const HostTwoFactorAuth = ({ collective }) => {
+const HostTwoFactorAuth = ({ collective, contentOnly }) => {
   const { formatMessage } = useIntl();
   const { addToast } = useToasts();
   const [setSettings, { loading, error }] = useMutation(editCollectiveSettingsMutation);
@@ -91,7 +91,7 @@ const HostTwoFactorAuth = ({ collective }) => {
     <Fragment>
       <Flex flexDirection="column">
         <Container>
-          <SettingsTitle>
+          <SettingsTitle contentOnly={contentOnly}>
             <FormattedMessage id="TwoFactorAuth.Setup.Title" defaultMessage="Set up two-factor authentication" />
           </SettingsTitle>
           <Flex mb={2} flexWrap="wrap" justifyContent="center">
@@ -192,6 +192,7 @@ HostTwoFactorAuth.propTypes = {
     currency: PropTypes.string.isRequired,
     settings: PropTypes.string.isRequired,
   }),
+  contentOnly: PropTypes.bool,
 };
 
 export default HostTwoFactorAuth;

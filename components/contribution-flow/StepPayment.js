@@ -93,6 +93,7 @@ const StepPayment = ({
   isEmbed,
   hideCreditCardPostalCode,
   onNewCardFormReady,
+  disabledPaymentMethodTypes,
 }) => {
   // GraphQL mutations and queries
   const { loading, data, error } = useQuery(paymentMethodsQuery, {
@@ -105,7 +106,15 @@ const StepPayment = ({
   // data handling
   const paymentMethods = get(data, 'account.paymentMethods', null) || [];
   const paymentOptions = React.useMemo(() =>
-    generatePaymentMethodOptions(paymentMethods, stepProfile, stepDetails, stepSummary, collective, isEmbed),
+    generatePaymentMethodOptions(
+      paymentMethods,
+      stepProfile,
+      stepDetails,
+      stepSummary,
+      collective,
+      isEmbed,
+      disabledPaymentMethodTypes,
+    ),
   );
 
   const setNewPaymentMethod = (key, paymentMethod) => {
@@ -206,6 +215,7 @@ StepPayment.propTypes = {
   hideCreditCardPostalCode: PropTypes.bool,
   isSubmitting: PropTypes.bool,
   isEmbed: PropTypes.bool,
+  disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
 };
 
 StepPayment.defaultProps = {

@@ -256,20 +256,6 @@ class BannerIframe extends React.Component {
     window.parent.postMessage(message, '*');
   };
 
-  sendMessageToParentWindow = () => {
-    if (!window.parent) {
-      return;
-    }
-    if (!this.height) {
-      return;
-    }
-    const message = `oc-${JSON.stringify({
-      id: this.props.id,
-      height: this.height,
-    })}`;
-    window.parent.postMessage(message, '*');
-  };
-
   renderTopContributors = collective => {
     const [orgs, individuals] = partition(collective.contributors.nodes, c => c.type !== CollectiveType.USER);
     return <TopContributors organizations={orgs} individuals={individuals} currency={collective.currency} />;

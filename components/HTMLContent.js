@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
+import { CaretUp } from '@styled-icons/fa-solid/CaretUp';
 import { getLuminance } from 'polished';
 import { FormattedMessage } from 'react-intl';
-import sanitizeHtml from 'sanitize-html';
 import styled, { css } from 'styled-components';
 import { space, typography } from 'styled-system';
 
@@ -29,8 +29,6 @@ export const isEmptyValue = value => {
   }
 };
 
-const getFirstSentenceFromHTML = html => html.split?.(/<\/?\w+>/).filter(a => a.length)[0] || '';
-
 const ReadFullLink = styled.a`
   cursor: pointer;
   font-size: 12px;
@@ -39,8 +37,14 @@ const ReadFullLink = styled.a`
   }
 `;
 
-const DisplayBox = styled.div`
-  display: inline;
+const InlineDisplayBox = styled.div`
+  overflow-y: hidden;
+`;
+
+const CollapsedDisplayBox = styled(InlineDisplayBox)`
+  max-height: ${props => props.maxHeight + 20}px;
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 `;
 
 /**
@@ -52,46 +56,81 @@ const DisplayBox = styled.div`
  * ⚠️ Be careful! This component will pass content to `dangerouslySetInnerHTML` so
  * always ensure `content` is properly sanitized!
  */
-const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
-  const [isOpen, setOpen] = React.useState(false);
-  if (!content) {
-    return <div {...props} />;
-  }
-  let __html = sanitize ? sanitizeHtml(content) : content;
+const HTMLContent = styled(
+  ({
+    content,
+    collapsable = false,
+    maxCollapsedHeight = 20,
+    collapsePadding = 1,
+    hideViewMoreLink = false,
+    ...props
+  }) => {
+    const [isOpen, setOpen] = React.useState(false);
+    const [isCollapsed, setIsCollapsed] = React.useState(false);
+    const contentRef = useRef();
 
-  if (collapsable && !isOpen) {
-    const firstSentence = getFirstSentenceFromHTML(__html);
-    // Hide "Read full description" if we can display everything in the firstSentence
-    if (firstSentence === __html) {
-      collapsable = false;
+    const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
+
+    useEffect(() => {
+      if (collapsable && contentRef?.current?.clientHeight > maxCollapsedHeight + collapsePadding) {
+        setIsCollapsed(true);
+      }
+    }, [content]);
+
+    if (!content) {
+      return <div {...props} />;
     }
-    __html = firstSentence;
-  }
 
-  return (
-    <div>
-      <DisplayBox collapsed={collapsable && !isOpen} dangerouslySetInnerHTML={{ __html }} {...props} />
-      {!isOpen && collapsable && (
-        <ReadFullLink
-          onClick={() => setOpen(true)}
-          {...props}
-          role="button"
-          tabIndex={0}
-          onKeyDown={event => {
-            if (event.key === 'Enter') {
-              event.preventDefault();
-              setOpen(true);
-            }
-          }}
-        >
-          &nbsp;
-          <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />
-          <CaretDown size="10px" />
-        </ReadFullLink>
-      )}
-    </div>
-  );
-})`
+    return (
+      <div>
+        {!isCollapsed || isOpen ? (
+          <InlineDisplayBox ref={contentRef} dangerouslySetInnerHTML={{ __html: content }} {...props} />
+        ) : (
+          <DisplayBox
+            ref={contentRef}
+            maxHeight={maxCollapsedHeight}
+            dangerouslySetInnerHTML={{ __html: content }}
+            {...props}
+          />
+        )}
+        {!isOpen && isCollapsed && !hideViewMoreLink && (
+          <ReadFullLink
+            onClick={() => setOpen(true)}
+            {...props}
+            role="button"
+            tabIndex={0}
+            onKeyDown={event => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                setOpen(true);
+              }
+            }}
+          >
+            <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />
+            <CaretDown size="10px" />
+          </ReadFullLink>
+        )}
+        {isOpen && isCollapsed && (
+          <ReadFullLink
+            onClick={() => setOpen(false)}
+            {...props}
+            role="button"
+            tabIndex={0}
+            onKeyDown={event => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                setOpen(false);
+              }
+            }}
+          >
+            <FormattedMessage defaultMessage="Collapse" />
+            <CaretUp size="10px" />
+          </ReadFullLink>
+        )}
+      </div>
+    );
+  },
+)`
   /** Override global styles to match what we have in the editor */
   width: 100%;
   line-height: 1.75em;
@@ -171,7 +210,7 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
 
   ${typography}
   ${space}
-  
+
   // Apply custom theme if the color is safe to apply
 
   ${props => {
@@ -201,15 +240,24 @@ const HTMLContent = styled(({ content, collapsable, sanitize, ...props }) => {
 `;
 
 HTMLContent.propTypes = {
-  /** The HTML string. Makes sure this is sanitized properly! */
   content: PropTypes.string,
-  sanitize: PropTypes.bool,
+  /* Whether the content is collapsible; adds a blur effect and a show/hide link. */
   collapsable: PropTypes.bool,
+  /* The maximum a height of the content before being collapsed. */
+  maxCollapsedHeight: PropTypes.number,
+  /* The the padding to apply to the collapse blur; useful in the case of
+   *  making sure only the blur effect is not applied unnecessarily. For
+   *  example maxCollapsedHeight=20 and collapsePadding=22 ensure that
+   *  content is collapsed only when there's more than two lines and if there's
+   *  only two lines the blur effect is not applied.
+   */
+  collapsePadding: PropTypes.number,
+  /* Hides the "Read full description/collapse" link */
+  hideViewMoreLink: PropTypes.bool,
 };
 
 HTMLContent.defaultProps = {
   fontSize: '14px',
-  sanitize: false,
 };
 
 export default HTMLContent;

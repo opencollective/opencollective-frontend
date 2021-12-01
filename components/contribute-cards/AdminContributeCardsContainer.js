@@ -23,8 +23,8 @@ const AdminContributeCardsContainer = ({
 }) => {
   const isEvent = collective.type === CollectiveType.EVENT;
   const createContributionTierRoute = isEvent
-    ? `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/edit/tiers`
-    : `/${collective.slug}/edit/tiers`;
+    ? `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/admin/tiers`
+    : `/${collective.slug}/admin/tiers`;
 
   React.useEffect(() => {
     if (onMount) {

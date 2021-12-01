@@ -7,9 +7,9 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 
 const msg = defineMessages({
-  organizationName: {
-    id: 'Organization.Name',
-    defaultMessage: 'Organization name',
+  displayName: {
+    id: 'Fields.displayName',
+    defaultMessage: 'Display name',
   },
   website: {
     id: 'Fields.website',
@@ -36,19 +36,12 @@ const CreateOrganizationForm = ({ values, onChange }) => {
   const dispatchChange = field => e => onChange({ ...values, [field]: e.target.value });
   return (
     <div>
-      <StyledInputField
-        autoFocus
-        name="name"
-        htmlFor="name"
-        label={formatMessage(msg.organizationName)}
-        mt={3}
-        required
-      >
+      <StyledInputField autoFocus name="name" htmlFor="name" label={formatMessage(msg.displayName)} mt={3} required>
         {inputProps => (
           <StyledInput
             {...inputProps}
             width="100%"
-            placeholder="e.g. AirBnb, TripleByte"
+            placeholder="e.g., AirBnb, TripleByte"
             value={values.name}
             minLength={2}
             onChange={dispatchChange('name')}
@@ -66,7 +59,7 @@ const CreateOrganizationForm = ({ values, onChange }) => {
         {inputProps => (
           <StyledInput
             {...inputProps}
-            placeholder="e.g. opencollective.com"
+            placeholder="e.g., opencollective.com"
             width="100%"
             value={values.website}
             onChange={dispatchChange('website')}
@@ -77,7 +70,7 @@ const CreateOrganizationForm = ({ values, onChange }) => {
         {inputProps => (
           <StyledInput
             {...inputProps}
-            placeholder="e.g. @opencollect"
+            placeholder="e.g., @opencollect"
             width="100%"
             value={values.twitterHandle}
             onChange={dispatchChange('twitterHandle')}

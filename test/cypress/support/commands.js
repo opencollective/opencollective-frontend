@@ -221,7 +221,7 @@ Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEma
  * Add a stripe credit card on the collective designated by `collectiveSlug`.
  */
 Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
-  cy.login({ redirect: `/${collectiveSlug}/edit/payment-methods` });
+  cy.login({ redirect: `/${collectiveSlug}/admin/payment-methods` });
   cy.contains('button', 'Add a credit card').click();
   cy.wait(2000);
   fillStripeInput();

@@ -140,9 +140,9 @@ const useUpdateOrder = ({ contribution, onSuccess }) => {
   };
 };
 
-const getTierAmountOptions = (selectedTier, contribution) => {
+const getTierAmountOptions = (selectedTier, contribution, locale) => {
   const currency = contribution.amount.currency;
-  const buildOptionFromAmount = amount => ({ label: formatCurrency(amount, currency), value: amount });
+  const buildOptionFromAmount = amount => ({ label: formatCurrency(amount, currency, { locale }), value: amount });
   if (selectedTier && !selectedTier?.flexible) {
     return [buildOptionFromAmount(selectedTier.amount)];
   } else {
@@ -185,15 +185,16 @@ const getContributeOptions = (intl, contribution, tiers, disableCustomContributi
   return tierOptions;
 };
 
-const getDefaultContributeOption = (contribution, tiersOptions) => {
-  const customContribution = tiersOptions.find(option => option.isCustom);
+const geSelectedContributeOption = (contribution, tiersOptions) => {
+  const defaultContribution =
+    tiersOptions.find(option => option.isCustom) || tiersOptions.find(option => option.interval);
   if (!contribution.tier) {
-    return customContribution;
+    return defaultContribution;
   } else {
     // for some collectives if a tier has been deleted it won't have moved the contribution
     // to the custom 'null' tier so we have to check for that
     const matchedTierOption = tiersOptions.find(option => option.id === contribution.tier.id);
-    return !matchedTierOption ? customContribution : matchedTierOption;
+    return !matchedTierOption ? defaultContribution : matchedTierOption;
   }
 };
 
@@ -209,14 +210,22 @@ const useContributeOptions = (order, tiers, tiersLoading, disableCustomContribut
     return getContributeOptions(intl, order, tiers, disableCustomContributions);
   }, [intl, order, tiers, disableCustomContributions]);
 
+  if (!contributeOptions.length === 0) {
+    throw new Error('Could not compute at least one contribution option.');
+  }
+
   if (contributeOptions && !selectedContributeOption && !tiersLoading) {
-    setSelectedContributeOption(getDefaultContributeOption(order, contributeOptions));
+    const selectedContribution = geSelectedContributeOption(order, contributeOptions);
+    if (!selectedContribution) {
+      throw new Error('Could not compute a selected contribution option.');
+    }
+    setSelectedContributeOption(selectedContribution);
     setLoading(false);
   }
 
   useEffect(() => {
     if (selectedContributeOption !== null) {
-      const options = getTierAmountOptions(selectedContributeOption, order);
+      const options = getTierAmountOptions(selectedContributeOption, order, intl.locale);
       setAmountOptions(options);
 
       let option;
@@ -274,12 +283,28 @@ const ContributionInterval = ({ tier, contribution }) => {
   }
 };
 
+ContributionInterval.propTypes = {
+  tier: PropTypes.shape({
+    id: PropTypes.string,
+    interval: PropTypes.string,
+  }),
+  contribution: PropTypes.shape({
+    tier: PropTypes.shape({
+      id: PropTypes.string,
+      interval: PropTypes.string,
+    }),
+    frequency: PropTypes.string,
+  }),
+  onCloseEdit: PropTypes.func,
+};
+
 const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
   // GraphQL mutations and queries
   const queryVariables = { slug: contribution.toAccount.slug };
   const { data, loading: tiersLoading } = useQuery(tiersQuery, { variables: queryVariables, context: API_V2_CONTEXT });
 
   // state management
+  const { locale } = useIntl();
   const { addToast } = useToasts();
   const { isSubmittingOrder, updateOrder } = useUpdateOrder({ contribution, onSuccess: onCloseEdit });
   const tiers = get(data, 'account.tiers.nodes', null);
@@ -380,7 +405,7 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
                               defaultMessage="Min. amount: {minAmount}"
                               id="RecurringContributions.minAmount"
                               values={{
-                                minAmount: formatCurrency(minimumAmount, currency),
+                                minAmount: formatCurrency(minimumAmount, currency, { locale }),
                               }}
                             />
                           </P>

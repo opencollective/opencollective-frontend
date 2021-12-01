@@ -128,6 +128,12 @@ const CollectiveContainer = ({ useLink, collective, children }) => {
   }
 };
 
+CollectiveContainer.propTypes = {
+  useLink: PropTypes.bool,
+  collective: PropTypes.object.isRequired,
+  children: PropTypes.func.isRequired,
+};
+
 /**
  * A card to show a collective that supports including a custom body.
  */

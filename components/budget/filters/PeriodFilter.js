@@ -1,88 +1,90 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
-import dayjs from 'dayjs';
-import { FormattedMessage } from 'react-intl';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
+import { has } from 'lodash';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { addMonths, addYears } from '../../../lib/date-utils';
+import { parseDateInterval, stripTime } from '../../../lib/date-utils';
+import dayjs from '../../../lib/dayjs';
 
+import { DateRange } from '../../DateRange';
 import { Box, Flex } from '../../Grid';
+import PeriodFilterPresetsSelect from '../../PeriodFilterPresetsSelect';
 import PopupMenu from '../../PopupMenu';
 import StyledButton from '../../StyledButton';
+import StyledButtonSet from '../../StyledButtonSet';
 import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
+import StyledTooltip from '../../StyledTooltip';
+import { Span } from '../../Text';
 
-const normalizeDate = date => {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-};
-
-const formatDate = date => (!date ? '' : dayjs(date).format('YYYY-MM-DD'));
+const DEFAULT_INTERVAL = { from: '', to: '', timezoneType: 'local' };
 
 /**
- * Parse `strValue` and returns an array like [dateFrom, dateTo]. Each value in the array
- * will be `undefined` if there's no filter for it.
+ * Get a date range as stored internally from a `value` prop, that can be either an object
+ * like { from, to } or a stringified value (see `encodeDateInterval`).
  */
-export const getDateRangeFromPeriod = strValue => {
-  // Use a normalized date (without time) to better handle Apollo caching
-  const now = normalizeDate(new Date());
-
-  // Compatibility with old format ("6-month", "1-year")
-  const legacyParsedValue = strValue?.match(/((\d+)-)?(month|year)/);
-  if (legacyParsedValue) {
-    const value = parseInt(legacyParsedValue[2]) || 1;
-    const interval = legacyParsedValue[3];
-    const dateAddFunc = interval === 'month' ? addMonths : addYears;
-    return [dateAddFunc(now, -value), now];
+const getIntervalFromValue = value => {
+  const isIntervalObject = value => typeof value === 'object' && has(value, 'from') && has(value, 'to');
+  const intervalFromValue = isIntervalObject(value) ? { ...value } : parseDateInterval(value);
+  if (intervalFromValue.timezoneType === 'UTC') {
+    const toUTC = date => (date ? dayjs.utc(date) : null);
+    intervalFromValue.from = toUTC(intervalFromValue.from);
+    intervalFromValue.to = toUTC(intervalFromValue.to);
   }
 
-  // New format (dateFrom-dateTo)
-  const parsedValue = strValue?.match(/([^→]+)(→(.+))?/);
-  if (parsedValue) {
-    const parseDate = dateStr => (!dateStr || dateStr === 'all' ? undefined : new Date(dateStr));
-    return [parseDate(parsedValue[1]), parseDate(parsedValue[3])];
-  }
-
-  return [];
-};
-
-const encodePeriod = dateInterval => {
-  const stringifyDate = date => (!date ? 'all' : formatDate(date));
-  if (!dateInterval.from && !dateInterval.to) {
-    return '';
-  } else {
-    return `${stringifyDate(dateInterval.from)}→${stringifyDate(dateInterval.to)}`;
-  }
-};
-
-const getDefaultDateInterval = () => {
-  return { from: '', to: '' };
-};
-
-const getDefaultState = value => {
-  const defaultInterval = getDefaultDateInterval();
-  const intervalFromValue = getDateRangeFromPeriod(value);
   return {
-    from: intervalFromValue[0] || defaultInterval.from,
-    to: intervalFromValue[1] || defaultInterval.to,
+    from: stripTime(intervalFromValue.from),
+    to: stripTime(intervalFromValue.to),
+    timezoneType: intervalFromValue.timezoneType || 'local',
   };
 };
 
-const DateRange = ({ from, to }) => {
-  if (!from && !to) {
-    return <FormattedMessage id="DateRange.All" defaultMessage="All" />;
-  } else if (from && to) {
-    return (
-      <FormattedMessage
-        id="Date.DateRange"
-        defaultMessage="{dateFrom, date, short} to {dateTo, date, short}"
-        values={{ dateFrom: from, dateTo: to }}
-      />
-    );
-  } else if (from) {
-    return <FormattedMessage id="Date.SinceShort" defaultMessage="Since {date, date, short}" values={{ date: from }} />;
+/**
+ * Update `interval` with a new value for `from` or `to` and return the updated interval
+ * as a new object.
+ */
+const getNewInterval = (interval, changeField, newValue) => {
+  const newInterval = { ...interval };
+  newInterval[changeField] = stripTime(newValue);
+
+  // Reset interval in case fromDate is after toDate
+  if (newInterval.from && newInterval.to && newInterval.from > newInterval.to) {
+    const fieldToReset = changeField === 'from' ? 'to' : 'from';
+    newInterval[fieldToReset] = '';
+  }
+
+  return newInterval;
+};
+
+/**
+ * Date is locally stored as '2020-01-01'. We need to force the time to make sure it's not modified
+ * by timezones when parsed.
+ */
+const parseDateForDateRange = (dateStr, isEndOfDay) => {
+  if (!dateStr) {
+    return null;
+  } else if (!isEndOfDay) {
+    return new Date(`${dateStr}T00:00:00`);
   } else {
-    return <FormattedMessage id="Date.BeforeShort" defaultMessage="Before {date, date, short}" values={{ date: to }} />;
+    return new Date(`${dateStr}T23:59:59`);
+  }
+};
+
+const UTC_LABEL = defineMessage({ defaultMessage: 'Coordinated Universal Time' });
+const getTimeZoneTypeName = (intl, timezone) => {
+  if (timezone === 'local') {
+    try {
+      return intl.timeZone || dayjs.tz.guess();
+    } catch {
+      return '';
+    }
+  } else if (timezone === 'UTC') {
+    return intl.formatMessage(UTC_LABEL);
+  } else {
+    return '';
   }
 };
 
@@ -116,32 +118,45 @@ const TriggerContainer = styled(StyledButton)`
   }
 `;
 
-const PeriodFilter = ({ onChange, value, inputId, ...props }) => {
-  const [dateInterval, setDateInterval] = React.useState(() => getDefaultState(value));
-  const setDate = (type, date) => {
-    setDateInterval(value => ({ ...value, [type]: !date ? null : normalizeDate(new Date(date)) }));
+const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
+  const intl = useIntl();
+  const intervalFromValue = React.useMemo(() => getIntervalFromValue(value), [value]);
+  const [tmpDateInterval, setTmpDateInterval] = React.useState(intervalFromValue);
+  const formattedMin = stripTime(minDate);
+
+  const setDate = (changeField, date) => {
+    setTmpDateInterval(getNewInterval(tmpDateInterval, changeField, date));
   };
 
   return (
     <PopupMenu
-      placement="bottom-end"
-      onClose={() => setDateInterval(getDefaultState(value))}
+      placement="bottom-start"
+      onClose={() => setTmpDateInterval(intervalFromValue)}
       Button={({ onClick }) => (
         <TriggerContainer onClick={onClick} id={inputId} data-cy="period-filter" {...props}>
           <Flex justifyContent="space-between" alignItems="center">
-            <span>
-              <DateRange from={dateInterval.from} to={dateInterval.to} />
-            </span>
+            <DateRange
+              from={parseDateForDateRange(intervalFromValue.from, false)}
+              to={parseDateForDateRange(intervalFromValue.to, true)}
+              isUTC={intervalFromValue.timezoneType === 'UTC'}
+            />
             <ChevronDown size={25} color="#cccccc" />
           </Flex>
         </TriggerContainer>
       )}
     >
       {({ setOpen }) => (
-        <Box mx="8px" my="16px" width="190px">
+        <Box mx="8px" my="8px" width="190px">
+          <Box mb={3}>
+            <PeriodFilterPresetsSelect
+              inputId={`${inputId}-presets-select`}
+              onChange={setTmpDateInterval}
+              interval={tmpDateInterval}
+            />
+          </Box>
           <StyledInputField
-            data-cy="download-csv-start-date"
-            label="Start Date"
+            label={<FormattedMessage defaultMessage="Start date" />}
+            labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
             name="dateFrom"
             mt="12px"
             labelFontSize="13px"
@@ -154,14 +169,15 @@ const PeriodFilter = ({ onChange, value, inputId, ...props }) => {
                 closeOnSelect
                 lineHeight={1}
                 fontSize="13px"
-                defaultValue={formatDate(dateInterval.from)}
+                value={stripTime(tmpDateInterval.from)}
+                min={formattedMin}
                 onChange={e => setDate('from', e.target.value)}
               />
             )}
           </StyledInputField>
           <StyledInputField
-            data-cy="download-csv-end-date"
-            label="End Date"
+            label={<FormattedMessage defaultMessage="End date" />}
+            labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
             name="dateTo"
             mt="12px"
             labelFontSize="13px"
@@ -174,34 +190,83 @@ const PeriodFilter = ({ onChange, value, inputId, ...props }) => {
                 closeOnSelect
                 lineHeight={1}
                 fontSize="13px"
-                defaultValue={formatDate(dateInterval.to)}
+                value={stripTime(tmpDateInterval.to)}
+                min={formattedMin}
+                max={stripTime(new Date())}
                 onChange={e => setDate('to', e.target.value)}
               />
             )}
           </StyledInputField>
-          <StyledButton
-            buttonSize="tiny"
-            mr={2}
-            onClick={() => {
-              setDateInterval(getDefaultDateInterval());
-              setOpen(false);
-              onChange('');
-            }}
-          >
-            <FormattedMessage id="Reset" defaultMessage="Reset" />
-          </StyledButton>
-          <StyledButton
-            buttonSize="tiny"
-            buttonStyle="primary"
+          <StyledInputField
+            name="timezoneType"
             mt="12px"
-            data-cy="btn-apply-period-filter"
-            onClick={() => {
-              onChange(encodePeriod(dateInterval));
-              setOpen(false);
-            }}
+            labelFontSize="13px"
+            label={
+              <Flex alignItems="center">
+                <StyledTooltip
+                  content={
+                    <FormattedMessage defaultMessage="By default, all dates are filtered and displayed using your local timezone. You can switch to UTC to indicate that the dates provided above use the Coordinated Universal Time format, which matches how email reports are generated" />
+                  }
+                >
+                  <InfoCircle size={16} />
+                </StyledTooltip>
+                <Span ml={1}>
+                  <FormattedMessage defaultMessage="Timezone" />
+                </Span>
+              </Flex>
+            }
           >
-            <FormattedMessage id="Apply" defaultMessage="Apply" />
-          </StyledButton>
+            {inputProps => (
+              <StyledButtonSet
+                {...inputProps}
+                size="tiny"
+                items={['local', 'UTC']}
+                buttonProps={{ p: 1, fontSize: '11px' }}
+                selected={tmpDateInterval.timezoneType}
+                buttonPropsBuilder={({ item }) => ({ title: getTimeZoneTypeName(intl, item) })}
+                onChange={timezoneType => {
+                  setTmpDateInterval({ ...tmpDateInterval, timezoneType });
+                }}
+              >
+                {({ item }) => {
+                  switch (item) {
+                    case 'local':
+                      return <FormattedMessage defaultMessage="Local" />;
+                    case 'UTC':
+                      return <FormattedMessage defaultMessage="UTC" />;
+                  }
+                }}
+              </StyledButtonSet>
+            )}
+          </StyledInputField>
+          <Flex mt={2}>
+            <StyledButton
+              buttonSize="tiny"
+              mr={2}
+              mt="12px"
+              flex="1"
+              onClick={() => {
+                setTmpDateInterval(DEFAULT_INTERVAL);
+                setOpen(false);
+                onChange(null);
+              }}
+            >
+              <FormattedMessage id="Reset" defaultMessage="Reset" />
+            </StyledButton>
+            <StyledButton
+              buttonSize="tiny"
+              buttonStyle="primary"
+              mt="12px"
+              data-cy="btn-apply-period-filter"
+              flex="1"
+              onClick={() => {
+                onChange(tmpDateInterval);
+                setOpen(false);
+              }}
+            >
+              <FormattedMessage id="Apply" defaultMessage="Apply" />
+            </StyledButton>
+          </Flex>
         </Box>
       )}
     </PopupMenu>
@@ -210,8 +275,17 @@ const PeriodFilter = ({ onChange, value, inputId, ...props }) => {
 
 PeriodFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
+  /** The value, either as a string with the `dateFrom→dateTo` format or an object like { from, to }*/
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.shape({
+      from: PropTypes.string,
+      to: PropTypes.string,
+      timezoneType: PropTypes.string,
+    }),
+  ]),
   inputId: PropTypes.string,
+  minDate: PropTypes.string,
 };
 
 export default PeriodFilter;

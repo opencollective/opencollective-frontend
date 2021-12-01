@@ -78,6 +78,7 @@ class UserTwoFactorAuth extends React.Component {
     /** From parent component */
     slug: PropTypes.string,
     userEmail: PropTypes.string,
+    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -219,7 +220,7 @@ class UserTwoFactorAuth extends React.Component {
 
     return (
       <Flex flexDirection="column">
-        <SettingsTitle>
+        <SettingsTitle contentOnly={this.props.contentOnly}>
           {doesAccountAlreadyHave2FA ? (
             <FormattedMessage id="TwoFactorAuth" defaultMessage="Two-factor authentication" />
           ) : (

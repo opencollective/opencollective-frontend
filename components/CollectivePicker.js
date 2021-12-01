@@ -60,7 +60,7 @@ const CollectiveLabelTextContainer = styled.div`
  */
 export const DefaultCollectiveLabel = ({ value: collective }) => (
   <Flex alignItems="center">
-    <Avatar collective={collective} radius={28} />
+    <Avatar collective={collective} radius={16} />
     <CollectiveLabelTextContainer>
       <Span fontSize="12px" fontWeight="500" lineHeight="18px" color="black.700">
         {truncate(collective.name, { length: 40 })}
@@ -312,6 +312,7 @@ class CollectivePicker extends React.PureComponent {
                 onMenuClose={this.closeMenu}
                 value={this.getValue()}
                 onChange={this.onChange}
+                noOptionsMessage={searchText ? undefined : () => null}
                 formatOptionLabel={(option, context) => {
                   if (option[FLAG_COLLECTIVE_PICKER_COLLECTIVE]) {
                     return formatOptionLabel(option, context);
@@ -397,6 +398,7 @@ class CollectivePicker extends React.PureComponent {
 }
 
 CollectivePicker.propTypes = {
+  ...StyledSelect.propTypes,
   /** The id of the search input */
   inputId: PropTypes.string.isRequired,
   /** The list of collectives to display */

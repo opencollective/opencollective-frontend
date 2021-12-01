@@ -25,9 +25,12 @@ Box.propTypes = {
   ...propTypes.flexbox,
 };
 
-export const Flex = styled(Box)({
-  display: 'flex',
-});
+export const Flex = styled(Box)(
+  {
+    display: 'flex',
+  },
+  compose(space, layout, flexbox),
+);
 
 Flex.displayName = 'Flex';
 

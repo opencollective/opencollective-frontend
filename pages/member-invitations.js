@@ -25,6 +25,13 @@ const memberInvitationsPageQuery = gqlV2`
         name
         type
         imageUrl
+        isHost
+        ... on AccountWithHost {
+          host {
+            name
+            termsUrl
+          }
+        }
       }
     }
   }

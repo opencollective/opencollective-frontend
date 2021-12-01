@@ -21,6 +21,7 @@ const ContainerOverlay = ({ backgroundType, backgroundOpacity, ...props }) => {
       display="flex"
       flexDirection="column"
       justifyContent="center"
+      alignItems="center"
       background={`rgba(${lightness}, ${lightness}, ${lightness}, ${opacity})`}
       width="100%"
       height="100%"

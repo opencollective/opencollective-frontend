@@ -6,6 +6,7 @@ import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
 
 import { uploadImageWithXHR } from '../lib/api';
+import { CustomScrollbarCSS } from '../lib/styled-components-shared-styles';
 import { stripHTML } from '../lib/utils';
 
 import Container from './Container';
@@ -30,7 +31,11 @@ const TrixEditorContainer = styled.div`
     margin-top: 8px;
     padding-top: 8px;
     outline-offset: 0.5em;
-    overflow-y: scroll;
+    ${CustomScrollbarCSS}
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    ${props => Boolean(props.editorMaxHeight) && css({ overflowY: 'scroll' })}
 
     // Outline (only when there's no border)
     ${props =>

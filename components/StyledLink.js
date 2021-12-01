@@ -29,6 +29,19 @@ const StyledLink = styled.a.attrs(props => {
   cursor: pointer;
   text-decoration: none;
 
+  /* Disable button styles */
+  ${props =>
+    props.as === 'button' &&
+    css`
+      background: none;
+      color: inherit;
+      border: none;
+      padding: 0;
+      font: inherit;
+      cursor: pointer;
+      outline: inherit;
+    `}
+
   ${border}
   ${color}
   ${layout}

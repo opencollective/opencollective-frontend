@@ -4,8 +4,11 @@ import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
+import { adminPanelQuery } from '../../../pages/admin-panel';
 import Container from '../../Container';
+import { getI18nLink } from '../../I18nFormatters';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
@@ -41,8 +44,12 @@ const ArchiveCollective = ({ collective }) => {
   const defaultAction = isArchived ? 'Archive' : 'Unarchive';
   const [modal, setModal] = useState({ type: defaultAction, show: false });
 
-  const [archiveCollective] = useMutation(archiveCollectiveMutation);
-  const [unarchiveCollective] = useMutation(unarchiveCollectiveMutation);
+  const adminPanelMutationParams = {
+    refetchQueries: [{ query: adminPanelQuery, variables: { slug: collective.slug }, context: API_V2_CONTEXT }],
+  };
+  const [archiveCollective] = useMutation(archiveCollectiveMutation, adminPanelMutationParams);
+  const [unarchiveCollective] = useMutation(unarchiveCollectiveMutation, adminPanelMutationParams);
+  const isSelfHosted = collective.host?.id === collective.id;
 
   const handleArchiveCollective = async ({ id }) => {
     setModal({ type: 'Archive', show: false });
@@ -118,7 +125,7 @@ const ArchiveCollective = ({ collective }) => {
         <StyledButton
           onClick={() => setModal({ type: 'Archive', show: true })}
           loading={processing}
-          disabled={collective.isHost || hasBalance ? true : false}
+          disabled={collective.isHost || hasBalance}
           mb={2}
         >
           <FormattedMessage
@@ -143,13 +150,21 @@ const ArchiveCollective = ({ collective }) => {
       )}
       {!isArchived && collective.isHost && (
         <P color="rgb(224, 183, 0)" my={1}>
-          <FormattedMessage
-            id="collective.archive.isHost"
-            defaultMessage={
-              "You can't archive {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings)."
-            }
-            values={{ type: collective.type }}
-          />
+          {isSelfHosted ? (
+            <FormattedMessage
+              id="collective.archive.selfHosted"
+              defaultMessage={`To archive this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
+              values={{ SettingsLink: getI18nLink({ href: `/${collective.host?.slug}/admin/host` }) }}
+            />
+          ) : (
+            <FormattedMessage
+              id="collective.archive.isHost"
+              defaultMessage={
+                "You can't archive {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings)."
+              }
+              values={{ type: collective.type }}
+            />
+          )}
         </P>
       )}
       {isArchived && confirmationMsg && (

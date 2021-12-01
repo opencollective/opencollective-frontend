@@ -94,7 +94,7 @@ class Member extends React.Component {
       ? `${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(
           membership.stats.totalDonations,
           collective.currency,
-          { precision: 0 },
+          { precision: 0, locale: intl.locale },
         )}`
       : '';
     let title = member.name;

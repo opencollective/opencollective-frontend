@@ -6,7 +6,7 @@ import { Printer } from '@styled-icons/feather/Printer';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { giftCardsDownloadUrl } from '../lib/url_helpers';
+import { giftCardsDownloadUrl } from '../lib/url-helpers';
 
 import FileDownloader from './FileDownloader';
 import { Box, Flex } from './Grid';

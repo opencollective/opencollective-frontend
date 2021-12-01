@@ -14,9 +14,11 @@ const SignInToContributeAsAnOrganization = ({ onCancel, ...props }) => {
       </StyledButton>
       <SignInOrJoinFree
         {...props}
-        defaultForm="create-account"
-        createProfileTabs={['organization']}
+        defaultForm="signin"
         createProfileLabels={{
+          personal: (
+            <FormattedMessage id="ContributionFlow.CreateUserLabel" defaultMessage="Contribute as an individual" />
+          ),
           organization: (
             <FormattedMessage
               id="ContributionFlow.CreateOrganizationLabel"

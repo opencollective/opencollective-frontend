@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Lock } from '@styled-icons/fa-solid';
+import { Lock } from '@styled-icons/material/Lock';
 import { defineMessages, useIntl } from 'react-intl';
 
 import StyledTooltip from '../StyledTooltip';
@@ -15,9 +15,9 @@ const msg = defineMessages({
 /**
  * A lock icon with a tooltip indicating that this info is private
  */
-const PrivateInfoIcon = ({ children, size, tooltipProps, withoutTooltip, ...props }) => {
+const PrivateInfoIcon = ({ children, size, tooltipProps, withoutTooltip, color, ...props }) => {
   const { formatMessage } = useIntl();
-  const icon = <Lock size={size} {...props} />;
+  const icon = <Lock size={size} color={color} {...props} />;
 
   if (withoutTooltip) {
     return icon;
@@ -40,10 +40,12 @@ PrivateInfoIcon.propTypes = {
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   tooltipProps: PropTypes.object,
   withoutTooltip: PropTypes.bool,
+  color: PropTypes.string,
 };
 
 PrivateInfoIcon.defaultProps = {
-  size: '1em',
+  size: '0.9em',
+  color: '#75777A',
 };
 
 export default PrivateInfoIcon;

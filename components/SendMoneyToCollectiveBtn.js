@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { formatCurrency } from '../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
@@ -21,6 +21,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
     fromCollective: PropTypes.object.isRequired,
     toCollective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
+    intl: PropTypes.object.isRequired,
     data: PropTypes.object,
     sendMoneyToCollective: PropTypes.func,
     confirmTransfer: PropTypes.func,
@@ -81,7 +82,8 @@ class SendMoneyToCollectiveBtn extends React.Component {
   }
 
   render() {
-    const { amount, currency, toCollective } = this.props;
+    const { amount, currency, toCollective, intl } = this.props;
+    const { locale } = intl;
     return (
       <div className="SendMoneyToCollectiveBtn">
         <Flex justifyContent="center" mb={1}>
@@ -92,7 +94,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
                 id="SendMoneyToCollective.btn"
                 defaultMessage="Send {amount} to {collective}"
                 values={{
-                  amount: formatCurrency(amount, currency),
+                  amount: formatCurrency(amount, currency, locale),
                   collective: toCollective.name,
                 }}
               />
@@ -160,4 +162,4 @@ const addSendMoneyToCollectiveMutation = graphql(sendMoneyToCollectiveMutation, 
 
 const addGraphql = compose(addPaymentMethodsData, addSendMoneyToCollectiveMutation);
 
-export default addGraphql(SendMoneyToCollectiveBtn);
+export default addGraphql(injectIntl(SendMoneyToCollectiveBtn));

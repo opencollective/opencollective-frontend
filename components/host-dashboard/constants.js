@@ -3,4 +3,5 @@ export const HOST_SECTIONS = {
   HOSTED_COLLECTIVES: 'hosted-collectives',
   PENDING_APPLICATIONS: 'pending-applications',
   REPORTS: 'reports',
+  FINANCIAL_CONTRIBUTIONS: 'orders',
 };

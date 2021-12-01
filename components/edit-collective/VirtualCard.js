@@ -2,7 +2,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Copy } from '@styled-icons/feather/Copy';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
 import { margin } from 'styled-system';
@@ -120,7 +120,7 @@ const ActionsButton = props => {
         <Reference>
           {({ ref }) => (
             <Action ref={ref} onClick={() => setDisplayActions(true)}>
-              <FormattedMessage id="VirtualCards.Actions" defaultMessage="Actions" />
+              <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
             </Action>
           )}
         </Reference>
@@ -177,12 +177,20 @@ ActionsButton.propTypes = {
   editHandler: PropTypes.func,
 };
 
-const getLimitString = ({ spend_limit, spend_limit_duration }) => {
-  const value = formatCurrency(spend_limit, 'USD');
-  if (spend_limit === 0) {
+const getLimitString = (spendingLimitAmount, spendingLimitInterval, locale) => {
+  const value = formatCurrency(spendingLimitAmount, 'USD', { locale });
+  if (!spendingLimitAmount) {
     return <FormattedMessage id="VirtualCards.NoLimit" defaultMessage="No Limit" />;
   }
-  switch (spend_limit_duration) {
+  switch (spendingLimitInterval) {
+    case 'DAILY':
+      return (
+        <Fragment>
+          <FormattedMessage defaultMessage="Limited to" />
+          &nbsp;
+          {value}/<FormattedMessage defaultMessage="day" />
+        </Fragment>
+      );
     case 'MONTHLY':
       return (
         <Fragment>
@@ -208,8 +216,10 @@ const getLimitString = ({ spend_limit, spend_limit_duration }) => {
 
 const VirtualCard = props => {
   const [displayDetails, setDisplayDetails] = React.useState(false);
-
+  const { locale } = useIntl();
   const { addToast } = useToasts();
+
+  const isActive = props.data.state === 'OPEN' || props.data.status === 'active';
 
   const name = props.name || '';
   const cardNumber = `****  ****  ****  ${props.last4}`;
@@ -227,13 +237,13 @@ const VirtualCard = props => {
       <Box flexGrow={1} m="24px 24px 0 24px">
         <Flex fontSize="16px" lineHeight="24px" fontWeight="500" justifyContent="space-between">
           <Box>{name}</Box>
-          <StateLabel isActive={props.data.state === 'OPEN'}>{props.data.state}</StateLabel>
+          <StateLabel isActive={isActive}>{(props.data.state || props.data.status).toUpperCase()}</StateLabel>
         </Flex>
         {displayDetails ? (
           <React.Fragment>
             <P mt="27px" fontSize="18px" fontWeight="700" lineHeight="26px">
-              {props.privateData.cardNumber}{' '}
-              <Action color="black" ml={2} onClick={handleCopy(props.privateData.cardNumber.replace(/\s/g, ''))}>
+              {props.privateData.cardNumber.replace(/\d{4}(?=.)/g, '$& ')}{' '}
+              <Action color="black" ml={2} onClick={handleCopy(props.privateData.cardNumber)}>
                 <Copy size="18px" />
               </Action>
             </P>
@@ -287,7 +297,7 @@ const VirtualCard = props => {
                 }}
               />
               &nbsp;&middot;&nbsp;
-              {getLimitString(props.data)}
+              {getLimitString(props.spendingLimitAmount, props.spendingLimitInterval, locale)}
             </P>
           </React.Fragment>
         )}
@@ -297,7 +307,7 @@ const VirtualCard = props => {
         color="black.900"
         minHeight="48px"
         px="24px"
-        justifyContent={props.hasActions ? 'space-between' : 'flex-end'}
+        justifyContent={'space-between'}
         alignItems="center"
         shrink={0}
       >
@@ -309,6 +319,7 @@ const VirtualCard = props => {
             editHandler={props.editHandler}
           />
         )}
+        <React.Fragment>{props.provider}</React.Fragment>
         <Action onClick={() => setDisplayDetails(!displayDetails)}>
           {displayDetails ? (
             <React.Fragment>
@@ -342,6 +353,9 @@ VirtualCard.propTypes = {
   name: PropTypes.string,
   data: PropTypes.object,
   privateData: PropTypes.object,
+  provider: PropTypes.string,
+  spendingLimitAmount: PropTypes.number,
+  spendingLimitInterval: PropTypes.string,
   createdAt: PropTypes.string,
 };
 

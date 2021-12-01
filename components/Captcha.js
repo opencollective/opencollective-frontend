@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
+import * as Sentry from '@sentry/browser';
 import { toUpper } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -23,7 +24,7 @@ export const isCaptchaEnabled = () => {
   return parseToBoolean(getEnvVar('CAPTCHA_ENABLED'));
 };
 
-const ReCaptcha = ({ onVerify, ...props }) => {
+const ReCaptcha = ({ onVerify, onError, ...props }) => {
   const { verify } = useRecaptcha();
   const [loading, setLoading] = React.useState(false);
   const [verified, setVerified] = React.useState(false);
@@ -38,6 +39,7 @@ const ReCaptcha = ({ onVerify, ...props }) => {
       }
     } catch (e) {
       addToast({ type: TOAST_TYPE.ERROR, message: e.message });
+      onError?.(e);
     }
     setLoading(false);
   };
@@ -62,6 +64,7 @@ const ReCaptcha = ({ onVerify, ...props }) => {
 
 ReCaptcha.propTypes = {
   onVerify: PropTypes.func,
+  onError: PropTypes.func,
 };
 
 const Captcha = ({ onVerify, provider, ...props }) => {
@@ -69,6 +72,9 @@ const Captcha = ({ onVerify, provider, ...props }) => {
   const RECAPTCHA_SITE_KEY = getEnvVar('RECAPTCHA_SITE_KEY');
   const handleVerify = obj => {
     onVerify({ ...obj, provider });
+  };
+  const handleError = err => {
+    Sentry.captureException(err);
   };
 
   React.useEffect(() => {
@@ -81,9 +87,9 @@ const Captcha = ({ onVerify, provider, ...props }) => {
 
   let captcha = null;
   if (provider === PROVIDERS.HCAPTCHA && HCAPTCHA_SITEKEY) {
-    captcha = <HCaptcha sitekey={HCAPTCHA_SITEKEY} onVerify={token => handleVerify({ token })} />;
+    captcha = <HCaptcha sitekey={HCAPTCHA_SITEKEY} onVerify={token => handleVerify({ token })} onError={handleError} />;
   } else if (provider === PROVIDERS.RECAPTCHA && RECAPTCHA_SITE_KEY) {
-    captcha = <ReCaptcha onVerify={handleVerify} {...props} />;
+    captcha = <ReCaptcha onVerify={handleVerify} onError={handleError} {...props} />;
   }
   return <Box data-cy="captcha">{captcha}</Box>;
 };

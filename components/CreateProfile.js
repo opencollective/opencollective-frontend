@@ -21,8 +21,12 @@ const messages = defineMessages({
     defaultMessage: 'Receive our monthly newsletter',
   },
   nameLabel: {
-    id: 'User.FullName',
-    defaultMessage: 'Full name',
+    id: 'Fields.displayName',
+    defaultMessage: 'Display name',
+  },
+  legalName: {
+    id: 'LegalName',
+    defaultMessage: 'Legal Name',
   },
   orgName: {
     id: 'Organization.Name',
@@ -43,7 +47,7 @@ const messages = defineMessages({
   },
 });
 
-const Tab = ({ active, children, setActive }) => (
+const Tab = ({ active, children, setActive, 'data-cy': dataCy }) => (
   <Container
     bg={active ? 'white.full' : 'black.50'}
     color="black.700"
@@ -55,6 +59,7 @@ const Tab = ({ active, children, setActive }) => (
     tabIndex={0}
     onClick={setActive}
     onKeyDown={event => event.key === 'Enter' && setActive(event)}
+    data-cy={dataCy}
   >
     <P fontWeight={active ? '600' : 'normal'}>{children}</P>
   </Container>
@@ -64,6 +69,7 @@ Tab.propTypes = {
   active: PropTypes.bool,
   children: PropTypes.node,
   setActive: PropTypes.func,
+  'data-cy': PropTypes.string,
 };
 
 const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
@@ -174,7 +180,12 @@ const CreateProfile = ({
     <StyledCard width={1} maxWidth={480} {...props}>
       <Flex>
         {tabs.map(tab => (
-          <Tab key={tab} active={activeTab === tab} setActive={() => setActiveTab(tab)}>
+          <Tab
+            key={tab}
+            active={activeTab === tab}
+            setActive={() => setActiveTab(tab)}
+            data-cy={`createProfile-tab-${tab}`}
+          >
             {labels?.[tab] || DEFAULT_LABELS[tab]}
           </Tab>
         ))}
@@ -186,7 +197,7 @@ const CreateProfile = ({
           p={4}
           onSubmit={event => {
             event.preventDefault();
-            const data = pick(state, ['name', 'newsletterOptIn']);
+            const data = pick(state, ['name', 'legalName', 'newsletterOptIn']);
             onPersonalSubmit({ ...data, email });
           }}
           method="POST"
@@ -199,7 +210,27 @@ const CreateProfile = ({
               required
             >
               {inputProps => (
-                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g. John Doe" />
+                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g., John Doe" />
+              )}
+            </StyledInputField>
+          </Box>
+          <Box mb={24}>
+            <StyledInputField
+              name="legalName"
+              htmlFor="legalName"
+              required={false}
+              label={formatMessage(messages.legalName)}
+              mt={3}
+              isPrivate
+              hint={
+                <FormattedMessage
+                  id="legalName.description"
+                  defaultMessage="The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name."
+                />
+              }
+            >
+              {inputProps => (
+                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g., John Dawson" />
               )}
             </StyledInputField>
           </Box>
@@ -211,7 +242,7 @@ const CreateProfile = ({
                   {...inputProps}
                   {...getFieldProps(inputProps.name)}
                   type="email"
-                  placeholder="e.g. yourname@yourhost.com"
+                  placeholder="e.g., yourname@yourhost.com"
                   value={email}
                   onKeyDown={e => {
                     // See https://github.com/facebook/react/issues/6368
@@ -237,7 +268,7 @@ const CreateProfile = ({
             fontWeight="600"
             loading={submitting}
           >
-            <FormattedMessage id="contribution.createPersoProfile" defaultMessage="Create Personal Profile" />
+            {DEFAULT_LABELS.personal}
           </StyledButton>
         </Box>
       )}
@@ -250,7 +281,9 @@ const CreateProfile = ({
             event.preventDefault();
             const data = pick(state, [
               'name',
+              'legalName',
               'orgName',
+              'orgLegalName',
               'website',
               'githubHandle',
               'twitterHandle',
@@ -271,7 +304,27 @@ const CreateProfile = ({
               required
             >
               {inputProps => (
-                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g. John Doe" />
+                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g., John Doe" />
+              )}
+            </StyledInputField>
+          </Box>
+          <Box mb={24}>
+            <StyledInputField
+              name="legalName"
+              htmlFor="legalName"
+              required={false}
+              label={formatMessage(messages.legalName)}
+              mt={3}
+              isPrivate
+              hint={
+                <FormattedMessage
+                  id="legalName.description"
+                  defaultMessage="The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name."
+                />
+              }
+            >
+              {inputProps => (
+                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g., John Dawson" />
               )}
             </StyledInputField>
           </Box>
@@ -283,7 +336,7 @@ const CreateProfile = ({
                   {...getFieldProps(inputProps.name)}
                   type="email"
                   value={email}
-                  placeholder="e.g. yourname@yourhost.com"
+                  placeholder="e.g., yourname@yourhost.com"
                   onKeyDown={e => {
                     // See https://github.com/facebook/react/issues/6368
                     if (e.key === ' ') {
@@ -309,8 +362,26 @@ const CreateProfile = ({
                 <StyledInput
                   {...inputProps}
                   {...getFieldProps(inputProps.name)}
-                  placeholder="e.g. AirBnb, Women Who Code"
+                  placeholder="e.g., AirBnb, Women Who Code"
                   required
+                />
+              )}
+            </StyledInputField>
+          </Box>
+          <Box mb={24}>
+            <StyledInputField
+              name="orgLegalName"
+              htmlFor="orgLegalName"
+              required={false}
+              label={formatMessage(messages.legalName)}
+              mt={3}
+              isPrivate
+            >
+              {inputProps => (
+                <StyledInput
+                  {...inputProps}
+                  {...getFieldProps(inputProps.name)}
+                  placeholder="e.g., Open Collective Inc."
                 />
               )}
             </StyledInputField>
@@ -375,7 +446,7 @@ const CreateProfile = ({
             fontWeight="600"
             loading={submitting}
           >
-            <FormattedMessage id="contribution.createOrgProfile" defaultMessage="Create Organization Profile" />
+            {DEFAULT_LABELS.organization}
           </StyledButton>
         </Box>
       )}
@@ -396,7 +467,7 @@ const CreateProfile = ({
 };
 
 CreateProfile.propTypes = {
-  /** a map of errors to the matching field name, e.g. `{ email: 'Invalid email' }` will display that message until the email field */
+  /** a map of errors to the matching field name, e.g., `{ email: 'Invalid email' }` will display that message until the email field */
   errors: PropTypes.objectOf(PropTypes.string),
   /** handles submissions of personal profile form */
   onPersonalSubmit: PropTypes.func.isRequired,

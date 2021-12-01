@@ -6,7 +6,7 @@ const newFlowRoute = '/apex/donate';
  * Test the order flow's success page.
  */
 describe('Contribution Flow: Order success', () => {
-  const userParams = { firstName: 'Order', lastName: 'Tester' };
+  const userParams = { name: 'Order Tester' };
   const publicMessage = "Wow such an amazing project 💙 Let's take it to the moon!!! 🚀";
 
   describe('New flow', () => {

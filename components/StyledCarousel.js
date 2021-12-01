@@ -177,7 +177,7 @@ const StyledCarousel = props => {
       </Flex>
       <Container width={1} display="flex" alignItems="center" justifyContent={'center'}>
         {showArrowController && controllerPosition === 'bottom' && renderLeftController()}
-        <Flex mx={3} my={3} display={props.display}>
+        <Flex mx={3} my={3}>
           {Array.from({ length: children.length }, (_, i) => (
             <Indicator key={i} active={i === activeIndex} mx={1} onClick={() => handleOnClickIndicator(i)} />
           ))}

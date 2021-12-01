@@ -25,7 +25,7 @@ const ExpenseTypeLabels = defineMessages({
     id: 'ExpenseForm.ReceiptLabel',
     defaultMessage: 'Reimbursement',
   },
-  [expenseTypes.FUNDING_REQUEST]: {
+  [expenseTypes.GRANT]: {
     id: 'ExpenseForm.Type.Request',
     defaultMessage: 'Request Grant',
   },
@@ -40,7 +40,7 @@ const ExpenseTypeDescription = defineMessages({
     id: 'ExpenseForm.InvoiceDescription',
     defaultMessage: 'Bill for your time or a service.',
   },
-  [expenseTypes.FUNDING_REQUEST]: {
+  [expenseTypes.GRANT]: {
     id: 'ExpenseForm.FundingRequestDescription',
     defaultMessage: 'Request a grant for your project or initiative.',
   },
@@ -88,13 +88,13 @@ const ExpenseTypeOptionContainer = styled.label`
 const illustrations = {
   [expenseTypes.INVOICE]: invoiceIllustration,
   [expenseTypes.RECEIPT]: receiptIllustration,
-  [expenseTypes.FUNDING_REQUEST]: grantAnimation,
+  [expenseTypes.GRANT]: grantAnimation,
 };
 
 const staticIllustrations = {
   [expenseTypes.INVOICE]: invoiceIllustrationStatic,
   [expenseTypes.RECEIPT]: receiptIllustrationStatic,
-  [expenseTypes.FUNDING_REQUEST]: grantIllustration,
+  [expenseTypes.GRANT]: grantIllustration,
 };
 
 const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
@@ -168,8 +168,8 @@ const ExpenseTypeRadioSelect = ({ name, onChange, value, options = {} }) => {
           {options.fundingRequest && (
             <ExpenseTypeOption
               name={name}
-              type={expenseTypes.FUNDING_REQUEST}
-              isChecked={value === expenseTypes.FUNDING_REQUEST}
+              type={expenseTypes.GRANT}
+              isChecked={value === expenseTypes.FUNDING_REQUEST || value === expenseTypes.GRANT}
               onChange={onChange}
             />
           )}

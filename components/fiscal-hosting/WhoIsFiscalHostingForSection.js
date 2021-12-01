@@ -128,7 +128,7 @@ const messages = defineMessages({
     defaultMessage: 'Funder coalitions',
   },
   'fiscalHosting.founderCoalition.description': {
-    id: 'fiscalHosting.founderCoalition.description',
+    id: 'fiscalHosting.distributeCollaboration.description',
     defaultMessage:
       'Like an open source software project, which isn’t owned by anyone and wants resources held in common.',
   },
@@ -142,7 +142,7 @@ const messages = defineMessages({
       'Can work with a nonprofit fiscal host to separate funds from the commercial side and coordinate grants and sponsorships.',
   },
   'fiscalHosting.grantMakingInstitution': {
-    id: 'fiscalHosting.grantMakingInstitution',
+    id: 'fiscalHosting.companiesGivingBack',
     defaultMessage: 'Companies giving back',
   },
   'fiscalHosting.grantMakingInstitution.description': {
@@ -200,7 +200,7 @@ const PotentialUsers = ({ users }) => {
     <Wrapper
       gridTemplateColumns={['100%', 'repeat(2, 1fr)', null, null, 'repeat(3, 1fr)']}
       placeItems="center"
-      alignItems="center"
+      alignItems="flex-start"
     >
       {users.map(user => (
         <PotentialUser key={user.id} id={user.id} />

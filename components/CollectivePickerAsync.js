@@ -97,6 +97,7 @@ const CollectivePickerAsync = ({
   invitable,
   emptyCustomOptions,
   noCache,
+  isLoading,
   ...props
 }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
@@ -117,7 +118,7 @@ const CollectivePickerAsync = ({
   return (
     <CollectivePicker
       inputId={inputId}
-      isLoading={loading}
+      isLoading={Boolean(loading || isLoading)}
       collectives={filteredCollectives}
       groupByType={!types || types.length > 1}
       filterOption={() => true /** Filtering is done by the API */}
@@ -137,6 +138,7 @@ const CollectivePickerAsync = ({
 };
 
 CollectivePickerAsync.propTypes = {
+  ...CollectivePicker.propTypes,
   /** The id of the search input */
   inputId: PropTypes.string.isRequired,
   /** The types of collectives to retrieve */

@@ -1,17 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Undo } from '@styled-icons/fa-solid/Undo';
 import { Field, FieldArray, Form, Formik } from 'formik';
 import { first, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../../lib/constants/collectives';
+import { accountSupportsGrants } from '../../lib/collective.lib';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { requireFields } from '../../lib/form-utils';
 import { flattenObjectDeep } from '../../lib/utils';
 
+import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
 import { serializeAddress } from '../I18nAddressFields';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
@@ -41,7 +43,7 @@ const msg = defineMessages({
   },
   grantSubjectPlaceholder: {
     id: `ExpenseForm.GrantSubjectPlaceholder`,
-    defaultMessage: 'e.g. research, software development, etc...',
+    defaultMessage: 'e.g., research, software development, etc...',
   },
   addNewReceipt: {
     id: 'ExpenseForm.AddReceipt',
@@ -67,10 +69,21 @@ const msg = defineMessages({
     id: 'ExpenseForm.StepExpenseFundingRequest',
     defaultMessage: 'Set grant details',
   },
-
   stepPayee: {
     id: 'ExpenseForm.StepPayeeInvoice',
     defaultMessage: 'Payee information',
+  },
+  cancelEditExpense: {
+    defaultMessage: 'Cancel Edit',
+  },
+  confirmCancelEditExpense: {
+    defaultMessage: 'Are you sure you want to cancel the edits?',
+  },
+  clearExpenseForm: {
+    defaultMessage: 'Clear Form',
+  },
+  confirmClearExpenseForm: {
+    defaultMessage: 'Are you sure you want to clear the expense form?',
   },
 });
 
@@ -98,10 +111,10 @@ export const prepareExpenseForSubmit = expenseData => {
   // The collective picker still uses API V1 for when creating a new profile on the fly
   const payeeIdField = typeof expenseData.payee?.id === 'string' ? 'id' : 'legacyId';
   const isInvoice = expenseData.type === expenseTypes.INVOICE;
-  const isFundingRequest = expenseData.type === expenseTypes.FUNDING_REQUEST;
+  const isGrant = expenseData.type === expenseTypes.FUNDING_REQUEST || expenseData.type === expenseTypes.GRANT;
   const payee =
     expenseData.payee?.isNewUser || expenseData.payee?.isInvite
-      ? pick(expenseData.payee, ['name', 'email', 'organization', 'newsletterOptIn'])
+      ? pick(expenseData.payee, ['name', 'email', 'legalName', 'organization', 'newsletterOptIn'])
       : { [payeeIdField]: expenseData.payee.id };
 
   const payeeLocation = isInvoice ? pick(expenseData.payeeLocation, ['address', 'country', 'structured']) : null;
@@ -116,7 +129,7 @@ export const prepareExpenseForSubmit = expenseData => {
     items: expenseData.items.map(item => {
       return pick(item, [
         ...(item.__isNew ? [] : ['id']),
-        ...(isInvoice || isFundingRequest ? [] : ['url']), // never submit URLs for invoices or requests
+        ...(isInvoice || isGrant ? [] : ['url']), // never submit URLs for invoices or requests
         'description',
         'incurredAt',
         'amount',
@@ -183,6 +196,7 @@ const ExpenseFormBody = ({
   formik,
   payoutProfiles,
   collective,
+  expense,
   autoFocusTitle,
   onCancel,
   formPersister,
@@ -195,12 +209,12 @@ const ExpenseFormBody = ({
   const intl = useIntl();
   const { formatMessage } = intl;
   const formRef = React.useRef();
-  const { values, handleChange, errors, setValues, dirty, touched, setErrors } = formik;
+  const { values, handleChange, errors, setValues, dirty, touched, resetForm, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
   const isReceipt = values.type === expenseTypes.RECEIPT;
-  const isFundingRequest = values.type === expenseTypes.FUNDING_REQUEST;
+  const isGrant = values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT;
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
   const stepOneCompleted =
     values.payoutMethod &&
@@ -213,6 +227,8 @@ const ExpenseFormBody = ({
   const [step, setStep] = React.useState(stepOneCompleted || isCreditCardCharge ? STEPS.EXPENSE : STEPS.PAYEE);
   // Only true when logged in and drafting the expense
   const [isOnBehalf, setOnBehalf] = React.useState(false);
+  const [showResetModal, setShowResetModal] = React.useState(false);
+  const editingExpense = expense !== undefined;
 
   // Scroll to top when step changes
   React.useEffect(() => {
@@ -362,10 +378,7 @@ const ExpenseFormBody = ({
           }}
           value={values.type}
           options={{
-            fundingRequest:
-              [CollectiveType.FUND, CollectiveType.PROJECT].includes(collective.type) ||
-              collective.settings?.fundingRequest === true ||
-              collective.host?.settings?.fundingRequest === true,
+            fundingRequest: accountSupportsGrants(collective, collective?.host),
           }}
         />
       )}
@@ -394,7 +407,7 @@ const ExpenseFormBody = ({
                 lineHeight="24px"
                 fontWeight="bold"
               >
-                {values.type === expenseTypes.FUNDING_REQUEST ? (
+                {values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT ? (
                   <FormattedMessage
                     id="Expense.EnterRequestSubject"
                     defaultMessage="Enter grant subject <small>(Public)</small>"
@@ -447,7 +460,7 @@ const ExpenseFormBody = ({
               width="100%"
               withOutline
               placeholder={
-                values.type === expenseTypes.FUNDING_REQUEST
+                values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT
                   ? formatMessage(msg.grantSubjectPlaceholder)
                   : formatMessage(msg.descriptionPlaceholder)
               }
@@ -484,9 +497,7 @@ const ExpenseFormBody = ({
 
               <Flex alignItems="center" my={24}>
                 <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
-                  {formatMessage(
-                    isReceipt ? msg.stepReceipt : isFundingRequest ? msg.stepFundingRequest : msg.stepInvoice,
-                  )}
+                  {formatMessage(isReceipt ? msg.stepReceipt : isGrant ? msg.stepFundingRequest : msg.stepInvoice)}
                 </Span>
                 <StyledHr flex="1" borderColor="black.300" mx={2} />
                 <StyledButton
@@ -498,16 +509,14 @@ const ExpenseFormBody = ({
                   disabled={isCreditCardCharge}
                 >
                   +&nbsp;
-                  {formatMessage(
-                    isReceipt ? msg.addNewReceipt : isFundingRequest ? msg.addNewGrantItem : msg.addNewItem,
-                  )}
+                  {formatMessage(isReceipt ? msg.addNewReceipt : isGrant ? msg.addNewGrantItem : msg.addNewItem)}
                 </StyledButton>
               </Flex>
               <Box>
                 <FieldArray name="items" component={ExpenseFormItems} />
               </Box>
 
-              {values.type === expenseTypes.FUNDING_REQUEST && (
+              {(values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT) && (
                 <Box my={40}>
                   <ExpenseAttachedFilesForm
                     title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}
@@ -570,6 +579,47 @@ const ExpenseFormBody = ({
                     {errors.payoutMethod.data.currency.toString()}
                   </Box>
                 )}
+                <StyledHr flex="1" borderColor="white.full" mx={2} />
+                {showResetModal ? (
+                  <ConfirmationModal
+                    show
+                    onClose={() => setShowResetModal(false)}
+                    header={editingExpense ? formatMessage(msg.cancelEditExpense) : formatMessage(msg.clearExpenseForm)}
+                    body={
+                      editingExpense
+                        ? formatMessage(msg.confirmCancelEditExpense)
+                        : formatMessage(msg.confirmClearExpenseForm)
+                    }
+                    continueHandler={() => {
+                      if (editingExpense) {
+                        onCancel();
+                      } else {
+                        setStep(STEPS.PAYEE);
+                        resetForm({ values: getDefaultExpense(collective) });
+                        if (formPersister) {
+                          formPersister.clearValues();
+                          window.scrollTo(0, 0);
+                        }
+                      }
+                      setShowResetModal(false);
+                    }}
+                  />
+                ) : (
+                  <StyledButton
+                    type="button"
+                    buttonStyle="borderless"
+                    width={['100%', 'auto']}
+                    color="red.500"
+                    mt={1}
+                    mx={[2, 0]}
+                    mr={[null, 3]}
+                    whiteSpace="nowrap"
+                    onClick={() => setShowResetModal(true)}
+                  >
+                    <Undo size={11} />
+                    <Span mx={1}>{formatMessage(editingExpense ? msg.cancelEditExpense : msg.clearExpenseForm)}</Span>
+                  </StyledButton>
+                )}
               </Flex>
             </HiddenFragment>
           </HiddenFragment>
@@ -603,12 +653,24 @@ ExpenseFormBody.propTypes = {
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
       settings: PropTypes.shape({
-        fundingRequest: PropTypes.bool,
+        disableGrantsByDefault: PropTypes.bool,
       }),
     }),
     settings: PropTypes.object,
     isApproved: PropTypes.bool,
   }).isRequired,
+  expense: PropTypes.shape({
+    type: PropTypes.oneOf(Object.values(expenseTypes)),
+    description: PropTypes.string,
+    status: PropTypes.string,
+    payee: PropTypes.object,
+    draft: PropTypes.object,
+    items: PropTypes.arrayOf(
+      PropTypes.shape({
+        url: PropTypes.string,
+      }),
+    ),
+  }),
 };
 
 /**
@@ -618,6 +680,7 @@ const ExpenseForm = ({
   onSubmit,
   collective,
   expense,
+  originalExpense,
   payoutProfiles,
   autoFocusTitle,
   onCancel,
@@ -659,6 +722,7 @@ const ExpenseForm = ({
           formik={formik}
           payoutProfiles={payoutProfiles}
           collective={collective}
+          expense={originalExpense}
           autoFocusTitle={autoFocusTitle}
           onCancel={onCancel}
           formPersister={formPersister}
@@ -698,6 +762,19 @@ ExpenseForm.propTypes = {
   }).isRequired,
   /** If editing */
   expense: PropTypes.shape({
+    type: PropTypes.oneOf(Object.values(expenseTypes)),
+    description: PropTypes.string,
+    status: PropTypes.string,
+    payee: PropTypes.object,
+    draft: PropTypes.object,
+    items: PropTypes.arrayOf(
+      PropTypes.shape({
+        url: PropTypes.string,
+      }),
+    ),
+  }),
+  /** To reset form */
+  originalExpense: PropTypes.shape({
     type: PropTypes.oneOf(Object.values(expenseTypes)),
     description: PropTypes.string,
     status: PropTypes.string,

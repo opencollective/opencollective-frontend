@@ -36,6 +36,10 @@ const desiredServiceLevel = Number(process.env.SERVICE_LEVEL) || 100;
 
 const start = id =>
   nextApp.prepare().then(() => {
+    logger.info(
+      `Starting with NODE_ENV=${process.env.NODE_ENV} OC_ENV=${process.env.OC_ENV} API_URL=${process.env.API_URL}`,
+    );
+
     // Not much documentation on this,
     // but we should ensure this goes to the default Next.js handler
     app.get('/__nextjs_original-stack-frame', nextApp.getRequestHandler());

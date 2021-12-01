@@ -4,7 +4,6 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import {
-  GQLV2_PAYMENT_METHOD_LEGACY_TYPES,
   GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES,
   PAYMENT_METHOD_SERVICE,
   PAYMENT_METHOD_TYPE,
@@ -27,6 +26,7 @@ export const generatePaymentMethodOptions = (
   stepSummary,
   collective,
   isEmbed,
+  disabledPaymentMethodTypes,
 ) => {
   const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
@@ -47,12 +47,9 @@ export const generatePaymentMethodOptions = (
 
   let uniquePMs = uniqBy(paymentMethodsOptions, 'id');
 
-  // TODO(paymentMethodType): remove deprecated form once migration is over
   uniquePMs = uniquePMs.filter(
     ({ paymentMethod }) =>
-      (paymentMethod.providerType !== GQLV2_PAYMENT_METHOD_LEGACY_TYPES.ACCOUNT_BALANCE &&
-        paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE) ||
-      collective.host.legacyId === stepProfile.host?.id,
+      paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE || collective.host.legacyId === stepProfile.host?.id,
   );
 
   // prepaid budget: limited to a specific host
@@ -75,23 +72,15 @@ export const generatePaymentMethodOptions = (
 
   uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
     const sourcePaymentMethod = paymentMethod.sourcePaymentMethod || paymentMethod;
-    const sourceProviderType = sourcePaymentMethod.providerType;
     const sourceType = sourcePaymentMethod.type;
 
-    // TODO(paymentMethodType): remove deprecated form once migration is over
-    // (no need to uppercase here because we check providerType first)
+    const isGiftCard = paymentMethod.type === PAYMENT_METHOD_TYPE.GIFTCARD;
+    const isSourcePrepaid = sourceType === PAYMENT_METHOD_TYPE.PREPAID;
+    const isSourceCreditCard = sourceType === PAYMENT_METHOD_TYPE.CREDITCARD;
 
-    const isGiftCard =
-      paymentMethod.providerType === GQLV2_PAYMENT_METHOD_LEGACY_TYPES.GIFT_CARD ||
-      paymentMethod.type === PAYMENT_METHOD_TYPE.GIFTCARD;
-    const isSourcePrepaid =
-      sourceProviderType === GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PREPAID_BUDGET ||
-      sourceType === PAYMENT_METHOD_TYPE.PREPAID;
-    const isSourceCreditCard =
-      sourceProviderType === GQLV2_PAYMENT_METHOD_LEGACY_TYPES.CREDIT_CARD ||
-      sourceType === PAYMENT_METHOD_TYPE.CREDITCARD;
-
-    if (isGiftCard && paymentMethod.limitedToHosts) {
+    if (disabledPaymentMethodTypes?.includes(paymentMethod.type)) {
+      return false;
+    } else if (isGiftCard && paymentMethod.limitedToHosts) {
       return matchesHostCollectiveId(paymentMethod);
     } else if (isSourcePrepaid) {
       return matchesHostCollectiveIdPrepaid(sourcePaymentMethod);
@@ -117,15 +106,11 @@ export const generatePaymentMethodOptions = (
     }
 
     // Paypal
-    if (hostHasPaypal) {
+    if (hostHasPaypal && !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.PAYMENT)) {
       uniquePMs.push({
         key: 'paypal',
         title: 'PayPal',
         paymentMethod: {
-          // TODO(paymentMethodType): remove deprecated form
-          // Deprecated but current form
-          providerType: GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PAYPAL,
-          // Future proof form
           service: PAYMENT_METHOD_SERVICE.PAYPAL,
           type: PAYMENT_METHOD_TYPE.PAYMENT,
         },
@@ -136,14 +121,15 @@ export const generatePaymentMethodOptions = (
       });
     }
 
-    if (!interval && !isEmbed && supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.ALIPAY)) {
+    if (
+      !interval &&
+      !isEmbed &&
+      supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.ALIPAY) &&
+      !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.ALIPAY)
+    ) {
       uniquePMs.push({
         key: 'alipay',
         paymentMethod: {
-          // TODO(paymentMethodType): remove deprecated form
-          // Deprecated but current form
-          providerType: GQLV2_PAYMENT_METHOD_LEGACY_TYPES.ALIPAY,
-          // Future proof form
           service: PAYMENT_METHOD_SERVICE.STRIPE,
           type: PAYMENT_METHOD_TYPE.ALIPAY,
         },
@@ -156,15 +142,11 @@ export const generatePaymentMethodOptions = (
     }
 
     // Manual (bank transfer)
-    if (hostHasManual && !interval) {
+    if (hostHasManual && !interval && !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)) {
       uniquePMs.push({
         key: 'manual',
         title: get(collective, 'host.settings.paymentMethods.manual.title', null) || 'Bank transfer',
         paymentMethod: {
-          // TODO(paymentMethodType): remove deprecated form
-          // Deprecated but current form
-          providerType: GQLV2_PAYMENT_METHOD_LEGACY_TYPES.BANK_TRANSFER,
-          // Future proof form
           service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
           type: PAYMENT_METHOD_TYPE.MANUAL,
         },
@@ -201,10 +183,6 @@ export const getGQLV2AmountInput = (valueInCents, defaultValue) => {
   } else {
     return defaultValue;
   }
-};
-
-export const isAllowedRedirect = host => {
-  return ['octobox.io', 'dotnetfoundation.org', 'hopin.com'].includes(host);
 };
 
 const getCanonicalURL = (collective, tier) => {

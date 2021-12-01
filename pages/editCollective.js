@@ -60,6 +60,16 @@ class EditCollectivePage extends React.Component {
     }
   }
 
+  getBlocker(LoggedInUser, collective) {
+    if (!LoggedInUser) {
+      <FormattedMessage id="mustBeLoggedIn" defaultMessage="You must be logged in to see this page" />;
+    } else if (!collective) {
+      return <FormattedMessage id="editCollective.notFound" defaultMessage="No collective data to edit" />;
+    } else if (collective.isIncognito) {
+      return <FormattedMessage defaultMessage="You cannot edit this collective" />;
+    }
+  }
+
   render() {
     const { data, editCollective, LoggedInUser, loadingLoggedInUser } = this.props;
     const collective = get(data, 'Collective') || this.state.Collective;
@@ -74,27 +84,22 @@ class EditCollectivePage extends React.Component {
       );
     } else if (data && data.error) {
       return <ErrorPage data={data} />;
-    } else if (!LoggedInUser || !collective) {
+    }
+
+    const blocker = this.getBlocker(LoggedInUser, collective);
+    if (blocker) {
       return (
         <Page>
           <Flex justifyContent="center" p={5}>
             <MessageBox type="error" withIcon>
-              {LoggedInUser ? (
-                <FormattedMessage id="editCollective.notFound" defaultMessage="No collective data to edit" />
-              ) : (
-                <FormattedMessage id="mustBeLoggedIn" defaultMessage="You must be logged in to see this page" />
-              )}
+              {blocker}
             </MessageBox>
           </Flex>
         </Page>
       );
     }
 
-    return (
-      <div>
-        <EditCollective collective={collective} editCollective={editCollective} />
-      </div>
-    );
+    return <EditCollective collective={collective} editCollective={editCollective} />;
   }
 }
 

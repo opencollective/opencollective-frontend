@@ -78,7 +78,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
 
   const mainMenu = menuState === 'mainMenu' && (status === 'ACTIVE' || status === 'ERROR');
   const cancelMenu = menuState === 'cancelMenu';
-  const updateTierMenu = menuState === 'updateTierMenu';
+  const updateOrderMenu = menuState === 'updateOrderMenu';
   const paymentMethodMenu = menuState === 'paymentMethodMenu';
 
   return (
@@ -121,7 +121,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
             alignItems="center"
             justifyContent="space-between"
             onClick={() => {
-              setMenuState('updateTierMenu');
+              setMenuState('updateOrderMenu');
             }}
             data-cy="recurring-contribution-menu-tier-option"
           >
@@ -231,7 +231,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
         </MenuSection>
       )}
 
-      {updateTierMenu && (
+      {updateOrderMenu && (
         <MenuSection data-cy="recurring-contribution-order-menu">
           <UpdateOrderPopUp setMenuState={setMenuState} contribution={contribution} onCloseEdit={onCloseEdit} />
         </MenuSection>

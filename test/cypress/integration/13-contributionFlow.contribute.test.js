@@ -50,12 +50,12 @@ describe('Contribution Flow: Order', () => {
   });
 
   it('Can order as new user', () => {
-    const userParams = { firstName: 'Order', lastName: 'Tester' };
+    const userParams = { name: 'Order Tester' };
     const visitParams = { onBeforeLoad: mockRecaptcha };
     const routeBase = '/apex/contribute';
 
     cy.waitUntil(() =>
-      cy.signup({ user: userParams, redirect: `${routeBase}/sponsors-470/checkout`, visitParams }).then(user => {
+      cy.signup({ user: userParams, redirect: `${routeBase}/sponsors-470/checkout`, visitParams }).then(() => {
         // Mock clock so we can check next contribution date in a consistent way
         cy.clock(Date.parse('2042/05/03'));
 
@@ -77,9 +77,8 @@ describe('Contribution Flow: Order', () => {
         // ---- Step Profile ----
         cy.checkStepsProgress({ enabled: ['details', 'profile'], disabled: 'payment' });
         // Personnal account must be the first entry, and it must be checked
-        const userName = `${user.firstName} ${user.lastName}`;
+        const userName = userParams.name;
         cy.contains('[data-cy="ContributionProfile"] > label:first', userName);
-        cy.contains('[data-cy="ContributionProfile"] > label:first', user.email);
         cy.get('[data-cy="ContributionProfile"] > label:first input[type=radio]').should('be.checked');
 
         cy.getByDataCy('progress-step-profile').contains(userName);

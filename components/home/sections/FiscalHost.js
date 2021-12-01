@@ -340,7 +340,7 @@ const FiscalHost = () => {
                   color="white.full"
                 >
                   <FormattedMessage
-                    id="home.becomeFiscalHost.description"
+                    id="home.learnMore.documentation"
                     defaultMessage="Support your community with fundholding and fiscal sponsorship services. "
                   />
                 </P>

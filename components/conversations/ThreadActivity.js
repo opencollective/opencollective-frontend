@@ -6,13 +6,15 @@ import { Cogs as CogsIcon } from '@styled-icons/fa-solid/Cogs';
 import { AlertOctagon as ErrorIcon } from '@styled-icons/feather/AlertOctagon';
 import { Edit as EditIcon } from '@styled-icons/feather/Edit';
 import { FileText as InvitedIcon } from '@styled-icons/feather/FileText';
+import { Plus as PlusIcon } from '@styled-icons/feather/Plus';
 import { UserCheck as ApprovedIcon } from '@styled-icons/feather/UserCheck';
 import { UserMinus as UnapprovedIcon } from '@styled-icons/feather/UserMinus';
 import { Update as UpdateIcon } from '@styled-icons/material/Update';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled, { useTheme } from 'styled-components';
 
 import Avatar from '../Avatar';
+import DateTime from '../DateTime';
 import { Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import StyledLink from '../StyledLink';
@@ -23,98 +25,103 @@ import { Span } from '../Text';
  * **All** keys must have a matching entry in `MESSAGES` below.
  */
 const ACTIVITIES_INFO = {
+  COLLECTIVE_EXPENSE_CREATED: {
+    type: 'info',
+    icon: PlusIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.Created',
+      defaultMessage: 'Expense created',
+    }),
+  },
   COLLECTIVE_EXPENSE_APPROVED: {
     type: 'info',
     icon: ApprovedIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.Approved',
+      defaultMessage: 'Expense approved',
+    }),
   },
   COLLECTIVE_EXPENSE_UNAPPROVED: {
     type: 'warning',
     icon: UnapprovedIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.Unapproved',
+      defaultMessage: 'Expense unapproved',
+    }),
   },
   COLLECTIVE_EXPENSE_UPDATED: {
     type: 'info',
     icon: EditIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.Updated',
+      defaultMessage: 'Expense updated',
+    }),
   },
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID: {
     type: 'info',
     icon: UpdateIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.MarkedAsUnpaid',
+      defaultMessage: 'Expense marked as unpaid',
+    }),
   },
   COLLECTIVE_EXPENSE_REJECTED: {
     type: 'error',
     icon: RejectedIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.Rejected',
+      defaultMessage: 'Expense rejected',
+    }),
   },
   COLLECTIVE_EXPENSE_INVITE_DRAFTED: {
     type: 'info',
     icon: InvitedIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.Invite.Drafted',
+      defaultMessage: 'Expense invited',
+    }),
   },
   COLLECTIVE_EXPENSE_PAID: {
     type: 'success',
     icon: CheckIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.Paid',
+      defaultMessage: 'Expense paid',
+    }),
   },
   COLLECTIVE_EXPENSE_PROCESSING: {
     type: 'info',
     icon: CogsIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.Processing',
+      defaultMessage: 'Expense processing',
+    }),
   },
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT: {
     type: 'info',
     icon: CogsIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.ScheduledForPayment',
+      defaultMessage: 'Expense scheduled for payment',
+    }),
   },
   COLLECTIVE_EXPENSE_ERROR: {
     type: 'error',
     icon: ErrorIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.Error',
+      defaultMessage: 'Expense error',
+    }),
   },
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM: {
     type: 'error',
     icon: RejectedIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.MarkedAsSpam',
+      defaultMessage: 'Expense marked as spam',
+    }),
   },
 };
-
-const MESSAGES = defineMessages({
-  COLLECTIVE_EXPENSE_UPDATED: {
-    id: 'Expense.Activity.Updated',
-    defaultMessage: 'Expense updated',
-  },
-  COLLECTIVE_EXPENSE_REJECTED: {
-    id: 'Expense.Activity.Rejected',
-    defaultMessage: 'Expense rejected',
-  },
-  COLLECTIVE_EXPENSE_INVITE_DRAFTED: {
-    id: 'Expense.Activity.Invite.Drafted',
-    defaultMessage: 'Expense invited',
-  },
-  COLLECTIVE_EXPENSE_APPROVED: {
-    id: 'Expense.Activity.Approved',
-    defaultMessage: 'Expense approved',
-  },
-  COLLECTIVE_EXPENSE_UNAPPROVED: {
-    id: 'Expense.Activity.Unapproved',
-    defaultMessage: 'Expense unapproved',
-  },
-  COLLECTIVE_EXPENSE_PAID: {
-    id: 'Expense.Activity.Paid',
-    defaultMessage: 'Expense paid',
-  },
-  COLLECTIVE_EXPENSE_MARKED_AS_UNPAID: {
-    id: 'Expense.Activity.MarkedAsUnpaid',
-    defaultMessage: 'Expense marked as unpaid',
-  },
-  COLLECTIVE_EXPENSE_PROCESSING: {
-    id: 'Expense.Activity.Processing',
-    defaultMessage: 'Expense processing',
-  },
-  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT: {
-    id: 'Expense.Activity.ScheduledForPayment',
-    defaultMessage: 'Expense scheduled for payment',
-  },
-  COLLECTIVE_EXPENSE_ERROR: {
-    id: 'Expense.Activity.Error',
-    defaultMessage: 'Expense error',
-  },
-  COLLECTIVE_EXPENSE_MARKED_AS_SPAM: {
-    id: 'Expense.Activity.MarkedAsSpam',
-    defaultMessage: 'Expense marked as spam',
-  },
-});
 
 const getActivityColor = (activityType, theme) => {
   switch (ACTIVITIES_INFO[activityType]?.type) {
@@ -152,6 +159,7 @@ const ThreadActivity = ({ activity }) => {
   const { formatMessage } = useIntl();
   const theme = useTheme();
   const activityColor = getActivityColor(activity.type, theme);
+  const message = ACTIVITIES_INFO[activity.type]?.message;
   return (
     <div>
       {activity.individual && (
@@ -169,19 +177,15 @@ const ThreadActivity = ({ activity }) => {
                 }}
               />
             </Span>
-            <Span color="black.600" fontSize="12px" title={activity.createdAt}>
-              <FormattedMessage
-                id="UpdatedOnDate"
-                defaultMessage="Updated on {date, date, long}"
-                values={{ date: new Date(activity.createdAt) }}
-              />
+            <Span color="black.600" fontSize="12px">
+              <FormattedMessage defaultMessage="on {date}" values={{ date: <DateTime value={activity.createdAt} /> }} />
             </Span>
           </Flex>
         </Flex>
       )}
-      {MESSAGES[activity.type] && (
+      {message && (
         <ActivityMessage color={activityColor}>
-          {formatMessage(MESSAGES[activity.type])}
+          {formatMessage(message)}
           {activity.data?.error?.message ? `: ${activity.data.error.message}` : ''}
         </ActivityMessage>
       )}

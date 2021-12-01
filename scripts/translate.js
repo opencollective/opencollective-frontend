@@ -18,7 +18,7 @@ const DUPLICATED_IGNORED_IDS = new Set([
   'expense.rejected',
   'order.rejected',
 ]);
-const DUPLICATED_IGNORED_MESSAGES = new Set(['all', 'type', 'paid', 'pending', 'other']);
+const DUPLICATED_IGNORED_MESSAGES = new Set(['all', 'type', 'paid', 'pending', 'other', 'expired']);
 
 /* eslint-disable no-console */
 

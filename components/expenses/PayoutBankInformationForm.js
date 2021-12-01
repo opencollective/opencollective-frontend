@@ -10,13 +10,14 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
+import { I18nSupportLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledSelect from '../StyledSelect';
 import StyledSpinner from '../StyledSpinner';
 import StyledTooltip from '../StyledTooltip';
-import { P } from '../Text';
+import { P, Span } from '../Text';
 
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
 const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => ({ label: name, value: key }));
@@ -59,8 +60,7 @@ const requiredFieldsQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const Input = props => {
-  const { input, getFieldName, disabled, currency, loading, refetch, formik, host } = props;
+const Input = ({ input, getFieldName, disabled, currency, loading, refetch, formik, host }) => {
   const isAccountHolderName = input.key === 'accountHolderName';
   const fieldName = isAccountHolderName ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
   let validate = input.required ? value => (value ? undefined : `${input.name} is required`) : undefined;
@@ -73,8 +73,6 @@ const Input = props => {
           return `${input.name} is required`;
         } else if (!matches && value) {
           return input.validationError || `Invalid ${input.name}`;
-        } else if (isAccountHolderName && (!value || value.match(/^[^\s]{1}\b/))) {
-          return 'Your full name is required';
         }
       };
     }
@@ -89,16 +87,29 @@ const Input = props => {
               error={(meta.touched || disabled) && meta.error}
               hint={input.hint}
             >
-              {() => (
-                <StyledInput
-                  {...field}
-                  placeholder={input.example}
-                  error={(meta.touched || disabled) && meta.error}
-                  disabled={disabled}
-                  width="100%"
-                  value={get(formik.values, field.name) || ''}
-                />
-              )}
+              {() => {
+                const inputValue = get(formik.values, field.name);
+                return (
+                  <React.Fragment>
+                    <StyledInput
+                      {...field}
+                      placeholder={input.example}
+                      error={(meta.touched || disabled) && meta.error}
+                      disabled={disabled}
+                      width="100%"
+                      value={inputValue || ''}
+                    />
+                    {isAccountHolderName && inputValue && inputValue.match(/^[^\s]{1}\b/) && (
+                      <MessageBox mt={2} fontSize="12px" type="warning" withIcon>
+                        <FormattedMessage
+                          id="Warning.AccountHolderNameNotValid"
+                          defaultMessage="Please make sure this name matches exactly what is written on your bank account details, otherwise the payment might fail."
+                        />
+                      </MessageBox>
+                    )}
+                  </React.Fragment>
+                );
+              }}
             </StyledInputField>
           )}
         </Field>
@@ -156,7 +167,7 @@ const Input = props => {
                     formik.setFieldValue(field.name, value);
                     if (input.refreshRequirementsOnChange) {
                       refetch({
-                        slug: host.slug,
+                        slug: host ? host.slug : TW_API_COLLECTIVE_SLUG,
                         currency,
                         accountDetails: get(set({ ...formik.values }, field.name, value), getFieldName('data')),
                       });
@@ -213,7 +224,12 @@ FieldGroup.propTypes = {
 const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   const { loading, error, data, refetch } = useQuery(requiredFieldsQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: host.slug, currency },
+    // A) If `fixedCurrency` was passed in PayoutBankInformationForm (2) (3)
+    //    then `host` is not set and we'll use the Platform Wise account
+    // B) If `host` is set, we expect to be in 2 cases:
+    //      * The Collective Host has Wise configured and we should be able to fetch `requiredFields` from it
+    //      * The Collective Host doesn't have Wise configured and `host` is already switched to the Platform account
+    variables: { slug: host ? host.slug : TW_API_COLLECTIVE_SLUG, currency },
   });
 
   if (loading && !data) {
@@ -231,9 +247,25 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     );
   }
 
+  // If at this point we don't have `requiredFields` available,
+  // we can display an error message, Wise is likely not configured on the platform
+  if (!data?.host?.transferwise?.requiredFields) {
+    if (process.env.OC_ENV === 'development') {
+      return (
+        <MessageBox fontSize="12px" type="warning">
+          Could not fetch requiredFields, Wise is likely not configured on the platform.
+        </MessageBox>
+      );
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn('Could not fetch requiredFields through Wise.');
+      return;
+    }
+  }
+
   const transactionTypeValues = data.host.transferwise.requiredFields.map(rf => ({ label: rf.title, value: rf.type }));
   // Some currencies offer different methods for the transaction
-  // e.g. USD allows ABA and SWIFT transactions.
+  // e.g., USD allows ABA and SWIFT transactions.
   const availableMethods = data.host.transferwise.requiredFields.find(
     method => method.type === get(formik.values, getFieldName(`data.type`)),
   );
@@ -292,7 +324,9 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
       {Boolean(addressFields.length) && (
         <React.Fragment>
           <Box mt={3} flex="1" fontSize="14px" fontWeight="bold">
-            <FormattedMessage id="PayoutBankInformationForm.RecipientAddress" defaultMessage="Recipient's Address" />
+            <Span mr={2}>
+              <FormattedMessage id="PayoutBankInformationForm.RecipientAddress" defaultMessage="Recipient's Address" />
+            </Span>
             <StyledTooltip
               content={
                 <FormattedMessage
@@ -347,33 +381,73 @@ const availableCurrenciesQuery = gqlV2/* GraphQL */ `
 
 /**
  * Form for payout bank information. Must be used with Formik.
+ *
+ * The main goal is to use this component in the Expense Flow (1) but it's also reused in:
+ *
+ * - Collective onboarding, AcceptContributionsOurselvesOrOrg.js (2)
+ * - In Collective/Host settings -> Receiving Money, BankTransfer.js (3)
+ *
+ * In (1) we pass the host where the expense is submitted and fixedCurrency is never set.
+ *   * If Wise is configured on that host, `availableCurrencies` should normally be available.
+ *   * If it's not, we'll have to fetch `availableCurrencies` from the Platform Wise account
+ *
+ * In (2) and (3), we never pass an `host` and `fixedCurrency` is sometimes set.
+ *   * If `fixedCurrency` is set, we don't need `availableCurrencies`
+ *   * If `fixedCurrency` is not set, we'll fetch `availableCurrencies` from the Platform Wise account
  */
 const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, ignoreBlockedCurrencies, optional }) => {
   const { data, loading } = useQuery(availableCurrenciesQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: host?.transferwise ? host.slug : TW_API_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
-    // Skip fetching/loading if the currency is fixed or availableCurrencies was pre-loaded
-    skip: Boolean(fixedCurrency || host.transferwise?.availableCurrencies),
+    variables: { slug: TW_API_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
+    // Skip fetching/loading if the currency is fixed (2) (3)
+    // Or if availableCurrencies is already available. Expense Flow + Host with Wise configured (1)
+    skip: Boolean(fixedCurrency || host?.transferwise?.availableCurrencies),
   });
   const formik = useFormikContext();
   const { formatMessage } = useIntl();
-  host = data?.host || host;
 
   // Display spinner if loading
   if (loading) {
     return <StyledSpinner />;
-  } else if (!host.transferwise?.availableCurrencies && !fixedCurrency) {
-    return null;
   }
 
-  const availableCurrencies = host.transferwise?.availableCurrencies || data?.host?.transferwise?.availableCurrencies;
-  const currencies = formatStringOptions(fixedCurrency ? [fixedCurrency] : availableCurrencies.map(c => c.code));
+  // Fiscal Host with Wise configured (1) OR Platform account as fallback (1) or default (2) (3)
+  // NOTE: If `fixedCurrency is set`, `wiseHost` will be null (at least today)
+  const wiseHost = data?.host || host;
+
+  const availableCurrencies = wiseHost?.transferwise?.availableCurrencies;
+
+  let currencies;
+  if (fixedCurrency) {
+    currencies = formatStringOptions([fixedCurrency]);
+  } else if (availableCurrencies) {
+    currencies = formatStringOptions(availableCurrencies.map(c => c.code));
+  } else {
+    // If at this point we don't have `fixedCurrency` or `availableCurrencies`,
+    // we can display an error message, Wise is likely not configured on the platform
+    return (
+      <MessageBox fontSize="12px" type="warning">
+        <FormattedMessage
+          defaultMessage="An error ocurred while preparing the form for bank accounts. Please contact <I18nSupportLink>support</I18nSupportLink>"
+          values={{ I18nSupportLink }}
+        />
+      </MessageBox>
+    );
+  }
+
   if (optional) {
     currencies.unshift({ label: 'No selection', value: null });
   }
+
   const currencyFieldName = getFieldName('data.currency');
   const selectedCurrency = get(formik.values, currencyFieldName);
+
   const validateCurrencyMinimumAmount = () => {
+    // Skip if currency is fixed (2) (3)
+    // or if `availableCurrencies` is not set (but we're not supposed to be there anyway)
+    if (fixedCurrency || !availableCurrencies) {
+      return;
+    }
     // Only validate minimum amount if the form has items
     if (formik?.values?.items?.length > 0) {
       const invoiceTotalAmount = formik.values.items.reduce(
@@ -383,9 +457,10 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
       const minAmountForSelectedCurrency =
         availableCurrencies.find(c => c.code === selectedCurrency)?.minInvoiceAmount * 100;
       if (invoiceTotalAmount < minAmountForSelectedCurrency) {
-        return `The minimum amount for transfering to ${selectedCurrency} is ${formatCurrency(
+        // TODO intl
+        return `The minimum amount for transferring to ${selectedCurrency} is ${formatCurrency(
           minAmountForSelectedCurrency,
-          host.currency,
+          wiseHost.currency,
         )}`;
       }
     }
@@ -418,7 +493,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
           disabled={!isNew}
           formik={formik}
           getFieldName={getFieldName}
-          host={host}
+          host={wiseHost}
         />
       )}
       {!selectedCurrency && !currencies?.length && (

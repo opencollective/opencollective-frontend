@@ -10,7 +10,7 @@ import copy from 'copy-to-clipboard';
 import { defineMessages, injectIntl } from 'react-intl';
 
 // Open Collective Frontend imports
-import { facebookShareURL, linkedInShareURL, mailToURL, tweetURL } from '../../lib/url_helpers';
+import { facebookShareURL, linkedInShareURL, mailToURL, tweetURL } from '../../lib/url-helpers';
 
 import Container from '../Container';
 import { Flex } from '../Grid';

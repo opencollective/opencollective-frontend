@@ -9,7 +9,6 @@ import styled from 'styled-components';
 
 import { HELP_MESSAGE } from '../../lib/constants/dismissable-help-message';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { parseToBoolean } from '../../lib/utils';
 
 import Container from '../Container';
 import DismissibleMessage from '../DismissibleMessage';
@@ -19,8 +18,6 @@ import StyledRoundButton from '../StyledRoundButton';
 import StyledTooltip from '../StyledTooltip';
 
 import ChangelogNotificationDropdown from './ChangelogNotificationDropdown';
-
-const CHANGE_LOG_UPDATES_ENABLED = parseToBoolean(process.env.CHANGE_LOG_UPDATES_ENABLED);
 
 const FlameIcon = styled(StyledRoundButton)`
   border-radius: 50%;
@@ -63,7 +60,7 @@ const ChangelogTrigger = props => {
     <FormattedMessage id="ChangelogTrigger.tooltip.content" defaultMessage="What's new with Open Collective" />
   );
 
-  if (!LoggedInUser || !CHANGE_LOG_UPDATES_ENABLED) {
+  if (!LoggedInUser) {
     return null;
   }
 

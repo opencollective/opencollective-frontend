@@ -21,13 +21,13 @@ const messages = defineMessages({
       'Fiscal hosts usually have specific topics or areas they are designed to serve. When it comes to the application process, their acceptance criteria will fit in that scope.',
   },
   'fiscalHosting.location': {
-    id: 'fiscalHosting.location',
+    id: 'SectionLocation.Title',
     defaultMessage: 'Location',
   },
   'fiscalHosting.location.description': {
     id: 'fiscalHosting.location.description',
     defaultMessage:
-      'Which country a fiscal host is based in will determine the currency you your money will be accounted in, and where you are located in a legal sense, e.g. if you are applying for an EU grant, you might need a fiscal host based in the EU.',
+      'Which country a fiscal host is based in will determine the currency you your money will be accounted in, and where you are located in a legal sense, e.g., if you are applying for an EU grant, you might need a fiscal host based in the EU.',
   },
   'fiscalHosting.legalStructure': {
     id: 'fiscalHosting.legalStructure',
@@ -43,9 +43,8 @@ const messages = defineMessages({
     defaultMessage: 'Services offered',
   },
   'fiscalHosting.serviceOffered.description': {
-    id: 'fiscalHosting.serviceOffered.description',
     defaultMessage:
-      'Do you want your host to be a charity, a company, a cooperative, or something else? E.g. a charity structure can enable tax-deductible donations, but may also have more restrictions on allowed activities.',
+      'Some Fiscal Hosts are very light-touch, while others provide significant support or programming and options like employment and insurance. Fiscal Hosts with a specific focus, such as open source projects or climate movement groups, may offer services specifically tailored to that community.',
   },
   'fiscalHosting.fees': {
     id: 'fiscalHosting.fees',

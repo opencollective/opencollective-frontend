@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl, useIntl } from 'react-intl';
 
 import { formatValueAsCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
@@ -9,6 +9,8 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import Container from '../../Container';
 import { Box } from '../../Grid';
 import Loading from '../../Loading';
+import MessageBox from '../../MessageBox';
+import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import StyledCard from '../../StyledCard';
 import { P, Span } from '../../Text';
 import SettingsTitle from '../SettingsTitle';
@@ -20,6 +22,7 @@ const metricsQuery = gqlV2/* GraphQL */ `
       slug
       hostFeePercent
       platformFeePercent
+      isActive
       plan {
         id
         name
@@ -64,13 +67,22 @@ const metricsQuery = gqlV2/* GraphQL */ `
 `;
 
 const HostMetrics = props => {
-  const { loading, data } = useQuery(metricsQuery, {
+  const { locale } = useIntl();
+  const { loading, data, error } = useQuery(metricsQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: props.collective.slug },
   });
 
   if (loading) {
     return <Loading />;
+  } else if (error) {
+    return <MessageBoxGraphqlError error={error} maxWidth={500} m="0 auto" />;
+  } else if (data.host && !data.host.isActive) {
+    return (
+      <MessageBox withIcon type="error" maxWidth={400} m="0 auto">
+        <FormattedMessage id="host.onlyActive" defaultMessage="This page is only available for active fiscal hosts" />
+      </MessageBox>
+    );
   }
 
   const displayHostFees = data.host.hostFeePercent || data.host.hostMetrics.hostFees.value ? true : false;
@@ -98,7 +110,7 @@ const HostMetrics = props => {
 
   return (
     <Fragment>
-      <SettingsTitle>
+      <SettingsTitle contentOnly={props.contentOnly}>
         <FormattedMessage id="Host.Metrics" defaultMessage="Host Metrics" />
       </SettingsTitle>
 
@@ -116,7 +128,7 @@ const HostMetrics = props => {
                 <FormattedMessage id="Host.Metrics.TotalMoneyManages" defaultMessage="Total Money Managed" />
               </P>
               <P fontSize="20px" mt={1}>
-                {formatValueAsCurrency(data.host.hostMetrics.totalMoneyManaged)}{' '}
+                {formatValueAsCurrency(data.host.hostMetrics.totalMoneyManaged, { locale })}{' '}
                 <Span color="black.400">{data.host.hostMetrics.totalMoneyManaged.currency}</Span>
               </P>
               <P fontSize="10px">
@@ -133,7 +145,7 @@ const HostMetrics = props => {
                 <FormattedMessage id="Host.Metrics.HostFees" defaultMessage="Host Fees" />
               </P>
               <P fontSize="20px" mt={1}>
-                {formatValueAsCurrency(data.host.hostMetrics.hostFees)}{' '}
+                {formatValueAsCurrency(data.host.hostMetrics.hostFees, { locale })}{' '}
                 <Span color="black.400">{data.host.hostMetrics.hostFees.currency}</Span>
               </P>
               <P fontSize="10px">
@@ -151,7 +163,7 @@ const HostMetrics = props => {
                   <FormattedMessage id="Host.Metrics.PlatformFees" defaultMessage="Platform Fees" />
                 </P>
                 <P fontSize="20px" mt={1}>
-                  {formatValueAsCurrency(data.host.hostMetrics.platformFees)}{' '}
+                  {formatValueAsCurrency(data.host.hostMetrics.platformFees, { locale })}{' '}
                   <Span color="black.400">{data.host.hostMetrics.platformFees.currency}</Span>
                 </P>
                 <P fontSize="10px">
@@ -166,7 +178,7 @@ const HostMetrics = props => {
                   <FormattedMessage id="Host.Metrics.PendingPlatformFees" defaultMessage="Pending Platform Fees" />
                 </P>
                 <P fontSize="20px" mt={1}>
-                  {formatValueAsCurrency(data.host.hostMetrics.pendingPlatformFees)}{' '}
+                  {formatValueAsCurrency(data.host.hostMetrics.pendingPlatformFees, { locale })}{' '}
                   <Span color="black.400">{data.host.hostMetrics.pendingPlatformFees.currency}</Span>
                 </P>
                 <P fontSize="10px">
@@ -185,7 +197,7 @@ const HostMetrics = props => {
                   <FormattedMessage id="Host.Metrics.PlatformTips" defaultMessage="Platform Tips" />
                 </P>
                 <P fontSize="20px" mt={1}>
-                  {formatValueAsCurrency(data.host.hostMetrics.platformTips)}{' '}
+                  {formatValueAsCurrency(data.host.hostMetrics.platformTips, { locale })}{' '}
                   <Span color="black.400">{data.host.hostMetrics.platformTips.currency}</Span>
                 </P>
                 <P fontSize="10px">
@@ -200,7 +212,7 @@ const HostMetrics = props => {
                   <FormattedMessage id="Host.Metrics.PendingPlatformTips" defaultMessage="Pending Platform Tips" />
                 </P>
                 <P fontSize="20px" mt={1}>
-                  {formatValueAsCurrency(data.host.hostMetrics.pendingPlatformTips)}{' '}
+                  {formatValueAsCurrency(data.host.hostMetrics.pendingPlatformTips, { locale })}{' '}
                   <Span color="black.400">{data.host.hostMetrics.pendingPlatformTips.currency}</Span>
                 </P>
                 <P fontSize="10px">
@@ -223,7 +235,7 @@ const HostMetrics = props => {
                   />
                 </P>
                 <P fontSize="20px" mt={1}>
-                  {formatValueAsCurrency(data.host.hostMetrics.hostFeeShare)}{' '}
+                  {formatValueAsCurrency(data.host.hostMetrics.hostFeeShare, { locale })}{' '}
                   <Span color="black.400">{data.host.hostMetrics.hostFeeShare.currency}</Span>
                 </P>
                 <P fontSize="10px">
@@ -238,7 +250,7 @@ const HostMetrics = props => {
                   <FormattedMessage id="Host.Metrics.PendingHostFeeShare" defaultMessage="Pending Host Fee Share" />
                 </P>
                 <P fontSize="20px" mt={1}>
-                  {formatValueAsCurrency(data.host.hostMetrics.pendingHostFeeShare)}{' '}
+                  {formatValueAsCurrency(data.host.hostMetrics.pendingHostFeeShare, { locale })}{' '}
                   <Span color="black.400">{data.host.hostMetrics.pendingHostFeeShare.currency}</Span>
                 </P>
                 <P fontSize="10px">
@@ -261,6 +273,7 @@ HostMetrics.propTypes = {
     slug: PropTypes.string,
   }),
   hideTopsection: PropTypes.func.isRequired,
+  contentOnly: PropTypes.bool,
 };
 
 export default injectIntl(HostMetrics);

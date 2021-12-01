@@ -5,13 +5,13 @@ import { get } from 'lodash';
 import { injectIntl } from 'react-intl';
 
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
+import { floatAmountToCents } from '../lib/currency-utils';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { floatAmountToCents } from '../lib/math';
 import { compose, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
-import { STEPS } from '../components/contribution-flow/constants';
+import { PAYMENT_FLOW, STEPS } from '../components/contribution-flow/constants';
 import ContributionBlocker, {
   CONTRIBUTION_BLOCKER,
   getContributionBlocker,
@@ -63,21 +63,27 @@ class NewContributionFlowPage extends React.Component {
       description: query.description ? decodeURIComponent(query.description) : undefined,
       interval: query.interval,
       verb: query.verb,
-      paymentMethod: query.paymentMethod,
+      paymentFlow: query.paymentFlow,
+      hideCreditCardPostalCode: parseToBoolean(query.hideCreditCardPostalCode),
       redirect: query.redirect,
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
       contributeAs: query.contributeAs,
+      disabledPaymentMethodTypes: query.disabledPaymentMethodTypes
+        ? query.disabledPaymentMethodTypes.split(',')
+        : undefined,
       error: query.error,
+      tags: query.tags ? query.tags.split(',') : undefined,
     };
   }
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
     verb: PropTypes.string,
-    paymentMethod: PropTypes.string,
+    paymentFlow: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
+    disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
     quantity: PropTypes.number,
     totalAmount: PropTypes.number,
     platformContribution: PropTypes.number,
@@ -87,6 +93,7 @@ class NewContributionFlowPage extends React.Component {
     error: PropTypes.string,
     contributeAs: PropTypes.string,
     skipStepDetails: PropTypes.bool,
+    hideCreditCardPostalCode: PropTypes.bool,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
@@ -97,6 +104,7 @@ class NewContributionFlowPage extends React.Component {
     loadStripe: PropTypes.func,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
+    tags: PropTypes.arrayOf(PropTypes.string),
     step: PropTypes.oneOf(Object.values(STEPS)),
   };
 
@@ -124,8 +132,9 @@ class NewContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, step, LoggedInUser, error } = this.props;
+    const { data = {}, step, paymentFlow, LoggedInUser, error } = this.props;
     const { account, tier } = data;
+    const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
 
     if (data.loading) {
       return (
@@ -135,14 +144,20 @@ class NewContributionFlowPage extends React.Component {
       );
     }
 
-    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
+    const contributionBlocker = getContributionBlocker(
+      LoggedInUser,
+      account,
+      tier,
+      Boolean(this.props.tierId),
+      isCrypto,
+    );
     if (contributionBlocker) {
       if (contributionBlocker.reason === CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION) {
         return <Redirect to={`/${account.slug}/contribute`} />;
       }
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
-      return <ContributionFlowSuccess collective={account} isCrypto={this.props.paymentMethod === 'crypto'} />;
+      return <ContributionFlowSuccess collective={account} isCrypto={isCrypto} />;
     } else {
       return (
         <ContributionFlowContainer
@@ -151,16 +166,19 @@ class NewContributionFlowPage extends React.Component {
           tier={tier}
           step={step}
           verb={this.props.verb}
-          paymentMethod={this.props.paymentMethod}
+          paymentFlow={paymentFlow}
           redirect={this.props.redirect}
           description={this.props.description}
           defaultQuantity={this.props.quantity}
+          disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
           fixedInterval={this.props.interval}
           fixedAmount={this.props.totalAmount}
           platformContribution={this.props.platformContribution}
           customData={this.props.customData}
           skipStepDetails={this.props.skipStepDetails}
+          hideCreditCardPostalCode={this.props.hideCreditCardPostalCode}
           contributeAs={this.props.contributeAs}
+          tags={this.props.tags}
           error={error}
         />
       );

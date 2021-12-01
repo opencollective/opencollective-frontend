@@ -1,10 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
+import { Question } from '@styled-icons/remix-line/Question';
 import { FormattedMessage } from 'react-intl';
 
+import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import { Box, Flex } from './Grid';
+import StyledTooltip from './StyledTooltip';
 import { P, Span } from './Text';
+
+const PrivateIconWithSpace = () => (
+  <React.Fragment>
+    &nbsp;
+    <PrivateInfoIcon tooltipProps={{ containerVerticalAlign: 'text-top' }} />
+  </React.Fragment>
+);
+
+// eslint-disable-next-line react/prop-types
+const QuestionMarkIconWithSpace = ({ helpText, labelFontSize, labelColor }) => (
+  <StyledTooltip content={helpText}>
+    &nbsp;
+    <Question size={labelFontSize} color={labelColor} />
+  </StyledTooltip>
+);
 
 /**
  * Form field to display an input element with a label and errors. Uses [renderProps](https://reactjs.org/docs/render-props.html#using-props-other-than-render) to pass field props like 'name' and 'id' to child input.
@@ -26,14 +44,19 @@ const StyledInputField = ({
   labelProps,
   hideOptionalLabel,
   useRequiredLabel,
+  isPrivate,
+  helpText,
   ...props
 }) => {
-  const labelContent = label && <Span color={labelColor}>{label}</Span>;
   const isCheckbox = inputType === 'checkbox';
   htmlFor = htmlFor || (name ? `input-${name}` : undefined);
-
   const displayOptionalLabel = hideOptionalLabel ? false : required === false;
   const displayRequiredLabel = useRequiredLabel ? required === true : false;
+  const labelContent = label && (
+    <Span color={labelColor} fontSize={labelFontSize} fontWeight={labelFontWeight}>
+      {label}
+    </Span>
+  );
 
   return (
     <Box {...props}>
@@ -42,7 +65,8 @@ const StyledInputField = ({
           <P
             as="label"
             htmlFor={htmlFor}
-            display="block"
+            display="flex"
+            alignItems="center"
             fontSize={labelFontSize}
             fontWeight={labelFontWeight}
             mb={isCheckbox ? 0 : 2}
@@ -52,17 +76,26 @@ const StyledInputField = ({
             {...labelProps}
           >
             {displayOptionalLabel && !isCheckbox ? (
-              <Span color="black.500">
+              <Span color="black.700" fontWeight="normal">
                 <FormattedMessage
                   id="OptionalFieldLabel"
                   defaultMessage="{field} (optional)"
                   values={{ field: labelContent }}
                 />
+                {isPrivate && <PrivateIconWithSpace />}
               </Span>
             ) : displayRequiredLabel ? (
-              <Span color="black.500">{labelContent} *</Span>
+              <Span color="black.700">
+                {labelContent} * {isPrivate && <PrivateIconWithSpace />}
+              </Span>
             ) : (
-              labelContent
+              <React.Fragment>
+                {labelContent}
+                {isPrivate && <PrivateIconWithSpace />}
+              </React.Fragment>
+            )}
+            {helpText && (
+              <QuestionMarkIconWithSpace helpText={helpText} labelColor={labelColor} labelFontSize={labelFontSize} />
             )}
           </P>
         )}
@@ -87,8 +120,8 @@ const StyledInputField = ({
         </Box>
       )}
       {hint && !error && (
-        <Box pt={0}>
-          <Span ml={1} fontSize="12px" color="black.500" css={{ verticalAlign: 'middle' }}>
+        <Box mt="6px">
+          <Span fontSize="12px" color="black.700" css={{ verticalAlign: 'middle' }}>
             {hint}
           </Span>
         </Box>
@@ -102,6 +135,8 @@ StyledInputField.propTypes = {
   children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
   /** Show disabled state for field */
   disabled: PropTypes.bool,
+  /** If true, a "Private" lock icon will be displayed next to the label */
+  isPrivate: PropTypes.bool,
   /** text to display below the input or error status */
   error: PropTypes.any,
   /** text to display below the input when there's no error */
@@ -127,6 +162,8 @@ StyledInputField.propTypes = {
   labelColor: PropTypes.string,
   /** Anything here will be passed down to label */
   labelProps: PropTypes.object,
+  /** Help text that will appear next to the label (a small question mark with help text shown when hovered) */
+  helpText: PropTypes.string,
   /** All props from `Box` */
   ...Box.propTypes,
 };

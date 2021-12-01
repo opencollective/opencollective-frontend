@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { omit, size } from 'lodash';
+import { intersection, size } from 'lodash';
 import { useIntl } from 'react-intl';
 import { components as ReactSelectComponents } from 'react-select';
 import styled from 'styled-components';
@@ -12,15 +12,10 @@ import { i18nTransactionKind } from '../../../lib/i18n/transaction';
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 import { Span } from '../../Text';
 
-const DISPLAYED_TRANSACTION_KINDS = omit(TransactionKind, [
-  'PLATFORM_FEE',
-  'PREPAID_PAYMENT_METHOD',
-  'PAYMENT_PROCESSOR_FEE',
-]);
-
 export const getDefaultKinds = () => {
   return [
     TransactionKind.ADDED_FUNDS,
+    TransactionKind.BALANCE_TRANSFER,
     TransactionKind.CONTRIBUTION,
     TransactionKind.EXPENSE,
     TransactionKind.PLATFORM_TIP,
@@ -77,17 +72,19 @@ const REACT_SELECT_COMPONENT_OVERRIDE = {
   MultiValue: () => null, // Items will be displayed as a truncated string in `TruncatedValueContainer `
 };
 
-const TransactionsKindFilter = ({ onChange, value, ...props }) => {
+const TransactionsKindFilter = ({ onChange, value, kinds, ...props }) => {
   const intl = useIntl();
   const getOption = (value, idx) => ({ label: i18nTransactionKind(intl, value), value, idx });
-  const options = React.useMemo(() => Object.values(DISPLAYED_TRANSACTION_KINDS).map(getOption), [intl]);
+  const displayedKinds = kinds && kinds.length ? kinds : getDefaultKinds();
+  const options = displayedKinds.map(getOption);
   const selectedOptions = React.useMemo(
-    () => (!value ? getDefaultKinds() : parseTransactionKinds(value)).map(getOption),
+    () => (!value ? intersection(getDefaultKinds(), displayedKinds) : parseTransactionKinds(value)).map(getOption),
     [value],
   );
   return (
     <StyledSelectFilter
       isSearchable={false}
+      isClearable={false}
       onChange={options => onChange(optionsToQueryString(options))}
       value={selectedOptions}
       options={options}
@@ -105,6 +102,7 @@ const TransactionsKindFilter = ({ onChange, value, ...props }) => {
 TransactionsKindFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string,
+  kinds: PropTypes.array,
 };
 
 export default TransactionsKindFilter;

@@ -17,7 +17,7 @@ import StyledRoundButton from '../StyledRoundButton';
 import { P, Span } from '../Text';
 
 import AddFundsModal from './AddFundsModal';
-import CollectiveFeesStructureModal from './CollectiveFeesStructureModal';
+import CollectiveSettingsModal from './CollectiveSettingsModal';
 
 const msg = defineMessages({
   addFunds: {
@@ -136,7 +136,7 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
         <AddFundsModal show collective={collective} host={host} onClose={() => setCurrentModal(null)} />
       )}
       {currentModal === 'feesStructure' && (
-        <CollectiveFeesStructureModal collective={collective} host={host} onClose={() => setCurrentModal(null)} />
+        <CollectiveSettingsModal collective={collective} host={host} onClose={() => setCurrentModal(null)} />
       )}
     </StyledCollectiveCard>
   );

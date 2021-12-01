@@ -31,8 +31,6 @@ import StripeOrBankAccountPicker from './StripeOrBankAccountPicker';
 
 import acceptOrganizationIllustration from '../../public/static/images/create-collective/acceptContributionsOrganizationHoverIllustration.png';
 
-const TW_API_COLLECTIVE_SLUG = process.env.TW_API_COLLECTIVE_SLUG;
-
 const { ORGANIZATION } = CollectiveType;
 
 const CreateNewOrg = styled(Flex)`
@@ -126,7 +124,7 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
   submitBankAccountInformation = async payoutMethodData => {
     // prepare objects
     const account = {
-      legacyId: this.state.organization ? this.state.organization.id : this.props.LoggedInUser.CollectiveId,
+      legacyId: this.state.organization ? this.state.organization.id : this.props.collective.id,
     };
 
     // try mutation
@@ -234,7 +232,10 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
               <Fragment>
                 <Image src={acceptOrganizationIllustration} alt="" />
                 <H2 fontSize="20px" fontWeight="bold" color="black.900" textAlign="center">
-                  <FormattedMessage id="acceptContributions.organization.subtitle" defaultMessage="Our organization" />
+                  <FormattedMessage
+                    id="acceptContributions.organization.subtitle"
+                    defaultMessage="Our Own Fiscal Host"
+                  />
                 </H2>
               </Fragment>
             ) : (
@@ -343,7 +344,6 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
                         <Form>
                           <Box width={['100%', '75%']}>
                             <PayoutBankInformationForm
-                              host={{ slug: TW_API_COLLECTIVE_SLUG }}
                               getFieldName={string => string}
                               // Fix currency if it was already linked to Stripe
                               fixedCurrency={

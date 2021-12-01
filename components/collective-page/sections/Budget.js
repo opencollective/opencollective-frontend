@@ -5,7 +5,7 @@ import { get, orderBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { TransactionKind } from '../../../lib/constants/transactions';
+import { EMPTY_ARRAY } from '../../../lib/constants/utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { DebitItem } from '../../budget/DebitCreditList';
@@ -19,6 +19,7 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledCard from '../../StyledCard';
 import StyledFilters from '../../StyledFilters';
 import { P } from '../../Text';
+import { getDefaultKinds } from '../../transactions/filters/TransactionsKindFilter';
 import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
 import TransactionItem from '../../transactions/TransactionItem';
 import { withUser } from '../../UserProvider';
@@ -31,10 +32,17 @@ export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
     host(slug: $hostSlug) {
       ...ExpenseHostFields
     }
-    transactions(account: { slug: $slug }, limit: $limit, hasExpense: false, kind: $kind) {
+    transactions(
+      account: { slug: $slug }
+      limit: $limit
+      kind: $kind
+      includeIncognitoTransactions: true
+      includeGiftCardTransactions: true
+      includeChildrenTransactions: true
+    ) {
       ...TransactionsQueryCollectionFragment
     }
-    expenses(account: { slug: $slug }, limit: $limit) {
+    expenses(account: { slug: $slug }, limit: $limit, includeChildrenExpenses: true) {
       totalCount
       nodes {
         ...ExpensesListFieldsFragment
@@ -46,16 +54,9 @@ export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
   ${expenseHostFields}
 `;
 
-const DEFAULT_KINDS = [
-  TransactionKind.ADDED_FUNDS,
-  TransactionKind.CONTRIBUTION,
-  TransactionKind.EXPENSE,
-  TransactionKind.PLATFORM_TIP,
-];
-
 // Any change here should be reflected in API's `server/graphql/cache.js`
 export const getBudgetSectionQueryVariables = (collectiveSlug, hostSlug) => {
-  return { slug: collectiveSlug, hostSlug, limit: 3, kind: DEFAULT_KINDS };
+  return { slug: collectiveSlug, hostSlug, limit: 3, kind: getDefaultKinds() };
 };
 
 const BudgetItemContainer = styled.div`
@@ -73,15 +74,13 @@ const geFilterLabel = filter => {
     case 'all':
       return <FormattedMessage id="SectionTransactions.All" defaultMessage="All" />;
     case 'expenses':
-      return <FormattedMessage id="section.expenses.title" defaultMessage="Expenses" />;
+      return <FormattedMessage id="Expenses" defaultMessage="Expenses" />;
     case 'transactions':
-      return <FormattedMessage id="SectionTransactions.Title" defaultMessage="Transactions" />;
+      return <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />;
     default:
       return null;
   }
 };
-
-const EMPTY_ARRAY = [];
 
 const getBudgetItems = (transactions, expenses, filter) => {
   if (filter === 'expenses') {
@@ -89,7 +88,11 @@ const getBudgetItems = (transactions, expenses, filter) => {
   } else if (filter === 'transactions') {
     return transactions;
   } else {
-    return orderBy([...transactions, ...expenses], 'createdAt', 'desc').slice(0, 3);
+    const expenseIds = expenses.map(expense => expense.id);
+    const transactionsWithoutMatchingExpense = transactions.filter(
+      transaction => !expenseIds.includes(transaction.expense?.id),
+    );
+    return orderBy([...transactionsWithoutMatchingExpense, ...expenses], 'createdAt', 'desc').slice(0, 3);
   }
 };
 

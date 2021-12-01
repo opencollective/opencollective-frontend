@@ -50,6 +50,7 @@ class EditPaymentMethods extends React.Component {
     editCollective: PropTypes.func.isRequired,
     /** From stripeLoader */
     loadStripe: PropTypes.func.isRequired,
+    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -185,9 +186,8 @@ class EditPaymentMethods extends React.Component {
   };
 
   getPaymentMethodsToDisplay() {
-    // TODO(paymentMethodType): remove toUpperCase once migration is over
     const paymentMethods = get(this.props, 'data.Collective.paymentMethods', []).filter(
-      pm => pm.balance > 0 || (pm.type?.toUpperCase() === PAYMENT_METHOD_TYPE.GIFTCARD && pm.monthlyLimitPerMember),
+      pm => pm.balance > 0 || (pm.type === PAYMENT_METHOD_TYPE.GIFTCARD && pm.monthlyLimitPerMember),
     );
     return sortBy(paymentMethods, ['type', 'id']);
   }
@@ -225,7 +225,7 @@ class EditPaymentMethods extends React.Component {
       <Loading />
     ) : (
       <Flex className="EditPaymentMethods" flexDirection="column">
-        <SettingsTitle>
+        <SettingsTitle contentOnly={this.props.contentOnly}>
           <FormattedMessage id="editCollective.menu.paymentMethods" defaultMessage="Payment Methods" />
         </SettingsTitle>
         {error && (
@@ -249,8 +249,7 @@ class EditPaymentMethods extends React.Component {
                   paymentMethod={pm}
                   subscriptions={pm.subscriptions}
                   hasMonthlyLimitPerMember={
-                    // TODO(paymentMethodType): remove toUpperCase once migration is over
-                    Collective.type === 'ORGANIZATION' && pm.type?.toUpperCase() !== PAYMENT_METHOD_TYPE.PREPAID
+                    Collective.type === 'ORGANIZATION' && pm.type !== PAYMENT_METHOD_TYPE.PREPAID
                   }
                   currency={pm.currency || Collective.currency}
                   collectiveSlug={Collective.slug}

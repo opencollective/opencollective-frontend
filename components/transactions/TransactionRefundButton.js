@@ -20,18 +20,19 @@ export const refundTransactionMutation = gqlV2/* GraphQL */ `
 `;
 
 const TransactionRefundButton = props => {
-  const [refundTransaction, { error: mutationError }] = useMutation(refundTransactionMutation, {
+  const [refundTransaction] = useMutation(refundTransactionMutation, {
     context: API_V2_CONTEXT,
   });
   const [isEnabled, setEnabled] = React.useState(false);
   const [error, setError] = React.useState(null);
 
-  React.useEffect(() => {
-    setError(mutationError);
-  }, [mutationError]);
-
   const handleRefundTransaction = async () => {
-    await refundTransaction({ variables: { transaction: { id: props.id } } });
+    try {
+      await refundTransaction({ variables: { transaction: { id: props.id } } });
+    } catch (error) {
+      setError(error);
+      return;
+    }
     props.onMutationSuccess();
     setEnabled(false);
   };

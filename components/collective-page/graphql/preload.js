@@ -15,7 +15,7 @@ import { getUpdatesSectionQueryVariables, updatesSectionQuery } from '../section
 
 import { budgetSectionQuery, collectivePageQuery, getCollectivePageQueryVariables } from './queries';
 
-export const preloadCollectivePageGraphlQueries = async (slug, client) => {
+export const preloadCollectivePageGraphqlQueries = async (slug, client) => {
   const result = await client.query({
     query: collectivePageQuery,
     variables: getCollectivePageQueryVariables(slug),

@@ -119,6 +119,10 @@ exports.REWRITES = [
     destination: '/editCollective',
   },
   {
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?',
+    destination: '/admin-panel',
+  },
+  {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contact',
     destination: '/collective-contact',
   },
@@ -166,8 +170,7 @@ exports.REWRITES = [
 
   // New Create Collective Flow
   {
-    source:
-      '/:hostCollectiveSlug?/:verb(create)/:version(v2)?/:category(opensource|community|climate|covid-19)?/:step(form)?',
+    source: '/:hostCollectiveSlug?/:verb(create)/:version(v2)?/:category(opensource|community|climate)?/:step(form)?',
     destination: '/create-collective',
   },
   // Events and Projects using collective page
@@ -216,7 +219,7 @@ exports.REWRITES = [
   },
   // New Routes -> New flow
   {
-    source: `/:collectiveSlug/:verb(donate)/:paymentMethod(crypto)?/:step(${contributionFlowSteps})?`,
+    source: `/:collectiveSlug/:verb(donate)/:paymentFlow(crypto)?/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
   {
@@ -236,7 +239,7 @@ exports.REWRITES = [
   },
   // Embed
   {
-    source: `/embed/:collectiveSlug/:verb(donate)/:paymentMethod(crypto)?/:step(${contributionFlowSteps})?`,
+    source: `/embed/:collectiveSlug/:verb(donate)/:paymentFlow(crypto)?/:step(${contributionFlowSteps})?`,
     destination: '/embed/contribution-flow',
   },
   {
@@ -254,7 +257,7 @@ exports.REWRITES = [
   },
   // Marketing Pages
   {
-    source: `/:pageSlug(how-it-works|gift-of-giving|gift-cards)`,
+    source: `/:pageSlug(gift-of-giving|gift-cards)`,
     destination: '/marketingPage',
   },
   // New accept financial contributions flow
@@ -303,16 +306,16 @@ exports.REWRITES = [
     destination: '/become-a-sponsor',
   },
   {
+    source: '/how-it-works',
+    destination: '/how-it-works',
+  },
+  {
     source: '/member-invitations',
     destination: '/member-invitations',
   },
   {
     source: '/applications',
     destination: '/applications',
-  },
-  {
-    source: '/opencollective/root-actions',
-    destination: '/root-actions',
   },
   // Collective
   // ----------
@@ -324,5 +327,15 @@ exports.REWRITES = [
   {
     source: '/:slug/:action(apply)?/:mode(onboarding)?/:step(administrators|contact-info|success)?',
     destination: '/collective-page',
+  },
+  // Root actions
+  {
+    source: '/opencollective/root-actions',
+    destination: '/root-actions',
+  },
+  // Terms of services for the host
+  {
+    source: '/:hostCollectiveSlug/terms',
+    destination: '/terms-of-fiscal-sponsorship',
   },
 ];

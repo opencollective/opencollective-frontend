@@ -70,7 +70,12 @@ describe('Conversations', () => {
       );
       cy.getByDataCy('conversation-preview').should(
         'contain.text',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, lev...',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. De hominibus dici non necesse est. Immo alio genere; Si longus, lev',
+      );
+      cy.getByDataCy('conversation-preview').should('contain.text', '...');
+      cy.getByDataCy('conversation-preview').should(
+        'not.contain.text',
+        'Quicquid enim a sapientia proficiscitur, id continuo debet expletum esse omnibus suis partibus.',
       );
     });
   });

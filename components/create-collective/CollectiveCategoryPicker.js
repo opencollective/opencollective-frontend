@@ -45,7 +45,6 @@ const messages = defineMessages({
     defaultMessage: 'For open source projects',
   },
   climate: { id: 'createCollective.category.climate', defaultMessage: 'For climate initiatives' },
-  covid: { id: 'createCollective.category.covid', defaultMessage: 'For COVID-19 groups' },
 });
 
 const CollectiveCategoryPicker = () => {
@@ -67,78 +66,52 @@ const CollectiveCategoryPicker = () => {
           <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
         </H1>
       </Box>
-      <Flex flexDirection="column" justifyContent="center" alignItems="center" mb={[5, 6]}>
-        <Box alignItems="center">
-          <Flex justifyContent="center" alignItems="center" flexDirection={['column', 'row']}>
-            <Container alignItems="center" width={[null, 280, 312]} mb={[4, 0]}>
-              <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                <Image
-                  src="/static/images/create-collective/openSourceIllustration.png"
-                  alt={formatMessage(messages.opensource)}
-                />
-                <Link href={`${baseRoute}/opensource`}>
-                  <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
-                    {formatMessage(messages.opensource)}
-                  </StyledButton>
-                </Link>
-                <ExamplesLink href="/discover?show=opensource" openInNewTab>
-                  <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
-                </ExamplesLink>
-              </Flex>
-            </Container>
-            <Container
-              borderLeft={['none', '1px solid #E6E8EB']}
-              borderTop={['1px solid #E6E8EB', 'none']}
-              alignItems="center"
-              width={[null, 280, 312]}
-              mb={[4, 0]}
-            >
-              <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                <Image
-                  src="/static/images/create-collective/climateIllustration.png"
-                  alt={formatMessage(messages.covid)}
-                />
-                <Link href={`${baseRoute}/covid-19`}>
-                  <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
-                    {formatMessage(messages.covid)}
-                  </StyledButton>
-                </Link>
-                <ExamplesLink href="/discover?show=covid-19" openInNewTab>
-                  <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
-                </ExamplesLink>
-              </Flex>
-            </Container>
-            <Container
-              borderLeft={['none', '1px solid #E6E8EB']}
-              borderTop={['1px solid #E6E8EB', 'none']}
-              alignItems="center"
-              width={[null, 280, 312]}
-            >
-              <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                <Image
-                  src="/static/images/create-collective/communityIllustration.png"
-                  alt={formatMessage(messages.community)}
-                />
-                <Link href={`${baseRoute}/community`}>
-                  <StyledButton
-                    fontSize="13px"
-                    buttonStyle="primary"
-                    minHeight="36px"
-                    mt={[2, 3]}
-                    mb={3}
-                    px={3}
-                    data-cy="ccf-category-picker-button-community"
-                  >
-                    {formatMessage(messages.community)}
-                  </StyledButton>
-                </Link>
-                <ExamplesLink href="/discover?show=community" openInNewTab>
-                  <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
-                </ExamplesLink>
-              </Flex>
-            </Container>
+      <Flex justifyContent="center" alignItems="center" flexDirection={['column', 'row']} mb={[5, 6]}>
+        <Container alignItems="center" width={[null, 280, 312]} mb={[4, 0]}>
+          <Flex flexDirection="column" justifyContent="center" alignItems="center">
+            <Image
+              src="/static/images/create-collective/openSourceIllustration.png"
+              alt={formatMessage(messages.opensource)}
+            />
+            <Link href={`${baseRoute}/opensource`}>
+              <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
+                {formatMessage(messages.opensource)}
+              </StyledButton>
+            </Link>
+            <ExamplesLink href="/discover?show=opensource" openInNewTab>
+              <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
+            </ExamplesLink>
           </Flex>
-        </Box>
+        </Container>
+        <Container
+          borderLeft={['none', '1px solid #E6E8EB']}
+          borderTop={['1px solid #E6E8EB', 'none']}
+          alignItems="center"
+          width={[null, 280, 312]}
+        >
+          <Flex flexDirection="column" justifyContent="center" alignItems="center">
+            <Image
+              src="/static/images/create-collective/communityIllustration.png"
+              alt={formatMessage(messages.community)}
+            />
+            <Link href={`${baseRoute}/community`}>
+              <StyledButton
+                fontSize="13px"
+                buttonStyle="primary"
+                minHeight="36px"
+                mt={[2, 3]}
+                mb={3}
+                px={3}
+                data-cy="ccf-category-picker-button-community"
+              >
+                {formatMessage(messages.community)}
+              </StyledButton>
+            </Link>
+            <ExamplesLink href="/discover?show=community" openInNewTab>
+              <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
+            </ExamplesLink>
+          </Flex>
+        </Container>
       </Flex>
     </Fragment>
   );

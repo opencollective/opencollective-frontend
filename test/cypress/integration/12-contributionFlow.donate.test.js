@@ -6,8 +6,8 @@ const visitParams = { onBeforeLoad: mockRecaptcha };
 
 describe('Contribution Flow: Donate', () => {
   it('Can donate as new user', () => {
-    const userParams = { firstName: 'Donate', lastName: 'Tester' };
-    cy.signup({ user: userParams, redirect: donateRoute, visitParams }).then(user => {
+    const userParams = { name: 'Donate Tester' };
+    cy.signup({ user: userParams, redirect: donateRoute, visitParams }).then(() => {
       // Mock clock so we can check next contribution date in a consistent way
       cy.clock(Date.parse('2042/05/25'));
 
@@ -41,10 +41,9 @@ describe('Contribution Flow: Donate', () => {
       // ---- Step profile ----
       cy.checkStepsProgress({ enabled: ['profile', 'details'], disabled: 'payment' });
       // Personal account must be the first entry, and it must be checked
-      const userName = `${user.firstName} ${user.lastName}`;
+      const userName = userParams.name;
       cy.contains('[data-cy="ContributionProfile"] > label:first', userName);
       cy.contains('[data-cy="ContributionProfile"] > label:first', `Personal`);
-      cy.contains('[data-cy="ContributionProfile"] > label:first', user.email);
       cy.get('[data-cy="ContributionProfile"] > label:first input[type=radio]').should('be.checked');
 
       // User profile is shown on step, all other steps must be disabled

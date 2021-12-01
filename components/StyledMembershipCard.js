@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage, injectIntl, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
 import { formatCurrency } from '../lib/currency-utils';
@@ -15,6 +15,7 @@ import { P, Span } from './Text';
  * A card to show a user's membership.
  */
 const StyledMembershipCard = ({ membership, intl, ...props }) => {
+  const { locale } = useIntl();
   const { account, since, role } = membership;
   return (
     <StyledCollectiveCard collective={account} {...props}>
@@ -25,7 +26,12 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
               <FormattedMessage
                 id="Membership.ContributorSince"
                 defaultMessage="{contributorType} since"
-                values={{ contributorType: formatMemberRole(intl, role) }}
+                values={{
+                  contributorType:
+                    role === roles.HOST
+                      ? intl.formatMessage({ defaultMessage: 'Hosted' })
+                      : formatMemberRole(intl, role),
+                }}
               />{' '}
               <Span display="block" fontSize="16px" fontWeight="bold">
                 <FormattedDate value={since} month="long" year="numeric" />
@@ -43,6 +49,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
                       the API only returns the total amount in collective's currency. */
                   formatCurrency(membership.totalDonations.valueInCents, membership.totalDonations.currency || 'USD', {
                     precision: 0,
+                    locale,
                   })
                 }
               </Span>

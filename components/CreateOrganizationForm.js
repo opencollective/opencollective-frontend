@@ -5,6 +5,7 @@ import { trim } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import slugify from 'slugify';
+import { isURL } from 'validator';
 
 import { BackButton } from './create-collective/CreateCollectiveForm';
 import OnboardingProfileCard from './onboarding-modal/OnboardingProfileCard';
@@ -24,12 +25,13 @@ import { withUser } from './UserProvider';
 
 const orgMessages = defineMessages({
   nameLabel: { id: 'Organization.Name', defaultMessage: 'Organization name' },
+  legalNameLabel: { id: 'LegalName', defaultMessage: 'Legal Name' },
   slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
   descriptionPlaceholder: {
     id: 'create.collective.placeholder',
     defaultMessage: 'Making the world a better place',
   },
-  websiteLabel: { id: 'createOrg.form.webstiteLabel', defaultMessage: 'Organization website' },
+  websiteLabel: { id: 'createOrg.form.websiteLabel', defaultMessage: 'Organization website' },
   suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
   descriptionLabel: {
     id: 'ExpenseForm.inviteeOrgDescriptionLabel',
@@ -57,12 +59,13 @@ const orgMessages = defineMessages({
   },
   errorWebsite: {
     id: 'createOrg.form.error.website',
-    defaultMessage: 'Enter a valid website, e.g. www.example.com or example.org',
+    defaultMessage: 'Enter a valid website, e.g., www.example.com or example.org',
   },
 });
 
 const placeholders = {
-  name: { id: 'placeholder.name', defaultMessage: 'e.g. Salesforce, Airbnb' },
+  name: { id: 'placeholder.name', defaultMessage: 'e.g., Salesforce, Airbnb' },
+  examples: { id: 'examples', defaultMessage: 'e.g., {examples}' },
   slug: { id: 'placeholder.slug', defaultMessage: 'Airbnb' },
   description: { id: 'placeholderdescription', defaultMessage: 'Making a world a better place' },
   website: { id: 'placeholder.website', defaultMessage: 'www.example.com' },
@@ -75,6 +78,7 @@ const CreateOrganizationForm = props => {
   const [admins, setAdmins] = useState([{ role: 'ADMIN', member: LoggedInUser.collective }]);
   const initialValues = {
     name: '',
+    legalName: '',
     slug: '',
     description: '',
     website: '',
@@ -86,6 +90,9 @@ const CreateOrganizationForm = props => {
     if (values.name.length > 50) {
       errors.name = intl.formatMessage(orgMessages.errorName);
     }
+    if (values.legalName.length > 255) {
+      errors.legalName = intl.formatMessage(orgMessages.errorName);
+    }
     if (values.slug.length > 30) {
       errors.slug = intl.formatMessage(orgMessages.errorSlug);
     }
@@ -95,16 +102,20 @@ const CreateOrganizationForm = props => {
     if (values.description.length > 150) {
       errors.description = intl.formatMessage(orgMessages.errorDescription);
     }
-    const regexExp = /[-a-zA-Z0-9@:%._/+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_/+.~#?&//=]*)?/gi;
 
-    if ((values.website && !values.website.match(new RegExp(regexExp))) || values.website.startsWith('http')) {
-      errors.website = intl.formatMessage(orgMessages.errorWebsite);
+    if (values.website) {
+      // Prepend https:// before validation if the URL doesn't start with a protocol
+      const websiteUrl = values.website.match(/^\w+:\/\/.*/) ? values.website : `https://${values.website}`;
+      if (!isURL(websiteUrl)) {
+        errors.website = intl.formatMessage(orgMessages.errorWebsite);
+      }
     }
+
     return errors;
   };
   const submit = values => {
-    const { name, slug, description, website } = values;
-    onSubmit({ name, slug, description, website, authorization });
+    const { name, legalName, slug, description, website } = values;
+    onSubmit({ name, legalName, slug, description, website, authorization });
   };
 
   const removeAdmin = collective => {
@@ -197,6 +208,36 @@ const CreateOrganizationForm = props => {
                       >
                         {inputProps => (
                           <Field as={StyledInput} {...inputProps} placeholder={intl.formatMessage(placeholders.name)} />
+                        )}
+                      </StyledInputField>
+                      <StyledInputField
+                        name="legalName"
+                        htmlFor="legalName"
+                        label={intl.formatMessage(orgMessages.legalNameLabel)}
+                        labelFontSize="13px"
+                        labelColor="black.700"
+                        labelFontWeight="600"
+                        fontSize="18px"
+                        value={values.legalName}
+                        required={false}
+                        mt={3}
+                        isPrivate
+                        data-cy="cof-form-legalName"
+                        hint={
+                          <FormattedMessage
+                            id="editCollective.legalName.description"
+                            defaultMessage="Legal names are private and used in receipts, tax forms, payment details on expenses, and other non-public contexts. Legal names are only visible to admins."
+                          />
+                        }
+                      >
+                        {inputProps => (
+                          <Field
+                            as={StyledInput}
+                            {...inputProps}
+                            placeholder={intl.formatMessage(placeholders.examples, {
+                              examples: 'Salesforce, Inc., Airbnb, Inc.',
+                            })}
+                          />
                         )}
                       </StyledInputField>
                       <StyledInputField
@@ -364,10 +405,7 @@ const CreateOrganizationForm = props => {
                       required
                       fontSize="12px"
                       label={
-                        <FormattedMessage
-                          id="createorganization.authorization.label"
-                          defaultMessage="I verify that I am authorized to represent this organization."
-                        />
+                        <FormattedMessage defaultMessage="I certify that I am authorized to represent this organization" />
                       }
                       onChange={({ checked }) => {
                         setAuthorization(checked);

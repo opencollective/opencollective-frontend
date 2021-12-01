@@ -1,12 +1,15 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FastField, Field } from 'formik';
-import { first, get, isEmpty, omit, partition, pick } from 'lodash';
+import { first, get, groupBy, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { compareNames } from '../../lib/collective.lib';
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { flattenObjectDeep } from '../../lib/utils';
@@ -20,13 +23,18 @@ import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
 import I18nAddressFields from '../I18nAddressFields';
 import InputTypeCountry from '../InputTypeCountry';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
+import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledTextarea from '../StyledTextarea';
+import StyledTooltip from '../StyledTooltip';
 
 import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
+
+const { INDIVIDUAL, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
 const msg = defineMessages({
   payeeLabel: {
@@ -54,8 +62,6 @@ const msg = defineMessages({
     defaultMessage: 'Physical address',
   },
 });
-
-const EMPTY_ARRAY = [];
 
 const setLocationFromPayee = (formik, payee) => {
   formik.setFieldValue('payeeLocation.country', payee?.location?.country || null);
@@ -98,6 +104,81 @@ const refreshPayoutProfile = (formik, payoutProfiles) => {
   formik.setValues({ ...formik.values, draft: omit(formik.values.draft, ['payee']), payee });
 };
 
+const getPayeeOptions = (intl, payoutProfiles) => {
+  const profileOptions = payoutProfiles.map(value => ({
+    value,
+    label: value.name,
+    [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
+  }));
+
+  const profilesByType = groupBy(profileOptions, p => p.value.type);
+
+  const myself = profilesByType[INDIVIDUAL] || [];
+  const myOrganizations = profilesByType[ORGANIZATION] || [];
+
+  myOrganizations.push({
+    label: null,
+    value: null,
+    isDisabled: true,
+    [FLAG_NEW_COLLECTIVE]: true,
+    types: [CollectiveType.ORGANIZATION],
+    __background__: 'white',
+  });
+
+  const payeeOptions = [
+    { options: myself, label: intl.formatMessage({ defaultMessage: 'Myself' }) },
+    { options: myOrganizations, label: intl.formatMessage({ defaultMessage: 'My Organizations' }) },
+  ];
+
+  if (profilesByType[COLLECTIVE]?.length) {
+    payeeOptions.push({
+      options: profilesByType[COLLECTIVE],
+      label: intl.formatMessage({ id: 'collective', defaultMessage: 'My Collectives' }),
+    });
+  }
+  if (profilesByType[FUND]?.length) {
+    payeeOptions.push({
+      options: profilesByType[FUND],
+      label: intl.formatMessage({ id: 'funds', defaultMessage: 'My Funds' }),
+    });
+  }
+  if (profilesByType[PROJECT]?.length) {
+    payeeOptions.push({
+      options: profilesByType[PROJECT],
+      label: intl.formatMessage({ defaultMessage: 'My Projects' }),
+    });
+  }
+  if (profilesByType[EVENT]?.length) {
+    payeeOptions.push({
+      options: profilesByType[EVENT],
+      label: intl.formatMessage({ id: 'events', defaultMessage: 'My Events' }),
+    });
+  }
+
+  return payeeOptions;
+};
+
+const checkStepOneCompleted = (values, isOnBehalf) => {
+  if (isOnBehalf) {
+    return Boolean(values.payee);
+  } else if (!isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod)))) {
+    return false; // There are some errors in the form
+  } else if (values.type !== expenseTypes.RECEIPT) {
+    // Require an address for non-receipt expenses
+    return Boolean(values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address);
+  } else {
+    return true;
+  }
+};
+
+const checkRequiresAddress = values => {
+  return (
+    values.payee &&
+    !values.payee.isInvite &&
+    [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST, expenseTypes.GRANT].includes(values.type)
+  );
+};
+
 const ExpenseFormPayeeStep = ({
   formik,
   payoutProfiles,
@@ -111,35 +192,13 @@ const ExpenseFormPayeeStep = ({
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, errors } = formik;
-  const stepOneCompleted = isOnBehalf
-    ? values.payee
-    : isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod))) &&
-      (values.type === expenseTypes.RECEIPT ||
-        (values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address));
-
+  const stepOneCompleted = checkStepOneCompleted(values, isOnBehalf);
   const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee), [values.payee]);
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
-  const requiresAddress =
-    values.payee &&
-    !values.payee.isInvite &&
-    [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST].includes(values.type);
+  const payeeOptions = React.useMemo(() => getPayeeOptions(intl, payoutProfiles), [payoutProfiles]);
+  const requiresAddress = checkRequiresAddress(values);
   const canInvite = !values?.status;
-  const profileOptions = payoutProfiles.map(value => ({
-    value,
-    label: value.name,
-    [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
-  }));
-  const [myself, myorganizations] = partition(profileOptions, p => p.value.type === 'INDIVIDUAL');
-
-  myorganizations.push({
-    label: null,
-    value: null,
-    isDisabled: true,
-    [FLAG_NEW_COLLECTIVE]: true,
-    types: [CollectiveType.ORGANIZATION],
-    __background__: 'white',
-  });
 
   const collectivePick = canInvite
     ? ({ id }) => (
@@ -177,10 +236,7 @@ const ExpenseFormPayeeStep = ({
               padding: '8px',
             },
           }}
-          emptyCustomOptions={[
-            { options: myself, label: 'Myself' },
-            { options: myorganizations, label: 'My Organizations' },
-          ]}
+          emptyCustomOptions={payeeOptions}
           customOptionsPosition={CUSTOM_OPTIONS_POSITION.BOTTOM}
           getDefaultOptions={build => values.payee && build(values.payee)}
           invitable
@@ -193,10 +249,7 @@ const ExpenseFormPayeeStep = ({
     : ({ id }) => (
         <CollectivePicker
           inputId={id}
-          customOptions={[
-            { options: myself, label: 'Myself' },
-            { options: myorganizations, label: 'My Organizations' },
-          ]}
+          customOptions={payeeOptions}
           getDefaultOptions={build => values.payee && build(values.payee)}
           data-cy="select-expense-payee"
           collective={values.payee}
@@ -225,6 +278,46 @@ const ExpenseFormPayeeStep = ({
               </StyledInputField>
             )}
           </Field>
+          {values.payee?.legalName && (
+            <Field name="legalName">
+              {({ field }) => (
+                <StyledInputField
+                  name={field.name}
+                  label={
+                    <React.Fragment>
+                      <FormattedMessage id="LegalName" defaultMessage="Legal Name" />
+                      &nbsp;
+                      <StyledTooltip
+                        content={() => (
+                          <FormattedMessage
+                            id="ExpenseForm.legalName.tooltip"
+                            defaultMessage="The legal name of the payee. This can be changed in your profile settings."
+                          />
+                        )}
+                      >
+                        <InfoCircle size={16} />
+                      </StyledTooltip>
+                    </React.Fragment>
+                  }
+                  labelFontSize="13px"
+                  flex="1"
+                  mt={3}
+                >
+                  <StyledInput value={values.payee.legalName} disabled />
+                  {values.payoutMethod?.data?.accountHolderName &&
+                    values.payee.legalName &&
+                    !compareNames(values.payoutMethod.data.accountHolderName, values.payee.legalName) && (
+                      <MessageBox mt={2} fontSize="12px" type="warning" withIcon>
+                        <FormattedMessage
+                          id="Warning.LegalNameNotMatchBankAccountName"
+                          defaultMessage="The legal name should match the bank account holder name in most cases. Otherwise payments may be delayed. If the payment is to an organization, please select or create that organization's profile instead of your individual profile as the payee."
+                        />
+                      </MessageBox>
+                    )}
+                </StyledInputField>
+              )}
+            </Field>
+          )}
           {requiresAddress && (
             <Fragment>
               <FastField name="payeeLocation.country">
@@ -302,7 +395,7 @@ const ExpenseFormPayeeStep = ({
             </Fragment>
           )}
         </Box>
-        <Box flexGrow="1" flexBasis="50%" display={values.payee?.payoutMethods ? 'block' : 'none'}>
+        <Box flexGrow="1" flexBasis="50%" display={values.payee ? 'block' : 'none'}>
           <Field name="payoutMethod">
             {({ field }) => (
               <StyledInputField
@@ -393,6 +486,7 @@ const ExpenseFormPayeeStep = ({
                   onNext?.();
                 } else {
                   // We use set touched here to display errors on fields that are not dirty.
+                  console.log('ExpenseFormPayeeStep > Validation failed', errors);
                   formik.setTouched(errors);
                   formik.setErrors(errors);
                 }

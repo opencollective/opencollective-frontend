@@ -6,14 +6,14 @@ import { injectIntl } from 'react-intl';
 import { isEmail, isHexColor } from 'validator';
 
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
+import { floatAmountToCents } from '../../lib/currency-utils';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { floatAmountToCents } from '../../lib/math';
 import { compose, parseToBoolean } from '../../lib/utils';
 
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';
 import Container from '../../components/Container';
-import { STEPS } from '../../components/contribution-flow/constants';
+import { PAYMENT_FLOW, STEPS } from '../../components/contribution-flow/constants';
 import ContributionBlocker, { getContributionBlocker } from '../../components/contribution-flow/ContributionBlocker';
 import ContributionFlowSuccess from '../../components/contribution-flow/ContributionFlowSuccess';
 import {
@@ -67,35 +67,44 @@ class NewContributionFlowPage extends React.Component {
       description: query.description ? decodeURIComponent(query.description) : undefined,
       interval: query.interval,
       verb: query.verb,
+      hideCreditCardPostalCode: parseToBoolean(query.hideCreditCardPostalCode),
       redirect: query.redirect,
       customData: query.data,
       skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
       contributeAs: query.contributeAs,
+      disabledPaymentMethodTypes: query.disabledPaymentMethodTypes
+        ? query.disabledPaymentMethodTypes.split(',')
+        : undefined,
       defaultEmail: query.defaultEmail && isEmail(query.defaultEmail) ? query.defaultEmail : null,
       defaultName: query.defaultName,
       useTheme: query.useTheme ? parseToBoolean(query.useTheme) : false,
       hideHeader: query.hideHeader ? parseToBoolean(query.hideHeader) : false,
       backgroundColor: backgroundColor && isHexColor(backgroundColor) ? backgroundColor : undefined,
+      error: query.error,
+      tags: query.tags ? query.tags.split(',') : undefined,
     };
   }
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
-    paymentMethod: PropTypes.string,
+    paymentFlow: PropTypes.string,
     verb: PropTypes.string,
     redirect: PropTypes.string,
     description: PropTypes.string,
     backgroundColor: PropTypes.string,
+    disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
     quantity: PropTypes.number,
     totalAmount: PropTypes.number,
     platformContribution: PropTypes.number,
     interval: PropTypes.string,
     tierId: PropTypes.number,
     customData: PropTypes.object,
+    error: PropTypes.string,
     contributeAs: PropTypes.string,
     defaultEmail: PropTypes.string,
     defaultName: PropTypes.string,
     skipStepDetails: PropTypes.bool,
+    hideCreditCardPostalCode: PropTypes.bool,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
@@ -108,6 +117,7 @@ class NewContributionFlowPage extends React.Component {
     loadingLoggedInUser: PropTypes.bool,
     useTheme: PropTypes.bool,
     hideHeader: PropTypes.bool,
+    tags: PropTypes.arrayOf(PropTypes.string),
     step: PropTypes.oneOf(Object.values(STEPS)),
   };
 
@@ -138,8 +148,9 @@ class NewContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, step, LoggedInUser } = this.props;
+    const { data = {}, step, paymentFlow, LoggedInUser } = this.props;
     const { account, tier } = data;
+    const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
 
     if (data.loading) {
       return (
@@ -149,11 +160,17 @@ class NewContributionFlowPage extends React.Component {
       );
     }
 
-    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
+    const contributionBlocker = getContributionBlocker(
+      LoggedInUser,
+      account,
+      tier,
+      Boolean(this.props.tierId),
+      isCrypto,
+    );
     if (contributionBlocker) {
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
-      return <ContributionFlowSuccess collective={account} isCrypto={this.props.paymentMethod === 'crypto'} isEmbed />;
+      return <ContributionFlowSuccess collective={account} isCrypto={isCrypto} isEmbed />;
     } else {
       return (
         <Box height="100%" pt={3}>
@@ -169,14 +186,18 @@ class NewContributionFlowPage extends React.Component {
             redirect={this.props.redirect}
             description={this.props.description}
             defaultQuantity={this.props.quantity}
+            disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
             fixedInterval={this.props.interval}
             fixedAmount={this.props.totalAmount}
             platformContribution={this.props.platformContribution}
             customData={this.props.customData}
             skipStepDetails={this.props.skipStepDetails}
+            hideCreditCardPostalCode={this.props.hideCreditCardPostalCode}
             contributeAs={this.props.contributeAs}
             defaultEmail={this.props.defaultEmail}
             defaultName={this.props.defaultName}
+            tags={this.props.tags}
+            error={this.props.error}
           />
         </Box>
       );

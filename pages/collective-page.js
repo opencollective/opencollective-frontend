@@ -9,13 +9,12 @@ import { generateNotFoundError } from '../lib/errors';
 
 import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
-import { preloadCollectivePageGraphlQueries } from '../components/collective-page/graphql/preload';
+import { preloadCollectivePageGraphqlQueries } from '../components/collective-page/graphql/preload';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../components/collective-page/graphql/queries';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
-import OnboardingModal from '../components/onboarding-modal/OnboardingModal';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
@@ -36,6 +35,12 @@ const IncognitoUserCollective = dynamic(
 /** A page rendered when collective is guest */
 const GuestUserProfile = dynamic(
   () => import(/* webpackChunkName: 'GuestUserProfile' */ '../components/GuestUserProfile'),
+  { loading: Loading },
+);
+
+/** Load the onboarding modal dynamically since it's not used often */
+const OnboardingModal = dynamic(
+  () => import(/* webpackChunkName: 'OnboardingModal' */ '../components/onboarding-modal/OnboardingModal'),
   { loading: Loading },
 );
 
@@ -63,7 +68,7 @@ class CollectivePage extends React.Component {
 
     // If on server side
     if (req) {
-      await preloadCollectivePageGraphlQueries(slug, client);
+      await preloadCollectivePageGraphqlQueries(slug, client);
       skipDataFromTree = true;
     }
 

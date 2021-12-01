@@ -31,9 +31,12 @@ import SettingsTitle from '../SettingsTitle';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const { FUND, PROJECT, EVENT } = CollectiveType;
+const { FUND, PROJECT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
 const { FIXED, FLEXIBLE } = AmountTypes;
+
+const SIMPLIFIED_TIER_TYPES = [TIER, SERVICE, PRODUCT, DONATION];
+const DEFAULT_TIER_TYPES = [...SIMPLIFIED_TIER_TYPES, MEMBERSHIP];
 
 class Tiers extends React.Component {
   static propTypes = {
@@ -45,6 +48,7 @@ class Tiers extends React.Component {
     onChange: PropTypes.func.isRequired,
     intl: PropTypes.object,
     title: PropTypes.string,
+    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -66,11 +70,11 @@ class Tiers extends React.Component {
       },
       SERVICE: {
         id: 'tier.type.service',
-        defaultMessage: 'service (e.g. support)',
+        defaultMessage: 'service (e.g., support)',
       },
       PRODUCT: {
         id: 'tier.type.product',
-        defaultMessage: 'product (e.g. t-shirt)',
+        defaultMessage: 'product (e.g., t-shirt)',
       },
       DONATION: { id: 'tier.type.donation', defaultMessage: 'donation (gift)' },
       TICKET: {
@@ -203,10 +207,10 @@ class Tiers extends React.Component {
       {
         name: 'type',
         type: 'select',
-        options: getOptions(props.types || [TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION]),
+        options: collective =>
+          getOptions(props.types || (collective.type === PROJECT ? SIMPLIFIED_TIER_TYPES : DEFAULT_TIER_TYPES)),
         label: intl.formatMessage(this.messages['type.label']),
-        when: (tier, collective) =>
-          ![FUND, PROJECT].includes(collective.type) && !(collective.type === EVENT && props.defaultType === TICKET),
+        when: (tier, collective) => ![FUND].includes(collective.type) || props.types?.length === 1,
       },
       {
         name: 'name',
@@ -409,7 +413,7 @@ class Tiers extends React.Component {
                     component={field.component}
                     type={field.type}
                     defaultValue={defaultValues[field.name]}
-                    options={field.options}
+                    options={typeof field.options === 'function' ? field.options(collective) : field.options}
                     pre={field.pre}
                     placeholder={field.placeholder}
                     onChange={value => this.editTier(index, field.name, value)}
@@ -451,7 +455,9 @@ class Tiers extends React.Component {
 
     return (
       <div className="EditTiers">
-        <SettingsTitle mb={50}>{this.props.title}</SettingsTitle>
+        <SettingsTitle contentOnly={this.props.contentOnly} mb={50}>
+          {this.props.title}
+        </SettingsTitle>
         {displayContributionSettings && (
           <React.Fragment>
             <SettingsSectionTitle>

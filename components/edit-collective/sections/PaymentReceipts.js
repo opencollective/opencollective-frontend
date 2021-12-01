@@ -173,7 +173,7 @@ ReceiptCard.propTypes = {
 };
 
 const Receipts = ({ invoices }) => {
-  const { loading: loadingInvoice, call: downloadInvoice } = useAsyncCall(saveInvoice);
+  const { loading: loadingInvoice, call: downloadInvoice } = useAsyncCall(saveInvoice, { useErrorToast: true });
   const byMonthYear = groupBy(invoices, invoice => `${invoice.month}-${invoice.year}`);
 
   return Object.keys(byMonthYear).map(monthYear => {
@@ -198,7 +198,7 @@ const Receipts = ({ invoices }) => {
   });
 };
 
-const PaymentReceipts = ({ collective }) => {
+const PaymentReceipts = ({ collective, contentOnly }) => {
   const defaultFilter = {
     label: 'Past 12 months',
     value: 'PAST_12_MONTHS',
@@ -227,6 +227,7 @@ const PaymentReceipts = ({ collective }) => {
   return (
     <Flex flexDirection="column">
       <SettingsTitle
+        contentOnly={contentOnly}
         subtitle={
           <FormattedMessage
             id="paymentReceipts.section.description"
@@ -272,6 +273,7 @@ PaymentReceipts.propTypes = {
     id: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
   }).isRequired,
+  contentOnly: PropTypes.bool,
 };
 
 export default PaymentReceipts;

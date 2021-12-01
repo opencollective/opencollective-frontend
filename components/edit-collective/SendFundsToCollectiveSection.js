@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
 
@@ -11,6 +11,7 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
 
 const SendFundsToCollectiveSection = ({ collective, toCollective, LoggedInUser }) => {
+  const { locale } = useIntl();
   const [modal, setModal] = useState({ type: 'Transfer', show: false, isApproved: false });
 
   const confirmTransfer = () => {
@@ -38,7 +39,7 @@ const SendFundsToCollectiveSection = ({ collective, toCollective, LoggedInUser }
             id="SendMoneyToCollective.btn"
             defaultMessage="Send {amount} to {collective}"
             values={{
-              amount: formatCurrency(0, collective.currency),
+              amount: formatCurrency(0, collective.currency, { locale }),
               collective: toCollective.name,
             }}
           />

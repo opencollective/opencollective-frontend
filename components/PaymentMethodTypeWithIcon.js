@@ -23,9 +23,6 @@ const PaymentMethodTypeWithIcon = ({ isLoading, type, iconSize }) => {
     return <LoadingPlaceholder height={15} width={90} />;
   }
 
-  // TODO(paymentMethodType): remove toUpperCase once migration is over
-  type = type?.toUpperCase();
-
   switch (type) {
     case PAYMENT_METHOD_TYPE.GIFTCARD:
       return (

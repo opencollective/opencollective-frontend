@@ -1,68 +1,54 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { themeGet } from '@styled-system/theme-get';
-import ReactDateTime from 'react-datetime';
-import styled from 'styled-components';
+import { defineMessage, FormattedDate, useIntl } from 'react-intl';
 
+import { getDateFromValue } from '../lib/date-utils';
 import dayjs from '../lib/dayjs';
+import { capitalize } from '../lib/utils';
 
-const StyledDateTime = styled(ReactDateTime)`
-  input {
-    min-height: 36px;
-    border: 1px solid #dcdee0;
-    border-color: #dcdee0;
-    border-radius: 4px;
-    color: #313233;
-    overflow: scroll;
-    max-height: 100%;
-    min-width: 0;
-    width: 100%;
-    flex: 1 1 auto;
-    font-size: 14px;
-    line-height: 1.5;
-    overflow: scroll;
-    padding-top: 0;
-    padding-bottom: 0;
-    padding-left: 8px;
-    padding-right: 8px;
-    box-sizing: border-box;
-    outline: none;
-    background-color: #ffffff;
-    border-color: ${themeGet('colors.black.300')};
-    box-sizing: border-box;
+const TITLE_MESSAGE = defineMessage({
+  defaultMessage: 'Local time: {localTime}{newLine}UTC time: {utcTime}',
+});
 
-    &:disabled {
-      background-color: ${themeGet('colors.black.50')};
-      cursor: not-allowed;
-    }
+const generateTitle = (intl, date) => {
+  return intl.formatMessage(TITLE_MESSAGE, {
+    localTime: capitalize(intl.formatDate(date, { dateStyle: 'full', timeStyle: 'long' })),
+    utcTime: capitalize(intl.formatDate(date, { dateStyle: 'full', timeStyle: 'long', timeZone: 'UTC' })),
+    newLine: '\n',
+  });
+};
 
-    &:hover:not(:disabled) {
-      border-color: ${themeGet('colors.primary.300')};
-    }
+/**
+ * A wrapper around `FormattedDate` + HTML `<time>` with sensible defaults.
+ * Displays the full date and time in the user's locale and in UTC in the title.
+ */
+const DateTime = ({ value, dateStyle, timeStyle, ...props }) => {
+  const intl = useIntl();
+  const [title, setTitle] = React.useState();
+  const date = React.useMemo(() => getDateFromValue(value), [value]);
+  return (
+    <time
+      {...props}
+      title={title}
+      dateTime={date.toISOString()}
+      onMouseEnter={() => setTitle(generateTitle(intl, date))}
+    >
+      <FormattedDate dateStyle={dateStyle} timeStyle={timeStyle} value={date} />
+    </time>
+  );
+};
 
-    &:focus:not(:disabled) {
-      border-color: ${themeGet('colors.primary.500')};
-    }
+DateTime.propTypes = {
+  /** The value as a Date or as a parsable string */
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date), PropTypes.instanceOf(dayjs)]).isRequired,
+  /** Date style, set this to null to hide the date */
+  dateStyle: PropTypes.oneOf(['full', 'long', 'medium', 'short']),
+  /** Time style, set this to display the time along with the date */
+  timeStyle: PropTypes.oneOf(['full', 'long', 'medium', 'short']),
+};
 
-    &::placeholder {
-      color: ${themeGet('colors.black.400')};
-    }
-  }
-`;
-
-class DateTime extends React.Component {
-  static propTypes = {
-    date: PropTypes.string.isRequired,
-    timezone: PropTypes.string.isRequired,
-  };
-
-  render() {
-    const props = this.props;
-    const { date, timezone } = props;
-    const value = dayjs(new Date(date)).tz(timezone);
-
-    return <StyledDateTime value={value.isValid() ? value.toDate() : ''} utc={timezone === 'utc'} {...props} />;
-  }
-}
+DateTime.defaultProps = {
+  dateStyle: 'long',
+};
 
 export default DateTime;

@@ -34,7 +34,7 @@ describe('edit collective', () => {
   });
 
   beforeEach(() => {
-    cy.login({ redirect: `/${collectiveSlug}/edit` });
+    cy.login({ redirect: `/${collectiveSlug}/admin` });
   });
 
   it('edit members', () => {
@@ -70,7 +70,7 @@ describe('edit collective', () => {
     cy.url().should('eq', `${Cypress.config().baseUrl}/${collectiveSlug}`);
     cy.contains('#section-our-team', 'AmazingNewUser');
 
-    cy.visit(`/${collectiveSlug}/edit/members`);
+    cy.visit(`/${collectiveSlug}/admin/members`);
     cy.get('[data-cy="member-1"]').find('[data-cy="member-pending-tag"]').should('not.exist');
   });
 
@@ -135,7 +135,7 @@ describe('edit collective', () => {
     // Ensure the new tiers are properly displayed on order form
     cy.get('#amount > button').should('have.length', 4); // 3 presets + "Other"
 
-    cy.visit(`/${collectiveSlug}/edit/tiers`);
+    cy.visit(`/${collectiveSlug}/admin/tiers`);
     cy.get('.EditTiers .tier').first().find('.amountType [data-cy="amountType"]').click();
     cy.contains('[data-cy="select-option"]', 'fixed amount').click();
     cy.get('.EditTiers .tier').last().find('.removeTier').click();
@@ -158,7 +158,7 @@ describe('edit user collective', () => {
   });
 
   it('adds two-factor authentication', () => {
-    cy.visit(`/${user.collective.slug}/edit`).then(() => {
+    cy.visit(`/${user.collective.slug}/admin`).then(() => {
       cy.getByDataCy('menu-item-two-factor-auth').click();
       cy.getByDataCy('qr-code').should('exist');
       cy.getByDataCy('manual-entry-2fa-token')

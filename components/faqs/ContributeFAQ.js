@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { Box } from '../Grid';
 import HTMLContent from '../HTMLContent';
 import { getI18nLink } from '../I18nFormatters';
+import Link from '../Link';
 import StyledLink from '../StyledLink';
 
 import FAQ, { Content, Entry, Title } from './FAQ';
@@ -88,6 +89,17 @@ const ContributeFAQ = ({ collective, isCrypto, ...props }) => (
     </Entry>
     <Entry>
       <Title>
+        <FormattedMessage defaultMessage="What information is shared with the Collectives?" />
+      </Title>
+      <Content>
+        <FormattedMessage
+          defaultMessage="When you contribute to a Collective we share your email address with the Administrators. If you wish to keep your contribution private choose the ‘incognito’ profile. Read our <PrivacyPolicyLink>privacy policy</PrivacyPolicyLink>."
+          values={{ PrivacyPolicyLink: getI18nLink({ href: '/privacypolicy', openInNewTab: true, as: Link }) }}
+        />
+      </Content>
+    </Entry>
+    <Entry>
+      <Title>
         <FormattedMessage
           id="ContributeDetails.faq.isIncognito.title"
           defaultMessage="What is an incognito contribution?"
@@ -97,7 +109,7 @@ const ContributeFAQ = ({ collective, isCrypto, ...props }) => (
         <FormattedMessage
           id="ContributeDetails.faq.isIncognito.content"
           defaultMessage={
-            'Publicly, the contribution amount and date will be visible in the transparent budget, but your identity will be obscured, appearing only as "incognito". The contribution will not be linked to your public profile. However, the admins will be able to see your identity privately.'
+            'Publicly, the contribution amount and date will be visible in the transparent budget, but your identity will be obscured, appearing only as "incognito". The contribution will not be linked to your public profile.'
           }
         />
       </Content>

@@ -7,6 +7,7 @@ import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
 import { Box, Grid } from '../components/Grid';
 import ClearCacheForAccountForm from '../components/root-actions/ClearCacheForAccountForm';
+import ConnectAccountsForm from '../components/root-actions/ConnectAccountsForm';
 import MergeAccountsForm from '../components/root-actions/MergeAccountsForm';
 import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
@@ -16,6 +17,7 @@ const GRID_TEMPLATE_COLUMNS = ['1fr', 'minmax(220px, 1fr) 6fr'];
 
 const MENU = [
   { id: 'Clear cache', title: 'Clear cache for account', Component: ClearCacheForAccountForm },
+  { id: 'Connect accounts', Component: ConnectAccountsForm },
   { id: 'Merge accounts', isDangerous: true, Component: MergeAccountsForm },
 ];
 

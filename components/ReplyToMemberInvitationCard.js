@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { useRouter } from 'next/router';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../lib/errors';
@@ -10,12 +10,14 @@ import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import formatMemberRole from '../lib/i18n/member-role';
 
 import Avatar from './Avatar';
-import { Flex } from './Grid';
+import { Box, Flex } from './Grid';
+import { getI18nLink } from './I18nFormatters';
 import LinkCollective from './LinkCollective';
 import MemberRoleDescription, { hasRoleDescription } from './MemberRoleDescription';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
+import StyledCheckbox from './StyledCheckbox';
 import StyledTag from './StyledTag';
 import { H3, P } from './Text';
 import { withUser } from './UserProvider';
@@ -57,6 +59,8 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
   const intl = useIntl();
   const { formatMessage } = intl;
   const router = useRouter();
+  const hostTermsUrl = invitation.account.host?.termsUrl;
+  const [acceptedTOS, setAcceptedTOS] = React.useState(!hostTermsUrl); // Automatically accepts the TOS if there is no TOS URL
   const [accepted, setAccepted] = React.useState();
   const [isSubmitting, setSubmitting] = React.useState(false);
   const [sendReplyToInvitation, { error, data }] = useMutation(replyToMemberInvitationMutation, {
@@ -107,6 +111,26 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
           <MessageBox my={3} type="info" withIcon>
             {formatMessage(messages.emailDetails)}
           </MessageBox>
+          {Boolean(hostTermsUrl) && (
+            <Box mb={3} mt={4}>
+              <StyledCheckbox
+                onChange={({ checked }) => setAcceptedTOS(checked)}
+                label={
+                  <FormattedMessage
+                    id="OCFHostApplication.tosCheckBoxLabel"
+                    defaultMessage="I agree with the <TOSLink>terms of fiscal sponsorship</TOSLink>."
+                    values={{
+                      TOSLink: getI18nLink({
+                        href: invitation.account.host.termsUrl,
+                        openInNewTabNoFollow: true,
+                        onClick: e => e.stopPropagation(), // don't check the checkbox when clicking on the link
+                      }),
+                    }}
+                  />
+                }
+              />
+            </Box>
+          )}
           {error && (
             <MessageBox type="error" withIcon my={3}>
               {getErrorFromGraphqlException(error).message}
@@ -127,7 +151,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
               mx={2}
               minWidth={150}
               buttonStyle="primary"
-              disabled={isDisabled}
+              disabled={isDisabled || !acceptedTOS}
               loading={isSubmitting && accepted === true}
               onClick={buildReplyToInvitation(true)}
               data-cy="member-invitation-accept-btn"
@@ -149,6 +173,10 @@ ReplyToMemberInvitationCard.propTypes = {
     account: PropTypes.shape({
       name: PropTypes.string,
       slug: PropTypes.string,
+      host: PropTypes.shape({
+        name: PropTypes.string,
+        termsUrl: PropTypes.string,
+      }),
     }),
   }),
   /** @ignore form withUser */

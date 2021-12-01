@@ -17,6 +17,7 @@ import SettingsSectionTitle from './SettingsSectionTitle';
 class Export extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
+    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -24,12 +25,12 @@ class Export extends React.Component {
   }
 
   render() {
-    const { collective } = this.props;
+    const { collective, contentOnly } = this.props;
     const widgetCode = `<script src="https://opencollective.com/${collective.slug}/banner.js"></script>`;
 
     return (
       <div>
-        <SettingsTitle mb={4}>
+        <SettingsTitle mb={4} contentOnly={contentOnly}>
           <FormattedMessage id="editCollective.menu.export" defaultMessage="Export" />
         </SettingsTitle>
         <SettingsSectionTitle>
@@ -148,7 +149,7 @@ class Export extends React.Component {
         </Container>
         {collective.tiers[0] && (
           <div>
-            e.g.
+            e.g.,
             <br />
             <a href={`/${collective.slug}/members/all.json?limit=10&offset=0&TierId=${collective.tiers[0].id}`}>
               https://opencollective.com/
@@ -160,7 +161,7 @@ class Export extends React.Component {
         )}
         {!collective.tiers[0] && (
           <div>
-            e.g.
+            e.g.,
             <br />
             <a href={`/${collective.slug}/members/all.json?limit=10&offset=0`}>
               https://opencollective.com/

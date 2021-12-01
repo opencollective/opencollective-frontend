@@ -88,7 +88,7 @@ class StaticPage extends React.Component {
     const content = getContent(path, pageSlug);
 
     // get the title from the html of the markdown
-    // e.g. <h1 id="about-open-collective">About Open Collective</h1> => About Open Collective
+    // e.g., <h1 id="about-open-collective">About Open Collective</h1> => About Open Collective
     let title = content.substr(content.indexOf('<h1'), content.indexOf('</h1>'));
     title = title.substr(title.indexOf('>') + 1);
 
@@ -100,9 +100,6 @@ class StaticPage extends React.Component {
     pageSlug: PropTypes.string,
     title: PropTypes.string.isRequired,
     content: PropTypes.string.isRequired,
-  };
-
-  static propTypes = {
     LoggedInUser: PropTypes.object,
     data: PropTypes.object,
     query: PropTypes.object,

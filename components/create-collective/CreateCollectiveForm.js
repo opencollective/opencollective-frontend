@@ -341,7 +341,11 @@ class CreateCollectiveForm extends React.Component {
                                     defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of {hostName}"
                                     values={{
                                       hostName: host.name,
-                                      TOSLink: getI18nLink({ href: host.termsUrl, openInNewTabNoFollow: true }),
+                                      TOSLink: getI18nLink({
+                                        href: host.termsUrl,
+                                        openInNewTabNoFollow: true,
+                                        onClick: e => e.stopPropagation(), // don't check the checkbox when clicking on the link
+                                      }),
                                     }}
                                   />
                                 }

@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { encodeDateInterval } from '../../lib/date-utils';
+
 import AmountFilter from '../budget/filters/AmountFilter';
 import PeriodFilter from '../budget/filters/PeriodFilter';
 import { Box, Flex } from '../Grid';
@@ -23,12 +25,13 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const TransactionsFilters = ({ collective, filters, onChange }) => {
-  const getFilterProps = name => ({
+const TransactionsFilters = ({ collective, filters, kinds, onChange }) => {
+  const getFilterProps = (name, valueModifier) => ({
     inputId: `transactions-filter-${name}`,
     value: filters?.[name],
     onChange: value => {
-      onChange({ ...filters, [name]: value === 'ALL' ? null : value });
+      const preparedValue = valueModifier ? valueModifier(value) : value;
+      onChange({ ...filters, [name]: value === 'ALL' ? null : preparedValue });
     },
   });
 
@@ -44,7 +47,7 @@ const TransactionsFilters = ({ collective, filters, onChange }) => {
         <FilterLabel htmlFor="transactions-filter-period">
           <FormattedMessage id="Period" defaultMessage="Period" />
         </FilterLabel>
-        <PeriodFilter {...getFilterProps('period')} />
+        <PeriodFilter {...getFilterProps('period', encodeDateInterval)} minDate={collective.createdAt} />
       </FilterContainer>
       <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
         <FilterLabel htmlFor="transactions-filter-amount">
@@ -56,7 +59,7 @@ const TransactionsFilters = ({ collective, filters, onChange }) => {
         <FilterLabel htmlFor="transactions-filter-kind">
           <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />
         </FilterLabel>
-        <TransactionsKindFilter {...getFilterProps('kind')} />
+        <TransactionsKindFilter kinds={kinds} {...getFilterProps('kind')} />
       </FilterContainer>
     </Flex>
   );
@@ -65,8 +68,10 @@ const TransactionsFilters = ({ collective, filters, onChange }) => {
 TransactionsFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
+  kinds: PropTypes.array,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
+    createdAt: PropTypes.string,
   }).isRequired,
 };
 

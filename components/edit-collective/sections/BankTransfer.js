@@ -20,8 +20,6 @@ import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const TW_API_COLLECTIVE_SLUG = process.env.TW_API_COLLECTIVE_SLUG;
-
 const hostQuery = gqlV2/* GraphQL */ `
   query EditCollectiveBankTransferHost($slug: String) {
     host(slug: $slug) {
@@ -204,7 +202,6 @@ const BankTransfer = props => {
                   </SettingsSectionTitle>
                   <Flex mr={2} flexDirection="column" width={[1, 0.5]}>
                     <PayoutBankInformationForm
-                      host={{ slug: TW_API_COLLECTIVE_SLUG }}
                       getFieldName={string => string}
                       fixedCurrency={fixedCurrency}
                       ignoreBlockedCurrencies={false}

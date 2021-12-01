@@ -94,7 +94,7 @@ const getVariablesFromQuery = query => {
   };
 };
 
-const ROUTE_PARAMS = ['hostCollectiveSlug', 'view'];
+const ROUTE_PARAMS = ['hostCollectiveSlug', 'slug', 'section', 'view'];
 
 const updateQuery = (router, newParams) => {
   const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
@@ -170,7 +170,6 @@ const PendingApplications = ({ hostSlug }) => {
               ))}
           <Flex mt={5} justifyContent="center">
             <Pagination
-              route={`/${hostSlug}/dashboard/pending-applications`}
               total={hostApplications?.totalCount}
               limit={variables.limit}
               offset={variables.offset}

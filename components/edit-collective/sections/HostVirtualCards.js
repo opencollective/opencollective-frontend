@@ -21,6 +21,7 @@ import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import AssignVirtualCardModal from '../AssignVirtualCardModal';
+import CreateVirtualCardModal from '../CreateVirtualCardModal';
 import SettingsTitle from '../SettingsTitle';
 import VirtualCard from '../VirtualCard';
 
@@ -61,6 +62,9 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
           last4
           data
           privateData
+          provider
+          spendingLimitAmount
+          spendingLimitInterval
           createdAt
           account {
             id
@@ -129,7 +133,7 @@ const AddCardPlaceholder = styled(Flex)`
   ${props => `border: 1px dashed ${props.theme.colors.primary[500]};`}
 `;
 
-const VIRTUAL_CARDS_PER_PAGE = 5;
+const VIRTUAL_CARDS_PER_PAGE = 6;
 
 const HostVirtualCards = props => {
   const router = useRouter();
@@ -170,6 +174,7 @@ const HostVirtualCards = props => {
     },
   });
   const [displayAssignCardModal, setAssignCardModalDisplay] = React.useState(false);
+  const [displayCreateVirtualCardModal, setCreateVirtualCardModalDisplay] = React.useState(false);
   const [editingVirtualCard, setEditingVirtualCard] = React.useState(undefined);
   const [virtualCardPolicy, setVirtualCardPolicy] = React.useState(
     props.collective.settings?.virtualcards?.policy || '',
@@ -178,7 +183,7 @@ const HostVirtualCards = props => {
   const handleUpdateFilters = queryParams => {
     return router.push(
       {
-        pathname: `/${props.collective.slug}/edit/host-virtual-cards`,
+        pathname: `/${props.collective.slug}/admin/host-virtual-cards`,
         query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
       },
       null,
@@ -195,6 +200,14 @@ const HostVirtualCards = props => {
     });
     setAssignCardModalDisplay(false);
     setEditingVirtualCard(undefined);
+    refetch();
+  };
+  const handleCreateVirtualCardSuccess = message => {
+    addToast({
+      type: TOAST_TYPE.SUCCESS,
+      message: message || <FormattedMessage defaultMessage="Virtual card successfully created" />,
+    });
+    setCreateVirtualCardModalDisplay(false);
     refetch();
   };
   const handleSettingsUpdate = key => async value => {
@@ -218,7 +231,7 @@ const HostVirtualCards = props => {
 
   return (
     <Fragment>
-      <SettingsTitle>
+      <SettingsTitle contentOnly={props.contentOnly}>
         <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
       </SettingsTitle>
       <Box>
@@ -302,7 +315,7 @@ const HostVirtualCards = props => {
 
       <Box mt={4}>
         <SettingsSectionTitle>
-          <FormattedMessage id="Host.VirtualCards.List.Title" defaultMessage="Virtual Cards" />
+          <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
         </SettingsSectionTitle>
         <P>
           <FormattedMessage
@@ -340,6 +353,26 @@ const HostVirtualCards = props => {
             buttonStyle="primary"
             buttonSize="round"
             data-cy="confirmation-modal-continue"
+            onClick={() => setCreateVirtualCardModalDisplay(true)}
+          >
+            +
+          </StyledButton>
+          <Box mt="10px">
+            <FormattedMessage defaultMessage="Create virtual card" />
+          </Box>
+        </AddCardPlaceholder>
+        <AddCardPlaceholder
+          width="366px"
+          height="248px"
+          justifyContent="center"
+          alignItems="center"
+          flexDirection="column"
+        >
+          <StyledButton
+            my={1}
+            buttonStyle="primary"
+            buttonSize="round"
+            data-cy="confirmation-modal-continue"
             onClick={() => setAssignCardModalDisplay(true)}
           >
             +
@@ -354,13 +387,14 @@ const HostVirtualCards = props => {
             {...vc}
             onSuccess={refetch}
             editHandler={() => setEditingVirtualCard(vc)}
-            hasActions
+            // TODO: Edit card action need to be reworked
+            // hasActions
           />
         ))}
       </Grid>
       <Flex mt={5} alignItems="center" flexDirection="column" justifyContent="center">
         <Pagination
-          route={`/${props.collective.slug}/edit/host-virtual-cards`}
+          route={`/${props.collective.slug}/admin/host-virtual-cards`}
           total={data.host.hostedVirtualCards.totalCount}
           limit={VIRTUAL_CARDS_PER_PAGE}
           offset={offset}
@@ -382,6 +416,16 @@ const HostVirtualCards = props => {
           show
         />
       )}
+      {displayCreateVirtualCardModal && (
+        <CreateVirtualCardModal
+          host={data.host}
+          onSuccess={handleCreateVirtualCardSuccess}
+          onClose={() => {
+            setCreateVirtualCardModalDisplay(false);
+          }}
+          show
+        />
+      )}
     </Fragment>
   );
 };
@@ -398,6 +442,7 @@ HostVirtualCards.propTypes = {
       }),
     }),
   }),
+  contentOnly: PropTypes.bool,
   hideTopsection: PropTypes.func,
 };
 

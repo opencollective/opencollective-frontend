@@ -18,6 +18,7 @@ class SendingMoney extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     editCollectiveSettings: PropTypes.func.isRequired,
+    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -64,7 +65,7 @@ class SendingMoney extends React.Component {
 
     return (
       <Fragment>
-        <SettingsTitle mb={4}>
+        <SettingsTitle contentOnly={this.props.contentOnly} mb={4}>
           <FormattedMessage id="editCollective.sendingMoney" defaultMessage={'Sending Money'} />
         </SettingsTitle>
         <ConnectedAccounts

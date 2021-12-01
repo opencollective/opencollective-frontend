@@ -47,7 +47,7 @@ class CreateHostForm extends React.Component {
         defaultMessage: 'An Organization',
       },
       'organization.create': {
-        id: 'tier.order.organization.create',
+        id: 'host.organization.create',
         defaultMessage: 'Create an Organization',
       },
     });

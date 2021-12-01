@@ -166,6 +166,10 @@ class GoalsCover extends React.Component {
         id: 'cover.bar.yearlyBudget',
         defaultMessage: 'Estimated Annual Budget',
       },
+      'bar.monthlyBudget': {
+        id: 'cover.bar.monthlyBudget',
+        defaultMessage: 'Estimated Monthly Budget',
+      },
     });
 
     const maxGoal = maxBy(get(props.collective, 'settings.goals', []), g => (g.title ? g.amount : 0));
@@ -229,6 +233,8 @@ class GoalsCover extends React.Component {
    */
   getInitialGoals() {
     const { intl, collective } = this.props;
+    const settingGoals = get(this.props.collective, 'settings.goals', []);
+    const hasMonthlyGoal = settingGoals.some(goal => goal.type === 'monthlyBudget');
 
     // Always show current balance
     const goals = [
@@ -242,21 +248,34 @@ class GoalsCover extends React.Component {
       }),
     ];
 
-    // Add yearly budget
+    // Add yearly and monthly budgets
     if (
       get(collective, 'stats.yearlyBudget') > 0 &&
       get(collective, 'stats.yearlyBudget') !== get(collective, 'stats.balance')
     ) {
-      goals.push(
-        this.createGoal('yearlyBudget', {
-          animateProgress: true,
-          title: intl.formatMessage(this.messages['bar.yearlyBudget']),
-          amount: get(collective, 'stats.yearlyBudget'),
-          precision: 0,
-          position: 'below',
-          isReached: true,
-        }),
-      );
+      if (hasMonthlyGoal) {
+        goals.push(
+          this.createGoal('monthlyBudget', {
+            animateProgress: true,
+            title: intl.formatMessage(this.messages['bar.monthlyBudget']),
+            amount: get(collective, 'stats.yearlyBudget') / 12,
+            precision: 0,
+            position: 'below',
+            isReached: true,
+          }),
+        );
+      } else {
+        goals.push(
+          this.createGoal('yearlyBudget', {
+            animateProgress: true,
+            title: intl.formatMessage(this.messages['bar.yearlyBudget']),
+            amount: get(collective, 'stats.yearlyBudget'),
+            precision: 0,
+            position: 'below',
+            isReached: true,
+          }),
+        );
+      }
     }
 
     // Animate only the most advanced one
@@ -459,9 +478,12 @@ class GoalsCover extends React.Component {
   }
 
   renderGoal(goal, index) {
-    const { collective } = this.props;
+    const { collective, intl } = this.props;
     const slug = goal.slug;
-    const amount = formatCurrency(goal.amount || 0, collective.currency, { precision: goal.precision || 0 });
+    const amount = formatCurrency(goal.amount || 0, collective.currency, {
+      precision: goal.precision || 0,
+      locale: intl.locale,
+    });
 
     return (
       <GoalContainer className={`goal ${goal.slug}`} key={slug} goal={goal} index={index}>
@@ -475,12 +497,12 @@ class GoalsCover extends React.Component {
           </div>
           <div className="amount">
             {amount}
-            {goal.type === 'yearlyBudget' && (
+            {(goal.type === 'yearlyBudget' || goal.type === 'monthlyBudget') && (
               <div className="interval">
                 <FormattedMessage
                   id="tier.interval"
                   defaultMessage="per {interval, select, month {month} year {year} other {}}"
-                  values={{ interval: 'year' }}
+                  values={{ interval: goal.type === 'yearlyBudget' ? 'year' : 'month' }}
                 />
               </div>
             )}

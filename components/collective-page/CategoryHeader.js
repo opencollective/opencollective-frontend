@@ -5,7 +5,7 @@ import themeGet from '@styled-system/theme-get';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { NAVBAR_CATEGORIES } from '../../lib/collective-sections';
+import { CollectiveType, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import i18nNavbarCategory from '../../lib/i18n/navbar-categories';
 
 import Container from '../Container';
@@ -101,20 +101,31 @@ const getCategoryData = (intl, collective, category) => {
     case NAVBAR_CATEGORIES.CONTRIBUTE:
       return {
         img: contributeSectionHeaderIcon,
-        title: i18nNavbarCategory(intl, category),
-        subtitle: (
-          <FormattedMessage
-            id="CollectivePage.SectionContribute.Subtitle"
-            defaultMessage="Become a financial contributor."
-          />
-        ),
-        info: (
-          <FormattedMessage
-            id="CollectivePage.SectionContribute.info"
-            defaultMessage="Support {collectiveName} by contributing to them once, monthly, or yearly."
-            values={{ collectiveName: collective.name }}
-          />
-        ),
+        title:
+          collective.type === CollectiveType.EVENT ? (
+            <FormattedMessage defaultMessage="Get Involved" />
+          ) : (
+            i18nNavbarCategory(intl, category)
+          ),
+        subtitle:
+          collective.type === CollectiveType.EVENT ? (
+            <FormattedMessage defaultMessage="Support the event or buy tickets." />
+          ) : (
+            <FormattedMessage
+              id="CollectivePage.SectionContribute.Subtitle"
+              defaultMessage="Become a financial contributor."
+            />
+          ),
+        info:
+          collective.type === CollectiveType.EVENT ? (
+            <FormattedMessage defaultMessage="Support the event or buy tickets to attend." />
+          ) : (
+            <FormattedMessage
+              id="CollectivePage.SectionContribute.info"
+              defaultMessage="Support {collectiveName} by contributing to them once, monthly, or yearly."
+              values={{ collectiveName: collective.name }}
+            />
+          ),
       };
     case NAVBAR_CATEGORIES.CONTRIBUTIONS:
       return {

@@ -57,6 +57,7 @@ class CreateEvent extends React.Component {
     EventInputType.type = 'EVENT';
     EventInputType.ParentCollectiveId = parentCollective.id;
     EventInputType.tiers = EventInputType.tiers.filter(tier => tier.name);
+    EventInputType.settings = { disableCustomContributions: true };
     try {
       const res = await this.props.createCollective(EventInputType);
       const event = res.data.createCollective;

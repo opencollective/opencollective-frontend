@@ -17,6 +17,16 @@ import { webpackCollective, openSourceHost } from '../mocks/collectives';
 
 export const DefaultStory = props => <Hero {...props} />;
 
-<Story name="Default">{DefaultStory.bind({})}</Story>
+<Story
+  name="Default"
+  parameters={{
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/e71tBo0Sr8J7R5n6iMkqI42d/%5BOC.com%5D-04-Collectives?node-id=10032%3A6754',
+    },
+  }}
+>
+  {DefaultStory.bind({})}
+</Story>
 
 <ArgsTable story="Default" />

@@ -4,6 +4,8 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { encodeDateInterval } from '../../../../lib/date-utils';
+
 import PeriodFilter from '../../../budget/filters/PeriodFilter';
 import Container from '../../../Container';
 import { Box, Flex } from '../../../Grid';
@@ -11,8 +13,6 @@ import RequestVirtualCardBtn from '../../../RequestVirtualCardBtn';
 import StyledButton from '../../../StyledButton';
 
 import CollectiveFilter from './filters/CollectiveFilter';
-import MerchantFilter from './filters/MerchantFilter';
-import StatusFilter from './filters/StatusFilter';
 
 const FilterContainer = styled(Box)`
   margin-bottom: 8px;
@@ -30,7 +30,6 @@ const FilterLabel = styled.label`
 const VirtualCardFilters = ({
   filters,
   onChange,
-  virtualCardMerchants,
   isCollectiveFilter,
   virtualCardCollectives,
   collective,
@@ -39,12 +38,13 @@ const VirtualCardFilters = ({
 }) => {
   const allowRequestVirtualCard = get(host, 'settings.virtualcards.requestcard');
 
-  const getFilterProps = name => {
+  const getFilterProps = (name, valueModifier) => {
     return {
       inputId: `virtual-cards-filter-${name}`,
       value: filters?.[name],
       onChange: value => {
-        onChange({ ...filters, [name]: value === 'ALL' ? null : value });
+        const preparedValue = valueModifier ? valueModifier(value) : value;
+        onChange({ ...filters, [name]: value === 'ALL' ? null : preparedValue });
       },
     };
   };
@@ -63,7 +63,7 @@ const VirtualCardFilters = ({
       {isCollectiveFilter && (
         <FilterContainer mr={[0, '8px']} mb={['8px', 0]}>
           <FilterLabel htmlFor="virtual-card-filter-collective">
-            <FormattedMessage id="VirtualCard.Collective" defaultMessage="Collective" />
+            <FormattedMessage id="Collective" defaultMessage="Collective" />
           </FilterLabel>
           <CollectiveFilter
             {...getFilterProps('collectiveAccountIds')}
@@ -72,26 +72,14 @@ const VirtualCardFilters = ({
         </FilterContainer>
       )}
       <Flex flexWrap="wrap">
-        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} width={[1, filterWidth]}>
-          <FilterLabel htmlFor="virtual-card-filter-status">
-            <FormattedMessage id="VirtualCard.Status" defaultMessage="Status" />
-          </FilterLabel>
-          <StatusFilter {...getFilterProps('state')} />
-        </FilterContainer>
         {displayPeriodFilter && (
           <FilterContainer mr={[0, '8px']} mb={['8px', 0]} width={[1, filterWidth]}>
             <FilterLabel htmlFor="virtual-card-filter-period">
-              <FormattedMessage id="VirtualCard.Period" defaultMessage="Period" />
+              <FormattedMessage id="Period" defaultMessage="Period" />
             </FilterLabel>
-            <PeriodFilter {...getFilterProps('period')} />
+            <PeriodFilter {...getFilterProps('period', encodeDateInterval)} />
           </FilterContainer>
         )}
-        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} width={[1, filterWidth]}>
-          <FilterLabel htmlFor="virtual-card-filter-amount">
-            <FormattedMessage id="VirtualCard.Merchant" defaultMessage="Merchant" />
-          </FilterLabel>
-          <MerchantFilter {...getFilterProps('merchant')} virtualCardMerchants={virtualCardMerchants} />
-        </FilterContainer>
         {allowRequestVirtualCard && (
           <RequestVirtualCardBtn collective={collective} host={host}>
             {btnProps => (
@@ -109,7 +97,6 @@ const VirtualCardFilters = ({
 VirtualCardFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
-  virtualCardMerchants: PropTypes.array,
   virtualCardCollectives: PropTypes.array,
   isCollectiveFilter: PropTypes.bool,
   host: PropTypes.object,

@@ -3,8 +3,6 @@
     "LoggedInUser": {
       "id": 2,
       "username": "xdamman",
-      "firstName": "Xavier",
-      "lastName": "Damman",
       "image": "https://opencollective-production.s3-us-west-1.amazonaws.com/5c825534ad62223ae6a539f6a5076d3cjpeg_1699f6e0-917c-11e6-a567-3f53b7b5f95c.jpeg",
       "collectives": [
         {

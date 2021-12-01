@@ -63,7 +63,7 @@ const ExpenseSummary = ({
 }) => {
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
-  const isFundingRequest = expense?.type === expenseTypes.FUNDING_REQUEST;
+  const isGrant = expense?.type === expenseTypes.FUNDING_REQUEST || expense?.type === expenseTypes.GRANT;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
   const expenseItems = expense?.items.length > 0 ? expense.items : expense?.draft?.items || [];
@@ -109,10 +109,6 @@ const ExpenseSummary = ({
                 permissions={pick(expense.permissions, ['canSeeInvoiceInfo', 'canDelete'])}
                 buttonProps={{ size: 32, m: 1 }}
                 linkAction="link"
-                onDelete={() => {
-                  onClose?.();
-                  onDelete?.(expense);
-                }}
               />
             </Box>
           )}
@@ -154,7 +150,7 @@ const ExpenseSummary = ({
           </React.Fragment>
         )}
       </Flex>
-      {isFundingRequest && expense.longDescription && (
+      {isGrant && expense.longDescription && (
         <Fragment>
           <Flex alignItems="center" mt={4}>
             <Span fontWeight="bold" fontSize="16px">
@@ -173,7 +169,7 @@ const ExpenseSummary = ({
           <Span fontWeight="bold" fontSize="16px">
             {isReceipt || isCreditCardCharge ? (
               <FormattedMessage id="Expense.AttachedReceipts" defaultMessage="Attached receipts" />
-            ) : isFundingRequest ? (
+            ) : isGrant ? (
               <FormattedMessage id="Expense.RequestDetails" defaultMessage="Request Details" />
             ) : (
               <FormattedMessage id="Expense.InvoiceItems" defaultMessage="Invoice items" />
@@ -203,27 +199,20 @@ const ExpenseSummary = ({
                 <Flex justifyContent="space-between" alignItems="baseline" flex="1">
                   <Flex flexDirection="column" justifyContent="center" flexGrow="1">
                     {attachment.description ? (
-                      isFundingRequest ? (
-                        <HTMLContent
-                          content={attachment.description}
-                          fontSize="12px"
-                          data-cy="comment-body"
-                          sanitize
-                          collapsable
-                          color="black.900"
-                          fontWeight="500"
-                        />
-                      ) : (
-                        <Span as="div" color="black.900" fontWeight="500">
-                          {attachment.description}
-                        </Span>
-                      )
+                      <HTMLContent
+                        content={attachment.description}
+                        fontSize="12px"
+                        color="black.900"
+                        collapsable
+                        fontWeight="500"
+                        collapsePadding={22}
+                      />
                     ) : (
                       <Span color="black.500" fontStyle="italic">
                         <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
                       </Span>
                     )}
-                    {!isFundingRequest && (
+                    {!isGrant && (
                       <Span mt={1} fontSize="12px" color="black.500">
                         <FormattedMessage
                           id="withColon"
@@ -289,12 +278,6 @@ const ExpenseSummary = ({
               permissions={expense?.permissions}
               buttonProps={{ size: 32, m: 1 }}
               linkAction="link"
-              onDelete={() => {
-                onClose();
-                if (onDelete) {
-                  onDelete(expense);
-                }
-              }}
               onError={error => onError({ error })}
               onEdit={onEdit}
             />
@@ -305,6 +288,10 @@ const ExpenseSummary = ({
               permissions={expense?.permissions}
               collective={collective}
               host={host}
+              onDelete={() => {
+                onDelete?.(expense);
+                onClose?.();
+              }}
             />
           </Flex>
         </Container>

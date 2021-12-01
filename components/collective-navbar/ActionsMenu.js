@@ -15,7 +15,9 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getContributeRoute } from '../../lib/collective.lib';
-import { getSettingsRoute } from '../../lib/url_helpers';
+import { getEnvVar } from '../../lib/env-utils';
+import { getSettingsRoute } from '../../lib/url-helpers';
+import { parseToBoolean } from '../../lib/utils';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -173,10 +175,11 @@ const StyledChevronDown = styled(ChevronDown)`
 
 const ITEM_PADDING = '11px 14px';
 
-const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionForNonMobile }) => {
+const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionForNonMobile, LoggedInUser }) => {
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
+  const hasNewAdminPanel = parseToBoolean(getEnvVar('NEW_ADMIN_DASHBOARD'));
 
   // Do not render the menu if there are no available CTAs
   if (isEmpty) {
@@ -214,7 +217,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SETTINGS}>
                         <StyledLink
                           as={Link}
-                          href={getSettingsRoute(collective)}
+                          href={getSettingsRoute(collective, null, LoggedInUser)}
                           p={ITEM_PADDING}
                           data-cy="edit-collective-btn"
                         >
@@ -223,7 +226,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         </StyledLink>
                       </MenuItem>
                     )}
-                    {callsToAction.hasDashboard && (
+                    {callsToAction.hasDashboard && !hasNewAdminPanel && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.DASHBOARD}>
                         <StyledLink as={Link} href={`/${collective.slug}/dashboard`}>
                           <Container p={ITEM_PADDING}>
@@ -400,6 +403,7 @@ CollectiveNavbarActionsMenu.propTypes = {
     hasSettings: PropTypes.bool,
   }).isRequired,
   hiddenActionForNonMobile: PropTypes.oneOf(Object.values(NAVBAR_ACTION_TYPE)),
+  LoggedInUser: PropTypes.object,
 };
 
 CollectiveNavbarActionsMenu.defaultProps = {
