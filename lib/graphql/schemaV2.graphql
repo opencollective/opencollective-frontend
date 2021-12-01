@@ -1728,6 +1728,7 @@ enum ActivityType {
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
   COLLECTIVE_VIRTUAL_CARD_ASSIGNED
+  COLLECTIVE_VIRTUAL_CARD_CREATED
   ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
@@ -2394,6 +2395,7 @@ type Host implements Account & AccountWithContributions {
     limit: Int! = 100
     offset: Int! = 0
     state: String = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
     merchantAccount: AccountReferenceInput = null
     collectiveAccountIds: [AccountReferenceInput] = null
   ): VirtualCardCollection!
@@ -7107,7 +7109,7 @@ type Mutation {
   setChangelogViewDate(changelogViewDate: DateTime!): Individual!
 
   """
-  Assign new Virtual Card information to existing hosted collective
+  Assign Virtual Card information to existing hosted collective
   """
   assignNewVirtualCard(
     """
@@ -7127,16 +7129,16 @@ type Mutation {
   ): VirtualCard!
 
   """
-  Create new virtual card for existing hosted collective
+  Create new Stripe Virtual Card for existing hosted collective
   """
   createVirtualCard(
     """
-    Virtual card name
+    Virtual Card name
     """
     name: String!
 
     """
-    Virtual card monthly limit
+    Virtual Card monthly limit
     """
     monthlyLimit: AmountInput!
 
