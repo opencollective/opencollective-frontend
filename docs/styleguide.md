@@ -10,12 +10,12 @@ npm run styleguide:dev
 
 ## Create a new component:
 
-Storybook files are defined in `mdx` format and placed in the `stories/` folder. Adding a new story could simply be done by 
+Storybook files are defined in `mdx` format and placed in the `stories/` folder. Adding a new story could simply be done by
 creating a new component in the `stories/` directory (i.e. `stories/NewComponent.js`). The steps are given below.
 
 1. Create a file in `stories/{folderName}/{filename}.stories.mdx`
-   a. Note: Normally we mimic the folder structure in the `components/` directory. If a component is in the root of the 
-   `components/` directory place the story in the `stories/design-system` folder. 
+   a. Note: Normally we mimic the folder structure in the `components/` directory. If a component is in the root of the
+   `components/` directory place the story in the `stories/design-system` folder.
 2. Add the following imports at the top of the file:
 
 ```es6
@@ -64,9 +64,9 @@ export const DefaultStory = props => <ComponentName {...props} />;
 
 6. Add and link design files:
 
-It's nice to be able to access the relevant design files within Storybook itself. This is especially true when 
+It's nice to be able to access the relevant design files within Storybook itself. This is especially true when
 we want to refer the design file for the relevant component in the future. We have [storybook-addon-designs](https://github.com/pocka/storybook-addon-designs) integrated to Storybook for this purpose. To link a design simply
-add the `design` parameter; 
+add the `design` parameter;
 
 ```jsx
 import { Meta, Story } from '@storybook/addon-docs/blocks';

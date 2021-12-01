@@ -34,5 +34,5 @@ export const decorators = [
       </ThemeProvider>
     </ApolloProvider>
   ),
-  withDesign
+  withDesign,
 ];
