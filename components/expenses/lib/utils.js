@@ -2,7 +2,6 @@ import { CollectiveType } from '../../../lib/collective-sections';
 import expenseTypes from '../../../lib/constants/expenseTypes';
 
 export const checkRequiresAddress = values => {
-  const isSelfHostedCollective = values.payee.id === values.payee.host?.id;
   const collectiveTypesNotRequiringAddress = [
     CollectiveType.COLLECTIVE,
     CollectiveType.EVENT,
@@ -13,7 +12,7 @@ export const checkRequiresAddress = values => {
 
   return (
     values.payee &&
-    (!collectiveTypesNotRequiringAddress.includes(values.payee.type) || isSelfHostedCollective) &&
+    (!collectiveTypesNotRequiringAddress.includes(values.payee.type) || values.payee.isHost) &&
     !values.payee.isInvite &&
     expenseTypesRequiringAddress.includes(values.type)
   );

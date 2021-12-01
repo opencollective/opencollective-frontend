@@ -31,6 +31,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
           name
           legalName
           isActive
+          isHost
           ... on AccountWithHost {
             host {
               id
