@@ -7,6 +7,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { compareNames } from '../../lib/collective.lib';
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
+import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
@@ -365,27 +366,29 @@ const ExpenseFormPayeeStep = ({
               )}
             </Fragment>
           )}
-          <FastField name="invoiceInfo">
-            {({ field }) => (
-              <StyledInputField
-                name={field.name}
-                label={formatMessage(msg.invoiceInfo)}
-                labelFontSize="13px"
-                required={false}
-                mt={3}
-              >
-                {inputProps => (
-                  <Field
-                    as={StyledTextarea}
-                    {...inputProps}
-                    {...field}
-                    minHeight={80}
-                    placeholder={formatMessage(msg.invoiceInfoPlaceholder)}
-                  />
-                )}
-              </StyledInputField>
-            )}
-          </FastField>
+          {values.type === expenseTypes.INVOICE && (
+            <FastField name="invoiceInfo">
+              {({ field }) => (
+                <StyledInputField
+                  name={field.name}
+                  label={formatMessage(msg.invoiceInfo)}
+                  labelFontSize="13px"
+                  required={false}
+                  mt={3}
+                >
+                  {inputProps => (
+                    <Field
+                      as={StyledTextarea}
+                      {...inputProps}
+                      {...field}
+                      minHeight={80}
+                      placeholder={formatMessage(msg.invoiceInfoPlaceholder)}
+                    />
+                  )}
+                </StyledInputField>
+              )}
+            </FastField>
+          )}
         </Box>
         <Box flexGrow="1" flexBasis="50%" display={values.payee ? 'block' : 'none'}>
           <Field name="payoutMethod">
