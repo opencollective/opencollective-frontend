@@ -51,16 +51,25 @@ const getChartOptions = (intl, category, dateFrom, dateTo) => {
 };
 
 const getCategories = (intl, category, dateFrom, dateTo) => {
-  if (category === 'WEEK') {
-    return [...new Array(7)].map((_, idx) => intl.formatDate(new Date(0, 0, idx), { weekday: 'long' }).toUpperCase());
+  if (category === 'DAY') {
+    const numberOfDays = dateTo.diff(dateFrom, 'day', false) + 1;
+    const startingDay = dateFrom.utc().date();
+    const startingMonth = dateFrom.utc().month();
+    const startingYear = dateFrom.utc().year();
+    return [...new Array(numberOfDays)].map((_, idx) =>
+      intl
+        .formatDate(new Date(startingYear, startingMonth, startingDay + idx), { day: 'numeric', month: 'short' })
+        .toUpperCase(),
+    );
   } else if (category === 'MONTH') {
-    const currentMonth = dateTo.month();
-    const numberOfMonths = Math.round(dateTo.diff(dateFrom, 'month', true));
+    const startingMonth = dateFrom.utc().month();
+    const startingYear = dateFrom.utc().year();
+    const numberOfMonths = dateTo.diff(dateFrom, 'month', false) + 1;
     return [...new Array(numberOfMonths)].map((_, idx) =>
-      intl.formatDate(new Date(0, idx + currentMonth - numberOfMonths + 1), { month: 'short' }).toUpperCase(),
+      intl.formatDate(new Date(startingYear, idx + startingMonth), { month: 'short', year: '2-digit' }).toUpperCase(),
     );
   } else if (category === 'YEAR') {
-    const numberOfYears = Math.round(dateTo.diff(dateFrom, 'year', true));
+    const numberOfYears = dateTo.diff(dateFrom, 'year', false);
     return [...new Array(numberOfYears)].map((_, idx) =>
       intl
         .formatDate(new Date(new Date().getUTCFullYear() - numberOfYears + 1 + idx, 0), { year: 'numeric' })
@@ -74,32 +83,34 @@ const constructChartDataPoints = (category, dataPoints, dateFrom, dateTo) => {
 
   // Show data aggregated yearly
   if (category === 'YEAR') {
-    const numberOfYears = Math.round(dateTo.diff(dateFrom, 'year', true));
+    const numberOfYears = dateTo.diff(dateFrom, 'year', false);
     chartDataPoints = new Array(numberOfYears).fill(0);
-    const currentYear = new Date().getUTCFullYear();
+    const currentYear = dayjs().utc().year();
     dataPoints.forEach(dataPoint => {
-      const year = new Date(dataPoint.date).getUTCFullYear();
+      const year = dayjs(dataPoint.date).utc().year();
       if (year > currentYear - numberOfYears) {
         chartDataPoints[numberOfYears - 1 - (currentYear - year)] = Math.abs(dataPoint.amount.value);
       }
     });
     // Show data aggregated monthly
   } else if (category === 'MONTH') {
-    const numberOfMonths = Math.round(dateTo?.diff(dateFrom, 'month', true));
+    const numberOfMonths = dateTo.diff(dateFrom, 'month', false) + 1;
     chartDataPoints = new Array(numberOfMonths).fill(0);
+    const startYear = dateFrom.utc().year();
+    const startMonth = dateFrom.utc().month();
     dataPoints.forEach(dataPoint => {
-      const month = new Date(dataPoint.date).getUTCMonth();
-      chartDataPoints[(month + 1) % numberOfMonths] = Math.abs(dataPoint.amount.value);
+      const month = dayjs(dataPoint.date).utc().month();
+      const year = dayjs(dataPoint.date).utc().year();
+      chartDataPoints[month - startMonth + 12 * (year - startYear)] = Math.abs(dataPoint.amount.value);
     });
-    // Show data for the past 7 days
-  } else if (category === 'WEEK') {
-    chartDataPoints = new Array(7).fill(0);
+    // Show data aggregated by day
+  } else if (category === 'DAY') {
+    const numberOfDays = dateTo.diff(dateFrom, 'day', false) + 1;
+    chartDataPoints = new Array(numberOfDays).fill(0);
+    const startDay = dateFrom.utc();
     dataPoints.forEach(dataPoint => {
-      const date = new Date(dataPoint.date);
-      const today = new Date();
-      if (today.getUTCFullYear() === date.getFullYear() && today.getUTCMonth() === date.getUTCMonth()) {
-        chartDataPoints[date.getUTCDay() % 7] = Math.abs(dataPoint.amount.value);
-      }
+      const currentDay = dayjs(dataPoint.date).utc();
+      chartDataPoints[Math.ceil(currentDay.diff(startDay, 'day', true))] = Math.abs(dataPoint.amount.value);
     });
   }
 
