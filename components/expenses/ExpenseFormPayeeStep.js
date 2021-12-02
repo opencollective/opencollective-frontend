@@ -13,6 +13,7 @@ import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { flattenObjectDeep } from '../../lib/utils';
+import { checkRequiresAddress } from './lib/utils';
 
 import CollectivePicker, {
   CUSTOM_OPTIONS_POSITION,
@@ -163,20 +164,12 @@ const checkStepOneCompleted = (values, isOnBehalf) => {
     return Boolean(values.payee);
   } else if (!isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod)))) {
     return false; // There are some errors in the form
-  } else if (values.type !== expenseTypes.RECEIPT) {
+  } else if (checkRequiresAddress(values)) {
     // Require an address for non-receipt expenses
     return Boolean(values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address);
   } else {
     return true;
   }
-};
-
-const checkRequiresAddress = values => {
-  return (
-    values.payee &&
-    !values.payee.isInvite &&
-    [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST, expenseTypes.GRANT].includes(values.type)
-  );
 };
 
 const ExpenseFormPayeeStep = ({
@@ -371,28 +364,30 @@ const ExpenseFormPayeeStep = ({
                   )}
                 </FastField>
               )}
-              <FastField name="invoiceInfo">
-                {({ field }) => (
-                  <StyledInputField
-                    name={field.name}
-                    label={formatMessage(msg.invoiceInfo)}
-                    labelFontSize="13px"
-                    required={false}
-                    mt={3}
-                  >
-                    {inputProps => (
-                      <Field
-                        as={StyledTextarea}
-                        {...inputProps}
-                        {...field}
-                        minHeight={80}
-                        placeholder={formatMessage(msg.invoiceInfoPlaceholder)}
-                      />
-                    )}
-                  </StyledInputField>
-                )}
-              </FastField>
             </Fragment>
+          )}
+          {values.type === expenseTypes.INVOICE && (
+            <FastField name="invoiceInfo">
+              {({ field }) => (
+                <StyledInputField
+                  name={field.name}
+                  label={formatMessage(msg.invoiceInfo)}
+                  labelFontSize="13px"
+                  required={false}
+                  mt={3}
+                >
+                  {inputProps => (
+                    <Field
+                      as={StyledTextarea}
+                      {...inputProps}
+                      {...field}
+                      minHeight={80}
+                      placeholder={formatMessage(msg.invoiceInfoPlaceholder)}
+                    />
+                  )}
+                </StyledInputField>
+              )}
+            </FastField>
           )}
         </Box>
         <Box flexGrow="1" flexBasis="50%" display={values.payee ? 'block' : 'none'}>

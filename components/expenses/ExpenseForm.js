@@ -12,6 +12,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { requireFields } from '../../lib/form-utils';
 import { flattenObjectDeep } from '../../lib/utils';
+import { checkRequiresAddress } from './lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
@@ -117,7 +118,9 @@ export const prepareExpenseForSubmit = expenseData => {
       ? pick(expenseData.payee, ['name', 'email', 'legalName', 'organization', 'newsletterOptIn'])
       : { [payeeIdField]: expenseData.payee.id };
 
-  const payeeLocation = isInvoice ? pick(expenseData.payeeLocation, ['address', 'country', 'structured']) : null;
+  const payeeLocation = checkRequiresAddress(expenseData)
+    ? pick(expenseData.payeeLocation, ['address', 'country', 'structured'])
+    : null;
 
   return {
     ...pick(expenseData, ['id', 'description', 'longDescription', 'type', 'privateMessage', 'invoiceInfo', 'tags']),
@@ -170,7 +173,7 @@ const validate = expense => {
     }
   }
 
-  if (expense.type === expenseTypes.INVOICE) {
+  if (checkRequiresAddress(expense)) {
     Object.assign(errors, requireFields(expense, ['payeeLocation.country', 'payeeLocation.address']));
   }
 
@@ -190,6 +193,13 @@ const HiddenFragment = styled.div`
 const STEPS = {
   PAYEE: 'PAYEE',
   EXPENSE: 'EXPENSE',
+};
+
+const checkAddressValuesAreCompleted = values => {
+  if (checkRequiresAddress(values)) {
+    return values.payeeLocation?.country && values.payeeLocation?.address;
+  }
+  return true;
 };
 
 const ExpenseFormBody = ({
@@ -219,7 +229,7 @@ const ExpenseFormBody = ({
   const stepOneCompleted =
     values.payoutMethod &&
     isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency'))) &&
-    (isReceipt ? true : values.payeeLocation?.country && values.payeeLocation?.address);
+    checkAddressValuesAreCompleted(values);
   const stepTwoCompleted = isInvite
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
