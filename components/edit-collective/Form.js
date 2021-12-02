@@ -740,6 +740,7 @@ class EditCollectiveForm extends React.Component {
           name: 'startsAt',
           type: 'datetime-local',
           placeholder: '',
+          min: dayjs().utc().format('YYYY-MM-DDTHH:mm'),
           defaultValue: dayjs(collective.startsAt || defaultStartsAt)
             .utc()
             .format('YYYY-MM-DDTHH:mm'),
@@ -753,6 +754,7 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'endsAt',
           type: 'datetime-local',
+          min: dayjs().utc().format('YYYY-MM-DDTHH:mm'),
           defaultValue: dayjs(collective.endsAt || defaultEndsAt)
             .utc()
             .format('YYYY-MM-DDTHH:mm'),
@@ -906,6 +908,7 @@ class EditCollectiveForm extends React.Component {
                       maxLength={field.maxLength}
                       isPrivate={field.isPrivate}
                       step={field.step}
+                      min={field.min}
                     />
                   ))}
                 </div>
