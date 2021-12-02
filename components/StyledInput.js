@@ -64,6 +64,10 @@ const StyledInput = styled.input`
     cursor: pointer;
   }
 
+  &[type='range'] {
+    cursor: grabbing;
+  }
+
   &:disabled {
     background-color: ${themeGet('colors.black.50')};
     cursor: not-allowed;
