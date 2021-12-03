@@ -4,6 +4,7 @@ import { Palette } from '@styled-icons/boxicons-regular/Palette';
 import { Camera } from '@styled-icons/feather/Camera';
 import { Github } from '@styled-icons/feather/Github';
 import { Globe } from '@styled-icons/feather/Globe';
+import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import { first, get } from 'lodash';
 import dynamic from 'next/dynamic';
@@ -14,6 +15,7 @@ import { getCollectiveMainTag } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { githubProfileUrl, twitterProfileUrl } from '../../../lib/url-helpers';
 
+import ContactCollectiveModal from '../../ContactCollectiveModal';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import { Box, Flex } from '../../Grid';
@@ -28,6 +30,7 @@ import StyledTag from '../../StyledTag';
 import { H1, Span } from '../../Text';
 import TruncatedTextWithTooltip from '../../TruncatedTextWithTooltip';
 import UserCompany from '../../UserCompany';
+import { useUser } from '../../UserProvider';
 import ContainerSectionContent from '../ContainerSectionContent';
 
 import CollectiveColorPicker from './CollectiveColorPicker';
@@ -78,9 +81,11 @@ const StyledShortDescription = styled.h2`
  */
 const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const intl = useIntl();
+  const { LoggedInUser } = useUser();
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
   const [message, showMessage] = React.useState(null);
+  const [showContactModal, setShowContactModal] = React.useState(false);
   const isEditing = hasColorPicker || isEditingCover;
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isEvent = collective.type === CollectiveType.EVENT;
@@ -194,6 +199,17 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                 </StyledTag>
               )}
               <Flex my={2}>
+                {collective.canContact && LoggedInUser && (
+                  <StyledRoundButton
+                    onClick={() => setShowContactModal(true)}
+                    size={32}
+                    mr={3}
+                    title="Contact"
+                    aria-label="Contact"
+                  >
+                    <Mail size={12} />
+                  </StyledRoundButton>
+                )}
                 {collective.twitterHandle && (
                   <StyledLink
                     data-cy="twitterProfileUrl"
@@ -346,6 +362,11 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
           )}
         </ContainerSectionContent>
       </Container>
+      <ContactCollectiveModal
+        show={showContactModal}
+        collective={collective}
+        onClose={() => setShowContactModal(false)}
+      />
     </Fragment>
   );
 };
@@ -361,6 +382,7 @@ Hero.propTypes = {
     isApproved: PropTypes.bool,
     backgroundImage: PropTypes.string,
     backgroundImageUrl: PropTypes.string,
+    canContact: PropTypes.bool,
     twitterHandle: PropTypes.string,
     githubHandle: PropTypes.string,
     website: PropTypes.string,
