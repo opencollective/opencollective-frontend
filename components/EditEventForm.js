@@ -9,6 +9,10 @@ import InputField from './InputField';
 import StyledButton from './StyledButton';
 import TimezonePicker from './TimezonePicker';
 
+const defaultStartsAt = new Date();
+defaultStartsAt.setHours(19);
+defaultStartsAt.setMinutes(0);
+
 class EditEventForm extends React.Component {
   static propTypes = {
     event: PropTypes.object,
@@ -61,6 +65,10 @@ class EditEventForm extends React.Component {
         defaultMessage: 'These instructions will be provided by email to the participants.',
       },
     });
+  }
+
+  componentDidMount() {
+    this.handleChange('startsAt', defaultStartsAt);
   }
 
   componentDidUpdate(prevProps) {
@@ -120,9 +128,6 @@ class EditEventForm extends React.Component {
 
     const isNew = !(event && event.id);
     const submitBtnLabel = loading ? 'loading' : isNew ? 'Create Event' : 'Save';
-    const defaultStartsAt = new Date();
-    defaultStartsAt.setHours(19);
-    defaultStartsAt.setMinutes(0);
 
     this.fields = [
       {
