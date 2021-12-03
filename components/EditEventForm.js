@@ -4,6 +4,8 @@ import dayjs from 'dayjs';
 import { set } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 
+import { convertDateFromApiUtc, convertDateToApiUtc } from '../lib/date-utils';
+
 import Tickets from './edit-collective/sections/Tickets';
 import Container from './Container';
 import InputField from './InputField';
@@ -75,9 +77,18 @@ class EditEventForm extends React.Component {
     set(event, fieldname, value);
 
     if (fieldname === 'startsAt') {
-      event[fieldname] = dayjs(value).format('YYYY-MM-DD HH:mm:ss+00');
+      event[fieldname] = convertDateToApiUtc(value, this.state.event.timezone);
     } else if (fieldname === 'endsAt') {
-      event[fieldname] = dayjs(value).format('YYYY-MM-DD HH:mm:ss+00');
+      event[fieldname] = convertDateToApiUtc(value, this.state.event.timezone);
+    } else if (fieldname === 'timezone') {
+      if (value) {
+        const timezone = this.state.event.timezone;
+        const startsAt = this.state.event.startsAt;
+        const endsAt = this.state.event.endsAt;
+        event.startsAt = convertDateToApiUtc(convertDateFromApiUtc(startsAt, timezone), value);
+        event.endsAt = convertDateToApiUtc(convertDateFromApiUtc(endsAt, timezone), value);
+        event.timezone = value;
+      }
     } else if (fieldname === 'name') {
       if (!event['name'].trim()) {
         this.setState({ disabled: true });
@@ -117,9 +128,6 @@ class EditEventForm extends React.Component {
     const isNew = !(event && event.id);
     const submitBtnLabel = loading ? 'loading' : isNew ? 'Create Event' : 'Save';
 
-    const defaultStartsAt = dayjs().utc().set('hour', 19).set('minute', 0);
-    const defaultEndsAt = dayjs().utc().set('hour', 22).set('minute', 0);
-
     this.fields = [
       {
         name: 'name',
@@ -135,31 +143,12 @@ class EditEventForm extends React.Component {
       {
         name: 'startsAt',
         type: 'datetime-local',
-        placeholder: '',
-        min: dayjs().utc().format('YYYY-MM-DDTHH:mm'),
-        defaultValue: dayjs(this.state.event['startsAt'] || defaultStartsAt)
-          .utc()
-          .format('YYYY-MM-DDTHH:mm'),
-        validate: date => {
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          return date.isAfter(yesterday);
-        },
+        defaultValue: dayjs(this.state.event.startsAt).tz(this.state.event.timezone).format('YYYY-MM-DDTHH:mm'),
       },
       {
         name: 'endsAt',
         type: 'datetime-local',
-        min: dayjs().utc().format('YYYY-MM-DDTHH:mm'),
-        defaultValue: dayjs(this.state.event['endsAt'] || defaultEndsAt)
-          .utc()
-          .format('YYYY-MM-DDTHH:mm'),
-        options: { timezone: event.timezone },
-        placeholder: '',
-        validate: date => {
-          const yesterday = new Date(this.state.event.startsAt || defaultStartsAt);
-          yesterday.setDate(yesterday.getDate() - 1);
-          return date.isAfter(yesterday);
-        },
+        defaultValue: dayjs(this.state.event.endsAt).tz(this.state.event.timezone).format('YYYY-MM-DDTHH:mm'),
       },
       {
         name: 'timezone',

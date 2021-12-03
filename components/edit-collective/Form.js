@@ -13,6 +13,7 @@ import { Currency } from '../../lib/constants/currency';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
+import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
 
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
@@ -328,24 +329,18 @@ class EditCollectiveForm extends React.Component {
       } else if (fieldname === 'application.message') {
         set(collective, 'settings.applyMessage', value);
       } else if (fieldname === 'startsAt' && collective.type === EVENT) {
-        collective[fieldname] = dayjs(value).format('YYYY-MM-DD HH:mm:ss+00');
-        const endsAt = collective.endsAt;
-        if (!endsAt || new Date(endsAt) < new Date(value)) {
-          let newEndDate = new Date(value);
-          if (!endsAt) {
-            newEndDate.setHours(newEndDate.getHours() + 2);
-          } else {
-            // https://github.com/opencollπective/opencollective/issues/1232
-            const endsAtDate = new Date(endsAt);
-            newEndDate = new Date(value);
-            newEndDate.setHours(endsAtDate.getHours());
-            newEndDate.setMinutes(endsAtDate.getMinutes());
-          }
-          const endsAtValue = newEndDate.toString();
-          collective['endsAt'] = dayjs(endsAtValue).format('YYYY-MM-DD HH:mm:ss+00');
-        }
+        collective[fieldname] = convertDateToApiUtc(value, collective.timezone);
       } else if (fieldname === 'endsAt' && collective.type === EVENT) {
-        collective[fieldname] = dayjs(value).format('YYYY-MM-DD HH:mm:ss+00');
+        collective[fieldname] = convertDateToApiUtc(value, collective.timezone);
+      } else if (fieldname === 'timezone' && collective.type === EVENT) {
+        if (value) {
+          const timezone = collective.timezone;
+          const startsAt = collective.startsAt;
+          const endsAt = collective.endsAt;
+          collective.startsAt = convertDateToApiUtc(convertDateFromApiUtc(startsAt, timezone), value);
+          collective.endsAt = convertDateToApiUtc(convertDateFromApiUtc(endsAt, timezone), value);
+          collective.timezone = value;
+        }
       } else {
         set(collective, fieldname, value);
       }
@@ -655,12 +650,6 @@ class EditCollectiveForm extends React.Component {
 
     const type = collective.type.toLowerCase();
 
-    const defaultStartsAt = dayjs().utc().set('hour', 19).set('minute', 0);
-    const defaultEndsAt = dayjs(collective.startsAt || defaultStartsAt)
-      .utc()
-      .set('hour', 22)
-      .set('minute', 0);
-
     this.fields = {
       info: [
         {
@@ -739,32 +728,13 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'startsAt',
           type: 'datetime-local',
-          placeholder: '',
-          min: dayjs().utc().format('YYYY-MM-DDTHH:mm'),
-          defaultValue: dayjs(collective.startsAt || defaultStartsAt)
-            .utc()
-            .format('YYYY-MM-DDTHH:mm'),
-          validate: date => {
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            return date.isAfter(yesterday);
-          },
+          defaultValue: dayjs(collective.startsAt).tz(collective.timezone).format('YYYY-MM-DDTHH:mm'),
           when: () => collective.type === EVENT,
         },
         {
           name: 'endsAt',
           type: 'datetime-local',
-          min: dayjs().utc().format('YYYY-MM-DDTHH:mm'),
-          defaultValue: dayjs(collective.endsAt || defaultEndsAt)
-            .utc()
-            .format('YYYY-MM-DDTHH:mm'),
-          options: { timezone: collective.timezone },
-          placeholder: '',
-          validate: date => {
-            const yesterday = new Date(collective.startsAt || defaultStartsAt);
-            yesterday.setDate(yesterday.getDate() - 1);
-            return date.isAfter(yesterday);
-          },
+          defaultValue: dayjs(collective.endsAt).tz(collective.timezone).format('YYYY-MM-DDTHH:mm'),
           when: () => collective.type === EVENT,
         },
         {
