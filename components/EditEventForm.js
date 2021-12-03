@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import dayjs from 'dayjs';
 import { set } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 
@@ -73,23 +74,10 @@ class EditEventForm extends React.Component {
     const event = {};
     set(event, fieldname, value);
 
-    // Make sure that endsAt is always >= startsAt
     if (fieldname === 'startsAt') {
-      const endsAt = this.state.event.endsAt;
-      if (!endsAt || new Date(endsAt) < new Date(value)) {
-        let newEndDate = new Date(value);
-        if (!endsAt) {
-          newEndDate.setHours(newEndDate.getHours() + 2);
-        } else {
-          // https://github.com/opencollective/opencollective/issues/1232
-          const endsAtDate = new Date(endsAt);
-          newEndDate = new Date(value);
-          newEndDate.setHours(endsAtDate.getHours());
-          newEndDate.setMinutes(endsAtDate.getMinutes());
-        }
-        value = newEndDate.toString();
-        event['endsAt'] = value;
-      }
+      event[fieldname] = dayjs(value).format('YYYY-MM-DD HH:mm:ss+00');
+    } else if (fieldname === 'endsAt') {
+      event[fieldname] = dayjs(value).format('YYYY-MM-DD HH:mm:ss+00');
     } else if (fieldname === 'name') {
       if (!event['name'].trim()) {
         this.setState({ disabled: true });
@@ -111,6 +99,14 @@ class EditEventForm extends React.Component {
     this.props.onSubmit({ ...this.state.event, tiers: this.state.tiers });
   }
 
+  getFieldDefaultValue(field) {
+    if (field.name === 'startsAt' || field.name === 'endsAt') {
+      return field.defaultValue;
+    } else {
+      return this.state.event[field.name] || field.defaultValue;
+    }
+  }
+
   render() {
     const { event, loading, intl } = this.props;
 
@@ -120,9 +116,9 @@ class EditEventForm extends React.Component {
 
     const isNew = !(event && event.id);
     const submitBtnLabel = loading ? 'loading' : isNew ? 'Create Event' : 'Save';
-    const defaultStartsAt = new Date();
-    defaultStartsAt.setHours(19);
-    defaultStartsAt.setMinutes(0);
+
+    const defaultStartsAt = dayjs().utc().set('hour', 19).set('minute', 0);
+    const defaultEndsAt = dayjs().utc().set('hour', 22).set('minute', 0);
 
     this.fields = [
       {
@@ -138,9 +134,12 @@ class EditEventForm extends React.Component {
       },
       {
         name: 'startsAt',
-        type: 'datetime',
+        type: 'datetime-local',
         placeholder: '',
-        defaultValue: defaultStartsAt,
+        min: dayjs().utc().format('YYYY-MM-DDTHH:mm'),
+        defaultValue: dayjs(this.state.event['startsAt'] || defaultStartsAt)
+          .utc()
+          .format('YYYY-MM-DDTHH:mm'),
         validate: date => {
           const yesterday = new Date();
           yesterday.setDate(yesterday.getDate() - 1);
@@ -149,7 +148,11 @@ class EditEventForm extends React.Component {
       },
       {
         name: 'endsAt',
-        type: 'datetime',
+        type: 'datetime-local',
+        min: dayjs().utc().format('YYYY-MM-DDTHH:mm'),
+        defaultValue: dayjs(this.state.event['endsAt'] || defaultEndsAt)
+          .utc()
+          .format('YYYY-MM-DDTHH:mm'),
         options: { timezone: event.timezone },
         placeholder: '',
         validate: date => {
@@ -202,7 +205,7 @@ class EditEventForm extends React.Component {
               ) : (
                 <InputField
                   key={field.name}
-                  defaultValue={this.state.event[field.name] || field.defaultValue}
+                  defaultValue={this.getFieldDefaultValue(field)}
                   validate={field.validate}
                   ref={field.name}
                   name={field.name}
@@ -215,6 +218,7 @@ class EditEventForm extends React.Component {
                     timezone: this.state.event.timezone,
                   }}
                   onChange={value => this.handleChange(field.name, value)}
+                  min={field.min}
                 />
               ),
             )}

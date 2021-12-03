@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
+import dayjs from 'dayjs';
 import { cloneDeep, find, get, set } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -327,7 +328,7 @@ class EditCollectiveForm extends React.Component {
       } else if (fieldname === 'application.message') {
         set(collective, 'settings.applyMessage', value);
       } else if (fieldname === 'startsAt' && collective.type === EVENT) {
-        collective[fieldname] = value;
+        collective[fieldname] = dayjs(value).format('YYYY-MM-DD HH:mm:ss+00');
         const endsAt = collective.endsAt;
         if (!endsAt || new Date(endsAt) < new Date(value)) {
           let newEndDate = new Date(value);
@@ -341,8 +342,10 @@ class EditCollectiveForm extends React.Component {
             newEndDate.setMinutes(endsAtDate.getMinutes());
           }
           const endsAtValue = newEndDate.toString();
-          collective['endsAt'] = endsAtValue;
+          collective['endsAt'] = dayjs(endsAtValue).format('YYYY-MM-DD HH:mm:ss+00');
         }
+      } else if (fieldname === 'endsAt' && collective.type === EVENT) {
+        collective[fieldname] = dayjs(value).format('YYYY-MM-DD HH:mm:ss+00');
       } else {
         set(collective, fieldname, value);
       }
@@ -649,10 +652,14 @@ class EditCollectiveForm extends React.Component {
     const isUser = collective.type === USER;
     const currencyOptions = Currency.map(c => ({ value: c, label: c }));
     const submitBtnLabel = this.messages[submitBtnMessageId] && intl.formatMessage(this.messages[submitBtnMessageId]);
-    const defaultStartsAt = new Date();
+
     const type = collective.type.toLowerCase();
-    defaultStartsAt.setHours(19);
-    defaultStartsAt.setMinutes(0);
+
+    const defaultStartsAt = dayjs().utc().set('hour', 19).set('minute', 0);
+    const defaultEndsAt = dayjs(collective.startsAt || defaultStartsAt)
+      .utc()
+      .set('hour', 22)
+      .set('minute', 0);
 
     this.fields = {
       info: [
@@ -731,9 +738,12 @@ class EditCollectiveForm extends React.Component {
         },
         {
           name: 'startsAt',
-          type: 'datetime',
+          type: 'datetime-local',
           placeholder: '',
-          defaultValue: collective.startsAt || defaultStartsAt,
+          min: dayjs().utc().format('YYYY-MM-DDTHH:mm'),
+          defaultValue: dayjs(collective.startsAt || defaultStartsAt)
+            .utc()
+            .format('YYYY-MM-DDTHH:mm'),
           validate: date => {
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
@@ -743,7 +753,11 @@ class EditCollectiveForm extends React.Component {
         },
         {
           name: 'endsAt',
-          type: 'datetime',
+          type: 'datetime-local',
+          min: dayjs().utc().format('YYYY-MM-DDTHH:mm'),
+          defaultValue: dayjs(collective.endsAt || defaultEndsAt)
+            .utc()
+            .format('YYYY-MM-DDTHH:mm'),
           options: { timezone: collective.timezone },
           placeholder: '',
           validate: date => {
@@ -894,6 +908,7 @@ class EditCollectiveForm extends React.Component {
                       maxLength={field.maxLength}
                       isPrivate={field.isPrivate}
                       step={field.step}
+                      min={field.min}
                     />
                   ))}
                 </div>
