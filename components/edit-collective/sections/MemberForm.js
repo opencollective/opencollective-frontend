@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import dayjs from 'dayjs';
 import { Form, Formik } from 'formik';
 import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
@@ -75,6 +76,15 @@ const MemberForm = props => {
     },
   ];
 
+  const getFieldDefaultValue = field => {
+    const fieldDefaultValue = get(member, field.name) || field.defaultValue;
+    if (field.name === 'since') {
+      return dayjs(fieldDefaultValue).format('YYYY-MM-DD');
+    } else {
+      return fieldDefaultValue;
+    }
+  };
+
   return (
     <Flex flexDirection="column" justifyContent="center">
       {member && (
@@ -113,10 +123,15 @@ const MemberForm = props => {
                     label={field.label}
                     type={field.type}
                     disabled={false}
-                    defaultValue={get(member, field.name) || field.defaultValue}
+                    defaultValue={getFieldDefaultValue(field)}
                     options={field.options}
                     onChange={value => {
-                      setFieldValue(field.name, value);
+                      if (field.name === 'since') {
+                        setFieldValue(field.name, dayjs(value).toISOString());
+                      } else {
+                        setFieldValue(field.name, value);
+                      }
+
                       if (field.name === 'role') {
                         setMemberRole(value);
                       }

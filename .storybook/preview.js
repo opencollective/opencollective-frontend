@@ -9,7 +9,6 @@ import { initClient } from '../lib/apollo-client';
 import { withDesign } from 'storybook-addon-designs';
 
 import 'nprogress/nprogress.css';
-import 'react-datetime/css/react-datetime.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
 
