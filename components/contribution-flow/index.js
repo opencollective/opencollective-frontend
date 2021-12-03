@@ -80,10 +80,10 @@ const STEP_LABELS = defineMessages({
 });
 
 const OTHER_MESSAGES = defineMessages({
-  tipLargerThanContributionWarning: {
-    id: 'Warning.TipLargerThanContribution',
+  tipAmountContributionWarning: {
+    id: 'Warning.TipAmountContributionWarning',
     defaultMessage:
-      'You are about to make a contribution of {contributionAmount} to {accountName}, with a tip to the Open Collective platform of {tipAmount}. This means the tip is equal to or larger than the contribution, when usually the reverse is intended.{newLine}{newLine}Are you sure you want to do this?',
+      'You are about to make a contribution of {contributionAmount} to {accountName}, with a tip to the Open Collective platform of {tipAmount}. The tip amount looks unusually high.{newLine}{newLine}Are you sure you want to do this?',
   },
   pastEventWarning: {
     id: 'Warning.PastEvent',
@@ -571,10 +571,14 @@ class ContributionFlow extends React.Component {
             return false;
           } else if (!isNil(tier?.availableQuantity) && stepDetails.quantity > tier.availableQuantity) {
             return false;
-          } else if (stepDetails.platformContribution && stepDetails.platformContribution >= stepDetails.amount) {
+          } else if (
+            stepDetails.amount &&
+            stepDetails.platformContribution &&
+            stepDetails.platformContribution / stepDetails.amount >= 0.5
+          ) {
             const currency = tier?.amount.currency || collective.currency;
             return confirm(
-              intl.formatMessage(OTHER_MESSAGES.tipLargerThanContributionWarning, {
+              intl.formatMessage(OTHER_MESSAGES.tipAmountContributionWarning, {
                 contributionAmount: formatCurrency(stepDetails.amount, currency, { locale: intl.locale }),
                 tipAmount: formatCurrency(stepDetails.platformContribution, currency, { locale: intl.locale }),
                 accountName: collective.name,
