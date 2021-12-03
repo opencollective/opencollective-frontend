@@ -2264,7 +2264,7 @@
   "Warning.LegalNameNotMatchBankAccountName": "The legal name should match the bank account holder name in most cases. Otherwise payments may be delayed. If the payment is to an organization, please select or create that organization's profile instead of your individual profile as the payee.",
   "warning.limitedAccount": "Twoje konto jest obecnie ograniczone. Jeśli uważasz, że to błąd, skontaktuj się z support@opencollective.com.",
   "Warning.PastEvent": "You're contributing to a past event.",
-  "Warning.TipLargerThanContribution": "Zamierzasz wnieść wkład {contributionAmount} do {accountName}, z prowizją platformy Open Collective w wysokości {tipAmount}. Oznacza to, że prowizja jest większa niż wkład, kiedy zwykle jest na odwrót.{newLine}{newLine}Czy na pewno chcesz to zrobić?",
+  "Warning.TipAmountContributionWarning": "You are about to make a contribution of {contributionAmount} to {accountName}, with a tip to the Open Collective platform of {tipAmount}. The tip amount looks unusually high.{newLine}{newLine}Are you sure you want to do this?",
   "WarningUnsavedChanges": "You have unsaved changes. Are you sure you want to leave this page?",
   "wdqJMo": "Manually credit Collective budgets with funds received outside the platform, such as other e-commerce or fundraising tools.",
   "WebhookEvents.All": "All",
