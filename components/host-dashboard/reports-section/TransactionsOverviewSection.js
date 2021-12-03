@@ -12,7 +12,7 @@ import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const getChartOptions = (intl, category, dateFrom, dateTo) => {
+const getChartOptions = () => {
   return {
     chart: {
       id: 'chart-transactions-overview',
@@ -33,13 +33,7 @@ const getChartOptions = (intl, category, dateFrom, dateTo) => {
     dataLabels: {
       enabled: false,
     },
-    markers: {
-      size: 4,
-    },
 
-    xaxis: {
-      categories: getCategories(intl, category, dateFrom, dateTo),
-    },
     yaxis: {
       labels: {
         formatter: function (value) {
@@ -50,67 +44,32 @@ const getChartOptions = (intl, category, dateFrom, dateTo) => {
   };
 };
 
-const getCategories = (intl, category, dateFrom, dateTo) => {
-  if (category === 'DAY') {
-    const numberOfDays = dateTo.diff(dateFrom, 'day', false) + 1;
-    const startingDay = dateFrom.utc().date();
-    const startingMonth = dateFrom.utc().month();
-    const startingYear = dateFrom.utc().year();
-    return [...new Array(numberOfDays)].map((_, idx) =>
-      intl
-        .formatDate(new Date(startingYear, startingMonth, startingDay + idx), { day: 'numeric', month: 'short' })
-        .toUpperCase(),
-    );
-  } else if (category === 'MONTH') {
-    const startingMonth = dateFrom.utc().month();
-    const startingYear = dateFrom.utc().year();
-    const numberOfMonths = dateTo.diff(dateFrom, 'month', false) + 1;
-    return [...new Array(numberOfMonths)].map((_, idx) =>
-      intl.formatDate(new Date(startingYear, idx + startingMonth), { month: 'short', year: '2-digit' }).toUpperCase(),
-    );
-  } else if (category === 'YEAR') {
-    const numberOfYears = dateTo.diff(dateFrom, 'year', false);
-    return [...new Array(numberOfYears)].map((_, idx) =>
-      intl
-        .formatDate(new Date(new Date().getUTCFullYear() - numberOfYears + 1 + idx, 0), { year: 'numeric' })
-        .toUpperCase(),
-    );
-  }
-};
-
-const constructChartDataPoints = (category, dataPoints, dateFrom, dateTo) => {
-  let chartDataPoints;
+const constructChartDataPoints = (category, dataPoints) => {
+  const chartDataPoints = [];
 
   // Show data aggregated yearly
   if (category === 'YEAR') {
-    const numberOfYears = dateTo.diff(dateFrom, 'year', false);
-    chartDataPoints = new Array(numberOfYears).fill(0);
-    const currentYear = dayjs().utc().year();
     dataPoints.forEach(dataPoint => {
-      const year = dayjs(dataPoint.date).utc().year();
-      if (year > currentYear - numberOfYears) {
-        chartDataPoints[numberOfYears - 1 - (currentYear - year)] = Math.abs(dataPoint.amount.value);
-      }
+      const year = dayjs(dataPoint.date).year();
+      chartDataPoints.push({ x: year, y: Math.abs(dataPoint.amount.value) });
     });
     // Show data aggregated monthly
   } else if (category === 'MONTH') {
-    const numberOfMonths = dateTo.diff(dateFrom, 'month', false) + 1;
-    chartDataPoints = new Array(numberOfMonths).fill(0);
-    const startYear = dateFrom.utc().year();
-    const startMonth = dateFrom.utc().month();
     dataPoints.forEach(dataPoint => {
-      const month = dayjs(dataPoint.date).utc().month();
-      const year = dayjs(dataPoint.date).utc().year();
-      chartDataPoints[month - startMonth + 12 * (year - startYear)] = Math.abs(dataPoint.amount.value);
+      const month = dayjs(dataPoint.date).format('MMM-YYYY');
+      chartDataPoints.push({ x: month, y: Math.abs(dataPoint.amount.value) });
+    });
+    // Show data aggregated by week
+  } else if (category === 'WEEK') {
+    dataPoints.forEach(dataPoint => {
+      const date = dayjs(dataPoint.date).format('DD-MMM-YYYY');
+      chartDataPoints.push({ x: date, y: Math.abs(dataPoint.amount.value) });
     });
     // Show data aggregated by day
   } else if (category === 'DAY') {
-    const numberOfDays = dateTo.diff(dateFrom, 'day', false) + 1;
-    chartDataPoints = new Array(numberOfDays).fill(0);
-    const startDay = dateFrom.utc();
     dataPoints.forEach(dataPoint => {
-      const currentDay = dayjs(dataPoint.date).utc();
-      chartDataPoints[Math.ceil(currentDay.diff(startDay, 'day', true))] = Math.abs(dataPoint.amount.value);
+      const date = dayjs(dataPoint.date).format('DD-MMM-YYYY');
+      chartDataPoints.push({ x: date, y: Math.abs(dataPoint.amount.value) });
     });
   }
 
@@ -265,14 +224,12 @@ const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
     {
       name: 'Contributions',
       data: contributionAmountOverTime
-        ? constructChartDataPoints(categoryType, contributionAmountOverTime.nodes, dateFrom, dateTo)
+        ? constructChartDataPoints(categoryType, contributionAmountOverTime.nodes)
         : null,
     },
     {
       name: 'Expenses',
-      data: expenseAmountOverTime
-        ? constructChartDataPoints(categoryType, expenseAmountOverTime.nodes, dateFrom, dateTo)
-        : null,
+      data: expenseAmountOverTime ? constructChartDataPoints(categoryType, expenseAmountOverTime.nodes) : null,
     },
   ];
 
