@@ -163,7 +163,7 @@
     "@storybook/addon-actions": "6.4.4",
     "@storybook/addon-docs": "6.4.4",
     "@storybook/addon-essentials": "6.4.4",
-    "@storybook/addon-links": "6.4.4",
+    "@storybook/addon-links": "6.4.5",
     "@storybook/react": "6.4.4",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.2",
     "babel-loader": "^8.2.2",
