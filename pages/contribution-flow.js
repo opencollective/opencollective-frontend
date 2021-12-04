@@ -20,7 +20,6 @@ import ContributionFlowSuccess from '../components/contribution-flow/Contributio
 import {
   contributionFlowAccountQuery,
   contributionFlowAccountWithTierQuery,
-  isLoggedInUserContributorQuery,
 } from '../components/contribution-flow/graphql/queries';
 import ContributionFlowContainer from '../components/contribution-flow/index';
 import { getContributionFlowMetadata } from '../components/contribution-flow/utils';
