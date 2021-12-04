@@ -5,7 +5,7 @@ import memoizeOne from 'memoize-one';
 import { ThemeProvider } from 'styled-components';
 import { isHexColor } from 'validator';
 
-import defaultTheme, { generateTheme, adjustLuminance } from '../lib/theme';
+import defaultTheme, { adjustLuminance, generateTheme } from '../lib/theme';
 
 /**
  * A special `ThemeProvider` that plugs the custom collective theme, defined by the color
