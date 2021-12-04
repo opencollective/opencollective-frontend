@@ -132,7 +132,7 @@ class HostDashboardPage extends React.Component {
       case HOST_SECTIONS.HOSTED_COLLECTIVES:
         return <HostDashboardHostedCollectives hostSlug={host.slug} />;
       case HOST_SECTIONS.REPORTS:
-        return <HostDashboardReports hostSlug={host.slug} />;
+        return <HostDashboardReports hostSlug={host.slug} hostCreateDate={host.createdAt} />;
       default:
         return <HostDashboardExpenses hostSlug={host.slug} />;
     }
@@ -218,6 +218,7 @@ const hostDashboardPageQuery = gqlV2/* GraphQL */ `
       slug
       name
       isHost
+      createdAt
     }
   }
 `;

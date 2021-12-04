@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { Question } from '@styled-icons/remix-line/Question';
+import dayjs from 'dayjs';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -165,11 +166,15 @@ const getDefaultDateInterval = () => {
   };
 };
 
-const HostDashboardReports = ({ hostSlug }) => {
+const HostDashboardReports = ({ hostSlug, hostCreateDate }) => {
   const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
   const [collectives, setCollectives] = React.useState(null);
-  const dateFrom = simpleDateToISOString(dateInterval?.from, false, dateInterval?.timezoneType);
-  const dateTo = simpleDateToISOString(dateInterval?.to, true, dateInterval?.timezoneType);
+  const dateFrom = simpleDateToISOString(dateInterval?.from || hostCreateDate, false, dateInterval?.timezoneType);
+  const dateTo = simpleDateToISOString(
+    dateInterval?.to || dayjs().startOf('day').toISOString(),
+    false,
+    dateInterval?.timezoneType,
+  );
   const variables = { hostSlug, account: collectives, dateFrom, dateTo };
   const { data, error, loading } = useQuery(hostReportPageQuery, { variables, context: API_V2_CONTEXT });
   const host = data?.host;
@@ -280,6 +285,7 @@ const HostDashboardReports = ({ hostSlug }) => {
 
 HostDashboardReports.propTypes = {
   hostSlug: PropTypes.string.isRequired,
+  hostCreateDate: PropTypes.string.isRequired,
 };
 
 export default HostDashboardReports;
