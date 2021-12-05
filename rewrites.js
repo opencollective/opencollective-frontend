@@ -314,6 +314,10 @@ exports.REWRITES = [
     destination: '/e2c',
   },
   {
+    source: '/:action(help|contact)/:formConfirmation(success)?',
+    destination: '/help-and-support',
+  },
+  {
     source: '/member-invitations',
     destination: '/member-invitations',
   },
