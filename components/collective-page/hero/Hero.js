@@ -174,7 +174,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
             </H1>
           </Box>
           <Flex>
-            {companies &&
+            {companies.length > 0 &&
               companies.map(company => (
                 <StyledLink key={company} as={UserCompany} mr={1} fontSize="20px" fontWeight={600} company={company} />
               ))}
