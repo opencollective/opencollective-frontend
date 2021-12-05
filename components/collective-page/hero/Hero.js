@@ -89,7 +89,8 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const parentIsHost = host && collective.parentCollective?.id === host.id;
   const firstConnectedAccount = first(collective.connectedTo);
   const connectedAccountIsHost = firstConnectedAccount && host && firstConnectedAccount.collective.id === host.id;
-  const companies = collective.company?.trim().split(' ');
+  // get only unique references
+  const companies = [...new Set(collective.company?.trim().toLowerCase().split(' '))];
 
   const handleHeroMessage = msg => {
     if (!msg) {
