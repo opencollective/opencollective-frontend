@@ -233,6 +233,25 @@ const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
     },
   ];
 
+  /*
+   * If a date doesn't have any contributions or expenses API returns nothing.
+   * But we need to make sure the two series (expenses and contributions) show 0 in these cases rather than NaN which
+   * is shown by default by Appex charts.
+   */
+  if (series[0]?.data?.length > series[1].data?.length) {
+    series[0].data.forEach(data => {
+      if (!series[1].data.find(point => point.x === data.x)) {
+        series[1].data.push({ x: data.x, y: 0 });
+      }
+    });
+  } else if (series[1]?.data?.length > series[0].data?.length) {
+    series[1].data.forEach(data => {
+      if (!series[0].data.find(point => point.x === data.x)) {
+        series[0].data.push({ x: data.x, y: 0 });
+      }
+    });
+  }
+
   const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host, locale), [host, locale]);
   const transactionBreakdownChart = React.useMemo(() => getTransactionsBreakdownChartData(host), [host]);
   return (
