@@ -89,6 +89,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const parentIsHost = host && collective.parentCollective?.id === host.id;
   const firstConnectedAccount = first(collective.connectedTo);
   const connectedAccountIsHost = firstConnectedAccount && host && firstConnectedAccount.collective.id === host.id;
+  const companies = collective.company?.trim().split(' ');
 
   const handleHeroMessage = msg => {
     if (!msg) {
@@ -171,9 +172,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
               {collective.name || collective.slug}
             </H1>
           </Box>
-          {collective.company && (
-            <StyledLink as={UserCompany} fontSize="20px" fontWeight={600} company={collective.company} />
-          )}
+          <Flex>
+            {companies &&
+              companies.map(company => (
+                <StyledLink as={UserCompany} mr={1} fontSize="20px" fontWeight={600} company={company} />
+              ))}
+          </Flex>
           {!isEvent && (
             <Flex alignItems="center" flexWrap="wrap">
               {(isCollective || isFund || isProject) && (
