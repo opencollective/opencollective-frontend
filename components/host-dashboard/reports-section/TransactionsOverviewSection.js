@@ -12,7 +12,7 @@ import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const getChartOptions = () => {
+const getChartOptions = category => {
   return {
     chart: {
       id: 'chart-transactions-overview',
@@ -34,6 +34,23 @@ const getChartOptions = () => {
       enabled: false,
     },
 
+    xaxis: {
+      labels: {
+        formatter: function (value) {
+          // Show data aggregated yearly
+          if (category === 'YEAR') {
+            return dayjs(value).utc().year();
+            // Show data aggregated monthly
+          } else if (category === 'MONTH') {
+            return dayjs(value).utc().format('MMM-YYYY');
+            // Show data aggregated by week or day
+          } else if (category === 'WEEK' || category === 'DAY') {
+            return dayjs(value).utc().format('DD-MMM-YYYY');
+          }
+        },
+      },
+    },
+
     yaxis: {
       labels: {
         formatter: function (value) {
@@ -46,33 +63,9 @@ const getChartOptions = () => {
 
 const constructChartDataPoints = (category, dataPoints) => {
   const chartDataPoints = [];
-
-  // Show data aggregated yearly
-  if (category === 'YEAR') {
-    dataPoints.forEach(dataPoint => {
-      const year = dayjs(dataPoint.date).year();
-      chartDataPoints.push({ x: year, y: Math.abs(dataPoint.amount.value) });
-    });
-    // Show data aggregated monthly
-  } else if (category === 'MONTH') {
-    dataPoints.forEach(dataPoint => {
-      const month = dayjs(dataPoint.date).format('MMM-YYYY');
-      chartDataPoints.push({ x: month, y: Math.abs(dataPoint.amount.value) });
-    });
-    // Show data aggregated by week
-  } else if (category === 'WEEK') {
-    dataPoints.forEach(dataPoint => {
-      const date = dayjs(dataPoint.date).format('DD-MMM-YYYY');
-      chartDataPoints.push({ x: date, y: Math.abs(dataPoint.amount.value) });
-    });
-    // Show data aggregated by day
-  } else if (category === 'DAY') {
-    dataPoints.forEach(dataPoint => {
-      const date = dayjs(dataPoint.date).format('DD-MMM-YYYY');
-      chartDataPoints.push({ x: date, y: Math.abs(dataPoint.amount.value) });
-    });
-  }
-
+  dataPoints.forEach(dataPoint => {
+    chartDataPoints.push({ x: dataPoint.date, y: Math.abs(dataPoint.amount.value) });
+  });
   return chartDataPoints;
 };
 
@@ -207,11 +200,9 @@ const getTransactionsBreakdownChartData = host => {
   return areas;
 };
 
-const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
+const TransactionsOverviewSection = ({ host, isLoading }) => {
   const intl = useIntl();
   const { locale } = intl;
-  const dateFrom = dateInterval.from ? dayjs(dateInterval.from) : dayjs(host?.createdAt);
-  const dateTo = dateInterval.to ? dayjs(dateInterval.to) : dayjs();
 
   const contributionStats = host?.contributionStats;
   const expenseStats = host?.expenseStats;
@@ -238,18 +229,19 @@ const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
    * But we need to make sure the two series (expenses and contributions) show 0 in these cases rather than NaN which
    * is shown by default by Appex charts.
    */
-  if (series[0]?.data?.length > series[1].data?.length) {
+  if (series[0]?.data && series[1]?.data) {
     series[0].data.forEach(data => {
       if (!series[1].data.find(point => point.x === data.x)) {
         series[1].data.push({ x: data.x, y: 0 });
       }
     });
-  } else if (series[1]?.data?.length > series[0].data?.length) {
+    series[1].data.sort((a, b) => new Date(a.x) - new Date(b.x));
     series[1].data.forEach(data => {
       if (!series[0].data.find(point => point.x === data.x)) {
         series[0].data.push({ x: data.x, y: 0 });
       }
     });
+    series[0].data.sort((a, b) => new Date(a.x) - new Date(b.x));
   }
 
   const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host, locale), [host, locale]);
@@ -270,13 +262,7 @@ const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
         {isLoading ? (
           <LoadingPlaceholder height={21} width="100%" borderRadius="8px" />
         ) : (
-          <Chart
-            type="area"
-            width="100%"
-            height="250px"
-            options={getChartOptions(intl, categoryType, dateFrom, dateTo)}
-            series={series}
-          />
+          <Chart type="area" width="100%" height="250px" options={getChartOptions(categoryType)} series={series} />
         )}
       </Box>
     </React.Fragment>
@@ -307,7 +293,6 @@ TransactionsOverviewSection.propTypes = {
       }),
     }),
   }),
-  dateInterval: PropTypes.object,
 };
 
 export default TransactionsOverviewSection;

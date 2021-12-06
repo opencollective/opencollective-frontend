@@ -270,7 +270,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           >
             <FormattedMessage id="TransactionsOverview" defaultMessage="Transactions overview" />
           </SectionTitle>
-          <TransactionsOverviewSection host={host} isLoading={loading} dateInterval={dateInterval} />
+          <TransactionsOverviewSection host={host} isLoading={loading} />
         </Container>
         <Box mb={4}>
           <PlatformTipsCollected host={host} isLoading={loading} />
