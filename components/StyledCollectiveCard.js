@@ -131,7 +131,7 @@ const CollectiveContainer = ({ useLink, collective, children }) => {
 CollectiveContainer.propTypes = {
   useLink: PropTypes.bool,
   collective: PropTypes.object.isRequired,
-  children: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired,
 };
 
 /**
