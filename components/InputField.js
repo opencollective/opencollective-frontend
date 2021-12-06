@@ -151,7 +151,6 @@ class InputField extends React.Component {
     maxLength: PropTypes.number,
     step: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     disabled: PropTypes.bool,
-    timeFormat: PropTypes.string,
     min: PropTypes.number,
     max: PropTypes.number,
     focus: PropTypes.bool,
