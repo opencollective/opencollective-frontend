@@ -144,11 +144,13 @@ class EditEventForm extends React.Component {
         name: 'startsAt',
         type: 'datetime-local',
         defaultValue: dayjs(this.state.event.startsAt).tz(this.state.event.timezone).format('YYYY-MM-DDTHH:mm'),
+        required: true,
       },
       {
         name: 'endsAt',
         type: 'datetime-local',
         defaultValue: dayjs(this.state.event.endsAt).tz(this.state.event.timezone).format('YYYY-MM-DDTHH:mm'),
+        required: true,
       },
       {
         name: 'timezone',
@@ -208,6 +210,7 @@ class EditEventForm extends React.Component {
                   }}
                   onChange={value => this.handleChange(field.name, value)}
                   min={field.min}
+                  required={field.required}
                 />
               ),
             )}

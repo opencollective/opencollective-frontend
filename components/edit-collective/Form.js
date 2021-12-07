@@ -730,12 +730,14 @@ class EditCollectiveForm extends React.Component {
           type: 'datetime-local',
           defaultValue: dayjs(collective.startsAt).tz(collective.timezone).format('YYYY-MM-DDTHH:mm'),
           when: () => collective.type === EVENT,
+          required: true,
         },
         {
           name: 'endsAt',
           type: 'datetime-local',
           defaultValue: dayjs(collective.endsAt).tz(collective.timezone).format('YYYY-MM-DDTHH:mm'),
           when: () => collective.type === EVENT,
+          required: true,
         },
         {
           name: 'timezone',
@@ -879,6 +881,7 @@ class EditCollectiveForm extends React.Component {
                       isPrivate={field.isPrivate}
                       step={field.step}
                       min={field.min}
+                      required={field.required}
                     />
                   ))}
                 </div>

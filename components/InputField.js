@@ -643,6 +643,7 @@ class InputField extends React.Component {
             step={field.step}
             min={field.min}
             max={field.max}
+            required={field.required}
             isPrivate={field.isPrivate}
           />
         );
