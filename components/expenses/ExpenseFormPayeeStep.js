@@ -93,11 +93,11 @@ const getPayoutMethodsFromPayee = payee => {
   if (payee && AccountTypesWithHost.includes(payee.type) && payee.id !== payee.host?.id) {
     if (!payoutMethods.find(pm => pm.type === PayoutMethodType.BANK_ACCOUNT)) {
       const hostPayoutMethods = get(payee, 'host.payoutMethods') || EMPTY_ARRAY;
-      const hostBankAccountPayoutMethods = hostPayoutMethods
+      const hostSuitablePayoutMethods = hostPayoutMethods
         .filter(pm => pm.isSaved && [PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.PAYPAL].includes(pm.type))
         .map(payoutMethod => ({ ...payoutMethod, isDeletable: false }));
       // TODO: maybe isDeletable should be true if the loggedInAccount is an admin of the host
-      payoutMethods.push(...hostBankAccountPayoutMethods);
+      payoutMethods.push(...hostSuitablePayoutMethods);
     }
   }
 

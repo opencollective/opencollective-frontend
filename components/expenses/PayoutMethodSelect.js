@@ -220,7 +220,6 @@ class PayoutMethodSelect extends React.Component {
     } else {
       pmTypes = payerHostSupportedPayoutMethods
         // Credit Card (Virtual Card) is generally not a Payout Method acceptable on the Frontend
-        // Should it be completely removed?
         .filter(type => type !== PayoutMethodType.CREDIT_CARD)
         // Account Balance is not possible on different Hosts
         .filter(type => type !== PayoutMethodType.ACCOUNT_BALANCE);

@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { compose, get, omit, pick } from 'lodash';
-import memoizeOne from 'memoize-one';
+import { compose, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { expenseSubmissionAllowed, getCollectiveTypeForUrl } from '../lib/collective.lib';
-import { CollectiveType } from '../lib/constants/collectives';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
+import { getPayoutProfiles } from '../lib/expenses';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
@@ -41,8 +40,6 @@ import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
 const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
-
-const { ORGANIZATION } = CollectiveType;
 
 class CreateExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, parentCollectiveSlug } }) {
@@ -257,31 +254,6 @@ class CreateExpensePage extends React.Component {
     return tagsStats && tagsStats.map(({ tag }) => tag);
   }
 
-  // This function is currently duplicated in expense.js
-  getPayoutProfiles = memoizeOne(loggedInAccount => {
-    if (!loggedInAccount) {
-      return [];
-    } else {
-      const payoutProfiles = [loggedInAccount];
-      for (const membership of get(loggedInAccount, 'adminMemberships.nodes', [])) {
-        if (
-          // Organizations
-          [ORGANIZATION].includes(membership.account.type) ||
-          // Relax available accounts
-          membership.account.isActive
-        ) {
-          // Push main account
-          payoutProfiles.push(omit(membership.account, ['childrenAccounts']));
-          // Push children and add Host if missing
-          for (const childrenAccount of membership.account.childrenAccounts.nodes) {
-            payoutProfiles.push({ host: membership.account.host, ...childrenAccount });
-          }
-        }
-      }
-      return payoutProfiles;
-    }
-  });
-
   render() {
     const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, router } = this.props;
     const { step } = this.state;
@@ -302,7 +274,7 @@ class CreateExpensePage extends React.Component {
     const host = collective && collective.host;
     const loggedInAccount = data && data.loggedInAccount;
 
-    const payoutProfiles = this.getPayoutProfiles(loggedInAccount);
+    const payoutProfiles = getPayoutProfiles(loggedInAccount);
 
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)}>
