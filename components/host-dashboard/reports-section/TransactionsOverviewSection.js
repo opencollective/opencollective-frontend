@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
+import { differenceBy } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -12,7 +13,7 @@ import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const getChartOptions = category => {
+const getChartOptions = timeUnit => {
   return {
     chart: {
       id: 'chart-transactions-overview',
@@ -38,13 +39,13 @@ const getChartOptions = category => {
       labels: {
         formatter: function (value) {
           // Show data aggregated yearly
-          if (category === 'YEAR') {
+          if (timeUnit === 'YEAR') {
             return dayjs(value).utc().year();
             // Show data aggregated monthly
-          } else if (category === 'MONTH') {
+          } else if (timeUnit === 'MONTH') {
             return dayjs(value).utc().format('MMM-YYYY');
             // Show data aggregated by week or day
-          } else if (category === 'WEEK' || category === 'DAY') {
+          } else if (timeUnit === 'WEEK' || timeUnit === 'DAY') {
             return dayjs(value).utc().format('DD-MMM-YYYY');
           }
         },
@@ -61,12 +62,8 @@ const getChartOptions = category => {
   };
 };
 
-const constructChartDataPoints = (category, dataPoints) => {
-  const chartDataPoints = [];
-  dataPoints.forEach(dataPoint => {
-    chartDataPoints.push({ x: dataPoint.date, y: Math.abs(dataPoint.amount.value) });
-  });
-  return chartDataPoints;
+const constructChartDataPoints = dataPoints => {
+  return dataPoints.map(({ date, amount }) => ({ x: date, y: Math.abs(amount.value) }));
 };
 
 const getTransactionsAreaChartData = (host, locale) => {
@@ -209,18 +206,16 @@ const TransactionsOverviewSection = ({ host, isLoading }) => {
 
   const { contributionAmountOverTime } = contributionStats || 0;
   const { expenseAmountOverTime } = expenseStats || 0;
-  const categoryType = contributionAmountOverTime?.timeUnit;
+  const timeUnit = contributionAmountOverTime?.timeUnit;
 
   const series = [
     {
       name: 'Contributions',
-      data: contributionAmountOverTime
-        ? constructChartDataPoints(categoryType, contributionAmountOverTime.nodes)
-        : null,
+      data: contributionAmountOverTime ? constructChartDataPoints(contributionAmountOverTime.nodes) : null,
     },
     {
       name: 'Expenses',
-      data: expenseAmountOverTime ? constructChartDataPoints(categoryType, expenseAmountOverTime.nodes) : null,
+      data: expenseAmountOverTime ? constructChartDataPoints(expenseAmountOverTime.nodes) : null,
     },
   ];
 
@@ -230,18 +225,12 @@ const TransactionsOverviewSection = ({ host, isLoading }) => {
    * is shown by default by Appex charts.
    */
   if (series[0]?.data && series[1]?.data) {
-    series[0].data.forEach(data => {
-      if (!series[1].data.find(point => point.x === data.x)) {
-        series[1].data.push({ x: data.x, y: 0 });
-      }
-    });
-    series[1].data.sort((a, b) => new Date(a.x) - new Date(b.x));
-    series[1].data.forEach(data => {
-      if (!series[0].data.find(point => point.x === data.x)) {
-        series[0].data.push({ x: data.x, y: 0 });
-      }
-    });
+    const dataMissingFromSeries0 = differenceBy(series[1].data, series[0].data, 'x');
+    const dataMissingFromSeries1 = differenceBy(series[0].data, series[1].data, 'x');
+    series[0].data.push(...dataMissingFromSeries0.map(({ x }) => ({ x, y: 0 })));
+    series[1].data.push(...dataMissingFromSeries1.map(({ x }) => ({ x, y: 0 })));
     series[0].data.sort((a, b) => new Date(a.x) - new Date(b.x));
+    series[1].data.sort((a, b) => new Date(a.x) - new Date(b.x));
   }
 
   const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host, locale), [host, locale]);
@@ -262,7 +251,7 @@ const TransactionsOverviewSection = ({ host, isLoading }) => {
         {isLoading ? (
           <LoadingPlaceholder height={21} width="100%" borderRadius="8px" />
         ) : (
-          <Chart type="area" width="100%" height="250px" options={getChartOptions(categoryType)} series={series} />
+          <Chart type="area" width="100%" height="250px" options={getChartOptions(timeUnit)} series={series} />
         )}
       </Box>
     </React.Fragment>
