@@ -71,15 +71,14 @@ const setLocationFromPayee = (formik, payee) => {
 };
 
 const getPayoutMethodsFromPayee = payee => {
-  const basePms = get(payee, 'payoutMethods') || EMPTY_ARRAY;
-  let filteredPms = basePms.filter(({ isSaved }) => isSaved);
+  const payoutMethods = (get(payee, 'payoutMethods') || EMPTY_ARRAY).filter(({ isSaved }) => isSaved);
 
   // If the Payee is active (can manage a budget and has a balance). This is usually:
-  // - a "Collective" family (Collective, Fund, Event, Project) with an host
-  // - an "Host" Organization with budget activated
+  // - a "Collective" family (Collective, Fund, Event, Project) with an host or Self Hosted
+  // - an "Host" Organization with budget activated (new default)
   if (payee?.isActive) {
-    if (!filteredPms.find(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)) {
-      filteredPms.unshift({
+    if (!payoutMethods.find(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)) {
+      payoutMethods.push({
         id: 'new',
         data: {},
         type: PayoutMethodType.ACCOUNT_BALANCE,
@@ -89,12 +88,20 @@ const getPayoutMethodsFromPayee = payee => {
   }
 
   // If the Payee is in the "Collective" family (Collective, Fund, Event, Project)
-  // Then the Account Balance should be its only option
+  // But not the Host itself (Self Hosted)
+  // Then we should add BANK_ACCOUNT and PAYPAL of the Host as an option
   if (payee && AccountTypesWithHost.includes(payee.type) && payee.id !== payee.host?.id) {
-    filteredPms = filteredPms.filter(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE);
+    if (!payoutMethods.find(pm => pm.type === PayoutMethodType.BANK_ACCOUNT)) {
+      const hostPayoutMethods = get(payee, 'host.payoutMethods') || EMPTY_ARRAY;
+      const hostSuitablePayoutMethods = hostPayoutMethods
+        .filter(pm => pm.isSaved && [PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.PAYPAL].includes(pm.type))
+        .map(payoutMethod => ({ ...payoutMethod, isDeletable: false }));
+      // TODO: maybe isDeletable should be true if the loggedInAccount is an admin of the host
+      payoutMethods.push(...hostSuitablePayoutMethods);
+    }
   }
 
-  return filteredPms.length > 0 ? filteredPms : EMPTY_ARRAY;
+  return payoutMethods.length > 0 ? payoutMethods : EMPTY_ARRAY;
 };
 
 const refreshPayoutProfile = (formik, payoutProfiles) => {
@@ -128,7 +135,7 @@ const getPayeeOptions = (intl, payoutProfiles) => {
 
   const payeeOptions = [
     { options: myself, label: intl.formatMessage({ defaultMessage: 'Myself' }) },
-    { options: myOrganizations, label: intl.formatMessage({ defaultMessage: 'My Organizations' }) },
+    { options: myOrganizations, label: intl.formatMessage({ id: 'organization', defaultMessage: 'My Organizations' }) },
   ];
 
   if (profilesByType[COLLECTIVE]?.length) {

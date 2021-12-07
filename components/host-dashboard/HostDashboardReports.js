@@ -48,6 +48,7 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
       hostFeePercent
       isTrustedHost
       stats {
+        id
         balance(dateTo: $dateTo) {
           valueInCents
           currency
@@ -61,6 +62,7 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
           valueInCents
         }
         contributionAmountOverTime {
+          timeUnit
           nodes {
             date
             amount {
@@ -253,11 +255,12 @@ const HostDashboardReports = ({ hostSlug }) => {
         </Container>
         <Container mb={38}>
           <SectionTitle>
-            <FormattedMessage id="Host.FeesCollective" defaultMessage="Host fees (collected)" />
+            <FormattedMessage id="Host.Metrics.HostFees" defaultMessage="Host Fees" />
           </SectionTitle>
           <HostFeesSection host={host} collectives={collectives} isLoading={loading} />
         </Container>
         <Container mb={38}>
+          {/*
           <SectionTitle
             hint={
               <FormattedMessage
@@ -266,9 +269,11 @@ const HostDashboardReports = ({ hostSlug }) => {
               />
             }
           >
-            <FormattedMessage id="TransactionsOverview" defaultMessage="Transactions overview" />
+          */}
+          <SectionTitle>
+            <FormattedMessage id="TransactionsOverview" defaultMessage="Contributions and Expenses" />
           </SectionTitle>
-          <TransactionsOverviewSection host={host} isLoading={loading} dateInterval={dateInterval} />
+          <TransactionsOverviewSection host={host} isLoading={loading} />
         </Container>
         <Box mb={4}>
           <PlatformTipsCollected host={host} isLoading={loading} />
