@@ -1,0 +1,126 @@
+import React from 'react';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+
+import { Box, Flex } from '../Grid';
+import NextIllustration from '../home/HomeNextIllustration';
+import { getI18nLink, I18nBold } from '../I18nFormatters';
+import { H2, H4, P } from '../Text';
+
+const ListItem = styled.li`
+  margin-left: 20px;
+  padding-left: 0;
+`;
+
+const ListWrapper = styled.ul`
+  padding-left: 20px;
+`;
+
+const InvestingInTheCommons = () => {
+  return (
+    <Flex flexDirection="column" justifyContent="center" alignItems="center" px="16px" my={['56px', '80px', '104px']}>
+      <Box width={['288px', 1]} mb={['40px', '64px']}>
+        <H2
+          letterSpacing="-0.04em"
+          fontSize={['32px', '40px']}
+          lineHeight={['40px', '48px']}
+          textAlign="center"
+          color="black.900"
+        >
+          <FormattedMessage id="e2c.investingInCommons" defaultMessage="Investing in the commons" />
+        </H2>
+      </Box>
+      <Flex flexDirection={['column', 'row-reverse']} alignItems={[null, 'center']}>
+        <Box
+          width={['288px', '330px', '416px']}
+          height={['288px', '354px']}
+          mb={['20px', 0]}
+          ml={[null, '40px', '56px']}
+        >
+          <NextIllustration
+            alt="Challenging business as usual"
+            src="/static/images/e2c/placeholder.png"
+            width={416}
+            height={354}
+          />
+        </Box>
+        <Box width="288px" textAlign="center" mb="24px" display={[null, 'none']}>
+          <H4 fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" color="black.800">
+            <FormattedMessage id="e2c.challengingBusiness" defaultMessage="Challenging business as usual" />
+          </H4>
+        </Box>
+        <Box width={['288px', '330px', '472px']}>
+          <H4
+            mb="24px"
+            display={['none', 'block']}
+            fontSize={['24px', '32px']}
+            lineHeight={['32px', '40px']}
+            letterSpacing="-0.008em"
+            color="black.800"
+          >
+            <FormattedMessage id="e2c.challengingBusiness" defaultMessage="Challenging business as usual" />
+          </H4>
+          <P fontSize="18px" lineHeight="26px" color="black.800">
+            <FormattedMessage
+              id="e2c.challengingBusiness.description"
+              defaultMessage="Many tech founders are forced to give away ownership and control to investors in order to get money as a start-up. <strong>Open Collective is different.</strong> {lineBreak} {lineBreak} We raised money from people who agreed: <ul><li>Investors get paid back slowly and can’t make us exploit people to create huge profits.</li> <li>Investors do NOT control the platform.</li></ul>"
+              values={{
+                li: listItem => <ListItem>{listItem}</ListItem>,
+                ul: list => <ListWrapper>{list}</ListWrapper>,
+                lineBreak: <br />,
+                strong: I18nBold,
+              }}
+            />
+          </P>
+        </Box>
+      </Flex>
+      <Flex flexDirection={['column', 'row']} mt="40px" alignItems={[null, 'center']}>
+        <Box
+          width={['288px', '330px', '416px']}
+          height={['288px', '354px']}
+          mb={['20px', 0]}
+          mr={[null, '40px', '56px']}
+        >
+          <NextIllustration
+            alt="Transparent finances"
+            src="/static/images/e2c/placeholder.png"
+            width={416}
+            height={354}
+          />
+        </Box>
+        <Box width="288px" textAlign="center" mb="24px" display={[null, 'none']}>
+          <H4 fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" color="black.800">
+            <FormattedMessage id="e2c.transparentFinances" defaultMessage="Transparent finances" />
+          </H4>
+        </Box>
+        <Box width={['288px', '330px', '472px']}>
+          <H4
+            mb="24px"
+            display={['none', 'block']}
+            fontSize={['24px', '32px']}
+            lineHeight={['32px', '40px']}
+            letterSpacing="-0.008em"
+            color="black.800"
+          >
+            <FormattedMessage id="e2c.transparentFinances" defaultMessage="Transparent finances" />
+          </H4>
+          <P fontSize="18px" lineHeight="26px" color="black.800">
+            <FormattedMessage
+              id="e2c.transparentFinances.description"
+              defaultMessage="Open Collective launched in 2016 and raised $3M of seed investment. The platform became profitable in 2020. {lineBreak}{lineBreak} See our investors and term sheets <link>here</link>."
+              values={{
+                lineBreak: <br />,
+                link: getI18nLink({
+                  openInNewTab: true,
+                  href: '',
+                }),
+              }}
+            />
+          </P>
+        </Box>
+      </Flex>
+    </Flex>
+  );
+};
+
+export default InvestingInTheCommons;

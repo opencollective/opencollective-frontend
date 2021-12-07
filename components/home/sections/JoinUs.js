@@ -83,7 +83,11 @@ const JoinUs = ({ page }) => (
           lineHeight={['40px', '48px', null, '56px']}
           letterSpacing={['-1.2px', '-1.6px', null, '-2px']}
         >
-          <FormattedMessage id="home.joinUsSection.title" defaultMessage="Join the movement" />
+          {page === 'e2c' ? (
+            <FormattedMessage id="e2c.joinTheMovement" defaultMessage="Join the movement and support us" />
+          ) : (
+            <FormattedMessage id="home.joinUsSection.title" defaultMessage="Join the movement" />
+          )}
         </H1>
         <Box my={(null, null, null, null, 3)} width={['288px', 1, null, '335px']}>
           <SectionSubtitle
@@ -96,6 +100,11 @@ const JoinUs = ({ page }) => (
               <FormattedMessage
                 id="becomeAHost.joinUsSection.subtitle"
                 defaultMessage="Open Collective makes fiscal sponsorship shine. Grantees and project participants will love the simplicity and accessibility, and you’ll love the huge reduction of overheads."
+              />
+            ) : page === 'e2c' ? (
+              <FormattedMessage
+                id="e2c.joinTheMovement.subtitle"
+                defaultMessage="Be part of the new generation of communities. There are a couple of ways for you to contribute:"
               />
             ) : (
               <FormattedMessage
