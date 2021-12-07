@@ -283,7 +283,7 @@ const Pricing = () => {
             </Link>
             <Link href="#collective">
               <StyledButton width={['224px', null, '139px']} py="8px" my="8px">
-                <FormattedMessage defaultMessage="Learn more" /> <ArrowDown size="13px" />{' '}
+                <FormattedMessage id="LearnMore" defaultMessage="Learn more" /> <ArrowDown size="13px" />{' '}
               </StyledButton>
             </Link>
           </Container>
@@ -377,12 +377,12 @@ const Pricing = () => {
                 whiteSpace="nowrap"
                 mr={[null, null, 3]}
               >
-                <FormattedMessage id="pricing.getStarted" defaultMessage="Create a Fiscal Host" />
+                <FormattedMessage id="home.createHost" defaultMessage="Create a Fiscal Host" />
               </StyledButton>
             </Link>
             <Link href="#fiscalHost">
               <StyledButton width={['224px', null, '139px']} py="8px" my="8px">
-                <FormattedMessage defaultMessage="Learn more" /> <ArrowDown size="13px" />{' '}
+                <FormattedMessage id="LearnMore" defaultMessage="Learn more" /> <ArrowDown size="13px" />{' '}
               </StyledButton>
             </Link>
           </Container>

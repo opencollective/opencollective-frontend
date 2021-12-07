@@ -92,7 +92,7 @@ const ExpenseAdminActions = ({
               loading={isLoading}
               onClick={downloadInvoice}
               disabled={isDisabled}
-              label={<FormattedMessage id="actions.download" defaultMessage="Download" />}
+              label={<FormattedMessage id="Download" defaultMessage="Download" />}
               icon={<IconDownload size="50%" />}
               {...buttonProps}
             />

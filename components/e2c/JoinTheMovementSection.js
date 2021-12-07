@@ -45,7 +45,7 @@ const JoinTheMovement = () => (
             textAlign={['center', null, 'left']}
           >
             <FormattedMessage
-              id="e2c.joinTheMovement.description"
+              id="home.joinUsSection.subtitle"
               defaultMessage="Be part of the new generation of communities."
             />
             <Span display={['none', 'inline-block']}>

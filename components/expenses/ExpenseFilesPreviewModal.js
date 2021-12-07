@@ -42,7 +42,7 @@ const FileInfo = ({ collective, expense, item, invoiceBlob }) => (
           onClick={() => saveAs(invoiceBlob, getExpenseInvoiceFilename(collective, expense))}
           fontSize
         >
-          <DownloadIcon size="1em" /> <FormattedMessage id="actions.download" defaultMessage="Download" />
+          <DownloadIcon size="1em" /> <FormattedMessage id="Download" defaultMessage="Download" />
         </StyledButton>
       )}
     </Container>
