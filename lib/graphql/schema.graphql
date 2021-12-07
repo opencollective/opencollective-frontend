@@ -2570,6 +2570,7 @@ type Expense implements Transaction {
     """
     fetchHostFee: Boolean = false
   ): Int
+  amountInHostCurrency: Int
   host: User
   createdByUser: UserDetails
   fromCollective: CollectiveInterface
@@ -2603,6 +2604,7 @@ interface Transaction {
     """
     fetchHostFee: Boolean = false
   ): Int
+  amountInHostCurrency: Int
 
   """
   Fee kept by the host in the lowest unit of the currency of the host (ie. in cents)
@@ -2683,6 +2685,7 @@ type Order implements Transaction {
     """
     fetchHostFee: Boolean = false
   ): Int
+  amountInHostCurrency: Int
   host: User
   createdByUser: UserDetails
   fromCollective: CollectiveInterface
