@@ -48,6 +48,7 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
       hostFeePercent
       isTrustedHost
       stats {
+        id
         balance(dateTo: $dateTo) {
           valueInCents
           currency
@@ -61,6 +62,7 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
           valueInCents
         }
         contributionAmountOverTime {
+          timeUnit
           nodes {
             date
             amount {
@@ -271,7 +273,7 @@ const HostDashboardReports = ({ hostSlug }) => {
           <SectionTitle>
             <FormattedMessage id="TransactionsOverview" defaultMessage="Contributions and Expenses" />
           </SectionTitle>
-          <TransactionsOverviewSection host={host} isLoading={loading} dateInterval={dateInterval} />
+          <TransactionsOverviewSection host={host} isLoading={loading} />
         </Container>
         <Box mb={4}>
           <PlatformTipsCollected host={host} isLoading={loading} />
