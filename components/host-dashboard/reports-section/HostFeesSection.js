@@ -73,7 +73,7 @@ const HostFeesSection = ({ host, collectives, isLoading }) => {
             {valuesToDisplay.sharedRevenue}
           </Box>
           <P fontSize="12px" fontWeight="400" mt="10px">
-            <FormattedMessage defaultMessage="Portion of Host Fees shared with Open Collective. It can be automatically transfered (settled) or is due and pending settlement (owed)." />
+            <FormattedMessage defaultMessage="Portion of Host Fees shared with Open Collective. It can be automatically transferred (settled) or is due and pending settlement (owed)." />
           </P>
         </Container>
         <Container

@@ -253,7 +253,7 @@ const HostDashboardReports = ({ hostSlug }) => {
         </Container>
         <Container mb={38}>
           <SectionTitle>
-            <FormattedMessage id="Host.FeesCollective" defaultMessage="Collected Host Fees" />
+            <FormattedMessage id="Host.Metrics.HostFees" defaultMessage="Host Fees" />
           </SectionTitle>
           <HostFeesSection host={host} collectives={collectives} isLoading={loading} />
         </Container>
