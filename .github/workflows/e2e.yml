@@ -170,7 +170,7 @@ jobs:
         id: node-modules
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}-${{ secrets.CACHE_VERSION }}
 
       - name: Install dependencies (frontend)
         if: steps.node-modules.outputs.cache-hit != 'true'
