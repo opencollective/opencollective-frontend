@@ -82,6 +82,10 @@ const messages = defineMessages({
     defaultMessage:
       'Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees).',
   },
+  'expensePolicy.approversCannotPayExpenses': {
+    id: 'collective.expensePolicy.approversCannotPayExpenses',
+    defaultMessage: 'Prevent users from paying expenses that were approved by themselves.',
+  },
 });
 
 const Policies = ({ collective, showOnlyExpensePolicy, contentOnly }) => {
@@ -107,6 +111,7 @@ const Policies = ({ collective, showOnlyExpensePolicy, contentOnly }) => {
   const collectiveContributionPolicy = get(collective, 'contributionPolicy', null);
   const collectiveExpensePolicy = get(collective, 'expensePolicy', null);
   const collectiveDisableExpenseSubmission = get(collective, 'settings.disablePublicExpenseSubmission', false);
+  const approversCannotPayExpenses = get(collective, 'settings.approversCannotPayExpenses', false);
 
   const selectOptions = React.useMemo(() => {
     const optionsArray = Object.entries(MODERATION_CATEGORIES).map(([key, value], index) => ({
@@ -132,16 +137,17 @@ const Policies = ({ collective, showOnlyExpensePolicy, contentOnly }) => {
       contributionPolicy: collectiveContributionPolicy || '',
       expensePolicy: collectiveExpensePolicy || '',
       disablePublicExpenseSubmission: collectiveDisableExpenseSubmission || false,
+      approversCannotPayExpenses: approversCannotPayExpenses || false,
     },
     async onSubmit(values) {
-      const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission } = values;
+      const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission, approversCannotPayExpenses } = values;
       await updatePolicies({
         variables: {
           collective: {
             id: collective.id,
             contributionPolicy,
             expensePolicy,
-            settings: { ...collective.settings, disablePublicExpenseSubmission },
+            settings: { ...collective.settings, disablePublicExpenseSubmission, approversCannotPayExpenses },
           },
         },
       });
@@ -288,6 +294,30 @@ const Policies = ({ collective, showOnlyExpensePolicy, contentOnly }) => {
             }
             defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
           />
+        </Container>
+        <Container>
+          <SettingsSectionTitle mt={4}>
+            <FormattedMessage
+              id="editCollective.expensesMultipleSignoffs.header"
+              defaultMessage="Multiple sign-offs for expenses"
+            />
+          </SettingsSectionTitle>
+          <P mb={2}>
+            <FormattedMessage
+              id="editCollective.expensesMultipleSignoffs.description"
+              defaultMessage="You can require multiple users to be involved when paying for expenses."
+            />
+          </P>
+          <Container mt={3}>
+            <StyledCheckbox
+              name="approver-cannot-pay"
+              label={formatMessage(messages['expensePolicy.approversCannotPayExpenses'])}
+              onChange={() =>
+                formik.setFieldValue('approversCannotPayExpenses', !formik.values.approversCannotPayExpenses)
+              }
+              defaultChecked={Boolean(formik.values.approversCannotPayExpenses)}
+            />
+          </Container>
         </Container>
         <Flex mt={5} mb={3} alignItems="center" justifyContent="center">
           <StyledButton
