@@ -73,6 +73,7 @@ const MemberForm = props => {
       type: 'date',
       defaultValue: new Date(),
       label: intl.formatMessage(memberFormMessages.sinceLabel),
+      required: true,
     },
   ];
 
@@ -136,6 +137,7 @@ const MemberForm = props => {
                         setMemberRole(value);
                       }
                     }}
+                    required={field.required}
                   />
                   {field.name === 'role' && hasRoleDescription(memberRole) && (
                     <Flex mb={3}>
