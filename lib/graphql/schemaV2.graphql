@@ -1773,7 +1773,6 @@ enum ActivityType {
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
-  HELP_AND_SUPPORT_MESSAGE
 }
 
 """
@@ -7284,7 +7283,7 @@ type Mutation {
   """
   Send help and support message
   """
-  sendMessage(name: String!, email: String!, topic: String!, message: String!): SupportResponse!
+  sendMessage(name: String!, email: String!, topic: String!, link: String, message: String!): SupportResponse!
 }
 
 input CollectiveCreateInput {

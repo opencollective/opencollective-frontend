@@ -5,6 +5,7 @@ import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { isURL } from 'validator';
 
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
@@ -20,12 +21,13 @@ import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
+import StyledInputGroup from '../StyledInputGroup';
 import { P, Span } from '../Text';
 import { useUser } from '../UserProvider';
 
 const supportMessageMutation = gqlV2/* GraphQL */ `
-  mutation sendMessage($name: String!, $email: String!, $topic: String!, $message: String!) {
-    sendMessage(name: $name, email: $email, topic: $topic, message: $message) {
+  mutation sendMessage($name: String!, $email: String!, $topic: String!, $link: String, $message: String!) {
+    sendMessage(name: $name, email: $email, topic: $topic, link: $link, message: $message) {
       sent
     }
   }
@@ -33,7 +35,7 @@ const supportMessageMutation = gqlV2/* GraphQL */ `
 
 const validate = values => {
   const errors = {};
-  const { name, topic, email, message } = values;
+  const { name, topic, email, message, link } = values;
 
   if (!name) {
     errors.name = createError(ERROR.FORM_FIELD_REQUIRED);
@@ -47,6 +49,10 @@ const validate = values => {
     errors.email = createError(ERROR.FORM_FIELD_REQUIRED);
   } else if (!isValidEmail(email)) {
     errors.email = createError(ERROR.FORM_FIELD_PATTERN);
+  }
+
+  if (link && !isURL(link)) {
+    errors.link = createError(ERROR.FORM_FIELD_PATTERN);
   }
 
   if (!message) {
@@ -68,6 +74,7 @@ const ContactForm = () => {
       email: '',
       topic: '',
       message: '',
+      link: '',
     },
     validate,
     onSubmit: async values => {
@@ -195,13 +202,53 @@ const ContactForm = () => {
                 />
               </P>
             </Box>
+            <Box mb="28px">
+              <StyledInputField
+                label={
+                  <FormattedMessage
+                    id="helpAndSupport.contactForm.link"
+                    defaultMessage="Add a link with files or something additional"
+                  />
+                }
+                {...getFieldProps('link')}
+                error={touched.link && formatFormErrorMessage(intl, errors.link)}
+                labelFontWeight="700"
+                labelProps={{
+                  lineHeight: '24px',
+                  fontSize: '16px',
+                }}
+                required={false}
+                hint={
+                  <FormattedMessage
+                    id="helpAndSupport.link.description"
+                    defaultMessage="We encourage you to include files or images in a cloud drive link."
+                  />
+                }
+              >
+                {inputProps => (
+                  <StyledInputGroup
+                    prepend="https://"
+                    type="url"
+                    {...inputProps}
+                    placeholder="yourdrive.com"
+                    width="100%"
+                  />
+                )}
+              </StyledInputField>
+            </Box>
             <Box
               display="flex"
               flexDirection={['column', 'row-reverse']}
               justifyContent={[null, 'space-between']}
               alignItems="center"
             >
-              <StyledButton width={['288px', '151px']} buttonSize="medium" buttonStyle="dark" mb={['24px', 0]}>
+              <StyledButton
+                type="submit"
+                width={['288px', '151px']}
+                buttonSize="medium"
+                buttonStyle="dark"
+                mb={['24px', 0]}
+              >
                 <FormattedMessage defaultMessage="Submit Issue" />
                 <Span ml={['10px', '5px']}>
                   <ArrowRight2 size="14px" />
