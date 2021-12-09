@@ -1,11 +1,12 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
-import ExitToCommunitySection from '../components/e2c/ExitToCommunitySection';
+import ExitToCommunity from '../components/e2c/ExitToCommunitySection';
 import InvestingInTheCommons from '../components/e2c/InvestingInTheCommonsSection';
+import JoinTheMovement from '../components/e2c/JoinTheMovementSection';
 import OCIsATechPlatform from '../components/e2c/OCIsATechPlatformSection';
+import ResourcesSection from '../components/e2c/ResourcesSection';
 import WhatDoesE2CMean from '../components/e2c/WhatDoesE2CMeanSection';
-import JoinUs from '../components/home/sections/JoinUs';
 import LearnMore from '../components/home/sections/LearnMore';
 import WeAreOpen from '../components/home/sections/WeAreOpen';
 import Page from '../components/Page';
@@ -23,13 +24,14 @@ const E2C = () => {
   const { formatMessage } = useIntl();
   return (
     <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
-      <ExitToCommunitySection />
+      <ExitToCommunity />
       <WhatDoesE2CMean />
       <InvestingInTheCommons />
+      <ResourcesSection />
       <OCIsATechPlatform />
       <WeAreOpen />
       <LearnMore page="e2c" />
-      <JoinUs page="e2c" />
+      <JoinTheMovement />
     </Page>
   );
 };
