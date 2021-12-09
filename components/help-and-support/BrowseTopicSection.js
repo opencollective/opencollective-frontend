@@ -1,5 +1,6 @@
 import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { Box, Flex, Grid } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
@@ -10,6 +11,14 @@ import StyledLink from '../StyledLink';
 import { H3, P } from '../Text';
 
 import NeedHelp from './NeedHelpSection';
+
+const TopicCard = styled(StyledCard)`
+  &:focus,
+  &:active,
+  &:hover {
+    border: 1px solid #1869f5;
+  }
+`;
 
 const topics = [
   {
@@ -94,7 +103,7 @@ const BrowseTopics = () => {
             </H3>
           </Box>
           <Box display={['none', 'inline-block']}>
-            <Link href="/">
+            <Link href="https://docs.opencollective.com" openInNewTab>
               <StyledButton minWidth={110} buttonStyle="dark" whiteSpace="nowrap">
                 <FormattedMessage id="helpAndSupport.viewAll" defaultMessage="View All" />
               </StyledButton>
@@ -110,7 +119,7 @@ const BrowseTopics = () => {
         >
           {topics.map(({ id, iconSrc, link }) => (
             <StyledLink key={id} href={link} openInNewTab>
-              <StyledCard
+              <TopicCard
                 width={['288px', null, '272px', null, '320px']}
                 padding="24px"
                 borderRadius="16px"
@@ -130,7 +139,7 @@ const BrowseTopics = () => {
                 <Box>
                   <NextIllustration width={64} height={64} src={iconSrc} alt={`${id} illustration`} />
                 </Box>
-              </StyledCard>
+              </TopicCard>
             </StyledLink>
           ))}
         </Grid>

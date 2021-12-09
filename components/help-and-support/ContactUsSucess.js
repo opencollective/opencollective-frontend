@@ -30,9 +30,9 @@ const Wrapper = styled(Container)`
 `;
 
 const ContactUsSuccess = () => (
-  <Flex flexDirection="column" alignItems="center" justifyContent="center" px="16px" mt="48px" mb="120px">
+  <Flex flexDirection="column" alignItems="center" justifyContent="center" px="16px" mt={['32px', '48px']} mb="120px">
     <Flex alignItems="center" width={['288px', '404px']}>
-      <Box width={['72px', '96px']} height={['72px', '96px']}>
+      <Box width={[null, '96px']} height={[null, '96px']}>
         <NextIllustration
           alt="How Open Collective works"
           src="/static/images/help-and-support/success-illustration.png"
