@@ -22,11 +22,11 @@ const StepCheckout = ({ stepDetails, order }) => {
     const depositAddress = order?.paymentMethod?.data?.depositAddress;
 
     return (
-      <Flex flexDirection="column" justifyContent="center" width={1} mt="24px">
+      <Flex flexDirection="column" width={1} mt="24px">
         <MessageBox type="info" fontSize="13px" mb={2}>
           <FormattedMessage
             id="collective.user.orderProcessing.crypto"
-            defaultMessage="<strong>Your contribution is pending.</strong> Once the transaction is completed you will receive a confirmation email with the details."
+            defaultMessage="<strong>Your contribution is pending.</strong> We also sent you these details to your email. Once the transaction is completed you will receive a confirmation email with the details."
             values={I18nFormatters}
           />
           {` `}
@@ -44,10 +44,10 @@ const StepCheckout = ({ stepDetails, order }) => {
             />
           )}
         </MessageBox>
-        <Flex mt="24px">
+        <Flex mt="24px" justifyContent="center">
           <P fontSize="13px" color="black.700">
             <FormattedMessage
-              defaultMessage="We also sent you these details to your email. You can <SupportLink>contact support</SupportLink> if something goes wrong."
+              defaultMessage="You can <SupportLink>contact support</SupportLink> if something goes wrong."
               values={{
                 SupportLink: I18nSupportLink,
               }}

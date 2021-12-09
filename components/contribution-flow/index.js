@@ -703,6 +703,11 @@ class ContributionFlow extends React.Component {
     }
   };
 
+  cryptoOrderCompleted = () => {
+    const { createdOrder } = this.state;
+    this.pushStepRoute('success', { OrderId: createdOrder.id });
+  };
+
   render() {
     const {
       collective,
@@ -726,7 +731,7 @@ class ContributionFlow extends React.Component {
         steps={this.getSteps()}
         currentStepName={this.props.step}
         onStepChange={this.onStepChange}
-        onComplete={this.submitOrder}
+        onComplete={isCrypto && isSubmitted ? this.cryptoOrderCompleted : this.submitOrder}
         skip={skipStepDetails ? ['details'] : null}
       >
         {({
@@ -839,10 +844,9 @@ class ContributionFlow extends React.Component {
                       totalAmount={getTotalAmount(stepDetails, stepSummary)}
                       currency={currency}
                       isCrypto={isCrypto}
-                      collective={collective}
                     />
                   </Box>
-                  {!isEmbed && currentStep.name !== 'checkout' && (
+                  {!isEmbed && (
                     <Box textAlign="center" mt={5}>
                       <CollectiveTitleContainer collective={collective} useLink>
                         <FormattedMessage
