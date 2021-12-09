@@ -87,7 +87,7 @@ const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => 
             assignee: { id: assignee.id },
             account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
             name: cardName,
-            monthlyLimit: { currency: 'USD', valueInCents: monthlyLimit, value: monthlyLimit / 100 },
+            monthlyLimit: { currency: collective.currency, valueInCents: monthlyLimit, value: monthlyLimit / 100 },
           },
         });
       } catch (e) {
@@ -122,7 +122,7 @@ const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => 
         errors.monthlyLimit = 'Required';
       }
       if (values.monthlyLimit > 100000) {
-        errors.monthlyLimit = 'MonthlyLimit should not exceed 1000$';
+        errors.monthlyLimit = `MonthlyLimit should not exceed 1000 ${values.collective?.currency || 'USD'}`;
       }
       return errors;
     },
@@ -238,8 +238,8 @@ const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => 
                 <StyledInputAmount
                   {...inputProps}
                   id="monthlyLimit"
-                  currency={'usd'}
-                  prepend={'usd'}
+                  currency={formik.values.collective?.currency || 'USD'}
+                  prepend={formik.values.collective?.currency || 'USD'}
                   onChange={value => formik.setFieldValue('monthlyLimit', value)}
                   value={formik.values.monthlyLimit}
                   disabled={isBusy}
@@ -278,6 +278,7 @@ CreateVirtualCardModal.propTypes = {
     type: PropTypes.string,
     name: PropTypes.string,
     imageUrl: PropTypes.string,
+    currency: PropTypes.string,
   }).isRequired,
 };
 

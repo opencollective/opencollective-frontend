@@ -46,6 +46,7 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
       supportedPayoutMethods
       name
       imageUrl
+      currency
       hostedVirtualCards(
         limit: $limit
         offset: $offset
