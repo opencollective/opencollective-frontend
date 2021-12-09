@@ -11,7 +11,7 @@ import { H1, H3, P } from '../../Text';
 import Newsletter from '../Newsletter';
 import SectionSubtitle from '../SectionSubtitle';
 
-const SectionWrapper = styled(Container)`
+export const JoinUsWrapper = styled(Container)`
   background: ${props =>
     props.page && props.page === 'becomeAHost'
       ? `url('/static/images/home/joinus-green-bg-sm.png')`
@@ -66,8 +66,46 @@ const Wrapper = styled(Container)`
   }
 `;
 
+export const JoinUsActionContainer = ({ title, description, link }) => {
+  return (
+    <Link href={link}>
+      <Wrapper
+        color="black.900"
+        className="linkWrapper"
+        my={[1, null, 4]}
+        width={['288px', '648px', '569px', null, '594px']}
+      >
+        <Box width={['192px', 1]}>
+          <H3
+            fontSize={['24px', '32px']}
+            textAlign="left"
+            lineHeight={['25px', '40px']}
+            letterSpacing={['-0.08px', '-1.2px']}
+            mb={2}
+            fontWeight="bold"
+          >
+            {title}
+          </H3>
+          <P fontSize="15px" color="black.700" lineHeight="23px" letterSpacing="-0.12px">
+            {description}
+          </P>
+        </Box>
+        <Box className="arrowWrapper" color="black.900" fontWeight="bold">
+          <ArrowRight2 size={'24'} />
+        </Box>
+      </Wrapper>
+    </Link>
+  );
+};
+
+JoinUsActionContainer.propTypes = {
+  title: PropTypes.string,
+  description: PropTypes.string,
+  link: PropTypes.string,
+};
+
 const JoinUs = ({ page }) => (
-  <SectionWrapper py={[5, null, null, 4]} width={1} page={page}>
+  <JoinUsWrapper py={[5, null, null, 4]} width={1} page={page}>
     <Flex
       mx={[3, 4]}
       flexDirection={['column', null, null, 'row']}
@@ -83,11 +121,7 @@ const JoinUs = ({ page }) => (
           lineHeight={['40px', '48px', null, '56px']}
           letterSpacing={['-1.2px', '-1.6px', null, '-2px']}
         >
-          {page === 'e2c' ? (
-            <FormattedMessage id="e2c.joinTheMovement" defaultMessage="Join the movement and support us" />
-          ) : (
-            <FormattedMessage id="home.joinUsSection.title" defaultMessage="Join the movement" />
-          )}
+          <FormattedMessage id="home.joinUsSection.title" defaultMessage="Join the movement" />
         </H1>
         <Box my={(null, null, null, null, 3)} width={['288px', 1, null, '335px']}>
           <SectionSubtitle
@@ -101,11 +135,6 @@ const JoinUs = ({ page }) => (
                 id="becomeAHost.joinUsSection.subtitle"
                 defaultMessage="Open Collective makes fiscal sponsorship shine. Grantees and project participants will love the simplicity and accessibility, and you’ll love the huge reduction of overheads."
               />
-            ) : page === 'e2c' ? (
-              <FormattedMessage
-                id="e2c.joinTheMovement.subtitle"
-                defaultMessage="Be part of the new generation of communities. There are a couple of ways for you to contribute:"
-              />
             ) : (
               <FormattedMessage
                 id="home.joinUsSection.subtitle"
@@ -117,75 +146,27 @@ const JoinUs = ({ page }) => (
       </Box>
 
       <Container ml={[null, null, null, 3, 6]}>
-        <Link href={page === 'becomeAHost' ? '/organizations/new' : '/create'}>
-          <Wrapper
-            color="black.900"
-            className="linkWrapper"
-            my={[1, null, 4]}
-            width={['288px', '648px', '569px', null, '594px']}
-          >
-            <Box width={['192px', 1]}>
-              <H3
-                fontSize={['24px', '32px']}
-                textAlign="left"
-                lineHeight={['25px', '40px']}
-                letterSpacing={['-0.08px', '-1.2px']}
-                mb={2}
-                fontWeight="bold"
-              >
-                {page === 'becomeAHost' ? (
-                  <FormattedMessage id="becomeAHost.create" defaultMessage="Join as a Fiscal Host" />
-                ) : (
-                  <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
-                )}
-              </H3>
-              <P fontSize="15px" color="black.700" lineHeight="23px" letterSpacing="-0.12px">
-                <FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now!" />
-              </P>
-            </Box>
-            <Box className="arrowWrapper" color="black.900" fontWeight="bold">
-              <ArrowRight2 size={'24'} />
-            </Box>
-          </Wrapper>
-        </Link>
-
-        <Link href="https://blog.opencollective.com/tag/case-studies/">
-          <Wrapper color="black.900" my={4} width={['288px', '648px', '569px', null, '594px']} className="linkWrapper">
-            <Container mb={2} width={['192px', 1]}>
-              <H3
-                fontSize={['24px', '32px']}
-                textAlign="left"
-                lineHeight={['25px', '40px']}
-                letterSpacing={['-0.08px', '-1.2px']}
-                mb={2}
-                fontWeight="bold"
-              >
-                <FormattedMessage id="ReadOurStories" defaultMessage="Read our stories" />
-              </H3>
-              <Box width={[null, '460px']}>
-                <P fontSize="15px" lineHeight="23px" letterSpacing="-0.12px" color="black.700" display={[null, 'none']}>
-                  <FormattedMessage id="home.joinUsSection.joinTeam" defaultMessage="Learn more about our impact." />
-                </P>
-                <P
-                  fontSize="15px"
-                  lineHeight="23px"
-                  letterSpacing="-0.12px"
-                  color="black.700"
-                  display={['none', 'block']}
-                >
-                  <FormattedMessage
-                    id="home.joinUsSection.ourStories"
-                    defaultMessage="Open Collective aims to foster transparency and sustainability in communities around the world. See how you can participate."
-                  />
-                </P>
-              </Box>
-            </Container>
-            <Box className="arrowWrapper" color="black.900">
-              <ArrowRight2 size={'24'} />
-            </Box>
-          </Wrapper>
-        </Link>
-
+        <JoinUsActionContainer
+          link={page === 'becomeAHost' ? '/organizations/new' : '/create'}
+          title={
+            page === 'becomeAHost' ? (
+              <FormattedMessage id="becomeAHost.create" defaultMessage="Join as a Fiscal Host" />
+            ) : (
+              <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
+            )
+          }
+          description={<FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now!" />}
+        />
+        <JoinUsActionContainer
+          link="https://blog.opencollective.com/tag/case-studies/"
+          title={<FormattedMessage id="ReadOurStories" defaultMessage="Read our stories" />}
+          description={
+            <FormattedMessage
+              id="home.joinUsSection.ourStories"
+              defaultMessage="Open Collective aims to foster transparency and sustainability in communities around the world. See how you can participate."
+            />
+          }
+        />
         <Wrapper
           color="black.900"
           my={4}
@@ -218,7 +199,7 @@ const JoinUs = ({ page }) => (
         </Wrapper>
       </Container>
     </Flex>
-  </SectionWrapper>
+  </JoinUsWrapper>
 );
 
 JoinUs.propTypes = {
