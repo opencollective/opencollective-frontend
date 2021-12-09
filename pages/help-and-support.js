@@ -9,6 +9,7 @@ import ContactUsSuccess from '../components/help-and-support/ContactUsSucess';
 import HowCanWeHelp from '../components/help-and-support/HowCanWeHelpSection';
 import HowOCWorks from '../components/help-and-support/HowOCWorksSection';
 import NeedHelp from '../components/help-and-support/NeedHelpSection';
+import SearchTopics from '../components/help-and-support/SearchTopicsSection';
 import WeAreHereIfYouWantToTalk from '../components/help-and-support/WeAreHereSection';
 import Link from '../components/Link';
 import Page from '../components/Page';
@@ -79,6 +80,7 @@ const HelpAndSupport = ({ action, formConfirmation }) => {
       ) : (
         <React.Fragment>
           <HowCanWeHelp />
+          <SearchTopics />
           <BrowseTopics />
           <HowOCWorks />
           <WeAreHereIfYouWantToTalk />
