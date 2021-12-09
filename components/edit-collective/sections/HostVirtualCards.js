@@ -66,6 +66,7 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
           provider
           spendingLimitAmount
           spendingLimitInterval
+          currency
           createdAt
           account {
             id

@@ -177,8 +177,8 @@ ActionsButton.propTypes = {
   editHandler: PropTypes.func,
 };
 
-const getLimitString = (spendingLimitAmount, spendingLimitInterval, locale) => {
-  const value = formatCurrency(spendingLimitAmount, 'USD', { locale });
+const getLimitString = (spendingLimitAmount, spendingLimitInterval, currency, locale) => {
+  const value = formatCurrency(spendingLimitAmount, currency, { locale });
   if (!spendingLimitAmount) {
     return <FormattedMessage id="VirtualCards.NoLimit" defaultMessage="No Limit" />;
   }
@@ -297,7 +297,7 @@ const VirtualCard = props => {
                 }}
               />
               &nbsp;&middot;&nbsp;
-              {getLimitString(props.spendingLimitAmount, props.spendingLimitInterval, locale)}
+              {getLimitString(props.spendingLimitAmount, props.spendingLimitInterval, props.currency, locale)}
             </P>
           </React.Fragment>
         )}
@@ -356,6 +356,7 @@ VirtualCard.propTypes = {
   provider: PropTypes.string,
   spendingLimitAmount: PropTypes.number,
   spendingLimitInterval: PropTypes.string,
+  currency: PropTypes.string,
   createdAt: PropTypes.string,
 };
 
