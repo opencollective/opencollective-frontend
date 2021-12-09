@@ -218,7 +218,7 @@ const ExpenseBudgetItem = ({
               {isAdminView &&
                 expense.permissions?.canPay === false &&
                 hasFeature(host, FEATURES.APPROVERS_CANNOT_PAY_EXPENSES) &&
-                expense.status === expenseStatus.APPROVED && (
+                [expenseStatus.APPROVED, expenseStatus.ERROR].includes(expense.status) && (
                   <Box mr="1px">
                     <StyledTooltip
                       content={
