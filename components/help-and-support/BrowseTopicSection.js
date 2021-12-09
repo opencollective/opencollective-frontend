@@ -13,10 +13,13 @@ import { H3, P } from '../Text';
 import NeedHelp from './NeedHelpSection';
 
 const TopicCard = styled(StyledCard)`
+  border-width: 1px;
+  border-color: transparent;
+
   &:focus,
   &:active,
   &:hover {
-    border: 1px solid #1869f5;
+    border-color: #1869f5;
   }
 `;
 
