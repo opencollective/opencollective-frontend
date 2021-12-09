@@ -11,10 +11,10 @@ const StyledIframe = styled.iframe`
   border-radius: 16px;
 `;
 
-const ExitToCommunitySection = () => {
+const ExitToCommunity = () => {
   return (
     <Flex
-      flexDirection={['column']}
+      flexDirection="column"
       justifyContent="center"
       alignItems="center"
       px="16px"
@@ -62,4 +62,4 @@ const ExitToCommunitySection = () => {
   );
 };
 
-export default ExitToCommunitySection;
+export default ExitToCommunity;

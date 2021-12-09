@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
 import { getI18nLink, I18nBold } from '../I18nFormatters';
-import { H2, H4, P } from '../Text';
+import { H2, H4, P, Span } from '../Text';
 
 const ListItem = styled.li`
   margin-left: 20px;
@@ -60,7 +60,7 @@ const InvestingInTheCommons = () => {
           >
             <FormattedMessage id="e2c.challengingBusiness" defaultMessage="Challenging business as usual" />
           </H4>
-          <P fontSize="18px" lineHeight="26px" color="black.800">
+          <Span fontSize="18px" lineHeight="26px" color="black.800">
             <FormattedMessage
               id="e2c.challengingBusiness.description"
               defaultMessage="Many tech founders are forced to give away ownership and control to investors in order to get money as a start-up. <strong>Open Collective is different.</strong> {lineBreak} {lineBreak} We raised money from people who agreed: <ul><li>Investors get paid back slowly and can’t make us exploit people to create huge profits.</li> <li>Investors do NOT control the platform.</li></ul>"
@@ -71,7 +71,7 @@ const InvestingInTheCommons = () => {
                 strong: I18nBold,
               }}
             />
-          </P>
+          </Span>
         </Box>
       </Flex>
       <Flex flexDirection={['column', 'row']} mt="40px" alignItems={[null, 'center']}>
