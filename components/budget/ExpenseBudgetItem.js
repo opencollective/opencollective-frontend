@@ -6,7 +6,6 @@ import { get, includes, size } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { toPx } from '../../lib/theme/helpers';
@@ -215,23 +214,6 @@ const ExpenseBudgetItem = ({
                   </StyledTooltip>
                 </Box>
               )}
-              {isAdminView &&
-                expense.permissions?.canPay === false &&
-                hasFeature(host, FEATURES.APPROVERS_CANNOT_PAY_EXPENSES) &&
-                [expenseStatus.APPROVED, expenseStatus.ERROR].includes(expense.status) && (
-                  <Box mr="1px">
-                    <StyledTooltip
-                      content={
-                        <FormattedMessage
-                          id="Expense.ApproverCannotPay"
-                          defaultMessage="This host enforces that approvers cannot pay for the expense"
-                        />
-                      }
-                    >
-                      <AlertTriangle size={18} />
-                    </StyledTooltip>
-                  </Box>
-                )}
               {isAdminView && (
                 <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} mb={0} py={0} mr="2px" fontSize="9px" />
               )}
