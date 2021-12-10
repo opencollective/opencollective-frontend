@@ -18,13 +18,13 @@ import { HostFeesSectionHistorical } from './HostFeesSectionHistorical';
 const getValuesToDisplay = (isLoading, host, locale) => {
   if (isLoading) {
     const loadingComponent = <LoadingPlaceholder height={21} width={120} />;
-    return { fees: loadingComponent, profit: loadingComponent, sharedRevenue: loadingComponent };
+    return { fees: loadingComponent, netHostFee: loadingComponent, sharedRevenue: loadingComponent };
   } else {
     const { hostFees, hostFeeShare } = host.hostMetrics;
     return {
       fees: formatCurrency(hostFees.valueInCents, host.currency, { locale }),
       sharedRevenue: formatCurrency(hostFeeShare.valueInCents, host.currency, { locale }),
-      profit: formatCurrency(hostFees.valueInCents - hostFeeShare.valueInCents, host.currency, { locale }),
+      netHostFee: formatCurrency(hostFees.valueInCents - hostFeeShare.valueInCents, host.currency, { locale }),
     };
   }
 };
@@ -41,7 +41,7 @@ const HostFeesSection = ({ host, collectives, isLoading }) => {
             <Flex alignItems="center">
               <Image width={14} height={7} src="/static/images/host-fees-timeline.svg" />
               <Span ml="10px" fontSize="12px" fontWeight="500" textTransform="uppercase">
-                <FormattedMessage defaultMessage="Total Host Fees" />
+                <FormattedMessage defaultMessage="Total Collected" />
               </Span>
             </Flex>
           </Container>
@@ -49,7 +49,31 @@ const HostFeesSection = ({ host, collectives, isLoading }) => {
             {valuesToDisplay.fees}
           </Box>
           <P fontSize="12px" fontWeight="400" mt="10px">
-            <FormattedMessage defaultMessage="Host Fees charged each month, which will be added to the Host budget at the end of the month." />
+            <FormattedMessage defaultMessage="Total Host Fees collected. They are continuously added to your Organization's budget." />
+          </P>
+        </Container>
+        <Container
+          display={['none', 'none', 'flex']}
+          borderLeft="1px solid"
+          borderColor="primary.800"
+          height="88px"
+          mt="39px"
+        />
+
+        <Container flex="1 1 230px" px={3}>
+          <Container mt="24px">
+            <Flex alignItems="center">
+              <Image width={9.42} height={12} mr={10} src="/static/images/host-fees-oc.svg" />
+              <Span ml="10px" fontSize="12px" fontWeight="500" textTransform="uppercase">
+                <FormattedMessage defaultMessage="Platform Share" />
+              </Span>
+            </Flex>
+          </Container>
+          <Box pt="12px" pb="10px" fontSize="18px" fontWeight="500">
+            {valuesToDisplay.sharedRevenue}
+          </Box>
+          <P fontSize="12px" fontWeight="400" mt="10px">
+            <FormattedMessage defaultMessage="Portion of Host Fees shared with Open Collective. It can be automatically transferred (settled) or is due and pending settlement (owed)." />
           </P>
         </Container>
         <Container
@@ -64,38 +88,15 @@ const HostFeesSection = ({ host, collectives, isLoading }) => {
             <Flex alignItems="center">
               <Image width={6.5} height={12} mr={10} src="/static/images/host-fees-money-sign.svg" />
               <Span ml="10px" fontSize="12px" fontWeight="500" textTransform="uppercase">
-                <FormattedMessage defaultMessage="Your Profit" />
+                <FormattedMessage defaultMessage="Net Host Fees" />
               </Span>
             </Flex>
           </Container>
           <Box pt="12px" pb="10px" fontSize="18px" fontWeight="500">
-            {valuesToDisplay.profit}
+            {valuesToDisplay.netHostFee}
           </Box>
           <P fontSize="12px" fontWeight="400" mt="10px">
-            <FormattedMessage defaultMessage="The profit as an organization resulting of the host fees you collect without the shared revenue for the use of the platform." />
-          </P>
-        </Container>
-        <Container
-          display={['none', 'none', 'flex']}
-          borderLeft="1px solid"
-          borderColor="primary.800"
-          height="88px"
-          mt="39px"
-        />
-        <Container flex="1 1 230px" px={3}>
-          <Container mt="24px">
-            <Flex alignItems="center">
-              <Image width={9.42} height={12} mr={10} src="/static/images/host-fees-oc.svg" />
-              <Span ml="10px" fontSize="12px" fontWeight="500" textTransform="uppercase">
-                <FormattedMessage defaultMessage="Shared Revenue" />
-              </Span>
-            </Flex>
-          </Container>
-          <Box pt="12px" pb="10px" fontSize="18px" fontWeight="500">
-            {valuesToDisplay.sharedRevenue}
-          </Box>
-          <P fontSize="12px" fontWeight="400" mt="10px">
-            <FormattedMessage defaultMessage="The cost of using the platform. It is collected each month with a settlement invoice uploaded to you as an expense." />
+            <FormattedMessage defaultMessage="Net Host Fees available for your Host to spend after considering the Platform Share portion." />
           </P>
         </Container>
       </Flex>
@@ -103,7 +104,7 @@ const HostFeesSection = ({ host, collectives, isLoading }) => {
       <Flex flexWrap="wrap" my={3} justifyContent="space-between">
         <Container px={2}>
           <P fontSize="12px" fontWeight="400" mt="16px">
-            <FormattedMessage defaultMessage="How is you organization's doing using Open Collective?" />
+            <FormattedMessage defaultMessage="How much Host Fees is your Host collecting over time?" />
           </P>
         </Container>
         <Container px={2} textAlign="right">

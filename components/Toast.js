@@ -31,6 +31,7 @@ const ToastMessage = styled.span`
   font-weight: 500;
   letter-spacing: 0.06em;
   margin-top: 8px;
+  word-break: break-word;
 `;
 
 const IconContainer = styled.div`

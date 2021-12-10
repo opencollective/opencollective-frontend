@@ -16,9 +16,7 @@ describe('event.create.test.js', () => {
 
   it('create an event', () => {
     cy.get('.inputs .inputField.name input', { timeout: 20000 }).type(title);
-    cy.get('.inputField.endsAt input').focus();
-    cy.get('.rdtNext span').click;
-    cy.get('.endsAt .rdtDay:not(.rdtOld):not(.rdtDisabled)').first().click();
+    cy.get('.inputField.endsAt input').type('2050-01-20T13:00');
     cy.get('.geosuggest__input').type('Superfilles');
     cy.wait(700);
     cy.get('.geosuggest__suggests > :nth-child(1)').click();

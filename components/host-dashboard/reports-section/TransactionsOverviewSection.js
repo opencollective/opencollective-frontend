@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
+import { differenceBy } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -12,7 +13,7 @@ import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const getChartOptions = (intl, startDate, endDate, hostCreatedAt) => {
+const getChartOptions = timeUnit => {
   return {
     chart: {
       id: 'chart-transactions-overview',
@@ -35,8 +36,22 @@ const getChartOptions = (intl, startDate, endDate, hostCreatedAt) => {
     },
 
     xaxis: {
-      categories: getCategories(intl, startDate, endDate, hostCreatedAt),
+      labels: {
+        formatter: function (value) {
+          // Show data aggregated yearly
+          if (timeUnit === 'YEAR') {
+            return dayjs(value).utc().year();
+            // Show data aggregated monthly
+          } else if (timeUnit === 'MONTH') {
+            return dayjs(value).utc().format('MMM-YYYY');
+            // Show data aggregated by week or day
+          } else if (timeUnit === 'WEEK' || timeUnit === 'DAY') {
+            return dayjs(value).utc().format('DD-MMM-YYYY');
+          }
+        },
+      },
     },
+
     yaxis: {
       labels: {
         formatter: function (value) {
@@ -47,72 +62,8 @@ const getChartOptions = (intl, startDate, endDate, hostCreatedAt) => {
   };
 };
 
-const getCategories = (intl, startDate, endDate, hostCreatedAt) => {
-  const numberOfDays = dayjs(startDate || hostCreatedAt).diff(dayjs(endDate), 'day');
-  if (numberOfDays <= 7) {
-    const startDay = startDate.getDay();
-    return [...new Array(7)].map((_, idx) =>
-      intl.formatDate(new Date(0, 0, idx + startDay), { weekday: 'long' }).toUpperCase(),
-    );
-  } else if (numberOfDays <= 365) {
-    const currentMonth = new Date().getMonth();
-    return [...new Array(12)].map((_, idx) =>
-      intl.formatDate(new Date(0, idx + currentMonth + 1), { month: 'short' }).toUpperCase(),
-    );
-  } else {
-    return [...new Array(6)].map((_, idx) =>
-      intl.formatDate(new Date(new Date().getFullYear() - 5 + idx, 0), { year: 'numeric' }).toUpperCase(),
-    );
-  }
-};
-
-const getCategoryType = (startDate, endDate, hostCreatedAt) => {
-  const numberOfDays = dayjs(startDate || hostCreatedAt).diff(dayjs(endDate), 'day');
-  if (numberOfDays <= 7) {
-    return 'WEEK';
-  } else if (numberOfDays <= 365) {
-    return 'MONTH';
-  } else {
-    return 'YEAR';
-  }
-};
-
-const constructChartDataPoints = (category, dataPoints) => {
-  let chartDataPoints;
-
-  // Show data for the past 5 years from the current year.
-  if (category === 'YEAR') {
-    chartDataPoints = new Array(6).fill(0);
-    const currentYear = new Date().getFullYear();
-    dataPoints.forEach(dataPoint => {
-      const year = new Date(dataPoint.date).getFullYear();
-      if (year > currentYear - 6) {
-        chartDataPoints[5 - (currentYear - year)] = Math.abs(dataPoint.amount.value);
-      }
-    });
-    // Show data for the past 12 months
-  } else if (category === 'MONTH') {
-    chartDataPoints = new Array(12).fill(0);
-    dataPoints.forEach(dataPoint => {
-      const date = new Date(dataPoint.date);
-      const today = new Date();
-      if (today.getFullYear() - date.getFullYear() <= 1) {
-        chartDataPoints[(date.getMonth() + (12 - today.getMonth())) % 12] = Math.abs(dataPoint.amount.value);
-      }
-    });
-    // Show data for the past 7 days
-  } else if (category === 'WEEK') {
-    chartDataPoints = new Array(7).fill(0);
-    dataPoints.forEach(dataPoint => {
-      const date = new Date(dataPoint.date);
-      const today = new Date();
-      if (today.getFullYear() === date.getFullYear() && today.getMonth() === date.getMonth()) {
-        chartDataPoints[date.getDay() % 7] = Math.abs(dataPoint.amount.value);
-      }
-    });
-  }
-
-  return chartDataPoints;
+const constructChartDataPoints = dataPoints => {
+  return dataPoints.map(({ date, amount }) => ({ x: date, y: Math.abs(amount.value) }));
 };
 
 const getTransactionsAreaChartData = (host, locale) => {
@@ -246,33 +197,44 @@ const getTransactionsBreakdownChartData = host => {
   return areas;
 };
 
-const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
+const TransactionsOverviewSection = ({ host, isLoading }) => {
   const intl = useIntl();
   const { locale } = intl;
-  const categoryType = getCategoryType(new Date(dateInterval?.from), new Date(dateInterval?.to), host?.createdAt);
 
   const contributionStats = host?.contributionStats;
   const expenseStats = host?.expenseStats;
 
   const { contributionAmountOverTime } = contributionStats || 0;
   const { expenseAmountOverTime } = expenseStats || 0;
+  const timeUnit = contributionAmountOverTime?.timeUnit;
 
   const series = [
     {
       name: 'Contributions',
-      data: contributionAmountOverTime
-        ? constructChartDataPoints(categoryType, contributionAmountOverTime.nodes)
-        : null,
+      data: contributionAmountOverTime ? constructChartDataPoints(contributionAmountOverTime.nodes) : null,
     },
     {
       name: 'Expenses',
-      data: expenseAmountOverTime ? constructChartDataPoints(categoryType, expenseAmountOverTime.nodes) : null,
+      data: expenseAmountOverTime ? constructChartDataPoints(expenseAmountOverTime.nodes) : null,
     },
   ];
 
+  /*
+   * If a date doesn't have any contributions or expenses API returns nothing.
+   * But we need to make sure the two series (expenses and contributions) show 0 in these cases rather than NaN which
+   * is shown by default by Appex charts.
+   */
+  if (series[0]?.data && series[1]?.data) {
+    const dataMissingFromSeries0 = differenceBy(series[1].data, series[0].data, 'x');
+    const dataMissingFromSeries1 = differenceBy(series[0].data, series[1].data, 'x');
+    series[0].data.push(...dataMissingFromSeries0.map(({ x }) => ({ x, y: 0 })));
+    series[1].data.push(...dataMissingFromSeries1.map(({ x }) => ({ x, y: 0 })));
+    series[0].data.sort((a, b) => new Date(a.x) - new Date(b.x));
+    series[1].data.sort((a, b) => new Date(a.x) - new Date(b.x));
+  }
+
   const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host, locale), [host, locale]);
   const transactionBreakdownChart = React.useMemo(() => getTransactionsBreakdownChartData(host), [host]);
-  const hasHistorical = false;
   return (
     <React.Fragment>
       <Box mt={18} mb={12}>
@@ -285,21 +247,13 @@ const TransactionsOverviewSection = ({ host, isLoading, dateInterval }) => {
           </div>
         )}
       </Box>
-      {hasHistorical && (
-        <Box mt="24px" mb="12px">
-          {isLoading ? (
-            <LoadingPlaceholder height={21} width="100%" borderRadius="8px" />
-          ) : (
-            <Chart
-              type="area"
-              width="100%"
-              height="250px"
-              options={getChartOptions(intl, new Date(dateInterval?.from), new Date(dateInterval?.to), host.createdAt)}
-              series={series}
-            />
-          )}
-        </Box>
-      )}
+      <Box mt="24px" mb="12px">
+        {isLoading ? (
+          <LoadingPlaceholder height={21} width="100%" borderRadius="8px" />
+        ) : (
+          <Chart type="area" width="100%" height="250px" options={getChartOptions(timeUnit)} series={series} />
+        )}
+      </Box>
     </React.Fragment>
   );
 };
@@ -328,7 +282,6 @@ TransactionsOverviewSection.propTypes = {
       }),
     }),
   }),
-  dateInterval: PropTypes.object,
 };
 
 export default TransactionsOverviewSection;

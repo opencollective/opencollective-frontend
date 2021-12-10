@@ -475,7 +475,7 @@ const ExpenseFormBody = ({
                   : formatMessage(msg.descriptionPlaceholder)
               }
             />
-            <HiddenFragment show={hasBaseFormFieldsCompleted}>
+            <HiddenFragment show={hasBaseFormFieldsCompleted || isInvite}>
               <Flex alignItems="flex-start" mt={3}>
                 <ExpenseTypeTag type={values.type} mr="4px" />
                 <StyledInputTags

@@ -3,17 +3,17 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import dayjs from 'dayjs';
-import { cloneDeep, debounce, get, includes, omit, sortBy, uniqBy, update } from 'lodash';
+import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getCollectiveTypeForUrl, getSuggestedTags } from '../lib/collective.lib';
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
-import { CollectiveType } from '../lib/constants/collectives';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
+import { getPayoutProfiles } from '../lib/expenses';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -145,8 +145,6 @@ const PrivateNoteLabel = () => {
 
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
 const SIDE_MARGIN_WIDTH = 'calc((100% - 1200px) / 2)';
-
-const { ORGANIZATION } = CollectiveType;
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query: { parentCollectiveSlug, collectiveSlug, ExpenseId, key, edit } }) {
@@ -429,33 +427,6 @@ class ExpensePage extends React.Component {
     });
   };
 
-  // This function is currently a duplicate of the one in create-expense.js
-  getPayoutProfiles = memoizeOne(loggedInAccount => {
-    if (!loggedInAccount) {
-      return [];
-    } else {
-      const payoutProfiles = [loggedInAccount];
-      for (const node of get(loggedInAccount, 'adminMemberships.nodes', [])) {
-        if (
-          // Organizations
-          [ORGANIZATION].includes(node.account.type) ||
-          // Independant Collectives
-          (node.account.isActive && node.account.id === node.account.host?.id) ||
-          // Same Host
-          (node.account.isActive && this.props.data?.expense?.account?.host?.id === node.account.host?.id)
-        ) {
-          // Push main account
-          payoutProfiles.push(omit(node.account, ['childrenAccounts']));
-          // Push children (Same Host)
-          if (this.props.data?.expense?.account?.host?.id === node.account.host?.id) {
-            payoutProfiles.push(...node.account.childrenAccounts.nodes);
-          }
-        }
-      }
-      return payoutProfiles;
-    }
-  });
-
   getThreadItems = memoizeOne((comments, activities) => {
     return sortBy([...(comments || []), ...activities], 'createdAt');
   });
@@ -506,7 +477,7 @@ class ExpensePage extends React.Component {
       expense?.items?.every(item => !item.url);
     const skipSummary = isMissingReceipt && status === PAGE_STATUS.EDIT;
 
-    const payoutProfiles = this.getPayoutProfiles(loggedInAccount);
+    const payoutProfiles = getPayoutProfiles(loggedInAccount);
 
     let threadItems;
 
