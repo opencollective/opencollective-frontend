@@ -160,10 +160,6 @@ export const SECTION_LABELS = defineMessages({
     id: 'Host.Plan',
     defaultMessage: 'Host Plan',
   },
-  [ALL_SECTIONS.HOST_METRICS]: {
-    id: 'Host.Metrics',
-    defaultMessage: 'Host Metrics',
-  },
   [ALL_SECTIONS.INFO]: {
     id: 'editCollective.menu.info',
     defaultMessage: 'Info',

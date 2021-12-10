@@ -437,6 +437,11 @@ interface Transaction {
   ): String
   amount: Amount!
   amountInHostCurrency: Amount!
+
+  """
+  Exchange rate between the currency of the transaction and the currency of the host (transaction.amount * transaction.hostCurrencyFxRate = transaction.amountInHostCurrency)
+  """
+  hostCurrencyFxRate: Float
   netAmount(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
@@ -1727,8 +1732,7 @@ enum ActivityType {
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
-  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
-  COLLECTIVE_VIRTUAL_CARD_CREATED
+  COLLECTIVE_VIRTUAL_CARD_ADDED
   ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
@@ -1747,6 +1751,8 @@ enum ActivityType {
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
+  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
+  COLLECTIVE_VIRTUAL_CARD_CREATED
 }
 
 """
@@ -2336,7 +2342,7 @@ type Host implements Account & AccountWithContributions {
     dateTo: DateTime!
 
     """
-    The time unit of the time series
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
     """
     timeUnit: TimeUnit!
   ): HostMetricsTimeSeries!
@@ -2420,7 +2426,7 @@ type Host implements Account & AccountWithContributions {
     """
     The time unit of the time series
     """
-    timeUnit: TimeUnit! = YEAR
+    timeUnit: TimeUnit
   ): ContributionStats!
   expenseStats(
     """
@@ -2439,9 +2445,9 @@ type Host implements Account & AccountWithContributions {
     dateTo: DateTime
 
     """
-    The time unit of the time series
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
     """
-    timeUnit: TimeUnit! = YEAR
+    timeUnit: TimeUnit
   ): ExpenseStats!
 
   """
@@ -4101,6 +4107,11 @@ type Credit implements Transaction {
   ): String
   amount: Amount!
   amountInHostCurrency: Amount!
+
+  """
+  Exchange rate between the currency of the transaction and the currency of the host (transaction.amount * transaction.hostCurrencyFxRate = transaction.amountInHostCurrency)
+  """
+  hostCurrencyFxRate: Float
   netAmount(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
@@ -4199,6 +4210,11 @@ type Debit implements Transaction {
   ): String
   amount: Amount!
   amountInHostCurrency: Amount!
+
+  """
+  Exchange rate between the currency of the transaction and the currency of the host (transaction.amount * transaction.hostCurrencyFxRate = transaction.amountInHostCurrency)
+  """
+  hostCurrencyFxRate: Float
   netAmount(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
