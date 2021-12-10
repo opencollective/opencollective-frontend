@@ -1,10 +1,8 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
 import { includes, pick } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -18,7 +16,6 @@ import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
-import StyledTooltip from '../StyledTooltip';
 import { H4, P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
@@ -92,35 +89,17 @@ const ExpenseSummary = ({
         </Flex>
         <Flex mb={[3, 0]} justifyContent={['space-between', 'flex-end']} alignItems="center">
           {expense?.status && (
-            <Flex>
-              {expense.permissions?.canPay === false &&
-                hasFeature(host, FEATURES.APPROVERS_CANNOT_PAY_EXPENSES) &&
-                expense.status === expenseStatus.APPROVED && (
-                  <Box mr="4px" mt="2px">
-                    <StyledTooltip
-                      content={
-                        <FormattedMessage
-                          id="Expense.ApproverCannotPay"
-                          defaultMessage="This host enforces that approvers cannot pay for the expense"
-                        />
-                      }
-                    >
-                      <AlertTriangle size={18} />
-                    </StyledTooltip>
-                  </Box>
-                )}
-              <Box>
-                <ExpenseStatusTag
-                  display="block"
-                  status={expense.status}
-                  letterSpacing="0.8px"
-                  fontWeight="600"
-                  fontSize="10px"
-                  showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
-                  showTaxFormMsg={expense.payee.isAdmin}
-                />
-              </Box>
-            </Flex>
+            <Box>
+              <ExpenseStatusTag
+                display="block"
+                status={expense.status}
+                letterSpacing="0.8px"
+                fontWeight="600"
+                fontSize="10px"
+                showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
+                showTaxFormMsg={expense.payee.isAdmin}
+              />
+            </Box>
           )}
           {!isLoading && expense.id && (
             <Box display={['flex', 'none']}>
@@ -401,7 +380,6 @@ ExpenseSummary.propTypes = {
     permissions: PropTypes.shape({
       canSeeInvoiceInfo: PropTypes.bool,
       canDelete: PropTypes.bool,
-      canPay: PropTypes.bool,
     }),
   }),
   /** Whether current user can edit the tags */
