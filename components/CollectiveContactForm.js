@@ -6,13 +6,15 @@ import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
 
-import { Flex } from './Grid';
+import Container from './Container';
+import { Box } from './Grid';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import StyledTextarea from './StyledTextarea';
-import { H2, P } from './Text';
+import { H2, P, Span } from './Text';
+import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const sendMessageMutation = gql`
   mutation SendMessage($collectiveId: Int!, $message: String!, $subject: String) {
@@ -22,13 +24,14 @@ const sendMessageMutation = gql`
   }
 `;
 
-const CollectiveContactForm = ({ collective }) => {
+const CollectiveContactForm = ({ collective, isModal = false, onClose }) => {
   const [subject, setSubject] = React.useState('');
   const [message, setMessage] = React.useState('');
   const [error, setError] = React.useState(null);
   const [submit, { data, loading }] = useMutation(sendMessageMutation);
+  const { addToast } = useToasts();
 
-  if (get(data, 'sendMessageToCollective.success')) {
+  if (get(data, 'sendMessageToCollective.success') && !isModal) {
     return (
       <MessageBox type="success" withIcon maxWidth={400} m="32px auto">
         <FormattedMessage id="MessageSent" defaultMessage="Message sent" />
@@ -36,18 +39,28 @@ const CollectiveContactForm = ({ collective }) => {
     );
   }
 
-  const messageLabel = <FormattedMessage id="Contact.Message" defaultMessage="Message" />;
+  const messageLabel = (
+    <Span fontWeight={700}>
+      <FormattedMessage id="Contact.Message" defaultMessage="Message" />
+    </Span>
+  );
   const subjectLabel = (
     <FormattedMessage
       id="OptionalFieldLabel"
       defaultMessage="{field} (optional)"
-      values={{ field: <FormattedMessage id="Contact.Subject" defaultMessage="Subject" /> }}
+      values={{
+        field: (
+          <Span fontWeight={700}>
+            <FormattedMessage id="Contact.Subject" defaultMessage="Subject" />
+          </Span>
+        ),
+      }}
     />
   );
 
   return (
-    <Flex flexDirection="column" alignItems={['center', 'flex-start']} maxWidth={1160} m="0 auto">
-      <H2 mb={2}>
+    <Box flexDirection="column" alignItems={['center', 'flex-start']} maxWidth={1160} m="0 auto">
+      <H2 mb={2} fontSize={isModal ? '28px' : '40px'}>
         <FormattedMessage
           id="ContactCollective"
           defaultMessage="Contact {collective}"
@@ -92,25 +105,38 @@ const CollectiveContactForm = ({ collective }) => {
           {error.message}
         </MessageBox>
       )}
-      <StyledButton
-        mt={4}
-        minWidth={200}
-        buttonStyle="primary"
-        disabled={message.length < 10}
-        loading={loading}
-        data-cy="submit"
-        onClick={async () => {
-          try {
-            setError(null);
-            await submit({ variables: { collectiveId: collective.id, subject, message } });
-          } catch (e) {
-            setError(getErrorFromGraphqlException(e));
-          }
-        }}
-      >
-        <FormattedMessage id="SendMessage" defaultMessage="Send message" />
-      </StyledButton>
-    </Flex>
+      <Container mt={2}>
+        <FormattedMessage defaultMessage="Message needs to be at least 10 characters long" />
+      </Container>
+      {isModal && <hr />}
+      <Box textAlign={isModal ? 'right' : ''}>
+        <StyledButton
+          mt={isModal ? 0 : 4}
+          minWidth={200}
+          buttonStyle="primary"
+          disabled={message.length < 10}
+          loading={loading}
+          data-cy="submit"
+          onClick={async () => {
+            try {
+              setError(null);
+              await submit({ variables: { collectiveId: collective.id, subject, message } });
+              if (isModal) {
+                addToast({
+                  type: TOAST_TYPE.SUCCESS,
+                  message: <FormattedMessage id="MessageSent" defaultMessage="Message sent" />,
+                });
+                onClose();
+              }
+            } catch (e) {
+              setError(getErrorFromGraphqlException(e));
+            }
+          }}
+        >
+          <FormattedMessage defaultMessage="Contact Collective" />
+        </StyledButton>
+      </Box>
+    </Box>
   );
 };
 
@@ -119,6 +145,10 @@ CollectiveContactForm.propTypes = {
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
   }),
+  /* Defines whether this form is displayed as a modal */
+  isModal: PropTypes.bool,
+  /* Specifies close behaviour is this form is part of a modal */
+  onClose: PropTypes.func,
 };
 
 export default CollectiveContactForm;
