@@ -20,6 +20,7 @@ import StyledButton from '../../StyledButton';
 import StyledInputSlider from '../../StyledInputSlider';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { Span } from '../../Text';
+import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import { editCollectiveBackgroundMutation } from '../graphql/mutations';
 
 import {
@@ -40,7 +41,7 @@ const EmptyDropzoneContainer = styled.div`
   cursor: pointer;
   box-sizing: border-box;
   border-radius: 4px;
-  height: 200px;
+  height: 122px;
   text-align: center;
   background: white;
   display: flex;
@@ -60,6 +61,7 @@ const EmptyDropzoneContainer = styled.div`
 
 const HeroBackgroundCropperModal = ({ onClose, collective }) => {
   const [isSubmitting, setSubmitting] = React.useState(false); // Not using Apollo to have a common flag with file upload
+  const { addToast } = useToasts();
   const [editBackground] = useMutation(editCollectiveBackgroundMutation);
   const containerSize = useElementSize({ defaultWidth: 600 });
   const [mediaSize, setMediaSize] = React.useState();
@@ -72,7 +74,6 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
   const minZoom = 0.25;
   const maxZoom = 5;
   const hasImage = Boolean(collective.backgroundImage ? uploadedImage !== KEY_IMG_REMOVE : uploadedImage);
-  const verticalMarginSize = 1.75; // Percentage
 
   const onDrop = ([file]) => {
     onZoomChange(1);
@@ -98,7 +99,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                 <Container position="relative" width="510px" maxWidth="100%">
                   <Container
                     position="relative"
-                    height={BASE_HERO_HEIGHT * scale * verticalMarginSize}
+                    height={BASE_HERO_HEIGHT * scale}
                     {...getRootProps()}
                     ref={mergeRefs([containerSize.ref, rootProps.ref])}
                     onClick={hasImage ? null : rootProps.onClick} // Invalidate click event if there's already an image
@@ -125,7 +126,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                       <Container
                         position="absolute"
                         width={BASE_HERO_WIDTH}
-                        height={BASE_HERO_HEIGHT * verticalMarginSize}
+                        height={BASE_HERO_HEIGHT}
                         left={0}
                         top={0}
                         border="1px solid grey"
@@ -139,7 +140,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                         >
                           <Cropper
                             image={uploadedImage ? uploadedImage.preview : collective.backgroundImageUrl}
-                            cropSize={{ width: '100%', height: BASE_HERO_HEIGHT * scale * 5 }}
+                            cropSize={{ width: BASE_HERO_WIDTH, height: BASE_HERO_HEIGHT }}
                             crop={crop}
                             zoom={zoom}
                             minZoom={minZoom}
@@ -153,7 +154,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                             }
                             style={{
                               imageStyle: { minHeight: '0', minWidth: '0', maxHeight: 'none', maxWidth: 'none' },
-                              containerStyle: { height: BASE_HERO_HEIGHT, cursor: hasImage ? 'move' : 'auto' },
+                              containerStyle: { cursor: hasImage ? 'move' : 'auto' },
                             }}
                           />
                         </StyledHeroBackground>
@@ -192,6 +193,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                     <StyledButton
                       {...BUTTONS_PROPS}
                       buttonStyle="primary"
+                      data-cy="heroBackgroundDropzoneSave"
                       py={1}
                       minWidth={75}
                       loading={isSubmitting}
@@ -232,7 +234,15 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                             onZoomChange((base && base.zoom) || 1);
                             setUploadedImage(null);
 
-                            // Close the modal
+                            // Show a toast and close the modal
+                            addToast({
+                              type: TOAST_TYPE.SUCCESS,
+                              title: <FormattedMessage defaultMessage="Cover updated" />,
+                              message: (
+                                <FormattedMessage defaultMessage="The page might take a few seconds to fully update" />
+                              ),
+                            });
+
                             onClose();
                           } finally {
                             setSubmitting(false);
