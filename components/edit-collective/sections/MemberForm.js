@@ -127,7 +127,7 @@ const MemberForm = props => {
                     defaultValue={getFieldDefaultValue(field)}
                     options={field.options}
                     onChange={value => {
-                      if (field.name === 'since') {
+                      if (field.name === 'since' && value) {
                         setFieldValue(field.name, dayjs(value).toISOString());
                       } else {
                         setFieldValue(field.name, value);
@@ -137,6 +137,12 @@ const MemberForm = props => {
                         setMemberRole(value);
                       }
                     }}
+                    onKeyDown={event => {
+                      if (event.key === 'Backspace') {
+                        event.preventDefault();
+                      }
+                    }}
+                    overflow="hidden"
                     required={field.required}
                   />
                   {field.name === 'role' && hasRoleDescription(memberRole) && (

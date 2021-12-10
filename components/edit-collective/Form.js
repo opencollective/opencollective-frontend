@@ -876,11 +876,17 @@ class EditCollectiveForm extends React.Component {
                       post={field.post}
                       context={this.state.collective}
                       onChange={value => this.handleChange(field.name, value)}
+                      onKeyDown={event => {
+                        if ((field.name === 'startsAt' || field.name === 'endsAt') && event.key === 'Backspace') {
+                          event.preventDefault();
+                        }
+                      }}
                       disabled={field.disabled}
                       maxLength={field.maxLength}
                       isPrivate={field.isPrivate}
                       step={field.step}
                       min={field.min}
+                      overflow="hidden"
                       required={field.required}
                     />
                   ))}

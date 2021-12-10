@@ -143,6 +143,8 @@ class InputField extends React.Component {
     className: PropTypes.string,
     type: PropTypes.string,
     onChange: PropTypes.func.isRequired,
+    onKeyDown: PropTypes.func,
+    overflow: PropTypes.string,
     required: PropTypes.bool,
     style: PropTypes.object,
     multiple: PropTypes.bool,
@@ -625,6 +627,7 @@ class InputField extends React.Component {
         this.input = (
           <FieldGroup
             onChange={event => this.handleChange(event.target.value)}
+            onKeyDown={field.onKeyDown}
             type={field.type}
             pre={field.pre}
             post={field.post}
@@ -645,6 +648,7 @@ class InputField extends React.Component {
             max={field.max}
             required={field.required}
             isPrivate={field.isPrivate}
+            overflow={field.overflow}
           />
         );
         break;

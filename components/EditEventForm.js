@@ -209,7 +209,13 @@ class EditEventForm extends React.Component {
                     timezone: this.state.event.timezone,
                   }}
                   onChange={value => this.handleChange(field.name, value)}
+                  onKeyDown={event => {
+                    if ((field.name === 'startsAt' || field.name === 'endsAt') && event.key === 'Backspace') {
+                      event.preventDefault();
+                    }
+                  }}
                   min={field.min}
+                  overflow="hidden"
                   required={field.required}
                 />
               ),
