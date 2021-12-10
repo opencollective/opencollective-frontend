@@ -11,6 +11,7 @@ import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import { pickBy } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -23,6 +24,7 @@ import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import AssignVirtualCardBtn from '../AssignVirtualCardBtn';
+import ContactCollectiveModal from '../ContactCollectiveModal';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
@@ -180,6 +182,8 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
   const hasNewAdminPanel = parseToBoolean(getEnvVar('NEW_ADMIN_DASHBOARD'));
+  const [showContactModal, setShowContactModal] = React.useState(false);
+  const router = useRouter();
 
   // Do not render the menu if there are no available CTAs
   if (isEmpty) {
@@ -300,12 +304,17 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasContact && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
-                        <StyledLink as={Link} href={`/${collective.slug}/contact`}>
-                          <Container p={ITEM_PADDING}>
-                            <Envelope size="20px" />
-                            <FormattedMessage id="Contact" defaultMessage="Contact" />
-                          </Container>
-                        </StyledLink>
+                        <StyledButton
+                          onClick={() =>
+                            LoggedInUser ? setShowContactModal(true) : router.push(`/${collective.slug}/contact`)
+                          }
+                          borderRadius={0}
+                          p={ITEM_PADDING}
+                          isBorderless
+                        >
+                          <Envelope size="20px" />
+                          <FormattedMessage id="Contact" defaultMessage="Contact" />
+                        </StyledButton>
                       </MenuItem>
                     )}
                     {callsToAction.hasApply && (
@@ -361,6 +370,11 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
           )}
         </ActionsDropdown>
       </Box>
+      <ContactCollectiveModal
+        show={showContactModal}
+        collective={collective}
+        onClose={() => setShowContactModal(false)}
+      />
     </Container>
   );
 };

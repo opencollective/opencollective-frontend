@@ -8,6 +8,7 @@ import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import { first, get } from 'lodash';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -82,6 +83,7 @@ const StyledShortDescription = styled.h2`
 const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const intl = useIntl();
   const { LoggedInUser } = useUser();
+  const router = useRouter();
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
   const [message, showMessage] = React.useState(null);
@@ -199,9 +201,11 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                 </StyledTag>
               )}
               <Flex my={2}>
-                {collective.canContact && LoggedInUser && (
+                {collective.canContact && (
                   <StyledRoundButton
-                    onClick={() => setShowContactModal(true)}
+                    onClick={() =>
+                      LoggedInUser ? setShowContactModal(true) : router.push(`/${collective.slug}/contact`)
+                    }
                     size={32}
                     mr={3}
                     title="Contact"
