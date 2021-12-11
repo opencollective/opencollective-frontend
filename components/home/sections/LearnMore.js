@@ -247,7 +247,7 @@ const LearnMore = ({ page }) => {
 };
 
 LearnMore.propTypes = {
-  page: PropTypes.String,
+  page: PropTypes.string,
 };
 
 export default LearnMore;

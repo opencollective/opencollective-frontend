@@ -39,7 +39,7 @@ const InvestingInTheCommons = () => {
         >
           <NextIllustration
             alt="Challenging business as usual"
-            src="/static/images/e2c/placeholder.png"
+            src="/static/images/e2c/challengingBusiness-illustration.png"
             width={416}
             height={354}
           />
@@ -83,7 +83,7 @@ const InvestingInTheCommons = () => {
         >
           <NextIllustration
             alt="Transparent finances"
-            src="/static/images/e2c/placeholder.png"
+            src="/static/images/e2c/transparent-finance-illustration.png"
             width={416}
             height={354}
           />

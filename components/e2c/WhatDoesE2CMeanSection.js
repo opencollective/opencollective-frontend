@@ -31,7 +31,6 @@ const WhatDoesE2CMean = () => {
           my={['31px', null, 0]}
           ml={[null, null, '32px']}
           width={['288px', '516px', '534px']}
-          display={[null, null, null, null, 'none']}
           minWidth={[null, null, '534px']}
         >
           <NextIllustration
@@ -41,26 +40,7 @@ const WhatDoesE2CMean = () => {
             height={357}
           />
         </Box>
-        <Container ml="54px" display={['none', null, null, null, 'inline-block']} position="relative">
-          <Container
-            width="400px"
-            height="400px"
-            backgroundImage="url('/static/images/e2c/whatDoesE2CMean-illustration-bg.png')"
-            backgroundRepeat="no-repeat"
-            backgroundSize="contain"
-            position="absolute"
-            right="-107px"
-            top="-140px"
-          />
-          <Box minWidth="490px">
-            <NextIllustration
-              alt="How Open Collective works"
-              src="/static/images/e2c/whatDoesE2CMean-illustration-lg.png"
-              width={490}
-              height={327}
-            />
-          </Box>
-        </Container>
+
         <Container display="flex" flexDirection="column" alignItems={['center', null, 'flex-start']}>
           <Box width="346px" display={['none', null, 'block']} mb="32px">
             <H2

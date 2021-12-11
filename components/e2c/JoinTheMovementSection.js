@@ -58,13 +58,13 @@ const JoinTheMovement = () => (
       <Container ml={[null, null, null, 3, 6]}>
         <Box mb="16px">
           <JoinUsActionContainer
-            link="https://docs.opencollective.com/help/financial-contributors/financial-contributors"
+            link="https://opencollective.com/opencollective/donate"
             title={<FormattedMessage id="financialContributions" defaultMessage="Financial contributions" />}
             description={<FormattedMessage defaultMessage="Get a tax-deductible receipt with your donation" />}
           />
         </Box>
         <JoinUsActionContainer
-          link="https://docs.opencollective.com/help/financial-contributors/financial-contributors"
+          link="mailto:pia@opencollective.com"
           title={<FormattedMessage id="helpResearch" defaultMessage="Help us with research" />}
           description={
             <FormattedMessage defaultMessage="Email us and find how you can contribute with your time to add to the research about sharing ownership within organizations." />

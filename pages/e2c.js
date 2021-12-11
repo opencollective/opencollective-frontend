@@ -27,8 +27,8 @@ const E2C = () => {
       <ExitToCommunity />
       <WhatDoesE2CMean />
       <InvestingInTheCommons />
-      <ResourcesSection />
       <OCIsATechPlatform />
+      <ResourcesSection />
       <WeAreOpen />
       <LearnMore page="e2c" />
       <JoinTheMovement />

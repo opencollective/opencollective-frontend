@@ -99,8 +99,8 @@ export const JoinUsActionContainer = ({ title, description, link }) => {
 };
 
 JoinUsActionContainer.propTypes = {
-  title: PropTypes.string,
-  description: PropTypes.string,
+  title: PropTypes.node,
+  description: PropTypes.node,
   link: PropTypes.string,
 };
 
