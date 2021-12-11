@@ -119,7 +119,7 @@ const ResourcesSection = () => {
 };
 
 const LearnWithUs = () => (
-  <Flex flexDirection="column" justifyContent="center" alignItems="center" px="16px">
+  <Flex flexDirection="column" justifyContent="center" alignItems="center" px="16px" mb="58px">
     <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center">
       <Box width={['288px', '330px', '458px', null, '524px']} mb={['40px', 0]} mr={[null, '40px']}>
         <NextIllustration
