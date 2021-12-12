@@ -112,7 +112,7 @@ const InvestingInTheCommons = () => {
                 lineBreak: <br />,
                 link: getI18nLink({
                   openInNewTab: true,
-                  href: '',
+                  href: 'https://docs.opencollective.com/help/about/investors',
                 }),
               }}
             />
