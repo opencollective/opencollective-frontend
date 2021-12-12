@@ -45,7 +45,7 @@ enables a network of:"
       <Box width={[null, null, '956px', null, '1088px']} mb="40px" display={['none', null, 'block']}>
         <NextIllustration
           alt="Challenging business as usual"
-          src="/static/images/e2c/network-md.png"
+          src="/static/images/e2c/network-lg.png"
           width={1088}
           height={408}
         />
