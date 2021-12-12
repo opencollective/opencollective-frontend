@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -150,7 +151,7 @@ const messages = defineMessages({
   },
 });
 
-const LearnMore = () => {
+const LearnMore = ({ page }) => {
   const intl = useIntl();
 
   return (
@@ -204,7 +205,7 @@ const LearnMore = () => {
                 </P>
                 <StyledLink
                   href={channel.link}
-                  color="#DC5F7D"
+                  color={page === 'e2c' ? 'ocBrands.600' : '#DC5F7D'}
                   fontSize="15px"
                   lineHeight="23px"
                   letterSpacing="-0.12px"
@@ -217,30 +218,36 @@ const LearnMore = () => {
           </Fragment>
         ))}
       </Container>
-      <Container display="flex" flexDirection={['column', 'row']} alignItems="center" justifyContent="center">
-        <Box width={['288px', '332px', null, null, '360px']} textAlign={['center', 'left']} mr={[null, 4]}>
-          <H3 color="color.800" fontSize="24px" lineHeight="32px" letterSpacing="-0.12px" my={2}>
-            <FormattedMessage id="home.contributeToPlatform" defaultMessage="Contribute to the platform!" />
-          </H3>
-          <P color="color.700" fontSize="18px" lineHeight="27px" letterSpacing="-0.2px" my={3}>
-            <FormattedMessage
-              id="home.contributeToPlatform.description"
-              defaultMessage="Open Collective is free for charitable initiatives. We rely on generosity of contributors like you to make this possible."
-            />
-          </P>
-        </Box>
-        <DonateButtonWrapper width="287px" height="300px" my={3} ml={[null, 4]}>
-          <DonateButtonBG alt="" />
-          <DonateButtonBGHover alt="" />
-          <Link href="/opencollective/donate">
-            <DonateButton buttonStyle="dark" minWidth={'97'}>
-              <FormattedMessage id="home.donate" defaultMessage="Donate" />
-            </DonateButton>
-          </Link>
-        </DonateButtonWrapper>
-      </Container>
+      {page !== 'e2c' && (
+        <Container display="flex" flexDirection={['column', 'row']} alignItems="center" justifyContent="center">
+          <Box width={['288px', '332px', null, null, '360px']} textAlign={['center', 'left']} mr={[null, 4]}>
+            <H3 color="color.800" fontSize="24px" lineHeight="32px" letterSpacing="-0.12px" my={2}>
+              <FormattedMessage id="home.contributeToPlatform" defaultMessage="Contribute to the platform!" />
+            </H3>
+            <P color="color.700" fontSize="18px" lineHeight="27px" letterSpacing="-0.2px" my={3}>
+              <FormattedMessage
+                id="home.contributeToPlatform.description"
+                defaultMessage="Open Collective is free for charitable initiatives. We rely on generosity of contributors like you to make this possible."
+              />
+            </P>
+          </Box>
+          <DonateButtonWrapper width="287px" height="300px" my={3} ml={[null, 4]}>
+            <DonateButtonBG alt="" />
+            <DonateButtonBGHover alt="" />
+            <Link href="/opencollective/donate">
+              <DonateButton buttonStyle="dark" minWidth={'97'}>
+                <FormattedMessage id="home.donate" defaultMessage="Donate" />
+              </DonateButton>
+            </Link>
+          </DonateButtonWrapper>
+        </Container>
+      )}
     </Container>
   );
+};
+
+LearnMore.propTypes = {
+  page: PropTypes.string,
 };
 
 export default LearnMore;
