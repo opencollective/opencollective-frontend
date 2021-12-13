@@ -30,7 +30,7 @@ enables a network of:"
         justifyContent="center"
         alignItems="center"
         width="100%"
-        overflow="hidden"
+        overflowX="scroll"
         mb="40px"
       >
         <Box display="flex" justifyContent="center" alignItems="center" width="700px" height="408px">
