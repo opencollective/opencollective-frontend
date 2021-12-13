@@ -5697,7 +5697,7 @@ type VirtualCard {
   provider: String
   spendingLimitAmount: Int
   spendingLimitInterval: String
-  currency: String
+  currency: Currency
   createdAt: DateTime
   updatedAt: DateTime
 }
