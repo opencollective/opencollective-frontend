@@ -16,6 +16,7 @@ import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledButtonSet from '../StyledButtonSet';
+import StyledCheckbox from '../StyledCheckbox';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
@@ -53,7 +54,11 @@ const getPayoutOptionValue = (payoutMethodType, isAuto, host) => {
   }
 };
 
-const DEFAULT_VALUES = { paymentProcessorFee: null, twoFactorAuthenticatorCode: null };
+const DEFAULT_VALUES = Object.freeze({
+  paymentProcessorFee: null,
+  twoFactorAuthenticatorCode: null,
+  feesPayer: 'COLLECTIVE',
+});
 
 const validate = values => {
   const errors = {};
@@ -61,6 +66,18 @@ const validate = values => {
     errors.paymentProcessorFee = createError(ERROR.FORM_FIELD_PATTERN);
   }
   return errors;
+};
+
+const getTotalPayoutAmount = (expenseAmount, { paymentProcessorFee, feesPayer }) => {
+  if (feesPayer === 'PAYEE') {
+    return expenseAmount;
+  } else {
+    return expenseAmount + (paymentProcessorFee || 0);
+  }
+};
+
+const canCustomizeFeesPayer = payoutMethodType => {
+  return [PayoutMethodType.BANK_ACCOUNT].includes(payoutMethodType);
 };
 
 const AmountLine = styled.div`
@@ -103,10 +120,18 @@ const Amount = styled.span`
 const SectionLabel = styled.p`
   font-size: 9px;
   font-weight: 500;
-  color: #9d9fa3;
+  color: #4e5052;
   margin: 5px 0;
   text-transform: uppercase;
 `;
+
+const getInitialValues = (expense, host, payoutMethodType) => {
+  return {
+    ...DEFAULT_VALUES,
+    ...getPayoutOptionValue(payoutMethodType, true, host),
+    feesPayer: expense.feesPayer || DEFAULT_VALUES.feesPayer,
+  };
+};
 
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
@@ -114,7 +139,7 @@ const SectionLabel = styled.p`
 const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }) => {
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
-  const initialValues = { ...DEFAULT_VALUES, ...getPayoutOptionValue(payoutMethodType, true, host) };
+  const initialValues = getInitialValues(expense, host, payoutMethodType);
   const formik = useFormik({ initialValues, validate, onSubmit });
   const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
@@ -157,6 +182,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             customBorderRadius="6px"
             onChange={item => {
               formik.setValues({
+                ...formik.values,
                 ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
                 paymentProcessorFee: null,
               });
@@ -194,6 +220,20 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
               />
             )}
           </StyledInputField>
+        )}
+        {canCustomizeFeesPayer(payoutMethodType) && (
+          <Flex mt={16}>
+            <StyledCheckbox
+              name="feesPayer"
+              checked={formik.values.feesPayer === 'PAYEE'}
+              onChange={({ checked }) => formik.setFieldValue('feesPayer', checked ? 'PAYEE' : 'COLLECTIVE')}
+              label={
+                <Span fontSize="12px">
+                  <FormattedMessage defaultMessage="The payee is covering the fees" />
+                </Span>
+              }
+            />
+          </Flex>
         )}
         <Box mt={19} mb={3}>
           <SectionLabel>
@@ -240,9 +280,9 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             </Label>
             <Amount>
               <FormattedMoneyAmount
-                amount={expense.amount + (formik.values.paymentProcessorFee || 0)}
+                amount={getTotalPayoutAmount(expense.amount, formik.values)}
                 currency={expense.currency}
-                currencyCodeStyles={{ color: 'black.400' }}
+                currencyCodeStyles={{ color: 'black.500' }}
               />
             </Amount>
           </AmountLine>
@@ -334,6 +374,7 @@ PayExpenseModal.propTypes = {
     legacyId: PropTypes.number,
     amount: PropTypes.number,
     currency: PropTypes.string,
+    feesPayer: PropTypes.string,
     payoutMethod: PropTypes.shape({
       type: PropTypes.oneOf(Object.values(PayoutMethodType)),
     }),
