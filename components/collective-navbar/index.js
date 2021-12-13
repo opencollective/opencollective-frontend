@@ -259,6 +259,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isAccountant, i
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     hasRequestGrant: accountSupportsGrants(collective, host) && expenseSubmissionAllowed(collective, LoggedInUser),
     addFunds: isHostAdmin,
+    createVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
     assignVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
     requestVirtualCard: isAdmin && isFeatureAvailable(collective, 'REQUEST_VIRTUAL_CARDS'),
     hasSettings: isAdmin || isAccountant,
