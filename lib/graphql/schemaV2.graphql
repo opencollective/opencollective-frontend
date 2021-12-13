@@ -437,6 +437,11 @@ interface Transaction {
   ): String
   amount: Amount!
   amountInHostCurrency: Amount!
+
+  """
+  Exchange rate between the currency of the transaction and the currency of the host (transaction.amount * transaction.hostCurrencyFxRate = transaction.amountInHostCurrency)
+  """
+  hostCurrencyFxRate: Float
   netAmount(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
@@ -683,6 +688,7 @@ type Expense {
   The account that requested this expense to be submitted
   """
   requestedByAccount: Account
+  quote: ExpenseQuote
 }
 
 """
@@ -1777,6 +1783,26 @@ enum LegalDocumentType {
   US tax form (W9)
   """
   US_TAX_FORM
+}
+
+"""
+Fields for an expense quote
+"""
+type ExpenseQuote {
+  """
+  Amount of this item
+  """
+  totalAmount: Amount!
+
+  """
+  Amount of payment processor fee
+  """
+  paymentProcessorFeeAmount: Amount!
+
+  """
+  The date on which the item was created
+  """
+  estimatedDeliveryAt: DateTime!
 }
 
 """
@@ -4121,6 +4147,11 @@ type Credit implements Transaction {
   ): String
   amount: Amount!
   amountInHostCurrency: Amount!
+
+  """
+  Exchange rate between the currency of the transaction and the currency of the host (transaction.amount * transaction.hostCurrencyFxRate = transaction.amountInHostCurrency)
+  """
+  hostCurrencyFxRate: Float
   netAmount(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
@@ -4219,6 +4250,11 @@ type Debit implements Transaction {
   ): String
   amount: Amount!
   amountInHostCurrency: Amount!
+
+  """
+  Exchange rate between the currency of the transaction and the currency of the host (transaction.amount * transaction.hostCurrencyFxRate = transaction.amountInHostCurrency)
+  """
+  hostCurrencyFxRate: Float
   netAmount(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -9,10 +10,12 @@ import { border, color, space, typography } from 'styled-system';
 import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledButtonSet from '../StyledButtonSet';
@@ -26,6 +29,21 @@ import { withUser } from '../UserProvider';
 
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
+
+const quoteExpenseQuery = gqlV2/* GraphQL */ `
+  query QuoteExpenseQuery($id: String!) {
+    expense(expense: { id: $id }) {
+      id
+      quote {
+        paymentProcessorFeeAmount {
+          valueInCents
+          currency
+        }
+        estimatedDeliveryAt
+      }
+    }
+  }
+`;
 
 const getPayoutLabel = (intl, type) => {
   return i18nPayoutMethodType(intl, type, { aliasBankAccountToTransferWise: true });
@@ -68,11 +86,11 @@ const validate = values => {
   return errors;
 };
 
-const getTotalPayoutAmount = (expenseAmount, { paymentProcessorFee, feesPayer }) => {
+const getTotalPayoutAmount = (expense, { paymentProcessorFee, feesPayer }) => {
   if (feesPayer === 'PAYEE') {
-    return expenseAmount;
+    return expense.amount;
   } else {
-    return expenseAmount + (paymentProcessorFee || 0);
+    return expense.amount + (paymentProcessorFee?.valueInCents || 0);
   }
 };
 
@@ -148,6 +166,20 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   const hasAutomaticManualPicker = ![PayoutMethodType.OTHER, PayoutMethodType.ACCOUNT_BALANCE].includes(
     payoutMethodType,
   );
+  const canQuote =
+    host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT && formik.values.feesPayer !== 'PAYEE';
+  const quoteQuery = useQuery(quoteExpenseQuery, {
+    variables: { id: expense.id },
+    context: API_V2_CONTEXT,
+    skip: !canQuote,
+  });
+
+  const paymentProcessorFee = formik.values.forceManual
+    ? {
+        valueInCents: formik.values.paymentProcessorFee,
+        currency: expense.currency,
+      }
+    : quoteQuery?.data?.expense?.quote.paymentProcessorFeeAmount;
 
   return (
     <StyledModal
@@ -252,7 +284,17 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
               />
             </Amount>
           </AmountLine>
-          {formik.values.paymentProcessorFee !== null && (
+          {canQuote && quoteQuery.loading && (
+            <AmountLine borderTop="0.8px dashed #9D9FA3">
+              <Label>
+                <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />
+              </Label>
+              <Amount>
+                <LoadingPlaceholder height="16px" />
+              </Amount>
+            </AmountLine>
+          )}
+          {canQuote && paymentProcessorFee?.valueInCents && (
             <AmountLine borderTop="0.8px dashed #9D9FA3">
               <Label>
                 <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />
@@ -260,11 +302,11 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
               <Amount>
                 <FormattedMoneyAmount
                   showCurrencyCode={false}
-                  amount={formik.values.paymentProcessorFee}
-                  currency={expense.currency}
+                  amount={paymentProcessorFee.valueInCents}
+                  currency={paymentProcessorFee.currency}
                   amountStyles={{
-                    fontWeight: formik.values.paymentProcessorFee ? 500 : 400,
-                    color: formik.values.paymentProcessorFee ? 'black.900' : 'black.400',
+                    fontWeight: paymentProcessorFee ? 500 : 400,
+                    color: paymentProcessorFee ? 'black.900' : 'black.400',
                   }}
                 />
               </Amount>
@@ -272,7 +314,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
           )}
           <AmountLine borderTop="1px solid #4E5052" pt={11}>
             <Label color="black.900" fontWeight="500">
-              {formik.values.paymentProcessorFee !== null ? (
+              {paymentProcessorFee !== null ? (
                 <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />
               ) : (
                 <FormattedMessage id="TotalAmountWithoutFee" defaultMessage="Total amount (without fees)" />
@@ -280,7 +322,10 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             </Label>
             <Amount>
               <FormattedMoneyAmount
-                amount={getTotalPayoutAmount(expense.amount, formik.values)}
+                amount={getTotalPayoutAmount(expense, {
+                  paymentProcessorFee,
+                  feesPayer: formik.values.feesPayer,
+                })}
                 currency={expense.currency}
                 currencyCodeStyles={{ color: 'black.500' }}
               />
@@ -340,6 +385,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             type="submit"
             loading={formik.isSubmitting}
             data-cy="mark-as-paid-button"
+            disabled={quoteQuery.loading}
           >
             {hasManualPayment ? (
               <React.Fragment>
