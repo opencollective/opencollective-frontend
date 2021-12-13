@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { useMutation } from '@apollo/client';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { useFormik } from 'formik';
@@ -7,9 +6,9 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { isURL } from 'validator';
 
+import { sendSupportEmail } from '../../lib/api';
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { isValidEmail } from '../../lib/utils';
 
 import Container from '../Container';
@@ -24,14 +23,6 @@ import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
 import { P, Span } from '../Text';
 import { useUser } from '../UserProvider';
-
-const supportMessageMutation = gqlV2/* GraphQL */ `
-  mutation sendMessage($name: String!, $email: String!, $topic: String!, $link: String, $message: String!) {
-    sendMessage(name: $name, email: $email, topic: $topic, link: $link, message: $message) {
-      sent
-    }
-  }
-`;
 
 const validate = values => {
   const errors = {};
@@ -66,8 +57,7 @@ const ContactForm = () => {
   const intl = useIntl();
   const router = useRouter();
   const { LoggedInUser } = useUser();
-  const [sendMessage, { error: submitError }] = useMutation(supportMessageMutation, { context: API_V2_CONTEXT });
-
+  const [submitError, setSubmitError] = useState('');
   const { getFieldProps, handleSubmit, errors, touched, setFieldValue } = useFormik({
     initialValues: {
       name: '',
@@ -77,11 +67,14 @@ const ContactForm = () => {
       link: '',
     },
     validate,
-    onSubmit: async values => {
-      const response = await sendMessage({ variables: values });
-      if (response.data.sendMessage) {
-        await router.push('/contact/success');
-      }
+    onSubmit: values => {
+      sendSupportEmail(values)
+        .then(() => {
+          return router.push('/contact/success');
+        })
+        .catch(error => {
+          setSubmitError(error.message || 'An error occur submitting this issue, try again');
+        });
     },
   });
 
