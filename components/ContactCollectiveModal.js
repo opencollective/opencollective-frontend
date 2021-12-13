@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import CollectiveContactForm from './CollectiveContactForm';
-import Modal from './StyledModal';
+import Modal, { ModalHeader } from './StyledModal';
 
 const ContactCollectiveModal = ({ collective, onClose, show }) => {
   return (
     <Modal role="alertdialog" width="578px" show={show} onClose={onClose} trapFocus>
+      <ModalHeader />
       <CollectiveContactForm collective={collective} isModal onClose={onClose} />
     </Modal>
   );
