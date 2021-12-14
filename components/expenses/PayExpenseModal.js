@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
+import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { border, color, space, typography } from 'styled-system';
@@ -94,8 +95,12 @@ const getTotalPayoutAmount = (expense, { paymentProcessorFee, feesPayer }) => {
   }
 };
 
-const canCustomizeFeesPayer = payoutMethodType => {
-  return [PayoutMethodType.BANK_ACCOUNT].includes(payoutMethodType);
+const canCustomizeFeesPayer = (expense, collective, hasManualPayment, feeAmount) => {
+  return Boolean(
+    [PayoutMethodType.BANK_ACCOUNT].includes(expense.payoutMethod?.type) && // Only for transferwise at the moment
+      expense.amount === get(collective, 'stats.balanceWithBlockedFunds.valueInCents') && // Only when emptying the collective balance
+      (!hasManualPayment || feeAmount), // Only when there may be fees
+  );
 };
 
 const AmountLine = styled.div`
@@ -253,7 +258,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             )}
           </StyledInputField>
         )}
-        {canCustomizeFeesPayer(payoutMethodType) && (
+        {canCustomizeFeesPayer(expense, collective, hasManualPayment, formik.values.paymentProcessorFee) && (
           <Flex mt={16}>
             <StyledCheckbox
               name="feesPayer"
@@ -294,7 +299,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
               </Amount>
             </AmountLine>
           )}
-          {canQuote && paymentProcessorFee?.valueInCents && (
+          {canQuote && Boolean(paymentProcessorFee?.valueInCents) && (
             <AmountLine borderTop="0.8px dashed #9D9FA3">
               <Label>
                 <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />
