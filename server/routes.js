@@ -80,6 +80,7 @@ module.exports = (expressApp, nextApp) => {
         searchParams.set('api_key', process.env.API_KEY);
         return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
       },
+      filter: req => req.url !== '/support',
     }),
   );
 

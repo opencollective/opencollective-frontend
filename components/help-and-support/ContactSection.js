@@ -58,6 +58,7 @@ const ContactForm = () => {
   const router = useRouter();
   const { LoggedInUser } = useUser();
   const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { getFieldProps, handleSubmit, errors, touched, setFieldValue } = useFormik({
     initialValues: {
       name: '',
@@ -68,11 +69,14 @@ const ContactForm = () => {
     },
     validate,
     onSubmit: values => {
+      setIsSubmitting(true);
       sendSupportEmail(values)
         .then(() => {
+          setIsSubmitting(false);
           return router.push('/contact/success');
         })
         .catch(error => {
+          setIsSubmitting(false);
           setSubmitError(error.message || 'An error occur submitting this issue, try again');
         });
     },
@@ -187,6 +191,7 @@ const ContactForm = () => {
                 inputName="message"
                 onChange={e => setFieldValue('message', e.target.value)}
                 withBorders
+                version="simplified"
               />
               <P mt="6px" fontSize="13px" lineHeight="20px" color="black.700">
                 <FormattedMessage
@@ -241,6 +246,7 @@ const ContactForm = () => {
                 buttonSize="medium"
                 buttonStyle="dark"
                 mb={['24px', 0]}
+                loading={isSubmitting}
               >
                 <FormattedMessage defaultMessage="Submit Issue" />
                 <Span ml={['10px', '5px']}>
