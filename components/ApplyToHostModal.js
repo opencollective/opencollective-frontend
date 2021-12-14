@@ -46,6 +46,7 @@ const hostFields = gqlV2/* GraphQL */ `
     type
     slug
     name
+    createdAt
     currency
     isOpenToApplications
     termsUrl
