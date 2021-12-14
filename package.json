@@ -190,6 +190,7 @@
     "eslint-plugin-formatjs": "^2.18.0",
     "eslint-plugin-graphql": "^4.0.0",
     "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-jsx": "^0.1.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-react": "^7.27.0",
     "eslint-plugin-react-hooks": "^4.2.0",
