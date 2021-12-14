@@ -106,6 +106,7 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     }
     transferwise {
       id
+      availableCurrencies
     }
   }
 `;
