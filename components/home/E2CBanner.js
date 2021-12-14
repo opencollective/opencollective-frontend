@@ -10,7 +10,7 @@ const E2CBanner = () => (
     <Box>
       <P fontSize="14px" lineHeight="20px" color="primary.900">
         <FormattedMessage
-          defaultMessage="Join us as we find a way to decentralize the ownership of the platform. <link><strong>Know more about Exit to Community #E2C</strong></link>"
+          defaultMessage="Join us as we find a way to decentralize the ownership of the platform. <link><strong>Learn more about Exit to Community #E2C</strong></link>"
           values={{
             strong: I18nBold,
             link: getI18nLink({
