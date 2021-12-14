@@ -1753,8 +1753,7 @@ enum ActivityType {
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
-  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
-  COLLECTIVE_VIRTUAL_CARD_CREATED
+  COLLECTIVE_VIRTUAL_CARD_ADDED
   ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
@@ -1773,6 +1772,8 @@ enum ActivityType {
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
+  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
+  COLLECTIVE_VIRTUAL_CARD_CREATED
 }
 
 """
@@ -2382,7 +2383,7 @@ type Host implements Account & AccountWithContributions {
     dateTo: DateTime!
 
     """
-    The time unit of the time series
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
     """
     timeUnit: TimeUnit!
   ): HostMetricsTimeSeries!
@@ -2466,7 +2467,7 @@ type Host implements Account & AccountWithContributions {
     """
     The time unit of the time series
     """
-    timeUnit: TimeUnit! = YEAR
+    timeUnit: TimeUnit
   ): ContributionStats!
   expenseStats(
     """
@@ -2485,9 +2486,9 @@ type Host implements Account & AccountWithContributions {
     dateTo: DateTime
 
     """
-    The time unit of the time series
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
     """
-    timeUnit: TimeUnit! = YEAR
+    timeUnit: TimeUnit
   ): ExpenseStats!
 
   """
@@ -7279,11 +7280,6 @@ type Mutation {
     """
     virtualCard: VirtualCardReferenceInput!
   ): Boolean
-
-  """
-  Send help and support message
-  """
-  sendMessage(name: String!, email: String!, topic: String!, link: String, message: String!): SupportResponse!
 }
 
 input CollectiveCreateInput {
@@ -10178,8 +10174,4 @@ input VirtualCardUpdateInput {
 
 input VirtualCardReferenceInput {
   id: String
-}
-
-type SupportResponse {
-  sent: Boolean
 }
