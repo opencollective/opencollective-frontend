@@ -101,6 +101,7 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
       country
     }
     supportedPayoutMethods
+    isTrustedHost
     plan {
       id
     }
