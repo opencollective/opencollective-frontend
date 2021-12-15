@@ -10,6 +10,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
+import ContributionConfirmationModal from '../ContributionConfirmationModal';
 import StyledButton from '../StyledButton';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
@@ -47,6 +48,7 @@ const ProcessOrderButtons = ({ order, permissions }) => {
   const mutationOptions = { context: API_V2_CONTEXT };
   const [processOrder, { loading }] = useMutation(processPendingOrderMutation, mutationOptions);
   const [hasConfirm, setConfirm] = React.useState(false);
+  const [showContributionConfirmationModal, setShowContributionConfirmationModal] = React.useState(false);
 
   const triggerAction = async action => {
     // Prevent submitting the action if another one is being submitted at the same time
@@ -83,14 +85,26 @@ const ProcessOrderButtons = ({ order, permissions }) => {
 
   return (
     <React.Fragment>
-      {permissions.canMarkAsPaid && (
-        <StyledButton {...getButtonProps('MARK_AS_PAID')} buttonStyle="successSecondary">
-          <ApproveIcon size={12} />
-          <ButtonLabel>
-            <FormattedMessage id="order.markAsCompleted" defaultMessage="Mark as completed" />
-          </ButtonLabel>
-        </StyledButton>
-      )}
+      {permissions.canMarkAsPaid &&
+        (!order.paymentMethod ? (
+          <StyledButton
+            {...getButtonProps('MARK_AS_PAID')}
+            onClick={() => setShowContributionConfirmationModal(true)}
+            buttonStyle="successSecondary"
+          >
+            <ApproveIcon size={12} />
+            <ButtonLabel>
+              <FormattedMessage defaultMessage="Edit & Confirm" />
+            </ButtonLabel>
+          </StyledButton>
+        ) : (
+          <StyledButton {...getButtonProps('MARK_AS_PAID')} buttonStyle="successSecondary">
+            <ApproveIcon size={12} />
+            <ButtonLabel>
+              <FormattedMessage id="order.markAsCompleted" defaultMessage="Mark as completed" />
+            </ButtonLabel>
+          </StyledButton>
+        ))}
       {permissions.canMarkAsExpired && (
         <StyledButton {...getButtonProps('MARK_AS_EXPIRED')} buttonStyle="dangerSecondary">
           <RejectIcon size={14} />
@@ -122,6 +136,13 @@ const ProcessOrderButtons = ({ order, permissions }) => {
           ) : null}
         </ConfirmationModal>
       )}
+      {showContributionConfirmationModal && (
+        <ContributionConfirmationModal
+          show={showContributionConfirmationModal}
+          order={order}
+          onClose={() => setShowContributionConfirmationModal(false)}
+        />
+      )}
     </React.Fragment>
   );
 };
@@ -134,6 +155,7 @@ ProcessOrderButtons.propTypes = {
   order: PropTypes.shape({
     id: PropTypes.string,
     legacyId: PropTypes.number,
+    paymentMethod: PropTypes.object,
   }).isRequired,
   onError: PropTypes.func,
   onSuccess: PropTypes.func,
