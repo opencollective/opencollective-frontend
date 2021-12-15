@@ -95,12 +95,21 @@ const getTotalPayoutAmount = (expense, { paymentProcessorFee, feesPayer }) => {
   }
 };
 
-const canCustomizeFeesPayer = (expense, collective, hasManualPayment, feeAmount) => {
-  return Boolean(
-    [PayoutMethodType.BANK_ACCOUNT].includes(expense.payoutMethod?.type) && // Only for transferwise at the moment
-      expense.amount === get(collective, 'stats.balanceWithBlockedFunds.valueInCents') && // Only when emptying the collective balance
-      (!hasManualPayment || feeAmount), // Only when there may be fees
-  );
+const canCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount) => {
+  // Current limitations:
+  // - Only for transferwise
+  // - Only when emptying the account balance
+  if (
+    ![PayoutMethodType.BANK_ACCOUNT].includes(expense.payoutMethod?.type) ||
+    expense.amount !== get(collective, 'stats.balanceWithBlockedFunds.valueInCents')
+  ) {
+    return false;
+  }
+
+  // We should only show the checkbox if there may actually be fees on the payout:
+  // - When the payment is manual, we only show the checkbox if a fee is set by the user
+  // - If it's an automatic payment then we can't predict the fees, so in doubt we show the checkbox
+  return !isManualPayment || Boolean(feeAmount);
 };
 
 const AmountLine = styled.div`
