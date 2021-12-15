@@ -29,7 +29,7 @@ const HowOCWorks = () => {
             color="black.900"
             whiteSpace={[null, null, 'pre-line']}
           >
-            <FormattedMessage id="howItWorks.title" defaultMessage="How Open Collective works" />
+            <FormattedMessage id="OC.howItWorks" defaultMessage="How Open Collective works" />
           </H1>
         </Box>
         <Box width={['288px', '344px', '458px', null, '558px']}>

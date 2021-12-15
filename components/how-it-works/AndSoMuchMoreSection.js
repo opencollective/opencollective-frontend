@@ -36,7 +36,7 @@ const MoreFeatures = () => (
           fontWeight="500"
         >
           <FormattedMessage
-            id="howItWorks.muchMore.description"
+            id="home.weAreOpenSection.subtitle"
             defaultMessage="We not only help you be transparent, we are too!"
           />
         </P>
@@ -58,7 +58,7 @@ const MoreFeatures = () => (
         </Box>
         <Box width="288px">
           <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" color="black.800" mb={3}>
-            <FormattedMessage id="howItWorks.events" defaultMessage="Events" />
+            <FormattedMessage id="Events" defaultMessage="Events" />
           </H3>
           <P fontSize="18px" lineHeight="26px" color="black.700" fontWeight="500">
             <FormattedMessage
@@ -74,7 +74,7 @@ const MoreFeatures = () => (
         </Box>
         <Box width="288px">
           <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" color="black.800" mb={3}>
-            <FormattedMessage id="howItWorks.projects" defaultMessage="Projects" />
+            <FormattedMessage id="CollectivePage.SectionProjects.Title" defaultMessage="Projects" />
           </H3>
           <P fontSize="18px" lineHeight="26px" color="black.700" fontWeight="500">
             <FormattedMessage
@@ -90,7 +90,7 @@ const MoreFeatures = () => (
         </Box>
         <Box width="288px">
           <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" color="black.800" mb={3}>
-            <FormattedMessage id="howItWorks.virtualCards" defaultMessage="Virtual Cards" />
+            <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
           </H3>
           <P fontSize="18px" lineHeight="26px" color="black.700" fontWeight="500">
             <FormattedMessage
@@ -141,7 +141,7 @@ const MoreFeatures = () => (
         href="https://docs.opencollective.com/help/"
         fontWeight="500"
       >
-        <FormattedMessage id="learnMore" defaultMessage="Learn more" />
+        <FormattedMessage id="LearnMore" defaultMessage="Learn more" />
       </StyledLink>
     </Box>
   </Flex>
