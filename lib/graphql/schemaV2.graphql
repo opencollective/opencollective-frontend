@@ -7216,14 +7216,24 @@ type Mutation {
   """
   editVirtualCard(
     """
-    Virtual Card being edited its new values
+    Virtual Card reference
     """
-    virtualCard: VirtualCardUpdateInput!
+    virtualCard: VirtualCardReferenceInput!
 
     """
-    The individual account reference to attach the Virtual Card to if desired
+    Virtual card name
     """
-    assignee: AccountReferenceInput
+    name: String!
+
+    """
+    Virtual card monthly limit
+    """
+    monthlyLimit: AmountInput
+
+    """
+    Individual account responsible for the card
+    """
+    assignee: AccountReferenceInput!
   ): VirtualCard!
 
   """

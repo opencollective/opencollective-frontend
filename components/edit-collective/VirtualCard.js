@@ -311,7 +311,7 @@ const VirtualCard = props => {
         alignItems="center"
         shrink={0}
       >
-        {props.hasActions && (
+        {props.canEditVirtualCard && (
           <ActionsButton
             id={props.id}
             state={props.data.state}
@@ -319,7 +319,6 @@ const VirtualCard = props => {
             editHandler={props.editHandler}
           />
         )}
-        <React.Fragment>{props.provider}</React.Fragment>
         <Action onClick={() => setDisplayDetails(!displayDetails)}>
           {displayDetails ? (
             <React.Fragment>
@@ -339,7 +338,7 @@ const VirtualCard = props => {
 };
 
 VirtualCard.propTypes = {
-  hasActions: PropTypes.bool,
+  canEditVirtualCard: PropTypes.bool,
   onSuccess: PropTypes.func,
   editHandler: PropTypes.func,
 
