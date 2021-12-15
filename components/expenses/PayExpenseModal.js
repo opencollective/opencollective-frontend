@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
+import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { border, color, space, typography } from 'styled-system';
@@ -94,8 +95,21 @@ const getTotalPayoutAmount = (expense, { paymentProcessorFee, feesPayer }) => {
   }
 };
 
-const canCustomizeFeesPayer = payoutMethodType => {
-  return [PayoutMethodType.BANK_ACCOUNT].includes(payoutMethodType);
+const canCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount) => {
+  // Current limitations:
+  // - Only for transferwise
+  // - Only when emptying the account balance
+  if (
+    ![PayoutMethodType.BANK_ACCOUNT].includes(expense.payoutMethod?.type) ||
+    expense.amount !== get(collective, 'stats.balanceWithBlockedFunds.valueInCents')
+  ) {
+    return false;
+  }
+
+  // We should only show the checkbox if there may actually be fees on the payout:
+  // - When the payment is manual, we only show the checkbox if a fee is set by the user
+  // - If it's an automatic payment then we can't predict the fees, so in doubt we show the checkbox
+  return !isManualPayment || Boolean(feeAmount);
 };
 
 const AmountLine = styled.div`
@@ -253,7 +267,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             )}
           </StyledInputField>
         )}
-        {canCustomizeFeesPayer(payoutMethodType) && (
+        {canCustomizeFeesPayer(expense, collective, hasManualPayment, formik.values.paymentProcessorFee) && (
           <Flex mt={16}>
             <StyledCheckbox
               name="feesPayer"
@@ -294,7 +308,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
               </Amount>
             </AmountLine>
           )}
-          {canQuote && paymentProcessorFee?.valueInCents && (
+          {canQuote && Boolean(paymentProcessorFee?.valueInCents) && (
             <AmountLine borderTop="0.8px dashed #9D9FA3">
               <Label>
                 <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />
