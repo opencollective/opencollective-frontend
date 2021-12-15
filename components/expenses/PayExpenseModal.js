@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
-import { get } from 'lodash';
+import { get, isNumber } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { border, color, space, typography } from 'styled-system';
@@ -308,7 +308,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
               </Amount>
             </AmountLine>
           )}
-          {canQuote && Boolean(paymentProcessorFee?.valueInCents) && (
+          {isNumber(paymentProcessorFee?.valueInCents) && (
             <AmountLine borderTop="0.8px dashed #9D9FA3">
               <Label>
                 <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />
