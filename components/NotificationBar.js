@@ -18,6 +18,10 @@ const NotificationBarContainer = styled.div`
   .collectiveArchived {
     background: #414141;
   }
+  a {
+    color: white;
+    text-decoration: underline;
+  }
 `;
 
 const ErrorMessageContainer = styled.div`
@@ -128,8 +132,8 @@ PendingApplicationActions.propTypes = {
 class NotificationBar extends React.Component {
   static propTypes = {
     status: PropTypes.string,
-    title: PropTypes.string,
-    description: PropTypes.string,
+    title: PropTypes.node,
+    description: PropTypes.node,
     error: PropTypes.string,
     refetch: PropTypes.func,
     actions: PropTypes.arrayOf(PropTypes.node),
