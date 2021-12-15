@@ -5753,6 +5753,7 @@ type VirtualCard {
   provider: String
   spendingLimitAmount: Int
   spendingLimitInterval: String
+  currency: Currency
   createdAt: DateTime
   updatedAt: DateTime
 }
