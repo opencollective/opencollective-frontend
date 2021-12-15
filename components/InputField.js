@@ -157,6 +157,7 @@ class InputField extends React.Component {
     max: PropTypes.number,
     focus: PropTypes.bool,
     help: PropTypes.string,
+    error: PropTypes.string,
   };
 
   constructor(props) {
@@ -649,6 +650,7 @@ class InputField extends React.Component {
             required={field.required}
             isPrivate={field.isPrivate}
             overflow={field.overflow}
+            error={field.error}
           />
         );
         break;

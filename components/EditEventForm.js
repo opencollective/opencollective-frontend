@@ -28,7 +28,14 @@ class EditEventForm extends React.Component {
 
     const event = { ...(props.event || {}) };
     event.slug = event.slug ? event.slug.replace(/.*\//, '') : '';
-    this.state = { event, tiers: event.tiers || [{}], disabled: false, showDeleteModal: false };
+    this.state = {
+      event,
+      tiers: event.tiers || [{}],
+      disabled: false,
+      showDeleteModal: false,
+      validStartDate: true,
+      validEndDate: true,
+    };
 
     this.messages = defineMessages({
       'slug.label': { id: 'collective.slug.label', defaultMessage: 'url' },
@@ -63,6 +70,7 @@ class EditEventForm extends React.Component {
         id: 'event.privateInstructions.description',
         defaultMessage: 'These instructions will be provided by email to the participants.',
       },
+      inValidDateError: { defaultMessage: 'Please enter a valid date' },
     });
   }
 
@@ -77,9 +85,17 @@ class EditEventForm extends React.Component {
     set(event, fieldname, value);
 
     if (fieldname === 'startsAt') {
-      event[fieldname] = convertDateToApiUtc(value, this.state.event.timezone);
+      const isValid = dayjs(value).isValid();
+      this.setState({ validStartDate: isValid, disabled: !isValid });
+      if (isValid) {
+        event[fieldname] = convertDateToApiUtc(value, this.state.event.timezone);
+      }
     } else if (fieldname === 'endsAt') {
-      event[fieldname] = convertDateToApiUtc(value, this.state.event.timezone);
+      const isValid = dayjs(value).isValid();
+      this.setState({ validEndDate: isValid, disabled: !isValid });
+      if (isValid) {
+        event[fieldname] = convertDateToApiUtc(value, this.state.event.timezone);
+      }
     } else if (fieldname === 'timezone') {
       if (value) {
         const timezone = this.state.event.timezone;
@@ -145,12 +161,14 @@ class EditEventForm extends React.Component {
         type: 'datetime-local',
         defaultValue: dayjs(this.state.event.startsAt).tz(this.state.event.timezone).format('YYYY-MM-DDTHH:mm'),
         required: true,
+        error: !this.state.validStartDate ? intl.formatMessage(this.messages.inValidDateError) : null,
       },
       {
         name: 'endsAt',
         type: 'datetime-local',
         defaultValue: dayjs(this.state.event.endsAt).tz(this.state.event.timezone).format('YYYY-MM-DDTHH:mm'),
         required: true,
+        error: !this.state.validEndDate ? intl.formatMessage(this.messages.inValidDateError) : null,
       },
       {
         name: 'timezone',
@@ -204,6 +222,7 @@ class EditEventForm extends React.Component {
                   description={field.description}
                   placeholder={field.placeholder}
                   type={field.type}
+                  error={field.error}
                   pre={field.pre}
                   context={{
                     timezone: this.state.event.timezone,

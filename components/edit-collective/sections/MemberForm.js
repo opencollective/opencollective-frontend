@@ -28,6 +28,7 @@ const memberFormMessages = defineMessages({
   roleLabel: { id: 'members.role.label', defaultMessage: 'Role' },
   sinceLabel: { id: 'user.since.label', defaultMessage: 'Since' },
   descriptionLabel: { id: 'Fields.description', defaultMessage: 'Description' },
+  inValidDateError: { defaultMessage: 'Please enter a valid date' },
 });
 
 const MemberForm = props => {
@@ -86,6 +87,14 @@ const MemberForm = props => {
     }
   };
 
+  const validate = values => {
+    const errors = {};
+    if (!dayjs(values.since).isValid()) {
+      errors.since = intl.formatMessage(memberFormMessages.inValidDateError);
+    }
+    return errors;
+  };
+
   return (
     <Flex flexDirection="column" justifyContent="center">
       {member && (
@@ -108,9 +117,9 @@ const MemberForm = props => {
           </Flex>
         </MemberContainer>
       )}
-      <Formik initialValues={initialValues} onSubmit={submit}>
+      <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange>
         {formik => {
-          const { setFieldValue, submitForm } = formik;
+          const { setFieldValue, submitForm, errors } = formik;
 
           bindSubmitForm(submitForm);
 
@@ -126,9 +135,14 @@ const MemberForm = props => {
                     disabled={false}
                     defaultValue={getFieldDefaultValue(field)}
                     options={field.options}
+                    error={errors[field.name]}
                     onChange={value => {
-                      if (field.name === 'since' && value) {
-                        setFieldValue(field.name, dayjs(value).toISOString());
+                      if (field.name === 'since') {
+                        if (dayjs(value).isValid()) {
+                          setFieldValue(field.name, dayjs(value).toISOString());
+                        } else {
+                          setFieldValue(field.name, null);
+                        }
                       } else {
                         setFieldValue(field.name, value);
                       }

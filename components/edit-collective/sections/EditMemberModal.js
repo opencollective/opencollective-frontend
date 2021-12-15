@@ -127,6 +127,7 @@ const EditMemberModal = props => {
 
   const handleEditMemberMutation = async values => {
     const { description, role, since } = values;
+
     try {
       await editMemberAccount({
         variables: {
