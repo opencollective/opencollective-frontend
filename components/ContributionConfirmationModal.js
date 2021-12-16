@@ -131,11 +131,10 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
                 values={{ collective: order.toAccount.name }}
               />
             </Span>
-            <Box width="142px">
+            <Box width="142px" data-cy="amount-received">
               <InputField
                 className="horizontal"
                 name="amountReceived"
-                data-cy="amount-received"
                 type="currency"
                 onChange={value => handleChange('amountReceived', value)}
                 pre={getCurrencySymbol(currency)}

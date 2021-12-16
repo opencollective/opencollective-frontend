@@ -85,27 +85,18 @@ const ProcessOrderButtons = ({ order, permissions }) => {
 
   return (
     <React.Fragment>
-      {permissions.canMarkAsPaid &&
-        (!order.paymentMethod ? (
-          <StyledButton
-            {...getButtonProps()}
-            data-cy="confirm-order-details-button"
-            onClick={() => setShowContributionConfirmationModal(true)}
-            buttonStyle="successSecondary"
-          >
-            <ApproveIcon size={12} />
-            <ButtonLabel>
-              <FormattedMessage defaultMessage="Edit & Confirm" />
-            </ButtonLabel>
-          </StyledButton>
-        ) : (
-          <StyledButton {...getButtonProps('MARK_AS_PAID')} buttonStyle="successSecondary">
-            <ApproveIcon size={12} />
-            <ButtonLabel>
-              <FormattedMessage id="order.markAsCompleted" defaultMessage="Mark as completed" />
-            </ButtonLabel>
-          </StyledButton>
-        ))}
+      {permissions.canMarkAsPaid && (
+        <StyledButton
+          {...getButtonProps('MARK_AS_PAID')}
+          onClick={() => setShowContributionConfirmationModal(true)}
+          buttonStyle="successSecondary"
+        >
+          <ApproveIcon size={12} />
+          <ButtonLabel>
+            <FormattedMessage id="order.markAsCompleted" defaultMessage="Mark as completed" />
+          </ButtonLabel>
+        </StyledButton>
+      )}
       {permissions.canMarkAsExpired && (
         <StyledButton {...getButtonProps('MARK_AS_EXPIRED')} buttonStyle="dangerSecondary">
           <RejectIcon size={14} />
