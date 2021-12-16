@@ -129,6 +129,10 @@ const HelpBlock = styled(Box)`
   font-size: 1.2rem;
 `;
 
+/**
+ * @deprecated InputField is deprecated and should be avoided for new developments.
+ * Please use the `Styled*` equivalents: `StyledInput`, `StyledInputAmount`, etc.
+ */
 class InputField extends React.Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
