@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { getCurrencySymbol } from '../lib/currency-utils';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import { Box, Flex } from './Grid';
-import InputField from './InputField';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
+import StyledInputAmount from './StyledInputAmount';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
@@ -45,14 +44,10 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
   const [amountReceived, setAmountReceived] = useState(amountInitiated);
   const [platformTip, setPlatformTip] = useState(order.platformContributionAmount.valueInCents);
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
-  const [netAmount, setNetAmount] = useState(amountReceived - platformTip);
   const intl = useIntl();
   const { addToast } = useToasts();
   const [confirmOrder, { loading }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
-
-  useEffect(() => {
-    setNetAmount(amountReceived - platformTip);
-  }, [amountReceived, platformTip]);
+  const netAmount = amountReceived - platformTip;
 
   const triggerAction = async () => {
     // Prevent submitting the action if another one is being submitted at the same time
@@ -74,16 +69,6 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
       onClose();
     } catch (e) {
       addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
-    }
-  };
-
-  const handleChange = (fieldName, value) => {
-    if (fieldName === 'amountReceived') {
-      setAmountReceived(value);
-    } else if (fieldName === 'platformTip') {
-      setPlatformTip(value);
-    } else if (fieldName === 'paymentProcessorFee') {
-      setPaymentProcessorFee(value);
     }
   };
 
@@ -109,17 +94,13 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
                 values={{ contributor: order.fromAccount.name }}
               />
             </Span>
-            <Box width="142px">
-              <InputField
-                className="horizontal"
-                name="amountInitiated"
-                type="currency"
-                onChange={() => null}
-                pre={getCurrencySymbol(currency)}
-                value={amountInitiated}
-                disabled
-              />
-            </Box>
+            <StyledInputAmount
+              name="amountInitiated"
+              width="142px"
+              currency={currency}
+              value={amountInitiated}
+              disabled
+            />
           </Flex>
         </Container>
         <StyledHr borderStyle="solid" mt="16px" mb="16px" />
@@ -131,16 +112,14 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
                 values={{ collective: order.toAccount.name }}
               />
             </Span>
-            <Box width="142px" data-cy="amount-received">
-              <InputField
-                className="horizontal"
-                name="amountReceived"
-                type="currency"
-                onChange={value => handleChange('amountReceived', value)}
-                pre={getCurrencySymbol(currency)}
-                value={amountReceived}
-              />
-            </Box>
+            <StyledInputAmount
+              name="amountReceived"
+              data-cy="amount-received"
+              width="142px"
+              currency={currency}
+              onChange={value => setAmountReceived(value)}
+              value={amountReceived}
+            />
           </Flex>
         </Container>
         <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
@@ -149,17 +128,13 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
             <Span fontSize="14px" lineHeight="20px" fontWeight="400">
               <FormattedMessage defaultMessage="Payment processor fees" values={{ collective: order.toAccount.name }} />
             </Span>
-            <Box width="142px">
-              <InputField
-                className="horizontal"
-                name="paymentProcessorFee"
-                type="currency"
-                onChange={value => handleChange('paymentProcessorFee', value)}
-                pre={getCurrencySymbol(currency)}
-                value={paymentProcessorFee}
-                defaultValue={0}
-              />
-            </Box>
+            <StyledInputAmount
+              name="paymentProcessorFee"
+              width="142px"
+              currency={currency}
+              onChange={value => setPaymentProcessorFee(value)}
+              value={paymentProcessorFee}
+            />
           </Flex>
         </Container>
         <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
@@ -168,16 +143,13 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
             <Span fontSize="14px" lineHeight="20px" fontWeight="400">
               <FormattedMessage defaultMessage="Platform tip amount" values={{ collective: order.toAccount.name }} />
             </Span>
-            <Box width="142px">
-              <InputField
-                className="horizontal"
-                name="platformTip"
-                type="currency"
-                onChange={value => handleChange('platformTip', value)}
-                pre={getCurrencySymbol(currency)}
-                value={platformTip}
-              />
-            </Box>
+            <StyledInputAmount
+              name="platformTip"
+              width="142px"
+              currency={currency}
+              onChange={value => setPlatformTip(value)}
+              value={platformTip}
+            />
           </Flex>
         </Container>
         <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
