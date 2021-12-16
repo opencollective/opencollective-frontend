@@ -1753,8 +1753,7 @@ enum ActivityType {
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
-  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
-  COLLECTIVE_VIRTUAL_CARD_CREATED
+  COLLECTIVE_VIRTUAL_CARD_ADDED
   ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
@@ -1773,6 +1772,8 @@ enum ActivityType {
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
+  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
+  COLLECTIVE_VIRTUAL_CARD_CREATED
 }
 
 """
@@ -2382,7 +2383,7 @@ type Host implements Account & AccountWithContributions {
     dateTo: DateTime!
 
     """
-    The time unit of the time series
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
     """
     timeUnit: TimeUnit!
   ): HostMetricsTimeSeries!
@@ -2466,7 +2467,7 @@ type Host implements Account & AccountWithContributions {
     """
     The time unit of the time series
     """
-    timeUnit: TimeUnit! = YEAR
+    timeUnit: TimeUnit
   ): ContributionStats!
   expenseStats(
     """
@@ -2485,9 +2486,9 @@ type Host implements Account & AccountWithContributions {
     dateTo: DateTime
 
     """
-    The time unit of the time series
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
     """
-    timeUnit: TimeUnit! = YEAR
+    timeUnit: TimeUnit
   ): ExpenseStats!
 
   """
@@ -6939,7 +6940,7 @@ type Mutation {
   """
   A mutation for the host to approve or reject an order
   """
-  processPendingOrder(order: OrderReferenceInput!, action: ProcessOrderAction!): Order!
+  processPendingOrder(order: OrderReferenceInput!, action: ProcessOrderAction!, details: OrderDetailsInput): Order!
 
   """
   Add a new payment method to be used with an Order
@@ -7190,12 +7191,12 @@ type Mutation {
   """
   createVirtualCard(
     """
-    Virtual Card name
+    Virtual card name
     """
     name: String!
 
     """
-    Virtual Card monthly limit
+    Virtual card monthly limit
     """
     monthlyLimit: AmountInput!
 
@@ -7205,7 +7206,7 @@ type Mutation {
     account: AccountReferenceInput!
 
     """
-    Individual account responsible for the card
+    Individual account responsible for the virtual card
     """
     assignee: AccountReferenceInput!
   ): VirtualCard!
@@ -10086,6 +10087,15 @@ enum ProcessOrderAction {
   To mark the order as paid
   """
   MARK_AS_PAID
+}
+
+"""
+Input to set amount details received by the host
+"""
+input OrderDetailsInput {
+  totalAmount: AmountInput
+  paymentProcessorFeesAmount: AmountInput
+  platformTipAmount: AmountInput
 }
 
 type CreditCardWithStripeError {

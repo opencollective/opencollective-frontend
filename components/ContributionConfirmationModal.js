@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { useMutation } from '@apollo/client';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getCurrencySymbol } from '../lib/currency-utils';
+import { i18nGraphqlException } from '../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
@@ -12,6 +15,29 @@ import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
 import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P, Span } from './Text';
+import { TOAST_TYPE, useToasts } from './ToastProvider';
+
+const confirmContributionMutation = gqlV2/* GraphQL */ `
+  mutation ConfirmContribution($id: String!, $action: ProcessOrderAction!, $details: OrderDetailsInput) {
+    processPendingOrder(order: { id: $id }, action: $action, details: $details) {
+      id
+      status
+      permissions {
+        id
+        canMarkAsPaid
+        canMarkAsExpired
+      }
+      amount {
+        currency
+        valueInCents
+      }
+      platformContributionAmount {
+        currency
+        valueInCents
+      }
+    }
+  }
+`;
 
 const ContributionConfirmationModal = ({ order, onClose, show }) => {
   const amountInitiated = order.amount.valueInCents + order.platformContributionAmount.valueInCents;
@@ -20,10 +46,36 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
   const [platformTip, setPlatformTip] = useState(order.platformContributionAmount.valueInCents);
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
   const [netAmount, setNetAmount] = useState(amountReceived - platformTip);
+  const intl = useIntl();
+  const { addToast } = useToasts();
+  const [confirmOrder, { loading }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
 
   useEffect(() => {
     setNetAmount(amountReceived - platformTip);
   }, [amountReceived, platformTip]);
+
+  const triggerAction = async () => {
+    // Prevent submitting the action if another one is being submitted at the same time
+    if (loading) {
+      return;
+    }
+
+    const orderConfirmationDetails = {
+      totalAmount: { valueInCents: amountReceived, currency },
+      paymentProcessorFeesAmount: { valueInCents: paymentProcessorFee, currency },
+      platformTipAmount: { valueInCents: platformTip, currency },
+    };
+    try {
+      await confirmOrder({ variables: { id: order.id, action: 'MARK_AS_PAID', details: orderConfirmationDetails } });
+      addToast({
+        type: TOAST_TYPE.SUCCESS,
+        message: intl.formatMessage({ defaultMessage: 'Order confirmed successfully' }),
+      });
+      onClose();
+    } catch (e) {
+      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+    }
+  };
 
   const handleChange = (fieldName, value) => {
     if (fieldName === 'amountReceived') {
@@ -70,7 +122,7 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
             </Box>
           </Flex>
         </Container>
-        <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
+        <StyledHr borderStyle="solid" mt="16px" mb="16px" />
         <Container>
           <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
             <Span fontSize="14px" lineHeight="20px" fontWeight="400">
@@ -151,7 +203,7 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
           >
             <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
           </StyledButton>
-          <StyledButton minWidth={240} buttonStyle="primary" type="submit">
+          <StyledButton minWidth={240} buttonStyle="primary" type="submit" onClick={() => triggerAction()}>
             <FormattedMessage
               defaultMessage="Confirm contribution of {amount}"
               values={{
