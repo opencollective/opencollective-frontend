@@ -135,6 +135,7 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
               <InputField
                 className="horizontal"
                 name="amountReceived"
+                data-cy="amount-received"
                 type="currency"
                 onChange={value => handleChange('amountReceived', value)}
                 pre={getCurrencySymbol(currency)}
@@ -203,7 +204,13 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
           >
             <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
           </StyledButton>
-          <StyledButton minWidth={240} buttonStyle="primary" type="submit" onClick={() => triggerAction()}>
+          <StyledButton
+            minWidth={240}
+            buttonStyle="primary"
+            type="submit"
+            onClick={() => triggerAction()}
+            data-cy="order-confirmation-modal-submit"
+          >
             <FormattedMessage
               defaultMessage="Confirm contribution of {amount}"
               values={{

@@ -88,7 +88,8 @@ const ProcessOrderButtons = ({ order, permissions }) => {
       {permissions.canMarkAsPaid &&
         (!order.paymentMethod ? (
           <StyledButton
-            {...getButtonProps('MARK_AS_PAID')}
+            {...getButtonProps()}
+            data-cy="confirm-order-details-button"
             onClick={() => setShowContributionConfirmationModal(true)}
             buttonStyle="successSecondary"
           >
