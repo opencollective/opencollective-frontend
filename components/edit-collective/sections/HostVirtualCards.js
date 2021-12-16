@@ -22,6 +22,7 @@ import { P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import AssignVirtualCardModal from '../AssignVirtualCardModal';
 import CreateVirtualCardModal from '../CreateVirtualCardModal';
+import DeleteVirtualCardModal from '../DeleteVirtualCardModal';
 import EditVirtualCardModal from '../EditVirtualCardModal';
 import SettingsTitle from '../SettingsTitle';
 import VirtualCard from '../VirtualCard';
@@ -179,6 +180,7 @@ const HostVirtualCards = props => {
   const [displayAssignCardModal, setAssignCardModalDisplay] = React.useState(false);
   const [displayCreateVirtualCardModal, setCreateVirtualCardModalDisplay] = React.useState(false);
   const [editingVirtualCard, setEditingVirtualCard] = React.useState(undefined);
+  const [deletingVirtualCard, setDeletingVirtualCard] = React.useState(undefined);
   const [virtualCardPolicy, setVirtualCardPolicy] = React.useState(
     props.collective.settings?.virtualcards?.policy || '',
   );
@@ -211,6 +213,7 @@ const HostVirtualCards = props => {
       message: message,
     });
     setEditingVirtualCard(undefined);
+    setDeletingVirtualCard(undefined);
     refetch();
   };
 
@@ -400,6 +403,7 @@ const HostVirtualCards = props => {
             {...vc}
             onSuccess={refetch}
             editHandler={() => setEditingVirtualCard(vc)}
+            deleteHandler={() => setDeletingVirtualCard(vc)}
             canEditVirtualCard
           />
         ))}
@@ -434,6 +438,17 @@ const HostVirtualCards = props => {
             setEditingVirtualCard(undefined);
           }}
           virtualCard={editingVirtualCard}
+          show
+        />
+      )}
+      {deletingVirtualCard && (
+        <DeleteVirtualCardModal
+          host={data.host}
+          onSuccess={handleEditCardSuccess}
+          onClose={() => {
+            setDeletingVirtualCard(undefined);
+          }}
+          virtualCard={deletingVirtualCard}
           show
         />
       )}

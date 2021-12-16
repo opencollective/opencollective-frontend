@@ -14,6 +14,7 @@ import Avatar from '../Avatar';
 import { Box, Flex } from '../Grid';
 import DismissIcon from '../icons/DismissIcon';
 import StyledCard from '../StyledCard';
+import StyledHr from '../StyledHr';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
@@ -155,8 +156,12 @@ const ActionsButton = props => {
                   boxShadow="0px 8px 12px rgba(20, 20, 20, 0.16)"
                 >
                   <Flex flexDirection="column" fontSize="13px" lineHeight="16px" fontWeight="500">
+                    <Action onClick={props.deleteHandler}>
+                      <FormattedMessage defaultMessage="Delete Card" />
+                    </Action>
+                    <StyledHr borderColor="black.300" mt={2} mb={2} />
                     <Action onClick={props.editHandler}>
-                      <FormattedMessage id="VirtualCards.EditCardDetails" defaultMessage="Edit Card Details" />
+                      <FormattedMessage defaultMessage="Edit Card Details" />
                     </Action>
                   </Flex>
                   <Arrow ref={arrowRef} {...arrowProps} />
@@ -175,6 +180,7 @@ ActionsButton.propTypes = {
   state: PropTypes.string,
   onSuccess: PropTypes.func,
   editHandler: PropTypes.func,
+  deleteHandler: PropTypes.func,
 };
 
 const getLimitString = (spendingLimitAmount, spendingLimitInterval, currency, locale) => {
@@ -317,6 +323,7 @@ const VirtualCard = props => {
             state={props.data.state}
             onSuccess={props.onSuccess}
             editHandler={props.editHandler}
+            deleteHandler={props.deleteHandler}
           />
         )}
         <Action onClick={() => setDisplayDetails(!displayDetails)}>
@@ -341,7 +348,7 @@ VirtualCard.propTypes = {
   canEditVirtualCard: PropTypes.bool,
   onSuccess: PropTypes.func,
   editHandler: PropTypes.func,
-
+  deleteHandler: PropTypes.func,
   account: PropTypes.shape({
     id: PropTypes.string,
     imageUrl: PropTypes.string,
