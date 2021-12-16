@@ -77,7 +77,7 @@ const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => 
   });
 
   const formik = useFormik({
-    initialValues: { ...initialValues },
+    initialValues,
     async onSubmit(values) {
       const { collective, assignee, cardName, monthlyLimit } = values;
 
