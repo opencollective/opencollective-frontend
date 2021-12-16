@@ -530,11 +530,16 @@ class ContributionFlow extends React.Component {
   getTierMinAmount = memoizeOne(getTierMinAmount);
   getApplicableTaxes = memoizeOne(getApplicableTaxes);
 
-  canHaveFeesOnTop() {
-    if (!this.props.collective.platformContributionAvailable) {
+  canHavePlatformTips() {
+    const { tier, collective } = this.props;
+    if (!collective.platformContributionAvailable) {
       return false;
-    } else if (this.props.tier?.type === TierTypes.TICKET) {
+    } else if (!tier) {
+      return true;
+    } else if (tier.type === TierTypes.TICKET) {
       return false;
+    } else if (tier.amountType === 'FIXED' && !tier.amount.valueInCents) {
+      return false; // No platform tips for free tiers
     } else {
       return true;
     }
@@ -813,7 +818,7 @@ class ContributionFlow extends React.Component {
                     onChange={data => this.setState(data)}
                     step={currentStep}
                     isCrypto={isCrypto}
-                    showFeesOnTop={this.canHaveFeesOnTop()}
+                    showFeesOnTop={this.canHavePlatformTips()}
                     onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
                     defaultProfileSlug={this.props.contributeAs}
                     defaultEmail={this.props.defaultEmail}
