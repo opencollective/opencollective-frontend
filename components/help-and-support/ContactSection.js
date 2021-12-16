@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
+// import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/router';
@@ -13,7 +13,7 @@ import { isValidEmail } from '../../lib/utils';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Link from '../Link';
+// import Link from '../Link';
 import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
@@ -254,6 +254,7 @@ const ContactForm = () => {
                 </Span>
               </StyledButton>
 
+              {/*
               <Link href="/help">
                 <StyledButton
                   width={['288px', '151px']}
@@ -268,6 +269,7 @@ const ContactForm = () => {
                   </Span>
                 </StyledButton>
               </Link>
+              */}
             </Box>
           </form>
         </StyledCard>
