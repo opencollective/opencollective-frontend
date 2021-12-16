@@ -39,10 +39,10 @@ const confirmContributionMutation = gqlV2/* GraphQL */ `
 `;
 
 const ContributionConfirmationModal = ({ order, onClose, show }) => {
-  const amountInitiated = order.amount.valueInCents + order.platformContributionAmount.valueInCents;
+  const amountInitiated = order.amount.valueInCents + order.platformTipAmount.valueInCents;
   const currency = order.amount.currency;
   const [amountReceived, setAmountReceived] = useState(amountInitiated);
-  const [platformTip, setPlatformTip] = useState(order.platformContributionAmount.valueInCents);
+  const [platformTip, setPlatformTip] = useState(order.platformTipAmount.valueInCents);
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
   const intl = useIntl();
   const { addToast } = useToasts();
@@ -75,12 +75,7 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
   return (
     <Modal width="578px" show={show} onClose={onClose} trapFocus>
       <ModalHeader>
-        <FormattedMessage
-          defaultMessage="Confirm contribution to {collectiveName}"
-          values={{
-            collectiveName: order.toAccount.name,
-          }}
-        />
+        <FormattedMessage defaultMessage="Confirm Contribution" />
       </ModalHeader>
       <ModalBody>
         <P mb={4} fontSize="13px">
