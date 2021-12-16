@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get, isNil } from 'lodash';
-import dynamic from 'next/dynamic';
 import styled from 'styled-components';
 
 import { capitalize } from '../lib/utils';
@@ -18,15 +17,6 @@ import StyledInputTags from './StyledInputTags';
 import StyledSelect from './StyledSelect';
 import StyledTextarea from './StyledTextarea';
 import TimezonePicker from './TimezonePicker';
-
-// Dynamic imports: this components have a huge impact on bundle size and are externalized
-// We use the DYNAMIC_IMPORT env variable to skip dynamic while using Jest
-let DateTimePicker;
-if (process.env.DYNAMIC_IMPORT) {
-  DateTimePicker = dynamic(() => import(/* webpackChunkName: 'DateTimePicker' */ './DateTimePicker'));
-} else {
-  DateTimePicker = require('./DateTimePicker').default;
-}
 
 const Label = ({ label, isPrivate }) => (
   <label>
@@ -157,6 +147,8 @@ class InputField extends React.Component {
     className: PropTypes.string,
     type: PropTypes.string,
     onChange: PropTypes.func.isRequired,
+    onKeyDown: PropTypes.func,
+    overflow: PropTypes.string,
     required: PropTypes.bool,
     style: PropTypes.object,
     multiple: PropTypes.bool,
@@ -165,11 +157,11 @@ class InputField extends React.Component {
     maxLength: PropTypes.number,
     step: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     disabled: PropTypes.bool,
-    timeFormat: PropTypes.string,
     min: PropTypes.number,
     max: PropTypes.number,
     focus: PropTypes.bool,
     help: PropTypes.string,
+    error: PropTypes.string,
   };
 
   constructor(props) {
@@ -232,7 +224,6 @@ class InputField extends React.Component {
 
   render() {
     const field = this.props;
-    const context = field.context || {};
     let value = this.state.value;
     const horizontal = field.className && field.className.match(/horizontal/);
     switch (this.props.type) {
@@ -322,57 +313,6 @@ class InputField extends React.Component {
           </div>
         );
         break;
-
-      case 'date':
-      case 'datetime': {
-        const timeFormat = field.type !== 'date';
-        const { closeOnSelect } = this.props;
-
-        this.input = (
-          <div>
-            {horizontal && (
-              <Flex flexWrap="wrap" p={1}>
-                <Box width={[1, 2 / 12]}>
-                  <label>{capitalize(field.label)}</label>
-                </Box>
-                <Box width={[1, 10 / 12]}>
-                  <DateTimePicker
-                    name={field.name}
-                    timeFormat={field.timeFormat || timeFormat}
-                    date={this.state.value || field.defaultValue}
-                    timezone={context.timezone || 'utc'}
-                    isValidDate={field.validate}
-                    onChange={date => (date.toISOString ? this.handleChange(date.toISOString()) : false)}
-                    closeOnSelect={closeOnSelect}
-                  />
-                </Box>
-              </Flex>
-            )}
-            {!horizontal && (
-              <Flex flexWrap="wrap" p={1}>
-                {field.label && (
-                  <Box width={1}>
-                    <label>{`${capitalize(field.label)}`}</label>
-                  </Box>
-                )}
-                <Box width={1}>
-                  <DateTimePicker
-                    name={field.name}
-                    timeFormat={field.timeFormat || timeFormat}
-                    date={this.state.value || field.defaultValue}
-                    timezone={context.timezone || 'utc'}
-                    isValidDate={field.validate}
-                    onChange={date => (date.toISOString ? this.handleChange(date.toISOString()) : false)}
-                    closeOnSelect={closeOnSelect}
-                  />
-                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
-                </Box>
-              </Flex>
-            )}
-          </div>
-        );
-        break;
-      }
 
       case 'component':
         this.input = (
@@ -692,6 +632,7 @@ class InputField extends React.Component {
         this.input = (
           <FieldGroup
             onChange={event => this.handleChange(event.target.value)}
+            onKeyDown={field.onKeyDown}
             type={field.type}
             pre={field.pre}
             post={field.post}
@@ -710,7 +651,10 @@ class InputField extends React.Component {
             step={field.step}
             min={field.min}
             max={field.max}
+            required={field.required}
             isPrivate={field.isPrivate}
+            overflow={field.overflow}
+            error={field.error}
           />
         );
         break;
