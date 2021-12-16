@@ -17,8 +17,8 @@ import { P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const confirmContributionMutation = gqlV2/* GraphQL */ `
-  mutation ConfirmContribution($id: String!, $action: ProcessOrderAction!, $details: OrderDetailsInput) {
-    processPendingOrder(order: { id: $id }, action: $action, details: $details) {
+  mutation ConfirmContribution($order: OrderUpdateInput!, $action: ProcessOrderAction!) {
+    processPendingOrder(order: $order, action: $action) {
       id
       status
       permissions {
@@ -55,13 +55,14 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
       return;
     }
 
-    const orderConfirmationDetails = {
-      totalAmount: { valueInCents: amountReceived, currency },
-      paymentProcessorFeesAmount: { valueInCents: paymentProcessorFee, currency },
-      platformTipAmount: { valueInCents: platformTip, currency },
+    const orderUpdate = {
+      id: order.id,
+      amount: netAmount,
+      paymentProcessorFee,
+      platformTip,
     };
     try {
-      await confirmOrder({ variables: { id: order.id, action: 'MARK_AS_PAID', details: orderConfirmationDetails } });
+      await confirmOrder({ variables: { order: orderUpdate, action: 'MARK_AS_PAID' } });
       addToast({
         type: TOAST_TYPE.SUCCESS,
         message: intl.formatMessage({ defaultMessage: 'Order confirmed successfully' }),

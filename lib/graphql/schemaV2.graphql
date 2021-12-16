@@ -6940,7 +6940,7 @@ type Mutation {
   """
   A mutation for the host to approve or reject an order
   """
-  processPendingOrder(order: OrderReferenceInput!, action: ProcessOrderAction!, details: OrderDetailsInput): Order!
+  processPendingOrder(order: OrderUpdateInput!, action: ProcessOrderAction!): Order!
 
   """
   Add a new payment method to be used with an Order
@@ -10074,6 +10074,33 @@ input PaymentMethodReferenceInput {
   id: String
 }
 
+input OrderUpdateInput {
+  """
+  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the order (ie: 4242)
+  """
+  legacyId: Int
+
+  """
+  Amount received by collective, excluding any tips or fees, in order currency in cents
+  """
+  amount: Int
+
+  """
+  Amount paid in fees for the payment processor in order currency in cents
+  """
+  paymentProcessorFee: Int
+
+  """
+  Amount intended as tip for the platform in order currency in cents
+  """
+  platformTip: Int
+}
+
 """
 Action to apply on the order
 """
@@ -10087,15 +10114,6 @@ enum ProcessOrderAction {
   To mark the order as paid
   """
   MARK_AS_PAID
-}
-
-"""
-Input to set amount details received by the host
-"""
-input OrderDetailsInput {
-  totalAmount: AmountInput
-  paymentProcessorFeesAmount: AmountInput
-  platformTipAmount: AmountInput
 }
 
 type CreditCardWithStripeError {
