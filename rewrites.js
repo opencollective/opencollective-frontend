@@ -310,10 +310,6 @@ exports.REWRITES = [
     destination: '/how-it-works',
   },
   {
-    source: '/api/support',
-    destination: '/api/support',
-  },
-  {
     source: '/e2c',
     destination: '/e2c',
   },

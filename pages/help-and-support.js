@@ -80,7 +80,7 @@ const HelpAndSupport = ({ action, formConfirmation }) => {
       ) : (
         <React.Fragment>
           <HowCanWeHelp />
-          {/*<SearchTopics />*/}
+          {/* <SearchTopics />*/}
           <BrowseTopics />
           <HowOCWorks />
           <WeAreHereIfYouWantToTalk />

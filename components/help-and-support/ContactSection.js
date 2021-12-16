@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { isURL } from 'validator';
 
-import { sendSupportEmail } from '../../lib/api';
+import { sendContactMessage } from '../../lib/api';
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { isValidEmail } from '../../lib/utils';
@@ -70,7 +70,7 @@ const ContactForm = () => {
     validate,
     onSubmit: values => {
       setIsSubmitting(true);
-      sendSupportEmail(values)
+      sendContactMessage(values)
         .then(() => {
           setIsSubmitting(false);
           return router.push('/contact/success');
@@ -192,6 +192,7 @@ const ContactForm = () => {
                 onChange={e => setFieldValue('message', e.target.value)}
                 withBorders
                 version="simplified"
+                editorMinHeight="20rem"
               />
               <P mt="6px" fontSize="13px" lineHeight="20px" color="black.700">
                 <FormattedMessage

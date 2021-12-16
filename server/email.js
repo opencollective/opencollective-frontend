@@ -1,4 +1,5 @@
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
+const sanitizeHtml = require('sanitize-html');
 
 const getMailgun = () => {
   const transport = {
@@ -12,8 +13,10 @@ const getMailgun = () => {
   return nodemailer.createTransport(transport);
 };
 
-export const sendMessage = (options = {}) => {
-  const { from, cc, to, bcc, subject, text, html, headers = {}, attachments, tag } = options;
+const sendMessage = (options = {}) => {
+  const { from, cc, to, bcc, subject, text, headers = {}, attachments, tag } = options;
+
+  const html = sanitizeHtml(options.html);
 
   headers['X-Mailgun-Dkim'] = 'yes';
   if (tag) {
@@ -22,6 +25,7 @@ export const sendMessage = (options = {}) => {
 
   return new Promise((resolve, reject) => {
     getMailgun().sendMail({ from, cc, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
+      console.log({ err, info });
       if (err) {
         return reject(err);
       } else {
@@ -30,3 +34,5 @@ export const sendMessage = (options = {}) => {
     });
   });
 };
+
+module.exports = { sendMessage };

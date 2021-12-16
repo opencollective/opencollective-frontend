@@ -5,7 +5,9 @@ const express = require('express');
 const proxy = require('express-http-proxy');
 const { template, trim } = require('lodash');
 
+const { sendMessage } = require('./email');
 const intl = require('./intl');
+const logger = require('./logger');
 
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
@@ -80,9 +82,41 @@ module.exports = (expressApp, nextApp) => {
         searchParams.set('api_key', process.env.API_KEY);
         return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
       },
-      filter: req => req.url !== '/support',
     }),
   );
+
+  /**
+   * Contact Form
+   */
+  app.post('/contact/send-message', async (req, res) => {
+    const body = req.body;
+
+    if (!(body && body.name && body.email && body.message)) {
+      res.status(400).send('All inputs required');
+    }
+
+    const additionalLink = body.link ? `Additional Link: <a href="https://${body.link}">${body.link}</a></br>` : '';
+
+    logger.info(`Contact From: ${body.name} <${body.email}>`);
+    logger.info(`Contact Subject: ${body.topic}`);
+    logger.info(`Contact Message: ${body.message}`);
+    if (additionalLink) {
+      logger.info(`Contact Link: ${additionalLink}`);
+    }
+
+    await sendMessage({
+      to: 'support@opencollective.freshdesk.com',
+      from: `${body.name} <${body.email}>`,
+      subject: `${body.topic}`,
+      html: `
+            ${body.message}
+            <br/>
+            ${additionalLink}
+        `,
+    });
+
+    res.status(200).send({ sent: true });
+  });
 
   /**
    * Prevent indexation from search engines

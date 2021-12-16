@@ -50,7 +50,7 @@ slack community"
       <Box width="2px" height="64px" backgroundColor="#1869F5" mx="40px" display={['none', 'inline-block']} />
       <StyledCard
         as={Link}
-        href="https://slack.opencollective.com/"
+        href="https://github.com/opencollective"
         borderWidth="0px"
         boxShadow={['0px 1px 4px 1px rgba(49, 50, 51, 0.1)', 'unset']}
         padding={['16px', 0]}

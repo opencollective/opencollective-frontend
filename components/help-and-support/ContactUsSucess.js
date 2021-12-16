@@ -71,7 +71,7 @@ const ContactUsSuccess = () => (
         </Wrapper>
       </StyledLink>
 
-      <StyledLink href="https://slack.opencollective.com/" openInNewTab>
+      <StyledLink href="https://github.com/opencollective" openInNewTab>
         <Wrapper color="black.900" className="linkWrapper" my={[3, null, 4]} width={['288px', '520px']}>
           <Box width={['184px', 1]}>
             <H3 fontSize="24px" textAlign="left" lineHeight="32px" letterSpacing="-0.008em" mb={2} color="black.800">
