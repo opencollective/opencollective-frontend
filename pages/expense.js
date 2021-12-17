@@ -465,9 +465,9 @@ class ExpensePage extends React.Component {
     const collective = expense?.account;
     const host = collective?.host;
     const canSeeInvoiceInfo = expense?.permissions.canSeeInvoiceInfo;
-    const isInvoice = expense?.type === expenseTypes.INVOICE;
+    const isInvoiceOrSettlement = [expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense?.type);
     const isDraft = expense?.status === expenseStatus.DRAFT;
-    const hasAttachedFiles = (isInvoice && canSeeInvoiceInfo) || expense?.attachedFiles?.length > 0;
+    const hasAttachedFiles = (isInvoiceOrSettlement && canSeeInvoiceInfo) || expense?.attachedFiles?.length > 0;
     const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
     const hasHeaderMsg = error || showTaxFormMsg;
     const isMissingReceipt =
