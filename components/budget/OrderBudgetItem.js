@@ -130,14 +130,14 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
                       currency={order.amount.currency}
                       precision={2}
                       amount={
-                        showPlatformTip && order.platformContributionAmount?.valueInCents
-                          ? order.amount.valueInCents + order.platformContributionAmount.valueInCents
+                        showPlatformTip && order.platformTipAmount?.valueInCents
+                          ? order.amount.valueInCents + order.platformTipAmount.valueInCents
                           : order.amount.valueInCents
                       }
                     />
                   </Span>
                 </Flex>
-                {showPlatformTip && order.platformContributionAmount?.valueInCents && (
+                {showPlatformTip && order.platformTipAmount?.valueInCents && (
                   <Container fontSize="10px" color="black.500">
                     <FormattedMessage
                       id="OrderBudgetItem.Tip"
@@ -145,8 +145,8 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
                       values={{
                         amount: (
                           <FormattedMoneyAmount
-                            amount={order.platformContributionAmount.valueInCents}
-                            currency={order.platformContributionAmount.currency}
+                            amount={order.platformTipAmount.valueInCents}
+                            currency={order.platformTipAmount.currency}
                             precision={2}
                             amountStyles={null}
                           />
@@ -231,7 +231,7 @@ OrderBudgetItem.propTypes = {
     status: PropTypes.oneOf(Object.values(ORDER_STATUS)).isRequired,
     createdAt: PropTypes.string.isRequired,
     amount: PropTypes.object.isRequired,
-    platformContributionAmount: PropTypes.object.isRequired,
+    platformTipAmount: PropTypes.object.isRequired,
     permissions: PropTypes.shape({
       canReject: PropTypes.bool,
       canMarkAsPaid: PropTypes.bool,
