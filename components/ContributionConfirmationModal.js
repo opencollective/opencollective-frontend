@@ -91,13 +91,15 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
                 values={{ contributor: order.fromAccount.name }}
               />
             </Span>
-            <StyledInputAmount
-              name="amountInitiated"
-              width="142px"
-              currency={currency}
-              value={amountInitiated}
-              disabled
-            />
+            <Box fontSize="16px" lineHeight="24px" fontWeight="700" mt={['8px', 0]}>
+              <FormattedMoneyAmount
+                width="142px"
+                amount={amountInitiated}
+                currency={currency}
+                precision={2}
+                amountStyles={null}
+              />
+            </Box>
           </Flex>
         </Container>
         <StyledHr borderStyle="solid" mt="16px" mb="16px" />
