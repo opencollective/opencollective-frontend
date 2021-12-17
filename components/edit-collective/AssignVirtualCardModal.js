@@ -270,6 +270,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
                     },
                   ]}
                   onChange={handleCollectivePick}
+                  filterResults={collectives => collectives.filter(c => c.isActive)}
                 />
               )}
             </StyledInputField>
