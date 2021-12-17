@@ -326,6 +326,21 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
     type
     requiredLegalDocuments
     feesPayer
+    account {
+      id
+      name
+      slug
+      createdAt
+      currency
+      type
+      stats {
+        id
+        balanceWithBlockedFunds {
+          valueInCents
+          currency
+        }
+      }
+    }
     permissions {
       id
       canDelete
