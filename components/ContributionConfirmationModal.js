@@ -39,10 +39,11 @@ const confirmContributionMutation = gqlV2/* GraphQL */ `
 `;
 
 const ContributionConfirmationModal = ({ order, onClose, show }) => {
-  const amountInitiated = order.amount.valueInCents + order.platformTipAmount.valueInCents;
+  const platformTipAmount = order.platformTipAmount?.valueInCents || 0;
+  const amountInitiated = order.amount.valueInCents + platformTipAmount;
   const currency = order.amount.currency;
   const [amountReceived, setAmountReceived] = useState(amountInitiated);
-  const [platformTip, setPlatformTip] = useState(order.platformTipAmount.valueInCents);
+  const [platformTip, setPlatformTip] = useState(platformTipAmount);
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
   const intl = useIntl();
   const { addToast } = useToasts();
@@ -141,6 +142,7 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
             </Span>
             <StyledInputAmount
               name="platformTip"
+              data-cy="platform-tip"
               width="142px"
               currency={currency}
               onChange={value => setPlatformTip(value)}
