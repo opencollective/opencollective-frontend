@@ -58,9 +58,9 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
 
     const orderUpdate = {
       id: order.id,
-      amount: netAmount,
-      paymentProcessorFee,
-      platformTip,
+      amount: { valueInCents: netAmount, currency },
+      paymentProcessorFee: { valueInCents: paymentProcessorFee, currency },
+      platformTip: { valueInCents: platformTip, currency },
     };
     try {
       await confirmOrder({ variables: { order: orderUpdate, action: 'MARK_AS_PAID' } });
