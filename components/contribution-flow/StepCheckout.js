@@ -8,7 +8,7 @@ import useClipboard from '../../lib/hooks/useClipboard';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import I18nFormatters, { I18nSupportLink } from '../I18nFormatters';
+import I18nFormatters from '../I18nFormatters';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
@@ -44,16 +44,6 @@ const StepCheckout = ({ stepDetails, order }) => {
             />
           )}
         </MessageBox>
-        <Flex mt="24px" justifyContent="center">
-          <P fontSize="13px" color="black.700">
-            <FormattedMessage
-              defaultMessage="You can <SupportLink>contact support</SupportLink> if something goes wrong."
-              values={{
-                SupportLink: I18nSupportLink,
-              }}
-            />
-          </P>
-        </Flex>
       </Flex>
     );
   };
