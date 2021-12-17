@@ -64,7 +64,6 @@ const ExpensesList = ({
             <ExpenseContainer key={expense.id} isFirst={!idx} data-cy={`expense-${expense.status}`}>
               <ExpenseBudgetItem
                 isInverted={isInverted}
-                collective={collective || expense.account}
                 expense={expense}
                 host={host}
                 showProcessActions

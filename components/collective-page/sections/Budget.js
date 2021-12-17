@@ -194,13 +194,7 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
                   >
                     {item.__typename === 'Expense' ? (
                       <DebitItem>
-                        <ExpenseBudgetItem
-                          expense={item}
-                          collective={collective}
-                          host={data?.host}
-                          showAmountSign
-                          showProcessActions
-                        />
+                        <ExpenseBudgetItem expense={item} host={data?.host} showAmountSign showProcessActions />
                       </DebitItem>
                     ) : (
                       <TransactionItem
