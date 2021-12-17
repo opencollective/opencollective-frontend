@@ -88,7 +88,7 @@ module.exports = (expressApp, nextApp) => {
   /**
    * Contact Form
    */
-  app.post('/contact/send-message', async (req, res) => {
+  app.post('/contact/send-message', express.json(), async (req, res) => {
     const body = req.body;
 
     if (!(body && body.name && body.email && body.message)) {

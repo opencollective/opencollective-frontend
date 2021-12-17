@@ -60,8 +60,6 @@ const start = id =>
 
     app.use(cookieParser());
 
-    app.use(express.json());
-
     app.use(intl.middleware());
 
     if (parseToBooleanDefaultFalse(process.env.DUPLICATE_HANDLER)) {
