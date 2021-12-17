@@ -95,6 +95,7 @@ const TotalMoneyManagedSection = ({ host, collectives, isLoading }) => {
       <Container mt={18} mb={12}>
         <ProportionalAreaChart areas={chartAreas} />
       </Container>
+      <Flex flexWrap="wrap" justifyContent="space-between">
         <Container px={2} textAlign="right">
           <StyledLinkButton asLink onClick={() => setShowMoneyManagedChart(!showMoneyManagedChart)}>
             <P fontSize="12px" fontWeight="400" mt="16px">
