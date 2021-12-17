@@ -41,9 +41,10 @@ describe('Contribution Flow: Sign In', () => {
     cy.get('[data-cy="cf-content"] input[name=email]').type(validUserEmail);
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
 
-    // Test user are logged in directly
+    // Test user gets logged in directly
     cy.contains('Contribute as');
-    cy.contains('Incognito');
-    cy.contains('TestOrg');
+    cy.contains('[data-cy="contribute-profile-picker"]', 'Personal profile - @incognito');
+    cy.getByDataCy('contribute-profile-picker').click();
+    cy.contains('[data-cy="select-option"]', 'TestOrg');
   });
 });

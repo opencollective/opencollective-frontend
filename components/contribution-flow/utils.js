@@ -223,3 +223,10 @@ export const getContributionFlowMetadata = (intl, account, tier) => {
         : intl.formatMessage(PAGE_META_MSGS.collectiveTitle, { collective: account.name }),
   };
 };
+
+/**
+ * Whether this contribution requires us to collect the address and legal name of the user
+ */
+export const contributionRequiresIdentity = amount => {
+  return Boolean(amount && amount >= 500000);
+};

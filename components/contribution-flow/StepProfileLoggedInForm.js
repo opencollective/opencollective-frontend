@@ -1,61 +1,12 @@
 import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { orderBy } from 'lodash';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import Avatar from '../Avatar';
-import { Box, Flex } from '../Grid';
-import { getI18nLink } from '../I18nFormatters';
-import Link from '../Link';
-import MessageBox from '../MessageBox';
-import StyledRadioList from '../StyledRadioList';
-import { P } from '../Text';
+import { Box } from '../Grid';
 
-import CreateOrganizationForm from './CreateOrganizationForm';
-
-const msg = defineMessages({
-  incognito: { id: 'profile.incognito', defaultMessage: 'Incognito' },
-  newOrg: { id: 'contributeAs.org.new', defaultMessage: 'A new organization' },
-});
+import ContributeProfilePicker from './ContributeProfilePicker';
+import StepProfileInfoMessage from './StepProfileInfoMessage';
 
 export const NEW_ORGANIZATION_KEY = 'newOrg';
-
-const prepareProfiles = (intl, profiles, collective, canUseIncognito) => {
-  const filteredProfiles = profiles.filter(p => {
-    // if admin of collective you are donating to, remove it from the list
-    if (p.id === collective.legacyId) {
-      return false;
-    } else if (!canUseIncognito && p.isIncognito) {
-      return false;
-    } else if (p.type === 'COLLECTIVE' && (!p.host || p.host.id !== collective.host?.legacyId)) {
-      return false;
-    } else {
-      return true;
-    }
-  });
-
-  if (canUseIncognito) {
-    const incognitoProfile = filteredProfiles.find(p => p.type === 'USER' && p.isIncognito);
-    if (!incognitoProfile) {
-      filteredProfiles.push({
-        id: 'incognito',
-        type: 'USER',
-        isIncognito: true,
-        name: intl.formatMessage(msg.incognito), // has to be a string for avatar's title
-      });
-    }
-  }
-
-  filteredProfiles.push({
-    id: NEW_ORGANIZATION_KEY,
-    isNew: true,
-    type: 'ORGANIZATION',
-    label: intl.formatMessage(msg.newOrg),
-  });
-
-  // Will put first: User / Not incognito
-  return orderBy(filteredProfiles, ['type', 'isNew', 'isIncognito', 'name'], ['desc', 'desc', 'desc', 'asc']);
-};
 
 const NewContributionFlowStepProfileLoggedInForm = ({
   profiles,
@@ -63,99 +14,58 @@ const NewContributionFlowStepProfileLoggedInForm = ({
   onChange,
   canUseIncognito,
   collective,
-  data,
+  // data,
+  // stepDetails,
 }) => {
-  const intl = useIntl();
-
   // set initial default profile so it shows in Steps Progress as well
+  // TODO: This looks like a hack. Why is the state not set in an upper component?
   useEffect(() => {
     onChange({ stepProfile: defaultSelectedProfile, stepPayment: null, stepSummary: null });
   }, [defaultSelectedProfile]);
 
-  const filteredProfiles = React.useMemo(
-    () => prepareProfiles(intl, profiles, collective, canUseIncognito),
-    [profiles, collective, canUseIncognito],
-  );
-
+  // const totalAmount = getTotalAmount(stepDetails);
   return (
     <Fragment>
-      <Box px={3}>
-        <StyledRadioList
-          name="ContributionProfile"
-          id="ContributionProfile"
-          data-cy="ContributionProfile"
-          options={filteredProfiles}
-          keyGetter="id"
-          defaultValue={defaultSelectedProfile ? defaultSelectedProfile.id : undefined}
-          radioSize={16}
-          onChange={selected => {
-            onChange({ stepProfile: selected.value });
+      <Box mb={4}>
+        <ContributeProfilePicker
+          account={collective}
+          profiles={profiles}
+          canUseIncognito={canUseIncognito}
+          defaultSelectedProfile={defaultSelectedProfile}
+          onChange={profile => {
+            onChange({ stepProfile: profile });
           }}
-        >
-          {({ radio, value, checked }) => (
-            <Box minHeight={70} py={2} bg="white.full" px={[0, 3]}>
-              <Flex alignItems="center" width={1}>
-                <Box as="span" mr={3} flexWrap="wrap">
-                  {radio}
-                </Box>
-                <Flex mr={3} css={{ flexBasis: '26px' }}>
-                  {value.id === NEW_ORGANIZATION_KEY ? (
-                    <Avatar type="ORGANIZATION" src="/static/images/default-organization-logo.svg" size="3.6rem" />
-                  ) : (
-                    <Avatar collective={value} size="3.6rem" />
-                  )}
-                </Flex>
-                <Flex flexDirection="column" flexGrow={1} maxWidth="75%">
-                  <P fontSize="14px" lineHeight="21px" fontWeight={500} color="black.900" truncateOverflow>
-                    {value.label || value.name}
-                  </P>
-                  {value.type === 'USER' &&
-                    (value.isIncognito ? (
-                      <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
-                        <FormattedMessage
-                          id="profile.incognito.description"
-                          defaultMessage="Keep my contribution private (see FAQ for more info)"
-                        />
-                      </P>
-                    ) : (
-                      <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
-                        <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" />
-                      </P>
-                    ))}
-                  {value.type === 'COLLECTIVE' && (
-                    <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
-                      <FormattedMessage id="ContributionFlow.CollectiveProfile" defaultMessage="Collective profile" />
-                    </P>
-                  )}
-                  {value.type === 'ORGANIZATION' && (
-                    <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
-                      <FormattedMessage
-                        id="ContributionFlow.OrganizationProfile"
-                        defaultMessage="Organization profile"
-                      />
-                    </P>
-                  )}
-                </Flex>
-              </Flex>
-              {value.id === NEW_ORGANIZATION_KEY && checked && (
-                <CreateOrganizationForm values={data} onChange={values => onChange({ stepProfile: values })} />
-              )}
-            </Box>
-          )}
-        </StyledRadioList>
-      </Box>
-      <MessageBox type="info" fontSize="13px" lineHeight="20px">
-        <FormattedMessage
-          defaultMessage="When you contribute to a Collective we share your email address with the Administrators. If you wish to keep your contribution private choose the ‘incognito’ profile. Read our <PrivacyPolicyLink>privacy policy</PrivacyPolicyLink>."
-          values={{ PrivacyPolicyLink: getI18nLink({ href: '/privacypolicy', openInNewTab: true, as: Link }) }}
         />
-      </MessageBox>
+      </Box>
+      {/* TODO: The code to require legal name/address will be implemented in a followup PR */}
+      {/* {contributionRequiresIdentity(totalAmount) && (
+        <React.Fragment>
+          <Flex alignItems="center" my="14px">
+            <P fontSize="24px" lineHeight="32px" fontWeight="500" mr={2}>
+              <FormattedMessage id="collective.address.label" defaultMessage="Address" />
+            </P>
+            <Span mr={2} lineHeight="0">
+              <PrivateInfoIcon size="14px" tooltipProps={{ containerLineHeight: '0' }} />
+            </Span>
+            <StyledHr my="18px" borderColor="black.300" width="100%" />
+          </Flex>
+          <StyledInputLocation
+            autoDetectCountry
+            location={data?.location}
+            onChange={value => dispatchChange('location', value)}
+            labelFontSize="16px"
+            labelFontWeight="700"
+          />
+        </React.Fragment>
+      )} */}
+      <StepProfileInfoMessage />
     </Fragment>
   );
 };
 
 NewContributionFlowStepProfileLoggedInForm.propTypes = {
   data: PropTypes.object,
+  stepDetails: PropTypes.object,
   onChange: PropTypes.func,
   defaultSelectedProfile: PropTypes.object,
   profiles: PropTypes.array,

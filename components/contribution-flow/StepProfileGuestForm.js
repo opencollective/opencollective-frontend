@@ -17,14 +17,10 @@ import StyledInputLocation from '../StyledInputLocation';
 import { P, Span } from '../Text';
 
 import StepProfileInfoMessage from './StepProfileInfoMessage';
-import { getTotalAmount } from './utils';
-
-const shouldRequireAllInfo = amount => {
-  return Boolean(amount && amount >= 500000);
-};
+import { contributionRequiresIdentity, getTotalAmount } from './utils';
 
 export const validateGuestProfile = (stepProfile, stepDetails, showError) => {
-  if (shouldRequireAllInfo(getTotalAmount(stepDetails))) {
+  if (contributionRequiresIdentity(getTotalAmount(stepDetails))) {
     const { name, legalName } = stepProfile;
     const location = stepProfile.location || {};
     const hasNameOrLegalName = name || legalName;
@@ -148,7 +144,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defau
           />
         )}
       </StyledInputField>
-      {shouldRequireAllInfo(totalAmount) && (
+      {contributionRequiresIdentity(totalAmount) && (
         <React.Fragment>
           <Flex alignItems="center" my="14px">
             <P fontSize="24px" lineHeight="32px" fontWeight="500" mr={2}>
