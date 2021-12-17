@@ -185,7 +185,7 @@ export const HostFeesSectionHistorical = ({ hostSlug }) => {
     <Box py={3}>
       <Flex alignItems="center" px={2} mb={2}>
         <P fontSize="11px" fontWeight="700" mr={3} textTransform="uppercase">
-          <FormattedMessage id="HostFeesSection.Title" defaultMessage="Collected host fees per year" />
+          <FormattedMessage id="HostFeesSection.Title" defaultMessage="Host Fees per year" />
         </P>
         <StyledSelectFilter
           inputId="host-report-host-fees-year-select"

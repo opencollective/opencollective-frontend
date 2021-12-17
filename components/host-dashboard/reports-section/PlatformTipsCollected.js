@@ -17,7 +17,7 @@ const PlatformTipsCollected = ({ host, isLoading }) => {
       <Flex alignItems="center" my={2}>
         <Image src="/static/images/opencollective-icon.svg" width={14} height={14} alt="" />
         <P textTransform="uppercase" ml={2} fontSize="12px" fontWeight="500" color="black.700" letterSpacing="0.06em">
-          <FormattedMessage id="PlatformTipsCollected" defaultMessage="Platform tips collected" />
+          <FormattedMessage id="PlatformTipsCollected" defaultMessage="Platform Tips" />
         </P>
       </Flex>
       <Box mt={20} mb={10}>
@@ -62,7 +62,7 @@ const PlatformTipsCollected = ({ host, isLoading }) => {
       <P fontSize="12px" lineHeight="18px" color="black.700">
         <FormattedMessage
           id="Host.PlatformTip.description"
-          defaultMessage="Tips for Open Collective are collected from contributions to your collectives. They are deposited along with the transaction to your organization's bank account, and we claim them at the end of each month with an expense."
+          defaultMessage="Contributors optionally add Platform Tips to transactions. Amounts owed to Open Collective that have been deposited into the Host's bank account are charged as part of monthly Settlement Expenses."
         />
       </P>
     </Container>
