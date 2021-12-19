@@ -316,7 +316,7 @@
   "collective.delete.title": "Usuń {type, select, EVENT {to wydarzenie} PROJECT {ten projekt} FUND {ten fundusz} COLLECTIVE {tą zbiórkę} ORGANIZATION {tą organizację} other {to konto}}",
   "collective.description.label": "Krótki opis",
   "collective.edit.backToProfile": "zobacz stronę {type}",
-  "collective.edit.host.findHost.description": "Join an existing Fiscal Host who will hold funds on your behalf and take care of accounting, taxes, banking, admin, payments, and liability. Most Hosts charge a fee for this service (you can review the details before choosing a Host).",
+  "collective.edit.host.findHost.description": "Dołącz do istniejącego Gospodarza Podatkowego, który będzie przechowywał fundusze w Twoim imieniu i zajmie się księgowością, podatkami, bankowością, administracją, płatnościami i odpowiedzialnością. Większość gospodarzy pobiera opłatę za tę usługę (możesz zapoznać się ze szczegółami przed wyborem gospodarza).",
   "collective.edit.host.findHost.title": "Zastosuj do hosta podatkowego",
   "collective.edit.host.legalName.info": "Ustaw nazwę prawną {isSelfHosted, select, false {hosta} other {}} w sekcji informacyjnej <SettingsLink>ustawień</SettingsLink>. Jest to wymagane, jeśli nazwa prawna jest inna niż nazwa wystawy do celów podatkowych i księgowych.",
   "collective.edit.host.noHost.description": "Nie możesz otrzymywać wkładów finansowych ani korzystać z funkcji budżetowych. Nadal możesz edytować swoją stronę profilową, wysyłać wydatki do zapłaty później i publikować aktualizacje.",
