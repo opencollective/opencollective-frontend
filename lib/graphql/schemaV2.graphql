@@ -6424,6 +6424,11 @@ type Mutation {
     Further information about collective applying to host
     """
     applicationData: JSON
+
+    """
+    Additional data for the collective creation. This argument has no effect in production
+    """
+    testPayload: JSON
   ): Collective
   createFund(
     """
@@ -6940,7 +6945,7 @@ type Mutation {
   """
   A mutation for the host to approve or reject an order
   """
-  processPendingOrder(order: OrderReferenceInput!, action: ProcessOrderAction!): Order!
+  processPendingOrder(order: OrderUpdateInput!, action: ProcessOrderAction!): Order!
 
   """
   Add a new payment method to be used with an Order
@@ -7191,12 +7196,12 @@ type Mutation {
   """
   createVirtualCard(
     """
-    Virtual Card name
+    Virtual card name
     """
     name: String!
 
     """
-    Virtual Card monthly limit
+    Virtual card monthly limit
     """
     monthlyLimit: AmountInput!
 
@@ -7206,7 +7211,7 @@ type Mutation {
     account: AccountReferenceInput!
 
     """
-    Individual account responsible for the card
+    Individual account responsible for the virtual card
     """
     assignee: AccountReferenceInput!
   ): VirtualCard!
@@ -10072,6 +10077,33 @@ input PaymentMethodReferenceInput {
   The id assigned to the payment method
   """
   id: String
+}
+
+input OrderUpdateInput {
+  """
+  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the order (ie: 4242)
+  """
+  legacyId: Int
+
+  """
+  Amount received by collective, excluding any tips or fees
+  """
+  amount: AmountInput
+
+  """
+  Amount paid in fees for the payment processor
+  """
+  paymentProcessorFee: AmountInput
+
+  """
+  Amount intended as tip for the platform
+  """
+  platformTip: AmountInput
 }
 
 """
