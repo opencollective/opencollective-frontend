@@ -97,6 +97,7 @@ const UploadedFilePreview = ({
   isDownloading,
   url,
   size,
+  maxHeight,
   alt,
   hasLink,
   fileName,
@@ -149,7 +150,13 @@ const UploadedFilePreview = ({
 
   return (
     <Container {...props}>
-      <CardContainer size={size} title={fileName} border={border} hasOnClick={Boolean(props.onClick)}>
+      <CardContainer
+        size={size}
+        maxHeight={maxHeight}
+        title={fileName}
+        border={border}
+        hasOnClick={Boolean(props.onClick)}
+      >
         {content}
       </CardContainer>
       {showFileName && (
@@ -182,7 +189,7 @@ UploadedFilePreview.propTypes = {
   onClick: PropTypes.func,
   border: PropTypes.string,
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  maxHeihgt: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
+  maxHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** If true, a link to the original file will be added if possible */
   hasLink: PropTypes.bool,
 };
