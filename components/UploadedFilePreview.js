@@ -195,6 +195,7 @@ UploadedFilePreview.propTypes = {
 };
 
 UploadedFilePreview.defaultProps = {
+  size: 88,
   border: '1px solid #dcdee0',
   hasLink: true,
   alt: 'Uploaded file preview',
