@@ -40,6 +40,7 @@ import HostMetrics from './sections/HostMetrics';
 import HostPlan from './sections/HostPlan';
 import HostTwoFactorAuth from './sections/HostTwoFactorAuth';
 import HostVirtualCards from './sections/HostVirtualCards';
+import HostVirtualCardsSettings from './sections/HostVirtualCardsSettings';
 import InvoicesReceipts from './sections/InvoicesReceipts';
 import Members from './sections/Members';
 import PaymentMethods from './sections/PaymentMethods';
@@ -575,6 +576,9 @@ class EditCollectiveForm extends React.Component {
 
       case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS:
         return <HostVirtualCards collective={collective} contentOnly={contentOnly} />;
+
+      case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS:
+        return <HostVirtualCardsSettings collective={collective} contentOnly={contentOnly} />;
 
       case EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS:
         return <VirtualCards collective={collective} contentOnly={contentOnly} />;

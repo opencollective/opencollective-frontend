@@ -1,0 +1,184 @@
+import React, { Fragment } from 'react';
+import PropTypes from 'prop-types';
+import { useMutation } from '@apollo/client';
+import { Info } from '@styled-icons/feather/Info';
+import { get } from 'lodash';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+
+import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+
+import { Box, Flex } from '../../Grid';
+import InputField from '../../InputField';
+import RichTextEditor from '../../RichTextEditor';
+import StyledButton from '../../StyledButton';
+import StyledInputField from '../../StyledInputField';
+import StyledTooltip from '../../StyledTooltip';
+import { P, Span } from '../../Text';
+import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import SettingsTitle from '../SettingsTitle';
+
+import SettingsSectionTitle from './SettingsSectionTitle';
+
+const VIRTUAL_CARDS_POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average length word
+
+const updateAccountSettingsMutation = gqlV2/* GraphQL */ `
+  mutation UpdateAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
+    editAccountSetting(account: $account, key: $key, value: $value) {
+      id
+      type
+      isActive
+      settings
+    }
+  }
+`;
+
+const messages = defineMessages({
+  'policy.placeholder': {
+    id: 'Host.VirtualCards.Policy.Placeholder',
+    defaultMessage: 'E.g. deadlines to submit receipts, allowed charges, limits, or who to contact with questions.',
+  },
+});
+
+const HostVirtualCards = props => {
+  const { formatMessage } = useIntl();
+  const { addToast } = useToasts();
+
+  const [updateAccountSetting, { loading: updateLoading }] = useMutation(updateAccountSettingsMutation, {
+    context: API_V2_CONTEXT,
+    onError: e => {
+      addToast({
+        type: TOAST_TYPE.ERROR,
+        message: (
+          <FormattedMessage
+            id="Host.VirtualCards.Settings.Error"
+            defaultMessage="Error updating setting: {error}"
+            values={{
+              error: e.message,
+            }}
+          />
+        ),
+      });
+    },
+  });
+  const [virtualCardPolicy, setVirtualCardPolicy] = React.useState(
+    props.collective.settings?.virtualcards?.policy || '',
+  );
+
+  const handleSettingsUpdate = key => async value => {
+    await updateAccountSetting({
+      variables: {
+        account: { legacyId: props.collective.id },
+        key,
+        value,
+      },
+    });
+    addToast({
+      type: TOAST_TYPE.SUCCESS,
+      message: <FormattedMessage id="Host.VirtualCards.Settings.Success" defaultMessage="Setting updated" />,
+    });
+  };
+
+  return (
+    <Fragment>
+      <SettingsTitle contentOnly={props.contentOnly}>
+        <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
+      </SettingsTitle>
+      <Box>
+        <SettingsSectionTitle>
+          <FormattedMessage id="Host.VirtualCards.Settings.Title" defaultMessage="Settings and Policy" />
+        </SettingsSectionTitle>
+        <Flex mt={4} justifyContent="space-between" alignItems="center">
+          <Box lineHeight="20px" fontSize="14px" fontWeight="500">
+            <FormattedMessage id="Host.VirtualCards.RequestCard.Title" defaultMessage="Enable card requests" />
+            <P fontSize="11px" fontWeight="400" color="black.600">
+              <FormattedMessage
+                id="Host.VirtualCards.RequestCard.Description"
+                defaultMessage="Collectives can request a card to be linked to their budget."
+              />
+            </P>
+          </Box>
+          <StyledInputField name="virtualcards.requestcard" htmlFor="virtualcards.requestcard" disabled={updateLoading}>
+            {inputProps => (
+              <InputField
+                name="application"
+                className="horizontal"
+                type="switch"
+                id={inputProps.id}
+                inputName={inputProps.name}
+                onChange={handleSettingsUpdate(inputProps.name)}
+                defaultValue={get(props.collective, `settings.${inputProps.name}`)}
+              />
+            )}
+          </StyledInputField>
+        </Flex>
+
+        <StyledInputField
+          name="virtualcards.policy"
+          htmlFor="virtualcards.policy"
+          disabled={updateLoading}
+          mt={4}
+          label={
+            <Box lineHeight="20px" fontSize="14px" fontWeight="500">
+              <Span mr={1}>
+                <FormattedMessage id="Host.VirtualCards.Policy.Title" defaultMessage="Virtual Card Policy" />
+              </Span>
+              <StyledTooltip
+                content={
+                  <FormattedMessage
+                    id="Host.VirtualCards.Policy.ToolTip"
+                    defaultMessage="This policy text will appear in a pop up when someone 'Requests a Virtual Card' from the Action menu on the collective's page."
+                  />
+                }
+              >
+                <Info size={16} />
+              </StyledTooltip>
+            </Box>
+          }
+        >
+          {inputProps => (
+            <RichTextEditor
+              withBorders
+              showCount
+              maxLength={VIRTUAL_CARDS_POLICY_MAX_LENGTH}
+              version="simplified"
+              editorMinHeight="20rem"
+              editorMaxHeight={500}
+              id={inputProps.id}
+              inputName={inputProps.name}
+              onChange={e => setVirtualCardPolicy(e.target.value)}
+              value={virtualCardPolicy}
+              placeholder={formatMessage(messages['policy.placeholder'])}
+              fontSize="14px"
+            />
+          )}
+        </StyledInputField>
+
+        <StyledButton
+          mt={10}
+          loading={updateLoading}
+          onClick={() => handleSettingsUpdate('virtualcards.policy')(virtualCardPolicy)}
+        >
+          <FormattedMessage id="Host.VirtualCards.Policy.Save" defaultMessage="Save Policy" />
+        </StyledButton>
+      </Box>
+    </Fragment>
+  );
+};
+
+HostVirtualCards.propTypes = {
+  collective: PropTypes.shape({
+    id: PropTypes.number,
+    slug: PropTypes.string,
+    settings: PropTypes.shape({
+      virtualcards: PropTypes.shape({
+        autopause: PropTypes.bool,
+        requestcard: PropTypes.bool,
+        policy: PropTypes.string,
+      }),
+    }),
+  }),
+  contentOnly: PropTypes.bool,
+  hideTopsection: PropTypes.func,
+};
+
+export default HostVirtualCards;
