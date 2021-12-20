@@ -66,7 +66,7 @@ const initialValues = {
   monthlyLimit: undefined,
 };
 
-const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => {
+const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modalProps }) => {
   const { addToast } = useToasts();
 
   const [createVirtualCard, { loading: isBusy }] = useMutation(createVirtualCardMutation, {
@@ -77,7 +77,10 @@ const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => 
   });
 
   const formik = useFormik({
-    initialValues,
+    initialValues: {
+      ...initialValues,
+      collective,
+    },
     async onSubmit(values) {
       const { collective, assignee, cardName, monthlyLimit } = values;
 
@@ -173,7 +176,7 @@ const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => 
                   name="collective"
                   id="collective"
                   collective={formik.values.collective}
-                  isDisabled={isBusy}
+                  isDisabled={!!collective || isBusy}
                   customOptions={[
                     {
                       value: host,
@@ -281,6 +284,14 @@ CreateVirtualCardModal.propTypes = {
     imageUrl: PropTypes.string,
     currency: PropTypes.string,
   }).isRequired,
+  collective: PropTypes.shape({
+    slug: PropTypes.string,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    type: PropTypes.string,
+    name: PropTypes.string,
+    imageUrl: PropTypes.string,
+    currency: PropTypes.string,
+  }),
 };
 
 /** @component */
