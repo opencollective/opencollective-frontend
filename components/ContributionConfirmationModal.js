@@ -117,7 +117,7 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
           <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
             <Span fontSize="14px" lineHeight="20px" fontWeight="400">
               <FormattedMessage
-                defaultMessage="Amount received by {collective}"
+                defaultMessage="Amount received for {collective}"
                 values={{ collective: order.toAccount.name }}
               />
             </Span>
