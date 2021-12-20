@@ -58,10 +58,20 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
 
     const orderUpdate = {
       id: order.id,
-      amount: { valueInCents: netAmount, currency },
-      paymentProcessorFee: { valueInCents: paymentProcessorFee, currency },
-      platformTip: { valueInCents: platformTip, currency },
     };
+
+    if (netAmount !== order.amount.valueInCents) {
+      orderUpdate.amount = { valueInCents: netAmount, currency };
+    }
+
+    if (paymentProcessorFee !== 0) {
+      orderUpdate.paymentProcessorFee = { valueInCents: paymentProcessorFee, currency };
+    }
+
+    if (platformTip !== order.platformTipAmount?.valueInCents) {
+      orderUpdate.platformTip = { valueInCents: platformTip, currency };
+    }
+
     try {
       await confirmOrder({ variables: { order: orderUpdate, action: 'MARK_AS_PAID' } });
       addToast({
