@@ -7,8 +7,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
-import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
-import CollectivePickerAsync from '../CollectivePickerAsync';
+import CollectivePicker from '../CollectivePicker';
 import Container from '../Container';
 import { Grid } from '../Grid';
 import StyledButton from '../StyledButton';
@@ -20,18 +19,23 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const createVirtualCardMutation = gqlV2/* GraphQL */ `
-  mutation createVirtualCard(
+const editVirtualCardMutation = gqlV2/* GraphQL */ `
+  mutation editVirtualCard(
+    $virtualCard: VirtualCardReferenceInput!
     $name: String!
-    $monthlyLimit: AmountInput!
-    $account: AccountReferenceInput!
+    $monthlyLimit: AmountInput
     $assignee: AccountReferenceInput!
   ) {
-    createVirtualCard(name: $name, monthlyLimit: $monthlyLimit, account: $account, assignee: $assignee) {
+    editVirtualCard(virtualCard: $virtualCard, name: $name, monthlyLimit: $monthlyLimit, assignee: $assignee) {
       id
       name
-      last4
-      data
+      spendingLimitAmount
+      assignee {
+        id
+        name
+        slug
+        imageUrl
+      }
     }
   }
 `;
@@ -59,46 +63,50 @@ const throttledCall = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
 
-const initialValues = {
-  collective: undefined,
-  assignee: undefined,
-  cardName: undefined,
-  monthlyLimit: undefined,
-};
-
-const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modalProps }) => {
+const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps }) => {
   const { addToast } = useToasts();
 
-  const [createVirtualCard, { loading: isBusy }] = useMutation(createVirtualCardMutation, {
+  const [editVirtualCard, { loading: isBusy }] = useMutation(editVirtualCardMutation, {
     context: API_V2_CONTEXT,
   });
   const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery, {
     context: API_V2_CONTEXT,
   });
 
+  const canEditMonthlyLimit = virtualCard.spendingLimitInterval === 'MONTHLY' && virtualCard.provider === 'STRIPE';
+
   const formik = useFormik({
     initialValues: {
-      ...initialValues,
-      collective,
+      cardName: virtualCard.name,
+      assignee: virtualCard.assignee,
+      monthlyLimit: canEditMonthlyLimit ? virtualCard.spendingLimitAmount : undefined,
     },
     async onSubmit(values) {
-      const { collective, assignee, cardName, monthlyLimit } = values;
+      const { assignee, cardName, monthlyLimit } = values;
 
       try {
-        await createVirtualCard({
-          variables: {
-            assignee: { id: assignee.id },
-            account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
-            name: cardName,
-            monthlyLimit: { currency: collective.currency, valueInCents: monthlyLimit, value: monthlyLimit / 100 },
-          },
-        });
+        const variables = {
+          virtualCard: { id: virtualCard.id },
+          name: cardName,
+          assignee: { id: assignee.id },
+        };
+
+        if (canEditMonthlyLimit) {
+          variables.monthlyLimit = {
+            currency: virtualCard.currency,
+            valueInCents: monthlyLimit,
+            value: monthlyLimit / 100,
+          };
+        }
+
+        await editVirtualCard({ variables });
       } catch (e) {
         addToast({
           type: TOAST_TYPE.ERROR,
           message: (
             <FormattedMessage
-              defaultMessage="Error creating virtual card: {error}"
+              id="Host.VirtualCards.EditCard.Error"
+              defaultMessage="Error editing card: {error}"
               values={{
                 error: e.message,
               }}
@@ -107,45 +115,34 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
         });
         return;
       }
-      onSuccess?.();
+
+      onSuccess?.(<FormattedMessage defaultMessage="Card successfully updated" />);
       handleClose();
     },
     validate(values) {
       const errors = {};
-      if (!values.collective) {
-        errors.collective = 'Required';
-      }
       if (!values.assignee) {
         errors.assignee = 'Required';
       }
       if (!values.cardName) {
         errors.cardName = 'Required';
       }
-      if (!values.monthlyLimit) {
+      if (canEditMonthlyLimit && !values.monthlyLimit) {
         errors.monthlyLimit = 'Required';
       }
-      if (values.monthlyLimit > 100000) {
-        errors.monthlyLimit = `MonthlyLimit should not exceed 1000 ${values.collective?.currency || 'USD'}`;
+      if (canEditMonthlyLimit && values.monthlyLimit > 100000) {
+        errors.monthlyLimit = 'Monthly limit should not exceed 1000$';
       }
       return errors;
     },
   });
 
   useEffect(() => {
-    if (formik.values.collective?.slug) {
-      throttledCall(getCollectiveUsers, { slug: formik.values.collective.slug });
-    }
-  }, [formik.values.collective]);
+    throttledCall(getCollectiveUsers, { slug: virtualCard.account.slug });
+  });
 
   const handleClose = () => {
-    formik.resetForm(initialValues);
-    formik.setErrors({});
     onClose?.();
-  };
-
-  const handleCollectivePick = async option => {
-    formik.setFieldValue('collective', option.value);
-    formik.setFieldValue('assignee', null);
   };
 
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
@@ -154,42 +151,14 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
     <Modal width="382px" onClose={handleClose} trapFocus {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose}>
-          <FormattedMessage defaultMessage="Create virtual card" />
+          <FormattedMessage defaultMessage="Edit virtual card" />
         </ModalHeader>
         <ModalBody pt={2}>
           <P>
-            <FormattedMessage defaultMessage="Create virtual card for a collective with the information below." />
+            <FormattedMessage defaultMessage="Edit virtual card for a collective with the information below." />
           </P>
           <StyledHr borderColor="black.300" mt={3} />
           <Grid mt={3} gridTemplateColumns="repeat(2, 1fr)" gridGap="26px 8px">
-            <StyledInputField
-              gridColumn="1/3"
-              labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Which collective will be assigned to this card?" />}
-              htmlFor="collective"
-              error={formik.touched.collective && formik.errors.collective}
-            >
-              {inputProps => (
-                <CollectivePickerAsync
-                  {...inputProps}
-                  hostCollectiveIds={[host.legacyId]}
-                  name="collective"
-                  id="collective"
-                  collective={formik.values.collective}
-                  isDisabled={!!collective || isBusy}
-                  customOptions={[
-                    {
-                      value: host,
-                      label: host.name,
-                      [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
-                    },
-                  ]}
-                  onChange={handleCollectivePick}
-                  filterResults={collectives => collectives.filter(c => c.isActive)}
-                />
-              )}
-            </StyledInputField>
-
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
@@ -231,25 +200,27 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
               )}
             </StyledInputField>
 
-            <StyledInputField
-              gridColumn="1/3"
-              labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Monthly limit" />}
-              htmlFor="monthlyLimit"
-              error={formik.touched.monthlyLimit && formik.errors.monthlyLimit}
-            >
-              {inputProps => (
-                <StyledInputAmount
-                  {...inputProps}
-                  id="monthlyLimit"
-                  currency={formik.values.collective?.currency || 'USD'}
-                  prepend={formik.values.collective?.currency || 'USD'}
-                  onChange={value => formik.setFieldValue('monthlyLimit', value)}
-                  value={formik.values.monthlyLimit}
-                  disabled={isBusy}
-                />
-              )}
-            </StyledInputField>
+            {canEditMonthlyLimit && (
+              <StyledInputField
+                gridColumn="1/3"
+                labelFontSize="13px"
+                label={<FormattedMessage defaultMessage="Monthly limit" />}
+                htmlFor="monthlyLimit"
+                error={formik.touched.monthlyLimit && formik.errors.monthlyLimit}
+              >
+                {inputProps => (
+                  <StyledInputAmount
+                    {...inputProps}
+                    id="monthlyLimit"
+                    currency={virtualCard.currency}
+                    prepend={virtualCard.currency}
+                    onChange={value => formik.setFieldValue('monthlyLimit', value)}
+                    value={formik.values.monthlyLimit}
+                    disabled={isBusy}
+                  />
+                )}
+              </StyledInputField>
+            )}
           </Grid>
         </ModalBody>
         <ModalFooter isFullWidth>
@@ -263,7 +234,7 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
               type="submit"
               textTransform="capitalize"
             >
-              <FormattedMessage defaultMessage="Create virtual card" />
+              <FormattedMessage defaultMessage="Update" />
             </StyledButton>
           </Container>
         </ModalFooter>
@@ -272,27 +243,27 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
   );
 };
 
-CreateVirtualCardModal.propTypes = {
+EditVirtualCardModal.propTypes = {
   onClose: PropTypes.func,
   onSuccess: PropTypes.func,
-  host: PropTypes.shape({
-    legacyId: PropTypes.number,
-    slug: PropTypes.string,
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    type: PropTypes.string,
+  virtualCard: PropTypes.shape({
+    id: PropTypes.string,
+    account: {
+      slug: PropTypes.string,
+    },
     name: PropTypes.string,
-    imageUrl: PropTypes.string,
+    assignee: {
+      id: PropTypes.string,
+      imageUrl: PropTypes.string,
+      name: PropTypes.string,
+      slug: PropTypes.string,
+    },
     currency: PropTypes.string,
-  }).isRequired,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    type: PropTypes.string,
-    name: PropTypes.string,
-    imageUrl: PropTypes.string,
-    currency: PropTypes.string,
+    spendingLimitAmount: PropTypes.number,
+    spendingLimitInterval: PropTypes.string,
+    provider: PropTypes.string,
   }),
 };
 
 /** @component */
-export default CreateVirtualCardModal;
+export default EditVirtualCardModal;

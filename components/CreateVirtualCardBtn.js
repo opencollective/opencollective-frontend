@@ -6,7 +6,7 @@ import CreateVirtualCardModal from './edit-collective/CreateVirtualCardModal';
 import StyledButton from './StyledButton';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
-const CreateVirtualCardBtn = ({ children, host }) => {
+const CreateVirtualCardBtn = ({ children, host, collective }) => {
   const [showModal, setShowModal] = React.useState(false);
   const { addToast } = useToasts();
 
@@ -23,6 +23,7 @@ const CreateVirtualCardBtn = ({ children, host }) => {
       {children({ onClick: () => setShowModal(true) })}
       <CreateVirtualCardModal
         host={host}
+        collective={collective}
         onClose={() => setShowModal(false)}
         setShow={setShowModal}
         onSuccess={handleCreateCardSuccess}
@@ -35,6 +36,7 @@ const CreateVirtualCardBtn = ({ children, host }) => {
 CreateVirtualCardBtn.propTypes = {
   children: PropTypes.func.isRequired,
   host: PropTypes.object.isRequired,
+  collective: PropTypes.object.isRequired,
 };
 
 const DefaultButton = props => (

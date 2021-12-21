@@ -22,6 +22,8 @@ import { P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import AssignVirtualCardModal from '../AssignVirtualCardModal';
 import CreateVirtualCardModal from '../CreateVirtualCardModal';
+import DeleteVirtualCardModal from '../DeleteVirtualCardModal';
+import EditVirtualCardModal from '../EditVirtualCardModal';
 import SettingsTitle from '../SettingsTitle';
 import VirtualCard from '../VirtualCard';
 
@@ -178,6 +180,7 @@ const HostVirtualCards = props => {
   const [displayAssignCardModal, setAssignCardModalDisplay] = React.useState(false);
   const [displayCreateVirtualCardModal, setCreateVirtualCardModalDisplay] = React.useState(false);
   const [editingVirtualCard, setEditingVirtualCard] = React.useState(undefined);
+  const [deletingVirtualCard, setDeletingVirtualCard] = React.useState(undefined);
   const [virtualCardPolicy, setVirtualCardPolicy] = React.useState(
     props.collective.settings?.virtualcards?.policy || '',
   );
@@ -201,9 +204,19 @@ const HostVirtualCards = props => {
       ),
     });
     setAssignCardModalDisplay(false);
-    setEditingVirtualCard(undefined);
     refetch();
   };
+
+  const handleEditCardSuccess = message => {
+    addToast({
+      type: TOAST_TYPE.SUCCESS,
+      message: message,
+    });
+    setEditingVirtualCard(undefined);
+    setDeletingVirtualCard(undefined);
+    refetch();
+  };
+
   const handleCreateVirtualCardSuccess = message => {
     addToast({
       type: TOAST_TYPE.SUCCESS,
@@ -212,6 +225,7 @@ const HostVirtualCards = props => {
     setCreateVirtualCardModalDisplay(false);
     refetch();
   };
+
   const handleSettingsUpdate = key => async value => {
     await updateAccountSetting({
       variables: {
@@ -389,8 +403,8 @@ const HostVirtualCards = props => {
             {...vc}
             onSuccess={refetch}
             editHandler={() => setEditingVirtualCard(vc)}
-            // TODO: Edit card action need to be reworked
-            // hasActions
+            deleteHandler={() => setDeletingVirtualCard(vc)}
+            canEditVirtualCard
           />
         ))}
       </Grid>
@@ -406,15 +420,35 @@ const HostVirtualCards = props => {
           <FormattedMessage id="TotalItems" defaultMessage="Total Items" />: {data.host.hostedVirtualCards.totalCount}
         </P>
       </Flex>
-      {(displayAssignCardModal || editingVirtualCard) && (
+      {displayAssignCardModal && (
         <AssignVirtualCardModal
           host={data.host}
           onSuccess={handleAssignCardSuccess}
           onClose={() => {
             setAssignCardModalDisplay(false);
+          }}
+          show
+        />
+      )}
+      {editingVirtualCard && (
+        <EditVirtualCardModal
+          host={data.host}
+          onSuccess={handleEditCardSuccess}
+          onClose={() => {
             setEditingVirtualCard(undefined);
           }}
           virtualCard={editingVirtualCard}
+          show
+        />
+      )}
+      {deletingVirtualCard && (
+        <DeleteVirtualCardModal
+          host={data.host}
+          onSuccess={handleEditCardSuccess}
+          onClose={() => {
+            setDeletingVirtualCard(undefined);
+          }}
+          virtualCard={deletingVirtualCard}
           show
         />
       )}

@@ -328,7 +328,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       </MenuItem>
                     )}
                     {callsToAction.createVirtualCard && (
-                      <CreateVirtualCardBtn host={collective.host}>
+                      <CreateVirtualCardBtn collective={collective} host={collective.host}>
                         {btnProps => (
                           <MenuItem
                             py={1}
