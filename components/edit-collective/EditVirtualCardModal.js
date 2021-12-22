@@ -19,6 +19,8 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
+const MAXIMUM_MONTHLY_LIMIT = 2000;
+
 const editVirtualCardMutation = gqlV2/* GraphQL */ `
   mutation editVirtualCard(
     $virtualCard: VirtualCardReferenceInput!
@@ -130,8 +132,8 @@ const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps }
       if (canEditMonthlyLimit && !values.monthlyLimit) {
         errors.monthlyLimit = 'Required';
       }
-      if (canEditMonthlyLimit && values.monthlyLimit > 100000) {
-        errors.monthlyLimit = 'Monthly limit should not exceed 1000$';
+      if (canEditMonthlyLimit && values.monthlyLimit > MAXIMUM_MONTHLY_LIMIT * 100) {
+        errors.monthlyLimit = `Monthly limit should not exceed ${MAXIMUM_MONTHLY_LIMIT}`;
       }
       return errors;
     },

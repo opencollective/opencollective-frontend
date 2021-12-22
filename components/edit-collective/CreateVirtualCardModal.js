@@ -20,6 +20,8 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
+const MAXIMUM_MONTHLY_LIMIT = 2000;
+
 const createVirtualCardMutation = gqlV2/* GraphQL */ `
   mutation createVirtualCard(
     $name: String!
@@ -124,8 +126,10 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
       if (!values.monthlyLimit) {
         errors.monthlyLimit = 'Required';
       }
-      if (values.monthlyLimit > 100000) {
-        errors.monthlyLimit = `MonthlyLimit should not exceed 1000 ${values.collective?.currency || 'USD'}`;
+      if (values.monthlyLimit > MAXIMUM_MONTHLY_LIMIT * 100) {
+        errors.monthlyLimit = `Monthly limit should not exceed ${MAXIMUM_MONTHLY_LIMIT} ${
+          values.collective?.currency || 'USD'
+        }`;
       }
       return errors;
     },
