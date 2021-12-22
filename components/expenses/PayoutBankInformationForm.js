@@ -63,13 +63,14 @@ const requiredFieldsQuery = gqlV2/* GraphQL */ `
 const Input = ({ input, getFieldName, disabled, currency, loading, refetch, formik, host }) => {
   const isAccountHolderName = input.key === 'accountHolderName';
   const fieldName = isAccountHolderName ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
-  let validate = input.required ? value => (value ? undefined : `${input.name} is required`) : undefined;
+  const required = disabled ? false : input.required;
+  let validate = required ? value => (value ? undefined : `${input.name} is required`) : undefined;
   if (input.type === 'text') {
     if (input.validationRegexp) {
       validate = value => {
         const matches = new RegExp(input.validationRegexp).test(value);
         // TODO(intl): This should be internationalized, ideally with `formatFormErrorMessage`
-        if (!value && input.required) {
+        if (!value && required) {
           return `${input.name} is required`;
         } else if (!matches && value) {
           return input.validationError || `Invalid ${input.name}`;
@@ -83,7 +84,8 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
             <StyledInputField
               label={input.name}
               labelFontSize="13px"
-              required={input.required}
+              required={required}
+              hideOptionalLabel={disabled}
               error={(meta.touched || disabled) && meta.error}
               hint={input.hint}
             >
@@ -123,7 +125,8 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
             <StyledInputField
               label={input.name}
               labelFontSize="13px"
-              required={input.required}
+              required={required}
+              hideOptionalLabel={disabled}
               error={(meta.touched || disabled) && meta.error}
               hint={input.hint}
             >
@@ -151,7 +154,8 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
             <StyledInputField
               label={input.name}
               labelFontSize="13px"
-              required={input.required}
+              required={required}
+              hideOptionalLabel={disabled}
               error={(meta.touched || disabled) && meta.error}
             >
               {() => (
