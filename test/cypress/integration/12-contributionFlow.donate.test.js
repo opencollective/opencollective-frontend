@@ -48,6 +48,7 @@ describe('Contribution Flow: Donate', () => {
       cy.getByDataCy('contribute-profile-picker').click();
       cy.contains('[data-cy="select-option"]:first', userName);
       cy.contains('[data-cy="select-option"]:first', 'Personal');
+      cy.get('body').type('{esc}');
 
       // User profile is shown on step, all other steps must be disabled
       cy.getByDataCy(`progress-step-profile`).contains(userName);

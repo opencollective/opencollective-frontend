@@ -83,8 +83,9 @@ describe('Contribution Flow: Order', () => {
         cy.contains('[data-cy="contribute-profile-picker"]', userName);
         cy.getByDataCy('contribute-profile-picker').click();
         cy.contains('[data-cy="select-option"]:first', userName);
-
         cy.getByDataCy('progress-step-profile').contains(userName);
+
+        cy.get('body').type('{esc}');
         cy.get('button[data-cy="cf-next-step"]').click();
 
         // ---- Step 3: Payment ----
