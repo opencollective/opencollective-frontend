@@ -103,7 +103,7 @@ const formatProfileOption = (option, _, intl) => {
   return (
     <Flex alignItems="center">
       <Avatar collective={account} radius={32} />
-      <Flex flexDirection="column" ml={3}>
+      <Flex flexDirection="column" ml={3} css={{ whiteSpace: 'initial' }}>
         <Span fontSize="14px" fontWeight="500" lineHeight="20px" color="black.900">
           {formatAccountName(intl, account)}
         </Span>
