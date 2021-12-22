@@ -108,7 +108,6 @@ class ContributionFlowStepContainer extends React.Component {
   /** Return an array of any other associated profile the user might control */
   getOtherProfiles() {
     const { LoggedInUser, collective } = this.props;
-    console.log('Get profiles from', LoggedInUser);
     if (!LoggedInUser) {
       return [];
     }

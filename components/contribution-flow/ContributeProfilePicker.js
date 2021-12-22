@@ -18,7 +18,7 @@ const filterProfiles = (profiles, account, canUseIncognito) => {
       return false;
     } else if (!canUseIncognito && p.isIncognito) {
       return false;
-    } else if (p.type === 'COLLECTIVE' && (!p.host || p.host.id !== account.host?.legacyId)) {
+    } else if (p.type === CollectiveType.COLLECTIVE && (!p.host || p.host.id !== account.host?.legacyId)) {
       return false;
     } else {
       return true;
@@ -42,13 +42,12 @@ const getProfileOptions = (intl, profiles, canUseIncognito) => {
 
   // Add incognito profile entry if it doesn't exists
   if (canUseIncognito) {
-    const hasIncognitoProfile = profiles.some(p => p.type === 'USER' && p.isIncognito);
+    const hasIncognitoProfile = profiles.some(p => p.type === CollectiveType.USER && p.isIncognito);
     if (!hasIncognitoProfile) {
-      // TODO Test this with a new user
       myself.push(
         getOptionFromAccount({
           id: 'incognito',
-          type: 'USER',
+          type: CollectiveType.USER,
           isIncognito: true,
           name: intl.formatMessage({ id: 'profile.incognito', defaultMessage: 'Incognito' }),
         }),
@@ -142,7 +141,7 @@ const ContributeProfilePicker = ({ profiles, canUseIncognito, account, onChange,
       isSearchable={filteredProfiles.length > 8}
       creatable
       excludeAdminFields
-      types={['ORGANIZATION']}
+      types={[CollectiveType.ORGANIZATION]}
       formatOptionLabel={formatProfileOption}
       onChange={({ value }) => {
         setSelectedProfile(value);
