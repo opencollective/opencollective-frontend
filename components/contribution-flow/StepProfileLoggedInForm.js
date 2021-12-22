@@ -58,7 +58,7 @@ const NewContributionFlowStepProfileLoggedInForm = ({
           />
         </React.Fragment>
       )} */}
-      <StepProfileInfoMessage />
+      <StepProfileInfoMessage hasIncognito />
     </Fragment>
   );
 };

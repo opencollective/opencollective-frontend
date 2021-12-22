@@ -164,7 +164,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defau
           />
         </React.Fragment>
       )}
-      <StepProfileInfoMessage amount={totalAmount} interval={stepDetails.interval} />
+      <StepProfileInfoMessage isGuest hasLegalNameField />
       {isCaptchaEnabled() && (
         <Flex justifyContent="center">
           <Captcha onVerify={result => dispatchChange('captcha', result)} />
