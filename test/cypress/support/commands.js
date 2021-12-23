@@ -148,6 +148,44 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
 });
 
 /**
+ * Create a collective. Admin will be the user designated by `email`. If not
+ * provided, the email used will default to `defaultTestUserEmail`.
+ */
+Cypress.Commands.add('createHostedCollectiveV2', ({ email = defaultTestUserEmail, testPayload } = {}) => {
+  const user = { email, newsletterOptIn: false };
+  return signinRequest(user, null).then(response => {
+    const token = getTokenFromRedirectUrl(response.body.redirect);
+    return graphqlQueryV2(token, {
+      operationName: 'createCollective',
+      query: `
+          mutation createCollective($collective: CollectiveCreateInput!, $host: AccountReferenceInput!, $testPayload: JSON) {
+            createCollective(collective: $collective, host: $host, automateApprovalWithGithub: true, testPayload: $testPayload) {
+              id
+              slug
+              name
+              description
+              settings
+            }
+          }
+        `,
+      variables: {
+        host: { slug: 'opensourceorg' },
+        automateApprovalWithGithub: true,
+        testPayload: testPayload || null,
+        collective: {
+          name: 'TestCollective',
+          slug: randomSlug(),
+          description: 'A test collective',
+          githubHandle: 'opencollective',
+        },
+      },
+    }).then(({ body }) => {
+      return body.data.createCollective;
+    });
+  });
+});
+
+/**
  * Create a expense.
  */
 Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, account, ...params } = {}) => {

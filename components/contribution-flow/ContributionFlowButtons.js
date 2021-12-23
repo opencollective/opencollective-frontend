@@ -87,7 +87,10 @@ class ContributionFlowButtons extends React.Component {
                   &rarr;
                 </React.Fragment>
               ) : isCrypto ? (
-                <FormattedMessage id="Finish" defaultMessage="Finish" />
+                <FormattedMessage
+                  defaultMessage="I've sent {CryptoAmount} {CryptoCurrency} to this wallet address"
+                  values={{ CryptoAmount: totalAmount, CryptoCurrency: currency }}
+                />
               ) : totalAmount ? (
                 <FormattedMessage
                   id="contribute.amount"

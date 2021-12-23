@@ -66,6 +66,10 @@ const accountOrdersQuery = gqlV2/* GraphQL */ `
           valueInCents
           currency
         }
+        platformTipAmount {
+          valueInCents
+          currency
+        }
         platformContributionAmount {
           valueInCents
           currency

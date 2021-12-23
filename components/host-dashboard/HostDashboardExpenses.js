@@ -72,20 +72,6 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
       nodes {
         ...ExpensesListFieldsFragment
         ...ExpensesListAdminFieldsFragment
-        account {
-          id
-          name
-          slug
-          createdAt
-          currency
-          type
-          stats {
-            balanceWithBlockedFunds {
-              valueInCents
-              currency
-            }
-          }
-        }
       }
     }
   }

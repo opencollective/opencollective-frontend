@@ -288,7 +288,6 @@ class CollectivePicker extends React.PureComponent {
     const { createFormCollectiveType, createdCollectives, displayInviteMenu, searchText } = this.state;
     const collectiveOptions = this.getOptionsFromCollectives(collectives, groupByType, sortFunc, intl);
     const allOptions = this.getAllOptions(collectiveOptions, customOptions, createdCollectives);
-
     const prefillValue = isEmail(searchText) ? { email: searchText } : { name: searchText };
 
     return (
@@ -315,7 +314,7 @@ class CollectivePicker extends React.PureComponent {
                 noOptionsMessage={searchText ? undefined : () => null}
                 formatOptionLabel={(option, context) => {
                   if (option[FLAG_COLLECTIVE_PICKER_COLLECTIVE]) {
-                    return formatOptionLabel(option, context);
+                    return formatOptionLabel(option, context, intl);
                   } else if (option[FLAG_NEW_COLLECTIVE]) {
                     return renderNewCollectiveOption ? (
                       renderNewCollectiveOption()
@@ -374,7 +373,7 @@ class CollectivePicker extends React.PureComponent {
                         optionalFields={this.props.createCollectiveOptionalFields}
                         onSuccess={collective => {
                           if (onChange) {
-                            onChange({ label: collective.name, value: collective });
+                            onChange({ label: collective.name, value: collective, isNew: true });
                           }
                           this.setState(state => ({
                             menuIsOpen: false,

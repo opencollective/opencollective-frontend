@@ -25,7 +25,7 @@ const getBorderColor = ({ error, success }) => {
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
 const StyledInput = styled.input`
-  &:not([type='checkbox']):not([type='radio']) {
+  &:not([type='checkbox']):not([type='radio']):not([type='range']) {
     min-height: 36px;
   }
 
@@ -42,7 +42,6 @@ const StyledInput = styled.input`
   border-style: ${props => (props.bare ? 'none' : 'solid')};
   box-sizing: border-box;
   outline: none;
-  background-color: ${themeGet('colors.white.full')};
 
   ${props => {
     if (props.withOutline) {
@@ -62,6 +61,10 @@ const StyledInput = styled.input`
 
   &[type=radio] {
     cursor: pointer;
+  }
+
+  &[type='range'] {
+    cursor: grabbing;
   }
 
   &:disabled {
@@ -132,6 +135,7 @@ SubmitInput.defaultProps = {
   buttonSize: 'large',
   fontWeight: 'bold',
   type: 'submit',
+  backgroundColor: 'colors.white.full',
 };
 
 /** @component */

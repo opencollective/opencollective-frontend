@@ -29,7 +29,7 @@ const HowOCWorks = () => {
             color="black.900"
             whiteSpace={[null, null, 'pre-line']}
           >
-            <FormattedMessage id="howItWorks.title" defaultMessage="How Open Collective works?" />
+            <FormattedMessage id="OC.howItWorks" defaultMessage="How Open Collective works" />
           </H1>
         </Box>
         <Box width={['288px', '344px', '458px', null, '558px']}>
@@ -42,7 +42,7 @@ const HowOCWorks = () => {
           >
             <FormattedMessage
               id="howItWorks.description"
-              defaultMessage="Open Collective enables all kinds of groups to raise, manage, and spend money transparently. Our open-source software platform engages contributors and supporters, automates admin, and helps you tell your story."
+              defaultMessage="Open Collective enables all kinds of groups to raise, manage, and spend money transparently. Our open source software platform engages contributors and supporters, automates admin, and helps you tell your story."
             />
           </P>
         </Box>

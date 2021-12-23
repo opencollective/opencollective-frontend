@@ -40,6 +40,7 @@ import HostMetrics from './sections/HostMetrics';
 import HostPlan from './sections/HostPlan';
 import HostTwoFactorAuth from './sections/HostTwoFactorAuth';
 import HostVirtualCards from './sections/HostVirtualCards';
+import HostVirtualCardsSettings from './sections/HostVirtualCardsSettings';
 import InvoicesReceipts from './sections/InvoicesReceipts';
 import Members from './sections/Members';
 import PaymentMethods from './sections/PaymentMethods';
@@ -284,6 +285,7 @@ class EditCollectiveForm extends React.Component {
         id: 'event.privateInstructions.description',
         defaultMessage: 'These instructions will be provided by email to the participants.',
       },
+      inValidDateError: { defaultMessage: 'Please enter a valid date' },
     });
 
     collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
@@ -303,6 +305,8 @@ class EditCollectiveForm extends React.Component {
       collective,
       tiers: tiers.length === 0 ? [] : tiers,
       tickets: tickets.length === 0 ? [] : tickets,
+      validStartDate: true,
+      validEndDate: true,
     };
   }
 
@@ -329,9 +333,17 @@ class EditCollectiveForm extends React.Component {
       } else if (fieldname === 'application.message') {
         set(collective, 'settings.applyMessage', value);
       } else if (fieldname === 'startsAt' && collective.type === EVENT) {
-        collective[fieldname] = convertDateToApiUtc(value, collective.timezone);
+        const isValid = dayjs(value).isValid();
+        this.setState({ validStartDate: isValid });
+        if (isValid) {
+          collective[fieldname] = convertDateToApiUtc(value, collective.timezone);
+        }
       } else if (fieldname === 'endsAt' && collective.type === EVENT) {
-        collective[fieldname] = convertDateToApiUtc(value, collective.timezone);
+        const isValid = dayjs(value).isValid();
+        this.setState({ validEndDate: isValid });
+        if (isValid) {
+          collective[fieldname] = convertDateToApiUtc(value, collective.timezone);
+        }
       } else if (fieldname === 'timezone' && collective.type === EVENT) {
         if (value) {
           const timezone = collective.timezone;
@@ -565,6 +577,9 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS:
         return <HostVirtualCards collective={collective} contentOnly={contentOnly} />;
 
+      case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS:
+        return <HostVirtualCardsSettings collective={collective} contentOnly={contentOnly} />;
+
       case EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS:
         return <VirtualCards collective={collective} contentOnly={contentOnly} />;
 
@@ -730,12 +745,16 @@ class EditCollectiveForm extends React.Component {
           type: 'datetime-local',
           defaultValue: dayjs(collective.startsAt).tz(collective.timezone).format('YYYY-MM-DDTHH:mm'),
           when: () => collective.type === EVENT,
+          error: !this.state.validStartDate ? intl.formatMessage(this.messages.inValidDateError) : null,
+          required: true,
         },
         {
           name: 'endsAt',
           type: 'datetime-local',
           defaultValue: dayjs(collective.endsAt).tz(collective.timezone).format('YYYY-MM-DDTHH:mm'),
           when: () => collective.type === EVENT,
+          error: !this.state.validEndDate ? intl.formatMessage(this.messages.inValidDateError) : null,
+          required: true,
         },
         {
           name: 'timezone',
@@ -873,12 +892,20 @@ class EditCollectiveForm extends React.Component {
                       pre={field.pre}
                       post={field.post}
                       context={this.state.collective}
+                      error={field.error}
                       onChange={value => this.handleChange(field.name, value)}
+                      onKeyDown={event => {
+                        if ((field.name === 'startsAt' || field.name === 'endsAt') && event.key === 'Backspace') {
+                          event.preventDefault();
+                        }
+                      }}
                       disabled={field.disabled}
                       maxLength={field.maxLength}
                       isPrivate={field.isPrivate}
                       step={field.step}
                       min={field.min}
+                      overflow="hidden"
+                      required={field.required}
                     />
                   ))}
                 </div>
@@ -896,7 +923,12 @@ class EditCollectiveForm extends React.Component {
                   type="submit"
                   onClick={this.handleSubmit}
                   data-cy="collective-save"
-                  disabled={status === 'loading' || !this.state.modified}
+                  disabled={
+                    status === 'loading' ||
+                    !this.state.modified ||
+                    !this.state.validStartDate ||
+                    !this.state.validEndDate
+                  }
                 >
                   {submitBtnLabel}
                 </StyledButton>

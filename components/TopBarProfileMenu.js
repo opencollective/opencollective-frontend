@@ -103,7 +103,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} href="/applications">
         <FormattedMessage id="menu.applications" defaultMessage="Applications" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} as="a" href="https://docs.opencollective.com">
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} as="a" href="/help">
         <FormattedMessage id="menu.help" defaultMessage="Help" />
       </UserMenuLinkEntry>
       {isMobileView ? (

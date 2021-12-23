@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
+import { get, isNumber } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { border, color, space, typography } from 'styled-system';
@@ -9,13 +11,16 @@ import { border, color, space, typography } from 'styled-system';
 import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledButtonSet from '../StyledButtonSet';
+import StyledCheckbox from '../StyledCheckbox';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
@@ -25,6 +30,21 @@ import { withUser } from '../UserProvider';
 
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
+
+const quoteExpenseQuery = gqlV2/* GraphQL */ `
+  query QuoteExpenseQuery($id: String!) {
+    expense(expense: { id: $id }) {
+      id
+      quote {
+        paymentProcessorFeeAmount {
+          valueInCents
+          currency
+        }
+        estimatedDeliveryAt
+      }
+    }
+  }
+`;
 
 const getPayoutLabel = (intl, type) => {
   return i18nPayoutMethodType(intl, type, { aliasBankAccountToTransferWise: true });
@@ -53,7 +73,11 @@ const getPayoutOptionValue = (payoutMethodType, isAuto, host) => {
   }
 };
 
-const DEFAULT_VALUES = { paymentProcessorFee: null, twoFactorAuthenticatorCode: null };
+const DEFAULT_VALUES = Object.freeze({
+  paymentProcessorFee: null,
+  twoFactorAuthenticatorCode: null,
+  feesPayer: 'COLLECTIVE',
+});
 
 const validate = values => {
   const errors = {};
@@ -61,6 +85,31 @@ const validate = values => {
     errors.paymentProcessorFee = createError(ERROR.FORM_FIELD_PATTERN);
   }
   return errors;
+};
+
+const getTotalPayoutAmount = (expense, { paymentProcessorFee, feesPayer }) => {
+  if (feesPayer === 'PAYEE') {
+    return expense.amount;
+  } else {
+    return expense.amount + (paymentProcessorFee?.valueInCents || 0);
+  }
+};
+
+const canCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount) => {
+  // Current limitations:
+  // - Only for transferwise
+  // - Only when emptying the account balance
+  if (
+    ![PayoutMethodType.BANK_ACCOUNT].includes(expense.payoutMethod?.type) ||
+    expense.amount !== get(collective, 'stats.balanceWithBlockedFunds.valueInCents')
+  ) {
+    return false;
+  }
+
+  // We should only show the checkbox if there may actually be fees on the payout:
+  // - When the payment is manual, we only show the checkbox if a fee is set by the user
+  // - If it's an automatic payment then we can't predict the fees, so in doubt we show the checkbox
+  return !isManualPayment || Boolean(feeAmount);
 };
 
 const AmountLine = styled.div`
@@ -103,10 +152,18 @@ const Amount = styled.span`
 const SectionLabel = styled.p`
   font-size: 9px;
   font-weight: 500;
-  color: #9d9fa3;
+  color: #4e5052;
   margin: 5px 0;
   text-transform: uppercase;
 `;
+
+const getInitialValues = (expense, host, payoutMethodType) => {
+  return {
+    ...DEFAULT_VALUES,
+    ...getPayoutOptionValue(payoutMethodType, true, host),
+    feesPayer: expense.feesPayer || DEFAULT_VALUES.feesPayer,
+  };
+};
 
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
@@ -114,7 +171,7 @@ const SectionLabel = styled.p`
 const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }) => {
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
-  const initialValues = { ...DEFAULT_VALUES, ...getPayoutOptionValue(payoutMethodType, true, host) };
+  const initialValues = getInitialValues(expense, host, payoutMethodType);
   const formik = useFormik({ initialValues, validate, onSubmit });
   const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
@@ -123,6 +180,20 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   const hasAutomaticManualPicker = ![PayoutMethodType.OTHER, PayoutMethodType.ACCOUNT_BALANCE].includes(
     payoutMethodType,
   );
+  const canQuote =
+    host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT && formik.values.feesPayer !== 'PAYEE';
+  const quoteQuery = useQuery(quoteExpenseQuery, {
+    variables: { id: expense.id },
+    context: API_V2_CONTEXT,
+    skip: !canQuote,
+  });
+
+  const paymentProcessorFee = formik.values.forceManual
+    ? {
+        valueInCents: formik.values.paymentProcessorFee,
+        currency: expense.currency,
+      }
+    : quoteQuery?.data?.expense?.quote.paymentProcessorFeeAmount;
 
   return (
     <StyledModal
@@ -157,6 +228,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             customBorderRadius="6px"
             onChange={item => {
               formik.setValues({
+                ...formik.values,
                 ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
                 paymentProcessorFee: null,
               });
@@ -195,6 +267,20 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             )}
           </StyledInputField>
         )}
+        {canCustomizeFeesPayer(expense, collective, hasManualPayment, formik.values.paymentProcessorFee) && (
+          <Flex mt={16}>
+            <StyledCheckbox
+              name="feesPayer"
+              checked={formik.values.feesPayer === 'PAYEE'}
+              onChange={({ checked }) => formik.setFieldValue('feesPayer', checked ? 'PAYEE' : 'COLLECTIVE')}
+              label={
+                <Span fontSize="12px">
+                  <FormattedMessage defaultMessage="The payee is covering the fees" />
+                </Span>
+              }
+            />
+          </Flex>
+        )}
         <Box mt={19} mb={3}>
           <SectionLabel>
             <FormattedMessage id="PaymentBreakdown" defaultMessage="Payment breakdown" />
@@ -212,7 +298,17 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
               />
             </Amount>
           </AmountLine>
-          {formik.values.paymentProcessorFee !== null && (
+          {canQuote && quoteQuery.loading && (
+            <AmountLine borderTop="0.8px dashed #9D9FA3">
+              <Label>
+                <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />
+              </Label>
+              <Amount>
+                <LoadingPlaceholder height="16px" />
+              </Amount>
+            </AmountLine>
+          )}
+          {isNumber(paymentProcessorFee?.valueInCents) && (
             <AmountLine borderTop="0.8px dashed #9D9FA3">
               <Label>
                 <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />
@@ -220,11 +316,11 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
               <Amount>
                 <FormattedMoneyAmount
                   showCurrencyCode={false}
-                  amount={formik.values.paymentProcessorFee}
-                  currency={expense.currency}
+                  amount={paymentProcessorFee.valueInCents}
+                  currency={paymentProcessorFee.currency}
                   amountStyles={{
-                    fontWeight: formik.values.paymentProcessorFee ? 500 : 400,
-                    color: formik.values.paymentProcessorFee ? 'black.900' : 'black.400',
+                    fontWeight: paymentProcessorFee ? 500 : 400,
+                    color: paymentProcessorFee ? 'black.900' : 'black.400',
                   }}
                 />
               </Amount>
@@ -232,7 +328,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
           )}
           <AmountLine borderTop="1px solid #4E5052" pt={11}>
             <Label color="black.900" fontWeight="500">
-              {formik.values.paymentProcessorFee !== null ? (
+              {paymentProcessorFee !== null ? (
                 <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />
               ) : (
                 <FormattedMessage id="TotalAmountWithoutFee" defaultMessage="Total amount (without fees)" />
@@ -240,9 +336,12 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             </Label>
             <Amount>
               <FormattedMoneyAmount
-                amount={expense.amount + (formik.values.paymentProcessorFee || 0)}
+                amount={getTotalPayoutAmount(expense, {
+                  paymentProcessorFee,
+                  feesPayer: formik.values.feesPayer,
+                })}
                 currency={expense.currency}
-                currencyCodeStyles={{ color: 'black.400' }}
+                currencyCodeStyles={{ color: 'black.500' }}
               />
             </Amount>
           </AmountLine>
@@ -300,6 +399,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             type="submit"
             loading={formik.isSubmitting}
             data-cy="mark-as-paid-button"
+            disabled={quoteQuery.loading}
           >
             {hasManualPayment ? (
               <React.Fragment>
@@ -334,6 +434,7 @@ PayExpenseModal.propTypes = {
     legacyId: PropTypes.number,
     amount: PropTypes.number,
     currency: PropTypes.string,
+    feesPayer: PropTypes.string,
     payoutMethod: PropTypes.shape({
       type: PropTypes.oneOf(Object.values(PayoutMethodType)),
     }),

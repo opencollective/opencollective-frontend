@@ -437,6 +437,11 @@ interface Transaction {
   ): String
   amount: Amount!
   amountInHostCurrency: Amount!
+
+  """
+  Exchange rate between the currency of the transaction and the currency of the host (transaction.amount * transaction.hostCurrencyFxRate = transaction.amountInHostCurrency)
+  """
+  hostCurrencyFxRate: Float
   netAmount(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
@@ -654,6 +659,11 @@ type Expense {
   invoiceInfo: String
 
   """
+  The fees payer for this expense
+  """
+  feesPayer: FeesPayer!
+
+  """
   The permissions given to current logged in user for this expense
   """
   permissions: ExpensePermissions!
@@ -678,6 +688,7 @@ type Expense {
   The account that requested this expense to be submitted
   """
   requestedByAccount: Account
+  quote: ExpenseQuote
 }
 
 """
@@ -1597,6 +1608,21 @@ type ExpenseItem {
 }
 
 """
+All supported expense types
+"""
+enum FeesPayer {
+  """
+  The collective will be responsible for paying the fees
+  """
+  COLLECTIVE
+
+  """
+  The payee will be responsible for paying the fees (they'll be deduced from the total amount)
+  """
+  PAYEE
+}
+
+"""
 Fields for the user permissions on an expense
 """
 type ExpensePermissions {
@@ -1727,8 +1753,7 @@ enum ActivityType {
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
-  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
-  COLLECTIVE_VIRTUAL_CARD_CREATED
+  COLLECTIVE_VIRTUAL_CARD_ADDED
   ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
@@ -1747,6 +1772,8 @@ enum ActivityType {
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
+  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
+  COLLECTIVE_VIRTUAL_CARD_CREATED
 }
 
 """
@@ -1757,6 +1784,26 @@ enum LegalDocumentType {
   US tax form (W9)
   """
   US_TAX_FORM
+}
+
+"""
+Fields for an expense quote
+"""
+type ExpenseQuote {
+  """
+  Amount of this item
+  """
+  totalAmount: Amount!
+
+  """
+  Amount of payment processor fee
+  """
+  paymentProcessorFeeAmount: Amount!
+
+  """
+  The date on which the item was created
+  """
+  estimatedDeliveryAt: DateTime!
 }
 
 """
@@ -2336,7 +2383,7 @@ type Host implements Account & AccountWithContributions {
     dateTo: DateTime!
 
     """
-    The time unit of the time series
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
     """
     timeUnit: TimeUnit!
   ): HostMetricsTimeSeries!
@@ -2420,7 +2467,7 @@ type Host implements Account & AccountWithContributions {
     """
     The time unit of the time series
     """
-    timeUnit: TimeUnit! = YEAR
+    timeUnit: TimeUnit
   ): ContributionStats!
   expenseStats(
     """
@@ -2439,9 +2486,9 @@ type Host implements Account & AccountWithContributions {
     dateTo: DateTime
 
     """
-    The time unit of the time series
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
     """
-    timeUnit: TimeUnit! = YEAR
+    timeUnit: TimeUnit
   ): ExpenseStats!
 
   """
@@ -4101,6 +4148,11 @@ type Credit implements Transaction {
   ): String
   amount: Amount!
   amountInHostCurrency: Amount!
+
+  """
+  Exchange rate between the currency of the transaction and the currency of the host (transaction.amount * transaction.hostCurrencyFxRate = transaction.amountInHostCurrency)
+  """
+  hostCurrencyFxRate: Float
   netAmount(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
@@ -4199,6 +4251,11 @@ type Debit implements Transaction {
   ): String
   amount: Amount!
   amountInHostCurrency: Amount!
+
+  """
+  Exchange rate between the currency of the transaction and the currency of the host (transaction.amount * transaction.hostCurrencyFxRate = transaction.amountInHostCurrency)
+  """
+  hostCurrencyFxRate: Float
   netAmount(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
@@ -5697,6 +5754,7 @@ type VirtualCard {
   provider: String
   spendingLimitAmount: Int
   spendingLimitInterval: String
+  currency: Currency
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -6366,6 +6424,11 @@ type Mutation {
     Further information about collective applying to host
     """
     applicationData: JSON
+
+    """
+    Additional data for the collective creation. This argument has no effect in production
+    """
+    testPayload: JSON
   ): Collective
   createFund(
     """
@@ -6882,7 +6945,7 @@ type Mutation {
   """
   A mutation for the host to approve or reject an order
   """
-  processPendingOrder(order: OrderReferenceInput!, action: ProcessOrderAction!): Order!
+  processPendingOrder(order: OrderUpdateInput!, action: ProcessOrderAction!): Order!
 
   """
   Add a new payment method to be used with an Order
@@ -7133,12 +7196,12 @@ type Mutation {
   """
   createVirtualCard(
     """
-    Virtual Card name
+    Virtual card name
     """
     name: String!
 
     """
-    Virtual Card monthly limit
+    Virtual card monthly limit
     """
     monthlyLimit: AmountInput!
 
@@ -7148,7 +7211,7 @@ type Mutation {
     account: AccountReferenceInput!
 
     """
-    Individual account responsible for the card
+    Individual account responsible for the virtual card
     """
     assignee: AccountReferenceInput!
   ): VirtualCard!
@@ -7158,14 +7221,24 @@ type Mutation {
   """
   editVirtualCard(
     """
-    Virtual Card being edited its new values
+    Virtual Card reference
     """
-    virtualCard: VirtualCardUpdateInput!
+    virtualCard: VirtualCardReferenceInput!
 
     """
-    The individual account reference to attach the Virtual Card to if desired
+    Virtual card name
     """
-    assignee: AccountReferenceInput
+    name: String!
+
+    """
+    Virtual card monthly limit
+    """
+    monthlyLimit: AmountInput
+
+    """
+    Individual account responsible for the card
+    """
+    assignee: AccountReferenceInput!
   ): VirtualCard!
 
   """
@@ -9568,6 +9641,11 @@ input ProcessExpensePaymentParams {
   2FA code for if the host account has 2FA for payouts turned on.
   """
   twoFactorAuthenticatorCode: String
+
+  """
+  2FA code for if the host account has 2FA for payouts turned on.
+  """
+  feesPayer: FeesPayer = COLLECTIVE
 }
 
 input ExpenseInviteDraftInput {
@@ -10009,6 +10087,33 @@ input PaymentMethodReferenceInput {
   The id assigned to the payment method
   """
   id: String
+}
+
+input OrderUpdateInput {
+  """
+  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the order (ie: 4242)
+  """
+  legacyId: Int
+
+  """
+  Amount received by collective, excluding any tips or fees
+  """
+  amount: AmountInput
+
+  """
+  Amount paid in fees for the payment processor
+  """
+  paymentProcessorFee: AmountInput
+
+  """
+  Amount intended as tip for the platform
+  """
+  platformTip: AmountInput
 }
 
 """

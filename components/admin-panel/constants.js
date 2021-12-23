@@ -14,6 +14,7 @@ export const HOST_DASHBOARD_SECTIONS = {
   EXPENSES: 'expenses',
   FINANCIAL_CONTRIBUTIONS: 'orders',
   HOSTED_COLLECTIVES: 'hosted-collectives',
+  HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   PENDING_APPLICATIONS: 'pending-applications',
 };
 
@@ -40,6 +41,7 @@ export const FISCAL_HOST_SECTIONS = {
   HOST_PLAN: 'host-plan',
   HOST_TWO_FACTOR_AUTH: 'host-two-factor-auth',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
+  HOST_VIRTUAL_CARDS_SETTINGS: 'host-virtual-cards-settings',
   INVOICES_RECEIPTS: 'invoices-receipts',
   POLICIES: 'policies',
   RECEIVING_MONEY: 'receiving-money',
@@ -223,6 +225,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.HOST_VIRTUAL_CARDS]: {
     id: 'VirtualCards.Title',
     defaultMessage: 'Virtual Cards',
+  },
+  [ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS]: {
+    id: 'VirtualCardsSettings.Title',
+    defaultMessage: 'Virtual Cards Settings',
   },
   [ALL_SECTIONS.VIRTUAL_CARDS]: {
     id: 'VirtualCards.Title',

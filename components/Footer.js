@@ -172,7 +172,7 @@ const navigation = {
   community: {
     openSource: 'https://github.com/opencollective/opencollective/issues',
     Slack: 'https://slack.opencollective.com',
-    docsAndHelp: 'https://docs.opencollective.com',
+    docsAndHelp: '/help',
     support: '/support',
   },
   company: {

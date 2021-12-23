@@ -49,7 +49,7 @@ const HostFeesSection = ({ host, collectives, isLoading }) => {
             {valuesToDisplay.fees}
           </Box>
           <P fontSize="12px" fontWeight="400" mt="10px">
-            <FormattedMessage defaultMessage="Total Host Fees collected. They are continuously added to your Organization's budget." />
+            <FormattedMessage defaultMessage="Host Fees charged to Collectives during this time period (these are added continuously to your budget)." />
           </P>
         </Container>
         <Container
@@ -73,7 +73,7 @@ const HostFeesSection = ({ host, collectives, isLoading }) => {
             {valuesToDisplay.sharedRevenue}
           </Box>
           <P fontSize="12px" fontWeight="400" mt="10px">
-            <FormattedMessage defaultMessage="Portion of Host Fees shared with Open Collective. It can be automatically transferred (settled) or is due and pending settlement (owed)." />
+            <FormattedMessage defaultMessage="Portion of Host Fees paid to Open Collective (which are either paid as you go, or charged monthly through settlement expenses, depending on the payment method.)" />
           </P>
         </Container>
         <Container
@@ -96,17 +96,12 @@ const HostFeesSection = ({ host, collectives, isLoading }) => {
             {valuesToDisplay.netHostFee}
           </Box>
           <P fontSize="12px" fontWeight="400" mt="10px">
-            <FormattedMessage defaultMessage="Net Host Fees available for your Host to spend after considering the Platform Share portion." />
+            <FormattedMessage defaultMessage="Net amount of Host Fees retained by your Organization after removing the Platform Share." />
           </P>
         </Container>
       </Flex>
 
       <Flex flexWrap="wrap" my={3} justifyContent="space-between">
-        <Container px={2}>
-          <P fontSize="12px" fontWeight="400" mt="16px">
-            <FormattedMessage defaultMessage="How much Host Fees is your Host collecting over time?" />
-          </P>
-        </Container>
         <Container px={2} textAlign="right">
           <StyledLinkButton asLink onClick={() => setShowHostFeeChart(!showHostFeeChart)}>
             <P fontSize="12px" fontWeight="400" mt="16px">

@@ -11,19 +11,15 @@ const ExpenseTypeFilter = ({ onChange, value, ...props }) => {
   const intl = useIntl();
   const getOption = value => ({ label: i18nExpenseType(intl, value), value });
 
+  const expenseTypeKeys = Object.keys(expenseTypes).filter(key => !['DEFAULT', 'FUNDING_REQUEST'].includes(key));
+  expenseTypeKeys.unshift('ALL');
+
   return (
     <StyledSelectFilter
       inputId="expenses-type-filter"
       onChange={({ value }) => onChange(value)}
       value={getOption(value || 'ALL')}
-      options={[
-        getOption('ALL'),
-        getOption(expenseTypes.RECEIPT),
-        getOption(expenseTypes.INVOICE),
-        getOption(expenseTypes.GRANT),
-        getOption(expenseTypes.CHARGE),
-        getOption(expenseTypes.UNCLASSIFIED),
-      ]}
+      options={expenseTypeKeys.map(getOption)}
       {...props}
     />
   );

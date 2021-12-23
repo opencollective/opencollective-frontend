@@ -43,6 +43,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   SENDING_MONEY: 'sending-money',
   HOST_TWO_FACTOR_AUTH: 'host-two-factor-auth',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
+  HOST_VIRTUAL_CARDS_SETTINGS: 'host-virtual-cards-settings',
 };
 
 const SECTION_LABELS = defineMessages({

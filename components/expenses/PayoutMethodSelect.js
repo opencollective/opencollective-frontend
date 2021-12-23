@@ -223,10 +223,9 @@ class PayoutMethodSelect extends React.Component {
         .filter(type => type !== PayoutMethodType.CREDIT_CARD)
         // Account Balance is not possible on different Hosts
         .filter(type => type !== PayoutMethodType.ACCOUNT_BALANCE);
-
       // Other not available for regular Collectives, Funds, Projects, Events
-      if (!payeeIsCollectiveFamilyType || payeeIsSelfHosted) {
-        pmTypes.push(PayoutMethodType.OTHER);
+      if (payeeIsCollectiveFamilyType && !payeeIsSelfHosted) {
+        pmTypes = pmTypes.filter(type => type !== PayoutMethodType.OTHER);
       }
     }
 

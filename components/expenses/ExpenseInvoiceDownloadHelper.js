@@ -51,7 +51,7 @@ export const useExpenseInvoiceDownloadHelper = ({ expense, collective, onError, 
   const [error, setError] = React.useState(null);
   const { addToast } = useToasts();
 
-  if (expense.type !== expenseTypes.INVOICE) {
+  if (![expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense.type)) {
     return { error: null, isLoading: false, filename: '', downloadInvoice: null };
   }
 

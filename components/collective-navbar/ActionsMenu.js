@@ -26,6 +26,7 @@ import ApplyToHostBtn from '../ApplyToHostBtn';
 import AssignVirtualCardBtn from '../AssignVirtualCardBtn';
 import ContactCollectiveModal from '../ContactCollectiveModal';
 import Container from '../Container';
+import CreateVirtualCardBtn from '../CreateVirtualCardBtn';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import RequestVirtualCardBtn from '../RequestVirtualCardBtn';
@@ -326,6 +327,23 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         />
                       </MenuItem>
                     )}
+                    {callsToAction.createVirtualCard && (
+                      <CreateVirtualCardBtn collective={collective} host={collective.host}>
+                        {btnProps => (
+                          <MenuItem
+                            py={1}
+                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CREATE_CARD}
+                          >
+                            <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
+                              <CreditCard size="20px" />
+                              <Span>
+                                <FormattedMessage defaultMessage="Create a Card" />
+                              </Span>
+                            </StyledButton>
+                          </MenuItem>
+                        )}
+                      </CreateVirtualCardBtn>
+                    )}
                     {callsToAction.assignVirtualCard && (
                       <AssignVirtualCardBtn collective={collective} host={collective.host}>
                         {btnProps => (
@@ -409,7 +427,9 @@ CollectiveNavbarActionsMenu.propTypes = {
     hasContribute: PropTypes.bool,
     /** Add funds to a collective */
     addFunds: PropTypes.bool,
-    /** Add new card to Collective */
+    /** Create new card for Collective */
+    createVirtualCard: PropTypes.bool,
+    /** Assign card to Collective */
     assignVirtualCard: PropTypes.bool,
     /** Request card to Collective */
     requestVirtualCard: PropTypes.bool,

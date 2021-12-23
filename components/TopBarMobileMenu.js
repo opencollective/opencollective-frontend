@@ -74,7 +74,7 @@ class TopBarMobileMenu extends React.Component {
           )}
           {menuItems.docs && (
             <ListItem>
-              <a href="https://docs.opencollective.com" onClick={closeMenu}>
+              <a href="/help" onClick={closeMenu}>
                 <FormattedMessage id="menu.docs" defaultMessage="Docs & Help" />
               </a>
             </ListItem>

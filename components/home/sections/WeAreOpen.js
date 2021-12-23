@@ -3,9 +3,9 @@ import { FormattedMessage } from 'react-intl';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
+import { H2 } from '../../Text';
 import NextIllustration from '../HomeNextIllustration';
 import SectionSubtitle from '../SectionSubtitle';
-import SectionTitle from '../SectionTitle';
 
 const WeAreOpen = () => (
   <Flex display="flex" flexDirection={['column', 'row']} alignItems="center" justifyContent="center" mx={[3, 4]}>
@@ -17,9 +17,14 @@ const WeAreOpen = () => (
       mr={[null, 2, 5]}
     >
       <Box textAlign={['center', 'left']} width={['288px', 1]}>
-        <SectionTitle fontSize="32px" lineHeight="40px" letterSpacing="-1.2px" color="black.800">
+        <H2
+          fontSize={['32px', null, null, null, '40px']}
+          lineHeight={['40px', null, null, null, '48px']}
+          letterSpacing={['-0.008em', null, null, null, '-0.04em']}
+          color="black.800"
+        >
           <FormattedMessage id="home.weAreOpenSection.title" defaultMessage="We are open in every way" />
-        </SectionTitle>
+        </H2>
       </Box>
       <Box display={['block', 'none']} my={3}>
         <NextIllustration
@@ -38,7 +43,7 @@ const WeAreOpen = () => (
         >
           <FormattedMessage
             id="home.weAreOpenSection.subtitle"
-            defaultMessage="We are transparent, just like we help you to be transparent."
+            defaultMessage="We not only help you be transparent, we are too!"
           />
         </SectionSubtitle>
       </Box>

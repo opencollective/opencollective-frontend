@@ -48,17 +48,6 @@ const assignNewVirtualCardMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const editVirtualCardMutation = gqlV2/* GraphQL */ `
-  mutation editVirtualCard($virtualCard: VirtualCardUpdateInput!, $assignee: AccountReferenceInput) {
-    editVirtualCard(virtualCard: $virtualCard, assignee: $assignee) {
-      id
-      name
-      last4
-      data
-    }
-  }
-`;
-
 const collectiveMembersQuery = gqlV2/* GraphQL */ `
   query CollectiveMembers($slug: String!) {
     account(slug: $slug) {
@@ -81,31 +70,19 @@ const throttledCall = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
 
-const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onClose, ...modalProps }) => {
-  const isEditing = !!virtualCard;
+const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modalProps }) => {
   const { addToast } = useToasts();
-  const [assignNewVirtualCard, { loading: isCallingAssignMutation }] = useMutation(assignNewVirtualCardMutation, {
-    context: API_V2_CONTEXT,
-  });
-  const [editVirtualCard, { loading: isCallingEditMutation }] = useMutation(editVirtualCardMutation, {
+  const [assignNewVirtualCard, { loading: isBusy }] = useMutation(assignNewVirtualCardMutation, {
     context: API_V2_CONTEXT,
   });
   const [getCollectiveUsers, { loading: isLoadingUsers, data: users }] = useLazyQuery(collectiveMembersQuery, {
     context: API_V2_CONTEXT,
   });
-  const isBusy = isCallingAssignMutation || isCallingEditMutation;
 
   const formik = useFormik({
     initialValues: {
-      ...(virtualCard
-        ? {
-            ...virtualCard.privateData,
-            assignee: virtualCard.assignee,
-            provider: virtualCard.provider,
-            cardName: virtualCard.name,
-          }
-        : initialValues),
-      collective: collective || virtualCard?.account,
+      ...initialValues,
+      collective,
     },
     async onSubmit(values) {
       const { collective, assignee, provider, cardName } = values;
@@ -115,63 +92,34 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
         expireDate: values.expireDate,
       };
 
-      if (isEditing) {
-        try {
-          await editVirtualCard({
-            variables: {
-              virtualCard: {
-                privateData,
-                id: virtualCard.id,
-              },
-              assignee: { id: assignee.id },
+      try {
+        await assignNewVirtualCard({
+          variables: {
+            virtualCard: {
+              privateData,
+              provider,
+              name: cardName,
             },
-          });
-        } catch (e) {
-          addToast({
-            type: TOAST_TYPE.ERROR,
-            message: (
-              <FormattedMessage
-                id="Host.VirtualCards.EditCard.Error"
-                defaultMessage="Error editing card: {error}"
-                values={{
-                  error: e.message,
-                }}
-              />
-            ),
-          });
-          return;
-        }
-        onSuccess?.(<FormattedMessage id="Host.VirtualCards.UpdateCard.Success" defaultMessage="Card updated" />);
-      } else {
-        try {
-          await assignNewVirtualCard({
-            variables: {
-              virtualCard: {
-                privateData,
-                provider,
-                name: cardName,
-              },
-              assignee: { id: assignee.id },
-              account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
-            },
-          });
-        } catch (e) {
-          addToast({
-            type: TOAST_TYPE.ERROR,
-            message: (
-              <FormattedMessage
-                id="Host.VirtualCards.AssignCard.Error"
-                defaultMessage="Error assigning card: {error}"
-                values={{
-                  error: e.message,
-                }}
-              />
-            ),
-          });
-          return;
-        }
-        onSuccess?.();
+            assignee: { id: assignee.id },
+            account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
+          },
+        });
+      } catch (e) {
+        addToast({
+          type: TOAST_TYPE.ERROR,
+          message: (
+            <FormattedMessage
+              id="Host.VirtualCards.AssignCard.Error"
+              defaultMessage="Error assigning card: {error}"
+              values={{
+                error: e.message,
+              }}
+            />
+          ),
+        });
+        return;
       }
+      onSuccess?.();
       handleClose();
     },
     validate(values) {
@@ -225,25 +173,14 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
     <Modal width="382px" onClose={handleClose} trapFocus {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose}>
-          {isEditing ? (
-            <FormattedMessage id="Host.VirtualCards.CardDetails" defaultMessage="Card Details" />
-          ) : (
-            <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />
-          )}
+          <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />
         </ModalHeader>
         <ModalBody pt={2}>
           <P>
-            {isEditing ? (
-              <FormattedMessage
-                id="Host.VirtualCards.CardDetails.Description"
-                defaultMessage="You can view and edit the credit card details."
-              />
-            ) : (
-              <FormattedMessage
-                id="Host.VirtualCards.AssignCard.Description"
-                defaultMessage="Assign existing card to a collective sharing the private information below."
-              />
-            )}
+            <FormattedMessage
+              id="Host.VirtualCards.AssignCard.Description"
+              defaultMessage="Assign existing card to a collective sharing the private information below."
+            />
           </P>
           <StyledHr borderColor="black.300" mt={3} />
           <Grid mt={3} gridTemplateColumns="repeat(2, 1fr)" gridGap="26px 8px">
@@ -261,7 +198,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
                   name="collective"
                   id="collective"
                   collective={formik.values.collective}
-                  isDisabled={!!collective || isEditing || isBusy}
+                  isDisabled={!!collective || isBusy}
                   customOptions={[
                     {
                       value: host,
@@ -270,6 +207,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
                     },
                   ]}
                   onChange={handleCollectivePick}
+                  filterResults={collectives => collectives.filter(c => c.isActive)}
                 />
               )}
             </StyledInputField>
@@ -312,7 +250,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
                     { key: 'STRIPE', value: 'STRIPE', label: 'Stripe' },
                   ]}
                   isSearchable={false}
-                  disabled={isBusy || isEditing}
+                  disabled={isBusy}
                   onChange={option => formik.setFieldValue('provider', option.value)}
                 />
               )}
@@ -332,7 +270,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
                   id="cardName"
                   onChange={formik.handleChange}
                   value={formik.values.cardName}
-                  disabled={isBusy || isEditing}
+                  disabled={isBusy}
                   guide={false}
                 />
               )}
@@ -384,7 +322,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
                       {...props}
                     />
                   )}
-                  disabled={isBusy || isEditing}
+                  disabled={isBusy}
                   guide={false}
                 />
               )}
@@ -442,11 +380,7 @@ const AssignVirtualCardModal = ({ collective, host, virtualCard, onSuccess, onCl
               type="submit"
               textTransform="capitalize"
             >
-              {isEditing ? (
-                <FormattedMessage id="SaveChanges" defaultMessage="Save changes" />
-              ) : (
-                <FormattedMessage id="SaveCard" defaultMessage="Save Card" />
-              )}
+              <FormattedMessage id="SaveCard" defaultMessage="Save Card" />
             </StyledButton>
           </Container>
         </ModalFooter>
@@ -472,29 +406,6 @@ AssignVirtualCardModal.propTypes = {
     type: PropTypes.string,
     name: PropTypes.string,
     imageUrl: PropTypes.string,
-  }),
-  virtualCard: PropTypes.shape({
-    id: PropTypes.string,
-    account: {
-      id: PropTypes.string,
-      imageUrl: PropTypes.string,
-      name: PropTypes.string,
-      slug: PropTypes.string,
-    },
-    createdAt: PropTypes.string,
-    name: PropTypes.string,
-    privateData: {
-      cardNumber: PropTypes.string,
-      cvv: PropTypes.string,
-      expireDate: PropTypes.string,
-    },
-    assignee: {
-      id: PropTypes.string,
-      imageUrl: PropTypes.string,
-      name: PropTypes.string,
-      slug: PropTypes.string,
-    },
-    provider: PropTypes.string,
   }),
 };
 
