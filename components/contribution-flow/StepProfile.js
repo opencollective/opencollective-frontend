@@ -31,6 +31,7 @@ const StepProfile = ({
           canUseIncognito={canUseIncognito}
           collective={collective}
           data={data}
+          stepDetails={stepDetails}
         />
       ) : (
         <StepProfileGuestForm
