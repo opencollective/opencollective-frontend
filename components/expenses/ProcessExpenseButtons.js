@@ -237,10 +237,8 @@ const ProcessExpenseButtons = ({
           data-cy="mark-as-unpaid-button"
           {...getButtonProps('MARK_AS_UNPAID')}
           onClick={null}
-          onConfirm={hasPaymentProcessorFeesRefunded =>
-            triggerAction('MARK_AS_UNPAID', {
-              paymentProcessorFee: hasPaymentProcessorFeesRefunded ? 1 : 0,
-            })
+          onConfirm={shouldRefundPaymentProcessorFee =>
+            triggerAction('MARK_AS_UNPAID', { shouldRefundPaymentProcessorFee })
           }
         />
       )}
