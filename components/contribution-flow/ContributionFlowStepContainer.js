@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, uniqBy } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -79,54 +78,8 @@ class ContributionFlowStepContainer extends React.Component {
     }
   };
 
-  getLoggedInUserDefaultContributeProfile() {
-    if (this.props.defaultProfileSlug) {
-      const otherProfiles = this.getOtherProfiles();
-      const contributorProfile = otherProfiles.find(profile => profile.slug === this.props.defaultProfileSlug);
-      if (contributorProfile) {
-        return contributorProfile;
-      }
-    }
-    if (get(this.props.mainState, 'stepProfile')) {
-      return this.props.mainState.stepProfile;
-    }
-    if (this.props.LoggedInUser) {
-      return this.getPersonalProfile();
-    }
-  }
-
-  /** Returns logged-in user profile */
-  getPersonalProfile() {
-    const { LoggedInUser } = this.props;
-    if (!LoggedInUser) {
-      return {};
-    }
-
-    return { email: LoggedInUser.email, image: LoggedInUser.image, ...LoggedInUser.collective };
-  }
-
-  /** Return an array of any other associated profile the user might control */
-  getOtherProfiles() {
-    const { LoggedInUser, collective } = this.props;
-    if (!LoggedInUser) {
-      return [];
-    }
-
-    return LoggedInUser.memberOf
-      .filter(
-        m =>
-          m.role === 'ADMIN' &&
-          m.collective.id !== collective.id &&
-          m.collective.type !== 'EVENT' &&
-          m.collective.type !== 'PROJECT',
-      )
-      .map(({ collective }) => {
-        return collective;
-      });
-  }
-
   renderStep = step => {
-    const { collective, mainState, tier, isEmbed, isCrypto, order } = this.props;
+    const { collective, mainState, tier, isEmbed, isCrypto, order, defaultProfileSlug } = this.props;
     const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
     switch (step) {
       case 'details':
@@ -142,16 +95,11 @@ class ContributionFlowStepContainer extends React.Component {
           <StepDetailsCrypto onChange={this.props.onChange} data={stepDetails} collective={collective} />
         );
       case 'profile': {
-        const personalProfile = this.getPersonalProfile();
-        const otherProfiles = this.getOtherProfiles();
-        const defaultSelectedProfile = this.getLoggedInUserDefaultContributeProfile();
-        const options = uniqBy([personalProfile, ...otherProfiles], 'id');
         return (
           <StepProfile
             collective={collective}
             stepDetails={stepDetails}
-            profiles={options}
-            defaultSelectedProfile={defaultSelectedProfile}
+            defaultProfileSlug={defaultProfileSlug}
             defaultEmail={this.props.defaultEmail}
             defaultName={this.props.defaultName}
             onChange={this.props.onChange}

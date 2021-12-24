@@ -9,7 +9,7 @@ describe('Contribution Flow: Guest contributions', () => {
   it('Makes a contribution as an existing user', () => {
     cy.visit('/apex/donate');
     cy.contains('[data-cy="amount-picker"] button', 'Other').click();
-    cy.get('input[name="custom-amount"]').type('{selectall}4257.42');
+    cy.get('input[name="custom-amount"]').type('{selectall}400.42');
     cy.contains('#interval button', 'Monthly').click();
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.contains('Contribute as a guest');
@@ -22,10 +22,10 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.wait(200);
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.useAnyPaymentMethod();
-    cy.contains('button[data-cy="cf-next-step"]', 'Contribute $4,257.42').click();
+    cy.contains('button[data-cy="cf-next-step"]', 'Contribute $400.42').click();
 
     cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
-    cy.contains('[data-cy="order-success"]', '$4,257.42 USD');
+    cy.contains('[data-cy="order-success"]', '$400.42 USD');
 
     // Open email
     const expectedEmailSubject = 'Thank you for your contribution to APEX';

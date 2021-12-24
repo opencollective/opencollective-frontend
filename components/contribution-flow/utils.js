@@ -3,6 +3,7 @@ import { find, get, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
+import INTERVALS from '../../lib/constants/intervals';
 import {
   GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES,
   PAYMENT_METHOD_SERVICE,
@@ -224,9 +225,21 @@ export const getContributionFlowMetadata = (intl, account, tier) => {
   };
 };
 
+const getTotalYearlyAmount = stepDetails => {
+  const totalAmount = getTotalAmount(stepDetails);
+  return totalAmount && stepDetails?.interval === INTERVALS.month ? totalAmount * 12 : totalAmount;
+};
+
+/**
+ * Whether this contribution requires us to collect the address of the user
+ */
+export const contributionRequiresAddress = stepDetails => {
+  return getTotalYearlyAmount(stepDetails) >= 5000e2;
+};
+
 /**
  * Whether this contribution requires us to collect the address and legal name of the user
  */
-export const contributionRequiresIdentity = amount => {
-  return Boolean(amount && amount >= 500000);
+export const contributionRequiresLegalName = stepDetails => {
+  return getTotalYearlyAmount(stepDetails) >= 500e2;
 };

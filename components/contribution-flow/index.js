@@ -189,6 +189,11 @@ class ContributionFlow extends React.Component {
             frequency: getGQLV2FrequencyFromInterval(stepDetails.interval),
             guestInfo,
             fromAccount,
+            fromAccountInfo: {
+              location: pick(stepProfile.location, ['name', 'address', 'country', 'structured']),
+              legalName: stepProfile.legalName,
+              name: stepProfile.name,
+            },
             toAccount: pick(this.props.collective, ['id']),
             data:
               this.props.paymentFlow === PAYMENT_FLOW.CRYPTO
