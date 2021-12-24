@@ -89,6 +89,12 @@ const accountOrdersQuery = gqlV2/* GraphQL */ `
           slug
           name
           imageUrl
+          ... on AccountWithHost {
+            host {
+              id
+              name
+            }
+          }
         }
         permissions {
           id
