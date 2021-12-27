@@ -5,7 +5,6 @@ import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { ChartWrapper } from '../../ChartWrapper';
@@ -97,14 +96,12 @@ const getChartOptions = (intl, hostCurrency) => ({
   yaxis: {
     labels: {
       minWidth: 38,
-      formatter: formatAmountForLegend,
+      formatter: value => formatAmountForLegend(intl.locale, hostCurrency, value),
     },
   },
   tooltip: {
     y: {
-      formatter: function (value) {
-        return formatCurrency(value * 100, hostCurrency);
-      },
+      formatter: value => formatAmountForLegend(intl.locale, hostCurrency, value),
     },
   },
 });

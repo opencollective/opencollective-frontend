@@ -5,6 +5,11 @@ export const getActiveYearsOptions = host => {
   return activeYears.map(year => ({ value: year, label: year })).reverse();
 };
 
-export const formatAmountForLegend = value => {
-  return value < 1000 ? value : `${Math.round(value / 1000).toLocaleString()}k`;
+export const formatAmountForLegend = (locale, currency, value) => {
+  return new Intl.NumberFormat(locale, {
+    currency,
+    style: 'currency',
+    notation: 'compact',
+    compactDisplay: 'short',
+  }).format(value);
 };
