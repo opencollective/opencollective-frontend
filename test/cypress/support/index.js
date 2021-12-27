@@ -23,7 +23,7 @@ Cypress.on('uncaught:exception', err => {
     // See https://github.com/cypress-io/cypress/issues/3170
     // Ignore this error
     return false;
-  } else if (/^[^(ResizeObserver loop limit exceeded)]/.test(err.message)) {
+  } else if (/ResizeObserver loop limit exceeded/.test(err.message)) {
     // Generated in `useElementSize`
     // As per https://stackoverflow.com/a/50387233, this one can safely be ignored
     return false;
