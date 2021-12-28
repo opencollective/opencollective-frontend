@@ -100,6 +100,10 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
           <FormattedMessage id="CollectiveFeesForm.Title" defaultMessage="Set fee structure" />
         </P>
 
+        <P>
+          <FormattedMessage defaultMessage="This change will also apply to all the projects and events created by this collective" />
+        </P>
+
         <StyledRadioList
           id="fees-structure-radio"
           name="fees-structure-radio"
