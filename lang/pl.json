@@ -827,7 +827,7 @@
   "EditCollective.VATNumber.Description": "Twój Europejski Numer Podatku od towarów i usług (NIP)",
   "EditCollectivePage.EmptySection": "Ta sekcja nie wydaje się mieć żadnych związanych z nią danych i nie pojawi się publicznie, dopóki się nie pojawią.",
   "EditCollectivePage.Sections": "Dostosuj sekcje strony profilu",
-  "EditCollectivePage.SectionsDescription": "Drag and drop to reorder sections. Toggle on and off with the visibility setting dropdown. Remember to click save at the bottom!",
+  "EditCollectivePage.SectionsDescription": "Przeciągnij i upuść, aby zmienić kolejność sekcji. Włączaj i wyłączaj sekcje za pomocą rozwijanej listy ustawień widoczności. Pamiętaj, aby kliknąć przycisk Zapisz na dole!",
   "EditCollectivePage.ShowSection.AlwaysVisible": "Zawsze widoczne",
   "EditCollectivePage.ShowSection.Disabled": "Wyłączone",
   "EditCollectivePage.ShowSection.OnlyAdmins": "Tylko dla administratorów",
