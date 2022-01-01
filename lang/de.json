@@ -1582,7 +1582,7 @@
   "NewContributionFlow.ChoosePaymentMethod": "Choose payment method",
   "NewContributionFlow.CollectiveAndTier": "{collective} - {tier}",
   "NewContributionFlow.ContributionDetailsTitle": "Contribution details",
-  "NewContributionFlow.FAQ.Secure.Title": "Is my contribution secure?",
+  "NewContributionFlow.FAQ.Secure.Title": "Ist meine Spende sicher?",
   "NewContributionFlow.InTheMeantime": "In the meantime, you can see what {collective} is up to <CollectiveLink>on their Collective page</CollectiveLink>.",
   "NewContributionFlow.Join": "Join {numberOfContributors} other fellow contributors",
   "NewContributionFlow.NumberOfFinancialContributors": "{contributors} financial contributors",
