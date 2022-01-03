@@ -7,7 +7,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
-import { requireFields, validateNumberInputs } from '../../lib/form-utils';
+import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import {
@@ -123,10 +123,7 @@ const getInitialValues = values => ({
 });
 
 const validate = values => {
-  return {
-    ...requireFields(values, ['amount', 'fromAccount', 'description']),
-    ...validateNumberInputs(values, ['amount']),
-  };
+  return requireFields(values, ['amount', 'fromAccount', 'description']);
 };
 
 // Build an account reference. Compatible with accounts from V1 and V2.
@@ -248,7 +245,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       <CollectiveModalHeader collective={collective} onClick={handleClose} />
       <Formik
         initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective })}
-        validate={values => validate(values, intl)}
+        validate={validate}
         onSubmit={async values => {
           if (!fundDetails.showPlatformTipModal) {
             await submitAddFunds({
@@ -288,13 +285,12 @@ const AddFundsModal = ({ host, collective, ...props }) => {
         }}
       >
         {({ values, isSubmitting, isValid, dirty }) => {
-          const totalAmount = isNaN(values.amount) ? 0 : values.amount;
           const hostFeePercent = isNaN(values.hostFeePercent) ? defaultHostFeePercent : values.hostFeePercent;
           const platformFeePercent = isNaN(values.platformFeePercent)
             ? defaultPlatformFeePercent
             : values.platformFeePercent;
-          const hostFee = Math.round(totalAmount * (hostFeePercent / 100));
-          const platformFee = Math.round(totalAmount * (platformFeePercent / 100));
+          const hostFee = Math.round(values.amount * (hostFeePercent / 100));
+          const platformFee = Math.round(values.amount * (platformFeePercent / 100));
 
           const defaultSources = [];
           defaultSources.push({ value: host, label: <DefaultCollectiveLabel value={host} /> });
@@ -419,7 +415,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                   </P>
                   <StyledHr my={2} borderColor="black.300" />
                   <AmountDetailsLine
-                    value={totalAmount || 0}
+                    value={values.amount || 0}
                     currency={collective.currency}
                     label={<FormattedMessage id="AddFundsModal.fundingAmount" defaultMessage="Funding amount" />}
                   />
@@ -451,7 +447,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                   )}
                   <StyledHr my={2} borderColor="black.300" />
                   <AmountDetailsLine
-                    value={totalAmount - hostFee - platformFee}
+                    value={values.amount - hostFee - platformFee}
                     currency={collective.currency}
                     label={
                       <FormattedMessage
@@ -465,7 +461,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     <FormattedMessage
                       id="AddFundsModal.disclaimer"
                       defaultMessage="By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective."
-                      values={{ amount: formatCurrency(totalAmount, collective.currency, { locale: intl.locale }) }}
+                      values={{ amount: formatCurrency(values.amount, collective.currency, { locale: intl.locale }) }}
                     />
                   </P>
                   {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
