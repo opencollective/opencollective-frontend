@@ -16,12 +16,14 @@ const getPrepend = (currency, currencyDisplay) => {
   }
 };
 
-const parseValueFromEvent = (e, precision, ignoreComma) => {
-  if (e.target.value === '') {
+const parseValueFromEvent = (e, precision) => {
+  if (e.target.validity.badInput) {
+    return NaN;
+  } else if (e.target.value === '') {
     return null;
   } else {
-    const parsedNumber = parseFloat(ignoreComma ? e.target.value.replace(',', '') : e.target.value);
-    return isNaN(parsedNumber) ? NaN : parsedNumber.toFixed(precision);
+    const parsedNumber = parseFloat(e.target.value);
+    return parsedNumber.toFixed(precision);
   }
 };
 
@@ -64,11 +66,8 @@ const StyledInputAmount = ({
       setRawValue(e.target.value);
     }
     if (onChange) {
-      const valueWithIgnoredComma = parseValueFromEvent(e, precision, true);
-      if (parsedValue === null || isNaN(parsedValue)) {
+      if (parsedValue === null || isNaN(parsedValue) || parsedValue === '') {
         onChange(parsedValue, e);
-      } else if (!e.target.checkValidity() || parsedValue !== valueWithIgnoredComma) {
-        onChange(e.target.value ? NaN : null, e);
       } else {
         onChange(floatAmountToCents(parsedValue), e);
       }
@@ -99,13 +98,7 @@ const StyledInputAmount = ({
       onBlur={e => {
         // Clean number if valid (ie. 41.1 -> 41.10)
         const parsedNumber = parseValueFromEvent(e, precision);
-        const valueWithIgnoredComma = parseValueFromEvent(e, precision, true);
-        if (
-          e.target.checkValidity() &&
-          !isNaN(parsedNumber) &&
-          parsedNumber !== null &&
-          valueWithIgnoredComma === parsedNumber
-        ) {
+        if (parsedNumber) {
           e.target.value = parsedNumber.toString();
           dispatchValue(e, parsedNumber);
         }
