@@ -86,6 +86,13 @@ const hostedCollectivesQuery = gqlV2/* GraphQL */ `
             ... on AccountWithContributions {
               totalFinancialContributors
             }
+            ... on AccountWithParent {
+              parent {
+                id
+                slug
+                name
+              }
+            }
           }
         }
       }
