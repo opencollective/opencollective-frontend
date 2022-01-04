@@ -67,7 +67,8 @@ ReCaptcha.propTypes = {
   onError: PropTypes.func,
 };
 
-const Captcha = ({ onVerify, provider, ...props }) => {
+// eslint-disable-next-line react/display-name
+const Captcha = React.forwardRef(({ onVerify, provider, ...props }, captchaRef) => {
   const HCAPTCHA_SITEKEY = getEnvVar('HCAPTCHA_SITEKEY');
   const RECAPTCHA_SITE_KEY = getEnvVar('RECAPTCHA_SITE_KEY');
   const handleVerify = obj => {
@@ -87,12 +88,19 @@ const Captcha = ({ onVerify, provider, ...props }) => {
 
   let captcha = null;
   if (provider === PROVIDERS.HCAPTCHA && HCAPTCHA_SITEKEY) {
-    captcha = <HCaptcha sitekey={HCAPTCHA_SITEKEY} onVerify={token => handleVerify({ token })} onError={handleError} />;
+    captcha = (
+      <HCaptcha
+        ref={captchaRef}
+        sitekey={HCAPTCHA_SITEKEY}
+        onVerify={token => handleVerify({ token })}
+        onError={handleError}
+      />
+    );
   } else if (provider === PROVIDERS.RECAPTCHA && RECAPTCHA_SITE_KEY) {
     captcha = <ReCaptcha onVerify={handleVerify} onError={handleError} {...props} />;
   }
   return <Box data-cy="captcha">{captcha}</Box>;
-};
+});
 
 Captcha.propTypes = {
   onVerify: PropTypes.func,
