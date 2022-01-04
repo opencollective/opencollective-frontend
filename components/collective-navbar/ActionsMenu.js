@@ -327,7 +327,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         />
                       </MenuItem>
                     )}
-                    {callsToAction.createVirtualCard && (
+                    {callsToAction.createVirtualCard && collective.isApproved && (
                       <CreateVirtualCardBtn collective={collective} host={collective.host}>
                         {btnProps => (
                           <MenuItem
@@ -344,7 +344,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         )}
                       </CreateVirtualCardBtn>
                     )}
-                    {callsToAction.assignVirtualCard && (
+                    {callsToAction.assignVirtualCard && collective.isApproved && (
                       <AssignVirtualCardBtn collective={collective} host={collective.host}>
                         {btnProps => (
                           <MenuItem
@@ -361,7 +361,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                         )}
                       </AssignVirtualCardBtn>
                     )}
-                    {callsToAction.requestVirtualCard && (
+                    {callsToAction.requestVirtualCard && collective.isApproved && (
                       <RequestVirtualCardBtn collective={collective} host={collective.host}>
                         {btnProps => (
                           <MenuItem
@@ -406,6 +406,7 @@ CollectiveNavbarActionsMenu.propTypes = {
     type: PropTypes.string,
     settings: PropTypes.object,
     tiers: PropTypes.array,
+    isApproved: PropTypes.bool,
     host: PropTypes.shape({
       hostFees: PropTypes.bool,
     }),
