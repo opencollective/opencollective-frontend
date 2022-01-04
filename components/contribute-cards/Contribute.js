@@ -53,9 +53,17 @@ const CoverImage = styled.div`
     const primary = props.theme.colors.primary;
     const radial = `radial-gradient(circle, ${primary[300]} 0%, ${primary[800]} 100%), `;
     const image = props.image ? `url(${props.image}), ` : '';
+    const applyGrayscale = (isDisabled, contributionType) => {
+      if (isDisabled) {
+        return 'filter: grayscale(0.75);';
+      } else if (contributionType === ContributionTypes.EVENT_PASSED) {
+        return 'filter: grayscale(0.50);';
+      }
+    };
+
     return css`
       background: ${image} ${radial} ${primary[500]};
-      ${props.isDisabled && `filter: grayscale(0.75);`}
+      ${applyGrayscale(props.isDisabled, props.contributionType)}
     `;
   }};
 `;
@@ -161,6 +169,8 @@ const getFooterHeading = type => {
 const getCTAButtonStyle = type => {
   if (type === ContributionTypes.TICKET) {
     return 'secondary';
+  } else if (type === ContributionTypes.EVENT_PASSED) {
+    return 'standard';
   } else {
     return 'primary';
   }
@@ -187,7 +197,7 @@ const ContributeCard = ({
 
   return (
     <StyledContributeCard {...props}>
-      <CoverImage image={image} isDisabled={disableCTA}>
+      <CoverImage image={image} isDisabled={disableCTA} contributionType={type}>
         <StyledTag
           position="absolute"
           bottom="8px"

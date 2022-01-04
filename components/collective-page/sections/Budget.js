@@ -126,7 +126,7 @@ ViewAllLink.propTypes = {
 };
 
 /**
- * The budget section. Shows the expenses, the latests transactions and some statistics
+ * The budget section. Shows the expenses, the latest transactions and some statistics
  * abut the global budget of the collective.
  */
 const SectionBudget = ({ collective, stats, LoggedInUser }) => {
