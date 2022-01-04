@@ -53,6 +53,15 @@ const editAccountSettingsMutation = gqlV2/* GraphQL */ `
         hostFeesStructure
         hostFeePercent
       }
+      childrenAccounts {
+        nodes {
+          id
+          ... on AccountWithHost {
+            hostFeesStructure
+            hostFeePercent
+          }
+        }
+      }
     }
 
     editAccountSetting(account: $account, key: $key, value: $value) {

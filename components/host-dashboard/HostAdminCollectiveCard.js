@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { SliderAlt } from '@styled-icons/boxicons-regular/SliderAlt';
-import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { HOST_FEE_STRUCTURE } from '../../lib/constants/host-fee-structure';
@@ -14,21 +14,11 @@ import { Box, Flex } from '../Grid';
 import StyledCollectiveCard from '../StyledCollectiveCard';
 import StyledHr from '../StyledHr';
 import StyledRoundButton from '../StyledRoundButton';
+import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 
 import AddFundsModal from './AddFundsModal';
 import CollectiveSettingsModal from './CollectiveSettingsModal';
-
-const msg = defineMessages({
-  addFunds: {
-    id: 'menu.addFunds',
-    defaultMessage: 'Add Funds',
-  },
-  feeStructure: {
-    id: 'FeeStructure',
-    defaultMessage: 'Fee structure',
-  },
-});
 
 const SectionTitle = props => (
   <Flex alignItems="center" mb={1}>
@@ -68,6 +58,7 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
   const [currentModal, setCurrentModal] = React.useState(null);
   const balance = collective.stats.balance.valueInCents || 0;
   const nbFinancialContributors = collective.totalFinancialContributors || 0;
+  const hasParent = Boolean(collective.parent);
   return (
     <StyledCollectiveCard collective={collective} bodyHeight={320} {...props}>
       <Box px={3} mb={16}>
@@ -117,25 +108,39 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
             size={32}
             fontSize="16px"
             onClick={() => setCurrentModal('addFunds')}
-            title={intl.formatMessage(msg.addFunds)}
+            title={intl.formatMessage({ id: 'menu.addFunds', defaultMessage: 'Add Funds' })}
           >
             {getCurrencySymbol(collective.currency)}
             <PlusIcon>+</PlusIcon>
           </StyledRoundButton>
-          <StyledRoundButton
-            ml={2}
-            size={32}
-            onClick={() => setCurrentModal('feesStructure')}
-            title={intl.formatMessage(msg.feeStructure)}
+          <StyledTooltip
+            noTooltip={!hasParent}
+            content={() =>
+              intl.formatMessage(
+                {
+                  defaultMessage:
+                    'This account inherits the settings of its parent. Please edit the configuration directly on {parentName}.',
+                },
+                { parentName: collective.parent.name },
+              )
+            }
           >
-            <SliderAlt size={14} color="#9D9FA3" />
-          </StyledRoundButton>
+            <StyledRoundButton
+              ml={2}
+              size={32}
+              onClick={() => setCurrentModal('accountSettings')}
+              title={intl.formatMessage({ defaultMessage: 'Account settings' })}
+              disabled={hasParent}
+            >
+              <SliderAlt size={14} color="#9D9FA3" />
+            </StyledRoundButton>
+          </StyledTooltip>
         </Container>
       </Box>
       {currentModal === 'addFunds' && (
         <AddFundsModal show collective={collective} host={host} onClose={() => setCurrentModal(null)} />
       )}
-      {currentModal === 'feesStructure' && (
+      {currentModal === 'accountSettings' && (
         <CollectiveSettingsModal collective={collective} host={host} onClose={() => setCurrentModal(null)} />
       )}
     </StyledCollectiveCard>
@@ -150,6 +155,7 @@ HostAdminCollectiveCard.propTypes = {
     hostFeesStructure: PropTypes.oneOf([null, ...Object.values(HOST_FEE_STRUCTURE)]),
     hostFeePercent: PropTypes.number,
     totalFinancialContributors: PropTypes.number,
+    parent: PropTypes.object,
     stats: PropTypes.shape({
       balance: PropTypes.shape({
         valueInCents: PropTypes.number,
