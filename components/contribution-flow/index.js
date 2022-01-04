@@ -139,6 +139,8 @@ class ContributionFlow extends React.Component {
     super(props);
     this.mainContainerRef = React.createRef();
     this.formRef = React.createRef();
+    this.captchaRef = React.createRef();
+
     const isCryptoFlow = props.paymentFlow === PAYMENT_FLOW.CRYPTO;
     this.state = {
       error: null,
@@ -226,7 +228,7 @@ class ContributionFlow extends React.Component {
 
       return this.handleOrderResponse(response.data.createOrder, stepProfile.email);
     } catch (e) {
-      this.setState({ isSubmitting: false });
+      this.handleError();
       this.showError(getErrorFromGraphqlException(e));
     }
   };
@@ -245,10 +247,18 @@ class ContributionFlow extends React.Component {
     }
   };
 
+  handleError = message => {
+    this.setState({ isSubmitting: false, error: message });
+    if (isCaptchaEnabled() && !this.props.LoggedInUser) {
+      this.setState({ stepProfile: set(this.state.stepProfile, 'captcha', null) });
+      this.captchaRef?.current?.resetCaptcha();
+    }
+  };
+
   handleStripeError = async (order, stripeError, email, guestToken) => {
     const { message, account, response } = stripeError;
     if (!response) {
-      this.setState({ isSubmitting: false, error: message });
+      this.handleError(message);
     } else if (response.paymentIntent) {
       const isAlipay = response.paymentIntent.allowed_source_types[0] === 'alipay';
       const stripe = await getStripe(null, account);
@@ -258,14 +268,14 @@ class ContributionFlow extends React.Component {
           })
         : await stripe.handleCardAction(response.paymentIntent.client_secret);
       if (result.error) {
-        this.setState({ isSubmitting: false, error: result.error.message });
+        this.handleError(result.error.message);
       } else if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {
         this.setState({ isSubmitting: true, error: null });
         try {
           const response = await this.props.confirmOrder({ variables: { order: { id: order.id }, guestToken } });
           return this.handleOrderResponse(response.data.confirmOrder, email);
         } catch (e) {
-          this.setState({ isSubmitting: false, error: e.message });
+          this.handleError(e.message);
         }
       }
     }
@@ -631,7 +641,7 @@ class ContributionFlow extends React.Component {
             return true;
           } else {
             const isCompleted = Boolean(noPaymentRequired || stepPayment);
-            if (isCaptchaEnabled() && !stepProfile.captcha) {
+            if (isCaptchaEnabled() && !stepProfile.captcha && !LoggedInUser) {
               this.showError('Captcha is required.');
               return false;
             } else if (isCompleted && stepPayment?.key === NEW_CREDIT_CARD_KEY) {
@@ -841,7 +851,7 @@ class ContributionFlow extends React.Component {
                     disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
                     hideCreditCardPostalCode={this.props.hideCreditCardPostalCode}
                   />
-                  {currentStep.name === STEPS.PAYMENT && isCaptchaEnabled() && (
+                  {isCaptchaEnabled() && currentStep.name === STEPS.PAYMENT && !LoggedInUser && (
                     <Flex mt={40} justifyContent="center">
                       <Captcha
                         ref={this.captchaRef}
