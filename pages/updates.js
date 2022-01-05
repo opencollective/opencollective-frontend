@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import { omitBy } from 'lodash';
 import { withRouter } from 'next/router';
 
-import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { CollectiveType, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
+import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -29,6 +30,15 @@ class UpdatesPage extends React.Component {
     LoggedInUser: PropTypes.object, // from withUser
     router: PropTypes.object,
   };
+
+  componentDidMount() {
+    const { router, data } = this.props;
+    const query = router.query;
+    const account = data?.account;
+    if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(account?.type) && !query.parentCollectiveSlug) {
+      router.push(`${getCollectivePageRoute(account)}/updates`, undefined, { shallow: true });
+    }
+  }
 
   updateQuery = (router, newParams) => {
     const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));

@@ -268,11 +268,11 @@ exports.REWRITES = [
   },
   // New recurring contributions page
   {
-    source: '/:slug/recurring-contributions',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/recurring-contributions',
     destination: '/recurring-contributions',
   },
   {
-    source: '/:slug/subscriptions',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/subscriptions',
     destination: '/recurring-contributions',
   },
   // Path routing: all the rewrites below are ready to be removed as soon as we

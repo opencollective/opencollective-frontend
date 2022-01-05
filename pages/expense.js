@@ -9,12 +9,13 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getCollectiveTypeForUrl, getSuggestedTags } from '../lib/collective.lib';
-import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { CollectiveType, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
@@ -210,6 +211,13 @@ class ExpensePage extends React.Component {
   }
 
   componentDidMount() {
+    const { router, data, legacyExpenseId } = this.props;
+    const query = router.query;
+    const account = data?.account;
+    if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(account?.type) && !query.parentCollectiveSlug) {
+      router.push(`${getCollectivePageRoute(account)}/expenses/${legacyExpenseId}`, undefined, { shallow: true });
+    }
+
     const shouldEditDraft = this.props.data.expense?.status === expenseStatus.DRAFT && this.props.draftKey;
     if (shouldEditDraft) {
       this.setState(() => ({
@@ -219,7 +227,7 @@ class ExpensePage extends React.Component {
       }));
     }
 
-    const expense = this.props.data?.expense;
+    const expense = data?.expense;
     if (
       expense?.status === expenseStatus.UNVERIFIED &&
       expense?.permissions?.canEdit &&

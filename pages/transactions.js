@@ -13,6 +13,7 @@ import roles from '../lib/constants/roles';
 import { parseDateInterval } from '../lib/date-utils';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import Body from '../components/Body';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
@@ -165,9 +166,13 @@ class TransactionsPage extends React.Component {
   }
 
   async componentDidMount() {
-    const { data } = this.props;
+    const { router, data } = this.props;
     const Collective = (data && data.account) || this.state.collective;
+    const query = router.query;
     this.setState({ Collective });
+    if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(Collective.type) && !query.parentCollectiveSlug) {
+      router.push(`${getCollectivePageRoute(Collective)}/transactions`, undefined, { shallow: true });
+    }
   }
 
   componentDidUpdate(oldProps) {

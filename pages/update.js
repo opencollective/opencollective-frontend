@@ -2,10 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, uniqBy, update } from 'lodash';
+import { withRouter } from 'next/router';
 
-import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { CollectiveType, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { getCollectivePageRoute } from '../lib/url-helpers';
 import { stripHTML } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -32,6 +34,7 @@ class UpdatePage extends React.Component {
     updateSlug: PropTypes.string,
     LoggedInUser: PropTypes.object, // from withUser
     client: PropTypes.object, // from withApollo
+    router: PropTypes.object, // from withRouter
     data: PropTypes.shape({
       account: PropTypes.object,
       update: PropTypes.object,
@@ -41,6 +44,15 @@ class UpdatePage extends React.Component {
   };
 
   state = { isReloadingData: false };
+
+  componentDidMount() {
+    const { router, data, updateSlug } = this.props;
+    const query = router.query;
+    const account = data?.account;
+    if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(account?.type) && !query.parentCollectiveSlug) {
+      router.push(`${getCollectivePageRoute(account)}/updates/${updateSlug}`, undefined, { shallow: true });
+    }
+  }
 
   async componentDidUpdate(oldProps) {
     // Refetch data when use logs in
@@ -246,4 +258,4 @@ const getUpdate = graphql(updateQuery, {
   },
 });
 
-export default withUser(getUpdate(withApollo(UpdatePage)));
+export default withRouter(withUser(getUpdate(withApollo(UpdatePage))));

@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import dynamic from 'next/dynamic';
+import { withRouter } from 'next/router';
 import { createGlobalStyle } from 'styled-components';
 
+import { CollectiveType } from '../lib/constants/collectives';
 import { generateNotFoundError } from '../lib/errors';
+import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
@@ -89,6 +92,7 @@ class CollectivePage extends React.Component {
     mode: PropTypes.string,
     action: PropTypes.string,
     LoggedInUser: PropTypes.object, // from withUser
+    router: PropTypes.object,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
@@ -131,6 +135,13 @@ class CollectivePage extends React.Component {
 
   componentDidMount() {
     this.setState({ smooth: true });
+
+    const { router, data } = this.props;
+    const query = router.query;
+    const collective = data?.Collective;
+    if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(collective?.type) && !query.parentCollectiveSlug) {
+      router.push(`${getCollectivePageRoute(collective)}`, undefined, { shallow: true });
+    }
   }
 
   getPageMetaData(collective) {
@@ -160,8 +171,8 @@ class CollectivePage extends React.Component {
     this.setState({ showOnboardingModal: bool });
   };
 
-  getCanonicalURL(slug) {
-    return `${process.env.WEBSITE_URL}/${slug}`;
+  getCanonicalURL(collective) {
+    return `${process.env.WEBSITE_URL}/${getCollectivePageRoute(collective)}`;
   }
 
   render() {
@@ -192,7 +203,7 @@ class CollectivePage extends React.Component {
     }
 
     return (
-      <Page canonicalURL={this.getCanonicalURL(slug)} {...this.getPageMetaData(collective)}>
+      <Page canonicalURL={this.getCanonicalURL(collective)} {...this.getPageMetaData(collective)}>
         <GlobalStyles smooth={this.state.smooth} />
         {loading ? (
           <Container py={[5, 6]}>
@@ -257,4 +268,4 @@ const addCollectivePageData = graphql(collectivePageQuery, {
   }),
 });
 
-export default withUser(addCollectivePageData(CollectivePage));
+export default withRouter(withUser(addCollectivePageData(CollectivePage)));

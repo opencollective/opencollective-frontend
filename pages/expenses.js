@@ -9,13 +9,14 @@ import styled from 'styled-components';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { getSuggestedTags } from '../lib/collective.lib';
-import { isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { CollectiveType, isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -114,6 +115,7 @@ class ExpensePage extends React.Component {
         isHost: PropTypes.bool,
         host: PropTypes.object,
         expensesTags: PropTypes.array,
+        type: PropTypes.oneOf(Object.keys(CollectiveType)),
       }),
       expenses: PropTypes.shape({
         nodes: PropTypes.array,
@@ -127,6 +129,15 @@ class ExpensePage extends React.Component {
     }),
     router: PropTypes.object,
   };
+
+  componentDidMount() {
+    const { router, data } = this.props;
+    const query = router.query;
+    const account = data?.account;
+    if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(account?.type) && !query.parentCollectiveSlug) {
+      router.push(`${getCollectivePageRoute(account)}/expenses`, undefined, { shallow: true });
+    }
+  }
 
   componentDidUpdate(oldProps) {
     const { LoggedInUser, data } = this.props;

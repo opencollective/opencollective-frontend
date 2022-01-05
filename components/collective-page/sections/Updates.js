@@ -165,7 +165,7 @@ class SectionUpdates extends React.PureComponent {
                       </LinkCollective>
                     </Box>
                     <Flex flexDirection="column" justifyContent="space-between">
-                      <Link href={`/${collective.slug}/updates/${update.slug}`}>
+                      <Link href={`${getCollectivePageRoute(collective)}/updates/${update.slug}`}>
                         <P color="black.900" fontWeight="600" mb={2}>
                           {update.title}
                         </P>
