@@ -69,6 +69,12 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       features {
         ...NavbarFields
       }
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+        }
+      }
     }
     transactions(
       account: { slug: $slug }

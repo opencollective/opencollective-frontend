@@ -43,15 +43,15 @@ exports.REWRITES = [
     destination: '/createOrganization',
   },
   {
-    source: '/:collectiveSlug/updates',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates',
     destination: '/updates',
   },
   {
-    source: '/:collectiveSlug/updates/new',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/new',
     destination: '/createUpdate',
   },
   {
-    source: '/:collectiveSlug/updates/:updateSlug',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/:updateSlug',
     destination: '/update',
   },
   {

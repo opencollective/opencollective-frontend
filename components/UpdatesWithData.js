@@ -5,6 +5,7 @@ import { cloneDeep } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import UpdateFilters from './updates/UpdateFilters';
 import Container from './Container';
@@ -68,7 +69,7 @@ class UpdatesWithData extends React.Component {
               </P>
             </Container>
             {LoggedInUser?.canEditCollective(collective) && (
-              <Link href={`/${collective.slug}/updates/new`}>
+              <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
                 <StyledButton buttonStyle="primary" m={2}>
                   <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />
                 </StyledButton>

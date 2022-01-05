@@ -2,16 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import Link from './Link';
+import { CollectiveType } from '../lib/constants/collectives';
+import { getCollectivePageRoute } from '../lib/url-helpers';
 
-/**
- * Returns event's parent collective slug. If the parent is not available,
- * fallback on `collective` slug which will result in a valid URL: parent
- * collective slug is only used to generate pretty URLs.
- */
-const getEventParentCollectiveSlug = parentCollective => {
-  return parentCollective && parentCollective.slug ? parentCollective.slug : 'collective';
-};
+import Link from './Link';
 
 /**
  * Create a `Link` to the collective based on collective type.
@@ -32,17 +26,17 @@ const LinkCollective = ({ target, title, noTitle, collective, children, ...props
     return children || collective.name;
   }
 
-  const { type, slug, name, parentCollective, isIncognito } = collective;
+  const { type, slug, name, isIncognito } = collective;
   if (type === 'USER' && (!name || isIncognito || !slug)) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
-  return type !== 'EVENT' ? (
+  return ![CollectiveType.EVENT, CollectiveType.PROJECT].includes(type) ? (
     <Link href={`/${slug}`} {...props} title={noTitle ? null : title || name} target={target}>
       {children || name || slug}
     </Link>
   ) : (
     <Link
-      href={`/${getEventParentCollectiveSlug(parentCollective)}/events/${slug}`}
+      href={`${getCollectivePageRoute(collective)}`}
       title={noTitle ? null : title || name}
       target={target}
       {...props}
