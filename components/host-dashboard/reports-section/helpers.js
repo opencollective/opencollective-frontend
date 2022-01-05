@@ -5,7 +5,7 @@ export const getActiveYearsOptions = host => {
   return activeYears.map(year => ({ value: year, label: year })).reverse();
 };
 
-export const formatAmountForLegend = (locale, currency, value) => {
+export const formatAmountForLegend = (value, currency, locale) => {
   return new Intl.NumberFormat(locale, {
     currency,
     style: 'currency',

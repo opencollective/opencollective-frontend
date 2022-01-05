@@ -106,12 +106,12 @@ const getChartOptions = (intl, hostCurrency) => ({
   yaxis: {
     labels: {
       minWidth: 38,
-      formatter: value => formatAmountForLegend(intl.locale, hostCurrency, value),
+      formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale),
     },
   },
   tooltip: {
     y: {
-      formatter: value => formatAmountForLegend(intl.locale, hostCurrency, value),
+      formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale),
     },
   },
 });

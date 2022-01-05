@@ -56,7 +56,7 @@ const getChartOptions = (timeUnit, hostCurrency, locale) => {
 
     yaxis: {
       labels: {
-        formatter: value => formatAmountForLegend(locale, hostCurrency, value),
+        formatter: value => formatAmountForLegend(value, hostCurrency, locale),
       },
     },
   };
