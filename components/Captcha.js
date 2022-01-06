@@ -67,7 +67,6 @@ ReCaptcha.propTypes = {
   onError: PropTypes.func,
 };
 
-// eslint-disable-next-line react/display-name
 const Captcha = React.forwardRef(({ onVerify, provider, ...props }, captchaRef) => {
   const HCAPTCHA_SITEKEY = getEnvVar('HCAPTCHA_SITEKEY');
   const RECAPTCHA_SITE_KEY = getEnvVar('RECAPTCHA_SITE_KEY');
@@ -101,6 +100,8 @@ const Captcha = React.forwardRef(({ onVerify, provider, ...props }, captchaRef) 
   }
   return <Box data-cy="captcha">{captcha}</Box>;
 });
+
+Captcha.displayName = 'Captcha';
 
 Captcha.propTypes = {
   onVerify: PropTypes.func,
