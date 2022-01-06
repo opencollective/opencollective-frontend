@@ -470,7 +470,7 @@ const CollectiveNavbar = ({
               {showBackButton && (
                 <Container display={['none', null, null, null, 'block']} position="absolute" left={-30}>
                   {collective && (
-                    <Link href={`${getCollectivePageRoute(collective)}`}>
+                    <Link href={getCollectivePageRoute(collective)}>
                       <StyledButton px={1} isBorderless>
                         &larr;
                       </StyledButton>

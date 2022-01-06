@@ -16,7 +16,7 @@ import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { getCollectivePageRoute } from '../lib/url-helpers';
+import { getCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -212,7 +212,11 @@ class ExpensePage extends React.Component {
     }
 
     return (
-      <Page collective={data.account} {...this.getPageMetaData(data.account)}>
+      <Page
+        collective={data.account}
+        canonicalURL={getCanonicalURL(data.account)}
+        {...this.getPageMetaData(data.account)}
+      >
         <CollectiveNavbar
           collective={data.account}
           isLoading={!data.account}

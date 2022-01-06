@@ -5,7 +5,7 @@ import { withRouter } from 'next/router';
 
 import { CollectiveType, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
-import { getCollectivePageRoute } from '../lib/url-helpers';
+import { getCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -57,7 +57,7 @@ class UpdatesPage extends React.Component {
 
     return (
       <div className="UpdatesPage">
-        <Header collective={collective} LoggedInUser={LoggedInUser} />
+        <Header collective={collective} LoggedInUser={LoggedInUser} canonicalURL={getCanonicalURL(collective)} />
 
         <Body>
           <CollectiveNavbar

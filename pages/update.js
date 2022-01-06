@@ -7,7 +7,7 @@ import { withRouter } from 'next/router';
 import { CollectiveType, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { getCollectivePageRoute } from '../lib/url-helpers';
+import { getCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 import { stripHTML } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -133,6 +133,7 @@ class UpdatePage extends React.Component {
         collective={account}
         title={update.title}
         description={stripHTML(update.summary)}
+        canonicalURL={getCanonicalURL(account)}
         metaTitle={`${update.title} - ${account.name}`}
       >
         <CollectiveNavbar

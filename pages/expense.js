@@ -15,7 +15,7 @@ import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { getCollectivePageRoute } from '../lib/url-helpers';
+import { getCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
@@ -494,7 +494,7 @@ class ExpensePage extends React.Component {
     }
 
     return (
-      <Page collective={collective} {...this.getPageMetaData(expense)}>
+      <Page collective={collective} canonicalURL={getCanonicalURL(collective)} {...this.getPageMetaData(expense)}>
         <CollectiveNavbar
           collective={collective}
           isLoading={!collective}

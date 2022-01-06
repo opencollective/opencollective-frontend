@@ -233,7 +233,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasDashboard && !hasNewAdminPanel && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.DASHBOARD}>
-                        <StyledLink as={Link} href={`/${getCollectivePageRoute(collective)}/dashboard`}>
+                        <StyledLink as={Link} href={`/${collective.slug}/dashboard`}>
                           <Container p={ITEM_PADDING}>
                             <Dashboard size="20px" />
                             <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />

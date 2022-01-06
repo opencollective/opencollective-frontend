@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../lib/constants/collectives';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import Link from './Link';
@@ -30,17 +29,8 @@ const LinkCollective = ({ target, title, noTitle, collective, children, ...props
   if (type === 'USER' && (!name || isIncognito || !slug)) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
-  return ![CollectiveType.EVENT, CollectiveType.PROJECT].includes(type) ? (
-    <Link href={`/${slug}`} {...props} title={noTitle ? null : title || name} target={target}>
-      {children || name || slug}
-    </Link>
-  ) : (
-    <Link
-      href={`${getCollectivePageRoute(collective)}`}
-      title={noTitle ? null : title || name}
-      target={target}
-      {...props}
-    >
+  return (
+    <Link href={getCollectivePageRoute(collective)} title={noTitle ? null : title || name} target={target} {...props}>
       {children || name || slug}
     </Link>
   );
