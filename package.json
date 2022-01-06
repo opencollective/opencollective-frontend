@@ -51,7 +51,7 @@
     "debug": "4.3.3",
     "dotenv": "10.0.0",
     "draft-js": "0.11.7",
-    "express": "4.17.1",
+    "express": "4.17.2",
     "express-basic-auth": "1.2.1",
     "express-http-proxy": "1.6.3",
     "express-limiter": "1.6.1",
