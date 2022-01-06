@@ -67,15 +67,15 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
               <P fontSize="14px" lineHeight="20px" fontWeight="bold">
                 <FormattedMoneyAmount
                   amount={
-                    !isNil(contribution.platformContributionAmount?.valueInCents)
-                      ? contribution.amount.valueInCents + contribution.platformContributionAmount.valueInCents
+                    !isNil(contribution.platformTipAmount?.valueInCents)
+                      ? contribution.amount.valueInCents + contribution.platformTipAmount.valueInCents
                       : contribution.amount.valueInCents
                   }
                   currency={contribution.amount.currency}
                   frequency={contribution.frequency}
                 />
               </P>
-              {!isNil(contribution.platformContributionAmount?.valueInCents) && (
+              {!isNil(contribution.platformTipAmount?.valueInCents) && (
                 <StyledTooltip
                   content={() => (
                     <FormattedMessage
@@ -95,7 +95,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                     />{' '}
                     +{' '}
                     <FormattedMoneyAmount
-                      amount={contribution.platformContributionAmount.valueInCents}
+                      amount={contribution.platformTipAmount.valueInCents}
                       currency={contribution.amount.currency}
                       showCurrencyCode={false}
                       precision={2}

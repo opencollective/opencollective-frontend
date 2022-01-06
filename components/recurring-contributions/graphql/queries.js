@@ -80,7 +80,7 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
               }
             }
           }
-          platformContributionAmount {
+          platformTipAmount {
             value
             valueInCents
           }
