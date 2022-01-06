@@ -234,12 +234,12 @@ const getTotalYearlyAmount = stepDetails => {
  * Whether this contribution requires us to collect the address of the user
  */
 export const contributionRequiresAddress = stepDetails => {
-  return getTotalYearlyAmount(stepDetails) >= 5000e2;
+  return stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 5000e2;
 };
 
 /**
  * Whether this contribution requires us to collect the address and legal name of the user
  */
 export const contributionRequiresLegalName = stepDetails => {
-  return getTotalYearlyAmount(stepDetails) >= 500e2;
+  return stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 500e2;
 };
