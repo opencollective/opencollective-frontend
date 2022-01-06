@@ -1836,6 +1836,11 @@ type Order {
   paymentMethod: PaymentMethod
 
   """
+  Platform contribution attached to the Order.
+  """
+  platformContributionAmount: Amount @deprecated(reason: "2021-06-07: Please use platformTipAmount")
+
+  """
   Platform Tip attached to the Order.
   """
   platformTipAmount: Amount
@@ -9895,6 +9900,11 @@ input OrderCreateInput {
   The payment method used for this order
   """
   paymentMethod: PaymentMethodInput
+
+  """
+  Platform contribution attached to this order
+  """
+  platformContributionAmount: AmountInput @deprecated(reason: "2021-12-17: Use platformTipAmount")
 
   """
   Platform tip attached to this order
