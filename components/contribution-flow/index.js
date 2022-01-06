@@ -138,6 +138,7 @@ class ContributionFlow extends React.Component {
     super(props);
     this.mainContainerRef = React.createRef();
     this.formRef = React.createRef();
+    const isCryptoFlow = props.paymentFlow === PAYMENT_FLOW.CRYPTO;
     this.state = {
       error: null,
       stripe: null,
@@ -152,9 +153,9 @@ class ContributionFlow extends React.Component {
       stepDetails: {
         quantity: 1,
         interval: props.fixedInterval || getDefaultInterval(props.tier),
-        amount: props.paymentFlow === PAYMENT_FLOW.CRYPTO ? '' : props.fixedAmount || getDefaultTierAmount(props.tier),
+        amount: isCryptoFlow ? '' : props.fixedAmount || getDefaultTierAmount(props.tier),
         platformContribution: props.platformContribution,
-        currency: CRYPTO_CURRENCIES[0],
+        currency: isCryptoFlow ? CRYPTO_CURRENCIES[0] : props.tier?.amount?.currency || props.collective.currency,
       },
     };
   }
@@ -189,6 +190,11 @@ class ContributionFlow extends React.Component {
             frequency: getGQLV2FrequencyFromInterval(stepDetails.interval),
             guestInfo,
             fromAccount,
+            fromAccountInfo: {
+              location: pick(stepProfile.location, ['name', 'address', 'country', 'structured']),
+              legalName: stepProfile.legalName,
+              name: stepProfile.name,
+            },
             toAccount: pick(this.props.collective, ['id']),
             data:
               this.props.paymentFlow === PAYMENT_FLOW.CRYPTO

@@ -11,21 +11,6 @@ import { Flex } from '../Grid';
 import { Span } from '../Text';
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
-const filterProfiles = (profiles, account, canUseIncognito) => {
-  return profiles.filter(p => {
-    // if admin of collective you are donating to, remove it from the list
-    if (p.id === account.legacyId) {
-      return false;
-    } else if (!canUseIncognito && p.isIncognito) {
-      return false;
-    } else if (p.type === CollectiveType.COLLECTIVE && (!p.host || p.host.id !== account.host?.legacyId)) {
-      return false;
-    } else {
-      return true;
-    }
-  });
-};
-
 const formatAccountName = (intl, account) => {
   return account.isIncognito
     ? intl.formatMessage({ id: 'profile.incognito', defaultMessage: 'Incognito' })
@@ -127,18 +112,19 @@ const formatProfileOption = (option, _, intl) => {
   );
 };
 
-const ContributeProfilePicker = ({ profiles, canUseIncognito, account, onChange, defaultSelectedProfile }) => {
+const ContributeProfilePicker = ({ profiles, canUseIncognito, onChange, defaultSelectedProfile }) => {
   const intl = useIntl();
-  const filteredProfiles = filterProfiles(profiles, account, canUseIncognito);
-  const options = getProfileOptions(intl, filteredProfiles, canUseIncognito);
+  const getOptionsArgs = [intl, profiles, canUseIncognito];
+  const options = React.useMemo(() => getProfileOptions(...getOptionsArgs), getOptionsArgs);
   const [selectedProfile, setSelectedProfile] = React.useState(defaultSelectedProfile);
   return (
     <CollectivePicker
       data-cy="contribute-profile-picker"
+      inputId="contribute-profile-picker"
       collective={selectedProfile}
       addLoggedInUserAsAdmin
       options={options}
-      isSearchable={filteredProfiles.length > 8}
+      isSearchable={profiles.length > 8}
       creatable
       excludeAdminFields
       types={[CollectiveType.ORGANIZATION]}
@@ -159,7 +145,6 @@ const ContributeProfilePicker = ({ profiles, canUseIncognito, account, onChange,
 ContributeProfilePicker.propTypes = {
   profiles: PropTypes.array,
   canUseIncognito: PropTypes.bool,
-  account: PropTypes.object,
   onChange: PropTypes.func,
   defaultSelectedProfile: PropTypes.object,
 };
