@@ -78,7 +78,7 @@ const selectOptions = [
     value: 'COLLECTIVE_ADMINS',
   },
   {
-    label: <FormattedMessage id="Update.notify.noOne" defaultMessage="No one" />,
+    label: <FormattedMessage defaultMessage="No one" />,
     value: 'NO_ONE',
   },
 ];

@@ -32,8 +32,8 @@ const UpdateAudienceBreakdown = ({ audienceStats, isLoading }) => {
   const intl = useIntl();
   if (isLoading) {
     return <LoadingPlaceholder height={50} />;
-  } else if (!audienceStats) {
-    return <FormattedMessage id="UpdateAudienceBreakdown.noOne" defaultMessage="Your Update will be sent to no one." />;
+  } else if (!audienceStats || audienceStats?.id.includes('NO_ONE')) {
+    return <FormattedMessage defaultMessage="Your Update will not be sent to anyone." />;
   }
 
   const typesWithStats = Object.keys(translatedTypes);
