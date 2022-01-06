@@ -307,6 +307,7 @@ class EditCollectiveForm extends React.Component {
       tickets: tickets.length === 0 ? [] : tickets,
       validStartDate: true,
       validEndDate: true,
+      endsAtDate: dayjs(collective.endsAt).tz(collective.timezone).format('YYYY-MM-DDTHH:mm'),
     };
   }
 
@@ -336,12 +337,16 @@ class EditCollectiveForm extends React.Component {
         const isValid = dayjs(value).isValid();
         this.setState({ validStartDate: isValid });
         if (isValid) {
+          const endsAtDate = dayjs(value).add(1, 'hour').tz(collective.timezone).format('YYYY-MM-DDTHH:mm');
+          this.setState({ endsAtDate });
           collective[fieldname] = convertDateToApiUtc(value, collective.timezone);
+          collective['endsAt'] = convertDateToApiUtc(endsAtDate, collective.timezone);
         }
       } else if (fieldname === 'endsAt' && collective.type === EVENT) {
         const isValid = dayjs(value).isValid();
         this.setState({ validEndDate: isValid });
         if (isValid) {
+          this.setState({ endsAtDate: value });
           collective[fieldname] = convertDateToApiUtc(value, collective.timezone);
         }
       } else if (fieldname === 'timezone' && collective.type === EVENT) {
@@ -752,7 +757,7 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'endsAt',
           type: 'datetime-local',
-          defaultValue: dayjs(collective.endsAt).tz(collective.timezone).format('YYYY-MM-DDTHH:mm'),
+          value: this.state.endsAtDate,
           when: () => collective.type === EVENT,
           error: !this.state.validEndDate ? intl.formatMessage(this.messages.inValidDateError) : null,
           required: true,
@@ -882,6 +887,7 @@ class EditCollectiveForm extends React.Component {
                       key={field.name}
                       className={field.className}
                       defaultValue={this.getFieldDefaultValue(field)}
+                      value={field.value}
                       validate={field.validate}
                       ref={field.name}
                       name={field.name}
