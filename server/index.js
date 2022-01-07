@@ -55,8 +55,15 @@ const start = id =>
       app.use(serviceLimiterMiddleware);
     }
 
-    // Content security policy is generated from `_document` for compatibility with Vercel
-    app.use(helmet({ contentSecurityPolicy: false }));
+    app.use(
+      helmet({
+        // Content security policy is generated from `_document` for compatibility with Vercel
+        contentSecurityPolicy: false,
+        crossOriginEmbedderPolicy: false, // This one turned of for loading Stripe js (at least)
+        crossOriginOpenerPolicy: false,
+        crossOriginResourcePolicy: false,
+      }),
+    );
 
     app.use(cookieParser());
 
