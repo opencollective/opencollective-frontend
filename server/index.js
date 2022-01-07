@@ -59,7 +59,7 @@ const start = id =>
       helmet({
         // Content security policy is generated from `_document` for compatibility with Vercel
         contentSecurityPolicy: false,
-        crossOriginEmbedderPolicy: false, // This one turned of for loading Stripe js (at least)
+        crossOriginEmbedderPolicy: false, // This one turned off for loading Stripe js (at least)
         crossOriginOpenerPolicy: false,
         crossOriginResourcePolicy: false,
       }),
