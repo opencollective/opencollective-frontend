@@ -56,6 +56,7 @@ const COMMON_DIRECTIVES = {
     '*.paypal.com',
     '*.paypalobjects.com',
     'https://hcaptcha.com',
+    'https://js.hcaptcha.com',
     'https://*.hcaptcha.com',
     'https://www.google.com',
   ],
