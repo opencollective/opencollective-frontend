@@ -11,9 +11,11 @@ import { Box } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
+
+import { formatAmountForLegend } from './helpers';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const getChartOptions = timeUnit => {
+const getChartOptions = (timeUnit, hostCurrency, locale) => {
   return {
     chart: {
       id: 'chart-transactions-overview',
@@ -54,9 +56,7 @@ const getChartOptions = timeUnit => {
 
     yaxis: {
       labels: {
-        formatter: function (value) {
-          return value < 1000 ? value : `${Math.round(value / 1000)}k`;
-        },
+        formatter: value => formatAmountForLegend(value, hostCurrency, locale),
       },
     },
   };
@@ -251,7 +251,13 @@ const TransactionsOverviewSection = ({ host, isLoading }) => {
         {isLoading ? (
           <LoadingPlaceholder height={21} width="100%" borderRadius="8px" />
         ) : (
-          <Chart type="area" width="100%" height="250px" options={getChartOptions(timeUnit)} series={series} />
+          <Chart
+            type="area"
+            width="100%"
+            height="250px"
+            options={getChartOptions(timeUnit, host.currency, locale)}
+            series={series}
+          />
         )}
       </Box>
     </React.Fragment>
