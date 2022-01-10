@@ -82,12 +82,7 @@ class SectionEvents extends React.PureComponent {
         >
           {this.sortEvents(events).map(event => (
             <Box key={event.id} px={CONTRIBUTE_CARD_PADDING_X}>
-              <ContributeEvent
-                collective={collective}
-                event={event}
-                hideContributors={hasNoContributorForEvents}
-                disableCTA={!collective.isActive || !event.isActive}
-              />
+              <ContributeEvent collective={collective} event={event} hideContributors={hasNoContributorForEvents} />
             </Box>
           ))}
           {isAdmin && (

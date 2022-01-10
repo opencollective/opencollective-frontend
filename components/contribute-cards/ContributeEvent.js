@@ -22,7 +22,6 @@ const ContributeEvent = ({ collective, event, ...props }) => {
   const description = truncate(event.description, { length: 100 });
   const isTruncated = description && description.length < event.description.length;
   const isPassed = isPastEvent(event);
-  const canOrderTickets = canOrderTicketsFromEvent(event);
   const takesMultipleDays = startsAt && endsAt && !DayJs(startsAt).isSame(endsAt, 'day');
   const showYearOnStartDate = !endsAt || !takesMultipleDays ? 'numeric' : undefined; // only if there's no end date
 
@@ -30,7 +29,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
     <Contribute
       route={`/${collective.slug}/events/${event.slug}`}
       type={isPassed ? ContributionTypes.EVENT_PASSED : ContributionTypes.EVENT_PARTICIPATE}
-      disableCTA={!isPassed && !canOrderTickets}
+      disableCTA={!canOrderTicketsFromEvent(event)}
       contributors={event.contributors}
       stats={event.stats.backers}
       image={event.backgroundImageUrl}
