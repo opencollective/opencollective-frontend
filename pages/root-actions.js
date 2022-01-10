@@ -11,6 +11,7 @@ import ClearCacheForAccountForm from '../components/root-actions/ClearCacheForAc
 import ConnectAccountsForm from '../components/root-actions/ConnectAccountsForm';
 import MergeAccountsForm from '../components/root-actions/MergeAccountsForm';
 import MoveAuthoredContributions from '../components/root-actions/MoveAuthoredContributions';
+import MoveReceivedContributions from '../components/root-actions/MoveReceivedContributions';
 import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
 import { H1, H2, H3, P, Span } from '../components/Text';
@@ -27,6 +28,12 @@ const MENU = [
     description: `This tool is meant to edit the account that authored one or more contributions.
     It can be used to mark contributions as "Incognito" by picking the contributor's incognito profile in "Move to".
     The payment methods used for the contributions are re-affected to the new profile, so make sure they have the permission to use them.`,
+  },
+  {
+    id: 'Move received contributions',
+    Component: MoveReceivedContributions,
+    description: `This tool is meant to edit the account that received a contribution.
+    Use it to move contributions to different tiers, sub-projects, events, etc.`,
   },
 ];
 
@@ -82,7 +89,7 @@ const RootActionsPage = () => {
           <H3 lineHeight="30px" fontSize="24px" backgroundColor="black.50" color="black.800" p={3}>
             {selectedMenuEntry.title || selectedMenuEntry.id}
           </H3>
-          <Box px={3}>
+          <Box px={[2, 3, 4]}>
             {selectedMenuEntry.isDangerous && (
               <Container textAlign="center" my={4}>
                 <H2 fontSize="30px" css={{ textShadow: '0px 2px 2px red' }}>

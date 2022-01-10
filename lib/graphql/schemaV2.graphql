@@ -1836,14 +1836,10 @@ type Order {
   paymentMethod: PaymentMethod
 
   """
-  Platform contribution attached to the Order.
-  """
-  platformContributionAmount: Amount @deprecated(reason: "2021-06-07: Please use platformTipAmount")
-
-  """
   Platform Tip attached to the Order.
   """
   platformTipAmount: Amount
+  platformTipEligible: Boolean
   tags: [String]!
   taxes: [OrderTax]!
 
@@ -4953,8 +4949,6 @@ type Individual implements Account {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  firstName: String @deprecated(reason: "2020-10-12: Use the name field")
-  lastName: String @deprecated(reason: "2020-10-12: Use the name field")
   email: String
   isGuest: Boolean!
   isFollowingConversation(id: String!): Boolean!
@@ -6351,6 +6345,11 @@ input TierReferenceInput {
   The DB id assigned to the Tier
   """
   legacyId: Int
+
+  """
+  Pass this flag to reference the custom tier (/donate)
+  """
+  isCustom: Boolean
 }
 
 """
@@ -6962,9 +6961,14 @@ type Mutation {
     orders: [OrderReferenceInput!]!
 
     """
-    The account to move the orders to
+    The account to move the orders to. Set to null to keep existing
     """
-    fromAccount: AccountReferenceInput!
+    fromAccount: AccountReferenceInput
+
+    """
+    The tier to move the orders to. Set to null to keep existing. Pass { id: "custom" } to reference the custom tier (/donate)
+    """
+    tier: TierReferenceInput
 
     """
     If true, the orders will be moved to the incognito account of "fromAccount"
@@ -9746,14 +9750,6 @@ input ExpenseInvitee {
   name: String
   email: String
   isInvite: Boolean
-  organization: ExpenseInviteeOrganizationInput
-}
-
-input ExpenseInviteeOrganizationInput {
-  description: String
-  name: String
-  slug: String
-  website: String
 }
 
 type EmojiReactionResponse {
@@ -9932,11 +9928,6 @@ input OrderCreateInput {
   The payment method used for this order
   """
   paymentMethod: PaymentMethodInput
-
-  """
-  Platform contribution attached to this order
-  """
-  platformContributionAmount: AmountInput @deprecated(reason: "2021-12-17: Use platformTipAmount")
 
   """
   Platform tip attached to this order
