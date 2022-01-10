@@ -62,7 +62,7 @@
     "formik": "2.2.9",
     "glob": "7.2.0",
     "graphql": "15.8.0",
-    "helmet": "4.6.0",
+    "helmet": "5.0.1",
     "i18n-iso-countries": "7.2.0",
     "jsdom": "19.0.0",
     "jsonwebtoken": "8.5.1",
