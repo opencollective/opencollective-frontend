@@ -9717,6 +9717,14 @@ input ExpenseInvitee {
   name: String
   email: String
   isInvite: Boolean
+  organization: ExpenseInviteeOrg
+}
+
+input ExpenseInviteeOrg {
+  description: String
+  name: String
+  slug: String
+  website: String
 }
 
 type EmojiReactionResponse {
