@@ -291,6 +291,73 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
         cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
       });
+
+      it.only('can invite a third-party organization to submit an expense', () => {
+        cy.getByDataCy('radio-expense-type-INVOICE').click();
+
+        cy.getByDataCy('select-expense-payee').click();
+        cy.getByDataCy('collective-picker-invite-button').click();
+        cy.getByDataCy('payee-type-org').click();
+        cy.get('input[name="payee.organization.name"]').type('Hollywood');
+        cy.get('input[name="payee.organization.description"]').type('We make movies.');
+        cy.get('input[name="payee.organization.website"]').type('http://hollywood.com');
+        cy.get('input[name="payee.name"]').type('Nicolas Cage');
+        cy.get('input[name="payee.email"]').type(inviteeEmail);
+        cy.get('[data-cy="expense-next"]').click();
+
+        cy.get('input[name="description"]').type('Service Invoice');
+        cy.get('input[name="items[0].amount"]').type('{selectall}4200');
+
+        cy.getByDataCy('expense-summary-btn').click();
+        cy.wait(500);
+
+        cy.getByDataCy('expense-status-msg').should('contain', 'DRAFT');
+        cy.getByDataCy('expense-draft-banner').should('contain', 'Your invite is on its way');
+        cy.getByDataCy('expense-draft-banner').should(
+          'contain',
+          `An invitation to submit this expense has been sent to ${inviteeEmail}`,
+        );
+        cy.getByDataCy('expense-summary-payee').should('contain', 'Hollywood');
+
+        // Log out and submit as invitee...
+        cy.url({ log: true }).then(_url => {
+          [, collective, expenseId] = _url.match(/\/([\w-]+)\/expenses\/(\w+)$/);
+        });
+        cy.wait(500);
+      });
+
+      it.only('can create a new expense and organization account as the invitee', () => {
+        cy.visit('/');
+        cy.logout();
+        cy.reload();
+        cy.visit(`/${collective}/expenses/${expenseId}?key=draft-key`);
+
+        cy.getByDataCy('payee-country').click();
+        cy.contains('[data-cy="select-option"]', 'Angola - AO').click();
+        cy.get('[data-cy="payee-address-address1"]').type('Street Name, 123');
+        cy.get('[data-cy="payee-address-city"]').type('City');
+
+        cy.getByDataCy('payout-method-select').click();
+        cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+        cy.get('textarea[name="payoutMethod.data.content"]').type('make it rain');
+
+        cy.getByDataCy('expense-next').click();
+
+        cy.get('input[name="items[0].description"]').type('That service');
+        cy.getByDataCy('expense-summary-btn').click();
+        cy.get('[data-cy="checkbox-tos"] [data-cy="custom-checkbox"]').click();
+        cy.getByDataCy('save-expense-btn').click();
+        cy.wait(500);
+        cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
+        cy.getByDataCy('expense-status-msg').parent().should('contain', 'Unverified');
+        cy.login({ email: inviteeEmail, redirect: `/${collective}/expenses/${expenseId}` });
+        cy.visit(`/${collective}/expenses/${expenseId}`);
+        cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
+        cy.getByDataCy('expense-author').should('contain', 'Invited by');
+        cy.getByDataCy('expense-summary-payee').should('contain', 'Hollywood');
+        cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
+        cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
+      });
     });
   });
 
