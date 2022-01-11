@@ -30,7 +30,7 @@ const confirmContributionMutation = gqlV2/* GraphQL */ `
         currency
         valueInCents
       }
-      platformContributionAmount {
+      platformTipAmount {
         currency
         valueInCents
       }
