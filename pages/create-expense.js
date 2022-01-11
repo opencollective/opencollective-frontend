@@ -163,23 +163,30 @@ class CreateExpensePage extends React.Component {
     }
   }
 
+  buildFormPersister() {
+    const { LoggedInUser, data } = this.props;
+    if (data.account && LoggedInUser) {
+      return new FormPersister(`expense-${data.account.id}=${LoggedInUser.id}`);
+    }
+  }
+
   handleResetForm() {
-    const { router, LoggedInUser, data } = this.props;
-    if (data.account && LoggedInUser && parseToBoolean(router.query.resetForm)) {
-      const formPersister = new FormPersister(`expense-${data.account.id}=${LoggedInUser.id}`);
-      formPersister.clearValues();
-      const query = omit(router.query, ['resetForm']);
-      const routeAs = router.asPath.split('?')[0];
-      return router.push({ pathname: '/create-expense', query }, routeAs, { shallow: true });
+    const { router } = this.props;
+    if (parseToBoolean(router.query.resetForm)) {
+      const formPersister = this.buildFormPersister();
+      if (formPersister) {
+        formPersister.clearValues();
+        const query = omit(router.query, ['resetForm']);
+        const routeAs = router.asPath.split('?')[0];
+        return router.push({ pathname: '/create-expense', query }, routeAs, { shallow: true });
+      }
     }
   }
 
   initFormPersister() {
-    const { data, LoggedInUser } = this.props;
-    if (data?.account && LoggedInUser) {
-      this.setState({
-        formPersister: new FormPersister(`expense-${data.account.id}=${LoggedInUser.id}`),
-      });
+    const formPersister = this.buildFormPersister();
+    if (formPersister) {
+      this.setState({ formPersister });
     }
   }
 
