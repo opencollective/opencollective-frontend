@@ -257,7 +257,7 @@ type UserDetails {
   id: Int
   CollectiveId: Int
   collective: CollectiveInterface
-  username: String
+  username: String @deprecated(reason: "2022-01-13: Not used anymore. Will be ignored")
   name: String
   image: String
   email: String
@@ -4035,7 +4035,7 @@ input UserInputType {
   name: String
   company: String
   image: String
-  username: String
+  username: String @deprecated(reason: "2022-01-13: Not used anymore. Will be ignored")
   description: String
   twitterHandle: String
   githubHandle: String

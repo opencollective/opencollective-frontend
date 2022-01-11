@@ -52,6 +52,9 @@ export const adminPanelQuery = gqlV2/* GraphQL */ `
           settings
         }
       }
+      ... on AccountWithHost {
+        isApproved
+      }
     }
   }
   ${collectiveNavbarFieldsFragment}
