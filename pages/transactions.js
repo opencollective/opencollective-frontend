@@ -271,7 +271,7 @@ class TransactionsPage extends React.Component {
         <Header
           collective={collective}
           LoggedInUser={LoggedInUser}
-          canonicalURL={getCanonicalURL(collective)}
+          canonicalURL={`${getCanonicalURL(collective)}/transactions`}
           noRobots={['USER', 'INDIVIDUAL'].includes(collective.type) && !collective.isHost}
         />
         <Body>

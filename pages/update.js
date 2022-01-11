@@ -4,10 +4,10 @@ import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, uniqBy, update } from 'lodash';
 import { withRouter } from 'next/router';
 
-import { CollectiveType, NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { getCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
+import { addParentToURLIfMissing, getCanonicalURL } from '../lib/url-helpers';
 import { stripHTML } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -47,11 +47,8 @@ class UpdatePage extends React.Component {
 
   componentDidMount() {
     const { router, data, updateSlug } = this.props;
-    const query = router.query;
     const account = data?.account;
-    if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(account?.type) && !query.parentCollectiveSlug) {
-      router.push(`${getCollectivePageRoute(account)}/updates/${updateSlug}`, undefined, { shallow: true });
-    }
+    addParentToURLIfMissing(router, account, `/updates/${updateSlug}`);
   }
 
   async componentDidUpdate(oldProps) {
@@ -133,7 +130,7 @@ class UpdatePage extends React.Component {
         collective={account}
         title={update.title}
         description={stripHTML(update.summary)}
-        canonicalURL={getCanonicalURL(account)}
+        canonicalURL={`${getCanonicalURL(account)}/update`}
         metaTitle={`${update.title} - ${account.name}`}
       >
         <CollectiveNavbar

@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { omitBy } from 'lodash';
 import { withRouter } from 'next/router';
 
-import { CollectiveType, NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
-import { getCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
+import { addParentToURLIfMissing, getCanonicalURL } from '../lib/url-helpers';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -33,11 +33,8 @@ class UpdatesPage extends React.Component {
 
   componentDidMount() {
     const { router, data } = this.props;
-    const query = router.query;
     const account = data?.account;
-    if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(account?.type) && !query.parentCollectiveSlug) {
-      router.push(`${getCollectivePageRoute(account)}/updates`, undefined, { shallow: true });
-    }
+    addParentToURLIfMissing(router, account, '/updates');
   }
 
   updateQuery = (router, newParams) => {
@@ -57,7 +54,11 @@ class UpdatesPage extends React.Component {
 
     return (
       <div className="UpdatesPage">
-        <Header collective={collective} LoggedInUser={LoggedInUser} canonicalURL={getCanonicalURL(collective)} />
+        <Header
+          collective={collective}
+          LoggedInUser={LoggedInUser}
+          canonicalURL={`${getCanonicalURL(collective)}/updates`}
+        />
 
         <Body>
           <CollectiveNavbar

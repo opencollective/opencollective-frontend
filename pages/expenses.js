@@ -16,7 +16,7 @@ import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { getCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
+import { addParentToURLIfMissing, getCanonicalURL } from '../lib/url-helpers';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -132,11 +132,8 @@ class ExpensePage extends React.Component {
 
   componentDidMount() {
     const { router, data } = this.props;
-    const query = router.query;
     const account = data?.account;
-    if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(account?.type) && !query.parentCollectiveSlug) {
-      router.push(`${getCollectivePageRoute(account)}/expenses`, undefined, { shallow: true });
-    }
+    addParentToURLIfMissing(router, account, '/expenses');
   }
 
   componentDidUpdate(oldProps) {
@@ -214,7 +211,7 @@ class ExpensePage extends React.Component {
     return (
       <Page
         collective={data.account}
-        canonicalURL={getCanonicalURL(data.account)}
+        canonicalURL={`${getCanonicalURL(data.account)}/expenses`}
         {...this.getPageMetaData(data.account)}
       >
         <CollectiveNavbar

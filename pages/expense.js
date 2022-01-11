@@ -9,13 +9,13 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getCollectiveTypeForUrl, getSuggestedTags } from '../lib/collective.lib';
-import { CollectiveType, NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { getCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
+import { addParentToURLIfMissing, getCanonicalURL } from '../lib/url-helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
@@ -212,11 +212,8 @@ class ExpensePage extends React.Component {
 
   componentDidMount() {
     const { router, data, legacyExpenseId } = this.props;
-    const query = router.query;
     const account = data?.account;
-    if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(account?.type) && !query.parentCollectiveSlug) {
-      router.push(`${getCollectivePageRoute(account)}/expenses/${legacyExpenseId}`, undefined, { shallow: true });
-    }
+    addParentToURLIfMissing(router, account, `/expenses/${legacyExpenseId}`);
 
     const shouldEditDraft = this.props.data.expense?.status === expenseStatus.DRAFT && this.props.draftKey;
     if (shouldEditDraft) {
@@ -494,7 +491,11 @@ class ExpensePage extends React.Component {
     }
 
     return (
-      <Page collective={collective} canonicalURL={getCanonicalURL(collective)} {...this.getPageMetaData(expense)}>
+      <Page
+        collective={collective}
+        canonicalURL={`${getCanonicalURL(collective)}/expense`}
+        {...this.getPageMetaData(expense)}
+      >
         <CollectiveNavbar
           collective={collective}
           isLoading={!collective}
