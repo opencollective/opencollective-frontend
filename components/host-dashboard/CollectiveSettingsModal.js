@@ -6,19 +6,21 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { accountSupportsGrants } from '../../lib/collective.lib';
 import { HOST_FEE_STRUCTURE } from '../../lib/constants/host-fee-structure';
+import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
-import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../StyledModal';
 import StyledRadioList from '../StyledRadioList';
 import { P } from '../Text';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 const OPTION_LABELS = defineMessages({
   [HOST_FEE_STRUCTURE.DEFAULT]: {
@@ -73,14 +75,14 @@ const editAccountSettingsMutation = gqlV2/* GraphQL */ `
 
 const CollectiveSettingsModal = ({ host, collective, ...props }) => {
   const intl = useIntl();
+  const { addToast } = useToasts();
   const [hostFeePercent, setHostFeePercent] = useState(getDefaultFee(collective, host));
   const [selectedOption, setSelectedOption] = useState(
     hostFeePercent === host.hostFeePercent ? HOST_FEE_STRUCTURE.DEFAULT : HOST_FEE_STRUCTURE.CUSTOM_FEE,
   );
   const [hasGrant, setHasGrant] = useState(() => accountSupportsGrants(collective, host));
-  const [submitFeesStructure, { loading, error }] = useMutation(editAccountSettingsMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [submitEditSettings, { loading }] = useMutation(editAccountSettingsMutation, { context: API_V2_CONTEXT });
+  const hasParent = Boolean(collective.parent);
 
   return (
     <StyledModal show maxWidth={432} trapFocus {...props}>
@@ -109,63 +111,70 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
           <FormattedMessage id="CollectiveFeesForm.Title" defaultMessage="Set fee structure" />
         </P>
 
-        <P>
-          <FormattedMessage defaultMessage="This change will also apply to all the projects and events created by this collective" />
-        </P>
+        {hasParent ? (
+          <MessageBox type="info" withIcon lineHeight="18px">
+            <FormattedMessage defaultMessage="Events and Projects inherit the host fees structure configuration of their parents." />
+          </MessageBox>
+        ) : (
+          <React.Fragment>
+            <P>
+              <FormattedMessage defaultMessage="This change will also apply to all the projects and events created by this collective" />
+            </P>
 
-        <StyledRadioList
-          id="fees-structure-radio"
-          name="fees-structure-radio"
-          options={[HOST_FEE_STRUCTURE.DEFAULT, HOST_FEE_STRUCTURE.CUSTOM_FEE]}
-          value={selectedOption}
-          onChange={({ value }) => setSelectedOption(value)}
-        >
-          {({ key, radio }) => (
-            <Flex key={key} mt={3}>
-              <Box mr={12}>{radio}</Box>
-              <Box>
-                <P mb={2} fontWeight="500">
-                  {intl.formatMessage(OPTION_LABELS[key])}
-                </P>
-                {key === HOST_FEE_STRUCTURE.DEFAULT && (
-                  <P fontSize="11px" lineHeight="16px" color="black.600" fontWeight="normal">
-                    <FormattedMessage
-                      id="CollectiveFeesForm.DefaultDescription"
-                      defaultMessage="Set the global (default) fee in your <Link>settings</Link>."
-                      values={{
-                        Link: getI18nLink({
-                          as: Link,
-                          href: `/${host.slug}/admin/${EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING}`,
-                          openInNewTab: true,
-                        }),
-                      }}
-                    />
-                  </P>
-                )}
-                {key === HOST_FEE_STRUCTURE.CUSTOM_FEE && (
-                  <StyledInputGroup
-                    append="%"
-                    type="number"
-                    min="0"
-                    max="100"
-                    maxWidth={90}
-                    appendProps={{ color: 'black.600' }}
-                    fontWeight="normal"
-                    value={isNaN(hostFeePercent) ? '' : hostFeePercent}
-                    step="0.01"
-                    onClick={() => setSelectedOption(key)}
-                    onChange={e => setHostFeePercent(parseFloat(e.target.value))}
-                    onBlur={e => {
-                      const newValue = clamp(round(parseFloat(e.target.value), 2), 0, 100);
-                      setHostFeePercent(isNaN(newValue) ? host.hostFeePercent : newValue);
-                    }}
-                  />
-                )}
-              </Box>
-            </Flex>
-          )}
-        </StyledRadioList>
-        {error && <MessageBoxGraphqlError error={error} mt={3} fontSize="13px" />}
+            <StyledRadioList
+              id="fees-structure-radio"
+              name="fees-structure-radio"
+              options={[HOST_FEE_STRUCTURE.DEFAULT, HOST_FEE_STRUCTURE.CUSTOM_FEE]}
+              value={selectedOption}
+              onChange={({ value }) => setSelectedOption(value)}
+            >
+              {({ key, radio }) => (
+                <Flex key={key} mt={3}>
+                  <Box mr={12}>{radio}</Box>
+                  <Box>
+                    <P mb={2} fontWeight="500">
+                      {intl.formatMessage(OPTION_LABELS[key])}
+                    </P>
+                    {key === HOST_FEE_STRUCTURE.DEFAULT && (
+                      <P fontSize="11px" lineHeight="16px" color="black.600" fontWeight="normal">
+                        <FormattedMessage
+                          id="CollectiveFeesForm.DefaultDescription"
+                          defaultMessage="Set the global (default) fee in your <Link>settings</Link>."
+                          values={{
+                            Link: getI18nLink({
+                              as: Link,
+                              href: `/${host.slug}/admin/${EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING}`,
+                              openInNewTab: true,
+                            }),
+                          }}
+                        />
+                      </P>
+                    )}
+                    {key === HOST_FEE_STRUCTURE.CUSTOM_FEE && (
+                      <StyledInputGroup
+                        append="%"
+                        type="number"
+                        min="0"
+                        max="100"
+                        maxWidth={90}
+                        appendProps={{ color: 'black.600' }}
+                        fontWeight="normal"
+                        value={isNaN(hostFeePercent) ? '' : hostFeePercent}
+                        step="0.01"
+                        onClick={() => setSelectedOption(key)}
+                        onChange={e => setHostFeePercent(parseFloat(e.target.value))}
+                        onBlur={e => {
+                          const newValue = clamp(round(parseFloat(e.target.value), 2), 0, 100);
+                          setHostFeePercent(isNaN(newValue) ? host.hostFeePercent : newValue);
+                        }}
+                      />
+                    )}
+                  </Box>
+                </Flex>
+              )}
+            </StyledRadioList>
+          </React.Fragment>
+        )}
       </ModalBody>
       <ModalFooter>
         <Flex justifyContent="center">
@@ -173,17 +182,23 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
             buttonStyle="primary"
             minWidth={90}
             loading={loading}
-            onClick={() => {
+            onClick={async () => {
               const isCustomFee = selectedOption === HOST_FEE_STRUCTURE.CUSTOM_FEE;
-              return submitFeesStructure({
-                variables: {
-                  account: { id: collective.id },
-                  hostFeePercent: isCustomFee ? hostFeePercent : host.hostFeePercent,
-                  isCustomFee,
-                  key: 'expenseTypes',
-                  value: { hasGrant },
-                },
-              }).then(props.onClose);
+              try {
+                await submitEditSettings({
+                  variables: {
+                    account: { id: collective.id },
+                    hostFeePercent: isCustomFee ? hostFeePercent : host.hostFeePercent,
+                    isCustomFee,
+                    key: 'expenseTypes',
+                    value: { hasGrant },
+                  },
+                });
+
+                props?.onClose();
+              } catch (e) {
+                addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+              }
             }}
           >
             <FormattedMessage id="save" defaultMessage="Save" />
@@ -203,6 +218,7 @@ CollectiveSettingsModal.propTypes = {
     id: PropTypes.string,
     hostFeePercent: PropTypes.number,
     settings: PropTypes.object,
+    parent: PropTypes.object,
     type: PropTypes.string,
   }).isRequired,
   host: PropTypes.shape({
