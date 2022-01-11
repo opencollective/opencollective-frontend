@@ -14,7 +14,6 @@ import { Box, Flex } from '../Grid';
 import StyledCollectiveCard from '../StyledCollectiveCard';
 import StyledHr from '../StyledHr';
 import StyledRoundButton from '../StyledRoundButton';
-import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 
 import AddFundsModal from './AddFundsModal';
@@ -58,7 +57,6 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
   const [currentModal, setCurrentModal] = React.useState(null);
   const balance = collective.stats.balance.valueInCents || 0;
   const nbFinancialContributors = collective.totalFinancialContributors || 0;
-  const hasParent = Boolean(collective.parent);
   return (
     <StyledCollectiveCard collective={collective} bodyHeight={320} {...props}>
       <Box px={3} mb={16}>
@@ -113,28 +111,15 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
             {getCurrencySymbol(collective.currency)}
             <PlusIcon>+</PlusIcon>
           </StyledRoundButton>
-          <StyledTooltip
-            noTooltip={!hasParent}
-            content={() =>
-              intl.formatMessage(
-                {
-                  defaultMessage:
-                    'This account inherits the settings of its parent. Please edit the configuration directly on {parentName}.',
-                },
-                { parentName: collective.parent.name },
-              )
-            }
+
+          <StyledRoundButton
+            ml={2}
+            size={32}
+            onClick={() => setCurrentModal('accountSettings')}
+            title={intl.formatMessage({ defaultMessage: 'Account settings' })}
           >
-            <StyledRoundButton
-              ml={2}
-              size={32}
-              onClick={() => setCurrentModal('accountSettings')}
-              title={intl.formatMessage({ defaultMessage: 'Account settings' })}
-              disabled={hasParent}
-            >
-              <SliderAlt size={14} color="#9D9FA3" />
-            </StyledRoundButton>
-          </StyledTooltip>
+            <SliderAlt size={14} color="#9D9FA3" />
+          </StyledRoundButton>
         </Container>
       </Box>
       {currentModal === 'addFunds' && (
