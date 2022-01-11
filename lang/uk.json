@@ -912,6 +912,7 @@
   "Events": "Події",
   "events": "Мої події",
   "events.create.login": "Ви повинні увійти в якості учасника команди цього Колективу, щоб створити подію.",
+  "ewvfiF": "Check this box to have the payee cover the cost of payment processor fees (useful to zero balance)",
   "examples": "напр., {examples}",
   "ExepenseAttachments.count": "{count, plural, one {# вкладення} few {# вкладення} many {# вкладень} other {# вкладень}}",
   "ExpandDescription": "Читати повний опис",
