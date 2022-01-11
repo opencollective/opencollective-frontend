@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { compose, pick } from 'lodash';
+import { compose, omit, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
@@ -12,6 +12,7 @@ import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { parseToBoolean } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
@@ -73,6 +74,7 @@ class CreateExpensePage extends React.Component {
       account: PropTypes.shape({
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
+        slug: PropTypes.string.isRequired,
         description: PropTypes.string,
         type: PropTypes.string.isRequired,
         twitterHandle: PropTypes.string,
@@ -118,7 +120,12 @@ class CreateExpensePage extends React.Component {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    // Reset form when `resetForm` is passed in the URL
+    if (this.handleResetForm()) {
+      return;
+    }
+
     // Re-fetch data if user is logged in
     if (this.props.LoggedInUser) {
       this.props.data.refetch();
@@ -126,7 +133,12 @@ class CreateExpensePage extends React.Component {
     }
   }
 
-  componentDidUpdate(oldProps, oldState) {
+  async componentDidUpdate(oldProps, oldState) {
+    // Reset form when `resetForm` is passed in the URL
+    if (this.handleResetForm()) {
+      return;
+    }
+
     // Re-fetch data if user is logged in
     if (!oldProps.LoggedInUser && this.props.LoggedInUser) {
       this.props.data.refetch();
@@ -151,12 +163,30 @@ class CreateExpensePage extends React.Component {
     }
   }
 
+  buildFormPersister() {
+    const { LoggedInUser, data } = this.props;
+    if (data.account && LoggedInUser) {
+      return new FormPersister(`expense-${data.account.id}=${LoggedInUser.id}`);
+    }
+  }
+
+  handleResetForm() {
+    const { router } = this.props;
+    if (parseToBoolean(router.query.resetForm)) {
+      const formPersister = this.buildFormPersister();
+      if (formPersister) {
+        formPersister.clearValues();
+        const query = omit(router.query, ['resetForm']);
+        const routeAs = router.asPath.split('?')[0];
+        return router.push({ pathname: '/create-expense', query }, routeAs, { shallow: true });
+      }
+    }
+  }
+
   initFormPersister() {
-    const { data, LoggedInUser } = this.props;
-    if (data?.account && LoggedInUser) {
-      this.setState({
-        formPersister: new FormPersister(`expense-${data.account.id}=${LoggedInUser.id}`),
-      });
+    const formPersister = this.buildFormPersister();
+    if (formPersister) {
+      this.setState({ formPersister });
     }
   }
 
