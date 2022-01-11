@@ -138,7 +138,7 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
       (values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address));
 
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
-  const [payeeType, setPayeeType] = React.useState(PAYEE_TYPE.USER);
+  const [payeeType, setPayeeType] = React.useState(values.payee?.organization ? PAYEE_TYPE.ORG : PAYEE_TYPE.USER);
   const [validateSlug, { data: existingSlugAccount }] = useLazyQuery(validateSlugQuery, {
     context: API_V2_CONTEXT,
   });
@@ -159,6 +159,8 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
   React.useEffect(() => {
     if (payeeType === PAYEE_TYPE.USER) {
       formik.setFieldValue('payee', omit(values.payee, ['organization']));
+    } else if (payeeType === PAYEE_TYPE.ORG && values.draft?.payee?.organization) {
+      formik.setFieldValue('payee', { ...values.payee, organization: values.draft.payee.organization });
     }
   }, [payeeType]);
   // Slug Validation

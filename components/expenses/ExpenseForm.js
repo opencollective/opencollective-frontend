@@ -709,6 +709,7 @@ const ExpenseForm = ({
     initialValues.attachedFiles = expense.draft.attachedFiles;
     initialValues.payoutMethod = expense.draft.payoutMethod;
     initialValues.payeeLocation = expense.draft.payeeLocation;
+    initialValues.payee = expense.draft.payee;
   }
 
   return (
