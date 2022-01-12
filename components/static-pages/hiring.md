@@ -6,7 +6,7 @@
 <strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>
 -->
 
-<em>January 28th 2021</em>. We are currently hiring for the following roles:
+<em>January 12th 2022</em>. We are currently hiring for the following roles:
 
 <ul>
   <li><a href='#developer'>Senior, 'Full Stack' (Node) Developer</a></li>
