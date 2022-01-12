@@ -31,8 +31,8 @@ import PayoutMethodSelect from './PayoutMethodSelect';
 
 const msg = defineMessages({
   nameLabel: {
-    id: `ExpenseForm.inviteeLabel`,
-    defaultMessage: 'Who will receive the money for this expense?',
+    id: `ExpenseForm.inviteNameLabel`,
+    defaultMessage: 'Contact name',
   },
   emailTitle: {
     id: 'User.EmailAddress',
@@ -83,8 +83,8 @@ const msg = defineMessages({
     defaultMessage: 'Organization website',
   },
   orgDescriptionLabel: {
-    id: 'ExpenseForm.inviteeOrgDescriptionLabel',
-    defaultMessage: 'What does your organization do?',
+    id: 'ExpenseForm.inviteOrgDescriptionLabel',
+    defaultMessage: 'Organization description',
   },
 });
 

@@ -1003,6 +1003,8 @@
   "ExpenseForm.inviteeLabel": "Qui recevra l'argent pour cette dépense?",
   "ExpenseForm.inviteeOrgDescriptionLabel": "Que fait votre organisation ?",
   "ExpenseForm.inviteeOrgNameLabel": "Quel est le nom de l'organisation ?",
+  "ExpenseForm.inviteNameLabel": "Contact name",
+  "ExpenseForm.inviteOrgDescriptionLabel": "Organization description",
   "ExpenseForm.InvoiceDescription": "Facturez pour votre temps ou un service.",
   "ExpenseForm.InvoiceInfo": "Informations de facturation additionnelle",
   "ExpenseForm.InvoiceInfoPlaceholder": "Numéro de TVA, mentions légales... etc Ces informations seront imprimées sur votre facture.",
