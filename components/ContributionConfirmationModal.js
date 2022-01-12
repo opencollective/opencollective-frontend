@@ -116,10 +116,7 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
         <Container>
           <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
             <Span fontSize="14px" lineHeight="20px" fontWeight="400">
-              <FormattedMessage
-                defaultMessage="Amount received for {collective}"
-                values={{ collective: order.toAccount.name }}
-              />
+              <FormattedMessage defaultMessage="Amount received" />
             </Span>
             <StyledInputAmount
               name="amountReceived"
@@ -150,7 +147,7 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
         <Container>
           <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
             <Span fontSize="14px" lineHeight="20px" fontWeight="400">
-              <FormattedMessage defaultMessage="Platform tip amount" values={{ collective: order.toAccount.name }} />
+              <FormattedMessage defaultMessage="Platform tip amount" />
             </Span>
             <StyledInputAmount
               name="platformTip"
@@ -166,7 +163,10 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
         <Container>
           <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
             <Span fontSize="14px" lineHeight="20px" fontWeight="500">
-              <FormattedMessage defaultMessage="Net Amount for Collective (USD):" />
+              <FormattedMessage
+                defaultMessage="Net Amount for {collective}:"
+                values={{ collective: order.toAccount.name }}
+              />
             </Span>
             <Box fontSize="16px" lineHeight="24px" fontWeight="700" ml="16px">
               <FormattedMoneyAmount amount={netAmount} currency={currency} precision={2} amountStyles={null} />
