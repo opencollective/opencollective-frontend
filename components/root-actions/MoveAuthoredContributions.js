@@ -298,6 +298,7 @@ const MoveAuthoredContributions = () => {
           {hasConfirmCheckbox && (
             <MessageBox type="warning" mt={3}>
               <StyledCheckbox
+                name="has-confirmed-move-contributions"
                 checked={hasConfirmed}
                 onChange={({ checked }) => setHasConfirmed(checked)}
                 label={
