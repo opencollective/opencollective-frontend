@@ -33,7 +33,7 @@ We are looking for a senior full-stack engineer who’s excited about open sourc
 
 - Are comfortable in a remote environment that is at the same time highly collaborative (we [apply](https://github.com/opencollective/opencollective/issues/2267) a [seeking feedback process](https://reinventingorganizationswiki.com/theory/decision-making/)) and autonomous (you can run a feature end to end on your own!)
 
-- Are based within 4 hours of Central European Time:
+- Are based within 5 hours of Central European Time:
 
   - to optimize timezone overlaps with the current engineering team (who are predominantly based in Europe)
 
