@@ -2,6 +2,7 @@ import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
+import { isIndividualAccount } from '../../lib/collective.lib';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -102,12 +103,16 @@ const getToAccountCustomOptions = fromAccount => {
     return [];
   }
 
+  // The select is always prefilled with the current account
+  const fromAccountOption = { [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true, value: fromAccount };
+  if (!isIndividualAccount(fromAccount)) {
+    return [fromAccountOption];
+  }
+
+  // Add the incognito profile option for individuals
   const incognitoLabel = `@${fromAccount.slug}'s incognito profile`;
   return [
-    {
-      [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
-      value: fromAccount,
-    },
+    fromAccountOption,
     {
       [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
       label: incognitoLabel,
