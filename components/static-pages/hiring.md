@@ -9,7 +9,7 @@
 <em>January 12th 2022</em>. We are currently hiring for the following roles:
 
 <ul>
-  <li><a href='#developer'>Senior, 'Full Stack' (Node) Developer</a></li>
+  <li><a href='#developer'>Senior, 'Full Stack' Software Engineer</a></li>
   <li><a href='#product-manager'>Senior Product Manager</a></li>
 </ul>
 
