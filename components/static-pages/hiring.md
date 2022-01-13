@@ -25,7 +25,7 @@ Like the movements that we support, we value openness and transparency. We striv
 
 We are a fully remote, international team - with team members in New Zealand, Mexico, India, Brazil, Canada, the United Kingdom, Spain, Germany and France. We are an equal opportunities employer and welcome applications from anyone with the right mix of experience and skills.
 
-<h2 id='developer'>Senior, 'Full Stack' (Node) Developer</h2>
+<h2 id='software-engineer'>Senior, 'Full Stack' Software Engineer</h2>
 
 We are looking for a senior full-stack engineer who’s excited about open source, making communities sustainable, and transparent finances.
 
