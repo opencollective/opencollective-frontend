@@ -1003,6 +1003,8 @@
   "ExpenseForm.inviteeLabel": "谁会收到这笔费用？",
   "ExpenseForm.inviteeOrgDescriptionLabel": "您的组织从事什么？",
   "ExpenseForm.inviteeOrgNameLabel": "组织的名称是什么？",
+  "ExpenseForm.inviteNameLabel": "Contact name",
+  "ExpenseForm.inviteOrgDescriptionLabel": "Organization description",
   "ExpenseForm.InvoiceDescription": "Bill for your time or a service.",
   "ExpenseForm.InvoiceInfo": "Additional invoice information",
   "ExpenseForm.InvoiceInfoPlaceholder": "Tax ID, VAT number, etc. This information will be printed on your invoice.",
