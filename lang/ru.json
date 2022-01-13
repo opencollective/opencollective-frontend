@@ -989,6 +989,7 @@
   "expense.unapprove.btn": "Не одобрить",
   "expense.unschedulePayment.btn": "Unschedule Payment",
   "ExpenseAmount": "Сумма расходов",
+  "ExpenseForm.accountTypeLabel": "Who will receive the money of this expense?",
   "ExpenseForm.AddAttachedFile": "Add new document",
   "ExpenseForm.AddGrantItem": "Add grant item",
   "ExpenseForm.AddLineItem": "Добавить новую позицию",

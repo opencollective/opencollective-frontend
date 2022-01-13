@@ -30,6 +30,10 @@ import PayoutMethodForm from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
 
 const msg = defineMessages({
+  accountType: {
+    id: `ExpenseForm.accountTypeLabel`,
+    defaultMessage: 'Who will receive the money of this expense?',
+  },
   nameLabel: {
     id: `ExpenseForm.inviteNameLabel`,
     defaultMessage: 'Contact name',
@@ -156,7 +160,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onBack, onNext }) =
       <P fontSize="11px" color="black.600">
         <FormattedMessage id="form.requiredFields" defaultMessage="Fields marked with (*) are mandatory." />
       </P>
-      <StyledInputField label="How you will receive the money of this expense?" labelFontSize="13px" mt={3}>
+      <StyledInputField label={formatMessage(msg.accountType)} labelFontSize="13px" mt={3}>
         <StyledCard>
           <Fieldset onChange={changePayeeType}>
             <Flex flexDirection={['column', 'row']} overflow="hidden">
