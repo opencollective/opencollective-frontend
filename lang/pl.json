@@ -989,6 +989,7 @@
   "expense.unapprove.btn": "Cofnij zatwierdzenie",
   "expense.unschedulePayment.btn": "Unschedule Payment",
   "ExpenseAmount": "Expense amount",
+  "ExpenseForm.accountTypeLabel": "Who will receive the money of this expense?",
   "ExpenseForm.AddAttachedFile": "Dodaj nowy dokument",
   "ExpenseForm.AddGrantItem": "Add grant item",
   "ExpenseForm.AddLineItem": "Dodaj nowy element",

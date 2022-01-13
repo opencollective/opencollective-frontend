@@ -989,6 +989,7 @@
   "expense.unapprove.btn": "Sin aprobar",
   "expense.unschedulePayment.btn": "Unschedule Payment",
   "ExpenseAmount": "Monto de gastos",
+  "ExpenseForm.accountTypeLabel": "Who will receive the money of this expense?",
   "ExpenseForm.AddAttachedFile": "Añade un nuevo documento",
   "ExpenseForm.AddGrantItem": "Añadir elemento de subvención",
   "ExpenseForm.AddLineItem": "Añadir un nuevo elemento",

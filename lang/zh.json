@@ -989,6 +989,7 @@
   "expense.unapprove.btn": "驳回",
   "expense.unschedulePayment.btn": "Unschedule Payment",
   "ExpenseAmount": "Expense amount",
+  "ExpenseForm.accountTypeLabel": "Who will receive the money of this expense?",
   "ExpenseForm.AddAttachedFile": "添加新文档",
   "ExpenseForm.AddGrantItem": "Add grant item",
   "ExpenseForm.AddLineItem": "添加新项目",
