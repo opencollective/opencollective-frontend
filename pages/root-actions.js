@@ -6,9 +6,11 @@ import styled, { css } from 'styled-components';
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
 import { Box, Grid } from '../components/Grid';
+import MessageBox from '../components/MessageBox';
 import ClearCacheForAccountForm from '../components/root-actions/ClearCacheForAccountForm';
 import ConnectAccountsForm from '../components/root-actions/ConnectAccountsForm';
 import MergeAccountsForm from '../components/root-actions/MergeAccountsForm';
+import MoveAuthoredContributions from '../components/root-actions/MoveAuthoredContributions';
 import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
 import { H1, H2, H3, P, Span } from '../components/Text';
@@ -19,6 +21,13 @@ const MENU = [
   { id: 'Clear cache', title: 'Clear cache for account', Component: ClearCacheForAccountForm },
   { id: 'Connect accounts', Component: ConnectAccountsForm },
   { id: 'Merge accounts', isDangerous: true, Component: MergeAccountsForm },
+  {
+    id: 'Move authored contributions',
+    Component: MoveAuthoredContributions,
+    description: `This tool is meant to edit the account that authored one or more contributions.
+    It can be used to mark contributions as "Incognito" by picking the contributor's incognito profile in "Move to".
+    The payment methods used for the contributions are re-affected to the new profile, so make sure they have the permission to use them.`,
+  },
 ];
 
 const MenuEntry = styled.button`
@@ -56,7 +65,7 @@ const RootActionsPage = () => {
           Root actions
         </H1>
       </Container>
-      <Grid gridGap={[0, null, 64]} gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" mb={5}>
+      <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" mb={5}>
         <Container borderRight="1px solid #e5e5e5">
           {MENU.filter(e => showHiddenActions || !e.isHidden).map(menuEntry => (
             <MenuEntry
@@ -69,27 +78,34 @@ const RootActionsPage = () => {
             </MenuEntry>
           ))}
         </Container>
-        <Box py={3} px={3}>
-          {selectedMenuEntry.isDangerous && (
-            <Container textAlign="center" mb={4} mt={2}>
-              <H2 fontSize="30px" css={{ textShadow: '0px 2px 2px red' }}>
-                <ExclamationTriangle color="red" size={30} />
-                <Span ml={3} css={{ verticalAlign: 'middle' }}>
-                  DANGEROUS ACTION
-                </Span>
-              </H2>
-              <P mt={2}>Please be super careful with the action below, and double check everything you do.</P>
-              <StyledHr width="100%" mt={4} />
-            </Container>
-          )}
-          <StyledCard p={4} my={4} width="100%">
-            <H3 lineHeight="30px" fontSize="20px">
-              {selectedMenuEntry.title || selectedMenuEntry.id}
-            </H3>
-            <StyledHr borderColor="#DCDEE0" mb={3} mt={2} />
-            <selectedMenuEntry.Component />
-          </StyledCard>
-        </Box>
+        <div>
+          <H3 lineHeight="30px" fontSize="24px" backgroundColor="black.50" color="black.800" p={3}>
+            {selectedMenuEntry.title || selectedMenuEntry.id}
+          </H3>
+          <Box px={3}>
+            {selectedMenuEntry.isDangerous && (
+              <Container textAlign="center" my={4}>
+                <H2 fontSize="30px" css={{ textShadow: '0px 2px 2px red' }}>
+                  <ExclamationTriangle color="red" size={30} />
+                  <Span ml={3} css={{ verticalAlign: 'middle' }}>
+                    DANGEROUS ACTION
+                  </Span>
+                </H2>
+                <P mt={2}>Please be super careful with the action below, and double check everything you do.</P>
+                <StyledHr width="100%" mt={4} />
+              </Container>
+            )}
+
+            {selectedMenuEntry.description && (
+              <MessageBox type="info" withIcon my={3} lineHeight="20px">
+                {selectedMenuEntry.description}
+              </MessageBox>
+            )}
+            <StyledCard p={4} my={4} width="100%">
+              <selectedMenuEntry.Component />
+            </StyledCard>
+          </Box>
+        </div>
       </Grid>
     </AuthenticatedPage>
   );

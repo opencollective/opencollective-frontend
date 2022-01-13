@@ -46,6 +46,7 @@ const ConfirmationModal = ({
   continueLabel,
   cancelHandler,
   continueHandler,
+  disableSubmit,
   ...props
 }) => {
   const [submitting, setSubmitting] = React.useState(false);
@@ -74,6 +75,7 @@ const ConfirmationModal = ({
             buttonStyle={isDanger ? 'danger' : isSuccess ? 'success' : 'primary'}
             data-cy="confirmation-modal-continue"
             loading={submitting}
+            disabled={disableSubmit}
             onClick={async () => {
               try {
                 setSubmitting(true);
@@ -109,6 +111,7 @@ ConfirmationModal.propTypes = {
   /** If true, a danger style button will be used for the main button */
   isDanger: PropTypes.bool,
   isSuccess: PropTypes.bool,
+  disableSubmit: PropTypes.bool,
   /** handles onClick cancel button. Defaults to `onClose` prop. */
   cancelHandler: PropTypes.func,
   /** continue button label of the confirmation modal. Defaults to `Confirm`. */

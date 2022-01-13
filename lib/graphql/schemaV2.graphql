@@ -1836,10 +1836,14 @@ type Order {
   paymentMethod: PaymentMethod
 
   """
+  Platform contribution attached to the Order.
+  """
+  platformContributionAmount: Amount @deprecated(reason: "2021-06-07: Please use platformTipAmount")
+
+  """
   Platform Tip attached to the Order.
   """
   platformTipAmount: Amount
-  platformTipEligible: Boolean
   tags: [String]!
   taxes: [OrderTax]!
 
@@ -6056,6 +6060,11 @@ type Query {
     includeHostedAccounts: Boolean
 
     """
+    Whether to include incognito orders. Must be admin or root
+    """
+    includeIncognito: Boolean = false
+
+    """
     Account orders filter (INCOMING or OUTGOING)
     """
     filter: AccountOrdersFilter
@@ -6942,6 +6951,26 @@ type Mutation {
   A mutation for the host to approve or reject an order
   """
   processPendingOrder(order: OrderUpdateInput!, action: ProcessOrderAction!): Order!
+
+  """
+  A mutation for root users to move orders from one account to another
+  """
+  moveOrders(
+    """
+    The orders to move
+    """
+    orders: [OrderReferenceInput!]!
+
+    """
+    The account to move the orders to
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    If true, the orders will be moved to the incognito account of "fromAccount"
+    """
+    makeIncognito: Boolean
+  ): [Order]!
 
   """
   Add a new payment method to be used with an Order
@@ -9895,6 +9924,11 @@ input OrderCreateInput {
   The payment method used for this order
   """
   paymentMethod: PaymentMethodInput
+
+  """
+  Platform contribution attached to this order
+  """
+  platformContributionAmount: AmountInput @deprecated(reason: "2021-12-17: Use platformTipAmount")
 
   """
   Platform tip attached to this order

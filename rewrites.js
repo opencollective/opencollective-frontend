@@ -338,7 +338,7 @@ exports.REWRITES = [
   },
   // Root actions
   {
-    source: '/opencollective/root-actions',
+    source: '/opencollective/root-actions/:section?',
     destination: '/root-actions',
   },
   // Terms of services for the host
