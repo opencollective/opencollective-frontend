@@ -101,7 +101,6 @@
             "id": 4610,
             "name": "camille rouffiange",
             "image": null,
-            "username": "obronicoco",
             "twitterHandle": "obronicoco",
             "description": null,
             "__typename": "User"
@@ -123,7 +122,6 @@
             "id": 4503,
             "name": "Véronique Bockstal",
             "image": null,
-            "username": "vbockstal",
             "twitterHandle": "vbockstal",
             "description": "CEO BeCentral ",
             "__typename": "User"
@@ -141,7 +139,6 @@
             "id": 4499,
             "name": "Tina Hendriks",
             "image": null,
-            "username": "tinahendriks",
             "twitterHandle": null,
             "description": null,
             "__typename": "User"
@@ -159,7 +156,6 @@
             "id": 4497,
             "name": "Alexandra Saveljeva",
             "image": null,
-            "username": "alexandrasaveljeva",
             "twitterHandle": null,
             "description": "Artist,Filmmaker, Chairperson of NGO\"Bioetika\" in Latvia. Doing internship in WYA,organising European Arts Forum 2017",
             "__typename": "User"
@@ -177,7 +173,6 @@
             "id": 1949,
             "name": "Caroline Sedda",
             "image": "https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/6c38469a-e7a5-4d72-ab3a-9220758a93e8",
-            "username": "carolinesedda",
             "twitterHandle": null,
             "description": null,
             "__typename": "User"
@@ -195,7 +190,6 @@
             "id": 1949,
             "name": "Caroline Sedda",
             "image": "https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/6c38469a-e7a5-4d72-ab3a-9220758a93e8",
-            "username": "carolinesedda",
             "twitterHandle": null,
             "description": null,
             "__typename": "User"
@@ -213,7 +207,6 @@
             "id": 4291,
             "name": "Ticto",
             "image": "https://scontent-lga3-1.xx.fbcdn.net/v/t1.0-9/14067500_501520080041378_2203538491740676884_n.png?oh=5da2ebdcc9db0a3c7c58a8c08a111427&oe=5987FC2D",
-            "username": "ticto",
             "twitterHandle": "tictonews",
             "description": "Been in and around startups for a while. CEO at Ticto!",
             "__typename": "User"
@@ -235,7 +228,6 @@
             "id": 4157,
             "name": "Axel Addington",
             "image": "https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/6e52448c-416d-435d-b68b-e7a0bdd47a34",
-            "username": "axeladdington",
             "twitterHandle": null,
             "description": "Trends profiler &amp; values designer",
             "__typename": "User"
