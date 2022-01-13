@@ -54,7 +54,7 @@ We are looking for a senior product manager who is excited about creating a worl
 
 - Are comfortable in a remote environment that is at the same time highly collaborative (we [apply](https://github.com/opencollective/opencollective/issues/2267) a [seeking feedback process](https://reinventingorganizationswiki.com/theory/decision-making/)) and autonomous (you will own complete features and products!)
 
-- Are based within 4 hours of Central European time:
+- Are based within 6 hours of Central European time:
 
   - to optimize timezone overlaps with the current product team (who are based in the UK)
 
