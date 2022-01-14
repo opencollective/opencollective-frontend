@@ -127,24 +127,43 @@ class StyledUpdate extends Component {
     this.setState({ modified: false, mode: 'details' });
   };
 
-  renderUpdateMeta(update, editable) {
+  renderUpdateMeta(update, isAdmin, editable, isEditing) {
     const { intl } = this.props;
     const { mode } = this.state;
     const fromAccount = update.fromCollective || update.fromAccount;
 
     return (
       <Container display="flex" alignItems="Baseline" color="black.700" data-cy="meta" flexWrap="wrap">
-        {update.isPrivate && (
-          <Box mr={2}>
-            <StyledTooltip
-              id="privateLockText"
-              content={() => (
-                <FormattedMessage id="update.private.lock_text" defaultMessage="This update is for contributors only" />
-              )}
-            >
-              <Lock data-tip data-for="privateLockText" data-cy="privateIcon" size={12} cursor="pointer" />
-            </StyledTooltip>
-          </Box>
+        {!isEditing && isAdmin && (
+          <StyledTag fontSize="11px" mr={2}>
+            {update.isPrivate ? (
+              <StyledTooltip
+                id="privateLockText"
+                content={() =>
+                  update.makePublicOn && !update.publishedAt ? (
+                    <FormattedMessage
+                      defaultMessage="Will be made public on {date, date, short}"
+                      values={{ date: new Date(update.makePublicOn) }}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="update.private.lock_text"
+                      defaultMessage="This update is for contributors only"
+                    />
+                  )
+                }
+              >
+                <Flex alignItems="center">
+                  <Box mr={2}>
+                    <Lock data-tip data-for="privateLockText" data-cy="privateIcon" size={10} cursor="pointer" />
+                  </Box>
+                  <FormattedMessage defaultMessage="Private update" />
+                </Flex>{' '}
+              </StyledTooltip>
+            ) : (
+              <FormattedMessage defaultMessage="Public update" />
+            )}
+          </StyledTag>
         )}
 
         {update.publishedAt ? (
@@ -182,9 +201,6 @@ class StyledUpdate extends Component {
             />
           </Box>
         )}
-        <StyledTag textTransform="uppercase" fontSize="10px" py={1}>
-          <FormattedMessage id="Member.Role.ADMIN" defaultMessage="Admin" />
-        </StyledTag>
         {editable && (
           <React.Fragment>
             <Box ml={2} mr={2} fontSize="12px">
@@ -192,11 +208,13 @@ class StyledUpdate extends Component {
                 {intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
               </StyledButton>
             </Box>
-            <Box mr={2} fontSize="12px">
-              <StyledButton buttonSize="tiny" onClick={this.deleteUpdate}>
-                <FormattedMessage id="actions.delete" defaultMessage="Delete" />
-              </StyledButton>
-            </Box>
+            {!isEditing && (
+              <Box mr={2} fontSize="12px">
+                <StyledButton buttonSize="tiny" onClick={this.deleteUpdate}>
+                  <FormattedMessage id="actions.delete" defaultMessage="Delete" />
+                </StyledButton>
+              </Box>
+            )}
           </React.Fragment>
         )}
       </Container>
@@ -213,7 +231,11 @@ class StyledUpdate extends Component {
         </Link>
       );
     } else {
-      return <H5 data-cy="updateTitle">{update.title}</H5>;
+      return (
+        <H5 data-cy="updateTitle" mb={2}>
+          {update.title}
+        </H5>
+      );
     }
   }
 
@@ -248,7 +270,7 @@ class StyledUpdate extends Component {
     const { update, collective, isReloadingData, reactions, LoggedInUser } = this.props;
 
     return (
-      <Container css={{ wordBreak: 'break-word' }} pl={[0, 60]} maxWidth={676}>
+      <Container css={{ wordBreak: 'break-word' }} pl={[0, 60]} maxWidth={718}>
         <StyledHr mt={3} mb={4} borderColor="black.100" />
         {update.html ? (
           <React.Fragment>
@@ -276,6 +298,7 @@ class StyledUpdate extends Component {
             id={update.id}
             isHost={Boolean(update.account?.isHost)}
             isChangelog={update.isChangelog}
+            isPrivate={update.isPrivate}
           />
         )}
       </Container>
@@ -286,8 +309,8 @@ class StyledUpdate extends Component {
     const { collective, update } = this.props;
 
     return (
-      <Container display="flex" flexDirection="column" flex="1 1" maxWidth={665} flexWrap="wrap">
-        {this.renderUpdateMeta(update, true)}
+      <Container display="flex" flexDirection="column" flex="1 1" maxWidth={700} flexWrap="wrap">
+        {this.renderUpdateMeta(update, true, true, true)}
         <EditUpdateForm collective={collective} update={update} onSubmit={this.save} isChangelog={update.isChangelog} />
       </Container>
     );
@@ -313,7 +336,7 @@ class StyledUpdate extends Component {
                 </Container>
                 <Box>
                   {this.renderUpdateTitle()}
-                  {this.renderUpdateMeta(update, editable)}
+                  {this.renderUpdateMeta(update, canEditUpdate, editable)}
                 </Box>
               </Flex>
               {mode === 'summary' && this.renderSummary(update)}
