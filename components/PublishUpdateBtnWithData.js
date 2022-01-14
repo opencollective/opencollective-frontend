@@ -34,6 +34,8 @@ const updateQuery = gqlV2/* GraphQL */ `
       id
       userCanPublishUpdate
       publishedAt
+      isPrivate
+      makePublicOn
       audienceStats(audience: $audience) {
         id
         total
