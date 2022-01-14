@@ -2978,6 +2978,11 @@ enum UpdateAudience {
   Will be sent to financial contributors
   """
   FINANCIAL_CONTRIBUTORS
+
+  """
+  Will be sent to no one
+  """
+  NO_ONE
 }
 
 """
@@ -6389,6 +6394,7 @@ type Mutation {
   addFunds(
     fromAccount: AccountReferenceInput!
     account: AccountReferenceInput!
+    tier: TierReferenceInput
     amount: AmountInput!
     description: String!
     hostFeePercent: Float!
@@ -9750,6 +9756,14 @@ input ExpenseInvitee {
   name: String
   email: String
   isInvite: Boolean
+  organization: ExpenseInviteeOrganizationInput
+}
+
+input ExpenseInviteeOrganizationInput {
+  description: String
+  name: String
+  slug: String
+  website: String
 }
 
 type EmojiReactionResponse {
