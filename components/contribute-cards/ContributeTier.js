@@ -80,7 +80,7 @@ TierTitle.propTypes = {
     slug: PropTypes.string,
   }),
   tier: PropTypes.shape({
-    id: PropTypes.string,
+    id: PropTypes.number,
     slug: PropTypes.string,
     name: PropTypes.string,
     useStandalonePage: PropTypes.bool,
