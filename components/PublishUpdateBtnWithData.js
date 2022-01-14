@@ -77,6 +77,10 @@ const selectOptions = [
     label: <FormattedMessage id="Update.notify.hostedCollectiveAdmins" defaultMessage="Hosted collective's admins" />,
     value: 'COLLECTIVE_ADMINS',
   },
+  {
+    label: <FormattedMessage defaultMessage="No one" />,
+    value: 'NO_ONE',
+  },
 ];
 
 const PublishUpdateBtn = ({ id, isHost, isChangelog }) => {
