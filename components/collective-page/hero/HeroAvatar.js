@@ -288,7 +288,7 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
 
 HeroAvatar.propTypes = {
   collective: PropTypes.shape({
-    id: PropTypes.string,
+    id: PropTypes.number,
     type: PropTypes.string,
     image: PropTypes.string,
     imageUrl: PropTypes.string,
