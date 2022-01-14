@@ -75,3 +75,131 @@ export const collectiveNavbarFieldsFragment = gql`
     REQUEST_VIRTUAL_CARDS
   }
 `;
+
+const contributeCardContributorFieldsFragment = gql`
+  fragment ContributeCardContributorFields on Contributor {
+    id
+    image(height: 64)
+    collectiveSlug
+    name
+    type
+    isGuest
+  }
+`;
+
+export const contributeCardTierFieldsFragment = gql`
+  fragment ContributeCardTierFields on Tier {
+    id
+    name
+    slug
+    description
+    useStandalonePage
+    goal
+    interval
+    currency
+    amount
+    minimumAmount
+    button
+    amountType
+    endsAt
+    type
+    maxQuantity
+    stats {
+      id
+      availableQuantity
+      totalDonated
+      totalRecurringDonations
+      contributors {
+        id
+        all
+        users
+        organizations
+      }
+    }
+    contributors(limit: $nbContributorsPerContributeCard) {
+      ...ContributeCardContributorFields
+    }
+  }
+  ${contributeCardContributorFieldsFragment}
+`;
+
+export const contributeCardEventFieldsFragment = gql`
+  fragment ContributeCardEventFields on Event {
+    id
+    slug
+    name
+    description
+    image
+    isActive
+    startsAt
+    endsAt
+    backgroundImageUrl(height: 208)
+    tiers {
+      id
+      type
+    }
+    contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
+      ...ContributeCardContributorFields
+    }
+    stats {
+      id
+      backers {
+        id
+        all
+        users
+        organizations
+      }
+    }
+  }
+  ${contributeCardContributorFieldsFragment}
+`;
+
+export const contributeCardProjectFieldsFragment = gql`
+  fragment ContributeCardProjectFields on Project {
+    id
+    slug
+    name
+    description
+    image
+    isActive
+    isArchived
+    backgroundImageUrl(height: 208)
+    contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER]) {
+      ...ContributeCardContributorFields
+    }
+    stats {
+      id
+      backers {
+        id
+        all
+        users
+        organizations
+      }
+    }
+  }
+  ${contributeCardContributorFieldsFragment}
+`;
+
+export const contributeCardConnectedCollectiveFieldsFragment = gql`
+  fragment ContributeCardConnectedCollectiveFields on Collective {
+    id
+    slug
+    name
+    type
+    description
+    backgroundImageUrl(height: 208)
+    stats {
+      id
+      backers {
+        id
+        all
+        users
+        organizations
+      }
+    }
+    contributors(limit: $nbContributorsPerContributeCard) {
+      ...ContributeCardContributorFields
+    }
+  }
+  ${contributeCardContributorFieldsFragment}
+`;
