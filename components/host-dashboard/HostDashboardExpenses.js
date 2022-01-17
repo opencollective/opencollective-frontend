@@ -51,6 +51,10 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
     host(slug: $hostSlug) {
       ...ExpenseHostFields
       ...HostInfoCardFields
+      transferwise {
+        id
+        availableCurrencies
+      }
     }
     expenses(
       host: { slug: $hostSlug }
