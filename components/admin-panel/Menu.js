@@ -49,7 +49,7 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
 
 OrganizationSettingsMenuLinks.propTypes = {
   collective: PropTypes.object,
-  isAccountantOnly: PropTypes.boolean,
+  isAccountantOnly: PropTypes.bool,
 };
 
 const Menu = ({ collective, isAccountantOnly }) => {
