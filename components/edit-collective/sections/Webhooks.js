@@ -34,10 +34,6 @@ const messages = defineMessages({
     id: 'webhooks.types.label',
     defaultMessage: 'Activity',
   },
-  'webhooks.add': {
-    id: 'webhooks.add',
-    defaultMessage: 'Add another webhook',
-  },
   'webhooks.remove': {
     id: 'webhooks.remove',
     defaultMessage: 'Remove webhook',
@@ -232,7 +228,7 @@ class Webhooks extends React.Component {
 
   render() {
     const { webhooks, status, error } = this.state;
-    const { intl, data } = this.props;
+    const { data } = this.props;
     const webhooksCount = webhooks.length;
 
     if (data.loading) {
@@ -261,7 +257,10 @@ class Webhooks extends React.Component {
           >
             <Add size="1.2em" />
             {'  '}
-            {intl.formatMessage(messages['webhooks.add'])}
+            <FormattedMessage
+              defaultMessage="Add {existingWebhooksCount, select, 0 {your first} other {another}} webhook"
+              values={{ existingWebhooksCount: webhooksCount }}
+            />
           </StyledButton>
         </Box>
 
