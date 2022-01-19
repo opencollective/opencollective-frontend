@@ -258,8 +258,6 @@ type UserDetails {
   CollectiveId: Int
   collective: CollectiveInterface
   username: String
-  firstName: String @deprecated(reason: "2021-09-24: Use \"name\"")
-  lastName: String @deprecated(reason: "2021-09-24: Use \"name\"")
   name: String
   image: String
   email: String
@@ -2939,8 +2937,6 @@ type User implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   hasVirtualCards: Boolean! @deprecated(reason: "2021-10-12: Use features.VIRTUAL_CARDS === ACTIVE")
-  firstName: String @deprecated(reason: "2020-03-27: These field are now deprecated in favor of collective.name")
-  lastName: String @deprecated(reason: "2020-03-27: These field are now deprecated in favor of collective.name")
   email: String
   applications: [Application]
 }
@@ -3853,8 +3849,6 @@ input CollectiveInputType {
   hostFeePercent: Float
   ParentCollectiveId: Int
   email: String
-  firstName: String @deprecated(reason: "2021-09-24: Use \"name\"")
-  lastName: String @deprecated(reason: "2021-09-24: Use \"name\"")
   isIncognito: Boolean
   isActive: Boolean
   contributionPolicy: String
@@ -3990,8 +3984,6 @@ input CollectiveAttributesInputType {
   type: String
   name: String
   company: String
-  firstName: String @deprecated(reason: "2021-09-24: Use \"name\"")
-  lastName: String @deprecated(reason: "2021-09-24: Use \"name\"")
   email: String
   description: String
   longDescription: String
@@ -4034,8 +4026,6 @@ Input type for UserType
 input UserInputType {
   id: Int
   email: Email
-  firstName: String @deprecated(reason: "2021-09-24: Use \"name\"")
-  lastName: String @deprecated(reason: "2021-09-24: Use \"name\"")
   legalName: String
   name: String
   company: String
