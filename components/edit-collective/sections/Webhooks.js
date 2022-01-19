@@ -16,13 +16,14 @@ import { i18nWebhookEventType } from '../../../lib/i18n/webhook-event-type';
 import { compose } from '../../../lib/utils';
 
 import { Box, Flex } from '../../Grid';
+import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledHr from '../../StyledHr';
 import StyledInputGroup from '../../StyledInputGroup';
 import StyledSelect from '../../StyledSelect';
-import { Span } from '../../Text';
+import { Label, P, Span } from '../../Text';
 import SettingsTitle from '../SettingsTitle';
 
 const messages = defineMessages({
@@ -179,7 +180,7 @@ class Webhooks extends React.Component {
         flexDirection="row-reverse"
         justifyContent="space-between"
       >
-        <Box my={[0, 4]}>
+        <Box my={[0, 3]}>
           <StyledButton
             width={1}
             py={1}
@@ -196,9 +197,9 @@ class Webhooks extends React.Component {
 
         <Box width={[1, 0.75]}>
           <Box mb={4}>
-            <Span fontSize="14px" mb={1}>
+            <Label fontSize="14px" mb={1}>
               {intl.formatMessage(messages['webhooks.url.label'])}
-            </Span>
+            </Label>
             <StyledInputGroup
               type="type"
               name="webhookUrl"
@@ -209,7 +210,9 @@ class Webhooks extends React.Component {
             />
           </Box>
           <Box>
-            <Span fontSize="14px">{intl.formatMessage(messages['webhooks.types.label'])}</Span>
+            <Label fontSize="14px" mb={1}>
+              {intl.formatMessage(messages['webhooks.types.label'])}
+            </Label>
             <StyledSelect
               isSearchable={false}
               inputId="event-type-select"
@@ -240,6 +243,22 @@ class Webhooks extends React.Component {
         <SettingsTitle contentOnly={this.props.contentOnly}>
           <FormattedMessage id="editCollective.menu.webhooks" defaultMessage="Webhooks" />
         </SettingsTitle>
+
+        <P fontSize="14px" lineHeight="18px">
+          <FormattedMessage
+            defaultMessage="You can use Webhooks to build custom integrations with Open Collective. Slack and Discord webhooks are natively supported. You can also integrate them with tools like Zapier, IFTTT, or Huginn. Learn more about this from <DocLink>the documentation</DocLink> or see how you can go further using our <GraphqlAPILink>public GraphQL API</GraphqlAPILink>."
+            values={{
+              GraphqlAPILink: getI18nLink({
+                href: 'https://docs.opencollective.com/help/contributing/development/api#graphql-api',
+                openInNewTab: true,
+              }),
+              DocLink: getI18nLink({
+                href: 'https://docs.opencollective.com/help/collectives/collective-settings/integrations#webhooks-generic-slack-discord',
+                openInNewTab: true,
+              }),
+            }}
+          />
+        </P>
 
         <div>{webhooks.map(this.renderWebhook)}</div>
 
