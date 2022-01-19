@@ -126,7 +126,24 @@ export const collectivePageQuery = gql`
       connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
         id
         collective: member {
-          ...ContributeCardConnectedCollectiveFields
+          id
+          slug
+          name
+          type
+          description
+          backgroundImageUrl(height: 208)
+          stats {
+            id
+            backers {
+              id
+              all
+              users
+              organizations
+            }
+          }
+          contributors(limit: $nbContributorsPerContributeCard) {
+            ...ContributeCardContributorFields
+          }
         }
       }
       updates(limit: 3, onlyPublishedUpdates: true) {
@@ -184,7 +201,6 @@ export const collectivePageQuery = gql`
   ${fragments.contributeCardTierFieldsFragment}
   ${fragments.contributeCardEventFieldsFragment}
   ${fragments.contributeCardProjectFieldsFragment}
-  ${fragments.contributeCardConnectedCollectiveFieldsFragment}
 `;
 /* eslint-enable graphql/template-strings */
 
