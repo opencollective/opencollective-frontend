@@ -179,27 +179,3 @@ export const contributeCardProjectFieldsFragment = gql`
   }
   ${contributeCardContributorFieldsFragment}
 `;
-
-export const contributeCardConnectedCollectiveFieldsFragment = gql`
-  fragment ContributeCardConnectedCollectiveFields on Collective {
-    id
-    slug
-    name
-    type
-    description
-    backgroundImageUrl(height: 208)
-    stats {
-      id
-      backers {
-        id
-        all
-        users
-        organizations
-      }
-    }
-    contributors(limit: $nbContributorsPerContributeCard) {
-      ...ContributeCardContributorFields
-    }
-  }
-  ${contributeCardContributorFieldsFragment}
-`;
