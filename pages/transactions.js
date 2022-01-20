@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
-import { get, isNil, omitBy } from 'lodash';
+import { get, isNil, omit, omitBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -13,7 +13,7 @@ import roles from '../lib/constants/roles';
 import { parseDateInterval } from '../lib/date-utils';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { getCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import Body from '../components/Body';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
@@ -168,11 +168,11 @@ class TransactionsPage extends React.Component {
   async componentDidMount() {
     const { router, data } = this.props;
     const Collective = (data && data.account) || this.state.collective;
-    const query = router.query;
+    const queryParameters = {
+      ...omit(this.props.query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
+    };
     this.setState({ Collective });
-    if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(Collective.type) && !query.parentCollectiveSlug) {
-      router.push(`${getCollectivePageRoute(Collective)}/transactions`, undefined, { shallow: true });
-    }
+    addParentToURLIfMissing(router, Collective, `/transactions`, queryParameters);
   }
 
   componentDidUpdate(oldProps) {
@@ -233,10 +233,18 @@ class TransactionsPage extends React.Component {
     }
   }
 
-  updateFilters(queryParams) {
+  buildFilterLinkParams(params) {
+    const queryParameters = {
+      ...omit(params, ['offset', 'collectiveType', 'parentCollectiveSlug']),
+    };
+
+    return omitBy(queryParameters, value => !value);
+  }
+
+  updateFilters(queryParams, collective) {
     return this.props.router.push({
-      pathname: `/${this.props.slug}/transactions`,
-      query: omitBy({ ...this.props.query, ...queryParams }, value => !value),
+      pathname: `${getCollectivePageCanonicalURL(collective)}/transactions`,
+      query: this.buildFilterLinkParams({ ...queryParams, offset: null }),
     });
   }
 
@@ -271,7 +279,7 @@ class TransactionsPage extends React.Component {
         <Header
           collective={collective}
           LoggedInUser={LoggedInUser}
-          canonicalURL={`${getCanonicalURL(collective)}/transactions`}
+          canonicalURL={`${getCollectivePageCanonicalURL(collective)}/transactions`}
           noRobots={['USER', 'INDIVIDUAL'].includes(collective.type) && !collective.isHost}
         />
         <Body>
@@ -289,7 +297,7 @@ class TransactionsPage extends React.Component {
               <Box p={2} flexGrow={[1, 0]}>
                 <SearchBar
                   defaultValue={query.searchTerm}
-                  onSubmit={searchTerm => this.updateFilters({ searchTerm, offset: null })}
+                  onSubmit={searchTerm => this.updateFilters({ searchTerm, offset: null }, collective)}
                 />
               </Box>
             </Flex>
@@ -306,7 +314,7 @@ class TransactionsPage extends React.Component {
                 filters={query}
                 kinds={transactions?.kinds}
                 collective={collective}
-                onChange={queryParams => this.updateFilters({ ...queryParams, offset: null })}
+                onChange={queryParams => this.updateFilters({ ...queryParams, offset: null }, collective)}
               />
               <Flex>
                 {canDownloadInvoices && (
@@ -333,7 +341,7 @@ class TransactionsPage extends React.Component {
               {this.state.hasChildren && (
                 <StyledCheckbox
                   checked={this.props.query.ignoreChildrenTransactions ? true : false}
-                  onChange={({ checked }) => this.updateFilters({ ignoreChildrenTransactions: checked })}
+                  onChange={({ checked }) => this.updateFilters({ ignoreChildrenTransactions: checked }, collective)}
                   label={
                     <FormattedMessage
                       id="transactions.excludeChildren"
@@ -345,7 +353,7 @@ class TransactionsPage extends React.Component {
               {this.state.hasGiftCards && (
                 <StyledCheckbox
                   checked={this.props.query.ignoreGiftCardsTransactions ? true : false}
-                  onChange={({ checked }) => this.updateFilters({ ignoreGiftCardsTransactions: checked })}
+                  onChange={({ checked }) => this.updateFilters({ ignoreGiftCardsTransactions: checked }, collective)}
                   label={
                     <FormattedMessage
                       id="transactions.excludeGiftCards"
@@ -357,7 +365,7 @@ class TransactionsPage extends React.Component {
               {this.state.hasIncognito && (
                 <StyledCheckbox
                   checked={this.props.query.ignoreIncognitoTransactions ? true : false}
-                  onChange={({ checked }) => this.updateFilters({ ignoreIncognitoTransactions: checked })}
+                  onChange={({ checked }) => this.updateFilters({ ignoreIncognitoTransactions: checked }, collective)}
                   label={
                     <FormattedMessage
                       id="transactions.excludeIncognito"

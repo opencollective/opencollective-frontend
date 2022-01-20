@@ -5,7 +5,7 @@ import { withRouter } from 'next/router';
 
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
-import { addParentToURLIfMissing, getCanonicalURL } from '../lib/url-helpers';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -57,7 +57,7 @@ class UpdatesPage extends React.Component {
         <Header
           collective={collective}
           LoggedInUser={LoggedInUser}
-          canonicalURL={`${getCanonicalURL(collective)}/updates`}
+          canonicalURL={`${getCollectivePageCanonicalURL(collective)}/updates`}
         />
 
         <Body>

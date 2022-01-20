@@ -7,7 +7,7 @@ import { withRouter } from 'next/router';
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { addParentToURLIfMissing, getCanonicalURL } from '../lib/url-helpers';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { stripHTML } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -130,7 +130,7 @@ class UpdatePage extends React.Component {
         collective={account}
         title={update.title}
         description={stripHTML(update.summary)}
-        canonicalURL={`${getCanonicalURL(account)}/update`}
+        canonicalURL={`${getCollectivePageCanonicalURL(account)}/update`}
         metaTitle={`${update.title} - ${account.name}`}
       >
         <CollectiveNavbar

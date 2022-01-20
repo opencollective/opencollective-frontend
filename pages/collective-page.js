@@ -6,9 +6,8 @@ import dynamic from 'next/dynamic';
 import { withRouter } from 'next/router';
 import { createGlobalStyle } from 'styled-components';
 
-import { CollectiveType } from '../lib/constants/collectives';
 import { generateNotFoundError } from '../lib/errors';
-import { getCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
@@ -96,6 +95,7 @@ class CollectivePage extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
+      account: PropTypes.object,
       Collective: PropTypes.shape({
         name: PropTypes.string,
         type: PropTypes.string.isRequired,
@@ -137,11 +137,8 @@ class CollectivePage extends React.Component {
     this.setState({ smooth: true });
 
     const { router, data } = this.props;
-    const query = router.query;
     const collective = data?.Collective;
-    if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(collective?.type) && !query.parentCollectiveSlug) {
-      router.push(getCollectivePageRoute(collective), undefined, { shallow: true });
-    }
+    addParentToURLIfMissing(router, collective);
   }
 
   getPageMetaData(collective) {
@@ -199,7 +196,7 @@ class CollectivePage extends React.Component {
     }
 
     return (
-      <Page canonicalURL={getCanonicalURL(collective)} {...this.getPageMetaData(collective)}>
+      <Page canonicalURL={getCollectivePageCanonicalURL(collective)} {...this.getPageMetaData(collective)}>
         <GlobalStyles smooth={this.state.smooth} />
         {loading ? (
           <Container py={[5, 6]}>
