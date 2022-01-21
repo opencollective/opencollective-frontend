@@ -1019,6 +1019,11 @@ enum UpdateAudienceTypeEnum {
   Will be sent to financial contributors
   """
   FINANCIAL_CONTRIBUTORS
+
+  """
+  Will be sent to no one
+  """
+  NO_ONE
 }
 
 """
