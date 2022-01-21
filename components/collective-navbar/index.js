@@ -44,10 +44,10 @@ import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
 import NavBarCategoryDropdown, { NavBarCategory } from './NavBarCategoryDropdown';
 
-const DisableGlobalScrollOnMobile = createGlobalStyle`
+const HideSectionsOnNavBarExpandOnMobile = createGlobalStyle`
   @media (max-width: 64em) {
-    body {
-      overflow: hidden;
+    .sectionsContainer {
+      display: none;
     }
   }
 `;
@@ -535,7 +535,7 @@ const CollectiveNavbar = ({
             justifyContent="space-between"
             flexDirection={['column', 'row']}
           >
-            {isExpanded && <DisableGlobalScrollOnMobile />}
+            {isExpanded && <HideSectionsOnNavBarExpandOnMobile />}
             <CategoriesContainer
               ref={navbarRef}
               display={isExpanded ? 'flex' : ['none', 'flex']}
