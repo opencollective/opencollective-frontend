@@ -11,6 +11,7 @@
 <ul>
   <li><a href='#software-engineer'>Senior, 'Full Stack' Software Engineer</a></li>
   <li><a href='#product-manager'>Senior Product Manager</a></li>
+  <li><a href='#community-manager'>Community Manager</a></li>
 </ul>
 
 ## But first, a little about us
@@ -67,6 +68,27 @@ We are looking for a senior product manager who is excited about creating a worl
   - documenting, releasing, marketing and supporting products after launch
   - supporting leadership to make effective strategic decisions on product development and success.
 
+- You have experience working within or adjacent to open source communities, are excited about our mission, and share our philosophy.
+
+<h2 id='community-manager'>Community Manager</h2>
+
+We are looking for a community development manager who is excited about strengthening the relationships between open source maintainers, contributors and users, and developing communities to their full potential.
+
+Open Source Collective provides a legal and financial home to 3,000 open source project communities. These communities struggle with similar challenges: how to encourage financial support, how to manage and use that support to forward the project’s goals and how to develop the community to make the project more sustainable. Equally, their struggle to recognise these shared challenges, and to with Open Source Collective and each other to overcome them.
+
+Our community is our business and this role is a key component of our strategy for the next three years. Without a strong understanding of the issues that impact our community and an ability to authentically represent them in the conversations that impact them we will be unable to deliver on the remainder of our strategy.
+
+### We think you’d be great at this if you:
+
+- Are comfortable in a remote environment that is at the same time highly collaborative (we apply a seeking feedback process) and autonomous.
+- Are based within 6 hours of Central European time:
+  - to optimize timezone overlaps with the current team (who are predominantly based in Europe)
+- Are comfortable with the messy work of developing, supporting and maintaining diverse communities, including (but not limited to):
+  - Hosting, facilitating and administrating regular community events and spaces (predominantly digital, occasionally physical)
+  - Engaging and reinforcing relationships with regular updates in varied content formats (writing, audio, video, etc)
+  - Co-creating guidance, documentation and resources
+  - Developing partnerships and programs to support community members
+  - Building context for and collaborating with product, design and engineering to develop software solutions.
 - You have experience working within or adjacent to open source communities, are excited about our mission, and share our philosophy.
 
 <!--
