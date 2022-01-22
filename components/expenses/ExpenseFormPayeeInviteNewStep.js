@@ -31,8 +31,8 @@ import PayoutMethodSelect from './PayoutMethodSelect';
 
 const msg = defineMessages({
   accountType: {
-    id: `ExpenseForm.accountTypeLabel`,
-    defaultMessage: 'Who will receive the money of this expense?',
+    id: `ExpenseForm.inviteeLabel`,
+    defaultMessage: 'Who will receive the money for this expense?',
   },
   nameLabel: {
     id: `ExpenseForm.inviteNameLabel`,
