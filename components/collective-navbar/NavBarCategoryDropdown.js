@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { useIntl } from 'react-intl';
+import { scroller } from 'react-scroll';
 import styled, { css } from 'styled-components';
 
 import { NAVBAR_CATEGORIES } from '../../lib/collective-sections';
@@ -185,6 +186,9 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
         isSelected={isSelected}
         {...getLinkProps(useAnchor, collective, category)}
         onClick={e => {
+          if (useAnchor) {
+            scroller.scrollTo(`category-${category}`, { smooth: true });
+          }
           // Remove focus to make sure dropdown gets closed
           if (document.activeElement?.contains(e.target)) {
             document.activeElement.blur();
