@@ -193,10 +193,7 @@ class CollectivePage extends React.Component {
 
     return (
       <Page canonicalURL={this.getCanonicalURL(slug)} {...this.getPageMetaData(collective)}>
-        {/* Smooth Scrolling effects the next link scroll to top behaviour on Firefox; https://github.com/vercel/next.js/issues/12105#issuecomment-907208495 */}
-        {typeof window !== 'undefined' && window.navigator.userAgent.indexOf('Firefox') === -1 && (
-          <GlobalStyles smooth={this.state.smooth} />
-        )}
+        <GlobalStyles smooth={this.state.smooth} />
         {loading ? (
           <Container py={[5, 6]}>
             <Loading />

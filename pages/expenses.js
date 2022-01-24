@@ -285,7 +285,7 @@ class ExpensePage extends React.Component {
                   showExpenseTypeFilters
                 >
                   {data.account?.expensesTags.length > 0 && (
-                    <span>
+                    <React.Fragment>
                       <H5 mb={3}>
                         <FormattedMessage id="Tags" defaultMessage="Tags" />
                       </H5>
@@ -309,7 +309,7 @@ class ExpensePage extends React.Component {
                           </Link>
                         )}
                       </ExpenseTags>
-                    </span>
+                    </React.Fragment>
                   )}
                 </ExpenseInfoSidebar>
               </Box>
