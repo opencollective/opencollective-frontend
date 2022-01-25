@@ -2863,6 +2863,11 @@ type AccountStats {
     Calculate total amount received after this date
     """
     dateFrom: DateTime
+
+    """
+    Computes contributions from the last x months. Cannot be used with startDate/endDate
+    """
+    periodInMonths: Int
   ): Amount!
 
   """
@@ -2891,6 +2896,12 @@ type AccountStats {
   ): Amount!
   yearlyBudget: Amount!
   yearlyBudgetManaged: Amount!
+
+  """
+  Total net amount received
+  """
+  totalNetAmountReceived: Amount!
+  activeRecurringContributions: JSON
 }
 
 """
