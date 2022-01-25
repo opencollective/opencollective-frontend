@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { Element } from 'react-scroll';
 
 import { getFilteredSectionsForCollective } from '../../lib/collective-sections';
 
@@ -280,7 +279,7 @@ class CollectivePage extends Component {
           ) : (
             sections.map((entry, entryIdx) =>
               entry.type === 'CATEGORY' ? (
-                <Element name={`category-${entry.name}`} key={`category-${entry.name}`}>
+                <Fragment key={`category-${entry.name}`}>
                   <CategoryHeader
                     id={`category-${entry.name}`}
                     ref={categoryRef => (this.sectionCategoriesRefs[entry.name] = categoryRef)}
@@ -302,7 +301,7 @@ class CollectivePage extends Component {
                       {this.renderSection(section.name)}
                     </SectionContainer>
                   ))}
-                </Element>
+                </Fragment>
               ) : entry.type === 'SECTION' ? (
                 <SectionContainer
                   key={`section-${entry.name}`}

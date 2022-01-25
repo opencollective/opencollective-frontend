@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
+import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
-import { scroller } from 'react-scroll';
+import { Scrollchor } from 'react-scrollchor';
 import styled, { css } from 'styled-components';
 
 import { NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import i18nNavbarCategory from '../../lib/i18n/navbar-categories';
 
+import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
@@ -34,7 +36,7 @@ const IconIllustration = styled.img.attrs({ alt: '' })`
   height: 32px;
 `;
 
-const CategoryContainer = styled(StyledLink).attrs({ px: [1, 3, 0] })`
+const CategoryContainer = styled(Container).attrs({ px: [1, 3, 0] })`
   display: block;
   width: 100%;
 
@@ -148,15 +150,6 @@ const CategoryDropdown = styled(Dropdown)`
   }
 `;
 
-const getLinkProps = (useAnchor, collective, category) => {
-  const anchor = `#category-${category}`;
-  if (useAnchor) {
-    return { href: anchor };
-  } else {
-    return { as: Link, href: `/${collective.slug}${anchor}` };
-  }
-};
-
 export const NavBarCategory = ({ category }) => {
   const intl = useIntl();
   return (
@@ -178,27 +171,29 @@ NavBarCategory.propTypes = {
 };
 
 const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, links }) => {
+  const router = useRouter();
   const displayedLinks = links.filter(link => !link.hide);
   return (
     <CategoryDropdown trigger="hover" tabIndex="-1">
-      <CategoryContainer
-        mr={[0, null, 3]}
-        isSelected={isSelected}
-        {...getLinkProps(useAnchor, collective, category)}
-        onClick={e => {
-          if (useAnchor) {
-            scroller.scrollTo(`category-${category}`, { smooth: true });
-          }
-          // Remove focus to make sure dropdown gets closed
-          if (document.activeElement?.contains(e.target)) {
-            document.activeElement.blur();
-          }
-        }}
-      >
-        <Flex pt="15px" pb="14px" px={[3, 1, 3, 1]}>
-          <NavBarCategory category={category} />{' '}
-        </Flex>
-      </CategoryContainer>
+      <Scrollchor to={useAnchor ? `#category-${category}` : null}>
+        <CategoryContainer
+          mr={[0, null, 3]}
+          isSelected={isSelected}
+          onClick={e => {
+            // Remove focus to make sure dropdown gets closed
+            if (document.activeElement?.contains(e.target)) {
+              document.activeElement.blur();
+            }
+            if (!useAnchor) {
+              router.push(`/${collective.slug}/#category-${category}`);
+            }
+          }}
+        >
+          <Flex pt="15px" pb="14px" px={[3, 1, 3, 1]}>
+            <NavBarCategory category={category} />{' '}
+          </Flex>
+        </CategoryContainer>
+      </Scrollchor>
       {displayedLinks.length > 0 && (
         <React.Fragment>
           <DropdownArrow />
