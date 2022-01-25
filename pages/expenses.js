@@ -7,7 +7,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
 import { getSuggestedTags } from '../lib/collective.lib';
 import { isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import expenseStatus from '../lib/constants/expense-status';
@@ -176,6 +176,12 @@ class ExpensePage extends React.Component {
     }
   };
 
+  getShouldDisplayFeatureNotSupported = account => {
+    if (!account) {
+      return true;
+    }
+  };
+
   getSuggestedTags = memoizeOne(getSuggestedTags);
 
   render() {
@@ -188,7 +194,7 @@ class ExpensePage extends React.Component {
         return <ErrorPage data={data} />;
       } else if (!data.account || !data.expenses?.nodes) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
-      } else if (!hasFeature(data.account, FEATURES.RECEIVE_EXPENSES)) {
+      } else if (!isFeatureSupported(data.account, FEATURES.RECEIVE_EXPENSES)) {
         return <PageFeatureNotSupported />;
       } else if (
         isSectionForAdminsOnly(data.account, Sections.BUDGET) &&
