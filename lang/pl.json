@@ -585,6 +585,7 @@
   "ContributionSummary": "Podsumowanie wkładu",
   "ContributionSummary.NextCharge": "Jeśli wybierzesz PayPal, pobierzesz opłatę tego samego dnia każdego miesiąca. W przeciwnym razie następna opłata będzie miała miejsce w dniu {date}, a następnie w pierwszym dniu {interval, select, month {każdego miesiąca} year {tym samym miesiącu każdego roku} other {}}. Możesz anulować lub edytować ten wkład, przechodząc do 'Zarządzaj wkładami'.",
   "ContributionToProject": "Wkład na rzecz {projectName}",
+  "ContributionType.ArchivedProject": "Archived Project",
   "ContributionType.ChildCollective": "Połączone kolekcje",
   "ContributionType.Crypto": "Wkład kryptowalut",
   "ContributionType.Custom": "Niestandardowy wkład",

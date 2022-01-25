@@ -585,6 +585,7 @@
   "ContributionSummary": "Résumé de la contribution",
   "ContributionSummary.NextCharge": "Si vous sélectionnez PayPal, vous serez facturé le même jour chaque mois. Sinon, le prochain débit sera le {date} et le premier jour de {interval, select, month {chaque mois} year {le même mois chaque année} other {}}. Vous pouvez annuler ou modifier cette contribution en allant dans \"Gérer les contributions\".",
   "ContributionToProject": "Contribution à {projectName}",
+  "ContributionType.ArchivedProject": "Archived Project",
   "ContributionType.ChildCollective": "Collectif connecté",
   "ContributionType.Crypto": "Crypto contribution",
   "ContributionType.Custom": "Contribution personnalisée",

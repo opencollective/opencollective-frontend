@@ -585,6 +585,7 @@
   "ContributionSummary": "Стисло про внесок",
   "ContributionSummary.NextCharge": "If you select PayPal, you will be charged on the same day each month. Otherwise the next charge will be on {date} and then the first day of {interval, select, month {each month} year {the same month each year} other {}}. You can cancel or edit this contribution by going to 'Manage Contributions'.",
   "ContributionToProject": "Внесок для {projectName}",
+  "ContributionType.ArchivedProject": "Archived Project",
   "ContributionType.ChildCollective": "Під’єднані Колективи",
   "ContributionType.Crypto": "Внесок криптовалютою",
   "ContributionType.Custom": "Довільний внесок",
