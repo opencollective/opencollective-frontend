@@ -585,6 +585,7 @@
   "ContributionSummary": "コントリビューションサマリー",
   "ContributionSummary.NextCharge": "If you select PayPal, you will be charged on the same day each month. Otherwise the next charge will be on {date} and then the first day of {interval, select, month {each month} year {the same month each year} other {}}. You can cancel or edit this contribution by going to 'Manage Contributions'.",
   "ContributionToProject": "{projectName} への貢献",
+  "ContributionType.ArchivedProject": "Archived Project",
   "ContributionType.ChildCollective": "Connected Collective",
   "ContributionType.Crypto": "Crypto contribution",
   "ContributionType.Custom": "カスタムコントリビュート",

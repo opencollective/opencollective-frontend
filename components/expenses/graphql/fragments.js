@@ -105,10 +105,6 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     plan {
       id
     }
-    transferwise {
-      id
-      availableCurrencies
-    }
   }
 `;
 
@@ -237,6 +233,10 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isApproved
         host {
           ...ExpenseHostFields
+          transferwise {
+            id
+            availableCurrencies
+          }
         }
       }
 
@@ -247,6 +247,10 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isActive
         host {
           ...ExpenseHostFields
+          transferwise {
+            id
+            availableCurrencies
+          }
         }
       }
 

@@ -94,10 +94,13 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
       >
         <FormattedMessage id="Settings" defaultMessage="Settings" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.username}/recurring-contributions`}>
+      <UserMenuLinkEntry
+        isMobileMenuLink={isMobileView}
+        href={`/${LoggedInUser.collective.slug}/recurring-contributions`}
+      >
         <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.username}/transactions`}>
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/transactions`}>
         <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
       </UserMenuLinkEntry>
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} href="/applications">
@@ -106,6 +109,12 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} as="a" href="/help">
         <FormattedMessage id="menu.help" defaultMessage="Help" />
       </UserMenuLinkEntry>
+      {LoggedInUser.isRoot() && (
+        <UserMenuLinkEntry isMobileMenuLink={isMobileView} href="/opencollective/root-actions">
+          {/** Not i18n on purpose, this is for platform admins only */}
+          Root Actions
+        </UserMenuLinkEntry>
+      )}
       {isMobileView ? (
         <UserMenuLinkEntry profileMenuLink as="a" data-cy="logout" onClick={logOutHandler}>
           <Flex alignItems="center">

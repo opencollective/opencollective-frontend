@@ -55,22 +55,10 @@ const WhatCanYouDo = () => {
         <FormattedMessage id="home.whatCanYouDoSection.title" defaultMessage="What can you do with Open Collective?" />
       </SectionTitle>
       <Box width={['288px', '548px', '708px', null, '755px']} textAlign="center">
-        <SectionSubTitle
-          display={['none', 'block']}
-          fontSize={[null, '20px']}
-          lineHeight={[null, '28px']}
-          letterSpacing={[null, '-0.6px']}
-          color="black.700"
-        >
+        <SectionSubTitle fontSize="20px" lineHeight="28px" letterSpacing="-0.6px" color="black.700">
           <FormattedMessage
             id="home.whatCanYouDoSection.subTitle"
             defaultMessage="Accept donations and sponsorships, celebrate your supporters, pay expenses, and keep everyone up to date — all in one place."
-          />
-        </SectionSubTitle>
-        <SectionSubTitle display={[null, 'none']}>
-          <FormattedMessage
-            id="home.whatIsGreatAboutOC.description"
-            defaultMessage="Money management made simple, plus great tools for community engagement, budget reporting, and fiscal sponsorship."
           />
         </SectionSubTitle>
       </Box>

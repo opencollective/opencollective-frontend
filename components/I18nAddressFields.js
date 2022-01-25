@@ -94,7 +94,7 @@ const ZoneSelect = ({ info, required, value, name, label, onChange, id, error, .
     if (zoneOptions) {
       const formValueZone = value;
       if (formValueZone && !zoneOptions.find(option => option.value === formValueZone)) {
-        onChange({ name: name, value: null });
+        onChange({ target: { name: name, value: null } });
       }
     }
   }, [zoneOptions]);

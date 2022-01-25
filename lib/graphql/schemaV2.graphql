@@ -1836,14 +1836,10 @@ type Order {
   paymentMethod: PaymentMethod
 
   """
-  Platform contribution attached to the Order.
-  """
-  platformContributionAmount: Amount @deprecated(reason: "2021-06-07: Please use platformTipAmount")
-
-  """
   Platform Tip attached to the Order.
   """
   platformTipAmount: Amount
+  platformTipEligible: Boolean
   tags: [String]!
   taxes: [OrderTax]!
 
@@ -2982,6 +2978,11 @@ enum UpdateAudience {
   Will be sent to financial contributors
   """
   FINANCIAL_CONTRIBUTORS
+
+  """
+  Will be sent to no one
+  """
+  NO_ONE
 }
 
 """
@@ -4953,8 +4954,6 @@ type Individual implements Account {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  firstName: String @deprecated(reason: "2020-10-12: Use the name field")
-  lastName: String @deprecated(reason: "2020-10-12: Use the name field")
   email: String
   isGuest: Boolean!
   isFollowingConversation(id: String!): Boolean!
@@ -6060,6 +6059,11 @@ type Query {
     includeHostedAccounts: Boolean
 
     """
+    Whether to include incognito orders. Must be admin or root
+    """
+    includeIncognito: Boolean = false
+
+    """
     Account orders filter (INCOMING or OUTGOING)
     """
     filter: AccountOrdersFilter
@@ -6346,6 +6350,11 @@ input TierReferenceInput {
   The DB id assigned to the Tier
   """
   legacyId: Int
+
+  """
+  Pass this flag to reference the custom tier (/donate)
+  """
+  isCustom: Boolean
 }
 
 """
@@ -6385,6 +6394,7 @@ type Mutation {
   addFunds(
     fromAccount: AccountReferenceInput!
     account: AccountReferenceInput!
+    tier: TierReferenceInput
     amount: AmountInput!
     description: String!
     hostFeePercent: Float!
@@ -6948,6 +6958,31 @@ type Mutation {
   processPendingOrder(order: OrderUpdateInput!, action: ProcessOrderAction!): Order!
 
   """
+  A mutation for root users to move orders from one account to another
+  """
+  moveOrders(
+    """
+    The orders to move
+    """
+    orders: [OrderReferenceInput!]!
+
+    """
+    The account to move the orders to. Set to null to keep existing
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    The tier to move the orders to. Set to null to keep existing. Pass { id: "custom" } to reference the custom tier (/donate)
+    """
+    tier: TierReferenceInput
+
+    """
+    If true, the orders will be moved to the incognito account of "fromAccount"
+    """
+    makeIncognito: Boolean
+  ): [Order]!
+
+  """
   Add a new payment method to be used with an Order
   """
   addCreditCard(
@@ -7221,24 +7256,24 @@ type Mutation {
   """
   editVirtualCard(
     """
-    Virtual Card reference
+    Virtual card reference
     """
     virtualCard: VirtualCardReferenceInput!
 
     """
     Virtual card name
     """
-    name: String!
+    name: String
+
+    """
+    Individual account responsible for the card
+    """
+    assignee: AccountReferenceInput
 
     """
     Virtual card monthly limit
     """
     monthlyLimit: AmountInput
-
-    """
-    Individual account responsible for the card
-    """
-    assignee: AccountReferenceInput!
   ): VirtualCard!
 
   """
@@ -9628,9 +9663,14 @@ Parameters for paying an expense
 """
 input ProcessExpensePaymentParams {
   """
-  The fee charged by payment processor in collective currency, or the fee refunded when used with MARK_AS_UNPAID
+  The fee charged by payment processor in collective currency
   """
   paymentProcessorFee: Int
+
+  """
+  Whether the payment processor fees should be refunded when triggering MARK_AS_UNPAID
+  """
+  shouldRefundPaymentProcessorFee: Boolean
 
   """
   Bypass automatic integrations (ie. PayPal, Transferwise) to process the expense manually
@@ -9716,6 +9756,14 @@ input ExpenseInvitee {
   name: String
   email: String
   isInvite: Boolean
+  organization: ExpenseInviteeOrganizationInput
+}
+
+input ExpenseInviteeOrganizationInput {
+  description: String
+  name: String
+  slug: String
+  website: String
 }
 
 type EmojiReactionResponse {
@@ -9876,6 +9924,11 @@ input OrderCreateInput {
   fromAccount: AccountReferenceInput
 
   """
+  Additional information about the contributing profile
+  """
+  fromAccountInfo: OrderFromAccountInfo
+
+  """
   The profile you want to contribute to
   """
   toAccount: AccountReferenceInput!
@@ -9891,9 +9944,9 @@ input OrderCreateInput {
   paymentMethod: PaymentMethodInput
 
   """
-  Platform contribution attached to this order
+  Platform tip attached to this order
   """
-  platformContributionAmount: AmountInput
+  platformTipAmount: AmountInput
 
   """
   Use this field to set the taxes associated to this order
@@ -9929,6 +9982,18 @@ input OrderCreateInput {
   Tags associated to the order
   """
   tags: [String]
+}
+
+"""
+Some context about how an order was created
+"""
+input OrderFromAccountInfo {
+  """
+  The location of the contributor. Account location will be updated with this address if different from the existing one.
+  """
+  location: LocationInput
+  name: String
+  legalName: String
 }
 
 """
@@ -10207,11 +10272,6 @@ input VirtualCardInput {
 enum VirtualCardProvider {
   PRIVACY
   STRIPE
-}
-
-input VirtualCardUpdateInput {
-  id: String
-  privateData: JSONObject
 }
 
 input VirtualCardReferenceInput {

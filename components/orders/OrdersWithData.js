@@ -70,10 +70,6 @@ const accountOrdersQuery = gqlV2/* GraphQL */ `
           valueInCents
           currency
         }
-        platformContributionAmount {
-          valueInCents
-          currency
-        }
         paymentMethod {
           id
           providerType

@@ -205,6 +205,7 @@ const ExpenseSummary = ({
                         color="black.900"
                         collapsable
                         fontWeight="500"
+                        maxCollapsedHeight={100}
                         collapsePadding={22}
                       />
                     ) : (

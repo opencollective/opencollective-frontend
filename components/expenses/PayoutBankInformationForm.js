@@ -277,6 +277,9 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     field.group.every(g => g.key.includes('address.')),
   );
 
+  const transactionMethodFieldName = getFieldName('data.type');
+  const transactionMethod = get(formik.values, transactionMethodFieldName);
+
   return (
     <Flex flexDirection="column">
       <Field name={getFieldName('data.type')}>
@@ -307,24 +310,28 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
           </StyledInputField>
         )}
       </Field>
-      <Box mt={3} flex="1">
-        <P fontSize="14px" fontWeight="bold">
-          <FormattedMessage id="PayoutBankInformationForm.AccountInfo" defaultMessage="Account Information" />
-        </P>
-      </Box>
-      {otherFields.map(field => (
-        <FieldGroup
-          currency={currency}
-          disabled={disabled}
-          field={field}
-          formik={formik}
-          getFieldName={getFieldName}
-          host={host}
-          key={kebabCase(field.name)}
-          loading={loading}
-          refetch={refetch}
-        />
-      ))}
+      {transactionMethod && (
+        <Span>
+          <Box mt={3} flex="1">
+            <P fontSize="14px" fontWeight="bold">
+              <FormattedMessage id="PayoutBankInformationForm.AccountInfo" defaultMessage="Account Information" />
+            </P>
+          </Box>
+          {otherFields.map(field => (
+            <FieldGroup
+              currency={currency}
+              disabled={disabled}
+              field={field}
+              formik={formik}
+              getFieldName={getFieldName}
+              host={host}
+              key={kebabCase(field.name)}
+              loading={loading}
+              refetch={refetch}
+            />
+          ))}
+        </Span>
+      )}
       {Boolean(addressFields.length) && (
         <React.Fragment>
           <Box mt={3} flex="1" fontSize="14px" fontWeight="bold">

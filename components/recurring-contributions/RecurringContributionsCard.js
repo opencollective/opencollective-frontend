@@ -114,15 +114,15 @@ const RecurringContributionsCard = ({
             <P fontSize="14px" lineHeight="20px" fontWeight="bold" data-cy="recurring-contribution-amount-contributed">
               <FormattedMoneyAmount
                 amount={
-                  !isNil(contribution.platformContributionAmount?.valueInCents)
-                    ? contribution.amount.valueInCents + contribution.platformContributionAmount.valueInCents
+                  !isNil(contribution.platformTipAmount?.valueInCents)
+                    ? contribution.amount.valueInCents + contribution.platformTipAmount.valueInCents
                     : contribution.amount.valueInCents
                 }
                 interval={contribution.frequency.toLowerCase().slice(0, -2)}
                 currency={contribution.amount.currency}
               />
             </P>
-            {!isNil(contribution.platformContributionAmount?.valueInCents) && (
+            {!isNil(contribution.platformTipAmount?.valueInCents) && (
               <StyledTooltip
                 content={() => (
                   <FormattedMessage
@@ -142,7 +142,7 @@ const RecurringContributionsCard = ({
                   />
                   {' + '}
                   <FormattedMoneyAmount
-                    amount={contribution.platformContributionAmount.valueInCents}
+                    amount={contribution.platformTipAmount.valueInCents}
                     currency={contribution.amount.currency}
                     showCurrencyCode={false}
                     precision="auto"
@@ -198,7 +198,7 @@ RecurringContributionsCard.propTypes = {
   onEdit: PropTypes.func,
   contribution: PropTypes.shape({
     amount: PropTypes.object.isRequired,
-    platformContributionAmount: PropTypes.object,
+    platformTipAmount: PropTypes.object,
     frequency: PropTypes.string.isRequired,
     totalDonations: PropTypes.object.isRequired,
     paymentMethod: PropTypes.object,

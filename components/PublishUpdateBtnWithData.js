@@ -34,6 +34,8 @@ const updateQuery = gqlV2/* GraphQL */ `
       id
       userCanPublishUpdate
       publishedAt
+      isPrivate
+      makePublicOn
       audienceStats(audience: $audience) {
         id
         total
@@ -76,6 +78,10 @@ const selectOptions = [
   {
     label: <FormattedMessage id="Update.notify.hostedCollectiveAdmins" defaultMessage="Hosted collective's admins" />,
     value: 'COLLECTIVE_ADMINS',
+  },
+  {
+    label: <FormattedMessage defaultMessage="No one" />,
+    value: 'NO_ONE',
   },
 ];
 

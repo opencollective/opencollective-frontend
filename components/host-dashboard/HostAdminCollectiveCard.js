@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { SliderAlt } from '@styled-icons/boxicons-regular/SliderAlt';
-import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { HOST_FEE_STRUCTURE } from '../../lib/constants/host-fee-structure';
@@ -18,17 +18,6 @@ import { P, Span } from '../Text';
 
 import AddFundsModal from './AddFundsModal';
 import CollectiveSettingsModal from './CollectiveSettingsModal';
-
-const msg = defineMessages({
-  addFunds: {
-    id: 'menu.addFunds',
-    defaultMessage: 'Add Funds',
-  },
-  feeStructure: {
-    id: 'FeeStructure',
-    defaultMessage: 'Fee structure',
-  },
-});
 
 const SectionTitle = props => (
   <Flex alignItems="center" mb={1}>
@@ -117,16 +106,17 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
             size={32}
             fontSize="16px"
             onClick={() => setCurrentModal('addFunds')}
-            title={intl.formatMessage(msg.addFunds)}
+            title={intl.formatMessage({ id: 'menu.addFunds', defaultMessage: 'Add Funds' })}
           >
             {getCurrencySymbol(collective.currency)}
             <PlusIcon>+</PlusIcon>
           </StyledRoundButton>
+
           <StyledRoundButton
             ml={2}
             size={32}
-            onClick={() => setCurrentModal('feesStructure')}
-            title={intl.formatMessage(msg.feeStructure)}
+            onClick={() => setCurrentModal('accountSettings')}
+            title={intl.formatMessage({ defaultMessage: 'Account settings' })}
           >
             <SliderAlt size={14} color="#9D9FA3" />
           </StyledRoundButton>
@@ -135,7 +125,7 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
       {currentModal === 'addFunds' && (
         <AddFundsModal show collective={collective} host={host} onClose={() => setCurrentModal(null)} />
       )}
-      {currentModal === 'feesStructure' && (
+      {currentModal === 'accountSettings' && (
         <CollectiveSettingsModal collective={collective} host={host} onClose={() => setCurrentModal(null)} />
       )}
     </StyledCollectiveCard>
@@ -150,6 +140,7 @@ HostAdminCollectiveCard.propTypes = {
     hostFeesStructure: PropTypes.oneOf([null, ...Object.values(HOST_FEE_STRUCTURE)]),
     hostFeePercent: PropTypes.number,
     totalFinancialContributors: PropTypes.number,
+    parent: PropTypes.object,
     stats: PropTypes.shape({
       balance: PropTypes.shape({
         valueInCents: PropTypes.number,

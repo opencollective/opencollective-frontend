@@ -124,7 +124,7 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
       type
       data
     }
-    platformContributionAmount {
+    platformTipAmount {
       value
       valueInCents
       currency

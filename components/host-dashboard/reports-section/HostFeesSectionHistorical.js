@@ -8,7 +8,6 @@ const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import { get, groupBy } from 'lodash';
 import styled from 'styled-components';
 
-import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { i18nTransactionSettlementStatus } from '../../../lib/i18n/transaction';
 
@@ -107,14 +106,12 @@ const getChartOptions = (intl, hostCurrency) => ({
   yaxis: {
     labels: {
       minWidth: 38,
-      formatter: formatAmountForLegend,
+      formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale),
     },
   },
   tooltip: {
     y: {
-      formatter: function (value) {
-        return formatCurrency(value * 100, hostCurrency, { locale: intl.locale });
-      },
+      formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale),
     },
   },
 });

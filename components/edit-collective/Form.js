@@ -733,6 +733,7 @@ class EditCollectiveForm extends React.Component {
           maxLength: 255,
           type: 'textarea',
           when: () => collective.type !== EVENT,
+          // TODO: Use structured here to be consistent with other places
         },
         {
           name: 'country',

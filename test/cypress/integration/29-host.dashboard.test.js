@@ -106,8 +106,8 @@ describe('host dashboard', () => {
     it('Cannot submit incomplete form', () => {
       cy.login({ redirect: '/brusselstogetherasbl/admin/hosted-collectives' });
       cy.get('[data-cy="hosted-collective-add-funds-btn"]').first().click();
-      cy.wait(300);
-      cy.get('[data-cy="add-funds-submit-btn"]').should('be.disabled');
+      cy.getByDataCy('add-funds-submit-btn').click();
+      cy.contains('[data-cy="add-funds-form"]', 'This field is required');
     });
 
     it('Can add funds and platform tip as collective host', () => {

@@ -9,23 +9,25 @@ describe('Contribution Flow: Guest contributions', () => {
   it('Makes a contribution as an existing user', () => {
     cy.visit('/apex/donate');
     cy.contains('[data-cy="amount-picker"] button', 'Other').click();
-    cy.get('input[name="custom-amount"]').type('{selectall}4257.42');
+    cy.get('input[name="custom-amount"]').type('{selectall}400.42');
     cy.contains('#interval button', 'Monthly').click();
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.contains('Contribute as a guest');
     cy.get('input[name=email]').type(defaultTestUserEmail);
     cy.get('input[name=name]').type('Jack London');
+    cy.wait(200);
+    cy.get('button[data-cy="cf-next-step"]').click();
+
+    cy.useAnyPaymentMethod();
     cy.get('[data-cy=captcha] > div > iframe').then(recaptchaIframe => {
       const body = recaptchaIframe.contents();
       cy.wrap(body).find('#checkbox').should('be.visible').click();
     });
     cy.wait(200);
-    cy.get('button[data-cy="cf-next-step"]').click();
-    cy.useAnyPaymentMethod();
-    cy.contains('button[data-cy="cf-next-step"]', 'Contribute $4,257.42').click();
+    cy.contains('button[data-cy="cf-next-step"]', 'Contribute $400.42').click();
 
     cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
-    cy.contains('[data-cy="order-success"]', '$4,257.42 USD');
+    cy.contains('[data-cy="order-success"]', '$400.42 USD');
 
     // Open email
     const expectedEmailSubject = 'Thank you for your contribution to APEX';
@@ -49,13 +51,13 @@ describe('Contribution Flow: Guest contributions', () => {
 
     const email = randomEmail();
     cy.get('input[name=email]').type(`{selectall}${email}`);
+    cy.get('button[data-cy="cf-next-step"]').click();
+    cy.useAnyPaymentMethod();
     cy.get('[data-cy=captcha] > div > iframe').then(recaptchaIframe => {
       const body = recaptchaIframe.contents();
       cy.wrap(body).find('#checkbox').should('be.visible').click();
     });
     cy.wait(200);
-    cy.get('button[data-cy="cf-next-step"]').click();
-    cy.useAnyPaymentMethod();
     cy.contains('button[data-cy="cf-next-step"]', 'Contribute $10').click();
 
     cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -107,13 +109,13 @@ describe('Contribution Flow: Guest contributions', () => {
 
       cy.get('input[name=name]').type('Rick Astley');
       cy.get('input[name=email]').type(`{selectall}${firstEmail}`);
+      cy.get('button[data-cy="cf-next-step"]').click();
+      cy.useAnyPaymentMethod();
       cy.get('[data-cy=captcha] > div > iframe').then(recaptchaIframe => {
         const body = recaptchaIframe.contents();
         cy.wrap(body).find('#checkbox').should('be.visible').click();
       });
       cy.wait(200);
-      cy.get('button[data-cy="cf-next-step"]').click();
-      cy.useAnyPaymentMethod();
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $10').click();
 
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -140,13 +142,13 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.get('input[name=name]').type('Rick Astley');
       cy.get('input[name=legalName]:invalid').should('not.exist'); // Legal name is optional if name is provided
       cy.get('input[name=email]').type(`{selectall}${firstEmail}`);
+      cy.get('button[data-cy="cf-next-step"]').click();
+      cy.useAnyPaymentMethod();
       cy.get('[data-cy=captcha] > div > iframe').then(recaptchaIframe => {
         const body = recaptchaIframe.contents();
         cy.wrap(body).find('#checkbox').should('be.visible').click();
       });
       cy.wait(200);
-      cy.get('button[data-cy="cf-next-step"]').click();
-      cy.useAnyPaymentMethod();
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $500').click();
 
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -184,14 +186,14 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.get('input[name="address1"]').type('323 Logic Street');
       cy.get('input[name="postalCode"]').type('83740');
       cy.get('input[name="city"]').type("La Cadière d'Azur");
+
+      cy.get('button[data-cy="cf-next-step"]').click();
+      cy.useAnyPaymentMethod();
       cy.get('[data-cy=captcha] > div > iframe').then(recaptchaIframe => {
         const body = recaptchaIframe.contents();
         cy.wrap(body).find('#checkbox').should('be.visible').click();
       });
       cy.wait(200);
-
-      cy.get('button[data-cy="cf-next-step"]').click();
-      cy.useAnyPaymentMethod();
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $5,000').click();
 
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');

@@ -85,7 +85,7 @@ const StyledInputAmount = ({
       prepend={getPrepend(currency, currencyDisplay)}
       type="number"
       inputMode="decimal"
-      error={getError(curValue, minAmount, props.required)}
+      error={props.error || getError(curValue, minAmount, props.required)}
       defaultValue={isUndefined(defaultValue) ? undefined : defaultValue / 100}
       value={curValue}
       onWheel={e => {
