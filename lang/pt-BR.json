@@ -993,7 +993,6 @@
   "expense.unapprove.btn": "Desaprovar",
   "expense.unschedulePayment.btn": "Unschedule Payment",
   "ExpenseAmount": "Valor da despesa",
-  "ExpenseForm.accountTypeLabel": "Who will receive the money of this expense?",
   "ExpenseForm.AddAttachedFile": "Add new document",
   "ExpenseForm.AddGrantItem": "Adicionar item de concessão",
   "ExpenseForm.AddLineItem": "Adicionar novo item",
