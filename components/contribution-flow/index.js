@@ -641,7 +641,12 @@ class ContributionFlow extends React.Component {
             return true;
           } else {
             const isCompleted = Boolean(noPaymentRequired || stepPayment);
-            if (isCaptchaEnabled() && !stepProfile.captcha && !LoggedInUser) {
+            if (
+              !stepProfile.captcha &&
+              isCaptchaEnabled() &&
+              !LoggedInUser &&
+              stepPayment?.key === NEW_CREDIT_CARD_KEY
+            ) {
               this.showError(intl.formatMessage({ defaultMessage: 'Captcha is required.' }));
               return false;
             } else if (isCompleted && stepPayment?.key === NEW_CREDIT_CARD_KEY) {
@@ -745,6 +750,7 @@ class ContributionFlow extends React.Component {
     const currency = isCrypto ? stepDetails.currency.value : tier?.amount.currency || collective.currency;
     const isLoading = isCrypto ? isSubmitting : isSubmitted || isSubmitting;
     const pastEvent = collective.type === CollectiveType.EVENT && isPastEvent(collective);
+    const shouldDisplayCaptcha = isCaptchaEnabled() && !LoggedInUser && stepPayment?.key === NEW_CREDIT_CARD_KEY;
 
     return (
       <Steps
@@ -851,7 +857,7 @@ class ContributionFlow extends React.Component {
                     disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
                     hideCreditCardPostalCode={this.props.hideCreditCardPostalCode}
                   />
-                  {isCaptchaEnabled() && !nextStep && !LoggedInUser && (
+                  {!nextStep && shouldDisplayCaptcha && (
                     <Flex mt={40} justifyContent="center">
                       <Captcha
                         ref={this.captchaRef}

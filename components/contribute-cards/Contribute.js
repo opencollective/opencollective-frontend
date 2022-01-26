@@ -128,6 +128,10 @@ const I18nContributionType = defineMessages({
     id: 'ContributionType.Project',
     defaultMessage: 'Project',
   },
+  [ContributionTypes.ARCHIVED_PROJECT]: {
+    id: 'ContributionType.ArchivedProject',
+    defaultMessage: 'Archived Project',
+  },
 });
 
 const getContributeCTA = type => {

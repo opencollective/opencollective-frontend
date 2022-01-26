@@ -7,6 +7,7 @@ import styled, { css } from 'styled-components';
 
 import { EMPTY_ARRAY } from '../../../lib/constants/utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import { DebitItem } from '../../budget/DebitCreditList';
 import ExpenseBudgetItem from '../../budget/ExpenseBudgetItem';
@@ -100,7 +101,7 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions }) => {
   const isFilterAll = filter === 'all';
   if (filter === 'expenses' || (isFilterAll && hasExpenses && !hasTransactions)) {
     return (
-      <Link href={`/${collective.slug}/expenses`} data-cy="view-all-expenses-link">
+      <Link href={`${getCollectivePageRoute(collective)}/expenses`} data-cy="view-all-expenses-link">
         <span>
           <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
           &rarr;
@@ -109,7 +110,7 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions }) => {
     );
   } else if (filter === 'transactions' || (isFilterAll && hasTransactions && !hasExpenses)) {
     return (
-      <Link href={`/${collective.slug}/transactions`} data-cy="view-all-transactions-link">
+      <Link href={`${getCollectivePageRoute(collective)}/transactions`} data-cy="view-all-transactions-link">
         <FormattedMessage id="CollectivePage.SectionBudget.ViewAll" defaultMessage="View all transactions" /> &rarr;
       </Link>
     );

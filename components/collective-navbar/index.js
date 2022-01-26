@@ -22,7 +22,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import roles from '../../lib/constants/roles';
 import { getEnvVar } from '../../lib/env-utils';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
-import { getSettingsRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getSettingsRoute } from '../../lib/url-helpers';
 import { parseToBoolean } from '../../lib/utils';
 
 import ActionButton from '../ActionButton';
@@ -470,7 +470,7 @@ const CollectiveNavbar = ({
               {showBackButton && (
                 <Container display={['none', null, null, null, 'block']} position="absolute" left={-30}>
                   {collective && (
-                    <Link href={`/${collective.slug}`}>
+                    <Link href={getCollectivePageRoute(collective)}>
                       <StyledButton px={1} isBorderless>
                         &larr;
                       </StyledButton>

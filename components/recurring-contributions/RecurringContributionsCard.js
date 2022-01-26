@@ -53,7 +53,7 @@ const RecurringContributionsCard = ({
     <StyledCollectiveCard
       {...props}
       collective={collective}
-      bodyHeight="330px"
+      bodyHeight="350px"
       tag={
         <StyledTag
           display="inline-block"
@@ -85,7 +85,7 @@ const RecurringContributionsCard = ({
         <Box mb={3}>
           {showPaymentMethod && contribution.paymentMethod && (
             <Box mb={3}>
-              <P fontSize="14px" lineHeight="20px" fontWeight="400">
+              <P mb={2} fontSize="14px" lineHeight="20px" fontWeight="400">
                 Payment method
               </P>
               <Flex alignItems="center" height="28px">

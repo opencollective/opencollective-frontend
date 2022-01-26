@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import { borders } from 'styled-system';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { getCollectivePageRoute } from '../lib/url-helpers';
 import { compose, formatDate } from '../lib/utils';
 
 import EmojiReactionPicker from './conversations/EmojiReactionPicker';
@@ -226,7 +227,7 @@ class StyledUpdate extends Component {
     const { mode } = this.state;
     if (mode === 'summary') {
       return (
-        <Link href={`/${collective.slug}/updates/${update.slug}`}>
+        <Link href={`${getCollectivePageRoute(collective)}/updates/${update.slug}`}>
           <H5 data-cy="updateTitle">{update.title}</H5>
         </Link>
       );
@@ -348,7 +349,7 @@ class StyledUpdate extends Component {
         </UpdateWrapper>
         {update.publishedAt && mode === 'details' && (
           <Flex my={3} justifyContent={['center', 'flex-start']}>
-            <Link href={`/${collective.slug}/updates`}>
+            <Link href={`${getCollectivePageRoute(collective)}/updates`}>
               <StyledButton ml={[0, 5]}>{intl.formatMessage(this.messages['viewLatestUpdates'])}</StyledButton>
             </Link>
           </Flex>

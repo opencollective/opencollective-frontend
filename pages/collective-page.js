@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import dynamic from 'next/dynamic';
+import { withRouter } from 'next/router';
 import { createGlobalStyle } from 'styled-components';
 
 import { generateNotFoundError } from '../lib/errors';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
@@ -85,9 +87,11 @@ class CollectivePage extends React.Component {
     mode: PropTypes.string,
     action: PropTypes.string,
     LoggedInUser: PropTypes.object, // from withUser
+    router: PropTypes.object,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
+      account: PropTypes.object,
       Collective: PropTypes.shape({
         name: PropTypes.string,
         type: PropTypes.string.isRequired,
@@ -127,6 +131,10 @@ class CollectivePage extends React.Component {
 
   componentDidMount() {
     this.setState({ smooth: true });
+
+    const { router, data } = this.props;
+    const collective = data?.Collective;
+    addParentToURLIfMissing(router, collective);
   }
 
   getPageMetaData(collective) {
@@ -156,10 +164,6 @@ class CollectivePage extends React.Component {
     this.setState({ showOnboardingModal: bool });
   };
 
-  getCanonicalURL(slug) {
-    return `${process.env.WEBSITE_URL}/${slug}`;
-  }
-
   render() {
     const { slug, data, LoggedInUser, status, step, mode, action } = this.props;
     const { showOnboardingModal } = this.state;
@@ -188,7 +192,7 @@ class CollectivePage extends React.Component {
     }
 
     return (
-      <Page canonicalURL={this.getCanonicalURL(slug)} {...this.getPageMetaData(collective)}>
+      <Page canonicalURL={getCollectivePageCanonicalURL(collective)} {...this.getPageMetaData(collective)}>
         <GlobalStyles />
         {loading ? (
           <Container py={[5, 6]}>
@@ -253,4 +257,4 @@ const addCollectivePageData = graphql(collectivePageQuery, {
   }),
 });
 
-export default withUser(addCollectivePageData(CollectivePage));
+export default withRouter(withUser(addCollectivePageData(CollectivePage)));
