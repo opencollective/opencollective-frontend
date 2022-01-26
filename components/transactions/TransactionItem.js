@@ -306,8 +306,33 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
           </Container>
         )}
         {hasExpense && (
-          <Container mt={3} pt={[2, 0]}>
+          <Container display="flex" mt={3} pt={[2, 0]}>
             <ExpenseTags expense={expense} />
+            <StyledButton
+              data-cy="expense-details"
+              buttonSize="tiny"
+              buttonStyle="secondary"
+              isBorderless
+              onClick={() => setExpanded(!isExpanded)}
+            >
+              <Span whiteSpace="nowrap">
+                {isExpanded ? (
+                  <React.Fragment>
+                    <FormattedMessage id="closeDetails" defaultMessage="Close Details" />
+                    &nbsp;
+                    <ChevronUp size="1em" />
+                  </React.Fragment>
+                ) : (
+                  <React.Fragment>
+                    <Span whiteSpace="nowrap">
+                      <FormattedMessage id="viewDetails" defaultMessage="View Details" />
+                      &nbsp;
+                      <ChevronDown size="1em" />
+                    </Span>
+                  </React.Fragment>
+                )}
+              </Span>
+            </StyledButton>
           </Container>
         )}
         {!hasExpense && (!hasOrder || ![CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind)) && (
@@ -316,7 +341,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
           </Container>
         )}
       </Box>
-      {isExpanded && hasOrder && (
+      {isExpanded && (hasOrder || hasExpense) && (
         <TransactionDetails
           displayActions={displayActions}
           transaction={transaction}
