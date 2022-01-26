@@ -301,37 +301,40 @@ class ExpensePage extends React.Component {
                   </React.Fragment>
                 )}
               </Box>
-              <Box minWidth={270} width={['100%', null, null, 275]} mt={70}>
+              <Box minWidth={270} width={['100%', null, null, 275]} mt={[0, 70]}>
                 <ExpenseInfoSidebar
                   isLoading={data.loading}
                   collective={data.account}
                   host={data.account?.host}
-                  tags={data.account?.expensesTags.map(({ tag }) => tag)}
                   showExpenseTypeFilters
                 >
-                  <H5 mb={3}>
-                    <FormattedMessage id="Tags" defaultMessage="Tags" />
-                  </H5>
-                  <ExpenseTags
-                    isLoading={data.loading}
-                    expense={{ tags: data.account?.expensesTags.map(({ tag }) => tag) }}
-                    limit={30}
-                    getTagProps={this.getTagProps}
-                    data-cy="expense-tags-title"
-                  >
-                    {({ key, tag, renderedTag, props }) => (
-                      <Link
-                        key={key}
-                        href={{
-                          pathname: `/${this.props.collectiveSlug}/expenses`,
-                          query: this.buildFilterLinkParams({ tag: props.closeButtonProps ? null : tag }),
-                        }}
-                        data-cy="expense-tags-link"
+                  {data.account?.expensesTags.length > 0 && (
+                    <React.Fragment>
+                      <H5 mb={3}>
+                        <FormattedMessage id="Tags" defaultMessage="Tags" />
+                      </H5>
+                      <ExpenseTags
+                        isLoading={data.loading}
+                        expense={{ tags: data.account?.expensesTags.map(({ tag }) => tag) }}
+                        limit={30}
+                        getTagProps={this.getTagProps}
+                        data-cy="expense-tags-title"
                       >
-                        {renderedTag}
-                      </Link>
-                    )}
-                  </ExpenseTags>
+                        {({ key, tag, renderedTag, props }) => (
+                          <Link
+                            key={key}
+                            href={{
+                              pathname: `/${this.props.collectiveSlug}/expenses`,
+                              query: this.buildFilterLinkParams({ tag: props.closeButtonProps ? null : tag }),
+                            }}
+                            data-cy="expense-tags-link"
+                          >
+                            {renderedTag}
+                          </Link>
+                        )}
+                      </ExpenseTags>
+                    </React.Fragment>
+                  )}
                 </ExpenseInfoSidebar>
               </Box>
             </Flex>
