@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import StyledRoundButton from './StyledRoundButton';
-import { Span } from './Text';
 
 const CarouselContainer = styled(Container)`
   display: flex;
@@ -167,7 +166,7 @@ const StyledCarousel = props => {
               {React.Children.map(children, (child, index) => {
                 return (
                   <CarouselSlot order={getOrder(index)} mx={2}>
-                    {props.fitToContent ? <Span display={activeIndex !== index ? 'none' : null}>{child}</Span> : child}
+                    {child}
                   </CarouselSlot>
                 );
               })}
@@ -197,8 +196,6 @@ StyledCarousel.propTypes = {
   contentPosition: PropTypes.string,
   onChange: PropTypes.func,
   display: PropTypes.array,
-  /* Specifies whether the carousel slots needs to sized according to their content. */
-  fitToContent: PropTypes.bool,
 };
 
 StyledCarousel.defaultProps = {

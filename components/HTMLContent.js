@@ -7,6 +7,8 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { space, typography } from 'styled-system';
 
+import LoadingPlaceholder from './LoadingPlaceholder';
+
 /**
  * React-Quill usually saves something like `<p><br/></p` when saving with an empty
  * editor. This function tries to detect this and returns true if there's no real
@@ -71,6 +73,10 @@ const HTMLContent = styled(
 
     const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
 
+    if (contentRef?.current?.clientHeight === 0) {
+      return <LoadingPlaceholder />;
+    }
+
     useEffect(() => {
       if (collapsable && contentRef?.current?.clientHeight > maxCollapsedHeight + collapsePadding) {
         setIsCollapsed(true);
@@ -83,16 +89,12 @@ const HTMLContent = styled(
 
     return (
       <div>
-        {!isCollapsed || isOpen ? (
-          <InlineDisplayBox ref={contentRef} dangerouslySetInnerHTML={{ __html: content }} {...props} />
-        ) : (
-          <DisplayBox
-            ref={contentRef}
-            maxHeight={maxCollapsedHeight}
-            dangerouslySetInnerHTML={{ __html: content }}
-            {...props}
-          />
-        )}
+        <DisplayBox
+          ref={contentRef}
+          maxHeight={maxCollapsedHeight}
+          dangerouslySetInnerHTML={{ __html: content }}
+          {...props}
+        />
         {!isOpen && isCollapsed && !hideViewMoreLink && (
           <ReadFullLink
             onClick={() => setOpen(true)}
@@ -243,10 +245,10 @@ HTMLContent.propTypes = {
   content: PropTypes.string,
   /* Whether the content is collapsible; adds a blur effect and a show/hide link. */
   collapsable: PropTypes.bool,
-  /* The maximum height of the content when collapsed. */
+  /* The maximum a height of the content before being collapsed. */
   maxCollapsedHeight: PropTypes.number,
-  /* The padding to apply to the collapse blur; useful in the case to
-   *  make sure the blur effect is not applied unnecessarily. For
+  /* The the padding to apply to the collapse blur; useful in the case of
+   *  making sure only the blur effect is not applied unnecessarily. For
    *  example maxCollapsedHeight=20 and collapsePadding=22 ensure that
    *  content is collapsed only when there's more than two lines and if there's
    *  only two lines the blur effect is not applied.

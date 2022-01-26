@@ -59,7 +59,7 @@ const newsAndUpdatesQuery = gqlV2/* GraphQL */ `
 const renderStyledCarousel = (data, loading, error, onClose) => {
   if (loading === false && data) {
     return (
-      <StyledCarousel contentPosition="left" fitToContent>
+      <StyledCarousel contentPosition="left">
         {data.account.updates.nodes.map(update => (
           <Container key={update.id}>
             <Container fontSize="13px" lineHeight="20px" color="black.700">
