@@ -1030,7 +1030,7 @@
   "ExpenseForm.Type.Request": "Solicitação de concessão",
   "ExpenseFormAttachments.TotalAmount": "Valor total:",
   "expenseNeedsTaxForm.hover": "Não podemos realizar o pagamento até recebermos suas informações fiscais. Verifique se na sua caixa de entrada consta um e-mail da HelloWorks. Precisa de ajuda? Entre em contato com support@opencollective.com",
-  "expenseNeedsTaxFormMessage.msg": "Precisamos das suas informações fiscais para que possamos lhe pagar. Você receberá um e-mail da HelloWorks dizendo que a Open Collective está solicitando que você preencha um formulário. Isto é exigido pelo IRS (agência fiscal dos EUA) para todos os que facturam 600 dólares ou mais por ano. Exigimos também que seja concedido aos beneficiários para os nossos discursos. Se você não recebeu o e-mail dentro de 24 horas, ou se tiver alguma dúvida, entre em contato com <I18nSupportLink></I18nSupportLink>. Para obter mais informações, consulte a nossa <Link>documentação sobre impostos</Link>.",
+  "expenseNeedsTaxFormMessage.msg": "We need your tax information before we can pay you. You will receive an email with a link to fill out a form. If you have not received the email within 24 hours, check your spam, then contact <I18nSupportLink></I18nSupportLink>. Questions? See <Link>help docs about taxes</Link>.",
   "ExpensePage.title": "{title} · Despesa #{id}",
   "ExpensePolicies": "Políticas de despesas",
   "ExpenseReceiptImagePreview.Alt": "Visualização do recibo de despesa",
