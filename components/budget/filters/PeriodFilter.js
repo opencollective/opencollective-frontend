@@ -157,7 +157,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
           <StyledInputField
             name="timezoneType"
             mt="12px"
-            labelFontSize="13px"
+            labelFontSize="16px"
             labelFontWeight="700"
             label={
               <Flex alignItems="center">
@@ -179,7 +179,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
                 {...inputProps}
                 size="tiny"
                 items={['local', 'UTC']}
-                buttonProps={{ p: 1, fontSize: '11px' }}
+                buttonProps={{ p: 1, fontSize: '13px', fontWeight: 400 }}
                 selected={tmpDateInterval.timezoneType}
                 buttonPropsBuilder={({ item }) => ({ title: getTimeZoneTypeName(intl, item) })}
                 onChange={timezoneType => {
@@ -203,7 +203,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
             labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
             name="dateFrom"
             mt="12px"
-            labelFontSize="13px"
+            labelFontSize="16px"
           >
             {inputProps => (
               <StyledInput
@@ -225,7 +225,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
             labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
             name="dateTo"
             mt="12px"
-            labelFontSize="13px"
+            labelFontSize="16px"
           >
             {inputProps => (
               <StyledInput
@@ -244,7 +244,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
           </StyledInputField>
           <Flex mt={2}>
             <StyledButton
-              buttonSize="tiny"
+              buttonSize="medium"
               mr={2}
               mt="12px"
               flex="1"
@@ -257,7 +257,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
               <FormattedMessage id="Reset" defaultMessage="Reset" />
             </StyledButton>
             <StyledButton
-              buttonSize="tiny"
+              buttonSize="medium"
               buttonStyle="primary"
               mt="12px"
               data-cy="btn-apply-period-filter"
