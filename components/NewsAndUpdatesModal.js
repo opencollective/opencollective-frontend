@@ -94,7 +94,7 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
               <Container width="100%">
                 <HTMLContent
                   collapsable
-                  maxCollapsedHeight={480}
+                  maxCollapsedHeight={430}
                   color="black.800"
                   mt={1}
                   fontSize="16px"

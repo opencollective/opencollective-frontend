@@ -7,8 +7,6 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { space, typography } from 'styled-system';
 
-import LoadingPlaceholder from './LoadingPlaceholder';
-
 /**
  * React-Quill usually saves something like `<p><br/></p` when saving with an empty
  * editor. This function tries to detect this and returns true if there's no real
@@ -72,10 +70,6 @@ const HTMLContent = styled(
     const contentRef = useRef();
 
     const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
-
-    if (contentRef?.current?.clientHeight === 0) {
-      return <LoadingPlaceholder />;
-    }
 
     useEffect(() => {
       if (collapsable && contentRef?.current?.clientHeight > maxCollapsedHeight + collapsePadding) {
