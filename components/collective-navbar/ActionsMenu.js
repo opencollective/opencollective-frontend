@@ -17,7 +17,7 @@ import styled, { css } from 'styled-components';
 
 import { getContributeRoute } from '../../lib/collective.lib';
 import { getEnvVar } from '../../lib/env-utils';
-import { getSettingsRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getSettingsRoute } from '../../lib/url-helpers';
 import { parseToBoolean } from '../../lib/utils';
 
 import ActionButton from '../ActionButton';
@@ -243,7 +243,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasSubmitExpense && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE}>
-                        <StyledLink as={Link} href={`/${collective.slug}/expenses/new`}>
+                        <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/expenses/new`}>
                           <Container p={ITEM_PADDING}>
                             <Receipt size="20px" />
                             <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
@@ -253,7 +253,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasRequestGrant && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.REQUEST_GRANT}>
-                        <StyledLink as={Link} href={`/${collective.slug}/expenses/new`}>
+                        <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/expenses/new`}>
                           <Container p={ITEM_PADDING}>
                             <MoneyCheckAlt size="20px" />
                             <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
@@ -263,7 +263,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasManageSubscriptions && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS}>
-                        <StyledLink as={Link} href={`/${collective.slug}/recurring-contributions`}>
+                        <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/recurring-contributions`}>
                           <Container p={ITEM_PADDING}>
                             <Stack size="20px" />
                             <span>

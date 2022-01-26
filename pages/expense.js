@@ -15,6 +15,7 @@ import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
@@ -210,6 +211,10 @@ class ExpensePage extends React.Component {
   }
 
   componentDidMount() {
+    const { router, data, legacyExpenseId } = this.props;
+    const account = data?.account;
+    addParentToURLIfMissing(router, account, `/expenses/${legacyExpenseId}`);
+
     const shouldEditDraft = this.props.data.expense?.status === expenseStatus.DRAFT && this.props.draftKey;
     if (shouldEditDraft) {
       this.setState(() => ({
@@ -219,7 +224,7 @@ class ExpensePage extends React.Component {
       }));
     }
 
-    const expense = this.props.data?.expense;
+    const expense = data?.expense;
     if (
       expense?.status === expenseStatus.UNVERIFIED &&
       expense?.permissions?.canEdit &&
@@ -486,7 +491,11 @@ class ExpensePage extends React.Component {
     }
 
     return (
-      <Page collective={collective} {...this.getPageMetaData(expense)}>
+      <Page
+        collective={collective}
+        canonicalURL={`${getCollectivePageCanonicalURL(collective)}/expense`}
+        {...this.getPageMetaData(expense)}
+      >
         <CollectiveNavbar
           collective={collective}
           isLoading={!collective}

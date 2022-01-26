@@ -9,13 +9,14 @@ import styled from 'styled-components';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
 import { getSuggestedTags } from '../lib/collective.lib';
-import { isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { CollectiveType, isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -114,6 +115,7 @@ class ExpensePage extends React.Component {
         isHost: PropTypes.bool,
         host: PropTypes.object,
         expensesTags: PropTypes.array,
+        type: PropTypes.oneOf(Object.keys(CollectiveType)),
       }),
       expenses: PropTypes.shape({
         nodes: PropTypes.array,
@@ -127,6 +129,15 @@ class ExpensePage extends React.Component {
     }),
     router: PropTypes.object,
   };
+
+  componentDidMount() {
+    const { router, data } = this.props;
+    const account = data?.account;
+    const queryParameters = {
+      ...omit(this.props.query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
+    };
+    addParentToURLIfMissing(router, account, `/expenses`, queryParameters);
+  }
 
   componentDidUpdate(oldProps) {
     const { LoggedInUser, data } = this.props;
@@ -158,16 +169,16 @@ class ExpensePage extends React.Component {
     return omitBy(queryParameters, value => !value);
   }
 
-  updateFilters = queryParams => {
+  updateFilters = (queryParams, collective) => {
     return this.props.router.push({
-      pathname: `/${this.props.collectiveSlug}/expenses`,
+      pathname: `${getCollectivePageCanonicalURL(collective)}/expenses`,
       query: this.buildFilterLinkParams({ ...queryParams, offset: null }),
     });
   };
 
-  handleSearch = searchTerm => {
+  handleSearch = (searchTerm, collective) => {
     const params = this.buildFilterLinkParams({ searchTerm, offset: null });
-    this.props.router.push({ pathname: `/${this.props.collectiveSlug}/expenses`, query: params });
+    this.props.router.push({ pathname: `${getCollectivePageCanonicalURL(collective)}/expenses`, query: params });
   };
 
   getTagProps = tag => {
@@ -207,7 +218,11 @@ class ExpensePage extends React.Component {
     }
 
     return (
-      <Page collective={data.account} {...this.getPageMetaData(data.account)}>
+      <Page
+        collective={data.account}
+        canonicalURL={`${getCollectivePageCanonicalURL(data.account)}/expenses`}
+        {...this.getPageMetaData(data.account)}
+      >
         <CollectiveNavbar
           collective={data.account}
           isLoading={!data.account}
@@ -224,7 +239,10 @@ class ExpensePage extends React.Component {
                   </H1>
                   <Box mx="auto" />
                   <SearchFormContainer p={2}>
-                    <SearchBar defaultValue={query.searchTerm} onSubmit={this.handleSearch} />
+                    <SearchBar
+                      defaultValue={query.searchTerm}
+                      onSubmit={searchTerm => this.handleSearch(searchTerm, data.account)}
+                    />
                   </SearchFormContainer>
                 </Flex>
                 <StyledHr mb={26} borderWidth="0.5px" />
@@ -236,7 +254,7 @@ class ExpensePage extends React.Component {
                     <ExpensesFilters
                       collective={data.account}
                       filters={this.props.query}
-                      onChange={this.updateFilters}
+                      onChange={queryParams => this.updateFilters(queryParams, data.account)}
                     />
                   ) : (
                     <LoadingPlaceholder height={70} />
