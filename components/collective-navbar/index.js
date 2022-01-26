@@ -518,7 +518,7 @@ const CollectiveNavbar = ({
                 <ExpandMenuIcon
                   onClick={() => {
                     mainContainerRef.current?.scrollIntoView(true);
-                    setExpanded(true);
+                    setTimeout(() => setExpanded(true), 300);
                   }}
                 />
               )}
@@ -591,7 +591,7 @@ const CollectiveNavbar = ({
                     <ExpandMenuIcon
                       onClick={() => {
                         mainContainerRef.current?.scrollIntoView(true);
-                        setExpanded(!isExpanded);
+                        setTimeout(() => setExpanded(!isExpanded), 300);
                       }}
                     />
                   )}

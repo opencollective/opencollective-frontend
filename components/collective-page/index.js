@@ -272,7 +272,7 @@ class CollectivePage extends Component {
           showSelectedCategoryOnMobile
         />
 
-        <div ref={this.sectionsContainerRef} style={{ overflow: 'auto' }}>
+        <div ref={this.sectionsContainerRef}>
           {isEmpty(sections) ? (
             <SectionEmpty collective={this.props.collective} />
           ) : (
