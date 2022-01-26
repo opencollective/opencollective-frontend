@@ -1030,7 +1030,7 @@
   "ExpenseForm.Type.Request": "Wniosek o dotację",
   "ExpenseFormAttachments.TotalAmount": "Łączna kwota:",
   "expenseNeedsTaxForm.hover": "Nie możemy zapłacić dopóki nie otrzymamy informacji o Twoim rozliczeniu podatkowym. Sprawdź swoją skrzynkę odbiorczą w poszukiwaniu wiadomości e-mail od HelloWorks. Potrzebujesz pomocy? Skontaktuj się z support@opencollective.com",
-  "expenseNeedsTaxFormMessage.msg": "Zanim będziemy mogli Ci zapłacić, potrzebujemy Twoich danych podatkowych. Otrzymasz e-mail od HelloWorks z informacją, że Open Collective prosi Cię o wypełnienie formularza. Jest to wymagane przez IRS (amerykańska agencja podatkowa) dla każdego, kto wystawia fakturę na kwotę 600 USD lub więcej rocznie. Wymagamy go również od odbiorców dotacji do naszej dokumentacji. Jeśli nie otrzymałeś emaila w ciągu 24 godzin, lub masz jakiekolwiek pytania, prosimy o kontakt z <I18nSupportLink></I18nSupportLink>. Aby uzyskać więcej informacji, zobacz nasze <Link>dokumenty pomocy na temat podatków</Link>.",
+  "expenseNeedsTaxFormMessage.msg": "We need your tax information before we can pay you. You will receive an email with a link to fill out a form. If you have not received the email within 24 hours, check your spam, then contact <I18nSupportLink></I18nSupportLink>. Questions? See <Link>help docs about taxes</Link>.",
   "ExpensePage.title": "{title} · Wydatek #{id}",
   "ExpensePolicies": "Polityka wydatków",
   "ExpenseReceiptImagePreview.Alt": "Podgląd rachunku wydatków",
