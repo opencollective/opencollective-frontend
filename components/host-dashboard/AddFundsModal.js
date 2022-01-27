@@ -124,23 +124,38 @@ const addFundsMutation = gqlV2/* GraphQL */ `
   }
 `;
 
+const addFundsTierFieldsFragment = gqlV2/* GraphQL */ `
+  fragment AddFundsTierFields on Tier {
+    id
+    slug
+    legacyId
+    name
+  }
+`;
+
 const addFundsAccountQuery = gqlV2/* GraphQL */ `
   query AddFundsAccount($slug: String!) {
     account(slug: $slug) {
       id
+      type
       settings
+      ... on Organization {
+        tiers {
+          nodes {
+            ...AddFundsTierFields
+          }
+        }
+      }
       ... on AccountWithContributions {
         tiers {
           nodes {
-            id
-            slug
-            legacyId
-            name
+            ...AddFundsTierFields
           }
         }
       }
     }
   }
+  ${addFundsTierFieldsFragment}
 `;
 
 const addPlatformTipMutation = gqlV2/* GraphQL */ `
@@ -279,6 +294,11 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     [tiersNodes, accountSettings],
   );
 
+  // No modal if logged-out
+  if (!LoggedInUser) {
+    return null;
+  }
+
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
   const canAddHostFee = host.plan?.hostFees && collective.id !== host.id;
@@ -287,10 +307,6 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   // We don't want to use Platform Fees anymore for Hosts that switched to the new model
   const canAddPlatformFee = LoggedInUser.isRoot() && host.plan?.hostFeeSharePercent === 0;
   const defaultPlatformFeePercent = 0;
-
-  if (!LoggedInUser) {
-    return null;
-  }
 
   const handleClose = () => {
     setFundDetails({ showPlatformTipModal: false });
