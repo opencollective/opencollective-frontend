@@ -67,6 +67,7 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       createdAt
       imageUrl(height: 256)
       currency
+      settings
       features {
         ...NavbarFields
       }
