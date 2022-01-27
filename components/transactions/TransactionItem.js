@@ -363,7 +363,6 @@ TransactionItem.propTypes = {
       currency: PropTypes.string,
     }),
     netAmountInCollectiveCurrency: PropTypes.number,
-    refundTransaction: PropTypes.object,
     usingGiftCardFromCollective: PropTypes.object,
   }),
   collective: PropTypes.shape({

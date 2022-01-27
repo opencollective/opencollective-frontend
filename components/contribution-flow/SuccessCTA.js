@@ -4,6 +4,8 @@ import { themeGet } from '@styled-system/theme-get';
 import { defineMessages, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { getCollectivePageRoute } from '../../lib/url-helpers';
+
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Newsletter from '../home/Newsletter';
@@ -16,6 +18,7 @@ export const SUCCESS_CTA_TYPE = {
   BLOG: 'BLOG',
   JOIN: 'JOIN',
   SIGN_IN: 'SIGN_IN',
+  GO_TO_PROFILE: 'GO_TO_PROFILE',
 };
 
 const headerMessages = defineMessages({
@@ -34,6 +37,9 @@ const headerMessages = defineMessages({
   [SUCCESS_CTA_TYPE.NEWSLETTER]: {
     id: 'home.joinUsSection.newsletter',
     defaultMessage: 'Subscribe to our newsletter',
+  },
+  [SUCCESS_CTA_TYPE.GO_TO_PROFILE]: {
+    defaultMessage: "Go to {accountName}'s page",
   },
 });
 
@@ -55,6 +61,9 @@ const contentMessages = defineMessages({
     id: 'home.joinUsSection.weNeedUpdate',
     defaultMessage: 'We send updates once a month.',
   },
+  [SUCCESS_CTA_TYPE.GO_TO_PROFILE]: {
+    defaultMessage: 'Go to the public page of {accountName} on Open Collective',
+  },
 });
 
 const CTAContainer = styled(Container)`
@@ -63,6 +72,17 @@ const CTAContainer = styled(Container)`
   border: 1px solid ${themeGet('colors.black.400')};
   border-radius: 10px;
   background-color: white;
+
+  ${props =>
+    props.$isPrimary &&
+    css`
+      border: 1px solid ${themeGet('colors.primary.500')};
+
+      h3,
+      span {
+        color: ${themeGet('colors.primary.800')};
+      }
+    `}
 
   ${props =>
     props.hoverable &&
@@ -79,7 +99,7 @@ const CTAContainer = styled(Container)`
     `}
 `;
 
-const SuccessCTAWrapper = ({ type, orderId, email, ...props }) => {
+const SuccessCTAWrapper = ({ type, orderId, email, account, ...props }) => {
   switch (type) {
     case SUCCESS_CTA_TYPE.JOIN:
       return (
@@ -105,6 +125,8 @@ const SuccessCTAWrapper = ({ type, orderId, email, ...props }) => {
       );
     case SUCCESS_CTA_TYPE.BLOG:
       return <StyledLink href="https://blog.opencollective.com" openInNewTab color="black.800" {...props} />;
+    case SUCCESS_CTA_TYPE.GO_TO_PROFILE:
+      return <StyledLink as={Link} href={getCollectivePageRoute(account)} color="black.800" {...props} />;
     default:
       return <React.Fragment {...props} />;
   }
@@ -114,15 +136,16 @@ SuccessCTAWrapper.propTypes = {
   type: PropTypes.string,
   orderId: PropTypes.string,
   email: PropTypes.string,
+  account: PropTypes.object,
 };
 
-const SuccessCTA = ({ type, orderId, email }) => {
+const SuccessCTA = ({ type, orderId, email, account, isPrimary }) => {
   const { formatMessage } = useIntl();
   const isNewsletter = type === SUCCESS_CTA_TYPE.NEWSLETTER;
   return (
     <Container px={[3, 0]} my={3} maxWidth={600}>
-      <SuccessCTAWrapper type={type} orderId={orderId} email={email}>
-        <CTAContainer px={4} py={2} hoverable={!isNewsletter}>
+      <SuccessCTAWrapper account={account} type={type} orderId={orderId} email={email}>
+        <CTAContainer px={4} py={2} hoverable={!isNewsletter} $isPrimary={isPrimary}>
           <Flex
             flexDirection="column"
             alignItems="left"
@@ -131,10 +154,10 @@ const SuccessCTA = ({ type, orderId, email }) => {
             my={3}
           >
             <H3 mb={3} color="black.800">
-              {formatMessage(headerMessages[type])}
+              {formatMessage(headerMessages[type], { accountName: account.name })}
             </H3>
             <P fontSize="14px" lineHeight="24px" fontWeight={300} color="black.700">
-              {formatMessage(contentMessages[type])}
+              {formatMessage(contentMessages[type], { accountName: account.name })}
             </P>
             {isNewsletter && (
               <Box mt={2}>
@@ -154,9 +177,14 @@ const SuccessCTA = ({ type, orderId, email }) => {
 };
 
 SuccessCTA.propTypes = {
-  type: PropTypes.oneOf(Object.values(SUCCESS_CTA_TYPE)),
+  type: PropTypes.oneOf(Object.values(SUCCESS_CTA_TYPE)).isRequired,
   orderId: PropTypes.string,
   email: PropTypes.string,
+  isPrimary: PropTypes.bool,
+  account: PropTypes.shape({
+    name: PropTypes.string,
+    slug: PropTypes.string,
+  }).isRequired,
 };
 
 export default SuccessCTA;
