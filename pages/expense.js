@@ -79,6 +79,10 @@ const expensePageQuery = gqlV2/* GraphQL */ `
           ...CommentFields
         }
       }
+      account {
+        id
+        slug
+      }
     }
 
     # As it uses a dedicated variable this needs to be separated from the ExpensePageExpenseFields fragment
@@ -212,7 +216,7 @@ class ExpensePage extends React.Component {
 
   componentDidMount() {
     const { router, data, legacyExpenseId } = this.props;
-    const account = data?.account;
+    const account = data?.expense?.account;
     addParentToURLIfMissing(router, account, `/expenses/${legacyExpenseId}`);
 
     const shouldEditDraft = this.props.data.expense?.status === expenseStatus.DRAFT && this.props.draftKey;

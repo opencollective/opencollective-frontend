@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { truncate } from 'lodash';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import Link from '../Link';
 import StyledLink from '../StyledLink';
@@ -16,7 +17,7 @@ const ContributeProject = ({ collective, project, ...props }) => {
   const description = truncate(project.description, { length: 100 });
   return (
     <Contribute
-      route={`/${collective.slug}/projects/${project.slug}`}
+      route={`${getCollectivePageRoute(collective)}/projects/${project.slug}`}
       type={project.isArchived ? ContributionTypes.ARCHIVED_PROJECT : ContributionTypes.PROJECT}
       contributors={project.contributors}
       stats={project.stats.backers}

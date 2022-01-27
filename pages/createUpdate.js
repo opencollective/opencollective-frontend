@@ -8,7 +8,7 @@ import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
-import { getCollectivePageRoute } from '../lib/url-helpers';
+import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
 import { compose } from '../lib/utils';
 
 import Body from '../components/Body';
@@ -78,6 +78,12 @@ class CreateUpdatePage extends React.Component {
       error: '',
       updateType: props.data?.account?.slug === 'opencollective' ? UPDATE_TYPES[1] : UPDATE_TYPES[0],
     };
+  }
+
+  componentDidMount() {
+    const { router, data } = this.props;
+    const account = data?.account;
+    addParentToURLIfMissing(router, account, '/updates/new');
   }
 
   createUpdate = async update => {

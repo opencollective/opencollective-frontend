@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nTransactionKind, i18nTransactionType } from '../../lib/i18n/transaction';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
 import { CreditItem, DebitItem } from '../budget/DebitCreditList';
@@ -67,7 +68,11 @@ const ItemTitleWrapper = ({ expense, children }) => {
         content={<FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />}
         delayHide={0}
       >
-        <StyledLink as={Link} underlineOnHover href={`/${expense.account.slug}/expenses/${expense.legacyId}`}>
+        <StyledLink
+          as={Link}
+          underlineOnHover
+          href={`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`}
+        >
           {children}
         </StyledLink>
       </StyledTooltip>

@@ -16,7 +16,7 @@ import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -264,7 +264,10 @@ class ExpensePage extends React.Component {
                         defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
                         values={{
                           ResetLink: text => (
-                            <Link data-cy="reset-expenses-filters" href={`/${collectiveSlug}/expenses`}>
+                            <Link
+                              data-cy="reset-expenses-filters"
+                              href={`${getCollectivePageRoute(data.account)}/expenses`}
+                            >
                               <span>{text}</span>
                             </Link>
                           ),
@@ -286,7 +289,7 @@ class ExpensePage extends React.Component {
                     />
                     <Flex mt={5} justifyContent="center">
                       <Pagination
-                        route={`/${collectiveSlug}/expenses`}
+                        route={`${getCollectivePageRoute(data.account)}/expenses`}
                         total={data.expenses?.totalCount}
                         limit={data.variables.limit}
                         offset={data.variables.offset}
@@ -320,7 +323,7 @@ class ExpensePage extends React.Component {
                           <Link
                             key={key}
                             href={{
-                              pathname: `/${this.props.collectiveSlug}/expenses`,
+                              pathname: `${getCollectivePageRoute(data.account)}/expenses`,
                               query: this.buildFilterLinkParams({ tag: props.closeButtonProps ? null : tag }),
                             }}
                             data-cy="expense-tags-link"
