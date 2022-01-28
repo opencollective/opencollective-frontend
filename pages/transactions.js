@@ -7,7 +7,8 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
+import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { parseDateInterval } from '../lib/date-utils';
@@ -266,11 +267,7 @@ class TransactionsPage extends React.Component {
       );
     } else if (!collective) {
       return <ErrorPage data={data} />;
-    } else if (
-      isSectionForAdminsOnly(collective, Sections.BUDGET) &&
-      !LoggedInUser?.canEditCollective(collective) &&
-      !LoggedInUser?.isHostAdmin(collective)
-    ) {
+    } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, data.account)) {
       // Hack for funds that want to keep their budget "private"
       return <PageFeatureNotSupported showContactSupportLink={false} />;
     }
