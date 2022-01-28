@@ -811,7 +811,6 @@
   "editCollective.menu.policies": "정책",
   "editCollective.menu.tiers": "티어",
   "editCollective.menu.webhooks": "웹훅",
-  "editCollective.notFound": "수정할 콜렉티브 데이터 없음",
   "editCollective.receivingMoney": "Receiving Money",
   "editCollective.receivingMoney.bankTransfers": "게좌 이체",
   "editCollective.rejectCategories.description": "Specify any categories of contributor that you do not wish to accept money from, to automatically prevent these types of contributions. (You can also reject contributions individually using the button on a specific unwanted transaction)",

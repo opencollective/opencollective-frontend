@@ -811,7 +811,6 @@
   "editCollective.menu.policies": "Políticas",
   "editCollective.menu.tiers": "categorías",
   "editCollective.menu.webhooks": "Webhooks",
-  "editCollective.notFound": "No hay datos del colectivo para editar",
   "editCollective.receivingMoney": "Recibir dinero",
   "editCollective.receivingMoney.bankTransfers": "Transferencias bancarias",
   "editCollective.rejectCategories.description": "Especifica si no quieres recibir dinero de alguna categoría de contribuidores para evitar automáticamente este tipo de contribuciones (también puedes rechazar contribuciones una por una haciendo clic en el botón de una transacción no deseada)",

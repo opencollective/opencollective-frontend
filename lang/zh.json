@@ -811,7 +811,6 @@
   "editCollective.menu.policies": "策略",
   "editCollective.menu.tiers": "层级",
   "editCollective.menu.webhooks": "网络钩子",
-  "editCollective.notFound": "没有要编辑的 Collective 数据",
   "editCollective.receivingMoney": "收款",
   "editCollective.receivingMoney.bankTransfers": "银行转账",
   "editCollective.rejectCategories.description": "Specify any categories of contributor that you do not wish to accept money from, to automatically prevent these types of contributions. (You can also reject contributions individually using the button on a specific unwanted transaction)",

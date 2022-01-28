@@ -811,7 +811,6 @@
   "editCollective.menu.policies": "Polityka",
   "editCollective.menu.tiers": "Poziomy",
   "editCollective.menu.webhooks": "Webhooki",
-  "editCollective.notFound": "Brak zbiorczych danych do edycji",
   "editCollective.receivingMoney": "Otrzymywanie pieniędzy",
   "editCollective.receivingMoney.bankTransfers": "Przelewy bankowe",
   "editCollective.rejectCategories.description": "Określ kategorie wpłacających, od których nie chcesz przyjmować pieniędzy, aby automatycznie zapobiegać tego typu wpłatom. (Możesz również odrzucać wpłaty indywidualnie używając przycisku na konkretnej niechcianej transakcji)",

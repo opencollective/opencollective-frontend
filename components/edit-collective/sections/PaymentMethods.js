@@ -10,7 +10,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { PAYMENT_METHOD_TYPE } from '../../../lib/constants/payment-methods';
 import { getErrorFromGraphqlException, isErrorType } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { addEditCollectiveMutation } from '../../../lib/graphql/mutations';
 import { paymentMethodLabel } from '../../../lib/payment_method_label';
 import { getStripe, stripeTokenToPaymentMethod } from '../../../lib/stripe';
 import { compose } from '../../../lib/utils';
@@ -46,8 +45,6 @@ class EditPaymentMethods extends React.Component {
     removePaymentMethod: PropTypes.func.isRequired,
     /** From graphql query */
     updatePaymentMethod: PropTypes.func.isRequired,
-    /** From graphql query */
-    editCollective: PropTypes.func.isRequired,
     /** From stripeLoader */
     loadStripe: PropTypes.func.isRequired,
     contentOnly: PropTypes.bool,
@@ -405,7 +402,6 @@ const addGraphql = compose(
   addPaymentMethodsData,
   addRemovePaymentMethodMutation,
   addUpdatePaymentMethodMutation,
-  addEditCollectiveMutation,
   addCreateCreditCardMutation,
   addConfirmCreditCardMutation,
 );

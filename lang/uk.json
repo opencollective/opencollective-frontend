@@ -811,7 +811,6 @@
   "editCollective.menu.policies": "Політики",
   "editCollective.menu.tiers": "Рівні",
   "editCollective.menu.webhooks": "Вебхуки",
-  "editCollective.notFound": "Немає даних колективу для редагування",
   "editCollective.receivingMoney": "Отримання коштів",
   "editCollective.receivingMoney.bankTransfers": "Банківські перекази",
   "editCollective.rejectCategories.description": "Specify any categories of contributor that you do not wish to accept money from, to automatically prevent these types of contributions. (You can also reject contributions individually using the button on a specific unwanted transaction)",

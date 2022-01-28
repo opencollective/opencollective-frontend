@@ -811,7 +811,6 @@
   "editCollective.menu.policies": "Policies",
   "editCollective.menu.tiers": "Categories",
   "editCollective.menu.webhooks": "Webhooks",
-  "editCollective.notFound": "No collective data to edit",
   "editCollective.receivingMoney": "Receiving Money",
   "editCollective.receivingMoney.bankTransfers": "Bank Transfers",
   "editCollective.rejectCategories.description": "Specify any categories of contributor that you do not wish to accept money from, to automatically prevent these types of contributions. (You can also reject contributions individually using the button on a specific unwanted transaction)",
