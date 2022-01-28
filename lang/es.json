@@ -2300,6 +2300,7 @@
   "VerifyButton": "Verificar",
   "VerifyEmailAddress": "Verificar tu dirección de correo electrónico",
   "VerifyEmailInstructions": "Se ha enviado un correo electrónico de verificación a {email}. Haz clic en el enlace para completar el envío de este gasto. Si no te aparece el correo electrónico en tu bandeja de entrada revisa tu bandeja de Spam.",
+  "VI5XKs": "This page is powered by Open Collective, a platform that lets you collect and spend money transparently. Open Collective is free for charitable communities, we rely on the generosity of contributors like you to make this possible.",
   "VideoLinkerBox.AddVideo": "Añadir un vídeo",
   "VideoLinkerBox.SetUrl": "Set the video URL below. We support the following platforms: {supportedVideoProviders}",
   "ViewCollectivePage": "Ver perfil",
