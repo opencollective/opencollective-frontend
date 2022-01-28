@@ -8,6 +8,7 @@ import Container from './Container';
 import Footer from './Footer';
 import Header from './Header';
 import HostsWithData from './HostsWithData';
+import Link from './Link';
 import { H1, P } from './Text';
 
 const CoverSmallCTA = styled.span`
@@ -31,14 +32,14 @@ class Hosts extends React.Component {
         id: 'hosts.title',
         defaultMessage: 'Open Collective Hosts',
       },
-      'hosts.description': {
-        id: 'hosts.description',
-        defaultMessage:
-          'Fiscal Hosts hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. {findOutMoreLink}',
+      'hosts.fiscalHosts': {
+        defaultMessage: 'Fiscal Hosts',
       },
-      'hosts.findOutMoreLink': {
-        id: 'hosts.description.findOutMoreLink',
-        defaultMessage: 'Find out more about becoming a Fiscal Host.',
+      'hosts.findOutMore': {
+        defaultMessage: 'Find out more',
+      },
+      'hosts.becomingAFiscalHost': {
+        defaultMessage: 'becoming a Fiscal Host.',
       },
     });
   }
@@ -48,11 +49,33 @@ class Hosts extends React.Component {
 
     const title = intl.formatMessage(this.messages['hosts.title']);
 
-    const findOutMoreMessage = intl.formatMessage(this.messages['hosts.findOutMoreLink']);
+    const fiscalHostingMessage = intl.formatMessage(this.messages['hosts.fiscalHosts']);
+
+    const findOutMoreMessage = intl.formatMessage(this.messages['hosts.findOutMore']);
+
+    const becomingAHostMessage = intl.formatMessage(this.messages['hosts.becomingAFiscalHost']);
+
+    const fiscalHostingLink = (
+      <CoverSmallCTA>
+        <Link href="/fiscal-hosting">{fiscalHostingMessage}</Link>
+      </CoverSmallCTA>
+    );
 
     const findOutMoreLink = (
       <CoverSmallCTA>
-        <a href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host">{findOutMoreMessage}</a>
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host"
+        >
+          {findOutMoreMessage}
+        </a>
+      </CoverSmallCTA>
+    );
+
+    const becomingAHostLink = (
+      <CoverSmallCTA>
+        <Link href="/become-a-host">{becomingAHostMessage}</Link>
       </CoverSmallCTA>
     );
 
@@ -68,8 +91,8 @@ class Hosts extends React.Component {
             <P textAlign="center">
               <FormattedMessage
                 id="hosts.description"
-                defaultMessage="Fiscal Hosts hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. {findOutMoreLink}"
-                values={{ findOutMoreLink }}
+                defaultMessage="{fiscalHostingLink} hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. {findOutMoreLink} about {becomingAHostLink}"
+                values={{ fiscalHostingLink, findOutMoreLink, becomingAHostLink }}
               />
             </P>
           </Container>

@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
+import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import { H1, P } from '../Text';
@@ -42,7 +43,13 @@ const FiscalSponsorship = () => {
           >
             <FormattedMessage
               id="becomeAHost.description"
-              defaultMessage="Open Collective is purpose-built to streamline your processes, reduce overhead, increase transparency, and enable your organization to hold and manage funds for more projects in less time."
+              defaultMessage="Open Collective is purpose-built to streamline your processes, reduce overhead, increase transparency, and enable your organization to hold and manage funds for more projects in less time. <learnMoreLink>Learn more</learnMoreLink>."
+              values={{
+                learnMoreLink: getI18nLink({
+                  href: 'https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host',
+                  openInNewTab: true,
+                }),
+              }}
             />
           </P>
         </Box>
