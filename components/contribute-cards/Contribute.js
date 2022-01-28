@@ -195,6 +195,7 @@ const ContributeCard = ({
   hideContributors,
   image,
   disableCTA,
+  hideCTA,
   ...props
 }) => {
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
@@ -224,7 +225,7 @@ const ContributeCard = ({
           <Description data-cy="contribute-description">{children}</Description>
         </Flex>
         <Box>
-          {!disableCTA && (
+          {!disableCTA && !hideCTA && (
             <Link href={route}>
               <StyledButton buttonStyle={getCTAButtonStyle(type)} width={1} mb={2} mt={3} data-cy="contribute-btn">
                 {buttonText || getContributeCTA(type)}
@@ -293,6 +294,7 @@ ContributeCard.propTypes = {
   children: PropTypes.node,
   /** If true, the call to action will not be displayed */
   disableCTA: PropTypes.bool,
+  hideCTA: PropTypes.bool,
   /** Contributors */
   contributors: PropTypes.arrayOf(
     PropTypes.shape({

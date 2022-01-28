@@ -94,10 +94,10 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
   const isFlexibleAmount = tier.amountType === 'FLEXIBLE';
   const isFlexibleInterval = tier.interval === INTERVALS.flexible;
   const minAmount = isFlexibleAmount ? tier.minimumAmount : tier.amount;
-  const amountRaised = stats[tier.interval && !isFlexibleInterval ? 'totalRecurringDonations' : 'totalDonated'] || 0;
+  const amountRaised = stats?.[tier.interval && !isFlexibleInterval ? 'totalRecurringDonations' : 'totalDonated'] || 0;
   const tierIsExpired = isTierExpired(tier);
   const tierType = getContributionTypeFromTier(tier, tierIsExpired);
-  const hasNoneLeft = tier.stats.availableQuantity === 0;
+  const hasNoneLeft = stats?.availableQuantity === 0;
   const canContributeToCollective = collective.isActive && !isPastEvent(collective);
   const isDisabled = !canContributeToCollective || tierIsExpired || hasNoneLeft;
 
@@ -118,7 +118,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
       type={tierType}
       buttonText={tier.button}
       contributors={tier.contributors}
-      stats={tier.stats.contributors}
+      stats={stats?.contributors}
       data-cy="contribute-card-tier"
       disableCTA={isDisabled}
       {...props}
@@ -131,7 +131,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                 id="tier.limited"
                 values={{
                   maxQuantity: tier.maxQuantity,
-                  availableQuantity: tier.stats && tier.stats.availableQuantity,
+                  availableQuantity: stats?.availableQuantity,
                 }}
                 defaultMessage="LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}"
               />
@@ -239,7 +239,7 @@ ContributeTier.propTypes = {
       totalDonated: PropTypes.number,
       contributors: PropTypes.object,
       availableQuantity: PropTypes.number,
-    }).isRequired,
+    }),
     contributors: PropTypes.arrayOf(PropTypes.object),
   }),
   /** @ignore */

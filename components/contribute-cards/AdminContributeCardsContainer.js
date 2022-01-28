@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import ContributeCardsContainer from '../collective-page/ContributeCardsContainer';
+import StyledModal from '../StyledModal';
 
 import ContributeCardContainer from './ContributeCardContainer';
 import CreateNew from './CreateNew';
@@ -21,7 +22,10 @@ const AdminContributeCardsContainer = ({
   onContributionCardMove,
   onContributionCardDrop,
   onMount,
+  CardsContainer,
+  useTierModals,
 }) => {
+  const [showCreateModal, setShowCreateModal] = React.useState(false);
   const isEvent = collective.type === CollectiveType.EVENT;
   const createContributionTierRoute = isEvent
     ? `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/admin/tiers`
@@ -35,10 +39,11 @@ const AdminContributeCardsContainer = ({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <ContributeCardsContainer>
+      <CardsContainer>
         {cards.map(({ key, Component, componentProps }, index) => (
           <ContributeCardContainer key={key}>
             {cards.length === 1 ? (
+              // TODO Add edit button here
               <Component {...componentProps} />
             ) : (
               <DraggableContributeCardWrapper
@@ -47,16 +52,24 @@ const AdminContributeCardsContainer = ({
                 index={index}
                 onMove={onContributionCardMove}
                 onDrop={onContributionCardDrop}
+                hasEditModal={useTierModals}
               />
             )}
           </ContributeCardContainer>
         ))}
         <ContributeCardContainer>
-          <CreateNew data-cy="create-contribute-tier" route={createContributionTierRoute}>
-            <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
-          </CreateNew>
+          {useTierModals ? (
+            <CreateNew as="div" data-cy="create-contribute-tier" onClick={() => setShowCreateModal(true)}>
+              <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
+            </CreateNew>
+          ) : (
+            <CreateNew data-cy="create-contribute-tier" route={createContributionTierRoute}>
+              <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
+            </CreateNew>
+          )}
         </ContributeCardContainer>
-      </ContributeCardsContainer>
+        {showCreateModal && <StyledModal onClose={() => setShowCreateModal(false)}></StyledModal>}
+      </CardsContainer>
     </DndProvider>
   );
 };
@@ -74,9 +87,15 @@ AdminContributeCardsContainer.propTypes = {
       slug: PropTypes.string,
     }),
   }).isRequired,
+  /** Whether to use the new modals to edit/create tiers */ useTierModals: PropTypes.bool,
   onContributionCardMove: PropTypes.func.isRequired,
   onContributionCardDrop: PropTypes.func.isRequired,
   onMount: PropTypes.func,
+  CardsContainer: PropTypes.node,
+};
+
+AdminContributeCardsContainer.defaultProps = {
+  CardsContainer: ContributeCardsContainer,
 };
 
 export default AdminContributeCardsContainer;

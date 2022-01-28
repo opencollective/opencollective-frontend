@@ -205,6 +205,14 @@ const Menu = ({ collective, isAccountantOnly }) => {
           />
           <MenuLink
             collective={collective}
+            section={COLLECTIVE_SECTIONS.TIERS_REVAMP}
+            if={
+              ['development', 'staging'].includes(process.env.OC_ENV) &&
+              isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT])
+            }
+          />
+          <MenuLink
+            collective={collective}
             section={COLLECTIVE_SECTIONS.WEBHOOKS}
             if={isOneOfTypes(collective, [COLLECTIVE, USER, EVENT])}
           />
