@@ -1299,7 +1299,7 @@
   "Hero.EditCover": "Изменить обложку",
   "Hero.HostFee": "Комиссия представителя: {fee}",
   "Hero.PlatformFee": "Комиссия платформы: {fee}",
-  "HeroAvatar.Confirm.Remove": "Do really want to remove your profile picture?",
+  "HeroAvatar.Confirm.Remove": "Do you really want to remove your profile picture?",
   "HeroAvatar.Edit": "Изменить логотип",
   "HeroAvatar.Remove": "Убрать логотип",
   "Hide": "Скрыть",
