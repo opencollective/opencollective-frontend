@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
 import { Formik } from 'formik';
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../../lib/constants/payout-method';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
+import ConfirmationModal from '../../ConfirmationModal';
 import Container from '../../Container';
 import PayoutBankInformationForm from '../../expenses/PayoutBankInformationForm';
 import { Box, Flex } from '../../Grid';
@@ -79,6 +80,7 @@ const BankTransfer = props => {
   const [createPayoutMethod] = useMutation(createPayoutMethodMutation, { context: API_V2_CONTEXT });
   const [editBankTransfer] = useMutation(editBankTransferMutation, { context: API_V2_CONTEXT });
   const [showForm, setShowForm] = React.useState(false);
+  const [showRemoveBankConfirmationModal, setShowRemoveBankConfirmationModal] = React.useState(false);
 
   if (loading) {
     return <Loading />;
@@ -126,7 +128,7 @@ const BankTransfer = props => {
               )}
             </Container>
           </Box>
-          <Flex alignItems="center" my={2}>
+          <Box alignItems="center" my={2}>
             <StyledButton
               buttonStyle="standard"
               buttonSize="small"
@@ -145,8 +147,21 @@ const BankTransfer = props => {
                   <FormattedMessage id="paymentMethods.manual.add" defaultMessage="Set bank details" />
                 </Fragment>
               )}
-            </StyledButton>
-          </Flex>
+            </StyledButton>{' '}
+            {existingManualPaymentMethod && (
+              <StyledButton
+                mt={[2, 0]}
+                buttonStyle="standard"
+                buttonSize="small"
+                disabled={!data.host.plan.manualPayments}
+                onClick={() => {
+                  setShowRemoveBankConfirmationModal(true);
+                }}
+              >
+                <FormattedMessage defaultMessage="Remove bank details" />
+              </StyledButton>
+            )}
+          </Box>
         </Fragment>
       )}
       {showForm && (
@@ -249,6 +264,37 @@ const BankTransfer = props => {
             </form>
           )}
         </Formik>
+      )}
+      {showRemoveBankConfirmationModal && (
+        <ConfirmationModal
+          show={showRemoveBankConfirmationModal}
+          width="100%"
+          maxWidth="570px"
+          onClose={() => {
+            setShowRemoveBankConfirmationModal(false);
+          }}
+          header={<FormattedMessage defaultMessage="Remove Bank Account" />}
+          continueHandler={async () => {
+            const paymentMethods = get(data.host, 'settings.paymentMethods');
+            const modifiedPaymentMethods = omit(paymentMethods, 'manual');
+            await editBankTransfer({
+              variables: {
+                key: 'paymentMethods',
+                value: modifiedPaymentMethods,
+                account: { slug: props.collectiveSlug },
+              },
+              refetchQueries: [
+                { query: hostQuery, context: API_V2_CONTEXT, variables: { slug: props.collectiveSlug } },
+              ],
+              awaitRefetchQueries: true,
+            });
+            setShowRemoveBankConfirmationModal(false);
+          }}
+        >
+          <P fontSize="14px" lineHeight="18px" mt={2}>
+            <FormattedMessage defaultMessage="Are you sure you want to remove bank account details?" />
+          </P>
+        </ConfirmationModal>
       )}
     </Flex>
   );
