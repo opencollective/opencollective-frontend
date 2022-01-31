@@ -80,7 +80,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
 
 StyledMembershipCard.propTypes = {
   membership: PropTypes.shape({
-    account: {
+    account: PropTypes.shape({
       id: PropTypes.string,
       imageUrl: PropTypes.string,
       isAdmin: PropTypes.bool,
@@ -90,13 +90,13 @@ StyledMembershipCard.propTypes = {
       backers: PropTypes.shape({
         totalCount: PropTypes.number,
       }),
-    },
+    }),
     description: PropTypes.string,
     id: PropTypes.string,
     publicMessage: PropTypes.string,
     role: PropTypes.string,
     since: PropTypes.string,
-    totalDonations: { currency: PropTypes.string, valueInCents: PropTypes.number },
+    totalDonations: PropTypes.shape({ currency: PropTypes.string, valueInCents: PropTypes.number }),
   }),
   intl: PropTypes.object,
 };

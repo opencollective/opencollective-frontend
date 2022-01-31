@@ -146,6 +146,7 @@ const membershipsQuery = gql`
           yearlyBudget
         }
         parentCollective {
+          id
           slug
         }
       }
