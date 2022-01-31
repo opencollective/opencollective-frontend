@@ -55,7 +55,7 @@ import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
-import Menu, { EDIT_COLLECTIVE_SECTIONS } from './Menu';
+import { EDIT_COLLECTIVE_SECTIONS } from './Menu';
 
 const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, USER } = CollectiveType;
 
