@@ -216,7 +216,9 @@ export const budgetSectionQuery = gqlV2/* GraphQL */ `
       }
     }
     account(slug: $slug) {
+      id
       stats {
+        id
         balance {
           valueInCents
           currency
