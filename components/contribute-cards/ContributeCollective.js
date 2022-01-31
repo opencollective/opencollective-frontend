@@ -14,7 +14,7 @@ const ContributeCollective = ({ collective, ...props }) => {
   const description = truncate(collective.description, { length: 100 });
   return (
     <Contribute
-      route={`${getCollectivePageRoute(collective)}`}
+      route={getCollectivePageRoute(collective)}
       type={ContributionTypes.CHILD_COLLECTIVE}
       title={collective.name}
       contributors={collective.contributors}

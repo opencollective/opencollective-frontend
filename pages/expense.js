@@ -216,7 +216,7 @@ class ExpensePage extends React.Component {
 
   componentDidMount() {
     const { router, data, legacyExpenseId } = this.props;
-    const account = data?.expense?.account;
+    const account = data?.account;
     addParentToURLIfMissing(router, account, `/expenses/${legacyExpenseId}`);
 
     const shouldEditDraft = this.props.data.expense?.status === expenseStatus.DRAFT && this.props.draftKey;
