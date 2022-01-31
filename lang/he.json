@@ -1299,7 +1299,7 @@
   "Hero.EditCover": "עריכת תמונת כותרת",
   "Hero.HostFee": "עמלת מארח: {fee}",
   "Hero.PlatformFee": "עמלת פלטפורמה: {fee}",
-  "HeroAvatar.Confirm.Remove": "להסיר את תמונת הפרופיל שלך?",
+  "HeroAvatar.Confirm.Remove": "Do you really want to remove your profile picture?",
   "HeroAvatar.Edit": "עריכת הלוגו",
   "HeroAvatar.Remove": "הסרת הלוגו",
   "Hide": "הסתרה",
