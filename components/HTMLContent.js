@@ -39,12 +39,12 @@ const ReadFullLink = styled.a`
 
 const InlineDisplayBox = styled.div`
   overflow-y: hidden;
-  max-height: ${props => props.maxHeight + 20}px;
+  ${props => props.maxHeight && `max-height: ${props.maxHeight + 20}px;`}
 `;
 
 const CollapsedDisplayBox = styled.div`
   overflow-y: hidden;
-  max-height: ${props => props.maxCollapsedHeight + 20}px;
+  ${props => props.maxHeight && `max-height: ${props.maxCollapsedHeight + 20}px;`}
   -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 `;
