@@ -1299,7 +1299,7 @@
   "Hero.EditCover": "Edit cover",
   "Hero.HostFee": "Host fee: {fee}",
   "Hero.PlatformFee": "Platform fee: {fee}",
-  "HeroAvatar.Confirm.Remove": "Do really want to remove your profile picture?",
+  "HeroAvatar.Confirm.Remove": "Do you really want to remove your profile picture?",
   "HeroAvatar.Edit": "Edit logo",
   "HeroAvatar.Remove": "Remove logo",
   "Hide": "Hide",
