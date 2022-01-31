@@ -32,7 +32,7 @@ import StyledSelect from '../../StyledSelect';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
-import SettingsTitle from '../SettingsTitle';
+import SettingsSubtitle from '../SettingsSubtitle';
 
 export const getSettingsQuery = gqlV2/* GraphQL */ `
   query GetSettingsForEditCollectivePage($slug: String!) {
@@ -298,7 +298,7 @@ MenuCategory.propTypes = {
   onSectionToggle: PropTypes.func,
 };
 
-const EditCollectivePage = ({ collective, contentOnly }) => {
+const EditCollectivePage = ({ collective }) => {
   const intl = useIntl();
   const [isDirty, setDirty] = React.useState(false);
   const [sections, setSections] = React.useState(null);
@@ -348,17 +348,12 @@ const EditCollectivePage = ({ collective, contentOnly }) => {
   const displayedSections = tmpSections || sections;
   return (
     <DndProviderHTML5Backend>
-      <SettingsTitle
-        contentOnly={contentOnly}
-        subtitle={
-          <FormattedMessage
-            id="EditCollectivePage.SectionsDescription"
-            defaultMessage="Drag and drop to reorder sections. Toggle on and off with the visibility setting dropdown. Remember to click save at the bottom!"
-          />
-        }
-      >
-        <FormattedMessage id="EditCollectivePage.Sections" defaultMessage="Customize Profile Page Sections" />
-      </SettingsTitle>
+      <SettingsSubtitle>
+        <FormattedMessage
+          id="EditCollectivePage.SectionsDescription"
+          defaultMessage="Drag and drop to reorder sections. Toggle on and off with the visibility setting dropdown. Remember to click save at the bottom!"
+        />
+      </SettingsSubtitle>
       <Flex flexWrap="wrap" mt={4}>
         <Box width="100%" maxWidth={436}>
           {loading || !displayedSections ? (
@@ -452,7 +447,6 @@ EditCollectivePage.propTypes = {
     slug: PropTypes.string,
     type: PropTypes.string,
   }),
-  contentOnly: PropTypes.bool,
 };
 
 export default EditCollectivePage;

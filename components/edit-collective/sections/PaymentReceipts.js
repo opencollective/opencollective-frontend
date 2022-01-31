@@ -19,7 +19,7 @@ import StyledCard from '../../StyledCard';
 import StyledHr from '../../StyledHr';
 import StyledSelect from '../../StyledSelect';
 import { H3, P, Span } from '../../Text';
-import SettingsTitle from '../SettingsTitle';
+import SettingsSubtitle from '../SettingsSubtitle';
 
 const HostName = styled(P)`
   margin: 0 !important;
@@ -198,7 +198,7 @@ const Receipts = ({ invoices }) => {
   });
 };
 
-const PaymentReceipts = ({ collective, contentOnly }) => {
+const PaymentReceipts = ({ collective }) => {
   const defaultFilter = {
     label: 'Past 12 months',
     value: 'PAST_12_MONTHS',
@@ -226,17 +226,12 @@ const PaymentReceipts = ({ collective, contentOnly }) => {
 
   return (
     <Flex flexDirection="column">
-      <SettingsTitle
-        contentOnly={contentOnly}
-        subtitle={
-          <FormattedMessage
-            id="paymentReceipts.section.description"
-            defaultMessage="Consolidated receipts for your financial contributions."
-          />
-        }
-      >
-        <FormattedMessage id="paymentReceipts.section.title" defaultMessage="Monthly payment receipts" />
-      </SettingsTitle>
+      <SettingsSubtitle>
+        <FormattedMessage
+          id="paymentReceipts.section.description"
+          defaultMessage="Consolidated receipts for your financial contributions."
+        />
+      </SettingsSubtitle>
       <Box mt={4}>
         <P
           fontSize="9px"
@@ -273,7 +268,6 @@ PaymentReceipts.propTypes = {
     id: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
   }).isRequired,
-  contentOnly: PropTypes.bool,
 };
 
 export default PaymentReceipts;

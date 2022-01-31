@@ -14,7 +14,6 @@ import StyledInput from '../../StyledInput';
 import StyledTextarea from '../../StyledTextarea';
 import { P } from '../../Text';
 import { editCollectiveSettingsMutation } from '../mutations';
-import SettingsTitle from '../SettingsTitle';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
@@ -28,7 +27,7 @@ const messages = defineMessages({
   },
 });
 
-const InvoicesReceipts = ({ collective, contentOnly }) => {
+const InvoicesReceipts = ({ collective }) => {
   const { formatMessage } = useIntl();
 
   // For invoice Title
@@ -46,9 +45,6 @@ const InvoicesReceipts = ({ collective, contentOnly }) => {
 
   return (
     <Container>
-      <SettingsTitle contentOnly={contentOnly}>
-        <FormattedMessage id="becomeASponsor.invoiceReceipts" defaultMessage="Invoices & Receipts" />
-      </SettingsTitle>
       <SettingsSectionTitle>
         <FormattedMessage id="EditHostInvoice.receiptsSettings" defaultMessage="Receipt Settings" />
       </SettingsSectionTitle>
@@ -120,7 +116,6 @@ const InvoicesReceipts = ({ collective, contentOnly }) => {
 };
 
 InvoicesReceipts.propTypes = {
-  contentOnly: PropTypes.bool,
   collective: PropTypes.shape({
     id: PropTypes.number.isRequired,
     settings: PropTypes.object,

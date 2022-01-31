@@ -19,7 +19,6 @@ import AssignVirtualCardModal from '../AssignVirtualCardModal';
 import CreateVirtualCardModal from '../CreateVirtualCardModal';
 import DeleteVirtualCardModal from '../DeleteVirtualCardModal';
 import EditVirtualCardModal from '../EditVirtualCardModal';
-import SettingsTitle from '../SettingsTitle';
 import VirtualCard from '../VirtualCard';
 
 import VirtualCardFilters from './virtual-cards/VirtualCardFilters';
@@ -185,9 +184,6 @@ const HostVirtualCards = props => {
 
   return (
     <Fragment>
-      <SettingsTitle contentOnly={props.contentOnly}>
-        <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
-      </SettingsTitle>
       <Box>
         <P>
           <FormattedMessage
@@ -334,7 +330,6 @@ HostVirtualCards.propTypes = {
       }),
     }),
   }),
-  contentOnly: PropTypes.bool,
   hideTopsection: PropTypes.func,
 };
 

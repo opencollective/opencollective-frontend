@@ -15,7 +15,6 @@ import StyledInputField from '../../StyledInputField';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
-import SettingsTitle from '../SettingsTitle';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
@@ -80,9 +79,6 @@ const HostVirtualCards = props => {
 
   return (
     <Fragment>
-      <SettingsTitle contentOnly={props.contentOnly}>
-        <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
-      </SettingsTitle>
       <Box>
         <SettingsSectionTitle>
           <FormattedMessage id="Host.VirtualCards.Settings.Title" defaultMessage="Settings and Policy" />
@@ -177,7 +173,6 @@ HostVirtualCards.propTypes = {
       }),
     }),
   }),
-  contentOnly: PropTypes.bool,
   hideTopsection: PropTypes.func,
 };
 

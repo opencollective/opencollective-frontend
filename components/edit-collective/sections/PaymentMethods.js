@@ -28,7 +28,6 @@ import { withStripeLoader } from '../../StripeProvider';
 import StyledButton from '../../StyledButton';
 import { P, Span } from '../../Text';
 import EditPaymentMethod from '../EditPaymentMethod';
-import SettingsTitle from '../SettingsTitle';
 
 class EditPaymentMethods extends React.Component {
   static propTypes = {
@@ -47,7 +46,6 @@ class EditPaymentMethods extends React.Component {
     updatePaymentMethod: PropTypes.func.isRequired,
     /** From stripeLoader */
     loadStripe: PropTypes.func.isRequired,
-    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -222,9 +220,6 @@ class EditPaymentMethods extends React.Component {
       <Loading />
     ) : (
       <Flex className="EditPaymentMethods" flexDirection="column">
-        <SettingsTitle contentOnly={this.props.contentOnly}>
-          <FormattedMessage id="editCollective.menu.paymentMethods" defaultMessage="Payment Methods" />
-        </SettingsTitle>
         {error && (
           <MessageBox type="error" withIcon mb={4}>
             {this.renderError(error)}
