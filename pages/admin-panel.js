@@ -31,6 +31,7 @@ export const adminPanelQuery = gqlV2/* GraphQL */ `
       settings
       isArchived
       isIncognito
+      imageUrl(height: 256)
       features {
         ...NavbarFields
         VIRTUAL_CARDS
