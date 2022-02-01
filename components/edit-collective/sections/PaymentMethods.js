@@ -10,7 +10,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { PAYMENT_METHOD_TYPE } from '../../../lib/constants/payment-methods';
 import { getErrorFromGraphqlException, isErrorType } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { addEditCollectiveMutation } from '../../../lib/graphql/mutations';
 import { paymentMethodLabel } from '../../../lib/payment_method_label';
 import { getStripe, stripeTokenToPaymentMethod } from '../../../lib/stripe';
 import { compose } from '../../../lib/utils';
@@ -29,7 +28,6 @@ import { withStripeLoader } from '../../StripeProvider';
 import StyledButton from '../../StyledButton';
 import { P, Span } from '../../Text';
 import EditPaymentMethod from '../EditPaymentMethod';
-import SettingsTitle from '../SettingsTitle';
 
 class EditPaymentMethods extends React.Component {
   static propTypes = {
@@ -46,11 +44,8 @@ class EditPaymentMethods extends React.Component {
     removePaymentMethod: PropTypes.func.isRequired,
     /** From graphql query */
     updatePaymentMethod: PropTypes.func.isRequired,
-    /** From graphql query */
-    editCollective: PropTypes.func.isRequired,
     /** From stripeLoader */
     loadStripe: PropTypes.func.isRequired,
-    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -225,9 +220,6 @@ class EditPaymentMethods extends React.Component {
       <Loading />
     ) : (
       <Flex className="EditPaymentMethods" flexDirection="column">
-        <SettingsTitle contentOnly={this.props.contentOnly}>
-          <FormattedMessage id="editCollective.menu.paymentMethods" defaultMessage="Payment Methods" />
-        </SettingsTitle>
         {error && (
           <MessageBox type="error" withIcon mb={4}>
             {this.renderError(error)}
@@ -405,7 +397,6 @@ const addGraphql = compose(
   addPaymentMethodsData,
   addRemovePaymentMethodMutation,
   addUpdatePaymentMethodMutation,
-  addEditCollectiveMutation,
   addCreateCreditCardMutation,
   addConfirmCreditCardMutation,
 );

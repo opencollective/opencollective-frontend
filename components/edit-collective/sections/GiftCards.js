@@ -17,7 +17,6 @@ import StyledButton from '../../StyledButton';
 import StyledButtonSet from '../../StyledButtonSet';
 import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
-import SettingsTitle from '../SettingsTitle';
 
 const messages = defineMessages({
   notBatched: {
@@ -48,7 +47,6 @@ class GiftCards extends React.Component {
     router: PropTypes.object,
     /** @ignore */
     intl: PropTypes.object,
-    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -135,70 +133,65 @@ class GiftCards extends React.Component {
     const [batchesOptions, selectedOption] = this.getBatchesOptions(batches, get(data, 'variables.batch'), intl);
 
     return (
-      <div>
-        <SettingsTitle contentOnly={this.props.contentOnly}>
-          <FormattedMessage id="editCollective.menu.giftCards" defaultMessage="Gift Cards" />
-        </SettingsTitle>
-        <Box mt={4}>
-          <Box mb={4}>
-            <Flex
-              mb={3}
-              flexDirection={['column-reverse', 'row']}
-              justifyContent="space-between"
-              alignItems="center"
-              flexWrap="wrap"
-            >
-              {this.renderFilters(onlyConfirmed)}
-              <Flex justifyContent="center">
-                <Link href={`/${collectiveSlug}/admin/gift-cards-create`}>
-                  <StyledButton buttonStyle="primary" buttonSize="medium">
-                    <Add size="1em" />
-                    {'  '}
-                    <FormattedMessage id="giftCards.create" defaultMessage="Create gift cards" />
-                  </StyledButton>
-                </Link>
-              </Flex>
+      <Box mt={4}>
+        <Box mb={4}>
+          <Flex
+            mb={3}
+            flexDirection={['column-reverse', 'row']}
+            justifyContent="space-between"
+            alignItems="center"
+            flexWrap="wrap"
+          >
+            {this.renderFilters(onlyConfirmed)}
+            <Flex justifyContent="center">
+              <Link href={`/${collectiveSlug}/admin/gift-cards-create`}>
+                <StyledButton buttonStyle="primary" buttonSize="medium">
+                  <Add size="1em" />
+                  {'  '}
+                  <FormattedMessage id="giftCards.create" defaultMessage="Create gift cards" />
+                </StyledButton>
+              </Link>
             </Flex>
-            {batchesOptions.length > 1 && (
-              <Box mb={3}>
-                <StyledSelect
-                  inputId="batches-options"
-                  options={batchesOptions}
-                  onChange={({ value }) =>
-                    this.props.router.push({
-                      pathname: `/${collectiveSlug}/admin/gift-cards`,
-                      query: this.getQueryParams(['filter', 'batch'], { batch: value }),
-                    })
-                  }
-                  defaultValue={selectedOption}
-                />
-              </Box>
-            )}
-          </Box>
-          {data.loading ? (
-            <Loading />
-          ) : (
-            <div data-cy="gift-cards-list">
-              {paymentMethods.length === 0 && (
-                <Flex justifyContent="center" mt="4em">
-                  {this.renderNoGiftCardMessage(onlyConfirmed)}
-                </Flex>
-              )}
-              {paymentMethods.map(v => (
-                <div key={v.id}>
-                  <GiftCardDetails giftCard={v} collectiveSlug={this.props.collectiveSlug} />
-                  {v !== lastGiftCard && <hr />}
-                </div>
-              ))}
-              {total > limit && (
-                <Flex className="vc-pagination" justifyContent="center" mt={4}>
-                  <Pagination offset={offset} total={total} limit={limit} />
-                </Flex>
-              )}
-            </div>
+          </Flex>
+          {batchesOptions.length > 1 && (
+            <Box mb={3}>
+              <StyledSelect
+                inputId="batches-options"
+                options={batchesOptions}
+                onChange={({ value }) =>
+                  this.props.router.push({
+                    pathname: `/${collectiveSlug}/admin/gift-cards`,
+                    query: this.getQueryParams(['filter', 'batch'], { batch: value }),
+                  })
+                }
+                defaultValue={selectedOption}
+              />
+            </Box>
           )}
         </Box>
-      </div>
+        {data.loading ? (
+          <Loading />
+        ) : (
+          <div data-cy="gift-cards-list">
+            {paymentMethods.length === 0 && (
+              <Flex justifyContent="center" mt="4em">
+                {this.renderNoGiftCardMessage(onlyConfirmed)}
+              </Flex>
+            )}
+            {paymentMethods.map(v => (
+              <div key={v.id}>
+                <GiftCardDetails giftCard={v} collectiveSlug={this.props.collectiveSlug} />
+                {v !== lastGiftCard && <hr />}
+              </div>
+            ))}
+            {total > limit && (
+              <Flex className="vc-pagination" justifyContent="center" mt={4}>
+                <Pagination offset={offset} total={total} limit={limit} />
+              </Flex>
+            )}
+          </div>
+        )}
+      </Box>
     );
   }
 }

@@ -151,6 +151,20 @@ const nextConfig = {
         ]
       : [];
   },
+  async redirects() {
+    return [
+      {
+        source: '/:slug/edit/:section*',
+        destination: '/:slug/admin/:section*',
+        permanent: false,
+      },
+      {
+        source: '/:parentCollectiveSlug/events/:eventSlug/edit/:section*',
+        destination: '/:parentCollectiveSlug/events/:eventSlug/admin/:section*',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

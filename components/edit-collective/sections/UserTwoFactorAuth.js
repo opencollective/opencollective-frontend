@@ -26,7 +26,6 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import StyledTooltip from '../../StyledTooltip';
 import { H3, P } from '../../Text';
 import { withUser } from '../../UserProvider';
-import SettingsTitle from '../SettingsTitle';
 
 const messages = defineMessages({
   errorWrongLength: {
@@ -78,7 +77,6 @@ class UserTwoFactorAuth extends React.Component {
     /** From parent component */
     slug: PropTypes.string,
     userEmail: PropTypes.string,
-    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -220,13 +218,6 @@ class UserTwoFactorAuth extends React.Component {
 
     return (
       <Flex flexDirection="column">
-        <SettingsTitle contentOnly={this.props.contentOnly}>
-          {doesAccountAlreadyHave2FA ? (
-            <FormattedMessage id="TwoFactorAuth" defaultMessage="Two-factor authentication" />
-          ) : (
-            <FormattedMessage id="TwoFactorAuth.Setup.Title" defaultMessage="Set up two-factor authentication" />
-          )}
-        </SettingsTitle>
         {error && (
           <MessageBox type="error" withIcon my={2} data-cy="add-two-factor-auth-error">
             {error}

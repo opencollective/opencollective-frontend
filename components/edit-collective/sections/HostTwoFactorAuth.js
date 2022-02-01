@@ -19,7 +19,6 @@ import StyledInputField from '../../StyledInputField';
 import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import { editCollectiveSettingsMutation } from '../mutations';
-import SettingsTitle from '../SettingsTitle';
 
 import imgPreviewModal from '../../../public/static/images/host-two-factor-authentication/host-two-factor-authentication-payout-modal.png';
 import imgPreviewPrompt from '../../../public/static/images/host-two-factor-authentication/host-two-factor-authentication-payout-modal-prompt.png';
@@ -52,7 +51,7 @@ const ScreenshotPreview = styled.div`
   }
 `;
 
-const HostTwoFactorAuth = ({ collective, contentOnly }) => {
+const HostTwoFactorAuth = ({ collective }) => {
   const { formatMessage } = useIntl();
   const { addToast } = useToasts();
   const [setSettings, { loading, error }] = useMutation(editCollectiveSettingsMutation);
@@ -91,9 +90,6 @@ const HostTwoFactorAuth = ({ collective, contentOnly }) => {
     <Fragment>
       <Flex flexDirection="column">
         <Container>
-          <SettingsTitle contentOnly={contentOnly}>
-            <FormattedMessage id="TwoFactorAuth.Setup.Title" defaultMessage="Set up two-factor authentication" />
-          </SettingsTitle>
           <Flex mb={2} flexWrap="wrap" justifyContent="center">
             <Container mr={3} pr={3} flex="1 1" minWidth={300} maxWidth={700} borderRight={[null, '1px solid #dcdee0']}>
               <P wordBreak="break-word">
@@ -192,7 +188,6 @@ HostTwoFactorAuth.propTypes = {
     currency: PropTypes.string.isRequired,
     settings: PropTypes.string.isRequired,
   }),
-  contentOnly: PropTypes.bool,
 };
 
 export default HostTwoFactorAuth;

@@ -24,7 +24,6 @@ import StyledHr from '../../StyledHr';
 import StyledInputGroup from '../../StyledInputGroup';
 import StyledSelect from '../../StyledSelect';
 import { Label, P, Span } from '../../Text';
-import SettingsTitle from '../SettingsTitle';
 
 const messages = defineMessages({
   'webhooks.url.label': {
@@ -55,7 +54,6 @@ class Webhooks extends React.Component {
     data: PropTypes.object.isRequired,
     /** From intl */
     intl: PropTypes.object.isRequired,
-    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -240,10 +238,6 @@ class Webhooks extends React.Component {
 
     return (
       <div>
-        <SettingsTitle contentOnly={this.props.contentOnly}>
-          <FormattedMessage id="editCollective.menu.webhooks" defaultMessage="Webhooks" />
-        </SettingsTitle>
-
         <P fontSize="14px" lineHeight="18px">
           <FormattedMessage
             defaultMessage="You can use Webhooks to build custom integrations with Open Collective. Slack and Discord webhooks are natively supported. You can also integrate them with tools like Zapier, IFTTT, or Huginn. Learn more about this from <DocLink>the documentation</DocLink> or see how you can go further using our <GraphqlAPILink>public GraphQL API</GraphqlAPILink>."
