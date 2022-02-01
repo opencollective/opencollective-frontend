@@ -64,7 +64,7 @@ const StatContainer = styled.div`
 const BudgetStats = ({ collective, stats }) => {
   const { locale } = useIntl();
   const monthlyRecurring =
-    (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
+    (stats?.activeRecurringContributions?.monthly || 0) + (stats?.activeRecurringContributions?.yearly || 0) / 12;
   const isFund = collective.type === CollectiveType.FUND;
   const isProject = collective.type === CollectiveType.PROJECT;
 
@@ -77,7 +77,7 @@ const BudgetStats = ({ collective, stats }) => {
           </Container>
           <FormattedMessage id="CollectivePage.SectionBudget.Balance" defaultMessage="Today’s balance" />
         </StatTitle>
-        <StatAmount amount={stats.balance.valueInCents} currency={collective.currency} />
+        <StatAmount amount={stats?.balance?.valueInCents} currency={collective.currency} />
       </StatContainer>
       <StatContainer>
         <StatTitle>
@@ -93,14 +93,16 @@ const BudgetStats = ({ collective, stats }) => {
                   id="budgetSection-raised-total"
                   defaultMessage="Total contributed before fees: {amount}"
                   values={{
-                    amount: formatCurrency(stats?.totalAmountRaised.valueInCents || 0, collective.currency, { locale }),
+                    amount: formatCurrency(stats?.totalAmountRaised?.valueInCents || 0, collective.currency, {
+                      locale,
+                    }),
                   }}
                 />
               </Box>
             }
           />
         </StatTitle>
-        <StatAmount amount={stats.totalNetAmountRaised.valueInCents} currency={collective.currency} />
+        <StatAmount amount={stats?.totalNetAmountRaised?.valueInCents} currency={collective.currency} />
       </StatContainer>
       <StatContainer>
         <StatTitle>
@@ -108,7 +110,7 @@ const BudgetStats = ({ collective, stats }) => {
           <FormattedMessage id="budgetSection-disbursed" defaultMessage="Total disbursed" />
         </StatTitle>
         <StatAmount
-          amount={stats.totalNetAmountRaised.valueInCents - stats.balance.valueInCents}
+          amount={stats?.totalNetAmountRaised?.valueInCents - stats?.balance?.valueInCents}
           currency={collective.currency}
         />
       </StatContainer>
@@ -132,7 +134,7 @@ const BudgetStats = ({ collective, stats }) => {
                     id="CollectivePage.SectionBudget.TotalAmountReceived"
                     defaultMessage="Total received in the last 12 months: {amount}"
                     values={{
-                      amount: formatCurrency(stats?.totalAmountReceived.valueInCents || 0, collective.currency, {
+                      amount: formatCurrency(stats?.totalAmountReceived?.valueInCents || 0, collective.currency, {
                         locale,
                       }),
                     }}
@@ -141,7 +143,7 @@ const BudgetStats = ({ collective, stats }) => {
               }
             />
           </StatTitle>
-          <StatAmount amount={stats.yearlyBudget.valueInCents} currency={collective.currency} />
+          <StatAmount amount={stats?.yearlyBudget?.valueInCents} currency={collective.currency} />
         </StatContainer>
       )}
     </Fragment>
