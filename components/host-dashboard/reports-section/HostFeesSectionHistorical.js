@@ -8,7 +8,6 @@ const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 import { get, groupBy } from 'lodash';
 import styled from 'styled-components';
 
-import { formatCurrency } from '../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { i18nTransactionSettlementStatus } from '../../../lib/i18n/transaction';
 
@@ -107,14 +106,12 @@ const getChartOptions = (intl, hostCurrency) => ({
   yaxis: {
     labels: {
       minWidth: 38,
-      formatter: formatAmountForLegend,
+      formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale),
     },
   },
   tooltip: {
     y: {
-      formatter: function (value) {
-        return formatCurrency(value * 100, hostCurrency, { locale: intl.locale });
-      },
+      formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale),
     },
   },
 });
@@ -185,7 +182,7 @@ export const HostFeesSectionHistorical = ({ hostSlug }) => {
     <Box py={3}>
       <Flex alignItems="center" px={2} mb={2}>
         <P fontSize="11px" fontWeight="700" mr={3} textTransform="uppercase">
-          <FormattedMessage id="HostFeesSection.Title" defaultMessage="Collected host fees per year" />
+          <FormattedMessage id="HostFeesSection.Title" defaultMessage="Host Fees per year" />
         </P>
         <StyledSelectFilter
           inputId="host-report-host-fees-year-select"

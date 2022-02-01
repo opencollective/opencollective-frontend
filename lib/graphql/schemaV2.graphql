@@ -659,6 +659,11 @@ type Expense {
   invoiceInfo: String
 
   """
+  The fees payer for this expense
+  """
+  feesPayer: FeesPayer!
+
+  """
   The permissions given to current logged in user for this expense
   """
   permissions: ExpensePermissions!
@@ -683,6 +688,7 @@ type Expense {
   The account that requested this expense to be submitted
   """
   requestedByAccount: Account
+  quote: ExpenseQuote
 }
 
 """
@@ -1602,6 +1608,21 @@ type ExpenseItem {
 }
 
 """
+All supported expense types
+"""
+enum FeesPayer {
+  """
+  The collective will be responsible for paying the fees
+  """
+  COLLECTIVE
+
+  """
+  The payee will be responsible for paying the fees (they'll be deduced from the total amount)
+  """
+  PAYEE
+}
+
+"""
 Fields for the user permissions on an expense
 """
 type ExpensePermissions {
@@ -1766,6 +1787,26 @@ enum LegalDocumentType {
 }
 
 """
+Fields for an expense quote
+"""
+type ExpenseQuote {
+  """
+  Amount of this item
+  """
+  totalAmount: Amount!
+
+  """
+  Amount of payment processor fee
+  """
+  paymentProcessorFeeAmount: Amount!
+
+  """
+  The date on which the item was created
+  """
+  estimatedDeliveryAt: DateTime!
+}
+
+"""
 Order model
 """
 type Order {
@@ -1795,14 +1836,10 @@ type Order {
   paymentMethod: PaymentMethod
 
   """
-  Platform contribution attached to the Order.
-  """
-  platformContributionAmount: Amount @deprecated(reason: "2021-06-07: Please use platformTipAmount")
-
-  """
   Platform Tip attached to the Order.
   """
   platformTipAmount: Amount
+  platformTipEligible: Boolean
   tags: [String]!
   taxes: [OrderTax]!
 
@@ -2826,6 +2863,11 @@ type AccountStats {
     Calculate total amount received after this date
     """
     dateFrom: DateTime
+
+    """
+    Computes contributions from the last x months. Cannot be used with startDate/endDate
+    """
+    periodInMonths: Int
   ): Amount!
 
   """
@@ -2854,6 +2896,12 @@ type AccountStats {
   ): Amount!
   yearlyBudget: Amount!
   yearlyBudgetManaged: Amount!
+
+  """
+  Total net amount received
+  """
+  totalNetAmountReceived: Amount!
+  activeRecurringContributions: JSON
 }
 
 """
@@ -2941,6 +2989,11 @@ enum UpdateAudience {
   Will be sent to financial contributors
   """
   FINANCIAL_CONTRIBUTORS
+
+  """
+  Will be sent to no one
+  """
+  NO_ONE
 }
 
 """
@@ -4912,8 +4965,6 @@ type Individual implements Account {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  firstName: String @deprecated(reason: "2020-10-12: Use the name field")
-  lastName: String @deprecated(reason: "2020-10-12: Use the name field")
   email: String
   isGuest: Boolean!
   isFollowingConversation(id: String!): Boolean!
@@ -5713,6 +5764,7 @@ type VirtualCard {
   provider: String
   spendingLimitAmount: Int
   spendingLimitInterval: String
+  currency: Currency
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -6018,6 +6070,11 @@ type Query {
     includeHostedAccounts: Boolean
 
     """
+    Whether to include incognito orders. Must be admin or root
+    """
+    includeIncognito: Boolean = false
+
+    """
     Account orders filter (INCOMING or OUTGOING)
     """
     filter: AccountOrdersFilter
@@ -6304,6 +6361,11 @@ input TierReferenceInput {
   The DB id assigned to the Tier
   """
   legacyId: Int
+
+  """
+  Pass this flag to reference the custom tier (/donate)
+  """
+  isCustom: Boolean
 }
 
 """
@@ -6343,6 +6405,7 @@ type Mutation {
   addFunds(
     fromAccount: AccountReferenceInput!
     account: AccountReferenceInput!
+    tier: TierReferenceInput
     amount: AmountInput!
     description: String!
     hostFeePercent: Float!
@@ -6382,6 +6445,11 @@ type Mutation {
     Further information about collective applying to host
     """
     applicationData: JSON
+
+    """
+    Additional data for the collective creation. This argument has no effect in production
+    """
+    testPayload: JSON
   ): Collective
   createFund(
     """
@@ -6898,7 +6966,32 @@ type Mutation {
   """
   A mutation for the host to approve or reject an order
   """
-  processPendingOrder(order: OrderReferenceInput!, action: ProcessOrderAction!): Order!
+  processPendingOrder(order: OrderUpdateInput!, action: ProcessOrderAction!): Order!
+
+  """
+  A mutation for root users to move orders from one account to another
+  """
+  moveOrders(
+    """
+    The orders to move
+    """
+    orders: [OrderReferenceInput!]!
+
+    """
+    The account to move the orders to. Set to null to keep existing
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    The tier to move the orders to. Set to null to keep existing. Pass { id: "custom" } to reference the custom tier (/donate)
+    """
+    tier: TierReferenceInput
+
+    """
+    If true, the orders will be moved to the incognito account of "fromAccount"
+    """
+    makeIncognito: Boolean
+  ): [Order]!
 
   """
   Add a new payment method to be used with an Order
@@ -7149,12 +7242,12 @@ type Mutation {
   """
   createVirtualCard(
     """
-    Virtual Card name
+    Virtual card name
     """
     name: String!
 
     """
-    Virtual Card monthly limit
+    Virtual card monthly limit
     """
     monthlyLimit: AmountInput!
 
@@ -7164,7 +7257,7 @@ type Mutation {
     account: AccountReferenceInput!
 
     """
-    Individual account responsible for the card
+    Individual account responsible for the virtual card
     """
     assignee: AccountReferenceInput!
   ): VirtualCard!
@@ -7174,14 +7267,24 @@ type Mutation {
   """
   editVirtualCard(
     """
-    Virtual Card being edited its new values
+    Virtual card reference
     """
-    virtualCard: VirtualCardUpdateInput!
+    virtualCard: VirtualCardReferenceInput!
 
     """
-    The individual account reference to attach the Virtual Card to if desired
+    Virtual card name
+    """
+    name: String
+
+    """
+    Individual account responsible for the card
     """
     assignee: AccountReferenceInput
+
+    """
+    Virtual card monthly limit
+    """
+    monthlyLimit: AmountInput
   ): VirtualCard!
 
   """
@@ -9571,9 +9674,14 @@ Parameters for paying an expense
 """
 input ProcessExpensePaymentParams {
   """
-  The fee charged by payment processor in collective currency, or the fee refunded when used with MARK_AS_UNPAID
+  The fee charged by payment processor in collective currency
   """
   paymentProcessorFee: Int
+
+  """
+  Whether the payment processor fees should be refunded when triggering MARK_AS_UNPAID
+  """
+  shouldRefundPaymentProcessorFee: Boolean
 
   """
   Bypass automatic integrations (ie. PayPal, Transferwise) to process the expense manually
@@ -9584,6 +9692,11 @@ input ProcessExpensePaymentParams {
   2FA code for if the host account has 2FA for payouts turned on.
   """
   twoFactorAuthenticatorCode: String
+
+  """
+  2FA code for if the host account has 2FA for payouts turned on.
+  """
+  feesPayer: FeesPayer = COLLECTIVE
 }
 
 input ExpenseInviteDraftInput {
@@ -9654,6 +9767,14 @@ input ExpenseInvitee {
   name: String
   email: String
   isInvite: Boolean
+  organization: ExpenseInviteeOrganizationInput
+}
+
+input ExpenseInviteeOrganizationInput {
+  description: String
+  name: String
+  slug: String
+  website: String
 }
 
 type EmojiReactionResponse {
@@ -9814,6 +9935,11 @@ input OrderCreateInput {
   fromAccount: AccountReferenceInput
 
   """
+  Additional information about the contributing profile
+  """
+  fromAccountInfo: OrderFromAccountInfo
+
+  """
   The profile you want to contribute to
   """
   toAccount: AccountReferenceInput!
@@ -9829,9 +9955,9 @@ input OrderCreateInput {
   paymentMethod: PaymentMethodInput
 
   """
-  Platform contribution attached to this order
+  Platform tip attached to this order
   """
-  platformContributionAmount: AmountInput
+  platformTipAmount: AmountInput
 
   """
   Use this field to set the taxes associated to this order
@@ -9867,6 +9993,18 @@ input OrderCreateInput {
   Tags associated to the order
   """
   tags: [String]
+}
+
+"""
+Some context about how an order was created
+"""
+input OrderFromAccountInfo {
+  """
+  The location of the contributor. Account location will be updated with this address if different from the existing one.
+  """
+  location: LocationInput
+  name: String
+  legalName: String
 }
 
 """
@@ -10027,6 +10165,33 @@ input PaymentMethodReferenceInput {
   id: String
 }
 
+input OrderUpdateInput {
+  """
+  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the order (ie: 4242)
+  """
+  legacyId: Int
+
+  """
+  Amount received by collective, excluding any tips or fees
+  """
+  amount: AmountInput
+
+  """
+  Amount paid in fees for the payment processor
+  """
+  paymentProcessorFee: AmountInput
+
+  """
+  Amount intended as tip for the platform
+  """
+  platformTip: AmountInput
+}
+
 """
 Action to apply on the order
 """
@@ -10118,11 +10283,6 @@ input VirtualCardInput {
 enum VirtualCardProvider {
   PRIVACY
   STRIPE
-}
-
-input VirtualCardUpdateInput {
-  id: String
-  privateData: JSONObject
 }
 
 input VirtualCardReferenceInput {

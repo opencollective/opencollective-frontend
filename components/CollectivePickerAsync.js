@@ -30,6 +30,7 @@ const collectivePickerSearchQuery = gql`
         }
         imageUrl(height: 64)
         hostFeePercent
+        isActive
       }
     }
   }

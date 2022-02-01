@@ -14,6 +14,12 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
       features {
         ...NavbarFields
       }
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+        }
+      }
       orders(filter: OUTGOING, onlySubscriptions: true, includeIncognito: true) {
         totalCount
         nodes {
@@ -80,7 +86,7 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
               }
             }
           }
-          platformContributionAmount {
+          platformTipAmount {
             value
             valueInCents
           }

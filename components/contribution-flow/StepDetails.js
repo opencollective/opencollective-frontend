@@ -24,7 +24,7 @@ import { H5, P, Span } from '../Text';
 import { useUser } from '../UserProvider';
 
 import ChangeTierWarningModal from './ChangeTierWarningModal';
-import FeesOnTopInput from './FeesOnTopInput';
+import PlatformTipInput from './PlatformTipInput';
 import TierCustomFields from './TierCustomFields';
 import { getTotalAmount } from './utils';
 
@@ -32,7 +32,7 @@ const getCustomFields = (collective, tier) => {
   return [...(tier?.customFields || []), ...(collective.host?.settings?.contributionFlow?.customFields || [])];
 };
 
-const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }) => {
+const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, isEmbed }) => {
   const intl = useIntl();
   const amount = data?.amount;
   const getDefaultOtherAmountSelected = () => isNil(amount) || !presets?.includes(amount);
@@ -95,7 +95,6 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
           <StyledAmountPicker
             currency={currency}
             presets={presets}
-            otherAmountDisplay="button"
             value={isOtherAmountSelected ? OTHER_AMOUNT_KEY : data?.amount}
             onChange={value => {
               if (value === OTHER_AMOUNT_KEY) {
@@ -112,7 +111,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
                 name="custom-amount"
                 type="number"
                 currency={currency}
-                value={data?.amount || null}
+                value={data?.amount}
                 width={1}
                 min={minAmount}
                 currencyDisplay="full"
@@ -211,15 +210,16 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
           <StyledHr borderColor="black.300" mt={16} mb={32} />
         </React.Fragment>
       )}
-      {showFeesOnTop && data?.amount > 0 && (
+      {showFeesOnTop && (
         <Box mt={28}>
-          <FeesOnTopInput
+          <PlatformTipInput
             currency={currency}
             amount={data?.amount}
             fees={data?.platformContribution}
             interval={data?.interval}
             quantity={data?.quantity}
             onChange={value => dispatchChange('platformContribution', value)}
+            isEmbed={isEmbed}
           />
         </Box>
       )}
@@ -254,6 +254,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
 StepDetails.propTypes = {
   onChange: PropTypes.func,
   showFeesOnTop: PropTypes.bool,
+  isEmbed: PropTypes.bool,
   LoggedInUser: PropTypes.object,
   data: PropTypes.shape({
     amount: PropTypes.number,

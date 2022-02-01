@@ -69,10 +69,13 @@ const ScheduledExpensesBanner = ({ host, onSubmit, secondButton, expenses }) => 
       });
       onSubmit?.();
     } catch (e) {
+      const message = e?.response
+        ? await e.response.text()
+        : 'There was an error trying to process this batch, please contact support@opencollective.com';
       addToast({
         type: TOAST_TYPE.ERROR,
-        // @transferwise request function is swalling the error we get from the backend, adding a generic one
-        message: 'There was an error trying to process this batch, please contact support@opencollective.com',
+        title: 'Batch payment failed',
+        message,
       });
     }
   };
@@ -133,7 +136,7 @@ ScheduledExpensesBanner.propTypes = {
     id: PropTypes.string,
   }).isRequired,
   expenses: PropTypes.array,
-  onSubmit: PropTypes.function,
+  onSubmit: PropTypes.func,
   secondButton: PropTypes.node,
 };
 

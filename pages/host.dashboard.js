@@ -12,6 +12,7 @@ import styled, { css } from 'styled-components';
 import { CollectiveType } from '../lib/constants/collectives';
 import { getEnvVar } from '../lib/env-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { getSettingsRoute } from '../lib/url-helpers';
 import { parseToBoolean } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -22,9 +23,11 @@ import HostDashboardExpenses from '../components/host-dashboard/HostDashboardExp
 import HostDashboardHostedCollectives from '../components/host-dashboard/HostDashboardHostedCollectives';
 import HostDashboardReports from '../components/host-dashboard/HostDashboardReports';
 import PendingApplications from '../components/host-dashboard/PendingApplications';
+import { getI18nLink } from '../components/I18nFormatters';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
+import NotificationBar from '../components/NotificationBar';
 import OrdersWithData from '../components/orders/OrdersWithData';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
@@ -144,6 +147,7 @@ class HostDashboardPage extends React.Component {
 
     const canEdit = LoggedInUser && host && LoggedInUser.canEditCollective(host);
 
+    const newAdminUrl = host.id && getSettingsRoute(host, view, true);
     return (
       <Page collective={host} title={host.name || 'Host Dashboard'}>
         {data.account && (
@@ -158,6 +162,15 @@ class HostDashboardPage extends React.Component {
           </Flex>
         ) : (
           <React.Fragment>
+            <NotificationBar
+              title={<FormattedMessage defaultMessage="This page has moved" />}
+              description={
+                <FormattedMessage
+                  defaultMessage="We've built an <AdminLink>entirely new admin</AdminLink> for hosts, check it out! This URL will go away soon."
+                  values={{ AdminLink: getI18nLink({ href: newAdminUrl }) }}
+                />
+              }
+            />
             <Container
               position="relative"
               display="flex"

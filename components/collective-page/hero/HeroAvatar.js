@@ -205,7 +205,7 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
             <P fontSize="14px" lineHeight="18px" mt={2}>
               <FormattedMessage
                 id="HeroAvatar.Confirm.Remove"
-                defaultMessage="Do really want to remove your profile picture?"
+                defaultMessage="Do you really want to remove your profile picture?"
               />
             </P>
           </ConfirmationModal>
@@ -288,7 +288,7 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
 
 HeroAvatar.propTypes = {
   collective: PropTypes.shape({
-    id: PropTypes.string,
+    id: PropTypes.number,
     type: PropTypes.string,
     image: PropTypes.string,
     imageUrl: PropTypes.string,

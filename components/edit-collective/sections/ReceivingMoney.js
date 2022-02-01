@@ -1,12 +1,10 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { has } from 'lodash';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { injectIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import { CollectiveType } from '../../../lib/constants/collectives';
-
-import SettingsTitle from '../SettingsTitle';
 
 import BankTransfer from './BankTransfer';
 import ConnectedAccounts from './ConnectedAccounts';
@@ -16,7 +14,6 @@ const { USER } = CollectiveType;
 class ReceivingMoney extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    contentOnly: PropTypes.bool,
   };
 
   state = {
@@ -37,17 +34,12 @@ class ReceivingMoney extends React.Component {
     return (
       <Fragment>
         {!this.state.hideTopsection && (
-          <React.Fragment>
-            <SettingsTitle contentOnly={this.props.contentOnly} mb={4}>
-              <FormattedMessage id="editCollective.receivingMoney" defaultMessage="Receiving Money" />
-            </SettingsTitle>
-            <ConnectedAccounts
-              collective={this.props.collective}
-              connectedAccounts={this.props.collective.connectedAccounts}
-              services={services}
-              variation="RECEIVING"
-            />
-          </React.Fragment>
+          <ConnectedAccounts
+            collective={this.props.collective}
+            connectedAccounts={this.props.collective.connectedAccounts}
+            services={services}
+            variation="RECEIVING"
+          />
         )}
         {(this.props.collective.type !== USER || has(this.props.collective, 'data.settings.paymentMethods.manual')) && (
           <BankTransfer collectiveSlug={this.props.collective.slug} hideTopsection={this.hideTopsection} />

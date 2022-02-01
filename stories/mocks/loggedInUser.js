@@ -3,7 +3,6 @@ import LoggedInUser from '../../lib/LoggedInUser';
 export const newLoggedInUser = new LoggedInUser({
   __typename: 'UserDetails',
   id: 4829,
-  username: 'betree',
   email: 'benjamin+2@opencollective.com',
   image: 'https://opencollective-staging.s3.us-west-1.amazonaws.com/550ac070-e0f8-11e9-9d4c-e9c71c24ba70.jpg',
   isLimited: null,
@@ -32,7 +31,6 @@ export const newLoggedInUser = new LoggedInUser({
 export const loggedInUser = new LoggedInUser({
   __typename: 'UserDetails',
   id: 4829,
-  username: 'betree',
   email: 'benjamin+2@opencollective.com',
   image: 'https://opencollective-staging.s3.us-west-1.amazonaws.com/550ac070-e0f8-11e9-9d4c-e9c71c24ba70.jpg',
   isLimited: null,

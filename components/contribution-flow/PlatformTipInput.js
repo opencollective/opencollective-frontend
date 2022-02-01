@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import INTERVALS from '../../lib/constants/intervals';
 import { formatCurrency } from '../../lib/currency-utils';
 
+import Container from '../Container';
 import { Flex } from '../Grid';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledSelect from '../StyledSelect';
@@ -34,13 +35,18 @@ const DEFAULT_PERCENTAGES = [0.1, 0.15, 0.2];
 
 const getOptionFromPercentage = (amount, currency, percentage) => {
   const feeAmount = isNaN(amount) ? 0 : Math.round(amount * percentage);
+  let label = `${feeAmount / 100} ${currency}`;
+  if (feeAmount) {
+    label += ` (${percentage * 100}%)`; // Don't show percentages of 0
+  }
+
   return {
     // Value must be unique, so we set a special key if feeAmount is 0
     value: feeAmount || `${percentage}%`,
     feeAmount,
     percentage,
     currency,
-    label: `${feeAmount / 100} ${currency} (${percentage * 100}%)`,
+    label,
   };
 };
 
@@ -60,7 +66,7 @@ const getOptions = (amount, currency, intl) => {
   ];
 };
 
-const FeesOnTopInput = ({ currency, amount, quantity, fees, onChange }) => {
+const PlatformTipInput = ({ currency, amount, quantity, fees, onChange, isEmbed }) => {
   const intl = useIntl();
   const orderAmount = amount * quantity;
   const options = React.useMemo(() => getOptions(orderAmount, currency, intl), [orderAmount, currency]);
@@ -69,7 +75,7 @@ const FeesOnTopInput = ({ currency, amount, quantity, fees, onChange }) => {
       return (
         <span>
           {formatCurrency(option.feeAmount, option.currency, { locale: intl.locale })}{' '}
-          <Span color="black.500">({option.percentage * 100}%)</Span>
+          {Boolean(option.feeAmount) && <Span color="black.500">({option.percentage * 100}%)</Span>}
         </span>
       );
     } else {
@@ -96,20 +102,24 @@ const FeesOnTopInput = ({ currency, amount, quantity, fees, onChange }) => {
       onChange(0);
     } else if (selectedOption.percentage) {
       const newOption = getOptionFromPercentage(orderAmount, currency, selectedOption.percentage);
-      if (newOption.value !== fees) {
-        onChange(newOption.value);
+      if (newOption.feeAmount !== fees) {
+        onChange(newOption.feeAmount);
         setSelectedOption(newOption);
       }
     }
   }, [selectedOption, orderAmount, isReady]);
 
   return (
-    <div>
+    <Container data-cy="PlatformTipInput" display={amount === 0 ? 'none' : 'block'}>
       <P fontWeight="400" fontSize="14px" lineHeight="21px" color="black.900" my={32}>
-        <FormattedMessage
-          id="platformFee.info"
-          defaultMessage="Tips from contributors like you allow us to keep Open Collective free for Collectives. Thanks for any support!"
-        />
+        {!isEmbed ? (
+          <FormattedMessage
+            id="platformFee.info"
+            defaultMessage="Tips from contributors like you allow us to keep Open Collective free for Collectives. Thanks for any support!"
+          />
+        ) : (
+          <FormattedMessage defaultMessage="This page is powered by Open Collective, a platform that lets you collect and spend money transparently. Open Collective is free for charitable communities, we rely on the generosity of contributors like you to make this possible." />
+        )}
       </P>
       <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>
         <Flex alignItems="center">
@@ -130,24 +140,26 @@ const FeesOnTopInput = ({ currency, amount, quantity, fees, onChange }) => {
           onChange={setSelectedOption}
           formatOptionLabel={formatOptionLabel}
           value={selectedOption}
+          disabled={!amount} // Don't allow changing the platform tip if the amount is not set
         />
       </Flex>
       {selectedOption.value === 'CUSTOM' && (
         <Flex justifyContent="flex-end" mt={2}>
-          <StyledInputAmount id="feesOnTop" currency={currency} onChange={onChange} value={fees} />
+          <StyledInputAmount id="feesOnTop" name="platformTip" currency={currency} onChange={onChange} value={fees} />
         </Flex>
       )}
-    </div>
+    </Container>
   );
 };
 
-FeesOnTopInput.propTypes = {
+PlatformTipInput.propTypes = {
   currency: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   amount: PropTypes.number,
   quantity: PropTypes.number,
   fees: PropTypes.number,
+  isEmbed: PropTypes.bool,
   interval: PropTypes.oneOf(Object.values(INTERVALS)),
 };
 
-export default FeesOnTopInput;
+export default PlatformTipInput;

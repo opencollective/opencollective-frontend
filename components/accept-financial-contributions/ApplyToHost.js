@@ -57,7 +57,7 @@ class ApplyToHost extends React.Component {
         defaultMessage: 'Accept financial contributions',
       },
       applyToHost: {
-        id: 'pricing.applyFiscalHost',
+        id: 'collective.edit.host.findHost.title',
         defaultMessage: 'Apply to a Fiscal Host',
       },
       infoParagraph: {

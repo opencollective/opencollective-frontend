@@ -7,15 +7,16 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { getSuggestedTags } from '../lib/collective.lib';
-import { isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
+import { getSuggestedTags, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
+import { CollectiveType, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -114,6 +115,7 @@ class ExpensePage extends React.Component {
         isHost: PropTypes.bool,
         host: PropTypes.object,
         expensesTags: PropTypes.array,
+        type: PropTypes.oneOf(Object.keys(CollectiveType)),
       }),
       expenses: PropTypes.shape({
         nodes: PropTypes.array,
@@ -127,6 +129,15 @@ class ExpensePage extends React.Component {
     }),
     router: PropTypes.object,
   };
+
+  componentDidMount() {
+    const { router, data } = this.props;
+    const account = data?.account;
+    const queryParameters = {
+      ...omit(this.props.query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
+    };
+    addParentToURLIfMissing(router, account, `/expenses`, queryParameters);
+  }
 
   componentDidUpdate(oldProps) {
     const { LoggedInUser, data } = this.props;
@@ -158,21 +169,27 @@ class ExpensePage extends React.Component {
     return omitBy(queryParameters, value => !value);
   }
 
-  updateFilters = queryParams => {
+  updateFilters = (queryParams, collective) => {
     return this.props.router.push({
-      pathname: `/${this.props.collectiveSlug}/expenses`,
+      pathname: `${getCollectivePageCanonicalURL(collective)}/expenses`,
       query: this.buildFilterLinkParams({ ...queryParams, offset: null }),
     });
   };
 
-  handleSearch = searchTerm => {
+  handleSearch = (searchTerm, collective) => {
     const params = this.buildFilterLinkParams({ searchTerm, offset: null });
-    this.props.router.push({ pathname: `/${this.props.collectiveSlug}/expenses`, query: params });
+    this.props.router.push({ pathname: `${getCollectivePageCanonicalURL(collective)}/expenses`, query: params });
   };
 
   getTagProps = tag => {
     if (tag === this.props.query.tag) {
       return { type: 'info', closeButtonProps: true };
+    }
+  };
+
+  getShouldDisplayFeatureNotSupported = account => {
+    if (!account) {
+      return true;
     }
   };
 
@@ -188,20 +205,20 @@ class ExpensePage extends React.Component {
         return <ErrorPage data={data} />;
       } else if (!data.account || !data.expenses?.nodes) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
-      } else if (!hasFeature(data.account, FEATURES.RECEIVE_EXPENSES)) {
+      } else if (!isFeatureSupported(data.account, FEATURES.RECEIVE_EXPENSES)) {
         return <PageFeatureNotSupported />;
-      } else if (
-        isSectionForAdminsOnly(data.account, Sections.BUDGET) &&
-        !LoggedInUser?.canEditCollective(data.account) &&
-        !LoggedInUser?.isHostAdmin(data.account)
-      ) {
+      } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, data.account)) {
         // Hack for funds that want to keep their budget "private"
         return <PageFeatureNotSupported showContactSupportLink={false} />;
       }
     }
 
     return (
-      <Page collective={data.account} {...this.getPageMetaData(data.account)}>
+      <Page
+        collective={data.account}
+        canonicalURL={`${getCollectivePageCanonicalURL(data.account)}/expenses`}
+        {...this.getPageMetaData(data.account)}
+      >
         <CollectiveNavbar
           collective={data.account}
           isLoading={!data.account}
@@ -218,7 +235,10 @@ class ExpensePage extends React.Component {
                   </H1>
                   <Box mx="auto" />
                   <SearchFormContainer p={2}>
-                    <SearchBar defaultValue={query.searchTerm} onSubmit={this.handleSearch} />
+                    <SearchBar
+                      defaultValue={query.searchTerm}
+                      onSubmit={searchTerm => this.handleSearch(searchTerm, data.account)}
+                    />
                   </SearchFormContainer>
                 </Flex>
                 <StyledHr mb={26} borderWidth="0.5px" />
@@ -230,7 +250,7 @@ class ExpensePage extends React.Component {
                     <ExpensesFilters
                       collective={data.account}
                       filters={this.props.query}
-                      onChange={this.updateFilters}
+                      onChange={queryParams => this.updateFilters(queryParams, data.account)}
                     />
                   ) : (
                     <LoadingPlaceholder height={70} />
@@ -277,37 +297,40 @@ class ExpensePage extends React.Component {
                   </React.Fragment>
                 )}
               </Box>
-              <Box minWidth={270} width={['100%', null, null, 275]} mt={70}>
+              <Box minWidth={270} width={['100%', null, null, 275]} mt={[0, 70]}>
                 <ExpenseInfoSidebar
                   isLoading={data.loading}
                   collective={data.account}
                   host={data.account?.host}
-                  tags={data.account?.expensesTags.map(({ tag }) => tag)}
                   showExpenseTypeFilters
                 >
-                  <H5 mb={3}>
-                    <FormattedMessage id="Tags" defaultMessage="Tags" />
-                  </H5>
-                  <ExpenseTags
-                    isLoading={data.loading}
-                    expense={{ tags: data.account?.expensesTags.map(({ tag }) => tag) }}
-                    limit={30}
-                    getTagProps={this.getTagProps}
-                    data-cy="expense-tags-title"
-                  >
-                    {({ key, tag, renderedTag, props }) => (
-                      <Link
-                        key={key}
-                        href={{
-                          pathname: `/${this.props.collectiveSlug}/expenses`,
-                          query: this.buildFilterLinkParams({ tag: props.closeButtonProps ? null : tag }),
-                        }}
-                        data-cy="expense-tags-link"
+                  {data.account?.expensesTags.length > 0 && (
+                    <React.Fragment>
+                      <H5 mb={3}>
+                        <FormattedMessage id="Tags" defaultMessage="Tags" />
+                      </H5>
+                      <ExpenseTags
+                        isLoading={data.loading}
+                        expense={{ tags: data.account?.expensesTags.map(({ tag }) => tag) }}
+                        limit={30}
+                        getTagProps={this.getTagProps}
+                        data-cy="expense-tags-title"
                       >
-                        {renderedTag}
-                      </Link>
-                    )}
-                  </ExpenseTags>
+                        {({ key, tag, renderedTag, props }) => (
+                          <Link
+                            key={key}
+                            href={{
+                              pathname: `/${this.props.collectiveSlug}/expenses`,
+                              query: this.buildFilterLinkParams({ tag: props.closeButtonProps ? null : tag }),
+                            }}
+                            data-cy="expense-tags-link"
+                          >
+                            {renderedTag}
+                          </Link>
+                        )}
+                      </ExpenseTags>
+                    </React.Fragment>
+                  )}
                 </ExpenseInfoSidebar>
               </Box>
             </Flex>

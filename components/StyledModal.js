@@ -179,10 +179,10 @@ ModalFooter.defaultProps = {
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
  * a styled `Container`.
  */
-const StyledModal = ({ children, show, onClose, usePortal, trapFocus, ...props }) => {
+const StyledModal = ({ children, show, onClose, usePortal, trapFocus, ignoreEscapeKey, ...props }) => {
   const TrapContainer = trapFocus ? FocusTrap : React.Fragment;
   const onEscape = React.useCallback(() => {
-    if (show) {
+    if (show && !ignoreEscapeKey) {
       onClose();
     }
   }, [show]);
@@ -267,12 +267,15 @@ StyledModal.propTypes = {
   usePortal: PropTypes.bool,
   /** set this to true if the modal contains a form or buttons */
   trapFocus: PropTypes.bool,
+  /** whether to ignore the escape key */
+  ignoreEscapeKey: PropTypes.bool,
   /** children */
   children: PropTypes.node,
 };
 
 StyledModal.defaultProps = {
   usePortal: true,
+  trapFocus: false,
 };
 
 /** @component */

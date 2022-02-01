@@ -20,6 +20,8 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
+const MAXIMUM_MONTHLY_LIMIT = 2000;
+
 const createVirtualCardMutation = gqlV2/* GraphQL */ `
   mutation createVirtualCard(
     $name: String!
@@ -66,7 +68,7 @@ const initialValues = {
   monthlyLimit: undefined,
 };
 
-const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => {
+const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modalProps }) => {
   const { addToast } = useToasts();
 
   const [createVirtualCard, { loading: isBusy }] = useMutation(createVirtualCardMutation, {
@@ -77,7 +79,10 @@ const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => 
   });
 
   const formik = useFormik({
-    initialValues: { ...initialValues },
+    initialValues: {
+      ...initialValues,
+      collective,
+    },
     async onSubmit(values) {
       const { collective, assignee, cardName, monthlyLimit } = values;
 
@@ -87,7 +92,7 @@ const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => 
             assignee: { id: assignee.id },
             account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
             name: cardName,
-            monthlyLimit: { currency: 'USD', valueInCents: monthlyLimit, value: monthlyLimit / 100 },
+            monthlyLimit: { currency: collective.currency, valueInCents: monthlyLimit, value: monthlyLimit / 100 },
           },
         });
       } catch (e) {
@@ -121,8 +126,10 @@ const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => 
       if (!values.monthlyLimit) {
         errors.monthlyLimit = 'Required';
       }
-      if (values.monthlyLimit > 100000) {
-        errors.monthlyLimit = 'MonthlyLimit should not exceed 1000$';
+      if (values.monthlyLimit > MAXIMUM_MONTHLY_LIMIT * 100) {
+        errors.monthlyLimit = `Monthly limit should not exceed ${MAXIMUM_MONTHLY_LIMIT} ${
+          values.collective?.currency || 'USD'
+        }`;
       }
       return errors;
     },
@@ -173,7 +180,7 @@ const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => 
                   name="collective"
                   id="collective"
                   collective={formik.values.collective}
-                  isDisabled={isBusy}
+                  isDisabled={!!collective || isBusy}
                   customOptions={[
                     {
                       value: host,
@@ -182,6 +189,7 @@ const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => 
                     },
                   ]}
                   onChange={handleCollectivePick}
+                  filterResults={collectives => collectives.filter(c => c.isActive)}
                 />
               )}
             </StyledInputField>
@@ -238,8 +246,8 @@ const CreateVirtualCardModal = ({ host, onSuccess, onClose, ...modalProps }) => 
                 <StyledInputAmount
                   {...inputProps}
                   id="monthlyLimit"
-                  currency={'usd'}
-                  prepend={'usd'}
+                  currency={formik.values.collective?.currency || 'USD'}
+                  prepend={formik.values.collective?.currency || 'USD'}
                   onChange={value => formik.setFieldValue('monthlyLimit', value)}
                   value={formik.values.monthlyLimit}
                   disabled={isBusy}
@@ -278,7 +286,16 @@ CreateVirtualCardModal.propTypes = {
     type: PropTypes.string,
     name: PropTypes.string,
     imageUrl: PropTypes.string,
+    currency: PropTypes.string,
   }).isRequired,
+  collective: PropTypes.shape({
+    slug: PropTypes.string,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    type: PropTypes.string,
+    name: PropTypes.string,
+    imageUrl: PropTypes.string,
+    currency: PropTypes.string,
+  }),
 };
 
 /** @component */

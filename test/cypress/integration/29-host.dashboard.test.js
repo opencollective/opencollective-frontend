@@ -38,10 +38,13 @@ describe('host dashboard', () => {
   });
 
   describe('Orders', () => {
-    it('mark pending order as paid', () => {
+    it('edit order and mark as paid', () => {
       cy.login({ redirect: '/brusselstogetherasbl/admin/orders' });
       cy.get('[data-cy="MARK_AS_PAID-button"]:first').click();
-      cy.getByDataCy('confirmation-modal-continue').click();
+      cy.get('[data-cy="amount-received"]').type('10.23');
+      cy.get('[data-cy="platform-tip"]').type('1.20');
+      cy.getByDataCy('order-confirmation-modal-submit').click();
+      cy.contains('span', '9.03');
       cy.contains('[data-cy="order-status-msg"]:first', 'Paid');
     });
   });
@@ -103,8 +106,8 @@ describe('host dashboard', () => {
     it('Cannot submit incomplete form', () => {
       cy.login({ redirect: '/brusselstogetherasbl/admin/hosted-collectives' });
       cy.get('[data-cy="hosted-collective-add-funds-btn"]').first().click();
-      cy.wait(300);
-      cy.get('[data-cy="add-funds-submit-btn"]').should('be.disabled');
+      cy.getByDataCy('add-funds-submit-btn').click();
+      cy.contains('[data-cy="add-funds-form"]', 'This field is required');
     });
 
     it('Can add funds and platform tip as collective host', () => {

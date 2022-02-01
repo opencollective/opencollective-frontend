@@ -26,6 +26,7 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledLink from '../../StyledLink';
+import StyledModal from '../../StyledModal';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import { H1, Span } from '../../Text';
@@ -36,18 +37,18 @@ import ContainerSectionContent from '../ContainerSectionContent';
 
 import CollectiveColorPicker from './CollectiveColorPicker';
 import HeroAvatar from './HeroAvatar';
-import HeroBackground, { BASE_HERO_HEIGHT, StyledHeroBackground } from './HeroBackground';
+import HeroBackground from './HeroBackground';
 import HeroTotalCollectiveContributionsWithData from './HeroTotalCollectiveContributionsWithData';
 
 // Dynamic imports
 const HeroEventDetails = dynamic(() => import('./HeroEventDetails'));
 
-const HeroBackgroundEdit = dynamic(() => import('./HeroBackgroundEdit'), {
+const HeroBackgroundCropperModal = dynamic(() => import('./HeroBackgroundCropperModal'), {
   loading() {
     return (
-      <StyledHeroBackground>
-        <LoadingPlaceholder height={BASE_HERO_HEIGHT} />
-      </StyledHeroBackground>
+      <StyledModal show>
+        <LoadingPlaceholder height={300} minWidth={280} />
+      </StyledModal>
     );
   },
 });
@@ -118,28 +119,16 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
 
   return (
     <Fragment>
+      {isEditingCover && <HeroBackgroundCropperModal collective={collective} onClose={() => editCover(false)} />}
       {message && (
         <MessageBox type={message.type} withIcon={true}>
           {message.content}
         </MessageBox>
       )}
       <Container position="relative" minHeight={325} zIndex={1000} data-cy="collective-hero">
-        {isEditingCover ? (
-          <HeroBackgroundEdit collective={collective} onEditCancel={() => editCover(false)} />
-        ) : (
-          <HeroBackground collective={collective} />
-        )}
-
+        <HeroBackground collective={collective} />
         {isAdmin && !isEditing && (
-          // We don't have any mobile view for this one yet
-          <Container
-            data-cy="edit-collective-display-features"
-            display={['none', null, null, 'block']}
-            position="absolute"
-            right={25}
-            top={25}
-            zIndex={222}
-          >
+          <Container data-cy="edit-collective-display-features" position="absolute" right={25} top={25} zIndex={222}>
             <StyledButton data-cy="edit-cover-btn" buttonSize="tiny" onClick={() => editCover(true)}>
               <Camera size="1.2em" />
               <Span ml={2} css={{ verticalAlign: 'middle' }}>

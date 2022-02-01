@@ -1,4 +1,5 @@
 import mockRecaptcha from '../mocks/recaptcha';
+import { randomSlug } from '../support/faker';
 
 /**
  * Test the order flow - AKA the contribution flow with a tier selected.
@@ -40,7 +41,7 @@ describe('Contribution Flow: Order', () => {
     });
   });
 
-  describe('route resiliance', () => {
+  describe('route resilience', () => {
     it('with a multipart slug', () => {
       cy.login({ redirect: '/apex/contribute/a-multipart-420-470/checkout' });
       cy.contains('Contribution details');
@@ -76,12 +77,15 @@ describe('Contribution Flow: Order', () => {
 
         // ---- Step Profile ----
         cy.checkStepsProgress({ enabled: ['details', 'profile'], disabled: 'payment' });
-        // Personnal account must be the first entry, and it must be checked
-        const userName = userParams.name;
-        cy.contains('[data-cy="ContributionProfile"] > label:first', userName);
-        cy.get('[data-cy="ContributionProfile"] > label:first input[type=radio]').should('be.checked');
 
+        // Personal account must be the first entry, and it must be checked
+        const userName = userParams.name;
+        cy.contains('[data-cy="contribute-profile-picker"]', userName);
+        cy.getByDataCy('contribute-profile-picker').click();
+        cy.contains('[data-cy="select-option"]:first', userName);
         cy.getByDataCy('progress-step-profile').contains(userName);
+
+        cy.get('body').type('{esc}');
         cy.get('button[data-cy="cf-next-step"]').click();
 
         // ---- Step 3: Payment ----
@@ -101,14 +105,14 @@ describe('Contribution Flow: Order', () => {
     );
   });
 
-  it('Can order with an existing orgnanization', () => {
+  it('Can order with an existing organization', () => {
     let collectiveSlug = null;
     const visitParams = { onBeforeLoad: mockRecaptcha };
     const routeBase = '/apex/contribute';
 
     cy.login().then(() => {
       // Create a new organization
-      cy.createCollective({ type: 'ORGANIZATION' }).then(collective => {
+      cy.createCollective({ type: 'ORGANIZATION', name: randomSlug() }).then(collective => {
         collectiveSlug = collective.slug;
 
         cy.clock(Date.parse('2042/05/03'));
@@ -126,9 +130,8 @@ describe('Contribution Flow: Order', () => {
 
         // Profile
         cy.checkStepsProgress({ enabled: ['profile', 'details'], disabled: 'payment' });
-        cy.get(`[type="radio"][name=ContributionProfile][value=${collective.id}]`).check();
-        cy.tick(1000);
-        cy.get(`input[type=radio][name=ContributionProfile][value=${collective.id}]`).should('be.checked');
+        cy.getByDataCy('contribute-profile-picker').click();
+        cy.contains('[data-cy="select-option"]', collective.name).click();
 
         // Payment
         cy.getByDataCy('cf-next-step').click();

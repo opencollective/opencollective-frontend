@@ -99,7 +99,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
             </AmountLine>
           )}
           {Boolean(platformContribution) && (
-            <AmountLine color="black.700">
+            <AmountLine color="black.700" data-cy="ContributionSummary-Tip">
               <Label>
                 <FormattedMessage
                   id="SupportProject"
@@ -172,7 +172,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
         <Label fontWeight="500">
           <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
         </Label>
-        <Amount fontWeight="700">
+        <Amount fontWeight="700" data-cy="ContributionSummary-TodaysCharge">
           <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} isCrypto={isCrypto} />
         </Amount>
       </AmountLine>

@@ -14,6 +14,7 @@ import Avatar from '../Avatar';
 import { Box, Flex } from '../Grid';
 import DismissIcon from '../icons/DismissIcon';
 import StyledCard from '../StyledCard';
+import StyledHr from '../StyledHr';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
@@ -155,8 +156,12 @@ const ActionsButton = props => {
                   boxShadow="0px 8px 12px rgba(20, 20, 20, 0.16)"
                 >
                   <Flex flexDirection="column" fontSize="13px" lineHeight="16px" fontWeight="500">
+                    <Action onClick={props.deleteHandler}>
+                      <FormattedMessage defaultMessage="Delete Card" />
+                    </Action>
+                    <StyledHr borderColor="black.300" mt={2} mb={2} />
                     <Action onClick={props.editHandler}>
-                      <FormattedMessage id="VirtualCards.EditCardDetails" defaultMessage="Edit Card Details" />
+                      <FormattedMessage defaultMessage="Edit Card Details" />
                     </Action>
                   </Flex>
                   <Arrow ref={arrowRef} {...arrowProps} />
@@ -175,10 +180,11 @@ ActionsButton.propTypes = {
   state: PropTypes.string,
   onSuccess: PropTypes.func,
   editHandler: PropTypes.func,
+  deleteHandler: PropTypes.func,
 };
 
-const getLimitString = (spendingLimitAmount, spendingLimitInterval, locale) => {
-  const value = formatCurrency(spendingLimitAmount, 'USD', { locale });
+const getLimitString = (spendingLimitAmount, spendingLimitInterval, currency, locale) => {
+  const value = formatCurrency(spendingLimitAmount, currency, { locale });
   if (!spendingLimitAmount) {
     return <FormattedMessage id="VirtualCards.NoLimit" defaultMessage="No Limit" />;
   }
@@ -186,7 +192,7 @@ const getLimitString = (spendingLimitAmount, spendingLimitInterval, locale) => {
     case 'DAILY':
       return (
         <Fragment>
-          <FormattedMessage defaultMessage="Limited to" />
+          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
           &nbsp;
           {value}/<FormattedMessage defaultMessage="day" />
         </Fragment>
@@ -297,7 +303,7 @@ const VirtualCard = props => {
                 }}
               />
               &nbsp;&middot;&nbsp;
-              {getLimitString(props.spendingLimitAmount, props.spendingLimitInterval, locale)}
+              {getLimitString(props.spendingLimitAmount, props.spendingLimitInterval, props.currency, locale)}
             </P>
           </React.Fragment>
         )}
@@ -311,15 +317,15 @@ const VirtualCard = props => {
         alignItems="center"
         shrink={0}
       >
-        {props.hasActions && (
+        {props.canEditVirtualCard && (
           <ActionsButton
             id={props.id}
             state={props.data.state}
             onSuccess={props.onSuccess}
             editHandler={props.editHandler}
+            deleteHandler={props.deleteHandler}
           />
         )}
-        <React.Fragment>{props.provider}</React.Fragment>
         <Action onClick={() => setDisplayDetails(!displayDetails)}>
           {displayDetails ? (
             <React.Fragment>
@@ -339,10 +345,10 @@ const VirtualCard = props => {
 };
 
 VirtualCard.propTypes = {
-  hasActions: PropTypes.bool,
+  canEditVirtualCard: PropTypes.bool,
   onSuccess: PropTypes.func,
   editHandler: PropTypes.func,
-
+  deleteHandler: PropTypes.func,
   account: PropTypes.shape({
     id: PropTypes.string,
     imageUrl: PropTypes.string,
@@ -356,6 +362,7 @@ VirtualCard.propTypes = {
   provider: PropTypes.string,
   spendingLimitAmount: PropTypes.number,
   spendingLimitInterval: PropTypes.string,
+  currency: PropTypes.string,
   createdAt: PropTypes.string,
 };
 

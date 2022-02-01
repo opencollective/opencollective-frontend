@@ -2,17 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Box } from '../Grid';
-import { withUser } from '../UserProvider';
+import { useUser } from '../UserProvider';
 
 import StepProfileGuestForm from './StepProfileGuestForm';
 import StepProfileLoggedInForm from './StepProfileLoggedInForm';
 
 const StepProfile = ({
-  LoggedInUser,
   collective,
   stepDetails,
-  profiles,
-  defaultSelectedProfile,
+  defaultProfileSlug,
   defaultEmail,
   defaultName,
   onChange,
@@ -21,16 +19,17 @@ const StepProfile = ({
   onSignInClick,
   isEmbed,
 }) => {
+  const { LoggedInUser } = useUser();
   return (
     <Box width={1}>
       {LoggedInUser ? (
         <StepProfileLoggedInForm
-          profiles={profiles}
-          defaultSelectedProfile={defaultSelectedProfile}
+          defaultProfileSlug={defaultProfileSlug}
           onChange={onChange}
           canUseIncognito={canUseIncognito}
           collective={collective}
           data={data}
+          stepDetails={stepDetails}
         />
       ) : (
         <StepProfileGuestForm
@@ -57,12 +56,11 @@ StepProfile.propTypes = {
   data: PropTypes.object,
   onChange: PropTypes.func,
   onSignInClick: PropTypes.func,
-  defaultSelectedProfile: PropTypes.object,
+  defaultProfileSlug: PropTypes.string,
   defaultEmail: PropTypes.object,
   defaultName: PropTypes.object,
-  profiles: PropTypes.array,
   canUseIncognito: PropTypes.bool,
   isEmbed: PropTypes.bool,
 };
 
-export default withUser(StepProfile);
+export default StepProfile;

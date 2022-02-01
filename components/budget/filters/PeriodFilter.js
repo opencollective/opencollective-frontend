@@ -155,54 +155,15 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
             />
           </Box>
           <StyledInputField
-            label={<FormattedMessage defaultMessage="Start date" />}
-            labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
-            name="dateFrom"
-            mt="12px"
-            labelFontSize="13px"
-          >
-            {inputProps => (
-              <StyledInput
-                {...inputProps}
-                type="date"
-                width="100%"
-                closeOnSelect
-                lineHeight={1}
-                fontSize="13px"
-                value={stripTime(tmpDateInterval.from)}
-                min={formattedMin}
-                onChange={e => setDate('from', e.target.value)}
-              />
-            )}
-          </StyledInputField>
-          <StyledInputField
-            label={<FormattedMessage defaultMessage="End date" />}
-            labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
-            name="dateTo"
-            mt="12px"
-            labelFontSize="13px"
-          >
-            {inputProps => (
-              <StyledInput
-                {...inputProps}
-                type="date"
-                width="100%"
-                closeOnSelect
-                lineHeight={1}
-                fontSize="13px"
-                value={stripTime(tmpDateInterval.to)}
-                min={formattedMin}
-                max={stripTime(new Date())}
-                onChange={e => setDate('to', e.target.value)}
-              />
-            )}
-          </StyledInputField>
-          <StyledInputField
             name="timezoneType"
             mt="12px"
-            labelFontSize="13px"
+            labelFontSize="16px"
+            labelFontWeight="700"
             label={
               <Flex alignItems="center">
+                <Span mr={1}>
+                  <FormattedMessage defaultMessage="Timezone" />
+                </Span>
                 <StyledTooltip
                   content={
                     <FormattedMessage defaultMessage="By default, all dates are filtered and displayed using your local timezone. You can switch to UTC to indicate that the dates provided above use the Coordinated Universal Time format, which matches how email reports are generated" />
@@ -210,9 +171,6 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
                 >
                   <InfoCircle size={16} />
                 </StyledTooltip>
-                <Span ml={1}>
-                  <FormattedMessage defaultMessage="Timezone" />
-                </Span>
               </Flex>
             }
           >
@@ -221,7 +179,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
                 {...inputProps}
                 size="tiny"
                 items={['local', 'UTC']}
-                buttonProps={{ p: 1, fontSize: '11px' }}
+                buttonProps={{ p: 1, fontSize: '13px', fontWeight: 400 }}
                 selected={tmpDateInterval.timezoneType}
                 buttonPropsBuilder={({ item }) => ({ title: getTimeZoneTypeName(intl, item) })}
                 onChange={timezoneType => {
@@ -239,9 +197,54 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
               </StyledButtonSet>
             )}
           </StyledInputField>
+          <StyledInputField
+            label={<FormattedMessage defaultMessage="Start date" />}
+            labelFontWeight="700"
+            labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
+            name="dateFrom"
+            mt="12px"
+            labelFontSize="16px"
+          >
+            {inputProps => (
+              <StyledInput
+                {...inputProps}
+                type="date"
+                width="100%"
+                closeOnSelect
+                lineHeight={1}
+                fontSize="13px"
+                value={stripTime(tmpDateInterval.from)}
+                min={formattedMin}
+                onChange={e => setDate('from', e.target.value)}
+              />
+            )}
+          </StyledInputField>
+          <StyledInputField
+            label={<FormattedMessage defaultMessage="End date" />}
+            labelFontWeight="700"
+            labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
+            name="dateTo"
+            mt="12px"
+            labelFontSize="16px"
+          >
+            {inputProps => (
+              <StyledInput
+                {...inputProps}
+                type="date"
+                width="100%"
+                closeOnSelect
+                lineHeight={1}
+                fontSize="13px"
+                value={stripTime(tmpDateInterval.to)}
+                min={formattedMin}
+                max={stripTime(new Date())}
+                onChange={e => setDate('to', e.target.value)}
+              />
+            )}
+          </StyledInputField>
           <Flex mt={2}>
             <StyledButton
-              buttonSize="tiny"
+              buttonSize="medium"
               mr={2}
               mt="12px"
               flex="1"
@@ -254,7 +257,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
               <FormattedMessage id="Reset" defaultMessage="Reset" />
             </StyledButton>
             <StyledButton
-              buttonSize="tiny"
+              buttonSize="medium"
               buttonStyle="primary"
               mt="12px"
               data-cy="btn-apply-period-filter"

@@ -22,7 +22,6 @@ import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { H4, P } from '../../Text';
 import CreateHostFormWithData from '../CreateHostFormWithData';
 import EditConnectedAccount from '../EditConnectedAccount';
-import SettingsTitle from '../SettingsTitle';
 
 const OptionLabel = styled.label`
   display: block;
@@ -338,9 +337,6 @@ class Host extends React.Component {
 
     return (
       <EditCollectiveHostSection>
-        <SettingsTitle>
-          <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
-        </SettingsTitle>
         <H4 fontSize="15px" mb={3}>
           <FormattedMessage
             id="acceptContributions.picker.subtitle"

@@ -2,10 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, uniqBy, update } from 'lodash';
+import { withRouter } from 'next/router';
 
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { stripHTML } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -32,6 +34,7 @@ class UpdatePage extends React.Component {
     updateSlug: PropTypes.string,
     LoggedInUser: PropTypes.object, // from withUser
     client: PropTypes.object, // from withApollo
+    router: PropTypes.object, // from withRouter
     data: PropTypes.shape({
       account: PropTypes.object,
       update: PropTypes.object,
@@ -41,6 +44,12 @@ class UpdatePage extends React.Component {
   };
 
   state = { isReloadingData: false };
+
+  componentDidMount() {
+    const { router, data, updateSlug } = this.props;
+    const account = data?.account;
+    addParentToURLIfMissing(router, account, `/updates/${updateSlug}`);
+  }
 
   async componentDidUpdate(oldProps) {
     // Refetch data when use logs in
@@ -121,6 +130,7 @@ class UpdatePage extends React.Component {
         collective={account}
         title={update.title}
         description={stripHTML(update.summary)}
+        canonicalURL={`${getCollectivePageCanonicalURL(account)}/update`}
         metaTitle={`${update.title} - ${account.name}`}
       >
         <CollectiveNavbar
@@ -193,6 +203,13 @@ const updateQuery = gqlV2/* GraphQL */ `
       ... on Collective {
         isApproved
       }
+      type
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+        }
+      }
     }
     update(slug: $updateSlug, account: { slug: $collectiveSlug }) {
       id
@@ -239,4 +256,4 @@ const getUpdate = graphql(updateQuery, {
   },
 });
 
-export default withUser(getUpdate(withApollo(UpdatePage)));
+export default withRouter(withUser(getUpdate(withApollo(UpdatePage))));

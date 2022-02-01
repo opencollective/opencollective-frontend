@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { CardElement } from '@stripe/react-stripe-js';
-import { find, get, intersection, isEmpty, isNil, omitBy, pick } from 'lodash';
+import { find, get, intersection, isEmpty, isNil, omitBy, pick, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -27,9 +27,10 @@ import { isTrustedRedirectHost, objectToQueryString } from '../../lib/url-helper
 import { reportValidityHTML5 } from '../../lib/utils';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
+import Captcha, { isCaptchaEnabled } from '../Captcha';
 import Container from '../Container';
 import ContributeFAQ from '../faqs/ContributeFAQ';
-import { Box, Grid } from '../Grid';
+import { Box, Flex, Grid } from '../Grid';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import Steps from '../Steps';
@@ -138,6 +139,9 @@ class ContributionFlow extends React.Component {
     super(props);
     this.mainContainerRef = React.createRef();
     this.formRef = React.createRef();
+    this.captchaRef = React.createRef();
+
+    const isCryptoFlow = props.paymentFlow === PAYMENT_FLOW.CRYPTO;
     this.state = {
       error: null,
       stripe: null,
@@ -152,9 +156,9 @@ class ContributionFlow extends React.Component {
       stepDetails: {
         quantity: 1,
         interval: props.fixedInterval || getDefaultInterval(props.tier),
-        amount: props.paymentFlow === PAYMENT_FLOW.CRYPTO ? '' : props.fixedAmount || getDefaultTierAmount(props.tier),
+        amount: isCryptoFlow ? '' : props.fixedAmount || getDefaultTierAmount(props.tier),
         platformContribution: props.platformContribution,
-        currency: CRYPTO_CURRENCIES[0],
+        currency: isCryptoFlow ? CRYPTO_CURRENCIES[0] : props.tier?.amount?.currency || props.collective.currency,
       },
     };
   }
@@ -189,6 +193,11 @@ class ContributionFlow extends React.Component {
             frequency: getGQLV2FrequencyFromInterval(stepDetails.interval),
             guestInfo,
             fromAccount,
+            fromAccountInfo: {
+              location: pick(stepProfile.location, ['name', 'address', 'country', 'structured']),
+              legalName: stepProfile.legalName,
+              name: stepProfile.name,
+            },
             toAccount: pick(this.props.collective, ['id']),
             data:
               this.props.paymentFlow === PAYMENT_FLOW.CRYPTO
@@ -201,7 +210,7 @@ class ContributionFlow extends React.Component {
                 : null,
             customData: stepDetails.customData,
             paymentMethod: await this.getPaymentMethod(),
-            platformContributionAmount: getGQLV2AmountInput(stepDetails.platformContribution, undefined),
+            platformTipAmount: getGQLV2AmountInput(stepDetails.platformContribution, undefined),
             tier: this.props.tier && { legacyId: this.props.tier.legacyId },
             context: { isEmbed: this.props.isEmbed || false },
             tags: this.props.tags,
@@ -219,7 +228,7 @@ class ContributionFlow extends React.Component {
 
       return this.handleOrderResponse(response.data.createOrder, stepProfile.email);
     } catch (e) {
-      this.setState({ isSubmitting: false });
+      this.handleError();
       this.showError(getErrorFromGraphqlException(e));
     }
   };
@@ -238,10 +247,18 @@ class ContributionFlow extends React.Component {
     }
   };
 
+  handleError = message => {
+    this.setState({ isSubmitting: false, error: message });
+    if (isCaptchaEnabled() && !this.props.LoggedInUser) {
+      this.setState({ stepProfile: set(this.state.stepProfile, 'captcha', null) });
+      this.captchaRef?.current?.resetCaptcha();
+    }
+  };
+
   handleStripeError = async (order, stripeError, email, guestToken) => {
     const { message, account, response } = stripeError;
     if (!response) {
-      this.setState({ isSubmitting: false, error: message });
+      this.handleError(message);
     } else if (response.paymentIntent) {
       const isAlipay = response.paymentIntent.allowed_source_types[0] === 'alipay';
       const stripe = await getStripe(null, account);
@@ -251,14 +268,14 @@ class ContributionFlow extends React.Component {
           })
         : await stripe.handleCardAction(response.paymentIntent.client_secret);
       if (result.error) {
-        this.setState({ isSubmitting: false, error: result.error.message });
+        this.handleError(result.error.message);
       } else if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {
         this.setState({ isSubmitting: true, error: null });
         try {
           const response = await this.props.confirmOrder({ variables: { order: { id: order.id }, guestToken } });
           return this.handleOrderResponse(response.data.confirmOrder, email);
         } catch (e) {
-          this.setState({ isSubmitting: false, error: e.message });
+          this.handleError(e.message);
         }
       }
     }
@@ -378,7 +395,7 @@ class ContributionFlow extends React.Component {
     if (!stepProfile) {
       return action === 'prev';
     } else if (stepProfile.isGuest) {
-      return validateGuestProfile(stepProfile, stepDetails, this.showError);
+      return validateGuestProfile(stepProfile, stepDetails);
     }
 
     // Check if we're creating a new profile
@@ -530,11 +547,16 @@ class ContributionFlow extends React.Component {
   getTierMinAmount = memoizeOne(getTierMinAmount);
   getApplicableTaxes = memoizeOne(getApplicableTaxes);
 
-  canHaveFeesOnTop() {
-    if (!this.props.collective.platformContributionAvailable) {
+  canHavePlatformTips() {
+    const { tier, collective } = this.props;
+    if (!collective.platformContributionAvailable) {
       return false;
-    } else if (this.props.tier?.type === TierTypes.TICKET) {
+    } else if (!tier) {
+      return true;
+    } else if (tier.type === TierTypes.TICKET) {
       return false;
+    } else if (tier.amountType === 'FIXED' && !tier.amount.valueInCents) {
+      return false; // No platform tips for free tiers
     } else {
       return true;
     }
@@ -619,7 +641,15 @@ class ContributionFlow extends React.Component {
             return true;
           } else {
             const isCompleted = Boolean(noPaymentRequired || stepPayment);
-            if (isCompleted && stepPayment?.key === NEW_CREDIT_CARD_KEY) {
+            if (
+              !stepProfile.captcha &&
+              isCaptchaEnabled() &&
+              !LoggedInUser &&
+              stepPayment?.key === NEW_CREDIT_CARD_KEY
+            ) {
+              this.showError(intl.formatMessage({ defaultMessage: 'Captcha is required.' }));
+              return false;
+            } else if (isCompleted && stepPayment?.key === NEW_CREDIT_CARD_KEY) {
               return stepPayment.paymentMethod?.stripeData?.complete;
             } else {
               return isCompleted;
@@ -720,6 +750,7 @@ class ContributionFlow extends React.Component {
     const currency = isCrypto ? stepDetails.currency.value : tier?.amount.currency || collective.currency;
     const isLoading = isCrypto ? isSubmitting : isSubmitted || isSubmitting;
     const pastEvent = collective.type === CollectiveType.EVENT && isPastEvent(collective);
+    const shouldDisplayCaptcha = isCaptchaEnabled() && !LoggedInUser && stepPayment?.key === NEW_CREDIT_CARD_KEY;
 
     return (
       <Steps
@@ -813,7 +844,7 @@ class ContributionFlow extends React.Component {
                     onChange={data => this.setState(data)}
                     step={currentStep}
                     isCrypto={isCrypto}
-                    showFeesOnTop={this.canHaveFeesOnTop()}
+                    showFeesOnTop={this.canHavePlatformTips()}
                     onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
                     defaultProfileSlug={this.props.contributeAs}
                     defaultEmail={this.props.defaultEmail}
@@ -826,6 +857,14 @@ class ContributionFlow extends React.Component {
                     disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
                     hideCreditCardPostalCode={this.props.hideCreditCardPostalCode}
                   />
+                  {!nextStep && shouldDisplayCaptcha && (
+                    <Flex mt={40} justifyContent="center">
+                      <Captcha
+                        ref={this.captchaRef}
+                        onVerify={result => this.setState({ stepProfile: set(stepProfile, 'captcha', result) })}
+                      />
+                    </Flex>
+                  )}
                   <Box mt={40}>
                     <ContributionFlowButtons
                       goNext={goNext}

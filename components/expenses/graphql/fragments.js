@@ -101,10 +101,8 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
       country
     }
     supportedPayoutMethods
+    isTrustedHost
     plan {
-      id
-    }
-    transferwise {
       id
     }
   }
@@ -125,6 +123,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
     createdAt
     invoiceInfo
     requiredLegalDocuments
+    feesPayer
     draft
     items {
       id
@@ -234,6 +233,10 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isApproved
         host {
           ...ExpenseHostFields
+          transferwise {
+            id
+            availableCurrencies
+          }
         }
       }
 
@@ -244,6 +247,10 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isActive
         host {
           ...ExpenseHostFields
+          transferwise {
+            id
+            availableCurrencies
+          }
         }
       }
 
@@ -322,6 +329,28 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
     currency
     type
     requiredLegalDocuments
+    feesPayer
+    account {
+      id
+      name
+      slug
+      createdAt
+      currency
+      type
+      stats {
+        id
+        balanceWithBlockedFunds {
+          valueInCents
+          currency
+        }
+      }
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+        }
+      }
+    }
     permissions {
       id
       canDelete

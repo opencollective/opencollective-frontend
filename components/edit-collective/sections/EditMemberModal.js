@@ -127,6 +127,7 @@ const EditMemberModal = props => {
 
   const handleEditMemberMutation = async values => {
     const { description, role, since } = values;
+
     try {
       await editMemberAccount({
         variables: {
@@ -283,7 +284,7 @@ const EditMemberModal = props => {
                 >
                   <Flex alignItems="center">
                     <Delete height={25} />
-                    <FormattedMessage id="members.remove" defaultMessage="Remove" />
+                    <FormattedMessage id="Remove" defaultMessage="Remove" />
                   </Flex>
                 </StyledButton>
               </StyledTooltip>
@@ -299,7 +300,7 @@ const EditMemberModal = props => {
               >
                 <Flex alignItems="center">
                   <Delete height={25} />
-                  <FormattedMessage id="members.remove" defaultMessage="Remove" />
+                  <FormattedMessage id="Remove" defaultMessage="Remove" />
                 </Flex>
               </StyledButton>
             )}

@@ -170,7 +170,7 @@ class TopBar extends React.Component {
               )}
               {merged.docs && (
                 <NavLinkContainer>
-                  <NavLink href="https://docs.opencollective.com">
+                  <NavLink href="/help">
                     <FormattedMessage id="menu.docs" defaultMessage="Docs & Help" />
                   </NavLink>
                 </NavLinkContainer>

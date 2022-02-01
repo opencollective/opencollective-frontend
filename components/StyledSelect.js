@@ -48,21 +48,23 @@ const SelectContainer = ({ innerProps, ...props }) => (
 
 /* eslint-disable react/prop-types */
 const MultiValue = ({ children, removeProps, ...props }) => {
+  let title;
   if (typeof children === 'string') {
+    title = children;
     children = truncate(children, { maxLength: 32 });
   }
 
   if (props.selectProps.useCompactMode) {
     return (
       <StyledTag m="4px" variant="rounded" maxHeight="24px" closeButtonProps={removeProps}>
-        <Container maxWidth={16} overflow="hidden" title={props.data.label}>
+        <Container maxWidth={16} overflow="hidden" title={props.data.label || title}>
           {children}
         </Container>
       </StyledTag>
     );
   } else {
     return (
-      <StyledTag m="4px" variant="rounded-right" maxHeight="none" closeButtonProps={removeProps}>
+      <StyledTag m="4px" variant="rounded-right" maxHeight="none" closeButtonProps={removeProps} title={title}>
         {children}
       </StyledTag>
     );
@@ -73,7 +75,8 @@ const MultiValue = ({ children, removeProps, ...props }) => {
 /* eslint-disable react/prop-types */
 const ValueContainer = ({ children, ...rest }) => {
   const selectedCount = rest.getValue().length;
-  const isTruncate = selectedCount > 3;
+  const truncationThreshold = rest.selectProps.truncationThreshold || 3;
+  const isTruncate = selectedCount > truncationThreshold;
 
   let firstChild = [];
   let elementNames;

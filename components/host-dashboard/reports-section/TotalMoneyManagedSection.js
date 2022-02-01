@@ -96,11 +96,6 @@ const TotalMoneyManagedSection = ({ host, collectives, isLoading }) => {
         <ProportionalAreaChart areas={chartAreas} />
       </Container>
       <Flex flexWrap="wrap" justifyContent="space-between">
-        <Container px={2}>
-          <P fontSize="12px" fontWeight="400" mt="16px">
-            <FormattedMessage defaultMessage="How much money is your Host managing over time?" />
-          </P>
-        </Container>
         <Container px={2} textAlign="right">
           <StyledLinkButton asLink onClick={() => setShowMoneyManagedChart(!showMoneyManagedChart)}>
             <P fontSize="12px" fontWeight="400" mt="16px">

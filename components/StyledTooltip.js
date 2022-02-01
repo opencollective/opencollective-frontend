@@ -151,6 +151,8 @@ class StyledTooltip extends React.Component {
     containerLineHeight: PropTypes.string,
     containerCursor: PropTypes.string,
     delayHide: PropTypes.number,
+    /** If true, children will be rendered directly, without any tooltip. Useful to build conditional tooltips */
+    noTooltip: PropTypes.bool,
     /** The component that will be used as a container for the children */
     childrenContainer: PropTypes.any,
     /** The trigger. Either:
@@ -195,36 +197,39 @@ class StyledTooltip extends React.Component {
     this.setState({ isHovered: false });
   };
 
-  render() {
-    const isMounted = Boolean(this.state.id);
+  renderChildren(ref) {
+    return typeof this.props.children === 'function' ? (
+      this.props.children({
+        ref: ref,
+        onMouseEnter: this.onMouseEnter,
+        onMouseLeave: this.onMouseLeave,
+      })
+    ) : (
+      <ChildrenContainer
+        ref={ref}
+        as={this.props.childrenContainer}
+        display={this.props.display}
+        onMouseEnter={this.onMouseEnter}
+        onMouseLeave={this.onMouseLeave}
+        verticalAlign={this.props.containerVerticalAlign}
+        lineHeight={this.props.containerLineHeight}
+        cursor={this.props.containerCursor}
+      >
+        {this.props.children}
+      </ChildrenContainer>
+    );
+  }
 
+  render() {
+    if (this.props.noTooltip) {
+      return this.renderChildren();
+    }
+
+    const isMounted = Boolean(this.state.id);
     return (
       <React.Fragment>
         <Manager>
-          <Reference>
-            {({ ref }) =>
-              typeof this.props.children === 'function' ? (
-                this.props.children({
-                  ref: ref,
-                  onMouseEnter: this.onMouseEnter,
-                  onMouseLeave: this.onMouseLeave,
-                })
-              ) : (
-                <ChildrenContainer
-                  ref={ref}
-                  as={this.props.childrenContainer}
-                  display={this.props.display}
-                  onMouseEnter={this.onMouseEnter}
-                  onMouseLeave={this.onMouseLeave}
-                  verticalAlign={this.props.containerVerticalAlign}
-                  lineHeight={this.props.containerLineHeight}
-                  cursor={this.props.containerCursor}
-                >
-                  {this.props.children}
-                </ChildrenContainer>
-              )
-            }
-          </Reference>
+          <Reference>{({ ref }) => this.renderChildren(ref)}</Reference>
 
           {isMounted && this.state.showPopup && (
             <TooltipContent

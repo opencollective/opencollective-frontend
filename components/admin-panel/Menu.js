@@ -13,6 +13,7 @@ import {
   ALL_SECTIONS,
   COLLECTIVE_SECTIONS,
   FISCAL_HOST_SECTIONS,
+  HOST_DASHBOARD_SECTIONS,
   ORG_BUDGET_SECTIONS,
   PAGE_TITLES,
 } from './constants';
@@ -48,7 +49,7 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
 
 OrganizationSettingsMenuLinks.propTypes = {
   collective: PropTypes.object,
-  isAccountantOnly: PropTypes.boolean,
+  isAccountantOnly: PropTypes.bool,
 };
 
 const Menu = ({ collective, isAccountantOnly }) => {
@@ -71,6 +72,11 @@ const Menu = ({ collective, isAccountantOnly }) => {
           <MenuLink collective={collective} section={HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS} if={!isAccountantOnly} />
           <MenuLink collective={collective} section={HOST_SECTIONS.PENDING_APPLICATIONS} if={!isAccountantOnly} />
           <MenuLink collective={collective} section={HOST_SECTIONS.HOSTED_COLLECTIVES} if={!isAccountantOnly} />
+          <MenuLink
+            collective={collective}
+            section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS}
+            if={!isAccountantOnly && hasFeature(collective, FEATURES.PRIVACY_VCC)}
+          />
           <MenuLink collective={collective} section={HOST_SECTIONS.REPORTS} isBeta />
         </MenuGroup>
         <MenuGroup if={isHost || isType(collective, ORGANIZATION)}>
@@ -94,7 +100,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
               <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />
               <MenuLink
                 collective={collective}
-                section={FISCAL_HOST_SECTIONS.HOST_VIRTUAL_CARDS}
+                section={FISCAL_HOST_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS}
                 if={hasFeature(collective, FEATURES.PRIVACY_VCC)}
               />
               <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.HOST_TWO_FACTOR_AUTH} />

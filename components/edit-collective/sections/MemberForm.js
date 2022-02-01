@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import dayjs from 'dayjs';
 import { Form, Formik } from 'formik';
 import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
@@ -27,6 +28,7 @@ const memberFormMessages = defineMessages({
   roleLabel: { id: 'members.role.label', defaultMessage: 'Role' },
   sinceLabel: { id: 'user.since.label', defaultMessage: 'Since' },
   descriptionLabel: { id: 'Fields.description', defaultMessage: 'Description' },
+  inValidDateError: { defaultMessage: 'Please enter a valid date' },
 });
 
 const MemberForm = props => {
@@ -72,8 +74,26 @@ const MemberForm = props => {
       type: 'date',
       defaultValue: new Date(),
       label: intl.formatMessage(memberFormMessages.sinceLabel),
+      required: true,
     },
   ];
+
+  const getFieldDefaultValue = field => {
+    const fieldDefaultValue = get(member, field.name) || field.defaultValue;
+    if (field.name === 'since') {
+      return dayjs(fieldDefaultValue).format('YYYY-MM-DD');
+    } else {
+      return fieldDefaultValue;
+    }
+  };
+
+  const validate = values => {
+    const errors = {};
+    if (!dayjs(values.since).isValid()) {
+      errors.since = intl.formatMessage(memberFormMessages.inValidDateError);
+    }
+    return errors;
+  };
 
   return (
     <Flex flexDirection="column" justifyContent="center">
@@ -97,9 +117,9 @@ const MemberForm = props => {
           </Flex>
         </MemberContainer>
       )}
-      <Formik initialValues={initialValues} onSubmit={submit}>
+      <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange>
         {formik => {
-          const { setFieldValue, submitForm } = formik;
+          const { setFieldValue, submitForm, errors } = formik;
 
           bindSubmitForm(submitForm);
 
@@ -113,14 +133,31 @@ const MemberForm = props => {
                     label={field.label}
                     type={field.type}
                     disabled={false}
-                    defaultValue={get(member, field.name) || field.defaultValue}
+                    defaultValue={getFieldDefaultValue(field)}
                     options={field.options}
+                    error={errors[field.name]}
                     onChange={value => {
-                      setFieldValue(field.name, value);
+                      if (field.name === 'since') {
+                        if (dayjs(value).isValid()) {
+                          setFieldValue(field.name, dayjs(value).toISOString());
+                        } else {
+                          setFieldValue(field.name, null);
+                        }
+                      } else {
+                        setFieldValue(field.name, value);
+                      }
+
                       if (field.name === 'role') {
                         setMemberRole(value);
                       }
                     }}
+                    onKeyDown={event => {
+                      if (event.key === 'Backspace') {
+                        event.preventDefault();
+                      }
+                    }}
+                    overflow="hidden"
+                    required={field.required}
                   />
                   {field.name === 'role' && hasRoleDescription(memberRole) && (
                     <Flex mb={3}>

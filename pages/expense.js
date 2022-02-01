@@ -15,6 +15,7 @@ import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
@@ -210,6 +211,10 @@ class ExpensePage extends React.Component {
   }
 
   componentDidMount() {
+    const { router, data, legacyExpenseId } = this.props;
+    const account = data?.account;
+    addParentToURLIfMissing(router, account, `/expenses/${legacyExpenseId}`);
+
     const shouldEditDraft = this.props.data.expense?.status === expenseStatus.DRAFT && this.props.draftKey;
     if (shouldEditDraft) {
       this.setState(() => ({
@@ -219,7 +224,7 @@ class ExpensePage extends React.Component {
       }));
     }
 
-    const expense = this.props.data?.expense;
+    const expense = data?.expense;
     if (
       expense?.status === expenseStatus.UNVERIFIED &&
       expense?.permissions?.canEdit &&
@@ -465,9 +470,9 @@ class ExpensePage extends React.Component {
     const collective = expense?.account;
     const host = collective?.host;
     const canSeeInvoiceInfo = expense?.permissions.canSeeInvoiceInfo;
-    const isInvoice = expense?.type === expenseTypes.INVOICE;
+    const isInvoiceOrSettlement = [expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense?.type);
     const isDraft = expense?.status === expenseStatus.DRAFT;
-    const hasAttachedFiles = (isInvoice && canSeeInvoiceInfo) || expense?.attachedFiles?.length > 0;
+    const hasAttachedFiles = (isInvoiceOrSettlement && canSeeInvoiceInfo) || expense?.attachedFiles?.length > 0;
     const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
     const hasHeaderMsg = error || showTaxFormMsg;
     const isMissingReceipt =
@@ -486,7 +491,11 @@ class ExpensePage extends React.Component {
     }
 
     return (
-      <Page collective={collective} {...this.getPageMetaData(expense)}>
+      <Page
+        collective={collective}
+        canonicalURL={`${getCollectivePageCanonicalURL(collective)}/expense`}
+        {...this.getPageMetaData(expense)}
+      >
         <CollectiveNavbar
           collective={collective}
           isLoading={!collective}
@@ -534,7 +543,7 @@ class ExpensePage extends React.Component {
               <MessageBox type="warning" withIcon={true} mb={4}>
                 <FormattedMessage
                   id="expenseNeedsTaxFormMessage.msg"
-                  defaultMessage="We need your tax information before we can pay you. You will receive an email from HelloWorks saying Open Collective is requesting you fill out a form. This is required by the IRS (US tax agency) for everyone who invoices $600 or more per year. We also require one for grant recipients for our records. If you have not received the email within 24 hours, or you have any questions, please contact <I18nSupportLink></I18nSupportLink>. For more info, see our <Link>help docs about taxes</Link>."
+                  defaultMessage="We need your tax information before we can pay you. You will receive an email with a link to fill out a form. If you have not received the email within 24 hours, check your spam, then contact <I18nSupportLink></I18nSupportLink>. Questions? See <Link>help docs about taxes</Link>."
                   values={{
                     I18nSupportLink,
                     Link: getI18nLink({

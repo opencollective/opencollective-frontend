@@ -40,11 +40,15 @@ describe('Contribution Flow: Donate', () => {
 
       // ---- Step profile ----
       cy.checkStepsProgress({ enabled: ['profile', 'details'], disabled: 'payment' });
+
       // Personal account must be the first entry, and it must be checked
       const userName = userParams.name;
-      cy.contains('[data-cy="ContributionProfile"] > label:first', userName);
-      cy.contains('[data-cy="ContributionProfile"] > label:first', `Personal`);
-      cy.get('[data-cy="ContributionProfile"] > label:first input[type=radio]').should('be.checked');
+      cy.contains('[data-cy="contribute-profile-picker"]', userName);
+      cy.contains('[data-cy="contribute-profile-picker"]', 'Personal');
+      cy.getByDataCy('contribute-profile-picker').click();
+      cy.contains('[data-cy="select-option"]:first', userName);
+      cy.contains('[data-cy="select-option"]:first', 'Personal');
+      cy.get('body').type('{esc}');
 
       // User profile is shown on step, all other steps must be disabled
       cy.getByDataCy(`progress-step-profile`).contains(userName);
@@ -92,15 +96,18 @@ describe('Contribution Flow: Donate', () => {
     cy.signup({ redirect: donateRoute, visitParams }).then(() => {
       cy.get('#amount > :nth-child(3)').click();
       cy.get('button[data-cy="cf-next-step"]:not([disabled])').click();
-      cy.contains('[data-cy="ContributionProfile"] > label', 'A new organization').click();
-
-      // Name must be shown on step
-      cy.get('[data-cy="ContributionProfile"] input[name=name]').type('Evil Corp');
-      cy.getByDataCy('progress-step-profile').contains('Evil Corp');
+      cy.getByDataCy('contribute-profile-picker').click();
+      cy.contains('[data-cy="select-option"]', 'Create Organization').click();
 
       // Fill form
-      cy.get('[data-cy="ContributionProfile"] input[name=website]').type('https://www.youtube.com/watch?v=oHg5SJYRHA0');
-      cy.get('[data-cy="ContributionProfile"] input[name=twitterHandle]').type('test');
+      cy.getByDataCy('create-collective-mini-form').as('createOrgForm');
+      cy.get('@createOrgForm').find('input[name=name]').type('Evil Corp');
+      cy.get('@createOrgForm').find('input[name=website]').type('https://www.youtube.com/watch?v=oHg5SJYRHA0');
+      cy.get('@createOrgForm').find('button[type=submit]').click();
+      cy.contains('[data-cy="contribute-profile-picker"]', 'Evil Corp');
+
+      // Name must be shown on step
+      cy.getByDataCy('progress-step-profile').contains('Evil Corp');
 
       // Submit form
       cy.get('button[data-cy="cf-next-step"]:not([disabled])').click();

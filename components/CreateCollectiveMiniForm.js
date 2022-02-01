@@ -183,6 +183,7 @@ const CreateCollectiveMiniForm = ({
   onSuccess,
   addLoggedInUserAsAdmin,
   LoggedInUser,
+  refetchLoggedInUser,
   excludeAdminFields,
   optionalFields,
   email = '',
@@ -241,6 +242,10 @@ const CreateCollectiveMiniForm = ({
       }
     }
     return createCollective({ variables: prepareMutationVariables(values) }).then(({ data }) => {
+      if (addLoggedInUserAsAdmin) {
+        refetchLoggedInUser();
+      }
+
       return onSuccess(isUser ? data.createUser.user.collective : data.createCollective);
     });
   };
@@ -440,6 +445,8 @@ CreateCollectiveMiniForm.propTypes = {
   addLoggedInUserAsAdmin: PropTypes.bool,
   /** @ignore from withUser */
   LoggedInUser: PropTypes.object,
+  /** @ignore from withUser */
+  refetchLoggedInUser: PropTypes.func,
   /** If true, this does not render the 'admin name' and 'admin email' for create org form */
   excludeAdminFields: PropTypes.bool,
   /** The collective email */

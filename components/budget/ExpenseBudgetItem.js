@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { toPx } from '../../lib/theme/helpers';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
@@ -86,7 +87,6 @@ const ExpenseBudgetItem = ({
   host,
   isInverted,
   showAmountSign,
-  collective,
   expense,
   showProcessActions,
   view,
@@ -94,7 +94,7 @@ const ExpenseBudgetItem = ({
   onProcess,
 }) => {
   const [hasFilesPreview, showFilesPreview] = React.useState(false);
-  const featuredProfile = isInverted ? collective : expense?.payee;
+  const featuredProfile = isInverted ? expense?.account : expense?.payee;
   const isAdminView = view === 'admin';
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const pendingReceipt = isCharge && expense?.items?.every(i => i.url === null);
@@ -122,7 +122,11 @@ const ExpenseBudgetItem = ({
                 content={<FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />}
                 delayHide={0}
               >
-                <StyledLink as={Link} underlineOnHover href={`/${collective.slug}/expenses/${expense.legacyId}`}>
+                <StyledLink
+                  as={Link}
+                  underlineOnHover
+                  href={`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`}
+                >
                   <AutosizeText
                     value={expense.description}
                     maxLength={255}
@@ -150,7 +154,7 @@ const ExpenseBudgetItem = ({
 
               <P mt="5px" fontSize="12px" color="black.700">
                 {isAdminView ? (
-                  <StyledLink as={LinkCollective} collective={collective} />
+                  <StyledLink as={LinkCollective} collective={expense.account} />
                 ) : (
                   <FormattedMessage
                     id="CreatedBy"
@@ -170,11 +174,11 @@ const ExpenseBudgetItem = ({
                         balance: (
                           <FormattedMoneyAmount
                             amount={get(
-                              collective,
+                              expense.account,
                               'stats.balanceWithBlockedFunds.valueInCents',
-                              get(collective, 'stats.balanceWithBlockedFunds', 0),
+                              get(expense.account, 'stats.balanceWithBlockedFunds', 0),
                             )}
-                            currency={collective.currency}
+                            currency={expense.account.currency}
                             amountStyles={{ color: 'black.700' }}
                           />
                         ),
@@ -218,12 +222,7 @@ const ExpenseBudgetItem = ({
                 <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} mb={0} py={0} mr="2px" fontSize="9px" />
               )}
               {isExpensePaidOrRejected && hasProcessButtons(expense.permissions) ? (
-                <AdminExpenseStatusTag
-                  host={host}
-                  collective={expense.account || collective}
-                  expense={expense}
-                  p="3px 8px"
-                />
+                <AdminExpenseStatusTag host={host} collective={expense.account} expense={expense} p="3px 8px" />
               ) : (
                 <ExpenseStatusTag
                   status={expense.status}
@@ -301,7 +300,7 @@ const ExpenseBudgetItem = ({
           <ButtonsContainer>
             <ProcessExpenseButtons
               host={host}
-              collective={expense.account || collective}
+              collective={expense.account}
               expense={expense}
               permissions={expense.permissions}
               buttonProps={{ ...DEFAULT_PROCESS_EXPENSE_BTN_PROPS, mx: 1, py: 2 }}
@@ -313,7 +312,7 @@ const ExpenseBudgetItem = ({
       {hasFilesPreview && (
         <ExpenseFilesPreviewModal
           show
-          collective={collective}
+          collective={expense.account}
           expense={expense}
           onClose={() => showFilesPreview(false)}
         />
@@ -331,22 +330,6 @@ ExpenseBudgetItem.propTypes = {
   onProcess: PropTypes.func,
   showProcessActions: PropTypes.bool,
   view: PropTypes.oneOf(['public', 'admin']),
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string,
-    stats: PropTypes.shape({
-      // Collective / Balance can be v1 or v2 there ...
-      balanceWithBlockedFunds: PropTypes.oneOfType([
-        PropTypes.number,
-        PropTypes.shape({
-          valueInCents: PropTypes.number,
-        }),
-      ]),
-    }),
-    parent: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-    }),
-  }),
   host: PropTypes.object,
   suggestedTags: PropTypes.arrayOf(PropTypes.string),
   expense: PropTypes.shape({
@@ -380,7 +363,17 @@ ExpenseBudgetItem.propTypes = {
     }),
     /** If available, this `account` will be used to link expense in place of the `collective` */
     account: PropTypes.shape({
-      slug: PropTypes.string,
+      slug: PropTypes.string.isRequired,
+      currency: PropTypes.string,
+      stats: PropTypes.shape({
+        // Collective / Balance can be v1 or v2 there ...
+        balanceWithBlockedFunds: PropTypes.oneOfType([
+          PropTypes.number,
+          PropTypes.shape({
+            valueInCents: PropTypes.number,
+          }),
+        ]),
+      }),
     }),
   }),
 };

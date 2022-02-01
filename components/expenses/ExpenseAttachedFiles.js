@@ -13,7 +13,7 @@ import ExpenseInvoiceDownloadHelper, { getExpenseInvoiceFilename } from './Expen
 const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expense }) => {
   return (
     <Flex flexWrap="wrap">
-      {showInvoice && expense.type === expenseTypes.INVOICE && (
+      {showInvoice && [expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense.type) && (
         <Box mr={3} mb={3}>
           <ExpenseInvoiceDownloadHelper expense={expense} collective={collective}>
             {({ isLoading, downloadInvoice }) => (

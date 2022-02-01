@@ -43,15 +43,15 @@ exports.REWRITES = [
     destination: '/createOrganization',
   },
   {
-    source: '/:collectiveSlug/updates',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates',
     destination: '/updates',
   },
   {
-    source: '/:collectiveSlug/updates/new',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/new',
     destination: '/createUpdate',
   },
   {
-    source: '/:collectiveSlug/updates/:updateSlug',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/:updateSlug',
     destination: '/update',
   },
   {
@@ -109,14 +109,6 @@ exports.REWRITES = [
   {
     source: '/:parentCollectiveSlug/projects/(new|create)',
     destination: '/create-project',
-  },
-  {
-    source: '/:parentCollectiveSlug/events/:eventSlug/edit/:section?',
-    destination: '/editEvent',
-  },
-  {
-    source: '/:slug/edit/:section?',
-    destination: '/editCollective',
   },
   {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?',
@@ -268,11 +260,11 @@ exports.REWRITES = [
   },
   // New recurring contributions page
   {
-    source: '/:slug/recurring-contributions',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/recurring-contributions',
     destination: '/recurring-contributions',
   },
   {
-    source: '/:slug/subscriptions',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/subscriptions',
     destination: '/recurring-contributions',
   },
   // Path routing: all the rewrites below are ready to be removed as soon as we
@@ -310,6 +302,14 @@ exports.REWRITES = [
     destination: '/how-it-works',
   },
   {
+    source: '/e2c',
+    destination: '/e2c',
+  },
+  {
+    source: '/:action(help|contact)/:formConfirmation(success)?',
+    destination: '/help-and-support',
+  },
+  {
     source: '/member-invitations',
     destination: '/member-invitations',
   },
@@ -330,7 +330,7 @@ exports.REWRITES = [
   },
   // Root actions
   {
-    source: '/opencollective/root-actions',
+    source: '/opencollective/root-actions/:section?',
     destination: '/root-actions',
   },
   // Terms of services for the host

@@ -251,7 +251,7 @@ const ForCollectiveCard = () => {
                 whiteSpace="nowrap"
                 width={['224px', '226px', null, '237px', '139px']}
               >
-                <FormattedMessage id="pricing.findHost" defaultMessage="Find a Fiscal Host" />
+                <FormattedMessage id="join.findAFiscalHost" defaultMessage="Find a Fiscal Host" />
               </StyledButton>
             </Link>
           </Container>

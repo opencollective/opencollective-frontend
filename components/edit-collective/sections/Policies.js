@@ -18,7 +18,6 @@ import StyledCheckbox from '../../StyledCheckbox';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
-import SettingsTitle from '../SettingsTitle';
 
 import { getSettingsQuery } from './EditCollectivePage';
 import SettingsSectionTitle from './SettingsSectionTitle';
@@ -84,7 +83,7 @@ const messages = defineMessages({
   },
 });
 
-const Policies = ({ collective, showOnlyExpensePolicy, contentOnly }) => {
+const Policies = ({ collective, showOnlyExpensePolicy }) => {
   const { formatMessage } = useIntl();
   const [selected, setSelected] = React.useState([]);
 
@@ -175,11 +174,6 @@ const Policies = ({ collective, showOnlyExpensePolicy, contentOnly }) => {
 
   return (
     <Flex flexDirection="column">
-      {!showOnlyExpensePolicy && (
-        <SettingsTitle contentOnly={contentOnly}>
-          <FormattedMessage id="editCollective.menu.policies" defaultMessage="Policies" />
-        </SettingsTitle>
-      )}
       {error && <MessageBoxGraphqlError error={error} />}
       <form onSubmit={formik.handleSubmit}>
         <Container>
@@ -314,7 +308,6 @@ Policies.propTypes = {
     slug: PropTypes.string,
   }),
   showOnlyExpensePolicy: PropTypes.bool,
-  contentOnly: PropTypes.bool,
 };
 
 export default Policies;

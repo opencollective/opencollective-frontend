@@ -53,7 +53,7 @@ const HowOCIsDifferent = () => {
           letterSpacing={['-0.008em', '-0.04em']}
           color="black.900"
         >
-          <FormattedMessage id="howItWorks.HowOCIsDifferent.title" defaultMessage="How Open Collective is different?" />
+          <FormattedMessage id="howItWorks.HowOCIsDifferent.title" defaultMessage="Open Collective is different" />
         </H3>
       </Box>
 
@@ -134,7 +134,7 @@ const HowOCIsDifferent = () => {
           <Description>
             <FormattedMessage
               id="howItWorks.openIsBetter.description"
-              defaultMessage="Fully open source—our code is fully transparent and accessible, just like our own company budget. You own your data: we’ll never sell it or lock you in."
+              defaultMessage="Our code is fully transparent and open source, just like our budget. You own your data: we’ll never sell it or lock you in."
             />
           </Description>
         </Box>

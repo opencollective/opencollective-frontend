@@ -51,6 +51,10 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
     host(slug: $hostSlug) {
       ...ExpenseHostFields
       ...HostInfoCardFields
+      transferwise {
+        id
+        availableCurrencies
+      }
     }
     expenses(
       host: { slug: $hostSlug }
@@ -72,20 +76,6 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
       nodes {
         ...ExpensesListFieldsFragment
         ...ExpensesListAdminFieldsFragment
-        account {
-          id
-          name
-          slug
-          createdAt
-          currency
-          type
-          stats {
-            balanceWithBlockedFunds {
-              valueInCents
-              currency
-            }
-          }
-        }
       }
     }
   }

@@ -1,166 +1,202 @@
 import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { orderBy } from 'lodash';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { uniqBy } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 
-import Avatar from '../Avatar';
+import { CollectiveType } from '../../lib/constants/collectives';
+import roles from '../../lib/constants/roles';
+
 import { Box, Flex } from '../Grid';
-import { getI18nLink } from '../I18nFormatters';
-import Link from '../Link';
-import MessageBox from '../MessageBox';
-import StyledRadioList from '../StyledRadioList';
-import { P } from '../Text';
+import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import StyledHr from '../StyledHr';
+import StyledInput from '../StyledInput';
+import StyledInputField from '../StyledInputField';
+import StyledInputLocation from '../StyledInputLocation';
+import { P, Span } from '../Text';
+import { useUser } from '../UserProvider';
 
-import CreateOrganizationForm from './CreateOrganizationForm';
-
-const msg = defineMessages({
-  incognito: { id: 'profile.incognito', defaultMessage: 'Incognito' },
-  newOrg: { id: 'contributeAs.org.new', defaultMessage: 'A new organization' },
-});
+import ContributeProfilePicker from './ContributeProfilePicker';
+import StepProfileInfoMessage from './StepProfileInfoMessage';
+import { contributionRequiresAddress, contributionRequiresLegalName } from './utils';
 
 export const NEW_ORGANIZATION_KEY = 'newOrg';
 
-const prepareProfiles = (intl, profiles, collective, canUseIncognito) => {
-  const filteredProfiles = profiles.filter(p => {
-    // if admin of collective you are donating to, remove it from the list
-    if (p.id === collective.legacyId) {
-      return false;
-    } else if (!canUseIncognito && p.isIncognito) {
-      return false;
-    } else if (p.type === 'COLLECTIVE' && (!p.host || p.host.id !== collective.host?.legacyId)) {
-      return false;
-    } else {
-      return true;
-    }
-  });
+const memberCanBeUsedToContribute = (member, account, canUseIncognito) => {
+  if (member.role !== roles.ADMIN) {
+    return false;
+  } else if (member.collective.id === account.legacyId) {
+    // Collective can't contribute to itself
+    return false;
+  } else if (!canUseIncognito && member.collective.isIncognito) {
+    // Incognito can't be used to contribute if not allowed
+    return false;
+  } else if (
+    member.collective.type === CollectiveType.COLLECTIVE &&
+    member.collective.host?.id !== account.host.legacyId
+  ) {
+    // If the contributing account is fiscally hosted, the host mush be the same as the one you're contributing to
+    return false;
+  } else if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(member.collective.type)) {
+    // Not supported yet, see https://github.com/opencollective/opencollective/issues/5066
+    // To enable contributions from them, we need to remove this check and make sure they're fetched from the API
+    // (they're currently not because we only fetch direct members, not parent's)
+    return false;
+  } else {
+    return true;
+  }
+};
 
-  if (canUseIncognito) {
-    const incognitoProfile = filteredProfiles.find(p => p.type === 'USER' && p.isIncognito);
-    if (!incognitoProfile) {
-      filteredProfiles.push({
-        id: 'incognito',
-        type: 'USER',
-        isIncognito: true,
-        name: intl.formatMessage(msg.incognito), // has to be a string for avatar's title
-      });
+const getProfiles = (loggedInUser, collective, canUseIncognito) => {
+  if (!loggedInUser) {
+    return [];
+  } else {
+    const filteredMembers = loggedInUser.memberOf.filter(member =>
+      memberCanBeUsedToContribute(member, collective, canUseIncognito),
+    );
+    const memberProfiles = filteredMembers.map(member => member.collective);
+    const personalProfile = { email: loggedInUser.email, image: loggedInUser.image, ...loggedInUser.collective };
+    return uniqBy([personalProfile, ...memberProfiles], 'id');
+  }
+};
+
+const getDefaultProfile = (stepProfile, profiles, defaultProfileSlug) => {
+  // If there's a default profile slug, enforce it
+  if (defaultProfileSlug) {
+    const contributorProfile = profiles.find(({ slug }) => slug === defaultProfileSlug);
+    if (contributorProfile) {
+      return contributorProfile;
     }
   }
 
-  filteredProfiles.push({
-    id: NEW_ORGANIZATION_KEY,
-    isNew: true,
-    type: 'ORGANIZATION',
-    label: intl.formatMessage(msg.newOrg),
-  });
+  // Otherwise use the state-defined profile
+  if (stepProfile) {
+    return stepProfile;
+  }
 
-  // Will put first: User / Not incognito
-  return orderBy(filteredProfiles, ['type', 'isNew', 'isIncognito', 'name'], ['desc', 'desc', 'desc', 'asc']);
+  // If none defined yet, fallback to the logged-in user personal profile, if any
+  return profiles?.[0] || null;
 };
 
-const NewContributionFlowStepProfileLoggedInForm = ({
-  profiles,
-  defaultSelectedProfile,
-  onChange,
-  canUseIncognito,
-  collective,
-  data,
-}) => {
-  const intl = useIntl();
+const getProfileInfo = (stepProfile, profiles) => {
+  if (stepProfile?.isIncognito) {
+    const profileLocation = stepProfile.location || {};
+    const isEmptyLocation = !profileLocation.address && !profileLocation.country && !profileLocation.structured;
+    return {
+      name: '', // Can't change name for incognito
+      legalName: stepProfile.legalName ?? (profiles[0].legalName || profiles[0].name || ''), // Default to user's legal name
+      location: (isEmptyLocation ? profiles[0].location : stepProfile.location) || {}, // Default to user's location
+    };
+  } else {
+    return {
+      name: stepProfile?.name || '',
+      legalName: stepProfile?.legalName || '',
+      location: stepProfile?.location || {},
+    };
+  }
+};
+
+const StepProfileLoggedInForm = ({ defaultProfileSlug, onChange, canUseIncognito, collective, data, stepDetails }) => {
+  const { LoggedInUser } = useUser();
+  const getProfileArgs = [LoggedInUser, collective, canUseIncognito];
+  const profiles = React.useMemo(() => getProfiles(...getProfileArgs), getProfileArgs);
+  const defaultProfile = getDefaultProfile(data, profiles, defaultProfileSlug);
+  const profileInfo = getProfileInfo(data, profiles);
 
   // set initial default profile so it shows in Steps Progress as well
+  // TODO: This looks like a hack. Maybe the state should be set in an upper component
   useEffect(() => {
-    onChange({ stepProfile: defaultSelectedProfile, stepPayment: null, stepSummary: null });
-  }, [defaultSelectedProfile]);
-
-  const filteredProfiles = React.useMemo(
-    () => prepareProfiles(intl, profiles, collective, canUseIncognito),
-    [profiles, collective, canUseIncognito],
-  );
+    onChange({ stepProfile: defaultProfile, stepPayment: null, stepSummary: null });
+  }, [defaultProfile?.id]);
 
   return (
     <Fragment>
-      <Box px={3}>
-        <StyledRadioList
-          name="ContributionProfile"
-          id="ContributionProfile"
-          data-cy="ContributionProfile"
-          options={filteredProfiles}
-          keyGetter="id"
-          defaultValue={defaultSelectedProfile ? defaultSelectedProfile.id : undefined}
-          radioSize={16}
-          onChange={selected => {
-            onChange({ stepProfile: selected.value });
+      <Box mb={4}>
+        <ContributeProfilePicker
+          profiles={profiles}
+          canUseIncognito={canUseIncognito}
+          defaultSelectedProfile={defaultProfile}
+          onChange={profile => {
+            onChange({ stepProfile: profile });
           }}
-        >
-          {({ radio, value, checked }) => (
-            <Box minHeight={70} py={2} bg="white.full" px={[0, 3]}>
-              <Flex alignItems="center" width={1}>
-                <Box as="span" mr={3} flexWrap="wrap">
-                  {radio}
-                </Box>
-                <Flex mr={3} css={{ flexBasis: '26px' }}>
-                  {value.id === NEW_ORGANIZATION_KEY ? (
-                    <Avatar type="ORGANIZATION" src="/static/images/default-organization-logo.svg" size="3.6rem" />
-                  ) : (
-                    <Avatar collective={value} size="3.6rem" />
-                  )}
-                </Flex>
-                <Flex flexDirection="column" flexGrow={1} maxWidth="75%">
-                  <P fontSize="14px" lineHeight="21px" fontWeight={500} color="black.900" truncateOverflow>
-                    {value.label || value.name}
-                  </P>
-                  {value.type === 'USER' &&
-                    (value.isIncognito ? (
-                      <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
-                        <FormattedMessage
-                          id="profile.incognito.description"
-                          defaultMessage="Keep my contribution private (see FAQ for more info)"
-                        />
-                      </P>
-                    ) : (
-                      <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
-                        <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" />
-                      </P>
-                    ))}
-                  {value.type === 'COLLECTIVE' && (
-                    <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
-                      <FormattedMessage id="ContributionFlow.CollectiveProfile" defaultMessage="Collective profile" />
-                    </P>
-                  )}
-                  {value.type === 'ORGANIZATION' && (
-                    <P fontSize="12px" lineHeight="18px" fontWeight="normal" color="black.500">
-                      <FormattedMessage
-                        id="ContributionFlow.OrganizationProfile"
-                        defaultMessage="Organization profile"
-                      />
-                    </P>
-                  )}
-                </Flex>
-              </Flex>
-              {value.id === NEW_ORGANIZATION_KEY && checked && (
-                <CreateOrganizationForm values={data} onChange={values => onChange({ stepProfile: values })} />
-              )}
-            </Box>
-          )}
-        </StyledRadioList>
-      </Box>
-      <MessageBox type="info" fontSize="13px" lineHeight="20px">
-        <FormattedMessage
-          defaultMessage="When you contribute to a Collective we share your email address with the Administrators. If you wish to keep your contribution private choose the ‘incognito’ profile. Read our <PrivacyPolicyLink>privacy policy</PrivacyPolicyLink>."
-          values={{ PrivacyPolicyLink: getI18nLink({ href: '/privacypolicy', openInNewTab: true, as: Link }) }}
         />
-      </MessageBox>
+      </Box>
+      {contributionRequiresLegalName(stepDetails) && (
+        <React.Fragment>
+          {!data?.isIncognito && (
+            <StyledInputField
+              htmlFor="name"
+              label={<FormattedMessage defaultMessage="Your name" />}
+              labelFontSize="16px"
+              labelFontWeight="700"
+              hint={<FormattedMessage defaultMessage="This is your display name or alias." />}
+            >
+              {inputProps => (
+                <StyledInput
+                  {...inputProps}
+                  value={profileInfo.name}
+                  placeholder="Thomas Anderson"
+                  onChange={e => onChange({ stepProfile: { ...data, name: e.target.value } })}
+                  maxLength="255"
+                />
+              )}
+            </StyledInputField>
+          )}
+          <StyledInputField
+            htmlFor="legalName"
+            label={<FormattedMessage defaultMessage="Legal name" />}
+            required={!profileInfo.name}
+            labelFontSize="16px"
+            labelFontWeight="700"
+            isPrivate
+            mt={20}
+            hint={
+              <FormattedMessage defaultMessage="If different from your display name. Not public. Important for receipts, invoices, payments, and official documentation." />
+            }
+          >
+            {inputProps => (
+              <StyledInput
+                {...inputProps}
+                value={profileInfo.legalName}
+                placeholder={profileInfo.name}
+                onChange={e => onChange({ stepProfile: { ...data, legalName: e.target.value } })}
+                maxLength="255"
+              />
+            )}
+          </StyledInputField>
+        </React.Fragment>
+      )}
+      {contributionRequiresAddress(stepDetails) && (
+        <React.Fragment>
+          <Flex alignItems="center" my="14px">
+            <P fontSize="24px" lineHeight="32px" fontWeight="500" mr={2}>
+              <FormattedMessage id="collective.address.label" defaultMessage="Address" />
+            </P>
+            <Span mr={2} lineHeight="0">
+              <PrivateInfoIcon size="14px" tooltipProps={{ containerLineHeight: '0' }} />
+            </Span>
+            <StyledHr my="18px" borderColor="black.300" width="100%" />
+          </Flex>
+          <StyledInputLocation
+            autoDetectCountry
+            location={profileInfo.location}
+            onChange={value => onChange({ stepProfile: { ...data, location: value } })}
+            labelFontSize="16px"
+            labelFontWeight="700"
+          />
+        </React.Fragment>
+      )}
+      <StepProfileInfoMessage hasIncognito />
     </Fragment>
   );
 };
 
-NewContributionFlowStepProfileLoggedInForm.propTypes = {
+StepProfileLoggedInForm.propTypes = {
   data: PropTypes.object,
+  stepDetails: PropTypes.object,
   onChange: PropTypes.func,
-  defaultSelectedProfile: PropTypes.object,
-  profiles: PropTypes.array,
+  defaultProfileSlug: PropTypes.string,
   canUseIncognito: PropTypes.bool,
   collective: PropTypes.object,
 };
 
-export default NewContributionFlowStepProfileLoggedInForm;
+export default StepProfileLoggedInForm;
