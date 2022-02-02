@@ -44,11 +44,6 @@ interface CollectiveInterface {
   company: String
   description: String
   longDescription: String
-
-  """
-  Returns true if the collective has a long description
-  """
-  hasLongDescription: Boolean
   expensePolicy: String
   tags: [String]
 
@@ -163,7 +158,6 @@ interface CollectiveInterface {
   List of all notifications for this collective
   """
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -446,12 +440,6 @@ type Tier {
   longDescription: String
 
   """
-  Returns true if the tier has a long description
-  """
-  hasLongDescription: Boolean
-    @deprecated(reason: "2020-12-24: This field is being deprecated in favor of useStandalonePage")
-
-  """
   Returns true if the tier has its standalone page activated
   """
   useStandalonePage: Boolean
@@ -727,7 +715,6 @@ type PaymentMethodType {
   collective: CollectiveInterface
   emitter: CollectiveInterface
   limitedToTags: JSON
-  limitedToCollectiveIds: [Int] @deprecated(reason: "2020-08-11: This field does not exist anymore")
   limitedToHostCollectiveIds: [Int]
   orders(
     """
@@ -1088,6 +1075,7 @@ type CollectiveFeatures {
   PROJECTS: CollectiveFeatureStatus
   USE_EXPENSES: CollectiveFeatureStatus
   RECEIVE_EXPENSES: CollectiveFeatureStatus
+  MULTI_CURRENCY_EXPENSES: CollectiveFeatureStatus
   RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
   COLLECTIVE_GOALS: CollectiveFeatureStatus
   TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
@@ -1244,7 +1232,6 @@ type CollectiveStatsType {
   totalNetAmountReceived: Int
   yearlyBudget: Int
   yearlyBudgetManaged: Int
-  topFundingSources: JSON @deprecated(reason: "2021-01-29: Not used anymore")
   activeRecurringContributions: JSON
 }
 
@@ -1358,11 +1345,6 @@ type Collective implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
-
-  """
-  Returns true if the collective has a long description
-  """
-  hasLongDescription: Boolean
   expensePolicy: String
   tags: [String]
 
@@ -1492,7 +1474,6 @@ type Collective implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -1594,11 +1575,6 @@ type Event implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
-
-  """
-  Returns true if the collective has a long description
-  """
-  hasLongDescription: Boolean
   expensePolicy: String
   tags: [String]
 
@@ -1728,7 +1704,6 @@ type Event implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -1830,11 +1805,6 @@ type Fund implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
-
-  """
-  Returns true if the collective has a long description
-  """
-  hasLongDescription: Boolean
   expensePolicy: String
   tags: [String]
 
@@ -1964,7 +1934,6 @@ type Fund implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -2066,11 +2035,6 @@ type Organization implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
-
-  """
-  Returns true if the collective has a long description
-  """
-  hasLongDescription: Boolean
   expensePolicy: String
   tags: [String]
 
@@ -2200,7 +2164,6 @@ type Organization implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -2303,11 +2266,6 @@ type Project implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
-
-  """
-  Returns true if the collective has a long description
-  """
-  hasLongDescription: Boolean
   expensePolicy: String
   tags: [String]
 
@@ -2437,7 +2395,6 @@ type Project implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -2722,11 +2679,6 @@ type User implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
-
-  """
-  Returns true if the collective has a long description
-  """
-  hasLongDescription: Boolean
   expensePolicy: String
   tags: [String]
 
@@ -2856,7 +2808,6 @@ type User implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -2960,11 +2911,6 @@ type Vendor implements CollectiveInterface {
   company: String
   description: String
   longDescription: String
-
-  """
-  Returns true if the collective has a long description
-  """
-  hasLongDescription: Boolean
   expensePolicy: String
   tags: [String]
 
@@ -3094,7 +3040,6 @@ type Vendor implements CollectiveInterface {
   ): CollectiveSearchResults
   followers(limit: Int, offset: Int): [CollectiveInterface]
   notifications(limit: Int, offset: Int, channel: String, type: String, active: Boolean): [NotificationType]
-  maxQuantity: Int @deprecated(reason: "Not supported anymore")
   tiers(id: Int, slug: String, slugs: [String]): [Tier]
   orders(status: OrderStatus): [OrderType]
   ordersFromCollective(subscriptionsOnly: Boolean): [OrderType]
@@ -3197,7 +3142,6 @@ type Query {
   ): CollectiveInterface
   Tier(id: Int!): Tier
   LoggedInUser: UserDetails
-  AuthenticatedUser: CollectiveInterface @deprecated(reason: "2021-01-29: Not used anymore")
   allInvoices(fromCollectiveSlug: String!): [InvoiceType]
   TransactionInvoice(
     """
@@ -3231,18 +3175,7 @@ type Query {
   ): [Transaction]
   Application(id: Int): Application
   allUpdates(CollectiveId: Int!, includeHostedCollectives: Boolean, limit: Int, offset: Int): [UpdateType]
-  allOrders(
-    CollectiveId: Int
-    collectiveSlug: String
-    includeHostedCollectives: Boolean
-
-    """
-    Filter by status (PAID, PENDING, ERROR, ACTIVE, CANCELLED)
-    """
-    status: String
-    limit: Int
-    offset: Int
-  ): [OrderType] @deprecated(reason: "2021-01-29: Not used anymore")
+    @deprecated(reason: "2022-01-26: This endpoint is deprecated and will be removed soon")
   Transaction(id: Int, uuid: String): Transaction
   allCollectives(
     """
@@ -3403,11 +3336,6 @@ type Query {
     """
     limit: Int = 20
     offset: Int = 0
-
-    """
-    This flag is now ignored in favor of regular search
-    """
-    useAlgolia: Boolean = false @deprecated(reason: "2020-12-14: Algolia is intended to be removed in a near future")
   ): CollectiveSearchResults
   allTransactionsFromPaymentMethod(
     uuid: String!
@@ -3417,7 +3345,6 @@ type Query {
     dateFrom: String
     dateTo: String
   ): [Transaction] @deprecated(reason: "2021-01-29: Not used anymore")
-  Order(id: Int!): OrderType @deprecated(reason: "2021-01-29: Not used anymore")
 }
 
 """
@@ -3586,8 +3513,6 @@ type Mutation {
     token: String!
   ): UserDetails
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
-  markOrderAsPaid(id: Int!): OrderType @deprecated(reason: "2021-01-29: Not used anymore")
-  markPendingOrderAsExpired(id: Int!): OrderType @deprecated(reason: "2021-01-29: Not used anymore")
 
   """
   Update a single tier
@@ -3610,13 +3535,11 @@ type Mutation {
   A mutation to edit the public message of all matching members.
   """
   editPublicMessage(FromCollectiveId: Int!, CollectiveId: Int!, message: String): [Member]
+    @deprecated(reason: "2021-01-27: Please use editPublicMessage from GQLV2")
   createOrder(order: OrderInputType!): OrderType
     @deprecated(reason: "2020-10-13: This endpoint has been moved to GQLV2")
   confirmOrder(order: ConfirmOrderInputType!): OrderType
-  createComment(comment: CommentInputType!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
-  editComment(comment: CommentAttributesInputType!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
-  deleteComment(id: Int!): CommentType @deprecated(reason: "2021-01-29: Not used anymore")
-  refundTransaction(id: Int!): Transaction
+  refundTransaction(id: Int!): Transaction @deprecated(reason: "2022-01-27: Please use refundTransaction from GQLV2")
   createApplication(application: ApplicationInput!): Application
   deleteApplication(id: Int!): Application
 
@@ -3624,17 +3547,6 @@ type Mutation {
   Update a payment method
   """
   updatePaymentMethod(id: Int!, name: String, monthlyLimitPerMember: Int): PaymentMethodType
-
-  """
-  Add a new credit card to the given collective
-  """
-  createCreditCard(
-    CollectiveId: Int!
-    name: String!
-    token: String!
-    data: StripeCreditCardDataInputType!
-    monthlyLimitPerMember: Int
-  ): PaymentMethodType @deprecated(reason: "2021-01-29: Not used anymore")
 
   """
   Replace a payment method
@@ -3680,11 +3592,6 @@ type Mutation {
     Limit this payment method to make donations to collectives having those tags
     """
     limitedToTags: [String]
-
-    """
-    Limit this payment method to make donations to those collectives
-    """
-    limitedToCollectiveIds: [Int] @deprecated(reason: "2020-08-11: This field does not exist anymore")
 
     """
     Limit this payment method to make donations to the collectives hosted by those hosts
@@ -3758,21 +3665,6 @@ type Mutation {
     """
     id: Int!
   ): NotificationType
-
-  """
-  Endpoint to accept or reject an invitation to become a member
-  """
-  replyToMemberInvitation(
-    """
-    The ID of the invitation to accept or decline
-    """
-    invitationId: Int!
-
-    """
-    Whether this invitation should be accepted or declined
-    """
-    accept: Boolean!
-  ): Boolean @deprecated(reason: "2021-07-07: This endpoint has been moved to GQLV2")
   backyourstackDispatchOrder(id: Int!): BackYourStackDispatchState
 
   """
@@ -4040,7 +3932,6 @@ input UserInputType {
   twitterHandle: String
   githubHandle: String
   website: String
-  paypalEmail: String @deprecated(reason: "2020-01-21: Replaced by PayoutMethods")
   newsletterOptIn: Boolean
   location: LocationInputType
 }
@@ -4180,51 +4071,6 @@ Input type for ConfirmOrderType
 """
 input ConfirmOrderInputType {
   id: Int
-}
-
-"""
-This represents a Comment
-"""
-type CommentType {
-  id: Int
-  createdAt: DateString
-  updatedAt: DateString
-  html: String
-  createdByUser: UserDetails
-  fromCollective: CollectiveInterface
-  collective: CollectiveInterface
-  expense: ExpenseType
-  update: UpdateType
-}
-
-"""
-Input type for CommentType
-"""
-input CommentInputType {
-  id: Int
-  html: String
-
-  """
-  Not supported yet. Defaults to user collective ID.
-  """
-  FromCollectiveId: Int
-  CollectiveId: Int
-    @deprecated(
-      reason: "2019-11-28: This field is not used by the query. Collective ID is automatically guessed from linked entity (expense, update or conversation)"
-    )
-  ExpenseId: Int @deprecated(reason: "2020-03-18: Comments on expenses must use API V2")
-  UpdateId: Int @deprecated(reason: "2020-03-18: Comments on updates are not yet supported")
-  ConversationId: Int @deprecated(reason: "2020-03-18: Comments on conversations must use API V2")
-}
-
-"""
-Input type for CommentType
-"""
-input CommentAttributesInputType {
-  id: Int
-  html: String
-  UpdateId: Int
-    @deprecated(reason: "Deprecated since 2020-03-18: This field has never been active and will be removed soon.")
 }
 
 """

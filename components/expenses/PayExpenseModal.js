@@ -99,9 +99,11 @@ const canCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount) 
   // Current limitations:
   // - Only for transferwise
   // - Only when emptying the account balance
+  // - Only with expenses submitted in the same currency as the collective
   if (
     ![PayoutMethodType.BANK_ACCOUNT].includes(expense.payoutMethod?.type) ||
-    expense.amount !== get(collective, 'stats.balanceWithBlockedFunds.valueInCents')
+    expense.amount !== get(collective, 'stats.balanceWithBlockedFunds.valueInCents') ||
+    expense.currency !== collective?.currency
   ) {
     return false;
   }

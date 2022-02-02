@@ -442,6 +442,10 @@ const hostFieldsFragment = gqlV2/* GraphQL */ `
     expensePolicy
     settings
     currency
+    features {
+      id
+      MULTI_CURRENCY_EXPENSES
+    }
     location {
       address
       country
@@ -470,6 +474,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       expensePolicy
       features {
         ...NavbarFields
+        MULTI_CURRENCY_EXPENSES
       }
       expensesTags {
         id

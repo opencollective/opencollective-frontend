@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty } from 'lodash';
+import { isEmpty, uniq } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
+import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { toIsoDateStr } from '../../lib/date-utils';
 import { formatErrorMessage } from '../../lib/errors';
@@ -40,6 +41,7 @@ export const addNewExpenseItem = (formik, defaultValues) => {
 
 class ExpenseFormItems extends React.PureComponent {
   static propTypes = {
+    collective: PropTypes.object,
     /** @ignore from injectIntl */
     intl: PropTypes.object,
     /** Array helper as provided by formik */
@@ -51,6 +53,7 @@ class ExpenseFormItems extends React.PureComponent {
       values: PropTypes.object.isRequired,
       touched: PropTypes.object,
       errors: PropTypes.object,
+      setFieldValue: PropTypes.func,
     }).isRequired,
   };
 
@@ -114,6 +117,32 @@ class ExpenseFormItems extends React.PureComponent {
     }
   }
 
+  onCurrencyChange = newCurrency => {
+    this.props.form.setFieldValue('currency', newCurrency);
+  };
+
+  getPossibleCurrencies = () => {
+    const { collective, form } = this.props;
+
+    if (
+      !hasFeature(collective, FEATURES.MULTI_CURRENCY_EXPENSES) &&
+      !hasFeature(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES)
+    ) {
+      return [collective.currency];
+    }
+
+    const { payoutMethod, currency } = form.values;
+    return uniq(
+      [
+        currency,
+        collective.currency,
+        collective.host?.currency,
+        payoutMethod?.currency,
+        payoutMethod?.data?.currency,
+      ].filter(Boolean),
+    );
+  };
+
   render() {
     const { values, errors } = this.props.form;
     const requireFile = attachmentRequiresFile(values.type);
@@ -147,6 +176,7 @@ class ExpenseFormItems extends React.PureComponent {
     }
 
     const onRemove = requireFile || items.length > 1 ? this.remove : null;
+    const availableCurrencies = this.getPossibleCurrencies();
     return (
       <Box>
         {this.renderErrors()}
@@ -164,6 +194,9 @@ class ExpenseFormItems extends React.PureComponent {
             onUploadError={e => this.setState({ uploadErrors: [e] })}
             isOptional={values.payee?.isInvite}
             editOnlyDescriptiveInfo={isCreditCardCharge}
+            hasMultiCurrency={!index && availableCurrencies?.length > 1} // Only display currency picker for the first item
+            availableCurrencies={availableCurrencies}
+            onCurrencyChange={this.onCurrencyChange}
           />
         ))}
         <Flex alignItems="center" my={3}>

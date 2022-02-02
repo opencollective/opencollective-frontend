@@ -89,6 +89,10 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     expensePolicy
     website
     settings
+    features {
+      id
+      MULTI_CURRENCY_EXPENSES
+    }
     paypalPreApproval {
       id
       balance {
@@ -212,6 +216,10 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       twitterHandle
       currency
       expensePolicy
+      features {
+        id
+        MULTI_CURRENCY_EXPENSES
+      }
       expensesTags {
         id
         tag
