@@ -80,12 +80,16 @@ const getCallToAction = (selectedOrdersOptions, newTier) => {
   }
 };
 
+const getTierOption = tier => {
+  return { value: tier, label: `#${tier.legacyId} - ${tier.name}` };
+};
+
 const getTiersOptions = (tiers, accountSettings) => {
   if (!tiers) {
     return [];
   }
 
-  const tiersOptions = tiers.map(tier => ({ value: tier, label: `#${tier.legacyId} - ${tier.name}` }));
+  const tiersOptions = tiers.map(getTierOption);
   if (!accountSettings?.disableCustomContributions) {
     tiersOptions.unshift({ value: 'custom', label: 'Custom contribution' });
   }
@@ -179,6 +183,7 @@ const MoveReceivedContributions = () => {
             isLoading={tiersLoading}
             onChange={({ value }) => setNewTier(value)}
             options={tiersOptions}
+            value={!newTier ? null : getTierOption(newTier)}
           />
         )}
       </StyledInputField>
