@@ -721,7 +721,6 @@ class ContributionFlow extends React.Component {
     });
 
     const path = window.location.pathname;
-    console.log(path);
     if (window.location.search) {
       return `${path}${window.location.search}&${stepDetailsParams.slice(1)}`;
     } else {

@@ -8,7 +8,7 @@ import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
-import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 import { compose } from '../lib/utils';
 
 import Body from '../components/Body';
@@ -138,7 +138,11 @@ class CreateUpdatePage extends React.Component {
 
     return (
       <div>
-        <Header collective={collective} LoggedInUser={LoggedInUser} />
+        <Header
+          collective={collective}
+          LoggedInUser={LoggedInUser}
+          canonicalURL={`${getCollectivePageCanonicalURL(collective)}/updates/new`}
+        />
 
         <Body>
           <CollectiveNavbar collective={collective} isAdmin={isAdmin} />

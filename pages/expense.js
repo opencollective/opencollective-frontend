@@ -79,10 +79,6 @@ const expensePageQuery = gqlV2/* GraphQL */ `
           ...CommentFields
         }
       }
-      account {
-        id
-        slug
-      }
     }
 
     # As it uses a dedicated variable this needs to be separated from the ExpensePageExpenseFields fragment

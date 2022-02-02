@@ -10,7 +10,7 @@ import StyledLink from '../StyledLink';
 const CollectiveTitleContainer = ({ collective, useLink, children, linkColor }) => {
   if (useLink) {
     return (
-      <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}`} color={linkColor}>
+      <StyledLink as={Link} href={getCollectivePageRoute(collective)} color={linkColor}>
         {children}
       </StyledLink>
     );

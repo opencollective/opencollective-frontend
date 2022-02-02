@@ -115,11 +115,8 @@ class NewContributionFlowPage extends React.Component {
     this.loadExternalScripts();
     const { router, data } = this.props;
     const account = data?.account;
-    let path = router.asPath;
-    if (!path.includes(account?.parent?.slug)) {
-      path = path.replace(`${account?.slug}/`, '');
-      addParentToURLIfMissing(router, account, path);
-    }
+    const path = router.asPath;
+    addParentToURLIfMissing(router, account, path.replace(new RegExp(`^/${account?.slug}`), ''));
   }
 
   componentDidUpdate(prevProps) {
