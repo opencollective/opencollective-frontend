@@ -68,3 +68,35 @@ With min amount to `$10`:
     }}
   </Story>
 </Canvas>
+
+### With currency picker
+
+<Canvas>
+  <Story name="With currency picker">
+    {() => {
+      const [value, setValue] = React.useState(0);
+      const [currency, setCurrency] = React.useState('USD');
+      const [isValid, setIsValid] = React.useState(true);
+      return (
+        <div>
+          <StyledInputAmount
+            value={value}
+            currency={currency}
+            onCurrencyChange={setCurrency}
+            hasCurrencyPicker
+            maxWidth={250}
+            onChange={(value, e) => {
+              setValue(value);
+              setIsValid(e.target.checkValidity());
+            }}
+          />
+          <p>
+            Value: {currency} {new String(value)}
+            <br />
+            Is Valid: {isValid ? 'Yes' : 'No'}
+          </p>
+        </div>
+      );
+    }}
+  </Story>
+</Canvas>
