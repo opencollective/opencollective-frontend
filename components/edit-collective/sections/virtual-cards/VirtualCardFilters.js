@@ -80,7 +80,7 @@ const VirtualCardFilters = ({
             <PeriodFilter {...getFilterProps('period', encodeDateInterval)} />
           </FilterContainer>
         )}
-        {allowRequestVirtualCard && (
+        {allowRequestVirtualCard && collective.isApproved && (
           <RequestVirtualCardBtn collective={collective} host={host}>
             {btnProps => (
               <StyledButton m={3} {...btnProps} width={[1, 1 / 4]}>

@@ -82,7 +82,6 @@ const addFundsMutation = gqlV2/* GraphQL */ `
     $amount: AmountInput!
     $description: String!
     $hostFeePercent: Float!
-    $platformFeePercent: Float
   ) {
     addFunds(
       account: $account
@@ -90,7 +89,6 @@ const addFundsMutation = gqlV2/* GraphQL */ `
       amount: $amount
       description: $description
       hostFeePercent: $hostFeePercent
-      platformFeePercent: $platformFeePercent
       tier: $tier
     ) {
       id

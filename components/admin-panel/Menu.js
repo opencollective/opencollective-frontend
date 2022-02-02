@@ -167,7 +167,11 @@ const Menu = ({ collective, isAccountantOnly }) => {
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.VIRTUAL_CARDS}
-            if={isOneOfTypes(collective, [COLLECTIVE, FUND]) && hasFeature(collective.host, FEATURES.PRIVACY_VCC)}
+            if={
+              isOneOfTypes(collective, [COLLECTIVE, FUND]) &&
+              hasFeature(collective.host, FEATURES.PRIVACY_VCC) &&
+              collective.isApproved
+            }
           />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.TICKETS} if={isType(collective, EVENT)} />
           <MenuLink
@@ -211,6 +215,7 @@ Menu.propTypes = {
       USE_PAYMENT_METHODS: PropTypes.string,
       EMIT_GIFT_CARDS: PropTypes.string,
     }),
+    isApproved: PropTypes.bool,
   }),
 };
 
