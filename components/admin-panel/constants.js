@@ -37,7 +37,6 @@ export const ORG_BUDGET_SECTIONS = {
 
 export const FISCAL_HOST_SECTIONS = {
   FISCAL_HOSTING: 'fiscal-hosting',
-  HOST_METRICS: 'host-metrics',
   HOST_PLAN: 'host-plan',
   HOST_TWO_FACTOR_AUTH: 'host-two-factor-auth',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
