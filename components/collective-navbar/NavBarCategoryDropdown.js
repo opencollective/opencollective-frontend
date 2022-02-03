@@ -150,6 +150,15 @@ const CategoryDropdown = styled(Dropdown)`
   }
 `;
 
+const getLinkProps = (useAnchor, collective, category) => {
+  const anchor = `#category-${category}`;
+  if (useAnchor) {
+    return { href: anchor };
+  } else {
+    return { as: Link, href: `/${collective.slug}${anchor}` };
+  }
+};
+
 export const NavBarCategory = ({ category }) => {
   const intl = useIntl();
   return (
@@ -179,6 +188,7 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
         <CategoryContainer
           mr={[0, null, 3]}
           isSelected={isSelected}
+          {...getLinkProps(useAnchor, collective, category)}
           onClick={e => {
             // Remove focus to make sure dropdown gets closed
             if (document.activeElement?.contains(e.target)) {
