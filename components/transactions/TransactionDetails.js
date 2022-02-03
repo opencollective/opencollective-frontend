@@ -163,6 +163,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               taxInfo: transaction.taxInfo,
               intl,
               kind,
+              expense,
             })}
             {['CONTRIBUTION', 'ADDED_FUNDS', 'EXPENSE'].includes(transaction.kind) && hostFeeTransaction && (
               <React.Fragment>
