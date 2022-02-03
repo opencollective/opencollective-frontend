@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
-import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import { Scrollchor } from 'react-scrollchor';
 import styled, { css } from 'styled-components';
@@ -180,11 +179,19 @@ NavBarCategory.propTypes = {
 };
 
 const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, links }) => {
-  const router = useRouter();
   const displayedLinks = links.filter(link => !link.hide);
+
+  // eslint-disable-next-line react/prop-types
+  const NavBarScrollContainer = ({ children }) =>
+    useAnchor ? (
+      <Scrollchor to={`#category-${category}`}>{children}</Scrollchor>
+    ) : (
+      <React.Fragment>{children}</React.Fragment>
+    );
+
   return (
     <CategoryDropdown trigger="hover" tabIndex="-1">
-      <Scrollchor to={useAnchor ? `#category-${category}` : null}>
+      <NavBarScrollContainer>
         <CategoryContainer
           mr={[0, null, 3]}
           isSelected={isSelected}
@@ -194,16 +201,13 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
             if (document.activeElement?.contains(e.target)) {
               document.activeElement.blur();
             }
-            if (!useAnchor) {
-              router.push(`/${collective.slug}/#category-${category}`);
-            }
           }}
         >
           <Flex pt="15px" pb="14px" px={[3, 1, 3, 1]}>
             <NavBarCategory category={category} />{' '}
           </Flex>
         </CategoryContainer>
-      </Scrollchor>
+      </NavBarScrollContainer>
       {displayedLinks.length > 0 && (
         <React.Fragment>
           <DropdownArrow />
