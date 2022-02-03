@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Ban as UnapproveIcon } from '@styled-icons/fa-solid/Ban';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
 import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
@@ -14,6 +16,7 @@ import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
+import StyledTooltip from '../StyledTooltip';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { useUser } from '../UserProvider';
 
@@ -116,6 +119,22 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
   return { message: i18nGraphqlException(intl, error) };
 };
 
+const PermissionButton = ({ icon, label, permission, ...props }) => {
+  const intl = useIntl();
+  let button = (
+    <StyledButton {...props} disabled={!permission.allowed}>
+      {permission.reason ? <InfoCircle size={14} /> : icon}
+      {label}
+    </StyledButton>
+  );
+  const message = permission.reason && intl.formatMessage(ReasonMessage[permission.reason]);
+  if (message) {
+    button = <StyledTooltip content={message}>{button}</StyledTooltip>;
+  }
+
+  return button;
+};
+
 /**
  * All the buttons to process an expense, displayed in a React.Fragment to let the parent
  * in charge of the layout.
@@ -169,13 +188,19 @@ const ProcessExpenseButtons = ({
 
   return (
     <React.Fragment>
-      {permissions.canApprove && (
-        <StyledButton {...getButtonProps('APPROVE')} buttonStyle="secondary" data-cy="approve-button">
-          <ApproveIcon size={12} />
-          <ButtonLabel>
-            <FormattedMessage id="actions.approve" defaultMessage="Approve" />
-          </ButtonLabel>
-        </StyledButton>
+      {(permissions.approve.allowed || permissions.approve.reason === PERMISSION_CODES.AUTHOR_CANNOT_APPROVE) && (
+        <PermissionButton
+          {...getButtonProps('APPROVE')}
+          buttonStyle="secondary"
+          data-cy="approve-button"
+          icon={<ApproveIcon size={12} />}
+          permission={permissions.approve}
+          label={
+            <ButtonLabel>
+              <FormattedMessage id="actions.approve" defaultMessage="Approve" />
+            </ButtonLabel>
+          }
+        />
       )}
       {permissions.canReject && (
         <StyledButton {...getButtonProps('REJECT')} buttonStyle="dangerSecondary" data-cy="reject-button">
@@ -265,6 +290,10 @@ ProcessExpenseButtons.propTypes = {
     canMarkAsUnpaid: PropTypes.bool,
     canUnschedulePayment: PropTypes.bool,
     canDelete: PropTypes.bool,
+    approve: PropTypes.shape({
+      allowed: PropTypes.bool,
+      reason: PropTypes.string,
+    }),
   }).isRequired,
   expense: PropTypes.shape({
     id: PropTypes.string,
