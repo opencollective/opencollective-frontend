@@ -29,7 +29,6 @@ const ContributeEvent = ({ collective, event, ...props }) => {
     <Contribute
       route={`/${collective.slug}/events/${event.slug}`}
       type={isPassed ? ContributionTypes.EVENT_PASSED : ContributionTypes.EVENT_PARTICIPATE}
-      disableCTA={isPassed}
       contributors={event.contributors}
       stats={event.stats.backers}
       image={event.backgroundImageUrl}
