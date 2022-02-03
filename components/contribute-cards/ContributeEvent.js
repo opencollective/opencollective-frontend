@@ -7,7 +7,7 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import DayJs from '../../lib/dayjs';
-import { canOrderTicketsFromEvent, isPastEvent } from '../../lib/events';
+import { isPastEvent } from '../../lib/events';
 
 import Container from '../Container';
 import { Box } from '../Grid';
@@ -29,7 +29,6 @@ const ContributeEvent = ({ collective, event, ...props }) => {
     <Contribute
       route={`/${collective.slug}/events/${event.slug}`}
       type={isPassed ? ContributionTypes.EVENT_PASSED : ContributionTypes.EVENT_PARTICIPATE}
-      disableCTA={!canOrderTicketsFromEvent(event)}
       contributors={event.contributors}
       stats={event.stats.backers}
       image={event.backgroundImageUrl}
