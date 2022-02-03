@@ -124,7 +124,6 @@ describe('edit collective', () => {
     cy.contains('.actions > [data-cy="collective-save"]', 'Saved');
     cy.get('.backToProfile a').click(); // back to profile
     const tierCardSelector = '[data-cy="admin-contribute-cards"] [data-cy="contribute-card-tier"]';
-    cy.disableSmoothScroll();
     cy.get(tierCardSelector);
     cy.get(tierCardSelector).first().find('[data-cy="contribute-title"]').contains('Backer edited');
     cy.get(tierCardSelector).first().find('[data-cy="contribute-description"]').contains('New description for backers');
