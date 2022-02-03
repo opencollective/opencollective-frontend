@@ -36,7 +36,6 @@ import Export from './sections/Export';
 import FiscalHosting from './sections/FiscalHosting';
 import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
-import HostMetrics from './sections/HostMetrics';
 import HostPlan from './sections/HostPlan';
 import HostTwoFactorAuth from './sections/HostTwoFactorAuth';
 import HostVirtualCards from './sections/HostVirtualCards';
@@ -513,9 +512,6 @@ class EditCollectiveForm extends React.Component {
 
       case EDIT_COLLECTIVE_SECTIONS.HOST_PLAN:
         return <HostPlan collective={collective} />;
-
-      case EDIT_COLLECTIVE_SECTIONS.HOST_METRICS:
-        return <HostMetrics collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS:
         return <InvoicesReceipts collective={collective} />;
