@@ -83,7 +83,6 @@
   "AddFundsModal.hostFees": "向社群收取的托管费 ({hostFees})",
   "AddFundsModal.NeedHelp": "需要帮助？",
   "AddFundsModal.netAmount": "集体收到的净金额",
-  "AddFundsModal.platformFees": "平台费用（{platformFees}）",
   "AddFundsModal.platformTipInfo": "由于您没有向集体收取任何托管费，Open Collective 可以免费使用。 我们依靠您的慷慨来保持这种可能！",
   "AddFundsModal.source": "来源",
   "AddFundsModal.SubHeading": "向社群添加资金",
