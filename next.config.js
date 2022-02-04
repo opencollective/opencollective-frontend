@@ -6,9 +6,6 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true',
   productionBrowserSourceMaps: true,
-  images: {
-    disableStaticImages: true,
-  },
   webpack: (config, { webpack, isServer, buildId }) => {
     config.plugins.push(
       // Ignore __tests__
