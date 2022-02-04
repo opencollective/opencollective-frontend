@@ -83,7 +83,6 @@
   "AddFundsModal.hostFees": "Плата за хостинг, взимаемая с Коллектива ({hostFees})",
   "AddFundsModal.NeedHelp": "Нужна помощь?",
   "AddFundsModal.netAmount": "Итоговая сумма, полученная Коллективом",
-  "AddFundsModal.platformFees": "Комиссия платформы ({platformFees})",
   "AddFundsModal.platformTipInfo": "Since you are not charging a host fee to the collective, Open Collective is free to use. We rely on your generosity to keep this possible!",
   "AddFundsModal.source": "Источник",
   "AddFundsModal.SubHeading": "Добавить средства Коллективу",

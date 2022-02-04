@@ -83,7 +83,6 @@
   "AddFundsModal.hostFees": "Плата за послуги фіскального хостингу, що стягується з колективу ({hostFees})",
   "AddFundsModal.NeedHelp": "Потрібна допомога?",
   "AddFundsModal.netAmount": "Чиста сума, отримана колективом",
-  "AddFundsModal.platformFees": "Платня платформі ({platformFees})",
   "AddFundsModal.platformTipInfo": "Since you are not charging a host fee to the collective, Open Collective is free to use. We rely on your generosity to keep this possible!",
   "AddFundsModal.source": "Джерело",
   "AddFundsModal.SubHeading": "Додати кошти для Колективу",
