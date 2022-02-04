@@ -12,7 +12,7 @@ const nextConfig = {
   webpack: (config, { webpack, isServer, buildId }) => {
     config.plugins.push(
       // Ignore __tests__
-      new webpack.IgnorePlugin(/[\\/]__tests__[\\/]/),
+      new webpack.IgnorePlugin({ resourceRegExp: /[\\/]__tests__[\\/]/ }),
       // Only include our supported locales
       new webpack.ContextReplacementPlugin(/moment[\\/]locale$/, /en|fr|es|ja/),
       // Set extra environment variables accessible through process.env.*
