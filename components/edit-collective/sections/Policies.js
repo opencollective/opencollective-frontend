@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
-import { get, isEmpty } from 'lodash';
+import { filter, get, isEmpty, size, without } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
@@ -43,6 +43,15 @@ const editCollectiveMutation = gql/* GraphQL */ `
       type
       isActive
       settings
+    }
+  }
+`;
+
+const setPoliciesMutation = gqlV2/* GraphQL */ `
+  mutation SetPolicies($account: AccountReferenceInput!, $policies: [Policy]) {
+    setPolicies(account: $account, policies: $policies) {
+      id
+      policies
     }
   }
 `;
@@ -98,14 +107,19 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
       context: API_V2_CONTEXT,
     },
   );
-  const [updatePolicies, { loading: isSubmittingPolicies, error: policiesError }] = useMutation(editCollectiveMutation);
-  const error = categoriesError || policiesError;
+  const [updateCollective, { loading: isSubmittingSettings, error: settingsError }] =
+    useMutation(editCollectiveMutation);
+  const [setPolicies, { loading: isSettingPolicies, error: policiesError }] = useMutation(setPoliciesMutation, {
+    context: API_V2_CONTEXT,
+  });
+  const error = categoriesError || settingsError || policiesError;
 
   // Data and data handling
   const collectiveContributionFilteringCategories = get(data, 'account.settings.moderation.rejectedCategories', null);
   const collectiveContributionPolicy = get(collective, 'contributionPolicy', null);
   const collectiveExpensePolicy = get(collective, 'expensePolicy', null);
   const collectiveDisableExpenseSubmission = get(collective, 'settings.disablePublicExpenseSubmission', false);
+  const numberOfAdmins = size(filter(collective.members, m => m.role === 'ADMIN'));
 
   const selectOptions = React.useMemo(() => {
     const optionsArray = Object.entries(MODERATION_CATEGORIES).map(([key, value], index) => ({
@@ -116,25 +130,17 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
     return optionsArray;
   }, [MODERATION_CATEGORIES]);
 
-  React.useEffect(() => {
-    if (collectiveContributionFilteringCategories && isEmpty(selected)) {
-      const alreadyPickedCategories = collectiveContributionFilteringCategories.map(category => {
-        return selectOptions.find(option => option.value === category);
-      });
-      setSelected(alreadyPickedCategories);
-    }
-  }, [loading, collectiveContributionFilteringCategories]);
-
   // Form
   const formik = useFormik({
     initialValues: {
       contributionPolicy: collectiveContributionPolicy || '',
       expensePolicy: collectiveExpensePolicy || '',
       disablePublicExpenseSubmission: collectiveDisableExpenseSubmission || false,
+      policies: data?.account?.policies || [],
     },
     async onSubmit(values) {
-      const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission } = values;
-      await updatePolicies({
+      const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission, policies } = values;
+      await updateCollective({
         variables: {
           collective: {
             id: collective.id,
@@ -152,6 +158,14 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
           },
           key: 'moderation',
           value: { rejectedCategories: selectedRejectCategories },
+        },
+      });
+      await setPolicies({
+        variables: {
+          account: {
+            legacyId: collective.id,
+          },
+          policies,
         },
       });
     },
@@ -172,6 +186,21 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
     },
   });
 
+  React.useEffect(() => {
+    if (collectiveContributionFilteringCategories && isEmpty(selected)) {
+      const alreadyPickedCategories = collectiveContributionFilteringCategories.map(category => {
+        return selectOptions.find(option => option.value === category);
+      });
+      setSelected(alreadyPickedCategories);
+    }
+  }, [loading, collectiveContributionFilteringCategories]);
+
+  React.useEffect(() => {
+    if (data) {
+      formik.setFieldValue('policies', data.account?.policies || []);
+    }
+  }, [data]);
+
   return (
     <Flex flexDirection="column">
       {error && <MessageBoxGraphqlError error={error} />}
@@ -183,7 +212,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                 name="contributionPolicy"
                 htmlFor="contributionPolicy"
                 error={formik.errors.contributionPolicy}
-                disabled={isSubmittingPolicies}
+                disabled={isSubmittingSettings}
                 labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
                 label={
                   <SettingsSectionTitle>{formatMessage(messages['contributionPolicy.label'])}</SettingsSectionTitle>
@@ -220,7 +249,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             name="expensePolicy"
             htmlFor="expensePolicy"
             error={formik.errors.expensePolicy}
-            disabled={isSubmittingPolicies}
+            disabled={isSubmittingSettings}
             labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
             label={<SettingsSectionTitle>{formatMessage(messages['expensePolicy.label'])}</SettingsSectionTitle>}
           >
@@ -249,6 +278,49 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               defaultMessage="It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters."
             />
           </P>
+        </Container>
+        <Container>
+          <SettingsSectionTitle mt={4}>
+            <FormattedMessage id="editCollective.expenseApprovalsPolicy.header" defaultMessage="Expense approvals" />
+          </SettingsSectionTitle>
+          <StyledCheckbox
+            name="authorCannotApproveExpense"
+            label={
+              <FormattedMessage
+                id="editCollective.expenseApprovalsPolicy.authorCannotApprove"
+                defaultMessage="Admins cannot approve their own expenses. With this feature turned on, admins will need another admin to approve their expenses"
+              />
+            }
+            onChange={() =>
+              formik.setFieldValue(
+                'policies',
+                formik.values.policies?.includes('EXPENSE_AUTHOR_CANNOT_APPROVE')
+                  ? without(formik.values.policies, 'EXPENSE_AUTHOR_CANNOT_APPROVE')
+                  : [...formik.values.policies, 'EXPENSE_AUTHOR_CANNOT_APPROVE'],
+              )
+            }
+            checked={Boolean(formik.values.policies?.includes('EXPENSE_AUTHOR_CANNOT_APPROVE'))}
+            disabled={
+              isSettingPolicies ||
+              (numberOfAdmins < 2 && Boolean(!formik.values.policies?.includes('EXPENSE_AUTHOR_CANNOT_APPROVE')))
+            }
+          />
+          {collective?.isHost && (
+            <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
+              <FormattedMessage
+                id="editCollective.expenseApprovalsPolicy.authorCannotApprove.hostDescription"
+                defaultMessage="This policy is only enforced on your fiscal host and does not affect collectives hosted by you."
+              />
+            </P>
+          )}
+          {numberOfAdmins < 2 && Boolean(!formik.values.policies?.includes('EXPENSE_AUTHOR_CANNOT_APPROVE')) && (
+            <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
+              <FormattedMessage
+                id="editCollective.expenseApprovalsPolicy.authorCannotApprove.minAdminRequired"
+                defaultMessage="You need to have at least two admins to enable this policy."
+              />
+            </P>
+          )}
         </Container>
         <Container>
           <SettingsSectionTitle mt={4}>
@@ -289,7 +361,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             mx={2}
             minWidth={200}
             buttonSize="medium"
-            loading={isSubmittingPolicies || isSubmittingCategories}
+            loading={isSubmittingSettings || isSubmittingCategories}
             type="submit"
             onSubmit={formik.handleSubmit}
           >
@@ -306,6 +378,12 @@ Policies.propTypes = {
     settings: PropTypes.object,
     id: PropTypes.number,
     slug: PropTypes.string,
+    isHost: PropTypes.bool,
+    members: PropTypes.arrayOf(
+      PropTypes.shape({
+        role: PropTypes.string,
+      }),
+    ),
   }),
   showOnlyExpensePolicy: PropTypes.bool,
 };

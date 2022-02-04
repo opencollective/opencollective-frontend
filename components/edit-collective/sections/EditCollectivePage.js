@@ -42,6 +42,7 @@ export const getSettingsQuery = gqlV2/* GraphQL */ `
       isActive
       isHost
       settings
+      policies
     }
   }
 `;
