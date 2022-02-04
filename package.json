@@ -211,7 +211,6 @@
     "shx": "^0.3.3",
     "storybook-addon-designs": "^6.2.0",
     "typescript": "^4.3.5",
-    "url-loader": "^4.1.1",
     "webpack-bundle-analyzer": "^4.4.2"
   },
   "jest": {

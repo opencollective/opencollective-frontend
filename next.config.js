@@ -95,17 +95,6 @@ const nextConfig = {
       loader: 'html-loader',
     });
 
-    // Load images in base64
-    config.module.rules.push({
-      test: /components\/.*\.(svg|png|jpg|gif)$/,
-      use: {
-        loader: 'url-loader',
-        options: {
-          limit: 1000000,
-        },
-      },
-    });
-
     if (['ci', 'e2e'].includes(process.env.OC_ENV)) {
       config.optimization.minimize = false;
     }
