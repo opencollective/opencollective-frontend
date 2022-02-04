@@ -83,7 +83,6 @@
   "AddFundsModal.hostFees": "Comisión del Host cobrada al colectivo ({hostFees})",
   "AddFundsModal.NeedHelp": "¿Necesitas ayuda?",
   "AddFundsModal.netAmount": "Cantidad neta recibida por el colectivo",
-  "AddFundsModal.platformFees": "Comisión de la plataforma ({platformFees})",
   "AddFundsModal.platformTipInfo": "Puesto que no cobras una tarifa de host al colectivo, Open Collective es de uso gratuito. ¡Dependemos en tu generosidad para mantenerlo de esta manera!",
   "AddFundsModal.source": "Fuente",
   "AddFundsModal.SubHeading": "Añade fondos al colectivo",
