@@ -89,6 +89,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
     id,
     type,
     isRefunded,
+    isRefund,
     toAccount,
     fromAccount,
     host,
@@ -164,6 +165,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               intl,
               kind,
               expense,
+              isRefund,
             })}
             {['CONTRIBUTION', 'ADDED_FUNDS', 'EXPENSE'].includes(transaction.kind) && hostFeeTransaction && (
               <React.Fragment>
@@ -231,6 +233,7 @@ TransactionDetails.propTypes = {
   displayActions: PropTypes.bool,
   transaction: PropTypes.shape({
     isRefunded: PropTypes.bool,
+    isRefund: PropTypes.bool,
     kind: PropTypes.oneOf(Object.values(TransactionKind)),
     isOrderRejected: PropTypes.bool,
     fromAccount: PropTypes.shape({
