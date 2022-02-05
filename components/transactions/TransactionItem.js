@@ -305,7 +305,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             </StyledButton>
           </Container>
         )}
-        {hasExpense && !isRefund && (
+        {hasExpense && (
           <Container display="flex" mt={3} pt={[2, 0]}>
             <ExpenseTags expense={expense} />
             <StyledButton
