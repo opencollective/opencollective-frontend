@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@apollo/client": "3.3.21",
-    "@formatjs/intl-relativetimeformat": "9.5.2",
+    "@formatjs/intl-relativetimeformat": "10.0.0",
     "@hcaptcha/react-hcaptcha": "1.1.0",
     "@hyperwatch/hyperwatch": "3.8.2",
     "@material-ui/core": "4.12.3",
@@ -186,7 +186,7 @@
     "eslint-config-opencollective": "^3.0.3",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-cypress": "^2.12.1",
-    "eslint-plugin-formatjs": "^2.20.5",
+    "eslint-plugin-formatjs": "^3.0.0",
     "eslint-plugin-graphql": "^4.0.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-node": "^11.1.0",
