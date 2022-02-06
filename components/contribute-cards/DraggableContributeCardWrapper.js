@@ -61,7 +61,8 @@ const DraggableContributeCardWrapper = ({ Component, componentProps, index, onMo
   });
 
   const [{ isDragging }, drag, preview] = useDrag({
-    item: { type: DRAG_AND_DROP_TYPES.CONTRIBUTE_CARD, index },
+    type: DRAG_AND_DROP_TYPES.CONTRIBUTE_CARD,
+    item: { index },
     end: item => onDrop(item.index, index),
     collect: monitor => ({ isDragging: monitor.isDragging() }),
   });

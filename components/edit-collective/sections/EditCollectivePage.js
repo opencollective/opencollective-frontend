@@ -5,7 +5,8 @@ import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { cloneDeep, flatten, isEqual, set } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { useDrag, useDrop } from 'react-dnd';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -19,7 +20,6 @@ import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section
 
 import { Sections } from '../../collective-page/_constants';
 import Container from '../../Container';
-import DndProviderHTML5Backend from '../../DndProviderHTML5Backend';
 import EditCollectivePageFAQ from '../../faqs/EditCollectivePageFAQ';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
@@ -113,7 +113,8 @@ const CollectiveSectionEntry = ({
   });
 
   const [{ isDragging }, drag, preview] = useDrag({
-    item: { type: getItemType(parentItem), index, parentItem },
+    type: getItemType(parentItem),
+    item: { index, parentItem },
     collect: monitor => ({ isDragging: monitor.isDragging() }),
     end: onDrop,
   });
@@ -243,7 +244,8 @@ const MenuCategory = ({ item, index, collective, onMove, onDrop, onSectionToggle
   });
 
   const [{ isDragging }, drag, preview] = useDrag({
-    item: { type: getItemType(), index },
+    type: getItemType(),
+    item: { index },
     collect: monitor => ({ isDragging: monitor.isDragging() }),
     end: onDrop,
   });
@@ -347,7 +349,7 @@ const EditCollectivePage = ({ collective }) => {
 
   const displayedSections = tmpSections || sections;
   return (
-    <DndProviderHTML5Backend>
+    <DndProvider backend={HTML5Backend}>
       <SettingsSubtitle>
         <FormattedMessage
           id="EditCollectivePage.SectionsDescription"
@@ -438,7 +440,7 @@ const EditCollectivePage = ({ collective }) => {
           <EditCollectivePageFAQ withNewButtons withBorderLeft />
         </Box>
       </Flex>
-    </DndProviderHTML5Backend>
+    </DndProvider>
   );
 };
 
