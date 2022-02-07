@@ -202,16 +202,19 @@ class PayoutMethodSelect extends React.Component {
     title: this.getPayoutMethodTitle(pm),
   });
 
-  getPayerHostSupportedPayoutMethods = () => {
-    return this.props.collective.host?.supportedPayoutMethods || EMPTY_ARRAY;
-  };
-
-  getOptions = memoizeOne((payoutMethods, payee) => {
-    const payerHostSupportedPayoutMethods = this.getPayerHostSupportedPayoutMethods();
+  getOptions = memoizeOne((host, payoutMethods, payee) => {
+    let payerHostSupportedPayoutMethods;
+    if (host) {
+      payerHostSupportedPayoutMethods = host.supportedPayoutMethods || EMPTY_ARRAY;
+    } else {
+      // For collectives without a host, we allow expenses to be submitted with the "Other"/"Custom" payout method
+      // This is mostly for people trying out the platform
+      payerHostSupportedPayoutMethods = [PayoutMethodType.OTHER];
+    }
 
     const payeeIsSelfHosted = payee && payee.id === payee.host?.id;
     const payeeIsCollectiveFamilyType = payee && AccountTypesWithHost.includes(payee.type);
-    const payeeIsSameHost = payee && payee.host?.id === this.props.collective.host?.id;
+    const payeeIsSameHost = payee && host && payee.host?.id === host.id;
 
     let pmTypes;
 
@@ -264,7 +267,7 @@ class PayoutMethodSelect extends React.Component {
     const payeeIsCollectiveFamilyType = payee && AccountTypesWithHost.includes(payee.type);
     const payeeIsSameHost = payee && payee.host?.id === collective.host?.id;
 
-    const styledSelectOptions = this.getOptions(payoutMethods, payee);
+    const styledSelectOptions = this.getOptions(collective.host, payoutMethods, payee);
     const hasSuitablePayoutMethodOption = styledSelectOptions.find(({ options }) => options.length > 0) ? true : false;
 
     if (payeeIsCollectiveFamilyType && !payeeIsSameHost) {
