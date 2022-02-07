@@ -215,6 +215,33 @@ export const budgetSectionQuery = gqlV2/* GraphQL */ `
         ...ExpensesListFieldsFragment
       }
     }
+    account(slug: $slug) {
+      id
+      stats {
+        id
+        balance {
+          valueInCents
+          currency
+        }
+        yearlyBudget {
+          valueInCents
+          currency
+        }
+        activeRecurringContributions
+        totalAmountReceived(periodInMonths: 12) {
+          valueInCents
+          currency
+        }
+        totalAmountRaised: totalAmountReceived {
+          valueInCents
+          currency
+        }
+        totalNetAmountRaised: totalNetAmountReceived {
+          valueInCents
+          currency
+        }
+      }
+    }
   }
   ${transactionsQueryCollectionFragment}
   ${expensesListFieldsFragment}

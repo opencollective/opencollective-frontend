@@ -149,7 +149,6 @@ const AccountSettings = ({ account, section }) => {
       LoggedInUser={LoggedInUser}
       onSubmit={handleEditCollective}
       status={state.status}
-      contentOnly={true}
       section={section}
     />
   );

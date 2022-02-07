@@ -49,6 +49,33 @@ export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
         ...ExpensesListFieldsFragment
       }
     }
+    account(slug: $slug) {
+      id
+      stats {
+        id
+        balance {
+          valueInCents
+          currency
+        }
+        yearlyBudget {
+          valueInCents
+          currency
+        }
+        activeRecurringContributions
+        totalAmountReceived(periodInMonths: 12) {
+          valueInCents
+          currency
+        }
+        totalAmountRaised: totalAmountReceived {
+          valueInCents
+          currency
+        }
+        totalNetAmountRaised: totalNetAmountReceived {
+          valueInCents
+          currency
+        }
+      }
+    }
   }
   ${transactionsQueryCollectionFragment}
   ${expensesListFieldsFragment}
@@ -127,10 +154,10 @@ ViewAllLink.propTypes = {
 };
 
 /**
- * The budget section. Shows the expenses, the latests transactions and some statistics
+ * The budget section. Shows the expenses, the latest transactions and some statistics
  * abut the global budget of the collective.
  */
-const SectionBudget = ({ collective, stats, LoggedInUser }) => {
+const SectionBudget = ({ collective, LoggedInUser }) => {
   const [filter, setFilter] = React.useState('all');
   const budgetQuery = collective.host ? budgetSectionWithHostQuery : budgetSectionQuery;
   const budgetQueryResult = useQuery(budgetQuery, {
@@ -222,7 +249,11 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
           mb={2}
           mx={[null, null, 3]}
         >
-          <BudgetStats collective={collective} stats={stats} />
+          {isLoading ? (
+            <LoadingPlaceholder height={300} />
+          ) : (
+            <BudgetStats collective={collective} stats={data?.account?.stats} />
+          )}
         </StyledCard>
       </Flex>
     </ContainerSectionContent>
@@ -239,15 +270,6 @@ SectionBudget.propTypes = {
     isArchived: PropTypes.bool,
     settings: PropTypes.object,
     host: PropTypes.object,
-  }),
-
-  /** Stats */
-  stats: PropTypes.shape({
-    balance: PropTypes.number.isRequired,
-    yearlyBudget: PropTypes.number.isRequired,
-    activeRecurringContributions: PropTypes.object,
-    totalAmountReceived: PropTypes.number,
-    totalAmountRaised: PropTypes.number,
   }),
 
   LoggedInUser: PropTypes.object,

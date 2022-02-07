@@ -8,6 +8,7 @@ import styled, { css } from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { formatCurrency, getCurrencySymbol } from '../../lib/currency-utils';
+import { AmountPropTypeShape } from '../../lib/prop-types';
 
 import Container from '../Container';
 import DefinedTerm, { Terms } from '../DefinedTerm';
@@ -76,7 +77,7 @@ const BudgetStats = ({ collective, stats }) => {
           </Container>
           <FormattedMessage id="CollectivePage.SectionBudget.Balance" defaultMessage="Today’s balance" />
         </StatTitle>
-        <StatAmount amount={stats.balance} currency={collective.currency} />
+        <StatAmount amount={stats.balance.valueInCents} currency={collective.currency} />
       </StatContainer>
       <StatContainer>
         <StatTitle>
@@ -91,20 +92,25 @@ const BudgetStats = ({ collective, stats }) => {
                 <FormattedMessage
                   id="budgetSection-raised-total"
                   defaultMessage="Total contributed before fees: {amount}"
-                  values={{ amount: formatCurrency(stats?.totalAmountRaised || 0, collective.currency, { locale }) }}
+                  values={{
+                    amount: formatCurrency(stats?.totalAmountRaised.valueInCents || 0, collective.currency, { locale }),
+                  }}
                 />
               </Box>
             }
           />
         </StatTitle>
-        <StatAmount amount={stats.totalNetAmountRaised} currency={collective.currency} />
+        <StatAmount amount={stats.totalNetAmountRaised.valueInCents} currency={collective.currency} />
       </StatContainer>
       <StatContainer>
         <StatTitle>
           <Expand size="12px" />
           <FormattedMessage id="budgetSection-disbursed" defaultMessage="Total disbursed" />
         </StatTitle>
-        <StatAmount amount={stats.totalNetAmountRaised - stats.balance} currency={collective.currency} />
+        <StatAmount
+          amount={stats.totalNetAmountRaised.valueInCents - stats.balance.valueInCents}
+          currency={collective.currency}
+        />
       </StatContainer>
       {!isFund && !isProject && (
         <StatContainer data-cy="budgetSection-estimated-budget" $isMain>
@@ -126,14 +132,16 @@ const BudgetStats = ({ collective, stats }) => {
                     id="CollectivePage.SectionBudget.TotalAmountReceived"
                     defaultMessage="Total received in the last 12 months: {amount}"
                     values={{
-                      amount: formatCurrency(stats?.totalAmountReceived || 0, collective.currency, { locale }),
+                      amount: formatCurrency(stats?.totalAmountReceived.valueInCents || 0, collective.currency, {
+                        locale,
+                      }),
                     }}
                   />
                 </Box>
               }
             />
           </StatTitle>
-          <StatAmount amount={stats.yearlyBudget} currency={collective.currency} />
+          <StatAmount amount={stats.yearlyBudget.valueInCents} currency={collective.currency} />
         </StatContainer>
       )}
     </Fragment>
@@ -154,12 +162,12 @@ BudgetStats.propTypes = {
 
   /** Stats */
   stats: PropTypes.shape({
-    balance: PropTypes.number.isRequired,
-    yearlyBudget: PropTypes.number.isRequired,
+    balance: AmountPropTypeShape.isRequired,
+    yearlyBudget: AmountPropTypeShape.isRequired,
     activeRecurringContributions: PropTypes.object,
-    totalAmountReceived: PropTypes.number,
-    totalAmountRaised: PropTypes.number,
-    totalNetAmountRaised: PropTypes.number,
+    totalAmountReceived: AmountPropTypeShape,
+    totalAmountRaised: AmountPropTypeShape,
+    totalNetAmountRaised: AmountPropTypeShape,
   }),
 
   isLoading: PropTypes.bool,

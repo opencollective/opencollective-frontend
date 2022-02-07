@@ -58,7 +58,7 @@ class recurringContributionsPage extends React.Component {
   }
 
   static propTypes = {
-    slug: PropTypes.string.isRequired,
+    slug: PropTypes.string,
     loadingLoggedInUser: PropTypes.bool,
     LoggedInUser: PropTypes.object,
     data: PropTypes.shape({
@@ -143,9 +143,14 @@ class recurringContributionsPage extends React.Component {
 
 const addRecurringContributionsPageData = graphql(recurringContributionsQuery, {
   skip: props => !props.LoggedInUser,
-  options: {
+  options: props => ({
     context: API_V2_CONTEXT,
-  },
+    variables: {
+      // If slug is passed in the URL (e.g. /facebook/recurring-contributions), use it.
+      // Otherwise, use the slug of the LoggedInUser.
+      slug: props.slug || props.LoggedInUser?.collective?.slug,
+    },
+  }),
 });
 
 export default withUser(injectIntl(addRecurringContributionsPageData(recurringContributionsPage)));

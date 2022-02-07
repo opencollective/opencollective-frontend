@@ -9,6 +9,7 @@ import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import SectionSubTitle from '../home/SectionSubtitle';
 import SectionTitle from '../home/SectionTitle';
+import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledCarousel from '../StyledCarousel';
 import StyledLink from '../StyledLink';
@@ -189,7 +190,17 @@ const ApplyToFiscalHosts = () => (
       >
         <FormattedMessage
           id="fiscalHosting.applyToFiscalHost.description"
-          defaultMessage="Organizations around the world are using Open Collective to host multiple projects, groups and communities Find out more about them!"
+          defaultMessage="<orgsAroundTheWorldLink>Organizations around the world</orgsAroundTheWorldLink> are using Open Collective to host multiple projects, groups and communities. Find out more about them! Or you can <createYourOwnFiscalHostLink>create your own fiscal host</createYourOwnFiscalHostLink>."
+          values={{
+            orgsAroundTheWorldLink: getI18nLink({
+              as: Link,
+              href: '/hosts',
+            }),
+            createYourOwnFiscalHostLink: getI18nLink({
+              as: Link,
+              href: '/become-a-host',
+            }),
+          }}
         />
       </SectionSubTitle>
     </Container>

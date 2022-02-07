@@ -8,8 +8,8 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
-import { getSuggestedTags } from '../lib/collective.lib';
-import { CollectiveType, isSectionForAdminsOnly, NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { getSuggestedTags, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
+import { CollectiveType, NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
@@ -207,11 +207,7 @@ class ExpensePage extends React.Component {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
       } else if (!isFeatureSupported(data.account, FEATURES.RECEIVE_EXPENSES)) {
         return <PageFeatureNotSupported />;
-      } else if (
-        isSectionForAdminsOnly(data.account, Sections.BUDGET) &&
-        !LoggedInUser?.canEditCollective(data.account) &&
-        !LoggedInUser?.isHostAdmin(data.account)
-      ) {
+      } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, data.account)) {
         // Hack for funds that want to keep their budget "private"
         return <PageFeatureNotSupported showContactSupportLink={false} />;
       }
