@@ -11,8 +11,8 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { AccountTypesWithHost, CollectiveType, defaultBackgroundImage } from '../../lib/constants/collectives';
 import { Currency } from '../../lib/constants/currency';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
+import { GST_OPTIONS, VAT_OPTIONS } from '../../lib/constants/taxes';
 import { TierTypes } from '../../lib/constants/tiers-types';
-import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
 
 import Container from '../Container';
@@ -249,17 +249,17 @@ class EditCollectiveForm extends React.Component {
         id: 'EditCollective.VAT.Description',
         defaultMessage: 'European Value Added Tax',
       },
-      'VAT.None': {
-        id: 'EditCollective.VAT.None',
-        defaultMessage: 'Not subject to VAT',
+      'Tax.None': {
+        id: 'EditCollective.Tax.None',
+        defaultMessage: 'Not subject to {taxName}',
       },
-      'VAT.Host': {
-        id: 'EditCollective.VAT.Host',
-        defaultMessage: 'Use the host VAT settings',
+      'Tax.Host': {
+        id: 'EditCollective.Tax.Host',
+        defaultMessage: 'Use the host {taxName} settings',
       },
-      'VAT.Own': {
-        id: 'EditCollective.VAT.Own',
-        defaultMessage: 'Use my own VAT number',
+      'Tax.Own': {
+        id: 'EditCollective.Tax.Own',
+        defaultMessage: 'Use my own {taxName} number',
       },
       'VAT-number.label': {
         id: 'EditCollective.VATNumber',
@@ -318,6 +318,8 @@ class EditCollectiveForm extends React.Component {
         set(collective, 'settings.VAT.type', value);
       } else if (fieldname === 'VAT-number') {
         set(collective, 'settings.VAT.number', value);
+      } else if (fieldname === 'GST') {
+        set(collective, 'settings.GST.type', value);
       } else if (fieldname === 'GST-number') {
         if (!value) {
           set(collective, 'settings.GST', null);
@@ -580,15 +582,15 @@ class EditCollectiveForm extends React.Component {
           options: [
             {
               value: '',
-              label: intl.formatMessage(this.messages['VAT.None']),
+              label: intl.formatMessage(this.messages['Tax.None'], { taxName: 'VAT' }),
             },
             {
               value: VAT_OPTIONS.HOST,
-              label: intl.formatMessage(this.messages['VAT.Host']),
+              label: intl.formatMessage(this.messages['Tax.Host'], { taxName: 'VAT' }),
             },
             {
               value: VAT_OPTIONS.OWN,
-              label: intl.formatMessage(this.messages['VAT.Own']),
+              label: intl.formatMessage(this.messages['Tax.Own'], { taxName: 'VAT' }),
             },
           ],
         },
@@ -608,13 +610,36 @@ class EditCollectiveForm extends React.Component {
           },
         },
       );
-    } else if (taxes.includes(TaxType.GST) && collective.isHost) {
-      fields.push({
-        name: 'GST-number',
-        type: 'string',
-        placeholder: '9429037631147',
-        defaultValue: get(collective, 'settings.GST.number'),
-      });
+    } else if (taxes.includes(TaxType.GST)) {
+      if (collective.isHost) {
+        fields.push({
+          name: 'GST-number',
+          type: 'string',
+          placeholder: '9429037631147',
+          defaultValue: get(collective, 'settings.GST.number'),
+        });
+      } else {
+        fields.push({
+          name: 'GST',
+          label: 'GST',
+          type: 'select',
+          defaultValue: get(collective, 'settings.GST.type'),
+          when: () => {
+            return AccountTypesWithHost.includes(collective.type);
+          },
+          options: [
+            // Default: use host settings
+            {
+              value: '',
+              label: intl.formatMessage(this.messages['Tax.Host'], { taxName: 'GST' }),
+            },
+            {
+              value: GST_OPTIONS.NONE,
+              label: intl.formatMessage(this.messages['Tax.None'], { taxName: 'GST' }),
+            },
+          ],
+        });
+      }
     }
 
     return fields;
