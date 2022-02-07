@@ -36,6 +36,7 @@ class EditEventForm extends React.Component {
       validStartDate: true,
       validEndDate: true,
       endsAtDate: dayjs(event.endsAt).tz(event.timezone).format('YYYY-MM-DDTHH:mm'),
+      endAtDateTouched: false,
     };
 
     this.messages = defineMessages({
@@ -88,7 +89,7 @@ class EditEventForm extends React.Component {
     if (fieldname === 'startsAt') {
       const isValid = dayjs(value).isValid();
       this.setState({ validStartDate: isValid, disabled: !isValid });
-      if (isValid) {
+      if (isValid && !this.state.endsAtDateTouched) {
         const endsAtDate = dayjs(value).add(1, 'hour').tz(this.state.event.timezone).format('YYYY-MM-DDTHH:mm');
         this.setState({ endsAtDate });
         event[fieldname] = convertDateToApiUtc(value, this.state.event.timezone);
@@ -98,7 +99,7 @@ class EditEventForm extends React.Component {
       const isValid = dayjs(value).isValid();
       this.setState({ validEndDate: isValid, disabled: !isValid });
       if (isValid) {
-        this.setState({ endsAtDate: value });
+        this.setState({ endsAtDate: value, endsAtDateTouched: true });
         event[fieldname] = convertDateToApiUtc(value, this.state.event.timezone);
       }
     } else if (fieldname === 'timezone') {
