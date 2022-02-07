@@ -48,10 +48,16 @@ const getIntervalFromValue = value => {
  */
 const getNewInterval = (interval, changeField, newValue) => {
   const newInterval = { ...interval };
-  newInterval[changeField] = stripTime(newValue);
+  newInterval[changeField] = newValue;
 
   // Reset interval in case fromDate is after toDate
-  if (newInterval.from && newInterval.to && newInterval.from > newInterval.to) {
+  if (
+    newInterval.from &&
+    !newInterval.from.startsWith('0') &&
+    newInterval.to &&
+    !newInterval.to.startsWith('0') &&
+    newInterval.from > newInterval.to
+  ) {
     const fieldToReset = changeField === 'from' ? 'to' : 'from';
     newInterval[fieldToReset] = '';
   }
@@ -213,7 +219,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
                 closeOnSelect
                 lineHeight={1}
                 fontSize="13px"
-                value={stripTime(tmpDateInterval.from)}
+                value={tmpDateInterval.from}
                 min={formattedMin}
                 onChange={e => setDate('from', e.target.value)}
               />
@@ -235,7 +241,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
                 closeOnSelect
                 lineHeight={1}
                 fontSize="13px"
-                value={stripTime(tmpDateInterval.to)}
+                value={tmpDateInterval.to}
                 min={formattedMin}
                 max={stripTime(new Date())}
                 onChange={e => setDate('to', e.target.value)}
