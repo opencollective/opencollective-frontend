@@ -48,7 +48,7 @@ describe('Users can change their email address', () => {
 
   it('shows an error if validation link is invalid/expired', () => {
     cy.visit('/confirm/email/ThisIsDefinitelyNotAValidToken');
-    cy.contains('Invalid email confirmation token');
+    cy.contains('The confirmation link is invalid or has expired');
   });
 
   it('can re-send the confirmation email', () => {
