@@ -178,20 +178,21 @@ NavBarCategory.propTypes = {
   category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)).isRequired,
 };
 
+const NavBarScrollContainer = ({ useAnchor, category, children }) =>
+  useAnchor ? <Scrollchor to={`#category-${category}`}>{children}</Scrollchor> : children;
+
+NavBarScrollContainer.propTypes = {
+  category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)).isRequired,
+  useAnchor: PropTypes.bool,
+  children: PropTypes.node,
+};
+
 const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, links }) => {
   const displayedLinks = links.filter(link => !link.hide);
 
-  // eslint-disable-next-line react/prop-types
-  const NavBarScrollContainer = ({ children }) =>
-    useAnchor ? (
-      <Scrollchor to={`#category-${category}`}>{children}</Scrollchor>
-    ) : (
-      <React.Fragment>{children}</React.Fragment>
-    );
-
   return (
     <CategoryDropdown trigger="hover" tabIndex="-1">
-      <NavBarScrollContainer>
+      <NavBarScrollContainer category={category} useAnchor={useAnchor}>
         <CategoryContainer
           mr={[0, null, 3]}
           isSelected={isSelected}
