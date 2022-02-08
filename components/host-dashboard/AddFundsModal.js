@@ -11,12 +11,8 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
-import {
-  budgetSectionQuery,
-  collectivePageQuery,
-  getCollectivePageQueryVariables,
-} from '../collective-page/graphql/queries';
-import { getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
+import { collectivePageQuery, getCollectivePageQueryVariables } from '../collective-page/graphql/queries';
+import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
 import { DefaultCollectiveLabel } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
@@ -271,9 +267,9 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
-        query: budgetSectionQuery,
         context: API_V2_CONTEXT,
-        variables: getBudgetSectionQueryVariables(collective.slug),
+        query: getBudgetSectionQuery(true),
+        variables: getBudgetSectionQueryVariables(collective.slug, host.slug),
       },
       { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
     ],
@@ -680,6 +676,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
 AddFundsModal.propTypes = {
   host: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    slug: PropTypes.string.isRequired,
     name: PropTypes.string,
     plan: PropTypes.shape({
       hostFees: PropTypes.bool,

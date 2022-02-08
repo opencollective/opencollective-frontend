@@ -7,13 +7,13 @@ import {
   getTotalCollectiveContributionsQueryVariables,
   totalCollectiveContributionsQuery,
 } from '../hero/HeroTotalCollectiveContributionsWithData';
-import { getBudgetSectionQueryVariables } from '../sections/Budget';
+import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../sections/Budget';
 import { conversationsSectionQuery, getConversationsSectionQueryVariables } from '../sections/Conversations';
 import { getRecurringContributionsSectionQueryVariables } from '../sections/RecurringContributions';
 import { getTransactionsSectionQueryVariables, transactionsSectionQuery } from '../sections/Transactions';
 import { getUpdatesSectionQueryVariables, updatesSectionQuery } from '../sections/Updates';
 
-import { budgetSectionQuery, collectivePageQuery, getCollectivePageQueryVariables } from './queries';
+import { collectivePageQuery, getCollectivePageQueryVariables } from './queries';
 
 export const preloadCollectivePageGraphqlQueries = async (slug, client) => {
   const result = await client.query({
@@ -28,8 +28,8 @@ export const preloadCollectivePageGraphqlQueries = async (slug, client) => {
     if (sectionsNames.includes('budget')) {
       queries.push(
         client.query({
-          query: budgetSectionQuery,
-          variables: getBudgetSectionQueryVariables(slug),
+          query: getBudgetSectionQuery(Boolean(collective.host)),
+          variables: getBudgetSectionQueryVariables(slug, collective.host?.slug),
           context: API_V2_CONTEXT,
         }),
       );
