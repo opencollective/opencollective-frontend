@@ -155,6 +155,7 @@ export const collectivePageQuery = gql`
         startsAt
         endsAt
         location {
+          id
           name
           address
           country

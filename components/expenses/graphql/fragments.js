@@ -11,6 +11,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
     name
     legalName
     location {
+      id
       address
       country
       structured
@@ -52,6 +53,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
             }
           }
           location {
+            id
             address
             country
             structured
@@ -103,6 +105,7 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
       }
     }
     location {
+      id
       address
       country
     }
@@ -177,6 +180,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       }
     }
     payeeLocation {
+      id
       address
       country
       structured
@@ -196,6 +200,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       type
       website
       location {
+        id
         address
         country
       }
@@ -227,6 +232,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         tag
       }
       location {
+        id
         address
         country
       }
