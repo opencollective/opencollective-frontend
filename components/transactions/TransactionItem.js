@@ -7,6 +7,7 @@ import { truncate } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import expenseStatus from '../../lib/constants/expense-status';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nTransactionKind, i18nTransactionType } from '../../lib/i18n/transaction';
@@ -96,6 +97,18 @@ const KindTag = styled(StyledTag).attrs({
   fontSize: '10px',
   fontWeight: '600',
 })``;
+
+const getExpenseStatusTag = (status, isRefund, isRefunded) => {
+  let expenseStatusLabel;
+  if (isRefunded) {
+    expenseStatusLabel = expenseStatus.REFUNDED;
+  } else if (isRefund) {
+    expenseStatusLabel = expenseStatus.COMPLETED;
+  } else {
+    expenseStatusLabel = status;
+  }
+  return <ExpenseStatusTag status={expenseStatusLabel} fontSize="9px" px="6px" py="2px" />;
+};
 
 const TransactionItem = ({ displayActions, collective, transaction, onMutationSuccess }) => {
   const {
@@ -242,7 +255,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 py="2px"
               />
             )}{' '}
-            {hasExpense && <ExpenseStatusTag status={expense.status} fontSize="9px" px="6px" py="2px" />}
+            {hasExpense && getExpenseStatusTag(expense.status, isRefund, isRefunded)}
           </Flex>
         </Flex>
         {hasOrder && [CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
