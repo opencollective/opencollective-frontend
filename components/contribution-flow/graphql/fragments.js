@@ -158,6 +158,12 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
           totalCount
         }
       }
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+        }
+      }
       ... on AccountWithHost {
         host {
           ...OrderSuccessHostFragment
