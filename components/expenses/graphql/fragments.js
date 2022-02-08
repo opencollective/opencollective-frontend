@@ -1,5 +1,7 @@
 import { gqlV2 } from '../../../lib/graphql/helpers';
 
+import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
+
 export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
   fragment LoggedInAccountExpensePayoutFields on Individual {
     id
@@ -217,7 +219,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       currency
       expensePolicy
       features {
-        id
+        ...NavbarFields
         MULTI_CURRENCY_EXPENSES
       }
       expensesTags {
@@ -323,6 +325,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
   }
 
   ${expenseHostFields}
+  ${collectiveNavbarFieldsFragment}
 `;
 
 export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
