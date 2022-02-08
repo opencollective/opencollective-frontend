@@ -447,6 +447,7 @@ const hostFieldsFragment = gqlV2/* GraphQL */ `
       MULTI_CURRENCY_EXPENSES
     }
     location {
+      id
       address
       country
     }

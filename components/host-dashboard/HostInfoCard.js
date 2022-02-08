@@ -30,6 +30,7 @@ export const hostInfoCardFields = gqlV2/* GraphQL */ `
     slug
     currency
     location {
+      id
       address
       country
     }

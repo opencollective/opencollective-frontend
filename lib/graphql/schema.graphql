@@ -490,11 +490,7 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 """
 scalar JSON
 
-"""
-A person or an entity that contributes financially or by any other mean to the mission
-of the collective. While "Member" is dedicated to permissions, this type is meant
-to surface all the public contributors.
-"""
+"\n    A person or an entity that contributes financially or by any other mean to the mission\n    of the collective. While \"Member\" is dedicated to permissions, this type is meant\n    to surface all the public contributors.\n  "
 type Contributor {
   """
   A unique identifier for this member
@@ -774,6 +770,11 @@ type StatsMemberType {
 Type for Location
 """
 type LocationType {
+  """
+  Unique identifier for this location
+  """
+  id: String
+
   """
   A short name for the location (eg. Google Headquarters)
   """
@@ -3150,12 +3151,7 @@ type Query {
     transactionUuid: String!
   ): InvoiceType
 
-  """
-  Given a collective, returns all its transactions:
-  - Debit transactions made by collective without using a gift card
-  - Debit transactions made using a gift card from collective
-  - Credit transactions made to collective
-  """
+  "\n    Given a collective, returns all its transactions:\n    - Debit transactions made by collective without using a gift card\n    - Debit transactions made using a gift card from collective\n    - Credit transactions made to collective\n    "
   allTransactions(
     CollectiveId: Int
     collectiveSlug: String
