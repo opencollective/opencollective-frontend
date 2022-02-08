@@ -38,6 +38,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
     isActive
     settings
     location {
+      id
       country
     }
     ... on Organization {
@@ -74,6 +75,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
         slug
         settings
         location {
+          id
           country
         }
       }
@@ -84,6 +86,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
         slug
         settings
         location {
+          id
           country
         }
       }

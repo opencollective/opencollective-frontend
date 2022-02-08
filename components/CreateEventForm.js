@@ -12,7 +12,7 @@ import InputField from './InputField';
 import StyledButton from './StyledButton';
 import TimezonePicker from './TimezonePicker';
 
-class EditEventForm extends React.Component {
+class CreateEventForm extends React.Component {
   static propTypes = {
     event: PropTypes.object,
     loading: PropTypes.bool,
@@ -35,6 +35,8 @@ class EditEventForm extends React.Component {
       showDeleteModal: false,
       validStartDate: true,
       validEndDate: true,
+      endsAtDate: dayjs(event.endsAt).tz(event.timezone).format('YYYY-MM-DDTHH:mm'),
+      endAtDateTouched: false,
     };
 
     this.messages = defineMessages({
@@ -87,13 +89,17 @@ class EditEventForm extends React.Component {
     if (fieldname === 'startsAt') {
       const isValid = dayjs(value).isValid();
       this.setState({ validStartDate: isValid, disabled: !isValid });
-      if (isValid) {
+      if (isValid && !this.state.endsAtDateTouched) {
+        const endsAtDate = dayjs(value).add(1, 'hour').tz(this.state.event.timezone).format('YYYY-MM-DDTHH:mm');
+        this.setState({ endsAtDate });
         event[fieldname] = convertDateToApiUtc(value, this.state.event.timezone);
+        event['endsAt'] = convertDateToApiUtc(endsAtDate, this.state.event.timezone);
       }
     } else if (fieldname === 'endsAt') {
       const isValid = dayjs(value).isValid();
       this.setState({ validEndDate: isValid, disabled: !isValid });
       if (isValid) {
+        this.setState({ endsAtDate: value, endsAtDateTouched: true });
         event[fieldname] = convertDateToApiUtc(value, this.state.event.timezone);
       }
     } else if (fieldname === 'timezone') {
@@ -166,7 +172,7 @@ class EditEventForm extends React.Component {
       {
         name: 'endsAt',
         type: 'datetime-local',
-        defaultValue: dayjs(this.state.event.endsAt).tz(this.state.event.timezone).format('YYYY-MM-DDTHH:mm'),
+        value: this.state.endsAtDate,
         required: true,
         error: !this.state.validEndDate ? intl.formatMessage(this.messages.inValidDateError) : null,
       },
@@ -215,6 +221,7 @@ class EditEventForm extends React.Component {
                 <InputField
                   key={field.name}
                   defaultValue={this.getFieldDefaultValue(field)}
+                  value={field.value}
                   validate={field.validate}
                   ref={field.name}
                   name={field.name}
@@ -265,4 +272,4 @@ class EditEventForm extends React.Component {
   }
 }
 
-export default injectIntl(EditEventForm);
+export default injectIntl(CreateEventForm);

@@ -96,7 +96,7 @@ class ConfirmEmailPage extends React.Component {
           )}
           {status === 'error' && (
             <MessageBox type="error" withIcon>
-              {error.name === 'InvalidToken' ? (
+              {error.extensions?.code === 'INVALID_TOKEN' ? (
                 <FormattedMessage
                   id="confirmEmail.error.InvalidToken"
                   defaultMessage="The confirmation link is invalid or has expired"

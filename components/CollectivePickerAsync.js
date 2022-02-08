@@ -25,6 +25,7 @@ const collectivePickerSearchQuery = gql`
         name
         currency
         location {
+          id
           address
           country
         }

@@ -1,5 +1,7 @@
 import { gqlV2 } from '../../../lib/graphql/helpers';
 
+import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
+
 export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
   fragment LoggedInAccountExpensePayoutFields on Individual {
     id
@@ -9,6 +11,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
     name
     legalName
     location {
+      id
       address
       country
       structured
@@ -50,6 +53,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
             }
           }
           location {
+            id
             address
             country
             structured
@@ -89,6 +93,10 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     expensePolicy
     website
     settings
+    features {
+      id
+      MULTI_CURRENCY_EXPENSES
+    }
     paypalPreApproval {
       id
       balance {
@@ -97,6 +105,7 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
       }
     }
     location {
+      id
       address
       country
     }
@@ -171,6 +180,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       }
     }
     payeeLocation {
+      id
       address
       country
       structured
@@ -190,6 +200,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       type
       website
       location {
+        id
         address
         country
       }
@@ -212,11 +223,16 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       twitterHandle
       currency
       expensePolicy
+      features {
+        ...NavbarFields
+        MULTI_CURRENCY_EXPENSES
+      }
       expensesTags {
         id
         tag
       }
       location {
+        id
         address
         country
       }
@@ -315,6 +331,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
   }
 
   ${expenseHostFields}
+  ${collectiveNavbarFieldsFragment}
 `;
 
 export const expensesListFieldsFragment = gqlV2/* GraphQL */ `

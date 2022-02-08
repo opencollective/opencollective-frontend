@@ -9,7 +9,7 @@
 <em>January 12th 2022</em>. We are currently hiring for the following roles:
 
 <ul>
-  <li><a href='#software-engineer'>Senior, 'Full Stack' Software Engineer</a></li>
+  <li><a href='#software-engineer'>Senior Software Engineer</a></li>
   <li><a href='#product-manager'>Senior Product Manager</a></li>
 </ul>
 
@@ -25,9 +25,9 @@ Like the movements that we support, we value openness and transparency. We striv
 
 We are a fully remote, international team - with team members in New Zealand, Mexico, India, Brazil, Canada, the United Kingdom, Spain, Germany and France. We are an equal opportunities employer and welcome applications from anyone with the right mix of experience and skills.
 
-<h2 id='software-engineer'>Senior, 'Full Stack' Software Engineer</h2>
+<h2 id='software-engineer'>Senior Software Engineer</h2>
 
-We are looking for a senior full-stack engineer who’s excited about open source, making communities sustainable, and transparent finances.
+We are looking for a senior "full-stack" software engineer who’s excited about open source, making communities sustainable, and transparent finances.
 
 ### We think you’d be great at this if you:
 
@@ -75,7 +75,21 @@ We are looking for a senior product manager who is excited about creating a worl
 
 ## Interested?
 
-Please [email us](mailto:info@opencollective.com) with the role your are applying for, who you are, your experience and skills, and why you’re interested. This can take the form of a traditional CV, a website, video, or however you like to communicate.
+### Senior Software Engineer position
+
+Please [email us](mailto:info@opencollective.com) with "Senior Software Engineer" as subject.
+
+Your message should be convincing enough for us to consider your candidature and move you to the next stage. Ideally, we want you to cover the following:
+
+- About you. What's your story? Where you are coming from? What's you current status?
+- About us. How did you hear about Open Collective? What do you find interesting in Open Collective?
+- Experience. What is your greatest achievment in software engineering? Can you tell us about a past project you're proud of? What do you think you can bring to Open Collective?
+
+As part of our screening process, we'll also ask you to make a small contribution to [our codebase](https://github.com/opencollective). Have a look, do one now or be ready for it!
+
+### Senior Product Manager position
+
+Please [email us](mailto:info@opencollective.com) who you are, your experience and skills, and why you’re interested. This can take the form of a traditional CV, a website, video, or however you like to communicate.
 
 ## Join us today!
 
