@@ -1,10 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { gqlV2 } from '../../../lib/graphql/helpers';
-
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/Contribute';
-import { expensesListFieldsFragment } from '../../expenses/graphql/fragments';
-import { transactionsQueryCollectionFragment } from '../../transactions/graphql/fragments';
 
 import * as fragments from './fragments';
 
@@ -203,49 +199,6 @@ export const collectivePageQuery = gql`
   ${fragments.contributeCardProjectFieldsFragment}
 `;
 /* eslint-enable graphql/template-strings */
-
-export const budgetSectionQuery = gqlV2/* GraphQL */ `
-  query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
-    transactions(account: { slug: $slug }, limit: $limit, hasExpense: false, kind: $kind) {
-      ...TransactionsQueryCollectionFragment
-    }
-    expenses(account: { slug: $slug }, limit: $limit) {
-      totalCount
-      nodes {
-        ...ExpensesListFieldsFragment
-      }
-    }
-    account(slug: $slug) {
-      id
-      stats {
-        id
-        balance {
-          valueInCents
-          currency
-        }
-        yearlyBudget {
-          valueInCents
-          currency
-        }
-        activeRecurringContributions
-        totalAmountReceived(periodInMonths: 12) {
-          valueInCents
-          currency
-        }
-        totalAmountRaised: totalAmountReceived {
-          valueInCents
-          currency
-        }
-        totalNetAmountRaised: totalNetAmountReceived {
-          valueInCents
-          currency
-        }
-      }
-    }
-  }
-  ${transactionsQueryCollectionFragment}
-  ${expensesListFieldsFragment}
-`;
 
 export const getCollectivePageQueryVariables = slug => {
   return {

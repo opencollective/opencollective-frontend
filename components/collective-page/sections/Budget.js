@@ -26,7 +26,63 @@ import TransactionItem from '../../transactions/TransactionItem';
 import { withUser } from '../../UserProvider';
 import BudgetStats from '../BudgetStats';
 import ContainerSectionContent from '../ContainerSectionContent';
-import { budgetSectionQuery } from '../graphql/queries';
+
+const budgetSectionAccountFieldsFragment = gqlV2/* GraphQL */ `
+  fragment BudgetSectionAccountFields on Account {
+    id
+    stats {
+      id
+      balance {
+        valueInCents
+        currency
+      }
+      yearlyBudget {
+        valueInCents
+        currency
+      }
+      activeRecurringContributions
+      totalAmountReceived(periodInMonths: 12) {
+        valueInCents
+        currency
+      }
+      totalAmountRaised: totalAmountReceived {
+        valueInCents
+        currency
+      }
+      totalNetAmountRaised: totalNetAmountReceived {
+        valueInCents
+        currency
+      }
+    }
+  }
+`;
+
+export const budgetSectionQuery = gqlV2/* GraphQL */ `
+  query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
+    transactions(
+      account: { slug: $slug }
+      limit: $limit
+      kind: $kind
+      includeIncognitoTransactions: true
+      includeGiftCardTransactions: true
+      includeChildrenTransactions: true
+    ) {
+      ...TransactionsQueryCollectionFragment
+    }
+    expenses(account: { slug: $slug }, limit: $limit, includeChildrenExpenses: true) {
+      totalCount
+      nodes {
+        ...ExpensesListFieldsFragment
+      }
+    }
+    account(slug: $slug) {
+      ...BudgetSectionAccountFields
+    }
+  }
+  ${transactionsQueryCollectionFragment}
+  ${expensesListFieldsFragment}
+  ${budgetSectionAccountFieldsFragment}
+`;
 
 export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
   query BudgetSectionWithHost($slug: String!, $hostSlug: String!, $limit: Int!, $kind: [TransactionKind]) {
@@ -50,37 +106,18 @@ export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
       }
     }
     account(slug: $slug) {
-      id
-      stats {
-        id
-        balance {
-          valueInCents
-          currency
-        }
-        yearlyBudget {
-          valueInCents
-          currency
-        }
-        activeRecurringContributions
-        totalAmountReceived(periodInMonths: 12) {
-          valueInCents
-          currency
-        }
-        totalAmountRaised: totalAmountReceived {
-          valueInCents
-          currency
-        }
-        totalNetAmountRaised: totalNetAmountReceived {
-          valueInCents
-          currency
-        }
-      }
+      ...BudgetSectionAccountFields
     }
   }
   ${transactionsQueryCollectionFragment}
   ${expensesListFieldsFragment}
   ${expenseHostFields}
+  ${budgetSectionAccountFieldsFragment}
 `;
+
+export const getBudgetSectionQuery = hasHost => {
+  return hasHost ? budgetSectionWithHostQuery : budgetSectionQuery;
+};
 
 // Any change here should be reflected in API's `server/graphql/cache.js`
 export const getBudgetSectionQueryVariables = (collectiveSlug, hostSlug) => {
@@ -159,8 +196,7 @@ ViewAllLink.propTypes = {
  */
 const SectionBudget = ({ collective, LoggedInUser }) => {
   const [filter, setFilter] = React.useState('all');
-  const budgetQuery = collective.host ? budgetSectionWithHostQuery : budgetSectionQuery;
-  const budgetQueryResult = useQuery(budgetQuery, {
+  const budgetQueryResult = useQuery(getBudgetSectionQuery(Boolean(collective.host)), {
     variables: getBudgetSectionQueryVariables(collective.slug, collective.host?.slug),
     context: API_V2_CONTEXT,
   });
