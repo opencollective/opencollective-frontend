@@ -184,7 +184,7 @@ ContributorCard.propTypes = {
   /** The contributor to display */
   contributor: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    collectiveId: PropTypes.number.isRequired,
+    collectiveId: PropTypes.number,
     name: PropTypes.string,
     description: PropTypes.string,
     collectiveSlug: PropTypes.string,
