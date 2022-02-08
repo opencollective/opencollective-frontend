@@ -5,6 +5,7 @@ import { withRouter } from 'next/router';
 
 import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -30,6 +31,12 @@ class UpdatesPage extends React.Component {
     router: PropTypes.object,
   };
 
+  componentDidMount() {
+    const { router, data } = this.props;
+    const account = data?.account;
+    addParentToURLIfMissing(router, account, '/updates');
+  }
+
   updateQuery = (router, newParams) => {
     const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
     const pathname = router.asPath.split('?')[0];
@@ -47,7 +54,11 @@ class UpdatesPage extends React.Component {
 
     return (
       <div className="UpdatesPage">
-        <Header collective={collective} LoggedInUser={LoggedInUser} />
+        <Header
+          collective={collective}
+          LoggedInUser={LoggedInUser}
+          canonicalURL={`${getCollectivePageCanonicalURL(collective)}/updates`}
+        />
 
         <Body>
           <CollectiveNavbar

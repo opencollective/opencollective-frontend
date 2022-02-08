@@ -1,9 +1,13 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import themeGet from '@styled-system/theme-get';
 import { FastField, Field } from 'formik';
+import { omit } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
 import { isEmail } from 'validator';
 
+import { suggestSlug } from '../../lib/collective.lib';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
@@ -13,9 +17,11 @@ import I18nAddressFields from '../I18nAddressFields';
 import InputTypeCountry from '../InputTypeCountry';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
+import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
+import StyledInputGroup from '../StyledInputGroup';
 import StyledLinkButton from '../StyledLinkButton';
 import StyledTextarea from '../StyledTextarea';
 import { P } from '../Text';
@@ -24,9 +30,13 @@ import PayoutMethodForm from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
 
 const msg = defineMessages({
-  nameLabel: {
+  accountType: {
     id: `ExpenseForm.inviteeLabel`,
     defaultMessage: 'Who will receive the money for this expense?',
+  },
+  nameLabel: {
+    id: `ExpenseForm.inviteNameLabel`,
+    defaultMessage: 'Contact name',
   },
   emailTitle: {
     id: 'User.EmailAddress',
@@ -60,24 +70,183 @@ const msg = defineMessages({
     id: 'ExpenseForm.inviteAdditionalInfo',
     defaultMessage: 'Want to enter payout details, such as a PayPal address or bank account?',
   },
+  orgNameLabel: {
+    id: 'ExpenseForm.inviteeOrgNameLabel',
+    defaultMessage: "What's the name of the organization?",
+  },
+  orgSlugLabel: {
+    id: 'createCollective.form.slugLabel',
+    defaultMessage: 'Set your URL',
+  },
+  orgSlugErrorTaken: {
+    id: 'createCollective.form.error.slug.taken',
+    defaultMessage: 'URL already taken',
+  },
+  orgWebsiteLabel: {
+    id: 'createOrg.form.websiteLabel',
+    defaultMessage: 'Organization website',
+  },
+  orgDescriptionLabel: {
+    id: 'ExpenseForm.inviteOrgDescriptionLabel',
+    defaultMessage: 'Organization description',
+  },
 });
+
+const PAYEE_TYPE = {
+  USER: 'USER',
+  ORG: 'ORG',
+};
+
+const Fieldset = styled.fieldset`
+  border: none;
+  padding: 0;
+  margin: 0;
+`;
+
+const RadioOptionContainer = styled.label`
+  align-items: center;
+  display: flex;
+  flex: 1 1 50%;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 20px;
+  margin: 0px;
+  padding: 6px 16px;
+  cursor: pointer;
+
+  :not(:last-child) {
+    @media (max-width: ${themeGet('breakpoints.0')}) {
+      border-bottom: 1px solid #dcdee0;
+    }
+    @media (min-width: ${themeGet('breakpoints.0')}) {
+      border-right: 1px solid #dcdee0;
+    }
+  }
+`;
 
 const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onBack, onNext }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
-  const { values, errors } = formik;
+  const { values, touched, errors } = formik;
   const isValidEmail = values.payee?.email && isEmail(values.payee.email);
   const stepOneCompleted = values.payee?.name && isValidEmail;
   const emailError = !isValidEmail ? intl.formatMessage({ defaultMessage: 'Please enter a valid email' }) : null;
 
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
+  const [payeeType, setPayeeType] = React.useState(PAYEE_TYPE.USER);
   const [showAdditionalInfo, setAdditionalInfo] = React.useState(false);
+
+  React.useEffect(() => {
+    if (values.payee?.organization?.name && !touched.payee?.organization?.slug) {
+      const slug = suggestSlug(values.payee.organization.name);
+      if (values.payee.organization.slug !== slug) {
+        formik.setFieldValue('payee.organization.slug', suggestSlug(values.payee.organization.name));
+      }
+    }
+  }, [values.payee?.organization?.name]);
+  React.useEffect(() => {
+    if (payeeType === PAYEE_TYPE.USER) {
+      formik.setFieldValue('payee', omit(values.payee, ['organization']));
+    }
+  }, [payeeType]);
+
+  const changePayeeType = e => {
+    e.stopPropagation();
+    setPayeeType(e.target.value);
+  };
 
   return (
     <Fragment>
       <P fontSize="11px" color="black.600">
         <FormattedMessage id="form.requiredFields" defaultMessage="Fields marked with (*) are mandatory." />
       </P>
+      <StyledInputField label={formatMessage(msg.accountType)} labelFontSize="13px" mt={3}>
+        <StyledCard>
+          <Fieldset onChange={changePayeeType}>
+            <Flex flexDirection={['column', 'row']} overflow="hidden">
+              <RadioOptionContainer>
+                <Box alignSelf={['center', 'baseline', null, 'center']} mr="16px">
+                  <input
+                    type="radio"
+                    name="payeeType"
+                    checked={payeeType === PAYEE_TYPE.USER}
+                    value={PAYEE_TYPE.USER}
+                    onChange={changePayeeType}
+                    data-cy="payee-type-user"
+                  />
+                </Box>
+                <Box>Personal Account</Box>
+              </RadioOptionContainer>
+              <RadioOptionContainer>
+                <Box alignSelf={['center', 'baseline', null, 'center']} mr="16px">
+                  <input
+                    type="radio"
+                    name="payeeType"
+                    checked={payeeType === PAYEE_TYPE.ORG}
+                    value={PAYEE_TYPE.ORG}
+                    onChange={changePayeeType}
+                    data-cy="payee-type-org"
+                  />
+                </Box>
+                <Box>Organization Account</Box>
+              </RadioOptionContainer>
+            </Flex>
+          </Fieldset>
+        </StyledCard>
+      </StyledInputField>
+
+      {payeeType === PAYEE_TYPE.ORG && (
+        <Fragment>
+          <Grid gridTemplateColumns={['100%', 'calc(50% - 8px) calc(50% - 8px)']} gridColumnGap={[null, 2, null, 3]}>
+            <Field name="payee.organization.name">
+              {({ field }) => (
+                <StyledInputField name={field.name} label={formatMessage(msg.orgNameLabel)} labelFontSize="13px" mt={3}>
+                  {inputProps => <StyledInput {...inputProps} {...field} placeholder="e.g., Airbnb, Salesforce" />}
+                </StyledInputField>
+              )}
+            </Field>
+            <Field name="payee.organization.slug">
+              {({ field }) => (
+                <StyledInputField
+                  mt={3}
+                  labelFontSize="13px"
+                  error={errors.payee?.organization?.slug}
+                  name={field.name}
+                  label={formatMessage(msg.orgSlugLabel)}
+                >
+                  {inputProps => <StyledInputGroup {...inputProps} {...field} prepend="opencollective.com/" />}
+                </StyledInputField>
+              )}
+            </Field>
+            <Field name="payee.organization.website">
+              {({ field }) => (
+                <StyledInputField
+                  name={field.name}
+                  label={formatMessage(msg.orgWebsiteLabel)}
+                  labelFontSize="13px"
+                  mt={3}
+                >
+                  {inputProps => <StyledInputGroup {...inputProps} {...field} prepend="http://" />}
+                </StyledInputField>
+              )}
+            </Field>
+
+            <Field name="payee.organization.description">
+              {({ field }) => (
+                <StyledInputField
+                  name={field.name}
+                  label={formatMessage(msg.orgDescriptionLabel)}
+                  labelFontSize="13px"
+                  mt={3}
+                >
+                  {inputProps => <StyledInput {...inputProps} {...field} placeholder="" />}
+                </StyledInputField>
+              )}
+            </Field>
+          </Grid>
+        </Fragment>
+      )}
+
       <Grid
         gridTemplateColumns={['100%', 'calc(50% - 8px) calc(50% - 8px)']}
         gridColumnGap={[null, 2, null, 3]}

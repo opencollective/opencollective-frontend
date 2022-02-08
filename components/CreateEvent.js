@@ -10,7 +10,7 @@ import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
 import Body from './Body';
 import CollectiveNavbar from './collective-navbar';
 import Container from './Container';
-import EditEventForm from './EditEventForm';
+import CreateEventForm from './CreateEventForm';
 import Footer from './Footer';
 import Header from './Header';
 import Link from './Link';
@@ -127,7 +127,7 @@ class CreateEvent extends React.Component {
             )}
             {canCreateEvent && (
               <div>
-                <EditEventForm
+                <CreateEventForm
                   event={this.state.event}
                   onSubmit={this.createEvent}
                   onChange={this.resetError}

@@ -8,6 +8,8 @@ import { transactionsQueryCollectionFragment } from '../../transactions/graphql/
 
 import * as fragments from './fragments';
 
+// We have to disable the linter because it's not able to detect that `nbContributorsPerContributeCard` is used in fragments
+/* eslint-disable graphql/template-strings */
 export const collectivePageQuery = gql`
   query CollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug, throwIfMissing: false) {
@@ -113,95 +115,13 @@ export const collectivePageQuery = gql`
         ...ContributorsFields
       }
       tiers {
-        id
-        name
-        slug
-        description
-        useStandalonePage
-        goal
-        interval
-        currency
-        amount
-        minimumAmount
-        button
-        amountType
-        endsAt
-        type
-        maxQuantity
-        stats {
-          id
-          availableQuantity
-          totalDonated
-          totalRecurringDonations
-          contributors {
-            id
-            all
-            users
-            organizations
-          }
-        }
-        contributors(limit: $nbContributorsPerContributeCard) {
-          id
-          image
-          collectiveSlug
-          name
-          type
-          isGuest
-        }
+        ...ContributeCardTierFields
       }
       events(includePastEvents: true, includeInactive: true) {
-        id
-        slug
-        name
-        description
-        image
-        isActive
-        startsAt
-        endsAt
-        backgroundImageUrl(height: 208)
-        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
-          id
-          image
-          collectiveSlug
-          name
-          type
-          isGuest
-        }
-        stats {
-          id
-          backers {
-            id
-            all
-            users
-            organizations
-          }
-        }
+        ...ContributeCardEventFields
       }
       projects {
-        id
-        slug
-        name
-        description
-        image
-        isActive
-        isArchived
-        backgroundImageUrl(height: 208)
-        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER]) {
-          id
-          name
-          image
-          collectiveSlug
-          type
-        }
-        stats {
-          id
-          backers {
-            id
-            all
-            users
-            organizations
-          }
-        }
+        ...ContributeCardProjectFields
       }
       connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
         id
@@ -222,11 +142,7 @@ export const collectivePageQuery = gql`
             }
           }
           contributors(limit: $nbContributorsPerContributeCard) {
-            id
-            image
-            collectiveSlug
-            name
-            type
+            ...ContributeCardContributorFields
           }
         }
       }
@@ -282,7 +198,11 @@ export const collectivePageQuery = gql`
   ${fragments.updatesFieldsFragment}
   ${fragments.contributorsFieldsFragment}
   ${fragments.collectiveNavbarFieldsFragment}
+  ${fragments.contributeCardTierFieldsFragment}
+  ${fragments.contributeCardEventFieldsFragment}
+  ${fragments.contributeCardProjectFieldsFragment}
 `;
+/* eslint-enable graphql/template-strings */
 
 export const budgetSectionQuery = gqlV2/* GraphQL */ `
   query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
@@ -293,6 +213,33 @@ export const budgetSectionQuery = gqlV2/* GraphQL */ `
       totalCount
       nodes {
         ...ExpensesListFieldsFragment
+      }
+    }
+    account(slug: $slug) {
+      id
+      stats {
+        id
+        balance {
+          valueInCents
+          currency
+        }
+        yearlyBudget {
+          valueInCents
+          currency
+        }
+        activeRecurringContributions
+        totalAmountReceived(periodInMonths: 12) {
+          valueInCents
+          currency
+        }
+        totalAmountRaised: totalAmountReceived {
+          valueInCents
+          currency
+        }
+        totalNetAmountRaised: totalNetAmountReceived {
+          valueInCents
+          currency
+        }
       }
     }
   }

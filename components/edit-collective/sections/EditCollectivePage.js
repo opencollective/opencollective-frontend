@@ -5,7 +5,8 @@ import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { cloneDeep, flatten, isEqual, set } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { useDrag, useDrop } from 'react-dnd';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -19,7 +20,6 @@ import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section
 
 import { Sections } from '../../collective-page/_constants';
 import Container from '../../Container';
-import DndProviderHTML5Backend from '../../DndProviderHTML5Backend';
 import EditCollectivePageFAQ from '../../faqs/EditCollectivePageFAQ';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
@@ -32,7 +32,7 @@ import StyledSelect from '../../StyledSelect';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
-import SettingsTitle from '../SettingsTitle';
+import SettingsSubtitle from '../SettingsSubtitle';
 
 export const getSettingsQuery = gqlV2/* GraphQL */ `
   query GetSettingsForEditCollectivePage($slug: String!) {
@@ -113,7 +113,8 @@ const CollectiveSectionEntry = ({
   });
 
   const [{ isDragging }, drag, preview] = useDrag({
-    item: { type: getItemType(parentItem), index, parentItem },
+    type: getItemType(parentItem),
+    item: { index, parentItem },
     collect: monitor => ({ isDragging: monitor.isDragging() }),
     end: onDrop,
   });
@@ -243,7 +244,8 @@ const MenuCategory = ({ item, index, collective, onMove, onDrop, onSectionToggle
   });
 
   const [{ isDragging }, drag, preview] = useDrag({
-    item: { type: getItemType(), index },
+    type: getItemType(),
+    item: { index },
     collect: monitor => ({ isDragging: monitor.isDragging() }),
     end: onDrop,
   });
@@ -298,7 +300,7 @@ MenuCategory.propTypes = {
   onSectionToggle: PropTypes.func,
 };
 
-const EditCollectivePage = ({ collective, contentOnly }) => {
+const EditCollectivePage = ({ collective }) => {
   const intl = useIntl();
   const [isDirty, setDirty] = React.useState(false);
   const [sections, setSections] = React.useState(null);
@@ -347,18 +349,13 @@ const EditCollectivePage = ({ collective, contentOnly }) => {
 
   const displayedSections = tmpSections || sections;
   return (
-    <DndProviderHTML5Backend>
-      <SettingsTitle
-        contentOnly={contentOnly}
-        subtitle={
-          <FormattedMessage
-            id="EditCollectivePage.SectionsDescription"
-            defaultMessage="Drag and drop to reorder sections. Toggle on and off with the visibility setting dropdown. Remember to click save at the bottom!"
-          />
-        }
-      >
-        <FormattedMessage id="EditCollectivePage.Sections" defaultMessage="Customize Profile Page Sections" />
-      </SettingsTitle>
+    <DndProvider backend={HTML5Backend}>
+      <SettingsSubtitle>
+        <FormattedMessage
+          id="EditCollectivePage.SectionsDescription"
+          defaultMessage="Drag and drop to reorder sections. Toggle on and off with the visibility setting dropdown. Remember to click save at the bottom!"
+        />
+      </SettingsSubtitle>
       <Flex flexWrap="wrap" mt={4}>
         <Box width="100%" maxWidth={436}>
           {loading || !displayedSections ? (
@@ -443,7 +440,7 @@ const EditCollectivePage = ({ collective, contentOnly }) => {
           <EditCollectivePageFAQ withNewButtons withBorderLeft />
         </Box>
       </Flex>
-    </DndProviderHTML5Backend>
+    </DndProvider>
   );
 };
 
@@ -452,7 +449,6 @@ EditCollectivePage.propTypes = {
     slug: PropTypes.string,
     type: PropTypes.string,
   }),
-  contentOnly: PropTypes.bool,
 };
 
 export default EditCollectivePage;

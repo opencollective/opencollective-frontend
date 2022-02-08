@@ -53,9 +53,17 @@ const CoverImage = styled.div`
     const primary = props.theme.colors.primary;
     const radial = `radial-gradient(circle, ${primary[300]} 0%, ${primary[800]} 100%), `;
     const image = props.image ? `url(${props.image}), ` : '';
+    const applyGrayscale = (isDisabled, contributionType) => {
+      if (isDisabled) {
+        return 'filter: grayscale(0.75);';
+      } else if (contributionType === ContributionTypes.EVENT_PASSED) {
+        return 'filter: grayscale(0.50);';
+      }
+    };
+
     return css`
       background: ${image} ${radial} ${primary[500]};
-      ${props.isDisabled && `filter: grayscale(0.75);`}
+      ${applyGrayscale(props.isDisabled, props.contributionType)}
     `;
   }};
 `;
@@ -128,6 +136,10 @@ const I18nContributionType = defineMessages({
     id: 'ContributionType.Project',
     defaultMessage: 'Project',
   },
+  [ContributionTypes.ARCHIVED_PROJECT]: {
+    id: 'ContributionType.ArchivedProject',
+    defaultMessage: 'Archived Project',
+  },
 });
 
 const getContributeCTA = type => {
@@ -161,6 +173,8 @@ const getFooterHeading = type => {
 const getCTAButtonStyle = type => {
   if (type === ContributionTypes.TICKET) {
     return 'secondary';
+  } else if (type === ContributionTypes.EVENT_PASSED) {
+    return 'standard';
   } else {
     return 'primary';
   }
@@ -187,7 +201,7 @@ const ContributeCard = ({
 
   return (
     <StyledContributeCard {...props}>
-      <CoverImage image={image} isDisabled={disableCTA}>
+      <CoverImage image={image} isDisabled={disableCTA} contributionType={type}>
         <StyledTag
           position="absolute"
           bottom="8px"
@@ -204,9 +218,9 @@ const ContributeCard = ({
       </CoverImage>
       <Flex px={3} py={3} flexDirection="column" justifyContent="space-between" flex="1">
         <Flex flexDirection="column" flex="1 1">
-          <P fontSize="20px" mt={1} mb={2} fontWeight="bold" data-cy="contribute-title" color="black.900">
+          <Container fontSize="20px" mt={1} mb={2} fontWeight="bold" data-cy="contribute-title" color="black.900">
             {title}
-          </P>
+          </Container>
           <Description data-cy="contribute-description">{children}</Description>
         </Flex>
         <Box>

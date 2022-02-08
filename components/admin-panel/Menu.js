@@ -49,7 +49,7 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
 
 OrganizationSettingsMenuLinks.propTypes = {
   collective: PropTypes.object,
-  isAccountantOnly: PropTypes.boolean,
+  isAccountantOnly: PropTypes.bool,
 };
 
 const Menu = ({ collective, isAccountantOnly }) => {
@@ -114,11 +114,6 @@ const Menu = ({ collective, isAccountantOnly }) => {
                 section={FISCAL_HOST_SECTIONS.HOST_PLAN}
                 if={isOneOfTypes(collective, [USER, ORGANIZATION])}
               />
-              <MenuLink
-                collective={collective}
-                section={FISCAL_HOST_SECTIONS.HOST_METRICS}
-                if={isOneOfTypes(collective, [USER, ORGANIZATION])}
-              />
             </MenuGroup>
           </SubMenu>
         </MenuGroup>
@@ -172,7 +167,11 @@ const Menu = ({ collective, isAccountantOnly }) => {
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.VIRTUAL_CARDS}
-            if={isOneOfTypes(collective, [COLLECTIVE, FUND]) && hasFeature(collective.host, FEATURES.PRIVACY_VCC)}
+            if={
+              isOneOfTypes(collective, [COLLECTIVE, FUND]) &&
+              hasFeature(collective.host, FEATURES.PRIVACY_VCC) &&
+              collective.isApproved
+            }
           />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.TICKETS} if={isType(collective, EVENT)} />
           <MenuLink
@@ -216,6 +215,7 @@ Menu.propTypes = {
       USE_PAYMENT_METHODS: PropTypes.string,
       EMIT_GIFT_CARDS: PropTypes.string,
     }),
+    isApproved: PropTypes.bool,
   }),
 };
 

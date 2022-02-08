@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
+import { get } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -21,6 +22,8 @@ import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Flex } from '../Grid';
+import Link from '../Link';
+import LinkCollective from '../LinkCollective';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
@@ -75,10 +78,10 @@ const addFundsMutation = gqlV2/* GraphQL */ `
   mutation AddFunds(
     $fromAccount: AccountReferenceInput!
     $account: AccountReferenceInput!
+    $tier: TierReferenceInput
     $amount: AmountInput!
     $description: String!
     $hostFeePercent: Float!
-    $platformFeePercent: Float
   ) {
     addFunds(
       account: $account
@@ -86,23 +89,71 @@ const addFundsMutation = gqlV2/* GraphQL */ `
       amount: $amount
       description: $description
       hostFeePercent: $hostFeePercent
-      platformFeePercent: $platformFeePercent
+      tier: $tier
     ) {
       id
+      description
       transactions {
         id
         type
       }
+      fromAccount {
+        id
+        slug
+        name
+      }
       toAccount {
         id
+        slug
+        name
         stats {
           balance {
             valueInCents
           }
         }
       }
+      tier {
+        id
+        legacyId
+        slug
+        name
+      }
     }
   }
+`;
+
+const addFundsTierFieldsFragment = gqlV2/* GraphQL */ `
+  fragment AddFundsTierFields on Tier {
+    id
+    slug
+    legacyId
+    name
+  }
+`;
+
+const addFundsAccountQuery = gqlV2/* GraphQL */ `
+  query AddFundsAccount($slug: String!) {
+    account(slug: $slug) {
+      id
+      type
+      settings
+      ... on Organization {
+        tiers {
+          nodes {
+            ...AddFundsTierFields
+          }
+        }
+      }
+      ... on AccountWithContributions {
+        tiers {
+          nodes {
+            ...AddFundsTierFields
+          }
+        }
+      }
+    }
+  }
+  ${addFundsTierFieldsFragment}
 `;
 
 const addPlatformTipMutation = gqlV2/* GraphQL */ `
@@ -116,9 +167,9 @@ const addPlatformTipMutation = gqlV2/* GraphQL */ `
 const getInitialValues = values => ({
   amount: null,
   hostFeePercent: null,
-  platformFeePercent: 0,
   description: '',
   fromAccount: null,
+  tier: null,
   ...values,
 });
 
@@ -172,6 +223,23 @@ const getOptions = (amount, currency, intl) => {
   ];
 };
 
+const getTiersOptions = (intl, tiers) => {
+  if (!tiers) {
+    return [];
+  }
+
+  return [
+    {
+      value: null,
+      label: intl.formatMessage({ defaultMessage: 'No tier' }),
+    },
+    ...tiers.map(tier => ({
+      value: tier,
+      label: `#${tier.legacyId} - ${tier.name}`,
+    })),
+  ];
+};
+
 const AddFundsModal = ({ host, collective, ...props }) => {
   const { LoggedInUser } = useUser();
   const [fundDetails, setFundDetails] = useState({});
@@ -195,8 +263,11 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   };
   const [selectedOption, setSelectedOption] = useState(options[3]);
   const [customAmount, setCustomAmount] = useState(0);
-
-  const [submitAddFunds, { data, error: fundError }] = useMutation(addFundsMutation, {
+  const { data, loading } = useQuery(addFundsAccountQuery, {
+    context: API_V2_CONTEXT,
+    variables: { slug: collective.slug },
+  });
+  const [submitAddFunds, { data: addFundsResponse, error: fundError }] = useMutation(addFundsMutation, {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
@@ -213,18 +284,22 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     context: API_V2_CONTEXT,
   });
 
+  const tiersNodes = get(data, 'account.tiers.nodes');
+  const accountSettings = get(data, 'account.settings');
+  const tiersOptions = React.useMemo(
+    () => getTiersOptions(intl, tiersNodes, accountSettings),
+    [tiersNodes, accountSettings],
+  );
+
+  // No modal if logged-out
+  if (!LoggedInUser) {
+    return null;
+  }
+
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
   const canAddHostFee = host.plan?.hostFees && collective.id !== host.id;
   const defaultHostFeePercent = canAddHostFee && collective.hostFeePercent ? collective.hostFeePercent : 0;
-
-  // We don't want to use Platform Fees anymore for Hosts that switched to the new model
-  const canAddPlatformFee = LoggedInUser.isRoot() && host.plan?.hostFeeSharePercent === 0;
-  const defaultPlatformFeePercent = 0;
-
-  if (!LoggedInUser) {
-    return null;
-  }
 
   const handleClose = () => {
     setFundDetails({ showPlatformTipModal: false });
@@ -248,23 +323,27 @@ const AddFundsModal = ({ host, collective, ...props }) => {
         validate={validate}
         onSubmit={async values => {
           if (!fundDetails.showPlatformTipModal) {
-            await submitAddFunds({
+            const result = await submitAddFunds({
               variables: {
                 ...values,
                 amount: { valueInCents: values.amount },
                 platformTip: { valueInCents: 0 },
                 fromAccount: buildAccountReference(values.fromAccount),
                 account: buildAccountReference(values.account),
+                tier: !values.tier ? null : { id: values.tier.id },
               },
             });
+
+            const resultOrder = result.data.addFunds;
             setFundDetails({
               showPlatformTipModal: true,
               fundAmount: values.amount,
-              description: values.description,
-              source: values.fromAccount.name,
+              description: resultOrder.description,
+              source: resultOrder.fromAccount,
+              tier: resultOrder.tier,
             });
           } else if (selectedOption.value !== 0) {
-            const creditTransaction = data.addFunds.transactions.filter(
+            const creditTransaction = addFundsResponse.addFunds.transactions.filter(
               transaction => transaction.type === 'CREDIT',
             )[0];
             await addPlatformTip({
@@ -284,13 +363,9 @@ const AddFundsModal = ({ host, collective, ...props }) => {
           }
         }}
       >
-        {({ values, isSubmitting, isValid, dirty }) => {
+        {({ values, isSubmitting }) => {
           const hostFeePercent = isNaN(values.hostFeePercent) ? defaultHostFeePercent : values.hostFeePercent;
-          const platformFeePercent = isNaN(values.platformFeePercent)
-            ? defaultPlatformFeePercent
-            : values.platformFeePercent;
           const hostFee = Math.round(values.amount * (hostFeePercent / 100));
-          const platformFee = Math.round(values.amount * (platformFeePercent / 100));
 
           const defaultSources = [];
           defaultSources.push({ value: host, label: <DefaultCollectiveLabel value={host} /> });
@@ -300,7 +375,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
 
           if (!fundDetails.showPlatformTipModal) {
             return (
-              <Form>
+              <Form data-cy="add-funds-form">
                 <h3>
                   <FormattedMessage id="AddFundsModal.SubHeading" defaultMessage="Add Funds to the Collective" />
                 </h3>
@@ -322,6 +397,28 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                         onBlur={() => form.setFieldTouched(field.name, true)}
                         customOptions={defaultSources}
                         onChange={({ value }) => form.setFieldValue(field.name, value)}
+                      />
+                    )}
+                  </StyledInputFormikField>
+                  <StyledInputFormikField
+                    name="tier"
+                    htmlFor="addFunds-tier"
+                    label={<FormattedMessage defaultMessage="Tier" />}
+                    mt={3}
+                  >
+                    {({ form, field }) => (
+                      <StyledSelect
+                        inputId={field.id}
+                        data-cy="add-funds-tier"
+                        error={field.error}
+                        onBlur={() => form.setFieldTouched(field.name, true)}
+                        onChange={({ value }) => form.setFieldValue(field.name, value)}
+                        isLoading={loading}
+                        options={tiersOptions}
+                        isSearchable={options.length > 10}
+                        value={tiersOptions.find(option =>
+                          !values.tier ? option.value === null : option.value?.id === values.tier.id,
+                        )}
                       />
                     )}
                   </StyledInputFormikField>
@@ -390,26 +487,6 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       </StyledInputFormikField>
                     )}
                   </Flex>
-                  {canAddPlatformFee && (
-                    <Flex mt={3} flexWrap="wrap">
-                      <StyledInputFormikField
-                        name="platformFeePercent"
-                        htmlFor="addFunds-platformFeePercent"
-                        label={<FormattedMessage id="PlatformFee" defaultMessage="Platform fee" />}
-                      >
-                        {({ form, field }) => (
-                          <StyledInputPercentage
-                            id={field.id}
-                            placeholder="0"
-                            value={field.value}
-                            error={field.error}
-                            onChange={value => form.setFieldValue(field.name, value)}
-                            onBlur={() => form.setFieldTouched(field.name, true)}
-                          />
-                        )}
-                      </StyledInputFormikField>
-                    </Flex>
-                  )}
                   <P fontSize="14px" lineHeight="17px" fontWeight="500" mt={4}>
                     <FormattedMessage id="Details" defaultMessage="Details" />
                   </P>
@@ -432,22 +509,9 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       }
                     />
                   )}
-                  {canAddPlatformFee && (
-                    <AmountDetailsLine
-                      value={platformFee}
-                      currency={collective.currency}
-                      label={
-                        <FormattedMessage
-                          id="AddFundsModal.platformFees"
-                          defaultMessage="Platform fees ({platformFees})"
-                          values={{ platformFees: `${platformFeePercent}%` }}
-                        />
-                      }
-                    />
-                  )}
                   <StyledHr my={2} borderColor="black.300" />
                   <AmountDetailsLine
-                    value={values.amount - hostFee - platformFee}
+                    value={values.amount - hostFee}
                     currency={collective.currency}
                     label={
                       <FormattedMessage
@@ -475,7 +539,6 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       mx={2}
                       mb={1}
                       minWidth={120}
-                      disabled={!dirty || !isValid}
                       loading={isSubmitting}
                     >
                       <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
@@ -503,12 +566,26 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                         </li>
                         <li>
                           <FormattedMessage id="AddFundsModal.FromTheSource" defaultMessage="From the source" />{' '}
-                          <strong>{fundDetails.source}</strong>
+                          <strong>
+                            <LinkCollective collective={fundDetails.source} />
+                          </strong>
                         </li>
                         <li>
                           <FormattedMessage id="AddFundsModal.ForThePurpose" defaultMessage="For the purpose of" />{' '}
                           <strong>{fundDetails.description}</strong>
                         </li>
+                        {fundDetails.tier && (
+                          <li>
+                            <FormattedMessage defaultMessage="For the tier" />{' '}
+                            <StyledLink
+                              as={Link}
+                              openInNewTab
+                              href={`/${collective.slug}/contribute/${fundDetails.tier.slug}-${fundDetails.tier.legacyId}`}
+                            >
+                              <strong>{fundDetails.tier.name}</strong>
+                            </StyledLink>
+                          </li>
+                        )}
                       </ul>
                     </Container>
                     <Container pb={2}>
@@ -613,7 +690,6 @@ AddFundsModal.propTypes = {
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     currency: PropTypes.string,
     hostFeePercent: PropTypes.number,
-    platformFeePercent: PropTypes.number,
     slug: PropTypes.string,
   }).isRequired,
   onClose: PropTypes.func,

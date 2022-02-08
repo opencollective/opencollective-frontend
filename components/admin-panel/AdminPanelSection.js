@@ -15,12 +15,7 @@ import NotFound from '../NotFound';
 
 import AccountSettings from './sections/AccountSettings';
 import FinancialContributions from './sections/FinancialContributions';
-import {
-  ALL_SECTIONS,
-  HOST_DASHBOARD_SECTIONS,
-  LEGACY_COLLECTIVE_SETTINGS_SECTIONS,
-  SECTION_LABELS,
-} from './constants';
+import { HOST_DASHBOARD_SECTIONS, LEGACY_COLLECTIVE_SETTINGS_SECTIONS, SECTION_LABELS } from './constants';
 
 const HOST_ADMIN_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
@@ -35,9 +30,6 @@ const Title = styled(Box)`
   font-weight: 700;
   line-height: 32px;
 `;
-
-// Some sections include their own title
-const IGNORED_SECTION_TITLES = [ALL_SECTIONS.FINANCIAL_CONTRIBUTIONS, ALL_SECTIONS.HOST];
 
 const AdminPanelSection = ({ collective, isLoading, section }) => {
   const { formatMessage } = useIntl();
@@ -65,7 +57,7 @@ const AdminPanelSection = ({ collective, isLoading, section }) => {
   if (values(LEGACY_COLLECTIVE_SETTINGS_SECTIONS).includes(section)) {
     return (
       <Container width="100%">
-        {SECTION_LABELS[section] && !IGNORED_SECTION_TITLES.includes(section) && (
+        {SECTION_LABELS[section] && (
           <Box mb={3}>
             <Title>{formatMessage(SECTION_LABELS[section])}</Title>
           </Box>

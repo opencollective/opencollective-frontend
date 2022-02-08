@@ -8,6 +8,7 @@ import Container from './Container';
 import Footer from './Footer';
 import Header from './Header';
 import HostsWithData from './HostsWithData';
+import Link from './Link';
 import { H1, P } from './Text';
 
 const CoverSmallCTA = styled.span`
@@ -31,15 +32,6 @@ class Hosts extends React.Component {
         id: 'hosts.title',
         defaultMessage: 'Open Collective Hosts',
       },
-      'hosts.description': {
-        id: 'hosts.description',
-        defaultMessage:
-          'Fiscal Hosts hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. {findOutMoreLink}',
-      },
-      'hosts.findOutMoreLink': {
-        id: 'hosts.description.findOutMoreLink',
-        defaultMessage: 'Find out more about becoming a Fiscal Host.',
-      },
     });
   }
 
@@ -47,14 +39,6 @@ class Hosts extends React.Component {
     const { LoggedInUser, intl } = this.props;
 
     const title = intl.formatMessage(this.messages['hosts.title']);
-
-    const findOutMoreMessage = intl.formatMessage(this.messages['hosts.findOutMoreLink']);
-
-    const findOutMoreLink = (
-      <CoverSmallCTA>
-        <a href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host">{findOutMoreMessage}</a>
-      </CoverSmallCTA>
-    );
 
     return (
       <Container>
@@ -68,8 +52,30 @@ class Hosts extends React.Component {
             <P textAlign="center">
               <FormattedMessage
                 id="hosts.description"
-                defaultMessage="Fiscal Hosts hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. {findOutMoreLink}"
-                values={{ findOutMoreLink }}
+                defaultMessage="<FiscalHostingLink>Fiscal Hosts</FiscalHostingLink> hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. <FindOutMoreLink>Find out more</FindOutMoreLink> about <BecomingAHostLink>becoming a Fiscal Host</BecomingAHostLink>."
+                values={{
+                  FiscalHostingLink: msg => (
+                    <CoverSmallCTA>
+                      <Link href="/fiscal-hosting">{msg}</Link>
+                    </CoverSmallCTA>
+                  ),
+                  FindOutMoreLink: msg => (
+                    <CoverSmallCTA>
+                      <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host"
+                      >
+                        {msg}
+                      </a>
+                    </CoverSmallCTA>
+                  ),
+                  BecomingAHostLink: msg => (
+                    <CoverSmallCTA>
+                      <Link href="/become-a-host">{msg}</Link>
+                    </CoverSmallCTA>
+                  ),
+                }}
               />
             </P>
           </Container>

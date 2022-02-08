@@ -79,6 +79,7 @@ DefaultCollectiveLabel.propTypes = {
     name: PropTypes.string,
     slug: PropTypes.string,
     imageUrl: PropTypes.string,
+    email: PropTypes.string,
   }),
 };
 

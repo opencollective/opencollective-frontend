@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
+import { getCollectivePageRoute } from '../lib/url-helpers';
 import { compose } from '../lib/utils';
 
 import Body from '../components/Body';
@@ -103,7 +104,7 @@ class CreateUpdatePage extends React.Component {
         ],
       });
       this.setState({ isModified: false });
-      return this.props.router.push(`/${account.slug}/updates/${res.data.createUpdate.slug}`);
+      return this.props.router.push(`${getCollectivePageRoute(account)}/updates/${res.data.createUpdate.slug}`);
     } catch (e) {
       this.setState({ status: 'error', error: e.message });
     }

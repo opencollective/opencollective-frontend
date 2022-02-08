@@ -187,7 +187,6 @@ class CollectivePage extends Component {
             collective={this.props.collective}
             transactions={this.props.transactions}
             expenses={this.props.expenses}
-            stats={this.props.stats}
           />
         );
       case Sections.TRANSACTIONS:

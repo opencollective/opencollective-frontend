@@ -1,12 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isNil, isUndefined } from 'lodash';
+import { useIntl } from 'react-intl';
 
+import { Currency } from '../lib/constants/currency';
 import { floatAmountToCents, getCurrencySymbol } from '../lib/currency-utils';
 
+import Container from './Container';
+import { Box } from './Grid';
 import StyledInputGroup from './StyledInputGroup';
+import StyledSelect from './StyledSelect';
 
-const getPrepend = (currency, currencyDisplay) => {
+const formatCurrencyName = (currency, currencyDisplay) => {
   if (currencyDisplay === 'SYMBOL') {
     return getCurrencySymbol(currency);
   } else if (currencyDisplay === 'CODE') {
@@ -38,6 +43,34 @@ const getError = (curVal, minAmount, required) => {
   return Boolean((required && isNil(curVal)) || (minAmount && curVal < minAmount));
 };
 
+const CurrencyPicker = ({ availableCurrencies, value, onChange }) => {
+  const intl = useIntl();
+  return (
+    <StyledSelect
+      placeholder={intl.formatMessage({ id: 'Currency', defaultMessage: 'Currency' })}
+      isSearchable={availableCurrencies.length > 10}
+      options={availableCurrencies.map(value => ({ label: value, value }))}
+      value={!value ? null : { value, label: <Box minWidth={200}>{value}</Box> }}
+      width={90}
+      onChange={({ value }) => onChange(value)}
+      onInputChange={inputValue => (inputValue.length <= 3 ? inputValue : inputValue.substr(0, 3))} // Limit search length to 3 characters
+      styles={{
+        control: {
+          border: 'none',
+          background: '#F7F8FA',
+        },
+      }}
+    />
+  );
+};
+
+CurrencyPicker.propTypes = {
+  /** A list of currencies presented in the currency picker */
+  availableCurrencies: PropTypes.arrayOf(PropTypes.string).isRequired,
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.string,
+};
+
 /**
  * An input for amount inputs. Accepts all props from [StyledInputGroup](/#!/StyledInputGroup).
  */
@@ -52,6 +85,9 @@ const StyledInputAmount = ({
   onBlur,
   onChange,
   isEmpty,
+  hasCurrencyPicker,
+  onCurrencyChange,
+  availableCurrencies,
   ...props
 }) => {
   const [rawValue, setRawValue] = React.useState(value || defaultValue || '');
@@ -82,12 +118,21 @@ const StyledInputAmount = ({
       {...props}
       min={minAmount}
       max={isUndefined(max) ? max : max / 100}
-      prepend={getPrepend(currency, currencyDisplay)}
       type="number"
       inputMode="decimal"
-      error={getError(curValue, minAmount, props.required)}
+      error={props.error || getError(curValue, minAmount, props.required)}
       defaultValue={isUndefined(defaultValue) ? undefined : defaultValue / 100}
       value={curValue}
+      prependProps={!hasCurrencyPicker ? undefined : { p: 0 }}
+      prepend={
+        !hasCurrencyPicker ? (
+          formatCurrencyName(currency, currencyDisplay)
+        ) : (
+          <Container bgColor="black.50">
+            <CurrencyPicker onChange={onCurrencyChange} value={currency} availableCurrencies={availableCurrencies} />
+          </Container>
+        )
+      }
       onWheel={e => {
         e.preventDefault();
         e.target.blur();
@@ -121,7 +166,9 @@ const StyledInputAmount = ({
 StyledInputAmount.propTypes = {
   /** The currency (eg. `USD`, `EUR`...) */
   currency: PropTypes.string.isRequired,
-  /** OnChange function. Gets passed the amount in cents as first param, and the event as second param. */
+  /** Gets passed the new currency. Only when hasCurrencyPicker is true */
+  onCurrencyChange: PropTypes.func,
+  /** Gets passed the amount in cents as first param, and the event as second param. */
   onChange: PropTypes.func,
   /** OnChange function */
   onBlur: PropTypes.func,
@@ -131,12 +178,16 @@ StyledInputAmount.propTypes = {
   max: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   /** Value */
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** Currency style */
+  /** Currency style. If hasCurrencyPicker is true, `CODE` will be enforced. */
   currencyDisplay: PropTypes.oneOf(['SYMBOL', 'CODE', 'FULL']),
   /** Number of decimals */
   precision: PropTypes.number,
   /** A special prop to force the empty state */
   isEmpty: PropTypes.bool,
+  /** To enable the currency picker */
+  hasCurrencyPicker: PropTypes.bool,
+  /** A list of currencies presented in the currency picker */
+  availableCurrencies: PropTypes.arrayOf(PropTypes.string),
   /** Accept all PropTypes from `StyledInputGroup` */
   ...StyledInputGroup.propTypes,
 };
@@ -147,6 +198,7 @@ StyledInputAmount.defaultProps = {
   precision: 2,
   currencyDisplay: 'SYMBOL',
   name: 'amount',
+  availableCurrencies: Currency,
 };
 
 export default StyledInputAmount;

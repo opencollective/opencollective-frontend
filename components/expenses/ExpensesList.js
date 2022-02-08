@@ -48,7 +48,6 @@ const ExpensesList = ({
     return null;
   }
 
-  const totalAmount = sumBy(expenses, 'amount');
   return (
     <StyledCard>
       {isLoading ? (
@@ -92,7 +91,11 @@ const ExpensesList = ({
                   <FormattedMessage id="expense.page.total" defaultMessage="Page Total" />:
                 </FooterLabel>
                 <FooterLabel color="black.500">
-                  <FormattedMoneyAmount amount={totalAmount} currency={collective?.currency} precision={2} />
+                  <FormattedMoneyAmount
+                    amount={sumBy(expenses, 'amount')}
+                    currency={collective?.currency || host?.currency}
+                    precision={2}
+                  />
                 </FooterLabel>
               </Box>
               <P fontSize="12px" color="black.600">

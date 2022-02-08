@@ -35,23 +35,19 @@ exports.REWRITES = [
     destination: '/recurring-contributions-redirect',
   },
   {
-    source: '/recurring-contributions',
-    destination: '/recurring-contributions-redirect',
-  },
-  {
     source: '/organizations/new',
     destination: '/createOrganization',
   },
   {
-    source: '/:collectiveSlug/updates',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates',
     destination: '/updates',
   },
   {
-    source: '/:collectiveSlug/updates/new',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/new',
     destination: '/createUpdate',
   },
   {
-    source: '/:collectiveSlug/updates/:updateSlug',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/:updateSlug',
     destination: '/update',
   },
   {
@@ -109,14 +105,6 @@ exports.REWRITES = [
   {
     source: '/:parentCollectiveSlug/projects/(new|create)',
     destination: '/create-project',
-  },
-  {
-    source: '/:parentCollectiveSlug/events/:eventSlug/edit/:section?',
-    destination: '/editEvent',
-  },
-  {
-    source: '/:slug/edit/:section?',
-    destination: '/editCollective',
   },
   {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?',
@@ -272,6 +260,10 @@ exports.REWRITES = [
     destination: '/recurring-contributions',
   },
   {
+    source: '/recurring-contributions',
+    destination: '/recurring-contributions',
+  },
+  {
     source: '/:slug/subscriptions',
     destination: '/recurring-contributions',
   },
@@ -338,7 +330,7 @@ exports.REWRITES = [
   },
   // Root actions
   {
-    source: '/opencollective/root-actions',
+    source: '/opencollective/root-actions/:section?',
     destination: '/root-actions',
   },
   // Terms of services for the host

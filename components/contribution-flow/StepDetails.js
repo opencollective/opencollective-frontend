@@ -32,7 +32,7 @@ const getCustomFields = (collective, tier) => {
   return [...(tier?.customFields || []), ...(collective.host?.settings?.contributionFlow?.customFields || [])];
 };
 
-const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }) => {
+const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, isEmbed }) => {
   const intl = useIntl();
   const amount = data?.amount;
   const getDefaultOtherAmountSelected = () => isNil(amount) || !presets?.includes(amount);
@@ -219,6 +219,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
             interval={data?.interval}
             quantity={data?.quantity}
             onChange={value => dispatchChange('platformContribution', value)}
+            isEmbed={isEmbed}
           />
         </Box>
       )}
@@ -253,6 +254,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router }
 StepDetails.propTypes = {
   onChange: PropTypes.func,
   showFeesOnTop: PropTypes.bool,
+  isEmbed: PropTypes.bool,
   LoggedInUser: PropTypes.object,
   data: PropTypes.shape({
     amount: PropTypes.number,

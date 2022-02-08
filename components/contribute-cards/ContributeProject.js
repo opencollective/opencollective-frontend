@@ -17,7 +17,7 @@ const ContributeProject = ({ collective, project, ...props }) => {
   return (
     <Contribute
       route={`/${collective.slug}/projects/${project.slug}`}
-      type={ContributionTypes.PROJECT}
+      type={project.isArchived ? ContributionTypes.ARCHIVED_PROJECT : ContributionTypes.PROJECT}
       contributors={project.contributors}
       stats={project.stats.backers}
       image={project.backgroundImageUrl}
@@ -44,6 +44,7 @@ ContributeProject.propTypes = {
     stats: PropTypes.shape({
       backers: PropTypes.object,
     }).isRequired,
+    isArchived: PropTypes.bool,
   }),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,

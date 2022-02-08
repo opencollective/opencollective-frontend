@@ -52,7 +52,7 @@ const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps })
     }
   }
   return (
-    <StyledAvatar size={radius} type={type} src={src} {...styleProps}>
+    <StyledAvatar size={radius} type={type} src={src} title={name} {...styleProps}>
       {!src && type === 'USER' && name && <span>{getInitials(name)}</span>}
     </StyledAvatar>
   );

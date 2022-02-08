@@ -18,7 +18,7 @@ import StyledInputField from '../../StyledInputField';
 import StyledInputGroup from '../../StyledInputGroup';
 import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
-import SettingsTitle from '../SettingsTitle';
+import SettingsSubtitle from '../SettingsSubtitle';
 
 const BORDER = '1px solid #efefef';
 const getInterpolationOption = value => ({ label: startCase(value), value });
@@ -34,7 +34,6 @@ class CollectiveGoals extends React.Component {
     intl: PropTypes.object.isRequired,
     editCollectiveSettings: PropTypes.func.isRequired,
     title: PropTypes.string,
-    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -237,17 +236,12 @@ class CollectiveGoals extends React.Component {
     return (
       <Container>
         <Container borderBottom={BORDER} mb={4} pb={4}>
-          <SettingsTitle
-            contentOnly={this.props.contentOnly}
-            subtitle={
-              <FormattedMessage
-                id="EditGoals.Instructions"
-                defaultMessage="You can define custom goals to motivate contributors and track your progress. Goals appear in automated email notifications to your contributors. You can also choose to display them on your Collective by ticking the box below."
-              />
-            }
-          >
-            <FormattedMessage id="Goals" defaultMessage="Goals" />
-          </SettingsTitle>
+          <SettingsSubtitle>
+            <FormattedMessage
+              id="EditGoals.Instructions"
+              defaultMessage="You can define custom goals to motivate contributors and track your progress. Goals appear in automated email notifications to your contributors. You can also choose to display them on your Collective by ticking the box below."
+            />
+          </SettingsSubtitle>
           <Container mt={4}>
             <StyledCheckbox
               name="show-on-collective-page"

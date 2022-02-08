@@ -1836,14 +1836,10 @@ type Order {
   paymentMethod: PaymentMethod
 
   """
-  Platform contribution attached to the Order.
-  """
-  platformContributionAmount: Amount @deprecated(reason: "2021-06-07: Please use platformTipAmount")
-
-  """
   Platform Tip attached to the Order.
   """
   platformTipAmount: Amount
+  platformTipEligible: Boolean
   tags: [String]!
   taxes: [OrderTax]!
 
@@ -2867,6 +2863,11 @@ type AccountStats {
     Calculate total amount received after this date
     """
     dateFrom: DateTime
+
+    """
+    Computes contributions from the last x months. Cannot be used with startDate/endDate
+    """
+    periodInMonths: Int
   ): Amount!
 
   """
@@ -2895,6 +2896,12 @@ type AccountStats {
   ): Amount!
   yearlyBudget: Amount!
   yearlyBudgetManaged: Amount!
+
+  """
+  Total net amount received
+  """
+  totalNetAmountReceived: Amount!
+  activeRecurringContributions: JSON
 }
 
 """
@@ -2982,6 +2989,11 @@ enum UpdateAudience {
   Will be sent to financial contributors
   """
   FINANCIAL_CONTRIBUTORS
+
+  """
+  Will be sent to no one
+  """
+  NO_ONE
 }
 
 """
@@ -3016,6 +3028,7 @@ type CollectiveFeatures {
   PROJECTS: CollectiveFeatureStatus
   USE_EXPENSES: CollectiveFeatureStatus
   RECEIVE_EXPENSES: CollectiveFeatureStatus
+  MULTI_CURRENCY_EXPENSES: CollectiveFeatureStatus
   RECEIVE_HOST_APPLICATIONS: CollectiveFeatureStatus
   COLLECTIVE_GOALS: CollectiveFeatureStatus
   TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
@@ -4953,8 +4966,6 @@ type Individual implements Account {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  firstName: String @deprecated(reason: "2020-10-12: Use the name field")
-  lastName: String @deprecated(reason: "2020-10-12: Use the name field")
   email: String
   isGuest: Boolean!
   isFollowingConversation(id: String!): Boolean!
@@ -6060,6 +6071,11 @@ type Query {
     includeHostedAccounts: Boolean
 
     """
+    Whether to include incognito orders. Must be admin or root
+    """
+    includeIncognito: Boolean = false
+
+    """
     Account orders filter (INCOMING or OUTGOING)
     """
     filter: AccountOrdersFilter
@@ -6346,6 +6362,11 @@ input TierReferenceInput {
   The DB id assigned to the Tier
   """
   legacyId: Int
+
+  """
+  Pass this flag to reference the custom tier (/donate)
+  """
+  isCustom: Boolean
 }
 
 """
@@ -6385,6 +6406,7 @@ type Mutation {
   addFunds(
     fromAccount: AccountReferenceInput!
     account: AccountReferenceInput!
+    tier: TierReferenceInput
     amount: AmountInput!
     description: String!
     hostFeePercent: Float!
@@ -6946,6 +6968,31 @@ type Mutation {
   A mutation for the host to approve or reject an order
   """
   processPendingOrder(order: OrderUpdateInput!, action: ProcessOrderAction!): Order!
+
+  """
+  A mutation for root users to move orders from one account to another
+  """
+  moveOrders(
+    """
+    The orders to move
+    """
+    orders: [OrderReferenceInput!]!
+
+    """
+    The account to move the orders to. Set to null to keep existing
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    The tier to move the orders to. Set to null to keep existing. Pass { id: "custom" } to reference the custom tier (/donate)
+    """
+    tier: TierReferenceInput
+
+    """
+    If true, the orders will be moved to the incognito account of "fromAccount"
+    """
+    makeIncognito: Boolean
+  ): [Order]!
 
   """
   Add a new payment method to be used with an Order
@@ -8093,6 +8140,11 @@ input ExpenseCreateInput {
   Longer text to attach to the expense
   """
   longDescription: String
+
+  """
+  Currency that should be used for the payout. Defaults to the account currency
+  """
+  currency: Currency
 
   """
   Tags associated to the expense (ie. Food, Engineering...)
@@ -9471,6 +9523,11 @@ input ExpenseUpdateInput {
   longDescription: String
 
   """
+  Currency that should be used for the payout. Defaults to the account currency
+  """
+  currency: Currency
+
+  """
   Tags associated to the expense (ie. Food, Engineering...)
   """
   tags: [String]
@@ -9598,7 +9655,7 @@ enum ExpenseProcessAction {
   REJECT
 
   """
-  To mark the expense as rejected
+  To mark the expense as unpaid (marks the transaction as refunded)
   """
   MARK_AS_UNPAID
 
@@ -9721,6 +9778,14 @@ input ExpenseInvitee {
   name: String
   email: String
   isInvite: Boolean
+  organization: ExpenseInviteeOrganizationInput
+}
+
+input ExpenseInviteeOrganizationInput {
+  description: String
+  name: String
+  slug: String
+  website: String
 }
 
 type EmojiReactionResponse {
@@ -9899,11 +9964,6 @@ input OrderCreateInput {
   The payment method used for this order
   """
   paymentMethod: PaymentMethodInput
-
-  """
-  Platform contribution attached to this order
-  """
-  platformContributionAmount: AmountInput @deprecated(reason: "2021-12-17: Use platformTipAmount")
 
   """
   Platform tip attached to this order

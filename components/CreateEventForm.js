@@ -12,7 +12,7 @@ import InputField from './InputField';
 import StyledButton from './StyledButton';
 import TimezonePicker from './TimezonePicker';
 
-class EditEventForm extends React.Component {
+class CreateEventForm extends React.Component {
   static propTypes = {
     event: PropTypes.object,
     loading: PropTypes.bool,
@@ -272,4 +272,4 @@ class EditEventForm extends React.Component {
   }
 }
 
-export default injectIntl(EditEventForm);
+export default injectIntl(CreateEventForm);

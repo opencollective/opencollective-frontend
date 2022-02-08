@@ -7,6 +7,7 @@ import styled, { css } from 'styled-components';
 
 import { EMPTY_ARRAY } from '../../../lib/constants/utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import { DebitItem } from '../../budget/DebitCreditList';
 import ExpenseBudgetItem from '../../budget/ExpenseBudgetItem';
@@ -46,6 +47,33 @@ export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
       totalCount
       nodes {
         ...ExpensesListFieldsFragment
+      }
+    }
+    account(slug: $slug) {
+      id
+      stats {
+        id
+        balance {
+          valueInCents
+          currency
+        }
+        yearlyBudget {
+          valueInCents
+          currency
+        }
+        activeRecurringContributions
+        totalAmountReceived(periodInMonths: 12) {
+          valueInCents
+          currency
+        }
+        totalAmountRaised: totalAmountReceived {
+          valueInCents
+          currency
+        }
+        totalNetAmountRaised: totalNetAmountReceived {
+          valueInCents
+          currency
+        }
       }
     }
   }
@@ -100,7 +128,7 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions }) => {
   const isFilterAll = filter === 'all';
   if (filter === 'expenses' || (isFilterAll && hasExpenses && !hasTransactions)) {
     return (
-      <Link href={`/${collective.slug}/expenses`} data-cy="view-all-expenses-link">
+      <Link href={`${getCollectivePageRoute(collective)}/expenses`} data-cy="view-all-expenses-link">
         <span>
           <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
           &rarr;
@@ -109,7 +137,7 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions }) => {
     );
   } else if (filter === 'transactions' || (isFilterAll && hasTransactions && !hasExpenses)) {
     return (
-      <Link href={`/${collective.slug}/transactions`} data-cy="view-all-transactions-link">
+      <Link href={`${getCollectivePageRoute(collective)}/transactions`} data-cy="view-all-transactions-link">
         <FormattedMessage id="CollectivePage.SectionBudget.ViewAll" defaultMessage="View all transactions" /> &rarr;
       </Link>
     );
@@ -126,10 +154,10 @@ ViewAllLink.propTypes = {
 };
 
 /**
- * The budget section. Shows the expenses, the latests transactions and some statistics
+ * The budget section. Shows the expenses, the latest transactions and some statistics
  * abut the global budget of the collective.
  */
-const SectionBudget = ({ collective, stats, LoggedInUser }) => {
+const SectionBudget = ({ collective, LoggedInUser }) => {
   const [filter, setFilter] = React.useState('all');
   const budgetQuery = collective.host ? budgetSectionWithHostQuery : budgetSectionQuery;
   const budgetQueryResult = useQuery(budgetQuery, {
@@ -221,7 +249,11 @@ const SectionBudget = ({ collective, stats, LoggedInUser }) => {
           mb={2}
           mx={[null, null, 3]}
         >
-          <BudgetStats collective={collective} stats={stats} />
+          {isLoading ? (
+            <LoadingPlaceholder height={300} />
+          ) : (
+            <BudgetStats collective={collective} stats={data?.account?.stats} />
+          )}
         </StyledCard>
       </Flex>
     </ContainerSectionContent>
@@ -238,15 +270,6 @@ SectionBudget.propTypes = {
     isArchived: PropTypes.bool,
     settings: PropTypes.object,
     host: PropTypes.object,
-  }),
-
-  /** Stats */
-  stats: PropTypes.shape({
-    balance: PropTypes.number.isRequired,
-    yearlyBudget: PropTypes.number.isRequired,
-    activeRecurringContributions: PropTypes.object,
-    totalAmountReceived: PropTypes.number,
-    totalAmountRaised: PropTypes.number,
   }),
 
   LoggedInUser: PropTypes.object,

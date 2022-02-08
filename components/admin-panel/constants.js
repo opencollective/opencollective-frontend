@@ -37,7 +37,6 @@ export const ORG_BUDGET_SECTIONS = {
 
 export const FISCAL_HOST_SECTIONS = {
   FISCAL_HOSTING: 'fiscal-hosting',
-  HOST_METRICS: 'host-metrics',
   HOST_PLAN: 'host-plan',
   HOST_TWO_FACTOR_AUTH: 'host-two-factor-auth',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
@@ -161,10 +160,6 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.HOST_PLAN]: {
     id: 'Host.Plan',
     defaultMessage: 'Host Plan',
-  },
-  [ALL_SECTIONS.HOST_METRICS]: {
-    id: 'Host.Metrics',
-    defaultMessage: 'Host Metrics',
   },
   [ALL_SECTIONS.INFO]: {
     id: 'editCollective.menu.info',

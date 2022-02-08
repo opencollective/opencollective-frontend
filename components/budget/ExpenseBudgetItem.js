@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { toPx } from '../../lib/theme/helpers';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
@@ -121,7 +122,11 @@ const ExpenseBudgetItem = ({
                 content={<FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />}
                 delayHide={0}
               >
-                <StyledLink as={Link} underlineOnHover href={`/${expense.account.slug}/expenses/${expense.legacyId}`}>
+                <StyledLink
+                  as={Link}
+                  underlineOnHover
+                  href={`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`}
+                >
                   <AutosizeText
                     value={expense.description}
                     maxLength={255}

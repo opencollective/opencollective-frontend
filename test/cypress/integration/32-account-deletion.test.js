@@ -25,7 +25,7 @@ describe('Account Deletion', () => {
     const userParams = { name: 'New Tester' };
     const visitParams = { onBeforeLoad: mockRecaptcha };
     cy.signup({ user: userParams, visitParams }).then(user => {
-      cy.visit(`/${user.username}/admin/advanced`);
+      cy.visit(`/${user.collective.slug}/admin/advanced`);
       cy.contains('button', 'Delete this account').click();
       cy.get('[data-cy=delete]').click();
       cy.wait(1000);

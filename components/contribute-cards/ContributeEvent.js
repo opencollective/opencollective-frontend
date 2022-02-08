@@ -7,7 +7,7 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import DayJs from '../../lib/dayjs';
-import { canOrderTicketsFromEvent, isPastEvent } from '../../lib/events';
+import { isPastEvent } from '../../lib/events';
 
 import Container from '../Container';
 import { Box } from '../Grid';
@@ -22,7 +22,6 @@ const ContributeEvent = ({ collective, event, ...props }) => {
   const description = truncate(event.description, { length: 100 });
   const isTruncated = description && description.length < event.description.length;
   const isPassed = isPastEvent(event);
-  const canOrderTickets = canOrderTicketsFromEvent(event);
   const takesMultipleDays = startsAt && endsAt && !DayJs(startsAt).isSame(endsAt, 'day');
   const showYearOnStartDate = !endsAt || !takesMultipleDays ? 'numeric' : undefined; // only if there's no end date
 
@@ -30,7 +29,6 @@ const ContributeEvent = ({ collective, event, ...props }) => {
     <Contribute
       route={`/${collective.slug}/events/${event.slug}`}
       type={isPassed ? ContributionTypes.EVENT_PASSED : ContributionTypes.EVENT_PARTICIPATE}
-      disableCTA={!isPassed && !canOrderTickets}
       contributors={event.contributors}
       stats={event.stats.backers}
       image={event.backgroundImageUrl}

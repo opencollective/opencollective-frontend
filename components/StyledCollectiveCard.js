@@ -169,7 +169,7 @@ const StyledCollectiveCard = ({
         <Container display="flex" flexDirection="column" justifyContent="space-between" height={bodyHeight}>
           <Container p={3}>
             <CollectiveContainer useLink={useLink} collective={collective}>
-              <P fontSize="16px" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
+              <P mt={3} fontSize="16px" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
                 {collective.name}
               </P>
             </CollectiveContainer>

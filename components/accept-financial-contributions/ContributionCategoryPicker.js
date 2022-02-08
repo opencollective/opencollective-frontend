@@ -119,7 +119,7 @@ class ContributionCategoryPicker extends React.Component {
                   <Link href={`/${router.query.slug}/accept-financial-contributions/ourselves`}>
                     <StyledButton
                       fontSize="13px"
-                      buttonStyle="dark"
+                      buttonStyle="primary"
                       minHeight="36px"
                       mt={[2, 4]}
                       mb={3}
@@ -164,7 +164,7 @@ class ContributionCategoryPicker extends React.Component {
                   <Link href={`/${router.query.slug}/accept-financial-contributions/organization`}>
                     <StyledButton
                       fontSize="13px"
-                      buttonStyle="dark"
+                      buttonStyle="primary"
                       minHeight="36px"
                       mt={[2, 3]}
                       mb={3}
@@ -205,7 +205,7 @@ class ContributionCategoryPicker extends React.Component {
                   <Link href={`/${router.query.slug}/accept-financial-contributions/host`}>
                     <StyledButton
                       fontSize="13px"
-                      buttonStyle="dark"
+                      buttonStyle="primary"
                       minHeight="36px"
                       mt={[2, 3]}
                       mb={3}

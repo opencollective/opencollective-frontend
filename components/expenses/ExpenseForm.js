@@ -123,7 +123,16 @@ export const prepareExpenseForSubmit = expenseData => {
     : null;
 
   return {
-    ...pick(expenseData, ['id', 'description', 'longDescription', 'type', 'privateMessage', 'invoiceInfo', 'tags']),
+    ...pick(expenseData, [
+      'id',
+      'description',
+      'longDescription',
+      'type',
+      'privateMessage',
+      'invoiceInfo',
+      'tags',
+      'currency',
+    ]),
     payee,
     payeeLocation,
     payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
@@ -523,7 +532,9 @@ const ExpenseFormBody = ({
                 </StyledButton>
               </Flex>
               <Box>
-                <FieldArray name="items" component={ExpenseFormItems} />
+                <FieldArray name="items">
+                  {fieldsArrayProps => <ExpenseFormItems {...fieldsArrayProps} collective={collective} />}
+                </FieldArray>
               </Box>
 
               {(values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT) && (
@@ -709,6 +720,7 @@ const ExpenseForm = ({
     initialValues.attachedFiles = expense.draft.attachedFiles;
     initialValues.payoutMethod = expense.draft.payoutMethod;
     initialValues.payeeLocation = expense.draft.payeeLocation;
+    initialValues.payee = expense.draft.payee;
   }
 
   return (

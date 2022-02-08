@@ -14,7 +14,7 @@ import { sortTiersForCollective } from '../lib/tier-utils';
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
 import { Sections } from '../components/collective-page/_constants';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
+import * as fragments from '../components/collective-page/graphql/fragments';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
@@ -339,6 +339,8 @@ class TiersPage extends React.Component {
   }
 }
 
+// We have to disable the linter because it's not able to detect that `nbContributorsPerContributeCard` is used in fragments
+/* eslint-disable graphql/template-strings */
 const contributePageQuery = gql`
   query ContributePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug) {
@@ -393,96 +395,13 @@ const contributePageQuery = gql`
         tiersIds
       }
       tiers {
-        id
-        name
-        slug
-        description
-        goal
-        interval
-        currency
-        amount
-        minimumAmount
-        button
-        amountType
-        endsAt
-        maxQuantity
-        type
-        stats {
-          id
-          totalDonated
-          totalRecurringDonations
-          availableQuantity
-          contributors {
-            id
-            all
-            users
-            organizations
-          }
-        }
-        contributors(limit: $nbContributorsPerContributeCard) {
-          id
-          image
-          collectiveSlug
-          name
-          type
-        }
+        ...ContributeCardTierFields
       }
       events(includePastEvents: true, includeInactive: true) {
-        id
-        slug
-        name
-        description
-        image
-        isActive
-        startsAt
-        endsAt
-        backgroundImageUrl(height: 208)
-        tiers {
-          id
-          type
-        }
-        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
-          id
-          image
-          collectiveSlug
-          name
-          type
-        }
-        stats {
-          id
-          backers {
-            id
-            all
-            users
-            organizations
-          }
-        }
+        ...ContributeCardEventFields
       }
       projects {
-        id
-        slug
-        name
-        description
-        image
-        isActive
-        isArchived
-        backgroundImageUrl(height: 208)
-        contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER]) {
-          id
-          name
-          image
-          collectiveSlug
-          type
-        }
-        stats {
-          id
-          backers {
-            id
-            all
-            users
-            organizations
-          }
-        }
+        ...ContributeCardProjectFields
       }
       connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
         id
@@ -503,18 +422,18 @@ const contributePageQuery = gql`
             }
           }
           contributors(limit: $nbContributorsPerContributeCard) {
-            id
-            image
-            collectiveSlug
-            name
-            type
+            ...ContributeCardContributorFields
           }
         }
       }
     }
   }
-  ${collectiveNavbarFieldsFragment}
+  ${fragments.collectiveNavbarFieldsFragment}
+  ${fragments.contributeCardTierFieldsFragment}
+  ${fragments.contributeCardEventFieldsFragment}
+  ${fragments.contributeCardProjectFieldsFragment}
 `;
+/* eslint-enable graphql/template-strings */
 
 const addContributePageData = graphql(contributePageQuery, {
   options: props => ({

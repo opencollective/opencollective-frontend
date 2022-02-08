@@ -89,6 +89,10 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     expensePolicy
     website
     settings
+    features {
+      id
+      MULTI_CURRENCY_EXPENSES
+    }
     paypalPreApproval {
       id
       balance {
@@ -104,10 +108,6 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     isTrustedHost
     plan {
       id
-    }
-    transferwise {
-      id
-      availableCurrencies
     }
   }
 `;
@@ -216,6 +216,10 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       twitterHandle
       currency
       expensePolicy
+      features {
+        id
+        MULTI_CURRENCY_EXPENSES
+      }
       expensesTags {
         id
         tag
@@ -237,6 +241,10 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isApproved
         host {
           ...ExpenseHostFields
+          transferwise {
+            id
+            availableCurrencies
+          }
         }
       }
 
@@ -247,6 +255,10 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isActive
         host {
           ...ExpenseHostFields
+          transferwise {
+            id
+            availableCurrencies
+          }
         }
       }
 
@@ -338,6 +350,12 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
         balanceWithBlockedFunds {
           valueInCents
           currency
+        }
+      }
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
         }
       }
     }

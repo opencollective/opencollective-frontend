@@ -46,11 +46,13 @@ const memberCanBeUsedToContribute = (member, account, canUseIncognito) => {
   }
 };
 
-const getProfiles = (loggedInUser, collective) => {
+const getProfiles = (loggedInUser, collective, canUseIncognito) => {
   if (!loggedInUser) {
     return [];
   } else {
-    const filteredMembers = loggedInUser.memberOf.filter(member => memberCanBeUsedToContribute(member, collective));
+    const filteredMembers = loggedInUser.memberOf.filter(member =>
+      memberCanBeUsedToContribute(member, collective, canUseIncognito),
+    );
     const memberProfiles = filteredMembers.map(member => member.collective);
     const personalProfile = { email: loggedInUser.email, image: loggedInUser.image, ...loggedInUser.collective };
     return uniqBy([personalProfile, ...memberProfiles], 'id');

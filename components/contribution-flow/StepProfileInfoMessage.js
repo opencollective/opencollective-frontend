@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import Container from '../Container';
 import { Box } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
@@ -14,7 +15,7 @@ const StepProfileInfoMessage = ({ hasLegalNameField, hasIncognito, isGuest }) =>
   const ItemContainer = isList ? 'li' : 'span';
   return (
     <MessageBox type="info" fontSize="12px" color="black.800" my={3} py={2}>
-      <P fontSize="12px" lineHeight="18px">
+      <Container fontSize="12px" lineHeight="18px">
         <P fontWeight="bold" fontSize="12px" lineHeight="18px">
           <FormattedMessage defaultMessage="About privacy" />
         </P>
@@ -38,7 +39,7 @@ const StepProfileInfoMessage = ({ hasLegalNameField, hasIncognito, isGuest }) =>
             </ItemContainer>
           )}
         </Box>
-      </P>
+      </Container>
     </MessageBox>
   );
 };
