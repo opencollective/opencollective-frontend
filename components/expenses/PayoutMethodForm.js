@@ -111,7 +111,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
           )}
         </Field>
       )}
-      {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && host && (
+      {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && (
         <PayoutBankInformationForm isNew={isNew} getFieldName={getFieldName} host={host} />
       )}
       {isNew && (

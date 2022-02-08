@@ -209,7 +209,7 @@ class PayoutMethodSelect extends React.Component {
     } else {
       // For collectives without a host, we allow expenses to be submitted with the "Other"/"Custom" payout method
       // This is mostly for people trying out the platform
-      payerHostSupportedPayoutMethods = [PayoutMethodType.OTHER];
+      payerHostSupportedPayoutMethods = [PayoutMethodType.OTHER, PayoutMethodType.BANK_ACCOUNT];
     }
 
     const payeeIsSelfHosted = payee && payee.id === payee.host?.id;
