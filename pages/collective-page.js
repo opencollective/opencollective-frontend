@@ -46,11 +46,7 @@ const OnboardingModal = dynamic(
   { loading: Loading },
 );
 
-/** Add global style to enable smooth scroll on the page */
 const GlobalStyles = createGlobalStyle`
-  html {
-    scroll-behavior: ${prop => prop.smooth && 'smooth'};
-  }
   section {
     margin: 0;
   }
@@ -197,7 +193,7 @@ class CollectivePage extends React.Component {
 
     return (
       <Page canonicalURL={getCollectivePageCanonicalURL(collective)} {...this.getPageMetaData(collective)}>
-        <GlobalStyles smooth={this.state.smooth} />
+        <GlobalStyles />
         {loading ? (
           <Container py={[5, 6]}>
             <Loading />

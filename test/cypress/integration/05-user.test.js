@@ -1,9 +1,6 @@
-import { disableSmoothScroll } from '../support/helpers';
-
 const scrollToSection = section => {
   // Wait for collective page to load before disabling smooth scroll
   cy.get('[data-cy=collective-page-main]');
-  disableSmoothScroll();
   cy.get(`#section-${section}`).scrollIntoView();
 };
 

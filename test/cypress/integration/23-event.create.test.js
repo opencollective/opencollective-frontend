@@ -33,7 +33,6 @@ describe('event.create.test.js', () => {
     cy.get('#location .address').contains('1050');
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 2);
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier] [data-cy=amount]').contains(15);
-    cy.disableSmoothScroll();
     cy.get('#top').scrollIntoView();
     cy.get('[data-cy="edit-collective-btn"]:visible').click();
     // edit event info
