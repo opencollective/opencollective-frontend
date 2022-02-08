@@ -120,7 +120,13 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose }) => {
           onClick={async () => {
             try {
               setError(null);
-              await submit({ variables: { collectiveId: collective.id, subject, message } });
+              await submit({
+                variables: {
+                  collectiveId: typeof collective.id === 'string' ? collective.legacyId : collective.id,
+                  subject,
+                  message,
+                },
+              });
               if (isModal) {
                 addToast({
                   type: TOAST_TYPE.SUCCESS,
@@ -142,7 +148,8 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose }) => {
 
 CollectiveContactForm.propTypes = {
   collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    legacyId: PropTypes.number,
     name: PropTypes.string.isRequired,
   }),
   /* Defines whether this form is displayed as a modal */
