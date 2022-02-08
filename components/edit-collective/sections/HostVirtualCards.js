@@ -36,7 +36,6 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
       id
       legacyId
       slug
-      supportedPayoutMethods
       name
       imageUrl
       currency
