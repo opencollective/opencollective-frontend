@@ -30,7 +30,7 @@ class CreateEvent extends React.Component {
     super(props);
     const timezone = dayjs.tz.guess();
     const startsAt = dayjs().tz(timezone).set('hour', 19).set('minute', 0).set('second', 0);
-    const endsAt = dayjs().tz(timezone).set('hour', 22).set('minute', 0).set('second', 0);
+    const endsAt = dayjs().tz(timezone).set('hour', 20).set('minute', 0).set('second', 0);
 
     this.state = {
       event: {
