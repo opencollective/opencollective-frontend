@@ -361,6 +361,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
   ) {
     account(slug: $collectiveSlug) {
       id
+      legacyId
       slug
       type
       imageUrl
