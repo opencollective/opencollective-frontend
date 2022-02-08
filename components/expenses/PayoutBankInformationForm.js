@@ -194,7 +194,7 @@ Input.propTypes = {
   loading: PropTypes.bool,
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-  }).isRequired,
+  }),
   currency: PropTypes.string.isRequired,
   formik: PropTypes.object.isRequired,
   getFieldName: PropTypes.func.isRequired,
@@ -217,7 +217,7 @@ FieldGroup.propTypes = {
   loading: PropTypes.bool,
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-  }).isRequired,
+  }),
   currency: PropTypes.string.isRequired,
   formik: PropTypes.object.isRequired,
   getFieldName: PropTypes.func.isRequired,
@@ -372,7 +372,7 @@ DetailsForm.propTypes = {
   disabled: PropTypes.bool,
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-  }).isRequired,
+  }),
   currency: PropTypes.string.isRequired,
   formik: PropTypes.object.isRequired,
   getFieldName: PropTypes.func.isRequired,
@@ -527,7 +527,7 @@ PayoutBankInformationForm.propTypes = {
     transferwise: PropTypes.shape({
       availableCurrencies: PropTypes.arrayOf(PropTypes.object),
     }),
-  }).isRequired,
+  }),
   isNew: PropTypes.bool,
   optional: PropTypes.bool,
   ignoreBlockedCurrencies: PropTypes.bool,
