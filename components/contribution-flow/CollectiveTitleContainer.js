@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { getCollectivePageRoute } from '../../lib/url-helpers';
+
 import Container from '../Container';
 import Link from '../Link';
 import StyledLink from '../StyledLink';
@@ -8,7 +10,7 @@ import StyledLink from '../StyledLink';
 const CollectiveTitleContainer = ({ collective, useLink, children, linkColor }) => {
   if (useLink) {
     return (
-      <StyledLink as={Link} href={`/${collective.slug}`} color={linkColor}>
+      <StyledLink as={Link} href={getCollectivePageRoute(collective)} color={linkColor}>
         {children}
       </StyledLink>
     );

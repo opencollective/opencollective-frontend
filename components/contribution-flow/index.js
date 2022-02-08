@@ -23,7 +23,7 @@ import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
-import { isTrustedRedirectHost, objectToQueryString } from '../../lib/url-helpers';
+import { getCollectivePageRoute, isTrustedRedirectHost, objectToQueryString } from '../../lib/url-helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
@@ -502,26 +502,26 @@ class ContributionFlow extends React.Component {
       ...queryParams,
     };
 
-    let route = `/${collective.slug}/${verb}/${step}`;
+    let route = `${getCollectivePageRoute(collective)}/${verb}/${step}`;
 
     if (isEmbed) {
       if (tier) {
-        route = `/embed/${collective.slug}/contribute/${tier.slug}-${tier.legacyId}/${step}`;
+        route = `/embed${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.legacyId}/${step}`;
       } else {
-        route = `/embed/${collective.slug}/donate/${step}`;
+        route = `/embed${getCollectivePageRoute(collective)}/donate/${step}`;
       }
     } else if (tier) {
       if (tier.type === 'TICKET' && collective.parent) {
-        route = `/${collective.parent.slug}/events/${collective.slug}/order/${tier.legacyId}/${step}`;
+        route = `${getCollectivePageRoute(collective)}/order/${tier.legacyId}/${step}`;
       } else {
         // Enforce "contribute" verb for ordering tiers
-        route = `/${collective.slug}/contribute/${tier.slug}-${tier.legacyId}/checkout/${step}`;
+        route = `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.legacyId}/checkout/${step}`;
       }
     } else if (verb === 'contribute' || verb === 'new-contribute') {
       // Never use `contribute` as verb if not using a tier (would introduce a route conflict)
-      route = `/${collective.slug}/donate/${step}`;
+      route = `${getCollectivePageRoute(collective)}/donate/${step}`;
     } else if (verb === 'donate' && this.props.paymentFlow === PAYMENT_FLOW.CRYPTO) {
-      route = `/${collective.slug}/donate/crypto/${step}`;
+      route = `${getCollectivePageRoute(collective)}/donate/crypto/${step}`;
     }
 
     // Reset errors if any

@@ -12,6 +12,7 @@ import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { parseToBoolean } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -131,6 +132,10 @@ class CreateExpensePage extends React.Component {
       this.props.data.refetch();
       this.initFormPersister();
     }
+
+    const { router, data } = this.props;
+    const account = data?.account;
+    addParentToURLIfMissing(router, account, '/expenses/new');
   }
 
   async componentDidUpdate(oldProps, oldState) {
@@ -156,10 +161,11 @@ class CreateExpensePage extends React.Component {
   }
 
   getPageMetaData(collective) {
+    const canonicalURL = `${getCollectivePageCanonicalURL(collective)}/expenses/new`;
     if (collective) {
-      return { title: `${collective.name} - New expense` };
+      return { title: `${collective.name} - New expense`, canonicalURL };
     } else {
-      return { title: `New expense` };
+      return { title: `New expense`, canonicalURL };
     }
   }
 
@@ -504,6 +510,13 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
         # NOTE: This will be the account itself in this case
         host {
           ...CreateExpenseHostFields
+        }
+      }
+
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
         }
       }
     }

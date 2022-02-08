@@ -13,7 +13,7 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
-import { facebookShareURL, tweetURL } from '../../lib/url-helpers';
+import { facebookShareURL, getCollectivePageRoute, tweetURL } from '../../lib/url-helpers';
 
 import Container from '../../components/Container';
 import { formatAccountDetails } from '../../components/edit-collective/utils';
@@ -262,7 +262,9 @@ class ContributionFlowSuccess extends React.Component {
                       defaultMessage="You are now supporting <link>{collective}</link>."
                       values={{
                         collective: order.toAccount.name,
-                        link: isEmbed ? I18nBold : getI18nLink({ href: `/${order.toAccount.slug}`, as: Link }),
+                        link: isEmbed
+                          ? I18nBold
+                          : getI18nLink({ href: getCollectivePageRoute(order.toAccount), as: Link }),
                       }}
                     />
                   </P>
@@ -270,7 +272,7 @@ class ContributionFlowSuccess extends React.Component {
                 {isEmbed ? (
                   <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
                 ) : (
-                  <StyledLink as={Link} color="black.800" href={`/${order.toAccount.slug}`}>
+                  <StyledLink as={Link} color="black.800" href={getCollectivePageRoute(order.toAccount)}>
                     <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
                   </StyledLink>
                 )}

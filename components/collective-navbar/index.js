@@ -332,7 +332,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
       component: (
-        <Link href={`/${collective.slug}/expenses/new`}>
+        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
           <ActionButton tabIndex="-1">
             <MoneyCheckAlt size="1em" />
             <Span ml={2}>
@@ -346,7 +346,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
       component: (
-        <Link href={`/${collective.slug}/expenses/new`}>
+        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
           <ActionButton tabIndex="-1">
             <Receipt size="1em" />
             <Span ml={2}>
@@ -360,7 +360,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
-        <Link href={`/${collective.slug}/recurring-contributions`}>
+        <Link href={`${getCollectivePageRoute(collective)}/recurring-contributions`}>
           <ActionButton tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>

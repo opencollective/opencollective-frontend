@@ -8,6 +8,7 @@ import { FormattedMessage } from 'react-intl';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import useClipboard from '../../lib/hooks/useClipboard';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import Link from '../Link';
 import StyledRoundButton from '../StyledRoundButton';
@@ -71,7 +72,7 @@ const ExpenseAdminActions = ({
           }
         />
       ) : (
-        <Link href={`/${collective.slug}/expenses/${expense.legacyId}`}>
+        <Link href={`${getCollectivePageRoute(collective)}/expenses/${expense.legacyId}`}>
           <ButtonWithLabel
             onClick={() => copy(window.location.href)}
             disabled={isDisabled}

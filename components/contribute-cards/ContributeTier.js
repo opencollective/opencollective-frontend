@@ -9,6 +9,7 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency, getPrecisionFromAmount } from '../../lib/currency-utils';
 import { isPastEvent } from '../../lib/events';
 import { isTierExpired } from '../../lib/tier-utils';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { capitalize } from '../../lib/utils';
 
 import CollapsableText from '../CollapsableText';
@@ -112,9 +113,9 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
 
   let route;
   if (tierType === ContributionTypes.TICKET) {
-    route = `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/order/${tier.id}`;
+    route = `${getCollectivePageRoute(collective)}/order/${tier.id}`;
   } else {
-    route = `/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
+    route = `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}/checkout`;
   }
 
   return (
@@ -150,7 +151,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                 <StyledLink
                   as={Link}
                   whiteSpace="nowrap"
-                  href={`/${collective.slug}/contribute/${tier.slug}-${tier.id}`}
+                  href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}`}
                 >
                   <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
                 </StyledLink>
