@@ -218,9 +218,9 @@ const ContributeCard = ({
       </CoverImage>
       <Flex px={3} py={3} flexDirection="column" justifyContent="space-between" flex="1">
         <Flex flexDirection="column" flex="1 1">
-          <P fontSize="20px" mt={1} mb={2} fontWeight="bold" data-cy="contribute-title" color="black.900">
+          <Container fontSize="20px" mt={1} mb={2} fontWeight="bold" data-cy="contribute-title" color="black.900">
             {title}
-          </P>
+          </Container>
           <Description data-cy="contribute-description">{children}</Description>
         </Flex>
         <Box>
