@@ -314,6 +314,10 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       canMarkAsUnpaid
       canComment
       canUnschedulePayment
+      approve {
+        allowed
+        reason
+      }
     }
     activities {
       id
@@ -380,6 +384,10 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
       canSeeInvoiceInfo
       canEditTags
       canUnschedulePayment
+      approve {
+        allowed
+        reason
+      }
     }
     payoutMethod {
       id
