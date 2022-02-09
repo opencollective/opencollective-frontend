@@ -18,6 +18,7 @@ import StyledCheckbox from '../../StyledCheckbox';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
+import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
 import { getSettingsQuery } from './EditCollectivePage';
 import SettingsSectionTitle from './SettingsSectionTitle';
@@ -95,6 +96,7 @@ const messages = defineMessages({
 const Policies = ({ collective, showOnlyExpensePolicy }) => {
   const { formatMessage } = useIntl();
   const [selected, setSelected] = React.useState([]);
+  const { addToast } = useToasts();
 
   // GraphQL
   const { loading, data } = useQuery(getSettingsQuery, {
@@ -167,6 +169,11 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
           },
           policies,
         },
+      });
+
+      addToast({
+        type: TOAST_TYPE.SUCCESS,
+        message: formatMessage({ defaultMessage: 'Policies updated successfully' }),
       });
     },
     validate(values) {
