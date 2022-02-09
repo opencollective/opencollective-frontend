@@ -347,7 +347,7 @@
   "collective.emptyBalance.body": "Tem certeza de que deseja {action} ao {collective}?",
   "collective.emptyBalance.header": "{action} Saldo",
   "collective.event.delete.isNotDeletable-message": "{type, select, EVENT {Events} PROJECT {Projects} other {Accounts}} with transactions, orders or paid expenses cannot be deleted. Please archive it instead.",
-  "collective.expensePolicy.allowExpense": "Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees).",
+  "collective.expensePolicy.allowExpense": "Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees)",
   "collective.expensePolicy.description": "Pode ser assustador arquivar uma despesa se você não tem certeza do que é permitido. Forneça uma política clara para guiar os enviadores de despesas.",
   "collective.expensePolicy.error": "A política de despesas deve conter menos de {maxLength} caracteres",
   "collective.expensePolicy.placeholder": "Ex.: critérios de aprovação, limitações ou documentação necessária.",

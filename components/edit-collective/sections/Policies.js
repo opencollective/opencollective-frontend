@@ -88,7 +88,7 @@ const messages = defineMessages({
   'expensePolicy.allowExpense': {
     id: 'collective.expensePolicy.allowExpense',
     defaultMessage:
-      'Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees).',
+      'Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees)',
   },
 });
 
@@ -322,6 +322,16 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             </P>
           )}
         </Container>
+        <Container mt={3}>
+          <StyledCheckbox
+            name="allow-expense-submission"
+            label={formatMessage(messages['expensePolicy.allowExpense'])}
+            onChange={() =>
+              formik.setFieldValue('disablePublicExpenseSubmission', !formik.values.disablePublicExpenseSubmission)
+            }
+            defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
+          />
+        </Container>
         <Container>
           <SettingsSectionTitle mt={4}>
             <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />
@@ -343,16 +353,6 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             value={selected}
             onChange={selectedOptions => setSelected(selectedOptions)}
             isMulti
-          />
-        </Container>
-        <Container mt={4}>
-          <StyledCheckbox
-            name="allow-expense-submission"
-            label={formatMessage(messages['expensePolicy.allowExpense'])}
-            onChange={() =>
-              formik.setFieldValue('disablePublicExpenseSubmission', !formik.values.disablePublicExpenseSubmission)
-            }
-            defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
           />
         </Container>
         <Flex mt={5} mb={3} alignItems="center" justifyContent="center">

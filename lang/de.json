@@ -347,7 +347,7 @@
   "collective.emptyBalance.body": "Bist Du Dir sicher, dass du dieses/diesen {collective} {action} willst?",
   "collective.emptyBalance.header": "{action} Guthaben",
   "collective.event.delete.isNotDeletable-message": "{type, select, EVENT {Events} PROJECT {Projects} other {Accounts}} mit Transaktionen, Bestellungen oder bezahlten Ausgaben können nicht gelöscht werden. Bitte archivieren Sie es stattdessen.",
-  "collective.expensePolicy.allowExpense": "Lassen Sie nur die Erstellung von Ausgaben durch Teammitglieder und finanzielle Mitwirkende zu (sie können Ausgaben von anderen Zahlungsempfängern einladen).",
+  "collective.expensePolicy.allowExpense": "Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees)",
   "collective.expensePolicy.description": "Es kann beängstigend sein, Ausgaben einzureichen, wenn nicht klar ist, was erlaubt ist. Geben Sie eine klare Richtlinie an, um die Einreicher von Ausgaben zu leiten.",
   "collective.expensePolicy.error": "Die Spesenrichtlinie darf weniger als {maxLength} Zeichen enthalten",
   "collective.expensePolicy.placeholder": "Z.B. Genehmigungskriterien, Einschränkungen oder erforderliche Dokumentation.",

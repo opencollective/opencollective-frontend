@@ -347,7 +347,7 @@
   "collective.emptyBalance.body": "¿Estás seguro que quieres {action} este {collective}?",
   "collective.emptyBalance.header": "{action} Saldo",
   "collective.event.delete.isNotDeletable-message": "{type, select, EVENT {Eventos} PROJECT {Proyectos} other {Cuentas}} con trasnacciones, ordenes o gastos ya pagados no pueden ser eliminados. Por favor, archívelo en su lugar.",
-  "collective.expensePolicy.allowExpense": "Permitir solo gastos creados por miembros del equipo y contribuyentes (Ellos pueden invitar a otros a crear gastos)",
+  "collective.expensePolicy.allowExpense": "Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees)",
   "collective.expensePolicy.description": "Puede ser abrumador presentar un gasto si no está seguro de lo que está permitido. Proporcione una política clara para guiar a los remitentes de gastos.",
   "collective.expensePolicy.error": "La política de gastos debe tener menos de {maxLength} caracteres",
   "collective.expensePolicy.placeholder": "Por ejemplo, criterios de aprobación, limitaciones o documentación requerida.",
