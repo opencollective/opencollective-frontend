@@ -112,7 +112,17 @@ const getExpenseStatusTag = (status, isRefund, isRefunded) => {
   } else {
     expenseStatusLabel = status;
   }
-  return <ExpenseStatusTag status={expenseStatusLabel} fontSize="9px" px="6px" py="2px" />;
+  return (
+    <ExpenseStatusTag
+      status={expenseStatusLabel}
+      fontSize="12px"
+      fontWeight="bold"
+      lineHeight="16px"
+      letterSpacing="0.06em"
+      px="6px"
+      py="2px"
+    />
+  );
 };
 
 const TransactionItem = ({ displayActions, collective, transaction, onMutationSuccess }) => {
