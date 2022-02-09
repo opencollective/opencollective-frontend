@@ -43,6 +43,7 @@ const INFO_SEPARATOR = ' • ';
 const getDisplayedAmount = (transaction, collective) => {
   const isCredit = transaction.type === TransactionTypes.CREDIT;
   const hasOrder = transaction.order !== null;
+  const hasExpense = transaction.expense !== null;
   const isSelf = transaction.fromAccount.slug === collective.slug;
 
   if (isCredit && hasOrder) {
@@ -52,7 +53,7 @@ const getDisplayedAmount = (transaction, collective) => {
     // Expense Debits should display the Amount with Payment Method fees only on collective's profile
     return isSelf ? transaction.netAmount : transaction.amount;
   } else if (transaction.isRefunded) {
-    if ((isSelf && !transaction.isRefund) || (transaction.isRefund && isCredit)) {
+    if (hasExpense || (isSelf && !transaction.isRefund) || (transaction.isRefund && isCredit)) {
       return transaction.netAmount;
     } else {
       return transaction.amount;
