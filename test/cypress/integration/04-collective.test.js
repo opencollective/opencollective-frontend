@@ -131,6 +131,7 @@ describe('Collective page', () => {
     it('Shows latest updates', () => {
       scrollToSection(Sections.UPDATES);
       cy.get('[data-cy=view-all-updates-btn]').click();
+      cy.wait(3000);
       cy.get('[data-cy=updatesList]').should('have.length', 1);
     });
   });
