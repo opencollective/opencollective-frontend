@@ -149,7 +149,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
           slug
         }
       }
-      relatedTransactions(kind: [HOST_FEE, PAYMENT_PROCESSOR_COVER]) {
+      relatedTransactions(kind: [HOST_FEE]) {
         id
         type
         kind

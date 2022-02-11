@@ -113,12 +113,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
   const showRefundButton = permissions?.canRefund && !isRefunded;
   const showRejectButton = permissions?.canReject && !isOrderRejected;
   const showDownloadInvoiceButton = permissions?.canDownloadInvoice && !isInternalTransfer(fromAccount, toAccount);
-  const hostFeeTransaction = transaction.relatedTransactions?.find(
-    t => t.kind === TransactionKind.HOST_FEE && t.type === TransactionTypes.CREDIT,
-  );
-  const paymentProcessorCover = transaction.relatedTransactions?.find(
-    t => t.kind === TransactionKind.PAYMENT_PROCESSOR_COVER && t.type === TransactionTypes.CREDIT,
-  );
+  const hostFeeTransaction = transaction.relatedTransactions?.find(t => t.kind === 'HOST_FEE' && t.type === 'CREDIT');
 
   return (
     <DetailsContainer flexWrap="wrap" alignItems="flex-start">
@@ -171,7 +166,6 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               kind,
               expense,
               isRefund,
-              paymentProcessorCover,
             })}
             {['CONTRIBUTION', 'ADDED_FUNDS', 'EXPENSE'].includes(transaction.kind) && hostFeeTransaction && (
               <React.Fragment>
