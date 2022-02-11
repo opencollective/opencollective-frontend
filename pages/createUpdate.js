@@ -21,6 +21,7 @@ import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import Link from '../components/Link';
+import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import StyledButton from '../components/StyledButton';
 import StyledButtonSet from '../components/StyledButtonSet';
@@ -66,6 +67,7 @@ class CreateUpdatePage extends React.Component {
       account: PropTypes.object,
     }).isRequired, // from withData
     LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.object,
     router: PropTypes.object,
     intl: PropTypes.object.isRequired,
   };
@@ -127,10 +129,14 @@ class CreateUpdatePage extends React.Component {
   };
 
   render() {
-    const { data, LoggedInUser, intl } = this.props;
+    const { data, LoggedInUser, loadingLoggedInUser, intl } = this.props;
 
     if (!data.account) {
       return <ErrorPage data={data} />;
+    }
+
+    if (loadingLoggedInUser) {
+      return <LoadingPlaceholder />;
     }
 
     const collective = data.account;
