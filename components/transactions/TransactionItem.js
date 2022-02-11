@@ -134,6 +134,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
     order,
     expense,
     type,
+    kind,
     description,
     createdAt,
     isRefunded,
@@ -146,7 +147,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
   const intl = useIntl();
 
   const hasOrder = order !== null;
-  const hasExpense = expense !== null;
+  const isExpense = kind === TransactionKind.EXPENSE;
   const isCredit = type === TransactionTypes.CREDIT;
   const Item = isCredit ? CreditItem : DebitItem;
   const legacyCollectiveId = collective.legacyId || collective.id;
@@ -227,7 +228,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 )}
                 {INFO_SEPARATOR}
                 <DateTime value={createdAt} data-cy="transaction-date" />
-                {hasExpense && expense.comments?.totalCount > 0 && (
+                {isExpense && expense.comments?.totalCount > 0 && (
                   <React.Fragment>
                     {INFO_SEPARATOR}
                     <span>
@@ -271,7 +272,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 py="2px"
               />
             )}{' '}
-            {hasExpense && getExpenseStatusTag(expense.status, isRefund, isRefunded)}
+            {isExpense && getExpenseStatusTag(expense.status, isRefund, isRefunded)}
           </Flex>
         </Flex>
         {hasOrder && [CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
@@ -306,7 +307,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             </StyledButton>
           </Container>
         )}
-        {hasExpense && (
+        {isExpense && (
           <Container display="flex" mt={3} pt={[2, 0]}>
             <ExpenseTags expense={expense} />
             <StyledButton
@@ -336,13 +337,13 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             </StyledButton>
           </Container>
         )}
-        {!hasExpense && (!hasOrder || ![CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind)) && (
+        {!isExpense && (!hasOrder || ![CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind)) && (
           <Container mt={3} pt={[2, 0]}>
             <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
           </Container>
         )}
       </Box>
-      {isExpanded && (hasOrder || hasExpense) && (
+      {isExpanded && (hasOrder || isExpense) && (
         <TransactionDetails
           displayActions={displayActions}
           transaction={transaction}
