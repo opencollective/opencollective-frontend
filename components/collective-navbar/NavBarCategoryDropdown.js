@@ -178,16 +178,8 @@ NavBarCategory.propTypes = {
   category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)).isRequired,
 };
 
-const NavBarScrollContainer = ({ useAnchor, category, children }) => {
-  const isMobile = typeof window !== 'undefined' && window.matchMedia('only screen and (max-width: 640px)').matches;
-  return useAnchor ? (
-    <Scrollchor to={`#category-${category}`} animate={{ offset: isMobile ? -window.innerHeight : 0 }}>
-      {children}
-    </Scrollchor>
-  ) : (
-    children
-  );
-};
+const NavBarScrollContainer = ({ useAnchor, category, children }) =>
+  useAnchor ? <Scrollchor to={`#category-${category}`}>{children}</Scrollchor> : children;
 
 NavBarScrollContainer.propTypes = {
   category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)).isRequired,
