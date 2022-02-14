@@ -177,7 +177,8 @@ exports.REWRITES = [
   },
   // Tier page
   {
-    source: '/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)',
+    source:
+      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)',
     destination: '/tier',
   },
   // Conversations
