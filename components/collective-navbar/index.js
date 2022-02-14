@@ -43,15 +43,14 @@ import { useUser } from '../UserProvider';
 import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
 import NavBarCategoryDropdown, { NavBarCategory } from './NavBarCategoryDropdown';
-import SectionContainer from '../collective-page/SectionContainer';
 
 const DisableGlobalScrollOnMobile = createGlobalStyle`
   @media (max-width: 64em) {
     body {
       overflow: hidden;
     }
-    ${SectionContainer} {
-      overflow: auto !important;
+    #footer {
+      display: none;
     }
   }
 `;
