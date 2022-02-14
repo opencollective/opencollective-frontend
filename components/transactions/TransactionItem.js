@@ -156,10 +156,10 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
 
   const displayedAmount = getDisplayedAmount(transaction, collective);
 
-  const transactionDetailLink = transactionKind => {
+  const transactionDetailsLink = () => {
     return (
       <StyledButton
-        data-cy={transactionKind === TransactionKind.EXPENSE ? 'expense-details' : 'transaction-details'}
+        data-cy="transaction-details"
         buttonSize="tiny"
         buttonStyle="secondary"
         isBorderless
@@ -310,13 +310,13 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             {[CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
               <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
             )}
-            {transactionDetailLink(transaction.kind)}
+            {transactionDetailsLink()}
           </Container>
         )}
         {isExpense && (
           <Container display="flex" mt={3} pt={[2, 0]}>
             <ExpenseTags expense={expense} />
-            {transactionDetailLink(transaction.kind)}
+            {transactionDetailsLink()}
           </Container>
         )}
         {!isExpense && (!hasOrder || ![CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind)) && (
