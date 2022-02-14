@@ -17,6 +17,7 @@ const ExpenseItemsTotalAmount = ({ items, currency }) => {
           amount={items.reduce((amount, item) => amount + (item.amount || 0), 0)}
           precision={2}
           currency={currency}
+          showCurrencyCode={false}
         />
       ) : (
         '--.--'

@@ -6,6 +6,7 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { AmountPropTypeShape } from '../../lib/prop-types';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -67,6 +68,8 @@ const ExpenseSummary = ({
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
   const expenseItems = expense?.items.length > 0 ? expense.items : expense?.draft?.items || [];
+  const isMultiCurrency =
+    expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
 
   return (
     <StyledCard
@@ -241,17 +244,39 @@ const ExpenseSummary = ({
           ))}
         </div>
       )}
-      <Flex justifyContent="flex-end" mt={4} mb={2}>
+      <Flex flexDirection="column" alignItems="flex-end" mt={4} mb={2}>
         <Flex alignItems="center">
-          <Container fontSize="12px" fontWeight="500" mr={3} whiteSpace="nowrap">
-            <FormattedMessage id="ExpenseFormAttachments.TotalAmount" defaultMessage="Total amount:" />
-          </Container>
           {isLoading ? (
-            <LoadingPlaceholder height={18} width={100} />
+            <LoadingPlaceholder height={18} width={150} />
           ) : (
-            <ExpenseItemsTotalAmount currency={expense.currency} items={expenseItems} />
+            <React.Fragment>
+              <Container fontSize="12px" fontWeight="500" mr={3} whiteSpace="nowrap">
+                <FormattedMessage defaultMessage="Total amount ({currency}):" values={{ currency: expense.currency }} />
+              </Container>
+              <ExpenseItemsTotalAmount currency={expense.currency} items={expenseItems} />
+            </React.Fragment>
           )}
         </Flex>
+        {isMultiCurrency && (
+          <Flex alignItems="center" mt={2}>
+            <Container fontSize="12px" fontWeight="500" mr={3} whiteSpace="nowrap" color="black.600">
+              <FormattedMessage
+                defaultMessage="Accounted as ({currency}):"
+                values={{ currency: expense.amountInAccountCurrency.currency }}
+              />
+            </Container>
+            {' ~'}&nbsp;
+            <Span color="black.600">
+              <FormattedMoneyAmount
+                amount={expense.amountInAccountCurrency.valueInCents}
+                currency={expense.amountInAccountCurrency.currency}
+                precision={2}
+                showCurrencyCode={false}
+                amountStyles={null}
+              />
+            </Span>
+          </Flex>
+        )}
       </Flex>
       <ExpensePayeeDetails
         isLoading={isLoading}
@@ -330,6 +355,7 @@ ExpenseSummary.propTypes = {
     type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
     tags: PropTypes.arrayOf(PropTypes.string),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
+    amountInAccountCurrency: AmountPropTypeShape,
     items: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string,
