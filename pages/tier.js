@@ -2,6 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
+import { withRouter } from 'next/router';
+
+import { addParentToURLIfMissing } from '../lib/url-helpers';
 
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import ErrorPage from '../components/ErrorPage';
@@ -27,7 +30,14 @@ class TierPage extends React.Component {
     LoggedInUser: PropTypes.object, // from withUser
     tierSlug: PropTypes.string,
     redirect: PropTypes.string,
+    router: PropTypes.object,
   };
+
+  componentDidMount() {
+    const { router, tierId, tierSlug, data } = this.props;
+    const collective = data?.Tier?.collective;
+    addParentToURLIfMissing(router, collective, `/contribute/${tierSlug}-${tierId}`);
+  }
 
   // See https://github.com/opencollective/opencollective/issues/1872
   shouldComponentUpdate(newProps) {
@@ -85,4 +95,4 @@ class TierPage extends React.Component {
 
 const addTierPageData = graphql(tierPageQuery);
 
-export default withUser(addTierPageData(TierPage));
+export default withRouter(withUser(addTierPageData(TierPage)));
