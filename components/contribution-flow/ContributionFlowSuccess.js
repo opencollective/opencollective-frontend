@@ -122,24 +122,30 @@ class ContributionFlowSuccess extends React.Component {
     const email = get(router, 'query.email') ? decodeURIComponent(router.query.email) : null;
 
     if (!isEmbed) {
-      callsToAction.push(SUCCESS_CTA_TYPE.NEWSLETTER);
       if (!LoggedInUser) {
         if (isGuest) {
-          callsToAction.unshift(SUCCESS_CTA_TYPE.JOIN, SUCCESS_CTA_TYPE.BLOG);
+          callsToAction.unshift(SUCCESS_CTA_TYPE.JOIN, SUCCESS_CTA_TYPE.GO_TO_PROFILE, SUCCESS_CTA_TYPE.NEWSLETTER);
         } else {
-          callsToAction.unshift(SUCCESS_CTA_TYPE.SIGN_IN, SUCCESS_CTA_TYPE.BLOG);
+          callsToAction.unshift(SUCCESS_CTA_TYPE.SIGN_IN, SUCCESS_CTA_TYPE.GO_TO_PROFILE, SUCCESS_CTA_TYPE.NEWSLETTER);
         }
       } else {
         // all other logged in recurring/one time contributions
-        callsToAction.unshift(SUCCESS_CTA_TYPE.BLOG);
+        callsToAction.unshift(SUCCESS_CTA_TYPE.GO_TO_PROFILE, SUCCESS_CTA_TYPE.BLOG, SUCCESS_CTA_TYPE.NEWSLETTER);
       }
     }
 
     return (
       <Flex flexDirection="column" justifyContent="center" p={2}>
         {callsToAction.length <= 2 && <SuccessIllustration alt="" />}
-        {callsToAction.map(type => (
-          <SuccessCTA key={type} type={type} orderId={get(data, 'order.id')} email={email} />
+        {callsToAction.map((type, idx) => (
+          <SuccessCTA
+            key={type}
+            type={type}
+            orderId={get(data, 'order.id')}
+            email={email}
+            account={get(data, 'order.toAccount')}
+            isPrimary={idx === 0}
+          />
         ))}
       </Flex>
     );
