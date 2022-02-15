@@ -5,7 +5,9 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
+import { PayPalSupportedCurrencies } from '../../lib/constants/currency';
 import expenseTypes from '../../lib/constants/expenseTypes';
+import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { toIsoDateStr } from '../../lib/date-utils';
 import { formatErrorMessage } from '../../lib/errors';
 import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
@@ -176,7 +178,8 @@ class ExpenseFormItems extends React.PureComponent {
     }
 
     const onRemove = requireFile || items.length > 1 ? this.remove : null;
-    const availableCurrencies = this.getPossibleCurrencies();
+    const isPayPal = values?.payoutMethod?.type === PayoutMethodType.PAYPAL;
+    const availableCurrencies = isPayPal ? PayPalSupportedCurrencies : this.getPossibleCurrencies();
     return (
       <Box>
         {this.renderErrors()}
@@ -197,7 +200,6 @@ class ExpenseFormItems extends React.PureComponent {
             hasMultiCurrency={!index && availableCurrencies?.length > 1} // Only display currency picker for the first item
             availableCurrencies={availableCurrencies}
             onCurrencyChange={this.onCurrencyChange}
-            payoutMethod={values.payoutMethod}
           />
         ))}
         <Flex alignItems="center" my={3}>

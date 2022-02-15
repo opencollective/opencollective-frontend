@@ -5,9 +5,7 @@ import { escape, get, isEmpty, unescape } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isURL } from 'validator';
 
-import { PayPalSupportedCurrencies } from '../../lib/constants/currency';
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
 import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
@@ -108,16 +106,12 @@ const ExpenseItemForm = ({
   hasMultiCurrency,
   availableCurrencies,
   onCurrencyChange,
-  payoutMethod,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const attachmentKey = `attachment-${attachment.id || attachment.url}`;
   const getFieldName = field => `${name}.${field}`;
   const getError = field => formatFormErrorMessage(intl, get(errors, getFieldName(field)));
-  const isPayPal = payoutMethod?.type === PayoutMethodType.PAYPAL;
-  const showCurrencyPicker = hasMultiCurrency || isPayPal;
-  const currenciesToDisplay = isPayPal ? PayPalSupportedCurrencies : availableCurrencies;
 
   return (
     <Box mb={18} data-cy="expense-attachment-form">
@@ -242,8 +236,8 @@ const ExpenseItemForm = ({
                       placeholder="0.00"
                       onChange={(value, e) => setFieldValue(e.target.name, value)}
                       onCurrencyChange={onCurrencyChange}
-                      hasCurrencyPicker={showCurrencyPicker}
-                      availableCurrencies={currenciesToDisplay}
+                      hasCurrencyPicker={hasMultiCurrency}
+                      availableCurrencies={availableCurrencies}
                     />
                   )}
                 </Field>
@@ -305,9 +299,6 @@ ExpenseItemForm.propTypes = {
     amount: PropTypes.number,
   }).isRequired,
   editOnlyDescriptiveInfo: PropTypes.bool,
-  payoutMethod: PropTypes.shape({
-    type: PropTypes.string,
-  }),
 };
 
 ExpenseItemForm.defaultProps = {
