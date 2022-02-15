@@ -109,6 +109,10 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
       address
       country
     }
+    transferwise {
+      id
+      availableCurrencies
+    }
     supportedPayoutMethods
     isTrustedHost
     plan {

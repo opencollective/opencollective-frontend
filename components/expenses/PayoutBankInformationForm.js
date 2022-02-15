@@ -34,7 +34,9 @@ export const msg = defineMessages({
 const requiredFieldsQuery = gqlV2/* GraphQL */ `
   query PayoutBankInformationRequiredFields($slug: String, $currency: String!, $accountDetails: JSON) {
     host(slug: $slug) {
+      id
       transferwise {
+        id
         requiredFields(currency: $currency, accountDetails: $accountDetails) {
           type
           title
@@ -381,9 +383,11 @@ DetailsForm.propTypes = {
 const availableCurrenciesQuery = gqlV2/* GraphQL */ `
   query PayoutBankInformationAvailableCurrencies($slug: String, $ignoreBlockedCurrencies: Boolean) {
     host(slug: $slug) {
+      id
       slug
       currency
       transferwise {
+        id
         availableCurrencies(ignoreBlockedCurrencies: $ignoreBlockedCurrencies)
       }
     }
