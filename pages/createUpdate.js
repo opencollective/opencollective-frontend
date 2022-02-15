@@ -21,7 +21,6 @@ import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import Link from '../components/Link';
-import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import StyledButton from '../components/StyledButton';
 import StyledButtonSet from '../components/StyledButtonSet';
@@ -136,7 +135,7 @@ class CreateUpdatePage extends React.Component {
     }
 
     if (loadingLoggedInUser) {
-      return <LoadingPlaceholder />;
+      return null;
     }
 
     const collective = data.account;
