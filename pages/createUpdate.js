@@ -21,15 +21,13 @@ import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import Link from '../components/Link';
+import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
 import StyledButton from '../components/StyledButton';
 import StyledButtonSet from '../components/StyledButtonSet';
-import StyledSpinner from '../components/StyledSpinner';
 import { H1 } from '../components/Text';
 import { getUpdatesVariables, UPDATES_PER_PAGE, updatesQuery } from '../components/UpdatesWithData';
 import { withUser } from '../components/UserProvider';
-import LoadingGrid from '../components/LoadingGrid';
-import Loading from '../components/Loading';
 
 const BackButtonWrapper = styled(Container)`
   position: relative;
