@@ -197,6 +197,7 @@ class ExpenseFormItems extends React.PureComponent {
             hasMultiCurrency={!index && availableCurrencies?.length > 1} // Only display currency picker for the first item
             availableCurrencies={availableCurrencies}
             onCurrencyChange={this.onCurrencyChange}
+            payoutMethod={values.payoutMethod}
           />
         ))}
         <Flex alignItems="center" my={3}>
