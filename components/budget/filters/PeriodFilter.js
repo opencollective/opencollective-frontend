@@ -6,7 +6,7 @@ import { has } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { parseDateInterval, stripTime } from '../../../lib/date-utils';
+import { isValidDate, parseDateInterval, stripTime } from '../../../lib/date-utils';
 import dayjs from '../../../lib/dayjs';
 
 import { DateRange } from '../../DateRange';
@@ -51,13 +51,7 @@ const getNewInterval = (interval, changeField, newValue) => {
   newInterval[changeField] = newValue;
 
   // Reset interval in case fromDate is after toDate
-  if (
-    newInterval.from &&
-    !newInterval.from.startsWith('0') &&
-    newInterval.to &&
-    !newInterval.to.startsWith('0') &&
-    newInterval.from > newInterval.to
-  ) {
+  if (isValidDate(newInterval.from) && isValidDate(newInterval.to) && newInterval.from > newInterval.to) {
     const fieldToReset = changeField === 'from' ? 'to' : 'from';
     newInterval[fieldToReset] = '';
   }
