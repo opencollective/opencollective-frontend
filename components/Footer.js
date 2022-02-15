@@ -139,6 +139,10 @@ const messages = defineMessages({
     id: 'company.hiring',
     defaultMessage: 'Hiring',
   },
+  'company.e2c': {
+    id: 'e2c.title',
+    defaultMessage: 'Exit to Community #E2C',
+  },
   'company.termsOfService': {
     id: 'company.termsOfService',
     defaultMessage: 'Terms of service',
@@ -179,6 +183,7 @@ const navigation = {
     about: 'https://docs.opencollective.com/help/about/introduction',
     blog: 'https://blog.opencollective.com/',
     hiring: '/hiring',
+    e2c: '/e2c',
     termsOfService: '/tos',
     privacyPolicy: '/privacypolicy',
     securityPolicy: 'https://docs.opencollective.com/help/product/security',
