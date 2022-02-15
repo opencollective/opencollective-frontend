@@ -118,7 +118,7 @@ const PlatformTipInput = ({ currency, amount, quantity, fees, onChange, isEmbed 
             defaultMessage="Tips from contributors like you allow us to keep Open Collective free for Collectives. Thanks for any support!"
           />
         ) : (
-          <FormattedMessage defaultMessage="This page is powered by Open Collective, a platform that lets you collect and spend money transparently. Open Collective is free for charitable communities, we rely on the generosity of contributors like you to make this possible." />
+          <FormattedMessage defaultMessage="Powered by Open Collective, a platform to raise and spend money in full transparency. Tips from contributors like you help keep this service free for Collectives. Thanks for any support!" />
         )}
       </P>
       <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>
