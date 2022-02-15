@@ -24,9 +24,12 @@ import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import StyledButton from '../components/StyledButton';
 import StyledButtonSet from '../components/StyledButtonSet';
+import StyledSpinner from '../components/StyledSpinner';
 import { H1 } from '../components/Text';
 import { getUpdatesVariables, UPDATES_PER_PAGE, updatesQuery } from '../components/UpdatesWithData';
 import { withUser } from '../components/UserProvider';
+import LoadingGrid from '../components/LoadingGrid';
+import Loading from '../components/Loading';
 
 const BackButtonWrapper = styled(Container)`
   position: relative;
@@ -134,10 +137,6 @@ class CreateUpdatePage extends React.Component {
       return <ErrorPage data={data} />;
     }
 
-    if (loadingLoggedInUser) {
-      return null;
-    }
-
     const collective = data.account;
     const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(collective);
 
@@ -151,64 +150,72 @@ class CreateUpdatePage extends React.Component {
 
         <Body>
           <CollectiveNavbar collective={collective} isAdmin={isAdmin} />
-          <CreateUpdateWrapper className="content" mt={4} alignItems="baseline">
-            <BackButtonWrapper>
-              <Link href={`/${collective.slug}/updates`}>
-                <Container display="flex" color="#71757A" fontSize="14px" alignItems="center">
-                  <ArrowBack size={18} />
-                  <Box as="span" mx={2}>
-                    Back
-                  </Box>
-                </Container>
-              </Link>
-            </BackButtonWrapper>
-            <Container width={1} maxWidth={680}>
-              {!isAdmin && (
-                <div className="login">
-                  <p>
-                    <FormattedMessage
-                      id="updates.create.login"
-                      defaultMessage="You need to be logged in as an admin of this collective to be able to create an update."
-                    />
-                  </p>
-                  <p>
-                    <StyledButton buttonStyle="primary" href={`/signin?next=/${collective.slug}/updates/new`}>
-                      <FormattedMessage id="signIn" defaultMessage="Sign In" />
-                    </StyledButton>
-                  </p>
-                </div>
-              )}
-              {isAdmin && (
-                <Container my={3}>
-                  <H1 textAlign="left" fontSize="34px">
-                    <FormattedMessage id="updates.new.title" defaultMessage="New update" />
-                  </H1>
-                </Container>
-              )}
-              {collective.slug === 'opencollective' && isAdmin && (
-                <StyledButtonSet
-                  size="medium"
-                  items={UPDATE_TYPES}
-                  selected={this.state.updateType}
-                  onChange={value => this.setState({ updateType: value })}
-                >
-                  {({ item }) => intl.formatMessage(UPDATE_TYPE_MSGS[item])}
-                </StyledButtonSet>
-              )}
-              {isAdmin && (
-                <EditUpdateForm collective={collective} onSubmit={this.createUpdate} isChangelog={this.isChangelog()} />
-              )}
-              {this.state.status === 'error' && (
-                <MessageBox type="error" withIcon>
-                  <FormattedMessage
-                    id="updates.new.error"
-                    defaultMessage="Update failed: {err}"
-                    values={{ err: this.state.error }}
+          {loadingLoggedInUser ? (
+            <Loading />
+          ) : (
+            <CreateUpdateWrapper className="content" mt={4} alignItems="baseline">
+              <BackButtonWrapper>
+                <Link href={`/${collective.slug}/updates`}>
+                  <Container display="flex" color="#71757A" fontSize="14px" alignItems="center">
+                    <ArrowBack size={18} />
+                    <Box as="span" mx={2}>
+                      Back
+                    </Box>
+                  </Container>
+                </Link>
+              </BackButtonWrapper>
+              <Container width={1} maxWidth={680}>
+                {!isAdmin && (
+                  <div className="login">
+                    <p>
+                      <FormattedMessage
+                        id="updates.create.login"
+                        defaultMessage="You need to be logged in as an admin of this collective to be able to create an update."
+                      />
+                    </p>
+                    <p>
+                      <StyledButton buttonStyle="primary" href={`/signin?next=/${collective.slug}/updates/new`}>
+                        <FormattedMessage id="signIn" defaultMessage="Sign In" />
+                      </StyledButton>
+                    </p>
+                  </div>
+                )}
+                {isAdmin && (
+                  <Container my={3}>
+                    <H1 textAlign="left" fontSize="34px">
+                      <FormattedMessage id="updates.new.title" defaultMessage="New update" />
+                    </H1>
+                  </Container>
+                )}
+                {collective.slug === 'opencollective' && isAdmin && (
+                  <StyledButtonSet
+                    size="medium"
+                    items={UPDATE_TYPES}
+                    selected={this.state.updateType}
+                    onChange={value => this.setState({ updateType: value })}
+                  >
+                    {({ item }) => intl.formatMessage(UPDATE_TYPE_MSGS[item])}
+                  </StyledButtonSet>
+                )}
+                {isAdmin && (
+                  <EditUpdateForm
+                    collective={collective}
+                    onSubmit={this.createUpdate}
+                    isChangelog={this.isChangelog()}
                   />
-                </MessageBox>
-              )}
-            </Container>
-          </CreateUpdateWrapper>
+                )}
+                {this.state.status === 'error' && (
+                  <MessageBox type="error" withIcon>
+                    <FormattedMessage
+                      id="updates.new.error"
+                      defaultMessage="Update failed: {err}"
+                      values={{ err: this.state.error }}
+                    />
+                  </MessageBox>
+                )}
+              </Container>
+            </CreateUpdateWrapper>
+          )}
         </Body>
         <Footer />
       </div>
