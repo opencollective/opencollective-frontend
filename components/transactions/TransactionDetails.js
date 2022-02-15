@@ -89,6 +89,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
     id,
     type,
     isRefunded,
+    isRefund,
     toAccount,
     fromAccount,
     host,
@@ -103,6 +104,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
     order,
     expense,
     isOrderRejected,
+    kind,
   } = transaction;
   const isCredit = type === TransactionTypes.CREDIT;
   const hasOrder = order !== null;
@@ -115,30 +117,32 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
 
   return (
     <DetailsContainer flexWrap="wrap" alignItems="flex-start">
-      {(host || paymentMethod) && (
-        <Flex flexDirection="column" width={[1, 0.4]}>
-          {host && (
-            <Box>
-              <DetailTitle>
-                <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
-              </DetailTitle>
-              <DetailDescription>
-                <StyledLink as={LinkCollective} collective={host} />
-              </DetailDescription>
-            </Box>
-          )}
-          {paymentMethod && (
-            <Box>
-              <DetailTitle>
-                <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
-              </DetailTitle>
-              <DetailDescription>
-                <PaymentMethodTypeWithIcon type={paymentMethod.type} fontSize={11} iconSize={16} />
-              </DetailDescription>
-            </Box>
-          )}
-        </Flex>
-      )}
+      <Flex flexDirection="column" width={[1, 0.4]}>
+        {(host || paymentMethod) && (
+          <React.Fragment>
+            {host && (
+              <Box>
+                <DetailTitle>
+                  <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
+                </DetailTitle>
+                <DetailDescription>
+                  <StyledLink as={LinkCollective} collective={host} />
+                </DetailDescription>
+              </Box>
+            )}
+            {paymentMethod && (
+              <Box>
+                <DetailTitle>
+                  <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
+                </DetailTitle>
+                <DetailDescription>
+                  <PaymentMethodTypeWithIcon type={paymentMethod.type} fontSize={11} iconSize={16} />
+                </DetailDescription>
+              </Box>
+            )}
+          </React.Fragment>
+        )}
+      </Flex>
       <Flex flexDirection="column" width={[1, 0.6]}>
         <Box>
           <DetailTitle>
@@ -159,8 +163,11 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               taxAmount: transaction.taxAmount,
               taxInfo: transaction.taxInfo,
               intl,
+              kind,
+              expense,
+              isRefund,
             })}
-            {['CONTRIBUTION', 'ADDED_FUNDS'].includes(transaction.kind) && hostFeeTransaction && (
+            {['CONTRIBUTION', 'ADDED_FUNDS', 'EXPENSE'].includes(transaction.kind) && hostFeeTransaction && (
               <React.Fragment>
                 <br />
                 <FormattedMessage
@@ -226,6 +233,7 @@ TransactionDetails.propTypes = {
   displayActions: PropTypes.bool,
   transaction: PropTypes.shape({
     isRefunded: PropTypes.bool,
+    isRefund: PropTypes.bool,
     kind: PropTypes.oneOf(Object.values(TransactionKind)),
     isOrderRejected: PropTypes.bool,
     fromAccount: PropTypes.shape({

@@ -128,6 +128,9 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         status
         tags
         type
+        feesPayer
+        amount
+        currency
         legacyId
         # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
         comments(limit: 1) {
