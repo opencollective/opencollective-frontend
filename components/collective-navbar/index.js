@@ -49,6 +49,9 @@ const DisableGlobalScrollOnMobile = createGlobalStyle`
     body {
       overflow: hidden;
     }
+    #footer {
+      display: none;
+    }
   }
 `;
 
