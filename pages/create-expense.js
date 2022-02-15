@@ -458,6 +458,7 @@ const hostFieldsFragment = gqlV2/* GraphQL */ `
       country
     }
     transferwise {
+      id
       availableCurrencies
     }
     supportedPayoutMethods
