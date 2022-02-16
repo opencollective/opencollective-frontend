@@ -134,15 +134,20 @@ class ExpenseFormItems extends React.PureComponent {
     }
 
     const { payoutMethod, currency } = form.values;
-    return uniq(
-      [
-        currency,
-        collective.currency,
-        collective.host?.currency,
-        payoutMethod?.currency,
-        payoutMethod?.data?.currency,
-      ].filter(Boolean),
-    );
+    const isPayPal = payoutMethod?.type === PayoutMethodType.PAYPAL;
+    if (isPayPal) {
+      return PayPalSupportedCurrencies;
+    } else {
+      return uniq(
+        [
+          currency,
+          collective.currency,
+          collective.host?.currency,
+          payoutMethod?.currency,
+          payoutMethod?.data?.currency,
+        ].filter(Boolean),
+      );
+    }
   };
 
   render() {
@@ -178,8 +183,7 @@ class ExpenseFormItems extends React.PureComponent {
     }
 
     const onRemove = requireFile || items.length > 1 ? this.remove : null;
-    const isPayPal = values?.payoutMethod?.type === PayoutMethodType.PAYPAL;
-    const availableCurrencies = isPayPal ? PayPalSupportedCurrencies : this.getPossibleCurrencies();
+    const availableCurrencies = this.getPossibleCurrencies();
     return (
       <Box>
         {this.renderErrors()}
