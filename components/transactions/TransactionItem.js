@@ -297,7 +297,10 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 isRefund={isRefund}
                 isRefunded={isRefunded}
                 isOrderRejected={isOrderRejected}
-                fontSize="9px"
+                fontSize="12px"
+                fontWeight="bold"
+                lineHeight="16px"
+                letterSpacing="0.06em"
                 px="6px"
                 py="2px"
               />
