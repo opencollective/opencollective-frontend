@@ -1836,7 +1836,16 @@ type Order {
   id: String!
   legacyId: Int!
   description: String
+
+  """
+  Base order amount (without platform tip)
+  """
   amount: Amount!
+
+  """
+  Total order amount, including all taxes and platform tip
+  """
+  totalAmount: Amount!
   quantity: Int
   status: OrderStatus
   frequency: ContributionFrequency

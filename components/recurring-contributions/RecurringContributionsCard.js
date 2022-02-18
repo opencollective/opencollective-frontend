@@ -113,13 +113,9 @@ const RecurringContributionsCard = ({
             </P>
             <P fontSize="14px" lineHeight="20px" fontWeight="bold" data-cy="recurring-contribution-amount-contributed">
               <FormattedMoneyAmount
-                amount={
-                  !isNil(contribution.platformTipAmount?.valueInCents)
-                    ? contribution.amount.valueInCents + contribution.platformTipAmount.valueInCents
-                    : contribution.amount.valueInCents
-                }
+                amount={contribution.totalAmount.valueInCents}
                 interval={contribution.frequency.toLowerCase().slice(0, -2)}
-                currency={contribution.amount.currency}
+                currency={contribution.totalAmount.currency}
               />
             </P>
             {!isNil(contribution.platformTipAmount?.valueInCents) && (
@@ -198,6 +194,7 @@ RecurringContributionsCard.propTypes = {
   onEdit: PropTypes.func,
   contribution: PropTypes.shape({
     amount: PropTypes.object.isRequired,
+    totalAmount: PropTypes.object.isRequired,
     platformTipAmount: PropTypes.object,
     frequency: PropTypes.string.isRequired,
     totalDonations: PropTypes.object.isRequired,
