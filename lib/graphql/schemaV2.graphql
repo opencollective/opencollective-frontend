@@ -7515,6 +7515,16 @@ type Mutation {
   ): ProcessHostApplicationResponse!
 
   """
+  [Root only] Removes the host for an account
+  """
+  removeHost(
+    """
+    The account to unhost
+    """
+    account: AccountReferenceInput!
+  ): Account!
+
+  """
   Edit the settings for the given account
   """
   editAccountSetting(

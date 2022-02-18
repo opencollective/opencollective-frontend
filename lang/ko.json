@@ -457,6 +457,7 @@
   "Collectives.Oldest": "오래된 순",
   "CollectiveType.Collective": "{count, plural, one {Collective} other {Collectives}}",
   "CollectiveType.Event": "{count, plural, one {Event} other {Events}}",
+  "CollectiveType.Fund": "{count, plural, one {Fund} other {Funds}}",
   "CollectiveType.Organization": "{count, plural, one {Organization} other {Organizations}}",
   "CollectiveType.Project": "{count, plural, one {Project} other {Projects}}",
   "CollectiveType.User": "{count, plural, one {User} other {Users}}",
