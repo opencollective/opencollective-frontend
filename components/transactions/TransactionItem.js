@@ -104,14 +104,14 @@ const KindTag = styled(StyledTag).attrs({
   fontWeight: '600',
 })``;
 
-const getExpenseStatusTag = (status, isRefund, isRefunded) => {
+const getExpenseStatusTag = (expense, isRefund, isRefunded) => {
   let expenseStatusLabel;
   if (isRefunded) {
     expenseStatusLabel = expenseStatus.REFUNDED;
   } else if (isRefund) {
     expenseStatusLabel = expenseStatus.COMPLETED;
   } else {
-    expenseStatusLabel = status;
+    expenseStatusLabel = expense?.status || expenseStatus.PAID;
   }
   return (
     <ExpenseStatusTag
@@ -258,7 +258,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 )}
                 {INFO_SEPARATOR}
                 <DateTime value={createdAt} data-cy="transaction-date" />
-                {isExpense && expense.comments?.totalCount > 0 && (
+                {isExpense && expense?.comments?.totalCount > 0 && (
                   <React.Fragment>
                     {INFO_SEPARATOR}
                     <span>
@@ -305,7 +305,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 py="2px"
               />
             )}{' '}
-            {isExpense && getExpenseStatusTag(expense.status, isRefund, isRefunded)}
+            {isExpense && getExpenseStatusTag(expense, isRefund, isRefunded)}
           </Flex>
         </Flex>
         {hasOrder && [CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
