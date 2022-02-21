@@ -4,6 +4,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { canContributeRecurring } from '../../lib/collective.lib';
 import { isTierExpired } from '../../lib/tier-utils';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import Container from '../Container';
 import { Flex } from '../Grid';
@@ -122,7 +123,7 @@ const ContributionBlocker = ({ account, blocker }) => {
           blocker.reason}
       </MessageBox>
       {blocker.showOtherWaysToContribute && account && (
-        <Link href={`/${account.slug}/contribute`}>
+        <Link href={`${getCollectivePageRoute(account)}/contribute`}>
           <StyledButton buttonStyle="primary" buttonSize="large" mt={5}>
             <FormattedMessage id="createOrder.backToTier" defaultMessage="View all the other ways to contribute" />
           </StyledButton>
