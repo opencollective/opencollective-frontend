@@ -457,6 +457,7 @@
   "Collectives.Oldest": "最旧",
   "CollectiveType.Collective": "{count, plural, one {Collective} other {Collectives}}",
   "CollectiveType.Event": "{count, plural, one {Event} other {Events}}",
+  "CollectiveType.Fund": "{count, plural, one {Fund} other {Funds}}",
   "CollectiveType.Organization": "{count, plural, one {Organization} other {Organizations}}",
   "CollectiveType.Project": "{count, plural, one {Project} other {Projects}}",
   "CollectiveType.User": "{count, plural, one{用户} other {用户}}",

@@ -457,6 +457,7 @@
   "Collectives.Oldest": "Najstarsze",
   "CollectiveType.Collective": "{count, plural, one {Zbiór} few {Zbiory} many {Zbiorów} other {Zbiór}}",
   "CollectiveType.Event": "{count, plural, one{Wydarzenie} few {Wydarzenia} many {Wydarzeń} other{Wydarzenia}}",
+  "CollectiveType.Fund": "{count, plural, one {Fund} other {Funds}}",
   "CollectiveType.Organization": "{count, plural, one {Organizacja} few {Organizacje} many {Organizacji} other {Organizacji}}",
   "CollectiveType.Project": "{count, plural, one {Projekt} few {Projekty} many {Projektów} other {Projekty}}",
   "CollectiveType.User": "{count, plural, one {Sponsor} few {Sponsorzy} many {Sponsorów} other {Sponsorzy}}",

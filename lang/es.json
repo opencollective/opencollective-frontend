@@ -457,6 +457,7 @@
   "Collectives.Oldest": "Más antiguo",
   "CollectiveType.Collective": "{count, plural, one {Colectivo} other {Colectivos}}",
   "CollectiveType.Event": "{count, plural, one {Evento} other {Eventos}}",
+  "CollectiveType.Fund": "{count, plural, one {Fund} other {Funds}}",
   "CollectiveType.Organization": "{count, plural, one {Organización} other {Organizaciones}}",
   "CollectiveType.Project": "{count, plural, one {Proyecto} other {Proyectos}}",
   "CollectiveType.User": "{count, plural, one {Usuario} other {Usuarios}}",
