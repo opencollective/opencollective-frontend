@@ -64,7 +64,7 @@ const TierTitle = ({ collective, tier }) => {
       >
         <StyledLink
           as={Link}
-          href={`/${collective.slug}/contribute/${tier.slug}-${tier.id}`}
+          href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}`}
           color="black.900"
           hoverColor="black.900"
           underlineOnHover

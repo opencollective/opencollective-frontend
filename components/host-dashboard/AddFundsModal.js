@@ -10,6 +10,7 @@ import styled, { css } from 'styled-components';
 import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../collective-page/graphql/queries';
 import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
@@ -576,7 +577,9 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                             <StyledLink
                               as={Link}
                               openInNewTab
-                              href={`/${collective.slug}/contribute/${fundDetails.tier.slug}-${fundDetails.tier.legacyId}`}
+                              href={`${getCollectivePageRoute(collective)}/contribute/${fundDetails.tier.slug}-${
+                                fundDetails.tier.legacyId
+                              }`}
                             >
                               <strong>{fundDetails.tier.name}</strong>
                             </StyledLink>

@@ -6,10 +6,11 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+// Open Collective Frontend imports
 import { NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import INTERVALS from '../../lib/constants/intervals';
 import { isTierExpired } from '../../lib/tier-utils';
-// Open Collective Frontend imports
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { getWebsiteUrl } from '../../lib/utils';
 
 import CollectiveNavbar from '../collective-navbar';
@@ -171,6 +172,7 @@ class TierPage extends Component {
     const amountRaised = tier.stats?.[amountRaisedKey] || 0;
     const shareBlock = this.renderShareBlock();
     const isPassed = isTierExpired(tier);
+    const contributeQuery = redirect ? { redirect } : undefined;
 
     return (
       <Container>
@@ -341,7 +343,12 @@ class TierPage extends Component {
                       {isPassed ? (
                         <P textAlign="center">
                           <FormattedMessage id="Tier.Past" defaultMessage="This tier is not active anymore." />{' '}
-                          <Link href={{ pathname: `/${collective.slug}/contribute`, query: { redirect } }}>
+                          <Link
+                            href={{
+                              pathname: `${getCollectivePageRoute(collective)}/contribute`,
+                              query: contributeQuery,
+                            }}
+                          >
                             <FormattedMessage
                               id="createOrder.backToTier"
                               defaultMessage="View all the other ways to contribute"
@@ -352,8 +359,10 @@ class TierPage extends Component {
                       ) : (
                         <Link
                           href={{
-                            pathname: `/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`,
-                            query: { redirect },
+                            pathname: `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${
+                              tier.id
+                            }/checkout`,
+                            query: contributeQuery,
                           }}
                         >
                           <StyledButton
@@ -479,7 +488,7 @@ class TierPage extends Component {
               {isPassed ? (
                 <P textAlign="center">
                   <FormattedMessage id="Tier.Past" defaultMessage="This tier is not active anymore." />{' '}
-                  <Link href={{ pathname: `/${collective.slug}/contribute`, query: { redirect } }}>
+                  <Link href={{ pathname: `${getCollectivePageRoute(collective)}/contribute`, query: contributeQuery }}>
                     <FormattedMessage
                       id="createOrder.backToTier"
                       defaultMessage="View all the other ways to contribute"
@@ -490,8 +499,8 @@ class TierPage extends Component {
               ) : (
                 <Link
                   href={{
-                    pathname: `/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`,
-                    query: { redirect },
+                    pathname: `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}/checkout`,
+                    query: contributeQuery,
                   }}
                 >
                   <StyledButton
