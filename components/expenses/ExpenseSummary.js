@@ -265,8 +265,8 @@ const ExpenseSummary = ({
                 values={{ currency: expense.amountInAccountCurrency.currency }}
               />
             </Container>
-            {' ~'}&nbsp;
             <Span color="black.600">
+              {' ~'}&nbsp;
               <FormattedMoneyAmount
                 amount={expense.amountInAccountCurrency.valueInCents}
                 currency={expense.amountInAccountCurrency.currency}
