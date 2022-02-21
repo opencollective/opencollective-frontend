@@ -43,6 +43,11 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
             valueInCents
             currency
           }
+          totalAmount {
+            value
+            valueInCents
+            currency
+          }
           status
           frequency
           tier {
