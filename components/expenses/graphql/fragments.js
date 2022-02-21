@@ -133,6 +133,11 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
     privateMessage
     tags
     amount
+    amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
+      valueInCents
+      currency
+    }
+    accountCurrencyFxRate
     createdAt
     invoiceInfo
     requiredLegalDocuments
@@ -351,6 +356,11 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
     createdAt
     tags
     amount
+    amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
+      valueInCents
+      currency
+    }
+    accountCurrencyFxRate
     currency
     type
     requiredLegalDocuments

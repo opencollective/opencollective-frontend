@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
+import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -100,6 +101,8 @@ const ExpenseBudgetItem = ({
   const pendingReceipt = isCharge && expense?.items?.every(i => i.url === null);
   const nbAttachedFiles = !isAdminView ? 0 : getNbAttachedFiles(expense);
   const isExpensePaidOrRejected = [expenseStatus.REJECTED, expenseStatus.PAID].includes(expense?.status);
+  const isMultiCurrency =
+    expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
 
   return (
     <ExpenseContainer data-cy={`expense-container-${expense?.legacyId}`}>
@@ -191,15 +194,37 @@ const ExpenseBudgetItem = ({
           )}
         </Flex>
         <Flex flexDirection={['row', 'column']} mt={[3, 0]} flexWrap="wrap" alignItems={['center', 'flex-end']}>
-          <Flex my={2} mr={[3, 0]} minWidth={100} justifyContent="flex-end" data-cy="transaction-amount">
+          <Flex
+            my={2}
+            mr={[3, 0]}
+            flexDirection="column"
+            minWidth={100}
+            alignItems="flex-end"
+            data-cy="transaction-amount"
+          >
             {isLoading ? (
               <LoadingPlaceholder height={19} width={120} />
             ) : (
               <React.Fragment>
-                {showAmountSign && <TransactionSign isCredit={isInverted} />}
-                <Span color="black.700" fontSize="16px">
-                  <FormattedMoneyAmount amount={expense.amount} currency={expense.currency} precision={2} />
-                </Span>
+                <div>
+                  {showAmountSign && <TransactionSign isCredit={isInverted} />}
+                  <Span color="black.700" fontSize="16px">
+                    <FormattedMoneyAmount amount={expense.amount} currency={expense.currency} precision={2} />
+                  </Span>
+                </div>
+                {isMultiCurrency && (
+                  <Box my={1}>
+                    <Span color="black.600" fontSize="13px">
+                      ~{' '}
+                      <FormattedMoneyAmount
+                        amount={expense.amountInAccountCurrency.valueInCents}
+                        currency={expense.amountInAccountCurrency.currency}
+                        precision={2}
+                        amountStyles={null}
+                      />
+                    </Span>
+                  </Box>
+                )}
               </React.Fragment>
             )}
           </Flex>
@@ -341,6 +366,7 @@ ExpenseBudgetItem.propTypes = {
     createdAt: PropTypes.string.isRequired,
     tags: PropTypes.arrayOf(PropTypes.string),
     amount: PropTypes.number.isRequired,
+    amountInAccountCurrency: AmountPropTypeShape,
     currency: PropTypes.string.isRequired,
     permissions: PropTypes.object,
     items: PropTypes.arrayOf(PropTypes.object),

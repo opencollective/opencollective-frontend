@@ -13,6 +13,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
+import { AmountPropTypeShape } from '../../lib/prop-types';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -167,6 +168,15 @@ const getInitialValues = (expense, host, payoutMethodType) => {
   };
 };
 
+const getPaymentProcessorFee = (formik, expense, quoteQuery) => {
+  return formik.values.forceManual
+    ? {
+        valueInCents: formik.values.paymentProcessorFee,
+        currency: expense.currency,
+      }
+    : quoteQuery?.data?.expense?.quote.paymentProcessorFeeAmount;
+};
+
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
  */
@@ -190,12 +200,10 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
     skip: !canQuote,
   });
 
-  const paymentProcessorFee = formik.values.forceManual
-    ? {
-        valueInCents: formik.values.paymentProcessorFee,
-        currency: expense.currency,
-      }
-    : quoteQuery?.data?.expense?.quote.paymentProcessorFeeAmount;
+  const paymentProcessorFee = getPaymentProcessorFee(formik, expense, quoteQuery);
+  const isMultiCurrency =
+    expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
+  const totalAmount = getTotalPayoutAmount(expense, { paymentProcessorFee, feesPayer: formik.values.feesPayer });
 
   return (
     <StyledModal
@@ -258,7 +266,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             {inputProps => (
               <StyledInputAmount
                 {...inputProps}
-                currency={collective.currency}
+                currency={expense.currency}
                 currencyDisplay="FULL"
                 value={formik.values.paymentProcessorFee}
                 placeholder="0.00"
@@ -338,15 +346,29 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             </Label>
             <Amount>
               <FormattedMoneyAmount
-                amount={getTotalPayoutAmount(expense, {
-                  paymentProcessorFee,
-                  feesPayer: formik.values.feesPayer,
-                })}
+                amount={totalAmount}
                 currency={expense.currency}
                 currencyCodeStyles={{ color: 'black.500' }}
               />
             </Amount>
           </AmountLine>
+          {isMultiCurrency && expense.accountCurrencyFxRate && (
+            <AmountLine py={0}>
+              <Label color="black.600" fontWeight="500">
+                <FormattedMessage defaultMessage="Accounted as" />
+              </Label>
+              <Span display="flex" whiteSpace="nowrap">
+                ~&nbsp;
+                <Amount>
+                  <FormattedMoneyAmount
+                    amount={Math.round(totalAmount * expense.accountCurrencyFxRate)}
+                    amountStyles={null}
+                    currency={collective.currency}
+                  />
+                </Amount>
+              </Span>
+            </AmountLine>
+          )}
         </Box>
         {Boolean(error?.message?.startsWith('Two-factor authentication')) && (
           <StyledInputField
@@ -435,6 +457,8 @@ PayExpenseModal.propTypes = {
     id: PropTypes.string,
     legacyId: PropTypes.number,
     amount: PropTypes.number,
+    accountCurrencyFxRate: PropTypes.number,
+    amountInAccountCurrency: AmountPropTypeShape,
     currency: PropTypes.string,
     feesPayer: PropTypes.string,
     payoutMethod: PropTypes.shape({
