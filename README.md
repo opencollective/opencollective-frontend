@@ -17,7 +17,7 @@ If you see a step below that could be improved (or is outdated), please update t
 
 ### Prerequisite
 
-1. Make sure you have Node.js version >= 14.
+1. Make sure you have Node.js version 14.x and NPM version 6.x. Verison 7 of NPM is currently not supported, because it changes the contents of the lockfile, see [issue #4177](https://github.com/opencollective/opencollective/issues/4177) for details.
 
 - We recommend using [nvm](https://github.com/creationix/nvm): `nvm use`.
 
