@@ -1997,6 +1997,7 @@
   "SearchFor": "Шукати {entity}",
   "SearchFor2": "Шукати {entity1} або {entity2}",
   "SearchFor3": "Шукати {entity1}, {entity2} або {entity3}",
+  "SearchFor4": "Search for {entity1}, {entity2}, {entity3} or {entity4}",
   "section.budget.title": "Бюджет",
   "section.connect.info": "Розпочніть розмову з вашою спільнотою або поділіться оновленнями про те, як йдуть справи.",
   "section.connect.subtitle": "Розпочнімо!",

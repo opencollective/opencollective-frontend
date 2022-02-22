@@ -1997,6 +1997,7 @@
   "SearchFor": "Rechercher des {entity}",
   "SearchFor2": "Rechercher des {entity1} ou des {entity2}",
   "SearchFor3": "Rechercher des {entity1}, des {entity2} ou des {entity3}",
+  "SearchFor4": "Search for {entity1}, {entity2}, {entity3} or {entity4}",
   "section.budget.title": "Budget",
   "section.connect.info": "Start conversations with your community or share updates on how things are going.",
   "section.connect.subtitle": "Faisons connaissance !",

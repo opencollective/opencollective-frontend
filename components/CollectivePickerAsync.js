@@ -57,6 +57,10 @@ const Messages = defineMessages({
     id: 'SearchFor3',
     defaultMessage: 'Search for {entity1}, {entity2} or {entity3}',
   },
+  searchForType_4: {
+    id: 'SearchFor4',
+    defaultMessage: 'Search for {entity1}, {entity2}, {entity3} or {entity4}',
+  },
   search: {
     id: 'Search',
     defaultMessage: 'Search',
@@ -69,7 +73,7 @@ const Messages = defineMessages({
  */
 const getPlaceholder = (intl, types) => {
   const nbTypes = types ? types.length : 0;
-  if (nbTypes === 0 || nbTypes > 3) {
+  if (nbTypes === 0 || nbTypes > 4) {
     return intl.formatMessage(Messages.search);
   } else if (nbTypes === 1) {
     return intl.formatMessage(Messages.searchForType, { entity: formatCollectiveType(intl, types[0], 100) });

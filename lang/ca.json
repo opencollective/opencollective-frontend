@@ -1997,6 +1997,7 @@
   "SearchFor": "Search for {entity}",
   "SearchFor2": "Search for {entity1} or {entity2}",
   "SearchFor3": "Search for {entity1}, {entity2} or {entity3}",
+  "SearchFor4": "Search for {entity1}, {entity2}, {entity3} or {entity4}",
   "section.budget.title": "Pressupost",
   "section.connect.info": "Start conversations with your community or share updates on how things are going.",
   "section.connect.subtitle": "Let’s get the ball rolling!",
