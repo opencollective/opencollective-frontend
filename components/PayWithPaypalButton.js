@@ -107,6 +107,10 @@ class PayWithPaypalButton extends Component {
       return;
     }
 
+    // Make sure we cleanup any pre-existing button
+    this.paypalTarget.current.innerHTML = '';
+
+    // Initialize button
     const { host, currency } = this.props;
     const clientId = host.paypalClientId;
     const intent = this.props.interval ? 'subscription' : 'capture';
