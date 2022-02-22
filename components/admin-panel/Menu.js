@@ -75,7 +75,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
           <MenuLink
             collective={collective}
             section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS}
-            if={!isAccountantOnly && hasFeature(collective, FEATURES.PRIVACY_VCC)}
+            if={!isAccountantOnly && hasFeature(collective, FEATURES.VIRTUAL_CARDS)}
           />
           <MenuLink collective={collective} section={HOST_SECTIONS.REPORTS} isBeta />
         </MenuGroup>
@@ -101,7 +101,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
               <MenuLink
                 collective={collective}
                 section={FISCAL_HOST_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS}
-                if={hasFeature(collective, FEATURES.PRIVACY_VCC)}
+                if={hasFeature(collective, FEATURES.VIRTUAL_CARDS)}
               />
               <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.HOST_TWO_FACTOR_AUTH} />
               <MenuLink
@@ -169,7 +169,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={COLLECTIVE_SECTIONS.VIRTUAL_CARDS}
             if={
               isOneOfTypes(collective, [COLLECTIVE, FUND]) &&
-              hasFeature(collective.host, FEATURES.PRIVACY_VCC) &&
+              hasFeature(collective.host, FEATURES.VIRTUAL_CARDS) &&
               collective.isApproved
             }
           />

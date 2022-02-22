@@ -1977,7 +1977,7 @@ export const loggedInUser = new LoggedInUser({
           goals: [{}],
           editor: 'html',
           features: {
-            privacyVcc: true,
+            virtualCards: true,
             transferwise: true,
             paypalPayouts: true,
           },
@@ -4066,7 +4066,7 @@ export const loggedInUser = new LoggedInUser({
           goals: [{}],
           editor: 'html',
           features: {
-            privacyVcc: true,
+            virtualCards: true,
             transferwise: true,
             paypalPayouts: true,
           },
