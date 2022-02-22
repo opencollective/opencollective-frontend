@@ -5,7 +5,9 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
+import { PayPalSupportedCurrencies } from '../../lib/constants/currency';
 import expenseTypes from '../../lib/constants/expenseTypes';
+import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { toIsoDateStr } from '../../lib/date-utils';
 import { formatErrorMessage } from '../../lib/errors';
 import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
@@ -132,15 +134,20 @@ class ExpenseFormItems extends React.PureComponent {
     }
 
     const { payoutMethod, currency } = form.values;
-    return uniq(
-      [
-        currency,
-        collective.currency,
-        collective.host?.currency,
-        payoutMethod?.currency,
-        payoutMethod?.data?.currency,
-      ].filter(Boolean),
-    );
+    const isPayPal = payoutMethod?.type === PayoutMethodType.PAYPAL;
+    if (isPayPal) {
+      return PayPalSupportedCurrencies;
+    } else {
+      return uniq(
+        [
+          currency,
+          collective.currency,
+          collective.host?.currency,
+          payoutMethod?.currency,
+          payoutMethod?.data?.currency,
+        ].filter(Boolean),
+      );
+    }
   };
 
   render() {
