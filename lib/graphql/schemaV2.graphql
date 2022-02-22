@@ -569,7 +569,22 @@ type Expense {
   """
   Total amount of the expense (sum of the item's amounts).
   """
-  amount: Int!
+  amount: Int! @deprecated(reason: "2022-02-09: Please use amountV2")
+
+  """
+  Total amount of the expense
+  """
+  amountV2(
+    """
+    Source of the currency to express the amount. Defaults to the expense currency
+    """
+    currencySource: ExpenseCurrencySource
+  ): Amount
+
+  """
+  The exchange rate between the expense currency and the account currency
+  """
+  accountCurrencyFxRate: Float!
 
   """
   The time of creation
@@ -690,6 +705,26 @@ type Expense {
   """
   requestedByAccount: Account
   quote: ExpenseQuote
+}
+
+"""
+All supported expense currency sources
+"""
+enum ExpenseCurrencySource {
+  """
+  The expense currency expressed as the host currency
+  """
+  HOST
+
+  """
+  The expense currency expressed as the account currency
+  """
+  ACCOUNT
+
+  """
+  The expense currency expressed as the expense currency
+  """
+  EXPENSE
 }
 
 """
@@ -1836,7 +1871,16 @@ type Order {
   id: String!
   legacyId: Int!
   description: String
+
+  """
+  Base order amount (without platform tip)
+  """
   amount: Amount!
+
+  """
+  Total order amount, including all taxes and platform tip
+  """
+  totalAmount: Amount!
   quantity: Int
   status: OrderStatus
   frequency: ContributionFrequency
@@ -7513,6 +7557,16 @@ type Mutation {
     """
     message: String
   ): ProcessHostApplicationResponse!
+
+  """
+  [Root only] Removes the host for an account
+  """
+  removeHost(
+    """
+    The account to unhost
+    """
+    account: AccountReferenceInput!
+  ): Account!
 
   """
   Edit the settings for the given account

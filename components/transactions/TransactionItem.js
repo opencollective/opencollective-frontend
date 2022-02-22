@@ -43,7 +43,7 @@ const INFO_SEPARATOR = ' • ';
 const getDisplayedAmount = (transaction, collective) => {
   const isCredit = transaction.type === TransactionTypes.CREDIT;
   const hasOrder = transaction.order !== null;
-  const hasExpense = transaction.expense !== null;
+  const isExpense = transaction.kind === TransactionKind.EXPENSE;
   const isSelf = transaction.fromAccount.slug === collective.slug;
 
   if (isCredit && hasOrder) {
@@ -53,7 +53,7 @@ const getDisplayedAmount = (transaction, collective) => {
     // Expense Debits should display the Amount with Payment Method fees only on collective's profile
     return isSelf ? transaction.netAmount : transaction.amount;
   } else if (transaction.isRefunded) {
-    if (hasExpense || (isSelf && !transaction.isRefund) || (transaction.isRefund && isCredit)) {
+    if (isExpense || (isSelf && !transaction.isRefund) || (transaction.isRefund && isCredit)) {
       return transaction.netAmount;
     } else {
       return transaction.amount;
@@ -104,14 +104,14 @@ const KindTag = styled(StyledTag).attrs({
   fontWeight: '600',
 })``;
 
-const getExpenseStatusTag = (status, isRefund, isRefunded) => {
+const getExpenseStatusTag = (expense, isRefund, isRefunded) => {
   let expenseStatusLabel;
   if (isRefunded) {
     expenseStatusLabel = expenseStatus.REFUNDED;
   } else if (isRefund) {
     expenseStatusLabel = expenseStatus.COMPLETED;
   } else {
-    expenseStatusLabel = status;
+    expenseStatusLabel = expense?.status || expenseStatus.PAID;
   }
   return (
     <ExpenseStatusTag
@@ -155,6 +155,36 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
   const avatarCollective = isCredit ? fromAccount : toAccount;
 
   const displayedAmount = getDisplayedAmount(transaction, collective);
+
+  const transactionDetailsLink = () => {
+    return (
+      <StyledButton
+        data-cy="transaction-details"
+        buttonSize="tiny"
+        buttonStyle="secondary"
+        isBorderless
+        onClick={() => setExpanded(!isExpanded)}
+      >
+        <Span whiteSpace="nowrap">
+          {isExpanded ? (
+            <React.Fragment>
+              <FormattedMessage id="closeDetails" defaultMessage="Close Details" />
+              &nbsp;
+              <ChevronUp size="1em" />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <Span whiteSpace="nowrap">
+                <FormattedMessage id="viewDetails" defaultMessage="View Details" />
+                &nbsp;
+                <ChevronDown size="1em" />
+              </Span>
+            </React.Fragment>
+          )}
+        </Span>
+      </StyledButton>
+    );
+  };
 
   return (
     <Item data-cy="transaction-item">
@@ -228,7 +258,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 )}
                 {INFO_SEPARATOR}
                 <DateTime value={createdAt} data-cy="transaction-date" />
-                {isExpense && expense.comments?.totalCount > 0 && (
+                {isExpense && expense?.comments?.totalCount > 0 && (
                   <React.Fragment>
                     {INFO_SEPARATOR}
                     <span>
@@ -267,12 +297,15 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 isRefund={isRefund}
                 isRefunded={isRefunded}
                 isOrderRejected={isOrderRejected}
-                fontSize="9px"
+                fontSize="12px"
+                fontWeight="bold"
+                lineHeight="16px"
+                letterSpacing="0.06em"
                 px="6px"
                 py="2px"
               />
             )}{' '}
-            {isExpense && getExpenseStatusTag(expense.status, isRefund, isRefunded)}
+            {isExpense && getExpenseStatusTag(expense, isRefund, isRefunded)}
           </Flex>
         </Flex>
         {hasOrder && [CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
@@ -280,61 +313,13 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             {[CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
               <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
             )}
-            <StyledButton
-              data-cy="transaction-details"
-              buttonSize="tiny"
-              buttonStyle="secondary"
-              isBorderless
-              onClick={() => setExpanded(!isExpanded)}
-            >
-              <Span whiteSpace="nowrap">
-                {isExpanded ? (
-                  <React.Fragment>
-                    <FormattedMessage id="closeDetails" defaultMessage="Close Details" />
-                    &nbsp;
-                    <ChevronUp size="1em" />
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>
-                    <Span whiteSpace="nowrap">
-                      <FormattedMessage id="viewDetails" defaultMessage="View Details" />
-                      &nbsp;
-                      <ChevronDown size="1em" />
-                    </Span>
-                  </React.Fragment>
-                )}
-              </Span>
-            </StyledButton>
+            {transactionDetailsLink()}
           </Container>
         )}
         {isExpense && (
           <Container display="flex" mt={3} pt={[2, 0]}>
             <ExpenseTags expense={expense} />
-            <StyledButton
-              data-cy="expense-details"
-              buttonSize="tiny"
-              buttonStyle="secondary"
-              isBorderless
-              onClick={() => setExpanded(!isExpanded)}
-            >
-              <Span whiteSpace="nowrap">
-                {isExpanded ? (
-                  <React.Fragment>
-                    <FormattedMessage id="closeDetails" defaultMessage="Close Details" />
-                    &nbsp;
-                    <ChevronUp size="1em" />
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>
-                    <Span whiteSpace="nowrap">
-                      <FormattedMessage id="viewDetails" defaultMessage="View Details" />
-                      &nbsp;
-                      <ChevronDown size="1em" />
-                    </Span>
-                  </React.Fragment>
-                )}
-              </Span>
-            </StyledButton>
+            {transactionDetailsLink()}
           </Container>
         )}
         {!isExpense && (!hasOrder || ![CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind)) && (
@@ -418,7 +403,6 @@ TransactionItem.propTypes = {
       currency: PropTypes.string,
     }),
     netAmountInCollectiveCurrency: PropTypes.number,
-    refundTransaction: PropTypes.object,
     usingGiftCardFromCollective: PropTypes.object,
   }),
   collective: PropTypes.shape({

@@ -8,6 +8,12 @@ let loader;
 // to load images from a custom domain if provided
 if (process.env.NEXT_IMAGES_URL) {
   loader = ({ src, width, quality }) => {
+    if (src.endsWith('.svg')) {
+      // Special case to make svg serve as-is to avoid proxying through the built-in Image Optimization API.
+      // See https://nextjs.org/docs/api-reference/next/image#dangerously-allow-svg
+      return src;
+    }
+
     return `${process.env.NEXT_IMAGES_URL}/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality || 75}`;
   };
 }

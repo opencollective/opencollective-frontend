@@ -12,6 +12,7 @@ import ConnectAccountsForm from '../components/root-actions/ConnectAccountsForm'
 import MergeAccountsForm from '../components/root-actions/MergeAccountsForm';
 import MoveAuthoredContributions from '../components/root-actions/MoveAuthoredContributions';
 import MoveReceivedContributions from '../components/root-actions/MoveReceivedContributions';
+import UnhostAccountForm from '../components/root-actions/UnhostAccountForm';
 import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
 import { H1, H2, H3, P, Span } from '../components/Text';
@@ -22,6 +23,7 @@ const MENU = [
   { id: 'Clear cache', title: 'Clear cache for account', Component: ClearCacheForAccountForm },
   { id: 'Connect accounts', Component: ConnectAccountsForm },
   { id: 'Merge accounts', isDangerous: true, Component: MergeAccountsForm },
+  { id: 'Unhost account', Component: UnhostAccountForm },
   {
     id: 'Move authored contributions',
     Component: MoveAuthoredContributions,

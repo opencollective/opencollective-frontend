@@ -6,7 +6,7 @@ import { has } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { parseDateInterval, stripTime } from '../../../lib/date-utils';
+import { isValidDate, parseDateInterval, stripTime } from '../../../lib/date-utils';
 import dayjs from '../../../lib/dayjs';
 
 import { DateRange } from '../../DateRange';
@@ -48,10 +48,10 @@ const getIntervalFromValue = value => {
  */
 const getNewInterval = (interval, changeField, newValue) => {
   const newInterval = { ...interval };
-  newInterval[changeField] = stripTime(newValue);
+  newInterval[changeField] = newValue;
 
   // Reset interval in case fromDate is after toDate
-  if (newInterval.from && newInterval.to && newInterval.from > newInterval.to) {
+  if (isValidDate(newInterval.from) && isValidDate(newInterval.to) && newInterval.from > newInterval.to) {
     const fieldToReset = changeField === 'from' ? 'to' : 'from';
     newInterval[fieldToReset] = '';
   }
@@ -213,7 +213,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
                 closeOnSelect
                 lineHeight={1}
                 fontSize="13px"
-                value={stripTime(tmpDateInterval.from)}
+                value={tmpDateInterval.from}
                 min={formattedMin}
                 onChange={e => setDate('from', e.target.value)}
               />
@@ -235,7 +235,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
                 closeOnSelect
                 lineHeight={1}
                 fontSize="13px"
-                value={stripTime(tmpDateInterval.to)}
+                value={tmpDateInterval.to}
                 min={formattedMin}
                 max={stripTime(new Date())}
                 onChange={e => setDate('to', e.target.value)}
