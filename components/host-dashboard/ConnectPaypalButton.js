@@ -40,7 +40,7 @@ const ConnectPaypalButton = ({ host, paymentMethod }) => {
         {paymentMethod ? (
           <FormattedMessage id="ConnectPaypal.refill" defaultMessage="Refill balance" />
         ) : (
-          <FormattedMessage id="collective.connectedAccounts.paypal.button" defaultMessage="Connect PayPal" />
+          <FormattedMessage defaultMessage="Connect {service}" values={{ service: 'PayPal' }} />
         )}
       </StyledButton>
     </React.Fragment>
