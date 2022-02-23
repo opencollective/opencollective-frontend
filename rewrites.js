@@ -115,11 +115,8 @@ exports.REWRITES = [
     destination: '/collective-contact',
   },
   {
-    source: '/:hostCollectiveSlug/collectives/expenses',
-    destination: '/host.dashboard',
-  },
-  {
-    source: '/:hostCollectiveSlug/dashboard/:view(expenses|pending-applications|hosted-collectives|donations|reports)?',
+    source:
+      '/:hostCollectiveSlug/legacy-dashboard/:view(expenses|pending-applications|hosted-collectives|donations|reports)?',
     destination: '/host.dashboard',
   },
   {

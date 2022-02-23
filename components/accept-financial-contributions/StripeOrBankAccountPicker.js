@@ -67,9 +67,8 @@ class StripeOrBankAccountPicker extends React.Component {
         id: 'acceptContributions.addBankAccount',
         defaultMessage: 'Add bank account',
       },
-      connectStripe: {
-        id: 'collective.connectedAccounts.stripe.button',
-        defaultMessage: 'Connect Stripe',
+      connectService: {
+        defaultMessage: 'Connect {service}',
       },
     });
   }
@@ -109,7 +108,10 @@ class StripeOrBankAccountPicker extends React.Component {
           <Flex justifyContent="center" alignItems="center" flexDirection={['column', 'row']}>
             <Container alignItems="center" width={[null, 280, 312]} mb={[2, 0]}>
               <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                <Image src={stripeIllustration} alt={intl.formatMessage(this.messages.connectStripe)} />
+                <Image
+                  src={stripeIllustration}
+                  alt={intl.formatMessage(this.messages.connectService, { service: 'Stripe' })}
+                />
                 {stripeAccount ? (
                   <ConnectedAccountCard
                     width={2 / 3}
@@ -139,7 +141,7 @@ class StripeOrBankAccountPicker extends React.Component {
                       this.connectStripe();
                     }}
                   >
-                    <FormattedMessage id="collective.connectedAccounts.stripe.button" defaultMessage="Connect Stripe" />
+                    <FormattedMessage defaultMessage="Connect {service}" values={{ service: 'Stripe' }} />
                   </StyledButton>
                 )}
                 <Box minHeight={50} px={3}>

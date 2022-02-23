@@ -283,10 +283,8 @@ class CollectiveCard extends React.Component {
                   <LabelWrapper>
                     <FormattedMessage
                       id="collective.card.collectives.count"
-                      defaultMessage="Hosting {n, plural, one {Collective} other {Collectives}}"
-                      values={{
-                        n: get(collective, 'stats.collectives.hosted'),
-                      }}
+                      defaultMessage="Hosted {n, plural, one {Collective} other {Collectives}}"
+                      values={{ n: get(collective, 'stats.collectives.hosted') }}
                     />
                   </LabelWrapper>
                 </div>

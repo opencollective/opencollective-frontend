@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { capitalize } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { connectAccount, disconnectAccount } from '../../lib/api';
@@ -46,10 +47,6 @@ class EditConnectedAccount extends React.Component {
         id: 'collective.connectedAccounts.disconnect.button',
         defaultMessage: 'Disconnect',
       },
-      'collective.connectedAccounts.stripe.button': {
-        id: 'collective.connectedAccounts.stripe.button',
-        defaultMessage: 'Connect Stripe',
-      },
       'collective.connectedAccounts.stripe.description': {
         id: 'collective.create.connectedAccounts.stripe.description',
         defaultMessage: 'Connect a Stripe account to start accepting financial contributions.',
@@ -58,10 +55,6 @@ class EditConnectedAccount extends React.Component {
         id: 'collective.connectedAccounts.stripe.connected',
         defaultMessage: 'Stripe account connected on {updatedAt, date, short}',
       },
-      'collective.connectedAccounts.twitter.button': {
-        id: 'collective.connectedAccounts.twitter.button',
-        defaultMessage: 'Connect Twitter',
-      },
       'collective.connectedAccounts.twitter.description': {
         id: 'collective.connectedAccounts.twitter.description',
         defaultMessage: 'Connect a Twitter account to automatically thank new financial contributors',
@@ -69,10 +62,6 @@ class EditConnectedAccount extends React.Component {
       'collective.connectedAccounts.twitter.connected': {
         id: 'collective.connectedAccounts.twitter.connected',
         defaultMessage: 'Twitter account @{username} connected on {updatedAt, date, short}',
-      },
-      'collective.connectedAccounts.github.button': {
-        id: 'collective.connectedAccounts.github.button',
-        defaultMessage: 'Connect GitHub',
       },
       'collective.connectedAccounts.github.description': {
         id: 'collective.connectedAccounts.github.description',
@@ -177,7 +166,7 @@ class EditConnectedAccount extends React.Component {
               onClick={() => this.connect(service)}
               mb={2}
             >
-              {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.button`])}
+              {intl.formatMessage({ defaultMessage: 'Connect {service}' }, { service: capitalize(service) })}
             </StyledButton>
           </Box>
         )}

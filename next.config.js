@@ -153,6 +153,7 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      // Legacy settings (/edit)
       {
         source: '/:slug/edit/:section*',
         destination: '/:slug/admin/:section*',
@@ -161,6 +162,12 @@ const nextConfig = {
       {
         source: '/:parentCollectiveSlug/events/:eventSlug/edit/:section*',
         destination: '/:parentCollectiveSlug/events/:eventSlug/admin/:section*',
+        permanent: false,
+      },
+      // Legacy host dashboard (/host/dashboard)
+      {
+        source: '/:slug/dashboard/:section*',
+        destination: '/:slug/admin/:section*',
         permanent: false,
       },
     ];

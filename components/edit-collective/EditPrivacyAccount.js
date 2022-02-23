@@ -101,7 +101,7 @@ const EditPrivacyAccount = props => {
           )}
         </StyledInputField>
         <StyledButton mt={2} type="submit" loading={isCreating}>
-          <FormattedMessage id="collective.connectedAccounts.privacy.button" defaultMessage="Connect Privacy" />
+          <FormattedMessage defaultMessage="Connect {service}" values={{ service: 'Privacy' }} />
         </StyledButton>
       </form>
     );
