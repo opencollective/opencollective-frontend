@@ -168,7 +168,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             collective={collective}
             section={COLLECTIVE_SECTIONS.VIRTUAL_CARDS}
             if={
-              isOneOfTypes(collective, [COLLECTIVE, FUND]) &&
+              isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT]) &&
               hasFeature(collective.host, FEATURES.VIRTUAL_CARDS) &&
               collective.isApproved
             }
