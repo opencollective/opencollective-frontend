@@ -46,14 +46,13 @@ const getDisplayedAmount = (transaction, collective) => {
   const isExpense = transaction.kind === TransactionKind.EXPENSE;
   const isSelf = transaction.fromAccount.slug === collective.slug;
 
-  if (isCredit && hasOrder) {
+  if (isExpense) {
+    return transaction.netAmount;
+  } else if (isCredit && hasOrder) {
     // Credit from donations should display the full amount donated by the user
     return transaction.amount;
-  } else if (!isCredit && !hasOrder) {
-    // Expense Debits should display the Amount with Payment Method fees only on collective's profile
-    return isSelf ? transaction.netAmount : transaction.amount;
   } else if (transaction.isRefunded) {
-    if (isExpense || (isSelf && !transaction.isRefund) || (transaction.isRefund && isCredit)) {
+    if ((isSelf && !transaction.isRefund) || (transaction.isRefund && isCredit)) {
       return transaction.netAmount;
     } else {
       return transaction.amount;
