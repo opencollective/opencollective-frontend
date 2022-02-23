@@ -281,7 +281,7 @@
   "collective.balance.description": "Transfer remaining balance to {type, select, PROJECT {the Collective} EVENT {the Collective} other {the Fiscal Host}}. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance must be zero to archive {type, select, EVENT {the Event} PROJECT {the Project} other {or change Hosts}}. {type, select, EVENT {} PROJECT {} other {Alternatively, you can submit an expense or donate to another Collective to zero the balance.}}",
   "collective.balance.notAvailable": "O administrador não suporta este recurso. Envie uma despesa, doe para outro Coletivo ou contate o suporte se você estiver bloqueado.",
   "collective.balance.title": "Vazio {type, select, EVENT {Evento} PROJECT {Projeto} FUND {Financiamento} COLLECTIVE {Coletivo} other {conta}} saldo",
-  "collective.card.collectives.count": "Hospedando {n, plural, one {Coletivo} other {Coletivos}}",
+  "collective.card.collectives.count": "Hosted {n, plural, one {Collective} other {Collectives}}",
   "collective.card.memberOf.count": "Colaborador para {n, plural, one {Coletivo} other {Coletivos}}",
   "collective.card.stats.backers": "{n, plural, one {apoiador} other {apoiadores}}",
   "collective.card.stats.backersSoFar": "{n, plural, one {apoiador até agora} other {apoiadores até agora}}",

@@ -281,7 +281,7 @@
   "collective.balance.description": "Überweisen Sie das verbleibende Guthaben an {type, select, PROJECT {the Collective} EVENT {the Collective} other {the Fiscal Host}}. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} Saldo muss null sein, um {type, select, EVENT {the Event} PROJECT {the Project} other {or Hosts ändern}}. {type, select, EVENT {} PROJECT {} other {Alternativ können Sie eine Ausgabe einreichen oder an ein anderes Kollektiv spenden, um den Saldo auf Null zu setzen.}}",
   "collective.balance.notAvailable": "Der Host unterstützt diese Funktion nicht. Reichen Sie eine Ausgabe ein, spenden Sie an ein anderes Kollektiv oder wenden Sie sich an den Support, wenn Sie blockiert sind.",
   "collective.balance.title": "Leeres {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} Guthaben",
-  "collective.card.collectives.count": "Hosting {n, plural, one {Collective} other {Collectives}}",
+  "collective.card.collectives.count": "Hosted {n, plural, one {Collective} other {Collectives}}",
   "collective.card.memberOf.count": "Beitrag zu {n, plural, one {Collective} other {Collectives}}",
   "collective.card.stats.backers": "{n, plural, one {Unterstützer} other {Unterstützer}}",
   "collective.card.stats.backersSoFar": "{n, plural, one {Unterstützer bis jetzt} other {Unterstützer bis jetzt}}",

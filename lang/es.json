@@ -281,7 +281,7 @@
   "collective.balance.description": "Transfiere el saldo restante a {type, select, PROJECT {the Collective} EVENT {the Event} other {the Fiscal Host}} {type, select, EVENT {Evento} PROJECT {¡Proyecto} FUND {Fondo} COLLECTIVE {Colectivo} other {otro}} el balance debe ser cero para archivarlo {type, select, EVENT {the Event} PROJECT {the Project} other {o cambia Host}}. {type, select, EVENT {} PROJECT {} other {Como alternativa, puedes enviar un gasto o donar a otro colectivo para dejar el balance en 0.}}",
   "collective.balance.notAvailable": "El Anfitrión no soporta esta función. Envía un gasto, dona a otro Colectivo o ponte en contacto con el soporte si estás bloqueado.",
   "collective.balance.title": "¡Vaciado de {type, select, EVENT {Evento} PROJECT {Proyecto} FUND {¡Fondo} COLLECTIVE {¡colectivo} other {cuenta}} balance",
-  "collective.card.collectives.count": "Hospedando {n, plural, one {Colectivo} other {Colectivos}}",
+  "collective.card.collectives.count": "Hosted {n, plural, one {Collective} other {Collectives}}",
   "collective.card.memberOf.count": "Contribuidor a {n, plural, one {Colectivo} other {Colectivos}}",
   "collective.card.stats.backers": "{n} {n, plural, one {miembro} other {miembros}}",
   "collective.card.stats.backersSoFar": "{n, plural, one {patrocinador hasta ahora} other {patrocinadores hasta ahora}}",

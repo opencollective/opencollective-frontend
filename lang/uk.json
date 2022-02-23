@@ -281,7 +281,7 @@
   "collective.balance.description": "Transfer remaining balance to {type, select, PROJECT {the Collective} EVENT {the Collective} other {the Fiscal Host}}. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance must be zero to archive {type, select, EVENT {the Event} PROJECT {the Project} other {or change Hosts}}. {type, select, EVENT {} PROJECT {} other {Alternatively, you can submit an expense or donate to another Collective to zero the balance.}}",
   "collective.balance.notAvailable": "Фіскальний вузол не підтримує цієї функції. Надішліть витрати, внески іншим колективам або зверніться в службу підтримки, якщо вас заблоковано.",
   "collective.balance.title": "Empty {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance",
-  "collective.card.collectives.count": "{n, plural, one {Колектив} few {Колективи} many {Колективів} other {Колективів}} співпрацюють",
+  "collective.card.collectives.count": "Hosted {n, plural, one {Collective} other {Collectives}}",
   "collective.card.memberOf.count": "Contributor to {n, plural, one {Collective} other {Collectives}}",
   "collective.card.stats.backers": "{n, plural, one {меценат} other {меценатів}}",
   "collective.card.stats.backersSoFar": "{n, plural, one {backer so far} other {backers so far}}",

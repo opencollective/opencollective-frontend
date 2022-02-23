@@ -281,7 +281,7 @@
   "collective.balance.description": "Przenieś pozostałe saldo do {type, select, PROJECT {Zbióru} EVENT {Zbióru} other {Gospodarza podatkowego}}. Saldo {type, select, EVENT {Wydarzeń} PROJECT {Projektu} FUND {Funtuszu} COLLECTIVE {Zbióru} other {konta}} musi wynosić zero, aby zarchiwizować {type, select, EVENT {Wydarzenie} PROJECT {Projekt} other {lub zmień gospodarza}}. {type, select, EVENT {} PROJECT {} other {Alternatywnie, możesz zgłosić wydatek lub przekazać darowiznę innemu zbiorowi by wyzerować saldo.}}",
   "collective.balance.notAvailable": "Gospodarz nie obsługuje tej właściwości. Prześlij wydatki, przekaż darowiznę innej zbiórce lub skontaktuj się z pomocą techniczną, jeśli jesteś zablokowany.",
   "collective.balance.title": "Puste saldo {type, select, EVENT {Wydarzenia} PROJECT {Projektu} FUND {Funduszu} COLLECTIVE {Zbiórki} other {konta}}",
-  "collective.card.collectives.count": "Gospodarz {n, plural, one {Zbiórki} few {Zbiórek} many {Zbiorów} other {Zbiórek}}",
+  "collective.card.collectives.count": "Hosted {n, plural, one {Collective} other {Collectives}}",
   "collective.card.memberOf.count": "Współtwórca {n, plural, one {Zbiórki} other {Zbiórek}}",
   "collective.card.stats.backers": "{n, plural, one {zwolennik} few {zwolenników} many {zwolenników} other {zwolennicy}}",
   "collective.card.stats.backersSoFar": "{n, plural, one {sponsor} few {sponsorów} many {sponsorów} other {sponsorzy}} do tej pory",
