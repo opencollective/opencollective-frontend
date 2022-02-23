@@ -14,7 +14,7 @@ import { StyledSelectFilter } from '../../StyledSelectFilter';
 import StyledSpinner from '../../StyledSpinner';
 import { P } from '../../Text';
 
-import { formatAmountForLegend, getActiveYearsOptions } from './helpers';
+import { formatAmountForLegend, getActiveYearsOptions, getMinMaxDifference } from './helpers';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const totalMoneyManagedQuery = gqlV2/* GraphQL */ `
@@ -76,7 +76,7 @@ const getSeriesFromData = (intl, timeSeries, year) => {
   ];
 };
 
-const getChartOptions = (intl, hostCurrency) => ({
+const getChartOptions = (intl, hostCurrency, isCompactNotation) => ({
   chart: {
     id: 'chart-host-report-money-managed',
   },
@@ -96,12 +96,7 @@ const getChartOptions = (intl, hostCurrency) => ({
   yaxis: {
     labels: {
       minWidth: 38,
-      formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale),
-    },
-  },
-  tooltip: {
-    y: {
-      formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale),
+      formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale, isCompactNotation),
     },
   },
 });
@@ -109,7 +104,6 @@ const getChartOptions = (intl, hostCurrency) => ({
 const TotalMoneyManagedHistorical = ({ host, collectives }) => {
   const intl = useIntl();
   const yearsOptions = useMemo(() => getActiveYearsOptions(host), [null]);
-  const chartOptions = useMemo(() => getChartOptions(intl, host.currency), [host.currency]);
   const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
   const variables = getQueryVariables(host.slug, selectedYear, collectives);
   const { loading, data, previousData } = useQuery(totalMoneyManagedQuery, {
@@ -119,6 +113,11 @@ const TotalMoneyManagedHistorical = ({ host, collectives }) => {
   const hostTimeSeriesData = loading && !data ? previousData?.host : data?.host;
   const timeSeries = hostTimeSeriesData?.hostMetricsTimeSeries;
   const series = React.useMemo(() => getSeriesFromData(intl, timeSeries, selectedYear), [timeSeries]);
+  const isCompactNotation = getMinMaxDifference(series[0].data) >= 10000;
+  const chartOptions = useMemo(
+    () => getChartOptions(intl, host.currency, isCompactNotation),
+    [host.currency, isCompactNotation],
+  );
   return (
     <Box py={3}>
       <Flex alignItems="center" px={2} mb={2}>
