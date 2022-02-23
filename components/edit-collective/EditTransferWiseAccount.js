@@ -40,7 +40,7 @@ const EditTransferWiseAccount = ({ collective, ...props }) => {
         )}
 
         <StyledButton mt={2} type="submit" onClick={handleConnect}>
-          <FormattedMessage id="collective.connectedAccounts.transferwise.button" defaultMessage="Connect Wise" />
+          <FormattedMessage defaultMessage="Connect {service}" values={{ service: 'Wise' }} />
         </StyledButton>
       </React.Fragment>
     );
