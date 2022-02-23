@@ -1,7 +1,7 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
-import E2CBanner from '../components/home/E2CBanner';
+import Banner from '../components/home/Banner';
 import CreateCollective from '../components/home/sections/CreateCollective';
 import FeaturesSection from '../components/home/sections/Features';
 import FiscalHostSection from '../components/home/sections/FiscalHost';
@@ -26,7 +26,7 @@ const HomePage = () => {
   const { formatMessage } = useIntl();
   return (
     <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
-      <E2CBanner />
+      <Banner />
       <MakeCommunitySection />
       <WhatCanYouDoSection />
       <FeaturesSection />

@@ -103,6 +103,9 @@ const ExpenseItemForm = ({
   name,
   isOptional,
   editOnlyDescriptiveInfo,
+  hasMultiCurrency,
+  availableCurrencies,
+  onCurrencyChange,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -232,6 +235,9 @@ const ExpenseItemForm = ({
                       maxWidth="100%"
                       placeholder="0.00"
                       onChange={(value, e) => setFieldValue(e.target.name, value)}
+                      onCurrencyChange={onCurrencyChange}
+                      hasCurrencyPicker={hasMultiCurrency}
+                      availableCurrencies={availableCurrencies}
                     />
                   )}
                 </Field>
@@ -272,12 +278,18 @@ ExpenseItemForm.propTypes = {
   requireFile: PropTypes.bool,
   /** Whether a date is required for this expense type */
   requireDate: PropTypes.bool,
-  /** Wheter this whole item is optional */
+  /** Whether this whole item is optional */
   isOptional: PropTypes.bool,
+  /** Whether this item is the first in the list */
+  hasMultiCurrency: PropTypes.bool,
   /** True if description is HTML */
   isRichText: PropTypes.bool,
   /** Called when an attachment upload fails */
   onUploadError: PropTypes.func.isRequired,
+  /** For multi-currency expenses: called when the expense's currency changes */
+  onCurrencyChange: PropTypes.func.isRequired,
+  /** For multi-currency expenses */
+  availableCurrencies: PropTypes.arrayOf(PropTypes.string),
   /** the attachment data */
   attachment: PropTypes.shape({
     id: PropTypes.string,

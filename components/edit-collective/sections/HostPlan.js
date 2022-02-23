@@ -11,7 +11,6 @@ import { editCollectivePageQuery } from '../../../lib/graphql/queries';
 
 import StyledButton from '../../StyledButton';
 import StyledTooltip from '../../StyledTooltip';
-import SettingsTitle from '../SettingsTitle';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
@@ -197,10 +196,6 @@ const HostPlan = props => {
 
   return (
     <div>
-      <SettingsTitle contentOnly={props.contentOnly}>
-        <FormattedMessage id="Host.Plan" defaultMessage="Host Plan" />
-      </SettingsTitle>
-
       <PlanGrid>
         <NewPlanFeatures
           collective={collective}
@@ -287,7 +282,6 @@ const HostPlan = props => {
 
 HostPlan.propTypes = {
   collective: PropTypes.object.isRequired,
-  contentOnly: PropTypes.bool,
 };
 
 export default HostPlan;

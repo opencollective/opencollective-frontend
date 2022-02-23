@@ -9,9 +9,10 @@ import { FormattedMessage } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { TierTypes } from '../../../lib/constants/tiers-types';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { canOrderTicketsFromEvent, isPastEvent } from '../../../lib/events';
+import { isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { getCollectiveContributionCardsOrder, sortTiers, TIERS_ORDER_KEY } from '../../../lib/tier-utils';
+import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
@@ -239,7 +240,7 @@ class SectionContribute extends React.PureComponent {
     const hasNoContributor = !this.hasContributors(contributors);
     const sortedTicketTiers = this.sortTicketTiers(this.filterTickets(tiers));
     const hideTicketsFromNonAdmins = (sortedTicketTiers.length === 0 || !collective.isActive) && !isAdmin;
-    const cannotOrderTickets = (!hasContribute && !isAdmin) || (!canOrderTicketsFromEvent(collective) && !isAdmin);
+    const cannotOrderTickets = (!hasContribute && !isAdmin) || isPastEvent(collective);
 
     /*
     cases
@@ -363,7 +364,7 @@ class SectionContribute extends React.PureComponent {
             {/* "View all ways to contribute" button */}
             {(tiers.length > 6 || hasOtherWaysToContribute) && (
               <ContainerSectionContent pb={4}>
-                <Link href={`/${collective.slug}/contribute`}>
+                <Link href={`${getCollectivePageRoute(collective)}/contribute`}>
                   <StyledButton mt={3} width={1} buttonSize="small" fontSize="14px">
                     <FormattedMessage id="SectionContribute.All" defaultMessage="All ways to contribute" /> →
                   </StyledButton>

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import Contribute from './Contribute';
 
@@ -20,7 +21,7 @@ const messages = defineMessages({
 const ContributeCrypto = ({ intl, collective, contributors, stats, ...props }) => {
   return (
     <Contribute
-      route={`/${collective.slug}/donate/crypto`}
+      route={`${getCollectivePageRoute(collective)}/donate/crypto`}
       type={ContributionTypes.FINANCIAL_CRYPTO}
       title={intl.formatMessage(messages.title)}
       contributors={contributors}

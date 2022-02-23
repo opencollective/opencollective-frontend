@@ -196,7 +196,7 @@
   "becomeAHost.entity": "Любое лицо с банковским счетом",
   "becomeAHost.entity.description": "Кто управляет несколькими проектами и хочет использовать функции платформы Open Collective для прозрачного отслеживания бюджета, объединения потоков доходов, управления расходами и взаимодействия с сообществом.",
   "becomeAHost.fiscalSponsorshipService": "Поставщики услуг финансового спонсорства",
-  "becomeAHost.fiscalSponsorshipService.description": "В выбранной ими географической или промышленной области.",
+  "becomeAHost.fiscalSponsorshipService.description": "In their chosen geography or industry area.",
   "becomeAHost.grantMakers": "Грантодатели и финансирующие учреждения",
   "becomeAHost.grantMakers.description": "Who want to lower the barriers for unincorporated projects and informal initiatives, while ensuring robust oversight.",
   "becomeAHost.increaseCapacity": "Увеличить вместимость",

@@ -90,6 +90,7 @@ class ContributionFlowStepContainer extends React.Component {
             onChange={this.props.onChange}
             data={stepDetails}
             showFeesOnTop={this.props.showFeesOnTop}
+            isEmbed={isEmbed}
           />
         ) : (
           <StepDetailsCrypto onChange={this.props.onChange} data={stepDetails} collective={collective} />

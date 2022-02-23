@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { truncate } from 'lodash';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import Contribute from './Contribute';
 
@@ -13,7 +14,7 @@ const ContributeCollective = ({ collective, ...props }) => {
   const description = truncate(collective.description, { length: 100 });
   return (
     <Contribute
-      route={`/${collective.slug}`}
+      route={getCollectivePageRoute(collective)}
       type={ContributionTypes.CHILD_COLLECTIVE}
       title={collective.name}
       contributors={collective.contributors}

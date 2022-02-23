@@ -3,7 +3,7 @@ import { gqlV2 } from '../../../lib/graphql/helpers';
 import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
 
 export const recurringContributionsQuery = gqlV2/* GraphQL */ `
-  query RecurringContributions($slug: String) {
+  query RecurringContributions($slug: String!) {
     account(slug: $slug) {
       id
       slug
@@ -13,6 +13,12 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
       imageUrl
       features {
         ...NavbarFields
+      }
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+        }
       }
       orders(filter: OUTGOING, onlySubscriptions: true, includeIncognito: true) {
         totalCount
@@ -33,6 +39,11 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
             }
           }
           amount {
+            value
+            valueInCents
+            currency
+          }
+          totalAmount {
             value
             valueInCents
             currency

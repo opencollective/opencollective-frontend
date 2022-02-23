@@ -10,13 +10,10 @@ import styled, { css } from 'styled-components';
 import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 
-import {
-  budgetSectionQuery,
-  collectivePageQuery,
-  getCollectivePageQueryVariables,
-} from '../collective-page/graphql/queries';
-import { getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
+import { collectivePageQuery, getCollectivePageQueryVariables } from '../collective-page/graphql/queries';
+import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
 import { DefaultCollectiveLabel } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
@@ -82,7 +79,6 @@ const addFundsMutation = gqlV2/* GraphQL */ `
     $amount: AmountInput!
     $description: String!
     $hostFeePercent: Float!
-    $platformFeePercent: Float
   ) {
     addFunds(
       account: $account
@@ -90,7 +86,6 @@ const addFundsMutation = gqlV2/* GraphQL */ `
       amount: $amount
       description: $description
       hostFeePercent: $hostFeePercent
-      platformFeePercent: $platformFeePercent
       tier: $tier
     ) {
       id
@@ -124,23 +119,38 @@ const addFundsMutation = gqlV2/* GraphQL */ `
   }
 `;
 
+const addFundsTierFieldsFragment = gqlV2/* GraphQL */ `
+  fragment AddFundsTierFields on Tier {
+    id
+    slug
+    legacyId
+    name
+  }
+`;
+
 const addFundsAccountQuery = gqlV2/* GraphQL */ `
   query AddFundsAccount($slug: String!) {
     account(slug: $slug) {
       id
+      type
       settings
+      ... on Organization {
+        tiers {
+          nodes {
+            ...AddFundsTierFields
+          }
+        }
+      }
       ... on AccountWithContributions {
         tiers {
           nodes {
-            id
-            slug
-            legacyId
-            name
+            ...AddFundsTierFields
           }
         }
       }
     }
   }
+  ${addFundsTierFieldsFragment}
 `;
 
 const addPlatformTipMutation = gqlV2/* GraphQL */ `
@@ -154,7 +164,6 @@ const addPlatformTipMutation = gqlV2/* GraphQL */ `
 const getInitialValues = values => ({
   amount: null,
   hostFeePercent: null,
-  platformFeePercent: 0,
   description: '',
   fromAccount: null,
   tier: null,
@@ -259,9 +268,9 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
-        query: budgetSectionQuery,
         context: API_V2_CONTEXT,
-        variables: getBudgetSectionQueryVariables(collective.slug),
+        query: getBudgetSectionQuery(true),
+        variables: getBudgetSectionQueryVariables(collective.slug, host.slug),
       },
       { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
     ],
@@ -279,18 +288,15 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     [tiersNodes, accountSettings],
   );
 
+  // No modal if logged-out
+  if (!LoggedInUser) {
+    return null;
+  }
+
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
   const canAddHostFee = host.plan?.hostFees && collective.id !== host.id;
   const defaultHostFeePercent = canAddHostFee && collective.hostFeePercent ? collective.hostFeePercent : 0;
-
-  // We don't want to use Platform Fees anymore for Hosts that switched to the new model
-  const canAddPlatformFee = LoggedInUser.isRoot() && host.plan?.hostFeeSharePercent === 0;
-  const defaultPlatformFeePercent = 0;
-
-  if (!LoggedInUser) {
-    return null;
-  }
 
   const handleClose = () => {
     setFundDetails({ showPlatformTipModal: false });
@@ -356,11 +362,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       >
         {({ values, isSubmitting }) => {
           const hostFeePercent = isNaN(values.hostFeePercent) ? defaultHostFeePercent : values.hostFeePercent;
-          const platformFeePercent = isNaN(values.platformFeePercent)
-            ? defaultPlatformFeePercent
-            : values.platformFeePercent;
           const hostFee = Math.round(values.amount * (hostFeePercent / 100));
-          const platformFee = Math.round(values.amount * (platformFeePercent / 100));
 
           const defaultSources = [];
           defaultSources.push({ value: host, label: <DefaultCollectiveLabel value={host} /> });
@@ -482,26 +484,6 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       </StyledInputFormikField>
                     )}
                   </Flex>
-                  {canAddPlatformFee && (
-                    <Flex mt={3} flexWrap="wrap">
-                      <StyledInputFormikField
-                        name="platformFeePercent"
-                        htmlFor="addFunds-platformFeePercent"
-                        label={<FormattedMessage id="PlatformFee" defaultMessage="Platform fee" />}
-                      >
-                        {({ form, field }) => (
-                          <StyledInputPercentage
-                            id={field.id}
-                            placeholder="0"
-                            value={field.value}
-                            error={field.error}
-                            onChange={value => form.setFieldValue(field.name, value)}
-                            onBlur={() => form.setFieldTouched(field.name, true)}
-                          />
-                        )}
-                      </StyledInputFormikField>
-                    </Flex>
-                  )}
                   <P fontSize="14px" lineHeight="17px" fontWeight="500" mt={4}>
                     <FormattedMessage id="Details" defaultMessage="Details" />
                   </P>
@@ -524,22 +506,9 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       }
                     />
                   )}
-                  {canAddPlatformFee && (
-                    <AmountDetailsLine
-                      value={platformFee}
-                      currency={collective.currency}
-                      label={
-                        <FormattedMessage
-                          id="AddFundsModal.platformFees"
-                          defaultMessage="Platform fees ({platformFees})"
-                          values={{ platformFees: `${platformFeePercent}%` }}
-                        />
-                      }
-                    />
-                  )}
                   <StyledHr my={2} borderColor="black.300" />
                   <AmountDetailsLine
-                    value={values.amount - hostFee - platformFee}
+                    value={values.amount - hostFee}
                     currency={collective.currency}
                     label={
                       <FormattedMessage
@@ -608,7 +577,9 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                             <StyledLink
                               as={Link}
                               openInNewTab
-                              href={`/${collective.slug}/contribute/${fundDetails.tier.slug}-${fundDetails.tier.legacyId}`}
+                              href={`${getCollectivePageRoute(collective)}/contribute/${fundDetails.tier.slug}-${
+                                fundDetails.tier.legacyId
+                              }`}
                             >
                               <strong>{fundDetails.tier.name}</strong>
                             </StyledLink>
@@ -708,6 +679,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
 AddFundsModal.propTypes = {
   host: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    slug: PropTypes.string.isRequired,
     name: PropTypes.string,
     plan: PropTypes.shape({
       hostFees: PropTypes.bool,
@@ -718,7 +690,6 @@ AddFundsModal.propTypes = {
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     currency: PropTypes.string,
     hostFeePercent: PropTypes.number,
-    platformFeePercent: PropTypes.number,
     slug: PropTypes.string,
   }).isRequired,
   onClose: PropTypes.func,

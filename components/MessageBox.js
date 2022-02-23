@@ -54,12 +54,12 @@ const MessageBox = ({ withIcon, isLoading, children, ...props }) => {
   return (
     <Message {...props}>
       {isLoading && (
-        <Span mr={2} css={{ display: 'inline-block' }}>
+        <Span mr={2} style={{ display: 'inline-block' }}>
           <StyledSpinner size="1.5em" />
         </Span>
       )}
       {icon && !isLoading && (
-        <Span mr={2} css={{ display: 'inline-block', verticalAlign: 'text-bottom' }}>
+        <Span mr={2} style={{ display: 'inline-block', verticalAlign: 'text-bottom' }}>
           {icon}
         </Span>
       )}

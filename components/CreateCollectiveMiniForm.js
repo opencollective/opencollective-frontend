@@ -132,6 +132,7 @@ const createCollectiveMutation = gql`
       type
       imageUrl(height: 64)
       location {
+        id
         address
         country
       }
@@ -160,6 +161,7 @@ const createUserMutation = gql`
           slug
           type
           location {
+            id
             address
             country
           }

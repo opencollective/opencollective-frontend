@@ -13,7 +13,7 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
-import { facebookShareURL, tweetURL } from '../../lib/url-helpers';
+import { facebookShareURL, getCollectivePageRoute, tweetURL } from '../../lib/url-helpers';
 
 import Container from '../../components/Container';
 import { formatAccountDetails } from '../../components/edit-collective/utils';
@@ -122,24 +122,30 @@ class ContributionFlowSuccess extends React.Component {
     const email = get(router, 'query.email') ? decodeURIComponent(router.query.email) : null;
 
     if (!isEmbed) {
-      callsToAction.push(SUCCESS_CTA_TYPE.NEWSLETTER);
       if (!LoggedInUser) {
         if (isGuest) {
-          callsToAction.unshift(SUCCESS_CTA_TYPE.JOIN, SUCCESS_CTA_TYPE.BLOG);
+          callsToAction.unshift(SUCCESS_CTA_TYPE.JOIN, SUCCESS_CTA_TYPE.GO_TO_PROFILE, SUCCESS_CTA_TYPE.NEWSLETTER);
         } else {
-          callsToAction.unshift(SUCCESS_CTA_TYPE.SIGN_IN, SUCCESS_CTA_TYPE.BLOG);
+          callsToAction.unshift(SUCCESS_CTA_TYPE.SIGN_IN, SUCCESS_CTA_TYPE.GO_TO_PROFILE, SUCCESS_CTA_TYPE.NEWSLETTER);
         }
       } else {
         // all other logged in recurring/one time contributions
-        callsToAction.unshift(SUCCESS_CTA_TYPE.BLOG);
+        callsToAction.unshift(SUCCESS_CTA_TYPE.GO_TO_PROFILE, SUCCESS_CTA_TYPE.BLOG, SUCCESS_CTA_TYPE.NEWSLETTER);
       }
     }
 
     return (
       <Flex flexDirection="column" justifyContent="center" p={2}>
         {callsToAction.length <= 2 && <SuccessIllustration alt="" />}
-        {callsToAction.map(type => (
-          <SuccessCTA key={type} type={type} orderId={get(data, 'order.id')} email={email} />
+        {callsToAction.map((type, idx) => (
+          <SuccessCTA
+            key={type}
+            type={type}
+            orderId={get(data, 'order.id')}
+            email={email}
+            account={get(data, 'order.toAccount')}
+            isPrimary={idx === 0}
+          />
         ))}
       </Flex>
     );
@@ -262,7 +268,9 @@ class ContributionFlowSuccess extends React.Component {
                       defaultMessage="You are now supporting <link>{collective}</link>."
                       values={{
                         collective: order.toAccount.name,
-                        link: isEmbed ? I18nBold : getI18nLink({ href: `/${order.toAccount.slug}`, as: Link }),
+                        link: isEmbed
+                          ? I18nBold
+                          : getI18nLink({ href: getCollectivePageRoute(order.toAccount), as: Link }),
                       }}
                     />
                   </P>
@@ -270,7 +278,7 @@ class ContributionFlowSuccess extends React.Component {
                 {isEmbed ? (
                   <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
                 ) : (
-                  <StyledLink as={Link} color="black.800" href={`/${order.toAccount.slug}`}>
+                  <StyledLink as={Link} color="black.800" href={getCollectivePageRoute(order.toAccount)}>
                     <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
                   </StyledLink>
                 )}

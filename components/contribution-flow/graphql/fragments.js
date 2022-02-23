@@ -38,6 +38,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
     isActive
     settings
     location {
+      id
       country
     }
     ... on Organization {
@@ -74,6 +75,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
         slug
         settings
         location {
+          id
           country
         }
       }
@@ -84,6 +86,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
         slug
         settings
         location {
+          id
           country
         }
       }
@@ -156,6 +159,12 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
         # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
         contributors(limit: 1) {
           totalCount
+        }
+      }
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
         }
       }
       ... on AccountWithHost {

@@ -11,6 +11,7 @@ import intervals from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { getCurrencySymbol } from '../../../lib/currency-utils';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
+import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import { capitalize } from '../../../lib/utils';
 
 import Container from '../../Container';
@@ -27,7 +28,6 @@ import StyledLink from '../../StyledLink';
 import StyledLinkButton from '../../StyledLinkButton';
 import { P, Span } from '../../Text';
 import { editCollectiveSettingsMutation } from '../mutations';
-import SettingsTitle from '../SettingsTitle';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
@@ -48,7 +48,6 @@ class Tiers extends React.Component {
     onChange: PropTypes.func.isRequired,
     intl: PropTypes.object,
     title: PropTypes.string,
-    contentOnly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -296,12 +295,11 @@ class Tiers extends React.Component {
               if (!tier.id) {
                 return msg;
               } else {
-                const collectiveSlug = collective.slug;
                 return (
                   <StyledLink
                     as={Link}
                     openInNewTab
-                    href={{ pathname: `/${collectiveSlug}/contribute/${tier.slug}-${tier.id}` }}
+                    href={{ pathname: `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}` }}
                   >
                     <span>{msg}</span>
                   </StyledLink>
@@ -455,9 +453,6 @@ class Tiers extends React.Component {
 
     return (
       <div className="EditTiers">
-        <SettingsTitle contentOnly={this.props.contentOnly} mb={50}>
-          {this.props.title}
-        </SettingsTitle>
         {displayContributionSettings && (
           <React.Fragment>
             <SettingsSectionTitle>

@@ -112,7 +112,7 @@ class TopBar extends React.Component {
             <Logo width="36" height="36" />
             <Hide xs>
               <Box mx={2}>
-                <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open collective" />
+                <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
               </Box>
             </Hide>
           </Flex>

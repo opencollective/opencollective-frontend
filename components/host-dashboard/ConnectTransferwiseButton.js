@@ -22,7 +22,7 @@ const ConnectTransferwiseButton = ({ isConnected }) => {
         {isConnected ? (
           <FormattedMessage id="ConnectPaypal.refill" defaultMessage="Refill balance" />
         ) : (
-          <FormattedMessage id="collective.connectedAccounts.transferwise.button" defaultMessage="Connect Wise" />
+          <FormattedMessage defaultMessage="Connect {service}" values={{ service: 'Wise' }} />
         )}
       </StyledButton>
     </StyledLink>

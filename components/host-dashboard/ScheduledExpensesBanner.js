@@ -136,7 +136,7 @@ ScheduledExpensesBanner.propTypes = {
     id: PropTypes.string,
   }).isRequired,
   expenses: PropTypes.array,
-  onSubmit: PropTypes.function,
+  onSubmit: PropTypes.func,
   secondButton: PropTypes.node,
 };
 

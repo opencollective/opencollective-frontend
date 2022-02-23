@@ -2,12 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
+import { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
 
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { floatAmountToCents } from '../lib/currency-utils';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
 import { compose, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
@@ -106,10 +108,15 @@ class NewContributionFlowPage extends React.Component {
     loadingLoggedInUser: PropTypes.bool,
     tags: PropTypes.arrayOf(PropTypes.string),
     step: PropTypes.oneOf(Object.values(STEPS)),
+    router: PropTypes.object,
   };
 
   componentDidMount() {
     this.loadExternalScripts();
+    const { router, data } = this.props;
+    const account = data?.account;
+    const path = router.asPath;
+    addParentToURLIfMissing(router, account, path.replace(new RegExp(`^/${account?.slug}/`), '/'));
   }
 
   componentDidUpdate(prevProps) {
@@ -153,7 +160,7 @@ class NewContributionFlowPage extends React.Component {
     );
     if (contributionBlocker) {
       if (contributionBlocker.reason === CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION) {
-        return <Redirect to={`/${account.slug}/contribute`} />;
+        return <Redirect to={`${getCollectivePageRoute(account)}/contribute`} />;
       }
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else if (step === 'success') {
@@ -217,4 +224,4 @@ const addAccountWithTierData = graphql(contributionFlowAccountWithTierQuery, {
 
 const addGraphql = compose(addAccountData, addAccountWithTierData);
 
-export default addGraphql(withUser(injectIntl(withStripeLoader(NewContributionFlowPage))));
+export default addGraphql(withUser(injectIntl(withStripeLoader(withRouter(NewContributionFlowPage)))));

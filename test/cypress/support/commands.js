@@ -8,7 +8,6 @@ import { CreditCards } from '../../stripe-helpers';
 
 import { defaultTestUserEmail } from './data';
 import { randomEmail, randomSlug } from './faker';
-import { disableSmoothScroll } from './helpers';
 
 /**
  * Login with an existing account. If not provided in `params`, the email used for
@@ -392,14 +391,6 @@ Cypress.Commands.add('containsInDataCy', (query, content, params) => {
  */
 Cypress.Commands.add('waitForLoggedIn', params => {
   return cy.getByDataCy('user-menu-trigger', params);
-});
-
-/**
- * Helper to disable smooth scroll on page to help prevent cypress from missing elements
- * that may be hidden from view.
- */
-Cypress.Commands.add('disableSmoothScroll', () => {
-  disableSmoothScroll();
 });
 
 /**

@@ -26,7 +26,7 @@ import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
 import { P } from '../../Text';
 import { withUser } from '../../UserProvider';
-import SettingsTitle from '../SettingsTitle';
+import SettingsSubtitle from '../SettingsSubtitle';
 
 import EditMemberModal from './EditMemberModal';
 import InviteMemberModal from './InviteMemberModal';
@@ -75,7 +75,6 @@ class Members extends React.Component {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
     refetchLoggedInUser: PropTypes.func.isRequired,
-    contentOnly: PropTypes.bool,
     /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
     /** @ignore from Apollo */
@@ -232,19 +231,15 @@ class Members extends React.Component {
     return (
       <React.Fragment className="EditMembers">
         <Box className="members">
-          <SettingsTitle
-            contentOnly={this.props.contentOnly}
-            subtitle={
-              collective.type === 'COLLECTIVE' && (
-                <FormattedMessage
-                  id="members.edit.description"
-                  defaultMessage="Note: Only Collective Admins can edit this Collective and approve expenses."
-                />
-              )
-            }
-          >
-            <FormattedMessage id="EditMembers.Title" defaultMessage="Edit Team" />
-          </SettingsTitle>
+          {collective.type === 'COLLECTIVE' && (
+            <SettingsSubtitle>
+              <FormattedMessage
+                id="members.edit.description"
+                defaultMessage="Note: Only Collective Admins can edit this Collective and approve expenses."
+              />
+            </SettingsSubtitle>
+          )}
+
           <Hide md lg>
             <Grid>
               <HorizontalScroller container={AllCardsContainerMobile}>

@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { connectAccount } from '../../lib/api';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 
-import Container from '../Container';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 
 /**
@@ -23,9 +23,9 @@ const ConnectPaypalButton = ({ host, paymentMethod }) => {
   return (
     <React.Fragment>
       {error && (
-        <Container color="red.500" fontSize="10px">
+        <MessageBox withIcon type="error" fontSize="10px" mb={2}>
           {error.message || 'Oops, something went wrong. Please try again.'}
-        </Container>
+        </MessageBox>
       )}
       <StyledButton
         buttonStyle="secondary"
@@ -40,7 +40,7 @@ const ConnectPaypalButton = ({ host, paymentMethod }) => {
         {paymentMethod ? (
           <FormattedMessage id="ConnectPaypal.refill" defaultMessage="Refill balance" />
         ) : (
-          <FormattedMessage id="collective.connectedAccounts.paypal.button" defaultMessage="Connect PayPal" />
+          <FormattedMessage defaultMessage="Connect {service}" values={{ service: 'PayPal' }} />
         )}
       </StyledButton>
     </React.Fragment>

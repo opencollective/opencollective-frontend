@@ -22,7 +22,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import roles from '../../lib/constants/roles';
 import { getEnvVar } from '../../lib/env-utils';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
-import { getSettingsRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getSettingsRoute } from '../../lib/url-helpers';
 import { parseToBoolean } from '../../lib/utils';
 
 import ActionButton from '../ActionButton';
@@ -48,6 +48,9 @@ const DisableGlobalScrollOnMobile = createGlobalStyle`
   @media (max-width: 64em) {
     body {
       overflow: hidden;
+    }
+    #footer {
+      display: none;
     }
   }
 `;
@@ -332,7 +335,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
       component: (
-        <Link href={`/${collective.slug}/expenses/new`}>
+        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
           <ActionButton tabIndex="-1">
             <MoneyCheckAlt size="1em" />
             <Span ml={2}>
@@ -346,7 +349,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
       component: (
-        <Link href={`/${collective.slug}/expenses/new`}>
+        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
           <ActionButton tabIndex="-1">
             <Receipt size="1em" />
             <Span ml={2}>
@@ -360,7 +363,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
-        <Link href={`/${collective.slug}/recurring-contributions`}>
+        <Link href={`${getCollectivePageRoute(collective)}/recurring-contributions`}>
           <ActionButton tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>
@@ -470,7 +473,7 @@ const CollectiveNavbar = ({
               {showBackButton && (
                 <Container display={['none', null, null, null, 'block']} position="absolute" left={-30}>
                   {collective && (
-                    <Link href={`/${collective.slug}`}>
+                    <Link href={getCollectivePageRoute(collective)}>
                       <StyledButton px={1} isBorderless>
                         &larr;
                       </StyledButton>

@@ -15,7 +15,6 @@ import { getI18nLink } from '../../../I18nFormatters';
 import Loading from '../../../Loading';
 import Pagination from '../../../Pagination';
 import { P } from '../../../Text';
-import SettingsTitle from '../../SettingsTitle';
 import VirtualCard from '../../VirtualCard';
 
 import VirtualCardFilters from './VirtualCardFilters';
@@ -127,10 +126,6 @@ const VirtualCards = props => {
 
   return (
     <Box width={['366px', '764px']}>
-      <SettingsTitle contentOnly={props.contentOnly}>
-        <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
-      </SettingsTitle>
-
       <Box>
         <P>
           <FormattedMessage
@@ -198,7 +193,6 @@ VirtualCards.propTypes = {
     virtualCardMerchants: PropTypes.array,
     host: PropTypes.object,
   }),
-  contentOnly: PropTypes.bool,
   hideTopsection: PropTypes.func,
 };
 

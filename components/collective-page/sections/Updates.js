@@ -7,6 +7,7 @@ import { get, isEmpty } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import { formatDate } from '../../../lib/utils';
 
 import Avatar from '../../Avatar';
@@ -127,7 +128,7 @@ class SectionUpdates extends React.PureComponent {
             <FormattedMessage id="section.updates.subtitle" defaultMessage="Updates on our activities and progress." />
           </P>
           {isAdmin && (
-            <Link href={`/${collective.slug}/updates/new`}>
+            <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
               <StyledButton data-cy="create-new-update-btn" buttonStyle="primary" my={[2, 0]}>
                 <Span fontSize="16px" fontWeight="bold" mr={2}>
                   +
@@ -164,7 +165,7 @@ class SectionUpdates extends React.PureComponent {
                       </LinkCollective>
                     </Box>
                     <Flex flexDirection="column" justifyContent="space-between">
-                      <Link href={`/${collective.slug}/updates/${update.slug}`}>
+                      <Link href={`${getCollectivePageRoute(collective)}/updates/${update.slug}`}>
                         <P color="black.900" fontWeight="600" mb={2}>
                           {update.title}
                         </P>
@@ -173,7 +174,11 @@ class SectionUpdates extends React.PureComponent {
                         <Container>
                           <HTMLContent style={{ display: 'inline' }} content={update.summary} />
                           {` `}
-                          <StyledLink as={Link} fontSize="12px" href={`/${collective.slug}/updates/${update.slug}`}>
+                          <StyledLink
+                            as={Link}
+                            fontSize="12px"
+                            href={`${getCollectivePageRoute(collective)}/updates/${update.slug}`}
+                          >
                             <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
                           </StyledLink>
                         </Container>
@@ -237,7 +242,7 @@ class SectionUpdates extends React.PureComponent {
               ))}
             </StyledCard>
             {updates.length > 0 && (
-              <Link href={`/${collective.slug}/updates`}>
+              <Link href={`${getCollectivePageRoute(collective)}/updates`}>
                 <StyledButton data-cy="view-all-updates-btn" mt={4} width={1} buttonSize="small" fontSize="14px">
                   <FormattedMessage id="CollectivePage.SectionUpdates.ViewAll" defaultMessage="View all updates" /> →
                 </StyledButton>

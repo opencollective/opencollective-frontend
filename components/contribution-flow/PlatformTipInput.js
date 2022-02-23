@@ -66,7 +66,7 @@ const getOptions = (amount, currency, intl) => {
   ];
 };
 
-const PlatformTipInput = ({ currency, amount, quantity, fees, onChange }) => {
+const PlatformTipInput = ({ currency, amount, quantity, fees, onChange, isEmbed }) => {
   const intl = useIntl();
   const orderAmount = amount * quantity;
   const options = React.useMemo(() => getOptions(orderAmount, currency, intl), [orderAmount, currency]);
@@ -112,10 +112,14 @@ const PlatformTipInput = ({ currency, amount, quantity, fees, onChange }) => {
   return (
     <Container data-cy="PlatformTipInput" display={amount === 0 ? 'none' : 'block'}>
       <P fontWeight="400" fontSize="14px" lineHeight="21px" color="black.900" my={32}>
-        <FormattedMessage
-          id="platformFee.info"
-          defaultMessage="Tips from contributors like you allow us to keep Open Collective free for Collectives. Thanks for any support!"
-        />
+        {!isEmbed ? (
+          <FormattedMessage
+            id="platformFee.info"
+            defaultMessage="Tips from contributors like you allow us to keep Open Collective free for Collectives. Thanks for any support!"
+          />
+        ) : (
+          <FormattedMessage defaultMessage="Powered by Open Collective, a platform to raise and spend money in full transparency. Tips from contributors like you help keep this service free for Collectives. Thanks for any support!" />
+        )}
       </P>
       <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>
         <Flex alignItems="center">
@@ -154,6 +158,7 @@ PlatformTipInput.propTypes = {
   amount: PropTypes.number,
   quantity: PropTypes.number,
   fees: PropTypes.number,
+  isEmbed: PropTypes.bool,
   interval: PropTypes.oneOf(Object.values(INTERVALS)),
 };
 

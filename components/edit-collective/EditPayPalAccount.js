@@ -139,7 +139,7 @@ const EditPayPalAccount = props => {
         </StyledInputField>
 
         <StyledButton type="submit" mt={2} minWidth={150} loading={isCreating}>
-          <FormattedMessage id="collective.connectedAccounts.paypal.button" defaultMessage="Connect PayPal" />
+          <FormattedMessage defaultMessage="Connect {service}" values={{ service: 'PayPal' }} />
         </StyledButton>
       </form>
     );

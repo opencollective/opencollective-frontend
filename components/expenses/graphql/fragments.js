@@ -1,5 +1,7 @@
 import { gqlV2 } from '../../../lib/graphql/helpers';
 
+import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
+
 export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
   fragment LoggedInAccountExpensePayoutFields on Individual {
     id
@@ -9,6 +11,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
     name
     legalName
     location {
+      id
       address
       country
       structured
@@ -50,6 +53,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
             }
           }
           location {
+            id
             address
             country
             structured
@@ -89,6 +93,10 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     expensePolicy
     website
     settings
+    features {
+      id
+      MULTI_CURRENCY_EXPENSES
+    }
     paypalPreApproval {
       id
       balance {
@@ -97,8 +105,13 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
       }
     }
     location {
+      id
       address
       country
+    }
+    transferwise {
+      id
+      availableCurrencies
     }
     supportedPayoutMethods
     isTrustedHost
@@ -120,6 +133,11 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
     privateMessage
     tags
     amount
+    amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
+      valueInCents
+      currency
+    }
+    accountCurrencyFxRate
     createdAt
     invoiceInfo
     requiredLegalDocuments
@@ -171,6 +189,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       }
     }
     payeeLocation {
+      id
       address
       country
       structured
@@ -190,6 +209,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       type
       website
       location {
+        id
         address
         country
       }
@@ -212,11 +232,16 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       twitterHandle
       currency
       expensePolicy
+      features {
+        ...NavbarFields
+        MULTI_CURRENCY_EXPENSES
+      }
       expensesTags {
         id
         tag
       }
       location {
+        id
         address
         country
       }
@@ -298,6 +323,10 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       canMarkAsUnpaid
       canComment
       canUnschedulePayment
+      approve {
+        allowed
+        reason
+      }
     }
     activities {
       id
@@ -315,6 +344,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
   }
 
   ${expenseHostFields}
+  ${collectiveNavbarFieldsFragment}
 `;
 
 export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
@@ -326,6 +356,11 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
     createdAt
     tags
     amount
+    amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
+      valueInCents
+      currency
+    }
+    accountCurrencyFxRate
     currency
     type
     requiredLegalDocuments
@@ -344,6 +379,12 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
           currency
         }
       }
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+        }
+      }
     }
     permissions {
       id
@@ -357,6 +398,10 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
       canSeeInvoiceInfo
       canEditTags
       canUnschedulePayment
+      approve {
+        allowed
+        reason
+      }
     }
     payoutMethod {
       id

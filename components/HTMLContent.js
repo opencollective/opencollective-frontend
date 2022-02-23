@@ -39,10 +39,12 @@ const ReadFullLink = styled.a`
 
 const InlineDisplayBox = styled.div`
   overflow-y: hidden;
+  ${props => props.maxHeight && `max-height: ${props.maxHeight + 20}px;`}
 `;
 
-const CollapsedDisplayBox = styled(InlineDisplayBox)`
-  max-height: ${props => props.maxHeight + 20}px;
+const CollapsedDisplayBox = styled.div`
+  overflow-y: hidden;
+  ${props => props.maxHeight && `max-height: ${props.maxCollapsedHeight + 20}px;`}
   -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 `;
@@ -60,6 +62,7 @@ const HTMLContent = styled(
   ({
     content,
     collapsable = false,
+    maxHeight,
     maxCollapsedHeight = 20,
     collapsePadding = 1,
     hideViewMoreLink = false,
@@ -83,16 +86,13 @@ const HTMLContent = styled(
 
     return (
       <div>
-        {!isCollapsed || isOpen ? (
-          <InlineDisplayBox ref={contentRef} dangerouslySetInnerHTML={{ __html: content }} {...props} />
-        ) : (
-          <DisplayBox
-            ref={contentRef}
-            maxHeight={maxCollapsedHeight}
-            dangerouslySetInnerHTML={{ __html: content }}
-            {...props}
-          />
-        )}
+        <DisplayBox
+          ref={contentRef}
+          maxHeight={maxHeight}
+          maxCollapsedHeight={maxCollapsedHeight}
+          dangerouslySetInnerHTML={{ __html: content }}
+          {...props}
+        />
         {!isOpen && isCollapsed && !hideViewMoreLink && (
           <ReadFullLink
             onClick={() => setOpen(true)}
@@ -243,6 +243,8 @@ HTMLContent.propTypes = {
   content: PropTypes.string,
   /* Whether the content is collapsible; adds a blur effect and a show/hide link. */
   collapsable: PropTypes.bool,
+  /* The maximum a height of the content. */
+  maxHeight: PropTypes.number,
   /* The maximum a height of the content before being collapsed. */
   maxCollapsedHeight: PropTypes.number,
   /* The the padding to apply to the collapse blur; useful in the case of

@@ -52,8 +52,8 @@ const AddPaymentMethod = ({ onStripeReady, onPaypalSuccess, setNewPaymentMethodI
         )}
         {host.paypalClientId && (
           <PayWithPaypalButton
-            totalAmount={order.amount.valueInCents}
-            currency={order.amount.currency}
+            totalAmount={order.totalAmount.valueInCents}
+            currency={order.totalAmount.currency}
             interval={getIntervalFromContributionFrequency(order.frequency)}
             host={host}
             collective={order.toAccount}
@@ -93,7 +93,7 @@ AddPaymentMethod.propTypes = {
   onPaypalSuccess: PropTypes.func,
   isSubmitting: PropTypes.bool,
   order: PropTypes.shape({
-    amount: PropTypes.object,
+    totalAmount: PropTypes.object,
     frequency: PropTypes.string,
     toAccount: PropTypes.object,
     tier: PropTypes.object,
