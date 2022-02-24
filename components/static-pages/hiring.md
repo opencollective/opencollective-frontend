@@ -69,6 +69,33 @@ We are looking for a senior product manager who is excited about creating a worl
 
 - You have experience working within or adjacent to open source communities, are excited about our mission, and share our philosophy.
 
+<h2 id='product-manager'>Operations Manager</h2>
+
+We are looking for an operations manager who is excited about building and enabling a team building and using technology to empower communities.
+
+### We think you’d be great at this if you:
+
+- Are comfortable in a remote environment that is at the same time highly collaborative (we [apply](https://github.com/opencollective/opencollective/issues/2267) a [seeking feedback process](https://reinventingorganizationswiki.com/theory/decision-making/)) and autonomous (you will own complete features and products!)
+
+- Are based within 4 hours of Central European (UTC+1) or New Zealand Standard time (UTC+12):
+
+  - to optimize timezone overlaps with the current platform (based in Europe) or operations team (who are based in New Zealand)
+
+- Have significant experience leading operations at a non-profit and/or fiscal-sponsor legally situated in the US:
+
+  - Have a solid understanding of the legal and tax compliance issues involved
+  - Are comfortable guiding and working with accounting and legal counsel to meet those requirements
+  - Have a good understanding of employment law, both within the US and globally
+
+- Are comfortable with the processes, tools and risks involved in growing and supporting a team, with minimal support, including but not limited to:
+
+  - managing contracts, invoices, and payments (we use Xero, HelloSign, Metabse, and _lots_ of spreadsheets)
+  - working with PEOs to manage employment of contractors and employees, inc. management of benefits
+  - supporting our accountants to prepare accounts, file taxes and issue 1099s
+  - supporting leadership to make effective strategic decisions on organisation development, risks and mitigation.
+
+- You have experience working within or adjacent to open source and/or solidarity economy communities, are excited about our mission, and share our philosophy.
+
 <!--
 ## Want to apply spontaneously?
 -->
