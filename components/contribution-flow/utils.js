@@ -19,6 +19,7 @@ import {
 import CreditCardInactive from '../icons/CreditCardInactive';
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
+const PAYPAL_MAX_AMOUNT = 999999999; // See MAX_VALUE_EXCEEDED https://developer.paypal.com/api/rest/reference/orders/v2/errors/#link-createorder
 
 export const generatePaymentMethodOptions = (
   paymentMethods,
@@ -108,9 +109,12 @@ export const generatePaymentMethodOptions = (
 
     // Paypal
     if (hostHasPaypal && !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.PAYMENT)) {
+      const isDisabled = totalAmount > PAYPAL_MAX_AMOUNT;
       uniquePMs.push({
         key: 'paypal',
         title: 'PayPal',
+        disabled: isDisabled,
+        subtitle: isDisabled ? 'Maximum amount exceeded' : null,
         paymentMethod: {
           service: PAYMENT_METHOD_SERVICE.PAYPAL,
           type: PAYMENT_METHOD_TYPE.PAYMENT,
