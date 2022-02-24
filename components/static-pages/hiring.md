@@ -11,6 +11,7 @@
 <ul>
   <li><a href='#software-engineer'>Senior Software Engineer</a></li>
   <li><a href='#product-manager'>Senior Product Manager</a></li>
+  <li><a href='#operations-manager'>Operations Manager</a></li>
 </ul>
 
 ## But first, a little about us
@@ -69,7 +70,7 @@ We are looking for a senior product manager who is excited about creating a worl
 
 - You have experience working within or adjacent to open source communities, are excited about our mission, and share our philosophy.
 
-<h2 id='product-manager'>Operations Manager</h2>
+<h2 id='operations-manager'>Operations Manager</h2>
 
 We are looking for an operations manager who is excited about building and enabling a team building and using technology to empower communities.
 
@@ -116,6 +117,10 @@ Your message should be convincing enough for us to consider your candidature and
 As part of our screening process, we'll also ask you to make a small contribution to [our codebase](https://github.com/opencollective). Have a look, do one now or be ready for it!
 
 ### Senior Product Manager position
+
+Please [email us](mailto:info@opencollective.com) who you are, your experience and skills, and why you’re interested. This can take the form of a traditional CV, a website, video, or however you like to communicate.
+
+### Operations position
 
 Please [email us](mailto:info@opencollective.com) who you are, your experience and skills, and why you’re interested. This can take the form of a traditional CV, a website, video, or however you like to communicate.
 
