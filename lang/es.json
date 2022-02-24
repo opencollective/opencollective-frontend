@@ -1997,7 +1997,6 @@
   "SearchFor": "Buscar por {entity}",
   "SearchFor2": "Buscar por {entity1} o {entity2}",
   "SearchFor3": "Buscar por {entity1}, {entity2} o {entity3}",
-  "SearchFor4": "Search for {entity1}, {entity2}, {entity3} or {entity4}",
   "section.budget.title": "Presupuesto",
   "section.connect.info": "Empieza conversaciones con tu comunidad o comparte actualizaciones sobre cómo van las cosas.",
   "section.connect.subtitle": "Pongamos a rodar la pelota!",
