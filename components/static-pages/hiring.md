@@ -87,12 +87,13 @@ We are looking for an operations manager who is excited about building and enabl
   - Are comfortable guiding and working with accounting and legal counsel to meet those requirements
   - Have a good understanding of employment law, both within the US and globally
 
-- Are comfortable with the processes, tools and risks involved in growing and supporting a team, with minimal support, including but not limited to:
+- Are comfortable with the processes, tools and risks involved in growing and supporting a community of member projects, including but not limited to:
 
   - managing contracts, invoices, and payments (we use Xero, HelloSign, Metabse, and _lots_ of spreadsheets)
+  - managing vendor registration and supplier agremeements
   - working with PEOs to manage employment of contractors and employees, inc. management of benefits
-  - supporting our accountants to prepare accounts, file taxes and issue 1099s
-  - supporting leadership to make effective strategic decisions on organisation development, risks and mitigation.
+  - supporting accountants to prepare accounts, file taxes and issue 1099s
+  - supporting leadership to make effective strategic decisions on growth, development, risks and mitigation.
 
 - You have experience working within or adjacent to open source and/or solidarity economy communities, are excited about our mission, and share our philosophy.
 
