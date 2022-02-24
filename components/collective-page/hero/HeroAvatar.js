@@ -196,7 +196,6 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
         </Dropzone>
         {showModal && (
           <ConfirmationModal
-            show={showModal}
             width="100%"
             maxWidth="570px"
             onClose={() => {

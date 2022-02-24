@@ -603,7 +603,6 @@ const ExpenseFormBody = ({
                 <StyledHr flex="1" borderColor="white.full" mx={2} />
                 {showResetModal ? (
                   <ConfirmationModal
-                    show
                     onClose={() => setShowResetModal(false)}
                     header={editingExpense ? formatMessage(msg.cancelEditExpense) : formatMessage(msg.clearExpenseForm)}
                     body={

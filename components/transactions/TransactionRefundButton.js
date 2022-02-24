@@ -58,29 +58,30 @@ const TransactionRefundButton = props => {
             <FormattedMessage id="transaction.refund.btn" defaultMessage="refund" />
           </Flex>
         </StyledButton>
-        <ConfirmationModal
-          show={isEnabled}
-          onClose={closeModal}
-          header={<FormattedMessage id="Refund" defaultMessage="Refund" />}
-          body={
-            <div>
+        {isEnabled && (
+          <ConfirmationModal
+            onClose={closeModal}
+            header={<FormattedMessage id="Refund" defaultMessage="Refund" />}
+            body={
               <div>
-                <FormattedMessage
-                  id="transaction.refund.info"
-                  defaultMessage="The contributor will be refunded the full amount."
-                />
+                <div>
+                  <FormattedMessage
+                    id="transaction.refund.info"
+                    defaultMessage="The contributor will be refunded the full amount."
+                  />
+                </div>
+                {error && <MessageBoxGraphqlError mt="12px" error={error} />}
               </div>
-              {error && <MessageBoxGraphqlError mt="12px" error={error} />}
-            </div>
-          }
-          continueLabel={
-            <Flex alignItems="center" justifyContent="space-evenly">
-              <Undo size={16} />
-              <FormattedMessage id="Refund" defaultMessage="Refund" />
-            </Flex>
-          }
-          continueHandler={handleRefundTransaction}
-        />
+            }
+            continueLabel={
+              <Flex alignItems="center" justifyContent="space-evenly">
+                <Undo size={16} />
+                <FormattedMessage id="Refund" defaultMessage="Refund" />
+              </Flex>
+            }
+            continueHandler={handleRefundTransaction}
+          />
+        )}
       </Box>
     </Flex>
   );

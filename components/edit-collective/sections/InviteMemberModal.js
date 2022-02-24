@@ -12,7 +12,7 @@ import Container from '../../Container';
 import { Flex } from '../../Grid';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
@@ -43,7 +43,7 @@ const inviteMemberMutation = gqlV2/* GraphQL */ `
 `;
 
 const InviteMemberModal = props => {
-  const { intl, show, collective, membersIds, cancelHandler } = props;
+  const { intl, collective, membersIds, cancelHandler } = props;
 
   const { addToast } = useToasts();
 
@@ -113,7 +113,7 @@ const InviteMemberModal = props => {
 
   return (
     <Container>
-      <Modal width={688} show={show} onClose={cancelHandler}>
+      <StyledModal width={688} onClose={cancelHandler}>
         <ModalHeader mb={4}>
           <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
         </ModalHeader>
@@ -173,7 +173,7 @@ const InviteMemberModal = props => {
             </StyledButton>
           </Container>
         </ModalFooter>
-      </Modal>
+      </StyledModal>
     </Container>
   );
 };
@@ -183,7 +183,6 @@ InviteMemberModal.propTypes = {
   cancelHandler: PropTypes.func,
   intl: PropTypes.object.isRequired,
   membersIds: PropTypes.array,
-  show: PropTypes.bool,
 };
 
 export default InviteMemberModal;

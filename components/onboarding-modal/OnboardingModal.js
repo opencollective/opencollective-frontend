@@ -15,7 +15,13 @@ import { compose } from '../../lib/utils';
 import Container from '../../components/Container';
 import MessageBox from '../../components/MessageBox';
 import StyledButton from '../../components/StyledButton';
-import Modal, { CloseIcon, ModalBody, ModalFooter, ModalHeader, ModalOverlay } from '../../components/StyledModal';
+import StyledModal, {
+  CloseIcon,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+} from '../../components/StyledModal';
 import { H1, P } from '../../components/Text';
 
 import { Box, Flex } from '../Grid';
@@ -35,7 +41,7 @@ const StepsProgressBox = styled(Box)`
   }
 `;
 
-const ResponsiveModal = styled(Modal)`
+const ResponsiveModal = styled(StyledModal)`
   @media screen and (max-width: 40em) {
     transform: translate(0%, 0%);
     position: fixed;
@@ -266,125 +272,117 @@ class OnboardingModal extends React.Component {
       <React.Fragment>
         {step === 3 ? (
           <React.Fragment>
-            <ModalWithImage
-              usePortal={false}
-              width="576px"
-              minHeight="456px"
-              onClose={this.onClose}
-              show={showOnboardingModal}
-            >
-              <ModalBody>
-                <Flex flexDirection="column" alignItems="center">
-                  <Container display="flex" flexDirection="column" alignItems="center">
-                    <Box maxWidth="336px">
-                      <H1
-                        fontSize="40px"
-                        lineHeight="44px"
-                        fontWeight="bold"
-                        color="black.900"
-                        textAlign="center"
-                        mt={6}
-                        mb={4}
-                        mx={2}
-                        data-cy="welcome-collective"
-                      >
-                        <FormattedMessage
-                          id="onboarding.success.header"
-                          defaultMessage="Welcome to your new Collective!"
-                        />
-                      </H1>
-                    </Box>
-                    <Box maxWidth="450px">
-                      <P fontSize="16px" lineHeight="24px" color="black.900" textAlign="center" mb={4} mx={2}>
-                        <FormattedMessage
-                          id="onboarding.success.text"
-                          defaultMessage="You're all set! Customize the look, start accepting contributions, and interact with your community."
-                        />
-                      </P>
-                    </Box>
-                  </Container>
-                </Flex>
-              </ModalBody>
-              <ResponsiveModalFooter>
-                <Flex flexDirection="column" alignItems="center">
-                  <StyledButton buttonStyle="primary" onClick={this.onClose} data-cy="close-button">
-                    <FormattedMessage id="Close" defaultMessage="Close" />
-                  </StyledButton>
-                </Flex>
-              </ResponsiveModalFooter>
-            </ModalWithImage>
+            {showOnboardingModal && (
+              <ModalWithImage usePortal={false} width="576px" minHeight="456px" onClose={this.onClose}>
+                <ModalBody>
+                  <Flex flexDirection="column" alignItems="center">
+                    <Container display="flex" flexDirection="column" alignItems="center">
+                      <Box maxWidth="336px">
+                        <H1
+                          fontSize="40px"
+                          lineHeight="44px"
+                          fontWeight="bold"
+                          color="black.900"
+                          textAlign="center"
+                          mt={6}
+                          mb={4}
+                          mx={2}
+                          data-cy="welcome-collective"
+                        >
+                          <FormattedMessage
+                            id="onboarding.success.header"
+                            defaultMessage="Welcome to your new Collective!"
+                          />
+                        </H1>
+                      </Box>
+                      <Box maxWidth="450px">
+                        <P fontSize="16px" lineHeight="24px" color="black.900" textAlign="center" mb={4} mx={2}>
+                          <FormattedMessage
+                            id="onboarding.success.text"
+                            defaultMessage="You're all set! Customize the look, start accepting contributions, and interact with your community."
+                          />
+                        </P>
+                      </Box>
+                    </Container>
+                  </Flex>
+                </ModalBody>
+                <ResponsiveModalFooter>
+                  <Flex flexDirection="column" alignItems="center">
+                    <StyledButton buttonStyle="primary" onClick={this.onClose} data-cy="close-button">
+                      <FormattedMessage id="Close" defaultMessage="Close" />
+                    </StyledButton>
+                  </Flex>
+                </ResponsiveModalFooter>
+              </ModalWithImage>
+            )}
           </React.Fragment>
         ) : (
           <React.Fragment>
-            <ResponsiveModal
-              usePortal={false}
-              width="576px"
-              minHeight="456px"
-              onClose={this.onClose}
-              show={showOnboardingModal}
-            >
-              <ResponsiveModalHeader onClose={this.onClose}>
-                <Flex flexDirection="column" alignItems="center" width="100%">
-                  <StepsProgressBox ml={[0, '15px']} mb={[3, null, 4]} width={[1.0, 0.8]}>
-                    <OnboardingStepsProgress
-                      step={step}
-                      mode={mode}
-                      handleStep={step => this.setState({ step })}
-                      slug={collective.slug}
-                    />
-                  </StepsProgressBox>
-                </Flex>
-              </ResponsiveModalHeader>
-              <Formik
-                initialValues={{ website: '', twitterHandle: '', githubHandle: '' }}
-                onSubmit={values => {
-                  this.submitCollectiveInfo(values);
-                }}
-                validate={this.validateFormik}
-                validateOnBlur={true}
-              >
-                {({ values, handleSubmit, errors, touched }) => (
-                  <FormWithStyles>
-                    <ResponsiveModalBody>
-                      <Flex flexDirection="column" alignItems="center">
-                        <Image
-                          alt="OnBoarding"
-                          width={160}
-                          height={this.getStepParams(step, 'height')}
-                          src={this.getStepParams(step, 'src')}
-                        />
-                        <OnboardingContentBox
-                          slug={collective.slug}
-                          step={step}
-                          collective={collective}
-                          LoggedInUser={LoggedInUser}
-                          updateAdmins={this.updateAdmins}
-                          values={values}
-                          errors={errors}
-                          touched={touched}
-                        />
-                        {error && (
-                          <MessageBox type="error" withIcon mt={2}>
-                            {error.message}
-                          </MessageBox>
-                        )}
-                      </Flex>
-                    </ResponsiveModalBody>
-                    <ResponsiveModalFooter>
-                      <Flex flexDirection="column" alignItems="center">
-                        <OnboardingNavButtons
-                          step={step}
-                          mode={mode}
-                          slug={collective.slug}
-                          loading={isSubmitting}
-                          handleSubmit={handleSubmit}
-                        />
-                      </Flex>
-                    </ResponsiveModalFooter>
-                  </FormWithStyles>
-                )}
-              </Formik>
-            </ResponsiveModal>
+            {showOnboardingModal && (
+              <ResponsiveModal usePortal={false} width="576px" minHeight="456px" onClose={this.onClose}>
+                <ResponsiveModalHeader onClose={this.onClose}>
+                  <Flex flexDirection="column" alignItems="center" width="100%">
+                    <StepsProgressBox ml={[0, '15px']} mb={[3, null, 4]} width={[1.0, 0.8]}>
+                      <OnboardingStepsProgress
+                        step={step}
+                        mode={mode}
+                        handleStep={step => this.setState({ step })}
+                        slug={collective.slug}
+                      />
+                    </StepsProgressBox>
+                  </Flex>
+                </ResponsiveModalHeader>
+                <Formik
+                  initialValues={{ website: '', twitterHandle: '', githubHandle: '' }}
+                  onSubmit={values => {
+                    this.submitCollectiveInfo(values);
+                  }}
+                  validate={this.validateFormik}
+                  validateOnBlur={true}
+                >
+                  {({ values, handleSubmit, errors, touched }) => (
+                    <FormWithStyles>
+                      <ResponsiveModalBody>
+                        <Flex flexDirection="column" alignItems="center">
+                          <Image
+                            alt="OnBoarding"
+                            width={160}
+                            height={this.getStepParams(step, 'height')}
+                            src={this.getStepParams(step, 'src')}
+                          />
+                          <OnboardingContentBox
+                            slug={collective.slug}
+                            step={step}
+                            collective={collective}
+                            LoggedInUser={LoggedInUser}
+                            updateAdmins={this.updateAdmins}
+                            values={values}
+                            errors={errors}
+                            touched={touched}
+                          />
+                          {error && (
+                            <MessageBox type="error" withIcon mt={2}>
+                              {error.message}
+                            </MessageBox>
+                          )}
+                        </Flex>
+                      </ResponsiveModalBody>
+                      <ResponsiveModalFooter>
+                        <Flex flexDirection="column" alignItems="center">
+                          <OnboardingNavButtons
+                            step={step}
+                            mode={mode}
+                            slug={collective.slug}
+                            loading={isSubmitting}
+                            handleSubmit={handleSubmit}
+                          />
+                        </Flex>
+                      </ResponsiveModalFooter>
+                    </FormWithStyles>
+                  )}
+                </Formik>
+              </ResponsiveModal>
+            )}
           </React.Fragment>
         )}
         <ResponsiveModalOverlay onClick={this.onClose} noOverlay={noOverlay} />

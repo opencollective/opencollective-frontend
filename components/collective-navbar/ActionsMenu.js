@@ -388,11 +388,9 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
           )}
         </ActionsDropdown>
       </Box>
-      <ContactCollectiveModal
-        show={showContactModal}
-        collective={collective}
-        onClose={() => setShowContactModal(false)}
-      />
+      {showContactModal && (
+        <ContactCollectiveModal collective={collective} onClose={() => setShowContactModal(false)} />
+      )}
     </Container>
   );
 };

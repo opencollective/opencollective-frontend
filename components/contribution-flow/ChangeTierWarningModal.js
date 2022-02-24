@@ -5,10 +5,9 @@ import { FormattedMessage } from 'react-intl';
 import ConfirmationModal from '../ConfirmationModal';
 import { P } from '../Text';
 
-const ChangeTierWarningModal = ({ show, onClose, tierName, onConfirm }) => {
+const ChangeTierWarningModal = ({ onClose, tierName, onConfirm }) => {
   return (
     <ConfirmationModal
-      show={show}
       width="100%"
       maxWidth="570px"
       onClose={onClose}
@@ -27,8 +26,6 @@ const ChangeTierWarningModal = ({ show, onClose, tierName, onConfirm }) => {
 };
 
 ChangeTierWarningModal.propTypes = {
-  /** a boolean to know when to show modal */
-  show: PropTypes.bool.isRequired,
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
   onConfirm: PropTypes.func.isRequired,

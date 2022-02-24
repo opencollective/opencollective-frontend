@@ -12,7 +12,7 @@ import { Box, Flex } from './Grid';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
 import StyledInputAmount from './StyledInputAmount';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
@@ -38,7 +38,7 @@ const confirmContributionMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const ContributionConfirmationModal = ({ order, onClose, show }) => {
+const ContributionConfirmationModal = ({ order, onClose }) => {
   const platformTipAmount = order.platformTipAmount?.valueInCents || 0;
   const amountInitiated = order.amount.valueInCents + platformTipAmount;
   const currency = order.amount.currency;
@@ -85,7 +85,7 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
   };
 
   return (
-    <Modal width="578px" show={show} onClose={onClose} trapFocus>
+    <StyledModal width="578px" onClose={onClose} trapFocus>
       <ModalHeader>
         <FormattedMessage defaultMessage="Confirm Contribution" />
       </ModalHeader>
@@ -203,15 +203,13 @@ const ContributionConfirmationModal = ({ order, onClose, show }) => {
           </StyledButton>
         </Container>
       </ModalFooter>
-    </Modal>
+    </StyledModal>
   );
 };
 
 ContributionConfirmationModal.propTypes = {
   /** the order that is being confirmed */
   order: PropTypes.object,
-  /** a boolean to determine when to show modal */
-  show: PropTypes.bool.isRequired,
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
 };

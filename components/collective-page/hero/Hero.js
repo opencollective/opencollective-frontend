@@ -45,7 +45,7 @@ const HeroEventDetails = dynamic(() => import('./HeroEventDetails'));
 const HeroBackgroundCropperModal = dynamic(() => import('./HeroBackgroundCropperModal'), {
   loading() {
     return (
-      <StyledModal show>
+      <StyledModal>
         <LoadingPlaceholder height={300} minWidth={280} />
       </StyledModal>
     );
@@ -337,11 +337,9 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
           )}
         </ContainerSectionContent>
       </Container>
-      <ContactCollectiveModal
-        show={showContactModal}
-        collective={collective}
-        onClose={() => setShowContactModal(false)}
-      />
+      {showContactModal && (
+        <ContactCollectiveModal collective={collective} onClose={() => setShowContactModal(false)} />
+      )}
     </Fragment>
   );
 };

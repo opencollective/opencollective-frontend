@@ -336,7 +336,6 @@ const ExpenseBudgetItem = ({
       </Flex>
       {hasFilesPreview && (
         <ExpenseFilesPreviewModal
-          show
           collective={expense.account}
           expense={expense}
           onClose={() => showFilesPreview(false)}

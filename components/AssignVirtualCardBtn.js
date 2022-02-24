@@ -23,14 +23,14 @@ const AssignVirtualCardBtn = ({ children, collective, host }) => {
   return (
     <Fragment>
       {children({ onClick: () => setShowModal(true) })}
-      <AssignVirtualCardModal
-        host={host}
-        collective={collective}
-        onClose={() => setShowModal(false)}
-        setShow={setShowModal}
-        onSuccess={handleAssignCardSuccess}
-        show={showModal}
-      />
+      {showModal && (
+        <AssignVirtualCardModal
+          host={host}
+          collective={collective}
+          onClose={() => setShowModal(false)}
+          onSuccess={handleAssignCardSuccess}
+        />
+      )}
     </Fragment>
   );
 };

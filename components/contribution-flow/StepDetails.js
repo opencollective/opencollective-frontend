@@ -237,7 +237,6 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
       )}
       {temporaryInterval !== undefined && (
         <ChangeTierWarningModal
-          show
           tierName={tier.name}
           onClose={() => setTemporaryInterval(undefined)}
           onConfirm={() => {

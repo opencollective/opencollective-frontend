@@ -82,46 +82,47 @@ const TransactionRejectButton = props => {
             </Flex>
           </StyledButton>
         </StyledTooltip>
-        <ConfirmationModal
-          show={isEnabled}
-          onClose={closeModal}
-          header={<FormattedMessage id="RejectContribution" defaultMessage="Reject and refund" />}
-          body={
-            <React.Fragment>
-              <Flex flexDirection="column" alignItems="center" justifyContent="center">
-                <MessageBox type="warning" mx={2}>
-                  <FormattedMessage
-                    id="transaction.reject.info"
-                    defaultMessage="Only reject if you want to remove the contributor from your Collective. This will refund their transaction, remove them from your Collective, and display the contribution as 'rejected'."
-                  />
-                  <br />
-                  <br />
-                  {props.canRefund ? (
+        {isEnabled && (
+          <ConfirmationModal
+            onClose={closeModal}
+            header={<FormattedMessage id="RejectContribution" defaultMessage="Reject and refund" />}
+            body={
+              <React.Fragment>
+                <Flex flexDirection="column" alignItems="center" justifyContent="center">
+                  <MessageBox type="warning" mx={2}>
                     <FormattedMessage
-                      id="transaction.reject.info.canRefund"
-                      defaultMessage="If you are only trying to refund a mistaken transaction, please use the 'Refund' button instead."
+                      id="transaction.reject.info"
+                      defaultMessage="Only reject if you want to remove the contributor from your Collective. This will refund their transaction, remove them from your Collective, and display the contribution as 'rejected'."
                     />
-                  ) : (
-                    <FormattedMessage
-                      id="transaction.reject.info.cannotRefund"
-                      defaultMessage="Please only use this option if you do not wish for this contributor to be a part of your Collective. This will remove them from your Collective."
-                    />
-                  )}
-                </MessageBox>
-                {error && <MessageBoxGraphqlError mt="12px" error={error} />}
-                <TransactionRejectMessageForm message={message} onChange={message => setMessage(message)} />
+                    <br />
+                    <br />
+                    {props.canRefund ? (
+                      <FormattedMessage
+                        id="transaction.reject.info.canRefund"
+                        defaultMessage="If you are only trying to refund a mistaken transaction, please use the 'Refund' button instead."
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="transaction.reject.info.cannotRefund"
+                        defaultMessage="Please only use this option if you do not wish for this contributor to be a part of your Collective. This will remove them from your Collective."
+                      />
+                    )}
+                  </MessageBox>
+                  {error && <MessageBoxGraphqlError mt="12px" error={error} />}
+                  <TransactionRejectMessageForm message={message} onChange={message => setMessage(message)} />
+                </Flex>
+              </React.Fragment>
+            }
+            continueLabel={
+              <Flex alignItems="center" justifyContent="space-evenly">
+                <MinusCircle size={16} />
+                <FormattedMessage id="transaction.reject.yes.btn" defaultMessage="Yes, reject" />
               </Flex>
-            </React.Fragment>
-          }
-          continueLabel={
-            <Flex alignItems="center" justifyContent="space-evenly">
-              <MinusCircle size={16} />
-              <FormattedMessage id="transaction.reject.yes.btn" defaultMessage="Yes, reject" />
-            </Flex>
-          }
-          continueHandler={handleRejectTransaction}
-          isDanger
-        />
+            }
+            continueHandler={handleRejectTransaction}
+            isDanger
+          />
+        )}
       </Box>
     </Flex>
   );

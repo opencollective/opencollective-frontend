@@ -14,7 +14,6 @@ const RequestVirtualCardBtn = ({ children, collective, host }) => {
           collective={collective}
           onClose={() => setShowModal(false)}
           setShow={setShowModal}
-          show
         />
       )}
     </Fragment>

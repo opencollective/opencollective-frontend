@@ -11,13 +11,7 @@ const AddFundsBtn = ({ children, collective, host }) => {
     <Fragment>
       {children({ onClick: () => setShowModal(true) })}
       {showModal && (
-        <AddFundsModal
-          show
-          collective={collective}
-          host={host}
-          setShow={setShowModal}
-          onClose={() => setShowModal(null)}
-        />
+        <AddFundsModal collective={collective} host={host} setShow={setShowModal} onClose={() => setShowModal(null)} />
       )}
     </Fragment>
   );

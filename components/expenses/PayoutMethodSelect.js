@@ -318,7 +318,6 @@ class PayoutMethodSelect extends React.Component {
         />
         {removingPayoutMethod && (
           <ConfirmationModal
-            show
             isDanger
             type="remove"
             onClose={() => this.setState({ removingPayoutMethod: null })}

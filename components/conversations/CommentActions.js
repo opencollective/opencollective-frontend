@@ -177,7 +177,6 @@ const CommentActions = ({ comment, isConversationRoot, canEdit, canDelete, onDel
       {/** Confirm Modals */}
       {isDeleting && (
         <ConfirmationModal
-          show
           isDanger
           type="delete"
           onClose={() => setDeleting(false)}

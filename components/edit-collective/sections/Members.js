@@ -170,7 +170,6 @@ class Members extends React.Component {
           memberModalKey === this.state.currentModalKey ? (
             <EditMemberModal
               key={`member-edit-modal-${index}-${memberKey}`}
-              show={this.state.showEditModal}
               intl={intl}
               member={this.state.currentMember}
               collective={collective}
@@ -270,7 +269,6 @@ class Members extends React.Component {
             <Grid gridGap={20} gridTemplateColumns="repeat(auto-fill, 164px)">
               {this.state.showInviteModal ? (
                 <InviteMemberModal
-                  show={this.state.showInviteModal}
                   intl={intl}
                   collective={collective}
                   membersIds={membersCollectiveIds}

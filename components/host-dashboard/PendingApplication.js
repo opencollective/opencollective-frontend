@@ -390,16 +390,17 @@ const PendingApplication = ({ host, application, ...props }) => {
           </Container>
         )}
       </Container>
-      <ApplicationMessageModal
-        show={showContactModal}
-        collective={collective}
-        onClose={() => setShowContactModal(false)}
-        onConfirm={(message, isPrivate, resetMessage) => {
-          setShowContactModal(false);
-          const action = isPrivate ? ACTIONS.SEND_PRIVATE_MESSAGE : ACTIONS.SEND_PUBLIC_MESSAGE;
-          processApplication(action, message, resetMessage);
-        }}
-      />
+      {showContactModal && (
+        <ApplicationMessageModal
+          collective={collective}
+          onClose={() => setShowContactModal(false)}
+          onConfirm={(message, isPrivate, resetMessage) => {
+            setShowContactModal(false);
+            const action = isPrivate ? ACTIONS.SEND_PRIVATE_MESSAGE : ACTIONS.SEND_PUBLIC_MESSAGE;
+            processApplication(action, message, resetMessage);
+          }}
+        />
+      )}
     </Container>
   );
 };

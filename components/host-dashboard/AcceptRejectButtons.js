@@ -44,16 +44,17 @@ const AcceptRejectButtons = ({ collective, isLoading, onApprove, onReject }) => 
         <Ban size={12} />
         &nbsp; <FormattedMessage id="actions.reject" defaultMessage="Reject" />
       </StyledButton>
-      <ApplicationRejectionReasonModal
-        show={showRejectModal}
-        collective={collective}
-        onClose={() => setShowRejectModal(false)}
-        onConfirm={message => {
-          setAction('REJECT');
-          setShowRejectModal(false);
-          onReject(message);
-        }}
-      />
+      {showRejectModal && (
+        <ApplicationRejectionReasonModal
+          collective={collective}
+          onClose={() => setShowRejectModal(false)}
+          onConfirm={message => {
+            setAction('REJECT');
+            setShowRejectModal(false);
+            onReject(message);
+          }}
+        />
+      )}
     </Flex>
   );
 };

@@ -15,7 +15,7 @@ import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
@@ -150,7 +150,7 @@ const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps }
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
   return (
-    <Modal width="382px" onClose={handleClose} trapFocus {...modalProps}>
+    <StyledModal width="382px" onClose={handleClose} trapFocus {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose}>
           <FormattedMessage defaultMessage="Edit virtual card" />
@@ -241,7 +241,7 @@ const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps }
           </Container>
         </ModalFooter>
       </form>
-    </Modal>
+    </StyledModal>
   );
 };
 
