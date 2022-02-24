@@ -912,6 +912,7 @@
   "Events": "Wydarzenia",
   "events": "Moje wydarzenia",
   "events.create.login": "Musisz być zalogowany jako członek zespołu Kolektywu aby utworzyć wydarzenie.",
+  "ewvfiF": "Check this box to have the payee cover the cost of payment processor fees (useful to zero balance)",
   "examples": "np. {examples}",
   "ExepenseAttachments.count": "{count, plural, one {# załącznik} few {# załączniki} many {# załączników} other {# załączniku}}",
   "ExpandDescription": "Czytaj pełny opis",

@@ -912,6 +912,7 @@
   "Events": "イベント",
   "events": "My Events",
   "events.create.login": "You need to be logged as a team member of this Collective to create an event.",
+  "ewvfiF": "Check this box to have the payee cover the cost of payment processor fees (useful to zero balance)",
   "examples": "例: {examples}",
   "ExepenseAttachments.count": "{count, plural, one {# attachment} other {# attachments}}",
   "ExpandDescription": "Read full description",
