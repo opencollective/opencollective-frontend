@@ -124,6 +124,12 @@ class PayWithPaypalButton extends Component {
     const options = {
       env: getEnvVar('PAYPAL_ENVIRONMENT'),
       style: { ...PayWithPaypalButton.defaultStyle, ...this.props.style },
+      onError: () =>
+        this.props.onError?.({
+          message: this.props.intl.formatMessage({
+            defaultMessage: 'There was an error while initializing the PayPal checkout',
+          }),
+        }),
     };
 
     /* eslint-disable camelcase */
