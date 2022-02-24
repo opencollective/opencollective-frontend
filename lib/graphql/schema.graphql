@@ -37,6 +37,7 @@ interface CollectiveInterface {
   id: Int
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
+  children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   name: String
@@ -1339,6 +1340,7 @@ type Collective implements CollectiveInterface {
   id: Int
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
+  children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   name: String
@@ -1569,6 +1571,7 @@ type Event implements CollectiveInterface {
   id: Int
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
+  children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   name: String
@@ -1799,6 +1802,7 @@ type Fund implements CollectiveInterface {
   id: Int
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
+  children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   name: String
@@ -2029,6 +2033,7 @@ type Organization implements CollectiveInterface {
   id: Int
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
+  children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   name: String
@@ -2260,6 +2265,7 @@ type Project implements CollectiveInterface {
   id: Int
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
+  children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   name: String
@@ -2673,6 +2679,7 @@ type User implements CollectiveInterface {
   id: Int
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
+  children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   name: String
@@ -2905,6 +2912,7 @@ type Vendor implements CollectiveInterface {
   id: Int
   createdByUser: UserDetails
   parentCollective: CollectiveInterface
+  children: [CollectiveInterface]!
   type: String
   isActive: Boolean
   name: String
