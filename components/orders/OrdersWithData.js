@@ -30,7 +30,7 @@ const accountOrdersQuery = gqlV2/* GraphQL */ `
     $accountSlug: String
     $limit: Int!
     $offset: Int!
-    $status: OrderStatus
+    $status: [OrderStatus]
     $minAmount: Int
     $maxAmount: Int
     $dateFrom: DateTime

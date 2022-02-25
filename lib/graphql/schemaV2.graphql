@@ -124,37 +124,182 @@ interface Account {
     orderByRoles: Boolean
   ): MemberOfCollection
   transactions(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
     offset: Int! = 0
 
     """
-    Type of transaction (DEBIT/CREDIT)
+    The transaction type (DEBIT or CREDIT)
     """
     type: TransactionType
-    orderBy: ChronologicalOrderInput
+
+    """
+    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the host accounting the transaction
+    """
+    host: AccountReferenceInput
+
+    """
+    NOT IMPLEMENTED. Only return transactions that match these tags.
+    """
+    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return transactions where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transactions that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Only return transactions with an Expense attached
+    """
+    hasExpense: Boolean
+
+    """
+    Only return transactions with an Order attached
+    """
+    hasOrder: Boolean
+
+    """
+    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
+    """
+    includeRegularTransactions: Boolean! = true
 
     """
     If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
     """
     includeIncognitoTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from children (Events and Projects)
+    """
+    includeChildrenTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
+    Whether to include debt transactions
+    """
+    includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
   ): TransactionCollection!
   orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
-    offset: Int! = 0
-    filter: AccountOrdersFilter
-    status: [OrderStatus]
-    tierSlug: String
 
     """
-    Only returns orders that have an subscription (monthly/yearly)
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
-
-    """
-    Whether outgoing incognito contributions should be included. Only works when user is an admin.
-    """
-    includeIncognito: Boolean
-    orderBy: ChronologicalOrderInput
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -2222,33 +2367,182 @@ type Host implements Account & AccountWithContributions {
     orderByRoles: Boolean
   ): MemberOfCollection!
   transactions(
-    type: TransactionType
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
     offset: Int! = 0
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+
+    """
+    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the host accounting the transaction
+    """
+    host: AccountReferenceInput
+
+    """
+    NOT IMPLEMENTED. Only return transactions that match these tags.
+    """
+    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return transactions where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transactions that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Only return transactions with an Expense attached
+    """
+    hasExpense: Boolean
+
+    """
+    Only return transactions with an Order attached
+    """
+    hasOrder: Boolean
+
+    """
+    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
+    """
+    includeRegularTransactions: Boolean! = true
 
     """
     If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
     """
     includeIncognitoTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from children (Events and Projects)
+    """
+    includeChildrenTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
+    Whether to include debt transactions
+    """
+    includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
   ): TransactionCollection!
   orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
-    offset: Int! = 0
-    filter: AccountOrdersFilter
-    status: [OrderStatus]
-    tierSlug: String
 
     """
-    Only returns orders that have an subscription (monthly/yearly)
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
-
-    """
-    Whether outgoing incognito contributions should be included. Only works when user is an admin.
-    """
-    includeIncognito: Boolean
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -3706,33 +4000,182 @@ type Bot implements Account {
     orderByRoles: Boolean
   ): MemberOfCollection!
   transactions(
-    type: TransactionType
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
     offset: Int! = 0
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+
+    """
+    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the host accounting the transaction
+    """
+    host: AccountReferenceInput
+
+    """
+    NOT IMPLEMENTED. Only return transactions that match these tags.
+    """
+    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return transactions where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transactions that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Only return transactions with an Expense attached
+    """
+    hasExpense: Boolean
+
+    """
+    Only return transactions with an Order attached
+    """
+    hasOrder: Boolean
+
+    """
+    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
+    """
+    includeRegularTransactions: Boolean! = true
 
     """
     If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
     """
     includeIncognitoTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from children (Events and Projects)
+    """
+    includeChildrenTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
+    Whether to include debt transactions
+    """
+    includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
   ): TransactionCollection!
   orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
-    offset: Int! = 0
-    filter: AccountOrdersFilter
-    status: [OrderStatus]
-    tierSlug: String
 
     """
-    Only returns orders that have an subscription (monthly/yearly)
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
-
-    """
-    Whether outgoing incognito contributions should be included. Only works when user is an admin.
-    """
-    includeIncognito: Boolean
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -3964,33 +4407,182 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     orderByRoles: Boolean
   ): MemberOfCollection!
   transactions(
-    type: TransactionType
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
     offset: Int! = 0
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+
+    """
+    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the host accounting the transaction
+    """
+    host: AccountReferenceInput
+
+    """
+    NOT IMPLEMENTED. Only return transactions that match these tags.
+    """
+    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return transactions where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transactions that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Only return transactions with an Expense attached
+    """
+    hasExpense: Boolean
+
+    """
+    Only return transactions with an Order attached
+    """
+    hasOrder: Boolean
+
+    """
+    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
+    """
+    includeRegularTransactions: Boolean! = true
 
     """
     If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
     """
     includeIncognitoTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from children (Events and Projects)
+    """
+    includeChildrenTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
+    Whether to include debt transactions
+    """
+    includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
   ): TransactionCollection!
   orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
-    offset: Int! = 0
-    filter: AccountOrdersFilter
-    status: [OrderStatus]
-    tierSlug: String
 
     """
-    Only returns orders that have an subscription (monthly/yearly)
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
-
-    """
-    Whether outgoing incognito contributions should be included. Only works when user is an admin.
-    """
-    includeIncognito: Boolean
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -4546,33 +5138,182 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     orderByRoles: Boolean
   ): MemberOfCollection!
   transactions(
-    type: TransactionType
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
     offset: Int! = 0
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+
+    """
+    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the host accounting the transaction
+    """
+    host: AccountReferenceInput
+
+    """
+    NOT IMPLEMENTED. Only return transactions that match these tags.
+    """
+    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return transactions where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transactions that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Only return transactions with an Expense attached
+    """
+    hasExpense: Boolean
+
+    """
+    Only return transactions with an Order attached
+    """
+    hasOrder: Boolean
+
+    """
+    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
+    """
+    includeRegularTransactions: Boolean! = true
 
     """
     If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
     """
     includeIncognitoTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from children (Events and Projects)
+    """
+    includeChildrenTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
+    Whether to include debt transactions
+    """
+    includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
   ): TransactionCollection!
   orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
-    offset: Int! = 0
-    filter: AccountOrdersFilter
-    status: [OrderStatus]
-    tierSlug: String
 
     """
-    Only returns orders that have an subscription (monthly/yearly)
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
-
-    """
-    Whether outgoing incognito contributions should be included. Only works when user is an admin.
-    """
-    includeIncognito: Boolean
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -4912,33 +5653,182 @@ type Individual implements Account {
     orderByRoles: Boolean
   ): MemberOfCollection!
   transactions(
-    type: TransactionType
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
     offset: Int! = 0
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+
+    """
+    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the host accounting the transaction
+    """
+    host: AccountReferenceInput
+
+    """
+    NOT IMPLEMENTED. Only return transactions that match these tags.
+    """
+    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return transactions where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transactions that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Only return transactions with an Expense attached
+    """
+    hasExpense: Boolean
+
+    """
+    Only return transactions with an Order attached
+    """
+    hasOrder: Boolean
+
+    """
+    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
+    """
+    includeRegularTransactions: Boolean! = true
 
     """
     If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
     """
     includeIncognitoTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from children (Events and Projects)
+    """
+    includeChildrenTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
+    Whether to include debt transactions
+    """
+    includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
   ): TransactionCollection!
   orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
-    offset: Int! = 0
-    filter: AccountOrdersFilter
-    status: [OrderStatus]
-    tierSlug: String
 
     """
-    Only returns orders that have an subscription (monthly/yearly)
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
-
-    """
-    Whether outgoing incognito contributions should be included. Only works when user is an admin.
-    """
-    includeIncognito: Boolean
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -5234,33 +6124,182 @@ type Organization implements Account & AccountWithContributions {
     orderByRoles: Boolean
   ): MemberOfCollection!
   transactions(
-    type: TransactionType
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
     offset: Int! = 0
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+
+    """
+    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the host accounting the transaction
+    """
+    host: AccountReferenceInput
+
+    """
+    NOT IMPLEMENTED. Only return transactions that match these tags.
+    """
+    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return transactions where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transactions that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Only return transactions with an Expense attached
+    """
+    hasExpense: Boolean
+
+    """
+    Only return transactions with an Order attached
+    """
+    hasOrder: Boolean
+
+    """
+    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
+    """
+    includeRegularTransactions: Boolean! = true
 
     """
     If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
     """
     includeIncognitoTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from children (Events and Projects)
+    """
+    includeChildrenTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
+    Whether to include debt transactions
+    """
+    includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
   ): TransactionCollection!
   orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
-    offset: Int! = 0
-    filter: AccountOrdersFilter
-    status: [OrderStatus]
-    tierSlug: String
 
     """
-    Only returns orders that have an subscription (monthly/yearly)
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
-
-    """
-    Whether outgoing incognito contributions should be included. Only works when user is an admin.
-    """
-    includeIncognito: Boolean
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -5612,33 +6651,182 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     orderByRoles: Boolean
   ): MemberOfCollection!
   transactions(
-    type: TransactionType
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
     offset: Int! = 0
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+
+    """
+    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the host accounting the transaction
+    """
+    host: AccountReferenceInput
+
+    """
+    NOT IMPLEMENTED. Only return transactions that match these tags.
+    """
+    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return transactions where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transactions that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Only return transactions with an Expense attached
+    """
+    hasExpense: Boolean
+
+    """
+    Only return transactions with an Order attached
+    """
+    hasOrder: Boolean
+
+    """
+    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
+    """
+    includeRegularTransactions: Boolean! = true
 
     """
     If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
     """
     includeIncognitoTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from children (Events and Projects)
+    """
+    includeChildrenTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
+    Whether to include debt transactions
+    """
+    includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
   ): TransactionCollection!
   orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
-    offset: Int! = 0
-    filter: AccountOrdersFilter
-    status: [OrderStatus]
-    tierSlug: String
 
     """
-    Only returns orders that have an subscription (monthly/yearly)
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
-
-    """
-    Whether outgoing incognito contributions should be included. Only works when user is an admin.
-    """
-    includeIncognito: Boolean
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -6159,9 +7347,14 @@ type Query {
   ): Order
   orders(
     """
+    Return only orders made from/to account
+    """
+    account: AccountReferenceInput
+
+    """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 100
 
     """
     The offset to use to fetch
@@ -6169,17 +7362,12 @@ type Query {
     offset: Int! = 0
 
     """
-    Return only orders made from/to account
-    """
-    account: AccountReferenceInput
-
-    """
     If account is a host, also include hosted accounts orders
     """
     includeHostedAccounts: Boolean
 
     """
-    Whether to include incognito orders. Must be admin or root
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
 
@@ -6196,7 +7384,7 @@ type Query {
     """
     Use this field to filter orders on their statuses
     """
-    status: OrderStatus
+    status: [OrderStatus]
 
     """
     The order of results
@@ -6227,6 +7415,12 @@ type Query {
     The term to search
     """
     searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
+    """
+    onlySubscriptions: Boolean
   ): OrderCollection!
   organization(
     """
@@ -6283,9 +7477,14 @@ type Query {
   ): Tier
   transactions(
     """
+    Reference of the account(s) assigned to the main side of the transaction (CREDIT -> recipient, DEBIT -> sender)
+    """
+    account: [AccountReferenceInput!]
+
+    """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 100
 
     """
     The offset to use to fetch
@@ -6301,11 +7500,6 @@ type Query {
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
-
-    """
-    Reference of the account(s) assigned to the main side of the transaction (CREDIT -> recipient, DEBIT -> sender)
-    """
-    account: [AccountReferenceInput!]
 
     """
     Reference of the host accounting the transaction
@@ -6603,33 +7797,182 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     orderByRoles: Boolean
   ): MemberOfCollection!
   transactions(
-    type: TransactionType
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
     offset: Int! = 0
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+
+    """
+    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the host accounting the transaction
+    """
+    host: AccountReferenceInput
+
+    """
+    NOT IMPLEMENTED. Only return transactions that match these tags.
+    """
+    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return transactions where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transactions that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Only return transactions with an Expense attached
+    """
+    hasExpense: Boolean
+
+    """
+    Only return transactions with an Order attached
+    """
+    hasOrder: Boolean
+
+    """
+    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
+    """
+    includeRegularTransactions: Boolean! = true
 
     """
     If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
     """
     includeIncognitoTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from children (Events and Projects)
+    """
+    includeChildrenTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
+    Whether to include debt transactions
+    """
+    includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
   ): TransactionCollection!
   orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
-    offset: Int! = 0
-    filter: AccountOrdersFilter
-    status: [OrderStatus]
-    tierSlug: String
 
     """
-    Only returns orders that have an subscription (monthly/yearly)
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
-
-    """
-    Whether outgoing incognito contributions should be included. Only works when user is an admin.
-    """
-    includeIncognito: Boolean
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -6975,33 +8318,182 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     orderByRoles: Boolean
   ): MemberOfCollection!
   transactions(
-    type: TransactionType
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
     offset: Int! = 0
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+
+    """
+    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the host accounting the transaction
+    """
+    host: AccountReferenceInput
+
+    """
+    NOT IMPLEMENTED. Only return transactions that match these tags.
+    """
+    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return transactions where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transactions that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Only return transactions with an Expense attached
+    """
+    hasExpense: Boolean
+
+    """
+    Only return transactions with an Order attached
+    """
+    hasOrder: Boolean
+
+    """
+    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
+    """
+    includeRegularTransactions: Boolean! = true
 
     """
     If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
     """
     includeIncognitoTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from children (Events and Projects)
+    """
+    includeChildrenTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
+    Whether to include debt transactions
+    """
+    includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
   ): TransactionCollection!
   orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
     limit: Int! = 100
-    offset: Int! = 0
-    filter: AccountOrdersFilter
-    status: [OrderStatus]
-    tierSlug: String
 
     """
-    Only returns orders that have an subscription (monthly/yearly)
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
-
-    """
-    Whether outgoing incognito contributions should be included. Only works when user is an admin.
-    """
-    includeIncognito: Boolean
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
   ): OrderCollection!
   settings: JSON!
   conversations(
