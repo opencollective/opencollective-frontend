@@ -53,14 +53,9 @@ export const getContributorProfiles = (loggedInUser, collective, canUseIncognito
     filteredMembers.forEach(member => {
       contributorProfiles.push(member.collective);
       if (!isEmpty(member.collective.children)) {
-        const childrenOfSameHost = member.collective.children.filter(child => {
-          return child.paymentMethods?.some(
-            pm =>
-              pm.service === 'OPENCOLLECTIVE' &&
-              pm.type === 'COLLECTIVE' &&
-              member.collective.host.id === collective.host.legacyId,
-          );
-        });
+        const childrenOfSameHost = member.collective.children.filter(
+          child => child.host.id === collective.host.legacyId,
+        );
         contributorProfiles.push(...childrenOfSameHost);
       }
     });
