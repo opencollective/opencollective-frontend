@@ -6189,6 +6189,11 @@ type Query {
     filter: AccountOrdersFilter
 
     """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
     Use this field to filter orders on their statuses
     """
     status: OrderStatus
@@ -7273,6 +7278,16 @@ type Mutation {
     Additional data for the collective creation. This argument has no effect in production
     """
     testPayload: JSON
+
+    """
+    Create a Collective without a default admin (authenticated user or user)
+    """
+    skipDefaultAdmin: Boolean = false
+
+    """
+    List of members to invite on Collective creation.
+    """
+    inviteMembers: [InviteMemberInput]
   ): Collective
   createFund(
     """
@@ -7302,6 +7317,17 @@ type Mutation {
     """
     parent: AccountReferenceInput
   ): Project
+  createEvent(
+    """
+    Information about the Event to create (name, slug, description, tags, settings)
+    """
+    event: EventCreateInput!
+
+    """
+    Reference to the parent Account creating the Event.
+    """
+    account: AccountReferenceInput!
+  ): Event
   editComment(comment: CommentUpdateInput!): Comment
   deleteComment(id: String!): Comment
   createComment(comment: CommentCreateInput!): Comment
@@ -8205,6 +8231,25 @@ input IndividualCreateInput {
   email: String!
 }
 
+input InviteMemberInput {
+  """
+  Reference to an account for the invitee
+  """
+  memberAccount: AccountReferenceInput
+
+  """
+  Email and name of the invitee if no reference.
+  """
+  memberInfo: IndividualCreateInput
+
+  """
+  Role of the invitee
+  """
+  role: MemberRole!
+  description: String
+  since: DateTime
+}
+
 input FundCreateInput {
   name: String!
   slug: String!
@@ -8228,6 +8273,24 @@ input ProjectCreateInput {
   description: String!
   tags: [String]
   settings: JSON
+}
+
+input EventCreateInput {
+  name: String!
+  slug: String
+  description: String
+  tags: [String]
+  settings: JSON
+
+  """
+  The Event start date and time
+  """
+  startsAt: DateTime!
+
+  """
+  The Event end date and time
+  """
+  endsAt: DateTime!
 }
 
 input CommentUpdateInput {

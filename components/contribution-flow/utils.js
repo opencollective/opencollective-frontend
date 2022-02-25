@@ -1,5 +1,5 @@
 import React from 'react';
-import { find, get, sortBy, uniqBy } from 'lodash';
+import { find, get, isEmpty, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -9,6 +9,7 @@ import {
   PAYMENT_METHOD_SERVICE,
   PAYMENT_METHOD_TYPE,
 } from '../../lib/constants/payment-methods';
+import roles from '../../lib/constants/roles';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
   getPaymentMethodIcon,
@@ -20,6 +21,48 @@ import CreditCardInactive from '../icons/CreditCardInactive';
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
 const PAYPAL_MAX_AMOUNT = 999999999; // See MAX_VALUE_EXCEEDED https://developer.paypal.com/api/rest/reference/orders/v2/errors/#link-createorder
+
+const memberCanBeUsedToContribute = (member, account, canUseIncognito) => {
+  if (member.role !== roles.ADMIN) {
+    return false;
+  } else if (member.collective.id === account.legacyId) {
+    // Collective can't contribute to itself
+    return false;
+  } else if (!canUseIncognito && member.collective.isIncognito) {
+    // Incognito can't be used to contribute if not allowed
+    return false;
+  } else if (
+    member.collective.type === CollectiveType.COLLECTIVE &&
+    member.collective.host?.id !== account.host.legacyId
+  ) {
+    // If the contributing account is fiscally hosted, the host mush be the same as the one you're contributing to
+    return false;
+  } else {
+    return true;
+  }
+};
+
+export const getContributorProfiles = (loggedInUser, collective, canUseIncognito) => {
+  if (!loggedInUser) {
+    return [];
+  } else {
+    const filteredMembers = loggedInUser.memberOf.filter(member =>
+      memberCanBeUsedToContribute(member, collective, canUseIncognito),
+    );
+    const personalProfile = { email: loggedInUser.email, image: loggedInUser.image, ...loggedInUser.collective };
+    const contributorProfiles = [personalProfile];
+    filteredMembers.forEach(member => {
+      contributorProfiles.push(member.collective);
+      if (!isEmpty(member.collective.children)) {
+        const childrenOfSameHost = member.collective.children.filter(
+          child => child.host.id === collective.host.legacyId,
+        );
+        contributorProfiles.push(...childrenOfSameHost);
+      }
+    });
+    return uniqBy([personalProfile, ...contributorProfiles], 'id');
+  }
+};
 
 export const generatePaymentMethodOptions = (
   paymentMethods,
@@ -96,8 +139,15 @@ export const generatePaymentMethodOptions = (
   // Put disabled PMs at the end
   uniquePMs = sortBy(uniquePMs, ['disabled', 'paymentMethod.providerType', 'id']);
 
+  const balanceOnlyCollectiveTypes = [
+    CollectiveType.COLLECTIVE,
+    CollectiveType.EVENT,
+    CollectiveType.PROJECT,
+    CollectiveType.FUND,
+  ];
+
   // adding payment methods
-  if (stepProfile.type !== CollectiveType.COLLECTIVE) {
+  if (!balanceOnlyCollectiveTypes.includes(stepProfile.type)) {
     if (hostHasStripe) {
       // New credit card
       uniquePMs.push({
