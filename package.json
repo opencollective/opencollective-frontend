@@ -11,7 +11,7 @@
     "npm": "6.x"
   },
   "dependencies": {
-    "@apollo/client": "3.3.21",
+    "@apollo/client": "3.5.8",
     "@formatjs/intl-relativetimeformat": "10.0.0",
     "@hcaptcha/react-hcaptcha": "1.1.0",
     "@hyperwatch/hyperwatch": "3.8.2",
