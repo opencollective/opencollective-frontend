@@ -26,7 +26,6 @@ const CreateVirtualCardBtn = ({ children, host, collective }) => {
           host={host}
           collective={collective}
           onClose={() => setShowModal(false)}
-          setShow={setShowModal}
           onSuccess={handleCreateCardSuccess}
         />
       )}
