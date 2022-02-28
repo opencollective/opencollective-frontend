@@ -267,7 +267,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             {inputProps => (
               <StyledInputAmount
                 {...inputProps}
-                currency={expense.currency}
+                currency={collective.currency}
                 currencyDisplay="FULL"
                 value={formik.values.paymentProcessorFee}
                 placeholder="0.00"
