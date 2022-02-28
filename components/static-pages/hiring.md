@@ -82,11 +82,11 @@ We are looking for an operations manager who is excited about building and enabl
 
   - to optimize timezone overlaps with the current platform (based in Europe) or operations team (who are based in New Zealand)
 
-- Have significant experience leading operations at a non-profit and/or fiscal-sponsor legally situated in the US:
+- Have significant experience leading operations at a US-based, non-profit organisation offering fiscal-sponsorship as a service to member projects:
 
   - Have a solid understanding of the legal and tax compliance issues involved
   - Are comfortable guiding and working with accounting and legal counsel to meet those requirements
-  - Have a good understanding of employment law, both within the US and globally
+  - Have a good understanding of employment law and HR policies
 
 - Are comfortable with the processes, tools and risks involved in growing and supporting a community of member projects, including but not limited to:
 
