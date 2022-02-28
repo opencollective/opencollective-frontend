@@ -302,6 +302,13 @@ const ExpenseFormBody = ({
     }
   }, [values.payeeLocation]);
 
+  React.useEffect(() => {
+    formik.setFieldValue(
+      'currency',
+      values.payoutMethod?.currency || values.payoutMethod?.data?.currency || collective.currency,
+    );
+  }, [values.payoutMethod]);
+
   // Load values from localstorage
   React.useEffect(() => {
     if (shouldLoadValuesFromPersister && formPersister && !dirty) {
@@ -668,6 +675,7 @@ ExpenseFormBody.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
+    currency: PropTypes.string.isRequired,
     host: PropTypes.shape({
       transferwise: PropTypes.shape({
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
