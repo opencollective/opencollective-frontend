@@ -303,10 +303,16 @@ const ExpenseFormBody = ({
   }, [values.payeeLocation]);
 
   React.useEffect(() => {
-    formik.setFieldValue(
-      'currency',
-      values.payoutMethod?.currency || values.payoutMethod?.data?.currency || collective.currency,
-    );
+    if (expense?.currency !== collective.currency) {
+      formik.setFieldValue(
+        'currency',
+        values.payoutMethod?.currency || values.payoutMethod?.data?.currency || collective.currency,
+      );
+      const items = values.items || [];
+      const itemsArray = [...items];
+      itemsArray.forEach(item => (item.amount = 0));
+      formik.setFieldValue('items', itemsArray);
+    }
   }, [values.payoutMethod]);
 
   // Load values from localstorage
@@ -689,6 +695,7 @@ ExpenseFormBody.propTypes = {
   }).isRequired,
   expense: PropTypes.shape({
     type: PropTypes.oneOf(Object.values(expenseTypes)),
+    currency: PropTypes.string,
     description: PropTypes.string,
     status: PropTypes.string,
     payee: PropTypes.object,
