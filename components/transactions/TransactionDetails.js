@@ -16,7 +16,7 @@ import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
-import { P } from '../Text';
+import { P, Span } from '../Text';
 
 import TransactionRefundButton from './TransactionRefundButton';
 import TransactionRejectButton from './TransactionRejectButton';
@@ -55,8 +55,8 @@ const DetailTitle = styled.p`
   font-weight: 500;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  font-weight: 600;
-  font-size: 9px;
+  font-weight: bold;
+  font-size: 11px;
 `;
 
 const DetailDescription = styled.div`
@@ -122,115 +122,127 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
 
   return (
     <DetailsContainer flexWrap="wrap" alignItems="flex-start">
-      <Flex flexDirection="column" width={[1, 0.4]}>
-        {(host || paymentMethod) && (
-          <React.Fragment>
-            {host && (
-              <Box>
-                <DetailTitle>
-                  <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
-                </DetailTitle>
-                <DetailDescription>
-                  <StyledLink as={LinkCollective} collective={host} />
-                </DetailDescription>
-              </Box>
-            )}
-            {paymentMethod && (
-              <Box>
-                <DetailTitle>
-                  <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
-                </DetailTitle>
-                <DetailDescription>
-                  <PaymentMethodTypeWithIcon type={paymentMethod.type} fontSize={11} iconSize={16} />
-                </DetailDescription>
-              </Box>
-            )}
-          </React.Fragment>
-        )}
-      </Flex>
-      <Flex flexDirection="column" width={[1, 0.6]}>
-        <Box>
-          <DetailTitle>
-            <FormattedMessage id="transaction.details" defaultMessage="transaction details" />
-          </DetailTitle>
-          <DetailDescription>
-            {renderDetailsString({
-              amount,
-              platformFee,
-              hostFee,
-              paymentProcessorFee,
-              netAmount,
-              isCredit,
-              isRefunded,
-              hasOrder,
-              toAccount,
-              fromAccount,
-              taxAmount: transaction.taxAmount,
-              taxInfo: transaction.taxInfo,
-              intl,
-              kind,
-              expense,
-              isRefund,
-              paymentProcessorCover,
-            })}
-            {['CONTRIBUTION', 'ADDED_FUNDS', 'EXPENSE'].includes(transaction.kind) && hostFeeTransaction && (
-              <React.Fragment>
-                <br />
-                <FormattedMessage
-                  id="TransactionDetails.HostFee"
-                  defaultMessage="This transaction includes {amount} host fees"
-                  values={{
-                    amount: (
-                      <FormattedMoneyAmount
-                        amount={hostFeeTransaction.netAmount.valueInCents}
-                        currency={hostFeeTransaction.netAmount.currency}
-                        showCurrencyCode={false}
-                        amountStyles={null}
-                      />
-                    ),
-                  }}
-                />
-              </React.Fragment>
-            )}
-          </DetailDescription>
-          {displayActions && ( // Let us overide so we can hide buttons in the collective page
+      <Flex flexDirection="column" width={[1, 0.35]}>
+        <DetailTitle>
+          <FormattedMessage id="transaction.details" defaultMessage="transaction details" />
+        </DetailTitle>
+        <DetailDescription>
+          {renderDetailsString({
+            amount,
+            platformFee,
+            hostFee,
+            paymentProcessorFee,
+            netAmount,
+            isCredit,
+            isRefunded,
+            hasOrder,
+            toAccount,
+            fromAccount,
+            taxAmount: transaction.taxAmount,
+            taxInfo: transaction.taxInfo,
+            intl,
+            kind,
+            expense,
+            isRefund,
+            paymentProcessorCover,
+          })}
+          {['CONTRIBUTION', 'ADDED_FUNDS', 'EXPENSE'].includes(transaction.kind) && hostFeeTransaction && (
             <React.Fragment>
-              <Flex justifyContent="flex-end" alignItems="center">
-                {(showRefundButton || showRejectButton) && (
-                  <StyledTooltip content={rejectAndRefundTooltipContent(showRefundButton, showRejectButton)}>
-                    <Box mx={2}>
-                      <Info color="#1869F5" size={20} />
-                    </Box>
-                  </StyledTooltip>
-                )}
-                {showRefundButton && <TransactionRefundButton id={id} onMutationSuccess={onMutationSuccess} />}
-                {showRejectButton && (
-                  <TransactionRejectButton
-                    id={id}
-                    canRefund={permissions?.canRefund && !isRefunded}
-                    onMutationSuccess={onMutationSuccess}
-                  />
-                )}
-                {showDownloadInvoiceButton && (
-                  <StyledButton
-                    buttonSize="small"
-                    loading={loadingInvoice}
-                    onClick={downloadInvoiceWith({ transactionUuid: uuid, toCollectiveSlug: toAccount.slug })}
-                    minWidth={140}
-                    background="transparent"
-                    textTransform="capitalize"
-                    ml={2}
-                    px="unset"
-                  >
-                    {expense && <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />}
-                    {order && <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />}
-                  </StyledButton>
-                )}
-              </Flex>
+              <br />
+              <FormattedMessage
+                id="TransactionDetails.HostFee"
+                defaultMessage="This transaction includes {amount} host fees"
+                values={{
+                  amount: (
+                    <FormattedMoneyAmount
+                      amount={hostFeeTransaction.netAmount.valueInCents}
+                      currency={hostFeeTransaction.netAmount.currency}
+                      showCurrencyCode={false}
+                      amountStyles={null}
+                    />
+                  ),
+                }}
+              />
+            </React.Fragment>
+          )}
+        </DetailDescription>
+      </Flex>
+      <Flex flexDirection="column" width={[1, 0.25]}>
+        <Box>
+          {(host || paymentMethod) && (
+            <React.Fragment>
+              {host && (
+                <Box>
+                  <DetailTitle>
+                    <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
+                  </DetailTitle>
+                  <DetailDescription>
+                    <StyledLink as={LinkCollective} collective={host} />
+                  </DetailDescription>
+                </Box>
+              )}
+              {paymentMethod && (
+                <Box>
+                  <DetailTitle>
+                    <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
+                  </DetailTitle>
+                  <DetailDescription>
+                    <PaymentMethodTypeWithIcon type={paymentMethod.type} fontSize={11} iconSize={16} />
+                  </DetailDescription>
+                </Box>
+              )}
             </React.Fragment>
           )}
         </Box>
       </Flex>
+      {displayActions && ( // Let us overide so we can hide buttons in the collective page
+        <Flex flexDirection="column" width={[1, 0.4]}>
+          <Flex
+            flexWrap={['wrap', 'wrap', 'wrap', 'wrap', 'nowrap']}
+            justifyContent={['flex-start', 'flex-end']}
+            alignItems="center"
+            mt={[2, 0]}
+          >
+            {(showRefundButton || showRejectButton) && (
+              <StyledTooltip content={rejectAndRefundTooltipContent(showRefundButton, showRejectButton)} mt={2}>
+                <Box mx={2}>
+                  <Info color="#1869F5" size={20} />
+                </Box>
+              </StyledTooltip>
+            )}
+            {showRefundButton && (
+              <Span mb={2}>
+                <TransactionRefundButton id={id} onMutationSuccess={onMutationSuccess} />
+              </Span>
+            )}
+            {showRejectButton && (
+              <Span mb={2}>
+                <TransactionRejectButton
+                  id={id}
+                  canRefund={permissions?.canRefund && !isRefunded}
+                  onMutationSuccess={onMutationSuccess}
+                />
+              </Span>
+            )}
+            {showDownloadInvoiceButton && (
+              <StyledButton
+                buttonSize="small"
+                loading={loadingInvoice}
+                onClick={downloadInvoiceWith({ transactionUuid: uuid, toCollectiveSlug: toAccount.slug })}
+                minWidth={140}
+                background="transparent"
+                textTransform="capitalize"
+                ml={2}
+                mb={2}
+                px="unset"
+              >
+                {expense && <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />}
+                {order && <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />}
+              </StyledButton>
+            )}
+          </Flex>
+        </Flex>
+      )}
     </DetailsContainer>
   );
 };
