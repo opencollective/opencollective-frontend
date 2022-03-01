@@ -142,8 +142,9 @@ const CollectiveSectionEntry = ({
   if (collectiveType !== CollectiveType.FUND && collectiveType !== CollectiveType.PROJECT) {
     options = options.filter(({ value }) => value !== 'ADMIN');
   }
-  if (section === 'budget' && ![CollectiveType.FUND, CollectiveType.PROJECT].includes(collectiveType)) {
-    options = options.filter(({ value }) => value !== 'DISABLED');
+  // Can't hide the budget, expect if already hidden
+  if (section === 'budget' && isEnabled && !isEqual(restrictedTo, ['ADMIN'])) {
+    options = options.filter(({ value }) => value !== 'ADMIN' && value !== 'DISABLED');
   }
 
   let defaultValue;
