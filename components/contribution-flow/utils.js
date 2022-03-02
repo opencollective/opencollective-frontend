@@ -83,7 +83,7 @@ export const generatePaymentMethodOptions = (
   const paymentMethodsOptions = paymentMethods.map(pm => ({
     id: pm.id,
     key: `pm-${pm.id}`,
-    title: getPaymentMethodName(pm),
+    title: getPaymentMethodName(pm, stepProfile),
     subtitle: getPaymentMethodMetadata(pm, totalAmount),
     icon: getPaymentMethodIcon(pm),
     disabled: isPaymentMethodDisabled(pm, totalAmount),
