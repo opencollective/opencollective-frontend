@@ -124,13 +124,13 @@ class UpdatePage extends React.Component {
     const { account, update } = data;
     const comments = get(update, 'comments.nodes', []);
     const totalCommentsCount = get(update, 'comments.totalCount', 0);
-
+    const updateSlug = update?.slug || this.props.updateSlug;
     return (
       <Page
         collective={account}
         title={update.title}
         description={stripHTML(update.summary)}
-        canonicalURL={`${getCollectivePageCanonicalURL(account)}/update`}
+        canonicalURL={`${getCollectivePageCanonicalURL(account)}/updates/${updateSlug}`}
         metaTitle={`${update.title} - ${account.name}`}
       >
         <CollectiveNavbar
@@ -213,6 +213,7 @@ const updateQuery = gqlV2/* GraphQL */ `
     }
     update(slug: $updateSlug, account: { slug: $collectiveSlug }) {
       id
+      slug
       title
       createdAt
       publishedAt
