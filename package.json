@@ -22,7 +22,7 @@
     "@sentry/node": "6.18.1",
     "@shopify/address": "3.0.16",
     "@stripe/react-stripe-js": "1.7.0",
-    "@stripe/stripe-js": "1.23.0",
+    "@stripe/stripe-js": "1.24.0",
     "@styled-icons/boxicons-regular": "10.38.0",
     "@styled-icons/boxicons-solid": "10.38.0",
     "@styled-icons/fa-brands": "10.38.0",
