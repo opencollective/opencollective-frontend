@@ -303,15 +303,13 @@ const ExpenseFormBody = ({
   }, [values.payeeLocation]);
 
   React.useEffect(() => {
-    if (expense?.currency !== collective.currency) {
+    if (dirty) {
       formik.setFieldValue(
         'currency',
         values.payoutMethod?.currency || values.payoutMethod?.data?.currency || collective.currency,
       );
-      const items = values.items || [];
-      const itemsArray = [...items];
-      itemsArray.forEach(item => (item.amount = 0));
-      formik.setFieldValue('items', itemsArray);
+      const updatedItems = (values.items || []).map(item => ({ ...item, amount: 0 }));
+      formik.setFieldValue('items', updatedItems);
     }
   }, [values.payoutMethod]);
 
