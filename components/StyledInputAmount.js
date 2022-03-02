@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { isNil, isUndefined } from 'lodash';
-import CurrencyFlag from 'react-currency-flags';
 import { useIntl } from 'react-intl';
 
 import { Currency } from '../lib/constants/currency';
@@ -53,13 +53,12 @@ const i18nCurrencyName = (intl, currency) => {
 const generateCurrencyOptions = (intl, availableCurrencies) => {
   return availableCurrencies.map(currency => {
     const currencyName = i18nCurrencyName(intl, currency);
+    const emojiObj = getEmojiByCurrencyCode(currency);
     return {
       value: currency,
       label: (
         <Flex fontSize="14px" lineHeight="20px" fontWeight="500" title={currencyName}>
-          <Span>
-            <CurrencyFlag currency={currency} size="sm" />
-          </Span>
+          {emojiObj && <Span>{emojiObj.emoji}</Span>}
           &nbsp;
           <Span whiteSpace="nowrap" ml={1}>
             <Span color="black.800">{currency}</Span>
@@ -73,9 +72,10 @@ const generateCurrencyOptions = (intl, availableCurrencies) => {
 };
 
 const getSelectedCurrency = value => {
+  const emojiObj = getEmojiByCurrencyCode(value);
   return (
     <Box>
-      <CurrencyFlag currency={value} size="sm" />
+      {emojiObj && <Span>{emojiObj.emoji}</Span>}
       &nbsp;
       <Span color="black.800">{value}</Span>
     </Box>
