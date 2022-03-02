@@ -23,7 +23,6 @@ import { Box, Flex } from '../../Grid';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
 import LinkCollective from '../../LinkCollective';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
-import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledLink from '../../StyledLink';
 import StyledModal from '../../StyledModal';
@@ -87,7 +86,6 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const router = useRouter();
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
-  const [message, showMessage] = React.useState(null);
   const [showContactModal, setShowContactModal] = React.useState(false);
   const isEditing = hasColorPicker || isEditingCover;
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
@@ -100,17 +98,6 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   // get only unique references
   const companies = [...new Set(collective.company?.trim().toLowerCase().split(' '))];
 
-  const handleHeroMessage = msg => {
-    if (!msg) {
-      showMessage(null);
-    } else {
-      showMessage({
-        type: msg.type || 'info',
-        content: msg.content || msg,
-      });
-    }
-  };
-
   // Cancel edit mode when user navigates out to another collective
   useEffect(() => {
     editCover(false);
@@ -120,11 +107,6 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   return (
     <Fragment>
       {isEditingCover && <HeroBackgroundCropperModal collective={collective} onClose={() => editCover(false)} />}
-      {message && (
-        <MessageBox type={message.type} withIcon={true}>
-          {message.content}
-        </MessageBox>
-      )}
       <Container position="relative" minHeight={325} zIndex={1000} data-cy="collective-hero">
         <HeroBackground collective={collective} />
         {isAdmin && !isEditing && (
@@ -155,7 +137,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
         <ContainerSectionContent pt={40} display="flex" flexDirection="column">
           {/* Collective presentation (name, logo, description...) */}
           <Container position="relative" mb={2} width={128}>
-            <HeroAvatar collective={collective} isAdmin={isAdmin} handleHeroMessage={handleHeroMessage} />
+            <HeroAvatar collective={collective} isAdmin={isAdmin} />
           </Container>
           <Box maxWidth={['70%', '60%', null, '40%', '45%']}>
             <H1
