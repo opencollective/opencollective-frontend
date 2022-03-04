@@ -2289,7 +2289,7 @@
   "UploadDocumentationDescription": "Si quieres incluir documentación, puedes hacerlo aquí.",
   "uploadImage.isDragActive": "Drop it like it's hot 🔥",
   "uploadImage.isDragReject": "🚫 Este tipo de archivo no es aceptado",
-  "uploadImage.sizeRejected": "La resolución de la imagen debe ser inferior a 3000x3000, y el tamaño del archivo debe ser menor que 5MB.",
+  "uploadImage.sizeRejected": "Image resolution needs to be between {minResolution} and {maxResolution}. File size must be below {maxFileSize}.",
   "UploadInvoice": "Subir una factura",
   "UploadInvoiceDescription": "If you already have an invoice document, you can upload it here.",
   "user.create": "Crear nuevo usuario",
