@@ -2289,7 +2289,7 @@
   "UploadDocumentationDescription": "If you want to include any documentation, you can upload it here.",
   "uploadImage.isDragActive": "זרקו את זה כמו גחל לוהט 🔥",
   "uploadImage.isDragReject": "🚫 סוג קובץ זה אינו מורשה",
-  "uploadImage.sizeRejected": "Image resolution needs to be less than 3000x3000, and file size must be below 5MB.",
+  "uploadImage.sizeRejected": "Image resolution needs to be between {minResolution} and {maxResolution}. File size must be below {maxFileSize}.",
   "UploadInvoice": "Upload invoice",
   "UploadInvoiceDescription": "If you already have an invoice document, you can upload it here.",
   "user.create": "יצירת משתמש חדש",
