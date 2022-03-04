@@ -51,13 +51,16 @@ describe('Collective page', () => {
     });
 
     it('Can change avatar', () => {
-      uploadImage({
-        dropzone: '[data-cy=heroAvatarDropzone]',
-        fileName: 'gophercon.jpg',
-      });
+      const invalidResolutionMsg = 'Image resolution needs to be between 200x200 and 3000x3000';
 
+      // Check size
+      uploadImage({ dropzone: '[data-cy=heroAvatarDropzone]', fileName: 'small-15x15.jpg' });
+      cy.contains('[data-cy="toast-notification"]', invalidResolutionMsg);
+
+      // Valid avatar
+      uploadImage({ dropzone: '[data-cy=heroAvatarDropzone]', fileName: 'gophercon.jpg' });
+      cy.contains('[data-cy="toast-notification"]', invalidResolutionMsg).should('not.exist'); // Previous toast should be cleared out
       cy.get('[data-cy=collective-avatar-image-preview]').invoke('attr', 'src').should('not.be.empty');
-
       cy.get('[data-cy=heroAvatarDropzoneSave]').click();
     });
 
