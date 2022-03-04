@@ -1,6 +1,12 @@
 # Hiring
 
-## We’re hiring!
+## Come work at a Tech Company that actually Respects Your Time.
+
+Are you a top-notch engineer, product manager, or operations person? Do you want to get paid well, have time to relax each week, and be respected for your passion for open source, mutual aid, and the commons? Come work with us!
+
+<!--include photo!-->
+
+Join us at [Open Collective](https://opencollective.com/e2c) -- a tech platform that enables a network of 600+ nonprofits, co-ops, and fiscal hosts to support 7000+ groups to raise and spend $35 million each year with full transparency. We love open source, mutual aid, climate justice, and the work of decentralized groups.
 
 <!--
 <strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>
@@ -9,10 +15,12 @@
 <em>February 15th 2022</em>. We're still hiring for the following roles:
 
 <ul>
-  <li><a href='#software-engineer'>Senior Software Engineer</a></li>
+  <li><a href='#software-engineer'> 2 Senior Software Engineers</a></li>
   <li><a href='#product-manager'>Senior Product Manager</a></li>
   <li><a href='#operations-manager'>Operations Manager</a></li>
 </ul>
+
+Pay is transparent and is based on [where you live.] (https://docs.google.com/spreadsheets/d/1TvdgSmFbfB6Cj8vnWm01v7wZmo42QpcSvCK8tgIzDW0/edit#gid=165029136)
 
 ## But first, a little about us
 
@@ -24,7 +32,9 @@ Watch this 2 minute explainer video about what we do and why we are passionate a
 
 Like the movements that we support, we value openness and transparency. We strive to create inclusive, respectful and sustainable communities and we're 100% Open Source. If you want to know more about us, you can already join our [Slack](https://slack.opencollective.com) and check out the [Open Collective Way](https://docs.opencollective.com/help/about/the-open-collective-way) to learn more about how we operate and what we stand for.
 
-We are a fully remote, international team - with team members in New Zealand, Mexico, India, Brazil, Canada, the United Kingdom, Spain, Germany and France. We are an equal opportunities employer and welcome applications from anyone with the right mix of experience and skills.
+We are a remote-first team that loves distributed leadership and autonomy within collaboration around the world: Aix-en-Provence, Auckland, Brussels, Berlin, Guadalajara, New York, Madrid, Paris, Shropshire, Navi Mumbai, Vancouver and Wellington. This start-up culture is truly different – the culture is one of care, listening, rigor, and autonomy within collaboration. If you are used to cut-throat dynamics and all nighters, you will be happy to find another world is possible, and it is amazing. 
+
+We are building and maintaining money management software for the commons.
 
 <h2 id='software-engineer'>Senior Software Engineer</h2>
 
@@ -49,7 +59,7 @@ We are looking for a senior "full-stack" software engineer who’s excited about
 
 <h2 id='product-manager'>Senior Product Manager</h2>
 
-We are looking for a senior product manager who is excited about creating a world in which it is as rewarding and financially secure to build and maintain software for the commons as it is for the corporation.
+We are looking for two senior product manager who is excited about creating a world in which it is as rewarding and financially secure to build and maintain software for the commons as it is for the corporation.
 
 ### We think you’d be great at this if you:
 
@@ -112,7 +122,7 @@ Your message should be convincing enough for us to consider your candidature and
 
 - About you. What's your story? Where you are coming from? What's you current status?
 - About us. How did you hear about Open Collective? What do you find interesting in Open Collective?
-- Experience. What is your greatest achievment in software engineering? Can you tell us about a past project you're proud of? What do you think you can bring to Open Collective?
+- Experience. What is your greatest achievment in software engineering? Can you tell us about a past project you're proud of (it doesn’t have to be an engineering one or even a technical one.)? What do you think you can bring to Open Collective?
 
 As part of our screening process, we'll also ask you to make a small contribution to [our codebase](https://github.com/opencollective). Have a look, do one now or be ready for it!
 
