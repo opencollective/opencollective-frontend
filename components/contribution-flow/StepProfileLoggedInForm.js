@@ -59,6 +59,7 @@ const StepProfileLoggedInForm = ({ defaultProfileSlug, onChange, canUseIncognito
   const profiles = React.useMemo(() => getContributorProfiles(...getProfileArgs), getProfileArgs);
   const defaultProfile = getDefaultProfile(data, profiles, defaultProfileSlug);
   const profileInfo = getProfileInfo(data, profiles);
+  const isContributingFromSameHost = data?.host?.id === collective.host.legacyId;
 
   // set initial default profile so it shows in Steps Progress as well
   // TODO: This looks like a hack. Maybe the state should be set in an upper component
@@ -78,7 +79,7 @@ const StepProfileLoggedInForm = ({ defaultProfileSlug, onChange, canUseIncognito
           }}
         />
       </Box>
-      {contributionRequiresLegalName(stepDetails) && (
+      {!isContributingFromSameHost && contributionRequiresLegalName(stepDetails) && (
         <React.Fragment>
           {!data?.isIncognito && (
             <StyledInputField
@@ -123,7 +124,7 @@ const StepProfileLoggedInForm = ({ defaultProfileSlug, onChange, canUseIncognito
           </StyledInputField>
         </React.Fragment>
       )}
-      {contributionRequiresAddress(stepDetails) && (
+      {!isContributingFromSameHost && contributionRequiresAddress(stepDetails) && (
         <React.Fragment>
           <Flex alignItems="center" my="14px">
             <P fontSize="24px" lineHeight="32px" fontWeight="500" mr={2}>
@@ -154,7 +155,11 @@ StepProfileLoggedInForm.propTypes = {
   onChange: PropTypes.func,
   defaultProfileSlug: PropTypes.string,
   canUseIncognito: PropTypes.bool,
-  collective: PropTypes.object,
+  collective: PropTypes.shape({
+    host: PropTypes.shape({
+      legacyId: PropTypes.number,
+    }),
+  }),
 };
 
 export default StepProfileLoggedInForm;
