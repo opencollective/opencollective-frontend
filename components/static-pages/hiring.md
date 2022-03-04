@@ -32,7 +32,7 @@ Watch this 2 minute explainer video about what we do and why we are passionate a
 
 Like the movements that we support, we value openness and transparency. We strive to create inclusive, respectful and sustainable communities and we're 100% Open Source. If you want to know more about us, you can already join our [Slack](https://slack.opencollective.com) and check out the [Open Collective Way](https://docs.opencollective.com/help/about/the-open-collective-way) to learn more about how we operate and what we stand for.
 
-We are a remote-first team that loves distributed leadership and autonomy within collaboration around the world: Aix-en-Provence, Auckland, Brussels, Berlin, Guadalajara, New York, Madrid, Paris, Shropshire, Navi Mumbai, Vancouver and Wellington. This start-up culture is truly different – the culture is one of care, listening, rigor, and autonomy within collaboration. If you are used to cut-throat dynamics and all nighters, you will be happy to find another world is possible, and it is amazing. 
+We are a remote-first team that loves distributed leadership and autonomy within collaboration around the world: Aix-en-Provence, Auckland, Brussels, Berlin, Guadalajara, New York, Madrid, Paris, Shropshire, Navi Mumbai, Vancouver and Wellington. This start-up culture is truly different – the culture is one of care, listening, rigor, and autonomy within collaboration. If you are used to cut-throat dynamics and all nighters, you will be happy to find another world is possible, and it is amazing.
 
 We are building and maintaining money management software for the commons.
 
