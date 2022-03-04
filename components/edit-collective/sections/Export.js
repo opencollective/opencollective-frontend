@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { CollectiveType, isOneOfTypes } from '../../../lib/collective-sections';
 import { exportMembers } from '../../../lib/export_file';
 
 import Container from '../../Container';
@@ -158,15 +159,20 @@ class Export extends React.Component {
             </div>
           )}
         </Container>
-        <SettingsSectionTitle>
-          <FormattedMessage id="export.widget.title" defaultMessage="Widget" />
-        </SettingsSectionTitle>
-        <Container as="pre" fontSize="11px" whiteSpace="pre-wrap" mb={4}>
-          {widgetCode}
-        </Container>
-        <Box my={4}>
-          <ExportImages collective={collective} />
-        </Box>
+
+        {!isOneOfTypes(collective, [CollectiveType.EVENT, CollectiveType.PROJECT]) && (
+          <React.Fragment>
+            <SettingsSectionTitle>
+              <FormattedMessage id="export.widget.title" defaultMessage="Widget" />
+            </SettingsSectionTitle>
+            <Container as="pre" fontSize="11px" whiteSpace="pre-wrap" mb={4}>
+              {widgetCode}
+            </Container>
+            <Box my={4}>
+              <ExportImages collective={collective} />
+            </Box>
+          </React.Fragment>
+        )}
       </div>
     );
   }
