@@ -62,7 +62,15 @@ const ContributeEvent = ({ collective, event, ...props }) => {
             <Container display="flex" alignItems="center" fontSize="12px" mt={1}>
               <Clock size="1.3em" color="#4E5052" />
               <Span ml={2} color="black.700">
-                <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
+                {!takesMultipleDays ? (
+                  <React.Fragment>
+                    <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" />
+                    {`-`}
+                    <FormattedDate value={endsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
+                  </React.Fragment>
+                ) : (
+                  <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
+                )}
               </Span>
             </Container>
           )}
