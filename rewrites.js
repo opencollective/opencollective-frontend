@@ -31,10 +31,6 @@ exports.REWRITES = [
     destination: '/guest-join',
   },
   {
-    source: '/subscriptions',
-    destination: '/recurring-contributions-redirect',
-  },
-  {
     source: '/organizations/new',
     destination: '/createOrganization',
   },

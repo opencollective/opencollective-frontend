@@ -170,6 +170,12 @@ const nextConfig = {
         destination: '/:slug/admin/:section*',
         permanent: false,
       },
+      // Legacy subscriptions
+      {
+        source: '/subscriptions',
+        destination: '/recurring-contributions',
+        permanent: false,
+      },
     ];
   },
 };
