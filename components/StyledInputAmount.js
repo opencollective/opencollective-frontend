@@ -53,12 +53,12 @@ const i18nCurrencyName = (intl, currency) => {
 const generateCurrencyOptions = (intl, availableCurrencies) => {
   return availableCurrencies.map(currency => {
     const currencyName = i18nCurrencyName(intl, currency);
-    const emojiObj = getEmojiByCurrencyCode(currency);
+    const emoji = getEmojiByCurrencyCode(currency);
     return {
       value: currency,
       label: (
         <Flex fontSize="14px" lineHeight="20px" fontWeight="500" title={currencyName}>
-          {emojiObj && <Span>{emojiObj.emoji}</Span>}
+          {emoji && <Span>{emoji}</Span>}
           &nbsp;
           <Span whiteSpace="nowrap" ml={1}>
             <Span color="black.800">{currency}</Span>
@@ -72,10 +72,10 @@ const generateCurrencyOptions = (intl, availableCurrencies) => {
 };
 
 const getSelectedCurrency = value => {
-  const emojiObj = getEmojiByCurrencyCode(value);
+  const emoji = getEmojiByCurrencyCode(value);
   return (
     <Box>
-      {emojiObj && <Span>{emojiObj.emoji}</Span>}
+      {emoji && <Span>{emoji}</Span>}
       &nbsp;
       <Span color="black.800">{value}</Span>
     </Box>
