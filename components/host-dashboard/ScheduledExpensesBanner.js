@@ -124,7 +124,6 @@ const ScheduledExpensesBanner = ({ host, onSubmit, secondButton, expenses }) => 
             />
           }
           continueHandler={handlePayBatch}
-          show
         />
       )}
     </React.Fragment>

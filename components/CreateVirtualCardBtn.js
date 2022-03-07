@@ -21,14 +21,14 @@ const CreateVirtualCardBtn = ({ children, host, collective }) => {
   return (
     <Fragment>
       {children({ onClick: () => setShowModal(true) })}
-      <CreateVirtualCardModal
-        host={host}
-        collective={collective}
-        onClose={() => setShowModal(false)}
-        setShow={setShowModal}
-        onSuccess={handleCreateCardSuccess}
-        show={showModal}
-      />
+      {showModal && (
+        <CreateVirtualCardModal
+          host={host}
+          collective={collective}
+          onClose={() => setShowModal(false)}
+          onSuccess={handleCreateCardSuccess}
+        />
+      )}
     </Fragment>
   );
 };

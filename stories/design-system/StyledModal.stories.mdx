@@ -1,8 +1,8 @@
 import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
-import Modal, { ModalBody, ModalHeader, ModalFooter } from '../../components/StyledModal';
+import StyledModal, { ModalBody, ModalHeader, ModalFooter } from '../../components/StyledModal';
 import StyledButton from '../../components/StyledButton';
 
-<Meta title="Design system/StyledModal" component={Modal} />
+<Meta title="Design system/StyledModal" component={StyledModal} />
 
 ### Default
 
@@ -13,7 +13,7 @@ import StyledButton from '../../components/StyledButton';
       return (
         <div>
           {show ? (
-            <Modal show onClose={() => setShow(false)}>
+            <StyledModal onClose={() => setShow(false)}>
               <ModalHeader>Modal title goes here</ModalHeader>
               <ModalBody>
                 Contents of the modal goes here. There will be different content types but for noew lerts use this
@@ -33,7 +33,7 @@ import StyledButton from '../../components/StyledButton';
                   Go with this version
                 </StyledButton>
               </ModalFooter>
-            </Modal>
+            </StyledModal>
           ) : (
             <StyledButton buttonSize="large" buttonStyle="primary" onClick={() => setShow(true)}>
               Show modal

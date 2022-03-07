@@ -16,7 +16,7 @@ import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
@@ -81,7 +81,7 @@ const RequestVirtualCardModal = props => {
   };
 
   return (
-    <Modal width="382px" onClose={handleClose} trapFocus {...props}>
+    <StyledModal width="382px" onClose={handleClose} trapFocus {...props}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={props.onClose}>
           <FormattedMessage id="Collective.VirtualCards.RequestCard" defaultMessage="Request a Card" />
@@ -219,7 +219,7 @@ const RequestVirtualCardModal = props => {
           </Container>
         </ModalFooter>
       </form>
-    </Modal>
+    </StyledModal>
   );
 };
 

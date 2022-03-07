@@ -83,7 +83,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
   };
 
   return (
-    <StyledModal show onClose={onClose} ignoreEscapeKey>
+    <StyledModal onClose={onClose} ignoreEscapeKey>
       <ModalHeader mb={3}>
         <Span fontSize="20px" fontWeight="500">
           <FormattedMessage defaultMessage="Add cover image" />

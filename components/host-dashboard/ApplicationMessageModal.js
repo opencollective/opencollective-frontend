@@ -10,7 +10,7 @@ import LinkCollective from '../LinkCollective';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
 
@@ -19,7 +19,7 @@ const ApplicationMessageModal = ({ collective, onClose, onConfirm, ...modalProps
   const [isPrivate, setIsPrivate] = useState(false);
 
   return (
-    <Modal onClose={onClose} width="576px" {...modalProps}>
+    <StyledModal onClose={onClose} width="576px" {...modalProps}>
       <ModalHeader hideCloseIcon>
         <Flex justifyContent="space-between" flexDirection={['column', 'row']} width="100%">
           <Flex>
@@ -125,7 +125,7 @@ const ApplicationMessageModal = ({ collective, onClose, onConfirm, ...modalProps
           </StyledButton>
         </Container>
       </ModalFooter>
-    </Modal>
+    </StyledModal>
   );
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Times } from '@styled-icons/fa-solid/Times';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import FocusTrap from 'focus-trap-react';
 import { createPortal } from 'react-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
@@ -179,18 +179,18 @@ ModalFooter.defaultProps = {
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
  * a styled `Container`.
  */
-const StyledModal = ({ children, show, onClose, usePortal, trapFocus, ignoreEscapeKey, ...props }) => {
+const StyledModal = ({ children, onClose, usePortal, trapFocus, ignoreEscapeKey, ...props }) => {
   const TrapContainer = trapFocus ? FocusTrap : React.Fragment;
   const onEscape = React.useCallback(() => {
-    if (show && !ignoreEscapeKey) {
+    if (!ignoreEscapeKey) {
       onClose();
     }
-  }, [show]);
+  }, []);
 
   // Closes the modal upon the `ESC` key press.
   useKeyBoardShortcut({ callback: onEscape, keyMatch: ESCAPE_KEY });
 
-  if (show && usePortal === false) {
+  if (usePortal === false) {
     return (
       <React.Fragment>
         <GlobalModalStyle />
@@ -209,7 +209,7 @@ const StyledModal = ({ children, show, onClose, usePortal, trapFocus, ignoreEsca
       </React.Fragment>
     );
   }
-  if (show && typeof document !== 'undefined') {
+  if (typeof document !== 'undefined') {
     return createPortal(
       <React.Fragment>
         <GlobalModalStyle />
@@ -245,8 +245,6 @@ const StyledModal = ({ children, show, onClose, usePortal, trapFocus, ignoreEsca
 };
 
 StyledModal.propTypes = {
-  /** a boolean to determine when to show modal */
-  show: PropTypes.bool.isRequired,
   /** width of the modal component */
   width: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** height of the modal component */

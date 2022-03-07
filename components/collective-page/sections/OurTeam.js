@@ -58,11 +58,9 @@ const SectionOurTeam = ({ collective, coreContributors, LoggedInUser }) => {
           </Container>
         )}
       </Container>
-      <ContactCollectiveModal
-        show={showContactModal}
-        collective={collective}
-        onClose={() => setShowContactModal(false)}
-      />
+      {showContactModal && (
+        <ContactCollectiveModal collective={collective} onClose={() => setShowContactModal(false)} />
+      )}
     </ContainerSectionContent>
   );
 };

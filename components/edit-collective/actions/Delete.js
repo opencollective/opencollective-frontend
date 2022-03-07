@@ -10,7 +10,7 @@ import { getErrorFromGraphqlException } from '../../../lib/errors';
 import Container from '../../Container';
 import { getI18nLink } from '../../I18nFormatters';
 import StyledButton from '../../StyledButton';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
 import { withUser } from '../../UserProvider';
 import SettingsSectionTitle from '../sections/SettingsSectionTitle';
@@ -141,43 +141,45 @@ const DeleteCollective = ({ collective, ...props }) => {
             />
           </P>
         )}
-      <Modal show={showModal} width="570px" onClose={closeModal}>
-        <ModalHeader onClose={closeModal}>
-          <FormattedMessage
-            id="collective.delete.modal.header"
-            defaultMessage={'Delete {name}'}
-            values={{ name: collective.name }}
-          />
-        </ModalHeader>
-        <ModalBody>
-          <P>
+      {showModal && (
+        <StyledModal width="570px" onClose={closeModal}>
+          <ModalHeader onClose={closeModal}>
             <FormattedMessage
-              id="collective.delete.modal.body"
-              defaultMessage={
-                'Are you sure you want to delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
-              }
-              values={{ type: collective.type }}
+              id="collective.delete.modal.header"
+              defaultMessage={'Delete {name}'}
+              values={{ name: collective.name }}
             />
-          </P>
-        </ModalBody>
-        <ModalFooter>
-          <Container display="flex" justifyContent="flex-end">
-            <StyledButton mx={20} onClick={() => setShowModal(false)}>
-              <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
-            </StyledButton>
-            <StyledButton
-              buttonStyle="primary"
-              data-cy="delete"
-              onClick={() => {
-                setShowModal(false);
-                handleDelete();
-              }}
-            >
-              <FormattedMessage id="actions.delete" defaultMessage="Delete" />
-            </StyledButton>
-          </Container>
-        </ModalFooter>
-      </Modal>
+          </ModalHeader>
+          <ModalBody>
+            <P>
+              <FormattedMessage
+                id="collective.delete.modal.body"
+                defaultMessage={
+                  'Are you sure you want to delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
+                }
+                values={{ type: collective.type }}
+              />
+            </P>
+          </ModalBody>
+          <ModalFooter>
+            <Container display="flex" justifyContent="flex-end">
+              <StyledButton mx={20} onClick={() => setShowModal(false)}>
+                <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
+              </StyledButton>
+              <StyledButton
+                buttonStyle="primary"
+                data-cy="delete"
+                onClick={() => {
+                  setShowModal(false);
+                  handleDelete();
+                }}
+              >
+                <FormattedMessage id="actions.delete" defaultMessage="Delete" />
+              </StyledButton>
+            </Container>
+          </ModalFooter>
+        </StyledModal>
+      )}
     </Container>
   );
 };

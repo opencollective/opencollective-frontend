@@ -267,7 +267,6 @@ const BankTransfer = props => {
       )}
       {showRemoveBankConfirmationModal && (
         <ConfirmationModal
-          show={showRemoveBankConfirmationModal}
           width="100%"
           maxWidth="570px"
           onClose={() => {

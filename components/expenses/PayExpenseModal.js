@@ -207,15 +207,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   const totalAmount = getTotalPayoutAmount(expense, { paymentProcessorFee, feesPayer: formik.values.feesPayer });
 
   return (
-    <StyledModal
-      show
-      onClose={onClose}
-      width="100%"
-      minWidth={280}
-      maxWidth={334}
-      data-cy="pay-expense-modal"
-      trapFocus
-    >
+    <StyledModal onClose={onClose} width="100%" minWidth={280} maxWidth={334} data-cy="pay-expense-modal" trapFocus>
       <ModalHeader>
         <H4 fontSize="20px" fontWeight="700">
           <FormattedMessage id="PayExpenseTitle" defaultMessage="Pay expense" />

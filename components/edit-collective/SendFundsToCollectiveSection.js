@@ -7,7 +7,7 @@ import { formatCurrency } from '../../lib/currency-utils';
 import Container from '../Container';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
 import StyledButton from '../StyledButton';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
 
 const SendFundsToCollectiveSection = ({ collective, toCollective, LoggedInUser }) => {
@@ -45,38 +45,40 @@ const SendFundsToCollectiveSection = ({ collective, toCollective, LoggedInUser }
           />
         </StyledButton>
       )}
-      <Modal show={modal.show} width="570px" onClose={closeModal}>
-        <ModalHeader onClose={closeModal}>
-          <FormattedMessage
-            id="collective.emptyBalance.header"
-            values={{ action: modal.type }}
-            defaultMessage={'{action} Balance'}
-          />
-        </ModalHeader>
-        <ModalBody>
-          <P>
+      {modal.show && (
+        <StyledModal width="570px" onClose={closeModal}>
+          <ModalHeader onClose={closeModal}>
             <FormattedMessage
-              id="collective.emptyBalance.body"
-              values={{ collective: toCollective.name, action: modal.type.toLowerCase() }}
-              defaultMessage={'Are you sure you want to {action} to {collective}?'}
+              id="collective.emptyBalance.header"
+              values={{ action: modal.type }}
+              defaultMessage={'{action} Balance'}
             />
-          </P>
-        </ModalBody>
-        <ModalFooter>
-          <Container display="flex" justifyContent="flex-end">
-            <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false, isApproved: false })}>
-              <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
-            </StyledButton>
-            <StyledButton
-              buttonStyle="primary"
-              data-cy="action"
-              onClick={() => setModal({ ...modal, show: false, isApproved: true })}
-            >
-              <FormattedMessage id="confirm" defaultMessage={'Confirm'} />
-            </StyledButton>
-          </Container>
-        </ModalFooter>
-      </Modal>
+          </ModalHeader>
+          <ModalBody>
+            <P>
+              <FormattedMessage
+                id="collective.emptyBalance.body"
+                values={{ collective: toCollective.name, action: modal.type.toLowerCase() }}
+                defaultMessage={'Are you sure you want to {action} to {collective}?'}
+              />
+            </P>
+          </ModalBody>
+          <ModalFooter>
+            <Container display="flex" justifyContent="flex-end">
+              <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false, isApproved: false })}>
+                <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
+              </StyledButton>
+              <StyledButton
+                buttonStyle="primary"
+                data-cy="action"
+                onClick={() => setModal({ ...modal, show: false, isApproved: true })}
+              >
+                <FormattedMessage id="confirm" defaultMessage={'Confirm'} />
+              </StyledButton>
+            </Container>
+          </ModalFooter>
+        </StyledModal>
+      )}
     </Fragment>
   );
 };

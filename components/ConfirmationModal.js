@@ -4,7 +4,7 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import Container from './Container';
 import StyledButton from './StyledButton';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P } from './Text';
 
 const messages = defineMessages({
@@ -34,7 +34,6 @@ const confirmBtnMsgs = defineMessages({
  * confirmation purpose.
  */
 const ConfirmationModal = ({
-  show,
   header,
   body,
   children,
@@ -53,7 +52,7 @@ const ConfirmationModal = ({
   const { formatMessage } = useIntl();
 
   return (
-    <Modal role="alertdialog" width="570px" show={show} onClose={onClose} trapFocus {...props}>
+    <StyledModal role="alertdialog" width="570px" onClose={onClose} trapFocus {...props}>
       <ModalHeader onClose={onClose}>{header}</ModalHeader>
       <ModalBody pt={2}>{children || <P>{body}</P>}</ModalBody>
       <ModalFooter>
@@ -89,13 +88,11 @@ const ConfirmationModal = ({
           </StyledButton>
         </Container>
       </ModalFooter>
-    </Modal>
+    </StyledModal>
   );
 };
 
 ConfirmationModal.propTypes = {
-  /** a boolean to determin when to show modal */
-  show: PropTypes.bool.isRequired,
   /** header of the confirmation modal */
   header: PropTypes.node.isRequired,
   /** body of the confirmation modal */

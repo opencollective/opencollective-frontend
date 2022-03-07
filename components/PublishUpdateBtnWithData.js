@@ -120,7 +120,6 @@ const PublishUpdateBtn = ({ id, isHost, isChangelog }) => {
         )}
         {showModal ? (
           <ConfirmationModal
-            show
             onClose={() => setShowModal(false)}
             continueLabel={<FormattedMessage id="update.publish.btn" defaultMessage="Publish" />}
             header={<FormattedMessage id="update.publish.modal.header" defaultMessage="Publish update" />}

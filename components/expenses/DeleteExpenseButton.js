@@ -66,7 +66,6 @@ const DeleteExpenseButton = ({ expense, onDelete, buttonProps, isDisabled, onMod
           {deleteExpense => (
             <ConfirmationModal
               isDanger
-              show
               type="delete"
               onClose={() => showDeleteConfirm(false)}
               header={<FormattedMessage id="actions.delete" defaultMessage="Delete" />}

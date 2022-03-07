@@ -112,7 +112,6 @@ const MergeAccountsForm = () => {
       </StyledButton>
       {mergeSummary && (
         <ConfirmationModal
-          show
           isDanger
           continueLabel="Merge profiles"
           header={mergeCTA}

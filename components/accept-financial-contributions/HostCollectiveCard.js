@@ -29,7 +29,7 @@ const messages = defineMessages({
 });
 
 const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
-  const [show, setShow] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const { formatMessage, locale } = useIntl();
 
   return (
@@ -58,7 +58,7 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
             mb={2}
             px={3}
             onClick={() => {
-              setShow(true);
+              setShowModal(true);
               onChange('chosenHost', host);
             }}
             data-cy="afc-host-apply-button"
@@ -67,12 +67,11 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
           </StyledButton>
         </Container>
       </StyledCollectiveCard>
-      {show && (
+      {showModal && (
         <ApplyToHostModal
           hostSlug={host.slug}
           collective={collective}
-          show={show}
-          onClose={() => setShow(false)}
+          onClose={() => setShowModal(false)}
           onSuccess={() => {
             return props.router
               .push(`${collective.slug}/accept-financial-contributions/host/success`)

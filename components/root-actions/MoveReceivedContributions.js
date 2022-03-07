@@ -200,7 +200,6 @@ const MoveReceivedContributions = () => {
 
       {hasConfirmationModal && (
         <ConfirmationModal
-          show
           header={callToAction}
           continueHandler={moveContributions}
           onClose={() => setHasConfirmationModal(false)}
