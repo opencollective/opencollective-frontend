@@ -308,7 +308,7 @@ I18nAddressFields.propTypes = {
   prefix: PropTypes.string,
   required: PropTypes.bool,
   /** String if using old address textarea; object if using new address fields. */
-  value: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
+  value: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   onCountryChange: PropTypes.func.isRequired, // TODO Rename this prop, it's not doing what the name implies
   /** Called when the call to the Shopify API fails */
   onLoadError: PropTypes.func,
