@@ -28,7 +28,7 @@ Open Collective is on a mission to help communities around the world be sustaina
 
 Watch this video about what we do and why we are passionate about it:
 
-<iframe src="https://www.youtube.com/watch?v=SfHeSpoSHTM" scrolling="no" width="854" height="480" frameborder="0"></iframe>
+<iframe src="https://www.youtube.com/embed/SfHeSpoSHTM?wmode=opaque" scrolling="no" width="854" height="480" frameborder="0"></iframe>
 
 Like the movements that we support, we value openness and transparency. We strive to create inclusive, respectful and sustainable communities and we're 100% Open Source. If you want to know more about us, you can already join our [Slack](https://slack.opencollective.com) and check out the [Open Collective Way](https://docs.opencollective.com/help/about/the-open-collective-way) to learn more about how we operate and what we stand for.
 
