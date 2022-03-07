@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import css from '@styled-system/css';
@@ -133,92 +133,88 @@ class recurringContributionsPage extends React.Component {
     }
 
     const collective = data && data.account;
-    const canEditCollective = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const canEditCollective = Boolean(LoggedInUser?.canEditCollective(collective));
     const recurringContributions = collective && collective.orders;
     const groupedAdminOf = this.getAdministratedAccounts(LoggedInUser);
     return (
-      <AuthenticatedPage>
+      <AuthenticatedPage disableSignup>
         {loadingLoggedInUser || (data?.loading && isEmpty(groupedAdminOf)) ? (
           <Container py={[5, 6]}>
             <Loading />
           </Container>
+        ) : !LoggedInUser || (!data.loading && !canEditCollective) ? (
+          <Container p={4}>
+            <P p={2} fontSize="16px" textAlign="center">
+              <FormattedMessage
+                id="RecurringContributions.permissionError"
+                defaultMessage="You need to be logged in as the admin of this account to view this page."
+              />
+            </P>
+            {!LoggedInUser && <SignInOrJoinFree />}
+          </Container>
         ) : (
-          <Fragment>
-            {collective && !canEditCollective ? (
-              <Container p={4}>
-                <P p={2} fontSize="16px" textAlign="center">
-                  <FormattedMessage
-                    id="RecurringContributions.permissionError"
-                    defaultMessage="You need to be logged in as the admin of this account to view this page."
-                  />
-                </P>
-                <SignInOrJoinFree />
-              </Container>
-            ) : (
-              <Container>
-                <CollectiveNavbar collective={collective} />
-                <MainContainer py={[3, 4]} px={[2, 3, 4]}>
-                  <SectionTitle textAlign="left" mb={1}>
-                    <FormattedMessage id="Subscriptions.Title" defaultMessage="Recurring contributions" />
-                  </SectionTitle>
-                  <Grid gridTemplateColumns={['1fr', '250px 1fr']} gridGap={32} mt={4}>
-                    <div>
-                      <MenuEntry href="/recurring-contributions" $isActive={!slug} onClick={() => {}}>
-                        <Avatar collective={LoggedInUser.collective} size={32} />
-                        <Span ml={3}>
-                          <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" />
+          <Container>
+            <CollectiveNavbar collective={collective} />
+            <MainContainer py={[3, 4]} px={[2, 3, 4]}>
+              <SectionTitle textAlign="left" mb={1}>
+                <FormattedMessage id="Subscriptions.Title" defaultMessage="Recurring contributions" />
+              </SectionTitle>
+              <Grid gridTemplateColumns={['1fr', '250px 1fr']} gridGap={32} mt={4}>
+                <div>
+                  <MenuEntry href="/recurring-contributions" $isActive={!slug} onClick={() => {}}>
+                    <Avatar collective={LoggedInUser.collective} size={32} />
+                    <Span ml={3}>
+                      <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" />
+                    </Span>
+                  </MenuEntry>
+                  {Object.entries(groupedAdminOf).map(([collectiveType, members]) => (
+                    <div key={collectiveType}>
+                      <Flex alignItems="center" px={2} mt={3} mb={2}>
+                        <Span fontWeight="bold" color="black.700" fontSize="14px">
+                          {formatCollectiveType(intl, collectiveType, 2)}
                         </Span>
-                      </MenuEntry>
-                      {Object.entries(groupedAdminOf).map(([collectiveType, members]) => (
-                        <div key={collectiveType}>
-                          <Flex alignItems="center" px={2} mt={3} mb={2}>
-                            <Span fontWeight="bold" color="black.700" fontSize="14px">
-                              {formatCollectiveType(intl, collectiveType, 2)}
-                            </Span>
-                            <StyledHr ml={2} width="100%" borderColor="black.300" />
-                          </Flex>
-                          {members.map(m => (
-                            <MenuEntry
-                              key={m.id}
-                              href={`/${m.collective.slug}/recurring-contributions`}
-                              title={m.collective.name}
-                              $isActive={slug === m.collective.slug}
-                            >
-                              <Avatar collective={m.collective} size={32} />
-                              <Span ml={3} truncateOverflow>
-                                {m.collective.name}
-                              </Span>
-                            </MenuEntry>
-                          ))}
-                        </div>
+                        <StyledHr ml={2} width="100%" borderColor="black.300" />
+                      </Flex>
+                      {members.map(m => (
+                        <MenuEntry
+                          key={m.id}
+                          href={`/${m.collective.slug}/recurring-contributions`}
+                          title={m.collective.name}
+                          $isActive={slug === m.collective.slug}
+                        >
+                          <Avatar collective={m.collective} size={32} />
+                          <Span ml={3} truncateOverflow>
+                            {m.collective.name}
+                          </Span>
+                        </MenuEntry>
                       ))}
                     </div>
-                    <Box>
-                      <Box mx="auto">
-                        <StyledFilters
-                          filters={filters}
-                          getLabel={key => intl.formatMessage(I18nFilters[key])}
-                          selected={this.state.filter}
-                          justifyContent="left"
-                          minButtonWidth={175}
-                          onChange={filter => this.setState({ filter: filter })}
-                        />
-                      </Box>
-                      {data.loading ? (
-                        <LoadingPlaceholder maxHeight="400px" mt={3} />
-                      ) : (
-                        <RecurringContributionsContainer
-                          recurringContributions={recurringContributions}
-                          account={collective}
-                          filter={this.state.filter}
-                        />
-                      )}
-                    </Box>
-                  </Grid>
-                </MainContainer>
-              </Container>
-            )}
-          </Fragment>
+                  ))}
+                </div>
+                <Box>
+                  <Box mx="auto">
+                    <StyledFilters
+                      filters={filters}
+                      getLabel={key => intl.formatMessage(I18nFilters[key])}
+                      selected={this.state.filter}
+                      justifyContent="left"
+                      minButtonWidth={175}
+                      onChange={filter => this.setState({ filter: filter })}
+                    />
+                  </Box>
+                  {data.loading ? (
+                    <LoadingPlaceholder maxHeight="400px" mt={3} />
+                  ) : (
+                    <RecurringContributionsContainer
+                      recurringContributions={recurringContributions}
+                      account={collective}
+                      filter={this.state.filter}
+                    />
+                  )}
+                </Box>
+              </Grid>
+            </MainContainer>
+          </Container>
         )}
       </AuthenticatedPage>
     );
