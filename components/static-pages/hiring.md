@@ -1,6 +1,6 @@
 # Hiring
 
-## Come work at a Tech Company that actually Respects Your Time.
+## Come Work at a Mission Driven Tech Company with High Impact that Pays Well and Cares about You.
 
 Are you a top-notch engineer, product manager, or operations person? Do you want to get paid well, have time to relax each week, and be respected for your passion for open source, mutual aid, and the commons? Come work with us!
 
@@ -12,7 +12,7 @@ Join us at [Open Collective](https://opencollective.com/e2c) -- a tech platform 
 <strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>
 -->
 
-<em>February 15th 2022</em>. We're still hiring for the following roles:
+We're still hiring for the following roles:
 
 <ul>
   <li><a href='#software-engineer'> 2 Senior Software Engineers</a></li>
@@ -26,9 +26,9 @@ Pay is transparent and is based on [where you live](https://docs.google.com/spre
 
 Open Collective is on a mission to help communities around the world be sustainable. On Open Collective, groups like open source projects, neighbourhood associations, mutual aid groups and more can collect and spend money transparently, invite collaboration, and help their communities thrive.
 
-Watch this 2 minute explainer video about what we do and why we are passionate about it:
+Watch this video about what we do and why we are passionate about it:
 
-<iframe src="https://www.youtube.com/embed/IBU5fSILAe8?wmode=opaque&amp;enablejsapi=1" scrolling="no" width="854" height="480" frameborder="0"></iframe>
+<iframe src="https://www.youtube.com/watch?v=SfHeSpoSHTM" scrolling="no" width="854" height="480" frameborder="0"></iframe>
 
 Like the movements that we support, we value openness and transparency. We strive to create inclusive, respectful and sustainable communities and we're 100% Open Source. If you want to know more about us, you can already join our [Slack](https://slack.opencollective.com) and check out the [Open Collective Way](https://docs.opencollective.com/help/about/the-open-collective-way) to learn more about how we operate and what we stand for.
 
