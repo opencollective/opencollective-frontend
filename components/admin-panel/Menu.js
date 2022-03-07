@@ -109,11 +109,6 @@ const Menu = ({ collective, isAccountantOnly }) => {
                 section={FISCAL_HOST_SECTIONS.POLICIES}
                 if={isOneOfTypes(collective, [USER, ORGANIZATION])}
               />
-              <MenuLink
-                collective={collective}
-                section={FISCAL_HOST_SECTIONS.HOST_PLAN}
-                if={isOneOfTypes(collective, [USER, ORGANIZATION])}
-              />
             </MenuGroup>
           </SubMenu>
         </MenuGroup>
