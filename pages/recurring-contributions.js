@@ -161,7 +161,11 @@ class recurringContributionsPage extends React.Component {
               </SectionTitle>
               <Grid gridTemplateColumns={['1fr', '250px 1fr']} gridGap={32} mt={4}>
                 <div>
-                  <MenuEntry href="/recurring-contributions" $isActive={!slug} onClick={() => {}}>
+                  <MenuEntry
+                    href="/recurring-contributions"
+                    $isActive={!slug || slug === LoggedInUser.collective.slug}
+                    onClick={() => {}}
+                  >
                     <Avatar collective={LoggedInUser.collective} size={32} />
                     <Span ml={3}>
                       <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" />
