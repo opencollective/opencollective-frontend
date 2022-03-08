@@ -747,7 +747,7 @@
   "Date.DateRange": "{dateFrom, date, short} a {dateTo, date, short}",
   "Date.SinceShort": "Desde {date, date, short}",
   "DateRange.All": "Todos",
-  "DDNNLJ": "Fundraising and crowdfunding features",
+  "DDNNLJ": "Funciones para recaudar fondos y financiar en masa",
   "Decline": "Denegar",
   "DefaultValue": "Valor predeterminado",
   "Details": "Detalles",
