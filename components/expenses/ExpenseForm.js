@@ -304,12 +304,7 @@ const ExpenseFormBody = ({
 
   React.useEffect(() => {
     if (dirty) {
-      formik.setFieldValue(
-        'currency',
-        values.payoutMethod?.currency || values.payoutMethod?.data?.currency || collective.currency,
-      );
-      const updatedItems = (values.items || []).map(item => ({ ...item, amount: 0 }));
-      formik.setFieldValue('items', updatedItems);
+      formik.setFieldValue('currency', undefined);
     }
   }, [values.payoutMethod]);
 

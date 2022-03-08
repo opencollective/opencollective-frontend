@@ -28,7 +28,7 @@ const ExpenseItemsTotalAmount = ({ items, currency }) => {
 
 ExpenseItemsTotalAmount.propTypes = {
   /** The currency of the collective */
-  currency: PropTypes.string.isRequired,
+  currency: PropTypes.string,
   /** Expense items */
   items: PropTypes.arrayOf(
     PropTypes.shape({

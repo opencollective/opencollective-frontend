@@ -89,7 +89,8 @@ const CurrencyPicker = ({ availableCurrencies, value, onChange }) => {
   return (
     <StyledSelect
       inputId="currency-picker"
-      placeholder={intl.formatMessage({ id: 'Currency', defaultMessage: 'Currency' })}
+      placeholder="----"
+      error={!value}
       isSearchable={availableCurrencies?.length > 10}
       options={currencyOptions}
       value={!value ? null : { value, label: <Box minWidth={200}>{selectedCurrency}</Box> }}
@@ -98,7 +99,6 @@ const CurrencyPicker = ({ availableCurrencies, value, onChange }) => {
       onInputChange={inputValue => (inputValue.length <= 3 ? inputValue : inputValue.substr(0, 3))} // Limit search length to 3 characters
       styles={{
         control: {
-          border: 'none',
           background: '#F7F8FA',
         },
         menu: {
@@ -210,7 +210,7 @@ const StyledInputAmount = ({
 
 StyledInputAmount.propTypes = {
   /** The currency (eg. `USD`, `EUR`...) */
-  currency: PropTypes.string.isRequired,
+  currency: PropTypes.string,
   /** Gets passed the new currency. Only when hasCurrencyPicker is true */
   onCurrencyChange: PropTypes.func,
   /** Gets passed the amount in cents as first param, and the event as second param. */

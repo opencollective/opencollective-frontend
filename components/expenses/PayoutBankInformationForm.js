@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
@@ -421,6 +421,10 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
   const formik = useFormikContext();
   const { formatMessage } = useIntl();
 
+  useEffect(() => {
+    formik.setFieldValue('currency', formik?.values?.currency);
+  }, [formik?.values?.currency]);
+
   // Display spinner if loading
   if (loading) {
     return <StyledSpinner />;
@@ -457,12 +461,17 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
   const currencyFieldName = getFieldName('data.currency');
   const selectedCurrency = get(formik.values, currencyFieldName);
 
-  const validateCurrencyMinimumAmount = () => {
+  const validateCurrency = () => {
     // Skip if currency is fixed (2) (3)
     // or if `availableCurrencies` is not set (but we're not supposed to be there anyway)
     if (fixedCurrency || !availableCurrencies) {
       return;
     }
+
+    if (!formik?.values?.currency) {
+      return 'Please select a currency';
+    }
+
     // Only validate minimum amount if the form has items
     if (formik?.values?.items?.length > 0) {
       const invoiceTotalAmount = formik.values.items.reduce(
@@ -483,7 +492,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
 
   return (
     <React.Fragment>
-      <Field name={currencyFieldName} validate={validateCurrencyMinimumAmount}>
+      <Field name={currencyFieldName} validate={validateCurrency}>
         {({ field }) => (
           <StyledInputField name={field.name} label={formatMessage(msg.currency)} labelFontSize="13px" mt={3} mb={2}>
             {({ id }) => (
