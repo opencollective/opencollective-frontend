@@ -97,16 +97,16 @@ const getTotalPayoutAmount = (expense, { paymentProcessorFee, feesPayer }) => {
   }
 };
 
-const canCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount) => {
+const canCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount, isRoot) => {
+  const isSupportedPayoutMethod = [PayoutMethodType.BANK_ACCOUNT].includes(expense.payoutMethod?.type);
+  const isFullBalance = expense.amount === get(collective, 'stats.balanceWithBlockedFunds.valueInCents');
+  const isSameCurrency = expense.currency === collective?.currency;
+
   // Current limitations:
   // - Only for transferwise
-  // - Only when emptying the account balance
+  // - Only when emptying the account balance (or when root user)
   // - Only with expenses submitted in the same currency as the collective
-  if (
-    ![PayoutMethodType.BANK_ACCOUNT].includes(expense.payoutMethod?.type) ||
-    expense.amount !== get(collective, 'stats.balanceWithBlockedFunds.valueInCents') ||
-    expense.currency !== collective?.currency
-  ) {
+  if (!(isSupportedPayoutMethod && isSameCurrency && (isFullBalance || isRoot))) {
     return false;
   }
 
@@ -181,7 +181,7 @@ const getPaymentProcessorFee = (formik, expense, quoteQuery) => {
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
  */
-const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }) => {
+const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, LoggedInUser }) => {
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
   const initialValues = getInitialValues(expense, host, payoutMethodType);
@@ -270,7 +270,13 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             )}
           </StyledInputField>
         )}
-        {canCustomizeFeesPayer(expense, collective, hasManualPayment, formik.values.paymentProcessorFee) && (
+        {canCustomizeFeesPayer(
+          expense,
+          collective,
+          hasManualPayment,
+          formik.values.paymentProcessorFee,
+          LoggedInUser.isRoot(),
+        ) && (
           <Flex mt={16}>
             <StyledTooltip
               content={
