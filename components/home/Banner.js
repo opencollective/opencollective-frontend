@@ -10,11 +10,11 @@ const Banner = () => (
     <Box>
       <P fontSize="14px" lineHeight="20px" color="primary.900">
         <FormattedMessage
-          defaultMessage="We're hiring a Senior Product Manager and a Senior Software Engineer! <link><strong>Learn more about open positions</strong></link>"
+          defaultMessage="Open Source Collective is hiring a software engineer, product manager, and operations manager! <link><strong>Learn more</strong></link>"
           values={{
             strong: I18nBold,
             link: getI18nLink({
-              href: '/hiring',
+              href: 'https://blog.opencollective.com/osc-hiring/',
               textDecoration: 'underline',
               color: 'primary.900',
             }),
