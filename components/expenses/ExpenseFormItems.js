@@ -56,6 +56,7 @@ class ExpenseFormItems extends React.PureComponent {
       touched: PropTypes.object,
       errors: PropTypes.object,
       setFieldValue: PropTypes.func,
+      setFieldTouched: PropTypes.func,
     }).isRequired,
   };
 
@@ -119,8 +120,12 @@ class ExpenseFormItems extends React.PureComponent {
     }
   }
 
-  onCurrencyChange = newCurrency => {
-    this.props.form.setFieldValue('currency', newCurrency);
+  onCurrencyChange = async newCurrency => {
+    /* If we are calling setFieldValue in response to a field change and has validations
+     * we should set the field to touched; https://github.com/jaredpalmer/formik/issues/2059
+     */
+    await this.props.form.setFieldValue('currency', newCurrency);
+    this.props.form.setFieldTouched('currency', true);
   };
 
   getPossibleCurrencies = () => {
@@ -203,7 +208,7 @@ class ExpenseFormItems extends React.PureComponent {
             editOnlyDescriptiveInfo={isCreditCardCharge}
             hasMultiCurrency={!index && availableCurrencies?.length > 1} // Only display currency picker for the first item
             availableCurrencies={availableCurrencies}
-            onCurrencyChange={this.onCurrencyChange}
+            onCurrencyChange={async value => await this.onCurrencyChange(value)}
           />
         ))}
         <Flex alignItems="center" my={3}>

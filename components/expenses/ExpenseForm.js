@@ -6,11 +6,13 @@ import { first, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { accountSupportsGrants } from '../../lib/collective.lib';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { requireFields } from '../../lib/form-utils';
+import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep } from '../../lib/utils';
 import { checkRequiresAddress } from './lib/utils';
 
@@ -242,6 +244,9 @@ const ExpenseFormBody = ({
   const stepTwoCompleted = isInvite
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
+  const isMultiCurrency =
+    hasFeature(collective, FEATURES.MULTI_CURRENCY_EXPENSES) ||
+    hasFeature(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES);
 
   const [step, setStep] = React.useState(stepOneCompleted || isCreditCardCharge ? STEPS.EXPENSE : STEPS.PAYEE);
   // Only true when logged in and drafting the expense
@@ -303,7 +308,7 @@ const ExpenseFormBody = ({
   }, [values.payeeLocation]);
 
   React.useEffect(() => {
-    if (dirty) {
+    if (isMultiCurrency && dirty) {
       formik.setFieldValue('currency', undefined);
     }
   }, [values.payoutMethod]);
@@ -603,7 +608,7 @@ const ExpenseFormBody = ({
                 </StyledButton>
                 {errors.payoutMethod?.data?.currency && touched.items?.some?.(i => i.amount) && (
                   <Box mx={[2, 0]} mt={2} color="red.500" fontSize="12px" letterSpacing={0}>
-                    {errors.payoutMethod.data.currency.toString()}
+                    {errors.payoutMethod.data.currency}
                   </Box>
                 )}
                 <StyledHr flex="1" borderColor="white.full" mx={2} />
@@ -693,6 +698,7 @@ ExpenseFormBody.propTypes = {
     status: PropTypes.string,
     payee: PropTypes.object,
     draft: PropTypes.object,
+    amountInAccountCurrency: AmountPropTypeShape,
     items: PropTypes.arrayOf(
       PropTypes.shape({
         url: PropTypes.string,

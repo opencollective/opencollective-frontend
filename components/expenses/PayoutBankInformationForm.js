@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
@@ -421,10 +421,6 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
   const formik = useFormikContext();
   const { formatMessage } = useIntl();
 
-  useEffect(() => {
-    formik.setFieldValue('currency', formik?.values?.currency);
-  }, [formik?.values?.currency]);
-
   // Display spinner if loading
   if (loading) {
     return <StyledSpinner />;
@@ -469,7 +465,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
     }
 
     if (!formik?.values?.currency) {
-      return 'Please select a currency';
+      return formatMessage({ defaultMessage: 'Please select a currency' });
     }
 
     // Only validate minimum amount if the form has items
@@ -481,11 +477,16 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
       const minAmountForSelectedCurrency =
         availableCurrencies.find(c => c.code === selectedCurrency)?.minInvoiceAmount * 100;
       if (invoiceTotalAmount < minAmountForSelectedCurrency) {
-        // TODO intl
-        return `The minimum amount for transferring to ${selectedCurrency} is ${formatCurrency(
-          minAmountForSelectedCurrency,
-          wiseHost.currency,
-        )}`;
+        return formatMessage(
+          {
+            defaultMessage:
+              'The minimum amount for transferring to {selectedCurrency} is {minAmountForSelectedCurrency}',
+          },
+          {
+            selectedCurrency,
+            minAmountForSelectedCurrency: formatCurrency(minAmountForSelectedCurrency, wiseHost.currency),
+          },
+        );
       }
     }
   };
@@ -549,6 +550,7 @@ PayoutBankInformationForm.propTypes = {
   fixedCurrency: PropTypes.string,
   /** A map of errors for this object */
   errors: PropTypes.object,
+  formik: PropTypes.object,
 };
 
 export default PayoutBankInformationForm;
