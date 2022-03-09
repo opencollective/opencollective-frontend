@@ -688,7 +688,7 @@ class EditCollectiveForm extends React.Component {
           name: 'githubHandle',
           type: 'text',
           pre: 'https://github.com/',
-          maxLength: 39,
+          maxLength: 140, // 39 (Max length of GitHub org name) + 100 (Max length of repo name) + 1 (for the '/' sign)
           placeholder: '',
           label: 'Github',
           when: () => collective.type !== EVENT,
