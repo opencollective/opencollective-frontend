@@ -167,7 +167,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
           )}
         </DetailDescription>
       </Flex>
-      <Flex flexDirection="column" width={[1, 0.25]}>
+      <Flex flexDirection="column" width={[1, 0.35]}>
         <Box>
           {(host || paymentMethod) && (
             <React.Fragment>
@@ -196,13 +196,8 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
         </Box>
       </Flex>
       {displayActions && ( // Let us overide so we can hide buttons in the collective page
-        <Flex flexDirection="column" width={[1, 0.4]}>
-          <Flex
-            flexWrap={['wrap', 'wrap', 'wrap', 'wrap', 'nowrap']}
-            justifyContent={['flex-start', 'flex-end']}
-            alignItems="center"
-            mt={[2, 0]}
-          >
+        <Flex flexDirection="column" width={[1, 0.3]}>
+          <Flex flexWrap="wrap" justifyContent={['flex-start', 'flex-end']} alignItems="center" mt={[2, 0]}>
             {(showRefundButton || showRejectButton) && (
               <StyledTooltip content={rejectAndRefundTooltipContent(showRefundButton, showRejectButton)} mt={2}>
                 <Box mx={2}>
