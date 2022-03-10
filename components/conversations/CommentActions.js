@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { X } from '@styled-icons/feather/X';
 import { Edit } from '@styled-icons/material/Edit';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { usePopper } from 'react-popper';
 import styled from 'styled-components';
 
-import { getErrorFromGraphqlException } from '../../lib/errors';
+import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
@@ -116,6 +116,7 @@ const REACT_POPPER_MODIFIERS = [
 const mutationOptions = { context: API_V2_CONTEXT };
 
 const CommentActions = ({ comment, isConversationRoot, canEdit, canDelete, onDelete, onEditClick }) => {
+  const intl = useIntl();
   const [isDeleting, setDeleting] = React.useState(null);
   const [showAdminActions, setShowAdminActions] = React.useState(false);
   const [refElement, setRefElement] = React.useState(null);
@@ -208,7 +209,7 @@ const CommentActions = ({ comment, isConversationRoot, canEdit, canDelete, onDel
           </Container>
           {deleteError && (
             <MessageBox type="error" withIcon mt={3}>
-              {getErrorFromGraphqlException(deleteError).message}
+              {i18nGraphqlException(intl, deleteError)}
             </MessageBox>
           )}
         </ConfirmationModal>

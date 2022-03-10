@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
-import { getErrorFromGraphqlException } from '../lib/errors';
+import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import formatMemberRole from '../lib/i18n/member-role';
 
@@ -133,7 +133,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
           )}
           {error && (
             <MessageBox type="error" withIcon my={3}>
-              {getErrorFromGraphqlException(error).message}
+              {i18nGraphqlException(intl, error)}
             </MessageBox>
           )}
           <Flex mt={4} justifyContent="space-evenly">

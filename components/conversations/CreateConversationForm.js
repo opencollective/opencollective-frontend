@@ -4,7 +4,7 @@ import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { createError, ERROR, getErrorFromGraphqlException } from '../../lib/errors';
+import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import FormPersister from '../../lib/form-persister';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -196,7 +196,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
       </Flex>
       {submitError && (
         <MessageBox type="error" mt={3}>
-          {getErrorFromGraphqlException(submitError).message}
+          {i18nGraphqlException(intl, submitError)}
         </MessageBox>
       )}
       <StyledButton
