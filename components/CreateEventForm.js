@@ -84,7 +84,10 @@ class CreateEventForm extends React.Component {
 
   handleChange(fieldname, value) {
     const event = {};
-    set(event, fieldname, value);
+
+    if (value !== undefined) {
+      set(event, fieldname, value);
+    }
 
     if (fieldname === 'startsAt') {
       const isValid = dayjs(value).isValid();
