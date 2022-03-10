@@ -6,7 +6,7 @@ import { cloneDeep, get, pick, set } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { i18nGraphqlException } from '../../../lib/errors';
 
 import Container from '../../Container';
 import HostPayouts2FARollingLimitFAQ from '../../faqs/HostPayouts2FARollingLimitFAQ';
@@ -52,7 +52,7 @@ const ScreenshotPreview = styled.div`
 `;
 
 const HostTwoFactorAuth = ({ collective }) => {
-  const { formatMessage } = useIntl();
+  const intl = useIntl();
   const { addToast } = useToasts();
   const [setSettings, { loading, error }] = useMutation(editCollectiveSettingsMutation);
   const doesHostAlreadyHaveTwoFactorAuthEnabled = get(collective, 'settings.payoutsTwoFactorAuth.enabled', false);
@@ -108,7 +108,7 @@ const HostTwoFactorAuth = ({ collective }) => {
                         name="rollingLimit"
                         htmlFor="rollingLimit"
                         disabled={loading}
-                        label={formatMessage(messages['rollingLimit.label'])}
+                        label={intl.formatMessage(messages['rollingLimit.label'])}
                         labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
                       >
                         {inputProps => (
@@ -118,7 +118,7 @@ const HostTwoFactorAuth = ({ collective }) => {
                             type="number"
                             fontSize="14px"
                             value={formik.values.rollingLimit}
-                            placeholder={formatMessage(messages['rollingLimit.placeholder'])}
+                            placeholder={intl.formatMessage(messages['rollingLimit.placeholder'])}
                             onChange={value => formik.setFieldValue('rollingLimit', value)}
                             min={100}
                             precision={2}
@@ -146,7 +146,7 @@ const HostTwoFactorAuth = ({ collective }) => {
               ) : (
                 <StyledCheckbox
                   name="enable-rolling-limit"
-                  label={formatMessage(messages['rollingLimit.enable'])}
+                  label={intl.formatMessage(messages['rollingLimit.enable'])}
                   defaultChecked={defaultIsChecked}
                   width="auto"
                   isLoading={loading}
@@ -161,7 +161,7 @@ const HostTwoFactorAuth = ({ collective }) => {
           </Flex>
           {error && (
             <MessageBox type="error" fontSize="14px" withIcon mb={3}>
-              {getErrorFromGraphqlException(error).message}
+              {i18nGraphqlException(intl, error)}
             </MessageBox>
           )}
           <Flex flexWrap="wrap" justifyContent="space-between" width="100%">

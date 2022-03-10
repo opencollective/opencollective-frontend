@@ -8,7 +8,7 @@ import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'rea
 import styled from 'styled-components';
 
 import roles from '../../../lib/constants/roles';
-import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import formatMemberRole from '../../../lib/i18n/member-role';
 
@@ -315,14 +315,14 @@ class Members extends React.Component {
   }
 
   render() {
-    const { data } = this.props;
+    const { data, intl } = this.props;
 
     if (data.loading) {
       return <Loading />;
     } else if (data.error) {
       return (
         <MessageBox type="error" withIcon>
-          {getErrorFromGraphqlException(data.error).message}
+          {i18nGraphqlException(intl, data.error)}
         </MessageBox>
       );
     } else if (data.account?.parentAccount) {

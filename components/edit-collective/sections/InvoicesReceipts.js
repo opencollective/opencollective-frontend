@@ -4,7 +4,7 @@ import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { i18nGraphqlException } from '../../../lib/errors';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -28,7 +28,7 @@ const messages = defineMessages({
 });
 
 const InvoicesReceipts = ({ collective }) => {
-  const { formatMessage } = useIntl();
+  const intl = useIntl();
 
   // For invoice Title
   const defaultValue = get(collective.settings, 'invoiceTitle');
@@ -58,7 +58,7 @@ const InvoicesReceipts = ({ collective }) => {
       </P>
       {error && (
         <MessageBox type="error" fontSize="14px" withIcon mb={3}>
-          {getErrorFromGraphqlException(setValue).message}
+          {i18nGraphqlException(intl, error)}
         </MessageBox>
       )}
       <Flex flexWrap="wrap" justifyContent="space-between" maxWidth={800}>
@@ -73,7 +73,7 @@ const InvoicesReceipts = ({ collective }) => {
           />
 
           <StyledTextarea
-            placeholder={formatMessage(messages.extraInfoPlaceholder)}
+            placeholder={intl.formatMessage(messages.extraInfoPlaceholder)}
             defaultValue={info}
             onChange={e => setInfo(e.target.value)}
             width="100%"
