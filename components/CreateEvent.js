@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
+import { convertDateToApiUtc } from '../lib/date-utils';
 import dayjs from '../lib/dayjs';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
@@ -36,8 +37,8 @@ class CreateEvent extends React.Component {
       event: {
         parentCollective: props.parentCollective,
         timezone, // "Europe/Brussels", // "America/New_York"
-        startsAt,
-        endsAt,
+        startsAt: convertDateToApiUtc(startsAt, timezone),
+        endsAt: convertDateToApiUtc(endsAt, timezone),
       },
       result: {},
     };
