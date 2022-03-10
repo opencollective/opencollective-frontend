@@ -16,7 +16,6 @@ We're still hiring for the following roles:
 
 <ul>
   <li><a href='#software-engineer'> 2 Senior Software Engineers</a></li>
-  <li><a href='#product-manager'>Senior Product Manager</a></li>
   <li><a href='#operations-manager'>Operations Manager</a></li>
 </ul>
 
@@ -56,29 +55,6 @@ We are looking for a senior "full-stack" software engineer who’s excited about
   - our Web App (powered by Next.js, React and Apollo).
 
 - You are excited about our mission and share our philosophy.
-
-<h2 id='product-manager'>Senior Product Manager</h2>
-
-We are looking for two senior product manager who is excited about creating a world in which it is as rewarding and financially secure to build and maintain software for the commons as it is for the corporation.
-
-### We think you’d be great at this if you:
-
-- Are comfortable in a remote environment that is at the same time highly collaborative (we [apply](https://github.com/opencollective/opencollective/issues/2267) a [seeking feedback process](https://reinventingorganizationswiki.com/theory/decision-making/)) and autonomous (you will own complete features and products!)
-
-- Are based within 6 hours of Central European time:
-
-  - to optimize timezone overlaps with the current product team (who are based in the UK)
-
-- Have significant experience as a product manager in a software business (<em>"senior"</em>) i.e. a digital platform or product organisation.
-
-- Are comfortable with the processes, tools and trade-offs required to build and maintain products as a small team, with minimal support, including but not limited to:
-
-  - conducting, interpreting and conveying the results of user and market research, both quantitative and qualitative (we use Metabase and Matomo)
-  - building context for and collaborating with design and engineering to develop, scope, prioritize, execute, test and iterate on solutions
-  - documenting, releasing, marketing and supporting products after launch
-  - supporting leadership to make effective strategic decisions on product development and success.
-
-- You have experience working within or adjacent to open source communities, are excited about our mission, and share our philosophy.
 
 <h2 id='operations-manager'>Operations Manager</h2>
 
