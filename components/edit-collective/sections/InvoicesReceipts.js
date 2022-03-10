@@ -58,7 +58,7 @@ const InvoicesReceipts = ({ collective }) => {
       </P>
       {error && (
         <MessageBox type="error" fontSize="14px" withIcon mb={3}>
-          {i18nGraphqlException(intl, setValue)}
+          {i18nGraphqlException(intl, error)}
         </MessageBox>
       )}
       <Flex flexWrap="wrap" justifyContent="space-between" maxWidth={800}>
