@@ -321,6 +321,9 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
   } = contributeOptionsState;
   const selectedTier = selectedContributeOption?.isCustom ? null : selectedContributeOption;
   const isPaypal = contribution.paymentMethod.service === PAYMENT_METHOD_SERVICE.PAYPAL;
+  const tipAmount = contribution.platformTipAmount?.valueInCents || 0;
+  const newAmount = selectedAmountOption?.label === OTHER_LABEL ? inputAmountValue : selectedAmountOption?.value;
+  const newTotalAmount = newAmount + tipAmount; // For now tip can't be updated, we're just carrying it over
 
   // When we change the amount option (One of the presets or Other)
   const setSelectedAmountOption = ({ label, value }) => {
@@ -443,7 +446,7 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
           <PayWithPaypalButton
             isLoading={!selectedAmountOption}
             isSubmitting={isSubmittingOrder}
-            totalAmount={selectedAmountOption?.label === OTHER_LABEL ? inputAmountValue : selectedAmountOption?.value}
+            totalAmount={newTotalAmount}
             currency={contribution.amount.currency}
             interval={
               selectedContributeOption?.interval || getIntervalFromContributionFrequency(contribution.frequency)
