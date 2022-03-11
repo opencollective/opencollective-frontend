@@ -36,6 +36,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   VIRTUAL_CARDS: 'virtual-cards',
   // Host Specific
   FISCAL_HOSTING: 'fiscal-hosting',
+  HOST_PLAN: 'host-plan',
   INVOICES_RECEIPTS: 'invoices-receipts',
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
@@ -80,6 +81,10 @@ const SECTION_LABELS = defineMessages({
   [EDIT_COLLECTIVE_SECTIONS.HOST]: {
     id: 'Fiscalhost',
     defaultMessage: 'Fiscal Host',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.HOST_PLAN]: {
+    id: 'Host.Plan',
+    defaultMessage: 'Host Plan',
   },
   [EDIT_COLLECTIVE_SECTIONS.INFO]: {
     id: 'editCollective.menu.info',
@@ -200,6 +205,7 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: c => isType(c, USER),
   // Fiscal Host
   [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,
+  [EDIT_COLLECTIVE_SECTIONS.HOST_PLAN]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS]: () => false,
@@ -255,6 +261,8 @@ const EditCollectiveMenu = ({ collective, selectedSection }) => {
       {collective.isHost && (
         <Fragment>
           {![USER, ORGANIZATION].includes(collective.type) && <MenuDivider />}
+          {[USER, ORGANIZATION].includes(collective.type) &&
+            renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_PLAN))}
           {[USER, ORGANIZATION].includes(collective.type) &&
             renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.POLICIES))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS))}

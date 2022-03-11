@@ -37,6 +37,7 @@ export const ORG_BUDGET_SECTIONS = {
 
 export const FISCAL_HOST_SECTIONS = {
   FISCAL_HOSTING: 'fiscal-hosting',
+  HOST_PLAN: 'host-plan',
   HOST_TWO_FACTOR_AUTH: 'host-two-factor-auth',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   HOST_VIRTUAL_CARDS_SETTINGS: 'host-virtual-cards-settings',
@@ -155,6 +156,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.HOST]: {
     id: 'Fiscalhost',
     defaultMessage: 'Fiscal Host',
+  },
+  [ALL_SECTIONS.HOST_PLAN]: {
+    id: 'Host.Plan',
+    defaultMessage: 'Host Plan',
   },
   [ALL_SECTIONS.INFO]: {
     id: 'editCollective.menu.info',
