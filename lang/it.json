@@ -1714,7 +1714,7 @@
   "Order.MarkPaidConfirmDetails": "Confirm you have received the funds for this contribution.",
   "order.new": "Nuovo",
   "Order.NotFound": "Questo ordine non esiste",
-  "order.paid": "Paid",
+  "order.paid": "Pagato",
   "order.pending": "Pending",
   "order.pledged": "Pledged",
   "order.rejected": "Rejected",
