@@ -99,6 +99,7 @@ const CurrencyPicker = ({ availableCurrencies, value, onChange }) => {
       onInputChange={inputValue => (inputValue.length <= 3 ? inputValue : inputValue.substr(0, 3))} // Limit search length to 3 characters
       styles={{
         control: {
+          border: !value ? '' : 'none',
           background: '#F7F8FA',
         },
         menu: {

@@ -244,9 +244,10 @@ const ExpenseFormBody = ({
   const stepTwoCompleted = isInvite
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
-  const isMultiCurrency =
+  const collectiveSupportsMultiCurrency =
     hasFeature(collective, FEATURES.MULTI_CURRENCY_EXPENSES) ||
     hasFeature(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES);
+  const isMultiCurrency = collectiveSupportsMultiCurrency && expense?.currency !== collective?.currency;
 
   const [step, setStep] = React.useState(stepOneCompleted || isCreditCardCharge ? STEPS.EXPENSE : STEPS.PAYEE);
   // Only true when logged in and drafting the expense
@@ -308,7 +309,7 @@ const ExpenseFormBody = ({
   }, [values.payeeLocation]);
 
   React.useEffect(() => {
-    if (isMultiCurrency && dirty) {
+    if (isMultiCurrency && values.payoutMethod?.data?.currency !== expense?.currency) {
       formik.setFieldValue('currency', undefined);
     }
   }, [values.payoutMethod]);
