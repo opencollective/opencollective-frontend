@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { Search } from '@styled-icons/octicons/Search';
 import { isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -18,42 +17,10 @@ import Link from '../components/Link';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
-import StyledButton from '../components/StyledButton';
+import SearchForm from '../components/SearchForm';
 import StyledFilters from '../components/StyledFilters';
-import StyledInput from '../components/StyledInput';
 import StyledLink from '../components/StyledLink';
 import { H1, P } from '../components/Text';
-
-const SearchInput = styled(StyledInput)`
-  border: none;
-  border-bottom: 2px solid ${props => props.theme.colors.primary[500]};
-  border-radius: 0;
-  box-shadow: none;
-  display: block;
-  height: 3.4rem;
-  width: 100%;
-  padding: 0 4px;
-  font-size: 16px;
-  margin-right: 8px;
-
-  @media (min-width: 64em) {
-    font-size: 18px;
-  }
-
-  &::placeholder {
-    color: #999;
-    opacity: 1;
-  }
-`;
-
-const SearchButton = styled(StyledButton).attrs({
-  buttonStyle: 'primary',
-  buttonSize: 'small',
-})`
-  && {
-    padding: 0.5rem 2rem;
-  }
-`;
 
 const FILTERS = {
   ALL: 'ALL',
@@ -61,30 +28,45 @@ const FILTERS = {
   EVENT: 'EVENT',
   ORGANIZATION: 'ORGANIZATION',
   HOST: 'HOST',
+  PROJECT: 'PROJECT',
+  FUND: 'FUND',
 };
 
 const I18nFilters = defineMessages({
   [FILTERS.ALL]: {
-    id: 'searchFilter.all',
-    defaultMessage: 'View all',
+    id: 'Amount.AllShort',
+    defaultMessage: 'All',
   },
   [FILTERS.COLLECTIVE]: {
-    id: 'CollectiveType.Collective',
-    defaultMessage: '{count, plural, one {Collective} other {Collectives}}',
+    id: 'Collectives',
+    defaultMessage: 'Collectives',
   },
   [FILTERS.EVENT]: {
-    id: 'CollectiveType.Event',
-    defaultMessage: '{count, plural, one {Event} other {Events}}',
+    id: 'Events',
+    defaultMessage: 'Events',
   },
   [FILTERS.ORGANIZATION]: {
-    id: 'CollectiveType.Organization',
-    defaultMessage: '{count, plural, one {Organization} other {Organizations}}',
+    id: 'TopContributors.Organizations',
+    defaultMessage: 'Organizations',
   },
   [FILTERS.HOST]: {
     id: 'searchFilter.host',
     defaultMessage: 'Fiscal hosts',
   },
+  [FILTERS.PROJECT]: {
+    id: 'Projects',
+    defaultMessage: 'Projects',
+  },
+  [FILTERS.FUND]: {
+    defaultMessage: 'Funds',
+  },
 });
+
+const SearchFormContainer = styled(Box)`
+  height: 58px;
+  width: 608px;
+  min-width: 10rem;
+`;
 
 const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
 
@@ -149,34 +131,44 @@ class SearchPage extends React.Component {
       return <ErrorPage data={this.props.data} />;
     }
 
-    const filters = ['ALL', 'COLLECTIVE', 'EVENT', 'ORGANIZATION', 'HOST'];
+    const filters = ['ALL', 'COLLECTIVE', 'EVENT', 'ORGANIZATION', 'HOST', 'PROJECT', 'FUND'];
     const { collectives, limit = 20, offset, total = 0 } = search || {};
     const showCollectives = term.trim() !== '' && !!collectives;
 
     return (
-      <Page title="Search" showSearch={false}>
-        <Container mx="auto" px={3} py={[4, 5]} width={[1, 0.85]} maxWidth={1200}>
-          <Box width={1}>
-            <form method="GET" onSubmit={this.refetch}>
-              <H1 fontSize="36px" fontWeight="500">
-                <FormattedMessage id="search.OpenCollective" defaultMessage="Search Open Collective..." />
-              </H1>
-              <Flex alignItems="flex-end" my={3}>
-                <SearchInput type="search" name="q" placeholder="open source" defaultValue={term} />
-                <SearchButton type="submit">
-                  <Search size="1em" />
-                </SearchButton>
-              </Flex>
-            </form>
-          </Box>
+      <Page title="Search">
+        <Container mx="auto" px={3} py={[4, '40px']} width={[1, 0.85]} maxWidth={1200}>
+          <Container
+            alignItems="center"
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            textAlign="center"
+          >
+            <H1 fontSize="32px" fontWeight="700">
+              <FormattedMessage defaultMessage="Search in Open Collective" />
+            </H1>
+            <Flex justifyContent="center" flex="1 1 1" marginTop={16} width={1}>
+              <SearchFormContainer p={2}>
+                <SearchForm
+                  borderRadius="100px"
+                  fontSize="16px"
+                  py="1px"
+                  placeholder="Search by name, slug, tag, description..."
+                  defaultValue={term}
+                  onSubmit={this.refetch}
+                />
+              </SearchFormContainer>
+            </Flex>
+          </Container>
           {term && (
             <Box mt={4} mb={4} mx="auto">
               <StyledFilters
                 filters={filters}
-                getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
+                getLabel={key => intl.formatMessage(I18nFilters[key])}
                 selected={this.state.filter}
                 justifyContent="left"
-                minButtonWidth={150}
+                minButtonWidth={140}
                 onChange={filter => {
                   this.setState({ filter: filter });
                   this.onClick(filter);

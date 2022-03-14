@@ -91,9 +91,9 @@ const messages = defineMessages({
     id: 'join.aboutFiscalHosting',
     defaultMessage: 'About Fiscal Hosting',
   },
-  'join.discover': {
-    id: 'menu.discover',
-    defaultMessage: 'Discover',
+  'join.search': {
+    id: 'Search',
+    defaultMessage: 'Search',
   },
   'join.findAFiscalHost': {
     id: 'join.findAFiscalHost',
@@ -168,7 +168,7 @@ const navigation = {
   join: {
     createACollective: '/create',
     aboutFiscalHosting: '/fiscal-hosting',
-    discover: '/discover',
+    search: '/search',
     findAFiscalHost: '/hosts',
     becomeASponsor: '/become-a-sponsor',
     becomeAHost: '/become-a-host',

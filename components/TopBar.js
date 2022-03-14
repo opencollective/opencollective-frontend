@@ -13,7 +13,6 @@ import { Box, Flex } from './Grid';
 import Hide from './Hide';
 import Image from './Image';
 import Link from './Link';
-import SearchForm from './SearchForm';
 import SearchIcon from './SearchIcon';
 import StyledLink from './StyledLink';
 import TopBarMobileMenu from './TopBarMobileMenu';
@@ -24,11 +23,6 @@ const Logo = styled.img.attrs({
   alt: 'Open Collective logo',
 })`
   ${({ animate }) => (animate ? rotateMixin : null)};
-`;
-
-const SearchFormContainer = styled(Box)`
-  max-width: 30rem;
-  min-width: 10rem;
 `;
 
 const NavList = styled(Flex)`
@@ -54,12 +48,10 @@ const NavLink = styled(StyledLink)`
 
 class TopBar extends React.Component {
   static propTypes = {
-    showSearch: PropTypes.bool,
     menuItems: PropTypes.object,
   };
 
   static defaultProps = {
-    showSearch: true,
     menuItems: {
       discover: true,
       docs: true,
@@ -94,13 +86,13 @@ class TopBar extends React.Component {
   };
 
   render() {
-    const { showSearch, menuItems } = this.props;
-    const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
+    const { menuItems } = this.props;
+    const defaultMenu = { docs: true, howItWorks: false, pricing: false };
     const merged = { ...defaultMenu, ...menuItems };
     return (
       <Flex
         px={3}
-        py={showSearch ? 2 : 3}
+        py={3}
         alignItems="center"
         flexDirection="row"
         justifyContent="space-around"
@@ -118,38 +110,17 @@ class TopBar extends React.Component {
           </Flex>
         </Link>
 
-        {showSearch && (
-          <Flex justifyContent="flex-end" flex="1 1 auto">
-            <Hide xs sm md>
-              <SearchFormContainer p={2}>
-                <SearchForm borderRadius="6px" fontSize="14px" py="1px" />
-              </SearchFormContainer>
-            </Hide>
-          </Flex>
-        )}
-
-        <Flex alignItems="center" justifyContent={['flex-end', 'flex-start']} flex="1 1 auto">
-          <Hide lg>
-            <Box mx={3}>
-              <Link href="/search">
-                <Flex>
-                  <SearchIcon fill="#aaaaaa" size={24} />
-                </Flex>
-              </Link>
-            </Box>
-          </Hide>
+        <Flex alignItems="center" justifyContent={['flex-end', 'center']} flex="1 1 auto">
+          <Box mx={3}>
+            <Link href="/search">
+              <Flex>
+                <SearchIcon fill="#75777A" size={18} />
+              </Flex>
+            </Link>
+          </Box>
 
           <Hide xs>
             <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
-              {merged.discover && (
-                <NavLinkContainer>
-                  <Link href="/discover">
-                    <NavLink as={Container}>
-                      <FormattedMessage id="menu.discover" defaultMessage="Discover" />
-                    </NavLink>
-                  </Link>
-                </NavLinkContainer>
-              )}
               {merged.howItWorks && (
                 <NavLinkContainer>
                   <Link href="/how-it-works">
