@@ -19,6 +19,7 @@ const Page = ({
   metaTitle,
   noRobots,
   twitterHandle,
+  showSearch,
   menuItems,
   canonicalURL,
   collective,
@@ -32,6 +33,7 @@ const Page = ({
   return (
     <Fragment>
       <Header
+        showSearch={showSearch}
         title={title}
         noRobots={noRobots}
         twitterHandle={twitterHandle}
@@ -60,12 +62,17 @@ Page.propTypes = {
   image: PropTypes.string,
   loadingLoggedInUser: PropTypes.bool,
   LoggedInUser: PropTypes.shape({}),
+  showSearch: PropTypes.bool,
   noRobots: PropTypes.bool,
   title: PropTypes.string,
   metaTitle: PropTypes.string,
   twitterHandle: PropTypes.string,
   collective: PropTypes.object,
   menuItems: PropTypes.object,
+};
+
+Page.defaultProps = {
+  showSearch: true,
 };
 
 export default withUser(Page);

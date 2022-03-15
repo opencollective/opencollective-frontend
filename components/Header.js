@@ -28,6 +28,7 @@ class Header extends React.Component {
     className: PropTypes.string,
     title: PropTypes.string,
     metaTitle: PropTypes.string,
+    showSearch: PropTypes.bool,
     withTopBar: PropTypes.bool,
     menuItems: PropTypes.object,
     /** If true, a no-robots meta will be added to the page */
@@ -115,7 +116,9 @@ class Header extends React.Component {
           {canonicalURL && <link rel="canonical" href={canonicalURL} />}
         </Head>
         <div id="top" />
-        {withTopBar && <TopBar className={className} menuItems={this.props.menuItems} />}
+        {withTopBar && (
+          <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
+        )}
         <UserWarnings />
       </header>
     );

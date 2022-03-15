@@ -136,7 +136,7 @@ class SearchPage extends React.Component {
     const showCollectives = term.trim() !== '' && !!collectives;
 
     return (
-      <Page title="Search">
+      <Page title="Search" showSearch={false}>
         <Container mx="auto" px={3} py={[4, '40px']} width={[1, 0.85]} maxWidth={1200}>
           <Container
             alignItems="center"
