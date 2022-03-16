@@ -91,14 +91,16 @@ const getPayoutMethodsFromPayee = payee => {
   // But not the Host itself (Self Hosted)
   // Then we should add BANK_ACCOUNT and PAYPAL of the Host as an option
   if (payee && AccountTypesWithHost.includes(payee.type) && payee.id !== payee.host?.id) {
-    if (!payoutMethods.find(pm => pm.type === PayoutMethodType.BANK_ACCOUNT)) {
-      const hostPayoutMethods = get(payee, 'host.payoutMethods') || EMPTY_ARRAY;
-      const hostSuitablePayoutMethods = hostPayoutMethods
-        .filter(pm => pm.isSaved && [PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.PAYPAL].includes(pm.type))
-        .map(payoutMethod => ({ ...payoutMethod, isDeletable: false }));
-      // TODO: maybe isDeletable should be true if the loggedInAccount is an admin of the host
-      payoutMethods.push(...hostSuitablePayoutMethods);
+    const hostPayoutMethods = get(payee, 'host.payoutMethods') || EMPTY_ARRAY;
+    let hostSuitablePayoutMethods = hostPayoutMethods
+      .filter(payoutMethod => payoutMethod.type === PayoutMethodType.BANK_ACCOUNT)
+      .filter(payoutMethod => !payoutMethod.name || !payoutMethod.name?.includes('Ops account'));
+    if (hostSuitablePayoutMethods.length === 0) {
+      hostSuitablePayoutMethods = hostPayoutMethods.filter(
+        payoutMethod => payoutMethod.type === PayoutMethodType.PAYPAL,
+      );
     }
+    payoutMethods.push(...hostSuitablePayoutMethods.map(payoutMethod => ({ ...payoutMethod, isDeletable: false })));
   }
 
   return payoutMethods.length > 0 ? payoutMethods : EMPTY_ARRAY;
