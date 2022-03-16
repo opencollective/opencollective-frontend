@@ -6,8 +6,9 @@ import { CollectiveType } from '../../lib/constants/collectives';
 
 import Container from '../Container';
 import Currency from '../Currency';
-import { Box } from '../Grid';
+import { Box, Flex } from '../Grid';
 import StyledCollectiveCard from '../StyledCollectiveCard';
+import StyledHr from '../StyledHr';
 import { P, Span } from '../Text';
 
 /**
@@ -18,31 +19,88 @@ const DiscoverCollectiveCard = ({ collective, ...props }) => {
     <StyledCollectiveCard collective={collective} position="relative" {...props} data-cy="collective-card">
       <Container p={3}>
         <Box data-cy="caption" mb={2}>
-          <P mt={3} fontSize="12px" lineHeight="18px">
-            {collective.stats.backers.all > 0 && (
-              <FormattedMessage
-                id="discoverCard.backers.all"
-                defaultMessage="{count, plural, one {contributor {prettyCount} } other {Financial contributors {prettyCount} }}"
-                values={{
-                  count: collective.stats.backers.all,
-                  prettyCount: (
-                    <Span display="block" fontWeight="bold" fontSize="16px" lineHeight="24px">
+          {collective.isHost ? (
+            <React.Fragment>
+              {collective.stats.collectives.hosted > 0 && (
+                <Box pb="6px">
+                  <Span fontSize="14px" fontWeight={700} color="black.900">
+                    {collective.stats.collectives.hosted}
+                  </Span>
+                  {` `}
+                  <Span fontSize="12px" fontWeight={400} color="black.700">
+                    <FormattedMessage
+                      defaultMessage="{ count, plural, one {Collective} other {Collectives}} hosted"
+                      values={{ count: collective.stats.collectives.hosted }}
+                    />
+                  </Span>
+                </Box>
+              )}
+              <Box pb="6px">
+                <Span fontSize="14px" fontWeight={700} color="black.900">
+                  {collective.currency}
+                </Span>
+                {` `}
+                <Span fontSize="12px" fontWeight={400} color="black.700">
+                  <FormattedMessage id="Currency" defaultMessage="Currency" />
+                </Span>
+              </Box>
+              <Box pb="6px">
+                <Span fontSize="14px" fontWeight={700} color="black.900">{`${collective.hostFeePercent}%`}</Span>
+                {` `}
+                <Span fontSize="12px" fontWeight={400} color="black.700">
+                  <FormattedMessage defaultMessage="Host Fee" />
+                </Span>
+              </Box>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <P fontSize="12px" lineHeight="18px">
+                {collective.stats.backers.all > 0 && (
+                  <Box pb="6px">
+                    <Span fontSize="14px" fontWeight={700} color="black.900">
                       {collective.stats.backers.all}
                     </Span>
-                  ),
-                }}
-              />
-            )}
-          </P>
+                    {` `}
+                    <Span fontSize="12px" fontWeight={400} color="black.700">
+                      <FormattedMessage
+                        defaultMessage="{ count, plural, one {Contributor} other {Contributors}}"
+                        values={{ count: collective.stats.backers.all }}
+                      />
+                    </Span>
+                  </Box>
+                )}
+              </P>
 
-          {collective.stats.yearlyBudget > 0 && (
-            <P mt={1}>
-              <Span fontSize="12px" lineHeight="18px">
-                <FormattedMessage id="YearlyBudget" defaultMessage="Yearly budget" />
-              </Span>
-              <Span display="block" fontSize="16px" lineHeight="24px" fontWeight="bold">
-                <Currency value={collective.stats.yearlyBudget} currency={collective.currency} />
-              </Span>
+              {collective.stats.totalAmountReceived > 0 && (
+                <Box pb="6px">
+                  <Span fontSize="14px" fontWeight={700} color="black.900">
+                    <Currency
+                      currency={collective.currency}
+                      formatWithSeparators
+                      value={collective.stats.totalAmountReceived}
+                    />
+                  </Span>
+                  {` `}
+                  <Span fontSize="12px" fontWeight={400} color="black.700">
+                    <FormattedMessage defaultMessage="Money raised" />
+                  </Span>
+                </Box>
+              )}
+            </React.Fragment>
+          )}
+          {collective.description && (
+            <P mt=":15px">
+              <Container fontSize="12px">
+                <Flex alignItems="center" justifyContent="space-between" mb={12.5}>
+                  <Span textTransform="uppercase" color="black.700" fontWeight={500}>
+                    <FormattedMessage defaultMessage="About Us" />
+                  </Span>
+                  <StyledHr borderColor="black.300" flex="1" ml={2} />
+                </Flex>
+                <Span fontWeight={400} color="black.800">
+                  {collective.description}
+                </Span>
+              </Container>
             </P>
           )}
         </Box>
@@ -53,8 +111,16 @@ const DiscoverCollectiveCard = ({ collective, ...props }) => {
 
 DiscoverCollectiveCard.propTypes = {
   collective: PropTypes.shape({
-    type: PropTypes.oneOf([CollectiveType.COLLECTIVE]).isRequired,
+    type: PropTypes.oneOf([
+      CollectiveType.COLLECTIVE,
+      CollectiveType.ORGANIZATION,
+      CollectiveType.EVENT,
+      CollectiveType.PROJECT,
+      CollectiveType.FUND,
+    ]).isRequired,
     currency: PropTypes.string,
+    description: PropTypes.string,
+    isHost: PropTypes.bool,
     stats: PropTypes.shape({
       totalDonations: PropTypes.number,
       yearlyBudget: PropTypes.number,
@@ -62,7 +128,12 @@ DiscoverCollectiveCard.propTypes = {
       backers: PropTypes.shape({
         all: PropTypes.number,
       }),
+      collectives: PropTypes.shape({
+        hosted: PropTypes.number,
+      }),
+      totalAmountReceived: PropTypes.number,
     }),
+    hostFeePercent: PropTypes.number,
   }).isRequired,
 };
 

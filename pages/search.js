@@ -10,8 +10,9 @@ import styled from 'styled-components';
 
 import { parseToBoolean } from '../lib/utils';
 
-import CollectiveCard from '../components/CollectiveCard';
 import Container from '../components/Container';
+import DiscoverCollectiveCard from '../components/discover/DiscoverCollectiveCard';
+import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';
@@ -21,6 +22,7 @@ import Pagination from '../components/Pagination';
 import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
 import StyledInput from '../components/StyledInput';
+import { fadeIn } from '../components/StyledKeyframes';
 import StyledLink from '../components/StyledLink';
 import { H1, P } from '../components/Text';
 
@@ -53,6 +55,11 @@ const SearchButton = styled(StyledButton).attrs({
   && {
     padding: 0.5rem 2rem;
   }
+`;
+
+const CollectiveCardContainer = styled.div`
+  width: 275px;
+  animation: ${fadeIn} 0.2s;
 `;
 
 const FILTERS = {
@@ -193,7 +200,15 @@ class SearchPage extends React.Component {
             {showCollectives &&
               collectives.map(collective => (
                 <Flex key={collective.slug} my={3} mx={2}>
-                  <CollectiveCard collective={collective} />
+                  {collective.isPledged ? (
+                    <CollectiveCardContainer key={collective.id}>
+                      <PledgedCollectiveCard collective={collective} />
+                    </CollectiveCardContainer>
+                  ) : (
+                    <CollectiveCardContainer key={collective.id}>
+                      <DiscoverCollectiveCard collective={collective} />
+                    </CollectiveCardContainer>
+                  )}
                 </Flex>
               ))}
 
@@ -277,6 +292,11 @@ export const searchPageQuery = gql`
         slug
         path
         name
+        location {
+          country
+        }
+        tags
+        isHost
         company
         imageUrl
         backgroundImage
@@ -292,7 +312,12 @@ export const searchPageQuery = gql`
           backers {
             all
           }
+          collectives {
+            hosted
+          }
+          totalAmountReceived
         }
+        hostFeePercent
         parentCollective {
           id
           slug

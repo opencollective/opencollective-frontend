@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { injectIntl } from 'react-intl';
+import { injectIntl, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../lib/collective.lib';
@@ -13,7 +13,7 @@ import LinkCollective from './LinkCollective';
 import StyledCard from './StyledCard';
 import StyledLink from './StyledLink';
 import StyledTag from './StyledTag';
-import { P } from './Text';
+import { P, Span } from './Text';
 
 const MaskSVG = props => (
   <svg
@@ -128,6 +128,14 @@ const CollectiveContainer = ({ useLink, collective, children }) => {
   }
 };
 
+const getFlagEmoji = countryCode => {
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt());
+  return String.fromCodePoint(...codePoints);
+};
+
 CollectiveContainer.propTypes = {
   useLink: PropTypes.bool,
   collective: PropTypes.object.isRequired,
@@ -147,6 +155,12 @@ const StyledCollectiveCard = ({
   useLink,
   ...props
 }) => {
+  const intl = useIntl();
+  const regionNames = new Intl.DisplayNames(intl.locale, { type: 'region' });
+  const countryString = collective.location?.country
+    ? `${getFlagEmoji(collective.location.country)} ${regionNames.of(collective.location.country)}`
+    : null;
+
   return (
     <StyledCard {...props} position="relative" borderRadius={borderRadius}>
       <Container
@@ -180,15 +194,28 @@ const StyledCollectiveCard = ({
                 </StyledLink>
               </P>
             )}
-            {tag === undefined ? (
-              <StyledTag display="inline-block" variant="rounded-right" my={2}>
-                <I18nCollectiveTags
-                  tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
-                />
-              </StyledTag>
-            ) : (
-              tag
-            )}
+            <Container>
+              {tag === undefined ? (
+                <StyledTag display="inline-block" variant="rounded-right" my={2} backgroundColor="blue.50">
+                  <I18nCollectiveTags
+                    tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
+                  />
+                </StyledTag>
+              ) : (
+                tag
+              )}
+              {countryString && (
+                <Span ml={2} fontSize="12px" color="black.700" fontWeight={400}>
+                  {countryString}
+                </Span>
+              )}
+              {collective.tags &&
+                collective.tags.slice(0, 3).map(tag => (
+                  <StyledTag key={tag} display="inline-block" variant="rounded-right" m={1}>
+                    {tag}
+                  </StyledTag>
+                ))}
+            </Container>
           </Container>
           {children}
         </Container>
@@ -212,6 +239,7 @@ StyledCollectiveCard.propTypes = {
     backgroundImageUrl: PropTypes.string,
     website: PropTypes.string,
     tags: PropTypes.arrayOf(PropTypes.string),
+    location: PropTypes.shape({ country: PropTypes.string }),
     settings: PropTypes.object,
     host: PropTypes.shape({
       // TODO: getCollectiveMainTag should be based on slug
@@ -230,7 +258,7 @@ StyledCollectiveCard.propTypes = {
 };
 
 StyledCollectiveCard.defaultProps = {
-  bodyHeight: 260,
+  bodyHeight: 336,
   borderRadius: 16,
   useLink: true,
 };
