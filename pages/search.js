@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { Search } from '@styled-icons/octicons/Search';
+import { Search, ShareAlt } from '@styled-icons/boxicons-regular';
+import copy from 'copy-to-clipboard';
 import { isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -22,7 +23,8 @@ import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
 import StyledInput from '../components/StyledInput';
 import StyledLink from '../components/StyledLink';
-import { H1, P } from '../components/Text';
+import { H1, P, Span } from '../components/Text';
+import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 
 const SearchInput = styled(StyledInput)`
   border: none;
@@ -106,6 +108,7 @@ class SearchPage extends React.Component {
     router: PropTypes.object, // from next.js
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object,
+    addToast: PropTypes.func.isRequired, // from withToasts
   };
 
   constructor(props) {
@@ -139,6 +142,14 @@ class SearchPage extends React.Component {
   changePage = offset => {
     const { router } = this.props;
     this.props.router.push({ pathname: '/search', query: { ...router.query, offset } });
+  };
+
+  handleCopy = () => {
+    copy(window.location.href);
+    this.props.addToast({
+      type: TOAST_TYPE.SUCCESS,
+      message: <FormattedMessage defaultMessage="Search Result Copied!" />,
+    });
   };
 
   render() {
@@ -231,6 +242,17 @@ class SearchPage extends React.Component {
           )}
 
           {showCollectives && collectives.length !== 0 && (
+            <Flex flexDirection="column" alignItems="center">
+              <StyledButton onClick={this.handleCopy}>
+                <Span pr={1} fontSize="14px" fontWeight={500}>
+                  <FormattedMessage defaultMessage="Share results" />
+                </Span>
+                <ShareAlt size="14px" />
+              </StyledButton>
+            </Flex>
+          )}
+
+          {showCollectives && collectives.length !== 0 && (
             <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
               <P pt={3} pb={3} borderTop="1px solid #E6E6E6">
                 <em>
@@ -310,4 +332,4 @@ export const searchPageQuery = gql`
 
 export const addSearchPageData = graphql(searchPageQuery, { skip: props => !props.term });
 
-export default injectIntl(withRouter(addSearchPageData(SearchPage)));
+export default withToasts(injectIntl(withRouter(addSearchPageData(SearchPage))));
