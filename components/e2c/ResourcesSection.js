@@ -23,10 +23,21 @@ const blogEntries = [
     link: 'https://blog.opencollective.com/exit-to-community-part-2/',
     date: 'Oct 24 2021',
   },
+  {
+    imageSrc: '/static/images/e2c/blog-3.png',
+    title: `Building Capacity for Exit to Community`,
+    link: 'https://blog.opencollective.com/e2c-capacity-building/',
+    date: 'Mar 7 2022',
+  },
+  {
+    imageSrc: '/static/images/e2c/blog-4.png',
+    title: `Deep dive: community stewardship of Open Collective through a Perpetual Purpose Trust`,
+    link: 'https://blog.opencollective.com/ppt/',
+    date: 'Mar 10 2022',
+  },
 ];
 
 const ResourceContainer = styled(Container)`
-  display: flex;
   overflow-x: auto;
   padding: 0 16px;
   max-width: 100%;
@@ -34,11 +45,15 @@ const ResourceContainer = styled(Container)`
 
   @media screen and (min-width: 40em) {
     width: 768px;
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   @media screen and (min-width: 52em) {
     width: 956px;
+  }
+
+  @media screen and (min-width: 64em) {
+    width: 1200px;
   }
 `;
 
@@ -68,7 +83,7 @@ const ResourcesSection = () => {
             <Container
               display="flex"
               flexDirection="column"
-              width={['288px', '276px', '378px']}
+              minWidth={['288px', '276px', '380px', null, '360px']}
               key={index.toString()}
               mx={['8px', '20px']}
             >
