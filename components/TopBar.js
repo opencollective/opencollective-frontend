@@ -95,7 +95,7 @@ class TopBar extends React.Component {
 
   render() {
     const { showSearch, menuItems } = this.props;
-    const defaultMenu = { docs: true, howItWorks: false, pricing: false };
+    const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
     const merged = { ...defaultMenu, ...menuItems };
     return (
       <Flex
@@ -141,6 +141,15 @@ class TopBar extends React.Component {
 
           <Hide xs>
             <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
+              {merged.discover && (
+                <NavLinkContainer>
+                  <Link href="/discover">
+                    <NavLink as={Container}>
+                      <FormattedMessage id="menu.discover" defaultMessage="Discover" />
+                    </NavLink>
+                  </Link>
+                </NavLinkContainer>
+              )}
               {merged.howItWorks && (
                 <NavLinkContainer>
                   <Link href="/how-it-works">

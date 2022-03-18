@@ -51,6 +51,13 @@ class TopBarMobileMenu extends React.Component {
         data-cy="user-menu"
       >
         <Box as="ul" my={2} pl={0}>
+          {menuItems.discover && (
+            <ListItem>
+              <Link href="/discover" onClick={closeMenu}>
+                <FormattedMessage id="menu.discover" defaultMessage="Discover" />
+              </Link>
+            </ListItem>
+          )}
           {menuItems.howItWorks && (
             <ListItem>
               <Link href="/how-it-works" onClick={closeMenu}>

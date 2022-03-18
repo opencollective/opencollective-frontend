@@ -269,7 +269,7 @@ exports.REWRITES = [
   },
   {
     source: '/discover',
-    destination: '/search',
+    destination: '/discover',
   },
   {
     source: '/search',

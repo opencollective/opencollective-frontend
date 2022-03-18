@@ -10,7 +10,6 @@ import styled from 'styled-components';
 import { parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
-import DiscoverCollectiveCard from '../components/discover/DiscoverCollectiveCard';
 import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
@@ -18,6 +17,7 @@ import Link from '../components/Link';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
+import SearchCollectiveCard from '../components/search-page/SearchCollectiveCard';
 import SearchForm from '../components/SearchForm';
 import StyledFilters from '../components/StyledFilters';
 import { fadeIn } from '../components/StyledKeyframes';
@@ -198,7 +198,7 @@ class SearchPage extends React.Component {
                     </CollectiveCardContainer>
                   ) : (
                     <CollectiveCardContainer key={collective.id}>
-                      <DiscoverCollectiveCard collective={collective} />
+                      <SearchCollectiveCard collective={collective} />
                     </CollectiveCardContainer>
                   )}
                 </Flex>
