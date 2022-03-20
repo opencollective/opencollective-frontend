@@ -78,7 +78,11 @@ const ResourcesSection = () => {
             <FormattedMessage id="e2c.resources" defaultMessage="Resources" />
           </H2>
         </Box>
-        <HorizontalScroller container={ResourceContainer}>
+        <HorizontalScroller
+          container={ResourceContainer}
+          controlsTopPosition={30}
+          containerProps={{ hideScrollbar: true }}
+        >
           {blogEntries.map((blogEntry, index) => (
             <Container
               display="flex"
