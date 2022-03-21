@@ -98,13 +98,14 @@ const getTotalPayoutAmount = (expense, { paymentProcessorFee, feesPayer }) => {
 };
 
 const canCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount, isRoot) => {
-  const isSupportedPayoutMethod = [PayoutMethodType.BANK_ACCOUNT].includes(expense.payoutMethod?.type);
+  const supportedPayoutMethods = [PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.OTHER];
+  const isSupportedPayoutMethod = supportedPayoutMethods.includes(expense.payoutMethod?.type);
   const isFullBalance = expense.amount === get(collective, 'stats.balanceWithBlockedFunds.valueInCents');
   const isSameCurrency = expense.currency === collective?.currency;
 
   // Current limitations:
-  // - Only for transferwise
-  // - Only when emptying the account balance (or when root user)
+  // - Only for transferwise and manual payouts
+  // - Only when emptying the account balance (unless root user)
   // - Only with expenses submitted in the same currency as the collective
   if (!(isSupportedPayoutMethod && isSameCurrency && (isFullBalance || isRoot))) {
     return false;
