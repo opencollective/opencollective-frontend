@@ -101,7 +101,11 @@ class RedeemPage extends React.Component {
       if (this.props.LoggedInUser) {
         await this.props.redeemPaymentMethod({ variables: { code } });
         await this.props.refetchLoggedInUser();
-        this.props.router.push({ pathname: `/${this.props.collectiveSlug}/redeemed/${code}` });
+        if (this.props.collectiveSlug === 'strapijs') {
+          this.props.router.push('http://strapi.io/open-source');
+        } else {
+          this.props.router.push({ pathname: `/${this.props.collectiveSlug}/redeemed/${code}` });
+        }
         return;
       } else {
         await this.props.redeemPaymentMethod({ variables: { code, user: { email, name } } });
