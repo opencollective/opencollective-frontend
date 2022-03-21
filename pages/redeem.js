@@ -102,7 +102,7 @@ class RedeemPage extends React.Component {
         await this.props.redeemPaymentMethod({ variables: { code } });
         await this.props.refetchLoggedInUser();
         if (this.props.collectiveSlug === 'strapijs') {
-          this.props.router.push('http://strapi.io/open-source');
+          this.props.router.push('https://strapi.io/open-collective-gift-card-redeemed');
         } else {
           this.props.router.push({ pathname: `/${this.props.collectiveSlug}/redeemed/${code}` });
         }
