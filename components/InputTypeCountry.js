@@ -45,9 +45,16 @@ class InputTypeCountry extends Component {
     intl: PropTypes.object.isRequired,
     /** Is this input required? */
     required: PropTypes.bool,
+    /** Custom options **/
+    customOptions: PropTypes.arrayOf(
+      PropTypes.shape({
+        label: PropTypes.node,
+        value: PropTypes.any,
+      }),
+    ),
   };
 
-  static defaultProps = { name: 'country' };
+  static defaultProps = { name: 'country', customOptions: [] };
 
   async componentDidMount() {
     if (this.props.autoDetect && !this.props.value && !this.props.defaultValue) {
@@ -71,7 +78,7 @@ class InputTypeCountry extends Component {
       label: this.getCountryLabel(code, locale),
     }));
 
-    return orderBy(options, 'label');
+    return [...this.props.customOptions, ...orderBy(options, 'label')];
   });
 
   getSelectedOption = memoizeOne((locale, country) => {
@@ -80,10 +87,13 @@ class InputTypeCountry extends Component {
     }
 
     const code = country.toUpperCase();
-    return {
-      value: code,
-      label: this.getCountryLabel(code, locale),
-    };
+    const customOption = this.props.customOptions.find(customOption => customOption.value === code);
+    return (
+      customOption || {
+        value: code,
+        label: this.getCountryLabel(code, locale),
+      }
+    );
   });
 
   render() {

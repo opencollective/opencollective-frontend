@@ -3336,6 +3336,11 @@ type Query {
     skipRecentAccounts: Boolean = false
 
     """
+    Limit the search to collectives belonging to these countries
+    """
+    countries: [String]
+
+    """
     Limit the amount of results. Defaults to 20
     """
     limit: Int = 20
