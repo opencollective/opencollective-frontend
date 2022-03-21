@@ -58,7 +58,7 @@ const JoinTheMovement = () => (
       <Container ml={[null, null, null, 3, 6]}>
         <Box mb="16px">
           <JoinUsActionContainer
-            link="https://opencollective.com/opencollective/donate"
+            link="https://opencollective.com/comms-docs/projects/e2c"
             title={<FormattedMessage id="financialContributions" defaultMessage="Financial contributions" />}
             description={<FormattedMessage defaultMessage="Get a tax-deductible receipt with your donation" />}
           />
