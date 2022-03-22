@@ -259,9 +259,9 @@ const VirtualCard = props => {
             <Flex>
               <Box mt="19px" mr={4}>
                 <P fontSize="18px" fontWeight="700" lineHeight="26px">
-                  {props.privateData.expireDate}
+                  {props.privateData.expiryDate}
 
-                  <Action color="black" ml={2} onClick={handleCopy(props.privateData.expireDate)}>
+                  <Action color="black" ml={2} onClick={handleCopy(props.privateData.expiryDate)}>
                     <Copy size="18px" />
                   </Action>
                 </P>
