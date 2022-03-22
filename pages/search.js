@@ -5,23 +5,28 @@ import { graphql } from '@apollo/client/react/hoc';
 import { Search } from '@styled-icons/octicons/Search';
 import { isNil } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import expenseTypes from '../lib/constants/expenseTypes';
+import { i18nExpenseType } from '../lib/i18n/expense';
 import { parseToBoolean } from '../lib/utils';
 
 import CollectiveCard from '../components/CollectiveCard';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
+import InputTypeCountry from '../components/InputTypeCountry';
 import Link from '../components/Link';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
 import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
+import StyledHr from '../components/StyledHr';
 import StyledInput from '../components/StyledInput';
 import StyledLink from '../components/StyledLink';
+import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import { H1, P } from '../components/Text';
 
 const SearchInput = styled(StyledInput)`
@@ -88,12 +93,45 @@ const I18nFilters = defineMessages({
 
 const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
 
+const FilterLabel = styled.label`
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  text-transform: uppercase;
+  padding-bottom: 8px;
+  color: #4d4f51;
+`;
+
+const CountryFilter = ({ onChange, value, ...props }) => {
+  const intl = useIntl();
+  const getOption = value => ({ label: i18nExpenseType(intl, value), value });
+
+  const expenseTypeKeys = Object.keys(expenseTypes).filter(key => !['DEFAULT', 'FUNDING_REQUEST'].includes(key));
+  expenseTypeKeys.unshift('ALL');
+
+  return (
+    <StyledSelectFilter
+      inputId="expenses-type-filter"
+      onChange={({ value }) => onChange(value)}
+      value={getOption(value || 'ALL')}
+      options={expenseTypeKeys.map(getOption)}
+      {...props}
+    />
+  );
+};
+
+CountryFilter.propTypes = {
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.string,
+};
+
 class SearchPage extends React.Component {
   static getInitialProps({ query }) {
     return {
       term: query.q || '',
       types: query.types ? decodeURIComponent(query.types).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
+      countries: query.countries || null,
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
     };
@@ -101,6 +139,7 @@ class SearchPage extends React.Component {
 
   static propTypes = {
     term: PropTypes.string, // for addSearchQueryData
+    countries: PropTypes.arrayOf(PropTypes.string), // for addSearchQueryData
     limit: PropTypes.number, // for addSearchQueryData
     offset: PropTypes.number, // for addSearchQueryData
     router: PropTypes.object, // from next.js
@@ -114,6 +153,15 @@ class SearchPage extends React.Component {
     this.state = { filter: 'ALL' };
   }
 
+  changeCountry = country => {
+    const { router, term } = this.props;
+    const query = { q: term, types: router.query.types };
+    if (country !== 'ALL') {
+      query.countries = [country];
+    }
+    router.push({ pathname: router.pathname, query });
+  };
+
   refetch = event => {
     event.preventDefault();
 
@@ -121,19 +169,30 @@ class SearchPage extends React.Component {
     const { router } = this.props;
     const { q } = form;
 
-    router.push({ pathname: router.pathname, query: { q: q.value, types: router.query.types } });
+    const query = { q: q.value, types: router.query.types };
+    if (router.query.countries) {
+      query.countries = router.query.countries;
+    }
+    router.push({ pathname: router.pathname, query });
   };
 
   onClick = filter => {
-    const { term } = this.props;
+    const { term, router } = this.props;
+    let query;
 
     if (filter === 'HOST') {
-      this.props.router.push({ pathname: '/search', query: { q: term, isHost: true } });
+      query = { q: term, isHost: true };
     } else if (filter !== 'ALL') {
-      this.props.router.push({ pathname: '/search', query: { q: term, types: filter } });
+      query = { q: term, types: filter };
     } else {
-      this.props.router.push({ pathname: '/search', query: { q: term } });
+      query = { q: term };
     }
+
+    if (router.query.countries) {
+      query.countries = router.query.countries;
+    }
+
+    router.push({ pathname: '/search', query });
   };
 
   changePage = offset => {
@@ -170,7 +229,7 @@ class SearchPage extends React.Component {
             </form>
           </Box>
           {term && (
-            <Box mt={4} mb={4} mx="auto">
+            <Flex mt={4} mb={4} mx="auto" justifyContent="center">
               <StyledFilters
                 filters={filters}
                 getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
@@ -182,8 +241,20 @@ class SearchPage extends React.Component {
                   this.onClick(filter);
                 }}
               />
-            </Box>
+            </Flex>
           )}
+          <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
+          <Container width={[1, 1 / 4]}>
+            <FilterLabel htmlFor="country-filter-type">
+              <FormattedMessage id="collective.country.label" defaultMessage="Country" />
+            </FilterLabel>
+            <InputTypeCountry
+              inputId="search-country-filter"
+              defaultValue="ALL"
+              customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
+              onChange={country => this.changeCountry(country)}
+            />
+          </Container>
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
             {loading && !collectives && (
               <Flex py={3} width={1} justifyContent="center">
@@ -268,8 +339,23 @@ class SearchPage extends React.Component {
 export { SearchPage as MockSearchPage };
 
 export const searchPageQuery = gql`
-  query SearchPage($term: String!, $types: [TypeOfCollective], $isHost: Boolean, $limit: Int, $offset: Int) {
-    search(term: $term, types: $types, isHost: $isHost, limit: $limit, offset: $offset, skipRecentAccounts: true) {
+  query SearchPage(
+    $term: String!
+    $types: [TypeOfCollective]
+    $isHost: Boolean
+    $limit: Int
+    $offset: Int
+    $countries: [CountryISO]
+  ) {
+    search(
+      term: $term
+      types: $types
+      isHost: $isHost
+      limit: $limit
+      offset: $offset
+      skipRecentAccounts: true
+      countries: $countries
+    ) {
       collectives {
         id
         isActive
