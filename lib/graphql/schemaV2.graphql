@@ -729,7 +729,7 @@ type Expense {
   """
   The exchange rate between the expense currency and the account currency
   """
-  accountCurrencyFxRate: Float!
+  accountCurrencyFxRate: Float! @deprecated(reason: "2022-02-09: Please use amountV2")
 
   """
   The time of creation
@@ -3866,6 +3866,58 @@ type Amount {
   value: Float
   currency: Currency
   valueInCents: Int
+
+  """
+  If the amount was generated from a currency conversion, this field contains details about the conversion
+  """
+  exchangeRate: CurrencyExchangeRate
+}
+
+"""
+Fields for a currency fx rate
+"""
+type CurrencyExchangeRate {
+  """
+  Exchange rate value as a percentage
+  """
+  value: Float!
+
+  """
+  Where does the FX rate comes from
+  """
+  source: CurrencyExchangeRateSourceType!
+  fromCurrency: Currency!
+  toCurrency: Currency!
+
+  """
+  Date of the FX rate
+  """
+  date: DateTime!
+
+  """
+  Is the FX rate approximate or a fixed value?
+  """
+  isApproximate: Boolean!
+}
+
+"""
+Where does the FX rate come from
+"""
+enum CurrencyExchangeRateSourceType {
+  """
+  Open Collective internal system, relying on caching and 3rd party APIs
+  """
+  OPENCOLLECTIVE
+
+  """
+  PayPal API
+  """
+  PAYPAL
+
+  """
+  Wise API
+  """
+  WISE
 }
 
 """
@@ -7061,17 +7113,27 @@ type Query {
     offset: Int! = 0
 
     """
-    Only accounts that match these tags
+    Search accounts related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+
+    """
+    Only accounts that match these tags (ignored if used together with searchTerm)
     """
     tag: [String]
 
     """
-    Only accounts that match these account types
+    Only return accounts that match these account types (COLLECTIVE, FUND, EVENT, PROJECT, ORGANIZATION or INDIVIDUAL)
     """
     type: [AccountType]
 
     """
-    Only return active collectives
+    Only return Fiscal Hosts accounts if true
+    """
+    isHost: Boolean
+
+    """
+    Only return "active" accounts with Financial Contributions enabled if true.
     """
     isActive: Boolean
 
@@ -7084,6 +7146,11 @@ type Query {
     Only accounts that support one of these payment services will be returned
     """
     supportedPaymentMethodService: [PaymentMethodService]
+
+    """
+    Whether to skip recent suspicious accounts (48h)
+    """
+    skipRecentAccounts: Boolean = false
 
     """
     The order of results

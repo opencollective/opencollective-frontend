@@ -15,6 +15,8 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 
+import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
+import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -358,21 +360,19 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
               />
             </Amount>
           </AmountLine>
-          {isMultiCurrency && expense.accountCurrencyFxRate && (
+          {isMultiCurrency && expense.amountInAccountCurrency?.exchangeRate?.value && (
             <AmountLine py={0}>
               <Label color="black.600" fontWeight="500">
                 <FormattedMessage defaultMessage="Accounted as" />
               </Label>
-              <Span display="flex" whiteSpace="nowrap">
-                ~&nbsp;
-                <Amount>
-                  <FormattedMoneyAmount
-                    amount={Math.round(totalAmount * expense.accountCurrencyFxRate)}
-                    amountStyles={null}
-                    currency={collective.currency}
-                  />
-                </Amount>
-              </Span>
+              <Flex>
+                <Container mr={1} color="black.500" letterSpacing="-0.4px">
+                  {expense.amountInAccountCurrency.currency}
+                </Container>
+                <Container color="black.600">
+                  <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency} showCurrencyCode={false} />
+                </Container>
+              </Flex>
             </AmountLine>
           )}
         </Box>
@@ -463,7 +463,6 @@ PayExpenseModal.propTypes = {
     id: PropTypes.string,
     legacyId: PropTypes.number,
     amount: PropTypes.number,
-    accountCurrencyFxRate: PropTypes.number,
     amountInAccountCurrency: AmountPropTypeShape,
     currency: PropTypes.string,
     feesPayer: PropTypes.string,
