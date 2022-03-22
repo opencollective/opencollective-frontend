@@ -362,6 +362,115 @@ describe('New expense flow', () => {
     });
   });
 
+  describe('new expense with taxes', () => {
+    let collective;
+
+    before(() => {
+      cy.createHostedCollective().then(c => (collective = c));
+    });
+
+    it('can submit with VAT', () => {
+      // Activate VAT for collective
+      cy.editCollective({
+        id: collective.id,
+        location: { country: 'BE' },
+        settings: { VAT: { type: 'OWN', number: 'FRXX999999999' } },
+      });
+
+      cy.login({ redirect: `/${collective.slug}/expenses/new` });
+      cy.getByDataCy('radio-expense-type-INVOICE').click();
+
+      // ---- 1. Submit expense with VAT ----
+
+      // Fill payee / payout method
+      cy.getByDataCy('payout-method-select').click();
+      cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
+      cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
+      cy.getByDataCy('payee-country').click();
+      cy.contains('[data-cy="select-option"]', 'Angola - AO').click();
+      cy.get('input[data-cy="payee-address-address1"]').type('Street Name, 123');
+      cy.get('input[data-cy="payee-address-city"]').type('Citycitycity');
+      cy.getByDataCy('expense-next').click();
+
+      // Fill details
+      cy.get('input[name="description"]').type('Brussels January team retreat');
+      cy.get('input[name="items[0].description"]').type('TShirts');
+      cy.get('input[name="items[0].amount"]').type('{selectall}112');
+      cy.getByDataCy('expense-add-item-btn').click();
+      cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
+      cy.get('input[name="items[1].amount"]').type('{selectall}75.5');
+
+      // Need to fill in the tax rate before we can go next
+      cy.get('input[name="taxes.0.idNumber"]').should('not.have.attr', 'required'); // Not required if the rate is not set or 0
+      cy.getByDataCy('expense-items-total-amount').should('contain', '--.--');
+      cy.getByDataCy('tax-VAT-expense-amount-line').should('contain', '--.--');
+      cy.getByDataCy('expense-summary-btn').click();
+      cy.get('input:invalid').should('have.length', 1);
+
+      // Breakdown should be correct
+      cy.get('input[name="taxes.0.rate"]').type('5.5');
+      cy.get('input[name="taxes.0.idNumber"]').should('have.attr', 'required', 'required'); // Required if the rate is a positive number
+      cy.get('input[name="taxes.0.idNumber"]').type('FRXX999999999');
+      cy.getByDataCy('expense-invoiced-amount').should('contain', '$187.50');
+      cy.getByDataCy('tax-VAT-expense-amount-line').should('contain', '$10.31');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '$197.81');
+
+      // Check summary
+      cy.getByDataCy('expense-summary-btn').click();
+      cy.getByDataCy('expense-invoiced-amount').should('contain', '$187.50');
+      cy.getByDataCy('tax-VAT-expense-amount-line').should('contain', '$10.31');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '$197.81');
+
+      // Submit!
+      cy.getByDataCy('submit-expense-btn').click();
+      cy.contains('[data-cy="toast-notification"]', 'Expense submitted');
+      cy.getByDataCy('expense-invoiced-amount').should('contain', '$187.50');
+      cy.getByDataCy('tax-VAT-expense-amount-line').should('contain', '$10.31');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '$197.81');
+
+      // ---- 2. Edit VAT rate ----
+
+      // Start editing
+      cy.get('[data-cy="edit-expense-btn"]:visible').click();
+      cy.getByDataCy('expense-next').click();
+
+      // Add new item
+      cy.getByDataCy('expense-add-item-btn').click();
+      cy.get('input[name="items[2].description"]').type('Some more delicious stuff');
+      cy.get('input[name="items[2].amount"]').type('{selectall}34');
+      cy.getByDataCy('expense-invoiced-amount').should('contain', '$221.50');
+      cy.getByDataCy('tax-VAT-expense-amount-line').should('contain', '$12.18');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '$233.68');
+
+      // Change tax rate
+      cy.get('input[name="taxes.0.rate"]').type('{selectall}17.7');
+      cy.getByDataCy('expense-summary-btn').click();
+      cy.getByDataCy('save-expense-btn').click();
+      cy.getByDataCy('save-expense-btn').should('not.exist'); // wait for form to be submitted
+
+      // Check final expense page
+      cy.getByDataCy('expense-invoiced-amount').should('contain', '$221.50');
+      cy.getByDataCy('tax-VAT-expense-amount-line').should('contain', '$39.21');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '$260.71');
+
+      // ---- 3. Remove VAT ----
+      // Start editing
+      cy.get('[data-cy="edit-expense-btn"]:visible').click();
+      cy.getByDataCy('expense-next').click();
+
+      // Disable VAT
+      cy.getByDataCy('checkbox-tax-VAT').click();
+      cy.getByDataCy('expense-summary-btn').click();
+      cy.getByDataCy('save-expense-btn').click();
+      cy.getByDataCy('save-expense-btn').should('not.exist'); // wait for form to be submitted
+
+      // Check final expense page
+      cy.getByDataCy('expense-invoiced-amount').should('contain', '$221.50');
+      cy.getByDataCy('tax-VAT-expense-amount-line').should('contain', '$39.21');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '$260.71');
+    });
+  });
+
   describe('Actions on expense', () => {
     let collective;
     let user;
