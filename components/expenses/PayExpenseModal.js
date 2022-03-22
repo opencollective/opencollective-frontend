@@ -39,6 +39,12 @@ const quoteExpenseQuery = gqlV2/* GraphQL */ `
   query QuoteExpenseQuery($id: String!) {
     expense(expense: { id: $id }) {
       id
+      currency
+      amountInHostCurrency: amountV2(currencySource: HOST) {
+        exchangeRate {
+          value
+        }
+      }
       quote {
         paymentProcessorFeeAmount {
           valueInCents
@@ -173,12 +179,22 @@ const getInitialValues = (expense, host, payoutMethodType) => {
 };
 
 const getPaymentProcessorFee = (formik, expense, quoteQuery) => {
-  return formik.values.forceManual
-    ? {
-        valueInCents: formik.values.paymentProcessorFee,
+  if (formik.values.forceManual) {
+    return {
+      valueInCents: formik.values.paymentProcessorFee,
+      currency: expense.currency,
+    };
+  } else if (quoteQuery?.data?.expense?.quote) {
+    const { quote, amountInHostCurrency } = quoteQuery.data.expense;
+    if (quote.paymentProcessorFeeAmount.currency === expense.currency) {
+      return quote.paymentProcessorFeeAmount;
+    } else if (amountInHostCurrency.exchangeRate) {
+      return {
         currency: expense.currency,
-      }
-    : quoteQuery?.data?.expense?.quote.paymentProcessorFeeAmount;
+        valueInCents: quote.paymentProcessorFeeAmount.valueInCents / amountInHostCurrency.exchangeRate.value,
+      };
+    }
+  }
 };
 
 /**
@@ -370,7 +386,14 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
                   {expense.amountInAccountCurrency.currency}
                 </Container>
                 <Container color="black.600">
-                  <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency} showCurrencyCode={false} />
+                  <AmountWithExchangeRateInfo
+                    showCurrencyCode={false}
+                    amount={{
+                      valueInCents: Math.round(totalAmount * expense.amountInAccountCurrency.exchangeRate.value),
+                      currency: expense.currency,
+                      exchangeRate: expense.amountInAccountCurrency.exchangeRate,
+                    }}
+                  />
                 </Container>
               </Flex>
             </AmountLine>
