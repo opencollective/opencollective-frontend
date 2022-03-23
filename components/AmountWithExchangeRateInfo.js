@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -51,8 +52,9 @@ export const formatFxRateInfo = (intl, { value, date, source, isApproximate }) =
   );
 };
 
-const NoWrap = styled.div`
+const ContentContainer = styled.div`
   white-space: nowrap;
+  margin-right: 4px;
 `;
 
 const AmountWithExchangeRateInfo = ({ amount: { exchangeRate, currency, value, valueInCents }, showCurrencyCode }) => {
@@ -60,18 +62,23 @@ const AmountWithExchangeRateInfo = ({ amount: { exchangeRate, currency, value, v
   return (
     <StyledTooltip
       display="block"
-      childrenContainer={NoWrap}
+      containerVerticalAlign="middle"
       noTooltip={!exchangeRate}
       content={() => formatFxRateInfo(intl, exchangeRate)}
     >
-      {exchangeRate?.isApproximate && `~ `}
-      <FormattedMoneyAmount
-        amount={valueInCents ?? Math.round(value * 100)}
-        currency={currency}
-        precision={2}
-        amountStyles={null}
-        showCurrencyCode={showCurrencyCode}
-      />
+      <Flex flexWrap="noWrap" alignItems="center">
+        <ContentContainer>
+          {exchangeRate?.isApproximate && `~ `}
+          <FormattedMoneyAmount
+            amount={valueInCents ?? Math.round(value * 100)}
+            currency={currency}
+            precision={2}
+            amountStyles={null}
+            showCurrencyCode={showCurrencyCode}
+          />
+        </ContentContainer>
+        <InfoCircle size="1em" />
+      </Flex>
     </StyledTooltip>
   );
 };
