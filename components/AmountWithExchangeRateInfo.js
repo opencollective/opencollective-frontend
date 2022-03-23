@@ -33,7 +33,7 @@ export const formatFxRateInfo = (intl, { value, date, source, isApproximate }) =
         <div>
           <FormattedMessage
             defaultMessage="Acquired on: {date}"
-            values={{ date: <DateTime value={date} timeStyle="long" /> }}
+            values={{ date: <DateTime value={date} timeStyle="short" /> }}
           />
         </div>
       )}
