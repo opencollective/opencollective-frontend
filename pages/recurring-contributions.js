@@ -4,6 +4,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import css from '@styled-system/css';
 import { groupBy, isEmpty, mapValues, orderBy, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
+import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -104,11 +105,22 @@ class recurringContributionsPage extends React.Component {
       account: PropTypes.object,
     }), // from withData
     intl: PropTypes.object,
+    router: PropTypes.object,
   };
 
   constructor(props) {
     super(props);
     this.state = { filter: 'ACTIVE' };
+  }
+
+  componentDidUpdate() {
+    const { slug, data, router } = this.props;
+    if (data && !data.loading && !data.account && slug?.startsWith('guest-')) {
+      // We used to send links like `/guest-12345/recurring-contributions` by email, which caused troubles when updating the slug.
+      // This redirect ensures compatibility with old links byt redirecting them to the unified page.
+      // See https://github.com/opencollective/opencollective/issues/4876
+      router.replace('/recurring-contributions');
+    }
   }
 
   getAdministratedAccounts = memoizeOne(loggedInUser => {
@@ -237,4 +249,4 @@ const addRecurringContributionsPageData = graphql(recurringContributionsQuery, {
   }),
 });
 
-export default withUser(injectIntl(addRecurringContributionsPageData(recurringContributionsPage)));
+export default withRouter(withUser(injectIntl(addRecurringContributionsPageData(recurringContributionsPage))));
