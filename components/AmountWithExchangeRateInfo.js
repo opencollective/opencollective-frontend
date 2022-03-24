@@ -21,7 +21,7 @@ const FX_RATE_SOURCE_LABEL = {
 export const formatFxRateInfo = (intl, { value, date, source, isApproximate }) => {
   return (
     <Flex flexDirection="column">
-      <FormattedMessage defaultMessage="Exchange rate: {value}%" values={{ value: round(value, 2) }} />
+      <FormattedMessage defaultMessage="Exchange rate: {value}%" values={{ value: round(value, 7) }} />
       {source && (
         <div>
           <FormattedMessage
