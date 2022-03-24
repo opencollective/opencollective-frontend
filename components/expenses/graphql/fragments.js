@@ -136,8 +136,13 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
       currency
+      exchangeRate {
+        date
+        value
+        source
+        isApproximate
+      }
     }
-    accountCurrencyFxRate
     createdAt
     invoiceInfo
     requiredLegalDocuments
@@ -359,8 +364,13 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
       currency
+      exchangeRate {
+        date
+        value
+        source
+        isApproximate
+      }
     }
-    accountCurrencyFxRate
     currency
     type
     requiredLegalDocuments

@@ -8,6 +8,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 
+import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../FormattedMoneyAmount';
@@ -265,16 +266,9 @@ const ExpenseSummary = ({
                 values={{ currency: expense.amountInAccountCurrency.currency }}
               />
             </Container>
-            <Span color="black.600">
-              {' ~'}&nbsp;
-              <FormattedMoneyAmount
-                amount={expense.amountInAccountCurrency.valueInCents}
-                currency={expense.amountInAccountCurrency.currency}
-                precision={2}
-                showCurrencyCode={false}
-                amountStyles={null}
-              />
-            </Span>
+            <Container color="black.600">
+              <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency} />
+            </Container>
           </Flex>
         )}
       </Flex>
