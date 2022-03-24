@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
+import { Query } from '@apollo/client/react/components';
 import { graphql } from '@apollo/client/react/hoc';
 import { Search } from '@styled-icons/octicons/Search';
-import { isNil } from 'lodash';
+import { isNil, truncate } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { parseToBoolean } from '../lib/utils';
 
 import CollectiveCard from '../components/CollectiveCard';
@@ -15,13 +17,16 @@ import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';
+import Loading from '../components/Loading';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
 import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
+import StyledHr from '../components/StyledHr';
 import StyledInput from '../components/StyledInput';
 import StyledLink from '../components/StyledLink';
+import StyledTag from '../components/StyledTag';
 import { H1, P } from '../components/Text';
 
 const SearchInput = styled(StyledInput)`
@@ -88,12 +93,47 @@ const I18nFilters = defineMessages({
 
 const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
 
+const FilterLabel = styled.label`
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  text-transform: uppercase;
+  padding-bottom: 8px;
+  color: #4d4f51;
+`;
+
+const FilterButton = styled(StyledButton).attrs({
+  buttonSize: 'tiny',
+  buttonStyle: 'standard',
+})`
+  height: 22px;
+  background-color: #f1f2f3;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  width: 84px;
+  cursor: pointer;
+
+  ${props =>
+    props.$isSelected &&
+    css`
+      &,
+      &:active,
+      &:focus {
+        background-color: ${props => props.theme.colors.primary[100]};
+        color: ${props => props.theme.colors.primary[800]};
+      }
+    `}
+`;
+
 class SearchPage extends React.Component {
   static getInitialProps({ query }) {
     return {
       term: query.q || '',
       types: query.types ? decodeURIComponent(query.types).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
+      tags: query.tags?.split(',') || [],
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
     };
@@ -114,6 +154,24 @@ class SearchPage extends React.Component {
     this.state = { filter: 'ALL' };
   }
 
+  changeTags = tag => {
+    const { router, term } = this.props;
+    let tags = router.query?.tags?.split(',');
+    if (!tags || router.query?.tags?.length === 0) {
+      tags = [tag];
+    } else if (tags.includes(tag)) {
+      tags = tags.filter(value => value !== tag);
+    } else {
+      tags.push(tag);
+    }
+
+    const query = { q: term, types: router.query.types };
+    if (tags.length > 0) {
+      query.tags = tags.join();
+    }
+    router.push({ pathname: router.pathname, query });
+  };
+
   refetch = event => {
     event.preventDefault();
 
@@ -121,19 +179,30 @@ class SearchPage extends React.Component {
     const { router } = this.props;
     const { q } = form;
 
-    router.push({ pathname: router.pathname, query: { q: q.value, types: router.query.types } });
+    const query = { q: q.value, types: router.query.types };
+    if (router.query.tags) {
+      query.tags = router.query.tags;
+    }
+    router.push({ pathname: router.pathname, query });
   };
 
   onClick = filter => {
-    const { term } = this.props;
+    const { term, router } = this.props;
+    let query;
 
     if (filter === 'HOST') {
-      this.props.router.push({ pathname: '/search', query: { q: term, isHost: true } });
+      query = { q: term, isHost: true };
     } else if (filter !== 'ALL') {
-      this.props.router.push({ pathname: '/search', query: { q: term, types: filter } });
+      query = { q: term, types: filter };
     } else {
-      this.props.router.push({ pathname: '/search', query: { q: term } });
+      query = { q: term };
     }
+
+    if (router.query.tags) {
+      query.tags = router.query.tags;
+    }
+
+    router.push({ pathname: '/search', query });
   };
 
   changePage = offset => {
@@ -142,8 +211,9 @@ class SearchPage extends React.Component {
   };
 
   render() {
-    const { data, term = '', intl } = this.props;
+    const { router, data, term = '', intl } = this.props;
     const { error, loading, search } = data || {};
+    const tags = router?.query?.tags?.split(',') || [];
 
     if (error) {
       return <ErrorPage data={this.props.data} />;
@@ -184,6 +254,34 @@ class SearchPage extends React.Component {
               />
             </Box>
           )}
+          <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
+          <Container width={[1, 3 / 4]}>
+            <FilterLabel htmlFor="tag-filter-type">
+              <FormattedMessage defaultMessage="Tags" />
+            </FilterLabel>
+            <Query query={tagFrequencyQuery} context={API_V2_CONTEXT}>
+              {({ data, loading }) =>
+                loading ? (
+                  <Loading />
+                ) : (
+                  <Flex flexWrap="wrap" width={[null, '1000px']}>
+                    {data?.tagFrequency?.nodes?.map(node => (
+                      <FilterButton
+                        as={StyledTag}
+                        key={node.tag}
+                        title={node.tag}
+                        variant="rounded-right"
+                        $isSelected={tags.includes(node.tag)}
+                        onClick={() => this.changeTags(node.tag)}
+                      >
+                        {truncate(node.tag, { length: 9 })}
+                      </FilterButton>
+                    ))}
+                  </Flex>
+                )
+              }
+            </Query>
+          </Container>
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
             {loading && !collectives && (
               <Flex py={3} width={1} justifyContent="center">
@@ -268,8 +366,23 @@ class SearchPage extends React.Component {
 export { SearchPage as MockSearchPage };
 
 export const searchPageQuery = gql`
-  query SearchPage($term: String!, $types: [TypeOfCollective], $isHost: Boolean, $limit: Int, $offset: Int) {
-    search(term: $term, types: $types, isHost: $isHost, limit: $limit, offset: $offset, skipRecentAccounts: true) {
+  query SearchPage(
+    $term: String!
+    $types: [TypeOfCollective]
+    $tags: [String]
+    $isHost: Boolean
+    $limit: Int
+    $offset: Int
+  ) {
+    search(
+      term: $term
+      types: $types
+      isHost: $isHost
+      limit: $limit
+      offset: $offset
+      skipRecentAccounts: true
+      tags: $tags
+    ) {
       collectives {
         id
         isActive
@@ -304,6 +417,16 @@ export const searchPageQuery = gql`
       limit
       offset
       total
+    }
+  }
+`;
+
+export const tagFrequencyQuery = gqlV2/* GraphQL */ `
+  query TagFrequency {
+    tagFrequency {
+      nodes {
+        tag
+      }
     }
   }
 `;
