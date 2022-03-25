@@ -247,7 +247,8 @@ const ExpenseFormBody = ({
   const collectiveSupportsMultiCurrency =
     hasFeature(collective, FEATURES.MULTI_CURRENCY_EXPENSES) ||
     hasFeature(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES);
-  const isMultiCurrency = collectiveSupportsMultiCurrency && expense?.currency !== collective?.currency;
+  const isMultiCurrency =
+    collectiveSupportsMultiCurrency && values.payoutMethod?.data?.currency !== collective?.currency;
 
   const [step, setStep] = React.useState(stepOneCompleted || isCreditCardCharge ? STEPS.EXPENSE : STEPS.PAYEE);
   // Only true when logged in and drafting the expense
@@ -309,8 +310,10 @@ const ExpenseFormBody = ({
   }, [values.payeeLocation]);
 
   React.useEffect(() => {
-    if (isMultiCurrency && values.payoutMethod?.data?.currency !== expense?.currency) {
+    if (isMultiCurrency) {
       formik.setFieldValue('currency', undefined);
+    } else {
+      formik.setFieldValue('currency', collective?.currency);
     }
   }, [values.payoutMethod]);
 
@@ -609,7 +612,7 @@ const ExpenseFormBody = ({
                 </StyledButton>
                 {errors.payoutMethod?.data?.currency && touched.items?.some?.(i => i.amount) && (
                   <Box mx={[2, 0]} mt={2} color="red.500" fontSize="12px" letterSpacing={0}>
-                    {errors.payoutMethod.data.currency}
+                    {errors.payoutMethod.data.currency.toString()}
                   </Box>
                 )}
                 <StyledHr flex="1" borderColor="white.full" mx={2} />
