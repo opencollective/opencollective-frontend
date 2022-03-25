@@ -46,7 +46,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
   const customFields = getCustomFields(collective, tier);
   const currency = tier?.amount.currency || collective.currency;
   const selectedInterval = data?.interval !== INTERVALS.flexible ? data?.interval : null;
-  const accountSupportsRecurring = canContributeRecurring(collective, LoggedInUser);
+  const supportsRecurring = canContributeRecurring(collective, LoggedInUser) && (!tier || tier?.interval);
   const isFixedInterval = tier?.interval && tier.interval !== INTERVALS.flexible;
 
   const dispatchChange = (field, value) => {
@@ -56,14 +56,14 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
   // If an interval has been set (either from the tier defaults, or form an URL param) and the
   // collective doesn't support it, we reset the interval
   React.useEffect(() => {
-    if (selectedInterval && !isFixedInterval && !accountSupportsRecurring) {
+    if (selectedInterval && !isFixedInterval && !supportsRecurring) {
       dispatchChange('interval', null);
     }
-  }, [selectedInterval, isFixedInterval, accountSupportsRecurring]);
+  }, [selectedInterval, isFixedInterval, supportsRecurring]);
 
   return (
     <Box width={1}>
-      {!isFixedInterval && accountSupportsRecurring && (
+      {!isFixedInterval && supportsRecurring && (
         <StyledButtonSet
           id="interval"
           justifyContent="center"
