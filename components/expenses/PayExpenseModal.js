@@ -180,8 +180,9 @@ const getInitialValues = (expense, host, payoutMethodType) => {
 
 const getPaymentProcessorFee = (formik, expense, quoteQuery) => {
   if (formik.values.forceManual) {
+    const fxRate = expense.amountInAccountCurrency?.exchangeRate?.value || 1;
     return {
-      valueInCents: formik.values.paymentProcessorFee,
+      valueInCents: Math.round(formik.values.paymentProcessorFee * fxRate),
       currency: expense.currency,
     };
   } else if (quoteQuery?.data?.expense?.quote) {
