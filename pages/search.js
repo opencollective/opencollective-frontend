@@ -259,13 +259,13 @@ class SearchPage extends React.Component {
             <FilterLabel htmlFor="tag-filter-type">
               <FormattedMessage defaultMessage="Tags" />
             </FilterLabel>
-            <Query query={tagFrequencyQuery} context={API_V2_CONTEXT}>
+            <Query query={tagStatsQuery} context={API_V2_CONTEXT}>
               {({ data, loading }) =>
                 loading ? (
                   <Loading />
                 ) : (
                   <Flex flexWrap="wrap" width={[null, '1000px']}>
-                    {data?.tagFrequency?.nodes?.map(node => (
+                    {data?.tagStats?.nodes?.map(node => (
                       <FilterButton
                         as={StyledTag}
                         key={node.tag}
@@ -421,9 +421,9 @@ export const searchPageQuery = gql`
   }
 `;
 
-export const tagFrequencyQuery = gqlV2/* GraphQL */ `
-  query TagFrequency {
-    tagFrequency {
+export const tagStatsQuery = gqlV2/* GraphQL */ `
+  query TagStats {
+    tagStats {
       nodes {
         tag
       }
