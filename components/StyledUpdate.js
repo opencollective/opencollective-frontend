@@ -294,14 +294,19 @@ class StyledUpdate extends Component {
         ) : isReloadingData ? (
           <LoadingPlaceholder height={300} />
         ) : null}
-        {update.userCanPublishUpdate && (
+        {collective.isFrozen ? (
+          <MessageBox withIcon type="warning" mt={3}>
+            <FormattedMessage defaultMessage="This account is currently frozen and cannot be used to publish updates." />{' '}
+            <FormattedMessage defaultMessage="Please contact your fiscal host for more details." />
+          </MessageBox>
+        ) : update.userCanPublishUpdate ? (
           <PublishUpdateBtnWithData
             id={update.id}
             isHost={Boolean(update.account?.isHost)}
             isChangelog={update.isChangelog}
             isPrivate={update.isPrivate}
           />
-        )}
+        ) : null}
       </Container>
     );
   }

@@ -8,6 +8,7 @@ import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
+import MessageBox from '../MessageBox';
 import SignInOrJoinFree from '../SignInOrJoinFree';
 import { H1, P } from '../Text';
 import { withUser } from '../UserProvider';
@@ -79,6 +80,15 @@ class CreateProject extends Component {
             </Box>
           </Flex>
           <SignInOrJoinFree />
+        </Flex>
+      );
+    } else if (parent?.isFrozen) {
+      return (
+        <Flex flexDirection="column" alignItems="center" my={6}>
+          <MessageBox withIcon type="warning">
+            <FormattedMessage defaultMessage="This account it frozen, you cannot create new projects at this time." />{' '}
+            <FormattedMessage defaultMessage="Please contact your fiscal host for more details." />
+          </MessageBox>
         </Flex>
       );
     }

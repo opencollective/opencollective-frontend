@@ -19,6 +19,7 @@ const createProjectPageParentAccountQuery = gqlV2/* GraphQL */ `
       slug
       name
       currency
+      isFrozen
     }
   }
 `;

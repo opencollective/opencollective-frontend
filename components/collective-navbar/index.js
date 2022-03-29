@@ -17,7 +17,7 @@ import styled, { createGlobalStyle, css } from 'styled-components';
 import { display } from 'styled-system';
 
 import { accountSupportsGrants, expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
-import { getFilteredSectionsForCollective, isSectionEnabled, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
+import { getFilteredSectionsForCollective, isSectionEnabled } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import roles from '../../lib/constants/roles';
 import { getEnvVar } from '../../lib/env-utils';
@@ -41,6 +41,7 @@ import { Span } from '../Text';
 import { useUser } from '../UserProvider';
 
 import CollectiveNavbarActionsMenu from './ActionsMenu';
+import { NAVBAR_CATEGORIES } from './constants';
 import { getNavBarMenu, NAVBAR_ACTION_TYPE } from './menu';
 import NavBarCategoryDropdown, { NavBarCategory } from './NavBarCategoryDropdown';
 
@@ -506,7 +507,7 @@ const CollectiveNavbar = ({
                 </React.Fragment>
               ) : selectedCategory && showSelectedCategoryOnMobile ? (
                 <MobileCategoryContainer>
-                  <NavBarCategory category={selectedCategory} />
+                  <NavBarCategory collective={collective} category={selectedCategory} />
                 </MobileCategoryContainer>
               ) : (
                 <CollectiveName collective={collective} onClick={onCollectiveClick} />

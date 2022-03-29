@@ -321,14 +321,14 @@ class Members extends React.Component {
       return <Loading />;
     } else if (data.error) {
       return (
-        <MessageBox type="error" withIcon>
+        <MessageBox type="error" withIcon fontSize="13px">
           {i18nGraphqlException(intl, data.error)}
         </MessageBox>
       );
     } else if (data.account?.parentAccount) {
       const parent = data.account.parentAccount;
       return (
-        <MessageBox type="info" withIcon>
+        <MessageBox type="info" withIcon fontSize="13px">
           <FormattedMessage
             id="Members.DefinedInParent"
             defaultMessage="Team members are defined in the settings of {parentName}"
@@ -336,6 +336,13 @@ class Members extends React.Component {
               parentName: <Link href={`/${parent.slug}/admin/members`}>{parent.name}</Link>,
             }}
           />
+        </MessageBox>
+      );
+    } else if (data.account?.isFrozen) {
+      return (
+        <MessageBox type="warning" fontSize="13px" withIcon>
+          <FormattedMessage defaultMessage="This account is currently frozen, its team members therefore cannot be edited." />{' '}
+          <FormattedMessage defaultMessage="Please contact your fiscal host for more details." />
         </MessageBox>
       );
     } else {
@@ -368,6 +375,7 @@ export const coreContributorsQuery = gqlV2/* GraphQL */ `
   query CoreContributors($collectiveSlug: String!, $account: AccountReferenceInput!) {
     account(slug: $collectiveSlug) {
       id
+      isFrozen
       parentAccount {
         id
         slug

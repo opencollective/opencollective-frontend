@@ -15,6 +15,7 @@ import CreateEventForm from './CreateEventForm';
 import Footer from './Footer';
 import Header from './Header';
 import Link from './Link';
+import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import { withUser } from './UserProvider';
 
@@ -96,8 +97,7 @@ class CreateEvent extends React.Component {
 
   render() {
     const { parentCollective, LoggedInUser } = this.props;
-    const canCreateEvent = LoggedInUser && LoggedInUser.canEditCollective(parentCollective);
-
+    const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(parentCollective);
     const collective = parentCollective || {};
     const title = `Create a New ${collective.name} Event`;
 
@@ -106,10 +106,10 @@ class CreateEvent extends React.Component {
         <Header title={title} className={this.state.status} LoggedInUser={this.props.LoggedInUser} />
 
         <Body>
-          <CollectiveNavbar collective={collective} isAdmin={canCreateEvent} />
+          <CollectiveNavbar collective={collective} isAdmin={isAdmin} />
 
           <div className="content">
-            {!canCreateEvent && (
+            {!isAdmin ? (
               <Container margin="0 auto" textAlign="center">
                 <p>
                   <FormattedMessage
@@ -125,8 +125,12 @@ class CreateEvent extends React.Component {
                   </Link>
                 </p>
               </Container>
-            )}
-            {canCreateEvent && (
+            ) : collective.isFrozen ? (
+              <MessageBox withIcon type="warning" my={5}>
+                <FormattedMessage defaultMessage="This account is currently frozen and cannot be used to create events." />{' '}
+                <FormattedMessage defaultMessage="Please contact your fiscal host for more details." />
+              </MessageBox>
+            ) : (
               <div>
                 <CreateEventForm
                   event={this.state.event}
