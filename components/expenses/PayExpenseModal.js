@@ -69,7 +69,7 @@ const getPayoutOptionValue = (payoutMethodType, isAuto, host) => {
     return { forceManual: true, action: 'PAY' };
   } else {
     const isPaypalPayouts =
-      hasFeature(host, FEATURES.PAYPAL_PAYOUTS) &&
+      host.features[FEATURES.PAYPAL_PAYOUTS] === 'ACTIVE' &&
       payoutMethodType === PayoutMethodType.PAYPAL &&
       host.supportedPayoutMethods?.includes(PayoutMethodType.PAYPAL);
     const isWiseOTT =
