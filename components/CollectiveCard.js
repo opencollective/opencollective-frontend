@@ -248,7 +248,10 @@ class CollectiveCard extends React.Component {
                 </div>
                 <div className="yearlyBudget">
                   <ValueWrapper>
-                    <Currency value={collective.stats.yearlyBudget.valueInCents} currency={collective.currency} />
+                    <Currency
+                      value={collective.stats.yearlyBudget.valueInCents}
+                      currency={collective.stats.yearlyBudget.currency}
+                    />
                   </ValueWrapper>
                   <LabelWrapper>
                     <FormattedMessage id="collective.card.stats.yearlyBudget" defaultMessage={'yearly budget'} />
@@ -256,21 +259,24 @@ class CollectiveCard extends React.Component {
                 </div>
               </StatsWrapper>
             )}
-            {collective.stats && collective.memberOf?.nodes.length > 0 && collective.type === 'ORGANIZATION' && (
+            {collective.backers && collective.backers.totalCount > 0 && collective.type === 'ORGANIZATION' && (
               <StatsWrapper>
                 <div className="backers">
-                  <ValueWrapper>{collective.memberOf?.nodes.length}</ValueWrapper>
+                  <ValueWrapper>{collective.backers.totalCount}</ValueWrapper>
                   <LabelWrapper>
                     <FormattedMessage
                       id="collective.card.memberOf.count"
                       defaultMessage="Contributor to {n, plural, one {Collective} other {Collectives}}"
-                      values={{ n: collective.memberOf?.nodes.length }}
+                      values={{ n: collective.backers.totalCount }}
                     />
                   </LabelWrapper>
                 </div>
                 <div className="yearlyBudget">
                   <ValueWrapper>
-                    <Currency value={collective.stats.totalAmountSpent.valueInCents} currency={collective.currency} />
+                    <Currency
+                      value={collective.stats.totalAmountSpent.valueInCents}
+                      currency={collective.stats.totalAmountSpent.currency}
+                    />
                   </ValueWrapper>
                   <LabelWrapper>
                     <FormattedMessage id="AmountContributed" defaultMessage="Contributed" />

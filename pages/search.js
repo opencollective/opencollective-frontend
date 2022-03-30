@@ -150,8 +150,8 @@ class SearchPage extends React.Component {
     }
 
     const filters = ['ALL', 'COLLECTIVE', 'EVENT', 'ORGANIZATION', 'HOST'];
-    const { nodes: accountNodes, limit = 20, offset, totalCount = 0 } = accounts || {};
-    const showCollectives = term.trim() !== '' && !!accountNodes;
+    const { limit = 20, offset, totalCount = 0 } = accounts || {};
+    const showCollectives = term.trim() !== '' && !!accounts?.nodes;
 
     return (
       <Page title="Search" showSearch={false}>
@@ -185,20 +185,20 @@ class SearchPage extends React.Component {
             </Box>
           )}
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
-            {loading && accountNodes?.length > 0 && (
+            {loading && accounts?.nodes?.length > 0 && (
               <Flex py={3} width={1} justifyContent="center">
                 <LoadingGrid />
               </Flex>
             )}
             {showCollectives &&
-              accountNodes?.map(collective => (
+              accounts?.nodes?.map(collective => (
                 <Flex key={collective.slug} my={3} mx={2}>
                   <CollectiveCard collective={collective} />
                 </Flex>
               ))}
 
             {/* TODO: add suggested collectives when the result is empty */}
-            {showCollectives && accountNodes?.length === 0 && (
+            {showCollectives && accounts?.nodes?.length === 0 && (
               <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
                 <P my={4}>
                   <em>
@@ -224,13 +224,13 @@ class SearchPage extends React.Component {
               </Flex>
             )}
           </Flex>
-          {showCollectives && accountNodes?.length !== 0 && totalCount > limit && (
+          {showCollectives && accounts?.nodes?.length !== 0 && totalCount > limit && (
             <Container display="flex" justifyContent="center" fontSize="14px" my={3}>
               <Pagination offset={offset} total={totalCount} limit={limit} />
             </Container>
           )}
 
-          {showCollectives && accountNodes?.length !== 0 && (
+          {showCollectives && accounts?.nodes?.length !== 0 && (
             <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
               <P pt={3} pb={3} borderTop="1px solid #E6E6E6">
                 <em>
@@ -288,13 +288,14 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
         description
         longDescription
         website
-        currency
         stats {
           id
           totalAmountSpent {
+            currency
             valueInCents
           }
           yearlyBudget {
+            currency
             valueInCents
           }
         }
@@ -307,10 +308,8 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
         members(role: BACKER) {
           totalCount
         }
-        memberOf(role: BACKER) {
-          nodes {
-            id
-          }
+        backers: memberOf(role: BACKER) {
+          totalCount
         }
       }
       limit
