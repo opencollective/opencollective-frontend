@@ -544,6 +544,8 @@ enum OrderByFieldType {
   CREATED_AT
   MEMBER_COUNT
   TOTAL_CONTRIBUTED
+  ACTIVITY
+  RANK
 }
 
 """
@@ -7242,7 +7244,7 @@ type Query {
     """
     The order of results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: OrderByInput
   ): AccountCollection!
   collective(
     """
@@ -9147,6 +9149,11 @@ type Mutation {
     Account where the expense will be created
     """
     account: AccountReferenceInput!
+
+    """
+    Recurring Expense information
+    """
+    recurring: RecurringExpenseInput
   ): Expense!
 
   """
