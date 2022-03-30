@@ -96,6 +96,7 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     features {
       id
       MULTI_CURRENCY_EXPENSES
+      PAYPAL_PAYOUTS
     }
     paypalPreApproval {
       id
