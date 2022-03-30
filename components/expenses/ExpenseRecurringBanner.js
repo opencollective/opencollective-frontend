@@ -82,12 +82,11 @@ const ExpenseRecurringEditModal = ({ onClose, expense }) => {
             <StyledInput
               type="date"
               inputId="recurring-end-date"
-              // onChange={event => onChange({ ...recurring, endDate: event.target.value })}
               menuPlacement="auto"
               isSearchable={false}
               height="38px"
               width="100%"
-              value={toIsoDateStr(getDateFromValue(recurringExpense.endsAt))}
+              value={recurringExpense.endsAt && toIsoDateStr(getDateFromValue(recurringExpense.endsAt))}
               disabled
             />
           </Box>
@@ -104,7 +103,7 @@ const ExpenseRecurringEditModal = ({ onClose, expense }) => {
             onClick={handleDeletion}
             disabled={loading}
           >
-            Delete expense and Cancel recurring
+            Delete Recurring Expense
           </StyledButton>
         </Container>
       </ModalFooter>
