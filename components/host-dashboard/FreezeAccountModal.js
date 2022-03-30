@@ -47,7 +47,7 @@ const FreezeAccountModal = ({ collective, ...props }) => {
               <FormattedMessage defaultMessage="Are you sure want to unfreeze this collective?" />
             </P>
             <P fontSize="14px" lineHeight="20px" color="black.700" mb="10px">
-              <FormattedMessage defaultMessage="Unfreezing this collective means reinstating their complete usability on the platform" />
+              <FormattedMessage defaultMessage="Unfreezing the collective means they will now have full access to the platform." />
               <br />
               <br />
               <FormattedMessage defaultMessage="This collective (and all its related Projects & Events) will now have access to accept funds, pay out expenses, post updates, create new Events or Projects." />
