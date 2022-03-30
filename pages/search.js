@@ -102,29 +102,6 @@ const FilterLabel = styled.label`
   color: #4d4f51;
 `;
 
-const CountryFilter = ({ onChange, value, ...props }) => {
-  const intl = useIntl();
-  const getOption = value => ({ label: i18nExpenseType(intl, value), value });
-
-  const expenseTypeKeys = Object.keys(expenseTypes).filter(key => !['DEFAULT', 'FUNDING_REQUEST'].includes(key));
-  expenseTypeKeys.unshift('ALL');
-
-  return (
-    <StyledSelectFilter
-      inputId="expenses-type-filter"
-      onChange={({ value }) => onChange(value)}
-      value={getOption(value || 'ALL')}
-      options={expenseTypeKeys.map(getOption)}
-      {...props}
-    />
-  );
-};
-
-CountryFilter.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
-};
-
 class SearchPage extends React.Component {
   static getInitialProps({ query }) {
     return {
