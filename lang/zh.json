@@ -977,7 +977,7 @@
   "expense.ReceiptRequired": "需要收据",
   "Expense.Recurring.Edit": "Edit details",
   "Expense.Recurring.EditWarning.Description": "Any changes you make to this expense will apply to future recurrences.",
-  "Expense.Recurring.EditWarning.Ends": "ends {endAt, date, medium}",
+  "Expense.Recurring.EditWarning.Ends": "ends {endsAt, date, medium}",
   "Expense.Recurring.EditWarning.Title": "This is a recurring expense.",
   "expense.rejected": "被拒绝",
   "expense.RemoveItem": "移除项目",

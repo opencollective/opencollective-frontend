@@ -695,7 +695,7 @@ ExpenseFormBody.propTypes = {
     payoutMethod: PropTypes.object,
     recurringExpense: PropTypes.shape({
       interval: PropTypes.string,
-      endAt: PropTypes.string,
+      endsAt: PropTypes.string,
     }),
     items: PropTypes.arrayOf(
       PropTypes.shape({

@@ -76,7 +76,7 @@ const ExpenseRecurringForm = ({ recurring, onChange, ...props }) => {
               <StyledInput
                 type="date"
                 inputId="recurring-end-date"
-                onChange={event => onChange({ ...recurring, endAt: event.target.value })}
+                onChange={event => onChange({ ...recurring, endsAt: event.target.value })}
                 menuPlacement="auto"
                 isSearchable={false}
                 height="38px"

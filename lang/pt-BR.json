@@ -977,7 +977,7 @@
   "expense.ReceiptRequired": "Recibo obrigatório",
   "Expense.Recurring.Edit": "Edit details",
   "Expense.Recurring.EditWarning.Description": "Any changes you make to this expense will apply to future recurrences.",
-  "Expense.Recurring.EditWarning.Ends": "ends {endAt, date, medium}",
+  "Expense.Recurring.EditWarning.Ends": "ends {endsAt, date, medium}",
   "Expense.Recurring.EditWarning.Title": "This is a recurring expense.",
   "expense.rejected": "Rejeitado",
   "expense.RemoveItem": "Remover item",

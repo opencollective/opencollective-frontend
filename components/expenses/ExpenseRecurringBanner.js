@@ -25,7 +25,7 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 const recurringExpensePropType = PropTypes.shape({
   id: PropTypes.string,
   interval: PropTypes.string,
-  endAt: PropTypes.string,
+  endsAt: PropTypes.string,
 }).isRequired;
 
 const deleteExpenseMutation = gqlV2/* GraphQL */ `
@@ -87,11 +87,7 @@ const ExpenseRecurringEditModal = ({ onClose, expense }) => {
               isSearchable={false}
               height="38px"
               width="100%"
-<<<<<<< HEAD
-              value={recurringExpense.endAt && toIsoDateStr(getDateFromValue(recurringExpense.endAt))}
-=======
-              value={toIsoDateStr(getDateFromValue(recurringExpense.endAt))}
->>>>>>> feat: add recurring expense fields behind feature flag
+              value={toIsoDateStr(getDateFromValue(recurringExpense.endsAt))}
               disabled
             />
           </Box>
@@ -146,13 +142,13 @@ const ExpenseRecurringBanner = ({ expense }) => {
         </P>
         <P color="black.800" fontWeight="400" fontSize="12px" lineHeight="18px" mt={1}>
           ({RecurringExpenseIntervals[recurringExpense.interval]}
-          {recurringExpense.endAt && (
+          {recurringExpense.endsAt && (
             <React.Fragment>
               ,&nbsp;
               <FormattedMessage
                 id="Expense.Recurring.EditWarning.Ends"
-                defaultMessage="ends {endAt, date, medium}"
-                values={{ endAt: getDateFromValue(recurringExpense.endAt) }}
+                defaultMessage="ends {endsAt, date, medium}"
+                values={{ endsAt: getDateFromValue(recurringExpense.endsAt) }}
               />
             </React.Fragment>
           )}

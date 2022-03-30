@@ -2042,7 +2042,7 @@ type RecurringExpense {
   """
   The time this expense will cease to be recurring
   """
-  endAt: DateTime
+  endsAt: DateTime
 
   """
   The last expense created by this recurring expense record paid for
@@ -11427,7 +11427,7 @@ input RecurringExpenseInput {
   """
   The date when this recurring expense should cease
   """
-  endAt: DateString
+  endsAt: DateString
 }
 
 input ExpenseUpdateInput {

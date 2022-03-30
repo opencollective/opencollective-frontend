@@ -349,7 +349,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
     }
     recurringExpense {
       interval
-      endAt
+      endsAt
     }
   }
 
