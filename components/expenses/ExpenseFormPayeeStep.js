@@ -195,7 +195,10 @@ const ExpenseFormPayeeStep = ({
   const { formatMessage } = intl;
   const { values, errors } = formik;
   const stepOneCompleted = checkStepOneCompleted(values, isOnBehalf);
-  const allPayoutMethods = React.useMemo(() => getPayoutMethodsFromPayee(values.payee), [values.payee]);
+  const allPayoutMethods = React.useMemo(
+    () => getPayoutMethodsFromPayee(values.payee),
+    [values.payee, loggedInAccount],
+  );
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
   const payeeOptions = React.useMemo(() => getPayeeOptions(intl, payoutProfiles), [payoutProfiles]);

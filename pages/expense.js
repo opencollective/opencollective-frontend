@@ -31,6 +31,7 @@ import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpenseInviteNotificationBanner from '../components/expenses/ExpenseInviteNotificationBanner';
 import ExpenseMissingReceiptNotificationBanner from '../components/expenses/ExpenseMissingReceiptNotificationBanner';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
+import ExpenseRecurringBanner from '../components/expenses/ExpenseRecurringBanner';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import {
   expensePageExpenseFieldsFragment,
@@ -480,6 +481,7 @@ class ExpensePage extends React.Component {
       expense?.type === expenseTypes.CHARGE &&
       expense?.permissions?.canEdit &&
       expense?.items?.every(item => !item.url);
+    const isRecurring = expense?.recurringExpense;
     const skipSummary = isMissingReceipt && status === PAGE_STATUS.EDIT;
 
     const payoutProfiles = getPayoutProfiles(loggedInAccount);
@@ -555,7 +557,8 @@ class ExpensePage extends React.Component {
               </MessageBox>
             )}
             {status === PAGE_STATUS.VIEW &&
-              ((expense?.status === expenseStatus.UNVERIFIED && this.state.createdUser) || isDraft) && (
+              ((expense?.status === expenseStatus.UNVERIFIED && this.state.createdUser) ||
+                (isDraft && !isRecurring)) && (
                 <ExpenseInviteNotificationBanner expense={expense} createdUser={this.state.createdUser} />
               )}
             {isMissingReceipt && (
@@ -664,6 +667,7 @@ class ExpensePage extends React.Component {
                     {!isDraft && (
                       <ExpenseNotesForm onChange={this.onNotesChanges} defaultValue={expense.privateMessage} />
                     )}
+                    {isRecurring && <ExpenseRecurringBanner expense={expense} />}
                     <Flex flexWrap="wrap" mt={4}>
                       <StyledButton
                         mt={2}

@@ -855,6 +855,7 @@ type Expense {
   """
   requestedByAccount: Account
   quote: ExpenseQuote
+  recurringExpense: RecurringExpense
 }
 
 """
@@ -1955,6 +1956,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
   COLLECTIVE_EXPENSE_INVITE_DRAFTED
+  COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
@@ -2014,6 +2016,49 @@ type ExpenseQuote {
   The date on which the item was created
   """
   estimatedDeliveryAt: DateTime!
+}
+
+"""
+A recurring expense object
+"""
+type RecurringExpense {
+  """
+  Unique identifier for this recurring expense
+  """
+  id: String!
+
+  """
+  The interval in which this recurring expense is created
+  """
+  interval: RecurringExpenseInterval!
+  account: Account!
+  fromAccount: Account!
+
+  """
+  The last time this recurring expense was paid for
+  """
+  lastDraftedAt: DateTime!
+
+  """
+  The time this expense will cease to be recurring
+  """
+  endsAt: DateTime
+
+  """
+  The last expense created by this recurring expense record paid for
+  """
+  lastExpenseCreated: Expense
+}
+
+"""
+All supported intervals for recurring expenses
+"""
+enum RecurringExpenseInterval {
+  day
+  week
+  month
+  quarter
+  year
 }
 
 """
@@ -9037,6 +9082,11 @@ type Mutation {
     Account where the expense will be created
     """
     account: AccountReferenceInput!
+
+    """
+    Recurring Expense information
+    """
+    recurring: RecurringExpenseInput
   ): Expense!
 
   """
@@ -11366,6 +11416,18 @@ enum CountryISO {
   Western Sahara
   """
   EH
+}
+
+input RecurringExpenseInput {
+  """
+  The interval in which this recurring expense is created
+  """
+  interval: RecurringExpenseInterval!
+
+  """
+  The date when this recurring expense should cease
+  """
+  endsAt: DateTime
 }
 
 input ExpenseUpdateInput {

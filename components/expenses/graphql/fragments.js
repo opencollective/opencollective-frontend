@@ -347,6 +347,10 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         imageUrl
       }
     }
+    recurringExpense {
+      interval
+      endsAt
+    }
   }
 
   ${expenseHostFields}
