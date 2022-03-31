@@ -151,7 +151,7 @@ class SearchPage extends React.Component {
 
     const filters = ['ALL', 'COLLECTIVE', 'EVENT', 'ORGANIZATION', 'HOST'];
     const { limit = 20, offset, totalCount = 0 } = accounts || {};
-    const showCollectives = term.trim() !== '' && !!accounts?.nodes;
+    const showCollectives = !!accounts?.nodes;
 
     return (
       <Page title="Search" showSearch={false}>
@@ -169,21 +169,19 @@ class SearchPage extends React.Component {
               </Flex>
             </form>
           </Box>
-          {term && (
-            <Box mt={4} mb={4} mx="auto">
-              <StyledFilters
-                filters={filters}
-                getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
-                selected={this.state.filter}
-                justifyContent="left"
-                minButtonWidth={150}
-                onChange={filter => {
-                  this.setState({ filter: filter });
-                  this.onClick(filter);
-                }}
-              />
-            </Box>
-          )}
+          <Box mt={4} mb={4} mx="auto">
+            <StyledFilters
+              filters={filters}
+              getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
+              selected={this.state.filter}
+              justifyContent="left"
+              minButtonWidth={150}
+              onChange={filter => {
+                this.setState({ filter: filter });
+                this.onClick(filter);
+              }}
+            />
+          </Box>
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
             {loading && accounts?.nodes?.length > 0 && (
               <Flex py={3} width={1} justifyContent="center">
@@ -320,7 +318,6 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
 `;
 
 export const addSearchPageData = graphql(searchPageQuery, {
-  skip: props => !props.term,
   options: { context: API_V2_CONTEXT },
 });
 
