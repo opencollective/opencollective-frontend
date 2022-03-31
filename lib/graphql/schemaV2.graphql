@@ -2030,14 +2030,14 @@ type RecurringExpense {
   """
   The interval in which this recurring expense is created
   """
-  interval: RecurringExpenseInterval
-  account: Account
-  fromAccount: Account
+  interval: RecurringExpenseInterval!
+  account: Account!
+  fromAccount: Account!
 
   """
   The last time this recurring expense was paid for
   """
-  lastDraftedAt: DateTime
+  lastDraftedAt: DateTime!
 
   """
   The time this expense will cease to be recurring
@@ -11427,7 +11427,7 @@ input RecurringExpenseInput {
   """
   The date when this recurring expense should cease
   """
-  endsAt: DateString
+  endsAt: DateTime
 }
 
 input ExpenseUpdateInput {
