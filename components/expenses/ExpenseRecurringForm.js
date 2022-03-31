@@ -2,12 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { getDateFromValue, toIsoDateStr } from '../../lib/date-utils';
 import { RecurringIntervalOptions } from '../../lib/i18n/expense';
 
 import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledInput from '../StyledInput';
+import StyledInputField from '../StyledInputField';
 import StyledSelect from '../StyledSelect';
 import { P, Span } from '../Text';
 
@@ -56,32 +58,48 @@ const ExpenseRecurringForm = ({ recurring, onChange, ...props }) => {
         </P>
 
         {isRecurring && (
-          <Flex flexDirection={['column', 'row']}>
+          <Flex flexDirection={['column', 'row']} mt={2}>
             <Box mr={[0, 3]}>
-              <P color="black.700" fontWeight="600" fontSize="13px" lineHeight="16px" mt={2} mb={1}>
-                <FormattedMessage id="Frequency" defaultMessage="Frequency" />
-              </P>
-              <StyledSelect
-                inputId="recurring-frequency"
-                options={RecurringIntervalOptions}
-                onChange={({ value: interval }) => onChange({ ...recurring, interval })}
-                menuPlacement="auto"
-                isSearchable={false}
-              />
+              <StyledInputField
+                name="frequency"
+                htmlFor="frequency"
+                label={<FormattedMessage id="Frequency" defaultMessage="Frequency" />}
+                labelFontSize="13px"
+                labelFontWeight={600}
+                required
+              >
+                {inputProps => (
+                  <StyledSelect
+                    {...inputProps}
+                    options={RecurringIntervalOptions}
+                    onChange={({ value: interval }) => onChange({ ...recurring, interval })}
+                    menuPlacement="auto"
+                    isSearchable={false}
+                  />
+                )}
+              </StyledInputField>
             </Box>
             <Box>
-              <P color="black.700" fontWeight="600" fontSize="13px" lineHeight="16px" mt={2} mb={1}>
-                <FormattedMessage id="EndDate" defaultMessage="End Date" />
-              </P>
-              <StyledInput
-                type="date"
-                inputId="recurring-end-date"
-                onChange={event => onChange({ ...recurring, endsAt: event.target.value })}
-                menuPlacement="auto"
-                isSearchable={false}
-                height="38px"
-                width="100%"
-              />
+              <StyledInputField
+                name="endsAt"
+                htmlFor="endsAt"
+                label={<FormattedMessage id="EndDate" defaultMessage="End Date" />}
+                labelFontSize="13px"
+                labelFontWeight={600}
+                required={false}
+              >
+                {inputProps => (
+                  <StyledInput
+                    {...inputProps}
+                    type="date"
+                    onChange={event => onChange({ ...recurring, endsAt: getDateFromValue(event.target.value) })}
+                    menuPlacement="auto"
+                    height="38px"
+                    width="100%"
+                    min={toIsoDateStr(new Date())}
+                  />
+                )}
+              </StyledInputField>
             </Box>
           </Flex>
         )}
