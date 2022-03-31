@@ -29,6 +29,7 @@ export const collectivePageQuery = gql`
       isPledged
       isApproved
       isArchived
+      isFrozen
       isHost
       isIncognito
       isGuest

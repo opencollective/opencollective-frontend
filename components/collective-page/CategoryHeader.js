@@ -99,6 +99,7 @@ const getCategoryData = (intl, collective, category) => {
         ),
       };
     case NAVBAR_CATEGORIES.CONTRIBUTE:
+      // TODO: Hide "Become a financial contributor." if can't contribute
       return {
         img: contributeSectionHeaderIcon,
         title:

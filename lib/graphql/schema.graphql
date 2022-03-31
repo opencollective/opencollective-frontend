@@ -80,6 +80,11 @@ interface CollectiveInterface {
   path: String
   isHost: Boolean
   isIncognito: Boolean
+
+  """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
   isGuest: Boolean
   canApply: Boolean
   canContact: Boolean
@@ -1408,6 +1413,11 @@ type Collective implements CollectiveInterface {
   isGuest: Boolean
 
   """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -1637,6 +1647,11 @@ type Event implements CollectiveInterface {
   Returns whether this collective is a guest profile
   """
   isGuest: Boolean
+
+  """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
 
   """
   Returns whether this collective is archived
@@ -1870,6 +1885,11 @@ type Fund implements CollectiveInterface {
   isGuest: Boolean
 
   """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -2099,6 +2119,11 @@ type Organization implements CollectiveInterface {
   Returns whether this collective is a guest profile
   """
   isGuest: Boolean
+
+  """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
 
   """
   Returns whether this collective is archived
@@ -2331,6 +2356,11 @@ type Project implements CollectiveInterface {
   Returns whether this collective is a guest profile
   """
   isGuest: Boolean
+
+  """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
 
   """
   Returns whether this collective is archived
@@ -2747,6 +2777,11 @@ type User implements CollectiveInterface {
   isGuest: Boolean
 
   """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
+
+  """
   Returns whether this collective is archived
   """
   isArchived: Boolean
@@ -2978,6 +3013,11 @@ type Vendor implements CollectiveInterface {
   Returns whether this collective is a guest profile
   """
   isGuest: Boolean
+
+  """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
 
   """
   Returns whether this collective is archived
