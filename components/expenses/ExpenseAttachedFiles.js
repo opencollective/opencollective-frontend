@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 
@@ -8,9 +8,18 @@ import { Box, Flex } from '../Grid';
 import StyledLinkButton from '../StyledLinkButton';
 import UploadedFilePreview from '../UploadedFilePreview';
 
-import ExpenseInvoiceDownloadHelper, { getExpenseInvoiceFilename } from './ExpenseInvoiceDownloadHelper';
+import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
+
+const getFileName = (intl, idx, totalNbFiles) => {
+  if (totalNbFiles === 1) {
+    return intl.formatMessage({ id: 'File.AttachedFile', defaultMessage: 'Attached file' });
+  } else {
+    return intl.formatMessage({ defaultMessage: 'Attached file {number}' }, { number: idx + 1 });
+  }
+};
 
 const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expense }) => {
+  const intl = useIntl();
   return (
     <Flex flexWrap="wrap">
       {showInvoice && [expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense.type) && (
@@ -20,7 +29,7 @@ const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expens
               <UploadedFilePreview
                 onClick={downloadInvoice}
                 isDownloading={isLoading}
-                fileName={getExpenseInvoiceFilename(collective, expense)}
+                fileName={<FormattedMessage id="File.DownloadExpense" defaultMessage="Download expense" />}
                 size={88}
                 showFileName
               />
@@ -30,7 +39,7 @@ const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expens
       )}
       {files.map((file, idx) => (
         <Box key={file.id || file.url} mr={3} mb={3}>
-          <UploadedFilePreview size={88} url={file.url} fileName={file.name} showFileName />
+          <UploadedFilePreview size={88} url={file.url} fileName={getFileName(intl, idx, files.length)} showFileName />
           {onRemove && (
             <StyledLinkButton variant="danger" fontSize="12px" mt={1} onClick={() => onRemove(idx)}>
               <FormattedMessage id="Remove" defaultMessage="Remove" />
