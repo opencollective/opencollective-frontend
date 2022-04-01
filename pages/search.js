@@ -4,12 +4,10 @@ import { graphql } from '@apollo/client/react/hoc';
 import { Search } from '@styled-icons/octicons/Search';
 import { isNil } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import expenseTypes from '../lib/constants/expenseTypes';
-import { i18nExpenseType } from '../lib/i18n/expense';
 import { parseToBoolean } from '../lib/utils';
 
 import CollectiveCard from '../components/CollectiveCard';
@@ -26,7 +24,6 @@ import StyledFilters from '../components/StyledFilters';
 import StyledHr from '../components/StyledHr';
 import StyledInput from '../components/StyledInput';
 import StyledLink from '../components/StyledLink';
-import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import { H1, P } from '../components/Text';
 
 const SearchInput = styled(StyledInput)`
@@ -108,7 +105,7 @@ class SearchPage extends React.Component {
       term: query.q || '',
       types: query.types ? decodeURIComponent(query.types).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
-      countries: query.countries || null,
+      country: query.country || null,
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
     };
@@ -116,7 +113,7 @@ class SearchPage extends React.Component {
 
   static propTypes = {
     term: PropTypes.string, // for addSearchQueryData
-    countries: PropTypes.arrayOf(PropTypes.string), // for addSearchQueryData
+    country: PropTypes.arrayOf(PropTypes.string), // for addSearchQueryData
     limit: PropTypes.number, // for addSearchQueryData
     offset: PropTypes.number, // for addSearchQueryData
     router: PropTypes.object, // from next.js
@@ -134,7 +131,7 @@ class SearchPage extends React.Component {
     const { router, term } = this.props;
     const query = { q: term, types: router.query.types };
     if (country !== 'ALL') {
-      query.countries = [country];
+      query.country = [country];
     }
     router.push({ pathname: router.pathname, query });
   };
@@ -147,8 +144,8 @@ class SearchPage extends React.Component {
     const { q } = form;
 
     const query = { q: q.value, types: router.query.types };
-    if (router.query.countries) {
-      query.countries = router.query.countries;
+    if (router.query.country) {
+      query.country = router.query.country;
     }
     router.push({ pathname: router.pathname, query });
   };
@@ -165,8 +162,8 @@ class SearchPage extends React.Component {
       query = { q: term };
     }
 
-    if (router.query.countries) {
-      query.countries = router.query.countries;
+    if (router.query.country) {
+      query.country = router.query.country;
     }
 
     router.push({ pathname: '/search', query });
@@ -322,7 +319,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
     $isHost: Boolean
     $limit: Int
     $offset: Int
-    $countries: [CountryISO]
+    $country: [CountryISO]
   ) {
     accounts(
       searchTerm: $term
@@ -331,7 +328,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
       limit: $limit
       offset: $offset
       skipRecentAccounts: true
-      countries: $countries
+      country: $country
     ) {
       nodes {
         id
