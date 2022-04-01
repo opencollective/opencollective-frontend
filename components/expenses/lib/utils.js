@@ -1,4 +1,4 @@
-import { CollectiveType } from '../../../lib/collective-sections';
+import { CollectiveType } from '../../../lib/constants/collectives';
 import expenseTypes from '../../../lib/constants/expenseTypes';
 
 export const checkRequiresAddress = values => {
