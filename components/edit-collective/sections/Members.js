@@ -7,16 +7,19 @@ import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
 import roles from '../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import formatMemberRole from '../../../lib/i18n/member-role';
+import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import Avatar from '../../Avatar';
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
 import Hide from '../../Hide';
 import HorizontalScroller from '../../HorizontalScroller';
+import { getI18nLink } from '../../I18nFormatters';
 import Link from '../../Link';
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';
@@ -342,7 +345,12 @@ class Members extends React.Component {
       return (
         <MessageBox type="warning" fontSize="13px" withIcon>
           <FormattedMessage defaultMessage="This account is currently frozen, its team members therefore cannot be edited." />{' '}
-          <FormattedMessage defaultMessage="Please contact your fiscal host for more details." />
+          {isFeatureEnabled(data.account.host, FEATURES.CONTACT_FORM) && (
+            <FormattedMessage
+              defaultMessage="Please <ContactLink>contact</ContactLink> your fiscal host for more details."
+              values={{ ContactLink: getI18nLink({ href: `${getCollectivePageRoute(data.account.host)}/contact` }) }}
+            />
+          )}
         </MessageBox>
       );
     } else {
@@ -381,6 +389,17 @@ export const coreContributorsQuery = gqlV2/* GraphQL */ `
         slug
         type
         name
+      }
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+          name
+          features {
+            id
+            CONTACT_FORM
+          }
+        }
       }
       members(role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {
         nodes {

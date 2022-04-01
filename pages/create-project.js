@@ -20,6 +20,17 @@ const createProjectPageParentAccountQuery = gqlV2/* GraphQL */ `
       name
       currency
       isFrozen
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+          name
+          features {
+            id
+            CONTACT_FORM
+          }
+        }
+      }
     }
   }
 `;

@@ -194,6 +194,17 @@ const updateQuery = gqlV2/* GraphQL */ `
       imageUrl
       isFrozen
       twitterHandle
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+          name
+          features {
+            id
+            CONTACT_FORM
+          }
+        }
+      }
       features {
         ...NavbarFields
       }
