@@ -9,7 +9,6 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { getCollectiveTypeForUrl, getSuggestedTags } from '../lib/collective.lib';
-import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
@@ -18,6 +17,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
+import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { Sections } from '../components/collective-page/_constants';
 import Container from '../components/Container';
 import CommentForm from '../components/conversations/CommentForm';
@@ -31,6 +31,7 @@ import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpenseInviteNotificationBanner from '../components/expenses/ExpenseInviteNotificationBanner';
 import ExpenseMissingReceiptNotificationBanner from '../components/expenses/ExpenseMissingReceiptNotificationBanner';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
+import ExpenseRecurringBanner from '../components/expenses/ExpenseRecurringBanner';
 import ExpenseSummary from '../components/expenses/ExpenseSummary';
 import {
   expensePageExpenseFieldsFragment,
@@ -480,6 +481,7 @@ class ExpensePage extends React.Component {
       expense?.type === expenseTypes.CHARGE &&
       expense?.permissions?.canEdit &&
       expense?.items?.every(item => !item.url);
+    const isRecurring = expense?.recurringExpense;
     const skipSummary = isMissingReceipt && status === PAGE_STATUS.EDIT;
 
     const payoutProfiles = getPayoutProfiles(loggedInAccount);
@@ -555,7 +557,8 @@ class ExpensePage extends React.Component {
               </MessageBox>
             )}
             {status === PAGE_STATUS.VIEW &&
-              ((expense?.status === expenseStatus.UNVERIFIED && this.state.createdUser) || isDraft) && (
+              ((expense?.status === expenseStatus.UNVERIFIED && this.state.createdUser) ||
+                (isDraft && !isRecurring)) && (
                 <ExpenseInviteNotificationBanner expense={expense} createdUser={this.state.createdUser} />
               )}
             {isMissingReceipt && (
@@ -664,6 +667,7 @@ class ExpensePage extends React.Component {
                     {!isDraft && (
                       <ExpenseNotesForm onChange={this.onNotesChanges} defaultValue={expense.privateMessage} />
                     )}
+                    {isRecurring && <ExpenseRecurringBanner expense={expense} />}
                     <Flex flexWrap="wrap" mt={4}>
                       <StyledButton
                         mt={2}

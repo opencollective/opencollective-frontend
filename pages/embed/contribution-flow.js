@@ -129,7 +129,8 @@ class NewContributionFlowPage extends React.Component {
     const { router, data } = this.props;
     const account = data?.account;
     const path = router.asPath;
-    addParentToURLIfMissing(router, account, path.replace(new RegExp(`^/${account?.slug}/`), '/'));
+    const rawPath = path.replace(new RegExp(`^/embed/${account?.slug}/`), '/');
+    addParentToURLIfMissing(router, account, rawPath, null, { prefix: '/embed' });
   }
 
   componentDidUpdate(prevProps) {

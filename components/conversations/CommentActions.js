@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
+import { DotsHorizontalRounded } from '@styled-icons/boxicons-regular/DotsHorizontalRounded';
 import { X } from '@styled-icons/feather/X';
 import { Edit } from '@styled-icons/material/Edit';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -14,7 +15,6 @@ import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import { Flex } from '../Grid';
-import RoundHoriztonalDotsIcon from '../icons/RoundHorizontalDotsIcon';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
@@ -142,7 +142,7 @@ const CommentActions = ({ comment, isConversationRoot, canEdit, canDelete, onDel
           data-cy="commnent-actions-trigger"
           onClick={() => setShowAdminActions(!showAdminActions)}
         >
-          <RoundHoriztonalDotsIcon size="16" />
+          <DotsHorizontalRounded size="16" />
         </StyledButton>
       </div>
 

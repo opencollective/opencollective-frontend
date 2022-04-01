@@ -8,6 +8,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { borders } from 'styled-system';
 
+import { FEATURES, isFeatureEnabled } from '../lib/allowed-features';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 import { compose, formatDate } from '../lib/utils';
@@ -19,6 +20,7 @@ import Container from './Container';
 import EditUpdateForm from './EditUpdateForm';
 import { Box, Flex } from './Grid';
 import HTMLContent from './HTMLContent';
+import { getI18nLink } from './I18nFormatters';
 import Link from './Link';
 import LinkCollective from './LinkCollective';
 import LoadingPlaceholder from './LoadingPlaceholder';
@@ -294,14 +296,24 @@ class StyledUpdate extends Component {
         ) : isReloadingData ? (
           <LoadingPlaceholder height={300} />
         ) : null}
-        {update.userCanPublishUpdate && (
+        {collective.isFrozen ? (
+          <MessageBox withIcon type="warning" mt={3}>
+            <FormattedMessage defaultMessage="This account is currently frozen and cannot be used to publish updates." />{' '}
+            {isFeatureEnabled(collective.host, FEATURES.CONTACT_FORM) && (
+              <FormattedMessage
+                defaultMessage="Please <ContactLink>contact</ContactLink> your fiscal host for more details."
+                values={{ ContactLink: getI18nLink({ href: `${getCollectivePageRoute(collective.host)}/contact` }) }}
+              />
+            )}
+          </MessageBox>
+        ) : update.userCanPublishUpdate ? (
           <PublishUpdateBtnWithData
             id={update.id}
             isHost={Boolean(update.account?.isHost)}
             isChangelog={update.isChangelog}
             isPrivate={update.isPrivate}
           />
-        )}
+        ) : null}
       </Container>
     );
   }
