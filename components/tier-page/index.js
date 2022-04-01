@@ -7,13 +7,13 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 // Open Collective Frontend imports
-import { NAVBAR_CATEGORIES } from '../../lib/collective-sections';
 import INTERVALS from '../../lib/constants/intervals';
 import { isTierExpired } from '../../lib/tier-utils';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { getWebsiteUrl } from '../../lib/utils';
 
 import CollectiveNavbar from '../collective-navbar';
+import { NAVBAR_CATEGORIES } from '../collective-navbar/constants';
 import { Sections } from '../collective-page/_constants';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';

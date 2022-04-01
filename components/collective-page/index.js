@@ -284,7 +284,6 @@ class CollectivePage extends Component {
                     ref={categoryRef => (this.sectionCategoriesRefs[entry.name] = categoryRef)}
                     collective={collective}
                     category={entry.name}
-                    isAdmin={isAdmin}
                   />
                   {entry.sections.map((section, idx) => (
                     <SectionContainer
