@@ -212,7 +212,7 @@ class SearchPage extends React.Component {
 
   render() {
     const { router, data, term = '', intl } = this.props;
-    const { error, loading, search } = data || {};
+    const { error, loading, accounts } = data || {};
     const tags = router?.query?.tags?.split(',') || [];
 
     if (error) {
@@ -220,8 +220,8 @@ class SearchPage extends React.Component {
     }
 
     const filters = ['ALL', 'COLLECTIVE', 'EVENT', 'ORGANIZATION', 'HOST'];
-    const { collectives, limit = 20, offset, total = 0 } = search || {};
-    const showCollectives = term.trim() !== '' && !!collectives;
+    const { limit = 20, offset, totalCount = 0 } = accounts || {};
+    const showCollectives = term.trim() !== '' && !!accounts?.nodes;
 
     return (
       <Page title="Search" showSearch={false}>
@@ -283,20 +283,20 @@ class SearchPage extends React.Component {
             </Query>
           </Container>
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
-            {loading && !collectives && (
+            {loading && accounts?.nodes?.length > 0 && (
               <Flex py={3} width={1} justifyContent="center">
                 <LoadingGrid />
               </Flex>
             )}
             {showCollectives &&
-              collectives.map(collective => (
+              accounts?.nodes?.map(collective => (
                 <Flex key={collective.slug} my={3} mx={2}>
                   <CollectiveCard collective={collective} />
                 </Flex>
               ))}
 
             {/* TODO: add suggested collectives when the result is empty */}
-            {showCollectives && collectives.length === 0 && (
+            {showCollectives && accounts?.nodes?.length === 0 && (
               <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
                 <P my={4}>
                   <em>
@@ -322,13 +322,13 @@ class SearchPage extends React.Component {
               </Flex>
             )}
           </Flex>
-          {showCollectives && collectives.length !== 0 && total > limit && (
+          {showCollectives && accounts?.nodes?.length !== 0 && totalCount > limit && (
             <Container display="flex" justifyContent="center" fontSize="14px" my={3}>
-              <Pagination offset={offset} total={total} limit={limit} />
+              <Pagination offset={offset} total={totalCount} limit={limit} />
             </Container>
           )}
 
-          {showCollectives && collectives.length !== 0 && (
+          {showCollectives && accounts?.nodes?.length !== 0 && (
             <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
               <P pt={3} pb={3} borderTop="1px solid #E6E6E6">
                 <em>
@@ -365,58 +365,55 @@ class SearchPage extends React.Component {
 
 export { SearchPage as MockSearchPage };
 
-export const searchPageQuery = gql`
-  query SearchPage(
-    $term: String!
-    $types: [TypeOfCollective]
-    $tags: [String]
-    $isHost: Boolean
-    $limit: Int
-    $offset: Int
-  ) {
-    search(
-      term: $term
-      types: $types
+export const searchPageQuery = gqlV2/* GraphQL */ `
+  query SearchPage($term: String!, $type: [AccountType], $tags: [String], $isHost: Boolean, $limit: Int, $offset: Int) {
+    accounts(
+      searchTerm: $term
+      type: $type
       isHost: $isHost
       limit: $limit
       offset: $offset
       skipRecentAccounts: true
       tags: $tags
     ) {
-      collectives {
+      nodes {
         id
         isActive
         type
         slug
-        path
         name
-        company
         imageUrl
-        backgroundImage
+        backgroundImageUrl
         description
         longDescription
         website
-        currency
         stats {
           id
-          balance
-          totalAmountSpent
-          yearlyBudget
-          backers {
-            all
+          totalAmountSpent {
+            currency
+            valueInCents
+          }
+          yearlyBudget {
+            currency
+            valueInCents
           }
         }
-        parentCollective {
-          id
-          slug
+        ... on AccountWithParent {
+          parent {
+            id
+            slug
+          }
         }
-        memberOf(role: "BACKER") {
-          id
+        members(role: BACKER) {
+          totalCount
+        }
+        backers: memberOf(role: BACKER) {
+          totalCount
         }
       }
       limit
       offset
-      total
+      totalCount
     }
   }
 `;
@@ -431,6 +428,9 @@ export const tagStatsQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-export const addSearchPageData = graphql(searchPageQuery, { skip: props => !props.term });
+export const addSearchPageData = graphql(searchPageQuery, {
+  skip: props => !props.term,
+  options: { context: API_V2_CONTEXT },
+});
 
 export default injectIntl(withRouter(addSearchPageData(SearchPage)));

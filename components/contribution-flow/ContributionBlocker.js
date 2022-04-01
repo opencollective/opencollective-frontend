@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { FEATURES } from '../../lib/allowed-features';
 import { canContributeRecurring } from '../../lib/collective.lib';
 import { isTierExpired } from '../../lib/tier-utils';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -13,6 +14,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 
 export const CONTRIBUTION_BLOCKER = {
+  DISABLED: 'DISABLED',
   NO_HOST: 'NO_HOST',
   NOT_ACTIVE: 'NOT_ACTIVE',
   NO_PAYMENT_PROVIDER: 'NO_PAYMENT_PROVIDER',
@@ -24,6 +26,9 @@ export const CONTRIBUTION_BLOCKER = {
 };
 
 const msg = defineMessages({
+  [CONTRIBUTION_BLOCKER.DISABLED]: {
+    defaultMessage: 'This account cannot receive financial contributions at this time',
+  },
   [CONTRIBUTION_BLOCKER.NO_HOST]: {
     id: 'createOrder.missingHost',
     defaultMessage: "This collective doesn't have a host and can't accept financial contributions",
@@ -64,6 +69,8 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     return { reason: CONTRIBUTION_BLOCKER.NO_HOST };
   } else if (!account.isActive) {
     return { reason: CONTRIBUTION_BLOCKER.NOT_ACTIVE };
+  } else if (account.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] === 'DISABLED') {
+    return { reason: CONTRIBUTION_BLOCKER.DISABLED };
   } else if (tier?.availableQuantity === 0) {
     const intlParams = { type: tier.type, name: <q>{tier.name}</q> };
     return { reason: CONTRIBUTION_BLOCKER.TIER_EMPTY, intlParams, showOtherWaysToContribute: true };

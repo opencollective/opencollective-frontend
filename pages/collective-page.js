@@ -192,7 +192,11 @@ class CollectivePage extends React.Component {
     }
 
     return (
-      <Page canonicalURL={getCollectivePageCanonicalURL(collective)} {...this.getPageMetaData(collective)}>
+      <Page
+        collective={collective}
+        canonicalURL={getCollectivePageCanonicalURL(collective)}
+        {...this.getPageMetaData(collective)}
+      >
         <GlobalStyles />
         {loading ? (
           <Container py={[5, 6]}>
