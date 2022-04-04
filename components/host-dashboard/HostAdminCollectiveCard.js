@@ -4,7 +4,7 @@ import { SliderAlt } from '@styled-icons/boxicons-regular/SliderAlt';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../../lib/collective-sections';
+import { CollectiveType } from '../../lib/constants/collectives';
 import { HOST_FEE_STRUCTURE } from '../../lib/constants/host-fee-structure';
 import { getCurrencySymbol } from '../../lib/currency-utils';
 import { formatHostFeeStructure } from '../../lib/i18n/host-fee-structure';
