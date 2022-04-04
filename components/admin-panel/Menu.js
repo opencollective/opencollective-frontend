@@ -4,7 +4,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective.lib';
-import { CollectiveType, getCollectiveTypeKey, isOneOfTypes, isType } from '../../lib/collective-sections';
+import { getCollectiveTypeKey, isOneOfTypes, isType } from '../../lib/collective-sections';
+import { CollectiveType } from '../../lib/constants/collectives';
 
 import { HOST_SECTIONS } from '../host-dashboard/constants';
 

@@ -103,7 +103,7 @@ class SearchPage extends React.Component {
   static getInitialProps({ query }) {
     return {
       term: query.q || '',
-      types: query.types ? decodeURIComponent(query.types).split(',') : DEFAULT_SEARCH_TYPES,
+      type: query.type ? decodeURIComponent(query.type).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
       country: query.country || null,
       limit: Number(query.limit) || 20,
@@ -143,7 +143,7 @@ class SearchPage extends React.Component {
     const { router } = this.props;
     const { q } = form;
 
-    const query = { q: q.value, types: router.query.types };
+    const query = { q: q.value, type: router.query.type };
     if (router.query.country) {
       query.country = router.query.country;
     }
@@ -157,7 +157,7 @@ class SearchPage extends React.Component {
     if (filter === 'HOST') {
       query = { q: term, isHost: true };
     } else if (filter !== 'ALL') {
-      query = { q: term, types: filter };
+      query = { q: term, type: filter };
     } else {
       query = { q: term };
     }
