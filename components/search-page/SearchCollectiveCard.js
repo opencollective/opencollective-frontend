@@ -18,23 +18,23 @@ import StyledCollectiveCard from './StyledCollectiveCard';
  *
  * TODO: This component is mostly copies from ../DiscoverCollectiveCard.js added until we completely deprecate the discover page.
  */
-const DiscoverCollectiveCard = ({ collective, ...props }) => {
+const SearchCollectiveCard = ({ collective, ...props }) => {
   return (
     <StyledCollectiveCard collective={collective} position="relative" {...props} data-cy="collective-card">
       <Container p={3}>
         <Box data-cy="caption" mb={2}>
-          {collective.isHost ? (
+          {collective.isHost && collective.host ? (
             <React.Fragment>
-              {collective.stats.collectives.hosted > 0 && (
+              {collective.host?.totalHostedCollectives > 0 && (
                 <Box pb="6px">
                   <Span fontSize="14px" fontWeight={700} color="black.900">
-                    {collective.stats.collectives.hosted}
+                    {collective.host.totalHostedCollectives}
                   </Span>
                   {` `}
                   <Span fontSize="12px" fontWeight={400} color="black.700">
                     <FormattedMessage
                       defaultMessage="{ count, plural, one {Collective} other {Collectives}} hosted"
-                      values={{ count: collective.stats.collectives.hosted }}
+                      values={{ count: collective.host.totalHostedCollectives }}
                     />
                   </Span>
                 </Box>
@@ -49,7 +49,7 @@ const DiscoverCollectiveCard = ({ collective, ...props }) => {
                 </Span>
               </Box>
               <Box>
-                <Span fontSize="14px" fontWeight={700} color="black.900">{`${collective.hostFeePercent}%`}</Span>
+                <Span fontSize="14px" fontWeight={700} color="black.900">{`${collective.host.hostFeePercent}%`}</Span>
                 {` `}
                 <Span fontSize="12px" fontWeight={400} color="black.700">
                   <FormattedMessage defaultMessage="Host Fee" />
@@ -59,29 +59,29 @@ const DiscoverCollectiveCard = ({ collective, ...props }) => {
           ) : (
             <React.Fragment>
               <P fontSize="12px" lineHeight="18px">
-                {collective.stats.backers.all > 0 && (
+                {collective.backers.totalCount > 0 && (
                   <Box pb="6px">
                     <Span fontSize="14px" fontWeight={700} color="black.900">
-                      {collective.stats.backers.all}
+                      {collective.backers.totalCount}
                     </Span>
                     {` `}
                     <Span fontSize="12px" fontWeight={400} color="black.700">
                       <FormattedMessage
                         defaultMessage="{ count, plural, one {Contributor} other {Contributors}}"
-                        values={{ count: collective.stats.backers.all }}
+                        values={{ count: collective.backers.totalCount }}
                       />
                     </Span>
                   </Box>
                 )}
               </P>
 
-              {collective.stats.totalAmountReceived > 0 && (
+              {collective.stats.totalAmountReceived.valueInCents > 0 && (
                 <Box pb="6px">
                   <Span fontSize="14px" fontWeight={700} color="black.900">
                     <Currency
-                      currency={collective.currency}
+                      currency={collective.stats.totalAmountReceived.currency}
                       formatWithSeparators
-                      value={collective.stats.totalAmountReceived}
+                      value={collective.stats.totalAmountReceived.valueInCents}
                     />
                   </Span>
                   {` `}
@@ -111,7 +111,7 @@ const DiscoverCollectiveCard = ({ collective, ...props }) => {
   );
 };
 
-DiscoverCollectiveCard.propTypes = {
+SearchCollectiveCard.propTypes = {
   collective: PropTypes.shape({
     type: PropTypes.oneOf([
       CollectiveType.COLLECTIVE,
@@ -124,19 +124,19 @@ DiscoverCollectiveCard.propTypes = {
     description: PropTypes.string,
     isHost: PropTypes.bool,
     stats: PropTypes.shape({
-      totalDonations: PropTypes.number,
-      yearlyBudget: PropTypes.number,
-      totalAmountSpent: PropTypes.number,
-      backers: PropTypes.shape({
-        all: PropTypes.number,
+      totalAmountReceived: PropTypes.shape({
+        valueInCents: PropTypes.number,
+        currency: PropTypes.string,
       }),
-      collectives: PropTypes.shape({
-        hosted: PropTypes.number,
-      }),
-      totalAmountReceived: PropTypes.number,
     }),
-    hostFeePercent: PropTypes.number,
+    host: PropTypes.shape({
+      totalHostedCollectives: PropTypes.number,
+      hostFeePercent: PropTypes.number,
+    }),
+    backers: PropTypes.shape({
+      totalCount: PropTypes.number,
+    }),
   }).isRequired,
 };
 
-export default injectIntl(DiscoverCollectiveCard);
+export default injectIntl(SearchCollectiveCard);
