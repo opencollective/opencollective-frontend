@@ -40,6 +40,7 @@ const COMMON_DIRECTIVES = {
     '*.sentry.io',
     'atlas.shopifycloud.com',
     'country-service.shopifycloud.com',
+    'maps.googleapis.com',
     'https://transferwise.com',
     'https://sandbox.transferwise.tech',
     'https://hcaptcha.com',
@@ -59,6 +60,7 @@ const COMMON_DIRECTIVES = {
     'https://js.hcaptcha.com',
     'https://*.hcaptcha.com',
     'https://www.google.com',
+    'https://cdn.matomo.cloud',
   ],
   frameSrc: [
     'www.youtube.com',
