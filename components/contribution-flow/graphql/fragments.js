@@ -41,6 +41,10 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
       id
       country
     }
+    features {
+      id
+      RECEIVE_FINANCIAL_CONTRIBUTIONS
+    }
     ... on Organization {
       platformFeePercent
       platformContributionAvailable

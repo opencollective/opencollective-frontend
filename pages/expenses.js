@@ -9,7 +9,7 @@ import styled from 'styled-components';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
 import { getSuggestedTags, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
-import { CollectiveType, NAVBAR_CATEGORIES } from '../lib/collective-sections';
+import { CollectiveType } from '../lib/constants/collectives';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
@@ -20,6 +20,7 @@ import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePa
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
+import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';

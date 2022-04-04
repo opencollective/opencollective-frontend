@@ -4,13 +4,13 @@ import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, uniqBy, update } from 'lodash';
 import { withRouter } from 'next/router';
 
-import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { stripHTML } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
+import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
@@ -192,7 +192,19 @@ const updateQuery = gqlV2/* GraphQL */ `
       description
       settings
       imageUrl
+      isFrozen
       twitterHandle
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+          name
+          features {
+            id
+            CONTACT_FORM
+          }
+        }
+      }
       features {
         ...NavbarFields
       }

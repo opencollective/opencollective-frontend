@@ -152,9 +152,13 @@ const AdminPanelPage = () => {
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
+  const titleBase = account?.isHost
+    ? intl.formatMessage({ id: 'AdminPanel.button', defaultMessage: 'Admin' })
+    : intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' });
+
   return (
     <AdminPanelContext.Provider value={{ selectedSection }}>
-      <Page>
+      <Page noRobots collective={account} title={account ? `${account.name} - ${titleBase}` : titleBase}>
         {!blocker && (
           <AdminPanelTopBar
             isLoading={isLoading}

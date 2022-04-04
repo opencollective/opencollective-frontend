@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { sumBy } from 'lodash';
 import FlipMove from 'react-flip-move';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -31,6 +30,34 @@ const FooterLabel = styled.span`
   margin-right: 5px;
   text-transform: uppercase;
 `;
+
+const ExpensesTotal = ({ collective, host, expenses }) => {
+  const { total, isApproximate } = React.useMemo(() => {
+    let isApproximate = false;
+    let total = 0;
+    for (const expense of expenses) {
+      total += expense.amountInAccountCurrency?.valueInCents || expense.amount;
+      if (expense.amountInAccountCurrency?.exchangeRate?.isApproximate) {
+        isApproximate = true;
+      }
+    }
+
+    return { total, isApproximate };
+  }, [expenses]);
+
+  return (
+    <React.Fragment>
+      {isApproximate && `~ `}
+      <FormattedMoneyAmount amount={total} currency={collective?.currency || host?.currency} precision={2} />
+    </React.Fragment>
+  );
+};
+
+ExpensesTotal.propTypes = {
+  collective: PropTypes.object,
+  host: PropTypes.object,
+  expenses: PropTypes.array,
+};
 
 const ExpensesList = ({
   collective,
@@ -91,11 +118,7 @@ const ExpensesList = ({
                   <FormattedMessage id="expense.page.total" defaultMessage="Page Total" />:
                 </FooterLabel>
                 <FooterLabel color="black.500">
-                  <FormattedMoneyAmount
-                    amount={sumBy(expenses, 'amount')}
-                    currency={collective?.currency || host?.currency}
-                    precision={2}
-                  />
+                  <ExpensesTotal expenses={expenses} collective={collective} host={host} />
                 </FooterLabel>
               </Box>
               <P fontSize="12px" color="black.600">

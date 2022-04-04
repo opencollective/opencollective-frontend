@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import { ArrowForward } from '@styled-icons/material/ArrowForward';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { debounceScroll } from '../lib/ui-utils';
 import withViewport from '../lib/withViewport';
@@ -16,12 +16,22 @@ const RefContainer = styled.div`
   overflow-x: auto;
   scroll-behavior: smooth;
   max-width: 100%;
+  ${props =>
+    props.hideScrollbar &&
+    css`
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      overflow: -moz-scrollbars-none; /** For older firefox */
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    `}
 `;
 
 const ControlsContainer = styled(Flex)`
   z-index: 10;
   position: absolute;
-  top: 50%;
+  top: ${props => (props.controlsTopPosition ? `${props.controlsTopPosition}%` : '50%')};
   pointer-events: none;
   justify-content: space-between;
   width: 100%;
@@ -55,6 +65,8 @@ class HorizontalScroller extends React.PureComponent {
     getScrollDistance: PropTypes.func,
     /** @ignore from withViewport */
     width: PropTypes.number,
+    /** Set the top position of the arrows. Defaults 50% */
+    controlsTopPosition: PropTypes.number,
   };
 
   constructor(props) {
@@ -129,7 +141,7 @@ class HorizontalScroller extends React.PureComponent {
 
     return (
       <Container position="relative">
-        <ControlsContainer px={[2, null, 5]}>
+        <ControlsContainer px={[2, null, 5]} controlsTopPosition={this.props.controlsTopPosition}>
           <ArrowContainer isVisible={canGoPrev}>
             <ArrowBack onMouseDown={canGoPrev ? this.onPrevClick : undefined} />
           </ArrowContainer>

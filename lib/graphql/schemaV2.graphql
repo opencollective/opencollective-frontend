@@ -63,6 +63,11 @@ interface Account {
   isArchived: Boolean
 
   """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -729,7 +734,7 @@ type Expense {
   """
   The exchange rate between the expense currency and the account currency
   """
-  accountCurrencyFxRate: Float!
+  accountCurrencyFxRate: Float! @deprecated(reason: "2022-02-09: Please use amountV2")
 
   """
   The time of creation
@@ -850,6 +855,7 @@ type Expense {
   """
   requestedByAccount: Account
   quote: ExpenseQuote
+  recurringExpense: RecurringExpense
 }
 
 """
@@ -1950,7 +1956,10 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
   COLLECTIVE_EXPENSE_INVITE_DRAFTED
+  COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  COLLECTIVE_FROZEN
+  COLLECTIVE_UNFROZEN
   COLLECTIVE_MEMBER_CREATED
   COLLECTIVE_TRANSACTION_CREATED
   COLLECTIVE_UPDATE_CREATED
@@ -2007,6 +2016,49 @@ type ExpenseQuote {
   The date on which the item was created
   """
   estimatedDeliveryAt: DateTime!
+}
+
+"""
+A recurring expense object
+"""
+type RecurringExpense {
+  """
+  Unique identifier for this recurring expense
+  """
+  id: String!
+
+  """
+  The interval in which this recurring expense is created
+  """
+  interval: RecurringExpenseInterval!
+  account: Account!
+  fromAccount: Account!
+
+  """
+  The last time this recurring expense was paid for
+  """
+  lastDraftedAt: DateTime!
+
+  """
+  The time this expense will cease to be recurring
+  """
+  endsAt: DateTime
+
+  """
+  The last expense created by this recurring expense record paid for
+  """
+  lastExpenseCreated: Expense
+}
+
+"""
+All supported intervals for recurring expenses
+"""
+enum RecurringExpenseInterval {
+  day
+  week
+  month
+  quarter
+  year
 }
 
 """
@@ -2283,6 +2335,11 @@ type Host implements Account & AccountWithContributions {
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
 
   """
   Returns whether the account accepts financial contributions.
@@ -3866,6 +3923,58 @@ type Amount {
   value: Float
   currency: Currency
   valueInCents: Int
+
+  """
+  If the amount was generated from a currency conversion, this field contains details about the conversion
+  """
+  exchangeRate: CurrencyExchangeRate
+}
+
+"""
+Fields for a currency fx rate
+"""
+type CurrencyExchangeRate {
+  """
+  Exchange rate value as a percentage
+  """
+  value: Float!
+
+  """
+  Where does the FX rate comes from
+  """
+  source: CurrencyExchangeRateSourceType!
+  fromCurrency: Currency!
+  toCurrency: Currency!
+
+  """
+  Date of the FX rate
+  """
+  date: DateTime!
+
+  """
+  Is the FX rate approximate or a fixed value?
+  """
+  isApproximate: Boolean!
+}
+
+"""
+Where does the FX rate come from
+"""
+enum CurrencyExchangeRateSourceType {
+  """
+  Open Collective internal system, relying on caching and 3rd party APIs
+  """
+  OPENCOLLECTIVE
+
+  """
+  PayPal API
+  """
+  PAYPAL
+
+  """
+  Wise API
+  """
+  WISE
 }
 
 """
@@ -3916,6 +4025,11 @@ type Bot implements Account {
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
 
   """
   Returns whether the account accepts financial contributions.
@@ -4323,6 +4437,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
 
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
@@ -5056,6 +5175,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   isArchived: Boolean
 
   """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
+
+  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -5571,6 +5695,11 @@ type Individual implements Account {
   isArchived: Boolean
 
   """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
+
+  """
   Returns whether the account accepts financial contributions.
   """
   isActive: Boolean
@@ -6040,6 +6169,11 @@ type Organization implements Account & AccountWithContributions {
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
 
   """
   Returns whether the account accepts financial contributions.
@@ -6569,6 +6703,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   isArchived: Boolean
 
   """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
+
+  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -7061,17 +7200,27 @@ type Query {
     offset: Int! = 0
 
     """
-    Only accounts that match these tags
+    Search accounts related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+
+    """
+    Only accounts that match these tags (ignored if used together with searchTerm)
     """
     tag: [String]
 
     """
-    Only accounts that match these account types
+    Only return accounts that match these account types (COLLECTIVE, FUND, EVENT, PROJECT, ORGANIZATION or INDIVIDUAL)
     """
     type: [AccountType]
 
     """
-    Only return active collectives
+    Only return Fiscal Hosts accounts if true
+    """
+    isHost: Boolean
+
+    """
+    Only return "active" accounts with Financial Contributions enabled if true.
     """
     isActive: Boolean
 
@@ -7084,6 +7233,11 @@ type Query {
     Only accounts that support one of these payment services will be returned
     """
     supportedPaymentMethodService: [PaymentMethodService]
+
+    """
+    Whether to skip recent suspicious accounts (48h)
+    """
+    skipRecentAccounts: Boolean = false
 
     """
     The order of results
@@ -7715,6 +7869,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   isArchived: Boolean
 
   """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
+
+  """
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
@@ -8234,6 +8393,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Returns whether this account is archived
   """
   isArchived: Boolean
+
+  """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
 
   """
   Returns whether it's active: can accept financial contributions and pay expenses.
@@ -8918,6 +9082,11 @@ type Mutation {
     Account where the expense will be created
     """
     account: AccountReferenceInput!
+
+    """
+    Recurring Expense information
+    """
+    recurring: RecurringExpenseInput
   ): Expense!
 
   """
@@ -9124,6 +9293,22 @@ type Mutation {
     If using a custom fee, set this to true
     """
     isCustomFee: Boolean!
+  ): Account!
+
+  """
+  An endpoint for hosts to edit the freeze status of their hosted accounts
+  """
+  editAccountFreezeStatus(
+    """
+    Account to freeze
+    """
+    account: AccountReferenceInput!
+    action: AccountFreezeAction!
+
+    """
+    Message to send by email to the admins of the account
+    """
+    message: String
   ): Account!
 
   """
@@ -11233,6 +11418,18 @@ enum CountryISO {
   EH
 }
 
+input RecurringExpenseInput {
+  """
+  The interval in which this recurring expense is created
+  """
+  interval: RecurringExpenseInterval!
+
+  """
+  The date when this recurring expense should cease
+  """
+  endsAt: DateTime
+}
+
 input ExpenseUpdateInput {
   """
   ID of the expense that you are trying to edit
@@ -11575,6 +11772,11 @@ enum ProcessHostApplicationAction {
 Values that can be edited in Account's settings
 """
 scalar AccountSettingsKey
+
+enum AccountFreezeAction {
+  FREEZE
+  UNFREEZE
+}
 
 """
 Response for the addTwoFactorAuthTokenToIndividual mutation

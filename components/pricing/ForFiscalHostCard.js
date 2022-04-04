@@ -129,7 +129,7 @@ const messages = defineMessages({
   },
   'pricing.grow.fee': {
     id: 'pricing.grow.fee',
-    defaultMessage: 'Of the revenue your organization make through Host Fees ¹',
+    defaultMessage: 'Of the revenue your organization makes through Host Fees ¹',
   },
   'pricing.grow.feeNote': {
     id: 'pricing.grow.feeNote',
@@ -231,19 +231,22 @@ const ForFiscalHosts = () => {
           <P fontSize="12px" lineHeight="18px" color="black.700">
             <FormattedMessage
               id="pricing.paymentProcessor"
-              defaultMessage="(1) Payment processor fees apply when using <stripeLink>Stripe</stripeLink>, <paypalLink>Paypal</paypalLink>, or <transferwiseLink>Wise</transferwiseLink>."
+              defaultMessage="(1) Payment processor fees apply when using <stripeLink></stripeLink>, <paypalLink></paypalLink>, or <transferwiseLink></transferwiseLink>."
               values={{
                 stripeLink: getI18nLink({
                   href: 'https://stripe.com/pricing',
                   openInNewTab: true,
+                  text: 'Stripe',
                 }),
                 paypalLink: getI18nLink({
                   href: 'https://paypal.com/pricing',
                   openInNewTab: true,
+                  text: 'PayPal',
                 }),
                 transferwiseLink: getI18nLink({
                   href: 'https://wise.com/pricing',
                   openInNewTab: true,
+                  text: 'Wise',
                 }),
               }}
             />
