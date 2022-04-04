@@ -133,7 +133,7 @@ class SearchPage extends React.Component {
       term: query.q || '',
       types: query.types ? decodeURIComponent(query.types).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
-      tags: query.tags?.split(',') || [],
+      tag: query.tag?.split(',') || [],
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
     };
@@ -156,8 +156,8 @@ class SearchPage extends React.Component {
 
   changeTags = tag => {
     const { router, term } = this.props;
-    let tags = router.query?.tags?.split(',');
-    if (!tags || router.query?.tags?.length === 0) {
+    let tags = router.query?.tag?.split(',');
+    if (!tags || router.query?.tag?.length === 0) {
       tags = [tag];
     } else if (tags.includes(tag)) {
       tags = tags.filter(value => value !== tag);
@@ -167,7 +167,7 @@ class SearchPage extends React.Component {
 
     const query = { q: term, types: router.query.types };
     if (tags.length > 0) {
-      query.tags = tags.join();
+      query.tag = tags.join();
     }
     router.push({ pathname: router.pathname, query });
   };
@@ -180,8 +180,8 @@ class SearchPage extends React.Component {
     const { q } = form;
 
     const query = { q: q.value, types: router.query.types };
-    if (router.query.tags) {
-      query.tags = router.query.tags;
+    if (router.query.tag) {
+      query.tag = router.query.tag;
     }
     router.push({ pathname: router.pathname, query });
   };
@@ -198,8 +198,8 @@ class SearchPage extends React.Component {
       query = { q: term };
     }
 
-    if (router.query.tags) {
-      query.tags = router.query.tags;
+    if (router.query.tag) {
+      query.tag = router.query.tag;
     }
 
     router.push({ pathname: '/search', query });
@@ -212,8 +212,8 @@ class SearchPage extends React.Component {
 
   render() {
     const { router, data, term = '', intl } = this.props;
-    const { error, loading, accounts } = data || {};
-    const tags = router?.query?.tags?.split(',') || [];
+    const { error, loading, accounts, tagStats } = data || {};
+    const tags = router?.query?.tag?.split(',') || [];
 
     if (error) {
       return <ErrorPage data={this.props.data} />;
@@ -259,28 +259,20 @@ class SearchPage extends React.Component {
             <FilterLabel htmlFor="tag-filter-type">
               <FormattedMessage defaultMessage="Tags" />
             </FilterLabel>
-            <Query query={tagStatsQuery} context={API_V2_CONTEXT}>
-              {({ data, loading }) =>
-                loading ? (
-                  <Loading />
-                ) : (
-                  <Flex flexWrap="wrap" width={[null, '1000px']}>
-                    {data?.tagStats?.nodes?.map(node => (
-                      <FilterButton
-                        as={StyledTag}
-                        key={node.tag}
-                        title={node.tag}
-                        variant="rounded-right"
-                        $isSelected={tags.includes(node.tag)}
-                        onClick={() => this.changeTags(node.tag)}
-                      >
-                        {truncate(node.tag, { length: 9 })}
-                      </FilterButton>
-                    ))}
-                  </Flex>
-                )
-              }
-            </Query>
+            <Flex flexWrap="wrap" width={[null, '1000px']}>
+              {tagStats?.nodes?.map(node => (
+                <FilterButton
+                  as={StyledTag}
+                  key={node.tag}
+                  title={node.tag}
+                  variant="rounded-right"
+                  $isSelected={tags.includes(node.tag)}
+                  onClick={() => this.changeTags(node.tag)}
+                >
+                  {truncate(node.tag, { length: 9 })}
+                </FilterButton>
+              ))}
+            </Flex>
           </Container>
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
             {loading && accounts?.nodes?.length > 0 && (
@@ -366,7 +358,7 @@ class SearchPage extends React.Component {
 export { SearchPage as MockSearchPage };
 
 export const searchPageQuery = gqlV2/* GraphQL */ `
-  query SearchPage($term: String!, $type: [AccountType], $tags: [String], $isHost: Boolean, $limit: Int, $offset: Int) {
+  query SearchPage($term: String!, $type: [AccountType], $tag: [String], $isHost: Boolean, $limit: Int, $offset: Int) {
     accounts(
       searchTerm: $term
       type: $type
@@ -374,7 +366,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
       limit: $limit
       offset: $offset
       skipRecentAccounts: true
-      tags: $tags
+      tag: $tag
     ) {
       nodes {
         id
@@ -415,11 +407,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
       offset
       totalCount
     }
-  }
-`;
 
-export const tagStatsQuery = gqlV2/* GraphQL */ `
-  query TagStats {
     tagStats {
       nodes {
         tag
