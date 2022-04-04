@@ -5,8 +5,7 @@ import { useIntl } from 'react-intl';
 import { Scrollchor } from 'react-scrollchor';
 import styled, { css } from 'styled-components';
 
-import { NAVBAR_CATEGORIES } from '../../lib/collective-sections';
-import i18nNavbarCategory from '../../lib/i18n/navbar-categories';
+import { getSectionsCategoryDetails, SECTIONS_CATEGORY_ICON } from '../../lib/collective-sections';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -15,20 +14,7 @@ import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 
-import aboutNavbarIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconAbout.png';
-import budgetNavbarIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconBudget.png';
-import connectNavbarIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconConnect.png';
-import contributeNavbarIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconContribute.png';
-import eventsNavbarIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconEvents.png';
-
-const CATEGORY_ICON = {
-  ABOUT: aboutNavbarIcon,
-  BUDGET: budgetNavbarIcon,
-  CONNECT: connectNavbarIcon,
-  CONTRIBUTE: contributeNavbarIcon,
-  CONTRIBUTIONS: contributeNavbarIcon,
-  EVENTS: eventsNavbarIcon,
-};
+import { NAVBAR_CATEGORIES } from './constants';
 
 const IconIllustration = styled.img.attrs({ alt: '' })`
   width: 32px;
@@ -158,16 +144,17 @@ const getLinkProps = (useAnchor, collective, category) => {
   }
 };
 
-export const NavBarCategory = ({ category }) => {
+export const NavBarCategory = ({ category, collective }) => {
   const intl = useIntl();
+  const categoryDetails = getSectionsCategoryDetails(intl, collective, category);
   return (
     <Flex>
       <Flex alignItems="center" mr={2}>
-        <IconIllustration src={CATEGORY_ICON[category] || CATEGORY_ICON.CONTRIBUTE} />
+        <IconIllustration src={categoryDetails.img || SECTIONS_CATEGORY_ICON.CONTRIBUTE} />
       </Flex>
       <Flex alignItems="center">
         <Span textTransform="uppercase" fontSize="14px" fontWeight="500" color="black.800" letterSpacing="0.02em">
-          {i18nNavbarCategory(intl, category)}
+          {categoryDetails.title}
         </Span>
       </Flex>
     </Flex>
@@ -176,6 +163,7 @@ export const NavBarCategory = ({ category }) => {
 
 NavBarCategory.propTypes = {
   category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)).isRequired,
+  collective: PropTypes.object.isRequired,
 };
 
 const NavBarScrollContainer = ({ useAnchor, category, children }) =>
@@ -205,7 +193,7 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
           }}
         >
           <Flex pt="15px" pb="14px" px={[3, 1, 3, 1]}>
-            <NavBarCategory category={category} />{' '}
+            <NavBarCategory category={category} collective={collective} />
           </Flex>
         </CategoryContainer>
       </NavBarScrollContainer>

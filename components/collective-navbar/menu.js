@@ -1,11 +1,13 @@
 import { defineMessages } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { hasSection, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
+import { hasSection } from '../../lib/collective-sections';
 import i18nCollectivePageSection from '../../lib/i18n-collective-page-section';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import { Sections } from '../collective-page/_constants';
+
+import { NAVBAR_CATEGORIES } from './constants';
 
 export const NAVBAR_ACTION_TYPE = {
   SUBMIT_EXPENSE: 'hasSubmitExpense',
@@ -106,6 +108,10 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
         route: `${collectivePageRoute}/connected-collectives`,
         title: intl.formatMessage(titles.CONNECTED_COLLECTIVES),
       });
+    }
+
+    if (hasSection(sections, Sections.CONTRIBUTORS)) {
+      addSectionLink(intl, links, collective, sections, Sections.CONTRIBUTORS);
     }
   } else if (category === NAVBAR_CATEGORIES.CONTRIBUTIONS) {
     addSectionLink(intl, links, collective, sections, Sections.CONTRIBUTIONS);

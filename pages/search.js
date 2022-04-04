@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Search, ShareAlt } from '@styled-icons/boxicons-regular';
 import copy from 'copy-to-clipboard';
@@ -9,6 +8,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { parseToBoolean } from '../lib/utils';
 
 import CollectiveCard from '../components/CollectiveCard';
@@ -94,7 +94,7 @@ class SearchPage extends React.Component {
   static getInitialProps({ query }) {
     return {
       term: query.q || '',
-      types: query.types ? decodeURIComponent(query.types).split(',') : DEFAULT_SEARCH_TYPES,
+      type: query.type ? decodeURIComponent(query.type).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
@@ -124,7 +124,7 @@ class SearchPage extends React.Component {
     const { router } = this.props;
     const { q } = form;
 
-    router.push({ pathname: router.pathname, query: { q: q.value, types: router.query.types } });
+    router.push({ pathname: router.pathname, query: { q: q.value, type: router.query.type } });
   };
 
   onClick = filter => {
@@ -133,7 +133,7 @@ class SearchPage extends React.Component {
     if (filter === 'HOST') {
       this.props.router.push({ pathname: '/search', query: { q: term, isHost: true } });
     } else if (filter !== 'ALL') {
-      this.props.router.push({ pathname: '/search', query: { q: term, types: filter } });
+      this.props.router.push({ pathname: '/search', query: { q: term, type: filter } });
     } else {
       this.props.router.push({ pathname: '/search', query: { q: term } });
     }
@@ -154,15 +154,15 @@ class SearchPage extends React.Component {
 
   render() {
     const { data, term = '', intl } = this.props;
-    const { error, loading, search } = data || {};
+    const { error, loading, accounts } = data || {};
 
     if (error) {
       return <ErrorPage data={this.props.data} />;
     }
 
     const filters = ['ALL', 'COLLECTIVE', 'EVENT', 'ORGANIZATION', 'HOST'];
-    const { collectives, limit = 20, offset, total = 0 } = search || {};
-    const showCollectives = term.trim() !== '' && !!collectives;
+    const { limit = 20, offset, totalCount = 0 } = accounts || {};
+    const showCollectives = term.trim() !== '' && !!accounts?.nodes;
 
     return (
       <Page title="Search" showSearch={false}>
@@ -196,20 +196,20 @@ class SearchPage extends React.Component {
             </Box>
           )}
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
-            {loading && !collectives && (
+            {loading && accounts?.nodes?.length > 0 && (
               <Flex py={3} width={1} justifyContent="center">
                 <LoadingGrid />
               </Flex>
             )}
             {showCollectives &&
-              collectives.map(collective => (
+              accounts?.nodes?.map(collective => (
                 <Flex key={collective.slug} my={3} mx={2}>
                   <CollectiveCard collective={collective} />
                 </Flex>
               ))}
 
             {/* TODO: add suggested collectives when the result is empty */}
-            {showCollectives && collectives.length === 0 && (
+            {showCollectives && accounts?.nodes?.length === 0 && (
               <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
                 <P my={4}>
                   <em>
@@ -235,13 +235,13 @@ class SearchPage extends React.Component {
               </Flex>
             )}
           </Flex>
-          {showCollectives && collectives.length !== 0 && total > limit && (
+          {showCollectives && accounts?.nodes?.length !== 0 && totalCount > limit && (
             <Container display="flex" justifyContent="center" fontSize="14px" my={3}>
-              <Pagination offset={offset} total={total} limit={limit} />
+              <Pagination offset={offset} total={totalCount} limit={limit} />
             </Container>
           )}
 
-          {showCollectives && collectives.length !== 0 && (
+          {showCollectives && accounts?.nodes?.length !== 0 && (
             <Flex flexDirection="column" alignItems="center">
               <StyledButton onClick={this.handleCopy}>
                 <Span pr={1} fontSize="14px" fontWeight={500}>
@@ -252,7 +252,7 @@ class SearchPage extends React.Component {
             </Flex>
           )}
 
-          {showCollectives && collectives.length !== 0 && (
+          {showCollectives && accounts?.nodes?.length !== 0 && (
             <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
               <P pt={3} pb={3} borderTop="1px solid #E6E6E6">
                 <em>
@@ -289,47 +289,61 @@ class SearchPage extends React.Component {
 
 export { SearchPage as MockSearchPage };
 
-export const searchPageQuery = gql`
-  query SearchPage($term: String!, $types: [TypeOfCollective], $isHost: Boolean, $limit: Int, $offset: Int) {
-    search(term: $term, types: $types, isHost: $isHost, limit: $limit, offset: $offset, skipRecentAccounts: true) {
-      collectives {
+export const searchPageQuery = gqlV2/* GraphQL */ `
+  query SearchPage($term: String!, $type: [AccountType], $isHost: Boolean, $limit: Int, $offset: Int) {
+    accounts(
+      searchTerm: $term
+      type: $type
+      isHost: $isHost
+      limit: $limit
+      offset: $offset
+      skipRecentAccounts: true
+    ) {
+      nodes {
         id
         isActive
         type
         slug
-        path
         name
-        company
         imageUrl
-        backgroundImage
+        backgroundImageUrl
         description
         longDescription
         website
-        currency
         stats {
           id
-          balance
-          totalAmountSpent
-          yearlyBudget
-          backers {
-            all
+          totalAmountSpent {
+            currency
+            valueInCents
+          }
+          yearlyBudget {
+            currency
+            valueInCents
           }
         }
-        parentCollective {
-          id
-          slug
+        ... on AccountWithParent {
+          parent {
+            id
+            slug
+          }
         }
-        memberOf(role: "BACKER") {
-          id
+        members(role: BACKER) {
+          totalCount
+        }
+        backers: memberOf(role: BACKER) {
+          totalCount
         }
       }
       limit
       offset
-      total
+      totalCount
     }
   }
 `;
 
-export const addSearchPageData = graphql(searchPageQuery, { skip: props => !props.term });
+export const addSearchPageData = graphql(searchPageQuery, {
+  skip: props => !props.term,
+  options: { context: API_V2_CONTEXT },
+});
 
 export default withToasts(injectIntl(withRouter(addSearchPageData(SearchPage))));

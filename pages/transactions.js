@@ -8,7 +8,6 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
-import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { parseDateInterval } from '../lib/date-utils';
@@ -19,6 +18,7 @@ import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/u
 import Body from '../components/Body';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
+import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import ErrorPage from '../components/ErrorPage';
