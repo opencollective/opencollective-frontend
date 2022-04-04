@@ -876,7 +876,7 @@
   "eKwDAi": "This Expense is between different Hosts but the recipient Host doesn't have a suitable Payout Method available ({payoutMethodTypes}).",
   "Email": "E-mail",
   "emptyBalance": "Saldo Vazio",
-  "EmptyCollectivePage": "{collective} ainda está trabalhando em seu perfil público. Enquanto isso, você pode conferir outros coletivos!",
+  "EmptyCollectivePage": "{collective} is still working on their public profile. In the meantime, check out some other Collectives!",
   "EndDate": "End Date",
   "Error": "Erro",
   "Error.AccountEmailAlreadyExists": "Já existe uma conta para este e-mail, por favor <SignInLink> entre </SignInLink>.",

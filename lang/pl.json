@@ -876,7 +876,7 @@
   "eKwDAi": "Ten Wydatek jest pomiędzy różnymi Gospodarzami, ale Gospodarz odbiorcy nie ma dostępnej odpowiedniej Metody Wypłaty ({payoutMethodTypes}).",
   "Email": "E-mail",
   "emptyBalance": "Puste saldo",
-  "EmptyCollectivePage": "{collective} nadal pracuje nad publicznym profilem. W międzyczasie możesz sprawdzić kilka innych zbiórek!",
+  "EmptyCollectivePage": "{collective} is still working on their public profile. In the meantime, check out some other Collectives!",
   "EndDate": "End Date",
   "Error": "Błąd",
   "Error.AccountEmailAlreadyExists": "Konto już istnieje dla tego e-maila, proszę <SignInLink>zaloguj się</SignInLink>.",
