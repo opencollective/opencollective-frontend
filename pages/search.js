@@ -92,7 +92,7 @@ class SearchPage extends React.Component {
   static getInitialProps({ query }) {
     return {
       term: query.q || '',
-      types: query.types ? decodeURIComponent(query.types).split(',') : DEFAULT_SEARCH_TYPES,
+      type: query.type ? decodeURIComponent(query.type).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
@@ -121,7 +121,7 @@ class SearchPage extends React.Component {
     const { router } = this.props;
     const { q } = form;
 
-    router.push({ pathname: router.pathname, query: { q: q.value, types: router.query.types } });
+    router.push({ pathname: router.pathname, query: { q: q.value, type: router.query.type } });
   };
 
   onClick = filter => {
@@ -130,7 +130,7 @@ class SearchPage extends React.Component {
     if (filter === 'HOST') {
       this.props.router.push({ pathname: '/search', query: { q: term, isHost: true } });
     } else if (filter !== 'ALL') {
-      this.props.router.push({ pathname: '/search', query: { q: term, types: filter } });
+      this.props.router.push({ pathname: '/search', query: { q: term, type: filter } });
     } else {
       this.props.router.push({ pathname: '/search', query: { q: term } });
     }
