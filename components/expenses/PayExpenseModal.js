@@ -15,6 +15,8 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 
+import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
+import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -37,6 +39,12 @@ const quoteExpenseQuery = gqlV2/* GraphQL */ `
   query QuoteExpenseQuery($id: String!) {
     expense(expense: { id: $id }) {
       id
+      currency
+      amountInHostCurrency: amountV2(currencySource: HOST) {
+        exchangeRate {
+          value
+        }
+      }
       quote {
         paymentProcessorFeeAmount {
           valueInCents
@@ -61,7 +69,7 @@ const getPayoutOptionValue = (payoutMethodType, isAuto, host) => {
     return { forceManual: true, action: 'PAY' };
   } else {
     const isPaypalPayouts =
-      hasFeature(host, FEATURES.PAYPAL_PAYOUTS) &&
+      host.features[FEATURES.PAYPAL_PAYOUTS] === 'ACTIVE' &&
       payoutMethodType === PayoutMethodType.PAYPAL &&
       host.supportedPayoutMethods?.includes(PayoutMethodType.PAYPAL);
     const isWiseOTT =
@@ -98,13 +106,14 @@ const getTotalPayoutAmount = (expense, { paymentProcessorFee, feesPayer }) => {
 };
 
 const canCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount, isRoot) => {
-  const isSupportedPayoutMethod = [PayoutMethodType.BANK_ACCOUNT].includes(expense.payoutMethod?.type);
+  const supportedPayoutMethods = [PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.OTHER];
+  const isSupportedPayoutMethod = supportedPayoutMethods.includes(expense.payoutMethod?.type);
   const isFullBalance = expense.amount === get(collective, 'stats.balanceWithBlockedFunds.valueInCents');
   const isSameCurrency = expense.currency === collective?.currency;
 
   // Current limitations:
-  // - Only for transferwise
-  // - Only when emptying the account balance (or when root user)
+  // - Only for transferwise and manual payouts
+  // - Only when emptying the account balance (unless root user)
   // - Only with expenses submitted in the same currency as the collective
   if (!(isSupportedPayoutMethod && isSameCurrency && (isFullBalance || isRoot))) {
     return false;
@@ -170,12 +179,23 @@ const getInitialValues = (expense, host, payoutMethodType) => {
 };
 
 const getPaymentProcessorFee = (formik, expense, quoteQuery) => {
-  return formik.values.forceManual
-    ? {
-        valueInCents: formik.values.paymentProcessorFee,
+  if (formik.values.forceManual) {
+    const fxRate = expense.amountInAccountCurrency?.exchangeRate?.value || 1;
+    return {
+      valueInCents: Math.round(formik.values.paymentProcessorFee * fxRate),
+      currency: expense.currency,
+    };
+  } else if (quoteQuery?.data?.expense?.quote) {
+    const { quote, amountInHostCurrency } = quoteQuery.data.expense;
+    if (quote.paymentProcessorFeeAmount.currency === expense.currency) {
+      return quote.paymentProcessorFeeAmount;
+    } else if (amountInHostCurrency.exchangeRate) {
+      return {
         currency: expense.currency,
-      }
-    : quoteQuery?.data?.expense?.quote.paymentProcessorFeeAmount;
+        valueInCents: quote.paymentProcessorFeeAmount.valueInCents / amountInHostCurrency.exchangeRate.value,
+      };
+    }
+  }
 };
 
 /**
@@ -357,21 +377,26 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
               />
             </Amount>
           </AmountLine>
-          {isMultiCurrency && expense.accountCurrencyFxRate && (
+          {isMultiCurrency && expense.amountInAccountCurrency?.exchangeRate?.value && (
             <AmountLine py={0}>
               <Label color="black.600" fontWeight="500">
                 <FormattedMessage defaultMessage="Accounted as" />
               </Label>
-              <Span display="flex" whiteSpace="nowrap">
-                ~&nbsp;
-                <Amount>
-                  <FormattedMoneyAmount
-                    amount={Math.round(totalAmount * expense.accountCurrencyFxRate)}
-                    amountStyles={null}
-                    currency={collective.currency}
+              <Flex>
+                <Container mr={1} color="black.500" letterSpacing="-0.4px">
+                  {expense.amountInAccountCurrency.currency}
+                </Container>
+                <Container color="black.600">
+                  <AmountWithExchangeRateInfo
+                    showCurrencyCode={false}
+                    amount={{
+                      valueInCents: Math.round(totalAmount * expense.amountInAccountCurrency.exchangeRate.value),
+                      currency: expense.currency,
+                      exchangeRate: expense.amountInAccountCurrency.exchangeRate,
+                    }}
                   />
-                </Amount>
-              </Span>
+                </Container>
+              </Flex>
             </AmountLine>
           )}
         </Box>
@@ -462,7 +487,6 @@ PayExpenseModal.propTypes = {
     id: PropTypes.string,
     legacyId: PropTypes.number,
     amount: PropTypes.number,
-    accountCurrencyFxRate: PropTypes.number,
     amountInAccountCurrency: AmountPropTypeShape,
     currency: PropTypes.string,
     feesPayer: PropTypes.string,

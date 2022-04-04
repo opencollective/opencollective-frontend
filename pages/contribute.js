@@ -6,13 +6,13 @@ import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { TierTypes } from '../lib/constants/tiers-types';
 import { sortEvents } from '../lib/events';
 import { sortTiersForCollective } from '../lib/tier-utils';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
+import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { Sections } from '../components/collective-page/_constants';
 import * as fragments from '../components/collective-page/graphql/fragments';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';

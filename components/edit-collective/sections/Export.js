@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType, isOneOfTypes } from '../../../lib/collective-sections';
+import { isOneOfTypes } from '../../../lib/collective-sections';
+import { CollectiveType } from '../../../lib/constants/collectives';
 import { exportMembers } from '../../../lib/export_file';
 
 import Container from '../../Container';

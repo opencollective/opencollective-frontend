@@ -12,6 +12,7 @@ import { i18nTransactionKind } from '../../../lib/i18n/transaction';
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 import { Span } from '../../Text';
 
+// (!) Remember that any changes made here should be applied to the cache in API > `getCacheKeyForBudgetOrTransactionsSections`
 export const getDefaultKinds = () => {
   return [
     TransactionKind.ADDED_FUNDS,
