@@ -292,7 +292,7 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
       });
 
-      it.only('can invite a third-party organization to submit an expense', () => {
+      it('can invite a third-party organization to submit an expense', () => {
         cy.getByDataCy('radio-expense-type-INVOICE').click();
 
         cy.getByDataCy('select-expense-payee').click();
@@ -326,7 +326,7 @@ describe('New expense flow', () => {
         cy.wait(500);
       });
 
-      it.only('can create a new expense and organization account as the invitee', () => {
+      it('can create a new expense and organization account as the invitee', () => {
         cy.visit('/');
         cy.logout();
         cy.reload();
