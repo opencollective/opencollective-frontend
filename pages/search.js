@@ -21,8 +21,8 @@ import Pagination from '../components/Pagination';
 import SearchCollectiveCard from '../components/search-page/SearchCollectiveCard';
 import SearchForm from '../components/SearchForm';
 import StyledFilters from '../components/StyledFilters';
-import { fadeIn } from '../components/StyledKeyframes';
 import StyledHr from '../components/StyledHr';
+import { fadeIn } from '../components/StyledKeyframes';
 import StyledLink from '../components/StyledLink';
 import { H1, P } from '../components/Text';
 
