@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { Search } from '@styled-icons/octicons/Search';
+import { ShareAlt } from '@styled-icons/boxicons-regular';
+import copy from 'copy-to-clipboard';
 import { isNil, truncate } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -10,51 +11,30 @@ import styled, { css } from 'styled-components';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { parseToBoolean } from '../lib/utils';
 
-import CollectiveCard from '../components/CollectiveCard';
 import Container from '../components/Container';
+import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
+import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
+import Image from '../components/Image';
 import Link from '../components/Link';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
+import SearchCollectiveCard from '../components/search-page/SearchCollectiveCard';
+import SearchForm from '../components/SearchForm';
 import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
+import { fadeIn } from '../components/StyledKeyframes';
 import StyledHr from '../components/StyledHr';
-import StyledInput from '../components/StyledInput';
 import StyledLink from '../components/StyledLink';
+import { H1, P, Span } from '../components/Text';
+import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import StyledTag from '../components/StyledTag';
-import { H1, P } from '../components/Text';
 
-const SearchInput = styled(StyledInput)`
-  border: none;
-  border-bottom: 2px solid ${props => props.theme.colors.primary[500]};
-  border-radius: 0;
-  box-shadow: none;
-  display: block;
-  height: 3.4rem;
-  width: 100%;
-  padding: 0 4px;
-  font-size: 16px;
-  margin-right: 8px;
-
-  @media (min-width: 64em) {
-    font-size: 18px;
-  }
-
-  &::placeholder {
-    color: #999;
-    opacity: 1;
-  }
-`;
-
-const SearchButton = styled(StyledButton).attrs({
-  buttonStyle: 'primary',
-  buttonSize: 'small',
-})`
-  && {
-    padding: 0.5rem 2rem;
-  }
+const CollectiveCardContainer = styled.div`
+  width: 275px;
+  animation: ${fadeIn} 0.2s;
 `;
 
 const FILTERS = {
@@ -63,30 +43,45 @@ const FILTERS = {
   EVENT: 'EVENT',
   ORGANIZATION: 'ORGANIZATION',
   HOST: 'HOST',
+  PROJECT: 'PROJECT',
+  FUND: 'FUND',
 };
 
 const I18nFilters = defineMessages({
   [FILTERS.ALL]: {
-    id: 'searchFilter.all',
-    defaultMessage: 'View all',
+    id: 'Amount.AllShort',
+    defaultMessage: 'All',
   },
   [FILTERS.COLLECTIVE]: {
-    id: 'CollectiveType.Collective',
-    defaultMessage: '{count, plural, one {Collective} other {Collectives}}',
+    id: 'Collectives',
+    defaultMessage: 'Collectives',
   },
   [FILTERS.EVENT]: {
-    id: 'CollectiveType.Event',
-    defaultMessage: '{count, plural, one {Event} other {Events}}',
+    id: 'Events',
+    defaultMessage: 'Events',
   },
   [FILTERS.ORGANIZATION]: {
-    id: 'CollectiveType.Organization',
-    defaultMessage: '{count, plural, one {Organization} other {Organizations}}',
+    id: 'TopContributors.Organizations',
+    defaultMessage: 'Organizations',
   },
   [FILTERS.HOST]: {
     id: 'searchFilter.host',
     defaultMessage: 'Fiscal hosts',
   },
+  [FILTERS.PROJECT]: {
+    id: 'Projects',
+    defaultMessage: 'Projects',
+  },
+  [FILTERS.FUND]: {
+    defaultMessage: 'Funds',
+  },
 });
+
+const SearchFormContainer = styled(Box)`
+  height: 58px;
+  width: 608px;
+  min-width: 10rem;
+`;
 
 const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
 
@@ -143,6 +138,7 @@ class SearchPage extends React.Component {
     router: PropTypes.object, // from next.js
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object,
+    addToast: PropTypes.func.isRequired, // from withToasts
   };
 
   constructor(props) {
@@ -207,6 +203,14 @@ class SearchPage extends React.Component {
     this.props.router.push({ pathname: '/search', query: { ...router.query, offset } });
   };
 
+  handleCopy = () => {
+    copy(window.location.href);
+    this.props.addToast({
+      type: TOAST_TYPE.SUCCESS,
+      message: <FormattedMessage defaultMessage="Search Result Copied!" />,
+    });
+  };
+
   render() {
     const { router, data, term = '', intl } = this.props;
     const { error, loading, accounts, tagStats } = data || {};
@@ -216,34 +220,44 @@ class SearchPage extends React.Component {
       return <ErrorPage data={this.props.data} />;
     }
 
-    const filters = ['ALL', 'COLLECTIVE', 'EVENT', 'ORGANIZATION', 'HOST'];
+    const filters = ['ALL', 'COLLECTIVE', 'EVENT', 'ORGANIZATION', 'HOST', 'PROJECT', 'FUND'];
     const { limit = 20, offset, totalCount = 0 } = accounts || {};
     const showCollectives = term.trim() !== '' && !!accounts?.nodes;
 
     return (
       <Page title="Search" showSearch={false}>
-        <Container mx="auto" px={3} py={[4, 5]} width={[1, 0.85]} maxWidth={1200}>
-          <Box width={1}>
-            <form method="GET" onSubmit={this.refetch}>
-              <H1 fontSize="36px" fontWeight="500">
-                <FormattedMessage id="search.OpenCollective" defaultMessage="Search Open Collective..." />
-              </H1>
-              <Flex alignItems="flex-end" my={3}>
-                <SearchInput type="search" name="q" placeholder="open source" defaultValue={term} />
-                <SearchButton type="submit">
-                  <Search size="1em" />
-                </SearchButton>
-              </Flex>
-            </form>
-          </Box>
+        <Container mx="auto" px={3} py={[4, '40px']} width={[1, 0.85]} maxWidth={1200}>
+          <Container
+            alignItems="center"
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            textAlign="center"
+          >
+            <H1 fontSize="32px" fontWeight="700">
+              <FormattedMessage defaultMessage="Search in Open Collective" />
+            </H1>
+            <Flex justifyContent="center" flex="1 1 1" marginTop={16} width={1}>
+              <SearchFormContainer p={2}>
+                <SearchForm
+                  borderRadius="100px"
+                  fontSize="16px"
+                  py="1px"
+                  placeholder="Search by name, slug, tag, description..."
+                  defaultValue={term}
+                  onSubmit={this.refetch}
+                />
+              </SearchFormContainer>
+            </Flex>
+          </Container>
           {term && (
             <Box mt={4} mb={4} mx="auto">
               <StyledFilters
                 filters={filters}
-                getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
+                getLabel={key => intl.formatMessage(I18nFilters[key])}
                 selected={this.state.filter}
                 justifyContent="left"
-                minButtonWidth={150}
+                minButtonWidth={140}
                 onChange={filter => {
                   this.setState({ filter: filter });
                   this.onClick(filter);
@@ -282,34 +296,68 @@ class SearchPage extends React.Component {
             {showCollectives &&
               accounts?.nodes?.map(collective => (
                 <Flex key={collective.slug} my={3} mx={2}>
-                  <CollectiveCard collective={collective} />
+                  {collective.isPledged ? (
+                    <CollectiveCardContainer key={collective.id}>
+                      <PledgedCollectiveCard collective={collective} />
+                    </CollectiveCardContainer>
+                  ) : (
+                    <CollectiveCardContainer key={collective.id}>
+                      <SearchCollectiveCard collective={collective} />
+                    </CollectiveCardContainer>
+                  )}
                 </Flex>
               ))}
 
-            {/* TODO: add suggested collectives when the result is empty */}
             {showCollectives && accounts?.nodes?.length === 0 && (
               <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
-                <P my={4}>
-                  <em>
-                    <FormattedMessage id="search.noResult" defaultMessage="Your search did not match any result" />
-                  </em>
-                </P>
-                {
-                  <Link href={{ pathname: '/pledges/new', query: { name: term } }}>
-                    <StyledLink
-                      display="block"
-                      fontSize="14px"
-                      fontWeight="bold"
-                      maxWidth="220px"
-                      py={2}
-                      px={4}
-                      textAlign="center"
-                      buttonStyle="primary"
-                    >
-                      <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
-                    </StyledLink>
-                  </Link>
-                }
+                <H1 fontSize="32px" lineHeight="40px" color="black.700" fontWeight={500}>
+                  <FormattedMessage defaultMessage="No results match your search" />
+                </H1>
+                <Container py={32}>
+                  <Image src="/static/images/empty-search.svg" alt="No Search Results" width={101.98} height={87.47} />
+                </Container>
+                <Container color="black.800" fontWeight={400}>
+                  <Container fontSize="18px" lineHeight="26px" textAlign="center">
+                    <FormattedMessage defaultMessage="Try refining your search, here are some tips:" />
+                  </Container>
+                  <Container fontSize="15px" lineHeight="22px">
+                    <ul>
+                      <li>
+                        <FormattedMessage defaultMessage="Make sure your spelling is correct" />
+                      </li>
+                      <li>
+                        <Span pt={8}>
+                          <FormattedMessage defaultMessage="Broaden your search (e.g. search 'garden' instead of 'community garden')" />
+                        </Span>
+                      </li>
+                      <li>
+                        <Span pt={8}>
+                          <FormattedMessage
+                            defaultMessage="Search our <Link>Docs</Link> for more info about using the Open Collective platform"
+                            values={{
+                              Link: getI18nLink({
+                                openInNewTab: true,
+                                href: 'https://opencollective.com/help',
+                              }),
+                            }}
+                          />
+                        </Span>
+                      </li>
+                    </ul>
+                  </Container>
+                  <Container fontSize="18px" lineHeight="26px" pt={16}>
+                    <FormattedMessage
+                      defaultMessage="Still no luck? Contact <SupportLink></SupportLink> or find us in <SlackLink>Slack</SlackLink>"
+                      values={{
+                        SupportLink: I18nSupportLink,
+                        SlackLink: getI18nLink({
+                          openInNewTab: true,
+                          href: 'https://slack.opencollective.com/',
+                        }),
+                      }}
+                    />
+                  </Container>
+                </Container>
               </Flex>
             )}
           </Flex>
@@ -317,6 +365,17 @@ class SearchPage extends React.Component {
             <Container display="flex" justifyContent="center" fontSize="14px" my={3}>
               <Pagination offset={offset} total={totalCount} limit={limit} />
             </Container>
+          )}
+
+          {showCollectives && accounts?.nodes?.length !== 0 && (
+            <Flex flexDirection="column" alignItems="center">
+              <StyledButton onClick={this.handleCopy}>
+                <Span pr={1} fontSize="14px" fontWeight={500}>
+                  <FormattedMessage defaultMessage="Share results" />
+                </Span>
+                <ShareAlt size="14px" />
+              </StyledButton>
+            </Flex>
           )}
 
           {showCollectives && accounts?.nodes?.length !== 0 && (
@@ -373,11 +432,17 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
         type
         slug
         name
+        location {
+          country
+        }
+        tags
+        isHost
         imageUrl
         backgroundImageUrl
         description
         longDescription
         website
+        currency
         stats {
           id
           totalAmountSpent {
@@ -388,17 +453,29 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
             currency
             valueInCents
           }
+          totalAmountReceived {
+            currency
+            valueInCents
+          }
+        }
+        ... on Organization {
+          host {
+            id
+            hostFeePercent
+            totalHostedCollectives
+          }
         }
         ... on AccountWithParent {
           parent {
             id
             slug
+            backgroundImageUrl
           }
         }
-        members(role: BACKER) {
+        backers: members(role: BACKER) {
           totalCount
         }
-        backers: memberOf(role: BACKER) {
+        memberOf(role: BACKER) {
           totalCount
         }
       }
@@ -420,4 +497,4 @@ export const addSearchPageData = graphql(searchPageQuery, {
   options: { context: API_V2_CONTEXT },
 });
 
-export default injectIntl(withRouter(addSearchPageData(SearchPage)));
+export default withToasts(injectIntl(withRouter(addSearchPageData(SearchPage))));
