@@ -207,13 +207,13 @@ describe('New expense flow', () => {
 
     describe('submit on behalf', () => {
       let collective, expenseId;
-      const inviteeEmail = randomEmail();
+      let inviteeEmail = randomEmail();
 
       it('can invite an existing user to submit an expense', () => {
         cy.getByDataCy('radio-expense-type-INVOICE').click();
 
         cy.getByDataCy('select-expense-payee').click();
-        cy.get('input#input-payee').type('Xa');
+        cy.get('input#input-payee').type('pia');
         cy.wait(2000);
         cy.get('#react-select-input-payee-option-0-0').click();
 
@@ -293,6 +293,7 @@ describe('New expense flow', () => {
       });
 
       it('can invite a third-party organization to submit an expense', () => {
+        inviteeEmail = randomEmail();
         cy.getByDataCy('radio-expense-type-INVOICE').click();
 
         cy.getByDataCy('select-expense-payee').click();
