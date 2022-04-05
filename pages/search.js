@@ -252,25 +252,27 @@ class SearchPage extends React.Component {
             </Box>
           )}
           <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
-          <Container width={[1, 3 / 4]}>
-            <FilterLabel htmlFor="tag-filter-type">
-              <FormattedMessage defaultMessage="Tags" />
-            </FilterLabel>
-            <Flex flexWrap="wrap" width={[null, '1000px']}>
-              {tagStats?.nodes?.map(node => (
-                <FilterButton
-                  as={StyledTag}
-                  key={node.tag}
-                  title={node.tag}
-                  variant="rounded-right"
-                  $isSelected={tags.includes(node.tag)}
-                  onClick={() => this.changeTags(node.tag)}
-                >
-                  {truncate(node.tag, { length: 9 })}
-                </FilterButton>
-              ))}
-            </Flex>
-          </Container>
+          {term && (
+            <Container width={[1, 3 / 4]}>
+              <FilterLabel htmlFor="tag-filter-type">
+                <FormattedMessage defaultMessage="Tags" />
+              </FilterLabel>
+              <Flex flexWrap="wrap" width={[null, '1000px']}>
+                {tagStats?.nodes?.map(node => (
+                  <FilterButton
+                    as={StyledTag}
+                    key={node.tag}
+                    title={node.tag}
+                    variant="rounded-right"
+                    $isSelected={tags.includes(node.tag)}
+                    onClick={() => this.changeTags(node.tag)}
+                  >
+                    {truncate(node.tag, { length: 9 })}
+                  </FilterButton>
+                ))}
+              </Flex>
+            </Container>
+          )}
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
             {loading && accounts?.nodes?.length > 0 && (
               <Flex py={3} width={1} justifyContent="center">
@@ -405,7 +407,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
       totalCount
     }
 
-    tagStats {
+    tagStats(searchTerm: $term) {
       nodes {
         tag
       }

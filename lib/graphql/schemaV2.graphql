@@ -7618,7 +7618,12 @@ type Query {
     """
     throwIfMissing: Boolean = true
   ): Project
-  tagStats: TagStatsCollection!
+  tagStats(
+    """
+    Return tags from collectives which includes this search term
+    """
+    searchTerm: String
+  ): TagStatsCollection!
   tier(
     """
     Identifiers to retrieve the tier
@@ -9161,7 +9166,7 @@ type Mutation {
   ): Expense!
 
   """
-  To verify an unverified expense.
+  To re-send the invitation to complete a draft expense
   """
   resendDraftExpenseInvite(
     """
