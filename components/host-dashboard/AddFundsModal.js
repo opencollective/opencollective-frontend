@@ -4,7 +4,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
 import { get } from 'lodash';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
@@ -33,19 +33,11 @@ import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../S
 import StyledSelect from '../StyledSelect';
 import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { useUser } from '../UserProvider';
-
-import illustration from '../contribution-flow/fees-on-top-illustration.png';
-
-const Illustration = styled.img.attrs({ src: illustration })`
-  width: 40px;
-  height: 40px;
-`;
 
 const PlatformTipContainer = styled(StyledModal)`
   ${props =>
-    props.showPlatformTipModal &&
+    props.showConfirmation &&
     css`
       background-image: url('/static/images/platform-tip-background.svg');
       background-repeat: no-repeat;
@@ -153,14 +145,6 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
   ${addFundsTierFieldsFragment}
 `;
 
-const addPlatformTipMutation = gqlV2/* GraphQL */ `
-  mutation AddPlatformTip($amount: AmountInput!, $transaction: TransactionReferenceInput!) {
-    addPlatformTipToTransaction(amount: $amount, transaction: $transaction) {
-      id
-    }
-  }
-`;
-
 const getInitialValues = values => ({
   amount: null,
   hostFeePercent: null,
@@ -177,47 +161,6 @@ const validate = values => {
 // Build an account reference. Compatible with accounts from V1 and V2.
 const buildAccountReference = input => {
   return typeof input.id === 'string' ? { id: input.id } : { legacyId: input.id };
-};
-
-const msg = defineMessages({
-  noThankYou: {
-    id: 'NoThankYou',
-    defaultMessage: 'No thank you',
-  },
-  other: {
-    id: 'platformFee.Other',
-    defaultMessage: 'Other',
-  },
-});
-
-const DEFAULT_PLATFORM_TIP_PERCENTAGES = [0.1, 0.15, 0.2];
-
-const getOptionFromPercentage = (amount, currency, percentage) => {
-  const feeAmount = isNaN(amount) ? 0 : Math.round(amount * percentage);
-  return {
-    // Value must be unique, so we set a special key if feeAmount is 0
-    value: feeAmount || `${percentage}%`,
-    feeAmount,
-    percentage,
-    currency,
-    label: `${feeAmount / 100} ${currency} (${percentage * 100}%)`,
-  };
-};
-
-const getOptions = (amount, currency, intl) => {
-  return [
-    ...DEFAULT_PLATFORM_TIP_PERCENTAGES.map(percentage => {
-      return getOptionFromPercentage(amount, currency, percentage);
-    }),
-    {
-      label: intl.formatMessage(msg.noThankYou),
-      value: 0,
-    },
-    {
-      label: intl.formatMessage(msg.other),
-      value: 'CUSTOM',
-    },
-  ];
 };
 
 const getTiersOptions = (intl, tiers) => {
@@ -240,31 +183,12 @@ const getTiersOptions = (intl, tiers) => {
 const AddFundsModal = ({ host, collective, ...props }) => {
   const { LoggedInUser } = useUser();
   const [fundDetails, setFundDetails] = useState({});
-  const { addToast } = useToasts();
   const intl = useIntl();
-  const options = React.useMemo(
-    () => getOptions(fundDetails.fundAmount, collective.currency, intl),
-    [fundDetails.fundAmount, collective.currency],
-  );
-  const formatOptionLabel = option => {
-    if (option.currency) {
-      return (
-        <span>
-          {formatCurrency(option.feeAmount, option.currency, { locale: intl.locale })}{' '}
-          <Span color="black.500">({option.percentage * 100}%)</Span>
-        </span>
-      );
-    } else {
-      return option.label;
-    }
-  };
-  const [selectedOption, setSelectedOption] = useState(options[3]);
-  const [customAmount, setCustomAmount] = useState(0);
   const { data, loading } = useQuery(addFundsAccountQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: collective.slug },
   });
-  const [submitAddFunds, { data: addFundsResponse, error: fundError }] = useMutation(addFundsMutation, {
+  const [submitAddFunds, { error: fundError }] = useMutation(addFundsMutation, {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
@@ -275,10 +199,6 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
     ],
     awaitRefetchQueries: true,
-  });
-
-  const [addPlatformTip, { error: platformTipError }] = useMutation(addPlatformTipMutation, {
-    context: API_V2_CONTEXT,
   });
 
   const tiersNodes = get(data, 'account.tiers.nodes');
@@ -299,9 +219,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   const defaultHostFeePercent = canAddHostFee && collective.hostFeePercent ? collective.hostFeePercent : 0;
 
   const handleClose = () => {
-    setFundDetails({ showPlatformTipModal: false });
-    setSelectedOption(options[3]);
-    setCustomAmount(0);
+    setFundDetails({ showConfirmation: false });
     props.onClose();
   };
 
@@ -311,15 +229,15 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       maxWidth={435}
       {...props}
       trapFocus
-      showPlatformTipModal={fundDetails.showPlatformTipModal}
       onClose={handleClose}
+      showConfirmation={fundDetails.showConfirmation}
     >
       <CollectiveModalHeader collective={collective} onClick={handleClose} />
       <Formik
         initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective })}
         validate={validate}
         onSubmit={async values => {
-          if (!fundDetails.showPlatformTipModal) {
+          if (!fundDetails.showConfirmation) {
             const result = await submitAddFunds({
               variables: {
                 ...values,
@@ -332,28 +250,13 @@ const AddFundsModal = ({ host, collective, ...props }) => {
             });
 
             const resultOrder = result.data.addFunds;
+
             setFundDetails({
-              showPlatformTipModal: true,
+              showConfirmation: true,
               fundAmount: values.amount,
               description: resultOrder.description,
               source: resultOrder.fromAccount,
               tier: resultOrder.tier,
-            });
-          } else if (selectedOption.value !== 0) {
-            const creditTransaction = addFundsResponse.addFunds.transactions.filter(
-              transaction => transaction.type === 'CREDIT',
-            )[0];
-            await addPlatformTip({
-              variables: {
-                ...values,
-                amount: { valueInCents: selectedOption.value !== 'CUSTOM' ? selectedOption.value : customAmount },
-                transaction: { id: creditTransaction.id },
-              },
-            });
-            handleClose();
-            addToast({
-              type: TOAST_TYPE.SUCCESS,
-              message: <FormattedMessage id="AddFundsModal.Success" defaultMessage="Platform tip successfully added" />,
             });
           } else {
             handleClose();
@@ -370,7 +273,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
             defaultSources.push({ value: collective, label: <DefaultCollectiveLabel value={collective} /> });
           }
 
-          if (!fundDetails.showPlatformTipModal) {
+          if (!fundDetails.showConfirmation) {
             return (
               <Form data-cy="add-funds-form">
                 <h3>
@@ -412,7 +315,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                         onChange={({ value }) => form.setFieldValue(field.name, value)}
                         isLoading={loading}
                         options={tiersOptions}
-                        isSearchable={options.length > 10}
+                        isSearchable={tiersOptions.length > 10}
                         value={tiersOptions.find(option =>
                           !values.tier ? option.value === null : option.value?.id === values.tier.id,
                         )}
@@ -594,54 +497,6 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       </StyledLink>
                     </Container>
                   </Container>
-                  {hostFee === 0 && (
-                    <Container>
-                      <StyledHr my={3} borderColor="black.300" />
-                      <div>
-                        <P fontWeight="400" fontSize="14px" lineHeight="21px" color="black.900" my={32}>
-                          <FormattedMessage
-                            id="AddFundsModal.platformTipInfo"
-                            defaultMessage="Since you are not charging a host fee to the collective, Open Collective is free to use. We rely on your generosity to keep this possible!"
-                          />
-                        </P>
-                        <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>
-                          <Flex alignItems="center">
-                            <Illustration alt="" />
-                            <P fontWeight={500} fontSize="12px" lineHeight="18px" color="black.900" mx={10}>
-                              <FormattedMessage
-                                id="AddFundsModal.thankYou"
-                                defaultMessage="Thank you for supporting us. Platform tip will be deducted from the host budget:"
-                              />
-                            </P>
-                          </Flex>
-                          <StyledSelect
-                            aria-label="Donation percentage"
-                            data-cy="donation-percentage"
-                            width="100%"
-                            maxWidth={['100%', 190]}
-                            mt={[2, 0]}
-                            isSearchable={false}
-                            fontSize="15px"
-                            options={options}
-                            onChange={setSelectedOption}
-                            formatOptionLabel={formatOptionLabel}
-                            value={selectedOption}
-                          />
-                        </Flex>
-                        {selectedOption.value === 'CUSTOM' && (
-                          <Flex justifyContent="flex-end" mt={2}>
-                            <StyledInputAmount
-                              id="platformTip"
-                              currency={collective.currency}
-                              onChange={amount => setCustomAmount(amount)}
-                              defaultValue={options[1].value}
-                            />
-                          </Flex>
-                        )}
-                      </div>
-                      {platformTipError && <MessageBoxGraphqlError error={platformTipError} mt={3} fontSize="13px" />}
-                    </Container>
-                  )}
                 </ModalBody>
                 <ModalFooter isFullWidth>
                   <Flex justifyContent="center" flexWrap="wrap">
@@ -654,13 +509,9 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       minWidth={120}
                       loading={isSubmitting}
                     >
-                      {selectedOption.value !== 0 ? (
-                        <FormattedMessage id="AddFundsModal.tipAndFinish" defaultMessage="Tip and Finish" />
-                      ) : (
-                        <FormattedMessage id="Finish" defaultMessage="Finish" />
-                      )}
+                      <FormattedMessage id="Finish" defaultMessage="Finish" />
                     </StyledButton>
-                    {!fundDetails.showPlatformTipModal && (
+                    {!fundDetails.showConfirmation && (
                       <StyledButton mx={2} mb={1} minWidth={100} onClick={handleClose} type="button">
                         <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                       </StyledButton>
