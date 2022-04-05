@@ -316,7 +316,7 @@ const ExpenseFormBody = ({
   }, [values.payeeLocation]);
 
   React.useEffect(() => {
-    if (isMultiCurrency) {
+    if (isMultiCurrency && values.payoutMethod?.type !== PayoutMethodType.PAYPAL) {
       formik.setFieldValue('currency', undefined);
     } else {
       formik.setFieldValue('currency', collective?.currency);
