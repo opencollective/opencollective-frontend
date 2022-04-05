@@ -25,12 +25,12 @@ import SearchCollectiveCard from '../components/search-page/SearchCollectiveCard
 import SearchForm from '../components/SearchForm';
 import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
-import { fadeIn } from '../components/StyledKeyframes';
 import StyledHr from '../components/StyledHr';
+import { fadeIn } from '../components/StyledKeyframes';
 import StyledLink from '../components/StyledLink';
+import StyledTag from '../components/StyledTag';
 import { H1, P, Span } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
-import StyledTag from '../components/StyledTag';
 
 const CollectiveCardContainer = styled.div`
   width: 275px;
