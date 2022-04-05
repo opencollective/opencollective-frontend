@@ -15,6 +15,8 @@ import Container from '../components/Container';
 import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
+import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
+import Image from '../components/Image';
 import Link from '../components/Link';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
@@ -217,30 +219,56 @@ class SearchPage extends React.Component {
                 </Flex>
               ))}
 
-            {/* TODO: add suggested collectives when the result is empty */}
             {showCollectives && accounts?.nodes?.length === 0 && (
               <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
-                <P my={4}>
-                  <em>
-                    <FormattedMessage id="search.noResult" defaultMessage="Your search did not match any result" />
-                  </em>
-                </P>
-                {
-                  <Link href={{ pathname: '/pledges/new', query: { name: term } }}>
-                    <StyledLink
-                      display="block"
-                      fontSize="14px"
-                      fontWeight="bold"
-                      maxWidth="220px"
-                      py={2}
-                      px={4}
-                      textAlign="center"
-                      buttonStyle="primary"
-                    >
-                      <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
-                    </StyledLink>
-                  </Link>
-                }
+                <H1 fontSize="32px" lineHeight="40px" color="black.700" fontWeight={500}>
+                  <FormattedMessage defaultMessage="No results match your search" />
+                </H1>
+                <Container py={32}>
+                  <Image src="/static/images/empty-search.svg" alt="No Search Results" width={101.98} height={87.47} />
+                </Container>
+                <Container color="black.800" fontWeight={400}>
+                  <Container fontSize="18px" lineHeight="26px" textAlign="center">
+                    <FormattedMessage defaultMessage="Try refining your search, here are some tips:" />
+                  </Container>
+                  <Container fontSize="15px" lineHeight="22px">
+                    <ul>
+                      <li>
+                        <FormattedMessage defaultMessage="Make sure your spelling is correct" />
+                      </li>
+                      <li>
+                        <Span pt={8}>
+                          <FormattedMessage defaultMessage="Broaden your search (e.g. search 'garden' instead of 'community garden')" />
+                        </Span>
+                      </li>
+                      <li>
+                        <Span pt={8}>
+                          <FormattedMessage
+                            defaultMessage="Search our <Link>Docs</Link> for more info about using the Open Collective platform"
+                            values={{
+                              Link: getI18nLink({
+                                openInNewTab: true,
+                                href: 'https://opencollective.com/help',
+                              }),
+                            }}
+                          />
+                        </Span>
+                      </li>
+                    </ul>
+                  </Container>
+                  <Container fontSize="18px" lineHeight="26px" pt={16}>
+                    <FormattedMessage
+                      defaultMessage="Still no luck? Contact <SupportLink></SupportLink> or find us in <SlackLink>Slack</SlackLink>"
+                      values={{
+                        SupportLink: I18nSupportLink,
+                        SlackLink: getI18nLink({
+                          openInNewTab: true,
+                          href: 'https://slack.opencollective.com/',
+                        }),
+                      }}
+                    />
+                  </Container>
+                </Container>
               </Flex>
             )}
           </Flex>
