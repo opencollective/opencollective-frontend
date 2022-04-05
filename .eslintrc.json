@@ -18,6 +18,19 @@
         ]
       }
     ],
+    "no-restricted-properties": [
+      "error",
+      {
+        "object": "it",
+        "property": "only",
+        "message": "it.only should only be used for debugging purposes and is not allowed in production code"
+      },
+      {
+        "object": "describe",
+        "property": "only",
+        "message": "describe.only should only be used for debugging purposes and is not allowed in production code"
+      }
+    ],
     // To lint multiple schemas each one needs a different tagName.
     // https://github.com/apollographql/eslint-plugin-graphql#additional-schemas-or-tags
     "graphql/template-strings": [
