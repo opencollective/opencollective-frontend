@@ -10390,7 +10390,7 @@ type Mutation {
   ): Expense!
 
   """
-  To verify an unverified expense.
+  To re-send the invitation to complete a draft expense
   """
   resendDraftExpenseInvite(
     """
