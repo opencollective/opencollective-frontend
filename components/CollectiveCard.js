@@ -188,7 +188,7 @@ class CollectiveCard extends React.Component {
       route = `/${collective.slug}`;
     }
 
-    const backersCount = get(collective, 'members.totalCount');
+    const backersCount = get(collective, 'backers.totalCount');
 
     return (
       <Link href={route} target="_top">
@@ -259,15 +259,15 @@ class CollectiveCard extends React.Component {
                 </div>
               </StatsWrapper>
             )}
-            {collective.backers && collective.backers.totalCount > 0 && collective.type === 'ORGANIZATION' && (
+            {collective.memberOf && collective.memberOf.totalCount > 0 && collective.type === 'ORGANIZATION' && (
               <StatsWrapper>
                 <div className="backers">
-                  <ValueWrapper>{collective.backers.totalCount}</ValueWrapper>
+                  <ValueWrapper>{collective.memberOf.totalCount}</ValueWrapper>
                   <LabelWrapper>
                     <FormattedMessage
                       id="collective.card.memberOf.count"
                       defaultMessage="Contributor to {n, plural, one {Collective} other {Collectives}}"
-                      values={{ n: collective.backers.totalCount }}
+                      values={{ n: collective.memberOf.totalCount }}
                     />
                   </LabelWrapper>
                 </div>
