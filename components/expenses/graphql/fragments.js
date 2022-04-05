@@ -96,6 +96,7 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
     features {
       id
       MULTI_CURRENCY_EXPENSES
+      PAYPAL_PAYOUTS
     }
     paypalPreApproval {
       id
@@ -136,8 +137,13 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
       currency
+      exchangeRate {
+        date
+        value
+        source
+        isApproximate
+      }
     }
-    accountCurrencyFxRate
     createdAt
     invoiceInfo
     requiredLegalDocuments
@@ -341,6 +347,10 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         imageUrl
       }
     }
+    recurringExpense {
+      interval
+      endsAt
+    }
   }
 
   ${expenseHostFields}
@@ -359,8 +369,13 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
       currency
+      exchangeRate {
+        date
+        value
+        source
+        isApproximate
+      }
     }
-    accountCurrencyFxRate
     currency
     type
     requiredLegalDocuments

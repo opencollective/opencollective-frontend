@@ -35,6 +35,7 @@ import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
 import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';
 import { validateExpenseItem } from './ExpenseItemForm';
 import ExpensePayeeDetails from './ExpensePayeeDetails';
+import ExpenseRecurringBanner from './ExpenseRecurringBanner';
 import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
 import ExpenseTypeTag from './ExpenseTypeTag';
 import { validatePayoutMethod } from './PayoutMethodForm';
@@ -237,6 +238,7 @@ const ExpenseFormBody = ({
   const isReceipt = values.type === expenseTypes.RECEIPT;
   const isGrant = values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT;
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
+  const isRecurring = expense && expense.recurringExpense !== null;
   const stepOneCompleted =
     values.payoutMethod &&
     isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency'))) &&
@@ -277,6 +279,10 @@ const ExpenseFormBody = ({
     // If creating a new expense or completing an expense submitted on your behalf, automatically select your default profile.
     else if (!isOnBehalf && (isDraft || !values.payee) && loggedInAccount && !isEmpty(payoutProfiles)) {
       formik.setFieldValue('payee', first(payoutProfiles));
+    }
+    // If recurring expense with selected Payout Method
+    if (isDraft && loggedInAccount && !values.payoutMethod && expense.payoutMethod) {
+      formik.setFieldValue('payoutMethod', expense.payoutMethod);
     }
   }, [payoutProfiles, loggedInAccount]);
 
@@ -319,7 +325,7 @@ const ExpenseFormBody = ({
 
   // Load values from localstorage
   React.useEffect(() => {
-    if (shouldLoadValuesFromPersister && formPersister && !dirty) {
+    if (shouldLoadValuesFromPersister && formPersister && !dirty && !isDraft) {
       const formValues = formPersister.loadValues();
       if (formValues) {
         // Reset payoutMethod if host is no longer connected to TransferWise
@@ -403,7 +409,7 @@ const ExpenseFormBody = ({
   }
 
   return (
-    <Form>
+    <Form ref={formRef}>
       {!isCreditCardCharge && (
         <ExpenseTypeRadioSelect
           name="type"
@@ -416,8 +422,9 @@ const ExpenseFormBody = ({
           }}
         />
       )}
+      {isRecurring && <ExpenseRecurringBanner expense={expense} />}
       {values.type && (
-        <StyledCard mt={4} p={[16, 16, 32]} overflow="initial" ref={formRef}>
+        <StyledCard mt={4} p={[16, 16, 32]} overflow="initial">
           <HiddenFragment show={step === STEPS.PAYEE}>
             <Flex alignItems="center" mb={16}>
               <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
@@ -702,6 +709,11 @@ ExpenseFormBody.propTypes = {
     status: PropTypes.string,
     payee: PropTypes.object,
     draft: PropTypes.object,
+    payoutMethod: PropTypes.object,
+    recurringExpense: PropTypes.shape({
+      interval: PropTypes.string,
+      endsAt: PropTypes.string,
+    }),
     amountInAccountCurrency: AmountPropTypeShape,
     items: PropTypes.arrayOf(
       PropTypes.shape({
@@ -819,6 +831,7 @@ ExpenseForm.propTypes = {
     status: PropTypes.string,
     payee: PropTypes.object,
     draft: PropTypes.object,
+    payoutMethod: PropTypes.object,
     items: PropTypes.arrayOf(
       PropTypes.shape({
         url: PropTypes.string,

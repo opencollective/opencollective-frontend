@@ -5,7 +5,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { PayPalSupportedCurrencies } from '../../lib/constants/currency';
+import { Currency, PayPalSupportedCurrencies } from '../../lib/constants/currency';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { toIsoDateStr } from '../../lib/date-utils';
@@ -142,6 +142,8 @@ class ExpenseFormItems extends React.PureComponent {
     const isPayPal = payoutMethod?.type === PayoutMethodType.PAYPAL;
     if (isPayPal) {
       return PayPalSupportedCurrencies;
+    } else if (payoutMethod?.type === PayoutMethodType.OTHER) {
+      return Currency;
     } else {
       return uniq(
         [

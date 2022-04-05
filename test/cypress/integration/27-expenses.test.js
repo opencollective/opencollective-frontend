@@ -72,7 +72,7 @@ describe('New expense flow', () => {
       // Fill missing info & submit
       cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
       cy.get('input[name="items[1].amount"]').type('{selectall}92.50');
-      cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50 USD');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50');
       cy.get('input:invalid').should('have.length', 0);
       cy.getByDataCy('expense-summary-btn').click();
 
@@ -81,7 +81,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
       cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'paypal-test@opencollective.com');
       cy.getByDataCy('expense-summary-payout-method-type').should('contain', 'PayPal');
-      cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50 USD');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50');
       cy.getByDataCy('expense-summary-items').should('contain', 'Fancy restaurant');
       cy.getByDataCy('expense-summary-items').should('contain', 'Potatoes for the giant raclette');
 
@@ -125,7 +125,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
       cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'paypal-test-2@opencollective.com');
       cy.getByDataCy('expense-summary-payout-method-type').should('contain', 'PayPal');
-      cy.getByDataCy('expense-items-total-amount').should('contain', '$237.50 USD');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '$237.50');
       cy.getByDataCy('expense-summary-items').should('contain', 'Fancy restaurant');
       cy.getByDataCy('expense-summary-items').should('contain', 'Potatoes for the giant raclette');
       cy.getByDataCy('expense-summary-items').should('contain', 'Some more delicious stuff');
@@ -165,7 +165,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-summary-payee').should('contain', 'Dummy Expense Org');
       cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
       cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
-      cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50 USD');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50');
       cy.getByDataCy('expense-summary-items').should('contain', 'Fancy restaurant');
       cy.getByDataCy('expense-summary-items').should('contain', 'Potatoes for the giant raclette');
 
@@ -207,13 +207,13 @@ describe('New expense flow', () => {
 
     describe('submit on behalf', () => {
       let collective, expenseId;
-      const inviteeEmail = randomEmail();
+      let inviteeEmail = randomEmail();
 
       it('can invite an existing user to submit an expense', () => {
         cy.getByDataCy('radio-expense-type-INVOICE').click();
 
         cy.getByDataCy('select-expense-payee').click();
-        cy.get('input#input-payee').type('Xa');
+        cy.get('input#input-payee').type('pia');
         cy.wait(2000);
         cy.get('#react-select-input-payee-option-0-0').click();
 
@@ -292,7 +292,8 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
       });
 
-      it.only('can invite a third-party organization to submit an expense', () => {
+      it('can invite a third-party organization to submit an expense', () => {
+        inviteeEmail = randomEmail();
         cy.getByDataCy('radio-expense-type-INVOICE').click();
 
         cy.getByDataCy('select-expense-payee').click();
@@ -326,7 +327,7 @@ describe('New expense flow', () => {
         cy.wait(500);
       });
 
-      it.only('can create a new expense and organization account as the invitee', () => {
+      it('can create a new expense and organization account as the invitee', () => {
         cy.visit('/');
         cy.logout();
         cy.reload();

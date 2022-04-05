@@ -192,19 +192,22 @@ const ForCollectiveCard = () => {
             (1){' '}
             <FormattedMessage
               id="pricing.notes.paymentProcessor"
-              defaultMessage="Payment processor fees apply when using <stripeLink>Stripe</stripeLink>, <paypalLink>Paypal</paypalLink>, or <transferwiseLink>Wise</transferwiseLink>."
+              defaultMessage="Payment processor fees apply when using <stripeLink></stripeLink>, <paypalLink></paypalLink>, or <transferwiseLink></transferwiseLink>."
               values={{
                 stripeLink: getI18nLink({
                   href: 'https://stripe.com/pricing',
                   openInNewTab: true,
+                  children: 'Stripe',
                 }),
                 paypalLink: getI18nLink({
                   href: 'https://paypal.com/pricing',
                   openInNewTab: true,
+                  children: 'PayPal',
                 }),
                 transferwiseLink: getI18nLink({
                   href: 'https://wise.com/pricing',
                   openInNewTab: true,
+                  children: 'Wise',
                 }),
               }}
             />

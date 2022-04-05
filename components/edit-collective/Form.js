@@ -793,10 +793,7 @@ class EditCollectiveForm extends React.Component {
           step: '0.01',
           post: '%',
           defaultValue: get(this.state.collective, 'hostFeePercent'),
-          when: () =>
-            collective.isHost &&
-            ((collective.plan?.name !== 'start-plan-2021' && collective.type === ORGANIZATION) ||
-              collective.hostFeePercent !== 0),
+          when: () => collective.isHost && (collective.type === ORGANIZATION || collective.hostFeePercent !== 0),
         },
         {
           name: 'tos',
