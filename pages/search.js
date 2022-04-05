@@ -21,6 +21,7 @@ import Page from '../components/Page';
 import Pagination from '../components/Pagination';
 import SearchCollectiveCard from '../components/search-page/SearchCollectiveCard';
 import SearchForm from '../components/SearchForm';
+import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
 import { fadeIn } from '../components/StyledKeyframes';
 import StyledLink from '../components/StyledLink';
