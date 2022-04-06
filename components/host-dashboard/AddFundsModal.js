@@ -141,6 +141,12 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
           }
         }
       }
+      ... on AccountWithHost {
+        host {
+          id
+          isTrustedHost
+        }
+      }
       ... on AccountWithContributions {
         tiers {
           nodes {
@@ -297,6 +303,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   // From the Host dashboard we pass host and collective as API v2 objects
   const canAddHostFee = host.plan?.hostFees && collective.id !== host.id;
   const defaultHostFeePercent = canAddHostFee && collective.hostFeePercent ? collective.hostFeePercent : 0;
+  const canAddPlatformTip = collective.host?.isTrustedHost;
 
   const handleClose = () => {
     setFundDetails({ showPlatformTipModal: false });
@@ -594,7 +601,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       </StyledLink>
                     </Container>
                   </Container>
-                  {hostFee === 0 && (
+                  {canAddPlatformTip && hostFee === 0 && (
                     <Container>
                       <StyledHr my={3} borderColor="black.300" />
                       <div>
@@ -691,6 +698,9 @@ AddFundsModal.propTypes = {
     currency: PropTypes.string,
     hostFeePercent: PropTypes.number,
     slug: PropTypes.string,
+    host: PropTypes.shape({
+      isTrustedHost: PropTypes.bool,
+    }),
   }).isRequired,
   onClose: PropTypes.func,
 };
