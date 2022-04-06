@@ -493,6 +493,7 @@ const ExpenseFormPayeeStep = ({
                   onNext?.();
                 } else {
                   // We use set touched here to display errors on fields that are not dirty.
+                  // eslint-disable-next-line no-console
                   console.log('ExpenseFormPayeeStep > Validation failed', errors);
                   formik.setTouched(errors);
                   formik.setErrors(errors);

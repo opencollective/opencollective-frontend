@@ -32,6 +32,7 @@ imagemin([process.argv[2]], {
   ...options,
   destination: process.argv[3] || Path.dirname(process.argv[2]),
 }).then(files => {
+  // eslint-disable-next-line no-console
   console.log(
     `${files.length} optimized files:\n${files
       .map(file => `${file.sourcePath} => ${file.destinationPath}`)
