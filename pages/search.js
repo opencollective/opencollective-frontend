@@ -28,9 +28,9 @@ import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
 import { fadeIn } from '../components/StyledKeyframes';
 import StyledLink from '../components/StyledLink';
+import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import { H1, P, Span } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
-import { StyledSelectFilter } from '../components/StyledSelectFilter';
 
 const CollectiveCardContainer = styled.div`
   width: 275px;
@@ -222,7 +222,7 @@ class SearchPage extends React.Component {
                   getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
                   selected={this.state.filter}
                   justifyContent="left"
-                  minButtonWidth={140}
+                  minButtonWidth="95px"
                   onChange={filter => {
                     this.setState({ filter: filter });
                     this.onClick(filter);
