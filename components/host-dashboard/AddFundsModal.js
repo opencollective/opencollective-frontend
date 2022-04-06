@@ -303,7 +303,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   // From the Host dashboard we pass host and collective as API v2 objects
   const canAddHostFee = host.plan?.hostFees && collective.id !== host.id;
   const defaultHostFeePercent = canAddHostFee && collective.hostFeePercent ? collective.hostFeePercent : 0;
-  const canAddPlatformTip = collective.host?.isTrustedHost;
+  const canAddPlatformTip = data?.account?.host?.isTrustedHost;
 
   const handleClose = () => {
     setFundDetails({ showPlatformTipModal: false });
@@ -698,9 +698,6 @@ AddFundsModal.propTypes = {
     currency: PropTypes.string,
     hostFeePercent: PropTypes.number,
     slug: PropTypes.string,
-    host: PropTypes.shape({
-      isTrustedHost: PropTypes.bool,
-    }),
   }).isRequired,
   onClose: PropTypes.func,
 };
