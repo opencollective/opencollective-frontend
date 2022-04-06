@@ -237,12 +237,12 @@ class SearchPage extends React.Component {
                         <FormattedMessage defaultMessage="Make sure your spelling is correct" />
                       </li>
                       <li>
-                        <Span pt={8}>
+                        <Span pt="8px">
                           <FormattedMessage defaultMessage="Broaden your search (e.g. search 'garden' instead of 'community garden')" />
                         </Span>
                       </li>
                       <li>
-                        <Span pt={8}>
+                        <Span pt="8px">
                           <FormattedMessage
                             defaultMessage="Search our <Link>Docs</Link> for more info about using the Open Collective platform"
                             values={{
