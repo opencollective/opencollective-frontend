@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../../lib/collective.lib';
 
+import { IGNORED_TAGS } from '../../pages/search';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import I18nCollectiveTags from '../I18nCollectiveTags';
@@ -211,12 +212,17 @@ const StyledCollectiveCard = ({
                   {countryString}
                 </Span>
               )}
+            </Container>
+            <Container>
               {collective.tags &&
-                collective.tags.slice(0, 3).map(tag => (
-                  <StyledTag key={tag} display="inline-block" variant="rounded-right" m={1}>
-                    {tag}
-                  </StyledTag>
-                ))}
+                collective.tags
+                  .filter(tag => !IGNORED_TAGS.includes(tag))
+                  .slice(0, 4)
+                  .map(tag => (
+                    <StyledTag key={tag} display="inline-block" variant="rounded-right" m={1}>
+                      {tag}
+                    </StyledTag>
+                  ))}
             </Container>
           </Container>
           {children}

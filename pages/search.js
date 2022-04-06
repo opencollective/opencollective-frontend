@@ -119,6 +119,8 @@ const FilterButton = styled(StyledButton).attrs({
     `}
 `;
 
+export const IGNORED_TAGS = ['community', 'user'];
+
 class SearchPage extends React.Component {
   static getInitialProps({ query }) {
     return {
@@ -272,18 +274,20 @@ class SearchPage extends React.Component {
                 <FormattedMessage defaultMessage="Tags" />
               </FilterLabel>
               <Flex flexWrap="wrap" width={[null, '1000px']}>
-                {tagStats?.nodes?.map(node => (
-                  <FilterButton
-                    as={StyledTag}
-                    key={node.tag}
-                    title={node.tag}
-                    variant="rounded-right"
-                    $isSelected={tags.includes(node.tag)}
-                    onClick={() => this.changeTags(node.tag)}
-                  >
-                    {truncate(node.tag, { length: 9 })}
-                  </FilterButton>
-                ))}
+                {tagStats?.nodes
+                  ?.filter(node => !IGNORED_TAGS.includes(node.tag))
+                  .map(node => (
+                    <FilterButton
+                      as={StyledTag}
+                      key={node.tag}
+                      title={node.tag}
+                      variant="rounded-right"
+                      $isSelected={tags.includes(node.tag)}
+                      onClick={() => this.changeTags(node.tag)}
+                    >
+                      {truncate(node.tag, { length: 9 })}
+                    </FilterButton>
+                  ))}
               </Flex>
             </Container>
           )}
