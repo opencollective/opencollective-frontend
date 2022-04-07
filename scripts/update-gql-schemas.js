@@ -49,6 +49,7 @@ export function printToFile(schema, filePath) {
     fs.writeFileSync(output, schema);
     return { status: 'ok', path: output };
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error(err.message.slice(0, 100));
     return { status: 'err', message: err.message };
   }
@@ -59,6 +60,7 @@ export async function main(endpoint, filePath) {
   const schema = await getRemoteSchema(endpoint);
 
   if (schema.status === 'err') {
+    // eslint-disable-next-line no-console
     console.error(schema.message);
   } else {
     printToFile(schema.schema, filePath);

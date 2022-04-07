@@ -134,7 +134,7 @@ const ExpenseInviteNotificationBanner = props => {
             ) : (
               <ResendDraftInviteButton expense={props.expense} />
             )}
-            <StyledLink href="/support" buttonStyle="standard" buttonSize="tiny">
+            <StyledLink href="/help" buttonStyle="standard" buttonSize="tiny">
               <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
             </StyledLink>
           </Box>
