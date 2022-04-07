@@ -109,7 +109,7 @@ class TopBarMobileMenu extends React.Component {
               <Slack size={17} color="#9D9FA3" />
             </StyledRoundButton>
           </StyledLink>
-          <StyledLink href="mailto:info@opencollective.com" openInNewTab onClick={closeMenu}>
+          <StyledLink as={Link} href="/contact" openInNewTab onClick={closeMenu}>
             <StyledRoundButton size={40} mr={2}>
               <Mail size={19} color="#9D9FA3" />
             </StyledRoundButton>

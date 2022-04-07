@@ -467,7 +467,7 @@ class SearchPage extends React.Component {
                   </Container>
                   <Container fontSize="18px" lineHeight="26px" pt={16}>
                     <FormattedMessage
-                      defaultMessage="Still no luck? Contact <SupportLink></SupportLink> or find us in <SlackLink>Slack</SlackLink>"
+                      defaultMessage="Still no luck? Contact <SupportLink>support</SupportLink> or find us in <SlackLink>Slack</SlackLink>"
                       values={{
                         SupportLink: I18nSupportLink,
                         SlackLink: getI18nLink({
