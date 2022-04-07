@@ -14,7 +14,7 @@ import StyledSelect from '../StyledSelect';
 import { P, Span } from '../Text';
 
 const ExpenseRecurringForm = ({ recurring, onChange, ...props }) => {
-  const [isRecurring, setRecurring] = React.useState(false);
+  const [isRecurring, setRecurring] = React.useState(!!recurring);
 
   const handleSetRecurring = isRecurring => {
     if (!isRecurring) {
@@ -74,6 +74,7 @@ const ExpenseRecurringForm = ({ recurring, onChange, ...props }) => {
                     options={RecurringIntervalOptions}
                     onChange={({ value: interval }) => onChange({ ...recurring, interval })}
                     menuPlacement="auto"
+                    value={RecurringIntervalOptions.find(i => i.value === recurring?.interval)}
                     isSearchable={false}
                   />
                 )}
@@ -96,6 +97,7 @@ const ExpenseRecurringForm = ({ recurring, onChange, ...props }) => {
                     menuPlacement="auto"
                     height="38px"
                     width="100%"
+                    value={recurring?.endsAt && toIsoDateStr(recurring.endsAt)}
                     min={toIsoDateStr(new Date())}
                   />
                 )}
@@ -112,7 +114,7 @@ ExpenseRecurringForm.propTypes = {
   onChange: PropTypes.func,
   recurring: PropTypes.shape({
     interval: PropTypes.string,
-    endDate: PropTypes.endDate,
+    endsAt: PropTypes.Date,
   }),
 };
 
