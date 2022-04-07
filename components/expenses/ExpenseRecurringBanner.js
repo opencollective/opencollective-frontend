@@ -58,10 +58,16 @@ const ExpenseRecurringEditModal = ({ onClose, expense }) => {
   };
 
   return (
-    <StyledModal role="alertdialog" width="432px" onClose={onClose} trapFocus>
+    <StyledModal role="alertdialog" width="432px" onClose={onClose} padding="auto" px={4} py="20px" trapFocus>
       <ModalHeader onClose={onClose}>Recurring Expense Setting</ModalHeader>
       <ModalBody pt={2}>
         <Flex flexDirection={'column'}>
+          <P color="black.700" fontWeight="400" fontSize="14px" lineHeight="20px" mt={0} mb={2}>
+            <FormattedMessage
+              id="Expense.Recurring.Edit.Description"
+              defaultMessage="Once the frequency and end date are set, you can't edit them. You can always cancel the recurring expense and submit a new one."
+            />
+          </P>
           <Box>
             <P color="black.700" fontWeight="600" fontSize="13px" lineHeight="16px" mt={2} mb={1}>
               <FormattedMessage id="Frequency" defaultMessage="Frequency" />
@@ -99,11 +105,12 @@ const ExpenseRecurringEditModal = ({ onClose, expense }) => {
             my={1}
             autoFocus
             minWidth={140}
-            buttonStyle="danger"
+            buttonStyle="dangerSecondary"
+            buttonSize="small"
             onClick={handleDeletion}
             disabled={loading}
           >
-            Delete Recurring Expense
+            Cancel Recurring Expense
           </StyledButton>
         </Container>
       </ModalFooter>
