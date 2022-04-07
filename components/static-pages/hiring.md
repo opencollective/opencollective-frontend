@@ -8,17 +8,7 @@ Are you a top-notch engineer, product manager, or operations person? Do you want
 
 Join us at [Open Collective](https://opencollective.com/e2c) -- a tech platform that enables a network of 600+ nonprofits, co-ops, and fiscal hosts to support 7000+ groups to raise and spend $35 million each year with full transparency. We love open source, mutual aid, climate justice, and the work of decentralized groups.
 
-<!--
 <strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>
--->
-
-We're still hiring for the following roles:
-
-<ul>
-  <li><a href='#software-engineer'> 2 Senior Software Engineers</a></li>
-</ul>
-
-Pay is transparent and is based on [where you live](https://docs.google.com/spreadsheets/d/1TvdgSmFbfB6Cj8vnWm01v7wZmo42QpcSvCK8tgIzDW0/edit#gid=165029136).
 
 ## But first, a little about us
 
@@ -34,52 +24,15 @@ We are a remote-first team that loves distributed leadership and autonomy within
 
 We are building and maintaining money management software for the commons.
 
-<h2 id='software-engineer'>Senior Software Engineer</h2>
-
-We are looking for a senior "full-stack" software engineer who’s excited about open source, making communities sustainable, and transparent finances.
-
-### We think you’d be great at this if you:
-
-- Are comfortable in a remote environment that is at the same time highly collaborative (we [apply](https://github.com/opencollective/opencollective/issues/2267) a [seeking feedback process](https://reinventingorganizationswiki.com/theory/decision-making/)) and autonomous (you can run a feature end to end on your own!)
-
-- Are based within 6 hours of Central European Time:
-
-  - to optimize timezone overlaps with the current engineering team (who are predominantly based in Europe)
-
-- Have significant experience as a full stack engineer using JavaScript (<em>"senior"</em>)
-
-- Are familiar with the technologies used in our two main projects:
-
-  - our GraphQL API (powered by Node, PostgreSQL and Sequelize)
-  - our Web App (powered by Next.js, React and Apollo).
-
-- You are excited about our mission and share our philosophy.
-
-<!--
 ## Want to apply spontaneously?
--->
 
-## Interested?
-
-### Senior Software Engineer position
-
-Please [email us](mailto:info@opencollective.com) with "Senior Software Engineer" as subject.
-
-Your message should be convincing enough for us to consider your candidature and move you to the next stage. Ideally, we want you to cover the following:
+Please [email us](mailto:info@opencollective.com) and let us know a little about yourself. Ideally, we want you to cover the following:
 
 - About you. What's your story? Where you are coming from? What's you current status?
 - About us. How did you hear about Open Collective? What do you find interesting in Open Collective?
 - Experience. What is your greatest achievment in software engineering? Can you tell us about a past project you're proud of (it doesn’t have to be an engineering one or even a technical one.)? What do you think you can bring to Open Collective?
 
 As part of our screening process, we'll also ask you to make a small contribution to [our codebase](https://github.com/opencollective). Have a look, do one now or be ready for it!
-
-### Senior Product Manager position
-
-Please [email us](mailto:info@opencollective.com) who you are, your experience and skills, and why you’re interested. This can take the form of a traditional CV, a website, video, or however you like to communicate.
-
-### Operations position
-
-Please [email us](mailto:info@opencollective.com) who you are, your experience and skills, and why you’re interested. This can take the form of a traditional CV, a website, video, or however you like to communicate.
 
 ## Join us today!
 
