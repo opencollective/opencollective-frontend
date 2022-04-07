@@ -279,7 +279,6 @@ const HostVirtualCards = props => {
           onClose={() => {
             setAssignCardModalDisplay(false);
           }}
-          show
         />
       )}
       {editingVirtualCard && (
@@ -290,7 +289,6 @@ const HostVirtualCards = props => {
             setEditingVirtualCard(undefined);
           }}
           virtualCard={editingVirtualCard}
-          show
         />
       )}
       {deletingVirtualCard && (
@@ -301,7 +299,6 @@ const HostVirtualCards = props => {
             setDeletingVirtualCard(undefined);
           }}
           virtualCard={deletingVirtualCard}
-          show
         />
       )}
       {displayCreateVirtualCardModal && (
@@ -311,7 +308,6 @@ const HostVirtualCards = props => {
           onClose={() => {
             setCreateVirtualCardModalDisplay(false);
           }}
-          show
         />
       )}
     </Fragment>

@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
+import { FEATURES, isFeatureEnabled } from '../lib/allowed-features';
+import { convertDateToApiUtc } from '../lib/date-utils';
 import dayjs from '../lib/dayjs';
 import { getErrorFromGraphqlException } from '../lib/errors';
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
+import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import Body from './Body';
 import CollectiveNavbar from './collective-navbar';
@@ -13,7 +16,9 @@ import Container from './Container';
 import CreateEventForm from './CreateEventForm';
 import Footer from './Footer';
 import Header from './Header';
+import { getI18nLink } from './I18nFormatters';
 import Link from './Link';
+import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import { withUser } from './UserProvider';
 
@@ -36,8 +41,8 @@ class CreateEvent extends React.Component {
       event: {
         parentCollective: props.parentCollective,
         timezone, // "Europe/Brussels", // "America/New_York"
-        startsAt,
-        endsAt,
+        startsAt: convertDateToApiUtc(startsAt, timezone),
+        endsAt: convertDateToApiUtc(endsAt, timezone),
       },
       result: {},
     };
@@ -95,8 +100,7 @@ class CreateEvent extends React.Component {
 
   render() {
     const { parentCollective, LoggedInUser } = this.props;
-    const canCreateEvent = LoggedInUser && LoggedInUser.canEditCollective(parentCollective);
-
+    const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(parentCollective);
     const collective = parentCollective || {};
     const title = `Create a New ${collective.name} Event`;
 
@@ -105,10 +109,10 @@ class CreateEvent extends React.Component {
         <Header title={title} className={this.state.status} LoggedInUser={this.props.LoggedInUser} />
 
         <Body>
-          <CollectiveNavbar collective={collective} isAdmin={canCreateEvent} />
+          <CollectiveNavbar collective={collective} isAdmin={isAdmin} />
 
           <div className="content">
-            {!canCreateEvent && (
+            {!isAdmin ? (
               <Container margin="0 auto" textAlign="center">
                 <p>
                   <FormattedMessage
@@ -124,8 +128,19 @@ class CreateEvent extends React.Component {
                   </Link>
                 </p>
               </Container>
-            )}
-            {canCreateEvent && (
+            ) : collective.isFrozen ? (
+              <MessageBox withIcon type="warning" my={5}>
+                <FormattedMessage defaultMessage="This account is currently frozen and cannot be used to create events." />{' '}
+                {isFeatureEnabled(collective.host, FEATURES.CONTACT_FORM) && (
+                  <FormattedMessage
+                    defaultMessage="Please <ContactLink>contact</ContactLink> your fiscal host for more details."
+                    values={{
+                      ContactLink: getI18nLink({ href: `${getCollectivePageRoute(collective.host)}/contact` }),
+                    }}
+                  />
+                )}
+              </MessageBox>
+            ) : (
               <div>
                 <CreateEventForm
                   event={this.state.event}

@@ -263,7 +263,6 @@ const MoveAuthoredContributions = () => {
 
       {hasConfirmationModal && (
         <ConfirmationModal
-          show
           header={callToAction}
           continueHandler={moveContributions}
           disableSubmit={hasConfirmCheckbox && !hasConfirmed}

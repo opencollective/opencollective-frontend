@@ -1,17 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Flex } from './Grid';
+import { I18nSupportLink } from './I18nFormatters';
 import Page from './Page';
 import { H1, P } from './Text';
-
-const messages = defineMessages({
-  title: {
-    id: 'FeatureNotSupported.title',
-    defaultMessage: 'Page inaccessible',
-  },
-});
 
 /**
  * A page to show when the feature is not supported by the collective.
@@ -19,7 +13,7 @@ const messages = defineMessages({
  */
 const PageFeatureNotSupported = ({ showContactSupportLink, ...props }) => {
   const { formatMessage } = useIntl();
-  const title = formatMessage(messages.title);
+  const title = formatMessage({ id: 'FeatureNotSupported.title', defaultMessage: 'Page inaccessible' });
   return (
     <Page noRobots title={title} {...props}>
       <Flex flexDirection="column" justifyContent="center" alignItems="center" px={2} py={[5, 6]}>
@@ -41,7 +35,8 @@ const PageFeatureNotSupported = ({ showContactSupportLink, ...props }) => {
               {' '}
               <FormattedMessage
                 id="ContactSupportForDetails"
-                defaultMessage="Please contact support@opencollective.com for more details."
+                defaultMessage="Please contact <SupportLink></SupportLink> for more details."
+                values={{ SupportLink: I18nSupportLink }}
               />
             </React.Fragment>
           )}

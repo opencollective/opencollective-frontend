@@ -10,7 +10,7 @@ const Banner = () => (
     <Box>
       <P fontSize="14px" lineHeight="20px" color="primary.900">
         <FormattedMessage
-          defaultMessage="We're hiring a Senior Product Manager and a Senior Software Engineer! <link><strong>Learn more about open positions</strong></link>"
+          defaultMessage="We're hiring Senior Software Engineers! <link><strong>Learn more about open positions</strong></link>"
           values={{
             strong: I18nBold,
             link: getI18nLink({

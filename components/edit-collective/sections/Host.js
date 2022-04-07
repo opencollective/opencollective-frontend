@@ -18,7 +18,7 @@ import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledLink from '../../StyledLink';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { H4, P } from '../../Text';
 import CreateHostFormWithData from '../CreateHostFormWithData';
 import EditConnectedAccount from '../EditConnectedAccount';
@@ -279,55 +279,61 @@ class Host extends React.Component {
               )}
             </Box>
           </Flex>
-          <Modal show={showModal} width="570px" onClose={closeModal}>
-            <ModalHeader onClose={closeModal}>
-              {action === 'Remove' ? (
-                <FormattedMessage id="collective.editHost.remove" values={{ name }} defaultMessage={'Remove {name}'} />
-              ) : (
-                <FormattedMessage
-                  id="collective.editHost.header"
-                  values={{ name }}
-                  defaultMessage={'Withdraw application to {name}'}
-                />
-              )}
-            </ModalHeader>
-            <ModalBody>
-              <P>
-                {action === 'Withdraw' && (
+          {showModal && (
+            <StyledModal width="570px" onClose={closeModal}>
+              <ModalHeader onClose={closeModal}>
+                {action === 'Remove' ? (
                   <FormattedMessage
-                    id="collective.editHost.withdrawApp"
+                    id="collective.editHost.remove"
                     values={{ name }}
-                    defaultMessage={'Are you sure you want to withdraw your application to {name}?'}
+                    defaultMessage={'Remove {name}'}
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="collective.editHost.header"
+                    values={{ name }}
+                    defaultMessage={'Withdraw application to {name}'}
                   />
                 )}
-                {action === 'Remove' && (
-                  <FormattedMessage
-                    id="collective.editHost.removeHost"
-                    values={{ name }}
-                    defaultMessage={'Are you sure you want to remove {name}?'}
-                  />
-                )}
-              </P>
-            </ModalBody>
-            <ModalFooter>
-              <Container display="flex" justifyContent="flex-end">
-                <StyledButton
-                  mx={20}
-                  onClick={() =>
-                    this.setState({
-                      showModal: false,
-                    })
-                  }
-                >
-                  <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
-                </StyledButton>
-                <StyledButton buttonStyle="primary" onClick={() => this.changeHost()} data-cy="continue">
-                  {/** TODO(i18n): This should be internationalized */}
-                  {action}
-                </StyledButton>
-              </Container>
-            </ModalFooter>
-          </Modal>
+              </ModalHeader>
+              <ModalBody>
+                <P>
+                  {action === 'Withdraw' && (
+                    <FormattedMessage
+                      id="collective.editHost.withdrawApp"
+                      values={{ name }}
+                      defaultMessage={'Are you sure you want to withdraw your application to {name}?'}
+                    />
+                  )}
+                  {action === 'Remove' && (
+                    <FormattedMessage
+                      id="collective.editHost.removeHost"
+                      values={{ name }}
+                      defaultMessage={'Are you sure you want to remove {name}?'}
+                    />
+                  )}
+                </P>
+              </ModalBody>
+              <ModalFooter>
+                <Container display="flex" justifyContent="flex-end">
+                  <StyledButton
+                    mx={20}
+                    onClick={() =>
+                      this.setState({
+                        showModal: false,
+                      })
+                    }
+                  >
+                    <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
+                  </StyledButton>
+                  <StyledButton buttonStyle="primary" onClick={() => this.changeHost()} data-cy="continue">
+                    {/** TODO(i18n): This should be internationalized */}
+                    {action}
+                  </StyledButton>
+                </Container>
+              </ModalFooter>
+            </StyledModal>
+          )}
         </Fragment>
       );
     }

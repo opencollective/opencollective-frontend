@@ -8,15 +8,7 @@ const RequestVirtualCardBtn = ({ children, collective, host }) => {
   return (
     <Fragment>
       {children({ onClick: () => setShowModal(true) })}
-      {showModal && (
-        <RequestVirtualCardModal
-          host={host}
-          collective={collective}
-          onClose={() => setShowModal(false)}
-          setShow={setShowModal}
-          show
-        />
-      )}
+      {showModal && <RequestVirtualCardModal host={host} collective={collective} onClose={() => setShowModal(false)} />}
     </Fragment>
   );
 };

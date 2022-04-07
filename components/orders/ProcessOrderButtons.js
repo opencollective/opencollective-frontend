@@ -107,7 +107,6 @@ const ProcessOrderButtons = ({ order, permissions }) => {
       )}
       {hasConfirm && (
         <ConfirmationModal
-          show
           onClose={() => setConfirm(false)}
           continueHandler={() => triggerAction(selectedAction)}
           isDanger={selectedAction === 'MARK_AS_EXPIRED'}
@@ -129,11 +128,7 @@ const ProcessOrderButtons = ({ order, permissions }) => {
         </ConfirmationModal>
       )}
       {showContributionConfirmationModal && (
-        <ContributionConfirmationModal
-          show={showContributionConfirmationModal}
-          order={order}
-          onClose={() => setShowContributionConfirmationModal(false)}
-        />
+        <ContributionConfirmationModal order={order} onClose={() => setShowContributionConfirmationModal(false)} />
       )}
     </React.Fragment>
   );

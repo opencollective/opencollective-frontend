@@ -22,7 +22,7 @@ import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import StyledTooltip from '../../StyledTooltip';
 import { H3, P } from '../../Text';
 import { withUser } from '../../UserProvider';
@@ -253,11 +253,7 @@ class UserTwoFactorAuth extends React.Component {
                       const { values, errors, touched, handleSubmit, isSubmitting } = formik;
 
                       return (
-                        <Modal
-                          show={this.state.disablingTwoFactorAuth}
-                          width="570px"
-                          onClose={() => this.setState({ disablingTwoFactorAuth: false })}
-                        >
+                        <StyledModal width="570px" onClose={() => this.setState({ disablingTwoFactorAuth: false })}>
                           <ModalHeader>
                             <FormattedMessage
                               id="TwoFactorAuth.Disable.Header"
@@ -320,7 +316,7 @@ class UserTwoFactorAuth extends React.Component {
                               </StyledButton>
                             </Container>
                           </ModalFooter>
-                        </Modal>
+                        </StyledModal>
                       );
                     }}
                   </Formik>
@@ -386,30 +382,31 @@ class UserTwoFactorAuth extends React.Component {
                       </Container>
                     </Box>
                   </Container>
-                  <ConfirmationModal
-                    show={showRecoveryCodesModal}
-                    isDanger
-                    type="confirm"
-                    onClose={() => this.setState({ showRecoveryCodesModal: false })}
-                    continueHandler={() =>
-                      this.setState({
-                        recoveryCodes: null,
-                        enablingTwoFactorAuth: false,
-                        showRecoveryCodesModal: false,
-                      })
-                    }
-                    header={
+                  {showRecoveryCodesModal && (
+                    <ConfirmationModal
+                      isDanger
+                      type="confirm"
+                      onClose={() => this.setState({ showRecoveryCodesModal: false })}
+                      continueHandler={() =>
+                        this.setState({
+                          recoveryCodes: null,
+                          enablingTwoFactorAuth: false,
+                          showRecoveryCodesModal: false,
+                        })
+                      }
+                      header={
+                        <FormattedMessage
+                          id="TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Header"
+                          defaultMessage="Are you sure?"
+                        />
+                      }
+                    >
                       <FormattedMessage
-                        id="TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Header"
-                        defaultMessage="Are you sure?"
+                        id="TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Body"
+                        defaultMessage="Once you click 'Confirm', you will no longer have access to your recovery codes."
                       />
-                    }
-                  >
-                    <FormattedMessage
-                      id="TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Body"
-                      defaultMessage="Once you click 'Confirm', you will no longer have access to your recovery codes."
-                    />
-                  </ConfirmationModal>
+                    </ConfirmationModal>
+                  )}
                 </Fragment>
               ) : (
                 <Fragment>

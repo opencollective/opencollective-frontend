@@ -18,7 +18,7 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledInputMask from '../StyledInputMask';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
@@ -170,7 +170,7 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
   return (
-    <Modal width="382px" onClose={handleClose} trapFocus {...modalProps}>
+    <StyledModal width="382px" onClose={handleClose} trapFocus {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose}>
           <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />
@@ -385,7 +385,7 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
           </Container>
         </ModalFooter>
       </form>
-    </Modal>
+    </StyledModal>
   );
 };
 

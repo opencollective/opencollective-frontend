@@ -26,7 +26,7 @@ import StyledButton from './StyledButton';
 import StyledCheckbox from './StyledCheckbox';
 import StyledHr from './StyledHr';
 import StyledInputFormikField from './StyledInputFormikField';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import StyledTextarea from './StyledTextarea';
 import { H1, P } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
@@ -202,7 +202,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   const isOCFHost = host?.legacyId === OPENCOLLECTIVE_FOUNDATION_ID;
 
   return (
-    <Modal onClose={onClose} width="570px" {...props}>
+    <StyledModal onClose={onClose} width="570px" {...props}>
       {loading ? (
         <React.Fragment>
           <ModalHeader hideCloseIcon>
@@ -439,7 +439,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
           )}
         </Formik>
       )}
-    </Modal>
+    </StyledModal>
   );
 };
 
@@ -451,10 +451,6 @@ ApplyToHostModal.propTypes = {
   /** Use this to force the value for `collective`. If not specified, user's administrated collectives will be displayed instead */
   collective: PropTypes.object,
   router: PropTypes.object,
-};
-
-ApplyToHostModal.defaultProps = {
-  show: true,
 };
 
 export default withRouter(ApplyToHostModal);

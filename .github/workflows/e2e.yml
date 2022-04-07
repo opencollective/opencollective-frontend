@@ -71,7 +71,7 @@ jobs:
         run: sudo apt-get install -y graphicsmagick
 
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '14.x'
 
@@ -89,7 +89,7 @@ jobs:
       # Checkouts
 
       - name: Checkout (frontend)
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set REF in env, removing the `refs/` part
         run: echo "MATCHING_BRANCH_REF=$(echo $GITHUB_REF | sed 's|refs/||')" >> $GITHUB_ENV
@@ -108,7 +108,7 @@ jobs:
 
       - name: Checkout (api - matching branch)
         if: steps.check-matching-branch.outputs.status == 200
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
@@ -116,13 +116,13 @@ jobs:
 
       - name: Checkout (api - main)
         if: steps.check-matching-branch.outputs.status != 200
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
 
       - name: Checkout (images)
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: opencollective/opencollective-images
           path: opencollective-images
@@ -217,7 +217,7 @@ jobs:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
 
       - name: Archive test screenshots
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: screenshots
           path: test/cypress/screenshots

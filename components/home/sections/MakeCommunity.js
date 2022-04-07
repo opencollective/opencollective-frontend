@@ -7,7 +7,7 @@ import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
 import StyledButton from '../../StyledButton';
-import Modal from '../../StyledModal';
+import StyledModal from '../../StyledModal';
 import { H1, H2, P, Span } from '../../Text';
 import NextIllustration from '../HomeNextIllustration';
 
@@ -172,25 +172,26 @@ const MakeCommunity = () => {
           </P>
         </Box>
       </Container>
-      <Modal
-        padding="0"
-        background="transparent"
-        show={showModal}
-        width={[1, null, '670px', null, '770px']}
-        onClose={() => setShowModal(false)}
-      >
-        <Container display="flex" width={1} height={400} maxWidth={712} background="black">
-          <iframe
-            title="YouTube video"
-            width="100%"
-            height="400px"
-            src="https://www.youtube.com/embed/IBU5fSILAe8"
-            frameBorder="0"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        </Container>
-      </Modal>
+      {showModal && (
+        <StyledModal
+          padding="0"
+          background="transparent"
+          width={[1, null, '670px', null, '770px']}
+          onClose={() => setShowModal(false)}
+        >
+          <Container display="flex" width={1} height={400} maxWidth={712} background="black">
+            <iframe
+              title="YouTube video"
+              width="100%"
+              height="400px"
+              src="https://www.youtube.com/embed/IBU5fSILAe8"
+              frameBorder="0"
+              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </Container>
+        </StyledModal>
+      )}
     </Fragment>
   );
 };

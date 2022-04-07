@@ -13,7 +13,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import Container from '../../Container';
 import { Flex } from '../../Grid';
 import StyledButton from '../../StyledButton';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import StyledTooltip from '../../StyledTooltip';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
@@ -78,7 +78,7 @@ const removeMemberMutation = gqlV2/* GraphQL */ `
 `;
 
 const EditMemberModal = props => {
-  const { intl, member, show, collective, isLastAdmin, cancelHandler, LoggedInUser, refetchLoggedInUser } = props;
+  const { intl, member, collective, isLastAdmin, cancelHandler, LoggedInUser, refetchLoggedInUser } = props;
 
   const { addToast } = useToasts();
 
@@ -259,7 +259,7 @@ const EditMemberModal = props => {
 
   return (
     <Container>
-      <Modal width={688} show={show} onClose={cancelHandler}>
+      <StyledModal width={688} onClose={cancelHandler}>
         <ModalHeader>
           <FormattedMessage id="editTeam.member.edit" defaultMessage="Edit Team Member" />
         </ModalHeader>
@@ -330,7 +330,7 @@ const EditMemberModal = props => {
             </StyledButton>
           </Container>
         </ModalFooter>
-      </Modal>
+      </StyledModal>
     </Container>
   );
 };
@@ -343,7 +343,6 @@ EditMemberModal.propTypes = {
   member: PropTypes.object,
   LoggedInUser: PropTypes.object.isRequired,
   refetchLoggedInUser: PropTypes.func.isRequired,
-  show: PropTypes.bool,
   router: PropTypes.object,
 };
 

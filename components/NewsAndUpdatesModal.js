@@ -17,14 +17,14 @@ import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledCarousel from './StyledCarousel';
 import StyledLink from './StyledLink';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P, Span } from './Text';
 
 const ModalHeaderWrapper = styled(ModalHeader)`
   height: 58px;
 `;
 
-const ModalWrapper = styled(Modal)`
+const ModalWrapper = styled(StyledModal)`
   padding-top: 8px;
   padding-bottom: 0px;
 `;

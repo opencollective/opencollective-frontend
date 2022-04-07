@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { isOneOfTypes } from '../../../lib/collective-sections';
+import { CollectiveType } from '../../../lib/constants/collectives';
 import { exportMembers } from '../../../lib/export_file';
 
 import Container from '../../Container';
@@ -28,16 +30,7 @@ class Export extends React.Component {
 
     return (
       <div>
-        <SettingsSectionTitle>
-          <FormattedMessage id="export.widget.title" defaultMessage="Widget" />
-        </SettingsSectionTitle>
-        <Container as="pre" fontSize="11px" whiteSpace="pre-wrap" mb={4}>
-          {widgetCode}
-        </Container>
-        <Box my={4}>
-          <ExportImages collective={collective} />
-        </Box>
-        <SettingsSectionTitle mt={4}>
+        <SettingsSectionTitle mt={2}>
           <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
         </SettingsSectionTitle>
         <P mb={2}>
@@ -142,28 +135,44 @@ class Export extends React.Component {
             </tr>
           </tbody>
         </Container>
-        {collective.tiers[0] && (
-          <div>
-            e.g.,
-            <br />
-            <a href={`/${collective.slug}/members/all.json?limit=10&offset=0&TierId=${collective.tiers[0].id}`}>
-              https://opencollective.com/
-              {collective.slug}
-              /members/all.json?limit=10&offset=0&TierId=
-              {collective.tiers[0].id}
-            </a>
-          </div>
-        )}
-        {!collective.tiers[0] && (
-          <div>
-            e.g.,
-            <br />
-            <a href={`/${collective.slug}/members/all.json?limit=10&offset=0`}>
-              https://opencollective.com/
-              {collective.slug}
-              /members/all.json?limit=10&offset=0
-            </a>
-          </div>
+        <Container mb={4}>
+          {collective.tiers[0] && (
+            <div>
+              e.g.,
+              <br />
+              <a href={`/${collective.slug}/members/all.json?limit=10&offset=0&TierId=${collective.tiers[0].id}`}>
+                https://opencollective.com/
+                {collective.slug}
+                /members/all.json?limit=10&offset=0&TierId=
+                {collective.tiers[0].id}
+              </a>
+            </div>
+          )}
+          {!collective.tiers[0] && (
+            <div>
+              e.g.,
+              <br />
+              <a href={`/${collective.slug}/members/all.json?limit=10&offset=0`}>
+                https://opencollective.com/
+                {collective.slug}
+                /members/all.json?limit=10&offset=0
+              </a>
+            </div>
+          )}
+        </Container>
+
+        {!isOneOfTypes(collective, [CollectiveType.EVENT, CollectiveType.PROJECT]) && (
+          <React.Fragment>
+            <SettingsSectionTitle>
+              <FormattedMessage id="export.widget.title" defaultMessage="Widget" />
+            </SettingsSectionTitle>
+            <Container as="pre" fontSize="11px" whiteSpace="pre-wrap" mb={4}>
+              {widgetCode}
+            </Container>
+            <Box my={4}>
+              <ExportImages collective={collective} />
+            </Box>
+          </React.Fragment>
         )}
       </div>
     );

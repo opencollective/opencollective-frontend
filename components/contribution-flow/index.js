@@ -684,7 +684,7 @@ class ContributionFlow extends React.Component {
         interval: stepDetails?.interval,
         onClick: () => this.setState({ isSubmitting: true }),
         onCancel: () => this.setState({ isSubmitting: false }),
-        onError: e => this.setState({ isSubmitting: false, error: `PayPal error: ${e.message}` }),
+        onError: e => this.setState({ isSubmitting: false, error: e.message }),
         // New callback, used by `PayWithPaypalButton`
         onSuccess: paypalInfo => {
           this.setState(

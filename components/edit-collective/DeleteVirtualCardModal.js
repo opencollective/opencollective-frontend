@@ -8,7 +8,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import StyledButton from '../StyledButton';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
@@ -58,7 +58,7 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps
   };
 
   return (
-    <Modal width="382px" onClose={handleClose} trapFocus {...modalProps}>
+    <StyledModal width="382px" onClose={handleClose} trapFocus {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose}>
           <FormattedMessage defaultMessage="Delete virtual card" />
@@ -84,7 +84,7 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps
           </Container>
         </ModalFooter>
       </form>
-    </Modal>
+    </StyledModal>
   );
 };
 

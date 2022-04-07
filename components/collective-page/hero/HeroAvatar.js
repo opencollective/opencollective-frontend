@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { Camera } from '@styled-icons/feather/Camera';
+import { inRange } from 'lodash';
 import dynamic from 'next/dynamic';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { upload } from '../../../lib/api';
+import { AVATAR_HEIGHT_RANGE, AVATAR_WIDTH_RANGE } from '../../../lib/constants/collectives';
 import { getAvatarBorderRadius } from '../../../lib/image-utils';
 
 import Avatar from '../../Avatar';
@@ -17,6 +19,7 @@ import { Box } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import { P, Span } from '../../Text';
+import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import { editCollectiveAvatarMutation } from '../graphql/mutations';
 
 const AVATAR_SIZE = 128;
@@ -77,24 +80,14 @@ const Triangle = styled.div`
   text-shadow: -2px -3px 4px rgba(121, 121, 121, 0.5);
 `;
 
-const Translations = defineMessages({
-  settings: {
-    id: 'Settings',
-    defaultMessage: 'Settings',
-  },
-  uploadImage: {
-    id: 'uploadImage.sizeRejected',
-    defaultMessage: 'Image resolution needs to be less than 3000x3000, and file size must be below 5MB.',
-  },
-});
-
-const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
+const HeroAvatar = ({ collective, isAdmin, intl }) => {
   const [editing, setEditing] = React.useState(false);
   const [showModal, setshowModal] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [uploadedImage, setUploadedImage] = React.useState(null);
   const borderRadius = getAvatarBorderRadius(collective.type);
   const [editImage] = useMutation(editCollectiveAvatarMutation);
+  const { addToast, removeToasts } = useToasts();
 
   const onDropImage = async ([image]) => {
     if (image) {
@@ -111,12 +104,32 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
     return new Promise(resolve => {
       const img = new Image();
       img.onload = () => {
-        if (img.width >= 3000 || img.height >= 3000 || image.size >= 5000000) {
-          handleHeroMessage({ content: intl.formatMessage(Translations.uploadImage), type: 'warning' });
+        if (
+          !inRange(img.width, ...AVATAR_WIDTH_RANGE) ||
+          !inRange(img.height, ...AVATAR_HEIGHT_RANGE) ||
+          image.size >= 5000000
+        ) {
+          addToast({
+            type: TOAST_TYPE.ERROR,
+            __isAvatarUploadError: true, // Flag to allow for easy removal of toast when a valid image is uploaded
+            message: intl.formatMessage(
+              {
+                id: 'uploadImage.sizeRejected',
+                defaultMessage:
+                  'Image resolution needs to be between {minResolution} and {maxResolution}. File size must be below {maxFileSize}.',
+              },
+              {
+                minResolution: `${AVATAR_WIDTH_RANGE[0]}x${AVATAR_HEIGHT_RANGE[0]}`,
+                maxResolution: `${AVATAR_WIDTH_RANGE[1]}x${AVATAR_HEIGHT_RANGE[1]}`,
+                maxFileSize: '5MB',
+              },
+            ),
+          });
+
           resolve(false);
         } else {
-          handleHeroMessage(null);
           resolve(true);
+          removeToasts(toast => Boolean(toast.__isAvatarUploadError));
         }
       };
       img.src = image.preview;
@@ -183,7 +196,6 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
         </Dropzone>
         {showModal && (
           <ConfirmationModal
-            show={showModal}
             width="100%"
             maxWidth="570px"
             onClose={() => {
@@ -198,7 +210,6 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
                 setshowModal(false);
               } finally {
                 setSubmitting(false);
-                handleHeroMessage(null);
               }
             }}
           >
@@ -270,7 +281,6 @@ const HeroAvatar = ({ collective, isAdmin, intl, handleHeroMessage }) => {
                     setEditing(false);
                   } finally {
                     setSubmitting(false);
-                    handleHeroMessage(null);
                   }
                 }}
               >
@@ -295,7 +305,6 @@ HeroAvatar.propTypes = {
   }).isRequired,
   isAdmin: PropTypes.bool,
   intl: PropTypes.object,
-  handleHeroMessage: PropTypes.func,
 };
 
 export default injectIntl(HeroAvatar);

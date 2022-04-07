@@ -12,8 +12,10 @@ import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
+import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
+import Container from '../Container';
 import DateTime from '../DateTime';
 import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
 import ExpenseFilesPreviewModal from '../expenses/ExpenseFilesPreviewModal';
@@ -102,7 +104,7 @@ const ExpenseBudgetItem = ({
   const nbAttachedFiles = !isAdminView ? 0 : getNbAttachedFiles(expense);
   const isExpensePaidOrRejected = [expenseStatus.REJECTED, expenseStatus.PAID].includes(expense?.status);
   const isMultiCurrency =
-    expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
+    expense?.amountInAccountCurrency && expense.amountInAccountCurrency?.currency !== expense.currency;
 
   return (
     <ExpenseContainer data-cy={`expense-container-${expense?.legacyId}`}>
@@ -213,17 +215,9 @@ const ExpenseBudgetItem = ({
                   </Span>
                 </div>
                 {isMultiCurrency && (
-                  <Box my={1}>
-                    <Span color="black.600" fontSize="13px">
-                      ~{' '}
-                      <FormattedMoneyAmount
-                        amount={expense.amountInAccountCurrency.valueInCents}
-                        currency={expense.amountInAccountCurrency.currency}
-                        precision={2}
-                        amountStyles={null}
-                      />
-                    </Span>
-                  </Box>
+                  <Container color="black.600" fontSize="13px" my={1}>
+                    <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency} />
+                  </Container>
                 )}
               </React.Fragment>
             )}
@@ -336,7 +330,6 @@ const ExpenseBudgetItem = ({
       </Flex>
       {hasFilesPreview && (
         <ExpenseFilesPreviewModal
-          show
           collective={expense.account}
           expense={expense}
           onClose={() => showFilesPreview(false)}

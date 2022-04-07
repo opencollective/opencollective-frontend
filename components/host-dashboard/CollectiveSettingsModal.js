@@ -85,7 +85,7 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
   const hasParent = Boolean(collective.parent);
 
   return (
-    <StyledModal show maxWidth={432} trapFocus {...props}>
+    <StyledModal maxWidth={432} trapFocus {...props}>
       <CollectiveModalHeader collective={collective} mb={3} />
       <ModalBody>
         <P fontSize="16px" lineHeight="24px" fontWeight="500" mb={2}>

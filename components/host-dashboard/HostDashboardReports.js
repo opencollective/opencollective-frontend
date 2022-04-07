@@ -5,7 +5,7 @@ import { Question } from '@styled-icons/remix-line/Question';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../../lib/collective-sections';
+import { CollectiveType } from '../../lib/constants/collectives';
 import { simpleDateToISOString } from '../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
@@ -224,7 +224,7 @@ const HostDashboardReports = ({ hostSlug }) => {
             <CollectivePickerAsync
               inputId="TransactionsCollectiveFilter"
               data-cy="transactions-collective-filter"
-              types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.PROJECT]}
+              types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.PROJECT, CollectiveType.FUND]}
               isMulti
               hostCollectiveIds={[host?.legacyId]}
               onChange={value => setCollectives(prepareCollectivesForFilter(value))}

@@ -71,6 +71,7 @@ const hostedCollectivesQuery = gqlV2/* GraphQL */ `
             type
             currency
             imageUrl(height: 96)
+            isFrozen
             tags
             settings
             createdAt

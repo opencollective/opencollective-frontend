@@ -4,7 +4,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective.lib';
-import { CollectiveType, getCollectiveTypeKey, isOneOfTypes, isType } from '../../lib/collective-sections';
+import { getCollectiveTypeKey, isOneOfTypes, isType } from '../../lib/collective-sections';
+import { CollectiveType } from '../../lib/constants/collectives';
 
 import { HOST_SECTIONS } from '../host-dashboard/constants';
 
@@ -109,11 +110,6 @@ const Menu = ({ collective, isAccountantOnly }) => {
                 section={FISCAL_HOST_SECTIONS.POLICIES}
                 if={isOneOfTypes(collective, [USER, ORGANIZATION])}
               />
-              <MenuLink
-                collective={collective}
-                section={FISCAL_HOST_SECTIONS.HOST_PLAN}
-                if={isOneOfTypes(collective, [USER, ORGANIZATION])}
-              />
             </MenuGroup>
           </SubMenu>
         </MenuGroup>
@@ -142,7 +138,11 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={COLLECTIVE_SECTIONS.POLICIES}
             if={isOneOfTypes(collective, [COLLECTIVE, FUND])}
           />
-          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.EXPORT} if={isType(collective, COLLECTIVE)} />
+          <MenuLink
+            collective={collective}
+            section={COLLECTIVE_SECTIONS.EXPORT}
+            if={isOneOfTypes(collective, [COLLECTIVE, EVENT, PROJECT])}
+          />
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.HOST}

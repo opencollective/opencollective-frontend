@@ -7,8 +7,8 @@ import { defineMessages, injectIntl } from 'react-intl';
 import { getCollectiveImage } from '../lib/image-utils';
 import { truncate } from '../lib/utils';
 
+import GlobalWarnings from './GlobalWarnings';
 import TopBar from './TopBar';
-import UserWarnings from './UserWarnings';
 
 const messages = defineMessages({
   defaultTitle: {
@@ -119,7 +119,7 @@ class Header extends React.Component {
         {withTopBar && (
           <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
         )}
-        <UserWarnings />
+        <GlobalWarnings collective={this.props.collective} />
       </header>
     );
   }

@@ -4,6 +4,7 @@ import { SliderAlt } from '@styled-icons/boxicons-regular/SliderAlt';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { CollectiveType } from '../../lib/constants/collectives';
 import { HOST_FEE_STRUCTURE } from '../../lib/constants/host-fee-structure';
 import { getCurrencySymbol } from '../../lib/currency-utils';
 import { formatHostFeeStructure } from '../../lib/i18n/host-fee-structure';
@@ -18,6 +19,7 @@ import { P, Span } from '../Text';
 
 import AddFundsModal from './AddFundsModal';
 import CollectiveSettingsModal from './CollectiveSettingsModal';
+import HostAdminCollectiveCardMoreButton from './HostAdminCollectiveCardMoreButton';
 
 const SectionTitle = props => (
   <Flex alignItems="center" mb={1}>
@@ -99,31 +101,36 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
         <P fontSize="12px" lineHeight="18px" color="black.800">
           <FormattedDate value={since} day="numeric" month="long" year="numeric" />
         </P>
-        <Container display="flex" alignItems="center" position="relative" mt={20}>
-          <StyledRoundButton
-            data-cy="hosted-collective-add-funds-btn"
-            buttonStyle="successSecondary"
-            size={32}
-            fontSize="16px"
-            onClick={() => setCurrentModal('addFunds')}
-            title={intl.formatMessage({ id: 'menu.addFunds', defaultMessage: 'Add Funds' })}
-          >
-            {getCurrencySymbol(collective.currency)}
-            <PlusIcon>+</PlusIcon>
-          </StyledRoundButton>
+        <Container display="flex" justifyContent="space-between" alignItems="center" position="relative" mt={20}>
+          <Flex>
+            <StyledRoundButton
+              data-cy="hosted-collective-add-funds-btn"
+              buttonStyle="successSecondary"
+              size={32}
+              fontSize="16px"
+              onClick={() => setCurrentModal('addFunds')}
+              title={intl.formatMessage({ id: 'menu.addFunds', defaultMessage: 'Add Funds' })}
+            >
+              {getCurrencySymbol(collective.currency)}
+              <PlusIcon>+</PlusIcon>
+            </StyledRoundButton>
 
-          <StyledRoundButton
-            ml={2}
-            size={32}
-            onClick={() => setCurrentModal('accountSettings')}
-            title={intl.formatMessage({ defaultMessage: 'Account settings' })}
-          >
-            <SliderAlt size={14} color="#9D9FA3" />
-          </StyledRoundButton>
+            <StyledRoundButton
+              ml={2}
+              size={32}
+              onClick={() => setCurrentModal('accountSettings')}
+              title={intl.formatMessage({ defaultMessage: 'Account settings' })}
+            >
+              <SliderAlt size={14} color="#9D9FA3" />
+            </StyledRoundButton>
+          </Flex>
+          {[CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(collective.type) && (
+            <HostAdminCollectiveCardMoreButton collective={collective} />
+          )}
         </Container>
       </Box>
       {currentModal === 'addFunds' && (
-        <AddFundsModal show collective={collective} host={host} onClose={() => setCurrentModal(null)} />
+        <AddFundsModal collective={collective} host={host} onClose={() => setCurrentModal(null)} />
       )}
       {currentModal === 'accountSettings' && (
         <CollectiveSettingsModal collective={collective} host={host} onClose={() => setCurrentModal(null)} />
@@ -136,10 +143,12 @@ HostAdminCollectiveCard.propTypes = {
   since: PropTypes.string,
   host: PropTypes.object,
   collective: PropTypes.shape({
+    type: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     hostFeesStructure: PropTypes.oneOf([null, ...Object.values(HOST_FEE_STRUCTURE)]),
     hostFeePercent: PropTypes.number,
     totalFinancialContributors: PropTypes.number,
+    isFrozen: PropTypes.bool,
     parent: PropTypes.object,
     stats: PropTypes.shape({
       balance: PropTypes.shape({

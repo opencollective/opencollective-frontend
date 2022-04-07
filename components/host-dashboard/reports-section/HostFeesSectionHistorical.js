@@ -109,11 +109,6 @@ const getChartOptions = (intl, hostCurrency) => ({
       formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale),
     },
   },
-  tooltip: {
-    y: {
-      formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale),
-    },
-  },
 });
 
 const SERIES_NAMES = defineMessages({

@@ -4,13 +4,13 @@ import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, uniqBy, update } from 'lodash';
 import { withRouter } from 'next/router';
 
-import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { stripHTML } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
+import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
@@ -124,13 +124,13 @@ class UpdatePage extends React.Component {
     const { account, update } = data;
     const comments = get(update, 'comments.nodes', []);
     const totalCommentsCount = get(update, 'comments.totalCount', 0);
-
+    const updateSlug = update?.slug || this.props.updateSlug;
     return (
       <Page
         collective={account}
         title={update.title}
         description={stripHTML(update.summary)}
-        canonicalURL={`${getCollectivePageCanonicalURL(account)}/update`}
+        canonicalURL={`${getCollectivePageCanonicalURL(account)}/updates/${updateSlug}`}
         metaTitle={`${update.title} - ${account.name}`}
       >
         <CollectiveNavbar
@@ -192,7 +192,19 @@ const updateQuery = gqlV2/* GraphQL */ `
       description
       settings
       imageUrl
+      isFrozen
       twitterHandle
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+          name
+          features {
+            id
+            CONTACT_FORM
+          }
+        }
+      }
       features {
         ...NavbarFields
       }
@@ -213,6 +225,7 @@ const updateQuery = gqlV2/* GraphQL */ `
     }
     update(slug: $updateSlug, account: { slug: $collectiveSlug }) {
       id
+      slug
       title
       createdAt
       publishedAt

@@ -91,7 +91,7 @@ ExpenseInvoicePreview.propTypes = {
   fileURL: PropTypes.string,
 };
 
-const ExpenseFilesPreviewModal = ({ collective, expense, show, onClose }) => {
+const ExpenseFilesPreviewModal = ({ collective, expense, onClose }) => {
   const [invoiceFile, setInvoiceFile] = React.useState(false);
   const [invoiceBlob, setInvoiceBlob] = React.useState(null);
   const [invoiceError, setInvoiceError] = React.useState(false);
@@ -116,7 +116,6 @@ const ExpenseFilesPreviewModal = ({ collective, expense, show, onClose }) => {
 
   return (
     <FilesPreviewModal
-      show={show}
       files={files}
       onClose={onClose}
       renderInfo={({ item }) => (
@@ -155,7 +154,6 @@ ExpenseFilesPreviewModal.propTypes = {
   collective: PropTypes.object,
   expense: PropTypes.object,
   onClose: PropTypes.func.isRequired,
-  show: PropTypes.bool,
 };
 
 export default ExpenseFilesPreviewModal;

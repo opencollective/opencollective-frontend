@@ -11,7 +11,7 @@ import Container from '../../Container';
 import { getI18nLink } from '../../I18nFormatters';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
 import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
@@ -185,69 +185,71 @@ const ArchiveCollective = ({ collective }) => {
         </StyledButton>
       )}
 
-      <Modal show={modal.show} width="570px" onClose={closeModal}>
-        <ModalHeader onClose={closeModal}>
-          {modal.type === 'Unarchive' ? (
-            <FormattedMessage
-              id="unarchive.modal.header"
-              defaultMessage="Unarchive {name}"
-              values={{ name: collective.name }}
-            />
-          ) : (
-            <FormattedMessage
-              id="archive.modal.header"
-              defaultMessage="Archive {name}"
-              values={{ name: collective.name }}
-            />
-          )}
-        </ModalHeader>
-        <ModalBody>
-          <P>
-            {modal.type !== 'Unarchive' && (
+      {modal.show && (
+        <StyledModal width="570px" onClose={closeModal}>
+          <ModalHeader onClose={closeModal}>
+            {modal.type === 'Unarchive' ? (
               <FormattedMessage
-                id="archive.account.confirmation"
-                defaultMessage={
-                  'Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
-                }
-                values={{ type: collective.type }}
+                id="unarchive.modal.header"
+                defaultMessage="Unarchive {name}"
+                values={{ name: collective.name }}
+              />
+            ) : (
+              <FormattedMessage
+                id="archive.modal.header"
+                defaultMessage="Archive {name}"
+                values={{ name: collective.name }}
               />
             )}
-            {modal.type === 'Unarchive' && (
-              <FormattedMessage
-                id="unarchive.account.confirmation"
-                defaultMessage={
-                  'Are you sure you want to unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
-                }
-                values={{ type: collective.type }}
-              />
-            )}
-          </P>
-        </ModalBody>
-        <ModalFooter>
-          <Container display="flex" justifyContent="flex-end">
-            <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false })}>
-              <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
-            </StyledButton>
-            <StyledButton
-              buttonStyle="primary"
-              data-cy="action"
-              onClick={() => {
-                if (modal.type === 'Unarchive') {
-                  handleUnarchiveCollective({ id: collective.id });
-                } else {
-                  handleArchiveCollective({ id: collective.id });
-                }
-              }}
-            >
-              {modal.type === 'Unarchive' ? (
-                <FormattedMessage id="collective.unarchive.confirm.btn" defaultMessage={'Unarchive'} />
-              ) : (
-                <FormattedMessage id="collective.archive.confirm.btn" defaultMessage={'Archive'} />
+          </ModalHeader>
+          <ModalBody>
+            <P>
+              {modal.type !== 'Unarchive' && (
+                <FormattedMessage
+                  id="archive.account.confirmation"
+                  defaultMessage={
+                    'Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
+                  }
+                  values={{ type: collective.type }}
+                />
               )}
-            </StyledButton>
-          </Container>
-        </ModalFooter>
-      </Modal>
+              {modal.type === 'Unarchive' && (
+                <FormattedMessage
+                  id="unarchive.account.confirmation"
+                  defaultMessage={
+                    'Are you sure you want to unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
+                  }
+                  values={{ type: collective.type }}
+                />
+              )}
+            </P>
+          </ModalBody>
+          <ModalFooter>
+            <Container display="flex" justifyContent="flex-end">
+              <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false })}>
+                <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
+              </StyledButton>
+              <StyledButton
+                buttonStyle="primary"
+                data-cy="action"
+                onClick={() => {
+                  if (modal.type === 'Unarchive') {
+                    handleUnarchiveCollective({ id: collective.id });
+                  } else {
+                    handleArchiveCollective({ id: collective.id });
+                  }
+                }}
+              >
+                {modal.type === 'Unarchive' ? (
+                  <FormattedMessage id="collective.unarchive.confirm.btn" defaultMessage={'Unarchive'} />
+                ) : (
+                  <FormattedMessage id="collective.archive.confirm.btn" defaultMessage={'Archive'} />
+                )}
+              </StyledButton>
+            </Container>
+          </ModalFooter>
+        </StyledModal>
+      )}
     </Container>
   );
 };

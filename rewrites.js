@@ -31,10 +31,6 @@ exports.REWRITES = [
     destination: '/guest-join',
   },
   {
-    source: '/subscriptions',
-    destination: '/recurring-contributions-redirect',
-  },
-  {
     source: '/organizations/new',
     destination: '/createOrganization',
   },
@@ -172,6 +168,15 @@ exports.REWRITES = [
     source: '/:collectiveSlug/:verb(tiers|contribute|events|projects|connected-collectives)',
     destination: '/contribute',
   },
+  // Embed
+  {
+    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:paymentFlow(crypto)?/:step(${contributionFlowSteps})?`,
+    destination: '/embed/contribution-flow',
+  },
+  {
+    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:step(${contributionFlowSteps})?`,
+    destination: '/embed/contribution-flow',
+  },
   // Tier page
   {
     source:
@@ -190,15 +195,6 @@ exports.REWRITES = [
   {
     source: '/:collectiveSlug/conversations/:slug?-:id([a-z0-9]+)',
     destination: '/conversation',
-  },
-  // Embed
-  {
-    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:paymentFlow(crypto)?/:step(${contributionFlowSteps})?`,
-    destination: '/embed/contribution-flow',
-  },
-  {
-    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:step(${contributionFlowSteps})?`,
-    destination: '/embed/contribution-flow',
   },
   // Contribute Flow
   // ---------------
