@@ -16,7 +16,6 @@ We're still hiring for the following roles:
 
 <ul>
   <li><a href='#software-engineer'> 2 Senior Software Engineers</a></li>
-  <li><a href='#operations-manager'>Operations Manager</a></li>
 </ul>
 
 Pay is transparent and is based on [where you live](https://docs.google.com/spreadsheets/d/1TvdgSmFbfB6Cj8vnWm01v7wZmo42QpcSvCK8tgIzDW0/edit#gid=165029136).
@@ -55,34 +54,6 @@ We are looking for a senior "full-stack" software engineer who’s excited about
   - our Web App (powered by Next.js, React and Apollo).
 
 - You are excited about our mission and share our philosophy.
-
-<h2 id='operations-manager'>Operations Manager</h2>
-
-We are looking for an operations manager who is excited about building and enabling a team building and using technology to empower communities.
-
-### We think you’d be great at this if you:
-
-- Are comfortable in a remote environment that is at the same time highly collaborative (we [apply](https://github.com/opencollective/opencollective/issues/2267) a [seeking feedback process](https://reinventingorganizationswiki.com/theory/decision-making/)) and autonomous (you will own complete features and products!)
-
-- Are based within 4 hours of Central European (UTC+1) or New Zealand Standard time (UTC+12):
-
-  - to optimize timezone overlaps with the current platform (based in Europe) or operations team (who are based in New Zealand)
-
-- Have significant experience leading operations at a US-based, non-profit organisation offering fiscal-sponsorship as a service to member projects:
-
-  - Have a solid understanding of the legal and tax compliance issues involved
-  - Are comfortable guiding and working with accounting and legal counsel to meet those requirements
-  - Have a good understanding of employment law and HR policies
-
-- Are comfortable with the processes, tools and risks involved in growing and supporting a community of member projects, including but not limited to:
-
-  - managing contracts, invoices, and payments (we use Xero, HelloSign, Metabse, and _lots_ of spreadsheets)
-  - managing vendor registration and supplier agremeements
-  - working with PEOs to manage employment of contractors and employees, inc. management of benefits
-  - supporting accountants to prepare accounts, file taxes and issue 1099s
-  - supporting leadership to make effective strategic decisions on growth, development, risks and mitigation.
-
-- You have experience working within or adjacent to open source and/or solidarity economy communities, are excited about our mission, and share our philosophy.
 
 <!--
 ## Want to apply spontaneously?
