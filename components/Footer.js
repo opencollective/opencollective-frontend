@@ -177,7 +177,6 @@ const navigation = {
     openSource: 'https://github.com/opencollective/opencollective/issues',
     Slack: 'https://slack.opencollective.com',
     docsAndHelp: '/help',
-    support: '/support',
   },
   company: {
     about: 'https://docs.opencollective.com/help/about/introduction',
