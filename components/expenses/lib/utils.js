@@ -4,6 +4,7 @@ import { isEmpty, isNil, sumBy } from 'lodash';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import expenseTypes from '../../../lib/constants/expenseTypes';
 
+import { validateTaxGST } from '../ExpenseGSTFormikFields';
 import { validateTaxVAT } from '../ExpenseVATFormikFields';
 
 export const checkRequiresAddress = values => {
@@ -44,10 +45,13 @@ export const validateExpenseTaxes = (intl, taxes) => {
     return null;
   } else {
     const taxesErrors = enabledTaxes.map(tax => {
-      if (tax.type === TaxType.VAT) {
-        return validateTaxVAT(intl, tax);
-      } else {
-        return `Tax type ${tax.type} is not supported`; // No i18n because it's a developer error
+      switch (tax.type) {
+        case TaxType.GST:
+          return validateTaxGST(intl, tax);
+        case TaxType.VAT:
+          return validateTaxVAT(intl, tax);
+        default:
+          return `Tax type ${tax.type} is not supported`; // No i18n because it's a developer error
       }
     });
 

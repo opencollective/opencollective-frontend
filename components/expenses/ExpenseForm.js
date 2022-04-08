@@ -298,7 +298,7 @@ const ExpenseFormBody = ({
     }
   }, [values.payee]);
 
-  // Return to Payee step if type is changed
+  // Return to Payee step if type is changed and reset some values
   React.useEffect(() => {
     if (!isCreditCardCharge) {
       setStep(STEPS.PAYEE);
@@ -306,6 +306,11 @@ const ExpenseFormBody = ({
 
       if (!isDraft && values.payee?.isInvite) {
         formik.setFieldValue('payee', null);
+      }
+
+      // Only invoices can have taxes
+      if (values.taxes?.length && !values.taxes[0].isDisabled && values.type !== expenseTypes.INVOICE) {
+        formik.setFieldValue('taxes', [{ ...values.taxes[0], isDisabled: true }]);
       }
     }
   }, [values.type]);

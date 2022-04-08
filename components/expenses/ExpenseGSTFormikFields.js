@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { checkVATNumberFormat, TaxType } from '@opencollective/taxes';
+import { TaxType } from '@opencollective/taxes';
 import { isNil } from 'lodash';
 import { useIntl } from 'react-intl';
 
@@ -10,11 +10,11 @@ import { verifyValueInRange } from '../../lib/form-utils';
 import { Grid } from '../Grid';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
-import StyledInputGroup from '../StyledInputGroup';
+import StyledSelect from '../StyledSelect';
 
-export const validateTaxVAT = (intl, tax) => {
+export const validateTaxGST = (intl, tax) => {
   const errors = {};
-  if (tax.type !== TaxType.VAT) {
+  if (tax.type !== TaxType.GST) {
     return errors;
   }
 
@@ -25,24 +25,20 @@ export const validateTaxVAT = (intl, tax) => {
   }
 
   // ID number is required if there's a tax rate
-  if (tax.rate) {
-    if (!tax.idNumber) {
-      errors.idNumber = createError(ERROR.FORM_FIELD_REQUIRED);
-    } else if (!checkVATNumberFormat(tax.idNumber).isValid) {
-      errors.idNumber = createError(ERROR.FORM_FIELD_PATTERN);
-    }
+  if (tax.rate && !tax.idNumber) {
+    errors.idNumber = createError(ERROR.FORM_FIELD_REQUIRED);
   }
 
   return errors;
 };
 
-const ExpenseVATFormikFields = ({ formik, isOptional }) => {
+const ExpenseGSTFormikFields = ({ formik, isOptional }) => {
   const intl = useIntl();
 
-  // If mounted, it means that the form is subject to VAT. Let's make sure we initialize taxes field accordingly
+  // If mounted, it means that the form is subject to GST. Let's make sure we initialize taxes field accordingly
   React.useEffect(() => {
-    if (!formik.values.taxes?.[0]?.type !== TaxType.VAT) {
-      formik.setFieldValue('taxes.0.type', TaxType.VAT);
+    if (!formik.values.taxes?.[0]?.type !== TaxType.GST) {
+      formik.setFieldValue('taxes.0', { ...formik.values.taxes?.[0], type: TaxType.GST, rate: 15 });
     }
   }, []);
 
@@ -50,17 +46,28 @@ const ExpenseVATFormikFields = ({ formik, isOptional }) => {
     <Grid gridTemplateColumns="120px minmax(120px, 1fr)" gridGap={2}>
       <StyledInputFormikField
         name="taxes.0.rate"
-        htmlFor="vat-rate"
-        label={intl.formatMessage({ defaultMessage: 'VAT rate' })}
+        htmlFor="GST-rate"
+        label={intl.formatMessage({ defaultMessage: 'GST rate' })}
         inputType="number"
         required={!isOptional}
       >
-        {({ field }) => <StyledInputGroup {...field} append="%" min={0} max={100} step="0.01" />}
+        {({ field }) => (
+          <StyledSelect
+            isSearchable={false}
+            name="taxes.0.rate"
+            inputId={field.id}
+            error={field.error}
+            onBlur={() => formik.setFieldTouched(field.name, true)}
+            onChange={({ value }) => formik.setFieldValue(field.name, value)}
+            options={[0, 15].map(value => ({ value, label: `${value}%` }))}
+            value={!isNil(field.value) && { value: field.value, label: `${field.value}%` }}
+          />
+        )}
       </StyledInputFormikField>
       <StyledInputFormikField
         name="taxes.0.idNumber"
-        htmlFor="vat-number"
-        label={intl.formatMessage({ defaultMessage: 'VAT identifier' })}
+        htmlFor="GST-number"
+        label={intl.formatMessage({ defaultMessage: 'GST identifier' })}
         required={!isOptional && Boolean(formik.values.taxes?.[0]?.rate)}
         mr={2}
       >
@@ -69,7 +76,7 @@ const ExpenseVATFormikFields = ({ formik, isOptional }) => {
             {...field}
             placeholder={intl.formatMessage(
               { id: 'examples', defaultMessage: 'e.g., {examples}' },
-              { examples: 'EU000011111' },
+              { examples: '123456789' },
             )}
           />
         )}
@@ -78,9 +85,9 @@ const ExpenseVATFormikFields = ({ formik, isOptional }) => {
   );
 };
 
-ExpenseVATFormikFields.propTypes = {
+ExpenseGSTFormikFields.propTypes = {
   formik: PropTypes.object,
   isOptional: PropTypes.bool,
 };
 
-export default ExpenseVATFormikFields;
+export default ExpenseGSTFormikFields;

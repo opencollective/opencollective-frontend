@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { accountHasVAT, TaxType } from '@opencollective/taxes';
+import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { isEmpty, uniq } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
@@ -23,6 +23,7 @@ import StyledHr from '../StyledHr';
 import { P, Span } from '../Text';
 
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
+import ExpenseGSTFormikFields from './ExpenseGSTFormikFields';
 import ExpenseItemForm from './ExpenseItemForm';
 import ExpenseVATFormikFields from './ExpenseVATFormikFields';
 
@@ -159,8 +160,23 @@ class ExpenseFormItems extends React.PureComponent {
 
   getApplicableTaxType() {
     const { collective, form } = this.props;
-    if (accountHasVAT(collective) && form.values.type === expenseTypes.INVOICE) {
-      return TaxType.VAT;
+    if (form.values.type === expenseTypes.INVOICE) {
+      if (accountHasVAT(collective)) {
+        return TaxType.VAT;
+      } else if (accountHasGST(collective)) {
+        return TaxType.GST;
+      }
+    }
+  }
+
+  renderTaxFormFields(taxType, isOptional) {
+    switch (taxType) {
+      case TaxType.VAT:
+        return <ExpenseVATFormikFields formik={this.props.form} isOptional={isOptional} />;
+      case TaxType.GST:
+        return <ExpenseGSTFormikFields formik={this.props.form} isOptional={isOptional} />;
+      default:
+        return `Tax not supported: ${taxType}`;
     }
   }
 
@@ -257,9 +273,7 @@ class ExpenseFormItems extends React.PureComponent {
         {taxType && !hasTaxFields && <StyledHr borderColor="black.300" borderStyle="dotted" mb={24} mt={24} />}
         <Flex justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" mt={24}>
           <Box flexBasis={['100%', null, null, '50%']} mb={3}>
-            {hasTaxFields && taxType === TaxType.VAT && (
-              <ExpenseVATFormikFields formik={this.props.form} isOptional={values.payee?.isInvite} />
-            )}
+            {hasTaxFields && this.renderTaxFormFields(taxType, Boolean(values.payee?.isInvite))}
           </Box>
           <Box mb={3} ml={[0, null, null, 4]} flexBasis={['100%', null, null, 'auto']}>
             <ExpenseAmountBreakdown currency={values.currency} items={items} taxes={values.taxes} />
