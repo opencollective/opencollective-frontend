@@ -111,7 +111,7 @@ const HostVirtualCards = props => {
           <Box lineHeight="20px" fontSize="14px" fontWeight="500">
             <FormattedMessage
               id="Host.VirtualCards.Reminder.Title"
-              defaultMessage="Automatically Notify Collective Admins"
+              defaultMessage="Automatically notify collectives about pending receipts"
             />
             <P fontSize="11px" fontWeight="400" color="black.600">
               <FormattedMessage
@@ -136,11 +136,11 @@ const HostVirtualCards = props => {
         </Flex>
         <Flex mt={4} justifyContent="space-between" alignItems="center">
           <Box lineHeight="20px" fontSize="14px" fontWeight="500">
-            <FormattedMessage id="Host.VirtualCards.AutoPause.Title" defaultMessage="Automatically Suspend Cards" />
+            <FormattedMessage id="Host.VirtualCards.AutoPause.Title" defaultMessage="Automatically suspend cards" />
             <P fontSize="11px" fontWeight="400" color="black.600">
               <FormattedMessage
                 id="Host.VirtualCards.AutoPause.Description"
-                defaultMessage="Automatically suspend cards that fail to supply receipts after 31 days."
+                defaultMessage="Automatically suspend cards with pending receipts after 31 days and resume after all receipts are submitted."
               />
             </P>
           </Box>
