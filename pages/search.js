@@ -19,7 +19,6 @@ import { Box, Flex } from '../components/Grid';
 import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
 import InputTypeCountry from '../components/InputTypeCountry';
-import Link from '../components/Link';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
@@ -29,9 +28,8 @@ import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
 import StyledHr from '../components/StyledHr';
 import { fadeIn } from '../components/StyledKeyframes';
-import StyledLink from '../components/StyledLink';
 import { StyledSelectFilter } from '../components/StyledSelectFilter';
-import { H1, P, Span } from '../components/Text';
+import { H1, Span } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 
 const CollectiveCardContainer = styled.div`
@@ -368,36 +366,6 @@ class SearchPage extends React.Component {
                 </Span>
                 <ShareAlt size="14px" />
               </StyledButton>
-            </Flex>
-          )}
-
-          {showCollectives && accounts?.nodes?.length !== 0 && (
-            <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
-              <P pt={3} pb={3} borderTop="1px solid #E6E6E6">
-                <em>
-                  <FormattedMessage
-                    id="search.ifYouDontSee"
-                    defaultMessage="If you don't see the collective you're looking for:"
-                  />
-                </em>
-              </P>
-              {
-                <Link href={{ pathname: '/pledges/new', query: { name: term } }}>
-                  <StyledLink
-                    as={Container}
-                    display="block"
-                    fontSize="14px"
-                    fontWeight="bold"
-                    maxWidth="220px"
-                    py={2}
-                    px={4}
-                    textAlign="center"
-                    buttonStyle="primary"
-                  >
-                    <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
-                  </StyledLink>
-                </Link>
-              }
             </Flex>
           )}
         </Container>
