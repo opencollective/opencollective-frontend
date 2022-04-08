@@ -232,7 +232,7 @@ class SearchPage extends React.Component {
             </Flex>
           )}
           <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
-          <Container width={[1, 1 / 4]}>
+          <Container width="200px">
             <FilterLabel htmlFor="country-filter-type">
               <FormattedMessage id="collective.country.label" defaultMessage="Country" />
             </FilterLabel>
