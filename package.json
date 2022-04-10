@@ -83,7 +83,7 @@
     "react-dnd": "15.1.2",
     "react-dnd-html5-backend": "15.1.3",
     "react-dom": "17.0.2",
-    "react-dropzone": "12.0.4",
+    "react-dropzone": "12.0.5",
     "react-easy-crop": "4.1.4",
     "react-flip-move": "3.0.4",
     "react-geosuggest": "2.14.1",
