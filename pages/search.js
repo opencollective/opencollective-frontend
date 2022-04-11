@@ -9,6 +9,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
@@ -29,6 +30,7 @@ import StyledFilters from '../components/StyledFilters';
 import StyledHr from '../components/StyledHr';
 import { fadeIn } from '../components/StyledKeyframes';
 import StyledLink from '../components/StyledLink';
+import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import { H1, P, Span } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 
@@ -94,6 +96,18 @@ const FilterLabel = styled.label`
   color: #4d4f51;
 `;
 
+const constructSortByQuery = sortByValue => {
+  let query = {};
+  if (sortByValue === 'ACTIVITY') {
+    query = { field: 'ACTIVITY', direction: 'DESC' };
+  } else if (sortByValue === 'CREATED_AT.DESC') {
+    query = { field: 'CREATED_AT', direction: 'DESC' };
+  } else if (sortByValue === 'CREATED_AT.ASC') {
+    query = { field: 'CREATED_AT', direction: 'ASC' };
+  }
+  return query;
+};
+
 class SearchPage extends React.Component {
   static getInitialProps({ query }) {
     return {
@@ -101,6 +115,7 @@ class SearchPage extends React.Component {
       type: query.type ? decodeURIComponent(query.type).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
       country: query.country || null,
+      sortBy: query.sortBy || 'ACTIVITY',
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
     };
@@ -109,6 +124,7 @@ class SearchPage extends React.Component {
   static propTypes = {
     term: PropTypes.string, // for addSearchQueryData
     country: PropTypes.arrayOf(PropTypes.string), // for addSearchQueryData
+    sortBy: PropTypes.string, // for addSearchQueryData
     limit: PropTypes.number, // for addSearchQueryData
     offset: PropTypes.number, // for addSearchQueryData
     router: PropTypes.object, // from next.js
@@ -125,10 +141,17 @@ class SearchPage extends React.Component {
 
   changeCountry = country => {
     const { router, term } = this.props;
-    const query = { q: term, types: router.query.types };
+    const query = { q: term, types: router.query.types, sortBy: router.query.sortBy };
     if (country !== 'ALL') {
       query.country = [country];
     }
+    router.push({ pathname: router.pathname, query });
+  };
+
+  changeSort = sortBy => {
+    const { router, term } = this.props;
+    const query = { q: term, types: router.query.types, isHost: router.query.isHost, country: router.query.country };
+    query.sortBy = sortBy.value;
     router.push({ pathname: router.pathname, query });
   };
 
@@ -139,7 +162,7 @@ class SearchPage extends React.Component {
     const { router } = this.props;
     const { q } = form;
 
-    const query = { q: q.value, type: router.query.type };
+    const query = { q: q.value, type: router.query.type, sortBy: router.query.sortBy };
     if (router.query.country) {
       query.country = router.query.country;
     }
@@ -161,6 +184,8 @@ class SearchPage extends React.Component {
     if (router.query.country) {
       query.country = router.query.country;
     }
+
+    query.sortBy = router.query.sortBy;
 
     router.push({ pathname: '/search', query });
   };
@@ -189,6 +214,8 @@ class SearchPage extends React.Component {
     const filters = ['ALL', 'COLLECTIVE', 'EVENT', 'ORGANIZATION', 'HOST', 'PROJECT', 'FUND'];
     const { limit = 20, offset, totalCount = 0 } = accounts || {};
     const showCollectives = term.trim() !== '' && !!accounts?.nodes;
+    const getOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
+    const options = [getOption('ACTIVITY'), getOption('CREATED_AT.DESC'), getOption('CREATED_AT.ASC')];
 
     return (
       <Page title="Search" showSearch={false}>
@@ -217,18 +244,28 @@ class SearchPage extends React.Component {
             </Flex>
           </Container>
           {term && (
-            <Flex mt={4} mb={4} mx="auto" justifyContent="center">
-              <StyledFilters
-                filters={filters}
-                getLabel={key => intl.formatMessage(I18nFilters[key])}
-                selected={this.state.filter}
-                justifyContent="left"
-                minButtonWidth={140}
-                onChange={filter => {
-                  this.setState({ filter: filter });
-                  this.onClick(filter);
-                }}
-              />
+            <Flex mt={4} mb={4} mx="auto" flexDirection={['column', 'row']}>
+              <Container width={[1, 4 / 5]}>
+                <StyledFilters
+                  filters={filters}
+                  getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
+                  selected={this.state.filter}
+                  justifyContent="left"
+                  minButtonWidth="95px"
+                  onChange={filter => {
+                    this.setState({ filter: filter });
+                    this.onClick(filter);
+                  }}
+                />
+              </Container>
+              <Container width={[1, 1 / 5]} pt={[2, 0]}>
+                <StyledSelectFilter
+                  inputId="sort-filter"
+                  value={this.props.sortBy ? getOption(this.props.sortBy) : options[0]}
+                  options={options}
+                  onChange={sortBy => this.changeSort(sortBy)}
+                />
+              </Container>
             </Flex>
           )}
           <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
@@ -375,10 +412,11 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
   query SearchPage(
     $term: String!
     $type: [AccountType]
+    $country: [CountryISO]
+    $sortBy: OrderByInput
     $isHost: Boolean
     $limit: Int
     $offset: Int
-    $country: [CountryISO]
   ) {
     accounts(
       searchTerm: $term
@@ -388,6 +426,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
       offset: $offset
       skipRecentAccounts: true
       country: $country
+      orderBy: $sortBy
     ) {
       nodes {
         id
@@ -451,7 +490,18 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
 
 export const addSearchPageData = graphql(searchPageQuery, {
   skip: props => !props.term,
-  options: { context: API_V2_CONTEXT },
+  options: props => ({
+    context: API_V2_CONTEXT,
+    variables: {
+      term: props.term,
+      type: props.type,
+      isHost: props.isHost,
+      limit: props.limit,
+      offset: props.offset,
+      country: props.country,
+      sortBy: constructSortByQuery(props.sortBy),
+    },
+  }),
 });
 
 export default withToasts(injectIntl(withRouter(addSearchPageData(SearchPage))));
