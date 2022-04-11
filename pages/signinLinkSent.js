@@ -4,6 +4,7 @@ import { PaperPlane } from '@styled-icons/boxicons-regular/PaperPlane';
 import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+import { isEmail } from 'validator';
 
 import Container from '../components/Container';
 import { Box, Flex } from '../components/Grid';
@@ -34,7 +35,7 @@ class SignInLinkSent extends Component {
 
   render() {
     const { email } = this.props;
-
+    const isValidEmail = email && isEmail(email);
     return (
       <Page title="Login Link Sent" noRobots>
         <Container pt={[4, 5]} pb={6} px={3} background="linear-gradient(180deg, #EBF4FF, #FFFFFF)" textAlign="center">
@@ -44,13 +45,15 @@ class SignInLinkSent extends Component {
           <H3 as="h1" fontWeight="bold">
             <FormattedMessage id="SignIn.LinkSent" defaultMessage="Your magic link is on its way!" />
           </H3>
-          <P fontSize="16px" lineHeight="24px" color="black.900" mt={4}>
-            <FormattedMessage
-              id="SignIn.SentTo"
-              defaultMessage="We've sent it to {email}."
-              values={{ email: <strong>{email}</strong> }}
-            />
-          </P>
+          {isValidEmail && (
+            <P fontSize="16px" lineHeight="24px" color="black.900" mt={4}>
+              <FormattedMessage
+                id="SignIn.SentTo"
+                defaultMessage="We've sent it to {email}."
+                values={{ email: <strong>{email}</strong> }}
+              />
+            </P>
+          )}
           <P color="black.700" fontSize="14px" lineHeight="18px" my={4}>
             <FormattedMessage
               id="SignIn.SuccessDetails"
