@@ -176,6 +176,12 @@ const nextConfig = {
         destination: '/recurring-contributions',
         permanent: false,
       },
+      // Legacy support page
+      {
+        source: '/support',
+        destination: '/help',
+        permanent: true,
+      },
     ];
   },
 };

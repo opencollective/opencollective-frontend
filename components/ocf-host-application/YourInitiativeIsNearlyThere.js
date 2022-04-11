@@ -74,7 +74,7 @@ const YourInitiativeIsNearlyThere = () => (
         <Link href="/">
           <FormattedMessage id="home" defaultMessage="Home" />
         </Link>
-        <Link href="/support">
+        <Link href="/help">
           <FormattedMessage id="community.support" defaultMessage="Support" />
         </Link>
         <Link href="https://slack.opencollective.com/">Slack</Link>

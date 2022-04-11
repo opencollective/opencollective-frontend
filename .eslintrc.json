@@ -3,7 +3,7 @@
   "env": { "jest": true },
   "plugins": ["graphql", "react-hooks", "simple-import-sort", "formatjs", "styled-components-a11y"],
   "rules": {
-    "no-console": "warn",
+    "no-console": "error",
     "require-atomic-updates": "off",
     "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
     "no-restricted-imports": [
@@ -103,5 +103,13 @@
         }
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["scripts/*.js"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
 }

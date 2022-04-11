@@ -105,7 +105,7 @@ const getTotalPayoutAmount = (expense, { paymentProcessorFee, feesPayer }) => {
   }
 };
 
-const canCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount, isRoot) => {
+const getCanCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount, isRoot) => {
   const supportedPayoutMethods = [PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.OTHER];
   const isSupportedPayoutMethod = supportedPayoutMethods.includes(expense.payoutMethod?.type);
   const isFullBalance = expense.amount === get(collective, 'stats.balanceWithBlockedFunds.valueInCents');
@@ -254,6 +254,9 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
                 ...formik.values,
                 ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
                 paymentProcessorFee: null,
+                feesPayer: !getCanCustomizeFeesPayer(expense, collective, hasManualPayment, null, LoggedInUser.isRoot())
+                  ? DEFAULT_VALUES.feesPayer // Reset fees payer if can't customize
+                  : formik.values.feesPayer,
               });
             }}
           >
@@ -290,7 +293,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
             )}
           </StyledInputField>
         )}
-        {canCustomizeFeesPayer(
+        {getCanCustomizeFeesPayer(
           expense,
           collective,
           hasManualPayment,

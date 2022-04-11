@@ -77,7 +77,6 @@ export default class FilesPreviewModal extends React.Component {
       <UploadedFilePreview
         url={item.url}
         size={350}
-        hasLink
         onClick={this.getItemOnClick(item)}
         isDownloading={this.state.isDownloading}
         title={item.title}

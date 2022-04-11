@@ -38,6 +38,7 @@ import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
+import StyledCard from '../components/StyledCard';
 import { H1 } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
@@ -375,20 +376,23 @@ class CreateExpensePage extends React.Component {
                         )}
                         {step === STEPS.SUMMARY && (
                           <div>
-                            <ExpenseSummary
-                              host={collective.host}
-                              expense={{
-                                ...this.state.expense,
-                                createdByAccount: this.props.data.loggedInAccount,
-                              }}
-                              collective={collective}
-                            />
-                            {hasFeature(collective, FEATURES.RECURRING_EXPENSES) && (
-                              <ExpenseRecurringForm
-                                recurring={this.state.recurring}
-                                onChange={recurring => this.setState({ recurring })}
+                            <StyledCard p={[16, 24, 32]} mb={0}>
+                              <ExpenseSummary
+                                host={collective.host}
+                                expense={{
+                                  ...this.state.expense,
+                                  createdByAccount: this.props.data.loggedInAccount,
+                                }}
+                                collective={collective}
+                                borderless
                               />
-                            )}
+                              {hasFeature(collective, FEATURES.RECURRING_EXPENSES) && (
+                                <ExpenseRecurringForm
+                                  recurring={this.state.recurring}
+                                  onChange={recurring => this.setState({ recurring })}
+                                />
+                              )}
+                            </StyledCard>
                             <Box mt={24}>
                               <ExpenseNotesForm
                                 onChange={this.onNotesChanges}

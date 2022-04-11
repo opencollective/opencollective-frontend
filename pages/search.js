@@ -9,6 +9,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
@@ -17,6 +18,7 @@ import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
 import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
+import InputTypeCountry from '../components/InputTypeCountry';
 import Link from '../components/Link';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
@@ -28,6 +30,7 @@ import StyledFilters from '../components/StyledFilters';
 import StyledHr from '../components/StyledHr';
 import { fadeIn } from '../components/StyledKeyframes';
 import StyledLink from '../components/StyledLink';
+import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import StyledTag from '../components/StyledTag';
 import { H1, P, Span } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
@@ -83,8 +86,6 @@ const SearchFormContainer = styled(Box)`
   min-width: 10rem;
 `;
 
-const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
-
 const FilterLabel = styled.label`
   font-weight: 500;
   font-size: 12px;
@@ -93,6 +94,18 @@ const FilterLabel = styled.label`
   padding-bottom: 8px;
   color: #4d4f51;
 `;
+
+const constructSortByQuery = sortByValue => {
+  let query = {};
+  if (sortByValue === 'ACTIVITY') {
+    query = { field: 'ACTIVITY', direction: 'DESC' };
+  } else if (sortByValue === 'CREATED_AT.DESC') {
+    query = { field: 'CREATED_AT', direction: 'DESC' };
+  } else if (sortByValue === 'CREATED_AT.ASC') {
+    query = { field: 'CREATED_AT', direction: 'ASC' };
+  }
+  return query;
+};
 
 const FilterButton = styled(StyledButton).attrs({
   buttonSize: 'tiny',
@@ -120,6 +133,7 @@ const FilterButton = styled(StyledButton).attrs({
 `;
 
 export const IGNORED_TAGS = ['community', 'user'];
+const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
 
 class SearchPage extends React.Component {
   static getInitialProps({ query }) {
@@ -127,6 +141,8 @@ class SearchPage extends React.Component {
       term: query.q || '',
       type: query.type ? decodeURIComponent(query.type).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
+      country: query.country || null,
+      sortBy: query.sortBy || 'ACTIVITY',
       tag: query.tag?.split(',') || [],
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
@@ -135,6 +151,8 @@ class SearchPage extends React.Component {
 
   static propTypes = {
     term: PropTypes.string, // for addSearchQueryData
+    country: PropTypes.arrayOf(PropTypes.string), // for addSearchQueryData
+    sortBy: PropTypes.string, // for addSearchQueryData
     limit: PropTypes.number, // for addSearchQueryData
     offset: PropTypes.number, // for addSearchQueryData
     router: PropTypes.object, // from next.js
@@ -149,6 +167,22 @@ class SearchPage extends React.Component {
     this.state = { filter: 'ALL' };
   }
 
+  changeCountry = country => {
+    const { router, term } = this.props;
+    const query = { q: term, types: router.query.types, sortBy: router.query.sortBy };
+    if (country !== 'ALL') {
+      query.country = [country];
+    }
+    router.push({ pathname: router.pathname, query });
+  };
+
+  changeSort = sortBy => {
+    const { router, term } = this.props;
+    const query = { q: term, types: router.query.types, isHost: router.query.isHost, country: router.query.country };
+    query.sortBy = sortBy.value;
+    router.push({ pathname: router.pathname, query });
+  };
+
   changeTags = tag => {
     const { router, term } = this.props;
     let tags = router.query?.tag?.split(',');
@@ -160,7 +194,7 @@ class SearchPage extends React.Component {
       tags.push(tag);
     }
 
-    const query = { q: term, types: router.query.types };
+    const query = { q: term, types: router.query.types, country: router.query.country, sortBy: router.query.sortBy };
     if (tags.length > 0) {
       query.tag = tags.join();
     }
@@ -174,7 +208,10 @@ class SearchPage extends React.Component {
     const { router } = this.props;
     const { q } = form;
 
-    const query = { q: q.value, type: router.query.type };
+    const query = { q: q.value, type: router.query.type, sortBy: router.query.sortBy };
+    if (router.query.country) {
+      query.country = router.query.country;
+    }
     if (router.query.tag) {
       query.tag = router.query.tag;
     }
@@ -193,9 +230,15 @@ class SearchPage extends React.Component {
       query = { q: term };
     }
 
+    if (router.query.country) {
+      query.country = router.query.country;
+    }
+
     if (router.query.tag) {
       query.tag = router.query.tag;
     }
+
+    query.sortBy = router.query.sortBy;
 
     router.push({ pathname: '/search', query });
   };
@@ -225,6 +268,8 @@ class SearchPage extends React.Component {
     const filters = ['ALL', 'COLLECTIVE', 'EVENT', 'ORGANIZATION', 'HOST', 'PROJECT', 'FUND'];
     const { limit = 20, offset, totalCount = 0 } = accounts || {};
     const showCollectives = term.trim() !== '' && !!accounts?.nodes;
+    const getOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
+    const options = [getOption('ACTIVITY'), getOption('CREATED_AT.DESC'), getOption('CREATED_AT.ASC')];
 
     return (
       <Page title="Search" showSearch={false}>
@@ -253,43 +298,66 @@ class SearchPage extends React.Component {
             </Flex>
           </Container>
           {term && (
-            <Box mt={4} mb={4} mx="auto">
-              <StyledFilters
-                filters={filters}
-                getLabel={key => intl.formatMessage(I18nFilters[key])}
-                selected={this.state.filter}
-                justifyContent="left"
-                minButtonWidth={140}
-                onChange={filter => {
-                  this.setState({ filter: filter });
-                  this.onClick(filter);
-                }}
-              />
-            </Box>
+            <Flex mt={4} mb={4} mx="auto" flexDirection={['column', 'row']}>
+              <Container width={[1, 4 / 5]}>
+                <StyledFilters
+                  filters={filters}
+                  getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
+                  selected={this.state.filter}
+                  justifyContent="left"
+                  minButtonWidth="95px"
+                  onChange={filter => {
+                    this.setState({ filter: filter });
+                    this.onClick(filter);
+                  }}
+                />
+              </Container>
+              <Container width={[1, 1 / 5]} pt={[2, 0]}>
+                <StyledSelectFilter
+                  inputId="sort-filter"
+                  value={this.props.sortBy ? getOption(this.props.sortBy) : options[0]}
+                  options={options}
+                  onChange={sortBy => this.changeSort(sortBy)}
+                />
+              </Container>
+            </Flex>
           )}
           <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
           {term && (
-            <Container width={[1, 3 / 4]}>
-              <FilterLabel htmlFor="tag-filter-type">
-                <FormattedMessage defaultMessage="Tags" />
-              </FilterLabel>
-              <Flex flexWrap="wrap" width={[null, '1000px']}>
-                {tagStats?.nodes
-                  ?.filter(node => !IGNORED_TAGS.includes(node.tag))
-                  .map(node => (
-                    <FilterButton
-                      as={StyledTag}
-                      key={node.tag}
-                      title={node.tag}
-                      variant="rounded-right"
-                      $isSelected={tags.includes(node.tag)}
-                      onClick={() => this.changeTags(node.tag)}
-                    >
-                      {truncate(node.tag, { length: 9 })}
-                    </FilterButton>
-                  ))}
-              </Flex>
-            </Container>
+            <Flex>
+              <Container width={[1, '200px']}>
+                <FilterLabel htmlFor="country-filter-type">
+                  <FormattedMessage id="collective.country.label" defaultMessage="Country" />
+                </FilterLabel>
+                <InputTypeCountry
+                  inputId="search-country-filter"
+                  defaultValue="ALL"
+                  customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
+                  onChange={country => this.changeCountry(country)}
+                />
+              </Container>
+              <Container width={[1, 3 / 4]}>
+                <FilterLabel htmlFor="tag-filter-type">
+                  <FormattedMessage defaultMessage="Tags" />
+                </FilterLabel>
+                <Flex flexWrap="wrap" width={[null, '1000px']}>
+                  {tagStats?.nodes
+                    ?.filter(node => !IGNORED_TAGS.includes(node.tag))
+                    .map(node => (
+                      <FilterButton
+                        as={StyledTag}
+                        key={node.tag}
+                        title={node.tag}
+                        variant="rounded-right"
+                        $isSelected={tags.includes(node.tag)}
+                        onClick={() => this.changeTags(node.tag)}
+                      >
+                        {truncate(node.tag, { length: 9 })}
+                      </FilterButton>
+                    ))}
+                </Flex>
+              </Container>
+            </Flex>
           )}
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
             {loading && accounts?.nodes?.length > 0 && (
@@ -330,12 +398,12 @@ class SearchPage extends React.Component {
                         <FormattedMessage defaultMessage="Make sure your spelling is correct" />
                       </li>
                       <li>
-                        <Span pt={8}>
+                        <Span pt="8px">
                           <FormattedMessage defaultMessage="Broaden your search (e.g. search 'garden' instead of 'community garden')" />
                         </Span>
                       </li>
                       <li>
-                        <Span pt={8}>
+                        <Span pt="8px">
                           <FormattedMessage
                             defaultMessage="Search our <Link>Docs</Link> for more info about using the Open Collective platform"
                             values={{
@@ -420,7 +488,16 @@ class SearchPage extends React.Component {
 export { SearchPage as MockSearchPage };
 
 export const searchPageQuery = gqlV2/* GraphQL */ `
-  query SearchPage($term: String!, $type: [AccountType], $tag: [String], $isHost: Boolean, $limit: Int, $offset: Int) {
+  query SearchPage(
+    $term: String!
+    $type: [AccountType]
+    $country: [CountryISO]
+    $tag: [String]
+    $sortBy: OrderByInput
+    $isHost: Boolean
+    $limit: Int
+    $offset: Int
+  ) {
     accounts(
       searchTerm: $term
       type: $type
@@ -428,6 +505,8 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
       limit: $limit
       offset: $offset
       skipRecentAccounts: true
+      country: $country
+      orderBy: $sortBy
       tag: $tag
     ) {
       nodes {
@@ -498,7 +577,19 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
 
 export const addSearchPageData = graphql(searchPageQuery, {
   skip: props => !props.term,
-  options: { context: API_V2_CONTEXT },
+  options: props => ({
+    context: API_V2_CONTEXT,
+    variables: {
+      term: props.term,
+      type: props.type,
+      isHost: props.isHost,
+      limit: props.limit,
+      offset: props.offset,
+      country: props.country,
+      tag: props.tag,
+      sortBy: constructSortByQuery(props.sortBy),
+    },
+  }),
 });
 
 export default withToasts(injectIntl(withRouter(addSearchPageData(SearchPage))));
