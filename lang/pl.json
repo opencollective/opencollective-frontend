@@ -1102,7 +1102,7 @@
   "Fields.website": "Strona",
   "File.AttachedFile": "Attached file",
   "File.DownloadExpense": "Download expense",
-  "File.NoFilename": "No filename",
+  "File.NoFilename": "Brak nazwy pliku",
   "FilesPreviewModal.AttachmentPreview": "Podgląd załącznika",
   "FilesUploadFailed": "Nie udało się przesłać {count, plural, one {pliku} few {# plików} many {# plików} other {# plików}}",
   "Filter.ByName": "Filtruj wg nazwy",

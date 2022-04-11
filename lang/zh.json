@@ -1102,7 +1102,7 @@
   "Fields.website": "网站",
   "File.AttachedFile": "Attached file",
   "File.DownloadExpense": "Download expense",
-  "File.NoFilename": "No filename",
+  "File.NoFilename": "没有文件名",
   "FilesPreviewModal.AttachmentPreview": "附件预览",
   "FilesUploadFailed": "{count, plural, one {The file} other {# files}} failed to upload",
   "Filter.ByName": "通过名称过滤",

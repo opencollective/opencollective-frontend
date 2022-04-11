@@ -1102,7 +1102,7 @@
   "Fields.website": "Вебсайт",
   "File.AttachedFile": "Attached file",
   "File.DownloadExpense": "Download expense",
-  "File.NoFilename": "No filename",
+  "File.NoFilename": "Немає назви файлу",
   "FilesPreviewModal.AttachmentPreview": "Попередній перегляд вкладення",
   "FilesUploadFailed": "Не вдалося завантажити {count, plural, one {файл} other {# файлів}}",
   "Filter.ByName": "Фільтр за назвою",

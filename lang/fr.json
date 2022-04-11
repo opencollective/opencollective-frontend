@@ -1102,7 +1102,7 @@
   "Fields.website": "Site Web",
   "File.AttachedFile": "Attached file",
   "File.DownloadExpense": "Download expense",
-  "File.NoFilename": "No filename",
+  "File.NoFilename": "Aucun nom de fichier",
   "FilesPreviewModal.AttachmentPreview": "Aperçu des pièces jointes",
   "FilesUploadFailed": "{count, plural, one {Le fichier} other {# fichiers}} n'ont pas put être mis en ligne",
   "Filter.ByName": "Filtrer par nom",
