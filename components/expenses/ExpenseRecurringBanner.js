@@ -110,7 +110,7 @@ const ExpenseRecurringEditModal = ({ onClose, expense }) => {
             onClick={handleDeletion}
             disabled={loading}
           >
-            Cancel Recurring Expense
+            <FormattedMessage id="Expense.Recurring.Edit.Cancel" defaultMessage="Cancel Recurring Expense" />
           </StyledButton>
         </Container>
       </ModalFooter>

@@ -981,6 +981,7 @@
   "expense.processing": "Обробка",
   "expense.ReceiptRequired": "Потрібні квитанції",
   "Expense.Recurring.Edit": "Edit details",
+  "Expense.Recurring.Edit.Cancel": "Cancel Recurring Expense",
   "Expense.Recurring.Edit.Description": "Once the frequency and end date are set, you can't edit them. You can always cancel the recurring expense and submit a new one.",
   "Expense.Recurring.EditWarning.Description": "Any changes you make to this expense will apply to future recurrences.",
   "Expense.Recurring.EditWarning.Ends": "ends {endsAt, date, medium}",

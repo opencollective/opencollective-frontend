@@ -981,6 +981,7 @@
   "expense.processing": "Procesando",
   "expense.ReceiptRequired": "Recibo requerido",
   "Expense.Recurring.Edit": "Editar detalles",
+  "Expense.Recurring.Edit.Cancel": "Cancel Recurring Expense",
   "Expense.Recurring.Edit.Description": "Once the frequency and end date are set, you can't edit them. You can always cancel the recurring expense and submit a new one.",
   "Expense.Recurring.EditWarning.Description": "Cualquier cambio que realices en este gasto se aplicará a futuras recurrencias.",
   "Expense.Recurring.EditWarning.Ends": "termina el {endsAt, date, medium}",
