@@ -22,7 +22,12 @@ const GRID_TEMPLATE_COLUMNS = ['1fr', 'minmax(220px, 1fr) 6fr'];
 const MENU = [
   { id: 'Clear cache', title: 'Clear cache for account', Component: ClearCacheForAccountForm },
   { id: 'Connect accounts', Component: ConnectAccountsForm },
-  { id: 'Merge accounts', isDangerous: true, Component: MergeAccountsForm },
+  {
+    id: 'Merge accounts',
+    isDangerous: true,
+    Component: MergeAccountsForm,
+    description: `Before merging user accounts, you must always make sure that the person who requested it own both emails. Merging means payment methods are merged too, so if we just merge 2 accounts because someones ask for it without verifying we could end up in a very bad situation.\nA simple way to do that is to send a unique random code to the other account they want to claim and ask them to share this code.`,
+  },
   { id: 'Unhost account', Component: UnhostAccountForm },
   {
     id: 'Move authored contributions',
@@ -106,7 +111,7 @@ const RootActionsPage = () => {
             )}
 
             {selectedMenuEntry.description && (
-              <MessageBox type="info" withIcon my={3} lineHeight="20px">
+              <MessageBox type="info" withIcon my={3} lineHeight="20px" whiteSpace="pre-wrap">
                 {selectedMenuEntry.description}
               </MessageBox>
             )}
