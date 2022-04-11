@@ -117,7 +117,6 @@ const FilterButton = styled(StyledButton).attrs({
   margin-bottom: 8px;
   font-size: 12px;
   font-weight: 500;
-  width: 84px;
   cursor: pointer;
 
   ${props =>
@@ -153,6 +152,7 @@ class SearchPage extends React.Component {
     term: PropTypes.string, // for addSearchQueryData
     country: PropTypes.arrayOf(PropTypes.string), // for addSearchQueryData
     sortBy: PropTypes.string, // for addSearchQueryData
+    tag: PropTypes.array, // for addSearchQueryData
     limit: PropTypes.number, // for addSearchQueryData
     offset: PropTypes.number, // for addSearchQueryData
     router: PropTypes.object, // from next.js
@@ -169,7 +169,7 @@ class SearchPage extends React.Component {
 
   changeCountry = country => {
     const { router, term } = this.props;
-    const query = { q: term, types: router.query.types, sortBy: router.query.sortBy };
+    const query = { q: term, types: router.query.types, sortBy: router.query.sortBy, tag: router.query.tag };
     if (country !== 'ALL') {
       query.country = [country];
     }
@@ -178,7 +178,13 @@ class SearchPage extends React.Component {
 
   changeSort = sortBy => {
     const { router, term } = this.props;
-    const query = { q: term, types: router.query.types, isHost: router.query.isHost, country: router.query.country };
+    const query = {
+      q: term,
+      types: router.query.types,
+      isHost: router.query.isHost,
+      country: router.query.country,
+      tag: router.query.tag,
+    };
     query.sortBy = sortBy.value;
     router.push({ pathname: router.pathname, query });
   };
@@ -324,7 +330,7 @@ class SearchPage extends React.Component {
           )}
           <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
           {term && (
-            <Flex>
+            <Flex flexDirection={['column', 'row']}>
               <Container width={[1, '200px']}>
                 <FilterLabel htmlFor="country-filter-type">
                   <FormattedMessage id="collective.country.label" defaultMessage="Country" />
@@ -336,27 +342,29 @@ class SearchPage extends React.Component {
                   onChange={country => this.changeCountry(country)}
                 />
               </Container>
-              <Container width={[1, 3 / 4]}>
-                <FilterLabel htmlFor="tag-filter-type">
-                  <FormattedMessage defaultMessage="Tags" />
-                </FilterLabel>
-                <Flex flexWrap="wrap" width={[null, '1000px']}>
-                  {tagStats?.nodes
-                    ?.filter(node => !IGNORED_TAGS.includes(node.tag))
-                    .map(node => (
-                      <FilterButton
-                        as={StyledTag}
-                        key={node.tag}
-                        title={node.tag}
-                        variant="rounded-right"
-                        $isSelected={tags.includes(node.tag)}
-                        onClick={() => this.changeTags(node.tag)}
-                      >
-                        {truncate(node.tag, { length: 9 })}
-                      </FilterButton>
-                    ))}
-                </Flex>
-              </Container>
+              {tagStats?.nodes?.length > 0 && (
+                <Container width={[1, 3 / 4]} pl={[0, '23px']} pt={[2, 0]}>
+                  <FilterLabel htmlFor="tag-filter-type">
+                    <FormattedMessage defaultMessage="Tags" />
+                  </FilterLabel>
+                  <Flex flexWrap="wrap" width={[null, '1000px']}>
+                    {tagStats?.nodes
+                      ?.filter(node => !IGNORED_TAGS.includes(node.tag))
+                      .map(node => (
+                        <FilterButton
+                          as={StyledTag}
+                          key={node.tag}
+                          title={node.tag}
+                          variant="rounded-right"
+                          $isSelected={tags.includes(node.tag)}
+                          onClick={() => this.changeTags(node.tag)}
+                        >
+                          {truncate(node.tag, { length: 20 })}
+                        </FilterButton>
+                      ))}
+                  </Flex>
+                </Container>
+              )}
             </Flex>
           )}
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
