@@ -8,6 +8,7 @@ import themeGet from '@styled-system/theme-get';
 import styled from 'styled-components';
 import { borders, color, display, flexbox, layout, shadow, space, typography } from 'styled-system';
 
+import { whiteSpace } from '../lib/styled-system-custom-properties';
 import { messageType } from '../lib/theme/variants/message';
 
 import StyledCard from './StyledCard';
@@ -31,6 +32,7 @@ const Message = styled.div`
   ${typography}
   ${color}
   ${flexbox}
+  ${whiteSpace}
 
   ${messageType}
 
