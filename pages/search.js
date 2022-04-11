@@ -244,7 +244,7 @@ class SearchPage extends React.Component {
             </Flex>
           </Container>
           {term && (
-            <Flex mt={4} mb={4} mx="auto">
+            <Flex mt={4} mb={4} mx="auto" flexDirection={['column', 'row']}>
               <Container width={[1, 4 / 5]}>
                 <StyledFilters
                   filters={filters}
@@ -258,7 +258,7 @@ class SearchPage extends React.Component {
                   }}
                 />
               </Container>
-              <Container width={[1, 1 / 5]}>
+              <Container width={[1, 1 / 5]} pt={[2, 0]}>
                 <StyledSelectFilter
                   inputId="sort-filter"
                   value={this.props.sortBy ? getOption(this.props.sortBy) : options[0]}
