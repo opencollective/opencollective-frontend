@@ -18,6 +18,7 @@ import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
 import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
+import InputTypeCountry from '../components/InputTypeCountry';
 import Link from '../components/Link';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
@@ -26,6 +27,7 @@ import SearchCollectiveCard from '../components/search-page/SearchCollectiveCard
 import SearchForm from '../components/SearchForm';
 import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
+import StyledHr from '../components/StyledHr';
 import { fadeIn } from '../components/StyledKeyframes';
 import StyledLink from '../components/StyledLink';
 import { StyledSelectFilter } from '../components/StyledSelectFilter';
@@ -85,6 +87,15 @@ const SearchFormContainer = styled(Box)`
 
 const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
 
+const FilterLabel = styled.label`
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  text-transform: uppercase;
+  padding-bottom: 8px;
+  color: #4d4f51;
+`;
+
 const constructSortByQuery = sortByValue => {
   let query = {};
   if (sortByValue === 'ACTIVITY') {
@@ -103,6 +114,7 @@ class SearchPage extends React.Component {
       term: query.q || '',
       type: query.type ? decodeURIComponent(query.type).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
+      country: query.country || null,
       sortBy: query.sortBy || 'ACTIVITY',
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
@@ -111,6 +123,7 @@ class SearchPage extends React.Component {
 
   static propTypes = {
     term: PropTypes.string, // for addSearchQueryData
+    country: PropTypes.arrayOf(PropTypes.string), // for addSearchQueryData
     sortBy: PropTypes.string, // for addSearchQueryData
     limit: PropTypes.number, // for addSearchQueryData
     offset: PropTypes.number, // for addSearchQueryData
@@ -126,9 +139,18 @@ class SearchPage extends React.Component {
     this.state = { filter: 'ALL' };
   }
 
+  changeCountry = country => {
+    const { router, term } = this.props;
+    const query = { q: term, types: router.query.types, sortBy: router.query.sortBy };
+    if (country !== 'ALL') {
+      query.country = [country];
+    }
+    router.push({ pathname: router.pathname, query });
+  };
+
   changeSort = sortBy => {
     const { router, term } = this.props;
-    const query = { q: term, types: router.query.types, isHost: router.query.isHost };
+    const query = { q: term, types: router.query.types, isHost: router.query.isHost, country: router.query.country };
     query.sortBy = sortBy.value;
     router.push({ pathname: router.pathname, query });
   };
@@ -141,6 +163,9 @@ class SearchPage extends React.Component {
     const { q } = form;
 
     const query = { q: q.value, type: router.query.type, sortBy: router.query.sortBy };
+    if (router.query.country) {
+      query.country = router.query.country;
+    }
     router.push({ pathname: router.pathname, query });
   };
 
@@ -154,6 +179,10 @@ class SearchPage extends React.Component {
       query = { q: term, type: filter };
     } else {
       query = { q: term };
+    }
+
+    if (router.query.country) {
+      query.country = router.query.country;
     }
 
     query.sortBy = router.query.sortBy;
@@ -239,6 +268,18 @@ class SearchPage extends React.Component {
               </Container>
             </Flex>
           )}
+          <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
+          <Container width="200px">
+            <FilterLabel htmlFor="country-filter-type">
+              <FormattedMessage id="collective.country.label" defaultMessage="Country" />
+            </FilterLabel>
+            <InputTypeCountry
+              inputId="search-country-filter"
+              defaultValue="ALL"
+              customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
+              onChange={country => this.changeCountry(country)}
+            />
+          </Container>
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
             {loading && accounts?.nodes?.length > 0 && (
               <Flex py={3} width={1} justifyContent="center">
@@ -371,8 +412,9 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
   query SearchPage(
     $term: String!
     $type: [AccountType]
-    $isHost: Boolean
+    $country: [CountryISO]
     $sortBy: OrderByInput
+    $isHost: Boolean
     $limit: Int
     $offset: Int
   ) {
@@ -383,6 +425,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
       limit: $limit
       offset: $offset
       skipRecentAccounts: true
+      country: $country
       orderBy: $sortBy
     ) {
       nodes {
@@ -455,6 +498,7 @@ export const addSearchPageData = graphql(searchPageQuery, {
       isHost: props.isHost,
       limit: props.limit,
       offset: props.offset,
+      country: props.country,
       sortBy: constructSortByQuery(props.sortBy),
     },
   }),
