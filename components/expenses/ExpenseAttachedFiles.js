@@ -29,9 +29,9 @@ const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expens
               <UploadedFilePreview
                 onClick={downloadInvoice}
                 isDownloading={isLoading}
-                fileName={<FormattedMessage id="File.DownloadExpense" defaultMessage="Download expense" />}
                 size={88}
                 showFileName
+                fileName={intl.formatMessage({ defaultMessage: 'Download expense' })}
               />
             )}
           </ExpenseInvoiceDownloadHelper>
