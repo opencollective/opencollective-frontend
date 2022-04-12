@@ -30,7 +30,7 @@ import StyledHr from '../components/StyledHr';
 import { fadeIn } from '../components/StyledKeyframes';
 import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import StyledTag from '../components/StyledTag';
-import { H1, Span } from '../components/Text';
+import { H1, P, Span } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 
 const CollectiveCardContainer = styled.div`
@@ -453,6 +453,23 @@ class SearchPage extends React.Component {
                 </Span>
                 <ShareAlt size="14px" />
               </StyledButton>
+            </Flex>
+          )}
+          {showCollectives && accounts?.nodes?.length !== 0 && (
+            <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
+              <P pt={3} pb={3} borderTop="1px solid #E6E6E6">
+                <em>
+                  <FormattedMessage
+                    defaultMessage="Can't find what you're looking for? Check our <Link>Docs & Help!</Link>"
+                    values={{
+                      Link: getI18nLink({
+                        href: 'https://opencollective.com/help',
+                        openInNewTab: true,
+                      }),
+                    }}
+                  />
+                </em>
+              </P>
             </Flex>
           )}
         </Container>
