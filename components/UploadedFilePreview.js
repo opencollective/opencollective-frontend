@@ -10,7 +10,7 @@ import { imagePreview } from '../lib/image-utils';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import Container from './Container';
-import { Box } from './Grid';
+import Link from './Link';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import { fadeInDown } from './StyledKeyframes';
 import StyledLink from './StyledLink';
@@ -54,21 +54,6 @@ const CardContainer = styled(Container)`
     transition: opacity 0.3s;
   }
 
-  ${props =>
-    props.hasOnClick &&
-    css`
-      cursor: pointer;
-      &:hover {
-        ${FileTextIcon} {
-          opacity: 0.25;
-        }
-        ${DownloadIcon} {
-          opacity: 1;
-          animation: ${fadeInDown} 0.3s;
-        }
-      }
-    `}
-
   img {
     width: 100%;
     max-height: 100%;
@@ -78,6 +63,24 @@ const CardContainer = styled(Container)`
       object-fit: cover;
     }
   }
+`;
+
+const MainContainer = styled(Container)`
+  text-align: center;
+  ${props =>
+    props.hasOnClick &&
+    css`
+      cursor: pointer;
+      &:hover ${CardContainer} {
+        ${FileTextIcon} {
+          opacity: 0.25;
+        }
+        ${DownloadIcon} {
+          opacity: 1;
+          animation: ${fadeInDown} 0.3s;
+        }
+      }
+    `}
 `;
 
 const PrivateIconContainer = styled.div`
@@ -99,7 +102,6 @@ const UploadedFilePreview = ({
   size,
   maxHeight,
   alt,
-  hasLink,
   fileName,
   showFileName,
   border,
@@ -138,29 +140,23 @@ const UploadedFilePreview = ({
     );
   } else {
     const resizeWidth = Array.isArray(size) ? max(size) : size;
-    const img = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt || fileName} />;
-    content = !hasLink ? (
-      img
-    ) : (
-      <ImageLink href={url} key={url}>
-        {img}
-      </ImageLink>
-    );
+    content = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt || fileName} />;
   }
 
   return (
-    <Container {...props}>
-      <CardContainer
-        size={size}
-        maxHeight={maxHeight}
-        title={fileName}
-        border={border}
-        hasOnClick={Boolean(props.onClick)}
-      >
+    <MainContainer
+      {...props}
+      hasOnClick={Boolean(url || props.onClick)}
+      maxWidth={size}
+      as={url ? Link : 'div'}
+      href={url}
+      openInNewTab
+    >
+      <CardContainer size={size} maxHeight={maxHeight} title={fileName} border={border}>
         {content}
       </CardContainer>
       {showFileName && (
-        <Box mt="6px" maxWidth={100}>
+        <Container mt="6px" maxWidth={100}>
           {isLoading ? (
             <LoadingPlaceholder height={12} />
           ) : fileName ? (
@@ -172,9 +168,9 @@ const UploadedFilePreview = ({
               <FormattedMessage id="File.NoFilename" defaultMessage="No filename" />
             </P>
           )}
-        </Box>
+        </Container>
       )}
-    </Container>
+    </MainContainer>
   );
 };
 
@@ -190,14 +186,11 @@ UploadedFilePreview.propTypes = {
   border: PropTypes.string,
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   maxHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  /** If true, a link to the original file will be added if possible */
-  hasLink: PropTypes.bool,
 };
 
 UploadedFilePreview.defaultProps = {
   size: 88,
   border: '1px solid #dcdee0',
-  hasLink: true,
   alt: 'Uploaded file preview',
 };
 

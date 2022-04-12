@@ -143,7 +143,7 @@ const ExpenseFilesPreviewModal = ({ collective, expense, onClose }) => {
             <ExpenseInvoicePreview isLoading={!invoiceFile} fileURL={invoiceFile} />
           )
         ) : (
-          <UploadedFilePreview url={item.url} size={350} hasLink title={item.title} />
+          <UploadedFilePreview url={item.url} size={350} title={item.title} />
         )
       }
     />

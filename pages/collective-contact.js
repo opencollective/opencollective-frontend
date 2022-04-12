@@ -5,11 +5,11 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { generateNotFoundError } from '../lib/errors';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import CollectiveNavbar from '../components/collective-navbar';
+import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import CollectiveContactForm from '../components/CollectiveContactForm';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';

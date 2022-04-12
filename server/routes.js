@@ -146,11 +146,12 @@ module.exports = (expressApp, nextApp) => {
   // Correct slug links that end or start with hyphen
   app.use((req, res, next) => {
     if (req.path) {
-      const path = req.path.split('/');
-      const slug = path[1];
-      if (trim(slug, '-') !== slug) {
-        path[1] = trim(slug, '-');
-        return res.redirect(301, path.join('/'));
+      const path = req.path.split('/'); // `/-xxx-/test` => [ '', '-xxx-', 'test' ]
+      const slug = path[1]; // slug = '-xxx-'
+      const trimmedSlug = trim(slug, '-'); // '-xxx-' => 'xxx'
+      if (trimmedSlug && trimmedSlug !== slug) {
+        path[1] = trimmedSlug; // path = [ '', 'xxx', 'test' ]
+        return res.redirect(301, path.join('/')); // `/xxx/test`
       }
     }
     next();

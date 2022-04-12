@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl';
 
-import { CollectiveType } from '../../lib/collective-sections';
+import { CollectiveType } from '../../lib/constants/collectives';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 

@@ -2,12 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Info } from '@styled-icons/feather/Info';
 import themeGet from '@styled-system/theme-get';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType, NAVBAR_CATEGORIES } from '../../lib/collective-sections';
-import i18nNavbarCategory from '../../lib/i18n/navbar-categories';
+import { getSectionsCategoryDetails } from '../../lib/collective-sections';
 
+import { NAVBAR_CATEGORIES } from '../collective-navbar/constants';
 import Container from '../Container';
 import { Flex } from '../Grid';
 import StyledHr from '../StyledHr';
@@ -16,11 +16,6 @@ import { P } from '../Text';
 
 import { Dimensions } from './_constants';
 import SectionTitle from './SectionTitle';
-
-import aboutSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconAbout.png';
-import budgetSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconBudget.png';
-import connectSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconConnect.png';
-import contributeSectionHeaderIcon from '../../public/static/images/collective-navigation/CollectiveNavbarIconContribute.png';
 
 const ContainerWithMaxWidth = styled(Container).attrs({
   maxWidth: Dimensions.MAX_SECTION_WIDTH,
@@ -61,90 +56,9 @@ const TypeIllustrationCircle = styled(Flex)`
   }
 `;
 
-const getCategoryData = (intl, collective, category) => {
-  switch (category) {
-    case NAVBAR_CATEGORIES.ABOUT:
-      return {
-        img: aboutSectionHeaderIcon,
-        title: i18nNavbarCategory(intl, category),
-      };
-    case NAVBAR_CATEGORIES.BUDGET:
-      return {
-        img: budgetSectionHeaderIcon,
-        title: i18nNavbarCategory(intl, category),
-        subtitle: (
-          <FormattedMessage
-            id="CollectivePage.SectionBudget.Subtitle"
-            defaultMessage="Transparent and open finances."
-          />
-        ),
-        info: (
-          <FormattedMessage
-            id="CollectivePage.SectionBudget.Description"
-            defaultMessage="See how funds circulate through {collectiveName}. Contributions and expenses are transparent. Learn where the money comes from and where it goes."
-            values={{ collectiveName: collective.name }}
-          />
-        ),
-      };
-    case NAVBAR_CATEGORIES.CONNECT:
-      return {
-        img: connectSectionHeaderIcon,
-        title: i18nNavbarCategory(intl, category),
-        subtitle: <FormattedMessage id="section.connect.subtitle" defaultMessage="Let’s get the ball rolling!" />,
-        info: (
-          <FormattedMessage
-            id="section.connect.info"
-            defaultMessage="Start conversations with your community or share updates on how things are going."
-          />
-        ),
-      };
-    case NAVBAR_CATEGORIES.CONTRIBUTE:
-      // TODO: Hide "Become a financial contributor." if can't contribute
-      return {
-        img: contributeSectionHeaderIcon,
-        title:
-          collective.type === CollectiveType.EVENT ? (
-            <FormattedMessage defaultMessage="Get Involved" />
-          ) : (
-            i18nNavbarCategory(intl, category)
-          ),
-        subtitle:
-          collective.type === CollectiveType.EVENT ? (
-            <FormattedMessage defaultMessage="Support the event or buy tickets." />
-          ) : (
-            <FormattedMessage
-              id="CollectivePage.SectionContribute.Subtitle"
-              defaultMessage="Become a financial contributor."
-            />
-          ),
-        info:
-          collective.type === CollectiveType.EVENT ? (
-            <FormattedMessage defaultMessage="Support the event or buy tickets to attend." />
-          ) : (
-            <FormattedMessage
-              id="CollectivePage.SectionContribute.info"
-              defaultMessage="Support {collectiveName} by contributing to them once, monthly, or yearly."
-              values={{ collectiveName: collective.name }}
-            />
-          ),
-      };
-    case NAVBAR_CATEGORIES.CONTRIBUTIONS:
-      return {
-        img: contributeSectionHeaderIcon,
-        title: i18nNavbarCategory(intl, category),
-      };
-    default:
-      return null;
-  }
-};
-
-const CategoryHeader = React.forwardRef(({ collective, category, isAdmin, ...props }, ref) => {
+const CategoryHeader = React.forwardRef(({ collective, category, ...props }, ref) => {
   const intl = useIntl();
-  const data = getCategoryData(intl, collective, category, isAdmin);
-  if (!data) {
-    return null;
-  }
-
+  const data = getSectionsCategoryDetails(intl, collective, category);
   return (
     <ContainerWithMaxWidth ref={ref} {...props}>
       <Flex alignItems="center" justifyContent="center">
@@ -179,7 +93,6 @@ CategoryHeader.displayName = 'CategoryHeader';
 CategoryHeader.propTypes = {
   category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)),
   collective: PropTypes.object,
-  isAdmin: PropTypes.bool,
 };
 
 export default CategoryHeader;

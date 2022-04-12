@@ -63,7 +63,7 @@ const FreezeAccountModal = ({ collective, ...props }) => {
               <FormattedMessage defaultMessage="Include a message to the Collective admins (Optional)" />
               <br />
               <Span fontSize="13px" fontWeight="400">
-                <FormattedMessage defaultMessage="They will also be notified of this unfreeze via auto-email notification." />
+                <FormattedMessage defaultMessage="They will also be notified of this unfreeze via auto-email." />
               </Span>
             </Label>
             <StyledTextarea

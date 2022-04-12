@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import { omitBy } from 'lodash';
 import { withRouter } from 'next/router';
 
-import { NAVBAR_CATEGORIES } from '../lib/collective-sections';
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
+import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { Sections } from '../components/collective-page/_constants';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { isURL } from 'validator';
 
-import { isTrustedRedirectHost } from '../lib/url-helpers';
+import { isRelativeHref, isTrustedRedirectHost } from '../lib/url-helpers';
 
 import Container from '../components/Container';
 import { Flex } from '../components/Grid';
@@ -18,7 +18,7 @@ import { H3, P, Span, Strong } from '../components/Text';
 
 // Make sure fallback is an internal link
 const getFallback = fallback => {
-  if (!fallback || fallback[0] !== '/') {
+  if (!fallback || !isRelativeHref(fallback)) {
     return '/';
   } else {
     return fallback;
