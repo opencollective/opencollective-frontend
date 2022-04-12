@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
-import { get, isNumber } from 'lodash';
+import { get, isNumber, round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { border, color, space, typography } from 'styled-system';
@@ -13,7 +13,9 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
+import { i18nTaxType } from '../../lib/i18n/taxes';
 import { AmountPropTypeShape } from '../../lib/prop-types';
+import { getAmountWithoutTaxes, getTaxAmount } from './lib/utils';
 
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import Container from '../Container';
@@ -225,6 +227,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
   const totalAmount = getTotalPayoutAmount(expense, { paymentProcessorFee, feesPayer: formik.values.feesPayer });
+  const amountWithoutTaxes = getAmountWithoutTaxes(expense.amount, expense.taxes);
 
   return (
     <StyledModal onClose={onClose} width="100%" minWidth={280} maxWidth={334} data-cy="pay-expense-modal" trapFocus>
@@ -331,11 +334,28 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
               <FormattedMoneyAmount
                 amountStyles={{ fontWeight: 500 }}
                 showCurrencyCode={false}
-                amount={expense.amount}
+                amount={amountWithoutTaxes}
                 currency={expense.currency}
               />
             </Amount>
           </AmountLine>
+          {expense.taxes?.map(tax => (
+            <AmountLine key={tax.type} data-cy={`tax-${tax.type}-expense-amount-line`} pt={0}>
+              <Label>
+                {i18nTaxType(intl, tax.type, 'short')} ({round(tax.rate * 100, 2) || 0}%)
+              </Label>
+              &nbsp;
+              <Amount>
+                <FormattedMoneyAmount
+                  amount={getTaxAmount(amountWithoutTaxes, tax)}
+                  precision={2}
+                  currency={expense.currency}
+                  amountStyles={{ fontWeight: 500 }}
+                  showCurrencyCode={false}
+                />
+              </Amount>
+            </AmountLine>
+          ))}
           {canQuote && quoteQuery.loading && (
             <AmountLine borderTop="0.8px dashed #9D9FA3">
               <Label>
@@ -493,6 +513,7 @@ PayExpenseModal.propTypes = {
     amountInAccountCurrency: AmountPropTypeShape,
     currency: PropTypes.string,
     feesPayer: PropTypes.string,
+    taxes: PropTypes.array,
     payoutMethod: PropTypes.shape({
       type: PropTypes.oneOf(Object.values(PayoutMethodType)),
     }),

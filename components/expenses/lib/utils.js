@@ -19,10 +19,10 @@ export const checkRequiresAddress = values => {
   );
 };
 
-export const isTaxRateValid = rate => !isNil(rate) && rate >= 0 && rate <= 100;
+export const isTaxRateValid = rate => !isNil(rate) && rate >= 0 && rate <= 1;
 
 export const getTaxAmount = (baseAmount, tax) => {
-  return Math.round((baseAmount * tax.rate) / 100);
+  return Math.round(baseAmount * tax.rate);
 };
 
 export const computeExpenseAmounts = (items, taxes) => {
@@ -37,6 +37,10 @@ export const computeExpenseAmounts = (items, taxes) => {
       : null;
 
   return { hasTaxes, totalInvoiced, totalAmount };
+};
+
+export const getAmountWithoutTaxes = (totalAmount, taxes) => {
+  return totalAmount / (1 + sumBy(taxes, 'rate'));
 };
 
 export const validateExpenseTaxes = (intl, taxes) => {

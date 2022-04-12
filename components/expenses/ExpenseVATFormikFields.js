@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { checkVATNumberFormat, TaxType } from '@opencollective/taxes';
-import { isNil } from 'lodash';
+import { isNil, round } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import { createError, ERROR } from '../../lib/errors';
@@ -21,7 +21,7 @@ export const validateTaxVAT = (intl, tax) => {
   if (isNaN(tax.rate) || isNil(tax.rate)) {
     errors.rate = createError(ERROR.FORM_FIELD_REQUIRED);
   } else {
-    verifyValueInRange(intl, errors, tax, 'rate', 0, 100);
+    verifyValueInRange(intl, errors, tax, 'rate', 0, 1);
   }
 
   // ID number is required if there's a tax rate
@@ -55,7 +55,17 @@ const ExpenseVATFormikFields = ({ formik, isOptional }) => {
         inputType="number"
         required={!isOptional}
       >
-        {({ field }) => <StyledInputGroup {...field} append="%" min={0} max={100} step="0.01" />}
+        {({ field }) => (
+          <StyledInputGroup
+            {...field}
+            value={round(field.value * 100, 2)}
+            onChange={e => formik.setFieldValue(e.target.name, round(e.target.value / 100, 4))}
+            append="%"
+            min={0}
+            max={100}
+            step="0.01"
+          />
+        )}
       </StyledInputFormikField>
       <StyledInputFormikField
         name="taxes.0.idNumber"

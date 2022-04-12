@@ -243,7 +243,7 @@ class ExpenseFormItems extends React.PureComponent {
           <div>
             <Flex alignItems="center" mt={24}>
               <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
-                <FormattedMessage defaultMessage="Tax Details and Total Amount" />
+                <FormattedMessage defaultMessage="Tax and Total" />
               </Span>
               <StyledHr flex="1" borderColor="black.300" mx={2} />
             </Flex>
@@ -262,7 +262,7 @@ class ExpenseFormItems extends React.PureComponent {
                 }}
                 label={
                   <FormattedMessage
-                    defaultMessage="The subtotal amount is subject to {taxName}"
+                    defaultMessage="Apply {taxName}"
                     values={{ taxName: i18nTaxType(this.props.intl, taxType) }}
                   />
                 }
