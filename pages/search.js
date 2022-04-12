@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular';
 import copy from 'copy-to-clipboard';
-import { isNil } from 'lodash';
+import { isNil, truncate } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
@@ -29,6 +29,7 @@ import StyledFilters from '../components/StyledFilters';
 import StyledHr from '../components/StyledHr';
 import { fadeIn } from '../components/StyledKeyframes';
 import { StyledSelectFilter } from '../components/StyledSelectFilter';
+import StyledTag from '../components/StyledTag';
 import { H1, Span } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 
@@ -83,8 +84,6 @@ const SearchFormContainer = styled(Box)`
   min-width: 10rem;
 `;
 
-const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
-
 const FilterLabel = styled.label`
   font-weight: 500;
   font-size: 12px;
@@ -106,6 +105,33 @@ const constructSortByQuery = sortByValue => {
   return query;
 };
 
+const FilterButton = styled(StyledButton).attrs({
+  buttonSize: 'tiny',
+  buttonStyle: 'standard',
+})`
+  height: 22px;
+  background-color: #f1f2f3;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+
+  ${props =>
+    props.$isSelected &&
+    css`
+      &,
+      &:active,
+      &:focus {
+        background-color: ${props => props.theme.colors.primary[100]};
+        color: ${props => props.theme.colors.primary[800]};
+      }
+    `}
+`;
+
+export const IGNORED_TAGS = ['community', 'user'];
+const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
+
 class SearchPage extends React.Component {
   static getInitialProps({ query }) {
     return {
@@ -114,6 +140,7 @@ class SearchPage extends React.Component {
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
       country: query.country || null,
       sortBy: query.sortBy || 'ACTIVITY',
+      tag: query.tag?.split(',') || [],
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
     };
@@ -123,6 +150,7 @@ class SearchPage extends React.Component {
     term: PropTypes.string, // for addSearchQueryData
     country: PropTypes.arrayOf(PropTypes.string), // for addSearchQueryData
     sortBy: PropTypes.string, // for addSearchQueryData
+    tag: PropTypes.array, // for addSearchQueryData
     limit: PropTypes.number, // for addSearchQueryData
     offset: PropTypes.number, // for addSearchQueryData
     router: PropTypes.object, // from next.js
@@ -139,7 +167,7 @@ class SearchPage extends React.Component {
 
   changeCountry = country => {
     const { router, term } = this.props;
-    const query = { q: term, types: router.query.types, sortBy: router.query.sortBy };
+    const query = { q: term, types: router.query.types, sortBy: router.query.sortBy, tag: router.query.tag };
     if (country !== 'ALL') {
       query.country = [country];
     }
@@ -148,8 +176,32 @@ class SearchPage extends React.Component {
 
   changeSort = sortBy => {
     const { router, term } = this.props;
-    const query = { q: term, types: router.query.types, isHost: router.query.isHost, country: router.query.country };
+    const query = {
+      q: term,
+      types: router.query.types,
+      isHost: router.query.isHost,
+      country: router.query.country,
+      tag: router.query.tag,
+    };
     query.sortBy = sortBy.value;
+    router.push({ pathname: router.pathname, query });
+  };
+
+  changeTags = tag => {
+    const { router, term } = this.props;
+    let tags = router.query?.tag?.split(',');
+    if (!tags || router.query?.tag?.length === 0) {
+      tags = [tag];
+    } else if (tags.includes(tag)) {
+      tags = tags.filter(value => value !== tag);
+    } else {
+      tags.push(tag);
+    }
+
+    const query = { q: term, types: router.query.types, country: router.query.country, sortBy: router.query.sortBy };
+    if (tags.length > 0) {
+      query.tag = tags.join();
+    }
     router.push({ pathname: router.pathname, query });
   };
 
@@ -163,6 +215,9 @@ class SearchPage extends React.Component {
     const query = { q: q.value, type: router.query.type, sortBy: router.query.sortBy };
     if (router.query.country) {
       query.country = router.query.country;
+    }
+    if (router.query.tag) {
+      query.tag = router.query.tag;
     }
     router.push({ pathname: router.pathname, query });
   };
@@ -181,6 +236,10 @@ class SearchPage extends React.Component {
 
     if (router.query.country) {
       query.country = router.query.country;
+    }
+
+    if (router.query.tag) {
+      query.tag = router.query.tag;
     }
 
     query.sortBy = router.query.sortBy;
@@ -202,8 +261,9 @@ class SearchPage extends React.Component {
   };
 
   render() {
-    const { data, term = '', intl } = this.props;
-    const { error, loading, accounts } = data || {};
+    const { router, data, term = '', intl } = this.props;
+    const { error, loading, accounts, tagStats } = data || {};
+    const tags = router?.query?.tag?.split(',') || [];
 
     if (error) {
       return <ErrorPage data={this.props.data} />;
@@ -267,17 +327,44 @@ class SearchPage extends React.Component {
             </Flex>
           )}
           <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
-          <Container width="200px">
-            <FilterLabel htmlFor="country-filter-type">
-              <FormattedMessage id="collective.country.label" defaultMessage="Country" />
-            </FilterLabel>
-            <InputTypeCountry
-              inputId="search-country-filter"
-              defaultValue="ALL"
-              customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
-              onChange={country => this.changeCountry(country)}
-            />
-          </Container>
+          {term && (
+            <Flex flexDirection={['column', 'row']}>
+              <Container width={[1, '200px']}>
+                <FilterLabel htmlFor="country-filter-type">
+                  <FormattedMessage id="collective.country.label" defaultMessage="Country" />
+                </FilterLabel>
+                <InputTypeCountry
+                  inputId="search-country-filter"
+                  defaultValue="ALL"
+                  customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
+                  onChange={country => this.changeCountry(country)}
+                />
+              </Container>
+              {tagStats?.nodes?.length > 0 && (
+                <Container width={[1, 3 / 4]} pl={[0, '23px']} pt={[2, 0]}>
+                  <FilterLabel htmlFor="tag-filter-type">
+                    <FormattedMessage defaultMessage="Tags" />
+                  </FilterLabel>
+                  <Flex flexWrap="wrap" width={[null, '1000px']}>
+                    {tagStats?.nodes
+                      ?.filter(node => !IGNORED_TAGS.includes(node.tag))
+                      .map(node => (
+                        <FilterButton
+                          as={StyledTag}
+                          key={node.tag}
+                          title={node.tag}
+                          variant="rounded-right"
+                          $isSelected={tags.includes(node.tag)}
+                          onClick={() => this.changeTags(node.tag)}
+                        >
+                          {truncate(node.tag, { length: 20 })}
+                        </FilterButton>
+                      ))}
+                  </Flex>
+                </Container>
+              )}
+            </Flex>
+          )}
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
             {loading && accounts?.nodes?.length > 0 && (
               <Flex py={3} width={1} justifyContent="center">
@@ -381,6 +468,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
     $term: String!
     $type: [AccountType]
     $country: [CountryISO]
+    $tag: [String]
     $sortBy: OrderByInput
     $isHost: Boolean
     $limit: Int
@@ -395,6 +483,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
       skipRecentAccounts: true
       country: $country
       orderBy: $sortBy
+      tag: $tag
     ) {
       nodes {
         id
@@ -453,6 +542,12 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
       offset
       totalCount
     }
+
+    tagStats(searchTerm: $term) {
+      nodes {
+        tag
+      }
+    }
   }
 `;
 
@@ -467,6 +562,7 @@ export const addSearchPageData = graphql(searchPageQuery, {
       limit: props.limit,
       offset: props.offset,
       country: props.country,
+      tag: props.tag,
       sortBy: constructSortByQuery(props.sortBy),
     },
   }),
