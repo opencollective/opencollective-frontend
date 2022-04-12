@@ -127,8 +127,9 @@ class ExpenseFormItems extends React.PureComponent {
     const { collective, form } = this.props;
 
     if (
-      !hasFeature(collective, FEATURES.MULTI_CURRENCY_EXPENSES) &&
-      !hasFeature(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES)
+      (!hasFeature(collective, FEATURES.MULTI_CURRENCY_EXPENSES) &&
+        !hasFeature(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES)) ||
+      payoutMethod?.type === PayoutMethodType.ACCOUNT_BALANCE
     ) {
       return [collective.currency];
     }
