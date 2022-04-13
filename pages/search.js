@@ -184,8 +184,8 @@ class SearchPage extends React.Component {
       isHost: router.query.isHost,
       country: router.query.country,
       tag: router.query.tag,
+      sortBy: sortBy.value,
     };
-    query.sortBy = sortBy.value;
     router.push({ pathname: router.pathname, query });
   };
 
@@ -273,7 +273,7 @@ class SearchPage extends React.Component {
 
     const filters = ['ALL', 'COLLECTIVE', 'EVENT', 'ORGANIZATION', 'HOST', 'PROJECT', 'FUND'];
     const { limit = 20, offset, totalCount = 0 } = accounts || {};
-    const showCollectives = term.trim() !== '' && !!accounts?.nodes;
+    const showCollectives = !!accounts?.nodes;
     const getOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
     const options = [getOption('ACTIVITY'), getOption('CREATED_AT.DESC'), getOption('CREATED_AT.ASC')];
 
@@ -303,70 +303,66 @@ class SearchPage extends React.Component {
               </SearchFormContainer>
             </Flex>
           </Container>
-          {term && (
-            <Flex mt={4} mb={4} mx="auto" flexDirection={['column', 'row']}>
-              <Container width={[1, 4 / 5]}>
-                <StyledFilters
-                  filters={filters}
-                  getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
-                  selected={this.state.filter}
-                  justifyContent="left"
-                  minButtonWidth="95px"
-                  onChange={filter => {
-                    this.setState({ filter: filter });
-                    this.onClick(filter);
-                  }}
-                />
-              </Container>
-              <Container width={[1, 1 / 5]} pt={[2, 0]}>
-                <StyledSelectFilter
-                  inputId="sort-filter"
-                  value={this.props.sortBy ? getOption(this.props.sortBy) : options[0]}
-                  options={options}
-                  onChange={sortBy => this.changeSort(sortBy)}
-                />
-              </Container>
-            </Flex>
-          )}
+          <Flex mt={4} mb={4} mx="auto" flexDirection={['column', 'row']}>
+            <Container width={[1, 4 / 5]}>
+              <StyledFilters
+                filters={filters}
+                getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
+                selected={this.state.filter}
+                justifyContent="left"
+                minButtonWidth="95px"
+                onChange={filter => {
+                  this.setState({ filter: filter });
+                  this.onClick(filter);
+                }}
+              />
+            </Container>
+            <Container width={[1, 1 / 5]} pt={[2, 0]}>
+              <StyledSelectFilter
+                inputId="sort-filter"
+                value={this.props.sortBy ? getOption(this.props.sortBy) : options[0]}
+                options={options}
+                onChange={sortBy => this.changeSort(sortBy)}
+              />
+            </Container>
+          </Flex>
           <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
-          {term && (
-            <Flex flexDirection={['column', 'row']}>
-              <Container width={[1, '200px']}>
-                <FilterLabel htmlFor="country-filter-type">
-                  <FormattedMessage id="collective.country.label" defaultMessage="Country" />
+          <Flex flexDirection={['column', 'row']}>
+            <Container width={[1, '200px']}>
+              <FilterLabel htmlFor="country-filter-type">
+                <FormattedMessage id="collective.country.label" defaultMessage="Country" />
+              </FilterLabel>
+              <InputTypeCountry
+                inputId="search-country-filter"
+                defaultValue="ALL"
+                customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
+                onChange={country => this.changeCountry(country)}
+              />
+            </Container>
+            {tagStats?.nodes?.length > 0 && (
+              <Container width={[1, 3 / 4]} pl={[0, '23px']} pt={[2, 0]}>
+                <FilterLabel htmlFor="tag-filter-type">
+                  <FormattedMessage defaultMessage="Tags" />
                 </FilterLabel>
-                <InputTypeCountry
-                  inputId="search-country-filter"
-                  defaultValue="ALL"
-                  customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
-                  onChange={country => this.changeCountry(country)}
-                />
+                <Flex flexWrap="wrap" width={[null, '1000px']}>
+                  {tagStats?.nodes
+                    ?.filter(node => !IGNORED_TAGS.includes(node.tag))
+                    .map(node => (
+                      <FilterButton
+                        as={StyledTag}
+                        key={node.tag}
+                        title={node.tag}
+                        variant="rounded-right"
+                        $isSelected={tags.includes(node.tag)}
+                        onClick={() => this.changeTags(node.tag)}
+                      >
+                        {truncate(node.tag, { length: 20 })}
+                      </FilterButton>
+                    ))}
+                </Flex>
               </Container>
-              {tagStats?.nodes?.length > 0 && (
-                <Container width={[1, 3 / 4]} pl={[0, '23px']} pt={[2, 0]}>
-                  <FilterLabel htmlFor="tag-filter-type">
-                    <FormattedMessage defaultMessage="Tags" />
-                  </FilterLabel>
-                  <Flex flexWrap="wrap" width={[null, '1000px']}>
-                    {tagStats?.nodes
-                      ?.filter(node => !IGNORED_TAGS.includes(node.tag))
-                      .map(node => (
-                        <FilterButton
-                          as={StyledTag}
-                          key={node.tag}
-                          title={node.tag}
-                          variant="rounded-right"
-                          $isSelected={tags.includes(node.tag)}
-                          onClick={() => this.changeTags(node.tag)}
-                        >
-                          {truncate(node.tag, { length: 20 })}
-                        </FilterButton>
-                      ))}
-                  </Flex>
-                </Container>
-              )}
-            </Flex>
-          )}
+            )}
+          </Flex>
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
             {loading && accounts?.nodes?.length > 0 && (
               <Flex py={3} width={1} justifyContent="center">
@@ -584,7 +580,6 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
 `;
 
 export const addSearchPageData = graphql(searchPageQuery, {
-  skip: props => !props.term,
   options: props => ({
     context: API_V2_CONTEXT,
     variables: {
