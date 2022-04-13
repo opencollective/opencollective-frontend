@@ -390,7 +390,7 @@ class SearchPage extends React.Component {
                   <FormattedMessage defaultMessage="No results match your search" />
                 </H1>
                 <Container py={32}>
-                  <Image src="/static/images/empty-search.svg" alt="No Search Results" width={101.98} height={87.47} />
+                  <Image src="/static/images/empty-search.png" alt="No Search Results" width={101.98} height={87.47} />
                 </Container>
                 <Container color="black.800" fontWeight={400}>
                   <Container fontSize="18px" lineHeight="26px" textAlign="center">
