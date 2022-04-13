@@ -23,7 +23,7 @@ describe('Contribution Flow: Guest contributions', () => {
       const body = recaptchaIframe.contents();
       cy.wrap(body).find('#checkbox').should('be.visible').click();
     });
-    cy.wait(200);
+    cy.wait(500);
     cy.contains('button[data-cy="cf-next-step"]', 'Contribute $400.42').click();
 
     cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -57,7 +57,7 @@ describe('Contribution Flow: Guest contributions', () => {
       const body = recaptchaIframe.contents();
       cy.wrap(body).find('#checkbox').should('be.visible').click();
     });
-    cy.wait(200);
+    cy.wait(500);
     cy.contains('button[data-cy="cf-next-step"]', 'Contribute $10').click();
 
     cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -115,7 +115,7 @@ describe('Contribution Flow: Guest contributions', () => {
         const body = recaptchaIframe.contents();
         cy.wrap(body).find('#checkbox').should('be.visible').click();
       });
-      cy.wait(200);
+      cy.wait(500);
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $10').click();
 
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -148,7 +148,7 @@ describe('Contribution Flow: Guest contributions', () => {
         const body = recaptchaIframe.contents();
         cy.wrap(body).find('#checkbox').should('be.visible').click();
       });
-      cy.wait(200);
+      cy.wait(500);
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $500').click();
 
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -193,7 +193,7 @@ describe('Contribution Flow: Guest contributions', () => {
         const body = recaptchaIframe.contents();
         cy.wrap(body).find('#checkbox').should('be.visible').click();
       });
-      cy.wait(200);
+      cy.wait(500);
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $5,000').click();
 
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
