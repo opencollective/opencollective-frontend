@@ -105,7 +105,7 @@ const MemberForm = props => {
                     <StyledSelect
                       inputId={field.id}
                       error={field.error}
-                      defaultValue={getOptions([memberRole])}
+                      defaultValue={getOptions([memberRole])[0]}
                       onBlur={() => form.setFieldTouched(field.name, true)}
                       onChange={({ value }) => {
                         form.setFieldValue(field.name, value);
