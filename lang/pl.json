@@ -59,6 +59,7 @@
   "9sbPks": "Domyślnie wszystkie daty są filtrowane i wyświetlane za pomocą lokalnej strefy czasowej. Możesz przełączyć się na UTC, aby zaznaczyć, że podane powyżej daty używają formatu Skoordynowany Uniwersalny Czas, który pasuje do generowania raportów e-mail",
   "9WIrrf": "Tax and Total",
   "A+AIST": "Attached file {number}",
+  "a3HMfz": "This payment method does not exist or has already been updated",
   "Accept": "Akceptuj",
   "acceptContributions.addBankAccount": "Dodaj konto bankowe",
   "acceptContributions.bankAccount.info": "Akceptuj wpłaty przez przelew bankowy. Budżet zostanie zaktualizowany po potwierdzeniu otrzymania środków.",

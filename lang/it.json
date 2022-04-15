@@ -59,6 +59,7 @@
   "9sbPks": "Per impostazione predefinita, tutte le date sono filtrate e visualizzate utilizzando il fuso orario locale. È possibile passare a UTC per indicare che le date fornite sopra utilizzare il formato Coordinated Universal Time, che corrisponde a come vengono generati i report di posta elettronica",
   "9WIrrf": "Tax and Total",
   "A+AIST": "Attached file {number}",
+  "a3HMfz": "This payment method does not exist or has already been updated",
   "Accept": "Accetta",
   "acceptContributions.addBankAccount": "Aggiungi conto bancario",
   "acceptContributions.bankAccount.info": "Accetta i contributi tramite bonifico bancario. Il budget verrà aggiornato quando avrai confermato la ricezione dell'importo.",

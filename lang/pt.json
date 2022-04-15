@@ -59,6 +59,7 @@
   "9sbPks": "Por padrão, todas as datas são filtradas e exibidas usando o seu fuso horário local. Pode alternar para TUC para indicar que as datas acima fornecidas usam o formato Tempo Universal Coordenado, que corresponde a como os relatórios de correio eletrónico são gerados",
   "9WIrrf": "Tax and Total",
   "A+AIST": "Attached file {number}",
+  "a3HMfz": "This payment method does not exist or has already been updated",
   "Accept": "Aceitar",
   "acceptContributions.addBankAccount": "Nova conta bancária",
   "acceptContributions.bankAccount.info": "Aceite contribuições por transferência bancária. O orçamento será atualizado quando confirmar a receção dos fundos.",

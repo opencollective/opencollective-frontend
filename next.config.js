@@ -176,6 +176,11 @@ const nextConfig = {
         destination: '/recurring-contributions',
         permanent: false,
       },
+      {
+        source: '/:collectiveSlug/paymentmethod/:paymentMethodId/update',
+        destination: '/paymentmethod/:paymentMethodId/update',
+        permanent: false,
+      },
       // Legacy support page
       {
         source: '/support',

@@ -55,7 +55,7 @@ exports.REWRITES = [
     destination: '/redeemed',
   },
   {
-    source: '/:collectiveSlug/paymentmethod/:id/update',
+    source: '/paymentmethod/:paymentMethodId/update',
     destination: '/updatePaymentMethod',
   },
   {
