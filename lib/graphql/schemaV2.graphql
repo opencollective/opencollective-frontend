@@ -692,9 +692,39 @@ type TaxInfo {
   id: String!
 
   """
+  Identifier for this tax (GST, VAT, etc)
+  """
+  type: OrderTaxType!
+
+  """
   Percentage applied, between 0-100
   """
-  percentage: Int!
+  percentage: Int! @deprecated(reason: "Please use `rate` instead")
+
+  """
+  Percentage applied, between 0-100
+  """
+  rate: Float!
+
+  """
+  Tax ID number of the 3rd party receiving/paying the tax
+  """
+  idNumber: String
+}
+
+"""
+The type of a tax like GST, VAT, etc
+"""
+enum OrderTaxType {
+  """
+  European Value Added Tax
+  """
+  VAT
+
+  """
+  New Zealand Good and Services Tax
+  """
+  GST
 }
 
 """
@@ -732,6 +762,11 @@ type Expense {
     """
     currencySource: ExpenseCurrencySource
   ): Amount
+
+  """
+  Taxes applied to this expense
+  """
+  taxes: [TaxInfo]!
 
   """
   The exchange rate between the expense currency and the account currency
@@ -3862,21 +3897,6 @@ type ExpenseStats {
 type OrderTax {
   type: OrderTaxType!
   percentage: Int!
-}
-
-"""
-Type for a required legal document
-"""
-enum OrderTaxType {
-  """
-  European Value Added Tax
-  """
-  VAT
-
-  """
-  New Zealand Good and Services Tax
-  """
-  GST
 }
 
 """
@@ -11334,7 +11354,7 @@ input ExpenseCreateInput {
   privateMessage: String
 
   """
-  Tax ID, VAT number...etc This information will be printed on your invoice.
+  Custom information to print on the invoice
   """
   invoiceInfo: String
 
@@ -11362,6 +11382,11 @@ input ExpenseCreateInput {
   The address of the payee
   """
   payeeLocation: LocationInput
+
+  """
+  The list of taxes that should be applied to the expense (VAT, GST, etc...)
+  """
+  tax: [ExpenseTaxInput]
 }
 
 input PayoutMethodInput {
@@ -11441,6 +11466,34 @@ input LocationInput {
   Structured JSON address
   """
   structured: JSON
+}
+
+"""
+Input to set taxes for an expense
+"""
+input ExpenseTaxInput {
+  type: TaxType!
+  rate: Float!
+
+  """
+  Tax identification number, if any
+  """
+  idNumber: String
+}
+
+"""
+The type of a tax like GST, VAT, etc
+"""
+enum TaxType {
+  """
+  European Value Added Tax
+  """
+  VAT
+
+  """
+  New Zealand Good and Services Tax
+  """
+  GST
 }
 
 input RecurringExpenseInput {
@@ -11525,6 +11578,11 @@ input ExpenseUpdateInput {
   The address of the payee
   """
   payeeLocation: LocationInput
+
+  """
+  The list of taxes that should be applied to the expense (VAT, GST, etc...)
+  """
+  tax: [ExpenseTaxInput]
 }
 
 input ExpenseItemInput {

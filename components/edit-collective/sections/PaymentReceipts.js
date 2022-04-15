@@ -255,6 +255,7 @@ const PaymentReceipts = ({ collective }) => {
           color="black.800"
           mb="24px"
           onChange={setActiveFilter}
+          isSearchable={false}
         />
         {content}
       </Box>

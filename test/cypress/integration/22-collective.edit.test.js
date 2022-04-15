@@ -145,6 +145,20 @@ describe('edit collective', () => {
     cy.get('.backToProfile a').click(); // back to profile
     cy.get(tierCardSelector).should('have.length', 2);
   });
+
+  it('enables VAT', () => {
+    cy.visit(`${collectiveSlug}/admin`);
+    cy.contains('[data-cy="country-select"]', 'Please select your country').click();
+    cy.contains('[data-cy="select-option"]', 'Belgium - BE').click();
+    cy.getByDataCy('VAT').click();
+    cy.contains('[data-cy="select-option"]', 'Use my own VAT number').click();
+    cy.contains('button', 'Save').click();
+    cy.contains('Saved');
+    cy.visit(`${collectiveSlug}/admin/tiers`);
+    cy.get('[data-cy="tier-input-field-type"]:first [data-cy="type"]').click();
+    cy.contains('[data-cy="select-option"]', 'product').click();
+    cy.contains('[data-cy="tier-input-field-type"]:first', 'Value-added tax (VAT): 21%');
+  });
 });
 
 describe('edit user collective', () => {

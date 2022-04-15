@@ -26,7 +26,7 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue, title, des
             defaultMessage="{field} (optional)"
             values={{
               field: (
-                <Span color="black.900" fontWeight="bold">
+                <Span color="black.900" fontSize="16px" fontWeight="bold">
                   {title}
                 </Span>
               ),
