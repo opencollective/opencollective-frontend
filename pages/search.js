@@ -214,13 +214,7 @@ class SearchPage extends React.Component {
     const { router } = this.props;
     const { q } = form;
 
-    const query = { q: q.value, type: router.query.type, sortBy: router.query.sortBy };
-    if (router.query.country) {
-      query.country = router.query.country;
-    }
-    if (router.query.tag) {
-      query.tag = router.query.tag;
-    }
+    const query = { q: q.value, type: router.query.type };
     router.push({ pathname: router.pathname, query });
   };
 
