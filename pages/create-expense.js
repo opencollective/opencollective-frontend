@@ -76,6 +76,7 @@ class CreateExpensePage extends React.Component {
       refetch: PropTypes.func,
       account: PropTypes.shape({
         id: PropTypes.string.isRequired,
+        parent: PropTypes.string,
         name: PropTypes.string.isRequired,
         slug: PropTypes.string.isRequired,
         description: PropTypes.string,
@@ -531,6 +532,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
         parent {
           id
           slug
+          expensePolicy
         }
       }
     }

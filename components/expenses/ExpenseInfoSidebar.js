@@ -83,7 +83,11 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
         </Container>
       </Box>
       {children && <Box my={50}>{children}</Box>}
-      <ExpandableExpensePolicies host={host} collective={collective} mt={50} />
+      <ExpandableExpensePolicies
+        host={host}
+        collective={collective?.type === 'PROJECT' ? collective.parent : collective}
+        mt={50}
+      />
       <Box mt={[0, 50]}>
         <CreateExpenseFAQ withBorderLeft withNewButtons titleProps={{ fontSize: '20px', fontWeight: 500, mb: 3 }} />
       </Box>
@@ -102,6 +106,7 @@ ExpenseInfoSidebar.propTypes = {
     id: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     type: PropTypes.string,
+    parent: PropTypes.object,
     isApproved: PropTypes.bool,
     stats: PropTypes.shape({
       balanceWithBlockedFunds: PropTypes.shape({
