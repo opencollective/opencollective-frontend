@@ -13,8 +13,10 @@ import formatMemberRole from '../../../lib/i18n/member-role';
 import Avatar from '../../Avatar';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import InputField from '../../InputField';
 import MemberRoleDescription, { hasRoleDescription } from '../../MemberRoleDescription';
+import StyledInput from '../../StyledInput';
+import StyledInputFormikField from '../../StyledInputFormikField';
+import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
 
 const MemberContainer = styled(Container)`
@@ -50,41 +52,8 @@ const MemberForm = props => {
 
   const getOptions = arr => {
     return arr.map(key => {
-      const obj = {};
-      obj[key] = formatMemberRole(intl, key);
-      return obj;
+      return { value: key, label: formatMemberRole(intl, key) };
     });
-  };
-
-  const fields = [
-    {
-      name: 'role',
-      type: 'select',
-      options: getOptions([roles.ADMIN, roles.MEMBER, roles.ACCOUNTANT]),
-      defaultValue: roles.ADMIN,
-      label: intl.formatMessage(memberFormMessages.roleLabel),
-    },
-    {
-      name: 'description',
-      maxLength: 255,
-      label: intl.formatMessage(memberFormMessages.descriptionLabel),
-    },
-    {
-      name: 'since',
-      type: 'date',
-      defaultValue: new Date(),
-      label: intl.formatMessage(memberFormMessages.sinceLabel),
-      required: true,
-    },
-  ];
-
-  const getFieldDefaultValue = field => {
-    const fieldDefaultValue = get(member, field.name) || field.defaultValue;
-    if (field.name === 'since') {
-      return dayjs(fieldDefaultValue).format('YYYY-MM-DD');
-    } else {
-      return fieldDefaultValue;
-    }
   };
 
   const validate = values => {
@@ -119,55 +88,77 @@ const MemberForm = props => {
       )}
       <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange>
         {formik => {
-          const { setFieldValue, submitForm, errors } = formik;
+          const { submitForm } = formik;
 
           bindSubmitForm(submitForm);
 
           return (
             <Form>
-              {fields.map(field => (
-                <Container key={field.name}>
-                  <InputField
-                    name={field.name}
-                    id={field.name}
-                    label={field.label}
-                    type={field.type}
-                    disabled={false}
-                    defaultValue={getFieldDefaultValue(field)}
-                    options={field.options}
-                    error={errors[field.name]}
-                    onChange={value => {
-                      if (field.name === 'since') {
-                        if (dayjs(value).isValid()) {
-                          setFieldValue(field.name, dayjs(value).toISOString());
-                        } else {
-                          setFieldValue(field.name, null);
-                        }
-                      } else {
-                        setFieldValue(field.name, value);
-                      }
-
-                      if (field.name === 'role') {
+              <StyledInputFormikField
+                name="role"
+                htmlFor="memberForm-role"
+                label={<P fontWeight="bold"> {intl.formatMessage(memberFormMessages.roleLabel)} </P>}
+                mt={3}
+              >
+                {({ form, field }) => (
+                  <React.Fragment>
+                    <StyledSelect
+                      inputId={field.id}
+                      error={field.error}
+                      defaultValue={getOptions([memberRole])}
+                      onBlur={() => form.setFieldTouched(field.name, true)}
+                      onChange={({ value }) => {
+                        form.setFieldValue(field.name, value);
                         setMemberRole(value);
-                      }
-                    }}
+                      }}
+                      options={getOptions([roles.ADMIN, roles.MEMBER, roles.ACCOUNTANT])}
+                    />
+                    {hasRoleDescription(memberRole) && (
+                      <Flex mb={3}>
+                        <Box mx={1} mt={1} fontSize="12px" color="black.600" fontStyle="italic">
+                          <MemberRoleDescription role={memberRole} />
+                        </Box>
+                      </Flex>
+                    )}
+                  </React.Fragment>
+                )}
+              </StyledInputFormikField>
+              <StyledInputFormikField
+                name="description"
+                htmlFor="memberForm-description"
+                label={<P fontWeight="bold">{intl.formatMessage(memberFormMessages.descriptionLabel)}</P>}
+                mt={3}
+              >
+                {({ field }) => <StyledInput {...field} />}
+              </StyledInputFormikField>
+              <StyledInputFormikField
+                name="since"
+                htmlFor="memberForm-since"
+                inputType="date"
+                label={<P fontWeight="bold">{intl.formatMessage(memberFormMessages.sinceLabel)}</P>}
+                mt={3}
+              >
+                {({ form, field }) => (
+                  <StyledInput
+                    {...field}
+                    required
+                    value={dayjs(field.value).format('YYYY-MM-DD')}
                     onKeyDown={event => {
                       if (event.key === 'Backspace') {
                         event.preventDefault();
                       }
                     }}
-                    overflow="hidden"
-                    required={field.required}
+                    onChange={event => {
+                      const value = event.target.value;
+                      if (dayjs(value).isValid()) {
+                        form.setFieldValue(field.name, dayjs(value).toISOString());
+                      } else {
+                        form.setFieldValue(field.name, null);
+                      }
+                    }}
                   />
-                  {field.name === 'role' && hasRoleDescription(memberRole) && (
-                    <Flex mb={3}>
-                      <Box mx={1} mt={1} fontSize="12px" color="black.600" fontStyle="italic">
-                        <MemberRoleDescription role={memberRole} />
-                      </Box>
-                    </Flex>
-                  )}
-                </Container>
-              ))}
+                )}
+              </StyledInputFormikField>
             </Form>
           );
         }}
