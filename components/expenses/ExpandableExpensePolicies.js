@@ -15,12 +15,12 @@ const msg = defineMessages({
   },
 });
 
-const ExpandableExpensePolicies = ({ host, collective, ...props }) => {
+const ExpandableExpensePolicies = ({ host, organization, ...props }) => {
   const { formatMessage } = useIntl();
   const hostPolicy = host && host.expensePolicy;
-  const collectivePolicy = collective && collective.expensePolicy;
+  const organizationPolicy = organization && organization.expensePolicy;
 
-  if (!collectivePolicy && !hostPolicy) {
+  if (!organizationPolicy && !hostPolicy) {
     return null;
   }
 
@@ -32,9 +32,9 @@ const ExpandableExpensePolicies = ({ host, collective, ...props }) => {
             <HTMLContent fontSize="12px" color="black.800" lineHeight="20px" content={host.expensePolicy} />
           </Container>
         )}
-        {collective && collective.expensePolicy && collective.id !== host?.id && (
+        {organization && organization.expensePolicy && organization.id !== host?.id && (
           <Container>
-            <HTMLContent fontSize="12px" color="black.800" lineHeight="20px" content={collective.expensePolicy} />
+            <HTMLContent fontSize="12px" color="black.800" lineHeight="20px" content={organization.expensePolicy} />
           </Container>
         )}
       </Collapse>
@@ -43,7 +43,7 @@ const ExpandableExpensePolicies = ({ host, collective, ...props }) => {
 };
 
 ExpandableExpensePolicies.propTypes = {
-  collective: PropTypes.shape({
+  organization: PropTypes.shape({
     id: PropTypes.string,
     expensePolicy: PropTypes.string,
   }),

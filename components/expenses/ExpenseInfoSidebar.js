@@ -85,7 +85,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
       {children && <Box my={50}>{children}</Box>}
       <ExpandableExpensePolicies
         host={host}
-        collective={collective?.type === 'PROJECT' ? collective.parent : collective}
+        organization={collective?.type === 'PROJECT' ? collective.parent : collective}
         mt={50}
       />
       <Box mt={[0, 50]}>
