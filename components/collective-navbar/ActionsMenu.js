@@ -240,7 +240,11 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasSubmitExpense && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE}>
-                        <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/expenses/new`}>
+                        <StyledLink
+                          data-cy="submit-expense-dropdown"
+                          as={Link}
+                          href={`${getCollectivePageRoute(collective)}/expenses/new`}
+                        >
                           <Container p={ITEM_PADDING}>
                             <Receipt size="20px" />
                             <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />

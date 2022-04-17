@@ -34,7 +34,13 @@ const ExpandableExpensePolicies = ({ host, organization, ...props }) => {
         )}
         {organization && organization.expensePolicy && organization.id !== host?.id && (
           <Container>
-            <HTMLContent fontSize="12px" color="black.800" lineHeight="20px" content={organization.expensePolicy} />
+            <HTMLContent
+              data-cy="expense-policy-html"
+              fontSize="12px"
+              color="black.800"
+              lineHeight="20px"
+              content={organization.expensePolicy}
+            />
           </Container>
         )}
       </Collapse>

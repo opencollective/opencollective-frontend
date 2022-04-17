@@ -262,6 +262,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
           >
             {inputProps => (
               <RichTextEditor
+                data-cy="expense-policy-input"
                 withBorders
                 showCount
                 maxLength={EXPENSE_POLICY_MAX_LENGTH}
@@ -364,6 +365,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
         </Container>
         <Flex mt={5} mb={3} alignItems="center" justifyContent="center">
           <StyledButton
+            data-cy="submit-policy-btn"
             buttonStyle="primary"
             mx={2}
             minWidth={200}
