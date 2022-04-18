@@ -130,7 +130,7 @@ class ErrorPage extends React.Component {
           &nbsp; 🤕
         </H1>
         <Flex mt={5} flexWrap="wrap" alignItems="center" justifyContent="center">
-          <StyledLink my={2} href="mailto:support@opencollective.com" mx={2} buttonStyle="standard" buttonSize="large">
+          <StyledLink my={2} href="https://opencollective.com/help" mx={2} buttonStyle="standard" buttonSize="large">
             <Support size="1em" /> <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
           </StyledLink>
           <StyledButton my={2} mx={2} buttonSize="large" onClick={() => location.reload()}>

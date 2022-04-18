@@ -9,9 +9,7 @@ export const getI18nLink = linkProps => chunks =>
 export const I18nBold = chunks => <strong>{chunks}</strong>;
 export const I18nItalic = chunks => <i>{chunks}</i>;
 export const I18nSupportLink = chunks => (
-  <StyledLink href="mailto:support@opencollective.com">
-    {chunks.length ? chunks : 'support@opencollective.com'}
-  </StyledLink>
+  <StyledLink href="https://opencollective.com/help">{chunks.length ? chunks : 'opencollective.com/help'}</StyledLink>
 );
 export const I18nSignInLink = chunks => (
   <Link href={{ pathname: '/signin', query: { next: typeof window !== undefined ? window.location.pathname : '' } }}>
