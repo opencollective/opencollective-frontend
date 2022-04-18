@@ -346,6 +346,7 @@ const editEditCollectiveWebhooksMutation = graphql(editCollectiveWebhooksMutatio
       mutate({
         variables,
         update: (cache, { data: { editWebhooks } }) => {
+          // read collective-specific data and append
           const { Collective } = cache.readQuery({
             query: editCollectiveWebhooksQuery,
             variables: { collectiveSlug: ownProps.collectiveSlug },

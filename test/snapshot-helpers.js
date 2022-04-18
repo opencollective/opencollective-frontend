@@ -1,5 +1,3 @@
-import React from 'react';
-import { IntlProvider } from 'react-intl';
 import renderer from 'react-test-renderer';
 
 import { withRequiredProviders } from './providers';
@@ -18,14 +16,5 @@ import { withRequiredProviders } from './providers';
 export const snapshot = (component, providersParams = {}) => {
   const componentWithProviders = withRequiredProviders(component, providersParams);
   const tree = renderer.create(componentWithProviders).toJSON();
-  return expect(tree).toMatchSnapshot();
-};
-
-/**
- * @deprecated Use `snapshot`
- * Same as `snapshot` but wraps component in a IntlProvider
- */
-export const snapshotI18n = (component, locale = 'en') => {
-  const tree = renderer.create(<IntlProvider locale={locale}>{component}</IntlProvider>).toJSON();
   return expect(tree).toMatchSnapshot();
 };

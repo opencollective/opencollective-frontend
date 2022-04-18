@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
+import { v4 as uuidv4 } from 'uuid';
 
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
@@ -280,8 +281,8 @@ const WhoIsFiscalHosting = () => {
         </StyledCarousel>
 
         <StyledCarousel display={['none', 'block']} width="100%" maxWidth="1200px" controllerPosition="side">
-          {Object.keys(WHO_IS_FISCAL_HOSTING_FOR).map((categories, index) => (
-            <PotentialUsers key={index.toString()} users={WHO_IS_FISCAL_HOSTING_FOR[categories]} />
+          {Object.keys(WHO_IS_FISCAL_HOSTING_FOR).map(categories => (
+            <PotentialUsers key={uuidv4()} users={WHO_IS_FISCAL_HOSTING_FOR[categories]} />
           ))}
         </StyledCarousel>
       </CarouselWrapper>

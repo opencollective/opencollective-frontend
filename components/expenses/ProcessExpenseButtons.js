@@ -280,6 +280,15 @@ const ProcessExpenseButtons = ({
   );
 };
 
+PermissionButton.propTypes = {
+  icon: PropTypes.string,
+  label: PropTypes.string,
+  permission: PropTypes.shape({
+    allowed: PropTypes.bool,
+    reason: PropTypes.string,
+  }),
+};
+
 ProcessExpenseButtons.propTypes = {
   permissions: PropTypes.shape({
     canApprove: PropTypes.bool,

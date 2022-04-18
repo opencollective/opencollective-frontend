@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
+import { v4 as uuidv4 } from 'uuid';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -150,8 +151,8 @@ Host.propTypes = {
 
 const HostDesktopCarousel = ({ display, controllerPosition }) => (
   <StyledCarousel controllerPosition={controllerPosition} width={1} display={display}>
-    {groupHostsIntoSections(HOSTS).map((groupedHost, index) => (
-      <Container display={['none', 'flex']} key={index.toString()} justifyContent="center" width={1}>
+    {groupHostsIntoSections(HOSTS).map(groupedHost => (
+      <Container display={['none', 'flex']} key={uuidv4()} justifyContent="center" width={1}>
         {groupedHost.map(host => (
           <Fragment key={host.id}>
             <Host {...host} />

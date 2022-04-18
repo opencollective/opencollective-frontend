@@ -6,6 +6,7 @@ import utc from 'dayjs/plugin/utc';
 import { groupBy, uniq } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+import { v4 as uuidv4 } from 'uuid';
 
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
 import { saveInvoice } from '../../../lib/transactions';
@@ -190,8 +191,8 @@ const Receipts = ({ invoices }) => {
           </H3>
           <StyledHr width={['60%', '80%']} borderStyle="solid" borderColor="#C4C7CC" />
         </Flex>
-        {byMonthYear[monthYear].map((invoice, index) => (
-          <ReceiptCard key={index.toString()} {...{ ...invoice, loadingInvoice, downloadInvoice, dateFrom, dateTo }} />
+        {byMonthYear[monthYear].map(invoice => (
+          <ReceiptCard key={uuidv4()} {...{ ...invoice, loadingInvoice, downloadInvoice, dateFrom, dateTo }} />
         ))}
       </Flex>
     );

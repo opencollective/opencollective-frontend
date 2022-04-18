@@ -4,7 +4,7 @@ import React from 'react';
 import { ThemeProvider } from 'styled-components';
 
 import theme from '../../lib/theme';
-import { snapshotI18n } from '../../test/snapshot-helpers';
+import { snapshot } from '../../test/snapshot-helpers';
 
 import { MockAddFundsSourcePicker, MockAddFundsSourcePickerForUser } from '../AddFundsSourcePicker';
 
@@ -18,7 +18,7 @@ describe('AddFundsSourcePicker component', () => {
   };
 
   it('renders default options', () => {
-    snapshotI18n(
+    snapshot(
       <ThemeProvider theme={theme}>
         <MockAddFundsSourcePicker {...defaultProps} />
       </ThemeProvider>,
@@ -32,7 +32,7 @@ describe('AddFundsSourcePicker component', () => {
         loading: true,
       },
     };
-    snapshotI18n(
+    snapshot(
       <ThemeProvider theme={theme}>
         <MockAddFundsSourcePicker {...props} />
       </ThemeProvider>,
@@ -48,7 +48,7 @@ describe('AddFundsSourcePicker component', () => {
       },
     };
 
-    snapshotI18n(
+    snapshot(
       <ThemeProvider theme={theme}>
         <MockAddFundsSourcePicker {...props} />
       </ThemeProvider>,
@@ -83,7 +83,7 @@ describe('AddFundsSourcePicker component', () => {
       },
     };
 
-    snapshotI18n(
+    snapshot(
       <ThemeProvider theme={theme}>
         <MockAddFundsSourcePicker {...props} />
       </ThemeProvider>,
@@ -100,7 +100,7 @@ describe('AddFundsSourcePickerForUser component', () => {
   };
 
   it('renders default options', () => {
-    snapshotI18n(
+    snapshot(
       <ThemeProvider theme={theme}>
         <MockAddFundsSourcePickerForUser {...defaultProps} />
       </ThemeProvider>,
@@ -120,7 +120,7 @@ describe('AddFundsSourcePickerForUser component', () => {
       },
     };
 
-    snapshotI18n(
+    snapshot(
       <ThemeProvider theme={theme}>
         <MockAddFundsSourcePickerForUser {...props} />
       </ThemeProvider>,
