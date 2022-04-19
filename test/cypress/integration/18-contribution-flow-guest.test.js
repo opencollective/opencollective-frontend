@@ -175,7 +175,7 @@ describe('Contribution Flow: Guest contributions', () => {
       // cy.get('input[name="location.country"]:invalid').should('have.length', 1);
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.get('[data-cy="cf-content"] [data-cy="country-select"]').click();
-      cy.contains('[data-cy="select-option"]', 'France - FR').click();
+      cy.contains('[data-cy="select-option"]', 'France').click();
       cy.get('input[name="address1"]:invalid').should('have.length', 1); // Empty
       cy.get('input[name="postalCode"]:invalid').should('have.length', 1); // Empty
       cy.get('input[name="city"]:invalid').should('have.length', 1); // Empty

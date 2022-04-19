@@ -188,7 +188,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
       cy.getByDataCy('payee-country').click();
-      cy.contains('[data-cy="select-option"]', 'Angola - AO').click();
+      cy.contains('[data-cy="select-option"]', 'Angola').click();
       cy.get('input[data-cy="payee-address-address1"]').type('Street Name, 123');
       cy.get('input[data-cy="payee-address-city"]').type('Citycitycity');
       cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
@@ -266,7 +266,7 @@ describe('New expense flow', () => {
         cy.reload();
 
         cy.getByDataCy('payee-country').click();
-        cy.contains('[data-cy="select-option"]', 'Angola - AO').click();
+        cy.contains('[data-cy="select-option"]', 'Angola').click();
         cy.get('[data-cy="payee-address-address1"]').type('Street Name, 123');
         cy.get('[data-cy="payee-address-city"]').type('City');
 
@@ -334,7 +334,7 @@ describe('New expense flow', () => {
         cy.visit(`/${collective}/expenses/${expenseId}?key=draft-key`);
 
         cy.getByDataCy('payee-country').click();
-        cy.contains('[data-cy="select-option"]', 'Angola - AO').click();
+        cy.contains('[data-cy="select-option"]', 'Angola').click();
         cy.get('[data-cy="payee-address-address1"]').type('Street Name, 123');
         cy.get('[data-cy="payee-address-city"]').type('City');
 
@@ -387,7 +387,7 @@ describe('New expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
       cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
       cy.getByDataCy('payee-country').click();
-      cy.contains('[data-cy="select-option"]', 'Angola - AO').click();
+      cy.contains('[data-cy="select-option"]', 'Angola').click();
       cy.get('input[data-cy="payee-address-address1"]').type('Street Name, 123');
       cy.get('input[data-cy="payee-address-city"]').type('Citycitycity');
       cy.getByDataCy('expense-next').click();
