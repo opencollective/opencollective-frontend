@@ -182,102 +182,107 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     menuPortalTarget,
     selectTheme,
     noOptionsMessage = () => intl.formatMessage(Messages.noOptions),
-  }) => ({
-    menuPortalTarget: menuPortalTarget === null || typeof document === 'undefined' ? undefined : document.body,
-    isDisabled: disabled || isDisabled,
-    placeholder: placeholder || intl.formatMessage(Messages.placeholder),
-    loadingMessage: () => intl.formatMessage(Messages.loading),
-    noOptionsMessage,
-    components: getComponents(components, useSearchIcon),
-    instanceId: instanceId ? instanceId : inputId,
-    theme: selectTheme,
-    styles: {
-      control: (baseStyles, state) => {
-        const customStyles = { borderColor: theme.colors.black[300] };
+    options,
+  }) => {
+    isSearchable = isSearchable === undefined ? options?.length > 8 : isSearchable;
+    return {
+      isSearchable,
+      menuPortalTarget: menuPortalTarget === null || typeof document === 'undefined' ? undefined : document.body,
+      isDisabled: disabled || isDisabled,
+      placeholder: placeholder || intl.formatMessage(Messages.placeholder),
+      loadingMessage: () => intl.formatMessage(Messages.loading),
+      noOptionsMessage,
+      components: getComponents(components, useSearchIcon),
+      instanceId: instanceId ? instanceId : inputId,
+      theme: selectTheme,
+      styles: {
+        control: (baseStyles, state) => {
+          const customStyles = { borderColor: theme.colors.black[300] };
 
-        if (error) {
-          customStyles.borderColor = theme.colors.red[500];
-          customStyles['&:hover'] = { borderColor: theme.colors.red[300] };
-        } else if (!state.isFocused) {
-          customStyles['&:hover'] = { borderColor: theme.colors.primary[300] };
-        } else if (state.isDisabled) {
-          customStyles.boxShadow = 'none';
-        } else {
-          customStyles.borderColor = theme.colors.primary[500];
-          customStyles.boxShadow = `inset 0px 2px 2px ${theme.colors.primary[50]}`;
-        }
+          if (error) {
+            customStyles.borderColor = theme.colors.red[500];
+            customStyles['&:hover'] = { borderColor: theme.colors.red[300] };
+          } else if (!state.isFocused) {
+            customStyles['&:hover'] = { borderColor: theme.colors.primary[300] };
+          } else if (state.isDisabled) {
+            customStyles.boxShadow = 'none';
+          } else {
+            customStyles.borderColor = theme.colors.primary[500];
+            customStyles.boxShadow = `inset 0px 2px 2px ${theme.colors.primary[50]}`;
+          }
 
-        if (isSearchable !== false) {
-          customStyles.cursor = 'text';
-        } else {
-          customStyles.cursor = 'pointer';
-        }
+          if (isSearchable !== false) {
+            customStyles.cursor = 'text';
+          } else {
+            customStyles.cursor = 'pointer';
+          }
 
-        if (typeof styles?.control === 'function') {
-          return styles.control({ ...baseStyles, ...customStyles }, state);
-        } else {
-          return { ...baseStyles, ...customStyles, ...styles?.control };
-        }
+          if (typeof styles?.control === 'function') {
+            return styles.control({ ...baseStyles, ...customStyles }, state);
+          } else {
+            return { ...baseStyles, ...customStyles, ...styles?.control };
+          }
+        },
+        option: (baseStyles, state) => {
+          const customStyles = { cursor: 'pointer' };
+
+          if (state.data.__background__) {
+            // Ability to force background by setting a special option prop
+            customStyles.background = state.data.__background__;
+          } else if (state.isSelected) {
+            customStyles.backgroundColor = theme.colors.primary[200];
+            customStyles.color = undefined;
+          } else if (state.isFocused) {
+            customStyles.backgroundColor = theme.colors.primary[100];
+          } else {
+            customStyles['&:hover'] = { backgroundColor: theme.colors.primary[100] };
+          }
+
+          return { ...baseStyles, ...customStyles, ...styles?.option };
+        },
+        singleValue: baseStyles => ({
+          ...baseStyles,
+          width: '100%',
+        }),
+        menu: baseStyles => {
+          return hideMenu
+            ? STYLES_DISPLAY_NONE
+            : {
+                ...baseStyles,
+                ...styles?.menu,
+                overflow: 'hidden', // for children border-radius to apply
+                zIndex: 10,
+              };
+        },
+        menuList: baseStyles => ({
+          ...baseStyles,
+          ...styles?.menuList,
+          paddingTop: 0,
+          paddingBottom: 0,
+        }),
+        indicatorSeparator: () => ({
+          display: 'none',
+        }),
+        clearIndicator: baseStyles => ({
+          ...baseStyles,
+          cursor: 'pointer',
+        }),
+        dropdownIndicator: baseStyles => {
+          if (hideDropdownIndicator) {
+            return STYLES_DISPLAY_NONE;
+          } else if (styles?.dropdownIndicator) {
+            return { ...baseStyles, ...styles.dropdownIndicator };
+          } else {
+            return baseStyles;
+          }
+        },
+        menuPortal: baseStyles => ({
+          ...baseStyles,
+          zIndex: 99999,
+        }),
       },
-      option: (baseStyles, state) => {
-        const customStyles = { cursor: 'pointer' };
-
-        if (state.data.__background__) {
-          // Ability to force background by setting a special option prop
-          customStyles.background = state.data.__background__;
-        } else if (state.isSelected) {
-          customStyles.backgroundColor = theme.colors.primary[200];
-          customStyles.color = undefined;
-        } else if (state.isFocused) {
-          customStyles.backgroundColor = theme.colors.primary[100];
-        } else {
-          customStyles['&:hover'] = { backgroundColor: theme.colors.primary[100] };
-        }
-
-        return { ...baseStyles, ...customStyles, ...styles?.option };
-      },
-      singleValue: baseStyles => ({
-        ...baseStyles,
-        width: '100%',
-      }),
-      menu: baseStyles => {
-        return hideMenu
-          ? STYLES_DISPLAY_NONE
-          : {
-              ...baseStyles,
-              ...styles?.menu,
-              overflow: 'hidden', // for children border-radius to apply
-              zIndex: 10,
-            };
-      },
-      menuList: baseStyles => ({
-        ...baseStyles,
-        ...styles?.menuList,
-        paddingTop: 0,
-        paddingBottom: 0,
-      }),
-      indicatorSeparator: () => ({
-        display: 'none',
-      }),
-      clearIndicator: baseStyles => ({
-        ...baseStyles,
-        cursor: 'pointer',
-      }),
-      dropdownIndicator: baseStyles => {
-        if (hideDropdownIndicator) {
-          return STYLES_DISPLAY_NONE;
-        } else if (styles?.dropdownIndicator) {
-          return { ...baseStyles, ...styles.dropdownIndicator };
-        } else {
-          return baseStyles;
-        }
-      },
-      menuPortal: baseStyles => ({
-        ...baseStyles,
-        zIndex: 99999,
-      }),
-    },
-  }),
+    };
+  },
 )`
   ${typography}
   ${layout}
