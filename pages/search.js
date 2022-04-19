@@ -13,6 +13,7 @@ import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
+import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
 import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
@@ -21,7 +22,6 @@ import InputTypeCountry from '../components/InputTypeCountry';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
-import PledgedCollectiveCard from '../components/search-page/PledgedCollectiveCard';
 import SearchCollectiveCard from '../components/search-page/SearchCollectiveCard';
 import SearchForm from '../components/SearchForm';
 import StyledButton from '../components/StyledButton';
@@ -278,7 +278,6 @@ class SearchPage extends React.Component {
             flexDirection="column"
             justifyContent="center"
             textAlign="center"
-            data-cy="search-banner"
           >
             <H1 fontSize="32px" fontWeight="700">
               <FormattedMessage defaultMessage="Search in Open Collective" />

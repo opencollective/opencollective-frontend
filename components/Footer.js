@@ -168,7 +168,7 @@ const navigation = {
   join: {
     createACollective: '/create',
     aboutFiscalHosting: '/fiscal-hosting',
-    discover: '/search',
+    discover: '/discover',
     findAFiscalHost: '/hosts',
     becomeASponsor: '/become-a-sponsor',
     becomeAHost: '/become-a-host',
