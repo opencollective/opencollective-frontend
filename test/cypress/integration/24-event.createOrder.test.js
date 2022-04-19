@@ -155,7 +155,7 @@ describe('event.createOrder page', () => {
 
     // French should have taxes
     cy.get('[data-cy="country-select"]').click();
-    cy.contains('[data-cy="select-option"]', 'France - FR').click();
+    cy.contains('[data-cy="select-option"]', 'France').click();
     cy.contains(breakdownLineSelector, 'VAT').contains('+ $16.80');
     cy.contains(breakdownLineSelector, 'TOTAL').contains('$96.80');
     cy.get('button[data-cy="cf-next-step"]').should('not.be.disabled');
@@ -199,7 +199,7 @@ describe('event.createOrder page', () => {
     // However if it's the same country than the collective than VAT should still apply,
     // even if the contributor is an organization
     cy.get('[data-cy="country-select"]').click();
-    cy.contains('[data-cy="select-option"]', 'Belgium - BE').click();
+    cy.contains('[data-cy="select-option"]', 'Belgium').click();
     cy.contains(breakdownLineSelector, 'VAT').contains('+ $16.80');
     cy.contains(breakdownLineSelector, 'TOTAL').contains('$96.80');
     cy.contains('div', 'Enter VAT number (if you have one)').click();
