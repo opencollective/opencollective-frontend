@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import countriesEN from 'i18n-iso-countries/langs/en.json';
-import countriesFR from 'i18n-iso-countries/langs/fr.json';
-import countriesPT from 'i18n-iso-countries/langs/pt.json';
+import { countryData } from 'country-currency-emoji-flags';
 import { isUndefined, orderBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -11,19 +9,9 @@ import fetchGeoLocation from '../lib/geolocation_api';
 
 import StyledSelect from './StyledSelect';
 
-const COUNTRY_NAMES = {
-  en: countriesEN.countries,
-  fr: countriesFR.countries,
-  pt: countriesPT.countries,
-};
-
-const getCountryName = (locale, country) => {
-  const names = COUNTRY_NAMES[locale]?.[country] ?? COUNTRY_NAMES.en[country];
-  if (Array.isArray(names)) {
-    return names[0];
-  } else {
-    return names;
-  }
+export const getCountryName = (locale, country) => {
+  const countryNames = new Intl.DisplayNames(locale, { type: 'region' });
+  return countryNames.of(country);
 };
 
 class InputTypeCountry extends Component {
@@ -73,7 +61,7 @@ class InputTypeCountry extends Component {
   }
 
   getOptions = memoizeOne(locale => {
-    const options = Object.keys(COUNTRY_NAMES.en).map(code => ({
+    const options = Object.keys(countryData).map(code => ({
       value: code,
       label: this.getCountryLabel(code, locale),
     }));

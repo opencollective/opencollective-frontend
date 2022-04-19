@@ -3,13 +3,12 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular';
 import copy from 'copy-to-clipboard';
-import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
+import { countryData, getEmojiByCountryCode } from 'country-currency-emoji-flags';
 import { isNil, truncate } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { Country } from '../lib/constants/country';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
@@ -20,6 +19,7 @@ import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
 import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
+import { getCountryName } from '../components/InputTypeCountry';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
@@ -255,13 +255,8 @@ class SearchPage extends React.Component {
     });
   };
 
-  i18nCountryName = (intl, country) => {
-    const countryNames = new Intl.DisplayNames(intl.locale, { type: 'region' });
-    return countryNames.of(country);
-  };
-
   getCountryOption = (intl, country) => {
-    const countryName = this.i18nCountryName(intl, country);
+    const countryName = getCountryName(intl.locale, country);
     const emoji = getEmojiByCountryCode(country);
     return {
       value: country,
@@ -295,7 +290,7 @@ class SearchPage extends React.Component {
     const sortOptions = [getSortOption('ACTIVITY'), getSortOption('CREATED_AT.DESC'), getSortOption('CREATED_AT.ASC')];
     const countryOptions = [
       { label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' },
-      ...this.generateCountryOptions(intl, Country),
+      ...this.generateCountryOptions(intl, Object.keys(countryData)),
     ];
 
     return (
