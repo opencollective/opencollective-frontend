@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular';
 import copy from 'copy-to-clipboard';
-import { isNil, truncate } from 'lodash';
+import { isNil, pickBy, truncate } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -171,7 +171,7 @@ class SearchPage extends React.Component {
     if (country !== 'ALL') {
       query.country = [country];
     }
-    router.push({ pathname: router.pathname, query });
+    router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
   };
 
   changeSort = sortBy => {
@@ -184,7 +184,7 @@ class SearchPage extends React.Component {
       tag: router.query.tag,
       sortBy: sortBy.value,
     };
-    router.push({ pathname: router.pathname, query });
+    router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
   };
 
   changeTags = tag => {
@@ -202,7 +202,7 @@ class SearchPage extends React.Component {
     if (tags.length > 0) {
       query.tag = tags.join();
     }
-    router.push({ pathname: router.pathname, query });
+    router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
   };
 
   refetch = event => {
@@ -213,7 +213,7 @@ class SearchPage extends React.Component {
     const { q } = form;
 
     const query = { q: q.value, type: router.query.type };
-    router.push({ pathname: router.pathname, query });
+    router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
   };
 
   onClick = filter => {
@@ -238,12 +238,7 @@ class SearchPage extends React.Component {
 
     query.sortBy = router.query.sortBy;
 
-    router.push({ pathname: '/search', query });
-  };
-
-  changePage = offset => {
-    const { router } = this.props;
-    this.props.router.push({ pathname: '/search', query: { ...router.query, offset } });
+    router.push({ pathname: '/search', query: pickBy(query, value => !isNil(value)) });
   };
 
   handleCopy = () => {
