@@ -353,7 +353,7 @@ class SearchPage extends React.Component {
                 <FilterLabel htmlFor="tag-filter-type">
                   <FormattedMessage defaultMessage="Tags" />
                 </FilterLabel>
-                <Flex flexWrap="wrap" width={[null, '1000px']}>
+                <Flex flexWrap="wrap">
                   {tagStats?.nodes
                     ?.filter(node => !IGNORED_TAGS.includes(node.tag))
                     .map(node => (
