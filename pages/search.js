@@ -163,12 +163,19 @@ class SearchPage extends React.Component {
   constructor(props) {
     super(props);
     this.onClick = this.onClick.bind(this);
-    this.state = { filter: 'ALL' };
+    const { router } = this.props;
+    if (router.query.isHost) {
+      this.state = { filter: 'HOST' };
+    } else if (router.query.type) {
+      this.state = { filter: router.query.type };
+    } else {
+      this.state = { filter: 'ALL' };
+    }
   }
 
   changeCountry = country => {
     const { router, term } = this.props;
-    const query = { q: term, types: router.query.types, sortBy: router.query.sortBy, tag: router.query.tag };
+    const query = { q: term, type: router.query.type, sortBy: router.query.sortBy, tag: router.query.tag };
     if (country !== 'ALL') {
       query.country = [country];
     }
@@ -179,7 +186,7 @@ class SearchPage extends React.Component {
     const { router, term } = this.props;
     const query = {
       q: term,
-      types: router.query.types,
+      type: router.query.type,
       isHost: router.query.isHost,
       country: router.query.country,
       tag: router.query.tag,
@@ -199,7 +206,7 @@ class SearchPage extends React.Component {
       tags.push(tag);
     }
 
-    const query = { q: term, types: router.query.types, country: router.query.country, sortBy: router.query.sortBy };
+    const query = { q: term, type: router.query.type, country: router.query.country, sortBy: router.query.sortBy };
     if (tags.length > 0) {
       query.tag = tags.join();
     }
