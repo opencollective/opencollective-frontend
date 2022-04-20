@@ -210,6 +210,7 @@ const ExpenseFormPayeeStep = ({
         <CollectivePickerAsync
           inputId={id}
           data-cy="select-expense-payee"
+          isSearchable
           collective={values.payee}
           onChange={({ value }) => {
             if (value) {
@@ -257,6 +258,7 @@ const ExpenseFormPayeeStep = ({
           customOptions={payeeOptions}
           getDefaultOptions={build => values.payee && build(values.payee)}
           data-cy="select-expense-payee"
+          isSearchable
           collective={values.payee}
           onChange={({ value }) => {
             formik.setFieldValue('payee', value);

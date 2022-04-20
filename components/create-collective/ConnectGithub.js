@@ -9,6 +9,7 @@ import { getGithubRepos } from '../../lib/api';
 
 import GithubRepositoriesFAQ from '../faqs/GithubRepositoriesFAQ';
 import { Box, Flex } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
@@ -108,22 +109,16 @@ class ConnectGithub extends React.Component {
             </P>
             <P fontSize="16px" color="black.600" mb={2}>
               <FormattedMessage
-                id="collective.subtitle.altVerification"
-                defaultMessage="Want to apply using {altverification}? {applylink}."
+                defaultMessage="Want to apply using an <AltVerificationLink>alternative verification criteria</AltVerificationLink>? <ApplyLink>Click here</ApplyLink>."
                 values={{
-                  applylink: (
-                    <Link href={{ pathname: `/opensource/create/form`, query: { hostTos: true } }}>
-                      <FormattedMessage id="clickHere" defaultMessage="Click here" />
-                    </Link>
-                  ),
-                  altverification: (
-                    <StyledLink href="https://www.oscollective.org/#criteria" openInNewTab>
-                      <FormattedMessage
-                        id="alternativeVerificationCriteria"
-                        defaultMessage="alternative verification criteria"
-                      />
-                    </StyledLink>
-                  ),
+                  ApplyLink: getI18nLink({
+                    as: Link,
+                    href: { pathname: `/opensource/create/form`, query: { hostTos: true } },
+                  }),
+                  AltVerificationLink: getI18nLink({
+                    openInNewTab: true,
+                    href: 'https://www.oscollective.org/#criteria',
+                  }),
                 }}
               />
             </P>

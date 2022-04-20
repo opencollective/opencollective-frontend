@@ -35,7 +35,7 @@ const FilterButton = styled(StyledButton).attrs({
  */
 const StyledFilters = ({ filters, disabled, getLabel, onChange, selected, minButtonWidth, ...flexProps }) => {
   return (
-    <Flex data-cy="filters" py={1} css={{ overflowX: 'auto' }} {...flexProps}>
+    <Flex data-cy="filters" px={1} py={1} css={{ overflowX: 'auto' }} {...flexProps}>
       {filters.map((filter, idx) => {
         const isSelected = filter === selected;
         return (

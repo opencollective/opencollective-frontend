@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
+import countriesEN from 'i18n-iso-countries/langs/en.json';
+import countriesFR from 'i18n-iso-countries/langs/fr.json';
+import countriesPT from 'i18n-iso-countries/langs/pt.json';
+import { isUndefined, orderBy } from 'lodash';
 import { countryData } from 'country-currency-emoji-flags';
 import { isUndefined, orderBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -7,7 +12,9 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import fetchGeoLocation from '../lib/geolocation_api';
 
+import { Flex } from './Grid';
 import StyledSelect from './StyledSelect';
+import { Span } from './Text';
 
 export const getCountryName = (locale, country) => {
   const countryNames = new Intl.DisplayNames(locale, { type: 'region' });
@@ -55,15 +62,22 @@ class InputTypeCountry extends Component {
     }
   }
 
-  getCountryLabel(code, locale) {
-    const name = getCountryName(locale, code);
-    return `${truncate(name, { length: 30 })} - ${code}`;
+  generateCountryLabel(locale, countryCode) {
+    const countryName = getCountryName(locale, countryCode);
+    const emoji = getEmojiByCountryCode(countryCode);
+    return (
+      <Flex fontSize="14px" lineHeight="20px" fontWeight="500" title={countryName}>
+        {emoji && <Span>{emoji}</Span>}
+        &nbsp;&nbsp;
+        <Span color="black.800">{countryName}</Span>
+      </Flex>
+    );
   }
 
   getOptions = memoizeOne(locale => {
     const options = Object.keys(countryData).map(code => ({
       value: code,
-      label: this.getCountryLabel(code, locale),
+      label: this.generateCountryLabel(locale, code),
     }));
 
     return [...this.props.customOptions, ...orderBy(options, 'label')];
@@ -79,7 +93,7 @@ class InputTypeCountry extends Component {
     return (
       customOption || {
         value: code,
-        label: this.getCountryLabel(code, locale),
+        label: this.generateCountryLabel(locale, code),
       }
     );
   });
