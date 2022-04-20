@@ -57,7 +57,7 @@ describe('edit collective', () => {
     cy.getByDataCy('confirmation-modal-continue').click();
     cy.get('[data-cy="member-1"] [data-cy="member-pending-tag"]').should('exist');
     cy.get('[data-cy="member-1"] [data-cy="resend-invite-btn"]').should('exist');
-    cy.get('[data-cy="member-1"] [data-cy="resend-invite-btn"]').click();
+    cy.getByDataCy('resend-invite-btn').click();
 
     // Check invitation email
     cy.openEmail(({ subject }) => subject.includes('Invitation to join CollectiveToEdit'));
