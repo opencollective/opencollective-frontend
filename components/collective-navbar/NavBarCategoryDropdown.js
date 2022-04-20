@@ -70,14 +70,6 @@ const CategoryContainer = styled(Container).attrs({ px: [1, 3, 0] })`
       }
     `}
 
-  ${props =>
-    props.mobileOnly &&
-    css`
-      @media (min-width: 64em) {
-        display: none;
-      }
-    `}
-
   @media (max-width: 64em) {
     border-top: 1px solid #e1e1e1;
     &::after {
