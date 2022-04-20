@@ -453,7 +453,7 @@ const CollectiveNavbar = ({
     if (!outside && isExpanded) {
       setTimeout(() => {
         setExpanded(false);
-      }, 200);
+      }, 500);
     }
   });
 
