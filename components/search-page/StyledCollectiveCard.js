@@ -200,9 +200,7 @@ const StyledCollectiveCard = ({
             <Container>
               {tag === undefined ? (
                 <StyledTag display="inline-block" variant="rounded-right" my={2} backgroundColor="blue.50">
-                  <I18nCollectiveTags
-                    tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
-                  />
+                  <I18nCollectiveTags tags={getCollectiveMainTag(null, null, collective.type)} />
                 </StyledTag>
               ) : (
                 tag
