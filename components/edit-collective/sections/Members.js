@@ -229,7 +229,13 @@ class Members extends React.Component {
                   </StyledTag>
                 </StyledTooltip>
               </TagContainer>
-              <StyledButton display="block" fontSize="11px" lineHeight="0" onClick={() => this.resendInvite(member)}>
+              <StyledButton
+                data-cy="resend-invite-btn"
+                display="block"
+                fontSize="11px"
+                lineHeight="0"
+                onClick={() => this.resendInvite(member)}
+              >
                 <FormattedMessage id="ResendInviteEmail" defaultMessage="Resend Invite" />
               </StyledButton>
             </React.Fragment>
