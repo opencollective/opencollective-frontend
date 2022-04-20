@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Edit } from '@styled-icons/material/Edit';
-import { get, omit } from 'lodash';
+import { compose, get, omit } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -78,6 +78,7 @@ class Members extends React.Component {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
     refetchLoggedInUser: PropTypes.func.isRequired,
+    inviteMember: PropTypes.func.isRequired,
     /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
     /** @ignore from Apollo */
@@ -148,6 +149,15 @@ class Members extends React.Component {
     return members.map(member => member.member && member.member.id);
   });
 
+  resendInvite = member =>
+    this.props.inviteMember({
+      variables: {
+        memberAccount: { id: member.memberAccount.id },
+        account: { slug: this.props.collective.slug },
+        role: member.role,
+      },
+    });
+
   renderMember = (member, index, nbAdmins, memberModalKey) => {
     const { intl, collective, LoggedInUser, refetchLoggedInUser } = this.props;
 
@@ -212,11 +222,16 @@ class Members extends React.Component {
           </P>
           <TagContainer>
             {isInvitation && (
-              <StyledTooltip content={intl.formatMessage(this.messages.memberPendingDetails)}>
-                <StyledTag data-cy="member-pending-tag" textTransform="uppercase" display="block" type="info">
-                  <FormattedMessage id="Pending" defaultMessage="Pending" />
-                </StyledTag>
-              </StyledTooltip>
+              <React.Fragment>
+                <StyledTooltip content={intl.formatMessage(this.messages.memberPendingDetails)}>
+                  <StyledTag data-cy="member-pending-tag" textTransform="uppercase" display="block" type="info">
+                    <FormattedMessage id="Pending" defaultMessage="Pending" />
+                  </StyledTag>
+                </StyledTooltip>
+                <StyledButton mx={2} minWidth={200} onClick={() => this.resendInvite(member)}>
+                  <FormattedMessage id="ResendInviteEmail" defaultMessage="Resend Invite" />
+                </StyledButton>
+              </React.Fragment>
             )}
           </TagContainer>
         </Flex>
@@ -428,6 +443,29 @@ export const coreContributorsQuery = gqlV2/* GraphQL */ `
   ${memberFieldsFragment}
 `;
 
+const inviteMemberMutation = gqlV2/* GraphQL */ `
+  mutation InviteMember(
+    $memberAccount: AccountReferenceInput!
+    $account: AccountReferenceInput!
+    $role: MemberRole!
+    $description: String
+    $since: DateTime
+  ) {
+    inviteMember(
+      memberAccount: $memberAccount
+      account: $account
+      role: $role
+      description: $description
+      since: $since
+    ) {
+      id
+      role
+      description
+      since
+    }
+  }
+`;
+
 const addCoreContributorsData = graphql(coreContributorsQuery, {
   options: props => ({
     fetchPolicy: 'network-only',
@@ -436,4 +474,24 @@ const addCoreContributorsData = graphql(coreContributorsQuery, {
   }),
 });
 
-export default injectIntl(addCoreContributorsData(withUser(Members)));
+const addInviteMemberMutation = graphql(inviteMemberMutation, {
+  name: 'inviteMember',
+  options: props => ({
+    context: API_V2_CONTEXT,
+    refetchQueries: [
+      {
+        query: coreContributorsQuery,
+        context: API_V2_CONTEXT,
+        variables: {
+          collectiveSlug: props.collective.slug,
+          account: { slug: props.collective.slug },
+        },
+      },
+    ],
+    awaitRefetchQueries: true,
+  }),
+});
+
+const inject = compose(withUser, injectIntl, addCoreContributorsData, addInviteMemberMutation);
+
+export default inject(Members);

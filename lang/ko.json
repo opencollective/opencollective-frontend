@@ -2017,6 +2017,7 @@
   "ResendEmail": "이메일 재전송",
   "ResendEmailSuccessful": "Check your inbox!",
   "ResendInvite": "초대장 다시 보내기",
+  "ResendInviteEmail": "Resend Invite",
   "ResendInviteSuccessful": "초대 전송됨",
   "Reset": "초기화",
   "response.status.yes": "{name} is going",

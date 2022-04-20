@@ -2017,6 +2017,7 @@
   "ResendEmail": "Reenviar correo electrónico",
   "ResendEmailSuccessful": "¡Revisa tu bandeja de entrada!",
   "ResendInvite": "Reenviar invitación",
+  "ResendInviteEmail": "Resend Invite",
   "ResendInviteSuccessful": "Invitación enviada",
   "Reset": "Restablecer",
   "response.status.yes": "{name} atenderá",

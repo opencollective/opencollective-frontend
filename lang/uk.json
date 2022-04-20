@@ -2017,6 +2017,7 @@
   "ResendEmail": "Повторно надіслати лист",
   "ResendEmailSuccessful": "Перевірте свої вхідні повідомлення!",
   "ResendInvite": "Повторно надіслати запрошення",
+  "ResendInviteEmail": "Resend Invite",
   "ResendInviteSuccessful": "Запрошення надіслано",
   "Reset": "Скинути",
   "response.status.yes": "{name} йде",

@@ -2017,6 +2017,7 @@
   "ResendEmail": "Отправить письмо еще раз",
   "ResendEmailSuccessful": "Проверьте почту!",
   "ResendInvite": "Отправить приглашение повторно",
+  "ResendInviteEmail": "Resend Invite",
   "ResendInviteSuccessful": "Приглашение отправлено",
   "Reset": "Сбросить",
   "response.status.yes": "{name} идёт",
