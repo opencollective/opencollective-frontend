@@ -279,7 +279,9 @@ const ExpenseFormBody = ({
     }
     // If creating a new expense or completing an expense submitted on your behalf, automatically select your default profile.
     else if (!isOnBehalf && (isDraft || !values.payee) && loggedInAccount && !isEmpty(payoutProfiles)) {
-      formik.setFieldValue('payee', first(payoutProfiles));
+      const defaultProfile =
+        (values.payee && payoutProfiles.find(p => p.slug === values.payee.slug)) || first(payoutProfiles);
+      formik.setFieldValue('payee', defaultProfile);
     }
     // If recurring expense with selected Payout Method
     if (isDraft && loggedInAccount && !values.payoutMethod && expense.payoutMethod) {
