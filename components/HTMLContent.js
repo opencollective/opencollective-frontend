@@ -87,7 +87,6 @@ const HTMLContent = styled(
     return (
       <div>
         <DisplayBox
-          // data-cy="expense-policy-html"
           ref={contentRef}
           maxHeight={maxHeight}
           maxCollapsedHeight={maxCollapsedHeight}
