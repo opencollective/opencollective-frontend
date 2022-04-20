@@ -54,7 +54,7 @@ const AllCardsContainerMobile = styled.div`
 
 const TagContainer = styled(Box)`
   position: absolute;
-  bottom: 10%;
+  bottom: 16%;
 `;
 
 const InviteNewCard = styled(MemberContainer)`
@@ -220,20 +220,20 @@ class Members extends React.Component {
           <P fontSize="11px" lineHeight="16px" mx={2} fontWeight={400} mb={5}>
             {get(member, 'description')}
           </P>
-          <TagContainer>
-            {isInvitation && (
-              <React.Fragment>
+          {isInvitation && (
+            <React.Fragment>
+              <TagContainer>
                 <StyledTooltip content={intl.formatMessage(this.messages.memberPendingDetails)}>
                   <StyledTag data-cy="member-pending-tag" textTransform="uppercase" display="block" type="info">
                     <FormattedMessage id="Pending" defaultMessage="Pending" />
                   </StyledTag>
                 </StyledTooltip>
-                <StyledButton mx={2} minWidth={200} onClick={() => this.resendInvite(member)}>
-                  <FormattedMessage id="ResendInviteEmail" defaultMessage="Resend Invite" />
-                </StyledButton>
-              </React.Fragment>
-            )}
-          </TagContainer>
+              </TagContainer>
+              <StyledButton display="block" fontSize="11px" lineHeight="0" onClick={() => this.resendInvite(member)}>
+                <FormattedMessage id="ResendInviteEmail" defaultMessage="Resend Invite" />
+              </StyledButton>
+            </React.Fragment>
+          )}
         </Flex>
       </MemberContainer>
     );
