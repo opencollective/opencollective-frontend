@@ -30,7 +30,7 @@ exports[`AddFundsSourcePicker component renders default options 1`] = `
       className="css-1f43avz-a11yText-A11yText"
     />
     <div
-      className=" css-p2fiel-control"
+      className=" css-13ncb8r-control"
       onMouseDown={[Function]}
       onTouchEnd={[Function]}
     >
@@ -43,49 +43,25 @@ exports[`AddFundsSourcePicker component renders default options 1`] = `
         >
           Search for Users or Organizations
         </div>
-        <div
-          className=" css-6j8wv5-Input"
-          data-value=""
-        >
-          <input
-            aria-autocomplete="list"
-            aria-controls="react-select-sourcePicker-listbox"
-            aria-describedby="react-select-sourcePicker-placeholder"
-            aria-expanded={false}
-            aria-haspopup={true}
-            aria-owns="react-select-sourcePicker-listbox"
-            autoCapitalize="none"
-            autoComplete="off"
-            autoCorrect="off"
-            className=""
-            disabled={false}
-            id="sourcePicker"
-            onBlur={[Function]}
-            onChange={[Function]}
-            onFocus={[Function]}
-            role="combobox"
-            spellCheck="false"
-            style={
-              Object {
-                "background": 0,
-                "border": 0,
-                "color": "inherit",
-                "font": "inherit",
-                "gridArea": "1 / 2",
-                "label": "input",
-                "margin": 0,
-                "minWidth": "2px",
-                "opacity": 1,
-                "outline": 0,
-                "padding": 0,
-                "width": "100%",
-              }
-            }
-            tabIndex={0}
-            type="text"
-            value=""
-          />
-        </div>
+        <input
+          aria-autocomplete="list"
+          aria-controls="react-select-sourcePicker-listbox"
+          aria-describedby="react-select-sourcePicker-placeholder"
+          aria-expanded={false}
+          aria-haspopup={true}
+          aria-owns="react-select-sourcePicker-listbox"
+          aria-readonly={true}
+          className="css-mohuvp-dummyInput-DummyInput"
+          disabled={false}
+          id="sourcePicker"
+          inputMode="none"
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          role="combobox"
+          tabIndex={0}
+          value=""
+        />
       </div>
       <div
         className=" css-1hb7zxy-IndicatorsContainer"
@@ -152,7 +128,7 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
       className="css-1f43avz-a11yText-A11yText"
     />
     <div
-      className=" css-p2fiel-control"
+      className=" css-13ncb8r-control"
       onMouseDown={[Function]}
       onTouchEnd={[Function]}
     >
@@ -165,49 +141,25 @@ exports[`AddFundsSourcePicker component renders fromCollectives by type in optgr
         >
           Search for Users or Organizations
         </div>
-        <div
-          className=" css-6j8wv5-Input"
-          data-value=""
-        >
-          <input
-            aria-autocomplete="list"
-            aria-controls="react-select-sourcePicker-listbox"
-            aria-describedby="react-select-sourcePicker-placeholder"
-            aria-expanded={false}
-            aria-haspopup={true}
-            aria-owns="react-select-sourcePicker-listbox"
-            autoCapitalize="none"
-            autoComplete="off"
-            autoCorrect="off"
-            className=""
-            disabled={false}
-            id="sourcePicker"
-            onBlur={[Function]}
-            onChange={[Function]}
-            onFocus={[Function]}
-            role="combobox"
-            spellCheck="false"
-            style={
-              Object {
-                "background": 0,
-                "border": 0,
-                "color": "inherit",
-                "font": "inherit",
-                "gridArea": "1 / 2",
-                "label": "input",
-                "margin": 0,
-                "minWidth": "2px",
-                "opacity": 1,
-                "outline": 0,
-                "padding": 0,
-                "width": "100%",
-              }
-            }
-            tabIndex={0}
-            type="text"
-            value=""
-          />
-        </div>
+        <input
+          aria-autocomplete="list"
+          aria-controls="react-select-sourcePicker-listbox"
+          aria-describedby="react-select-sourcePicker-placeholder"
+          aria-expanded={false}
+          aria-haspopup={true}
+          aria-owns="react-select-sourcePicker-listbox"
+          aria-readonly={true}
+          className="css-mohuvp-dummyInput-DummyInput"
+          disabled={false}
+          id="sourcePicker"
+          inputMode="none"
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          role="combobox"
+          tabIndex={0}
+          value=""
+        />
       </div>
       <div
         className=" css-1hb7zxy-IndicatorsContainer"
@@ -274,7 +226,7 @@ exports[`AddFundsSourcePicker component renders host name as first option 1`] = 
       className="css-1f43avz-a11yText-A11yText"
     />
     <div
-      className=" css-p2fiel-control"
+      className=" css-13ncb8r-control"
       onMouseDown={[Function]}
       onTouchEnd={[Function]}
     >
@@ -287,49 +239,25 @@ exports[`AddFundsSourcePicker component renders host name as first option 1`] = 
         >
           Search for Users or Organizations
         </div>
-        <div
-          className=" css-6j8wv5-Input"
-          data-value=""
-        >
-          <input
-            aria-autocomplete="list"
-            aria-controls="react-select-sourcePicker-listbox"
-            aria-describedby="react-select-sourcePicker-placeholder"
-            aria-expanded={false}
-            aria-haspopup={true}
-            aria-owns="react-select-sourcePicker-listbox"
-            autoCapitalize="none"
-            autoComplete="off"
-            autoCorrect="off"
-            className=""
-            disabled={false}
-            id="sourcePicker"
-            onBlur={[Function]}
-            onChange={[Function]}
-            onFocus={[Function]}
-            role="combobox"
-            spellCheck="false"
-            style={
-              Object {
-                "background": 0,
-                "border": 0,
-                "color": "inherit",
-                "font": "inherit",
-                "gridArea": "1 / 2",
-                "label": "input",
-                "margin": 0,
-                "minWidth": "2px",
-                "opacity": 1,
-                "outline": 0,
-                "padding": 0,
-                "width": "100%",
-              }
-            }
-            tabIndex={0}
-            type="text"
-            value=""
-          />
-        </div>
+        <input
+          aria-autocomplete="list"
+          aria-controls="react-select-sourcePicker-listbox"
+          aria-describedby="react-select-sourcePicker-placeholder"
+          aria-expanded={false}
+          aria-haspopup={true}
+          aria-owns="react-select-sourcePicker-listbox"
+          aria-readonly={true}
+          className="css-mohuvp-dummyInput-DummyInput"
+          disabled={false}
+          id="sourcePicker"
+          inputMode="none"
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          role="combobox"
+          tabIndex={0}
+          value=""
+        />
       </div>
       <div
         className=" css-1hb7zxy-IndicatorsContainer"
@@ -396,7 +324,7 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
       className="css-1f43avz-a11yText-A11yText"
     />
     <div
-      className=" css-p2fiel-control"
+      className=" css-13ncb8r-control"
       onMouseDown={[Function]}
       onTouchEnd={[Function]}
     >
@@ -409,49 +337,25 @@ exports[`AddFundsSourcePicker component renders loading state 1`] = `
         >
           Search for Users or Organizations
         </div>
-        <div
-          className=" css-6j8wv5-Input"
-          data-value=""
-        >
-          <input
-            aria-autocomplete="list"
-            aria-controls="react-select-sourcePicker-listbox"
-            aria-describedby="react-select-sourcePicker-placeholder"
-            aria-expanded={false}
-            aria-haspopup={true}
-            aria-owns="react-select-sourcePicker-listbox"
-            autoCapitalize="none"
-            autoComplete="off"
-            autoCorrect="off"
-            className=""
-            disabled={false}
-            id="sourcePicker"
-            onBlur={[Function]}
-            onChange={[Function]}
-            onFocus={[Function]}
-            role="combobox"
-            spellCheck="false"
-            style={
-              Object {
-                "background": 0,
-                "border": 0,
-                "color": "inherit",
-                "font": "inherit",
-                "gridArea": "1 / 2",
-                "label": "input",
-                "margin": 0,
-                "minWidth": "2px",
-                "opacity": 1,
-                "outline": 0,
-                "padding": 0,
-                "width": "100%",
-              }
-            }
-            tabIndex={0}
-            type="text"
-            value=""
-          />
-        </div>
+        <input
+          aria-autocomplete="list"
+          aria-controls="react-select-sourcePicker-listbox"
+          aria-describedby="react-select-sourcePicker-placeholder"
+          aria-expanded={false}
+          aria-haspopup={true}
+          aria-owns="react-select-sourcePicker-listbox"
+          aria-readonly={true}
+          className="css-mohuvp-dummyInput-DummyInput"
+          disabled={false}
+          id="sourcePicker"
+          inputMode="none"
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          role="combobox"
+          tabIndex={0}
+          value=""
+        />
       </div>
       <div
         className=" css-1hb7zxy-IndicatorsContainer"
