@@ -1,12 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
-import countriesEN from 'i18n-iso-countries/langs/en.json';
-import countriesFR from 'i18n-iso-countries/langs/fr.json';
-import countriesPT from 'i18n-iso-countries/langs/pt.json';
+import { countryData, getEmojiByCountryCode } from 'country-currency-emoji-flags';
 import { isUndefined, orderBy } from 'lodash';
-import { countryData } from 'country-currency-emoji-flags';
-import { isUndefined, orderBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 

@@ -4,7 +4,6 @@ import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular';
 import copy from 'copy-to-clipboard';
 import { isNil, pickBy, truncate } from 'lodash';
-import { countryData, getEmojiByCountryCode } from 'country-currency-emoji-flags';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -20,7 +19,7 @@ import { Box, Flex } from '../components/Grid';
 import Hide from '../components/Hide';
 import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
-import { getCountryName } from '../components/InputTypeCountry';
+import InputTypeCountry from '../components/InputTypeCountry';
 import LoadingGrid from '../components/LoadingGrid';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
@@ -251,25 +250,6 @@ class SearchPage extends React.Component {
     });
   };
 
-  getCountryOption = (intl, country) => {
-    const countryName = getCountryName(intl.locale, country);
-    const emoji = getEmojiByCountryCode(country);
-    return {
-      value: country,
-      label: (
-        <Flex fontSize="14px" lineHeight="20px" fontWeight="500" title={countryName}>
-          {emoji && <Span>{emoji}</Span>}
-          &nbsp;&nbsp;
-          <Span>{countryName}</Span>
-        </Flex>
-      ),
-    };
-  };
-
-  generateCountryOptions = (intl, countries) => {
-    return countries.map(country => this.getCountryOption(intl, country));
-  };
-
   render() {
     const { router, data, term = '', intl } = this.props;
     const { error, loading, accounts, tagStats } = data || {};
@@ -283,10 +263,6 @@ class SearchPage extends React.Component {
     const showCollectives = !!accounts?.nodes;
     const getSortOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
     const sortOptions = [getSortOption('ACTIVITY'), getSortOption('CREATED_AT.DESC'), getSortOption('CREATED_AT.ASC')];
-    const countryOptions = [
-      { label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' },
-      ...this.generateCountryOptions(intl, Object.keys(countryData)),
-    ];
 
     return (
       <Page title="Search" showSearch={false}>
@@ -349,8 +325,8 @@ class SearchPage extends React.Component {
               </FilterLabel>
               <StyledSelectFilter
                 inputId="sort-filter"
-                value={this.props.sortBy ? getOption(this.props.sortBy) : options[0]}
-                options={options}
+                value={this.props.sortBy ? getSortOption(this.props.sortBy) : sortOptions[0]}
+                options={sortOptions}
                 onChange={sortBy => this.changeSort(sortBy)}
                 minWidth={[0, '200px']}
               />
@@ -361,10 +337,12 @@ class SearchPage extends React.Component {
               </FilterLabel>
               <InputTypeCountry
                 inputId="search-country-filter"
-                defaultValue="ALL"
+                as={StyledSelectFilter}
+                defaultValue={this.props.country || 'ALL'}
                 customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
                 onChange={country => this.changeCountry(country)}
                 minWidth={[0, '200px']}
+                fontSize="12px"
               />
             </Container>
             {tagStats?.nodes?.length > 0 && (
