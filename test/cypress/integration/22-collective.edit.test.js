@@ -56,10 +56,14 @@ describe('edit collective', () => {
     cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
     cy.getByDataCy('confirmation-modal-continue').click();
     cy.get('[data-cy="member-1"] [data-cy="member-pending-tag"]').should('exist');
-    cy.get('[data-cy="member-1"] [data-cy="resend-invite-btn"]').should('exist');
-    cy.getByDataCy('resend-invite-btn').click();
+    cy.getByDataCy('resend-invite-btn').should('exist');
 
     // Check invitation email
+    cy.openEmail(({ subject }) => subject.includes('Invitation to join CollectiveToEdit'));
+    cy.contains('Test User Admin just invited you to the role of Administrator of CollectiveToEdit on Open Collective');
+
+    // Re-send the invitation email
+    cy.getByDataCy('resend-invite-btn').first().click();
     cy.openEmail(({ subject }) => subject.includes('Invitation to join CollectiveToEdit'));
     cy.contains('Test User Admin just invited you to the role of Administrator of CollectiveToEdit on Open Collective');
 
@@ -74,7 +78,7 @@ describe('edit collective', () => {
 
     cy.visit(`/${collectiveSlug}/admin/members`);
     cy.get('[data-cy="member-1"]').find('[data-cy="member-pending-tag"]').should('not.exist');
-    cy.get('[data-cy="member-1"] [data-cy="resend-invite-btn"]').should('not.exist');
+    cy.getByDataCy('resend-invite-btn').should('not.exist');
   });
 
   it('edit info', () => {
