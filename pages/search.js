@@ -267,7 +267,9 @@ class SearchPage extends React.Component {
     }
 
     const { limit = 20, offset, totalCount = 0 } = accounts || {};
-    const showCollectives = !!accounts?.nodes;
+    const showTagFilterSection = (accounts?.nodes?.length > 0 || tags.length > 0) && tagStats?.nodes?.length > 0;
+    const showCountriesFilterSection = accounts?.nodes?.length > 0 || router?.query?.country;
+    const showSortFilterSection = accounts?.nodes?.length > 0;
     const getSortOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
     const sortOptions = [getSortOption('ACTIVITY'), getSortOption('CREATED_AT.DESC'), getSortOption('CREATED_AT.ASC')];
 
@@ -326,33 +328,37 @@ class SearchPage extends React.Component {
           </Flex>
           <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
           <Flex flexDirection={['column', 'row']}>
-            <Container pr={[0, '19px']}>
-              <FilterLabel htmlFor="sort-filter-type">
-                <FormattedMessage defaultMessage="Sort" />
-              </FilterLabel>
-              <StyledSelectFilter
-                inputId="sort-filter"
-                value={this.props.sortBy ? getSortOption(this.props.sortBy) : sortOptions[0]}
-                options={sortOptions}
-                onChange={sortBy => this.changeSort(sortBy)}
-                minWidth={[0, '200px']}
-              />
-            </Container>
-            <Container pt={['20px', 0]}>
-              <FilterLabel htmlFor="country-filter-type">
-                <FormattedMessage id="collective.country.label" defaultMessage="Country" />
-              </FilterLabel>
-              <InputTypeCountry
-                inputId="search-country-filter"
-                as={StyledSelectFilter}
-                defaultValue={this.props.country || 'ALL'}
-                customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
-                onChange={country => this.changeCountry(country)}
-                minWidth={[0, '200px']}
-                fontSize="12px"
-              />
-            </Container>
-            {tagStats?.nodes?.length > 0 && (
+            {showSortFilterSection && (
+              <Container pr={[0, '19px']}>
+                <FilterLabel htmlFor="sort-filter-type">
+                  <FormattedMessage defaultMessage="Sort" />
+                </FilterLabel>
+                <StyledSelectFilter
+                  inputId="sort-filter"
+                  value={this.props.sortBy ? getSortOption(this.props.sortBy) : sortOptions[0]}
+                  options={sortOptions}
+                  onChange={sortBy => this.changeSort(sortBy)}
+                  minWidth={[0, '200px']}
+                />
+              </Container>
+            )}
+            {showCountriesFilterSection && (
+              <Container pt={['20px', 0]}>
+                <FilterLabel htmlFor="country-filter-type">
+                  <FormattedMessage id="collective.country.label" defaultMessage="Country" />
+                </FilterLabel>
+                <InputTypeCountry
+                  inputId="search-country-filter"
+                  as={StyledSelectFilter}
+                  defaultValue={this.props.country || 'ALL'}
+                  customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
+                  onChange={country => this.changeCountry(country)}
+                  minWidth={[0, '200px']}
+                  fontSize="12px"
+                />
+              </Container>
+            )}
+            {showTagFilterSection && (
               <Container pl={[0, '23px']} pt={['20px', 0]}>
                 <FilterLabel htmlFor="tag-filter-type">
                   <FormattedMessage defaultMessage="Tags" />
@@ -382,22 +388,21 @@ class SearchPage extends React.Component {
                 <LoadingGrid />
               </Flex>
             )}
-            {showCollectives &&
-              accounts?.nodes?.map(collective => (
-                <Flex key={collective.slug} my={3} mx={2}>
-                  {collective.isPledged ? (
-                    <CollectiveCardContainer key={collective.id}>
-                      <PledgedCollectiveCard collective={collective} />
-                    </CollectiveCardContainer>
-                  ) : (
-                    <CollectiveCardContainer key={collective.id}>
-                      <SearchCollectiveCard collective={collective} />
-                    </CollectiveCardContainer>
-                  )}
-                </Flex>
-              ))}
+            {accounts?.nodes?.map(collective => (
+              <Flex key={collective.slug} my={3} mx={2}>
+                {collective.isPledged ? (
+                  <CollectiveCardContainer key={collective.id}>
+                    <PledgedCollectiveCard collective={collective} />
+                  </CollectiveCardContainer>
+                ) : (
+                  <CollectiveCardContainer key={collective.id}>
+                    <SearchCollectiveCard collective={collective} />
+                  </CollectiveCardContainer>
+                )}
+              </Flex>
+            ))}
 
-            {showCollectives && accounts?.nodes?.length === 0 && (
+            {accounts?.nodes?.length === 0 && (
               <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
                 <H1 fontSize="32px" lineHeight="40px" color="black.700" fontWeight={500}>
                   <FormattedMessage defaultMessage="No results match your search" />
@@ -450,13 +455,13 @@ class SearchPage extends React.Component {
               </Flex>
             )}
           </Flex>
-          {showCollectives && accounts?.nodes?.length !== 0 && totalCount > limit && (
+          {accounts?.nodes?.length !== 0 && totalCount > limit && (
             <Container display="flex" justifyContent="center" fontSize="14px" my={3}>
               <Pagination offset={offset} total={totalCount} limit={limit} />
             </Container>
           )}
 
-          {showCollectives && accounts?.nodes?.length !== 0 && (
+          {accounts?.nodes?.length !== 0 && (
             <Flex flexDirection="column" alignItems="center">
               <StyledButton onClick={this.handleCopy}>
                 <Span pr={1} fontSize="14px" fontWeight={500}>
@@ -466,7 +471,7 @@ class SearchPage extends React.Component {
               </StyledButton>
             </Flex>
           )}
-          {showCollectives && accounts?.nodes?.length !== 0 && (
+          {accounts?.nodes?.length !== 0 && (
             <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
               <P pt={3} pb={3} borderTop="1px solid #E6E6E6">
                 <em>
