@@ -61,7 +61,7 @@ describe('edit collective', () => {
 
     // Re-send the invitation email
     cy.getByDataCy('resend-invite-btn').should('exist').first().click({ force: true });
-    cy.wait(100); // Wait for email
+    cy.wait(200); // Wait for email
     cy.getInbox().should('have.length', 3);
 
     // Check invitation email
