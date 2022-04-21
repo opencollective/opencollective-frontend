@@ -43,10 +43,11 @@ const MemberForm = props => {
   const initialValues = {
     description: get(member, 'description') || '',
     role: get(member, 'role') || roles.ADMIN,
-    since: get(member, 'since') ? new Date(get(member, 'since')).toISOString() : new Date(),
+    since: get(member, 'since') ? new Date(get(member, 'since')).toISOString() : new Date().toISOString(),
   };
 
   const submit = values => {
+    values.since = dayjs(values.since).toISOString();
     triggerSubmit(values);
   };
 
@@ -138,24 +139,13 @@ const MemberForm = props => {
                 label={<P fontWeight="bold">{intl.formatMessage(memberFormMessages.sinceLabel)}</P>}
                 mt={3}
               >
-                {({ form, field }) => (
+                {({ field }) => (
                   <StyledInput
                     {...field}
+                    min={'1970-01-01'}
+                    max={'2100-01-01'}
                     required
-                    value={dayjs(field.value).format('YYYY-MM-DD')}
-                    onKeyDown={event => {
-                      if (event.key === 'Backspace') {
-                        event.preventDefault();
-                      }
-                    }}
-                    onChange={event => {
-                      const value = event.target.value;
-                      if (dayjs(value).isValid()) {
-                        form.setFieldValue(field.name, dayjs(value).toISOString());
-                      } else {
-                        form.setFieldValue(field.name, null);
-                      }
-                    }}
+                    value={field.value?.split('T')[0]}
                   />
                 )}
               </StyledInputFormikField>
