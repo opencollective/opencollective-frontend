@@ -261,8 +261,8 @@ class SearchPage extends React.Component {
 
     const { limit = 20, offset, totalCount = 0 } = accounts || {};
     const showCollectives = !!accounts?.nodes;
-    const getOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
-    const options = [getOption('ACTIVITY'), getOption('CREATED_AT.DESC'), getOption('CREATED_AT.ASC')];
+    const getSortOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
+    const sortOptions = [getSortOption('ACTIVITY'), getSortOption('CREATED_AT.DESC'), getSortOption('CREATED_AT.ASC')];
 
     return (
       <Page title="Search" showSearch={false}>
@@ -325,8 +325,8 @@ class SearchPage extends React.Component {
               </FilterLabel>
               <StyledSelectFilter
                 inputId="sort-filter"
-                value={this.props.sortBy ? getOption(this.props.sortBy) : options[0]}
-                options={options}
+                value={this.props.sortBy ? getSortOption(this.props.sortBy) : sortOptions[0]}
+                options={sortOptions}
                 onChange={sortBy => this.changeSort(sortBy)}
                 minWidth={[0, '200px']}
               />
@@ -337,10 +337,12 @@ class SearchPage extends React.Component {
               </FilterLabel>
               <InputTypeCountry
                 inputId="search-country-filter"
-                defaultValue="ALL"
+                as={StyledSelectFilter}
+                defaultValue={this.props.country || 'ALL'}
                 customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
                 onChange={country => this.changeCountry(country)}
                 minWidth={[0, '200px']}
+                fontSize="12px"
               />
             </Container>
             {tagStats?.nodes?.length > 0 && (
