@@ -97,7 +97,6 @@
   "actions.spam": "סימון כספאם",
   "actions.submitApplication": "הגשת בקשה",
   "actions.unfollow": "ביטול מעקב",
-  "addfunds.fromCollective.host": "מארח ({host})",
   "AddFundsModal.disclaimer": "By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective.",
   "AddFundsModal.ForThePurpose": "למטרת",
   "AddFundsModal.FromTheSource": "מהמקור",
