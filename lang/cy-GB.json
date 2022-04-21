@@ -97,7 +97,6 @@
   "actions.spam": "Marciwch fel Sbam",
   "actions.submitApplication": "Cyflwyno cais",
   "actions.unfollow": "Dad-ddilyn",
-  "addfunds.fromCollective.host": "Gwesteiwr ({host})",
   "AddFundsModal.disclaimer": "Drwy glicio ychwanegu arian, rydych yn cytuno i neilltuo {amount} yn eich cyfrif banc ar ran y grŵp hwn.",
   "AddFundsModal.ForThePurpose": "I bwrpas",
   "AddFundsModal.FromTheSource": "O'r ffynhonnell",
