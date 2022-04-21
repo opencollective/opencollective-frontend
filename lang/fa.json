@@ -97,7 +97,6 @@
   "actions.spam": "Mark as Spam",
   "actions.submitApplication": "ثبت درخواست",
   "actions.unfollow": "لغو دنبال کردن",
-  "addfunds.fromCollective.host": "میزبان ({host})",
   "AddFundsModal.disclaimer": "By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective.",
   "AddFundsModal.ForThePurpose": "For the purpose of",
   "AddFundsModal.FromTheSource": "From the source",
