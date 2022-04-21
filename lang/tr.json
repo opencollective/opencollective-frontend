@@ -97,7 +97,6 @@
   "actions.spam": "Spam olarak işaretle",
   "actions.submitApplication": "Başvuruyu gönder",
   "actions.unfollow": "Takibi bırak",
-  "addfunds.fromCollective.host": "İdareci ({host})",
   "AddFundsModal.disclaimer": "Fon ekle'yi tıklayarak, bu kolektif adına banka hesabınızda {amount} ayırmayı kabul etmiş olursunuz.",
   "AddFundsModal.ForThePurpose": "Amacıyla",
   "AddFundsModal.FromTheSource": "Kaynaktan",
