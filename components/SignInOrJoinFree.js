@@ -323,7 +323,7 @@ class SignInOrJoinFree extends React.Component {
             {displayedForm !== 'create-account' ? (
               <SignIn
                 email={email}
-                onEmailChange={email => this.setState({ email })}
+                onEmailChange={email => this.setState({ email, unknownEmailError: false })}
                 onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
                 onSubmit={this.signIn}
                 loading={submitting}
@@ -339,7 +339,7 @@ class SignInOrJoinFree extends React.Component {
                   <Box maxWidth={480} mx={[2, 4]} width="100%">
                     <CreateProfile
                       email={email}
-                      onEmailChange={email => this.setState({ email })}
+                      onEmailChange={email => this.setState({ email, unknownEmailError: false })}
                       onPersonalSubmit={this.createProfile}
                       onOrgSubmit={this.createProfile}
                       onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
