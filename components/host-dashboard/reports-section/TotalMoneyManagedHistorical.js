@@ -15,6 +15,8 @@ import StyledSpinner from '../../StyledSpinner';
 import { P } from '../../Text';
 
 import { formatAmountForLegend, getActiveYearsOptions, getMinMaxDifference } from './helpers';
+
+// Dynamic imports
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const totalMoneyManagedQuery = gqlV2/* GraphQL */ `

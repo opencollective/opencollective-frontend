@@ -13,6 +13,8 @@ import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
 
 import { formatAmountForLegend } from './helpers';
+
+// Dynamic imports
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const getChartOptions = (timeUnit, hostCurrency, locale) => {

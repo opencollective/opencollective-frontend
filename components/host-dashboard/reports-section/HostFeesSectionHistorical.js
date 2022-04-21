@@ -1,22 +1,23 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { get, groupBy } from 'lodash';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
-
-import { get, groupBy } from 'lodash';
-import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { i18nTransactionSettlementStatus } from '../../../lib/i18n/transaction';
 
+import { ChartWrapper } from '../../ChartWrapper';
 import { Box, Flex } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 import { P } from '../../Text';
 
 import { formatAmountForLegend, getActiveYearsOptions } from './helpers';
+
+// Dynamic imports
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const hostFeeSectionTimeSeriesQuery = gqlV2/* GraphQL */ `
   query HostFeeSectionTimeSeries($hostSlug: String!, $dateFrom: DateTime!, $dateTo: DateTime!) {
@@ -49,23 +50,6 @@ const hostFeeSectionTimeSeriesQuery = gqlV2/* GraphQL */ `
         }
       }
     }
-  }
-`;
-
-const ChartWrapper = styled.div`
-  position: relative;
-
-  .apexcharts-legend-series {
-    background: white;
-    padding: 8px;
-    border-radius: 10px;
-    & > span {
-      vertical-align: middle;
-    }
-  }
-
-  .apexcharts-legend-marker {
-    margin-right: 8px;
   }
 `;
 
