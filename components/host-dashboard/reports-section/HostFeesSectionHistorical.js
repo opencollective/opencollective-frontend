@@ -93,6 +93,11 @@ const getChartOptions = (intl, hostCurrency) => ({
       formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale),
     },
   },
+  tooltip: {
+    y: {
+      formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale, false), // Never use compact notation in tooltip
+    },
+  },
 });
 
 const SERIES_NAMES = defineMessages({

@@ -101,6 +101,11 @@ const getChartOptions = (intl, hostCurrency, isCompactNotation) => ({
       formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale, isCompactNotation),
     },
   },
+  tooltip: {
+    y: {
+      formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale, false), // Never use compact notation in tooltip
+    },
+  },
 });
 
 const TotalMoneyManagedHistorical = ({ host, collectives }) => {

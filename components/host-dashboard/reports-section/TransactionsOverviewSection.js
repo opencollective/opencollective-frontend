@@ -61,6 +61,11 @@ const getChartOptions = (timeUnit, hostCurrency, locale) => {
         formatter: value => formatAmountForLegend(value, hostCurrency, locale),
       },
     },
+    tooltip: {
+      y: {
+        formatter: value => formatAmountForLegend(value, hostCurrency, locale, false), // Never use compact notation in tooltip
+      },
+    },
   };
 };
 
