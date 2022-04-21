@@ -97,7 +97,6 @@
   "actions.spam": "Отметить как спам",
   "actions.submitApplication": "Отправить заявку",
   "actions.unfollow": "Отписаться",
-  "addfunds.fromCollective.host": "Представитель ({host})",
   "AddFundsModal.disclaimer": "Нажимая кнопку ниже, вы соглашаетесь перечислить {amount} с вашего банковского счёта на имя Коллектива.",
   "AddFundsModal.ForThePurpose": "С целью",
   "AddFundsModal.FromTheSource": "Из источника",

@@ -97,7 +97,6 @@
   "actions.spam": "Marcar como Spam",
   "actions.submitApplication": "Enviar solicitação",
   "actions.unfollow": "Parar de seguir",
-  "addfunds.fromCollective.host": "Administrador Fiscal ({host})",
   "AddFundsModal.disclaimer": "Ao clicar abaixo, você concorda em reservar {amount} em sua conta bancária em nome do coletivo.",
   "AddFundsModal.ForThePurpose": "Com o propósito de",
   "AddFundsModal.FromTheSource": "Da fonte",
