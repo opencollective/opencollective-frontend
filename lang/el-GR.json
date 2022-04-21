@@ -97,7 +97,6 @@
   "actions.spam": "Σήμανση ως Ανεπιθύμητο",
   "actions.submitApplication": "Υποβολή αίτησης",
   "actions.unfollow": "Να μην ακολουθώ",
-  "addfunds.fromCollective.host": "Οικοδεσπότης ({host})",
   "AddFundsModal.disclaimer": "Κάνοντας κλικ στο Πρόσθεση Κεφαλαίου, συμφωνείτε να παραμερίσετε το ποσό των {amount} στον τραπεζικό σας λογαριασμό για λογαριασμό αυτής της κολεκτίβας.",
   "AddFundsModal.ForThePurpose": "Για τους σκοπούς του",
   "AddFundsModal.FromTheSource": "Από την πηγή",
