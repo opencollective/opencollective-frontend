@@ -26,7 +26,7 @@ const getChartOptions = (timeUnit, hostCurrency, locale) => {
       show: true,
       horizontalAlign: 'left',
     },
-    colors: ['#29CC75', '#F55882'],
+    colors: ['#29CC75', '#256643', '#F55882'],
     grid: {
       xaxis: { lines: { show: true } },
       yaxis: { lines: { show: false } },
@@ -64,8 +64,13 @@ const getChartOptions = (timeUnit, hostCurrency, locale) => {
   };
 };
 
-const constructChartDataPoints = dataPoints => {
-  return dataPoints.map(({ date, amount }) => ({ x: date, y: Math.abs(amount.value) }));
+const constructChartDataPoints = (dataPoints, filterFunc = null) => {
+  if (!dataPoints?.nodes?.length) {
+    return null;
+  } else {
+    const nodes = filterFunc ? dataPoints.nodes.filter(filterFunc) : dataPoints.nodes;
+    return nodes.map(({ date, amount }) => ({ x: date, y: Math.abs(amount.value) }));
+  }
 };
 
 const getTransactionsAreaChartData = (host, locale) => {
@@ -199,32 +204,27 @@ const getTransactionsBreakdownChartData = host => {
   return areas;
 };
 
-const TransactionsOverviewSection = ({ host, isLoading }) => {
-  const intl = useIntl();
-  const { locale } = intl;
-
-  const contributionStats = host?.contributionStats;
-  const expenseStats = host?.expenseStats;
-
-  const { contributionAmountOverTime } = contributionStats || 0;
-  const { expenseAmountOverTime } = expenseStats || 0;
-  const timeUnit = contributionAmountOverTime?.timeUnit;
-
+const getSeries = (host, intl) => {
+  const timeSeries = host?.hostMetricsTimeSeries || {};
   const series = [
     {
-      name: 'Contributions',
-      data: contributionAmountOverTime ? constructChartDataPoints(contributionAmountOverTime.nodes) : null,
+      name: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
+      data: constructChartDataPoints(timeSeries.totalReceived, node => node.kind === 'CONTRIBUTION'),
     },
     {
-      name: 'Expenses',
-      data: expenseAmountOverTime ? constructChartDataPoints(expenseAmountOverTime.nodes) : null,
+      name: intl.formatMessage({ id: 'Transaction.kind.ADDED_FUNDS', defaultMessage: 'Added funds' }),
+      data: constructChartDataPoints(timeSeries.totalReceived, node => node.kind === 'ADDED_FUNDS'),
+    },
+    {
+      name: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
+      data: constructChartDataPoints(timeSeries.totalSpent),
     },
   ];
 
   /*
    * If a date doesn't have any contributions or expenses API returns nothing.
    * But we need to make sure the two series (expenses and contributions) show 0 in these cases rather than NaN which
-   * is shown by default by Appex charts.
+   * is shown by default by Apex charts.
    */
   if (series[0]?.data && series[1]?.data) {
     const dataMissingFromSeries0 = differenceBy(series[1].data, series[0].data, 'x');
@@ -235,6 +235,14 @@ const TransactionsOverviewSection = ({ host, isLoading }) => {
     series[1].data.sort((a, b) => new Date(a.x) - new Date(b.x));
   }
 
+  return series;
+};
+
+const TransactionsOverviewSection = ({ host, isLoading }) => {
+  const intl = useIntl();
+  const { locale } = intl;
+  const timeUnit = host?.hostMetricsTimeSeries?.timeUnit;
+  const series = React.useMemo(() => getSeries(host, intl), [host]);
   const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host, locale), [host, locale]);
   const transactionBreakdownChart = React.useMemo(() => getTransactionsBreakdownChartData(host), [host]);
   return (
@@ -272,21 +280,25 @@ TransactionsOverviewSection.propTypes = {
     slug: PropTypes.string.isRequired,
     currency: PropTypes.string,
     createdAt: PropTypes.string,
-    contributionStats: PropTypes.shape({
-      contributionsCount: PropTypes.number,
-      oneTimeContributionsCount: PropTypes.number,
-      recurringContributionsCount: PropTypes.number,
-      dailyAverageIncomeAmount: PropTypes.shape({
-        value: PropTypes.number,
+    hostMetricsTimeSeries: PropTypes.shape({
+      timeUnit: PropTypes.string,
+      totalReceived: PropTypes.shape({
+        nodes: PropTypes.shape({
+          date: PropTypes.string,
+          kind: PropTypes.string,
+          amount: PropTypes.shape({
+            valueInCents: PropTypes.number,
+          }),
+        }),
       }),
-    }),
-    expenseStats: PropTypes.shape({
-      expensesCount: PropTypes.number,
-      invoicesCount: PropTypes.number,
-      reimbursementsCount: PropTypes.number,
-      grantsCount: PropTypes.number,
-      dailyAverageAmount: PropTypes.shape({
-        value: PropTypes.number,
+      totalSpent: PropTypes.shape({
+        nodes: PropTypes.shape({
+          date: PropTypes.string,
+          kind: PropTypes.string,
+          amount: PropTypes.shape({
+            valueInCents: PropTypes.number,
+          }),
+        }),
       }),
     }),
   }),

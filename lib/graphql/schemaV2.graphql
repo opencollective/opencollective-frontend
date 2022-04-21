@@ -1641,6 +1641,7 @@ enum ExpenseStatus {
   PAID
   SCHEDULED_FOR_PAYMENT
   SPAM
+  CANCELED
 }
 
 """
@@ -1995,6 +1996,8 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_INVITE_DRAFTED
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
+  COLLECTIVE_VIRTUAL_CARD_SUSPENDED
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
   COLLECTIVE_MEMBER_CREATED
@@ -2827,17 +2830,17 @@ type Host implements Account & AccountWithContributions {
     """
     The start date of the time series
     """
-    dateFrom: DateTime!
+    dateFrom: DateTime
 
     """
     The end date of the time series
     """
-    dateTo: DateTime!
+    dateTo: DateTime
 
     """
     The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
     """
-    timeUnit: TimeUnit!
+    timeUnit: TimeUnit
   ): HostMetricsTimeSeries!
 
   """
@@ -3681,6 +3684,21 @@ Host metrics time series
 """
 type HostMetricsTimeSeries {
   """
+  The start date of the time series
+  """
+  dateFrom: DateTime!
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime!
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+
+  """
   History of the collected platform tips
   """
   platformTips: TimeSeriesAmount!
@@ -3699,6 +3717,26 @@ type HostMetricsTimeSeries {
   History of the total money managed by this host
   """
   totalMoneyManaged: TimeSeriesAmount!
+
+  """
+  History of the total money received by this host
+  """
+  totalReceived: TimeSeriesAmountWithKind!
+
+  """
+  History of the total money spent by this host
+  """
+  totalSpent: TimeSeriesAmountWithKind!
+}
+
+enum TimeUnit {
+  SECOND
+  MINUTE
+  HOUR
+  DAY
+  WEEK
+  MONTH
+  YEAR
 }
 
 """
@@ -3743,16 +3781,6 @@ interface TimeSeries {
   timeUnit: TimeUnit!
 }
 
-enum TimeUnit {
-  SECOND
-  MINUTE
-  HOUR
-  DAY
-  WEEK
-  MONTH
-  YEAR
-}
-
 type TimeSeriesAmountNode {
   date: DateTime!
   amount: Amount!
@@ -3793,6 +3821,37 @@ enum TransactionSettlementStatus {
   OWED
   INVOICED
   SETTLED
+}
+
+"""
+Amounts with settlements time series
+"""
+type TimeSeriesAmountWithKind implements TimeSeries {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime!
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime!
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+
+  """
+  Time series data points
+  """
+  nodes: [TimeSeriesAmountWithKindNode!]!
+}
+
+type TimeSeriesAmountWithKindNode {
+  date: DateTime!
+  amount: Amount!
+  kind: TransactionKind!
 }
 
 """
@@ -3842,6 +3901,7 @@ type ContributionStats {
   The contribution amounts over time
   """
   contributionAmountOverTime: TimeSeriesAmount
+    @deprecated(reason: "2022-04-21: Please use hostMetricsTimeSeries.totalReceived")
 
   """
   Number of one time contributions
@@ -3871,7 +3931,7 @@ type ExpenseStats {
   """
   The total number of expenses over time
   """
-  expenseAmountOverTime: TimeSeriesAmount
+  expenseAmountOverTime: TimeSeriesAmount @deprecated(reason: "2022-04-21: Please use hostMetricsTimeSeries.totalSpent")
 
   """
   The daily average paid in expenses
@@ -9082,6 +9142,7 @@ enum ExpenseStatusFilter {
   PAID
   SCHEDULED_FOR_PAYMENT
   SPAM
+  CANCELED
 
   """
   Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
@@ -11473,6 +11534,10 @@ Input to set taxes for an expense
 """
 input ExpenseTaxInput {
   type: TaxType!
+
+  """
+  Tax rate as a float number between 0 and 1
+  """
   rate: Float!
 
   """

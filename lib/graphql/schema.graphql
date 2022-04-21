@@ -2564,6 +2564,11 @@ type Expense implements Transaction {
   taxAmount: Int
 
   """
+  If taxAmount is set, this field will contain more info about the tax
+  """
+  taxInfo: TaxInfo
+
+  """
   Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)
   """
   netAmountInCollectiveCurrency(
@@ -2583,6 +2588,51 @@ type Expense implements Transaction {
   paymentMethod: PaymentMethodType
   description: String
   expense: ExpenseType
+}
+
+"""
+Information about a tax
+"""
+type TaxInfo {
+  """
+  An unique identifier for this tax (GST, VAT, etc)
+  """
+  id: String!
+
+  """
+  Identifier for this tax (GST, VAT, etc)
+  """
+  type: OrderTaxType!
+
+  """
+  Percentage applied, between 0-100
+  """
+  percentage: Int! @deprecated(reason: "Please use `rate` instead")
+
+  """
+  Percentage applied, between 0-100
+  """
+  rate: Float!
+
+  """
+  Tax ID number of the 3rd party receiving/paying the tax
+  """
+  idNumber: String
+}
+
+"""
+The type of a tax like GST, VAT, etc
+"""
+enum OrderTaxType {
+  """
+  European Value Added Tax
+  """
+  VAT
+
+  """
+  New Zealand Good and Services Tax
+  """
+  GST
 }
 
 """
@@ -2620,6 +2670,7 @@ interface Transaction {
   platformFeeInHostCurrency: Int
   paymentProcessorFeeInHostCurrency: Int
   taxAmount: Int
+  taxInfo: TaxInfo
   createdByUser: UserDetails
   host: CollectiveInterface
   paymentMethod: PaymentMethodType
@@ -2677,6 +2728,11 @@ type Order implements Transaction {
   The amount paid in tax (for example VAT) for this transaction
   """
   taxAmount: Int
+
+  """
+  If taxAmount is set, this field will contain more info about the tax
+  """
+  taxInfo: TaxInfo
 
   """
   Amount after fees received by the collective in the lowest unit of its own currency (ie. cents)
