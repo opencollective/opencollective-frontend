@@ -107,6 +107,57 @@ const HostVirtualCards = props => {
             )}
           </StyledInputField>
         </Flex>
+        <Flex mt={4} justifyContent="space-between" alignItems="center">
+          <Box lineHeight="20px" fontSize="14px" fontWeight="500">
+            <FormattedMessage
+              id="Host.VirtualCards.Reminder.Title"
+              defaultMessage="Automatically notify collectives about pending receipts"
+            />
+            <P fontSize="11px" fontWeight="400" color="black.600">
+              <FormattedMessage
+                id="Host.VirtualCards.Reminder.Description"
+                defaultMessage="Send missing receipt reminder after 15 and 29 days after syncing the transaction."
+              />
+            </P>
+          </Box>
+          <StyledInputField name="virtualcards.reminder" htmlFor="virtualcards.reminder" disabled={updateLoading}>
+            {inputProps => (
+              <InputField
+                name="application"
+                className="horizontal"
+                type="switch"
+                id={inputProps.id}
+                inputName={inputProps.name}
+                onChange={handleSettingsUpdate(inputProps.name)}
+                defaultValue={get(props.collective, `settings.${inputProps.name}`)}
+              />
+            )}
+          </StyledInputField>
+        </Flex>
+        <Flex mt={4} justifyContent="space-between" alignItems="center">
+          <Box lineHeight="20px" fontSize="14px" fontWeight="500">
+            <FormattedMessage id="Host.VirtualCards.AutoPause.Title" defaultMessage="Automatically suspend cards" />
+            <P fontSize="11px" fontWeight="400" color="black.600">
+              <FormattedMessage
+                id="Host.VirtualCards.AutoPause.Description"
+                defaultMessage="Automatically suspend cards with pending receipts after 31 days and resume after all receipts are submitted."
+              />
+            </P>
+          </Box>
+          <StyledInputField name="virtualcards.autopause" htmlFor="virtualcards.autopause" disabled={updateLoading}>
+            {inputProps => (
+              <InputField
+                name="application"
+                className="horizontal"
+                type="switch"
+                id={inputProps.id}
+                inputName={inputProps.name}
+                onChange={handleSettingsUpdate(inputProps.name)}
+                defaultValue={get(props.collective, `settings.${inputProps.name}`)}
+              />
+            )}
+          </StyledInputField>
+        </Flex>
 
         <StyledInputField
           name="virtualcards.policy"

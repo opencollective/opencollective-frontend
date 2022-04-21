@@ -1,11 +1,11 @@
 import dayjs from 'dayjs';
 
 describe('event.createOrder page', () => {
-  let collectiveSlug = null;
+  let collective = null;
 
   const createEvent = name => {
     // Create event
-    cy.visit(`${collectiveSlug}/events/new`);
+    cy.visit(`${collective.slug}/events/new`);
     cy.get('.inputs input[name="name"]').type(name);
     cy.get('.inputs .startsAt input[type="datetime-local"]')
       .clear()
@@ -19,13 +19,11 @@ describe('event.createOrder page', () => {
   };
 
   before(() => {
-    cy.createHostedCollective().then(({ slug }) => {
-      collectiveSlug = slug;
-    });
+    cy.createHostedCollective().then(c => (collective = c));
   });
 
   beforeEach(() => {
-    cy.login({ redirect: `/${collectiveSlug}/events/create` });
+    cy.login({ redirect: `/${collective.slug}/events/create` });
   });
 
   it('makes an order for a free ticket', () => {
@@ -114,13 +112,11 @@ describe('event.createOrder page', () => {
 
   it('makes an order for tickets with VAT', () => {
     // Activate VAT for collective
-    cy.visit(`${collectiveSlug}/admin`);
-    cy.contains('[data-cy="country-select"]', 'Please select your country').click();
-    cy.contains('[data-cy="select-option"]', 'Belgium - BE').click();
-    cy.getByDataCy('VAT').click();
-    cy.contains('[data-cy="select-option"]', 'Use my own VAT number').click();
-    cy.contains('button', 'Save').click();
-    cy.contains('Saved');
+    cy.editCollective({
+      id: collective.id,
+      location: { country: 'BE' },
+      settings: { VAT: { type: 'OWN', number: 'FRXX999999999' } },
+    });
 
     // Create event
     createEvent('Test Event with VAT');
@@ -159,7 +155,7 @@ describe('event.createOrder page', () => {
 
     // French should have taxes
     cy.get('[data-cy="country-select"]').click();
-    cy.contains('[data-cy="select-option"]', 'France - FR').click();
+    cy.contains('[data-cy="select-option"]', 'France').click();
     cy.contains(breakdownLineSelector, 'VAT').contains('+ $16.80');
     cy.contains(breakdownLineSelector, 'TOTAL').contains('$96.80');
     cy.get('button[data-cy="cf-next-step"]').should('not.be.disabled');
@@ -203,7 +199,7 @@ describe('event.createOrder page', () => {
     // However if it's the same country than the collective than VAT should still apply,
     // even if the contributor is an organization
     cy.get('[data-cy="country-select"]').click();
-    cy.contains('[data-cy="select-option"]', 'Belgium - BE').click();
+    cy.contains('[data-cy="select-option"]', 'Belgium').click();
     cy.contains(breakdownLineSelector, 'VAT').contains('+ $16.80');
     cy.contains(breakdownLineSelector, 'TOTAL').contains('$96.80');
     cy.contains('div', 'Enter VAT number (if you have one)').click();

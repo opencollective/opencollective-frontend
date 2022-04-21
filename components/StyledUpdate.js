@@ -68,7 +68,6 @@ class StyledUpdate extends Component {
     update: PropTypes.object.isRequired,
     compact: PropTypes.bool, // if compact true, only show the summary
     editable: PropTypes.bool,
-    includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
     isReloadingData: PropTypes.bool,
     editUpdate: PropTypes.func.isRequired,

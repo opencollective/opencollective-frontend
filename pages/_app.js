@@ -17,7 +17,6 @@ import UserProvider from '../components/UserProvider';
 import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
-import '../public/static/styles/react-tags.css'; // TODO is this still used?
 
 Router.onRouteChangeStart = () => NProgress.start();
 

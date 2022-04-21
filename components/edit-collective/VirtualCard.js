@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { useMutation } from '@apollo/client';
 import { Copy } from '@styled-icons/feather/Copy';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
@@ -8,6 +9,8 @@ import styled from 'styled-components';
 import { margin } from 'styled-system';
 
 import { formatCurrency } from '../../lib/currency-utils';
+import { i18nGraphqlException } from '../../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
 import Avatar from '../Avatar';
@@ -15,6 +18,7 @@ import { Box, Flex } from '../Grid';
 import DismissIcon from '../icons/DismissIcon';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
+import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
@@ -104,6 +108,24 @@ const StateLabel = styled(Box)`
   line-height: 12px;
 `;
 
+const pauseCardMutation = gqlV2/* GraphQL */ `
+  mutation PauseVirtualCard($virtualCard: VirtualCardReferenceInput!) {
+    pauseVirtualCard(virtualCard: $virtualCard) {
+      id
+      data
+    }
+  }
+`;
+
+const resumeCardMutation = gqlV2/* GraphQL */ `
+  mutation ResumeVirtualCard($virtualCard: VirtualCardReferenceInput!) {
+    resumeVirtualCard(virtualCard: $virtualCard) {
+      id
+      data
+    }
+  }
+`;
+
 const ActionsButton = props => {
   const wrapperRef = React.useRef();
   const arrowRef = React.useRef();
@@ -114,6 +136,32 @@ const ActionsButton = props => {
       setDisplayActions(false);
     }
   });
+
+  const [pauseCard, { loading: pauseLoading }] = useMutation(pauseCardMutation, {
+    context: API_V2_CONTEXT,
+  });
+  const [resumeCard, { loading: resumeLoading }] = useMutation(resumeCardMutation, {
+    context: API_V2_CONTEXT,
+  });
+
+  const isActive = props.data.status === 'active' || props.data.state === 'OPEN';
+
+  const handlePauseUnpause = async () => {
+    try {
+      if (isActive) {
+        await pauseCard({ variables: { virtualCard: { id: props.id } } });
+      } else {
+        await resumeCard({ variables: { virtualCard: { id: props.id } } });
+      }
+      if (props.onSuccess) {
+        await props.onSuccess();
+      }
+    } catch (e) {
+      props.onError(e);
+    }
+  };
+
+  const isLoading = pauseLoading || resumeLoading;
 
   return (
     <div ref={wrapperRef}>
@@ -156,6 +204,17 @@ const ActionsButton = props => {
                   boxShadow="0px 8px 12px rgba(20, 20, 20, 0.16)"
                 >
                   <Flex flexDirection="column" fontSize="13px" lineHeight="16px" fontWeight="500">
+                    {props.provider === 'STRIPE' && (
+                      <Action onClick={handlePauseUnpause} disabled={isLoading}>
+                        {isActive ? (
+                          <FormattedMessage id="VirtualCards.PauseCard" defaultMessage="Pause Card" />
+                        ) : (
+                          <FormattedMessage id="VirtualCards.ResumeCard" defaultMessage="Resume Card" />
+                        )}{' '}
+                        {isLoading && <StyledSpinner size="0.9em" mb="2px" />}
+                      </Action>
+                    )}
+                    <StyledHr borderColor="black.300" mt={2} mb={2} />
                     <Action onClick={props.deleteHandler}>
                       <FormattedMessage defaultMessage="Delete Card" />
                     </Action>
@@ -177,8 +236,10 @@ const ActionsButton = props => {
 
 ActionsButton.propTypes = {
   id: PropTypes.string,
-  state: PropTypes.string,
+  data: PropTypes.object,
+  provider: PropTypes.string,
   onSuccess: PropTypes.func,
+  onError: PropTypes.func,
   editHandler: PropTypes.func,
   deleteHandler: PropTypes.func,
 };
@@ -222,7 +283,7 @@ const getLimitString = (spendingLimitAmount, spendingLimitInterval, currency, lo
 
 const VirtualCard = props => {
   const [displayDetails, setDisplayDetails] = React.useState(false);
-  const { locale } = useIntl();
+  const intl = useIntl();
   const { addToast } = useToasts();
 
   const isActive = props.data.state === 'OPEN' || props.data.status === 'active';
@@ -303,7 +364,7 @@ const VirtualCard = props => {
                 }}
               />
               &nbsp;&middot;&nbsp;
-              {getLimitString(props.spendingLimitAmount, props.spendingLimitInterval, props.currency, locale)}
+              {getLimitString(props.spendingLimitAmount, props.spendingLimitInterval, props.currency, intl.locale)}
             </P>
           </React.Fragment>
         )}
@@ -320,8 +381,10 @@ const VirtualCard = props => {
         {props.canEditVirtualCard && (
           <ActionsButton
             id={props.id}
-            state={props.data.state}
+            data={props.data}
+            provider={props.provider}
             onSuccess={props.onSuccess}
+            onError={error => addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, error) })}
             editHandler={props.editHandler}
             deleteHandler={props.deleteHandler}
           />

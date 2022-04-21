@@ -97,7 +97,6 @@
   "actions.spam": "迷惑メール報告",
   "actions.submitApplication": "申請内容を送信",
   "actions.unfollow": "フォロー解除",
-  "addfunds.fromCollective.host": "ホスト ({host})",
   "AddFundsModal.disclaimer": "「資金を追加する」をクリックすることで、この団体のためにあなたの銀行口座に{amount}を確保することに同意します。",
   "AddFundsModal.ForThePurpose": "For the purpose of",
   "AddFundsModal.FromTheSource": "From the source",

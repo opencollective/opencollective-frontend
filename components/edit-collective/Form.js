@@ -37,7 +37,6 @@ import FiscalHosting from './sections/FiscalHosting';
 import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
 import HostTwoFactorAuth from './sections/HostTwoFactorAuth';
-import HostVirtualCards from './sections/HostVirtualCards';
 import HostVirtualCardsSettings from './sections/HostVirtualCardsSettings';
 import InvoicesReceipts from './sections/InvoicesReceipts';
 import Members from './sections/Members';
@@ -542,9 +541,6 @@ class EditCollectiveForm extends React.Component {
       // Policies and moderation
       case EDIT_COLLECTIVE_SECTIONS.POLICIES:
         return <Policies collective={collective} />;
-
-      case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS:
-        return <HostVirtualCards collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS:
         return <HostVirtualCardsSettings collective={collective} />;

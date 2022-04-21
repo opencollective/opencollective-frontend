@@ -15,6 +15,7 @@ import NotFound from '../NotFound';
 
 import AccountSettings from './sections/AccountSettings';
 import FinancialContributions from './sections/FinancialContributions';
+import HostVirtualCards from './sections/HostVirtualCards';
 import { HOST_DASHBOARD_SECTIONS, LEGACY_COLLECTIVE_SETTINGS_SECTIONS, SECTION_LABELS } from './constants';
 
 const HOST_ADMIN_SECTIONS = {
@@ -23,6 +24,7 @@ const HOST_ADMIN_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.EXPENSES]: HostDashboardExpenses,
   [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: PendingApplications,
   [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
+  [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
 };
 
 const Title = styled(Box)`

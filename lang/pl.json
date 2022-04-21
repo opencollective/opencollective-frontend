@@ -97,7 +97,6 @@
   "actions.spam": "Oznacz jako spam",
   "actions.submitApplication": "Wyślij zgłoszenie",
   "actions.unfollow": "Przestań Obserwować",
-  "addfunds.fromCollective.host": "Gospodarz ({host})",
   "AddFundsModal.disclaimer": "Po naciśnięciu Dodaj środki, zgadzasz się, aby kwota {amount} została zarezerwowana na Twoim koncie bankowym w imieniu tego kolektywu.",
   "AddFundsModal.ForThePurpose": "Do celów",
   "AddFundsModal.FromTheSource": "Ze źródła",

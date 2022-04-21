@@ -544,6 +544,8 @@ enum OrderByFieldType {
   CREATED_AT
   MEMBER_COUNT
   TOTAL_CONTRIBUTED
+  ACTIVITY
+  RANK
 }
 
 """
@@ -690,9 +692,39 @@ type TaxInfo {
   id: String!
 
   """
+  Identifier for this tax (GST, VAT, etc)
+  """
+  type: OrderTaxType!
+
+  """
   Percentage applied, between 0-100
   """
-  percentage: Int!
+  percentage: Int! @deprecated(reason: "Please use `rate` instead")
+
+  """
+  Percentage applied, between 0-100
+  """
+  rate: Float!
+
+  """
+  Tax ID number of the 3rd party receiving/paying the tax
+  """
+  idNumber: String
+}
+
+"""
+The type of a tax like GST, VAT, etc
+"""
+enum OrderTaxType {
+  """
+  European Value Added Tax
+  """
+  VAT
+
+  """
+  New Zealand Good and Services Tax
+  """
+  GST
 }
 
 """
@@ -730,6 +762,11 @@ type Expense {
     """
     currencySource: ExpenseCurrencySource
   ): Amount
+
+  """
+  Taxes applied to this expense
+  """
+  taxes: [TaxInfo]!
 
   """
   The exchange rate between the expense currency and the account currency
@@ -3860,21 +3897,6 @@ type ExpenseStats {
 type OrderTax {
   type: OrderTaxType!
   percentage: Int!
-}
-
-"""
-Type for a required legal document
-"""
-enum OrderTaxType {
-  """
-  European Value Added Tax
-  """
-  VAT
-
-  """
-  New Zealand Good and Services Tax
-  """
-  GST
 }
 
 """
@@ -7205,7 +7227,7 @@ type Query {
     searchTerm: String
 
     """
-    Only accounts that match these tags (ignored if used together with searchTerm)
+    Only accounts that match these tags
     """
     tag: [String]
 
@@ -7240,9 +7262,14 @@ type Query {
     skipRecentAccounts: Boolean = false
 
     """
+    Limit the search to collectives belonging to these countries
+    """
+    country: [CountryISO]
+
+    """
     The order of results
     """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: OrderByInput
   ): AccountCollection!
   collective(
     """
@@ -7618,6 +7645,14 @@ type Query {
     """
     throwIfMissing: Boolean = true
   ): Project
+  tagStats(
+    """
+    Return tags from collectives which includes this search term
+    """
+    searchTerm: String
+    limit: Int! = 10
+    offset: Int! = 0
+  ): TagStatsCollection!
   tier(
     """
     Identifiers to retrieve the tier
@@ -7774,2413 +7809,6 @@ type Query {
     tier: TierReferenceInput
   ): PaypalPlan!
   loggedInAccount: Account
-}
-
-input ExpenseReferenceInput {
-  """
-  The public id identifying the expense (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String
-
-  """
-  The internal id of the expense (ie: 580)
-  """
-  legacyId: Int
-}
-
-"""
-A collection of "Expenses"
-"""
-type ExpenseCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Expense]
-}
-
-"""
-Describes the values allowed to filter expenses, namely all the expense statuses and the special "READY_TO_PAY" value.
-"""
-enum ExpenseStatusFilter {
-  DRAFT
-  UNVERIFIED
-  PENDING
-  APPROVED
-  REJECTED
-  PROCESSING
-  ERROR
-  PAID
-  SCHEDULED_FOR_PAYMENT
-  SPAM
-
-  """
-  Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
-  """
-  READY_TO_PAY
-}
-
-"""
-This represents an Project account
-"""
-type Fund implements Account & AccountWithHost & AccountWithContributions {
-  id: String
-  legacyId: Int
-
-  """
-  The slug identifying the account (ie: babel)
-  """
-  slug: String
-  type: AccountType
-
-  """
-  Public name
-  """
-  name: String
-
-  """
-  Private, legal name. Used for expense receipts, taxes, etc.
-  """
-  legalName: String
-  description: String
-  longDescription: String
-  tags: [String]
-  website: String
-  twitterHandle: String
-  githubHandle: String
-  currency: String
-  expensePolicy: String
-
-  """
-  Defines if the contributors wants to be incognito (name not displayed)
-  """
-  isIncognito: Boolean!
-  imageUrl(height: Int, format: ImageFormat): String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
-
-  """
-  The time of creation
-  """
-  createdAt: DateTime
-  updatedAt: DateTime
-
-  """
-  Returns whether this account is archived
-  """
-  isArchived: Boolean
-
-  """
-  Whether this account is frozen
-  """
-  isFrozen: Boolean!
-
-  """
-  Returns whether it's active: can accept financial contributions and pay expenses.
-  """
-  isActive: Boolean!
-
-  """
-  Returns whether the account is setup to Host collectives.
-  """
-  isHost: Boolean
-
-  """
-  Returns true if the remote user is an admin of this account
-  """
-  isAdmin: Boolean!
-  parentAccount: Account
-
-  """
-  Get all members (admins, members, backers, followers)
-  """
-  members(
-    limit: Int! = 100
-    offset: Int! = 0
-    role: [MemberRole]
-    accountType: [AccountType]
-
-    """
-    Admin only. To filter on the email address of a member, useful to check if a member exists.
-    """
-    email: EmailAddress
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
-  ): MemberCollection!
-  memberOf(
-    limit: Int! = 150
-    offset: Int! = 0
-    role: [MemberRole]
-    accountType: [AccountType]
-    account: AccountReferenceInput
-
-    """
-    Filter on whether the account is a host or not
-    """
-    isHostAccount: Boolean
-
-    """
-    Filter on (un)approved collectives
-    """
-    isApproved: Boolean
-
-    """
-    Filter on archived collectives
-    """
-    isArchived: Boolean
-
-    """
-    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
-    """
-    includeIncognito: Boolean = true
-
-    """
-    A term to search membership. Searches in collective tags, name, slug, members description and role.
-    """
-    searchTerm: String
-
-    """
-    Filters on the Host fees structure applied to this account
-    """
-    hostFeesStructure: HostFeeStructure
-
-    """
-    Order of the results
-    """
-    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Order the query by requested role order
-    """
-    orderByRoles: Boolean
-  ): MemberOfCollection!
-  transactions(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 100
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    The transaction type (DEBIT or CREDIT)
-    """
-    type: TransactionType
-
-    """
-    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
-    """
-    fromAccount: AccountReferenceInput
-
-    """
-    Reference of the host accounting the transaction
-    """
-    host: AccountReferenceInput
-
-    """
-    NOT IMPLEMENTED. Only return transactions that match these tags.
-    """
-    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
-
-    """
-    The order of results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Only return transactions where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
-
-    """
-    Only return transactions where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
-
-    """
-    Only return transactions that were created after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Only return transactions that were created before this date
-    """
-    dateTo: DateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
-
-    """
-    Only return transactions with an Expense attached
-    """
-    hasExpense: Boolean
-
-    """
-    Only return transactions with an Order attached
-    """
-    hasOrder: Boolean
-
-    """
-    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
-    """
-    includeRegularTransactions: Boolean! = true
-
-    """
-    If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
-    """
-    includeIncognitoTransactions: Boolean! = false
-
-    """
-    Whether to include transactions from children (Events and Projects)
-    """
-    includeChildrenTransactions: Boolean! = false
-
-    """
-    Whether to include transactions from Gift Cards issued by the account.
-    """
-    includeGiftCardTransactions: Boolean! = false
-
-    """
-    Whether to include debt transactions
-    """
-    includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
-
-    """
-    To filter by transaction kind
-    """
-    kind: [TransactionKind]
-  ): TransactionCollection!
-  orders(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 100
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    If account is a host, also include hosted accounts orders
-    """
-    includeHostedAccounts: Boolean
-
-    """
-    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
-    """
-    includeIncognito: Boolean = false
-
-    """
-    Account orders filter (INCOMING or OUTGOING)
-    """
-    filter: AccountOrdersFilter
-
-    """
-    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
-    """
-    frequency: ContributionFrequency
-
-    """
-    Use this field to filter orders on their statuses
-    """
-    status: [OrderStatus]
-
-    """
-    The order of results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Only return orders where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int
-
-    """
-    Only return orders where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int
-
-    """
-    Only return orders that were created after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Only return orders that were created after this date
-    """
-    dateTo: DateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
-
-    """
-    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
-    """
-    onlySubscriptions: Boolean
-  ): OrderCollection!
-  settings: JSON!
-  conversations(
-    limit: Int! = 15
-    offset: Int! = 0
-
-    """
-    Only return conversations matching this tag
-    """
-    tag: String
-  ): ConversationCollection!
-
-  """
-  Returns conversation's tags for collective sorted by popularity
-  """
-  conversationsTags(limit: Int! = 30): [TagStat]
-
-  """
-  Returns expense tags for collective sorted by popularity
-  """
-  expensesTags(limit: Int! = 30): [TagStat]
-  transferwise: TransferWise
-
-  """
-  The list of payout methods that this collective can use to get paid
-  """
-  payoutMethods: [PayoutMethod]
-
-  """
-  The list of payment methods that this collective can use to pay for Orders
-  """
-  paymentMethods(
-    type: [PaymentMethodType]
-    enumType: [PaymentMethodType] @deprecated(reason: "2021-08-20: use type instead from now")
-    service: [PaymentMethodService]
-
-    """
-    Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
-    """
-    includeExpired: Boolean
-  ): [PaymentMethod]!
-
-  """
-  The list of connected accounts (Stripe, Twitter, etc ...)
-  """
-  connectedAccounts: [ConnectedAccount]
-
-  """
-  The address associated to this account. This field is always public for collectives and events.
-  """
-  location: Location
-  categories: [String]!
-  stats: AccountStats
-  updates(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Only return published updates. You must be an admin of the account to see unpublished updates.
-    """
-    onlyPublishedUpdates: Boolean = false
-    onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-    searchTerm: String
-  ): UpdateCollection!
-
-  """
-  Describes the features enabled and available for this account
-  """
-  features: CollectiveFeatures!
-  virtualCards(
-    limit: Int! = 100
-    offset: Int! = 0
-    state: String = null
-    merchantAccount: AccountReferenceInput = null
-
-    """
-    Only return expenses that were created after this date
-    """
-    dateFrom: DateTime = null
-
-    """
-    Only return expenses that were created before this date
-    """
-    dateTo: DateTime = null
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): VirtualCardCollection!
-  virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
-
-  """
-  Returns the Fiscal Host
-  """
-  host: Host
-
-  """
-  Describe how the host charges the collective
-  """
-  hostFeesStructure: HostFeeStructure
-
-  """
-  Fees percentage that the host takes for this collective
-  """
-  hostFeePercent: Float
-
-  """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Int!
-
-  """
-  Date of approval by the Fiscal Host.
-  """
-  approvedAt: DateTime
-
-  """
-  Returns whether it's approved by the Fiscal Host
-  """
-  isApproved: Boolean!
-
-  """
-  Number of unique financial contributors.
-  """
-  totalFinancialContributors(
-    """
-    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
-    """
-    accountType: AccountType
-  ): Int!
-  tiers(
-    """
-    The number of results to fetch
-    """
-    limit: Int! = 100
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): TierCollection!
-
-  """
-  All the persons and entities that contribute to this account
-  """
-  contributors(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-    roles: [MemberRole]
-  ): ContributorCollection!
-
-  """
-  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
-  """
-  platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
-  contributionPolicy: String
-}
-
-"""
-A collection of "Hosts"
-"""
-type HostCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Host]
-}
-
-"""
-An invitation to join the members of a collective
-"""
-type MemberInvitation {
-  id: String!
-  createdAt: DateTime!
-  account: Account!
-  memberAccount: Account!
-  role: MemberRole!
-  description: String
-  tier: Tier
-  since: DateTime
-}
-
-input OrderReferenceInput {
-  """
-  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String
-
-  """
-  The legacy public id identifying the order (ie: 4242)
-  """
-  legacyId: Int
-}
-
-"""
-This represents an Project account
-"""
-type Project implements Account & AccountWithHost & AccountWithContributions & AccountWithParent {
-  id: String
-  legacyId: Int
-
-  """
-  The slug identifying the account (ie: babel)
-  """
-  slug: String
-  type: AccountType
-
-  """
-  Public name
-  """
-  name: String
-
-  """
-  Private, legal name. Used for expense receipts, taxes, etc.
-  """
-  legalName: String
-  description: String
-  longDescription: String
-  tags: [String]
-  website: String
-  twitterHandle: String
-  githubHandle: String
-  currency: String
-  expensePolicy: String
-
-  """
-  Defines if the contributors wants to be incognito (name not displayed)
-  """
-  isIncognito: Boolean!
-  imageUrl(height: Int, format: ImageFormat): String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
-
-  """
-  The time of creation
-  """
-  createdAt: DateTime
-  updatedAt: DateTime
-
-  """
-  Returns whether this account is archived
-  """
-  isArchived: Boolean
-
-  """
-  Whether this account is frozen
-  """
-  isFrozen: Boolean!
-
-  """
-  Returns whether it's active: can accept financial contributions and pay expenses.
-  """
-  isActive: Boolean!
-
-  """
-  Returns whether the account is setup to Host collectives.
-  """
-  isHost: Boolean
-
-  """
-  Returns true if the remote user is an admin of this account
-  """
-  isAdmin: Boolean!
-  parentAccount: Account
-
-  """
-  Get all members (admins, members, backers, followers)
-  """
-  members(
-    limit: Int! = 100
-    offset: Int! = 0
-    role: [MemberRole]
-    accountType: [AccountType]
-
-    """
-    Admin only. To filter on the email address of a member, useful to check if a member exists.
-    """
-    email: EmailAddress
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
-  ): MemberCollection!
-  memberOf(
-    limit: Int! = 150
-    offset: Int! = 0
-    role: [MemberRole]
-    accountType: [AccountType]
-    account: AccountReferenceInput
-
-    """
-    Filter on whether the account is a host or not
-    """
-    isHostAccount: Boolean
-
-    """
-    Filter on (un)approved collectives
-    """
-    isApproved: Boolean
-
-    """
-    Filter on archived collectives
-    """
-    isArchived: Boolean
-
-    """
-    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
-    """
-    includeIncognito: Boolean = true
-
-    """
-    A term to search membership. Searches in collective tags, name, slug, members description and role.
-    """
-    searchTerm: String
-
-    """
-    Filters on the Host fees structure applied to this account
-    """
-    hostFeesStructure: HostFeeStructure
-
-    """
-    Order of the results
-    """
-    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Order the query by requested role order
-    """
-    orderByRoles: Boolean
-  ): MemberOfCollection!
-  transactions(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 100
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    The transaction type (DEBIT or CREDIT)
-    """
-    type: TransactionType
-
-    """
-    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
-    """
-    fromAccount: AccountReferenceInput
-
-    """
-    Reference of the host accounting the transaction
-    """
-    host: AccountReferenceInput
-
-    """
-    NOT IMPLEMENTED. Only return transactions that match these tags.
-    """
-    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
-
-    """
-    The order of results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Only return transactions where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
-
-    """
-    Only return transactions where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
-
-    """
-    Only return transactions that were created after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Only return transactions that were created before this date
-    """
-    dateTo: DateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
-
-    """
-    Only return transactions with an Expense attached
-    """
-    hasExpense: Boolean
-
-    """
-    Only return transactions with an Order attached
-    """
-    hasOrder: Boolean
-
-    """
-    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
-    """
-    includeRegularTransactions: Boolean! = true
-
-    """
-    If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
-    """
-    includeIncognitoTransactions: Boolean! = false
-
-    """
-    Whether to include transactions from children (Events and Projects)
-    """
-    includeChildrenTransactions: Boolean! = false
-
-    """
-    Whether to include transactions from Gift Cards issued by the account.
-    """
-    includeGiftCardTransactions: Boolean! = false
-
-    """
-    Whether to include debt transactions
-    """
-    includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
-
-    """
-    To filter by transaction kind
-    """
-    kind: [TransactionKind]
-  ): TransactionCollection!
-  orders(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 100
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    If account is a host, also include hosted accounts orders
-    """
-    includeHostedAccounts: Boolean
-
-    """
-    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
-    """
-    includeIncognito: Boolean = false
-
-    """
-    Account orders filter (INCOMING or OUTGOING)
-    """
-    filter: AccountOrdersFilter
-
-    """
-    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
-    """
-    frequency: ContributionFrequency
-
-    """
-    Use this field to filter orders on their statuses
-    """
-    status: [OrderStatus]
-
-    """
-    The order of results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Only return orders where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int
-
-    """
-    Only return orders where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int
-
-    """
-    Only return orders that were created after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Only return orders that were created after this date
-    """
-    dateTo: DateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
-
-    """
-    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
-    """
-    onlySubscriptions: Boolean
-  ): OrderCollection!
-  settings: JSON!
-  conversations(
-    limit: Int! = 15
-    offset: Int! = 0
-
-    """
-    Only return conversations matching this tag
-    """
-    tag: String
-  ): ConversationCollection!
-
-  """
-  Returns conversation's tags for collective sorted by popularity
-  """
-  conversationsTags(limit: Int! = 30): [TagStat]
-
-  """
-  Returns expense tags for collective sorted by popularity
-  """
-  expensesTags(limit: Int! = 30): [TagStat]
-  transferwise: TransferWise
-
-  """
-  The list of payout methods that this collective can use to get paid
-  """
-  payoutMethods: [PayoutMethod]
-
-  """
-  The list of payment methods that this collective can use to pay for Orders
-  """
-  paymentMethods(
-    type: [PaymentMethodType]
-    enumType: [PaymentMethodType] @deprecated(reason: "2021-08-20: use type instead from now")
-    service: [PaymentMethodService]
-
-    """
-    Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
-    """
-    includeExpired: Boolean
-  ): [PaymentMethod]!
-
-  """
-  The list of connected accounts (Stripe, Twitter, etc ...)
-  """
-  connectedAccounts: [ConnectedAccount]
-
-  """
-  The address associated to this account. This field is always public for collectives and events.
-  """
-  location: Location
-  categories: [String]!
-  stats: AccountStats
-  updates(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Only return published updates. You must be an admin of the account to see unpublished updates.
-    """
-    onlyPublishedUpdates: Boolean = false
-    onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-    searchTerm: String
-  ): UpdateCollection!
-
-  """
-  Describes the features enabled and available for this account
-  """
-  features: CollectiveFeatures!
-  virtualCards(
-    limit: Int! = 100
-    offset: Int! = 0
-    state: String = null
-    merchantAccount: AccountReferenceInput = null
-
-    """
-    Only return expenses that were created after this date
-    """
-    dateFrom: DateTime = null
-
-    """
-    Only return expenses that were created before this date
-    """
-    dateTo: DateTime = null
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): VirtualCardCollection!
-  virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
-
-  """
-  Returns the Fiscal Host
-  """
-  host: Host
-
-  """
-  Describe how the host charges the collective
-  """
-  hostFeesStructure: HostFeeStructure
-
-  """
-  Fees percentage that the host takes for this collective
-  """
-  hostFeePercent: Float
-
-  """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Int!
-
-  """
-  Date of approval by the Fiscal Host.
-  """
-  approvedAt: DateTime
-
-  """
-  Returns whether it's approved by the Fiscal Host
-  """
-  isApproved: Boolean!
-
-  """
-  Number of unique financial contributors.
-  """
-  totalFinancialContributors(
-    """
-    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
-    """
-    accountType: AccountType
-  ): Int!
-  tiers(
-    """
-    The number of results to fetch
-    """
-    limit: Int! = 100
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): TierCollection!
-
-  """
-  All the persons and entities that contribute to this account
-  """
-  contributors(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-    roles: [MemberRole]
-  ): ContributorCollection!
-
-  """
-  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
-  """
-  platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
-  contributionPolicy: String
-
-  """
-  The Account parenting this account
-  """
-  parent: Account
-}
-
-input TierReferenceInput {
-  """
-  The id assigned to the Tier
-  """
-  id: String
-
-  """
-  The DB id assigned to the Tier
-  """
-  legacyId: Int
-
-  """
-  Pass this flag to reference the custom tier (/donate)
-  """
-  isCustom: Boolean
-}
-
-"""
-A PayPal plan to associate with a contribution
-"""
-type PaypalPlan {
-  id: String!
-}
-
-"""
-Input type for an amount with the value and currency
-"""
-input AmountInput {
-  """
-  The value in plain
-  """
-  value: Float
-
-  """
-  The currency string
-  """
-  currency: Currency
-
-  """
-  The value in cents
-  """
-  valueInCents: Int
-}
-
-"""
-This is the root mutation
-"""
-type Mutation {
-  """
-  Add funds to the given account
-  """
-  addFunds(
-    fromAccount: AccountReferenceInput!
-    account: AccountReferenceInput!
-    tier: TierReferenceInput
-    amount: AmountInput!
-    description: String!
-    hostFeePercent: Float
-  ): Order!
-  createCollective(
-    """
-    Information about the collective to create (name, slug, description, tags, ...)
-    """
-    collective: CollectiveCreateInput!
-
-    """
-    Reference to the host to apply on creation.
-    """
-    host: AccountReferenceInput
-
-    """
-    User information to create along with the collective
-    """
-    user: IndividualCreateInput
-
-    """
-    Whether to trigger the automated approval for Open Source collectives with GitHub.
-    """
-    automateApprovalWithGithub: Boolean = false
-
-    """
-    A message to attach for the host to review the application
-    """
-    message: String
-
-    """
-    Further information about collective applying to host
-    """
-    applicationData: JSON
-
-    """
-    Additional data for the collective creation. This argument has no effect in production
-    """
-    testPayload: JSON
-
-    """
-    Create a Collective without a default admin (authenticated user or user)
-    """
-    skipDefaultAdmin: Boolean = false
-
-    """
-    List of members to invite on Collective creation.
-    """
-    inviteMembers: [InviteMemberInput]
-  ): Collective
-  createFund(
-    """
-    Information about the collective to create (name, slug, description, tags, ...)
-    """
-    fund: FundCreateInput!
-
-    """
-    Reference to the host to apply on creation.
-    """
-    host: AccountReferenceInput
-  ): Fund
-  createOrganization(
-    """
-    Information about the organization to create (name, slug, description, website, ...)
-    """
-    organization: OrganizationCreateInput!
-  ): Organization
-  createProject(
-    """
-    Information about the Project to create (name, slug, description, tags, settings)
-    """
-    project: ProjectCreateInput!
-
-    """
-    Reference to the parent Account creating the Project.
-    """
-    parent: AccountReferenceInput
-  ): Project
-  createEvent(
-    """
-    Information about the Event to create (name, slug, description, tags, settings)
-    """
-    event: EventCreateInput!
-
-    """
-    Reference to the parent Account creating the Event.
-    """
-    account: AccountReferenceInput!
-  ): Event
-  editComment(comment: CommentUpdateInput!): Comment
-  deleteComment(id: String!): Comment
-  createComment(comment: CommentCreateInput!): Comment
-
-  """
-  Connect external account to Open Collective Account
-  """
-  createConnectedAccount(
-    """
-    Connected Account data
-    """
-    connectedAccount: ConnectedAccountCreateInput!
-
-    """
-    Account where the external account will be connected
-    """
-    account: AccountReferenceInput!
-  ): ConnectedAccount
-
-  """
-  Delete ConnectedAccount
-  """
-  deleteConnectedAccount(
-    """
-    ConnectedAccount reference containing either id or legacyId
-    """
-    connectedAccount: ConnectedAccountReferenceInput!
-  ): ConnectedAccount
-
-  """
-  Create a conversation
-  """
-  createConversation(
-    """
-    Conversation's title
-    """
-    title: String!
-
-    """
-    The body of the conversation initial comment
-    """
-    html: String!
-
-    """
-    ID of the Collective where the conversation will be created
-    """
-    CollectiveId: String!
-
-    """
-    A list of tags for this conversation
-    """
-    tags: [String]
-  ): Conversation
-  editConversation(
-    """
-    Conversation's id
-    """
-    id: String!
-
-    """
-    Conversation's title
-    """
-    title: String!
-
-    """
-    A list of tags for this conversation
-    """
-    tags: [String]
-  ): Conversation
-
-  """
-  Returns true if user is following, false otherwise. Must be authenticated.
-  """
-  followConversation(
-    """
-    Conversation's id
-    """
-    id: String!
-
-    """
-    Set this to false to unfollow the conversation
-    """
-    isActive: Boolean = true
-  ): Boolean
-
-  """
-  Submit an expense to a collective
-  """
-  createExpense(
-    """
-    Expense data
-    """
-    expense: ExpenseCreateInput!
-
-    """
-    Account where the expense will be created
-    """
-    account: AccountReferenceInput!
-
-    """
-    Recurring Expense information
-    """
-    recurring: RecurringExpenseInput
-  ): Expense!
-
-  """
-  To update an existing expense
-  """
-  editExpense(
-    """
-    Expense data
-    """
-    expense: ExpenseUpdateInput!
-
-    """
-    Expense draft key if invited to submit expense
-    """
-    draftKey: String
-  ): Expense!
-
-  """
-  Delete an expense. Only work if the expense is rejected - please check permissions.canDelete.
-  """
-  deleteExpense(
-    """
-    Reference of the expense to delete
-    """
-    expense: ExpenseReferenceInput!
-  ): Expense!
-
-  """
-  Process the expense with the given action
-  """
-  processExpense(
-    """
-    Reference of the expense to process
-    """
-    expense: ExpenseReferenceInput!
-
-    """
-    The action to trigger
-    """
-    action: ExpenseProcessAction!
-
-    """
-    If action is related to a payment, this object used for the payment parameters
-    """
-    paymentParams: ProcessExpensePaymentParams
-  ): Expense!
-
-  """
-  Persist an Expense as a draft and invite someone to edit and submit it.
-  """
-  draftExpenseAndInviteUser(
-    """
-    Expense data
-    """
-    expense: ExpenseInviteDraftInput!
-
-    """
-    Account where the expense will be created
-    """
-    account: AccountReferenceInput!
-  ): Expense!
-
-  """
-  To verify an unverified expense.
-  """
-  resendDraftExpenseInvite(
-    """
-    Reference of the expense to process
-    """
-    expense: ExpenseReferenceInput!
-  ): Expense!
-
-  """
-  To verify and unverified expense.
-  """
-  verifyExpense(
-    """
-    Reference of the expense to process
-    """
-    expense: ExpenseReferenceInput!
-
-    """
-    Expense draft key if invited to submit expense
-    """
-    draftKey: String
-  ): Expense!
-  addEmojiReaction(
-    """
-    The emoji associated with the reaction
-    """
-    emoji: String!
-
-    """
-    A unique identifier for the comment id associated with this reaction
-    """
-    comment: CommentReferenceInput
-
-    """
-    A unique identifier for the update id associated with this reaction
-    """
-    update: UpdateReferenceInput
-  ): EmojiReactionResponse!
-  removeEmojiReaction(
-    comment: CommentReferenceInput
-    update: UpdateReferenceInput
-    emoji: String!
-  ): EmojiReactionResponse!
-
-  """
-  Apply to an host with a collective
-  """
-  applyToHost(
-    """
-    Account applying to the host.
-    """
-    collective: AccountReferenceInput!
-
-    """
-    Host to apply to.
-    """
-    host: AccountReferenceInput!
-
-    """
-    A message to attach for the host to review the application
-    """
-    message: String
-
-    """
-    Further information about collective applying to host
-    """
-    applicationData: JSON
-  ): Account!
-
-  """
-  Reply to a host application
-  """
-  processHostApplication(
-    """
-    The account that applied to the host
-    """
-    account: AccountReferenceInput!
-
-    """
-    The host concerned by the application
-    """
-    host: AccountReferenceInput!
-
-    """
-    What to do with the application
-    """
-    action: ProcessHostApplicationAction!
-
-    """
-    A message to attach as a reason for the action
-    """
-    message: String
-  ): ProcessHostApplicationResponse!
-
-  """
-  [Root only] Removes the host for an account
-  """
-  removeHost(
-    """
-    The account to unhost
-    """
-    account: AccountReferenceInput!
-  ): Account!
-
-  """
-  Edit the settings for the given account
-  """
-  editAccountSetting(
-    """
-    Account where the settings will be updated
-    """
-    account: AccountReferenceInput!
-
-    """
-    The key that you want to edit in settings
-    """
-    key: AccountSettingsKey!
-
-    """
-    The value to set for this key
-    """
-    value: JSON!
-  ): Account!
-
-  """
-  An endpoint for hosts to edit the fees structure of their hosted accounts
-  """
-  editAccountFeeStructure(
-    """
-    Account where the settings will be updated
-    """
-    account: AccountReferenceInput!
-
-    """
-    The host fee percent to apply to this account
-    """
-    hostFeePercent: Float!
-
-    """
-    If using a custom fee, set this to true
-    """
-    isCustomFee: Boolean!
-  ): Account!
-
-  """
-  An endpoint for hosts to edit the freeze status of their hosted accounts
-  """
-  editAccountFreezeStatus(
-    """
-    Account to freeze
-    """
-    account: AccountReferenceInput!
-    action: AccountFreezeAction!
-
-    """
-    Message to send by email to the admins of the account
-    """
-    message: String
-  ): Account!
-
-  """
-  Add 2FA to the Individual if it does not have it
-  """
-  addTwoFactorAuthTokenToIndividual(
-    """
-    Individual that will have 2FA added to it
-    """
-    account: AccountReferenceInput!
-
-    """
-    The generated secret to save to the Individual
-    """
-    token: String!
-  ): AddTwoFactorAuthTokenToIndividualResponse!
-
-  """
-  Remove 2FA from the Individual if it has been enabled
-  """
-  removeTwoFactorAuthTokenFromIndividual(
-    """
-    Account that will have 2FA removed from it
-    """
-    account: AccountReferenceInput!
-
-    """
-    The 6-digit 2FA code
-    """
-    code: String!
-  ): Individual!
-
-  """
-  Update the plan
-  """
-  editHostPlan(
-    """
-    Account where the host plan will be edited.
-    """
-    account: AccountReferenceInput!
-
-    """
-    The name of the plan to subscribe to.
-    """
-    plan: String!
-  ): Host!
-
-  """
-  Edit key properties of an account.
-  """
-  editAccount(
-    """
-    Account to edit.
-    """
-    account: AccountUpdateInput!
-  ): Host!
-
-  """
-  [Root only] Clears the cache for a given account
-  """
-  clearCacheForAccount(
-    """
-    Account to clear the cache for
-    """
-    account: AccountReferenceInput!
-
-    """
-    Types of cache to clear
-    """
-    type: [AccountCacheType]! = [CLOUDFLARE, GRAPHQL_QUERIES, CONTRIBUTORS]
-  ): Account!
-
-  """
-  [Root only] Merge two accounts, returns the result account
-  """
-  mergeAccounts(
-    """
-    Account to merge from
-    """
-    fromAccount: AccountReferenceInput!
-
-    """
-    Account to merge to
-    """
-    toAccount: AccountReferenceInput!
-
-    """
-    If true, the result will be simulated and summarized in the response message
-    """
-    dryRun: Boolean! = true
-  ): MergeAccountsResponse!
-
-  """
-  Adds or removes a policy on a given account
-  """
-  setPolicies(
-    """
-    Account where the policies are being set
-    """
-    account: AccountReferenceInput!
-
-    """
-    The policy to be added
-    """
-    policies: [Policy]
-  ): Account!
-
-  """
-  Sends an email for guest to confirm their emails and create their Open Collective account
-  """
-  sendGuestConfirmationEmail(
-    """
-    The email to validate
-    """
-    email: EmailAddress!
-  ): Boolean!
-
-  """
-  Mark an account as confirmed
-  """
-  confirmGuestAccount(
-    """
-    The email to confirm
-    """
-    email: EmailAddress!
-
-    """
-    The key that you want to edit in settings
-    """
-    emailConfirmationToken: String!
-  ): ConfirmGuestAccountResponse!
-
-  """
-  Create a new Payout Method to get paid through the platform
-  """
-  createPayoutMethod(
-    """
-    Payout Method data
-    """
-    payoutMethod: PayoutMethodInput!
-
-    """
-    Account where the payout method will be associated
-    """
-    account: AccountReferenceInput!
-  ): PayoutMethod
-
-  """
-  Remove the given payout method
-  """
-  removePayoutMethod(payoutMethodId: String!): PayoutMethod!
-
-  """
-  To submit a new order
-  """
-  createOrder(order: OrderCreateInput!): OrderWithPayment!
-
-  """
-  Cancel an order
-  """
-  cancelOrder(
-    """
-    Object matching the OrderReferenceInput (id)
-    """
-    order: OrderReferenceInput!
-  ): Order
-
-  """
-  Update an Order's amount, tier, or payment method
-  """
-  updateOrder(
-    """
-    Reference to the Order to update
-    """
-    order: OrderReferenceInput!
-
-    """
-    Reference to a Payment Method to update the order with
-    """
-    paymentMethod: PaymentMethodReferenceInput
-
-    """
-    To update the order with a PayPal subscription
-    """
-    paypalSubscriptionId: String
-
-    """
-    Reference to a Tier to update the order with
-    """
-    tier: TierReferenceInput
-
-    """
-    An Amount to update the order to
-    """
-    amount: AmountInput
-  ): Order
-  confirmOrder(
-    order: OrderReferenceInput!
-
-    """
-    If the order was made as a guest, you can use this field to authenticate
-    """
-    guestToken: String
-  ): OrderWithPayment!
-
-  """
-  A mutation for the host to approve or reject an order
-  """
-  processPendingOrder(order: OrderUpdateInput!, action: ProcessOrderAction!): Order!
-
-  """
-  A mutation for root users to move orders from one account to another
-  """
-  moveOrders(
-    """
-    The orders to move
-    """
-    orders: [OrderReferenceInput!]!
-
-    """
-    The account to move the orders to. Set to null to keep existing
-    """
-    fromAccount: AccountReferenceInput
-
-    """
-    The tier to move the orders to. Set to null to keep existing. Pass { id: "custom" } to reference the custom tier (/donate)
-    """
-    tier: TierReferenceInput
-
-    """
-    If true, the orders will be moved to the incognito account of "fromAccount"
-    """
-    makeIncognito: Boolean
-  ): [Order]!
-
-  """
-  Add a new payment method to be used with an Order
-  """
-  addCreditCard(
-    """
-    The credit card info
-    """
-    creditCardInfo: CreditCardCreateInput!
-
-    """
-    Name associated to this credit card
-    """
-    name: String!
-
-    """
-    Whether this credit card should be saved for future payments
-    """
-    isSavedForLater: Boolean = true
-
-    """
-    Account to add the credit card to
-    """
-    account: AccountReferenceInput!
-  ): CreditCardWithStripeError!
-
-  """
-  Confirm a credit card is ready for use after strong customer authentication
-  """
-  confirmCreditCard(paymentMethod: PaymentMethodReferenceInput!): CreditCardWithStripeError!
-
-  """
-  Add platform tips to a transaction
-  """
-  addPlatformTipToTransaction(
-    """
-    Reference to the transaction in the platform tip
-    """
-    transaction: TransactionReferenceInput!
-
-    """
-    Amount of the platform tip
-    """
-    amount: AmountInput!
-  ): Transaction!
-
-  """
-  Refunds transaction
-  """
-  refundTransaction(
-    """
-    Reference of the transaction to refund
-    """
-    transaction: TransactionReferenceInput!
-  ): Transaction
-
-  """
-  Rejects transaction, removes member from Collective, and sends a message to the contributor
-  """
-  rejectTransaction(
-    """
-    Reference of the transaction to refund
-    """
-    transaction: TransactionReferenceInput!
-
-    """
-    Message to send to the contributor whose contribution has been rejected
-    """
-    message: String
-  ): Transaction!
-
-  """
-  Edit the public message for the given Member of a Collective
-  """
-  editPublicMessage(
-    """
-    Reference to an account for the donating Collective
-    """
-    fromAccount: AccountReferenceInput!
-
-    """
-    Reference to an account for the receiving Collective
-    """
-    toAccount: AccountReferenceInput!
-
-    """
-    New public message
-    """
-    message: String
-  ): Member!
-
-  """
-  [Root only] Create a member entry directly. For non-root users, use `inviteMember`
-  """
-  createMember(
-    """
-    Reference to an account for the member
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    memberAccount will become a member of this account
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of the member
-    """
-    role: MemberRole!
-    description: String
-    since: DateTime
-  ): Member!
-
-  """
-  Edit an existing member of the Collective
-  """
-  editMember(
-    """
-    Reference to an account for the member to edit.
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    Reference to an account for the Collective
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of member
-    """
-    role: MemberRole
-    description: String
-    since: DateTime
-  ): Member!
-
-  """
-  Remove a member from the Collective
-  """
-  removeMember(
-    """
-    Reference to an account of member to remove
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    Reference to the Collective account
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of member
-    """
-    role: MemberRole!
-    isInvitation: Boolean
-  ): Boolean
-
-  """
-  Invite a new member to the Collective
-  """
-  inviteMember(
-    """
-    Reference to an account for the invitee
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    Reference to an account for the inviting Collective
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of the invitee
-    """
-    role: MemberRole!
-    description: String
-    since: DateTime
-  ): MemberInvitation!
-
-  """
-  Edit an existing member invitation of the Collective
-  """
-  editMemberInvitation(
-    """
-    Reference to an account for the member to edit.
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    Reference to an account for the Collective
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of member
-    """
-    role: MemberRole
-    description: String
-    since: DateTime
-  ): MemberInvitation
-
-  """
-  Endpoint to accept or reject an invitation to become a member
-  """
-  replyToMemberInvitation(
-    """
-    Reference to the invitation
-    """
-    invitation: MemberInvitationReferenceInput!
-
-    """
-    Whether this invitation should be accepted or declined
-    """
-    accept: Boolean!
-  ): Boolean!
-  createUpdate(update: UpdateCreateInput!): Update!
-  editUpdate(update: UpdateUpdateInput!): Update!
-  publishUpdate(id: String!, notificationAudience: UpdateAudience): Update!
-  unpublishUpdate(id: String!): Update!
-  deleteUpdate(id: String!): Update!
-
-  """
-  Update the time which the user viewed the changelog updates
-  """
-  setChangelogViewDate(changelogViewDate: DateTime!): Individual!
-
-  """
-  Assign Virtual Card information to existing hosted collective
-  """
-  assignNewVirtualCard(
-    """
-    Virtual Card data
-    """
-    virtualCard: VirtualCardInput!
-
-    """
-    Account where the virtual card will be associated
-    """
-    account: AccountReferenceInput!
-
-    """
-    Individual account responsible for the card
-    """
-    assignee: AccountReferenceInput!
-  ): VirtualCard!
-
-  """
-  Create new Stripe Virtual Card for existing hosted collective
-  """
-  createVirtualCard(
-    """
-    Virtual card name
-    """
-    name: String!
-
-    """
-    Virtual card monthly limit
-    """
-    monthlyLimit: AmountInput!
-
-    """
-    Account where the virtual card will be associated
-    """
-    account: AccountReferenceInput!
-
-    """
-    Individual account responsible for the virtual card
-    """
-    assignee: AccountReferenceInput!
-  ): VirtualCard!
-
-  """
-  Edit existing Virtual Card information
-  """
-  editVirtualCard(
-    """
-    Virtual card reference
-    """
-    virtualCard: VirtualCardReferenceInput!
-
-    """
-    Virtual card name
-    """
-    name: String
-
-    """
-    Individual account responsible for the card
-    """
-    assignee: AccountReferenceInput
-
-    """
-    Virtual card monthly limit
-    """
-    monthlyLimit: AmountInput
-  ): VirtualCard!
-
-  """
-  Request Virtual Card to host
-  """
-  requestVirtualCard(
-    """
-    Request notes
-    """
-    notes: String
-
-    """
-    Purpose for this Virtual Card
-    """
-    purpose: String
-
-    """
-    Monthly budget you want for this Virtual Card
-    """
-    budget: Int
-
-    """
-    Account where the virtual card will be associated
-    """
-    account: AccountReferenceInput!
-  ): Boolean
-
-  """
-  Pause active Virtual Card
-  """
-  pauseVirtualCard(
-    """
-    Virtual Card reference
-    """
-    virtualCard: VirtualCardReferenceInput!
-  ): VirtualCard!
-
-  """
-  Resume paused Virtual Card
-  """
-  resumeVirtualCard(
-    """
-    Virtual Card reference
-    """
-    virtualCard: VirtualCardReferenceInput!
-  ): VirtualCard!
-
-  """
-  Delete Virtual Card
-  """
-  deleteVirtualCard(
-    """
-    Virtual Card reference
-    """
-    virtualCard: VirtualCardReferenceInput!
-  ): Boolean
-}
-
-input CollectiveCreateInput {
-  name: String!
-  slug: String!
-  description: String!
-  tags: [String]
-  githubHandle: String
-  settings: JSON
-}
-
-input IndividualCreateInput {
-  name: String!
-  email: String!
-}
-
-input InviteMemberInput {
-  """
-  Reference to an account for the invitee
-  """
-  memberAccount: AccountReferenceInput
-
-  """
-  Email and name of the invitee if no reference.
-  """
-  memberInfo: IndividualCreateInput
-
-  """
-  Role of the invitee
-  """
-  role: MemberRole!
-  description: String
-  since: DateTime
-}
-
-input FundCreateInput {
-  name: String!
-  slug: String!
-  description: String!
-  tags: [String]
-  settings: JSON
-}
-
-input OrganizationCreateInput {
-  name: String!
-  legalName: String
-  slug: String!
-  description: String!
-  website: String
-  settings: JSON
-}
-
-input ProjectCreateInput {
-  name: String!
-  slug: String!
-  description: String!
-  tags: [String]
-  settings: JSON
-}
-
-input EventCreateInput {
-  name: String!
-  slug: String
-  description: String
-  tags: [String]
-  settings: JSON
-
-  """
-  The Event start date and time
-  """
-  startsAt: DateTime!
-
-  """
-  The Event end date and time
-  """
-  endsAt: DateTime!
-}
-
-input CommentUpdateInput {
-  id: String!
-  html: String
-}
-
-input CommentCreateInput {
-  html: String
-
-  """
-  If your comment is linked to an expense, set it here
-  """
-  expense: ExpenseReferenceInput
-  ConversationId: String
-  update: UpdateReferenceInput
-}
-
-input UpdateReferenceInput {
-  """
-  The public id identifying the update
-  """
-  id: String
-}
-
-input ConnectedAccountCreateInput {
-  """
-  Optional Client ID for the token or secret
-  """
-  clientId: String
-
-  """
-  Private data related to the connected account
-  """
-  data: JSON
-
-  """
-  Refresh token for the connected account
-  """
-  refreshToken: String
-
-  """
-  Public data related to the connected account
-  """
-  settings: JSON
-
-  """
-  Secret token used to call service
-  """
-  token: String
-
-  """
-  Service which the connected account belongs to
-  """
-  service: ConnectedAccountService
-
-  """
-  Optional username for the connected account
-  """
-  username: String
-}
-
-input ConnectedAccountReferenceInput {
-  """
-  The public id identifying the connected account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String
-
-  """
-  The internal id of the account (ie: 580)
-  """
-  legacyId: Int
-}
-
-input ExpenseCreateInput {
-  """
-  Main title of the expense
-  """
-  description: String!
-
-  """
-  Longer text to attach to the expense
-  """
-  longDescription: String
-
-  """
-  Currency that should be used for the payout. Defaults to the account currency
-  """
-  currency: Currency
-
-  """
-  Tags associated to the expense (ie. Food, Engineering...)
-  """
-  tags: [String]
-
-  """
-  The type of the expense
-  """
-  type: ExpenseType!
-
-  """
-  A private note that will be attached to your invoice, as HTML
-  """
-  privateMessage: String
-
-  """
-  Tax ID, VAT number...etc This information will be printed on your invoice.
-  """
-  invoiceInfo: String
-
-  """
-  The payout method that will be used to reimburse the expense
-  """
-  payoutMethod: PayoutMethodInput!
-
-  """
-  The list of items for this expense. Total amount will be computed from them.
-  """
-  items: [ExpenseItemCreateInput]
-
-  """
-  (Optional) A list of files that you want to attach to this expense
-  """
-  attachedFiles: [ExpenseAttachedFileInput!]
-
-  """
-  Account to reimburse
-  """
-  payee: AccountReferenceInput!
-
-  """
-  The address of the payee
-  """
-  payeeLocation: LocationInput
-}
-
-input PayoutMethodInput {
-  id: String
-  data: JSON
-  name: String
-  isSaved: Boolean
-  type: PayoutMethodType
-}
-
-input ExpenseItemCreateInput {
-  """
-  Amount in cents
-  """
-  amount: Int!
-
-  """
-  What is this item about?
-  """
-  description: String!
-
-  """
-  URL of the file linked to this item. Must be provided if the expense type is RECEIPT.
-  """
-  url: URL
-
-  """
-  When was the money spent?
-  """
-  incurredAt: DateString
-}
-
-scalar DateString
-
-input ExpenseAttachedFileInput {
-  """
-  ID of the file
-  """
-  id: String
-
-  """
-  URL of the file
-  """
-  url: URL!
-}
-
-"""
-Input type for Geographic location
-"""
-input LocationInput {
-  """
-  A short name for the location (eg. Open Collective Headquarters)
-  """
-  name: String
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
-
-  """
-  Two letters country code (eg. FR, BE...etc)
-  """
-  country: CountryISO
-
-  """
-  Latitude
-  """
-  lat: Float
-
-  """
-  Longitude
-  """
-  long: Float
-
-  """
-  Structured JSON address
-  """
-  structured: JSON
 }
 
 """
@@ -11418,6 +9046,2456 @@ enum CountryISO {
   EH
 }
 
+input ExpenseReferenceInput {
+  """
+  The public id identifying the expense (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the expense (ie: 580)
+  """
+  legacyId: Int
+}
+
+"""
+A collection of "Expenses"
+"""
+type ExpenseCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Expense]
+}
+
+"""
+Describes the values allowed to filter expenses, namely all the expense statuses and the special "READY_TO_PAY" value.
+"""
+enum ExpenseStatusFilter {
+  DRAFT
+  UNVERIFIED
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSING
+  ERROR
+  PAID
+  SCHEDULED_FOR_PAYMENT
+  SPAM
+
+  """
+  Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
+  """
+  READY_TO_PAY
+}
+
+"""
+This represents an Project account
+"""
+type Fund implements Account & AccountWithHost & AccountWithContributions {
+  id: String
+  legacyId: Int
+
+  """
+  The slug identifying the account (ie: babel)
+  """
+  slug: String
+  type: AccountType
+
+  """
+  Public name
+  """
+  name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
+  description: String
+  longDescription: String
+  tags: [String]
+  website: String
+  twitterHandle: String
+  githubHandle: String
+  currency: String
+  expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
+  imageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  Returns whether this account is archived
+  """
+  isArchived: Boolean
+
+  """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
+
+  """
+  Returns whether it's active: can accept financial contributions and pay expenses.
+  """
+  isActive: Boolean!
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
+  parentAccount: Account
+
+  """
+  Get all members (admins, members, backers, followers)
+  """
+  members(
+    limit: Int! = 100
+    offset: Int! = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+  ): MemberCollection!
+  memberOf(
+    limit: Int! = 150
+    offset: Int! = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+    account: AccountReferenceInput
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
+
+    """
+    Filter on archived collectives
+    """
+    isArchived: Boolean
+
+    """
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
+
+    """
+    Filters on the Host fees structure applied to this account
+    """
+    hostFeesStructure: HostFeeStructure
+
+    """
+    Order of the results
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Order the query by requested role order
+    """
+    orderByRoles: Boolean
+  ): MemberOfCollection!
+  transactions(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+
+    """
+    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the host accounting the transaction
+    """
+    host: AccountReferenceInput
+
+    """
+    NOT IMPLEMENTED. Only return transactions that match these tags.
+    """
+    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return transactions where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transactions that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Only return transactions with an Expense attached
+    """
+    hasExpense: Boolean
+
+    """
+    Only return transactions with an Order attached
+    """
+    hasOrder: Boolean
+
+    """
+    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
+    """
+    includeRegularTransactions: Boolean! = true
+
+    """
+    If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
+    """
+    includeIncognitoTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from children (Events and Projects)
+    """
+    includeChildrenTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
+    Whether to include debt transactions
+    """
+    includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
+  ): TransactionCollection!
+  orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
+    """
+    onlySubscriptions: Boolean
+  ): OrderCollection!
+  settings: JSON!
+  conversations(
+    limit: Int! = 15
+    offset: Int! = 0
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): ConversationCollection!
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int! = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int! = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(
+    type: [PaymentMethodType]
+    enumType: [PaymentMethodType] @deprecated(reason: "2021-08-20: use type instead from now")
+    service: [PaymentMethodService]
+
+    """
+    Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
+  categories: [String]!
+  stats: AccountStats
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Only return published updates. You must be an admin of the account to see unpublished updates.
+    """
+    onlyPublishedUpdates: Boolean = false
+    onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
+  ): UpdateCollection!
+
+  """
+  Describes the features enabled and available for this account
+  """
+  features: CollectiveFeatures!
+  virtualCards(
+    limit: Int! = 100
+    offset: Int! = 0
+    state: String = null
+    merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: DateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+  ): VirtualCardCollection!
+  virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  policies: [Policy]
+
+  """
+  Returns the Fiscal Host
+  """
+  host: Host
+
+  """
+  Describe how the host charges the collective
+  """
+  hostFeesStructure: HostFeeStructure
+
+  """
+  Fees percentage that the host takes for this collective
+  """
+  hostFeePercent: Float
+
+  """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
+  Date of approval by the Fiscal Host.
+  """
+  approvedAt: DateTime
+
+  """
+  Returns whether it's approved by the Fiscal Host
+  """
+  isApproved: Boolean!
+
+  """
+  Number of unique financial contributors.
+  """
+  totalFinancialContributors(
+    """
+    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+    """
+    accountType: AccountType
+  ): Int!
+  tiers(
+    """
+    The number of results to fetch
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): TierCollection!
+
+  """
+  All the persons and entities that contribute to this account
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    roles: [MemberRole]
+  ): ContributorCollection!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+
+  """
+  Amount of money in cents in the currency of the account currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
+  contributionPolicy: String
+}
+
+"""
+A collection of "Hosts"
+"""
+type HostCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Host]
+}
+
+"""
+An invitation to join the members of a collective
+"""
+type MemberInvitation {
+  id: String!
+  createdAt: DateTime!
+  account: Account!
+  memberAccount: Account!
+  role: MemberRole!
+  description: String
+  tier: Tier
+  since: DateTime
+}
+
+input OrderReferenceInput {
+  """
+  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the order (ie: 4242)
+  """
+  legacyId: Int
+}
+
+"""
+This represents an Project account
+"""
+type Project implements Account & AccountWithHost & AccountWithContributions & AccountWithParent {
+  id: String
+  legacyId: Int
+
+  """
+  The slug identifying the account (ie: babel)
+  """
+  slug: String
+  type: AccountType
+
+  """
+  Public name
+  """
+  name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc.
+  """
+  legalName: String
+  description: String
+  longDescription: String
+  tags: [String]
+  website: String
+  twitterHandle: String
+  githubHandle: String
+  currency: String
+  expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
+  imageUrl(height: Int, format: ImageFormat): String
+  backgroundImageUrl(height: Int, format: ImageFormat): String
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  Returns whether this account is archived
+  """
+  isArchived: Boolean
+
+  """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
+
+  """
+  Returns whether it's active: can accept financial contributions and pay expenses.
+  """
+  isActive: Boolean!
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean
+
+  """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
+  parentAccount: Account
+
+  """
+  Get all members (admins, members, backers, followers)
+  """
+  members(
+    limit: Int! = 100
+    offset: Int! = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+  ): MemberCollection!
+  memberOf(
+    limit: Int! = 150
+    offset: Int! = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+    account: AccountReferenceInput
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
+
+    """
+    Filter on archived collectives
+    """
+    isArchived: Boolean
+
+    """
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
+
+    """
+    Filters on the Host fees structure applied to this account
+    """
+    hostFeesStructure: HostFeeStructure
+
+    """
+    Order of the results
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Order the query by requested role order
+    """
+    orderByRoles: Boolean
+  ): MemberOfCollection!
+  transactions(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+
+    """
+    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the host accounting the transaction
+    """
+    host: AccountReferenceInput
+
+    """
+    NOT IMPLEMENTED. Only return transactions that match these tags.
+    """
+    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return transactions where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transactions that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Only return transactions with an Expense attached
+    """
+    hasExpense: Boolean
+
+    """
+    Only return transactions with an Order attached
+    """
+    hasOrder: Boolean
+
+    """
+    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
+    """
+    includeRegularTransactions: Boolean! = true
+
+    """
+    If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
+    """
+    includeIncognitoTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from children (Events and Projects)
+    """
+    includeChildrenTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
+    Whether to include debt transactions
+    """
+    includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
+  ): TransactionCollection!
+  orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
+    """
+    onlySubscriptions: Boolean
+  ): OrderCollection!
+  settings: JSON!
+  conversations(
+    limit: Int! = 15
+    offset: Int! = 0
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): ConversationCollection!
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int! = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int! = 30): [TagStat]
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The list of payment methods that this collective can use to pay for Orders
+  """
+  paymentMethods(
+    type: [PaymentMethodType]
+    enumType: [PaymentMethodType] @deprecated(reason: "2021-08-20: use type instead from now")
+    service: [PaymentMethodService]
+
+    """
+    Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]!
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...)
+  """
+  connectedAccounts: [ConnectedAccount]
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
+  categories: [String]!
+  stats: AccountStats
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Only return published updates. You must be an admin of the account to see unpublished updates.
+    """
+    onlyPublishedUpdates: Boolean = false
+    onlyChangelogUpdates: Boolean
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
+  ): UpdateCollection!
+
+  """
+  Describes the features enabled and available for this account
+  """
+  features: CollectiveFeatures!
+  virtualCards(
+    limit: Int! = 100
+    offset: Int! = 0
+    state: String = null
+    merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: DateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+  ): VirtualCardCollection!
+  virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  policies: [Policy]
+
+  """
+  Returns the Fiscal Host
+  """
+  host: Host
+
+  """
+  Describe how the host charges the collective
+  """
+  hostFeesStructure: HostFeeStructure
+
+  """
+  Fees percentage that the host takes for this collective
+  """
+  hostFeePercent: Float
+
+  """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Int!
+
+  """
+  Date of approval by the Fiscal Host.
+  """
+  approvedAt: DateTime
+
+  """
+  Returns whether it's approved by the Fiscal Host
+  """
+  isApproved: Boolean!
+
+  """
+  Number of unique financial contributors.
+  """
+  totalFinancialContributors(
+    """
+    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+    """
+    accountType: AccountType
+  ): Int!
+  tiers(
+    """
+    The number of results to fetch
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): TierCollection!
+
+  """
+  All the persons and entities that contribute to this account
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    roles: [MemberRole]
+  ): ContributorCollection!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+
+  """
+  Amount of money in cents in the currency of the account currently available to spend
+  """
+  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
+  contributionPolicy: String
+
+  """
+  The Account parenting this account
+  """
+  parent: Account
+}
+
+"""
+A collection of "Tags"
+"""
+type TagStatsCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [TagStat]
+}
+
+input TierReferenceInput {
+  """
+  The id assigned to the Tier
+  """
+  id: String
+
+  """
+  The DB id assigned to the Tier
+  """
+  legacyId: Int
+
+  """
+  Pass this flag to reference the custom tier (/donate)
+  """
+  isCustom: Boolean
+}
+
+"""
+A PayPal plan to associate with a contribution
+"""
+type PaypalPlan {
+  id: String!
+}
+
+"""
+Input type for an amount with the value and currency
+"""
+input AmountInput {
+  """
+  The value in plain
+  """
+  value: Float
+
+  """
+  The currency string
+  """
+  currency: Currency
+
+  """
+  The value in cents
+  """
+  valueInCents: Int
+}
+
+"""
+This is the root mutation
+"""
+type Mutation {
+  """
+  Add funds to the given account
+  """
+  addFunds(
+    fromAccount: AccountReferenceInput!
+    account: AccountReferenceInput!
+    tier: TierReferenceInput
+    amount: AmountInput!
+    description: String!
+    hostFeePercent: Float
+  ): Order!
+  createCollective(
+    """
+    Information about the collective to create (name, slug, description, tags, ...)
+    """
+    collective: CollectiveCreateInput!
+
+    """
+    Reference to the host to apply on creation.
+    """
+    host: AccountReferenceInput
+
+    """
+    User information to create along with the collective
+    """
+    user: IndividualCreateInput
+
+    """
+    Whether to trigger the automated approval for Open Source collectives with GitHub.
+    """
+    automateApprovalWithGithub: Boolean = false
+
+    """
+    A message to attach for the host to review the application
+    """
+    message: String
+
+    """
+    Further information about collective applying to host
+    """
+    applicationData: JSON
+
+    """
+    Additional data for the collective creation. This argument has no effect in production
+    """
+    testPayload: JSON
+
+    """
+    Create a Collective without a default admin (authenticated user or user)
+    """
+    skipDefaultAdmin: Boolean = false
+
+    """
+    List of members to invite on Collective creation.
+    """
+    inviteMembers: [InviteMemberInput]
+  ): Collective
+  createFund(
+    """
+    Information about the collective to create (name, slug, description, tags, ...)
+    """
+    fund: FundCreateInput!
+
+    """
+    Reference to the host to apply on creation.
+    """
+    host: AccountReferenceInput
+  ): Fund
+  createOrganization(
+    """
+    Information about the organization to create (name, slug, description, website, ...)
+    """
+    organization: OrganizationCreateInput!
+  ): Organization
+  createProject(
+    """
+    Information about the Project to create (name, slug, description, tags, settings)
+    """
+    project: ProjectCreateInput!
+
+    """
+    Reference to the parent Account creating the Project.
+    """
+    parent: AccountReferenceInput
+  ): Project
+  createEvent(
+    """
+    Information about the Event to create (name, slug, description, tags, settings)
+    """
+    event: EventCreateInput!
+
+    """
+    Reference to the parent Account creating the Event.
+    """
+    account: AccountReferenceInput!
+  ): Event
+  editComment(comment: CommentUpdateInput!): Comment
+  deleteComment(id: String!): Comment
+  createComment(comment: CommentCreateInput!): Comment
+
+  """
+  Connect external account to Open Collective Account
+  """
+  createConnectedAccount(
+    """
+    Connected Account data
+    """
+    connectedAccount: ConnectedAccountCreateInput!
+
+    """
+    Account where the external account will be connected
+    """
+    account: AccountReferenceInput!
+  ): ConnectedAccount
+
+  """
+  Delete ConnectedAccount
+  """
+  deleteConnectedAccount(
+    """
+    ConnectedAccount reference containing either id or legacyId
+    """
+    connectedAccount: ConnectedAccountReferenceInput!
+  ): ConnectedAccount
+
+  """
+  Create a conversation
+  """
+  createConversation(
+    """
+    Conversation's title
+    """
+    title: String!
+
+    """
+    The body of the conversation initial comment
+    """
+    html: String!
+
+    """
+    ID of the Collective where the conversation will be created
+    """
+    CollectiveId: String!
+
+    """
+    A list of tags for this conversation
+    """
+    tags: [String]
+  ): Conversation
+  editConversation(
+    """
+    Conversation's id
+    """
+    id: String!
+
+    """
+    Conversation's title
+    """
+    title: String!
+
+    """
+    A list of tags for this conversation
+    """
+    tags: [String]
+  ): Conversation
+
+  """
+  Returns true if user is following, false otherwise. Must be authenticated.
+  """
+  followConversation(
+    """
+    Conversation's id
+    """
+    id: String!
+
+    """
+    Set this to false to unfollow the conversation
+    """
+    isActive: Boolean = true
+  ): Boolean
+
+  """
+  Submit an expense to a collective
+  """
+  createExpense(
+    """
+    Expense data
+    """
+    expense: ExpenseCreateInput!
+
+    """
+    Account where the expense will be created
+    """
+    account: AccountReferenceInput!
+
+    """
+    Recurring Expense information
+    """
+    recurring: RecurringExpenseInput
+  ): Expense!
+
+  """
+  To update an existing expense
+  """
+  editExpense(
+    """
+    Expense data
+    """
+    expense: ExpenseUpdateInput!
+
+    """
+    Expense draft key if invited to submit expense
+    """
+    draftKey: String
+  ): Expense!
+
+  """
+  Delete an expense. Only work if the expense is rejected - please check permissions.canDelete.
+  """
+  deleteExpense(
+    """
+    Reference of the expense to delete
+    """
+    expense: ExpenseReferenceInput!
+  ): Expense!
+
+  """
+  Process the expense with the given action
+  """
+  processExpense(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+
+    """
+    The action to trigger
+    """
+    action: ExpenseProcessAction!
+
+    """
+    If action is related to a payment, this object used for the payment parameters
+    """
+    paymentParams: ProcessExpensePaymentParams
+  ): Expense!
+
+  """
+  Persist an Expense as a draft and invite someone to edit and submit it.
+  """
+  draftExpenseAndInviteUser(
+    """
+    Expense data
+    """
+    expense: ExpenseInviteDraftInput!
+
+    """
+    Account where the expense will be created
+    """
+    account: AccountReferenceInput!
+  ): Expense!
+
+  """
+  To re-send the invitation to complete a draft expense
+  """
+  resendDraftExpenseInvite(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+  ): Expense!
+
+  """
+  To verify and unverified expense.
+  """
+  verifyExpense(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+
+    """
+    Expense draft key if invited to submit expense
+    """
+    draftKey: String
+  ): Expense!
+  addEmojiReaction(
+    """
+    The emoji associated with the reaction
+    """
+    emoji: String!
+
+    """
+    A unique identifier for the comment id associated with this reaction
+    """
+    comment: CommentReferenceInput
+
+    """
+    A unique identifier for the update id associated with this reaction
+    """
+    update: UpdateReferenceInput
+  ): EmojiReactionResponse!
+  removeEmojiReaction(
+    comment: CommentReferenceInput
+    update: UpdateReferenceInput
+    emoji: String!
+  ): EmojiReactionResponse!
+
+  """
+  Apply to an host with a collective
+  """
+  applyToHost(
+    """
+    Account applying to the host.
+    """
+    collective: AccountReferenceInput!
+
+    """
+    Host to apply to.
+    """
+    host: AccountReferenceInput!
+
+    """
+    A message to attach for the host to review the application
+    """
+    message: String
+
+    """
+    Further information about collective applying to host
+    """
+    applicationData: JSON
+  ): Account!
+
+  """
+  Reply to a host application
+  """
+  processHostApplication(
+    """
+    The account that applied to the host
+    """
+    account: AccountReferenceInput!
+
+    """
+    The host concerned by the application
+    """
+    host: AccountReferenceInput!
+
+    """
+    What to do with the application
+    """
+    action: ProcessHostApplicationAction!
+
+    """
+    A message to attach as a reason for the action
+    """
+    message: String
+  ): ProcessHostApplicationResponse!
+
+  """
+  [Root only] Removes the host for an account
+  """
+  removeHost(
+    """
+    The account to unhost
+    """
+    account: AccountReferenceInput!
+  ): Account!
+
+  """
+  Edit the settings for the given account
+  """
+  editAccountSetting(
+    """
+    Account where the settings will be updated
+    """
+    account: AccountReferenceInput!
+
+    """
+    The key that you want to edit in settings
+    """
+    key: AccountSettingsKey!
+
+    """
+    The value to set for this key
+    """
+    value: JSON!
+  ): Account!
+
+  """
+  An endpoint for hosts to edit the fees structure of their hosted accounts
+  """
+  editAccountFeeStructure(
+    """
+    Account where the settings will be updated
+    """
+    account: AccountReferenceInput!
+
+    """
+    The host fee percent to apply to this account
+    """
+    hostFeePercent: Float!
+
+    """
+    If using a custom fee, set this to true
+    """
+    isCustomFee: Boolean!
+  ): Account!
+
+  """
+  An endpoint for hosts to edit the freeze status of their hosted accounts
+  """
+  editAccountFreezeStatus(
+    """
+    Account to freeze
+    """
+    account: AccountReferenceInput!
+    action: AccountFreezeAction!
+
+    """
+    Message to send by email to the admins of the account
+    """
+    message: String
+  ): Account!
+
+  """
+  Add 2FA to the Individual if it does not have it
+  """
+  addTwoFactorAuthTokenToIndividual(
+    """
+    Individual that will have 2FA added to it
+    """
+    account: AccountReferenceInput!
+
+    """
+    The generated secret to save to the Individual
+    """
+    token: String!
+  ): AddTwoFactorAuthTokenToIndividualResponse!
+
+  """
+  Remove 2FA from the Individual if it has been enabled
+  """
+  removeTwoFactorAuthTokenFromIndividual(
+    """
+    Account that will have 2FA removed from it
+    """
+    account: AccountReferenceInput!
+
+    """
+    The 6-digit 2FA code
+    """
+    code: String!
+  ): Individual!
+
+  """
+  Update the plan
+  """
+  editHostPlan(
+    """
+    Account where the host plan will be edited.
+    """
+    account: AccountReferenceInput!
+
+    """
+    The name of the plan to subscribe to.
+    """
+    plan: String!
+  ): Host!
+
+  """
+  Edit key properties of an account.
+  """
+  editAccount(
+    """
+    Account to edit.
+    """
+    account: AccountUpdateInput!
+  ): Host!
+
+  """
+  [Root only] Clears the cache for a given account
+  """
+  clearCacheForAccount(
+    """
+    Account to clear the cache for
+    """
+    account: AccountReferenceInput!
+
+    """
+    Types of cache to clear
+    """
+    type: [AccountCacheType]! = [CLOUDFLARE, GRAPHQL_QUERIES, CONTRIBUTORS]
+  ): Account!
+
+  """
+  [Root only] Merge two accounts, returns the result account
+  """
+  mergeAccounts(
+    """
+    Account to merge from
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Account to merge to
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    If true, the result will be simulated and summarized in the response message
+    """
+    dryRun: Boolean! = true
+  ): MergeAccountsResponse!
+
+  """
+  Adds or removes a policy on a given account
+  """
+  setPolicies(
+    """
+    Account where the policies are being set
+    """
+    account: AccountReferenceInput!
+
+    """
+    The policy to be added
+    """
+    policies: [Policy]
+  ): Account!
+
+  """
+  Sends an email for guest to confirm their emails and create their Open Collective account
+  """
+  sendGuestConfirmationEmail(
+    """
+    The email to validate
+    """
+    email: EmailAddress!
+  ): Boolean!
+
+  """
+  Mark an account as confirmed
+  """
+  confirmGuestAccount(
+    """
+    The email to confirm
+    """
+    email: EmailAddress!
+
+    """
+    The key that you want to edit in settings
+    """
+    emailConfirmationToken: String!
+  ): ConfirmGuestAccountResponse!
+
+  """
+  Create a new Payout Method to get paid through the platform
+  """
+  createPayoutMethod(
+    """
+    Payout Method data
+    """
+    payoutMethod: PayoutMethodInput!
+
+    """
+    Account where the payout method will be associated
+    """
+    account: AccountReferenceInput!
+  ): PayoutMethod
+
+  """
+  Remove the given payout method
+  """
+  removePayoutMethod(payoutMethodId: String!): PayoutMethod!
+
+  """
+  To submit a new order
+  """
+  createOrder(order: OrderCreateInput!): OrderWithPayment!
+
+  """
+  Cancel an order
+  """
+  cancelOrder(
+    """
+    Object matching the OrderReferenceInput (id)
+    """
+    order: OrderReferenceInput!
+  ): Order
+
+  """
+  Update an Order's amount, tier, or payment method
+  """
+  updateOrder(
+    """
+    Reference to the Order to update
+    """
+    order: OrderReferenceInput!
+
+    """
+    Reference to a Payment Method to update the order with
+    """
+    paymentMethod: PaymentMethodReferenceInput
+
+    """
+    To update the order with a PayPal subscription
+    """
+    paypalSubscriptionId: String
+
+    """
+    Reference to a Tier to update the order with
+    """
+    tier: TierReferenceInput
+
+    """
+    An Amount to update the order to
+    """
+    amount: AmountInput
+  ): Order
+  confirmOrder(
+    order: OrderReferenceInput!
+
+    """
+    If the order was made as a guest, you can use this field to authenticate
+    """
+    guestToken: String
+  ): OrderWithPayment!
+
+  """
+  A mutation for the host to approve or reject an order
+  """
+  processPendingOrder(order: OrderUpdateInput!, action: ProcessOrderAction!): Order!
+
+  """
+  A mutation for root users to move orders from one account to another
+  """
+  moveOrders(
+    """
+    The orders to move
+    """
+    orders: [OrderReferenceInput!]!
+
+    """
+    The account to move the orders to. Set to null to keep existing
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    The tier to move the orders to. Set to null to keep existing. Pass { id: "custom" } to reference the custom tier (/donate)
+    """
+    tier: TierReferenceInput
+
+    """
+    If true, the orders will be moved to the incognito account of "fromAccount"
+    """
+    makeIncognito: Boolean
+  ): [Order]!
+
+  """
+  Add a new payment method to be used with an Order
+  """
+  addCreditCard(
+    """
+    The credit card info
+    """
+    creditCardInfo: CreditCardCreateInput!
+
+    """
+    Name associated to this credit card
+    """
+    name: String!
+
+    """
+    Whether this credit card should be saved for future payments
+    """
+    isSavedForLater: Boolean = true
+
+    """
+    Account to add the credit card to
+    """
+    account: AccountReferenceInput!
+  ): CreditCardWithStripeError!
+
+  """
+  Confirm a credit card is ready for use after strong customer authentication
+  """
+  confirmCreditCard(paymentMethod: PaymentMethodReferenceInput!): CreditCardWithStripeError!
+
+  """
+  Add platform tips to a transaction
+  """
+  addPlatformTipToTransaction(
+    """
+    Reference to the transaction in the platform tip
+    """
+    transaction: TransactionReferenceInput!
+
+    """
+    Amount of the platform tip
+    """
+    amount: AmountInput!
+  ): Transaction!
+
+  """
+  Refunds transaction
+  """
+  refundTransaction(
+    """
+    Reference of the transaction to refund
+    """
+    transaction: TransactionReferenceInput!
+  ): Transaction
+
+  """
+  Rejects transaction, removes member from Collective, and sends a message to the contributor
+  """
+  rejectTransaction(
+    """
+    Reference of the transaction to refund
+    """
+    transaction: TransactionReferenceInput!
+
+    """
+    Message to send to the contributor whose contribution has been rejected
+    """
+    message: String
+  ): Transaction!
+
+  """
+  Edit the public message for the given Member of a Collective
+  """
+  editPublicMessage(
+    """
+    Reference to an account for the donating Collective
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the receiving Collective
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    New public message
+    """
+    message: String
+  ): Member!
+
+  """
+  [Root only] Create a member entry directly. For non-root users, use `inviteMember`
+  """
+  createMember(
+    """
+    Reference to an account for the member
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    memberAccount will become a member of this account
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of the member
+    """
+    role: MemberRole!
+    description: String
+    since: DateTime
+  ): Member!
+
+  """
+  Edit an existing member of the Collective
+  """
+  editMember(
+    """
+    Reference to an account for the member to edit.
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the Collective
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of member
+    """
+    role: MemberRole
+    description: String
+    since: DateTime
+  ): Member!
+
+  """
+  Remove a member from the Collective
+  """
+  removeMember(
+    """
+    Reference to an account of member to remove
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    Reference to the Collective account
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of member
+    """
+    role: MemberRole!
+    isInvitation: Boolean
+  ): Boolean
+
+  """
+  Invite a new member to the Collective
+  """
+  inviteMember(
+    """
+    Reference to an account for the invitee
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the inviting Collective
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of the invitee
+    """
+    role: MemberRole!
+    description: String
+    since: DateTime
+  ): MemberInvitation!
+
+  """
+  Edit an existing member invitation of the Collective
+  """
+  editMemberInvitation(
+    """
+    Reference to an account for the member to edit.
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the Collective
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of member
+    """
+    role: MemberRole
+    description: String
+    since: DateTime
+  ): MemberInvitation
+
+  """
+  Endpoint to accept or reject an invitation to become a member
+  """
+  replyToMemberInvitation(
+    """
+    Reference to the invitation
+    """
+    invitation: MemberInvitationReferenceInput!
+
+    """
+    Whether this invitation should be accepted or declined
+    """
+    accept: Boolean!
+  ): Boolean!
+  createUpdate(update: UpdateCreateInput!): Update!
+  editUpdate(update: UpdateUpdateInput!): Update!
+  publishUpdate(id: String!, notificationAudience: UpdateAudience): Update!
+  unpublishUpdate(id: String!): Update!
+  deleteUpdate(id: String!): Update!
+
+  """
+  Update the time which the user viewed the changelog updates
+  """
+  setChangelogViewDate(changelogViewDate: DateTime!): Individual!
+
+  """
+  Assign Virtual Card information to existing hosted collective
+  """
+  assignNewVirtualCard(
+    """
+    Virtual Card data
+    """
+    virtualCard: VirtualCardInput!
+
+    """
+    Account where the virtual card will be associated
+    """
+    account: AccountReferenceInput!
+
+    """
+    Individual account responsible for the card
+    """
+    assignee: AccountReferenceInput!
+  ): VirtualCard!
+
+  """
+  Create new Stripe Virtual Card for existing hosted collective
+  """
+  createVirtualCard(
+    """
+    Virtual card name
+    """
+    name: String!
+
+    """
+    Virtual card monthly limit
+    """
+    monthlyLimit: AmountInput!
+
+    """
+    Account where the virtual card will be associated
+    """
+    account: AccountReferenceInput!
+
+    """
+    Individual account responsible for the virtual card
+    """
+    assignee: AccountReferenceInput!
+  ): VirtualCard!
+
+  """
+  Edit existing Virtual Card information
+  """
+  editVirtualCard(
+    """
+    Virtual card reference
+    """
+    virtualCard: VirtualCardReferenceInput!
+
+    """
+    Virtual card name
+    """
+    name: String
+
+    """
+    Individual account responsible for the card
+    """
+    assignee: AccountReferenceInput
+
+    """
+    Virtual card monthly limit
+    """
+    monthlyLimit: AmountInput
+  ): VirtualCard!
+
+  """
+  Request Virtual Card to host
+  """
+  requestVirtualCard(
+    """
+    Request notes
+    """
+    notes: String
+
+    """
+    Purpose for this Virtual Card
+    """
+    purpose: String
+
+    """
+    Monthly budget you want for this Virtual Card
+    """
+    budget: Int
+
+    """
+    Account where the virtual card will be associated
+    """
+    account: AccountReferenceInput!
+  ): Boolean
+
+  """
+  Pause active Virtual Card
+  """
+  pauseVirtualCard(
+    """
+    Virtual Card reference
+    """
+    virtualCard: VirtualCardReferenceInput!
+  ): VirtualCard!
+
+  """
+  Resume paused Virtual Card
+  """
+  resumeVirtualCard(
+    """
+    Virtual Card reference
+    """
+    virtualCard: VirtualCardReferenceInput!
+  ): VirtualCard!
+
+  """
+  Delete Virtual Card
+  """
+  deleteVirtualCard(
+    """
+    Virtual Card reference
+    """
+    virtualCard: VirtualCardReferenceInput!
+  ): Boolean
+}
+
+input CollectiveCreateInput {
+  name: String!
+  slug: String!
+  description: String!
+  tags: [String]
+  githubHandle: String
+  settings: JSON
+}
+
+input IndividualCreateInput {
+  name: String!
+  email: String!
+}
+
+input InviteMemberInput {
+  """
+  Reference to an account for the invitee
+  """
+  memberAccount: AccountReferenceInput
+
+  """
+  Email and name of the invitee if no reference.
+  """
+  memberInfo: IndividualCreateInput
+
+  """
+  Role of the invitee
+  """
+  role: MemberRole!
+  description: String
+  since: DateTime
+}
+
+input FundCreateInput {
+  name: String!
+  slug: String!
+  description: String!
+  tags: [String]
+  settings: JSON
+}
+
+input OrganizationCreateInput {
+  name: String!
+  legalName: String
+  slug: String!
+  description: String!
+  website: String
+  settings: JSON
+}
+
+input ProjectCreateInput {
+  name: String!
+  slug: String!
+  description: String!
+  tags: [String]
+  settings: JSON
+}
+
+input EventCreateInput {
+  name: String!
+  slug: String
+  description: String
+  tags: [String]
+  settings: JSON
+
+  """
+  The Event start date and time
+  """
+  startsAt: DateTime!
+
+  """
+  The Event end date and time
+  """
+  endsAt: DateTime!
+}
+
+input CommentUpdateInput {
+  id: String!
+  html: String
+}
+
+input CommentCreateInput {
+  html: String
+
+  """
+  If your comment is linked to an expense, set it here
+  """
+  expense: ExpenseReferenceInput
+  ConversationId: String
+  update: UpdateReferenceInput
+}
+
+input UpdateReferenceInput {
+  """
+  The public id identifying the update
+  """
+  id: String
+}
+
+input ConnectedAccountCreateInput {
+  """
+  Optional Client ID for the token or secret
+  """
+  clientId: String
+
+  """
+  Private data related to the connected account
+  """
+  data: JSON
+
+  """
+  Refresh token for the connected account
+  """
+  refreshToken: String
+
+  """
+  Public data related to the connected account
+  """
+  settings: JSON
+
+  """
+  Secret token used to call service
+  """
+  token: String
+
+  """
+  Service which the connected account belongs to
+  """
+  service: ConnectedAccountService
+
+  """
+  Optional username for the connected account
+  """
+  username: String
+}
+
+input ConnectedAccountReferenceInput {
+  """
+  The public id identifying the connected account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the account (ie: 580)
+  """
+  legacyId: Int
+}
+
+input ExpenseCreateInput {
+  """
+  Main title of the expense
+  """
+  description: String!
+
+  """
+  Longer text to attach to the expense
+  """
+  longDescription: String
+
+  """
+  Currency that should be used for the payout. Defaults to the account currency
+  """
+  currency: Currency
+
+  """
+  Tags associated to the expense (ie. Food, Engineering...)
+  """
+  tags: [String]
+
+  """
+  The type of the expense
+  """
+  type: ExpenseType!
+
+  """
+  A private note that will be attached to your invoice, as HTML
+  """
+  privateMessage: String
+
+  """
+  Custom information to print on the invoice
+  """
+  invoiceInfo: String
+
+  """
+  The payout method that will be used to reimburse the expense
+  """
+  payoutMethod: PayoutMethodInput!
+
+  """
+  The list of items for this expense. Total amount will be computed from them.
+  """
+  items: [ExpenseItemCreateInput]
+
+  """
+  (Optional) A list of files that you want to attach to this expense
+  """
+  attachedFiles: [ExpenseAttachedFileInput!]
+
+  """
+  Account to reimburse
+  """
+  payee: AccountReferenceInput!
+
+  """
+  The address of the payee
+  """
+  payeeLocation: LocationInput
+
+  """
+  The list of taxes that should be applied to the expense (VAT, GST, etc...)
+  """
+  tax: [ExpenseTaxInput]
+}
+
+input PayoutMethodInput {
+  id: String
+  data: JSON
+  name: String
+  isSaved: Boolean
+  type: PayoutMethodType
+}
+
+input ExpenseItemCreateInput {
+  """
+  Amount in cents
+  """
+  amount: Int!
+
+  """
+  What is this item about?
+  """
+  description: String!
+
+  """
+  URL of the file linked to this item. Must be provided if the expense type is RECEIPT.
+  """
+  url: URL
+
+  """
+  When was the money spent?
+  """
+  incurredAt: DateString
+}
+
+scalar DateString
+
+input ExpenseAttachedFileInput {
+  """
+  ID of the file
+  """
+  id: String
+
+  """
+  URL of the file
+  """
+  url: URL!
+}
+
+"""
+Input type for Geographic location
+"""
+input LocationInput {
+  """
+  A short name for the location (eg. Open Collective Headquarters)
+  """
+  name: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
+  country: CountryISO
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
+}
+
+"""
+Input to set taxes for an expense
+"""
+input ExpenseTaxInput {
+  type: TaxType!
+  rate: Float!
+
+  """
+  Tax identification number, if any
+  """
+  idNumber: String
+}
+
+"""
+The type of a tax like GST, VAT, etc
+"""
+enum TaxType {
+  """
+  European Value Added Tax
+  """
+  VAT
+
+  """
+  New Zealand Good and Services Tax
+  """
+  GST
+}
+
 input RecurringExpenseInput {
   """
   The interval in which this recurring expense is created
@@ -11500,6 +11578,11 @@ input ExpenseUpdateInput {
   The address of the payee
   """
   payeeLocation: LocationInput
+
+  """
+  The list of taxes that should be applied to the expense (VAT, GST, etc...)
+  """
+  tax: [ExpenseTaxInput]
 }
 
 input ExpenseItemInput {

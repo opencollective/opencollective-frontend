@@ -131,15 +131,6 @@ summary {
   cursor: pointer;
 }
 
-body.showModal {
-  overflow: hidden;
-}
-
-body.showModal .EventPage {
-  filter: blur(3px);
-  background: rgba(0, 0, 0, 0.6);
-}
-
 body > div:first-child {
   position: relative;
   min-height: 100%;
@@ -148,21 +139,6 @@ body > div:first-child {
 @media (max-width: 600px) {
   html {
     font-size: 55%;
-  }
-}
-
-#root {
-  height: 100%;
-}
-
-.EventPage {
-  position: relative;
-  height: 100%;
-}
-
-@media (max-width: 600px) {
-  .showModal .EventPage {
-    display: none;
   }
 }
 
@@ -215,46 +191,8 @@ a {
   clear: both;
 }
 
-.pullLeft {
-  float: left;
-}
-
-.pullRight {
-  float: right;
-}
-
 .hidden {
   display: none;
-}
-
-.mobileOnly {
-  display: none;
-}
-
-.mediumScreenOnly {
-  display: none;
-}
-
-.desktopOnly {
-  display: none;
-}
-
-@media (min-width: 1024px) {
-  .desktopOnly {
-    display: inherit !important;
-  }
-}
-
-@media (min-width: 420px) and (max-width: 1024px) {
-  .mediumScreenOnly {
-    display: inherit !important;
-  }
-}
-
-@media (max-width: 420px) {
-  .mobileOnly {
-    display: inherit !important;
-  }
 }
 
 #nprogress .spinner {

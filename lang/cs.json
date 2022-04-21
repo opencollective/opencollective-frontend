@@ -97,7 +97,6 @@
   "actions.spam": "Označit jako spam",
   "actions.submitApplication": "Odeslat žádost",
   "actions.unfollow": "Přestat sledovat",
-  "addfunds.fromCollective.host": "Hostitel ({host})",
   "AddFundsModal.disclaimer": "Kliknutím na přidat prostředky souhlasíte s vyčleněním {amount} z Vašeho bankovního účtu pro tento kolektiv.",
   "AddFundsModal.ForThePurpose": "Pro účely",
   "AddFundsModal.FromTheSource": "Ze zdroje",

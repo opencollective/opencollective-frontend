@@ -97,7 +97,6 @@
   "actions.spam": "스팸으로 표시",
   "actions.submitApplication": "신청 제출",
   "actions.unfollow": "팔로우 취소",
-  "addfunds.fromCollective.host": "재정 ({host})",
   "AddFundsModal.disclaimer": "By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective.",
   "AddFundsModal.ForThePurpose": "For the purpose of",
   "AddFundsModal.FromTheSource": "From the source",

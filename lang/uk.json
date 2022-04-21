@@ -97,7 +97,6 @@
   "actions.spam": "Позначити як спам",
   "actions.submitApplication": "Надіслати заявку",
   "actions.unfollow": "Не стежити",
-  "addfunds.fromCollective.host": "Фіскальний вузол ({host})",
   "AddFundsModal.disclaimer": "By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective.",
   "AddFundsModal.ForThePurpose": "Для мети",
   "AddFundsModal.FromTheSource": "З джерела",
