@@ -97,7 +97,6 @@
   "actions.spam": "Marcar como Spam",
   "actions.submitApplication": "Enviar aplicación",
   "actions.unfollow": "Dejar de seguir",
-  "addfunds.fromCollective.host": "Anfitrión ({host})",
   "AddFundsModal.disclaimer": "Haciendo clic en agregar fondos, estás aceptando destinar {amount} con cargo a tu cuenta bancaria en nombre del colectivo.",
   "AddFundsModal.ForThePurpose": "Para el propósito de",
   "AddFundsModal.FromTheSource": "Desde la fuente",

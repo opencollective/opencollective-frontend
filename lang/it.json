@@ -97,7 +97,6 @@
   "actions.spam": "Contrassegna come spam",
   "actions.submitApplication": "Invia la richiesta",
   "actions.unfollow": "Smetti di seguire",
-  "addfunds.fromCollective.host": "Organizzatore ({host})",
   "AddFundsModal.disclaimer": "Cliccando aggiungi fondi, acconsenti a metter da parte {amount} nel tuo conto bancario per conto di questo collettivo.",
   "AddFundsModal.ForThePurpose": "Al fine di",
   "AddFundsModal.FromTheSource": "Dalla fonte",

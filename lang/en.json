@@ -97,7 +97,6 @@
   "actions.spam": "Mark as Spam",
   "actions.submitApplication": "Submit application",
   "actions.unfollow": "Unfollow",
-  "addfunds.fromCollective.host": "Host ({host})",
   "AddFundsModal.disclaimer": "By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective.",
   "AddFundsModal.ForThePurpose": "For the purpose of",
   "AddFundsModal.FromTheSource": "From the source",

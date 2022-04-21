@@ -128,6 +128,7 @@ const CollectivePickerAsync = ({
       placeholder={placeholder}
       types={types}
       useSearchIcon={true}
+      isSearchable
       // Only displays the invite option if no results were found:
       invitable={invitable}
       onInputChange={newTerm => {

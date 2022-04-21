@@ -97,7 +97,6 @@
   "actions.spam": "标记为垃圾邮件",
   "actions.submitApplication": "提交你的申请",
   "actions.unfollow": "取消关注",
-  "addfunds.fromCollective.host": "主管({host})",
   "AddFundsModal.disclaimer": "点击下面的“添加资金”按钮，即表示你同意代表社群在银行帐户中预留{amount}.",
   "AddFundsModal.ForThePurpose": "为以下目的：",
   "AddFundsModal.FromTheSource": "来自外部",

@@ -97,7 +97,6 @@
   "actions.spam": "Als Spam markieren",
   "actions.submitApplication": "Bewerbung einreichen",
   "actions.unfollow": "Nicht mehr folgen",
-  "addfunds.fromCollective.host": "Host ({host})",
   "AddFundsModal.disclaimer": "Indem Sie auf Guthaben hinzufügen klicken, erklären Sie sich damit einverstanden, {amount} im Namen dieses Kollektivs auf Ihrem Bankkonto zurückzulegen.",
   "AddFundsModal.ForThePurpose": "Im Sinne",
   "AddFundsModal.FromTheSource": "Aus der Quelle",

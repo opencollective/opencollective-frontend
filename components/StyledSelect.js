@@ -184,7 +184,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     noOptionsMessage = () => intl.formatMessage(Messages.noOptions),
     options,
   }) => {
-    isSearchable = isSearchable === undefined ? options?.length > 8 : isSearchable;
+    isSearchable = isSearchable ?? options?.length > 8;
     return {
       isSearchable,
       menuPortalTarget: menuPortalTarget === null || typeof document === 'undefined' ? undefined : document.body,
