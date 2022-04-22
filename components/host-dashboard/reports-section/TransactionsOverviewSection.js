@@ -71,7 +71,7 @@ const getChartOptions = (timeUnit, hostCurrency, locale) => {
 
 const constructChartDataPoints = (dataPoints, filterFunc = null) => {
   if (!dataPoints?.nodes?.length) {
-    return null;
+    return [];
   } else {
     const nodes = filterFunc ? dataPoints.nodes.filter(filterFunc) : dataPoints.nodes;
     return nodes.map(({ date, amount }) => ({ x: date, y: Math.abs(amount.value) }));
