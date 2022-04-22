@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
-import { differenceBy } from 'lodash';
+import { difference, flatten, uniq } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -226,19 +226,18 @@ const getSeries = (host, intl) => {
     },
   ];
 
-  /*
-   * If a date doesn't have any contributions or expenses API returns nothing.
-   * But we need to make sure the two series (expenses and contributions) show 0 in these cases rather than NaN which
-   * is shown by default by Apex charts.
-   */
-  if (series[0]?.data && series[1]?.data) {
-    const dataMissingFromSeries0 = differenceBy(series[1].data, series[0].data, 'x');
-    const dataMissingFromSeries1 = differenceBy(series[0].data, series[1].data, 'x');
-    series[0].data.push(...dataMissingFromSeries0.map(({ x }) => ({ x, y: 0 })));
-    series[1].data.push(...dataMissingFromSeries1.map(({ x }) => ({ x, y: 0 })));
-    series[0].data.sort((a, b) => new Date(a.x) - new Date(b.x));
-    series[1].data.sort((a, b) => new Date(a.x) - new Date(b.x));
-  }
+  // If a date doesn't have any data attached, API returns nothing.
+  // But we need to make sure all series show 0 in these cases rather than `NaN` which
+  // is shown by default by Apex charts.
+  const indexesBySeries = series.map(singleSeries => singleSeries.data.map(d => d.x));
+  const uniqueIndexes = uniq(flatten(indexesBySeries));
+  indexesBySeries.forEach((_, idx) => {
+    const missingIndexes = difference(uniqueIndexes, indexesBySeries[idx]);
+    if (missingIndexes.length) {
+      series[idx].data.push(...missingIndexes.map(x => ({ x, y: 0 })));
+      series[idx].data.sort((a, b) => new Date(a.x) - new Date(b.x));
+    }
+  });
 
   return series;
 };
