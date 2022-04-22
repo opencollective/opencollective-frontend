@@ -245,7 +245,7 @@ const ForCollectiveCard = () => {
                 <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
               </StyledButton>
             </Link>
-            <Link href="/hosts">
+            <Link href="/search?isHost=true">
               <StyledButton
                 buttonStyle="secondary"
                 py="8px"
