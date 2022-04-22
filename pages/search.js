@@ -220,6 +220,15 @@ class SearchPage extends React.Component {
     const { router } = this.props;
     const { q } = form;
 
+    /*
+     * Make sure we don't perform the re-fetch if search term is empty
+     *
+     * TODO: Remove this once, https://github.com/opencollective/opencollective/issues/5454 is done
+     */
+    if (q.value?.trim()?.length === 0) {
+      return;
+    }
+
     const query = { q: q.value, type: router.query.type };
     router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
   };

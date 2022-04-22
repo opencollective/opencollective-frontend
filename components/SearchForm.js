@@ -40,9 +40,17 @@ const SearchButton = styled(Flex)`
 
 class SearchForm extends React.Component {
   handleSubmit = event => {
-    const searchInput = event.target.elements.q;
-    this.props.router.push({ pathname: '/search', query: { q: searchInput.value } });
     event.preventDefault();
+    const searchInput = event.target.elements.q;
+    /*
+     * Make sure we don't perform the re-fetch if search term is empty
+     *
+     * TODO: Remove this once, https://github.com/opencollective/opencollective/issues/5454 is done
+     */
+    if (searchInput.value.trim()?.length === 0) {
+      return;
+    }
+    this.props.router.push({ pathname: '/search', query: { q: searchInput.value } });
   };
 
   render() {
