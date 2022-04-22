@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../lib/currency-utils';
+import { i18nTransactionKind } from '../../../lib/i18n/transaction';
 
 import { Box } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -17,7 +18,7 @@ import { formatAmountForLegend } from './helpers';
 // Dynamic imports
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const getChartOptions = (timeUnit, hostCurrency, locale) => {
+const getChartOptions = (intl, timeUnit, hostCurrency, series) => {
   return {
     chart: {
       id: 'chart-transactions-overview',
@@ -26,7 +27,7 @@ const getChartOptions = (timeUnit, hostCurrency, locale) => {
       show: true,
       horizontalAlign: 'left',
     },
-    colors: ['#29CC75', '#256643', '#F55882'],
+    colors: ['#29CC75', '#F55882'],
     grid: {
       xaxis: { lines: { show: true } },
       yaxis: { lines: { show: false } },
@@ -58,24 +59,26 @@ const getChartOptions = (timeUnit, hostCurrency, locale) => {
 
     yaxis: {
       labels: {
-        formatter: value => formatAmountForLegend(value, hostCurrency, locale),
+        formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale),
       },
     },
     tooltip: {
       y: {
-        formatter: value => formatAmountForLegend(value, hostCurrency, locale, false), // Never use compact notation in tooltip
+        formatter: (value, { seriesIndex, dataPointIndex }) => {
+          const formatAmount = amount => formatAmountForLegend(amount, hostCurrency, intl.locale, false); // Never use compact notation in tooltip
+          const dataPoint = series[seriesIndex].data[dataPointIndex];
+          if (dataPoint.kinds && Object.keys(dataPoint.kinds).length > 1) {
+            const formatKindAmount = ([kind, amount]) => `${formatAmount(amount)} ${i18nTransactionKind(intl, kind)}`;
+            const amountsByKind = Object.entries(dataPoint.kinds).map(formatKindAmount).join(', ');
+            const prettyKindAmounts = `<small style="font-weight: normal; text-transform: lowercase;">(${amountsByKind})</small>`;
+            return `${formatAmount(value)} ${prettyKindAmounts}`;
+          } else {
+            return formatAmount(value);
+          }
+        },
       },
     },
   };
-};
-
-const constructChartDataPoints = (dataPoints, filterFunc = null) => {
-  if (!dataPoints?.nodes?.length) {
-    return [];
-  } else {
-    const nodes = filterFunc ? dataPoints.nodes.filter(filterFunc) : dataPoints.nodes;
-    return nodes.map(({ date, amount }) => ({ x: date, y: Math.abs(amount.value) }));
-  }
 };
 
 const getTransactionsAreaChartData = (host, locale) => {
@@ -209,20 +212,34 @@ const getTransactionsBreakdownChartData = host => {
   return areas;
 };
 
+/**
+ * Transforms a list of datapoints like [{ date, kind, amount }] into a series like:
+ * `[{ x: date, y: 3000, kinds: { ADDED_FUNDS: 2000, CONTRIBUTION: 1000 } }]`
+ */
+const getSeriesDataFromTotalReceivedNodes = nodes => {
+  const keyedData = {};
+  nodes.forEach(({ date, amount, kind }) => {
+    if (!keyedData[date]) {
+      keyedData[date] = { x: date, y: 0, kinds: {} };
+    }
+
+    keyedData[date].y += amount.value;
+    keyedData[date]['kinds'][kind] = amount.value;
+  });
+
+  return Object.values(keyedData);
+};
+
 const getSeries = (host, intl) => {
-  const timeSeries = host?.hostMetricsTimeSeries || {};
+  const getNodes = timeSeries => host?.hostMetricsTimeSeries?.[timeSeries]?.nodes || [];
   const series = [
     {
       name: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
-      data: constructChartDataPoints(timeSeries.totalReceived, node => node.kind === 'CONTRIBUTION'),
-    },
-    {
-      name: intl.formatMessage({ id: 'Transaction.kind.ADDED_FUNDS', defaultMessage: 'Added funds' }),
-      data: constructChartDataPoints(timeSeries.totalReceived, node => node.kind === 'ADDED_FUNDS'),
+      data: getSeriesDataFromTotalReceivedNodes(getNodes('totalReceived')),
     },
     {
       name: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
-      data: constructChartDataPoints(timeSeries.totalSpent),
+      data: getNodes('totalSpent').map(({ date, amount }) => ({ x: date, y: Math.abs(amount.value) })),
     },
   ];
 
@@ -269,7 +286,7 @@ const TransactionsOverviewSection = ({ host, isLoading }) => {
             type="area"
             width="100%"
             height="250px"
-            options={getChartOptions(timeUnit, host.currency, locale)}
+            options={getChartOptions(intl, timeUnit, host.currency, series)}
             series={series}
           />
         )}
