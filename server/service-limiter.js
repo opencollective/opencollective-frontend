@@ -2,7 +2,7 @@ const debug = require('debug');
 
 const logger = require('./logger');
 
-const nonEssentialRobots = ['Ahrefs', 'Bluechip Backlinks', 'Semrush', 'SpiderFoot', 'WebMeUp'];
+const nonEssentialRobots = ['Ahrefs', 'Bluechip Backlinks', 'PetalBot', 'Semrush', 'Shenma', 'SpiderFoot', 'WebMeUp'];
 
 const essentialRobots = ['Facebook', 'Pingdom', 'Twitter'];
 
