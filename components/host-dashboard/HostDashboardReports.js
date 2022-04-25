@@ -61,32 +61,11 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
         dailyAverageIncomeAmount {
           valueInCents
         }
-        contributionAmountOverTime {
-          timeUnit
-          nodes {
-            date
-            amount {
-              value
-              valueInCents
-              currency
-            }
-          }
-        }
       }
       expenseStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
         expensesCount
         dailyAverageAmount {
           valueInCents
-        }
-        expenseAmountOverTime {
-          nodes {
-            date
-            amount {
-              value
-              valueInCents
-              currency
-            }
-          }
         }
         invoicesCount
         reimbursementsCount
@@ -120,6 +99,29 @@ const hostReportPageQuery = gqlV2/* GraphQL */ `
         totalMoneyManaged {
           valueInCents
           currency
+        }
+      }
+      hostMetricsTimeSeries(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
+        timeUnit
+        totalReceived {
+          timeUnit
+          nodes {
+            date
+            kind
+            amount {
+              value
+            }
+          }
+        }
+        totalSpent {
+          timeUnit
+          nodes {
+            date
+            kind
+            amount {
+              value
+            }
+          }
         }
       }
     }

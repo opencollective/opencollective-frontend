@@ -15,6 +15,8 @@ import StyledSpinner from '../../StyledSpinner';
 import { P } from '../../Text';
 
 import { formatAmountForLegend, getActiveYearsOptions, getMinMaxDifference } from './helpers';
+
+// Dynamic imports
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const totalMoneyManagedQuery = gqlV2/* GraphQL */ `
@@ -97,6 +99,11 @@ const getChartOptions = (intl, hostCurrency, isCompactNotation) => ({
     labels: {
       minWidth: 38,
       formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale, isCompactNotation),
+    },
+  },
+  tooltip: {
+    y: {
+      formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale, false), // Never use compact notation in tooltip
     },
   },
 });
