@@ -1475,8 +1475,6 @@
   "HostFee.MonthlyRetainer": "Monthly retainer",
   "HostFeesSection.Title": "Host Fees per year",
   "HostingSince": "Представитель с",
-  "hosts.description": "<FiscalHostingLink>Fiscal Hosts</FiscalHostingLink> hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. <FindOutMoreLink>Find out more</FindOutMoreLink> about <BecomingAHostLink>becoming a Fiscal Host</BecomingAHostLink>.",
-  "hosts.title": "Представители Open Collective",
   "HostSince": "Представитель с",
   "howItWorks": "Как это работает",
   "howItWorks.becomeHost": "О том, как стать фискальным представителем",
