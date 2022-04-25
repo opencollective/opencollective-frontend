@@ -9,7 +9,6 @@ import styled from 'styled-components';
 import { maxWidth } from 'styled-system';
 
 import { formatCurrency } from '../lib/currency-utils';
-import { subscriptionsQuery } from '../lib/graphql/queries';
 import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
 import { compose } from '../lib/utils';
 
@@ -45,21 +44,30 @@ const AlignedBullets = styled.ul`
 `;
 
 class UpdatePaymentPage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, id } }) {
-    return { slug: collectiveSlug, id: Number(id) };
+  static getInitialProps({ query: { paymentMethodId } }) {
+    return { paymentMethodId: parseInt(paymentMethodId) };
   }
 
   static propTypes = {
-    collective: PropTypes.object,
-    slug: PropTypes.string,
-    id: PropTypes.number,
+    paymentMethodId: PropTypes.number,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
-    data: PropTypes.object,
-    subscriptions: PropTypes.array,
     intl: PropTypes.object.isRequired,
     replaceCreditCard: PropTypes.func.isRequired,
     loadStripe: PropTypes.func.isRequired,
+    data: PropTypes.shape({
+      refetch: PropTypes.func,
+      loading: PropTypes.bool,
+      error: PropTypes.any,
+      PaymentMethod: PropTypes.shape({
+        id: PropTypes.number,
+        orders: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.number,
+          }),
+        ),
+      }),
+    }),
   };
 
   state = {
@@ -101,7 +109,7 @@ class UpdatePaymentPage extends React.Component {
           variables: {
             CollectiveId: this.props.LoggedInUser.collective.id,
             ...paymentMethod,
-            id: parseInt(this.props.id),
+            id: parseInt(this.props.paymentMethodId),
           },
         });
         const updatedCreditCard = res.data.replaceCreditCard;
@@ -184,10 +192,9 @@ class UpdatePaymentPage extends React.Component {
       return <ErrorPage data={data} />;
     }
 
-    const filteredSubscriptions = this.props.subscriptions.filter(
-      sub => sub.paymentMethod && sub.paymentMethod.id === this.props.id,
-    );
-
+    const orders = data.PaymentMethod?.orders || [];
+    const hasForm = showCreditCardForm && Boolean(data.PaymentMethod);
+    const contributingAccount = orders?.[0]?.fromCollective || LoggedInUser.collective;
     return (
       <div className="UpdatedPaymentMethodPage">
         <Page>
@@ -199,65 +206,70 @@ class UpdatePaymentPage extends React.Component {
                 </H1>
               </Box>
 
-              <Box mt={3}>
-                <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
-                  <Box>
-                    <FormattedMessage
-                      id="updatePaymentMethod.subtitle.line"
-                      defaultMessage="Please add a new payment method for the following subscriptions before your current one expires."
-                    />
+              {Boolean(data.PaymentMethod) && (
+                <React.Fragment>
+                  <Box mt={3}>
+                    <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+                      <Box>
+                        <FormattedMessage
+                          id="updatePaymentMethod.subtitle.line"
+                          defaultMessage="Please add a new payment method for the following subscriptions before your current one expires."
+                        />
+                      </Box>
+                    </Subtitle>
                   </Box>
-                </Subtitle>
-              </Box>
 
-              <Box mt={3}>
-                <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
-                  <Box alignItems="left">
-                    <AlignedBullets>
-                      {filteredSubscriptions.map(sub => {
-                        return (
-                          <li key={sub.id}>
-                            {sub.collective.name}:{' '}
-                            {formatCurrency(sub.totalAmount, sub.currency, {
-                              precision: 2,
-                              locale: intl.locale,
-                            })}{' '}
-                            ({sub.interval}ly)
-                          </li>
-                        );
-                      })}
-                    </AlignedBullets>
+                  <Box mt={3}>
+                    <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+                      <Box alignItems="left">
+                        <AlignedBullets>
+                          {orders.map(order => {
+                            return (
+                              <li key={order.id}>
+                                {order.collective.name}:{' '}
+                                {formatCurrency(order.totalAmount, order.currency, {
+                                  precision: 2,
+                                  locale: intl.locale,
+                                })}{' '}
+                                ({order.interval}ly)
+                              </li>
+                            );
+                          })}
+                        </AlignedBullets>
+                      </Box>
+                    </Subtitle>
                   </Box>
-                </Subtitle>
-              </Box>
+                </React.Fragment>
+              )}
             </HappyBackground>
             <Flex alignItems="center" flexDirection="column" mt={-175} mb={4}>
               <Container mt={54} zIndex={2}>
                 <Flex justifyContent="center" alignItems="center" flexDirection="column">
                   <Container background="white" borderRadius="16px" maxWidth="600px">
                     <ShadowBox py="24px" px="32px" minWidth="500px">
-                      {showCreditCardForm && (
+                      {hasForm ? (
                         <Box mr={2} css={{ flexGrow: 1 }}>
                           <NewCreditCardForm
                             name="newCreditCardInfo"
-                            profileType={get(this.props.collective, 'type')}
                             hasSaveCheckBox={false}
                             onChange={newCreditCardInfo => this.setState({ newCreditCardInfo, error: null })}
                             onReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
                           />
                         </Box>
-                      )}
-                      {!showCreditCardForm && error}
-                      {!showCreditCardForm && success && (
+                      ) : error ? (
+                        error
+                      ) : success ? (
                         <FormattedMessage
                           id="updatePaymentMethod.form.success"
                           defaultMessage="Your new card info has been added"
                         />
+                      ) : (
+                        <FormattedMessage defaultMessage="This payment method does not exist or has already been updated" />
                       )}
                     </ShadowBox>
                   </Container>
                   <Flex mt={5} mb={4} px={2} flexDirection="column" alignItems="center">
-                    {showCreditCardForm && (
+                    {hasForm && (
                       <StyledButton
                         buttonStyle="primary"
                         buttonSize="large"
@@ -276,11 +288,12 @@ class UpdatePaymentPage extends React.Component {
                         />
                       </StyledButton>
                     )}
-                    {!showCreditCardForm && error && (
+                    {!hasForm && error && (
                       <StyledButton
                         buttonStyle="primary"
                         buttonSize="large"
                         mb={2}
+                        mt={3}
                         maxWidth={335}
                         width={1}
                         onClick={this.handleReload}
@@ -291,22 +304,24 @@ class UpdatePaymentPage extends React.Component {
                         />
                       </StyledButton>
                     )}
-                    {!showCreditCardForm && success && (
-                      <Link href={`/${this.props.slug}`}>
-                        <StyledButton
-                          buttonStyle="primary"
-                          buttonSize="large"
-                          mb={2}
-                          maxWidth={335}
-                          width={1}
-                          textTransform="capitalize"
-                        >
-                          <FormattedMessage
-                            id="updatePaymentMethod.form.updatePaymentMethodSuccess.btn"
-                            defaultMessage="Go to profile page"
-                          />
-                        </StyledButton>
-                      </Link>
+                    {!hasForm && success && (
+                      <Box mt={3}>
+                        <Link href={`/${contributingAccount.slug}`}>
+                          <StyledButton
+                            buttonStyle="primary"
+                            buttonSize="large"
+                            mb={2}
+                            maxWidth={335}
+                            width={1}
+                            textTransform="capitalize"
+                          >
+                            <FormattedMessage
+                              id="updatePaymentMethod.form.updatePaymentMethodSuccess.btn"
+                              defaultMessage="Go to profile page"
+                            />
+                          </StyledButton>
+                        </Link>
+                      </Box>
                     )}
                   </Flex>
                 </Flex>
@@ -335,32 +350,37 @@ const replaceCreditCardMutation = gql`
   }
 `;
 
+const subscriptionsQuery = gql`
+  query UpdateSubscriptionsForPaymentMethod($paymentMethodId: Int) {
+    PaymentMethod(id: $paymentMethodId) {
+      id
+      orders(hasActiveSubscription: true) {
+        id
+        currency
+        totalAmount
+        interval
+        createdAt
+        fromCollective {
+          id
+          name
+          slug
+        }
+        collective {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
+
 const addReplaceCreditCardMutation = graphql(replaceCreditCardMutation, {
   name: 'replaceCreditCard',
 });
 
 const addSubscriptionsData = graphql(subscriptionsQuery, {
-  options: props => ({
-    variables: {
-      slug: props.slug,
-    },
-  }),
-
   skip: props => {
     return props.loadingLoggedInUser || !props.LoggedInUser;
-  },
-
-  props: ({ data }) => {
-    let subscriptions = [];
-
-    if (data && data.Collective) {
-      subscriptions = data.Collective.ordersFromCollective.filter(sub => sub.isSubscriptionActive === true);
-    }
-
-    return {
-      data,
-      subscriptions,
-    };
   },
 });
 

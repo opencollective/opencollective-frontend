@@ -59,6 +59,7 @@
   "9sbPks": "Par défaut, toutes les dates sont filtrées et affichées en utilisant votre fuseau horaire local. Vous pouvez basculer vers l'UTC pour indiquer que les dates fournies ci-dessus utilisent le format Temps Universel Coordonné, qui correspond au format utilisé pour les échanges d'e-mails",
   "9WIrrf": "Tax and Total",
   "A+AIST": "Attached file {number}",
+  "a3HMfz": "This payment method does not exist or has already been updated",
   "Accept": "Accepter",
   "acceptContributions.addBankAccount": "Ajouter un compte bancaire",
   "acceptContributions.bankAccount.info": "Accepter les contributions par virement bancaire. Le budget sera mis à jour lorsque vous confirmerez la réception des fonds.",
