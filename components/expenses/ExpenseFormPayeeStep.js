@@ -220,7 +220,7 @@ const ExpenseFormPayeeStep = ({
               );
 
               const payee = existingProfile || {
-                ...pick(value, ['id', 'name', 'slug', 'email']),
+                ...pick(value, ['id', 'name', 'slug', 'email', 'type']),
                 isInvite: !isNewlyCreatedProfile,
               };
 
