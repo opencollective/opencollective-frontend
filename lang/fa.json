@@ -59,6 +59,7 @@
   "9sbPks": "By default, all dates are filtered and displayed using your local timezone. You can switch to UTC to indicate that the dates provided above use the Coordinated Universal Time format, which matches how email reports are generated",
   "9WIrrf": "Tax and Total",
   "A+AIST": "Attached file {number}",
+  "a3HMfz": "This payment method does not exist or has already been updated",
   "Accept": "تایید",
   "acceptContributions.addBankAccount": "اضافه کردن حساب بانکی",
   "acceptContributions.bankAccount.info": "Accept contributions via bank transfer. The budget will update when you confirm receipt of funds.",
