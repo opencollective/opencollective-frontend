@@ -5,6 +5,7 @@ import { injectIntl, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../../lib/collective.lib';
+import { getIntlDisplayNames } from '../../lib/i18n';
 
 import { IGNORED_TAGS } from '../../pages/search';
 import Avatar from '../Avatar';
@@ -159,7 +160,7 @@ const StyledCollectiveCard = ({
   ...props
 }) => {
   const intl = useIntl();
-  const regionNames = new Intl.DisplayNames(intl.locale, { type: 'region' });
+  const regionNames = getIntlDisplayNames(intl.locale, 'region');
   const countryString = collective.location?.country
     ? `${getFlagEmoji(collective.location.country)} ${regionNames.of(collective.location.country)}`
     : null;
