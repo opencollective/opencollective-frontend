@@ -56,19 +56,20 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   static async getInitialProps({ Component, ctx, client }) {
-    try {
-      let pageProps = {};
+    // Get the `locale` and `messages` from the request object on the server.
+    // In the browser, use the same values that the server serialized.
+    const { locale, messages } = ctx?.req || window.__NEXT_DATA__.props;
+    const props = { pageProps: {}, scripts: {}, locale, messages };
 
+    try {
       if (Component.getInitialProps) {
-        pageProps = await Component.getInitialProps({ ...ctx, client });
+        props.pageProps = await Component.getInitialProps({ ...ctx, client });
       }
 
-      const scripts = {};
-
-      if (pageProps.scripts) {
-        if (pageProps.scripts.googleMaps) {
+      if (props.pageProps.scripts) {
+        if (props.pageProps.scripts.googleMaps) {
           if (ctx.req) {
-            scripts['google-maps'] = getGoogleMapsScriptUrl();
+            props.scripts['google-maps'] = getGoogleMapsScriptUrl();
           } else {
             try {
               await loadGoogleMaps();
@@ -79,16 +80,11 @@ class OpenCollectiveFrontendApp extends App {
           }
         }
       }
-
-      // Get the `locale` and `messages` from the request object on the server.
-      // In the browser, use the same values that the server serialized.
-      const { req } = ctx;
-      const { locale, messages } = req || window.__NEXT_DATA__.props;
-
-      return { pageProps, scripts, locale, messages };
     } catch (error) {
-      return { hasError: true, errorEventId: sentryLib.captureException(error, ctx) };
+      return { ...props, hasError: true, errorEventId: sentryLib.captureException(error, ctx) };
     }
+
+    return props;
   }
 
   static getDerivedStateFromProps(props, state) {
