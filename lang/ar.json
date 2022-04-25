@@ -59,6 +59,7 @@
   "9sbPks": "بشكل افتراضي، يتم تصفية جميع التواريخ وعرضها باستخدام المنطقة الزمنية المحلية الخاصة بك. يمكنك الانتقال إلى UTC للإشارة إلى أن التواريخ المقدمة أعلاه تستخدم تنسيق التوقيت العالمي، الذي يتطابق مع آلية إنشاء تقارير البريد الإلكتروني",
   "9WIrrf": "Tax and Total",
   "A+AIST": "Attached file {number}",
+  "a3HMfz": "This payment method does not exist or has already been updated",
   "Accept": "قبول",
   "acceptContributions.addBankAccount": "إضافة حساب مصرفي",
   "acceptContributions.bankAccount.info": "قبول المساهمات عن طريق التحويل البنكي. سيتم تحديث الميزانية عند تأكيد استلام الأموال.",
