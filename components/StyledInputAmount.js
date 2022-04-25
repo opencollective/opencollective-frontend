@@ -6,6 +6,7 @@ import { useIntl } from 'react-intl';
 
 import { Currency } from '../lib/constants/currency';
 import { floatAmountToCents, getCurrencySymbol } from '../lib/currency-utils';
+import { getIntlDisplayNames } from '../lib/i18n';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -45,14 +46,10 @@ const getError = (curVal, minAmount, required) => {
   return Boolean((required && isNil(curVal)) || (minAmount && curVal < minAmount));
 };
 
-const i18nCurrencyName = (intl, currency) => {
-  const currencyNames = new Intl.DisplayNames(intl.locale, { type: 'currency' });
-  return currencyNames.of(currency);
-};
-
 const generateCurrencyOptions = (intl, availableCurrencies) => {
+  const currencyDisplayNames = getIntlDisplayNames(intl.locale, 'currency');
   return availableCurrencies.map(currency => {
-    const currencyName = i18nCurrencyName(intl, currency);
+    const currencyName = currencyDisplayNames.of(currency);
     const emoji = getEmojiByCurrencyCode(currency);
     return {
       value: currency,

@@ -6,15 +6,11 @@ import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import fetchGeoLocation from '../lib/geolocation_api';
+import { getIntlDisplayNames } from '../lib/i18n';
 
 import { Flex } from './Grid';
 import StyledSelect from './StyledSelect';
 import { Span } from './Text';
-
-export const getCountryName = (locale, country) => {
-  const countryNames = new Intl.DisplayNames(locale, { type: 'region' });
-  return countryNames.of(country);
-};
 
 class InputTypeCountry extends Component {
   static propTypes = {
@@ -46,6 +42,11 @@ class InputTypeCountry extends Component {
 
   static defaultProps = { name: 'country', customOptions: [] };
 
+  constructor(props) {
+    super(props);
+    this.countryNames = getIntlDisplayNames(props.intl.locale, 'region');
+  }
+
   async componentDidMount() {
     if (this.props.autoDetect && !this.props.value && !this.props.defaultValue) {
       const country = await fetchGeoLocation();
@@ -58,7 +59,7 @@ class InputTypeCountry extends Component {
   }
 
   generateCountryLabel(locale, countryCode) {
-    const countryName = getCountryName(locale, countryCode);
+    const countryName = this.countryNames.of(countryCode);
     const emoji = getEmojiByCountryCode(countryCode);
     return (
       <Flex fontSize="14px" lineHeight="20px" fontWeight="500" title={countryName}>
