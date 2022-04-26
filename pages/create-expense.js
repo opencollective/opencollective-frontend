@@ -212,10 +212,10 @@ class CreateExpensePage extends React.Component {
           'recipientNote',
           'items',
           'attachedFiles',
-          'payee',
           'payeeLocation',
           'payoutMethod',
         ]);
+        expenseDraft['payee'] = pick(expense.payee, ['id', 'slug', 'name', 'email', 'isInvite', 'organization']);
         const result = await this.props.draftExpenseAndInviteUser({
           variables: {
             account: { id: this.props.data.account.id },
