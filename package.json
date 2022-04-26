@@ -62,6 +62,7 @@
     "focus-trap-react": "8.9.2",
     "formik": "2.2.9",
     "glob": "7.2.0",
+    "google-calendar-url": "0.0.5",
     "graphql": "16.3.0",
     "helmet": "5.0.2",
     "jsdom": "19.0.0",

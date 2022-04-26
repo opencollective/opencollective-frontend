@@ -13,6 +13,8 @@ import Link from '../Link';
 import StyledLink from '../StyledLink';
 import { H3, P, Span } from '../Text';
 
+import { googleCalendarEventUrl } from 'google-calendar-url';
+
 export const SUCCESS_CTA_TYPE = {
   NEWSLETTER: 'NEWSLETTER',
   BLOG: 'BLOG',
@@ -134,9 +136,20 @@ const SuccessCTAWrapper = ({ type, orderId, email, account, ...props }) => {
       return <StyledLink href="https://blog.opencollective.com" openInNewTab color="black.800" {...props} />;
     case SUCCESS_CTA_TYPE.GO_TO_PROFILE:
       return <StyledLink as={Link} href={getCollectivePageRoute(account)} color="black.800" {...props} />;
-    case SUCCESS_CTA_TYPE.CALENDAR:
-      return <StyledLink as={Link} href={'https://calendar.google.com/'} color="black.800" {...props} />;
-    // TODO(kai): use add-to-calendar component
+    case SUCCESS_CTA_TYPE.CALENDAR: {
+      const url = googleCalendarEventUrl({
+        start: '20201212T100000Z',
+        end: '20201212T110000Z',
+        title: 'Event title',
+        details: 'Event details',
+        location: 'San Francisco',
+      });
+
+      console.log('url', url);
+
+      return <StyledLink as={Link} href={url} color="black.800" {...props} />;
+    }
+    // TODO(kai): use add-to-calendar component with correct URL
     default:
       return <React.Fragment {...props} />;
   }

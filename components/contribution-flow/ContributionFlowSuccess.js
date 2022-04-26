@@ -121,7 +121,8 @@ class ContributionFlowSuccess extends React.Component {
     const isGuest = get(data, 'order.fromAccount.isGuest');
     const email = get(router, 'query.email') ? decodeURIComponent(router.query.email) : null;
 
-    console.log('data', data, 'collective', collective);
+    console.log('data', data);
+    console.log('collective', collective);
 
     if (!isEmbed) {
       if (!LoggedInUser) {
