@@ -24,6 +24,8 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
       }
       taxInfo {
         id
+        rate
+        type
       }
       platformFee {
         currency

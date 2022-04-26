@@ -147,6 +147,33 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
 });
 
 /**
+ * Calls the mutation to edit the settings of an account
+ */
+Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserEmail) => {
+  return signinRequestAndReturnToken({ email: userEmail }).then(token => {
+    return graphqlQuery(token, {
+      operationName: 'EditCollective',
+      query: `
+        mutation EditCollective($collective: CollectiveInputType!) {
+          editCollective(collective: $collective) {
+            id
+            slug
+            name
+            settings
+            location {
+              country
+            }
+          }
+        }
+      `,
+      variables: { collective },
+    }).then(({ body }) => {
+      return body.data.createCollective;
+    });
+  });
+});
+
+/**
  * Create a collective. Admin will be the user designated by `email`. If not
  * provided, the email used will default to `defaultTestUserEmail`.
  */

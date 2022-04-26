@@ -25,6 +25,7 @@ const sendMessage = (options = {}) => {
 
   return new Promise((resolve, reject) => {
     getMailgun().sendMail({ from, cc, to, bcc, subject, text, html, headers, attachments }, (err, info) => {
+      // eslint-disable-next-line no-console
       console.log({ err, info });
       if (err) {
         return reject(err);

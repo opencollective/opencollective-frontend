@@ -284,6 +284,7 @@ class CollectivePicker extends React.PureComponent {
       width,
       addLoggedInUserAsAdmin,
       renderNewCollectiveOption,
+      isSearchable,
       ...props
     } = this.props;
     const { createFormCollectiveType, createdCollectives, displayInviteMenu, searchText } = this.state;
@@ -313,6 +314,7 @@ class CollectivePicker extends React.PureComponent {
                 value={this.getValue()}
                 onChange={this.onChange}
                 noOptionsMessage={searchText ? undefined : () => null}
+                isSearchable={isSearchable ?? true}
                 formatOptionLabel={(option, context) => {
                   if (option[FLAG_COLLECTIVE_PICKER_COLLECTIVE]) {
                     return formatOptionLabel(option, context, intl);

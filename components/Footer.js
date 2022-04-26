@@ -169,7 +169,7 @@ const navigation = {
     createACollective: '/create',
     aboutFiscalHosting: '/fiscal-hosting',
     discover: '/discover',
-    findAFiscalHost: '/hosts',
+    findAFiscalHost: '/search?isHost=true',
     becomeASponsor: '/become-a-sponsor',
     becomeAHost: '/become-a-host',
   },
@@ -177,7 +177,6 @@ const navigation = {
     openSource: 'https://github.com/opencollective/opencollective/issues',
     Slack: 'https://slack.opencollective.com',
     docsAndHelp: '/help',
-    support: '/support',
   },
   company: {
     about: 'https://docs.opencollective.com/help/about/introduction',

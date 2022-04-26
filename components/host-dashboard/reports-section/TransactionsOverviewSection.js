@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
-import { differenceBy } from 'lodash';
+import { difference, flatten, uniq } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../lib/currency-utils';
+import { i18nTransactionKind } from '../../../lib/i18n/transaction';
 
 import { Box } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -13,9 +14,11 @@ import ProportionalAreaChart from '../../ProportionalAreaChart';
 import { P, Span } from '../../Text';
 
 import { formatAmountForLegend } from './helpers';
+
+// Dynamic imports
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const getChartOptions = (timeUnit, hostCurrency, locale) => {
+const getChartOptions = (intl, timeUnit, hostCurrency, series) => {
   return {
     chart: {
       id: 'chart-transactions-overview',
@@ -56,14 +59,26 @@ const getChartOptions = (timeUnit, hostCurrency, locale) => {
 
     yaxis: {
       labels: {
-        formatter: value => formatAmountForLegend(value, hostCurrency, locale),
+        formatter: value => formatAmountForLegend(value, hostCurrency, intl.locale),
+      },
+    },
+    tooltip: {
+      y: {
+        formatter: (value, { seriesIndex, dataPointIndex }) => {
+          const formatAmount = amount => formatAmountForLegend(amount, hostCurrency, intl.locale, false); // Never use compact notation in tooltip
+          const dataPoint = series[seriesIndex].data[dataPointIndex];
+          if (dataPoint.kinds && Object.keys(dataPoint.kinds).length > 1) {
+            const formatKindAmount = ([kind, amount]) => `${formatAmount(amount)} ${i18nTransactionKind(intl, kind)}`;
+            const amountsByKind = Object.entries(dataPoint.kinds).map(formatKindAmount).join(', ');
+            const prettyKindAmounts = `<small style="font-weight: normal; text-transform: lowercase;">(${amountsByKind})</small>`;
+            return `${formatAmount(value)} ${prettyKindAmounts}`;
+          } else {
+            return formatAmount(value);
+          }
+        },
       },
     },
   };
-};
-
-const constructChartDataPoints = dataPoints => {
-  return dataPoints.map(({ date, amount }) => ({ x: date, y: Math.abs(amount.value) }));
 };
 
 const getTransactionsAreaChartData = (host, locale) => {
@@ -197,42 +212,58 @@ const getTransactionsBreakdownChartData = host => {
   return areas;
 };
 
-const TransactionsOverviewSection = ({ host, isLoading }) => {
-  const intl = useIntl();
-  const { locale } = intl;
+/**
+ * Transforms a list of datapoints like [{ date, kind, amount }] into a series like:
+ * `[{ x: date, y: 3000, kinds: { ADDED_FUNDS: 2000, CONTRIBUTION: 1000 } }]`
+ */
+const getSeriesDataFromTotalReceivedNodes = nodes => {
+  const keyedData = {};
+  nodes.forEach(({ date, amount, kind }) => {
+    if (!keyedData[date]) {
+      keyedData[date] = { x: date, y: 0, kinds: {} };
+    }
 
-  const contributionStats = host?.contributionStats;
-  const expenseStats = host?.expenseStats;
+    keyedData[date].y += amount.value;
+    keyedData[date]['kinds'][kind] = amount.value;
+  });
 
-  const { contributionAmountOverTime } = contributionStats || 0;
-  const { expenseAmountOverTime } = expenseStats || 0;
-  const timeUnit = contributionAmountOverTime?.timeUnit;
+  return Object.values(keyedData);
+};
 
+const getSeries = (host, intl) => {
+  const getNodes = timeSeries => host?.hostMetricsTimeSeries?.[timeSeries]?.nodes || [];
   const series = [
     {
-      name: 'Contributions',
-      data: contributionAmountOverTime ? constructChartDataPoints(contributionAmountOverTime.nodes) : null,
+      name: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
+      data: getSeriesDataFromTotalReceivedNodes(getNodes('totalReceived')),
     },
     {
-      name: 'Expenses',
-      data: expenseAmountOverTime ? constructChartDataPoints(expenseAmountOverTime.nodes) : null,
+      name: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
+      data: getNodes('totalSpent').map(({ date, amount }) => ({ x: date, y: Math.abs(amount.value) })),
     },
   ];
 
-  /*
-   * If a date doesn't have any contributions or expenses API returns nothing.
-   * But we need to make sure the two series (expenses and contributions) show 0 in these cases rather than NaN which
-   * is shown by default by Appex charts.
-   */
-  if (series[0]?.data && series[1]?.data) {
-    const dataMissingFromSeries0 = differenceBy(series[1].data, series[0].data, 'x');
-    const dataMissingFromSeries1 = differenceBy(series[0].data, series[1].data, 'x');
-    series[0].data.push(...dataMissingFromSeries0.map(({ x }) => ({ x, y: 0 })));
-    series[1].data.push(...dataMissingFromSeries1.map(({ x }) => ({ x, y: 0 })));
-    series[0].data.sort((a, b) => new Date(a.x) - new Date(b.x));
-    series[1].data.sort((a, b) => new Date(a.x) - new Date(b.x));
-  }
+  // If a date doesn't have any data attached, API returns nothing.
+  // But we need to make sure all series show 0 in these cases rather than `NaN` which
+  // is shown by default by Apex charts.
+  const indexesBySeries = series.map(singleSeries => singleSeries.data.map(d => d.x));
+  const uniqueIndexes = uniq(flatten(indexesBySeries));
+  indexesBySeries.forEach((_, idx) => {
+    const missingIndexes = difference(uniqueIndexes, indexesBySeries[idx]);
+    if (missingIndexes.length) {
+      series[idx].data.push(...missingIndexes.map(x => ({ x, y: 0 })));
+      series[idx].data.sort((a, b) => new Date(a.x) - new Date(b.x));
+    }
+  });
 
+  return series;
+};
+
+const TransactionsOverviewSection = ({ host, isLoading }) => {
+  const intl = useIntl();
+  const { locale } = intl;
+  const timeUnit = host?.hostMetricsTimeSeries?.timeUnit;
+  const series = React.useMemo(() => getSeries(host, intl), [host]);
   const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host, locale), [host, locale]);
   const transactionBreakdownChart = React.useMemo(() => getTransactionsBreakdownChartData(host), [host]);
   return (
@@ -255,7 +286,7 @@ const TransactionsOverviewSection = ({ host, isLoading }) => {
             type="area"
             width="100%"
             height="250px"
-            options={getChartOptions(timeUnit, host.currency, locale)}
+            options={getChartOptions(intl, timeUnit, host.currency, series)}
             series={series}
           />
         )}
@@ -270,21 +301,25 @@ TransactionsOverviewSection.propTypes = {
     slug: PropTypes.string.isRequired,
     currency: PropTypes.string,
     createdAt: PropTypes.string,
-    contributionStats: PropTypes.shape({
-      contributionsCount: PropTypes.number,
-      oneTimeContributionsCount: PropTypes.number,
-      recurringContributionsCount: PropTypes.number,
-      dailyAverageIncomeAmount: PropTypes.shape({
-        value: PropTypes.number,
+    hostMetricsTimeSeries: PropTypes.shape({
+      timeUnit: PropTypes.string,
+      totalReceived: PropTypes.shape({
+        nodes: PropTypes.shape({
+          date: PropTypes.string,
+          kind: PropTypes.string,
+          amount: PropTypes.shape({
+            valueInCents: PropTypes.number,
+          }),
+        }),
       }),
-    }),
-    expenseStats: PropTypes.shape({
-      expensesCount: PropTypes.number,
-      invoicesCount: PropTypes.number,
-      reimbursementsCount: PropTypes.number,
-      grantsCount: PropTypes.number,
-      dailyAverageAmount: PropTypes.shape({
-        value: PropTypes.number,
+      totalSpent: PropTypes.shape({
+        nodes: PropTypes.shape({
+          date: PropTypes.string,
+          kind: PropTypes.string,
+          amount: PropTypes.shape({
+            valueInCents: PropTypes.number,
+          }),
+        }),
       }),
     }),
   }),

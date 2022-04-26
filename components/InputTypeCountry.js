@@ -1,30 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import countriesEN from 'i18n-iso-countries/langs/en.json';
-import countriesFR from 'i18n-iso-countries/langs/fr.json';
-import countriesPT from 'i18n-iso-countries/langs/pt.json';
-import { isUndefined, orderBy, truncate } from 'lodash';
+import { countryData, getEmojiByCountryCode } from 'country-currency-emoji-flags';
+import { isUndefined, orderBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import fetchGeoLocation from '../lib/geolocation_api';
+import { getIntlDisplayNames } from '../lib/i18n';
 
+import { Flex } from './Grid';
 import StyledSelect from './StyledSelect';
-
-const COUNTRY_NAMES = {
-  en: countriesEN.countries,
-  fr: countriesFR.countries,
-  pt: countriesPT.countries,
-};
-
-const getCountryName = (locale, country) => {
-  const names = COUNTRY_NAMES[locale]?.[country] ?? COUNTRY_NAMES.en[country];
-  if (Array.isArray(names)) {
-    return names[0];
-  } else {
-    return names;
-  }
-};
+import { Span } from './Text';
 
 class InputTypeCountry extends Component {
   static propTypes = {
@@ -45,9 +31,21 @@ class InputTypeCountry extends Component {
     intl: PropTypes.object.isRequired,
     /** Is this input required? */
     required: PropTypes.bool,
+    /** Custom options **/
+    customOptions: PropTypes.arrayOf(
+      PropTypes.shape({
+        label: PropTypes.node,
+        value: PropTypes.any,
+      }),
+    ),
   };
 
-  static defaultProps = { name: 'country' };
+  static defaultProps = { name: 'country', customOptions: [] };
+
+  constructor(props) {
+    super(props);
+    this.countryNames = getIntlDisplayNames(props.intl.locale, 'region');
+  }
 
   async componentDidMount() {
     if (this.props.autoDetect && !this.props.value && !this.props.defaultValue) {
@@ -60,18 +58,25 @@ class InputTypeCountry extends Component {
     }
   }
 
-  getCountryLabel(code, locale) {
-    const name = getCountryName(locale, code);
-    return `${truncate(name, { length: 30 })} - ${code}`;
+  generateCountryLabel(locale, countryCode) {
+    const countryName = this.countryNames.of(countryCode);
+    const emoji = getEmojiByCountryCode(countryCode);
+    return (
+      <Flex fontSize="14px" lineHeight="20px" fontWeight="500" title={countryName}>
+        {emoji && <Span>{emoji}</Span>}
+        &nbsp;&nbsp;
+        <Span color="black.800">{countryName}</Span>
+      </Flex>
+    );
   }
 
   getOptions = memoizeOne(locale => {
-    const options = Object.keys(COUNTRY_NAMES.en).map(code => ({
+    const options = Object.keys(countryData).map(code => ({
       value: code,
-      label: this.getCountryLabel(code, locale),
+      label: this.generateCountryLabel(locale, code),
     }));
 
-    return orderBy(options, 'label');
+    return [...this.props.customOptions, ...orderBy(options, 'label')];
   });
 
   getSelectedOption = memoizeOne((locale, country) => {
@@ -80,10 +85,13 @@ class InputTypeCountry extends Component {
     }
 
     const code = country.toUpperCase();
-    return {
-      value: code,
-      label: this.getCountryLabel(code, locale),
-    };
+    const customOption = this.props.customOptions.find(customOption => customOption.value === code);
+    return (
+      customOption || {
+        value: code,
+        label: this.generateCountryLabel(locale, code),
+      }
+    );
   });
 
   render() {

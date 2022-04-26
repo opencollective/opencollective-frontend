@@ -14,7 +14,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { requireFields } from '../../lib/form-utils';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep } from '../../lib/utils';
-import { checkRequiresAddress } from './lib/utils';
+import { checkRequiresAddress, validateExpenseTaxes } from './lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
@@ -101,6 +101,7 @@ const getDefaultExpense = collective => ({
   privateMessage: '',
   invoiceInfo: '',
   currency: collective.currency,
+  taxes: [],
   payeeLocation: {
     address: '',
     country: null,
@@ -140,10 +141,10 @@ export const prepareExpenseForSubmit = expenseData => {
     payeeLocation,
     payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
     attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])) : [],
-    // Omit item's ids that were created for keying purposes
+    tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => {
       return pick(item, [
-        ...(item.__isNew ? [] : ['id']),
+        ...(item.__isNew ? [] : ['id']), // Omit item's ids that were created for keying purposes
         ...(isInvoice || isGrant ? [] : ['url']), // never submit URLs for invoices or requests
         'description',
         'incurredAt',
@@ -156,7 +157,7 @@ export const prepareExpenseForSubmit = expenseData => {
 /**
  * Validate the expense
  */
-const validate = expense => {
+const validateExpense = (intl, expense) => {
   const isCardCharge = expense.type === expenseTypes.CHARGE;
   if (expense.payee?.isInvite) {
     return expense.payee.id
@@ -171,6 +172,13 @@ const validate = expense => {
     const hasErrors = itemsErrors.some(errors => !isEmpty(errors));
     if (hasErrors) {
       errors.items = itemsErrors;
+    }
+  }
+
+  if (expense.taxes?.length) {
+    const taxesErrors = validateExpenseTaxes(intl, expense.taxes);
+    if (taxesErrors) {
+      errors['taxes'] = taxesErrors;
     }
   }
 
@@ -278,7 +286,9 @@ const ExpenseFormBody = ({
     }
     // If creating a new expense or completing an expense submitted on your behalf, automatically select your default profile.
     else if (!isOnBehalf && (isDraft || !values.payee) && loggedInAccount && !isEmpty(payoutProfiles)) {
-      formik.setFieldValue('payee', first(payoutProfiles));
+      const defaultProfile =
+        (values.payee && payoutProfiles.find(p => p.slug === values.payee.slug)) || first(payoutProfiles);
+      formik.setFieldValue('payee', defaultProfile);
     }
     // If recurring expense with selected Payout Method
     if (isDraft && loggedInAccount && !values.payoutMethod && expense.payoutMethod) {
@@ -297,7 +307,7 @@ const ExpenseFormBody = ({
     }
   }, [values.payee]);
 
-  // Return to Payee step if type is changed
+  // Return to Payee step if type is changed and reset some values
   React.useEffect(() => {
     if (!isCreditCardCharge) {
       setStep(STEPS.PAYEE);
@@ -305,6 +315,11 @@ const ExpenseFormBody = ({
 
       if (!isDraft && values.payee?.isInvite) {
         formik.setFieldValue('payee', null);
+      }
+
+      // Only invoices can have taxes
+      if (values.taxes?.length && !values.taxes[0].isDisabled && values.type !== expenseTypes.INVOICE) {
+        formik.setFieldValue('taxes', [{ ...values.taxes[0], isDisabled: true }]);
       }
     }
   }, [values.type]);
@@ -427,7 +442,7 @@ const ExpenseFormBody = ({
         <StyledCard mt={4} p={[16, 16, 32]} overflow="initial">
           <HiddenFragment show={step === STEPS.PAYEE}>
             <Flex alignItems="center" mb={16}>
-              <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
+              <Span color="black.900" fontSize="18px" lineHeight="26px" fontWeight="bold">
                 {formatMessage(msg.stepPayee)}
               </Span>
               <Box ml={2}>
@@ -444,8 +459,8 @@ const ExpenseFormBody = ({
                 as="label"
                 htmlFor="expense-description"
                 color="black.900"
-                fontSize="16px"
-                lineHeight="24px"
+                fontSize="18px"
+                lineHeight="26px"
                 fontWeight="bold"
               >
                 {values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT ? (
@@ -455,7 +470,7 @@ const ExpenseFormBody = ({
                     values={{
                       small(msg) {
                         return (
-                          <Span fontWeight="normal" color="black.600">
+                          <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
                             {msg}
                           </Span>
                         );
@@ -465,11 +480,11 @@ const ExpenseFormBody = ({
                 ) : (
                   <FormattedMessage
                     id="Expense.EnterExpenseTitle"
-                    defaultMessage="Enter expense title <small>(Public)</small>"
+                    defaultMessage="Expense title <small>(Public)</small>"
                     values={{
                       small(msg) {
                         return (
-                          <Span fontWeight="normal" color="black.600">
+                          <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
                             {msg}
                           </Span>
                         );
@@ -537,7 +552,7 @@ const ExpenseFormBody = ({
               )}
 
               <Flex alignItems="center" my={24}>
-                <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
+                <Span color="black.900" fontSize="18px" lineHeight="26px" fontWeight="bold">
                   {formatMessage(isReceipt ? msg.stepReceipt : isGrant ? msg.stepFundingRequest : msg.stepInvoice)}
                 </Span>
                 <StyledHr flex="1" borderColor="black.300" mx={2} />
@@ -743,9 +758,12 @@ const ExpenseForm = ({
 }) => {
   const isDraft = expense?.status === expenseStatus.DRAFT;
   const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
+  const intl = useIntl();
   const initialValues = { ...getDefaultExpense(collective), ...expense };
+  const validate = expenseData => validateExpense(intl, expenseData);
   if (isDraft) {
     initialValues.items = expense.draft.items;
+    initialValues.taxes = expense.draft.taxes;
     initialValues.attachedFiles = expense.draft.attachedFiles;
     initialValues.payoutMethod = expense.draft.payoutMethod;
     initialValues.payeeLocation = expense.draft.payeeLocation;

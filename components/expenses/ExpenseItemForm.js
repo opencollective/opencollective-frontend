@@ -106,6 +106,7 @@ const ExpenseItemForm = ({
   hasMultiCurrency,
   availableCurrencies,
   onCurrencyChange,
+  isLastItem,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -259,7 +260,7 @@ const ExpenseItemForm = ({
             {formatMessage(requireFile ? msg.removeReceipt : msg.removeItem)}
           </StyledButton>
         )}
-        <StyledHr flex="1" borderStyle="dashed" borderColor="black.200" />
+        {!isLastItem && <StyledHr flex="1" borderStyle="dashed" borderColor="black.200" />}
       </Flex>
     </Box>
   );
@@ -299,6 +300,7 @@ ExpenseItemForm.propTypes = {
     amount: PropTypes.number,
   }).isRequired,
   editOnlyDescriptiveInfo: PropTypes.bool,
+  isLastItem: PropTypes.bool,
 };
 
 ExpenseItemForm.defaultProps = {

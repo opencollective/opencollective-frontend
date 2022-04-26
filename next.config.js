@@ -176,6 +176,23 @@ const nextConfig = {
         destination: '/recurring-contributions',
         permanent: false,
       },
+      {
+        source: '/:collectiveSlug/paymentmethod/:paymentMethodId/update',
+        destination: '/paymentmethod/:paymentMethodId/update',
+        permanent: false,
+      },
+      // Legacy support page
+      {
+        source: '/support',
+        destination: '/help',
+        permanent: true,
+      },
+      // Redirect /hosts to /search page with hosts filter applied
+      {
+        source: '/hosts',
+        destination: '/search?isHost=true',
+        permanent: true,
+      },
     ];
   },
 };

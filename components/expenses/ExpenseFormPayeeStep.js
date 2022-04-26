@@ -210,6 +210,7 @@ const ExpenseFormPayeeStep = ({
         <CollectivePickerAsync
           inputId={id}
           data-cy="select-expense-payee"
+          isSearchable
           collective={values.payee}
           onChange={({ value }) => {
             if (value) {
@@ -219,7 +220,7 @@ const ExpenseFormPayeeStep = ({
               );
 
               const payee = existingProfile || {
-                ...pick(value, ['id', 'name', 'slug', 'email']),
+                ...pick(value, ['id', 'name', 'slug', 'email', 'type']),
                 isInvite: !isNewlyCreatedProfile,
               };
 
@@ -257,6 +258,7 @@ const ExpenseFormPayeeStep = ({
           customOptions={payeeOptions}
           getDefaultOptions={build => values.payee && build(values.payee)}
           data-cy="select-expense-payee"
+          isSearchable
           collective={values.payee}
           onChange={({ value }) => {
             formik.setFieldValue('payee', value);
@@ -493,6 +495,7 @@ const ExpenseFormPayeeStep = ({
                   onNext?.();
                 } else {
                   // We use set touched here to display errors on fields that are not dirty.
+                  // eslint-disable-next-line no-console
                   console.log('ExpenseFormPayeeStep > Validation failed', errors);
                   formik.setTouched(errors);
                   formik.setErrors(errors);

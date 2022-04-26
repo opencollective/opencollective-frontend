@@ -23,7 +23,7 @@ describe('Contribution Flow: Guest contributions', () => {
       const body = recaptchaIframe.contents();
       cy.wrap(body).find('#checkbox').should('be.visible').click();
     });
-    cy.wait(200);
+    cy.wait(500);
     cy.contains('button[data-cy="cf-next-step"]', 'Contribute $400.42').click();
 
     cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -57,7 +57,7 @@ describe('Contribution Flow: Guest contributions', () => {
       const body = recaptchaIframe.contents();
       cy.wrap(body).find('#checkbox').should('be.visible').click();
     });
-    cy.wait(200);
+    cy.wait(500);
     cy.contains('button[data-cy="cf-next-step"]', 'Contribute $10').click();
 
     cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -115,7 +115,7 @@ describe('Contribution Flow: Guest contributions', () => {
         const body = recaptchaIframe.contents();
         cy.wrap(body).find('#checkbox').should('be.visible').click();
       });
-      cy.wait(200);
+      cy.wait(500);
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $10').click();
 
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -148,7 +148,7 @@ describe('Contribution Flow: Guest contributions', () => {
         const body = recaptchaIframe.contents();
         cy.wrap(body).find('#checkbox').should('be.visible').click();
       });
-      cy.wait(200);
+      cy.wait(500);
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $500').click();
 
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -175,7 +175,7 @@ describe('Contribution Flow: Guest contributions', () => {
       // cy.get('input[name="location.country"]:invalid').should('have.length', 1);
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.get('[data-cy="cf-content"] [data-cy="country-select"]').click();
-      cy.contains('[data-cy="select-option"]', 'France - FR').click();
+      cy.contains('[data-cy="select-option"]', 'France').click();
       cy.get('input[name="address1"]:invalid').should('have.length', 1); // Empty
       cy.get('input[name="postalCode"]:invalid').should('have.length', 1); // Empty
       cy.get('input[name="city"]:invalid').should('have.length', 1); // Empty
@@ -193,7 +193,7 @@ describe('Contribution Flow: Guest contributions', () => {
         const body = recaptchaIframe.contents();
         cy.wrap(body).find('#checkbox').should('be.visible').click();
       });
-      cy.wait(200);
+      cy.wait(500);
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $5,000').click();
 
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');

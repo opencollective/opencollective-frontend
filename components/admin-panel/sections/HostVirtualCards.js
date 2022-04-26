@@ -8,6 +8,12 @@ import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
+import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal';
+import CreateVirtualCardModal from '../../edit-collective/CreateVirtualCardModal';
+import DeleteVirtualCardModal from '../../edit-collective/DeleteVirtualCardModal';
+import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';
+import VirtualCardFilters from '../../edit-collective/sections/virtual-cards/VirtualCardFilters';
+import VirtualCard from '../../edit-collective/VirtualCard';
 import { Box, Flex, Grid } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
@@ -15,13 +21,6 @@ import Pagination from '../../Pagination';
 import StyledButton from '../../StyledButton';
 import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
-import AssignVirtualCardModal from '../AssignVirtualCardModal';
-import CreateVirtualCardModal from '../CreateVirtualCardModal';
-import DeleteVirtualCardModal from '../DeleteVirtualCardModal';
-import EditVirtualCardModal from '../EditVirtualCardModal';
-import VirtualCard from '../VirtualCard';
-
-import VirtualCardFilters from './virtual-cards/VirtualCardFilters';
 
 const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
   query HostedVirtualCards(
@@ -39,6 +38,7 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
       name
       imageUrl
       currency
+      settings
       hostedVirtualCards(
         limit: $limit
         offset: $offset
@@ -121,7 +121,7 @@ const HostVirtualCards = props => {
   const { loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
     context: API_V2_CONTEXT,
     variables: {
-      slug: props.collective.slug,
+      slug: props.hostSlug,
       limit: VIRTUAL_CARDS_PER_PAGE,
       offset,
       state,
@@ -140,7 +140,7 @@ const HostVirtualCards = props => {
   const handleUpdateFilters = queryParams => {
     return router.push(
       {
-        pathname: `/${props.collective.slug}/admin/host-virtual-cards`,
+        pathname: `/${props.hostSlug}/admin/host-virtual-cards`,
         query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
       },
       null,
@@ -185,6 +185,9 @@ const HostVirtualCards = props => {
   return (
     <Fragment>
       <Box>
+        <P fontSize="24px" fontWeight="700" lineHeight="32px" mb={3}>
+          <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
+        </P>
         <P>
           <FormattedMessage
             id="Host.VirtualCards.List.Description"
@@ -201,7 +204,7 @@ const HostVirtualCards = props => {
           <VirtualCardFilters
             isCollectiveFilter={true}
             filters={routerQuery}
-            collective={props.collective}
+            collective={data.host}
             virtualCardMerchants={data.host.hostedVirtualCardMerchants.nodes}
             virtualCardCollectives={data.host.hostedVirtualCardCollectives.nodes}
             onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
@@ -262,7 +265,7 @@ const HostVirtualCards = props => {
       </Grid>
       <Flex mt={5} alignItems="center" flexDirection="column" justifyContent="center">
         <Pagination
-          route={`/${props.collective.slug}/admin/host-virtual-cards`}
+          route={`/${data.host.slug}/admin/host-virtual-cards`}
           total={data.host.hostedVirtualCards.totalCount}
           limit={VIRTUAL_CARDS_PER_PAGE}
           offset={offset}
@@ -315,17 +318,7 @@ const HostVirtualCards = props => {
 };
 
 HostVirtualCards.propTypes = {
-  collective: PropTypes.shape({
-    id: PropTypes.number,
-    slug: PropTypes.string,
-    settings: PropTypes.shape({
-      virtualcards: PropTypes.shape({
-        autopause: PropTypes.bool,
-        requestcard: PropTypes.bool,
-        policy: PropTypes.string,
-      }),
-    }),
-  }),
+  hostSlug: PropTypes.string,
   hideTopsection: PropTypes.func,
 };
 

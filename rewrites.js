@@ -11,7 +11,7 @@ exports.REWRITES = [
     destination: '/fiscal-hosting',
   },
   {
-    source: '/:pageSlug(widgets|tos|privacypolicy|support|hiring)',
+    source: '/:pageSlug(widgets|tos|privacypolicy|hiring)',
     destination: '/staticPage',
   },
   {
@@ -55,7 +55,7 @@ exports.REWRITES = [
     destination: '/redeemed',
   },
   {
-    source: '/:collectiveSlug/paymentmethod/:id/update',
+    source: '/paymentmethod/:paymentMethodId/update',
     destination: '/updatePaymentMethod',
   },
   {
@@ -274,10 +274,6 @@ exports.REWRITES = [
   {
     source: '/search',
     destination: '/search',
-  },
-  {
-    source: '/hosts',
-    destination: '/hosts',
   },
   {
     source: '/pricing',

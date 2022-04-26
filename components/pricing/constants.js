@@ -17,7 +17,7 @@ export const PLANS = [
   {
     id: 'scale',
     fee: 'Negotiable',
-    actionLink: '/support',
+    actionLink: '/help',
     actionType: 'contactUs',
   },
 ];

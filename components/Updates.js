@@ -31,8 +31,6 @@ class Updates extends React.Component {
     collective: PropTypes.object,
     updates: PropTypes.object,
     fetchMore: PropTypes.func,
-    editable: PropTypes.bool,
-    includeHostedCollectives: PropTypes.bool,
     LoggedInUser: PropTypes.object,
   };
 

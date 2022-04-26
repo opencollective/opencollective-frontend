@@ -38,7 +38,7 @@ const Modal = styled(Container).attrs(props => ({
 
   ${space};
   ${background};
-  ${overflow}
+  ${overflow};
 
   @media (max-width: ${themeGet('breakpoints.0')}) {
     max-height: 90vh;

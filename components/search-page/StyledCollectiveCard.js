@@ -5,7 +5,9 @@ import { injectIntl, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../../lib/collective.lib';
+import { getIntlDisplayNames } from '../../lib/i18n';
 
+import { IGNORED_TAGS } from '../../pages/search';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import I18nCollectiveTags from '../I18nCollectiveTags';
@@ -158,7 +160,7 @@ const StyledCollectiveCard = ({
   ...props
 }) => {
   const intl = useIntl();
-  const regionNames = new Intl.DisplayNames(intl.locale, { type: 'region' });
+  const regionNames = getIntlDisplayNames(intl.locale, 'region');
   const countryString = collective.location?.country
     ? `${getFlagEmoji(collective.location.country)} ${regionNames.of(collective.location.country)}`
     : null;
@@ -199,9 +201,7 @@ const StyledCollectiveCard = ({
             <Container>
               {tag === undefined ? (
                 <StyledTag display="inline-block" variant="rounded-right" my={2} backgroundColor="blue.50">
-                  <I18nCollectiveTags
-                    tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
-                  />
+                  <I18nCollectiveTags tags={getCollectiveMainTag(null, null, collective.type)} />
                 </StyledTag>
               ) : (
                 tag
@@ -211,12 +211,17 @@ const StyledCollectiveCard = ({
                   {countryString}
                 </Span>
               )}
+            </Container>
+            <Container>
               {collective.tags &&
-                collective.tags.slice(0, 3).map(tag => (
-                  <StyledTag key={tag} display="inline-block" variant="rounded-right" m={1}>
-                    {tag}
-                  </StyledTag>
-                ))}
+                collective.tags
+                  .filter(tag => !IGNORED_TAGS.includes(tag))
+                  .slice(0, 4)
+                  .map(tag => (
+                    <StyledTag key={tag} display="inline-block" variant="rounded-right" m={1}>
+                      {tag}
+                    </StyledTag>
+                  ))}
             </Container>
           </Container>
           {children}
