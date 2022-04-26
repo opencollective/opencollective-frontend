@@ -1475,8 +1475,6 @@
   "HostFee.MonthlyRetainer": "Μηνιαίος δωρητής",
   "HostFeesSection.Title": "Host Fees per year",
   "HostingSince": "Οικοδεσπότης από",
-  "hosts.description": "<FiscalHostingLink>Fiscal Hosts</FiscalHostingLink> hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. <FindOutMoreLink>Find out more</FindOutMoreLink> about <BecomingAHostLink>becoming a Fiscal Host</BecomingAHostLink>.",
-  "hosts.title": "Οικοδεσπότες του Open Collective",
   "HostSince": "Οικοδεσπότης από",
   "howItWorks": "Πώς λειτουργεί",
   "howItWorks.becomeHost": "About becoming a fiscal host",
