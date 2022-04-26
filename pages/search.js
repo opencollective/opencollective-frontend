@@ -158,16 +158,17 @@ class SearchPage extends React.Component {
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object,
     addToast: PropTypes.func.isRequired, // from withToasts
+    isHost: PropTypes.bool,
+    type: PropTypes.array,
   };
 
   constructor(props) {
     super(props);
     this.onClick = this.onClick.bind(this);
-    const { router } = this.props;
-    if (router.query.isHost) {
+    if (this.props.isHost) {
       this.state = { filter: 'HOST' };
-    } else if (router.query.type) {
-      this.state = { filter: router.query.type };
+    } else if (this.props.type.length === 1) {
+      this.state = { filter: this.props.type[0] };
     } else {
       this.state = { filter: 'ALL' };
     }
