@@ -19,6 +19,7 @@ export const SUCCESS_CTA_TYPE = {
   JOIN: 'JOIN',
   SIGN_IN: 'SIGN_IN',
   GO_TO_PROFILE: 'GO_TO_PROFILE',
+  CALENDAR: 'CALENDAR',
 };
 
 const headerMessages = defineMessages({
@@ -40,6 +41,9 @@ const headerMessages = defineMessages({
   },
   [SUCCESS_CTA_TYPE.GO_TO_PROFILE]: {
     defaultMessage: "Go to {accountName}'s page",
+  },
+  [SUCCESS_CTA_TYPE.CALENDAR]: {
+    defaultMessage: 'Add to calendar',
   },
 });
 
@@ -63,6 +67,9 @@ const contentMessages = defineMessages({
   },
   [SUCCESS_CTA_TYPE.GO_TO_PROFILE]: {
     defaultMessage: 'Go to the public page of {accountName} on Open Collective',
+  },
+  [SUCCESS_CTA_TYPE.CALENDAR]: {
+    defaultMessage: "Add this event to your calendar to make sure you don't miss out on it.",
   },
 });
 
@@ -127,6 +134,9 @@ const SuccessCTAWrapper = ({ type, orderId, email, account, ...props }) => {
       return <StyledLink href="https://blog.opencollective.com" openInNewTab color="black.800" {...props} />;
     case SUCCESS_CTA_TYPE.GO_TO_PROFILE:
       return <StyledLink as={Link} href={getCollectivePageRoute(account)} color="black.800" {...props} />;
+    case SUCCESS_CTA_TYPE.CALENDAR:
+      return <StyledLink as={Link} href={'https://calendar.google.com/'} color="black.800" {...props} />;
+    // TODO(kai): use add-to-calendar component
     default:
       return <React.Fragment {...props} />;
   }

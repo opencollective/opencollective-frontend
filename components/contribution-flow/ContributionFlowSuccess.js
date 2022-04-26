@@ -116,21 +116,38 @@ class ContributionFlowSuccess extends React.Component {
   };
 
   renderCallsToAction = () => {
-    const { LoggedInUser, data, isEmbed, router } = this.props;
+    const { LoggedInUser, data, isEmbed, router, collective } = this.props;
     const callsToAction = [];
     const isGuest = get(data, 'order.fromAccount.isGuest');
     const email = get(router, 'query.email') ? decodeURIComponent(router.query.email) : null;
 
+    console.log('data', data, 'collective', collective);
+
     if (!isEmbed) {
       if (!LoggedInUser) {
         if (isGuest) {
-          callsToAction.unshift(SUCCESS_CTA_TYPE.JOIN, SUCCESS_CTA_TYPE.GO_TO_PROFILE, SUCCESS_CTA_TYPE.NEWSLETTER);
+          callsToAction.unshift(
+            SUCCESS_CTA_TYPE.CALENDAR,
+            SUCCESS_CTA_TYPE.JOIN,
+            SUCCESS_CTA_TYPE.GO_TO_PROFILE,
+            SUCCESS_CTA_TYPE.NEWSLETTER,
+          );
         } else {
-          callsToAction.unshift(SUCCESS_CTA_TYPE.SIGN_IN, SUCCESS_CTA_TYPE.GO_TO_PROFILE, SUCCESS_CTA_TYPE.NEWSLETTER);
+          callsToAction.unshift(
+            SUCCESS_CTA_TYPE.CALENDAR,
+            SUCCESS_CTA_TYPE.SIGN_IN,
+            SUCCESS_CTA_TYPE.GO_TO_PROFILE,
+            SUCCESS_CTA_TYPE.NEWSLETTER,
+          );
         }
       } else {
         // all other logged in recurring/one time contributions
-        callsToAction.unshift(SUCCESS_CTA_TYPE.GO_TO_PROFILE, SUCCESS_CTA_TYPE.BLOG, SUCCESS_CTA_TYPE.NEWSLETTER);
+        callsToAction.unshift(
+          SUCCESS_CTA_TYPE.CALENDAR,
+          SUCCESS_CTA_TYPE.GO_TO_PROFILE,
+          SUCCESS_CTA_TYPE.BLOG,
+          SUCCESS_CTA_TYPE.NEWSLETTER,
+        );
       }
     }
 
