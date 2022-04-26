@@ -1475,8 +1475,6 @@
   "HostFee.MonthlyRetainer": "Abonnement mensuel",
   "HostFeesSection.Title": "Host Fees per year",
   "HostingSince": "Hôte depuis",
-  "hosts.description": "<FiscalHostingLink>Fiscal Hosts</FiscalHostingLink> hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. <FindOutMoreLink>Find out more</FindOutMoreLink> about <BecomingAHostLink>becoming a Fiscal Host</BecomingAHostLink>.",
-  "hosts.title": "Hôtes d'Open Collective",
   "HostSince": "Hôte depuis",
   "howItWorks": "How it works",
   "howItWorks.becomeHost": "About becoming a fiscal host",
