@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { accountSupportsGrants } from '../../lib/collective.lib';
+import { PayPalSupportedCurrencies } from '../../lib/constants/currency';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -331,7 +332,11 @@ const ExpenseFormBody = ({
   }, [values.payeeLocation]);
 
   React.useEffect(() => {
-    if (isMultiCurrency && values.payoutMethod?.type !== PayoutMethodType.PAYPAL) {
+    if (values.payoutMethod?.type === PayoutMethodType.PAYPAL) {
+      if (!PayPalSupportedCurrencies.includes(values.currency)) {
+        formik.setFieldValue('currency', 'USD');
+      }
+    } else if (isMultiCurrency) {
       formik.setFieldValue('currency', undefined);
     } else {
       formik.setFieldValue('currency', collective?.currency);
