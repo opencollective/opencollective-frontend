@@ -13,6 +13,7 @@ describe('Recurring contributions', () => {
         cy.contains('[data-cy="select-option"]', 'monthly').click();
         cy.get('[data-cy="tier-input-field-amount"] input').last().type('10');
         cy.getByDataCy('collective-save').click();
+        cy.wait(2000);
         cy.logout();
       })
       .then(() => {
@@ -153,8 +154,9 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-menu').should('exist');
       cy.getByDataCy('recurring-contribution-menu-cancel-option').click();
       cy.getByDataCy('recurring-contribution-cancel-menu').should('exist');
-      cy.getByDataCy('recurring-contribution-cancel-menu').contains('Are you sure?');
-      cy.getByDataCy('recurring-contribution-cancel-no').contains('No, wait');
+      cy.getByDataCy('recurring-contribution-cancel-menu').contains(
+        'Why are you cancelling your subscription today? 🥺',
+      );
       cy.getByDataCy('recurring-contribution-cancel-yes')
         .click()
         .then(() => {
@@ -162,6 +164,8 @@ describe('Recurring contributions', () => {
           cy.getByDataCy('filter-button cancelled').click();
           cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
         });
+      cy.openEmail(({ subject, html }) => subject.includes(`Contribution cancelled to Test Collective`));
+      cy.contains("I'm cancelling for this reason");
     });
   });
 });

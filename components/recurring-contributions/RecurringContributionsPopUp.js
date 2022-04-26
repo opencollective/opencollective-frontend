@@ -22,6 +22,9 @@ import { withUser } from '../UserProvider';
 
 import UpdateOrderPopUp from './UpdateOrderPopUp';
 import UpdatePaymentMethodPopUp from './UpdatePaymentMethodPopUp';
+import StyledTextArea from '../StyledTextArea';
+import StyledRadioList from '../StyledRadioList';
+import Container from '../Container';
 
 //  Styled components
 const RedXCircle = styled(XCircle)`
@@ -61,8 +64,8 @@ const MenuSection = styled(Flex).attrs({
 
 // GraphQL
 const cancelRecurringContributionMutation = gqlV2/* GraphQL */ `
-  mutation CancelRecurringContribution($order: OrderReferenceInput!) {
-    cancelOrder(order: $order) {
+  mutation CancelRecurringContribution($order: OrderReferenceInput!, $reason: String!) {
+    cancelOrder(order: $order, reason: $reason) {
       id
       status
     }
@@ -72,6 +75,8 @@ const cancelRecurringContributionMutation = gqlV2/* GraphQL */ `
 const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, account }) => {
   const { addToast } = useToasts();
   const [menuState, setMenuState] = useState('mainMenu');
+  const [textAreaState, setTextAreaState] = useState("I'm cancelling for this reason");
+  const [radioListState, setRadioListState] = useState('No longer want to back the collective');
   const [submitCancellation, { loading: loadingCancellation }] = useMutation(cancelRecurringContributionMutation, {
     context: API_V2_CONTEXT,
   });
@@ -168,9 +173,18 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
             <GrayXCircle size={26} onClick={onCloseEdit} />
           </Flex>
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
-            <P fontSize="14px" fontWeight="400">
-              <FormattedMessage id="subscription.menu.cancel.yes" defaultMessage="Are you sure? 🥺" />
-            </P>
+            <Container p={3}>
+              <P fontSize="20px" fontWeight="400">
+                <FormattedMessage defaultMessage="Why are you cancelling your subscription today? 🥺" />
+              </P>
+              <StyledRadioList
+                defaultValue={'No longer want to back the collective'}
+                onChange={e => setRadioListState(e)}
+                name="cancellation-reason"
+                options={['No longer want to back the collective', 'Changing payment method or amount', 'other']}
+              />
+              <StyledTextArea onChange={e => setTextAreaState(e.target.value)} value={textAreaState} />
+            </Container>
           </Flex>
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
             <Flex flexGrow={1} alignItems="center">
@@ -180,12 +194,13 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
             <StyledButton
               buttonSize="tiny"
+              buttonStyle="secondary"
               minWidth={75}
               loading={loadingCancellation}
               data-cy="recurring-contribution-cancel-yes"
               onClick={async () => {
                 try {
-                  await submitCancellation({ variables: { order: { id: contribution.id } } });
+                  await submitCancellation({ variables: { order: { id: contribution.id }, reason: textAreaState } });
                   onCloseEdit();
                   addToast({
                     type: TOAST_TYPE.INFO,
@@ -203,18 +218,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
                 }
               }}
             >
-              <FormattedMessage id="yes" defaultMessage="Yes" />
-            </StyledButton>
-            <StyledButton
-              ml={2}
-              minWidth={95}
-              buttonSize="tiny"
-              buttonStyle="secondary"
-              disabled={loadingCancellation}
-              onClick={() => setMenuState('mainMenu')}
-              data-cy="recurring-contribution-cancel-no"
-            >
-              <FormattedMessage id="subscription.menu.cancel.no" defaultMessage="No, wait" />
+              <FormattedMessage id="submit" defaultMessage="Submit" />
             </StyledButton>
           </Flex>
         </MenuSection>
