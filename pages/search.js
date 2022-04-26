@@ -20,7 +20,7 @@ import Hide from '../components/Hide';
 import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
 import InputTypeCountry from '../components/InputTypeCountry';
-import LoadingGrid from '../components/LoadingGrid';
+import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import Page from '../components/Page';
 import Pagination from '../components/Pagination';
 import SearchCollectiveCard from '../components/search-page/SearchCollectiveCard';
@@ -392,24 +392,28 @@ class SearchPage extends React.Component {
             )}
           </Flex>
           <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
-            {loading && accounts?.nodes?.length > 0 && (
-              <Flex py={3} width={1} justifyContent="center">
-                <LoadingGrid />
-              </Flex>
-            )}
-            {accounts?.nodes?.map(collective => (
-              <Flex key={collective.slug} my={3} mx={2}>
-                {collective.isPledged ? (
-                  <CollectiveCardContainer key={collective.id}>
-                    <PledgedCollectiveCard collective={collective} />
-                  </CollectiveCardContainer>
-                ) : (
-                  <CollectiveCardContainer key={collective.id}>
-                    <SearchCollectiveCard collective={collective} />
-                  </CollectiveCardContainer>
-                )}
-              </Flex>
-            ))}
+            {loading
+              ? Array.from(new Array(12)).map((_, index) => (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <Flex key={index} my={3} mx={2}>
+                    <CollectiveCardContainer>
+                      <LoadingPlaceholder height={336} borderRadius="16px" />
+                    </CollectiveCardContainer>
+                  </Flex>
+                ))
+              : accounts?.nodes?.map(collective => (
+                  <Flex key={collective.slug} my={3} mx={2}>
+                    {collective.isPledged ? (
+                      <CollectiveCardContainer key={collective.id}>
+                        <PledgedCollectiveCard collective={collective} />
+                      </CollectiveCardContainer>
+                    ) : (
+                      <CollectiveCardContainer key={collective.id}>
+                        <SearchCollectiveCard collective={collective} />
+                      </CollectiveCardContainer>
+                    )}
+                  </Flex>
+                ))}
 
             {accounts?.nodes?.length === 0 && (
               <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
