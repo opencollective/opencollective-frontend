@@ -1475,6 +1475,8 @@
   "HostFee.MonthlyRetainer": "每月定金",
   "HostFeesSection.Title": "Host Fees per year",
   "HostingSince": "Hosting since",
+  "hosts.description": "<FiscalHostingLink>Fiscal Hosts</FiscalHostingLink> hold money on behalf of Collectives, taking care of accounting, taxes, invoices, etc. Some also provide extra services. <FindOutMoreLink>Find out more</FindOutMoreLink> about <BecomingAHostLink>becoming a Fiscal Host</BecomingAHostLink>.",
+  "hosts.title": "Open Collective Hosts",
   "HostSince": "Host since",
   "howItWorks": "How it works",
   "howItWorks.becomeHost": "About becoming a fiscal host",

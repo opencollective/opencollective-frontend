@@ -285,7 +285,7 @@ const FiscalHost = () => {
             <Box my={2} alignSelf={[null, 'center', null, 'flex-start']}>
               <DiscoverLink
                 as={Link}
-                href="/search?isHost=true"
+                href="/hosts"
                 fontSize="15px"
                 lineHeight="23px"
                 letterSpacing="-0.12px"

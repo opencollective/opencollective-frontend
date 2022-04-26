@@ -194,7 +194,7 @@ const ApplyToFiscalHosts = () => (
           values={{
             orgsAroundTheWorldLink: getI18nLink({
               as: Link,
-              href: '/search?isHost=true',
+              href: '/hosts',
             }),
             createYourOwnFiscalHostLink: getI18nLink({
               as: Link,

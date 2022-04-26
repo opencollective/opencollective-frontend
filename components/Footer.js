@@ -169,7 +169,7 @@ const navigation = {
     createACollective: '/create',
     aboutFiscalHosting: '/fiscal-hosting',
     discover: '/discover',
-    findAFiscalHost: '/search?isHost=true',
+    findAFiscalHost: '/hosts',
     becomeASponsor: '/become-a-sponsor',
     becomeAHost: '/become-a-host',
   },

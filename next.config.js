@@ -187,12 +187,6 @@ const nextConfig = {
         destination: '/help',
         permanent: true,
       },
-      // Redirect /hosts to /search page with hosts filter applied
-      {
-        source: '/hosts',
-        destination: '/search?isHost=true',
-        permanent: true,
-      },
     ];
   },
 };
