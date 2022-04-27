@@ -94,7 +94,6 @@ describe('New expense flow', () => {
 
       // Start editing
       cy.getByDataCy('edit-expense-btn').click();
-      cy.getByDataCy('expense-next').click();
       cy.get('input[name="description"]').type(' edited');
       cy.get('input[name="items[0].description"]').type(' but not too expensive');
       cy.get('input[name="items[0].amount"]').type('{selectall}111');
@@ -432,7 +431,6 @@ describe('New expense flow', () => {
 
       // Start editing
       cy.get('[data-cy="edit-expense-btn"]:visible').click();
-      cy.getByDataCy('expense-next').click();
 
       // Add new item
       cy.getByDataCy('expense-add-item-btn').click();
@@ -456,7 +454,6 @@ describe('New expense flow', () => {
       // ---- 3. Remove VAT ----
       // Start editing
       cy.get('[data-cy="edit-expense-btn"]:visible').click();
-      cy.getByDataCy('expense-next').click();
 
       // Disable VAT
       cy.getByDataCy('checkbox-tax-VAT').click();

@@ -300,9 +300,19 @@ const ExpenseFormBody = ({
     }
   }, [values.payee]);
 
+  const usePreviousValue = value => {
+    const ref = React.useRef();
+    React.useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+  };
+
+  const previousValue = usePreviousValue(values.type);
+
   // Return to Payee step if type is changed and reset some values
   React.useEffect(() => {
-    if (!isCreditCardCharge) {
+    if (previousValue && !isCreditCardCharge) {
       setStep(STEPS.PAYEE);
       setOnBehalf(false);
 
