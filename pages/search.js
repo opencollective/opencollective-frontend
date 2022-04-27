@@ -167,12 +167,19 @@ class SearchPage extends React.Component {
   constructor(props) {
     super(props);
     this.onClick = this.onClick.bind(this);
+    const term = props.term;
     if (this.props.isHost) {
-      this.state = { filter: 'HOST' };
+      this.state = { filter: 'HOST', term };
     } else if (this.props.type.length === 1) {
-      this.state = { filter: this.props.type[0] };
+      this.state = { filter: this.props.type[0], term };
     } else {
-      this.state = { filter: 'ALL' };
+      this.state = { filter: 'ALL', term };
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.term !== this.props.term) {
+      this.setState({ term: this.props.term });
     }
   }
 
@@ -270,9 +277,9 @@ class SearchPage extends React.Component {
   };
 
   render() {
-    const { router, data, term = '', intl } = this.props;
+    const { data, intl } = this.props;
     const { error, loading, accounts, tagStats } = data || {};
-    const tags = router?.query?.tag?.split(',') || [];
+    const tags = this.props.tag || [];
 
     if (error) {
       return <ErrorPage data={this.props.data} />;
@@ -280,7 +287,7 @@ class SearchPage extends React.Component {
 
     const { limit = 20, offset, totalCount = 0 } = accounts || {};
     const showTagFilterSection = (accounts?.nodes?.length > 0 || tags.length > 0) && tagStats?.nodes?.length > 0;
-    const showCountriesFilterSection = accounts?.nodes?.length > 0 || router?.query?.country;
+    const showCountriesFilterSection = accounts?.nodes?.length > 0 || this.props?.country;
     const showSortFilterSection = accounts?.nodes?.length > 0;
     const getSortOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
     const sortOptions = [
@@ -289,7 +296,7 @@ class SearchPage extends React.Component {
       getSortOption('CREATED_AT.DESC'),
       getSortOption('CREATED_AT.ASC'),
     ];
-    const selectedTypeFilter = router.query.isHost ? 'HOST' : router.query.type || 'ALL';
+    const selectedTypeFilter = this.props.isHost ? 'HOST' : this.props.type.length === 1 ? this.props.type[0] : 'ALL';
 
     return (
       <Page title="Search" showSearch={false}>
@@ -312,7 +319,8 @@ class SearchPage extends React.Component {
                 borderRadius="100px"
                 fontSize="16px"
                 placeholder="Search by name, slug, tag, description..."
-                defaultValue={term}
+                value={this.state.term}
+                onChange={value => this.setState({ term: value })}
                 onSubmit={this.refetch}
               />
             </SearchFormContainer>
@@ -368,7 +376,7 @@ class SearchPage extends React.Component {
                 <InputTypeCountry
                   inputId="search-country-filter"
                   as={StyledSelectFilter}
-                  defaultValue={this.props.country || 'ALL'}
+                  value={this.props.country || 'ALL'}
                   customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
                   onChange={country => this.changeCountry(country)}
                   minWidth={[0, '200px']}
