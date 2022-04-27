@@ -26,7 +26,7 @@ import Thread from '../components/conversations/Thread';
 import ErrorPage from '../components/ErrorPage';
 import ExpenseAdminActions from '../components/expenses/ExpenseAdminActions';
 import ExpenseAttachedFiles from '../components/expenses/ExpenseAttachedFiles';
-import ExpenseForm, { prepareExpenseForSubmit, STEPS } from '../components/expenses/ExpenseForm';
+import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpenseInviteNotificationBanner from '../components/expenses/ExpenseInviteNotificationBanner';
 import ExpenseMissingReceiptNotificationBanner from '../components/expenses/ExpenseMissingReceiptNotificationBanner';
@@ -253,7 +253,7 @@ class ExpensePage extends React.Component {
       expense?.permissions?.canEdit &&
       expense?.items?.every(item => !item.url);
     if (this.props.edit && isMissingReceipt && this.state.status !== PAGE_STATUS.EDIT) {
-      this.onEditBtnClick('EXPENSE');
+      this.onEditBtnClick();
       this.props.router.replace(document.location.pathname);
     }
 
@@ -437,12 +437,8 @@ class ExpensePage extends React.Component {
     return sortBy([...(comments || []), ...activities], 'createdAt');
   });
 
-  onEditBtnClick = async initialStep => {
-    return this.setState(() => ({
-      status: PAGE_STATUS.EDIT,
-      editedExpense: this.props.data.expense,
-      initialStep: initialStep,
-    }));
+  onEditBtnClick = async () => {
+    return this.setState(() => ({ status: PAGE_STATUS.EDIT, editedExpense: this.props.data.expense }));
   };
 
   onDelete = async expense => {
@@ -524,7 +520,7 @@ class ExpensePage extends React.Component {
                   collective={collective}
                   permissions={expense?.permissions}
                   onError={error => this.setState({ error })}
-                  onEdit={() => this.onEditBtnClick(STEPS.PAYEE)}
+                  onEdit={this.onEditBtnClick}
                 />
               )}
             </Flex>
@@ -578,7 +574,7 @@ class ExpensePage extends React.Component {
                   isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
                   collective={collective}
                   onError={error => this.setState({ error })}
-                  onEdit={() => this.onEditBtnClick(STEPS.PAYEE)}
+                  onEdit={this.onEditBtnClick}
                   onDelete={this.onDelete}
                   suggestedTags={this.getSuggestedTags(collective)}
                   canEditTags={get(expense, 'permissions.canEditTags', false)}
@@ -681,7 +677,7 @@ class ExpensePage extends React.Component {
                         mr={[null, 3]}
                         whiteSpace="nowrap"
                         data-cy="edit-expense-btn"
-                        onClick={() => this.setState({ status: PAGE_STATUS.EDIT, initialStep: STEPS.EXPENSE })}
+                        onClick={() => this.setState({ status: PAGE_STATUS.EDIT })}
                         disabled={this.state.isSubmitting}
                       >
                         ← <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
@@ -737,7 +733,6 @@ class ExpensePage extends React.Component {
                         });
                       }
                     }}
-                    initialStep={this.state.initialStep}
                     validateOnChange
                     disableSubmitIfUntouched
                   />

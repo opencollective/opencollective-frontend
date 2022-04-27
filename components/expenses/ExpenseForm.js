@@ -208,7 +208,7 @@ const HiddenFragment = styled.div`
   display: ${({ show }) => (show ? 'block' : 'none')};
 `;
 
-export const STEPS = {
+const STEPS = {
   PAYEE: 'PAYEE',
   EXPENSE: 'EXPENSE',
 };
@@ -233,7 +233,6 @@ const ExpenseFormBody = ({
   expensesTags,
   shouldLoadValuesFromPersister,
   isDraft,
-  initialStep,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -254,16 +253,7 @@ const ExpenseFormBody = ({
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
 
-  if (!initialStep) {
-    if (isInvite) {
-      initialStep = STEPS.PAYEE;
-    } else if (stepOneCompleted || isCreditCardCharge) {
-      initialStep = STEPS.EXPENSE;
-    } else {
-      initialStep = STEPS.PAYEE;
-    }
-  }
-  const [step, setStep] = React.useState(initialStep);
+  const [step, setStep] = React.useState(stepOneCompleted || isCreditCardCharge ? STEPS.EXPENSE : STEPS.PAYEE);
   // Only true when logged in and drafting the expense
   const [isOnBehalf, setOnBehalf] = React.useState(false);
   const [showResetModal, setShowResetModal] = React.useState(false);
@@ -313,6 +303,7 @@ const ExpenseFormBody = ({
   // Return to Payee step if type is changed and reset some values
   React.useEffect(() => {
     if (!isCreditCardCharge) {
+      setStep(STEPS.PAYEE);
       setOnBehalf(false);
 
       if (!isDraft && values.payee?.isInvite) {
@@ -727,7 +718,6 @@ ExpenseFormBody.propTypes = {
       }),
     ),
   }),
-  initialStep: PropTypes.oneOf([STEPS.EXPENSE, STEPS.PAYEE]),
 };
 
 /**
@@ -747,7 +737,6 @@ const ExpenseForm = ({
   loading,
   expensesTags,
   shouldLoadValuesFromPersister,
-  initialStep,
 }) => {
   const isDraft = expense?.status === expenseStatus.DRAFT;
   const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
@@ -793,7 +782,6 @@ const ExpenseForm = ({
           loading={loading}
           shouldLoadValuesFromPersister={shouldLoadValuesFromPersister}
           isDraft={isDraft}
-          initialStep={initialStep}
         />
       )}
     </Formik>
@@ -870,7 +858,6 @@ ExpenseForm.propTypes = {
       ),
     }),
   ),
-  initialStep: PropTypes.oneOf([STEPS.EXPENSE, STEPS.PAYEE]),
 };
 
 ExpenseForm.defaultProps = {
