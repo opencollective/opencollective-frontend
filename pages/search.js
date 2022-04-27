@@ -98,6 +98,8 @@ const constructSortByQuery = sortByValue => {
   let query = {};
   if (sortByValue === 'ACTIVITY') {
     query = { field: 'ACTIVITY', direction: 'DESC' };
+  } else if (sortByValue === 'RANK') {
+    query = { field: 'RANK', direction: 'DESC' };
   } else if (sortByValue === 'CREATED_AT.DESC') {
     query = { field: 'CREATED_AT', direction: 'DESC' };
   } else if (sortByValue === 'CREATED_AT.ASC') {
@@ -281,7 +283,12 @@ class SearchPage extends React.Component {
     const showCountriesFilterSection = accounts?.nodes?.length > 0 || router?.query?.country;
     const showSortFilterSection = accounts?.nodes?.length > 0;
     const getSortOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
-    const sortOptions = [getSortOption('ACTIVITY'), getSortOption('CREATED_AT.DESC'), getSortOption('CREATED_AT.ASC')];
+    const sortOptions = [
+      getSortOption('ACTIVITY'),
+      getSortOption('RANK'),
+      getSortOption('CREATED_AT.DESC'),
+      getSortOption('CREATED_AT.ASC'),
+    ];
 
     return (
       <Page title="Search" showSearch={false}>
