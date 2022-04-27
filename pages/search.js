@@ -289,6 +289,7 @@ class SearchPage extends React.Component {
       getSortOption('CREATED_AT.DESC'),
       getSortOption('CREATED_AT.ASC'),
     ];
+    const selectedTypeFilter = router.query.isHost ? 'HOST' : router.query.type || 'ALL';
 
     return (
       <Page title="Search" showSearch={false}>
@@ -323,7 +324,7 @@ class SearchPage extends React.Component {
               <StyledFilters
                 filters={Object.keys(FILTERS)}
                 getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
-                selected={this.state.filter}
+                selected={selectedTypeFilter}
                 minButtonWidth="95px"
                 onChange={filter => {
                   this.setState({ filter: filter });
@@ -334,7 +335,7 @@ class SearchPage extends React.Component {
             <Hide md lg>
               <StyledSelectFilter
                 inputId="collective-type-filter"
-                value={{ label: intl.formatMessage(I18nFilters[this.state.filter]), value: this.state.filter }}
+                value={{ label: intl.formatMessage(I18nFilters[selectedTypeFilter]), value: selectedTypeFilter }}
                 options={Object.keys(FILTERS).map(key => ({ label: intl.formatMessage(I18nFilters[key]), value: key }))}
                 onChange={({ value }) => {
                   this.setState({ filter: value });
