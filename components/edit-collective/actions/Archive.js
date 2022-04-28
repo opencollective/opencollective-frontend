@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
+import { CollectiveType } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
@@ -49,7 +50,7 @@ const ArchiveCollective = ({ collective }) => {
   };
   const [archiveCollective] = useMutation(archiveCollectiveMutation, adminPanelMutationParams);
   const [unarchiveCollective] = useMutation(unarchiveCollectiveMutation, adminPanelMutationParams);
-  const isSelfHosted = collective.host?.id === collective.id;
+  const isSelfHosted = collective.host?.id === collective.id && collective.type !== CollectiveType.ORGANIZATION;
 
   const handleArchiveCollective = async ({ id }) => {
     setModal({ type: 'Archive', show: false });
