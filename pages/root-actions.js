@@ -7,6 +7,7 @@ import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
 import { Box, Grid } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
+import BanAccount from '../components/root-actions/BanAccounts';
 import ClearCacheForAccountForm from '../components/root-actions/ClearCacheForAccountForm';
 import ConnectAccountsForm from '../components/root-actions/ConnectAccountsForm';
 import MergeAccountsForm from '../components/root-actions/MergeAccountsForm';
@@ -41,6 +42,12 @@ const MENU = [
     Component: MoveReceivedContributions,
     description: `This tool is meant to edit the account that received a contribution.
     Use it to move contributions to different tiers, sub-projects, events, etc.`,
+  },
+  {
+    id: 'Moderation',
+    Component: BanAccount,
+    isDangerous: true,
+    description: 'Use this action to ban an account or a network of accounts.',
   },
 ];
 
