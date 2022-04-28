@@ -8,7 +8,6 @@ import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import { first, get } from 'lodash';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -16,7 +15,7 @@ import { getCollectiveMainTag } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { githubProfileUrl, twitterProfileUrl } from '../../../lib/url-helpers';
 
-import ContactCollectiveModal from '../../ContactCollectiveModal';
+import ContactCollectiveBtn from '../../ContactCollectiveBtn';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import { Box, Flex } from '../../Grid';
@@ -83,10 +82,8 @@ const StyledShortDescription = styled.h2`
 const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const intl = useIntl();
   const { LoggedInUser } = useUser();
-  const router = useRouter();
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
-  const [showContactModal, setShowContactModal] = React.useState(false);
   const isEditing = hasColorPicker || isEditingCover;
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isEvent = collective.type === CollectiveType.EVENT;
@@ -173,17 +170,13 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
               )}
               <Flex my={2}>
                 {collective.canContact && (
-                  <StyledRoundButton
-                    onClick={() =>
-                      LoggedInUser ? setShowContactModal(true) : router.push(`/${collective.slug}/contact`)
-                    }
-                    size={32}
-                    mr={3}
-                    title="Contact"
-                    aria-label="Contact"
-                  >
-                    <Mail size={12} />
-                  </StyledRoundButton>
+                  <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
+                    {btnProps => (
+                      <StyledRoundButton {...btnProps} size={32} mr={3} title="Contact" aria-label="Contact">
+                        <Mail size={12} />
+                      </StyledRoundButton>
+                    )}
+                  </ContactCollectiveBtn>
                 )}
                 {collective.twitterHandle && (
                   <StyledLink
@@ -337,9 +330,6 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
           )}
         </ContainerSectionContent>
       </Container>
-      {showContactModal && (
-        <ContactCollectiveModal collective={collective} onClose={() => setShowContactModal(false)} />
-      )}
     </Fragment>
   );
 };

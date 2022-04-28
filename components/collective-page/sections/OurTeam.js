@@ -2,10 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Mail } from '@styled-icons/feather/Mail';
 import { get } from 'lodash';
-import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import ContactCollectiveModal from '../../ContactCollectiveModal';
+import ContactCollectiveBtn from '../../ContactCollectiveBtn';
 import Container from '../../Container';
 import ContributorCard from '../../ContributorCard';
 import StyledButton from '../../StyledButton';
@@ -19,8 +18,6 @@ const COLLECTIVE_CARD_WIDTH = 144;
  */
 const SectionOurTeam = ({ collective, coreContributors, LoggedInUser }) => {
   const loggedUserCollectiveId = get(LoggedInUser, 'CollectiveId');
-  const [showContactModal, setShowContactModal] = React.useState(false);
-  const router = useRouter();
 
   return (
     <ContainerSectionContent py={[3, 4]}>
@@ -45,22 +42,19 @@ const SectionOurTeam = ({ collective, coreContributors, LoggedInUser }) => {
         </Container>
         {collective.canContact && (
           <Container display="flex" flexDirection="column" alignItems="center">
-            <StyledButton
-              onClick={() => (LoggedInUser ? setShowContactModal(true) : router.push(`/${collective.slug}/contact`))}
-              buttonStyle="secondary"
-              mt={[3, 4]}
-            >
-              <Span mr="8px">
-                <Mail size={16} />
-              </Span>
-              <FormattedMessage defaultMessage="Contact Collective" />
-            </StyledButton>
+            <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
+              {btnProps => (
+                <StyledButton {...btnProps} buttonStyle="secondary" mt={[3, 4]}>
+                  <Span mr="8px">
+                    <Mail size={16} />
+                  </Span>
+                  <FormattedMessage defaultMessage="Contact Collective" />
+                </StyledButton>
+              )}
+            </ContactCollectiveBtn>
           </Container>
         )}
       </Container>
-      {showContactModal && (
-        <ContactCollectiveModal collective={collective} onClose={() => setShowContactModal(false)} />
-      )}
     </ContainerSectionContent>
   );
 };
