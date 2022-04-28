@@ -312,7 +312,7 @@ const ExpenseFormBody = ({
 
   // Return to Payee step if type is changed and reset some values
   React.useEffect(() => {
-    if (previousValue && !isCreditCardCharge) {
+    if ((previousValue || values.payee?.isInvite) && !isCreditCardCharge) {
       setStep(STEPS.PAYEE);
       setOnBehalf(false);
 
