@@ -70,26 +70,39 @@ class InputTypeCountry extends Component {
     );
   }
 
+  getCountryParts = countryString => {
+    if (!countryString) {
+      return null;
+    } else if (countryString === 'ALL') {
+      return 'ALL';
+    } else {
+      return countryString.split('-');
+    }
+  };
+
   getOptions = memoizeOne(locale => {
-    const options = Object.keys(countryData).map(code => ({
-      value: code,
-      label: this.generateCountryLabel(locale, code),
-    }));
+    const options = Object.keys(countryData).map(code => {
+      const countryName = this.countryNames.of(code);
+      return {
+        value: `${countryName}-${code}`,
+        label: this.generateCountryLabel(locale, code),
+      };
+    });
 
     return [...this.props.customOptions, ...orderBy(options, 'label')];
   });
 
-  getSelectedOption = memoizeOne((locale, country) => {
-    if (!country) {
+  getSelectedOption = memoizeOne((locale, countryString) => {
+    const countryParts = this.getCountryParts(countryString);
+    if (!countryParts) {
       return null;
     }
 
-    const code = country.toUpperCase();
-    const customOption = this.props.customOptions.find(customOption => customOption.value === code);
+    const customOption = this.props.customOptions.find(customOption => customOption.value === countryParts[0]);
     return (
       customOption || {
-        value: code,
-        label: this.generateCountryLabel(locale, code),
+        value: `${countryParts[0]}-${countryParts[1]}`,
+        label: this.generateCountryLabel(locale, countryParts[1]),
       }
     );
   });
@@ -101,7 +114,7 @@ class InputTypeCountry extends Component {
         name={name}
         inputId={inputId}
         minWidth={150}
-        options={this.getOptions(locale || intl.locale, defaultValue)}
+        options={this.getOptions(locale || intl.locale)}
         onChange={({ value }) => onChange(value)}
         value={!isUndefined(value) ? this.getSelectedOption(locale || intl.locale, value) : undefined}
         defaultValue={defaultValue ? this.getSelectedOption(locale || intl.locale, defaultValue) : undefined}

@@ -108,6 +108,14 @@ const constructSortByQuery = sortByValue => {
   return query;
 };
 
+const getCountryParts = countryString => {
+  if (!countryString || countryString === 'ALL') {
+    return null;
+  } else {
+    return countryString.split('-');
+  }
+};
+
 const FilterButton = styled(StyledButton).attrs({
   buttonSize: 'tiny',
   buttonStyle: 'standard',
@@ -614,7 +622,7 @@ export const addSearchPageData = graphql(searchPageQuery, {
       isHost: props.isHost,
       limit: props.limit,
       offset: props.offset,
-      country: props.country,
+      country: getCountryParts(props.country) ? getCountryParts(props.country)[1] : null,
       tag: props.tag,
       sortBy: constructSortByQuery(props.sortBy),
     },
