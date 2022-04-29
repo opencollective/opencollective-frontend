@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { injectIntl, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../../lib/collective.lib';
@@ -270,4 +270,4 @@ StyledCollectiveCard.defaultProps = {
   useLink: true,
 };
 
-export default injectIntl(StyledCollectiveCard);
+export default StyledCollectiveCard;

@@ -6563,7 +6563,7 @@ type Organization implements Account & AccountWithContributions {
   """
   connectedAccounts: [ConnectedAccount]
 
-  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see the addresses of the collectives they're admin of\n            - Hosts can see the address of organizations submitting expenses to their collectives\n        "
+  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.\n            - Hosts can see the address of organizations submitting expenses to their collectives.\n        "
   location: Location
   categories: [String]!
   stats: AccountStats
@@ -7315,6 +7315,7 @@ type Query {
     Only accounts that support one of these payment services will be returned
     """
     supportedPaymentMethodService: [PaymentMethodService]
+      @deprecated(reason: "2022-04-22: Introduced for Hacktoberfest and not used anymore.")
 
     """
     Whether to skip recent suspicious accounts (48h)
@@ -10708,41 +10709,6 @@ type Mutation {
   ): Host!
 
   """
-  [Root only] Clears the cache for a given account
-  """
-  clearCacheForAccount(
-    """
-    Account to clear the cache for
-    """
-    account: AccountReferenceInput!
-
-    """
-    Types of cache to clear
-    """
-    type: [AccountCacheType]! = [CLOUDFLARE, GRAPHQL_QUERIES, CONTRIBUTORS]
-  ): Account!
-
-  """
-  [Root only] Merge two accounts, returns the result account
-  """
-  mergeAccounts(
-    """
-    Account to merge from
-    """
-    fromAccount: AccountReferenceInput!
-
-    """
-    Account to merge to
-    """
-    toAccount: AccountReferenceInput!
-
-    """
-    If true, the result will be simulated and summarized in the response message
-    """
-    dryRun: Boolean! = true
-  ): MergeAccountsResponse!
-
-  """
   Adds or removes a policy on a given account
   """
   setPolicies(
@@ -11233,6 +11199,61 @@ type Mutation {
     """
     virtualCard: VirtualCardReferenceInput!
   ): Boolean
+
+  """
+  [Root only] Clears the cache for a given account
+  """
+  clearCacheForAccount(
+    """
+    Account to clear the cache for
+    """
+    account: AccountReferenceInput!
+
+    """
+    Types of cache to clear
+    """
+    type: [AccountCacheType]! = [CLOUDFLARE, GRAPHQL_QUERIES, CONTRIBUTORS]
+  ): Account!
+
+  """
+  [Root only] Merge two accounts, returns the result account
+  """
+  mergeAccounts(
+    """
+    Account to merge from
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Account to merge to
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    If true, the result will be simulated and summarized in the response message
+    """
+    dryRun: Boolean! = true
+  ): MergeAccountsResponse!
+
+  """
+  [Root only] Ban accounts
+  """
+  banAccount(
+    """
+    Account(s) to ban
+    """
+    account: [AccountReferenceInput!]!
+
+    """
+    If true, the associated accounts will also be banned
+    """
+    includeAssociatedAccounts: Boolean!
+
+    """
+    If true, the result will be simulated and summarized in the response message
+    """
+    dryRun: Boolean!
+  ): BanAccountResponse!
 }
 
 input CollectiveCreateInput {
@@ -11949,24 +11970,6 @@ input AccountUpdateInput {
   currency: Currency
 }
 
-enum AccountCacheType {
-  CLOUDFLARE
-  GRAPHQL_QUERIES
-  CONTRIBUTORS
-}
-
-type MergeAccountsResponse {
-  """
-  The resulting account
-  """
-  account: Account!
-
-  """
-  A message to display to the user about the result
-  """
-  message: String
-}
-
 """
 Response for the confirmGuestAccount mutation
 """
@@ -12375,4 +12378,39 @@ enum VirtualCardProvider {
 
 input VirtualCardReferenceInput {
   id: String
+}
+
+enum AccountCacheType {
+  CLOUDFLARE
+  GRAPHQL_QUERIES
+  CONTRIBUTORS
+}
+
+type MergeAccountsResponse {
+  """
+  The resulting account
+  """
+  account: Account!
+
+  """
+  A message to display to the user about the result
+  """
+  message: String
+}
+
+type BanAccountResponse {
+  """
+  Whether the accounts can be banned
+  """
+  isAllowed: Boolean!
+
+  """
+  A summary of the changes
+  """
+  message: String
+
+  """
+  The accounts impacted by the mutation
+  """
+  accounts: [Account!]!
 }

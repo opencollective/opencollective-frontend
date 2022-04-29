@@ -64,6 +64,7 @@ class SearchForm extends React.Component {
       onChange,
       borderRadius = '20px',
       height = '46px',
+      disabled,
     } = this.props;
     return (
       <form action="/search" method="GET" onSubmit={onSubmit}>
@@ -90,6 +91,7 @@ class SearchForm extends React.Component {
             defaultValue={defaultValue}
             value={value}
             onChange={onChange && (e => onChange(e.target.value))}
+            disabled={disabled}
           />
         </SearchInputContainer>
       </form>
@@ -110,6 +112,7 @@ SearchForm.propTypes = {
   borderRadius: PropTypes.string,
   height: PropTypes.string,
   router: PropTypes.object,
+  disabled: PropTypes.bool,
 };
 
 export default withRouter(SearchForm);
