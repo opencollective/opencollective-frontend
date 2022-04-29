@@ -8,12 +8,13 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
 import { Flex } from '../Grid';
-import LinkCollective from '../LinkCollective';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+
+import BanAccountsSummary from './BanAccountsSummary';
 
 export const banAccountsMutation = gqlV2/* GraphQL */ `
   mutation BanAccounts($account: [AccountReferenceInput!]!, $dryRun: Boolean!, $includeAssociatedAccounts: Boolean!) {
@@ -114,20 +115,7 @@ const BanAccount = () => {
             }
           }}
         >
-          <P whiteSpace="pre-wrap" lineHeight="24px">
-            {dryRunData.message}
-          </P>
-          {Boolean(dryRunData.isAllowed && dryRunData.accounts.length) && (
-            <P mt={2}>
-              List of impacted accounts:{' '}
-              {dryRunData.accounts.map((account, index) => (
-                <span key={account.id}>
-                  {index > 0 && ', '}
-                  <LinkCollective collective={account} openInNewTab />
-                </span>
-              ))}
-            </P>
-          )}
+          <BanAccountsSummary dryRunData={dryRunData} />
         </ConfirmationModal>
       )}
     </div>

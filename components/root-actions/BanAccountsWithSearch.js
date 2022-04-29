@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { uniqBy } from 'lodash';
+import { truncate, uniqBy } from 'lodash';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -8,18 +8,19 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
-import { Flex } from '../Grid';
-import LinkCollective from '../LinkCollective';
+import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledCollectiveCard from '../search-page/StyledCollectiveCard';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
+import StyledLink from '../StyledLink';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import { banAccountsMutation } from './BanAccounts';
+import BanAccountsSummary from './BanAccountsSummary';
 
 export const searchQuery = gqlV2/* GraphQL */ `
   query SearchPage($term: String!, $offset: Int) {
@@ -167,7 +168,18 @@ const BanAccountsWithSearch = () => {
                 }
               }}
             >
-              <StyledCollectiveCard collective={account} bodyHeight={200} />
+              <StyledCollectiveCard collective={account} bodyHeight={200} pb={3} px={3} fontSize="11px">
+                <div>
+                  {account.website && (
+                    <Box mb={2}>
+                      <StyledLink openInNewTabNoFollow href={account.website}>
+                        {truncate(account.website, { length: 128 })}
+                      </StyledLink>
+                    </Box>
+                  )}
+                  {account.description && <P fontSize="11px">{truncate(account.description, { length: 120 })}</P>}
+                </div>
+              </StyledCollectiveCard>
             </CardContainer>
           ))}
         </AccountsContainer>
@@ -233,20 +245,7 @@ const BanAccountsWithSearch = () => {
             }
           }}
         >
-          <P whiteSpace="pre-wrap" lineHeight="24px">
-            {dryRunData.message}
-          </P>
-          {Boolean(dryRunData.isAllowed && dryRunData.accounts.length) && (
-            <P mt={2}>
-              List of impacted accounts:{' '}
-              {dryRunData.accounts.map((account, index) => (
-                <span key={account.id}>
-                  {index > 0 && ', '}
-                  <LinkCollective collective={account} openInNewTab />
-                </span>
-              ))}
-            </P>
-          )}
+          <BanAccountsSummary dryRunData={dryRunData} />
         </ConfirmationModal>
       )}
     </div>
