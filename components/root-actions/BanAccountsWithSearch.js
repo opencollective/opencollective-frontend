@@ -117,7 +117,7 @@ const AccountsContainer = styled.div`
 
 const BanAccountsWithSearch = () => {
   const [searchTerm, setSearchTerm] = React.useState('');
-  const { data, loading, error } = useQuery(searchQuery, {
+  const { data, loading, error, refetch } = useQuery(searchQuery, {
     variables: { term: searchTerm },
     context: API_V2_CONTEXT,
     skip: !searchTerm,
@@ -231,7 +231,7 @@ const BanAccountsWithSearch = () => {
               const result = await banAccounts(false);
               setDryRunData(null);
               setSelectedAccounts([]);
-              setSearchTerm('');
+              refetch(); // Refresh the search results, no need to wait for it
               addToast({
                 type: TOAST_TYPE.SUCCESS,
                 title: `Successfully banned ${result.data.banAccount.accounts.length} accounts`,
