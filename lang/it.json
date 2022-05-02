@@ -77,7 +77,6 @@
   "acceptContributions.picker.header": "Accetta contributi finanziari",
   "acceptContributions.picker.host": "Unisciti a un Host fiscale",
   "acceptContributions.picker.hostInfo": "Richiedi di unirti a un Organizzatore Fiscale, che riceverà denaro per conto del tuo Collettivo. Scegli questa opzione se desideri che qualcun altro si occupi di banche, contabilità, tasse, pagamenti e responsabilità. <MoreInfoLink>Maggiori informazioni </MoreInfoLink>",
-  "acceptContributions.picker.organizationInfo": "Selezionare o creare il proprio Organizzazione Fiscale, che gestisci. Scegli questa opzione se hai una persona giuridica creata per gestire la contabilità, le tasse, i pagamenti e la responsabilità per più Collettivi. <MoreInfoLink>Maggiori informazioni</MoreInfoLink>",
   "acceptContributions.picker.ourselves": "Collettivo Indipendente",
   "acceptContributions.picker.ourselvesInfo": "Collega semplicemente un conto bancario al tuo Collettivo. Sarai responsabile per la contabilità, le tasse, i pagamenti e la responsabilità. Scegli questa opzione se hai un singolo collettivo e desideri gestire denaro per il collettivo tu stesso. <MoreInfoLink>Maggiori informazioni</MoreInfoLink>",
   "acceptContributions.picker.subtitle": "Chi gestirà il denaro per conto di questo Collettivo?",
