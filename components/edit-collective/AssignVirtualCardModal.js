@@ -26,7 +26,7 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 const initialValues = {
   cardNumber: undefined,
   collective: undefined,
-  expireDate: undefined,
+  expiryDate: undefined,
   cvv: undefined,
   assignee: undefined,
   provider: undefined,
@@ -89,7 +89,9 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
       const privateData = {
         cardNumber: values.cardNumber.replace(/\s+/g, ''),
         cvv: values.cvv,
-        expireDate: values.expireDate,
+        expiryDate: values.expiryDate,
+        // Should be removed once https://github.com/opencollective/opencollective-api/pull/7307 is deployed to production
+        expireDate: values.expiryDate,
       };
 
       try {
@@ -141,8 +143,8 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
       if (!values.assignee) {
         errors.assignee = 'Required';
       }
-      if (!values.expireDate) {
-        errors.expireDate = 'Required';
+      if (!values.expiryDate) {
+        errors.expiryDate = 'Required';
       }
       if (!values.cvv) {
         errors.cvv = 'Required';
@@ -329,17 +331,17 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
             </StyledInputField>
             <StyledInputField
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Expire date" />}
-              htmlFor="expireDate"
-              error={formik.touched.expireDate && formik.errors.expireDate}
+              label={<FormattedMessage defaultMessage="Expiry date" />}
+              htmlFor="expiryDate"
+              error={formik.touched.expiryDate && formik.errors.expiryDate}
             >
               {inputProps => (
                 <StyledInputMask
                   {...inputProps}
-                  name="expireDate"
-                  id="expireDate"
+                  name="expiryDate"
+                  id="expiryDate"
                   onChange={formik.handleChange}
-                  value={formik.values.expireDate}
+                  value={formik.values.expiryDate}
                   mask={[/[01]/, /\d/, '/', '2', '0', /\d/, /\d/]}
                   placeholder="MM/YYYY"
                   guide={false}
