@@ -149,7 +149,7 @@ const getContentSecurityPolicyConfig = () => {
     };
   } else if (env === 'production') {
     return {
-      reportOnly: true,
+      reportOnly: false,
       directives: generateDirectives({
         imgSrc: [
           'opencollective-production.s3.us-west-1.amazonaws.com',
