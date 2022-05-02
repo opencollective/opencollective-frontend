@@ -580,22 +580,11 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
             valueInCents
           }
         }
-        ... on AccountWithHost {
-          hostCollective: host {
-            id
-            location {
-              country
-            }
-          }
-        }
         ... on Organization {
           host {
             id
             hostFeePercent
             totalHostedCollectives
-            location {
-              country
-            }
           }
         }
         ... on AccountWithParent {

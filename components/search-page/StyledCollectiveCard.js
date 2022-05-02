@@ -161,10 +161,7 @@ const StyledCollectiveCard = ({
 }) => {
   const intl = useIntl();
   const regionNames = getIntlDisplayNames(intl.locale, 'region');
-  const collectiveCountry =
-    collective.location?.country ||
-    collective.parent?.location?.country ||
-    collective.hostCollective?.location?.country;
+  const collectiveCountry = collective.location?.country || collective.parent?.location?.country;
   const countryString = collectiveCountry
     ? `${getFlagEmoji(collectiveCountry)} ${regionNames.of(collectiveCountry)}`
     : null;
@@ -252,7 +249,7 @@ StyledCollectiveCard.propTypes = {
     tags: PropTypes.arrayOf(PropTypes.string),
     location: PropTypes.shape({ country: PropTypes.string }),
     settings: PropTypes.object,
-    hostCollective: PropTypes.shape({
+    host: PropTypes.shape({
       // TODO: getCollectiveMainTag should be based on slug
       id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       location: PropTypes.shape({ country: PropTypes.string }),
