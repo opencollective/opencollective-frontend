@@ -8,6 +8,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
@@ -132,7 +133,6 @@ const FilterButton = styled(StyledButton).attrs({
     `}
 `;
 
-export const IGNORED_TAGS = ['community', 'user'];
 const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
 
 class SearchPage extends React.Component {

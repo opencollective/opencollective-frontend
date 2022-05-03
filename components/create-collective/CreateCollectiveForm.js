@@ -22,6 +22,7 @@ import StyledCheckbox from '../StyledCheckbox';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
+import StyledInputTags from '../StyledInputTags';
 import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { H1, P } from '../Text';
@@ -54,6 +55,7 @@ const messages = defineMessages({
     id: 'createCollective.form.descriptionLabel',
     defaultMessage: 'What does your Collective do?',
   },
+  tagsLabel: { id: 'Tags', defaultMessage: 'Tags' },
   descriptionHint: {
     id: 'createCollective.form.descriptionHint',
     defaultMessage: 'Write a short description (150 characters max)',
@@ -85,6 +87,7 @@ class CreateCollectiveForm extends React.Component {
     onChange: PropTypes.func,
     github: PropTypes.object,
     router: PropTypes.object.isRequired,
+    popularTags: PropTypes.arrayOf(PropTypes.string),
   };
 
   hasHostTerms() {
@@ -99,7 +102,7 @@ class CreateCollectiveForm extends React.Component {
   }
 
   render() {
-    const { intl, error, host, loading, github } = this.props;
+    const { intl, error, host, loading, github, popularTags } = this.props;
     const hasHostTerms = this.hasHostTerms();
 
     const initialValues = {
@@ -132,8 +135,8 @@ class CreateCollectiveForm extends React.Component {
     };
 
     const submit = values => {
-      const { description, name, slug, message } = values;
-      this.props.onSubmit({ collective: { name, description, slug }, message });
+      const { description, name, slug, message, tags } = values;
+      this.props.onSubmit({ collective: { name, description, slug, tags }, message });
     };
 
     return (
@@ -278,6 +281,31 @@ class CreateCollectiveForm extends React.Component {
                       <P fontSize="11px" color="black.600">
                         {intl.formatMessage(messages.descriptionHint)}
                       </P>
+                      <StyledInputFormikField
+                        name="tags"
+                        htmlFor="tags"
+                        labelProps={LABEL_STYLES}
+                        label={intl.formatMessage(messages.tagsLabel)}
+                        value={values.tags}
+                        required
+                        mt={3}
+                        mb={2}
+                        data-cy="ccf-form-tags"
+                      >
+                        {({ field }) => (
+                          <StyledInputTags
+                            {...field}
+                            suggestedTags={popularTags}
+                            onChange={tags => {
+                              formik.setFieldValue(
+                                'tags',
+                                tags.map(t => t.value.toLowerCase()),
+                              );
+                            }}
+                            value={values.tags}
+                          />
+                        )}
+                      </StyledInputFormikField>
 
                       {host && (
                         <StyledInputFormikField
