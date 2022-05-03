@@ -249,6 +249,7 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
 
 /**
  * Create a collective hosted by the open source collective.
+ * TODO: Migrate this to GQLV2 -> `createCollective` with `automateApprovalWithGithub` set to true
  */
 Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEmail, ...collectiveParams } = {}) => {
   const collective = {
