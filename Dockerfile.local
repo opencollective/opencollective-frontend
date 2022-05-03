@@ -1,0 +1,8 @@
+FROM node:14.19-alpine
+
+RUN apk add --no-cache postgresql-client 
+
+WORKDIR /api
+
+CMD if test -d node_modules; then echo "no need for npm i"; else npm i -q; fi && npm run dev
+

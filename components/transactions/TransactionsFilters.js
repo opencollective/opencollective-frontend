@@ -10,6 +10,7 @@ import PeriodFilter from '../filters/PeriodFilter';
 import { Box, Flex } from '../Grid';
 
 import TransactionsKindFilter from './filters/TransactionsKindFilter';
+import TransactionsPaymentMethodFilter from './filters/TransactionsPaymentMethodFilter';
 import TransactionsTypeFilter from './filters/TransactionsTypeFilter';
 
 const FilterContainer = styled(Box)`
@@ -25,7 +26,7 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const TransactionsFilters = ({ collective, filters, kinds, onChange }) => {
+const TransactionsFilters = ({ collective, filters, kinds, paymentMethod, onChange }) => {
   const getFilterProps = (name, valueModifier) => ({
     inputId: `transactions-filter-${name}`,
     value: filters?.[name],
@@ -34,6 +35,8 @@ const TransactionsFilters = ({ collective, filters, kinds, onChange }) => {
       onChange({ ...filters, [name]: value === 'ALL' ? null : preparedValue });
     },
   });
+
+  console.log('paymentMethod', paymentMethod);
 
   return (
     <Flex flexDirection={['column', 'row']} flexGrow={[1, 0.5]}>
@@ -61,6 +64,12 @@ const TransactionsFilters = ({ collective, filters, kinds, onChange }) => {
         </FilterLabel>
         <TransactionsKindFilter kinds={kinds} {...getFilterProps('kind')} />
       </FilterContainer>
+      <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+        <FilterLabel htmlFor="transactions-filter-paymentMethod">
+          <FormattedMessage id="transactions.paymentMethod" defaultMessage="PaymentMethod" />
+        </FilterLabel>
+        <TransactionsPaymentMethodFilter paymentMethod={paymentMethod} {...getFilterProps('paymentMethod')} />
+      </FilterContainer>
     </Flex>
   );
 };
@@ -69,6 +78,7 @@ TransactionsFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
   kinds: PropTypes.array,
+  paymentMethod: PropTypes.array,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     createdAt: PropTypes.string,
