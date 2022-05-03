@@ -77,7 +77,6 @@
   "acceptContributions.picker.header": "接受财政捐助",
   "acceptContributions.picker.host": "成为财务主管",
   "acceptContributions.picker.hostInfo": "申请加入财务主管来为您的社群保管资金，如果您想让其它人来管理银行业务、会计、税务、交易管理与承担责任，请选择此项。<MoreInfoLink>更多信息详见此处</MoreInfoLink>",
-  "acceptContributions.picker.organizationInfo": "选择或创建您自己管理的财务主管。 如果您有一个法人来处理多个社群的会计、税款、付款和赔偿责任，请选择此选项。 <MoreInfoLink>更多信息详见此处</MoreInfoLink>",
   "acceptContributions.picker.ourselves": "独立社群",
   "acceptContributions.picker.ourselvesInfo": "只需将银行账户连接到您的社群。您将负责会计、税收、付款和责任。 选择此选项，如果您有一个集体并想为自己持有资金。<MoreInfoLink>更多信息</MoreInfoLink>",
   "acceptContributions.picker.subtitle": "谁将代表这个社群持有资金？",

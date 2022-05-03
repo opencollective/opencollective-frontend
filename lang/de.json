@@ -77,7 +77,6 @@
   "acceptContributions.picker.header": "Finanzbeiträge akzeptieren",
   "acceptContributions.picker.host": "Treten Sie einem steuerlichen Träger bei",
   "acceptContributions.picker.hostInfo": "Bewerben Sie sich, um einem Steuerträger beizutreten, der Geld im Namen Ihres Kollektivs hält. Wählen Sie diese Option, wenn jemand anders sich um Bankwesen, Buchhaltung, Steuern, Zahlungen und Haftung kümmern soll. <MoreInfoLink>Mehr Informationen</MoreInfoLink>",
-  "acceptContributions.picker.organizationInfo": "Wählen oder erstellen Sie Ihren eigenen Steuerträger, den Sie verwalten. Wählen Sie diese Option, wenn Sie eine juristische Person eingerichtet haben, die für Buchhaltung, Steuern, Zahlungen und Haftung für mehrere Kollektive zuständig ist. <MoreInfoLink>Mehr Informationen</MoreInfoLink>",
   "acceptContributions.picker.ourselves": "Unabhängiges Kollektiv",
   "acceptContributions.picker.ourselvesInfo": "Verbinden Sie einfach ein Bankkonto mit Ihrem Kollektiv. Sie sind verantwortlich für Buchhaltung, Steuern, Zahlungen und Haftung. Wählen Sie diese Option, wenn Sie ein einzelnes Kollektiv haben und dessen Gelder selbst verwalten möchten.<MoreInfoLink>Mehr Informationen</MoreInfoLink>",
   "acceptContributions.picker.subtitle": "Wer wird Geld im Auftrag des Kollektivs verwalten?",

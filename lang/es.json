@@ -77,7 +77,6 @@
   "acceptContributions.picker.header": "Aceptar contribuciones financieras",
   "acceptContributions.picker.host": "Únete a una organización host",
   "acceptContributions.picker.hostInfo": "Aplica para ser hospedado por una organización host, quien guardará el dinero en nombre de ti y tu equipo. Elije esta opción si quieres que alguien más se ocupe de los asuntos bancarios, contabilidad, impuestos, pagos y que se haga responsable ante la ley.  <MoreInfoLink>Más información</MoreInfoLink>",
-  "acceptContributions.picker.organizationInfo": "Crea tu propia organización host, tú la administras. Elije esta opción si tienes una entidad legal configurada para manejar la contabilidad, los impuestos, los pagos y la responsabilidad legal de múltiples Colectivos. <MoreInfoLink>Más información</MoreInfoLink>",
   "acceptContributions.picker.ourselves": "Colectivo independiente",
   "acceptContributions.picker.ourselvesInfo": "Simplemente conecta una cuenta bancaria a tu Colectivo. Serás responsable de la contabilidad, los impuestos, los pagos y las obligaciones legales. Elige esta opción si tienes un solo Colectivo y quieres recibir dinero por ti mismo.",
   "acceptContributions.picker.subtitle": "¿Quién guardará el dinero del Colectivo?",
