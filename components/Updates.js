@@ -83,15 +83,15 @@ class Updates extends React.Component {
               <FormattedMessage id="updates.empty" defaultMessage="No Updates" />
             </Container>
           )}
-          {showLoadMore && (
-            <Container margin="1rem" textAlign="center">
-              <StyledButton onClick={this.fetchMore}>
-                {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
-                {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
-              </StyledButton>
-            </Container>
-          )}
         </Container>
+        {showLoadMore && (
+          <Container margin="1rem" textAlign="center">
+            <StyledButton onClick={this.fetchMore} textTransform="capitalize">
+              {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
+              {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
+            </StyledButton>
+          </Container>
+        )}
       </div>
     );
   }
