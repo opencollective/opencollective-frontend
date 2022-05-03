@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { countryData, getCountryCodeByCountryName, getEmojiByCountryCode } from 'country-currency-emoji-flags';
+import { countryData, getEmojiByCountryCode } from 'country-currency-emoji-flags';
 import { isUndefined, orderBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -71,15 +71,10 @@ class InputTypeCountry extends Component {
   }
 
   getOptions = memoizeOne(locale => {
-    const countryNames = new Intl.DisplayNames(locale, { type: 'region' });
-    const options = Object.keys(countryData).map(code => {
-      const countryName = countryNames.of(code);
-
-      return {
-        value: countryName,
-        label: this.generateCountryLabel(locale, code),
-      };
-    });
+    const options = Object.keys(countryData).map(code => ({
+      value: code,
+      label: this.generateCountryLabel(locale, code),
+    }));
 
     return [...this.props.customOptions, ...orderBy(options, 'label')];
   });
@@ -89,7 +84,7 @@ class InputTypeCountry extends Component {
       return null;
     }
 
-    const code = getCountryCodeByCountryName(country) || 'ALL';
+    const code = country.toUpperCase();
     const customOption = this.props.customOptions.find(customOption => customOption.value === code);
     return (
       customOption || {

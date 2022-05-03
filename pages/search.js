@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular';
 import copy from 'copy-to-clipboard';
-import { getCountryCodeByCountryName } from 'country-currency-emoji-flags';
 import { isNil, pickBy, truncate } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -615,7 +614,7 @@ export const addSearchPageData = graphql(searchPageQuery, {
       isHost: props.isHost,
       limit: props.limit,
       offset: props.offset,
-      country: getCountryCodeByCountryName(props.country) || undefined,
+      country: props.country,
       tag: props.tag,
       sortBy: constructSortByQuery(props.sortBy),
     },
