@@ -16,8 +16,6 @@ import acceptHostHoverIllustration from '../../public/static/images/create-colle
 import acceptHostIllustration from '../../public/static/images/create-collective/acceptContributionsHostIllustration.png';
 import acceptMyselfHoverIllustration from '../../public/static/images/create-collective/acceptContributionsMyselfHoverIllustration.png';
 import acceptMyselfIllustration from '../../public/static/images/create-collective/acceptContributionsMyselfIllustration.png';
-import acceptOrganizationHoverIllustration from '../../public/static/images/create-collective/acceptContributionsOrganizationHoverIllustration.png';
-import acceptOrganizationIllustration from '../../public/static/images/create-collective/acceptContributionsOrganizationIllustration.png';
 
 const Image = styled.img`
   position: absolute;
@@ -56,7 +54,6 @@ const HoverImage = styled.img`
 `;
 
 const independentCollectiveMoreInfo = 'https://docs.opencollective.com/help/independent-collectives';
-const ownFiscalHostMoreInfo = 'https://opencollective.com/become-a-fiscal-host';
 const applyFiscalHostMoreInfo = 'https://opencollective.com/fiscal-hosting';
 
 class ContributionCategoryPicker extends React.Component {
@@ -83,7 +80,6 @@ class ContributionCategoryPicker extends React.Component {
         defaultMessage: 'Independent Collective',
       },
       host: { id: 'acceptContributions.picker.host', defaultMessage: 'Join a Fiscal Host' },
-      organization: { id: 'acceptContributions.organization.subtitle', defaultMessage: 'Our Own Fiscal Host' },
     });
   }
 
@@ -137,51 +133,6 @@ class ContributionCategoryPicker extends React.Component {
                         values={{
                           MoreInfoLink: getI18nLink({
                             href: independentCollectiveMoreInfo,
-                            openInNewTab: true,
-                          }),
-                        }}
-                      />
-                    </P>
-                  </Box>
-                </Flex>
-              </Container>
-              <Container
-                borderLeft={['none', '1px solid #E6E8EB']}
-                borderTop={['1px solid #E6E8EB', 'none']}
-                alignItems="center"
-                width={[null, 280, 312]}
-                mb={[2, 0]}
-                pt={[3, 0]}
-              >
-                <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                  <Box size={[192, 208, 256]}>
-                    <Image src={acceptOrganizationIllustration} alt={intl.formatMessage(this.messages.organization)} />
-                    <HoverImage
-                      src={acceptOrganizationHoverIllustration}
-                      alt={intl.formatMessage(this.messages.organization)}
-                    />
-                  </Box>
-                  <Link href={`/${router.query.slug}/accept-financial-contributions/organization`}>
-                    <StyledButton
-                      fontSize="13px"
-                      buttonStyle="primary"
-                      minHeight="36px"
-                      mt={[2, 3]}
-                      mb={3}
-                      minWidth={'145px'}
-                      data-cy="afc-picker-organization-button"
-                    >
-                      {intl.formatMessage(this.messages.organization)}
-                    </StyledButton>
-                  </Link>
-                  <Box minHeight={50} px={3}>
-                    <P color="black.600" textAlign="center" mt={[2, 3]} fontSize={['12px', '14px']}>
-                      <FormattedMessage
-                        id="acceptContributions.picker.organizationInfo"
-                        defaultMessage="Select or create your own Fiscal Host, which you manage. Choose this option if you have a legal entity set up to handle accounting, taxes, payments, and liability for multiple Collectives. <MoreInfoLink>More info</MoreInfoLink>"
-                        values={{
-                          MoreInfoLink: getI18nLink({
-                            href: ownFiscalHostMoreInfo,
                             openInNewTab: true,
                           }),
                         }}

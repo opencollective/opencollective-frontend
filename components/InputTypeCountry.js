@@ -71,12 +71,15 @@ class InputTypeCountry extends Component {
   }
 
   getOptions = memoizeOne(locale => {
-    const options = Object.keys(countryData).map(code => ({
-      value: code,
-      label: this.generateCountryLabel(locale, code),
-    }));
+    const options = Object.keys(countryData).map(code => {
+      return {
+        value: code,
+        country: this.countryNames.of(code),
+        label: this.generateCountryLabel(locale, code),
+      };
+    });
 
-    return [...this.props.customOptions, ...orderBy(options, 'label')];
+    return [...this.props.customOptions, ...orderBy(options, 'country')];
   });
 
   getSelectedOption = memoizeOne((locale, country) => {
