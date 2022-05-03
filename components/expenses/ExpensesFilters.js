@@ -9,6 +9,7 @@ import AmountFilter from '../budget/filters/AmountFilter';
 import PeriodFilter from '../budget/filters/PeriodFilter';
 import { Flex } from '../Grid';
 
+import ExpensesOrder from './filters/ExpensesOrder';
 import ExpensesPayoutTypeFilter from './filters/ExpensesPayoutTypeFilter';
 import ExpensesStatusFilter from './filters/ExpensesStatusFilter';
 import ExpensesTypeFilter from './filters/ExpensesTypeFilter';
@@ -30,7 +31,7 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const ExpensesFilters = ({ collective, filters, onChange }) => {
+const ExpensesFilters = ({ collective, filters, onChange, wrap = true }) => {
   const getFilterProps = (name, valueModifier) => ({
     inputId: `expenses-filter-${name}`,
     value: filters?.[name],
@@ -41,7 +42,7 @@ const ExpensesFilters = ({ collective, filters, onChange }) => {
   });
 
   return (
-    <Flex flexWrap="wrap">
+    <Flex flexWrap={wrap ? 'wrap' : 'nowrap'}>
       <FilterContainer>
         <FilterLabel htmlFor="expenses-filter-type">
           <FormattedMessage id="expense.type" defaultMessage="Type" />
@@ -72,6 +73,12 @@ const ExpensesFilters = ({ collective, filters, onChange }) => {
         </FilterLabel>
         <ExpensesStatusFilter {...getFilterProps('status')} />
       </FilterContainer>
+      <FilterContainer>
+        <FilterLabel htmlFor="expenses-order">
+          <FormattedMessage id="expense.order" defaultMessage="Order" />
+        </FilterLabel>
+        <ExpensesOrder {...getFilterProps('orderBy')} />
+      </FilterContainer>
     </Flex>
   );
 };
@@ -83,6 +90,7 @@ ExpensesFilters.propTypes = {
     currency: PropTypes.string.isRequired,
     createdAt: PropTypes.string,
   }).isRequired,
+  wrap: PropTypes.bool,
 };
 
 export default React.memo(ExpensesFilters);
