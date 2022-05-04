@@ -121,6 +121,14 @@ const ACTIVITIES_INFO = {
       defaultMessage: 'Expense marked as spam',
     }),
   },
+  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE: {
+    type: 'warning',
+    icon: UnapprovedIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.MarkedAsIncomplete',
+      defaultMessage: 'Expense marked as incomplete',
+    }),
+  },
 };
 
 const getActivityColor = (activityType, theme) => {
