@@ -107,6 +107,7 @@ class SectionUpdates extends React.PureComponent {
 
   render() {
     const { collective, isAdmin } = this.props;
+    console.log('props', this.props);
     const updates = get(this.props.data, 'Collective.updates', []);
 
     // Nothing to show if updates is empty and user can't add new ones

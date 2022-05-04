@@ -65,6 +65,7 @@ const tierHasFixedInterval = tier => tier?.interval && tier.interval !== 'flexib
  * From received params, see if there's anything preventing the contribution
  */
 export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTier, isCrypto = false) => {
+  console.log({ account });
   if (!account.host) {
     return { reason: CONTRIBUTION_BLOCKER.NO_HOST };
   } else if (!account.isActive) {

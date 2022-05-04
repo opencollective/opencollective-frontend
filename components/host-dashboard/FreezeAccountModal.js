@@ -12,6 +12,7 @@ import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../S
 import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import StyledCheckbox from '../StyledCheckbox';
 
 const editAccountFreezeStatusMutation = gqlV2/* GraphQL */ `
   mutation EditAccountFreezeStatus($account: AccountReferenceInput!, $action: AccountFreezeAction!, $message: String) {
@@ -32,6 +33,7 @@ const FreezeAccountModal = ({ collective, ...props }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
   const [message, setMessage] = useState('');
+  const [keepContributions, setKeepContributions] = useState(false);
   const isUnfreezing = collective.isFrozen;
   const [editAccountFreezeStatus, { loading }] = useMutation(editAccountFreezeStatusMutation, {
     context: API_V2_CONTEXT,
@@ -109,9 +111,14 @@ const FreezeAccountModal = ({ collective, ...props }) => {
               value={message}
               fontSize="13px"
             />
-            <P fontSize="13px" color="black.700" mt="6px">
+            <P fontSize="13px" color="black.700" mt="6px" mb="6px">
               <FormattedMessage defaultMessage="Make sure to let the admins know if action is required" />
             </P>
+            <StyledCheckbox
+              name="only contributions"
+              label="Check this for the collective to still be able to receive contributions"
+              onChange={() => console.log({ keepContributions }) || setKeepContributions(!keepContributions)}
+            />
           </div>
         )}
       </ModalBody>
@@ -123,8 +130,9 @@ const FreezeAccountModal = ({ collective, ...props }) => {
             loading={loading}
             onClick={async () => {
               try {
-                const action = isUnfreezing ? 'UNFREEZE' : 'FREEZE';
+                const action = isUnfreezing ? 'UNFREEZE' : keepContributions ? 'FREEZEKEEPCONTRIBUTIONS' : 'FREEZE';
                 const variables = { account: { id: collective.id }, message, action };
+                // console.log({action})
                 await editAccountFreezeStatus({ variables });
                 const successMsgArgs = { accountName: collective.name, accountSlug: collective.slug };
                 addToast({

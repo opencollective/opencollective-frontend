@@ -21,6 +21,7 @@ export const preloadCollectivePageGraphqlQueries = async (slug, client) => {
     variables: getCollectivePageQueryVariables(slug),
   });
   const collective = result?.data?.Collective;
+  console.log('BEGINNING', collective);
   if (collective) {
     const sections = getFilteredSectionsForCollective(collective);
     const sectionsNames = getSectionsNames(sections);

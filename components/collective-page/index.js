@@ -136,6 +136,7 @@ class CollectivePage extends Component {
   renderSection(section) {
     switch (section) {
       case Sections.UPDATES:
+        console.log('RENDER SECTION ', this.props.collective);
         return (
           <SectionUpdates
             collective={this.props.collective}
@@ -247,6 +248,7 @@ class CollectivePage extends Component {
 
   render() {
     const { collective, host, isAdmin, isHostAdmin, onPrimaryColorChange } = this.props;
+    console.log({ collective });
     const { isFixed, selectedCategory } = this.state;
     const sections = this.getSections(collective, isAdmin, isHostAdmin);
 
