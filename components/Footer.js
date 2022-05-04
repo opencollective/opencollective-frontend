@@ -212,23 +212,7 @@ const generateLanguageOptions = () => {
     const language = languages[key];
     return {
       value: key,
-      label: (
-        <Flex
-          alignItems="center"
-          justifyContent="flex-start"
-          fontSize="12px"
-          color="black.800"
-          lineHeight="18px"
-          fontWeight="500"
-          letterSpacing="-0.04px"
-          title={`${language.name} - ${language.nativeName} (${language.completion})`}
-        >
-          <Span fontSize="24px">{language.flag}</Span>&nbsp;
-          <Span whiteSpace="nowrap" ml={1}>
-            {truncate(`${language.name} - ${language.nativeName}`, { length: 23 })} ({language.completion})
-          </Span>
-        </Flex>
-      ),
+      label: `${truncate(`${language.name} - ${language.nativeName}`, { length: 23 })} (${language.completion})`,
     };
   });
 };
@@ -238,6 +222,12 @@ const Footer = () => {
   const languageOptions = React.useMemo(generateLanguageOptions);
   const defaultLanguage = languageOptions.find(language => language.value === intl.locale);
   const { LoggedInUser } = useUser();
+  const formatLanguageOptionLabel = ({ value, label }, { context }) => (
+    <Span fontSize="12px" fontWeight={context === 'menu' && value === intl.locale ? 'bold' : 'normal'}>
+      {label}
+    </Span>
+  );
+
   return (
     <FooterContainer>
       <Container
@@ -329,8 +319,8 @@ const Footer = () => {
                 defaultValue={defaultLanguage}
                 borderRadius="10px"
                 menuPlacement="auto"
-                isSearchable={false}
                 width={1}
+                formatOptionLabel={formatLanguageOptionLabel}
               />
             </Container>
           </Container>
@@ -454,6 +444,7 @@ const Footer = () => {
               onChange={({ value }) => switchLanguage(value)}
               defaultValue={defaultLanguage}
               menuPlacement="auto"
+              formatOptionLabel={formatLanguageOptionLabel}
             />
           </Container>
         </Container>
