@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
 import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
 import { XCircle } from '@styled-icons/boxicons-regular/XCircle';
 import themeGet from '@styled-system/theme-get';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
@@ -19,7 +19,7 @@ import StyledHr from '../StyledHr';
 import { slideInUp } from '../StyledKeyframes';
 import StyledRadioList from '../StyledRadioList';
 import StyledTextarea from '../StyledTextarea';
-import { P } from '../Text';
+import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { withUser } from '../UserProvider';
 
@@ -62,6 +62,30 @@ const MenuSection = styled(Flex).attrs({
   width: 1,
 })``;
 
+const i18nRadioCopy = (option, intl) => {
+  let msg;
+  switch (option) {
+    case 'No longer want to back the collective':
+      msg = intl.formatMessage({
+        id: 'subscription.cancel.reason1',
+        defaultMessage: 'No longer want to back the collective',
+      });
+      return msg;
+    case 'Changing payment method or amount':
+      msg = intl.formatMessage({
+        id: 'subscription.cancel.reason2',
+        defaultMessage: 'Changing payment method or armount',
+      });
+      return msg;
+    default:
+      msg = intl.formatMessage({
+        id: 'subscription.cancel.other',
+        defaultMessage: 'Other',
+      });
+      return msg;
+  }
+};
+
 // GraphQL
 const cancelRecurringContributionMutation = gqlV2/* GraphQL */ `
   mutation CancelRecurringContribution($order: OrderReferenceInput!, $reason: String!) {
@@ -75,11 +99,16 @@ const cancelRecurringContributionMutation = gqlV2/* GraphQL */ `
 const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, account }) => {
   const { addToast } = useToasts();
   const [menuState, setMenuState] = useState('mainMenu');
-  const [textAreaState, setTextAreaState] = useState("I'm cancelling for this reason");
-  const [radioListState, setRadioListState] = useState('No longer want to back the collective');
+  const intl = useIntl();
+  const [radioListState, setRadioListState] = useState(i18nRadioCopy('No longer want to back the collective', intl));
+  const [textAreaState, setTextAreaState] = useState(i18nRadioCopy('No longer want to back the collective', intl));
   const [submitCancellation, { loading: loadingCancellation }] = useMutation(cancelRecurringContributionMutation, {
     context: API_V2_CONTEXT,
   });
+
+  useEffect(() => {
+    setTextAreaState(radioListState);
+  }, [radioListState]);
 
   const mainMenu = menuState === 'mainMenu' && (status === 'ACTIVE' || status === 'ERROR');
   const cancelMenu = menuState === 'cancelMenu';
@@ -174,16 +203,34 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
           </Flex>
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
             <Container p={3}>
-              <P fontSize="20px" fontWeight="400">
-                <FormattedMessage defaultMessage="Why are you cancelling your subscription today? 🥺" />
+              <P fontSize="15px" fontWeight="bold" mb="10" lineHeight="20px">
+                <FormattedMessage
+                  id="subscription.cancel.question"
+                  defaultMessage="Why are you cancelling your subscription today? 🥺"
+                />
               </P>
+              <StyledHr width="90%" my={2} />
               <StyledRadioList
                 defaultValue={'No longer want to back the collective'}
-                onChange={e => setRadioListState(e)}
+                onChange={e => {
+                  setRadioListState(i18nRadioCopy(e.key, intl));
+                  setTextAreaState(e.key);
+                }}
                 name="cancellation-reason"
-                options={['No longer want to back the collective', 'Changing payment method or amount', 'other']}
+                options={['No longer want to back the collective', 'Changing payment method or amount', 'Other']}
+              >
+                {({ value, radio }) => (
+                  <P my={2} fontWeight="normal">
+                    <Span mx={2}>{radio}</Span>
+                    {i18nRadioCopy(value, intl)}
+                  </P>
+                )}
+              </StyledRadioList>
+              <StyledTextarea
+                data-cy="cancellation-text-area"
+                onChange={e => setTextAreaState(e.target.value)}
+                value={textAreaState}
               />
-              <StyledTextarea onChange={e => setTextAreaState(e.target.value)} value={textAreaState} />
             </Container>
           </Flex>
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">

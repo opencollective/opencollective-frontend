@@ -148,6 +148,7 @@ describe('Recurring contributions', () => {
   });
 
   it('Can cancel an active contribution', () => {
+    cy.clearInbox();
     cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
       cy.getByDataCy('recurring-contribution-edit-activate-button').first().contains('Edit');
       cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
@@ -157,6 +158,7 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-cancel-menu').contains(
         'Why are you cancelling your subscription today? 🥺',
       );
+      cy.getByDataCy('cancellation-text-area').clear().type('Because I want to');
       cy.getByDataCy('recurring-contribution-cancel-yes')
         .click()
         .then(() => {
@@ -164,8 +166,8 @@ describe('Recurring contributions', () => {
           cy.getByDataCy('filter-button cancelled').click();
           cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
         });
-      cy.openEmail(({ subject, html }) => subject.includes(`Contribution cancelled to Test Collective`));
-      cy.contains("I'm cancelling for this reason");
+      cy.openEmail(({ subject }) => subject.includes(`Contribution cancelled to Test Collective`));
+      cy.contains('Because I want to');
     });
   });
 });
