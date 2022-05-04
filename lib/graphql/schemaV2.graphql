@@ -544,10 +544,6 @@ enum OrderByFieldType {
   CREATED_AT
   MEMBER_COUNT
   TOTAL_CONTRIBUTED
-
-  """
-  The financial activity of the collective (number of transactions)
-  """
   ACTIVITY
   RANK
 }
@@ -1638,7 +1634,6 @@ enum ExpenseStatus {
   DRAFT
   UNVERIFIED
   PENDING
-  INCOMPLETE
   APPROVED
   REJECTED
   PROCESSING
@@ -1914,11 +1909,6 @@ type ExpensePermissions {
   canMarkAsUnpaid: Boolean!
 
   """
-  Whether the current user can mark this expense as incomplete
-  """
-  canMarkAsIncomplete: Boolean!
-
-  """
   Whether the current user can comment and see comments for this expense
   """
   canComment: Boolean!
@@ -2000,7 +1990,6 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_PAID
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM
-  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
   COLLECTIVE_EXPENSE_PROCESSING
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
@@ -2218,7 +2207,7 @@ type Tier {
   amount: Amount!
   type: TierType!
   interval: TierInterval @deprecated(reason: "2020-08-24: Please use \"frequency\"")
-  frequency: TierFrequency!
+  frequency: ContributionFrequency
   presets: [Int]
   maxQuantity: Int
 
@@ -2255,13 +2244,6 @@ enum TierInterval {
   month
   year
   flexible
-}
-
-enum TierFrequency {
-  MONTHLY
-  YEARLY
-  ONETIME
-  FLEXIBLE
 }
 
 enum TierAmountType {
@@ -2848,17 +2830,17 @@ type Host implements Account & AccountWithContributions {
     """
     The start date of the time series
     """
-    dateFrom: DateTime
+    dateFrom: DateTime!
 
     """
     The end date of the time series
     """
-    dateTo: DateTime
+    dateTo: DateTime!
 
     """
     The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
     """
-    timeUnit: TimeUnit
+    timeUnit: TimeUnit!
   ): HostMetricsTimeSeries!
 
   """
@@ -3341,11 +3323,6 @@ type AccountStats {
     Computes contributions from the last x months. Cannot be used with startDate/endDate
     """
     periodInMonths: Int
-
-    """
-    Set this to true to use cached data
-    """
-    useCache: Boolean! = false
   ): Amount!
 
   """
@@ -3707,21 +3684,6 @@ Host metrics time series
 """
 type HostMetricsTimeSeries {
   """
-  The start date of the time series
-  """
-  dateFrom: DateTime!
-
-  """
-  The end date of the time series
-  """
-  dateTo: DateTime!
-
-  """
-  The interval between two data points
-  """
-  timeUnit: TimeUnit!
-
-  """
   History of the collected platform tips
   """
   platformTips: TimeSeriesAmount!
@@ -3740,26 +3702,6 @@ type HostMetricsTimeSeries {
   History of the total money managed by this host
   """
   totalMoneyManaged: TimeSeriesAmount!
-
-  """
-  History of the total money received by this host
-  """
-  totalReceived: TimeSeriesAmountWithKind!
-
-  """
-  History of the total money spent by this host
-  """
-  totalSpent: TimeSeriesAmountWithKind!
-}
-
-enum TimeUnit {
-  SECOND
-  MINUTE
-  HOUR
-  DAY
-  WEEK
-  MONTH
-  YEAR
 }
 
 """
@@ -3804,6 +3746,16 @@ interface TimeSeries {
   timeUnit: TimeUnit!
 }
 
+enum TimeUnit {
+  SECOND
+  MINUTE
+  HOUR
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
 type TimeSeriesAmountNode {
   date: DateTime!
   amount: Amount!
@@ -3844,37 +3796,6 @@ enum TransactionSettlementStatus {
   OWED
   INVOICED
   SETTLED
-}
-
-"""
-Amounts with settlements time series
-"""
-type TimeSeriesAmountWithKind implements TimeSeries {
-  """
-  The start date of the time series
-  """
-  dateFrom: DateTime!
-
-  """
-  The end date of the time series
-  """
-  dateTo: DateTime!
-
-  """
-  The interval between two data points
-  """
-  timeUnit: TimeUnit!
-
-  """
-  Time series data points
-  """
-  nodes: [TimeSeriesAmountWithKindNode!]!
-}
-
-type TimeSeriesAmountWithKindNode {
-  date: DateTime!
-  amount: Amount!
-  kind: TransactionKind!
 }
 
 """
@@ -3924,7 +3845,6 @@ type ContributionStats {
   The contribution amounts over time
   """
   contributionAmountOverTime: TimeSeriesAmount
-    @deprecated(reason: "2022-04-21: Please use hostMetricsTimeSeries.totalReceived")
 
   """
   Number of one time contributions
@@ -3954,7 +3874,7 @@ type ExpenseStats {
   """
   The total number of expenses over time
   """
-  expenseAmountOverTime: TimeSeriesAmount @deprecated(reason: "2022-04-21: Please use hostMetricsTimeSeries.totalSpent")
+  expenseAmountOverTime: TimeSeriesAmount
 
   """
   The daily average paid in expenses
@@ -7338,9 +7258,6 @@ type Query {
     Only accounts that support one of these payment services will be returned
     """
     supportedPaymentMethodService: [PaymentMethodService]
-      @deprecated(
-        reason: "2022-04-22: Introduced for Hacktoberfest. Reference: https://github.com/opencollective/opencollective-api/pull/7440#issuecomment-1121504508"
-      )
 
     """
     Whether to skip recent suspicious accounts (48h)
@@ -7353,7 +7270,7 @@ type Query {
     country: [CountryISO]
 
     """
-    The order of results. Defaults to [RANK, DESC] (or [CREATED_AT, DESC] if `supportedPaymentMethodService` is provided)
+    The order of results
     """
     orderBy: OrderByInput
   ): AccountCollection!
@@ -9161,7 +9078,6 @@ enum ExpenseStatusFilter {
   DRAFT
   UNVERIFIED
   PENDING
-  INCOMPLETE
   APPROVED
   REJECTED
   PROCESSING
@@ -10497,11 +10413,6 @@ type Mutation {
     action: ExpenseProcessAction!
 
     """
-    Message to be attached to the action activity.
-    """
-    message: String
-
-    """
     If action is related to a payment, this object used for the payment parameters
     """
     paymentParams: ProcessExpensePaymentParams
@@ -10738,6 +10649,41 @@ type Mutation {
     """
     account: AccountUpdateInput!
   ): Host!
+
+  """
+  [Root only] Clears the cache for a given account
+  """
+  clearCacheForAccount(
+    """
+    Account to clear the cache for
+    """
+    account: AccountReferenceInput!
+
+    """
+    Types of cache to clear
+    """
+    type: [AccountCacheType]! = [CLOUDFLARE, GRAPHQL_QUERIES, CONTRIBUTORS]
+  ): Account!
+
+  """
+  [Root only] Merge two accounts, returns the result account
+  """
+  mergeAccounts(
+    """
+    Account to merge from
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Account to merge to
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    If true, the result will be simulated and summarized in the response message
+    """
+    dryRun: Boolean! = true
+  ): MergeAccountsResponse!
 
   """
   Adds or removes a policy on a given account
@@ -11230,61 +11176,6 @@ type Mutation {
     """
     virtualCard: VirtualCardReferenceInput!
   ): Boolean
-
-  """
-  [Root only] Clears the cache for a given account
-  """
-  clearCacheForAccount(
-    """
-    Account to clear the cache for
-    """
-    account: AccountReferenceInput!
-
-    """
-    Types of cache to clear
-    """
-    type: [AccountCacheType]! = [CLOUDFLARE, GRAPHQL_QUERIES, CONTRIBUTORS]
-  ): Account!
-
-  """
-  [Root only] Merge two accounts, returns the result account
-  """
-  mergeAccounts(
-    """
-    Account to merge from
-    """
-    fromAccount: AccountReferenceInput!
-
-    """
-    Account to merge to
-    """
-    toAccount: AccountReferenceInput!
-
-    """
-    If true, the result will be simulated and summarized in the response message
-    """
-    dryRun: Boolean! = true
-  ): MergeAccountsResponse!
-
-  """
-  [Root only] Ban accounts
-  """
-  banAccount(
-    """
-    Account(s) to ban
-    """
-    account: [AccountReferenceInput!]!
-
-    """
-    If true, the associated accounts will also be banned
-    """
-    includeAssociatedAccounts: Boolean!
-
-    """
-    If true, the result will be simulated and summarized in the response message
-    """
-    dryRun: Boolean!
-  ): BanAccountResponse!
 }
 
 input CollectiveCreateInput {
@@ -11802,11 +11693,6 @@ enum ExpenseProcessAction {
   To mark the expense as spam
   """
   MARK_AS_SPAM
-
-  """
-  To mark the expense as incomplete and notify the payee it requires more information
-  """
-  MARK_AS_INCOMPLETE
 }
 
 """
@@ -12004,6 +11890,24 @@ input AccountUpdateInput {
   """
   id: String!
   currency: Currency
+}
+
+enum AccountCacheType {
+  CLOUDFLARE
+  GRAPHQL_QUERIES
+  CONTRIBUTORS
+}
+
+type MergeAccountsResponse {
+  """
+  The resulting account
+  """
+  account: Account!
+
+  """
+  A message to display to the user about the result
+  """
+  message: String
 }
 
 """
@@ -12414,39 +12318,4 @@ enum VirtualCardProvider {
 
 input VirtualCardReferenceInput {
   id: String
-}
-
-enum AccountCacheType {
-  CLOUDFLARE
-  GRAPHQL_QUERIES
-  CONTRIBUTORS
-}
-
-type MergeAccountsResponse {
-  """
-  The resulting account
-  """
-  account: Account!
-
-  """
-  A message to display to the user about the result
-  """
-  message: String
-}
-
-type BanAccountResponse {
-  """
-  Whether the accounts can be banned
-  """
-  isAllowed: Boolean!
-
-  """
-  A summary of the changes
-  """
-  message: String
-
-  """
-  The accounts impacted by the mutation
-  """
-  accounts: [Account!]!
 }
