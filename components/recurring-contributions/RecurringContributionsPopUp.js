@@ -11,20 +11,20 @@ import styled from 'styled-components';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
+import Container from '../Container';
 import { Flex } from '../Grid';
 import I18nFormatters from '../I18nFormatters';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { slideInUp } from '../StyledKeyframes';
+import StyledRadioList from '../StyledRadioList';
+import StyledTextarea from '../StyledTextarea';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { withUser } from '../UserProvider';
 
 import UpdateOrderPopUp from './UpdateOrderPopUp';
 import UpdatePaymentMethodPopUp from './UpdatePaymentMethodPopUp';
-import StyledTextArea from '../StyledTextArea';
-import StyledRadioList from '../StyledRadioList';
-import Container from '../Container';
 
 //  Styled components
 const RedXCircle = styled(XCircle)`
@@ -183,7 +183,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
                 name="cancellation-reason"
                 options={['No longer want to back the collective', 'Changing payment method or amount', 'other']}
               />
-              <StyledTextArea onChange={e => setTextAreaState(e.target.value)} value={textAreaState} />
+              <StyledTextarea onChange={e => setTextAreaState(e.target.value)} value={textAreaState} />
             </Container>
           </Flex>
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
