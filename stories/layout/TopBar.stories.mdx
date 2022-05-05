@@ -21,7 +21,7 @@ import { loggedInUser, newLoggedInUser } from '../mocks/loggedInUser';
 
 export const LoggedOutStory = props => (
   <UserContext.Provider value={{ LoggedInUser: null, loadingLoggedInUser: false }}>
-    <TopBar {...props} />
+    <NavbarV2 {...props} />
   </UserContext.Provider>
 );
 
@@ -31,7 +31,7 @@ export const LoggedOutStory = props => (
 
 export const LoggedInStory = props => (
   <UserContext.Provider value={{ LoggedInUser: newLoggedInUser, loadingLoggedInUser: false }}>
-    <TopBar {...props} />
+    <NavbarV2 {...props} />
   </UserContext.Provider>
 );
 
@@ -48,7 +48,7 @@ export const LoggedInCollectiveAdmin = props => (
       ),
     }}
   >
-    <TopBar {...props} />
+    <NavbarV2 {...props} />
   </UserContext.Provider>
 );
 
@@ -58,7 +58,7 @@ export const LoggedInCollectiveAdmin = props => (
 
 export const LoggedInPowerUserStory = props => (
   <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-    <TopBar {...props} />
+    <NavbarV2 {...props} />
   </UserContext.Provider>
 );
 
