@@ -2110,7 +2110,7 @@
   "subscription.cancel.other": "Altro",
   "subscription.cancel.question": "Perché sta terminando la sua sottoscrizione oggi? 🥺",
   "subscription.cancel.reason1": "Non voglio supportare la colletiva più",
-  "subscription.cancel.reason2": "Changing payment method or armount",
+  "subscription.cancel.reason2": "Cambiando il modo di pagamento o quantità",
   "subscription.createSuccessCancel": "Your recurring contribution has been <strong>cancelled</strong>.",
   "subscription.createSuccessUpdated": "Your recurring contribution has been <strong>updated</strong>.",
   "subscription.menu.addPaymentMethod": "Add new payment method",

@@ -5,7 +5,7 @@ import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
 import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
 import { XCircle } from '@styled-icons/boxicons-regular/XCircle';
 import themeGet from '@styled-system/theme-get';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
@@ -62,34 +62,19 @@ const MenuSection = styled(Flex).attrs({
   width: 1,
 })``;
 
-const i18nRadioCopy = (option, intl) => {
-  let msg;
-  switch (option) {
-    case 'No longer want to back the collective':
-      msg = intl.formatMessage({
-        id: 'subscription.cancel.reason1',
-        defaultMessage: 'No longer want to back the collective',
-      });
-      return msg;
-    case 'Changing payment method or amount':
-      msg = intl.formatMessage({
-        id: 'subscription.cancel.reason2',
-        defaultMessage: 'Changing payment method or armount',
-      });
-      return msg;
-    default:
-      msg = intl.formatMessage({
-        id: 'subscription.cancel.other',
-        defaultMessage: 'Other',
-      });
-      return msg;
-  }
-};
+const i18nReasons = defineMessages({
+  NO_LONGER_WANT_TO_SUPPORT: {
+    id: 'subscription.cancel.reason1',
+    defaultMessage: 'No longer want to back the collective',
+  },
+  UPDATING_ORDER: { id: 'subscription.cancel.reason2', defaultMessage: 'Changing payment method or amount' },
+  OTHER: { id: 'subscription.cancel.other', defaultMessage: 'Other' },
+});
 
 // GraphQL
 const cancelRecurringContributionMutation = gqlV2/* GraphQL */ `
-  mutation CancelRecurringContribution($order: OrderReferenceInput!, $reason: String!) {
-    cancelOrder(order: $order, reason: $reason) {
+  mutation CancelRecurringContribution($order: OrderReferenceInput!, $reason: String!, $reasonCode: String!) {
+    cancelOrder(order: $order, reason: $reason, reasonCode: $reasonCode) {
       id
       status
     }
@@ -100,8 +85,8 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
   const { addToast } = useToasts();
   const [menuState, setMenuState] = useState('mainMenu');
   const intl = useIntl();
-  const [radioListState, setRadioListState] = useState(i18nRadioCopy('No longer want to back the collective', intl));
-  const [textAreaState, setTextAreaState] = useState(i18nRadioCopy('No longer want to back the collective', intl));
+  const [radioListState, setRadioListState] = useState('NO_LONGER_WANT_TO_SUPPORT');
+  const [textAreaState, setTextAreaState] = useState('NO_LONGER_WANT_TO_SUPPORT');
   const [submitCancellation, { loading: loadingCancellation }] = useMutation(cancelRecurringContributionMutation, {
     context: API_V2_CONTEXT,
   });
@@ -211,26 +196,25 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
               </P>
               <StyledHr width="90%" my={2} />
               <StyledRadioList
-                defaultValue={'No longer want to back the collective'}
-                onChange={e => {
-                  setRadioListState(i18nRadioCopy(e.key, intl));
-                  setTextAreaState(e.key);
-                }}
+                defaultValue="NO_LONGER_WANT_TO_SUPPORT"
+                onChange={e => setRadioListState(e.key)}
                 name="cancellation-reason"
-                options={['No longer want to back the collective', 'Changing payment method or amount', 'Other']}
+                options={['NO_LONGER_WANT_TO_SUPPORT', 'UPDATING_ORDER', 'OTHER']}
               >
                 {({ value, radio }) => (
                   <P my={2} fontWeight="normal">
                     <Span mx={2}>{radio}</Span>
-                    {i18nRadioCopy(value, intl)}
+                    {intl.formatMessage(i18nReasons[value])}
                   </P>
                 )}
               </StyledRadioList>
-              <StyledTextarea
-                data-cy="cancellation-text-area"
-                onChange={e => setTextAreaState(e.target.value)}
-                value={textAreaState}
-              />
+              {radioListState === 'OTHER' && (
+                <StyledTextarea
+                  data-cy="cancellation-text-area"
+                  onChange={e => setTextAreaState(e.target.value)}
+                  value={textAreaState === 'OTHER' ? intl.formatMessage(i18nReasons['OTHER']) : textAreaState}
+                />
+              )}
             </Container>
           </Flex>
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
@@ -247,7 +231,9 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
               data-cy="recurring-contribution-cancel-yes"
               onClick={async () => {
                 try {
-                  await submitCancellation({ variables: { order: { id: contribution.id }, reason: textAreaState } });
+                  await submitCancellation({
+                    variables: { order: { id: contribution.id }, reason: textAreaState, reasonCode: radioListState },
+                  });
                   onCloseEdit();
                   addToast({
                     type: TOAST_TYPE.INFO,

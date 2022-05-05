@@ -2110,7 +2110,7 @@
   "subscription.cancel.other": "Other",
   "subscription.cancel.question": "Why are you cancelling your subscription today? 🥺",
   "subscription.cancel.reason1": "No longer want to back the collective",
-  "subscription.cancel.reason2": "Changing payment method or armount",
+  "subscription.cancel.reason2": "Changing payment method or amount",
   "subscription.createSuccessCancel": "Your recurring contribution has been <strong>cancelled</strong>.",
   "subscription.createSuccessUpdated": "Your recurring contribution has been <strong>updated</strong>.",
   "subscription.menu.addPaymentMethod": "添加新的付款方式",

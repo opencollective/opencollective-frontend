@@ -2110,7 +2110,7 @@
   "subscription.cancel.other": "Other",
   "subscription.cancel.question": "Why are you cancelling your subscription today? 🥺",
   "subscription.cancel.reason1": "No longer want to back the collective",
-  "subscription.cancel.reason2": "Changing payment method or armount",
+  "subscription.cancel.reason2": "Changing payment method or amount",
   "subscription.createSuccessCancel": "Ваш периодический вклад был <strong>отменен</strong>.",
   "subscription.createSuccessUpdated": "Ваш периодический вклад был <strong>обновлен</strong>.",
   "subscription.menu.addPaymentMethod": "Add new payment method",
