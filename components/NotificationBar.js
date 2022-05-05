@@ -12,7 +12,7 @@ import Container from './Container';
 import { Flex } from './Grid';
 import { H1, P } from './Text';
 
-const logo = '/static/images/opencollective-icon.svg';
+const logo = '/static/images/opencollective-icon.png';
 
 const NotificationBarContainer = styled.div`
   .collectiveArchived {
