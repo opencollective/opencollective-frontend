@@ -17,9 +17,6 @@ import ExpensesTypeFilter from './filters/ExpensesTypeFilter';
 const FilterContainer = styled.div`
   margin-bottom: 8px;
   flex: 1 1 120px;
-  &:not(:last-child) {
-    margin-right: 18px;
-  }
 `;
 
 const FilterLabel = styled.label`
@@ -42,7 +39,7 @@ const ExpensesFilters = ({ collective, filters, onChange, wrap = true }) => {
   });
 
   return (
-    <Flex flexWrap={wrap ? 'wrap' : 'nowrap'}>
+    <Flex flexWrap={['wrap', null, wrap ? 'wrap' : 'nowrap']} gap="18px">
       <FilterContainer>
         <FilterLabel htmlFor="expenses-filter-type">
           <FormattedMessage id="expense.type" defaultMessage="Type" />
