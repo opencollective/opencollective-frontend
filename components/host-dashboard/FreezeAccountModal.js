@@ -117,7 +117,7 @@ const FreezeAccountModal = ({ collective, ...props }) => {
             <StyledCheckbox
               name="only contributions"
               label="Check this for the collective to still be able to receive contributions"
-              onChange={() => console.log({ keepContributions }) || setKeepContributions(!keepContributions)}
+              onChange={() => setKeepContributions(!keepContributions)}
             />
           </div>
         )}
@@ -132,7 +132,6 @@ const FreezeAccountModal = ({ collective, ...props }) => {
               try {
                 const action = isUnfreezing ? 'UNFREEZE' : keepContributions ? 'FREEZEKEEPCONTRIBUTIONS' : 'FREEZE';
                 const variables = { account: { id: collective.id }, message, action };
-                // console.log({action})
                 await editAccountFreezeStatus({ variables });
                 const successMsgArgs = { accountName: collective.name, accountSlug: collective.slug };
                 addToast({
