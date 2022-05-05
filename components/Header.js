@@ -8,7 +8,7 @@ import { getCollectiveImage } from '../lib/image-utils';
 import { truncate } from '../lib/utils';
 
 import GlobalWarnings from './GlobalWarnings';
-import TopBar from './TopBar';
+import NavbarV2 from './NavbarV2';
 
 const messages = defineMessages({
   defaultTitle: {
@@ -116,9 +116,7 @@ class Header extends React.Component {
           {canonicalURL && <link rel="canonical" href={canonicalURL} />}
         </Head>
         <div id="top" />
-        {withTopBar && (
-          <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
-        )}
+        {withTopBar && <NavbarV2 className={className} showSearch={this.props.showSearch} />}
         <GlobalWarnings collective={this.props.collective} />
       </header>
     );

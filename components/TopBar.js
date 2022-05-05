@@ -52,6 +52,9 @@ const NavLink = styled(StyledLink)`
   font-size: 1.4rem;
 `;
 
+/**
+ * @deprecated: Replaced by NavbarV2.js
+ */
 class TopBar extends React.Component {
   static propTypes = {
     showSearch: PropTypes.bool,

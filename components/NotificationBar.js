@@ -15,7 +15,7 @@ import { Flex } from './Grid';
 import { H1, P } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
-const logo = '/static/images/opencollective-icon.svg';
+const logo = '/static/images/opencollective-icon.png';
 
 const NotificationBarContainer = styled.div`
   .collectiveArchived {
