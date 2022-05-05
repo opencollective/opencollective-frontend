@@ -26,9 +26,10 @@ Box.propTypes = {
 };
 
 export const Flex = styled(Box)(
-  {
+  props => ({
     display: 'flex',
-  },
+    gap: props.gap,
+  }),
   compose(space, layout, flexbox),
 );
 
