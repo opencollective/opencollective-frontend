@@ -23,7 +23,6 @@ const GlobalWarningContainer = styled.div`
  */
 const GlobalWarnings = ({ collective }) => {
   const { LoggedInUser } = useUser();
-
   if (collective?.isFrozen) {
     // Frozen collectives
     return (
@@ -32,7 +31,11 @@ const GlobalWarnings = ({ collective }) => {
           <FormattedMessage defaultMessage="Some actions are temporarily limited" />
         </P>
         <P>
-          <FormattedMessage defaultMessage="Contributions to this page cannot be accepted at this time" />
+          {collective.features.RECEIVE_FINANCIAL_CONTRIBUTIONS === 'AVAILABLE' ? (
+            <FormattedMessage defaultMessage="Don't worry, you can still make contributions" />
+          ) : (
+            <FormattedMessage defaultMessage="Contributions to this page cannot be accepted at this time" />
+          )}
         </P>
       </GlobalWarningContainer>
     );
@@ -54,6 +57,9 @@ const GlobalWarnings = ({ collective }) => {
 GlobalWarnings.propTypes = {
   collective: PropTypes.shape({
     isFrozen: PropTypes.bool,
+    features: {
+      RECEIVE_FINANCIAL_CONTRIBUTIONS: PropTypes.bool,
+    },
   }),
 };
 
