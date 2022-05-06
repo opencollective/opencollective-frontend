@@ -592,6 +592,9 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
             id
             slug
             backgroundImageUrl
+            location {
+              country
+            }
           }
         }
         backers: members(role: BACKER) {
