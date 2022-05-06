@@ -64,6 +64,7 @@ const COMMON_DIRECTIVES = {
     'https://cdn.matomo.cloud',
   ],
   frameSrc: [
+    'blob:', // For expense invoice previews in the modal, as they're rendered in a blob
     'www.youtube.com',
     'www.youtube-nocookie.com',
     'opencollective.com',
