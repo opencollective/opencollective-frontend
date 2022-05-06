@@ -8,7 +8,6 @@ import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import expenseStatus from '../../lib/constants/expense-status';
 import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -23,6 +22,7 @@ import { useUser } from '../UserProvider';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import DeleteExpenseButton from './DeleteExpenseButton';
+import MarkExpenseAsIncompleteButton from './MarkExpenseAsIncompleteButton';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
 
@@ -217,11 +217,11 @@ const ProcessExpenseButtons = ({
         />
       )}
       {permissions.canMarkAsIncomplete && props.displayMarkAsIncomplete && (
-        <StyledButton {...getButtonProps('MARK_AS_INCOMPLETE')} buttonStyle="secondary" data-cy="reject-button">
-          <ButtonLabel>
-            <FormattedMessage id="actions.markAsIncomplete" defaultMessage="Mark as Incomplete" />
-          </ButtonLabel>
-        </StyledButton>
+        <MarkExpenseAsIncompleteButton
+          {...getButtonProps('MARK_AS_INCOMPLETE')}
+          onClick={null}
+          onSubmit={triggerAction}
+        />
       )}
       {permissions.canReject && (
         <StyledButton {...getButtonProps('REJECT')} buttonStyle="dangerSecondary" data-cy="reject-button">
@@ -249,21 +249,14 @@ const ProcessExpenseButtons = ({
         </StyledButton>
       )}
 
-      {permissions.canUnapprove &&
-        (expense?.status === expenseStatus.INCOMPLETE ? (
-          <StyledButton {...getButtonProps('UNAPPROVE')} buttonStyle="secondary" data-cy="unapprove-button">
-            <ButtonLabel>
-              <FormattedMessage id="expense.markPending" defaultMessage="Mark as Pending" />
-            </ButtonLabel>
-          </StyledButton>
-        ) : (
-          <StyledButton {...getButtonProps('UNAPPROVE')} buttonStyle="dangerSecondary" data-cy="unapprove-button">
-            <UnapproveIcon size={12} />
-            <ButtonLabel>
-              <FormattedMessage id="expense.unapprove.btn" defaultMessage="Unapprove" />
-            </ButtonLabel>
-          </StyledButton>
-        ))}
+      {permissions.canUnapprove && (
+        <StyledButton {...getButtonProps('UNAPPROVE')} buttonStyle="dangerSecondary" data-cy="unapprove-button">
+          <UnapproveIcon size={12} />
+          <ButtonLabel>
+            <FormattedMessage id="expense.unapprove.btn" defaultMessage="Unapprove" />
+          </ButtonLabel>
+        </StyledButton>
+      )}
       {permissions.canUnschedulePayment && (
         <StyledButton
           {...getButtonProps('UNSCHEDULE_PAYMENT')}
