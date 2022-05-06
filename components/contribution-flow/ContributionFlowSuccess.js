@@ -234,6 +234,11 @@ class ContributionFlowSuccess extends React.Component {
       );
     }
 
+    console.log('data', data);
+    console.log('collective', collective);
+    // TODO: For an event, most of the time parameters appear to be undefined -- not sure how to pass event time params to ContributorCard.
+    console.log('collective time', collective.startsAt, collective.endsAt, collective.timezone, collective.isSameDay);
+
     return (
       <Flex
         width={1}
