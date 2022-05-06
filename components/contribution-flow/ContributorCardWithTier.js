@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+import { atcb_action, atcb_init } from 'add-to-calendar-button';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { capitalize } from '../../lib/utils';
@@ -17,6 +18,8 @@ import { P } from '../Text';
 import { withUser } from '../UserProvider';
 
 const ContributorCardWithTier = ({ contribution, ...props }) => {
+  useEffect(() => atcb_init());
+
   const collective = contribution.toAccount;
   const contributors =
     collective.isHost && collective.host.contributors ? collective.host.contributors : collective.contributors;
@@ -123,6 +126,18 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                 }}
               />
             </P>
+          </Box>
+          <Box>
+            <div class="atcb" style={{ display: 'none' }}>
+              {JSON.stringify({
+                name: 'Some event',
+                startDate: '2022-01-14',
+                endDate: '2022-01-18',
+                options: ['Apple', 'Google', 'iCal', 'Microsoft365', 'Outlook.com', 'MicrosoftTeams', 'Yahoo'],
+                trigger: 'click',
+                iCalFileName: 'Reminder-Event',
+              })}
+            </div>
           </Box>
         </Container>
       </Flex>

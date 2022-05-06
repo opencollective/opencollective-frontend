@@ -275,13 +275,7 @@ class ContributionFlowSuccess extends React.Component {
                     />
                   </P>
                 </Box>
-                {isEmbed ? (
-                  <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
-                ) : (
-                  <StyledLink as={Link} color="black.800" href={getCollectivePageRoute(order.toAccount)}>
-                    <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
-                  </StyledLink>
-                )}
+                <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
                 {!isEmbed && (
                   <Box my={4}>
                     <Link href={{ pathname: '/discover', query: { show: getMainTag(order.toAccount) } }}>
