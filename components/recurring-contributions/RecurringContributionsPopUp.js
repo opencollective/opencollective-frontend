@@ -203,7 +203,9 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
               >
                 {({ value, radio }) => (
                   <P my={2} fontWeight="normal">
-                    <Span mx={2}>{radio}</Span>
+                    <Span data-cy={value} mx={2}>
+                      {radio}
+                    </Span>
                     {intl.formatMessage(i18nReasons[value])}
                   </P>
                 )}

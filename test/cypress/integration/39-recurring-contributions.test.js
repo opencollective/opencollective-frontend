@@ -158,6 +158,7 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-cancel-menu').contains(
         'Why are you cancelling your subscription today? 🥺',
       );
+      cy.getByDataCy('OTHER').click();
       cy.getByDataCy('cancellation-text-area').clear().type('Because I want to');
       cy.getByDataCy('recurring-contribution-cancel-yes')
         .click()
