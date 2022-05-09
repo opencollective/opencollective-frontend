@@ -40,7 +40,6 @@ const FileInfo = ({ collective, expense, item, invoiceBlob }) => (
           mr="-12px"
           mt={1}
           onClick={() => saveAs(invoiceBlob, getExpenseInvoiceFilename(collective, expense))}
-          fontSize
         >
           <DownloadIcon size="1em" /> <FormattedMessage id="Download" defaultMessage="Download" />
         </StyledButton>
@@ -92,7 +91,7 @@ ExpenseInvoicePreview.propTypes = {
 };
 
 const ExpenseFilesPreviewModal = ({ collective, expense, onClose }) => {
-  const [invoiceFile, setInvoiceFile] = React.useState(false);
+  const [invoiceFile, setInvoiceFile] = React.useState(null);
   const [invoiceBlob, setInvoiceBlob] = React.useState(null);
   const [invoiceError, setInvoiceError] = React.useState(false);
   const files = React.useMemo(() => getFilesFromExpense(collective, expense), [collective, expense]);
