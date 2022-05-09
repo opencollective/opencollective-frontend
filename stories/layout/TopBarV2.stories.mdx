@@ -1,13 +1,13 @@
 import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
 import { cloneDeep, update } from 'lodash';
-import TopBar from '../../components/TopBar';
+import TopBarV2 from '../../components/TopBarV2';
 import { UserContext } from '../../components/UserProvider';
 import theme from '../../lib/theme';
 import { loggedInUser, newLoggedInUser } from '../mocks/loggedInUser';
 
 <Meta
-  title="Layout/TopBar"
-  component={TopBar}
+  title="Layout/TopBarV2"
+  component={TopBarV2}
   parameters={{
     actions: {
       handles: ['mouseover', 'click'],
@@ -15,13 +15,13 @@ import { loggedInUser, newLoggedInUser } from '../mocks/loggedInUser';
   }}
 />
 
-# TopBar
+# TopBarV2
 
 ## Logged out
 
 export const LoggedOutStory = props => (
   <UserContext.Provider value={{ LoggedInUser: null, loadingLoggedInUser: false }}>
-    <TopBar {...props} />
+    <TopBarV2 {...props} />
   </UserContext.Provider>
 );
 
@@ -31,7 +31,7 @@ export const LoggedOutStory = props => (
 
 export const LoggedInStory = props => (
   <UserContext.Provider value={{ LoggedInUser: newLoggedInUser, loadingLoggedInUser: false }}>
-    <TopBar {...props} />
+    <TopBarV2 {...props} />
   </UserContext.Provider>
 );
 
@@ -48,7 +48,7 @@ export const LoggedInCollectiveAdmin = props => (
       ),
     }}
   >
-    <TopBar {...props} />
+    <TopBarV2 {...props} />
   </UserContext.Provider>
 );
 
@@ -58,7 +58,7 @@ export const LoggedInCollectiveAdmin = props => (
 
 export const LoggedInPowerUserStory = props => (
   <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-    <TopBar {...props} />
+    <TopBarV2 {...props} />
   </UserContext.Provider>
 );
 

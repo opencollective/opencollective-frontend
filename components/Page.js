@@ -44,6 +44,7 @@ const Page = ({
         canonicalURL={canonicalURL}
         collective={collective}
         menuItems={menuItems}
+        LoggedInUser={LoggedInUser}
       />
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       {showFooter && <Footer />}
