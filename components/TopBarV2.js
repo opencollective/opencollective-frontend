@@ -18,7 +18,7 @@ import SearchIcon from './SearchIcon';
 import StyledButton from './StyledButton';
 import StyledLink from './StyledLink';
 import { Span } from './Text';
-import TopBarMobileMenu from './TopBarMobileMenu';
+import TopBarMobileMenuV2 from './TopBarMobileMenuV2';
 import TopBarProfileMenu from './TopBarProfileMenu';
 
 const NavList = styled(Flex)`
@@ -51,7 +51,7 @@ const NavItem = styled(StyledLink)`
   }
 `;
 
-const NavbarV2 = ({ showSearch }) => {
+const TopBarV2 = ({ showSearch }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const ref = useRef();
 
@@ -81,7 +81,7 @@ const NavbarV2 = ({ showSearch }) => {
       </Link>
 
       <Flex alignItems="center" justifyContent={['flex-end', 'flex-end', 'center']} flex="1 1 auto">
-        <Hide xs sm>
+        <Hide xs>
           <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
             <PopupMenu
               Button={({ onClick }) => (
@@ -151,13 +151,13 @@ const NavbarV2 = ({ showSearch }) => {
             >
               <NavLinkContainer>
                 <a href="https://blog.opencollective.com/">
-                  <NavItem as={Container} mb={16}>
+                  <NavItem as={Container} mt={16} mb={16}>
                     <FormattedMessage id="company.blog" defaultMessage="Blog" />
                   </NavItem>
                 </a>
                 <Link href="/e2c">
-                  <NavItem as={Container} mt={16} mb={16}>
-                    <Span>Exit to Community</Span>
+                  <NavItem as={Container} mb={16}>
+                    <FormattedMessage id="OC.e2c" defaultMessage="Exit to Community" />
                   </NavItem>
                 </Link>
               </NavLinkContainer>
@@ -173,7 +173,7 @@ const NavbarV2 = ({ showSearch }) => {
         <NavButton as={StyledLink} href="/search?type=COLLECTIVE">
           <Flex>
             <SearchIcon fill="#75777A" size={18} />
-            <Hide xs>
+            <Hide xs sm>
               <Span ml="5px">
                 <FormattedMessage id="Search" defaultMessage="Search" />
               </Span>
@@ -189,7 +189,7 @@ const NavbarV2 = ({ showSearch }) => {
       </Container>
       <TopBarProfileMenu />
       <Hide sm md lg>
-        <TopBarMobileMenu showMobileMenu={showMobileMenu} closeMenu={toggleMobileMenu} />
+        <TopBarMobileMenuV2 showMobileMenu={showMobileMenu} closeMenu={toggleMobileMenu} />
         <Box mx={3} onClick={toggleMobileMenu}>
           <Flex as="a">
             <MenuIcon color="#aaaaaa" size={24} />
@@ -200,12 +200,12 @@ const NavbarV2 = ({ showSearch }) => {
   );
 };
 
-NavbarV2.propTypes = {
+TopBarV2.propTypes = {
   showSearch: PropTypes.bool,
 };
 
-NavbarV2.defaultProps = {
+TopBarV2.defaultProps = {
   showSearch: true,
 };
 
-export default NavbarV2;
+export default TopBarV2;

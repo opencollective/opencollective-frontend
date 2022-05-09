@@ -8,7 +8,8 @@ import { getCollectiveImage } from '../lib/image-utils';
 import { truncate } from '../lib/utils';
 
 import GlobalWarnings from './GlobalWarnings';
-import NavbarV2 from './NavbarV2';
+import TopBar from './TopBar';
+import TopBarV2 from './TopBarV2';
 
 const messages = defineMessages({
   defaultTitle: {
@@ -35,6 +36,7 @@ class Header extends React.Component {
     noRobots: PropTypes.bool,
     /** @ignore from injectIntl */
     intl: PropTypes.object,
+    LoggedInUser: PropTypes.object,
   };
 
   static defaultProps = {
@@ -95,7 +97,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { css, className, canonicalURL, withTopBar } = this.props;
+    const { css, className, canonicalURL, withTopBar, LoggedInUser } = this.props;
     return (
       <header>
         <Head>
@@ -116,7 +118,12 @@ class Header extends React.Component {
           {canonicalURL && <link rel="canonical" href={canonicalURL} />}
         </Head>
         <div id="top" />
-        {withTopBar && <NavbarV2 className={className} showSearch={this.props.showSearch} />}
+        {withTopBar &&
+          (LoggedInUser?.collective?.settings?.useNewTopBar ? (
+            <TopBarV2 className={className} showSearch={this.props.showSearch} />
+          ) : (
+            <TopBar className={className} showSearch={this.props.showSearch} />
+          ))}
         <GlobalWarnings collective={this.props.collective} />
       </header>
     );
