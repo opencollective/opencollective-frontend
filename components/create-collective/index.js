@@ -57,6 +57,10 @@ class CreateCollective extends Component {
     this.setState({ creating: true });
 
     // prepare object
+    collective.tags = collective.tags
+      ? [...collective.tags, this.props.router.query.category]
+      : [this.props.router.query.category];
+
     if (this.state.githubInfo) {
       collective.githubHandle = this.state.githubInfo.handle;
     }
@@ -190,7 +194,7 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
 `;
 
 const tagStatsQuery = gqlV2/* GraphQL */ `
-  query SearchPage {
+  query CreateCollectivePageQuery {
     tagStats {
       nodes {
         tag
