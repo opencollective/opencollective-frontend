@@ -5,9 +5,9 @@ import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../../lib/collective.lib';
+import { IGNORED_TAGS } from '../../lib/constants/collectives';
 import { getIntlDisplayNames } from '../../lib/i18n';
 
-import { IGNORED_TAGS } from '../../pages/search';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import I18nCollectiveTags from '../I18nCollectiveTags';
