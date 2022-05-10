@@ -193,6 +193,12 @@ const nextConfig = {
         destination: '/search?isHost=true',
         permanent: true,
       },
+      // Redirect legacy /discover page link to new /search page
+      {
+        source: '/discover',
+        destination: '/search',
+        permanent: true,
+      },
     ];
   },
 };
