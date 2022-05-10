@@ -544,6 +544,10 @@ enum OrderByFieldType {
   CREATED_AT
   MEMBER_COUNT
   TOTAL_CONTRIBUTED
+
+  """
+  The financial activity of the collective (number of transactions)
+  """
   ACTIVITY
   RANK
 }
@@ -3323,6 +3327,11 @@ type AccountStats {
     Computes contributions from the last x months. Cannot be used with startDate/endDate
     """
     periodInMonths: Int
+
+    """
+    Set this to true to use cached data
+    """
+    useCache: Boolean! = false
   ): Amount!
 
   """
@@ -7315,7 +7324,9 @@ type Query {
     Only accounts that support one of these payment services will be returned
     """
     supportedPaymentMethodService: [PaymentMethodService]
-      @deprecated(reason: "2022-04-22: Introduced for Hacktoberfest and not used anymore.")
+      @deprecated(
+        reason: "2022-04-22: Introduced for Hacktoberfest. Reference: https://github.com/opencollective/opencollective-api/pull/7440#issuecomment-1121504508"
+      )
 
     """
     Whether to skip recent suspicious accounts (48h)
@@ -7328,7 +7339,7 @@ type Query {
     country: [CountryISO]
 
     """
-    The order of results
+    The order of results. Defaults to [RANK, DESC] (or [CREATED_AT, DESC] if `supportedPaymentMethodService` is provided)
     """
     orderBy: OrderByInput
   ): AccountCollection!
