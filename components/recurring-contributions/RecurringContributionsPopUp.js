@@ -202,10 +202,8 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
                 options={['NO_LONGER_WANT_TO_SUPPORT', 'UPDATING_ORDER', 'OTHER']}
               >
                 {({ value, radio }) => (
-                  <P my={2} fontWeight="normal">
-                    <Span data-cy={value} mx={2}>
-                      {radio}
-                    </Span>
+                  <P my={2} data-cy={value} fontWeight="normal">
+                    <Span mx={2}>{radio}</Span>
                     {intl.formatMessage(i18nReasons[value])}
                   </P>
                 )}

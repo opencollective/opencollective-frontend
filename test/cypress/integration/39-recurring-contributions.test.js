@@ -147,7 +147,7 @@ describe('Recurring contributions', () => {
     });
   });
 
-  it('Can cancel an active contribution', () => {
+  it('Can cancel an active contribution with reasons displayed in modal, "other" displays text area', () => {
     cy.clearInbox();
     cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
       cy.getByDataCy('recurring-contribution-edit-activate-button').first().contains('Edit');
@@ -158,6 +158,9 @@ describe('Recurring contributions', () => {
       cy.getByDataCy('recurring-contribution-cancel-menu').contains(
         'Why are you cancelling your subscription today? 🥺',
       );
+      cy.getByDataCy('NO_LONGER_WANT_TO_SUPPORT').contains('No longer want to back the collective');
+      cy.getByDataCy('UPDATING_ORDER').contains('Changing payment method or amount');
+      cy.getByDataCy('cancellation-text-area').should('not.exist');
       cy.getByDataCy('OTHER').click();
       cy.getByDataCy('cancellation-text-area').clear().type('Because I want to');
       cy.getByDataCy('recurring-contribution-cancel-yes')
