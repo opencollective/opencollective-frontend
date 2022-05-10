@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
-import { filter, get, isEmpty, size, without } from 'lodash';
+import { filter, get, isEmpty, omit, size } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
@@ -49,7 +49,7 @@ const editCollectiveMutation = gql/* GraphQL */ `
 `;
 
 const setPoliciesMutation = gqlV2/* GraphQL */ `
-  mutation SetPolicies($account: AccountReferenceInput!, $policies: [Policy]) {
+  mutation SetPolicies($account: AccountReferenceInput!, $policies: JSON!) {
     setPolicies(account: $account, policies: $policies) {
       id
       policies
@@ -138,7 +138,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
       contributionPolicy: collectiveContributionPolicy || '',
       expensePolicy: collectiveExpensePolicy || '',
       disablePublicExpenseSubmission: collectiveDisableExpenseSubmission || false,
-      policies: data?.account?.policies || [],
+      policies: data?.account?.policies || {},
     },
     async onSubmit(values) {
       const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission, policies } = values;
@@ -302,15 +302,15 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             onChange={() =>
               formik.setFieldValue(
                 'policies',
-                formik.values.policies?.includes('EXPENSE_AUTHOR_CANNOT_APPROVE')
-                  ? without(formik.values.policies, 'EXPENSE_AUTHOR_CANNOT_APPROVE')
-                  : [...formik.values.policies, 'EXPENSE_AUTHOR_CANNOT_APPROVE'],
+                formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']
+                  ? omit(formik.values.policies, ['EXPENSE_AUTHOR_CANNOT_APPROVE'])
+                  : { ...formik.values.policies, EXPENSE_AUTHOR_CANNOT_APPROVE: true },
               )
             }
-            checked={Boolean(formik.values.policies?.includes('EXPENSE_AUTHOR_CANNOT_APPROVE'))}
+            checked={Boolean(formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'])}
             disabled={
               isSettingPolicies ||
-              (numberOfAdmins < 2 && Boolean(!formik.values.policies?.includes('EXPENSE_AUTHOR_CANNOT_APPROVE')))
+              (numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']))
             }
           />
           {collective?.isHost && (
@@ -321,7 +321,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               />
             </P>
           )}
-          {numberOfAdmins < 2 && Boolean(!formik.values.policies?.includes('EXPENSE_AUTHOR_CANNOT_APPROVE')) && (
+          {numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']) && (
             <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
               <FormattedMessage
                 id="editCollective.expenseApprovalsPolicy.authorCannotApprove.minAdminRequired"
