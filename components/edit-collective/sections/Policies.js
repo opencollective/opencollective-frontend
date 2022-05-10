@@ -91,6 +91,9 @@ const messages = defineMessages({
     defaultMessage:
       'Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees)',
   },
+  'requiredAdmins.numberOfAdmins': {
+    defaultMessage: '{admins, plural, =0 {Do not enforce minimum number of admins} one {# Admin} other {# Admins} }',
+  },
 });
 
 const Policies = ({ collective, showOnlyExpensePolicy }) => {
@@ -153,23 +156,25 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
         },
       });
       const selectedRejectCategories = selected.map(option => option.value);
-      await updateCategories({
-        variables: {
-          account: {
-            legacyId: collective.id,
+      await Promise.all([
+        updateCategories({
+          variables: {
+            account: {
+              legacyId: collective.id,
+            },
+            key: 'moderation',
+            value: { rejectedCategories: selectedRejectCategories },
           },
-          key: 'moderation',
-          value: { rejectedCategories: selectedRejectCategories },
-        },
-      });
-      await setPolicies({
-        variables: {
-          account: {
-            legacyId: collective.id,
+        }),
+        setPolicies({
+          variables: {
+            account: {
+              legacyId: collective.id,
+            },
+            policies,
           },
-          policies,
-        },
-      });
+        }),
+      ]);
 
       addToast({
         type: TOAST_TYPE.SUCCESS,
@@ -204,9 +209,18 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
 
   React.useEffect(() => {
     if (data) {
-      formik.setFieldValue('policies', data.account?.policies || []);
+      formik.setFieldValue('policies', data.account?.policies || {});
     }
   }, [data]);
+
+  const numberOfAdminsOptions = [0, 2, 3, 4, 5].map(n => ({
+    value: n,
+    label: formatMessage(messages['requiredAdmins.numberOfAdmins'], { admins: n }),
+  }));
+  const minAdminsApplies = [
+    { value: 'NEW_COLLECTIVES', label: <FormattedMessage defaultMessage="New Collectives Only" /> },
+    { value: 'ALL_COLLECTIVES', label: <FormattedMessage defaultMessage="All Collectives" /> },
+  ];
 
   return (
     <Flex flexDirection="column">
@@ -285,6 +299,81 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               id="collective.expensePolicy.description"
               defaultMessage="It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters."
             />
+          </P>
+        </Container>
+        <Container>
+          <SettingsSectionTitle mt={4}>
+            <FormattedMessage id="editCollective.admins.header" defaultMessage="Required Admins" />
+          </SettingsSectionTitle>
+          <P mb={2}>
+            <FormattedMessage
+              id="editCollective.admins.description"
+              defaultMessage="Please specify the minimum number of admins a collective needs to have for being accepted by your fiscal host and to accept contributions."
+            />
+          </P>
+          <Flex gap="12px 24px" mb={3} mt={2} flexDirection={['column', 'row']}>
+            <StyledInputField
+              disabled={isSubmittingSettings}
+              labelFontSize="13px"
+              labelFontWeight="700"
+              label={<FormattedMessage defaultMessage="Minimum number of admins" />}
+              flexGrow={1}
+            >
+              <StyledSelect
+                inputId="numberOfAdmins"
+                isSearchable={false}
+                options={numberOfAdminsOptions}
+                onChange={option => {
+                  if (option.value === 0) {
+                    formik.setFieldValue('policies', omit(formik.values.policies, ['COLLECTIVE_MINIMUM_ADMINS']));
+                  } else {
+                    formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
+                      ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
+                      numberOfAdmins: option.value,
+                    });
+                  }
+                }}
+                value={numberOfAdminsOptions.find(
+                  option => option.value === (formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins || 0),
+                )}
+              />
+            </StyledInputField>
+            <StyledInputField
+              disabled={isSubmittingSettings}
+              labelFontSize="13px"
+              labelFontWeight="700"
+              label={<FormattedMessage defaultMessage="Whom does this apply to" />}
+              flexGrow={1}
+            >
+              <StyledSelect
+                inputId="applies"
+                isSearchable={false}
+                options={minAdminsApplies}
+                onChange={option =>
+                  formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
+                    ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
+                    applies: option.value,
+                  })
+                }
+                value={minAdminsApplies.find(
+                  option => option.value === formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.applies,
+                )}
+              />
+            </StyledInputField>
+          </Flex>
+          <StyledCheckbox
+            name="minAdminsFreeze"
+            label={<FormattedMessage defaultMessage="Freeze collectives that don’t meet the minimum requirement" />}
+            onChange={({ checked }) => {
+              formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
+                ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
+                freeze: checked,
+              });
+            }}
+            checked={Boolean(formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze)}
+          />
+          <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
+            <FormattedMessage defaultMessage="Freezing the collective will prevent them from accepting and distributing contributions till they meet the requirements. This is a security measure to make sure the admins are within their rights. Read More." />
           </P>
         </Container>
         <Container>
