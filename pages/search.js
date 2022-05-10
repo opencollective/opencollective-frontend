@@ -562,19 +562,10 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
         imageUrl
         backgroundImageUrl
         description
-        longDescription
         website
         currency
         stats {
           id
-          totalAmountSpent {
-            currency
-            valueInCents
-          }
-          yearlyBudget {
-            currency
-            valueInCents
-          }
           totalAmountReceived {
             currency
             valueInCents
@@ -595,9 +586,6 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
           }
         }
         backers: members(role: BACKER) {
-          totalCount
-        }
-        memberOf(role: BACKER) {
           totalCount
         }
       }
