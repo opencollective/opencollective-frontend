@@ -13,7 +13,6 @@ import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
-import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
 import Hide from '../components/Hide';
@@ -420,15 +419,9 @@ class SearchPage extends React.Component {
                 ))
               : accounts?.nodes?.map(collective => (
                   <Flex key={collective.slug} my={3} mx={2}>
-                    {collective.isPledged ? (
-                      <CollectiveCardContainer key={collective.id}>
-                        <PledgedCollectiveCard collective={collective} />
-                      </CollectiveCardContainer>
-                    ) : (
-                      <CollectiveCardContainer key={collective.id}>
-                        <SearchCollectiveCard collective={collective} />
-                      </CollectiveCardContainer>
-                    )}
+                    <CollectiveCardContainer key={collective.id}>
+                      <SearchCollectiveCard collective={collective} />
+                    </CollectiveCardContainer>
                   </Flex>
                 ))}
 
