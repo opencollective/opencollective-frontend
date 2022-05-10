@@ -552,8 +552,8 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
         }
         tags
         isHost
-        imageUrl
-        backgroundImageUrl
+        imageUrl(height: 96)
+        backgroundImageUrl(height: 208)
         description
         website
         currency
