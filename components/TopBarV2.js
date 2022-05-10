@@ -170,7 +170,7 @@ const TopBarV2 = ({ showSearch }) => {
             <Container borderRight="2px solid #DCDDE0" height="20px" padding="5px" />
           </NavList>
         </Hide>
-        <NavButton as={StyledLink} href="/search?type=COLLECTIVE">
+        <NavButton as={StyledLink} href="/search">
           <Flex>
             <SearchIcon fill="#75777A" size={18} />
             <Hide xs sm>
