@@ -161,7 +161,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
           {!isEvent && (
             <Fragment>
               {(isCollective || isFund || isProject) && (
-                <Flex my="30px" mb={2} flexWrap="wrap">
+                <Flex my="30px" mb={2} flexWrap="wrap" data-cy="collective-tags">
                   <StyledTag
                     textTransform="uppercase"
                     variant="rounded-left"

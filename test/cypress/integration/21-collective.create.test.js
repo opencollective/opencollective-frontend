@@ -28,7 +28,7 @@ describe('create a collective', () => {
     );
   });
 
-  it('Can create a collective with tags', () => {
+  it('Can create a collective with tags and checks whether the added tags are shown in collective page', () => {
     cy.getByDataCy('ccf-category-picker-button-community').click();
     cy.getByDataCy('ccf-form-name').type('Bees are vicious');
     cy.getByDataCy('ccf-form-description').type('I do not like them');
@@ -38,5 +38,9 @@ describe('create a collective', () => {
     cy.get('[data-cy=ccf-form-tags]').contains('opencollective-tag');
     cy.get('[data-cy="custom-checkbox"').click();
     cy.get('[data-cy=ccf-form-submit]').click();
+    cy.visit('/bees-are-vicious');
+    cy.get('[data-cy=collective-tags]').contains('opencollective-tag');
+    cy.get('[data-cy=collective-tags]').contains('meetup');
+    cy.get('[data-cy=collective-tags]').contains('COLLECTIVE');
   });
 });
