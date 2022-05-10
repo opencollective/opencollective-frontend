@@ -50,7 +50,6 @@ const ArchiveCollective = ({ collective }) => {
   };
   const [archiveCollective] = useMutation(archiveCollectiveMutation, adminPanelMutationParams);
   const [unarchiveCollective] = useMutation(unarchiveCollectiveMutation, adminPanelMutationParams);
-  const isSelfHosted = collective.host?.id === collective.id && collective.type !== CollectiveType.ORGANIZATION;
 
   const handleArchiveCollective = async ({ id }) => {
     setModal({ type: 'Archive', show: false });
@@ -151,7 +150,7 @@ const ArchiveCollective = ({ collective }) => {
       )}
       {!isArchived && collective.isHost && (
         <P color="rgb(224, 183, 0)" my={1}>
-          {isSelfHosted ? (
+          {collective.type === CollectiveType.COLLECTIVE ? (
             <FormattedMessage
               id="collective.archive.selfHosted"
               defaultMessage={`To archive this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.`}
