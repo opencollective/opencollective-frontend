@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Flag as FlagIcon } from '@styled-icons/fa-solid/Flag';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
@@ -10,23 +10,31 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
 
+const messages = defineMessages({
+  reasonPlaceholder: {
+    defaultMessage: 'e.g. Email Address is wrong',
+  },
+});
+
 const MarkExpenseAsIncompleteModal = props => {
+  const intl = useIntl();
   const [message, setMessage] = React.useState();
 
   const onConfirm = () => props.onSubmit('MARK_AS_INCOMPLETE', { message });
 
   return (
     <StyledModal role="alertdialog" width="432px" onClose={props.onClose}>
-      <ModalHeader>Mark as incomplete</ModalHeader>
+      <ModalHeader>
+        <FormattedMessage defaultMessage="Mark as incomplete" />
+      </ModalHeader>
       <ModalBody pt={2}>
         <P color="black.700" lineHeight="20px">
-          Please mention the reason why this expense has been marked as incomplete. The reason will be shared with the
-          user and also be documented as a comment under the expense.
+          <FormattedMessage defaultMessage="Please mention the reason why this expense has been marked as incomplete. The reason will be shared with the user and also be documented as a comment under the expense." />
         </P>
         <Box>
           <StyledInputField
             name="reason"
-            label="Please specify the reason"
+            label={<FormattedMessage defaultMessage="Please specify the reason" />}
             labelFontSize="13px"
             labelFontWeight={600}
             labelColor="black.700"
@@ -37,7 +45,7 @@ const MarkExpenseAsIncompleteModal = props => {
               <StyledTextarea
                 {...inputProps}
                 minHeight={100}
-                placeholder="e.g. Email Address is wrong"
+                placeholder={intl.formatMessage(messages.reasonPlaceholder)}
                 onChange={e => setMessage(e.target.value)}
               />
             )}
@@ -47,10 +55,10 @@ const MarkExpenseAsIncompleteModal = props => {
       <ModalFooter>
         <Flex gap="16px" justifyContent="flex-end">
           <StyledButton buttonStyle="secondary" buttonSize="small" onClick={onConfirm}>
-            Confirm and mark as incomplete
+            <FormattedMessage defaultMessage="Confirm and mark as incomplete" />
           </StyledButton>
           <StyledButton buttonStyle="standard" buttonSize="small" onClick={props.onClose}>
-            Cancel
+            <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
           </StyledButton>
         </Flex>
       </ModalFooter>
