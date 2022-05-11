@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { CheckCircle as CheckIcon } from '@styled-icons/boxicons-regular/CheckCircle';
 import { Ban as RejectedIcon } from '@styled-icons/fa-solid/Ban';
@@ -198,12 +198,13 @@ const ThreadActivity = ({ activity }) => {
         </Flex>
       )}
       {message && (
-        <ActivityParagraph activityColor={activityColor}>
+        <ActivityParagraph activityColor={activityColor} mt={1} fontSize="12px" whiteSpace="pre-line">
           <ActivityMessage color={activityColor}>{formatMessage(message)}</ActivityMessage>
           {details && (
-            <P mt={1} fontSize="12px" whiteSpace="pre-line">
+            <Fragment>
+              <br />
               {escape(details)}
-            </P>
+            </Fragment>
           )}
         </ActivityParagraph>
       )}
