@@ -30,6 +30,7 @@ export const searchQuery = gqlV2/* GraphQL */ `
       offset: $offset
       skipRecentAccounts: false
       orderBy: { field: CREATED_AT, direction: DESC }
+      type: [COLLECTIVE, EVENT, FUND, INDIVIDUAL, ORGANIZATION, PROJECT]
     ) {
       nodes {
         id
