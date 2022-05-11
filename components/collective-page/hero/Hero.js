@@ -167,6 +167,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     variant="rounded-left"
                     backgroundColor="black.200"
                     mt={['5px', 0]}
+                    fontWeight={500}
                   >
                     <I18nCollectiveTags tags={collective.type} />
                   </StyledTag>
@@ -175,15 +176,19 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     <Fragment>
                       {displayedTags.map(tag => (
                         <Link key={tag} href={`/search?tag=${tag}`}>
-                          <StyledTag variant="rounded-right" ml="10px" mt={['5px', 0]}>
+                          <StyledTag variant="rounded-right" ml="10px" mt={['5px', 0]} fontWeight={500}>
                             <I18nCollectiveTags tags={tag} />
                           </StyledTag>
                         </Link>
                       ))}
                       {tagCount > 3 && (
                         <StyledLink onClick={() => setShowTagsModal(true)}>
-                          <StyledTag variant="rounded-right" ml="10px" mt={['5px', 0]}>
-                            <I18nCollectiveTags tags={`+ ${tagCount - 3} more`} />
+                          <StyledTag variant="rounded-right" ml="10px" mt={['5px', 0]} fontWeight={500}>
+                            <FormattedMessage
+                              id="expenses.countMore"
+                              defaultMessage="+ {count} more"
+                              values={{ count: tagCount - 3 }}
+                            />
                           </StyledTag>
                         </StyledLink>
                       )}
@@ -196,7 +201,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                             <Flex flexWrap="wrap">
                               {hiddenTags.map(tag => (
                                 <Link key={tag} href={`/search?tag=${tag}`}>
-                                  <StyledTag variant="rounded-right" ml="10px">
+                                  <StyledTag variant="rounded-right" ml="10px" fontWeight={500} mt="5px">
                                     <I18nCollectiveTags tags={tag} />
                                   </StyledTag>
                                 </Link>
