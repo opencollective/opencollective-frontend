@@ -38,6 +38,11 @@ const NavButton = styled(StyledButton)`
   font-weight: 500;
   font-size: 16px;
   padding: 10px;
+  @media (hover: hover) {
+    :hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 const NavItem = styled(StyledLink)`
@@ -90,7 +95,7 @@ const TopBarV2 = ({ showSearch }) => {
                   <ChevronDown size={20} />
                 </NavButton>
               )}
-              placement="bottom-start"
+              placement="bottom"
             >
               <NavLinkContainer>
                 {/* TODO: Add this part back when the /collectives page is designed */}
@@ -101,7 +106,7 @@ const TopBarV2 = ({ showSearch }) => {
                 {/* </Link>*/}
                 <Link href="/become-a-sponsor">
                   <NavItem as={Container} mt={16} mb={16}>
-                    <FormattedMessage defaultMessage="For Contributors" />
+                    <FormattedMessage defaultMessage="For Sponsors" />
                   </NavItem>
                 </Link>
                 <Link href="/become-a-host">
@@ -119,7 +124,7 @@ const TopBarV2 = ({ showSearch }) => {
                   <ChevronDown size={20} />
                 </NavButton>
               )}
-              placement="bottom-start"
+              placement="bottom"
             >
               <NavLinkContainer>
                 <Link href="/pricing">
@@ -147,7 +152,7 @@ const TopBarV2 = ({ showSearch }) => {
                   <ChevronDown size={20} />
                 </NavButton>
               )}
-              placement="bottom-start"
+              placement="bottom"
             >
               <NavLinkContainer>
                 <a href="https://blog.opencollective.com/">
