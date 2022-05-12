@@ -17,6 +17,7 @@ import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
 import Hide from '../components/Hide';
+import I18nCollectiveTags from '../components/I18nCollectiveTags';
 import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
 import InputTypeCountry from '../components/InputTypeCountry';
@@ -29,6 +30,8 @@ import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
 import StyledHr from '../components/StyledHr';
 import { fadeIn } from '../components/StyledKeyframes';
+import StyledLink from '../components/StyledLink';
+import StyledModal, { ModalBody, ModalHeader } from '../components/StyledModal';
 import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import StyledTag from '../components/StyledTag';
 import { H1, P, Span } from '../components/Text';
@@ -167,13 +170,15 @@ class SearchPage extends React.Component {
     super(props);
     this.onClick = this.onClick.bind(this);
     const term = props.term;
+    let filter;
     if (this.props.isHost) {
-      this.state = { filter: 'HOST', term };
+      filter = { filter: 'HOST', term };
     } else if (this.props.type.length === 1) {
-      this.state = { filter: this.props.type[0], term };
+      filter = { filter: this.props.type[0], term };
     } else {
-      this.state = { filter: 'ALL', term };
+      filter = { filter: 'ALL', term };
     }
+    this.state = { showTagsModal: false, filter };
   }
 
   componentDidUpdate(prevProps) {
@@ -275,10 +280,18 @@ class SearchPage extends React.Component {
     });
   };
 
+  changeTagsWithinModal = tag => {
+    this.changeTags(tag);
+    this.setState({ showTagsModal: false });
+  };
+
   render() {
     const { data, intl } = this.props;
     const { error, loading, accounts, tagStats } = data || {};
     const tags = this.props.tag || [];
+    const usefulTags = tagStats?.nodes?.filter(node => !IGNORED_TAGS.includes(node.tag));
+    const displayedTags = usefulTags?.slice(0, 6);
+    const hiddenTags = usefulTags?.slice(6);
 
     if (error) {
       return <ErrorPage data={this.props.data} />;
@@ -389,20 +402,43 @@ class SearchPage extends React.Component {
                   <FormattedMessage defaultMessage="Tags" />
                 </FilterLabel>
                 <Flex flexWrap="wrap">
-                  {tagStats?.nodes
-                    ?.filter(node => !IGNORED_TAGS.includes(node.tag))
-                    .map(node => (
-                      <FilterButton
-                        as={StyledTag}
-                        key={node.tag}
-                        title={node.tag}
-                        variant="rounded-right"
-                        $isSelected={tags.includes(node.tag)}
-                        onClick={() => this.changeTags(node.tag)}
-                      >
-                        {truncate(node.tag, { length: 20 })}
-                      </FilterButton>
-                    ))}
+                  {displayedTags.map(node => (
+                    <FilterButton
+                      as={StyledTag}
+                      key={node.tag}
+                      title={node.tag}
+                      variant="rounded-right"
+                      $isSelected={tags.includes(node.tag)}
+                      onClick={() => this.changeTags(node.tag)}
+                    >
+                      {truncate(node.tag, { length: 20 })}
+                    </FilterButton>
+                  ))}
+                  <FilterButton
+                    as={StyledTag}
+                    variant="rounded-right"
+                    onClick={() => this.setState({ showTagsModal: true })}
+                  >
+                    <FormattedMessage defaultMessage="See more..." />
+                  </FilterButton>
+                  {this.state.showTagsModal && (
+                    <StyledModal width="432px" onClose={() => this.setState({ showTagsModal: false })}>
+                      <ModalHeader pb="26px">
+                        <FormattedMessage defaultMessage="Open Collective Tags" />
+                      </ModalHeader>
+                      <ModalBody>
+                        <Flex flexWrap="wrap">
+                          {hiddenTags.map(node => (
+                            <StyledLink key={node.tag} onClick={() => this.changeTagsWithinModal(node.tag)}>
+                              <StyledTag variant="rounded-right" ml="10px" fontWeight={500} mt="5px">
+                                <I18nCollectiveTags tags={node.tag} />
+                              </StyledTag>
+                            </StyledLink>
+                          ))}
+                        </Flex>
+                      </ModalBody>
+                    </StyledModal>
+                  )}
                 </Flex>
               </Container>
             )}
@@ -590,7 +626,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
       totalCount
     }
 
-    tagStats(searchTerm: $term) {
+    tagStats(searchTerm: $term, limit: 50) {
       nodes {
         tag
       }
