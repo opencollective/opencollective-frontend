@@ -15,7 +15,7 @@ import { parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
-import { Box, Flex } from '../components/Grid';
+import { Box, Flex, Grid } from '../components/Grid';
 import Hide from '../components/Hide';
 import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
@@ -38,6 +38,11 @@ const CollectiveCardContainer = styled.div`
   width: 275px;
   animation: ${fadeIn} 0.2s;
 `;
+
+const AllCardsContainer = styled(Grid).attrs({
+  width: [null, '100%'],
+  gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 2fr))',
+})``;
 
 const FILTERS = {
   ALL: 'ALL',
@@ -416,23 +421,25 @@ class SearchPage extends React.Component {
               </Container>
             )}
           </Flex>
-          <Flex mb="64px" justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
-            {loading
-              ? Array.from(new Array(12)).map((_, index) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <Flex key={index} my={3} mx={2}>
-                    <CollectiveCardContainer>
-                      <LoadingPlaceholder height={336} borderRadius="16px" />
-                    </CollectiveCardContainer>
-                  </Flex>
-                ))
-              : accounts?.nodes?.map(collective => (
-                  <Flex key={collective.slug} my={3} mx={2}>
-                    <CollectiveCardContainer key={collective.id}>
-                      <SearchCollectiveCard collective={collective} />
-                    </CollectiveCardContainer>
-                  </Flex>
-                ))}
+          <Flex mb="64px" justifyContent="center" flexWrap="wrap">
+            <AllCardsContainer>
+              {loading
+                ? Array.from(new Array(12)).map((_, index) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <Flex key={index} my={3} mx={2}>
+                      <CollectiveCardContainer>
+                        <LoadingPlaceholder height={336} borderRadius="16px" />
+                      </CollectiveCardContainer>
+                    </Flex>
+                  ))
+                : accounts?.nodes?.map(collective => (
+                    <Flex key={collective.slug} my={3} mx={2}>
+                      <CollectiveCardContainer key={collective.id}>
+                        <SearchCollectiveCard collective={collective} />
+                      </CollectiveCardContainer>
+                    </Flex>
+                  ))}
+            </AllCardsContainer>
 
             {accounts?.nodes?.length === 0 && (
               <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
