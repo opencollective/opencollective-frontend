@@ -158,29 +158,30 @@ class TopBarMobileMenu extends React.Component {
           order={['2', null, '3']}
           borderRadius={16}
           background="#F7F8FA"
+          justifyContent="space-between"
         >
           <StyledLink href="https://blog.opencollective.com/" openInNewTab onClick={closeMenu}>
-            <StyledRoundButton size={40} mr={2}>
+            <StyledRoundButton size={40}>
               <Blog size={17} color="#9D9FA3" />
             </StyledRoundButton>
           </StyledLink>
           <StyledLink href="https://twitter.com/opencollect" openInNewTab onClick={closeMenu}>
-            <StyledRoundButton size={40} mr={2}>
+            <StyledRoundButton size={40}>
               <Twitter size={17} color="#9D9FA3" />
             </StyledRoundButton>
           </StyledLink>
           <StyledLink href="https://github.com/opencollective" openInNewTab onClick={closeMenu}>
-            <StyledRoundButton size={40} mr={2}>
+            <StyledRoundButton size={40}>
               <Github size={17} color="#9D9FA3" />
             </StyledRoundButton>
           </StyledLink>
           <StyledLink href="https://slack.opencollective.com" openInNewTab onClick={closeMenu}>
-            <StyledRoundButton size={40} mr={2}>
+            <StyledRoundButton size={40}>
               <Slack size={17} color="#9D9FA3" />
             </StyledRoundButton>
           </StyledLink>
           <StyledLink href="mailto:info@opencollective.com" openInNewTab onClick={closeMenu}>
-            <StyledRoundButton size={40} mr={2}>
+            <StyledRoundButton size={40}>
               <Mail size={19} color="#9D9FA3" />
             </StyledRoundButton>
           </StyledLink>
