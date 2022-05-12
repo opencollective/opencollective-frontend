@@ -22,6 +22,7 @@ import { useUser } from '../UserProvider';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import DeleteExpenseButton from './DeleteExpenseButton';
+import MarkExpenseAsIncompleteButton from './MarkExpenseAsIncompleteButton';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
 
@@ -57,7 +58,8 @@ export const hasProcessButtons = permissions => {
     permissions.canPay ||
     permissions.canMarkAsUnpaid ||
     permissions.canMarkAsSpam ||
-    permissions.canDelete
+    permissions.canDelete ||
+    permissions.canMarkAsIncomplete
   );
 };
 
@@ -148,6 +150,7 @@ const ProcessExpenseButtons = ({
   onSuccess,
   onModalToggle,
   onDelete,
+  ...props
 }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
   const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
@@ -202,6 +205,24 @@ const ProcessExpenseButtons = ({
           }
         />
       )}
+      {permissions.canPay && (
+        <PayExpenseButton
+          {...getButtonProps('PAY')}
+          onClick={null}
+          onSubmit={triggerAction}
+          expense={expense}
+          collective={collective}
+          host={host}
+          error={error}
+        />
+      )}
+      {permissions.canMarkAsIncomplete && props.displayMarkAsIncomplete && (
+        <MarkExpenseAsIncompleteButton
+          {...getButtonProps('MARK_AS_INCOMPLETE')}
+          onClick={null}
+          onSubmit={triggerAction}
+        />
+      )}
       {permissions.canReject && (
         <StyledButton {...getButtonProps('REJECT')} buttonStyle="dangerSecondary" data-cy="reject-button">
           <RejectIcon size={14} />
@@ -227,17 +248,7 @@ const ProcessExpenseButtons = ({
           </ButtonLabel>
         </StyledButton>
       )}
-      {permissions.canPay && (
-        <PayExpenseButton
-          {...getButtonProps('PAY')}
-          onClick={null}
-          onSubmit={triggerAction}
-          expense={expense}
-          collective={collective}
-          host={host}
-          error={error}
-        />
-      )}
+
       {permissions.canUnapprove && (
         <StyledButton {...getButtonProps('UNAPPROVE')} buttonStyle="dangerSecondary" data-cy="unapprove-button">
           <UnapproveIcon size={12} />
@@ -288,6 +299,7 @@ ProcessExpenseButtons.propTypes = {
     canMarkAsSpam: PropTypes.bool,
     canPay: PropTypes.bool,
     canMarkAsUnpaid: PropTypes.bool,
+    canMarkAsIncomplete: PropTypes.bool,
     canUnschedulePayment: PropTypes.bool,
     canDelete: PropTypes.bool,
     approve: PropTypes.shape({
@@ -298,6 +310,7 @@ ProcessExpenseButtons.propTypes = {
   expense: PropTypes.shape({
     id: PropTypes.string,
     legacyId: PropTypes.number,
+    status: PropTypes.string,
   }).isRequired,
   /** The account where the expense has been submitted */
   collective: PropTypes.object.isRequired,
@@ -310,6 +323,7 @@ ProcessExpenseButtons.propTypes = {
   onDelete: PropTypes.func,
   /** Called when a modal is opened/closed with a boolean like (isOpen) */
   onModalToggle: PropTypes.func,
+  displayMarkAsIncomplete: PropTypes.bool,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {

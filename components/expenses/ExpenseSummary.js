@@ -316,6 +316,7 @@ const ExpenseSummary = ({
                 onDelete?.(expense);
                 onClose?.();
               }}
+              displayMarkAsIncomplete
             />
           </Flex>
         </Container>

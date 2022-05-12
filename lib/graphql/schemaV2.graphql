@@ -1634,6 +1634,7 @@ enum ExpenseStatus {
   DRAFT
   UNVERIFIED
   PENDING
+  INCOMPLETE
   APPROVED
   REJECTED
   PROCESSING
@@ -1909,6 +1910,11 @@ type ExpensePermissions {
   canMarkAsUnpaid: Boolean!
 
   """
+  Whether the current user can mark this expense as incomplete
+  """
+  canMarkAsIncomplete: Boolean!
+
+  """
   Whether the current user can comment and see comments for this expense
   """
   canComment: Boolean!
@@ -1990,6 +1996,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_PAID
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM
+  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
   COLLECTIVE_EXPENSE_PROCESSING
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
@@ -9136,6 +9143,7 @@ enum ExpenseStatusFilter {
   DRAFT
   UNVERIFIED
   PENDING
+  INCOMPLETE
   APPROVED
   REJECTED
   PROCESSING
@@ -11771,6 +11779,11 @@ enum ExpenseProcessAction {
   To mark the expense as spam
   """
   MARK_AS_SPAM
+
+  """
+  To mark the expense as incomplete and notify the payee it requires more information
+  """
+  MARK_AS_INCOMPLETE
 }
 
 """
@@ -11801,6 +11814,11 @@ input ProcessExpensePaymentParams {
   2FA code for if the host account has 2FA for payouts turned on.
   """
   feesPayer: FeesPayer = COLLECTIVE
+
+  """
+  Message to be attached to the action activity.
+  """
+  message: String
 }
 
 input ExpenseInviteDraftInput {
