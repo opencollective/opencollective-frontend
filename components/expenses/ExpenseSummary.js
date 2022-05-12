@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { includes, pick } from 'lodash';
+import { includes } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import expenseStatus from '../../lib/constants/expense-status';
@@ -21,8 +21,8 @@ import StyledHr from '../StyledHr';
 import { H4, P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
-import ExpenseAdminActions from './ExpenseAdminActions';
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
+import ExpenseMoreActionsButton from './ExpenseMoreActionsButton';
 import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseStatusTag from './ExpenseStatusTag';
 import ExpenseTags from './ExpenseTags';
@@ -103,17 +103,6 @@ const ExpenseSummary = ({
                 fontSize="10px"
                 showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
                 showTaxFormMsg={expense.payee.isAdmin}
-              />
-            </Box>
-          )}
-          {!isLoading && expense.id && (
-            <Box display={['flex', 'none']}>
-              <ExpenseAdminActions
-                collective={collective}
-                expense={expense}
-                permissions={pick(expense.permissions, ['canSeeInvoiceInfo', 'canDelete'])}
-                buttonProps={{ size: 32, m: 1 }}
-                linkAction="link"
               />
             </Box>
           )}
@@ -283,30 +272,27 @@ const ExpenseSummary = ({
         collective={collective}
         isDraft={!isEditing && expense?.status === expenseStatus.DRAFT}
       />
-      {Boolean(
-        showProcessButtons && !isEditing && existsInAPI && collective && hasProcessButtons(expense?.permissions),
-      ) && (
-        <Container
-          display="flex"
-          width={1}
-          justifyContent={['end', 'space-between', 'end']}
-          alignItems="flex-end"
-          borderTop="1px solid #DCDEE0"
-          mt={4}
-          pt={12}
-        >
-          <Box display={['none', 'flex', 'none']} alignItems="center">
-            <ExpenseAdminActions
-              collective={collective}
-              expense={expense}
-              permissions={expense?.permissions}
-              buttonProps={{ size: 32, m: 1 }}
-              linkAction="link"
-              onError={error => onError({ error })}
-              onEdit={onEdit}
-            />
-          </Box>
-          <Flex flexWrap="wrap" justifyContent="flex-end">
+      <Container
+        display="flex"
+        width={1}
+        justifyContent="space-between"
+        flexDirection={['column-reverse', null, 'row']}
+        alignItems="flex-end"
+        borderTop="1px solid #DCDEE0"
+        mt={4}
+        pt={12}
+      >
+        <ExpenseMoreActionsButton
+          permissions={expense?.permissions}
+          onEdit={onEdit}
+          onError={onError}
+          expense={expense}
+          mt={['16px', null, '8px']}
+        />
+        {Boolean(
+          showProcessButtons && !isEditing && existsInAPI && collective && hasProcessButtons(expense?.permissions),
+        ) && (
+          <Flex flexWrap="wrap">
             <ProcessExpenseButtons
               expense={expense}
               permissions={expense?.permissions}
@@ -319,8 +305,8 @@ const ExpenseSummary = ({
               displayMarkAsIncomplete
             />
           </Flex>
-        </Container>
-      )}
+        )}
+      </Container>
     </StyledCard>
   );
 };
