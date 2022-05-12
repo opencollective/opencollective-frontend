@@ -60,7 +60,6 @@ const ExpenseSummary = ({
   onClose,
   onDelete,
   onEdit,
-  onError,
   ...props
 }) => {
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
@@ -282,13 +281,7 @@ const ExpenseSummary = ({
         mt={4}
         pt={12}
       >
-        <ExpenseMoreActionsButton
-          permissions={expense?.permissions}
-          onEdit={onEdit}
-          onError={onError}
-          expense={expense}
-          mt={['16px', null, '8px']}
-        />
+        <ExpenseMoreActionsButton onEdit={onEdit} expense={expense} mt={['16px', null, '8px']} />
         {Boolean(
           showProcessButtons && !isEditing && existsInAPI && collective && hasProcessButtons(expense?.permissions),
         ) && (
@@ -423,7 +416,6 @@ ExpenseSummary.propTypes = {
   onClose: PropTypes.func,
   /** Passed down from pages/expense.js */
   onEdit: PropTypes.func,
-  onError: PropTypes.func,
   /** Passed down from either ExpenseModal or pages/expense.js */
   onDelete: PropTypes.func,
 };

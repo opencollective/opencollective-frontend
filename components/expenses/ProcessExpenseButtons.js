@@ -22,7 +22,6 @@ import { useUser } from '../UserProvider';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import DeleteExpenseButton from './DeleteExpenseButton';
-import MarkExpenseAsIncompleteButton from './MarkExpenseAsIncompleteButton';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
 
@@ -58,8 +57,7 @@ export const hasProcessButtons = permissions => {
     permissions.canPay ||
     permissions.canMarkAsUnpaid ||
     permissions.canMarkAsSpam ||
-    permissions.canDelete ||
-    permissions.canMarkAsIncomplete
+    permissions.canDelete
   );
 };
 
@@ -150,7 +148,6 @@ const ProcessExpenseButtons = ({
   onSuccess,
   onModalToggle,
   onDelete,
-  ...props
 }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
   const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
@@ -214,13 +211,6 @@ const ProcessExpenseButtons = ({
           collective={collective}
           host={host}
           error={error}
-        />
-      )}
-      {permissions.canMarkAsIncomplete && props.displayMarkAsIncomplete && (
-        <MarkExpenseAsIncompleteButton
-          {...getButtonProps('MARK_AS_INCOMPLETE')}
-          onClick={null}
-          onSubmit={triggerAction}
         />
       )}
       {permissions.canReject && (

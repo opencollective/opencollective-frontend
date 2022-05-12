@@ -2218,7 +2218,7 @@ type Tier {
   amount: Amount!
   type: TierType!
   interval: TierInterval @deprecated(reason: "2020-08-24: Please use \"frequency\"")
-  frequency: ContributionFrequency
+  frequency: TierFrequency!
   presets: [Int]
   maxQuantity: Int
 
@@ -2255,6 +2255,13 @@ enum TierInterval {
   month
   year
   flexible
+}
+
+enum TierFrequency {
+  MONTHLY
+  YEARLY
+  ONETIME
+  FLEXIBLE
 }
 
 enum TierAmountType {
@@ -10490,6 +10497,11 @@ type Mutation {
     action: ExpenseProcessAction!
 
     """
+    Message to be attached to the action activity.
+    """
+    message: String
+
+    """
     If action is related to a payment, this object used for the payment parameters
     """
     paymentParams: ProcessExpensePaymentParams
@@ -11825,11 +11837,6 @@ input ProcessExpensePaymentParams {
   2FA code for if the host account has 2FA for payouts turned on.
   """
   feesPayer: FeesPayer = COLLECTIVE
-
-  """
-  Message to be attached to the action activity.
-  """
-  message: String
 }
 
 input ExpenseInviteDraftInput {

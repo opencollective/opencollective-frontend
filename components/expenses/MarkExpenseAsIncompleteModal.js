@@ -1,14 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Flag as FlagIcon } from '@styled-icons/fa-solid/Flag';
+import { useMutation } from '@apollo/client';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+
+import { i18nGraphqlException } from '../../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledTextarea from '../StyledTextarea';
-import { P, Span } from '../Text';
+import { P } from '../Text';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
+
+import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 
 const messages = defineMessages({
   reasonPlaceholder: {
@@ -16,14 +22,36 @@ const messages = defineMessages({
   },
 });
 
-const MarkExpenseAsIncompleteModal = props => {
+const processExpenseMutation = gqlV2/* GraphQL */ `
+  mutation ProcessExpense($id: String, $legacyId: Int, $action: ExpenseProcessAction!, $message: String) {
+    processExpense(expense: { id: $id, legacyId: $legacyId }, action: $action, message: $message) {
+      ...ExpensePageExpenseFields
+    }
+  }
+
+  ${expensePageExpenseFieldsFragment}
+`;
+
+const MarkExpenseAsIncompleteModal = ({ expense, onClose }) => {
   const intl = useIntl();
   const [message, setMessage] = React.useState();
+  const mutationOptions = { context: API_V2_CONTEXT };
+  const [processExpense] = useMutation(processExpenseMutation, mutationOptions);
+  const { addToast } = useToasts();
 
-  const onConfirm = () => props.onSubmit('MARK_AS_INCOMPLETE', { message });
+  const onConfirm = async () => {
+    try {
+      const variables = { id: expense.id, legacyId: expense.legacyId, action: 'MARK_AS_INCOMPLETE', message };
+      await processExpense({ variables });
+      onClose();
+    } catch (error) {
+      // Display a toast with light variant since we're in a modal
+      addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, error) });
+    }
+  };
 
   return (
-    <StyledModal role="alertdialog" width="432px" onClose={props.onClose}>
+    <StyledModal role="alertdialog" width="432px" onClose={onClose}>
       <ModalHeader>
         <FormattedMessage defaultMessage="Mark as incomplete" />
       </ModalHeader>
@@ -57,7 +85,7 @@ const MarkExpenseAsIncompleteModal = props => {
           <StyledButton buttonStyle="secondary" buttonSize="small" onClick={onConfirm}>
             <FormattedMessage defaultMessage="Confirm and mark as incomplete" />
           </StyledButton>
-          <StyledButton buttonStyle="standard" buttonSize="small" onClick={props.onClose}>
+          <StyledButton buttonStyle="standard" buttonSize="small" onClick={onClose}>
             <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
           </StyledButton>
         </Flex>
@@ -67,29 +95,12 @@ const MarkExpenseAsIncompleteModal = props => {
 };
 
 MarkExpenseAsIncompleteModal.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func,
+  expense: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    legacyId: PropTypes.number.isRequired,
+  }).isRequired,
 };
 
-const MarkExpenseAsIncompleteButton = ({ onSubmit, ...props }) => {
-  const [showModal, setShowModal] = React.useState(false);
-  return (
-    <React.Fragment>
-      <StyledButton buttonStyle="secondary" data-cy="incomplete-button" {...props} onClick={() => setShowModal(true)}>
-        <FlagIcon size={14} />
-        <Span marginLeft="6px">
-          <FormattedMessage id="actions.markAsIncomplete" defaultMessage="Mark as Incomplete" />
-        </Span>
-      </StyledButton>
-      {showModal && <MarkExpenseAsIncompleteModal onSubmit={onSubmit} onClose={() => setShowModal(false)} />}
-    </React.Fragment>
-  );
-};
-
-MarkExpenseAsIncompleteButton.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  loading: PropTypes.bool,
-  disabled: PropTypes.bool,
-};
-
-export default MarkExpenseAsIncompleteButton;
+export default MarkExpenseAsIncompleteModal;

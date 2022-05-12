@@ -553,7 +553,6 @@ class ExpensePage extends React.Component {
                   isEditing={status === PAGE_STATUS.EDIT_SUMMARY}
                   isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
                   collective={collective}
-                  onError={error => this.setState({ error })}
                   onEdit={this.onEditBtnClick}
                   onDelete={this.onDelete}
                   suggestedTags={this.getSuggestedTags(collective)}
