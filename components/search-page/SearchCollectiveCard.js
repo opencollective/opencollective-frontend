@@ -15,8 +15,6 @@ import StyledCollectiveCard from './StyledCollectiveCard';
 
 /**
  * A card to show a collective on the search page.
- *
- * TODO: This component is mostly copies from ../DiscoverCollectiveCard.js added until we completely deprecate the discover page.
  */
 const SearchCollectiveCard = ({ collective, ...props }) => {
   return (
