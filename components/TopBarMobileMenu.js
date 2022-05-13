@@ -31,7 +31,7 @@ const ListItem = styled.li`
 
 class TopBarMobileMenu extends React.Component {
   render() {
-    const { showMobileMenu, closeMenu } = this.props;
+    const { showMobileMenu, menuItems, closeMenu } = this.props;
 
     if (!showMobileMenu) {
       return null;
@@ -51,26 +51,34 @@ class TopBarMobileMenu extends React.Component {
         data-cy="user-menu"
       >
         <Box as="ul" my={2} pl={0}>
-          <ListItem>
-            <Link href="/discover" onClick={closeMenu}>
-              <FormattedMessage id="menu.discover" defaultMessage="Discover" />
-            </Link>
-          </ListItem>
-          <ListItem>
-            <Link href="/how-it-works" onClick={closeMenu}>
-              <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
-            </Link>
-          </ListItem>
-          <ListItem>
-            <Link href="/pricing" onClick={closeMenu}>
-              <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
-            </Link>
-          </ListItem>
-          <ListItem>
-            <a href="/help" onClick={closeMenu}>
-              <FormattedMessage id="menu.docs" defaultMessage="Docs & Help" />
-            </a>
-          </ListItem>
+          {menuItems.discover && (
+            <ListItem>
+              <Link href="/discover" onClick={closeMenu}>
+                <FormattedMessage id="menu.discover" defaultMessage="Discover" />
+              </Link>
+            </ListItem>
+          )}
+          {menuItems.howItWorks && (
+            <ListItem>
+              <Link href="/how-it-works" onClick={closeMenu}>
+                <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
+              </Link>
+            </ListItem>
+          )}
+          {menuItems.pricing && (
+            <ListItem>
+              <Link href="/pricing" onClick={closeMenu}>
+                <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
+              </Link>
+            </ListItem>
+          )}
+          {menuItems.docs && (
+            <ListItem>
+              <a href="/help" onClick={closeMenu}>
+                <FormattedMessage id="menu.docs" defaultMessage="Docs & Help" />
+              </a>
+            </ListItem>
+          )}
         </Box>
         <Container
           display="flex"
@@ -114,6 +122,7 @@ class TopBarMobileMenu extends React.Component {
 
 TopBarMobileMenu.propTypes = {
   showMobileMenu: PropTypes.bool,
+  menuItems: PropTypes.object,
   closeMenu: PropTypes.func,
 };
 
