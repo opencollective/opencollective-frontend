@@ -3551,6 +3551,7 @@ This is the root mutation
 type Mutation {
   createCollective(collective: CollectiveInputType!): CollectiveInterface
   createCollectiveFromGithub(collective: CollectiveInputType!): CollectiveInterface
+    @deprecated(reason: "2022-05-03: This mutation is deprecated and can only be used in test environments.")
   editCollective(collective: CollectiveInputType!): CollectiveInterface
   deleteCollective(id: Int!): CollectiveInterface
   deleteUserCollective(id: Int!): CollectiveInterface

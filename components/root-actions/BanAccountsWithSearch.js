@@ -51,15 +51,7 @@ export const searchQuery = gqlV2/* GraphQL */ `
         }
         stats {
           id
-          totalAmountSpent {
-            currency
-            valueInCents
-          }
-          yearlyBudget {
-            currency
-            valueInCents
-          }
-          totalAmountReceived {
+          totalAmountReceived(useCache: true) {
             currency
             valueInCents
           }
