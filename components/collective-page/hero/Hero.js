@@ -6,12 +6,11 @@ import { Github } from '@styled-icons/feather/Github';
 import { Globe } from '@styled-icons/feather/Globe';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
-import { first, get } from 'lodash';
+import { first } from 'lodash';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getCollectiveMainTag } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { githubProfileUrl, twitterProfileUrl } from '../../../lib/url-helpers';
 
@@ -20,11 +19,12 @@ import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import { Box, Flex } from '../../Grid';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
+import Link from '../../Link';
 import LinkCollective from '../../LinkCollective';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import StyledLink from '../../StyledLink';
-import StyledModal from '../../StyledModal';
+import StyledModal, { ModalBody, ModalHeader } from '../../StyledModal';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import { H1, Span } from '../../Text';
@@ -84,6 +84,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const { LoggedInUser } = useUser();
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
+  const [showTagsModal, setShowTagsModal] = React.useState(false);
   const isEditing = hasColorPicker || isEditingCover;
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isEvent = collective.type === CollectiveType.EVENT;
@@ -94,6 +95,9 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const connectedAccountIsHost = firstConnectedAccount && host && firstConnectedAccount.collective.id === host.id;
   // get only unique references
   const companies = [...new Set(collective.company?.trim().toLowerCase().split(' '))];
+  const tagCount = collective.tags?.length;
+  const displayedTags = collective.tags?.slice(0, 3);
+  const hiddenTags = collective.tags?.slice(3);
 
   // Cancel edit mode when user navigates out to another collective
   useEffect(() => {
@@ -155,172 +159,220 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
               ))}
           </Flex>
           {!isEvent && (
-            <Flex alignItems="center" flexWrap="wrap">
+            <Fragment>
               {(isCollective || isFund || isProject) && (
-                <StyledTag textTransform="uppercase" mx={2} my={2} mb={2}>
-                  <I18nCollectiveTags
-                    tags={getCollectiveMainTag(
-                      get(collective, 'host.id'),
-                      collective.tags,
-                      collective.type,
-                      collective.settings,
-                    )}
-                  />
-                </StyledTag>
-              )}
-              <Flex my={2}>
-                {collective.canContact && (
-                  <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
-                    {btnProps => (
-                      <StyledRoundButton {...btnProps} size={32} mr={3} title="Contact" aria-label="Contact">
-                        <Mail size={12} />
-                      </StyledRoundButton>
-                    )}
-                  </ContactCollectiveBtn>
-                )}
-                {collective.twitterHandle && (
-                  <StyledLink
-                    data-cy="twitterProfileUrl"
-                    href={twitterProfileUrl(collective.twitterHandle)}
-                    openInNewTab
+                <Flex my="30px" mb={2} flexWrap="wrap" data-cy="collective-tags">
+                  <StyledTag
+                    textTransform="uppercase"
+                    variant="rounded-left"
+                    backgroundColor="black.200"
+                    mt={['5px', 0]}
+                    fontWeight={500}
                   >
-                    <StyledRoundButton size={32} mr={3} title="Twitter" aria-label="Twitter link">
-                      <Twitter size={12} />
-                    </StyledRoundButton>
-                  </StyledLink>
-                )}
-                {collective.githubHandle && (
-                  <StyledLink data-cy="githubProfileUrl" href={githubProfileUrl(collective.githubHandle)} openInNewTab>
-                    <StyledRoundButton size={32} mr={3} title="GitHub" aria-label="GitHub link">
-                      <Github size={12} />
-                    </StyledRoundButton>
-                  </StyledLink>
-                )}
-                {collective.website && (
-                  <StyledLink data-cy="collectiveWebsite" href={collective.website} openInNewTabNoFollow>
-                    <StyledRoundButton
-                      size={32}
-                      mr={3}
-                      title={intl.formatMessage(Translations.website)}
-                      aria-label="Website link"
-                    >
-                      <Globe size={14} />
-                    </StyledRoundButton>
-                  </StyledLink>
-                )}
-              </Flex>
-              {Boolean(!parentIsHost && collective.parentCollective) && (
-                <Container mx={1} color="black.700" my="12px">
-                  <FormattedMessage
-                    id="Collective.Hero.ParentCollective"
-                    defaultMessage="Part of: {parentName}"
-                    values={{
-                      parentName: (
-                        <StyledLink as={LinkCollective} collective={collective.parentCollective} noTitle>
-                          <TruncatedTextWithTooltip value={collective.parentCollective.name} cursor="pointer" />
+                    <I18nCollectiveTags tags={collective.type} />
+                  </StyledTag>
+                  <Container borderRight="1px solid #C3C6CB" height="22px" padding="5px" mt={['5px', 0]} />
+                  {tagCount > 0 && (
+                    <Fragment>
+                      {displayedTags.map(tag => (
+                        <Link key={tag} href={`/search?tag=${tag}`}>
+                          <StyledTag variant="rounded-right" ml="10px" mt={['5px', 0]} fontWeight={500}>
+                            <I18nCollectiveTags tags={tag} />
+                          </StyledTag>
+                        </Link>
+                      ))}
+                      {tagCount > 3 && (
+                        <StyledLink onClick={() => setShowTagsModal(true)}>
+                          <StyledTag variant="rounded-right" ml="10px" mt={['5px', 0]} fontWeight={500}>
+                            <FormattedMessage
+                              id="expenses.countMore"
+                              defaultMessage="+ {count} more"
+                              values={{ count: tagCount - 3 }}
+                            />
+                          </StyledTag>
                         </StyledLink>
-                      ),
-                    }}
-                  />
-                </Container>
+                      )}
+                      {showTagsModal && (
+                        <StyledModal width="432px" onClose={() => setShowTagsModal(false)}>
+                          <ModalHeader pb="26px">
+                            <FormattedMessage defaultMessage="Open Collective Tags" />
+                          </ModalHeader>
+                          <ModalBody>
+                            <Flex flexWrap="wrap">
+                              {hiddenTags.map(tag => (
+                                <Link key={tag} href={`/search?tag=${tag}`}>
+                                  <StyledTag variant="rounded-right" ml="10px" fontWeight={500} mt="5px">
+                                    <I18nCollectiveTags tags={tag} />
+                                  </StyledTag>
+                                </Link>
+                              ))}
+                            </Flex>
+                          </ModalBody>
+                        </StyledModal>
+                      )}
+                    </Fragment>
+                  )}
+                </Flex>
               )}
-              {host && collective.isApproved && host.id !== collective.id && !collective.isHost && (
-                <Fragment>
-                  <Container mx={1} color="black.700" my={2}>
+              <Flex alignItems="center" flexWrap="wrap">
+                <Flex my={2}>
+                  {collective.canContact && (
+                    <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
+                      {btnProps => (
+                        <StyledRoundButton {...btnProps} size={32} mr={3} title="Contact" aria-label="Contact">
+                          <Mail size={12} />
+                        </StyledRoundButton>
+                      )}
+                    </ContactCollectiveBtn>
+                  )}
+                  {collective.twitterHandle && (
+                    <StyledLink
+                      data-cy="twitterProfileUrl"
+                      href={twitterProfileUrl(collective.twitterHandle)}
+                      openInNewTab
+                    >
+                      <StyledRoundButton size={32} mr={3} title="Twitter" aria-label="Twitter link">
+                        <Twitter size={12} />
+                      </StyledRoundButton>
+                    </StyledLink>
+                  )}
+                  {collective.githubHandle && (
+                    <StyledLink
+                      data-cy="githubProfileUrl"
+                      href={githubProfileUrl(collective.githubHandle)}
+                      openInNewTab
+                    >
+                      <StyledRoundButton size={32} mr={3} title="GitHub" aria-label="GitHub link">
+                        <Github size={12} />
+                      </StyledRoundButton>
+                    </StyledLink>
+                  )}
+                  {collective.website && (
+                    <StyledLink data-cy="collectiveWebsite" href={collective.website} openInNewTabNoFollow>
+                      <StyledRoundButton
+                        size={32}
+                        mr={3}
+                        title={intl.formatMessage(Translations.website)}
+                        aria-label="Website link"
+                      >
+                        <Globe size={14} />
+                      </StyledRoundButton>
+                    </StyledLink>
+                  )}
+                </Flex>
+                {Boolean(!parentIsHost && collective.parentCollective) && (
+                  <Container mx={1} color="black.700" my="12px">
                     <FormattedMessage
-                      id="Collective.Hero.Host"
-                      defaultMessage="{FiscalHost}: {hostName}"
+                      id="Collective.Hero.ParentCollective"
+                      defaultMessage="Part of: {parentName}"
                       values={{
-                        FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} color="black.700" />,
-                        hostName: (
-                          <StyledLink
-                            as={LinkCollective}
-                            collective={host}
-                            data-cy="fiscalHostName"
-                            noTitle
-                            color="black.700"
-                          >
-                            <TruncatedTextWithTooltip value={host.name} cursor="pointer" />
+                        parentName: (
+                          <StyledLink as={LinkCollective} collective={collective.parentCollective} noTitle>
+                            <TruncatedTextWithTooltip value={collective.parentCollective.name} cursor="pointer" />
                           </StyledLink>
                         ),
                       }}
                     />
                   </Container>
-                  {Boolean(!connectedAccountIsHost && firstConnectedAccount) && (
-                    <Container mx={1} color="black.700" my="12px">
+                )}
+                {host && collective.isApproved && host.id !== collective.id && !collective.isHost && (
+                  <Fragment>
+                    <Container mx={1} color="black.700" my={2}>
                       <FormattedMessage
-                        id="Collective.Hero.ParentCollective"
-                        defaultMessage="Part of: {parentName}"
+                        id="Collective.Hero.Host"
+                        defaultMessage="{FiscalHost}: {hostName}"
                         values={{
-                          parentName: (
+                          FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} color="black.700" />,
+                          hostName: (
                             <StyledLink
                               as={LinkCollective}
-                              collective={firstConnectedAccount.collective}
+                              collective={host}
+                              data-cy="fiscalHostName"
                               noTitle
                               color="black.700"
                             >
-                              <TruncatedTextWithTooltip
-                                value={firstConnectedAccount.collective.name}
-                                cursor="pointer"
-                              />
+                              <TruncatedTextWithTooltip value={host.name} cursor="pointer" />
                             </StyledLink>
                           ),
                         }}
                       />
                     </Container>
-                  )}
-                </Fragment>
-              )}
-              {collective.isHost && (
-                <Fragment>
-                  {collective.type !== CollectiveType.COLLECTIVE && (
-                    <Fragment>
-                      {collective.settings?.tos && (
-                        <StyledLink
-                          openInNewTab
-                          href={collective.settings.tos}
-                          borderBottom="2px dotted #969ba3"
-                          color="black.700"
-                          textDecoration="none"
-                          fontSize="12px"
-                          mr={2}
-                        >
-                          <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal hosting" />
-                        </StyledLink>
-                      )}
+                    {Boolean(!connectedAccountIsHost && firstConnectedAccount) && (
+                      <Container mx={1} color="black.700" my="12px">
+                        <FormattedMessage
+                          id="Collective.Hero.ParentCollective"
+                          defaultMessage="Part of: {parentName}"
+                          values={{
+                            parentName: (
+                              <StyledLink
+                                as={LinkCollective}
+                                collective={firstConnectedAccount.collective}
+                                noTitle
+                                color="black.700"
+                              >
+                                <TruncatedTextWithTooltip
+                                  value={firstConnectedAccount.collective.name}
+                                  cursor="pointer"
+                                />
+                              </StyledLink>
+                            ),
+                          }}
+                        />
+                      </Container>
+                    )}
+                  </Fragment>
+                )}
+                {collective.isHost && (
+                  <Fragment>
+                    {collective.type !== CollectiveType.COLLECTIVE && (
+                      <Fragment>
+                        {collective.settings?.tos && (
+                          <StyledLink
+                            openInNewTab
+                            href={collective.settings.tos}
+                            borderBottom="2px dotted #969ba3"
+                            color="black.700"
+                            textDecoration="none"
+                            fontSize="12px"
+                            mr={2}
+                          >
+                            <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal hosting" />
+                          </StyledLink>
+                        )}
+                        <Container ml={2} mr={3} color="black.700" fontSize="12px">
+                          <FormattedMessage
+                            id="Hero.HostFee"
+                            defaultMessage="Host fee: {fee}"
+                            values={{
+                              fee: (
+                                <DefinedTerm term={Terms.HOST_FEE} color="black.700">
+                                  {collective.hostFeePercent || 0}%
+                                </DefinedTerm>
+                              ),
+                            }}
+                          />
+                        </Container>
+                      </Fragment>
+                    )}
+                    {collective.platformFeePercent > 0 && (
                       <Container ml={2} mr={3} color="black.700" fontSize="12px">
                         <FormattedMessage
-                          id="Hero.HostFee"
-                          defaultMessage="Host fee: {fee}"
+                          id="Hero.PlatformFee"
+                          defaultMessage="Platform fee: {fee}"
                           values={{
                             fee: (
-                              <DefinedTerm term={Terms.HOST_FEE} color="black.700">
-                                {collective.hostFeePercent || 0}%
+                              <DefinedTerm term={Terms.PLATFORM_FEE} color="black.700">
+                                {collective.platformFeePercent || 0}%
                               </DefinedTerm>
                             ),
                           }}
                         />
                       </Container>
-                    </Fragment>
-                  )}
-                  {collective.platformFeePercent > 0 && (
-                    <Container ml={2} mr={3} color="black.700" fontSize="12px">
-                      <FormattedMessage
-                        id="Hero.PlatformFee"
-                        defaultMessage="Platform fee: {fee}"
-                        values={{
-                          fee: (
-                            <DefinedTerm term={Terms.PLATFORM_FEE} color="black.700">
-                              {collective.platformFeePercent || 0}%
-                            </DefinedTerm>
-                          ),
-                        }}
-                      />
-                    </Container>
-                  )}
-                </Fragment>
-              )}
-            </Flex>
+                    )}
+                  </Fragment>
+                )}
+              </Flex>
+            </Fragment>
           )}
           <StyledShortDescription>{collective.description}</StyledShortDescription>
           {isEvent && <HeroEventDetails collective={collective} />}
