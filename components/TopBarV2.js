@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
+import { ChevronDown, ChevronUp } from '@styled-icons/boxicons-regular';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -89,10 +89,11 @@ const TopBarV2 = ({ showSearch }) => {
         <Hide xs>
           <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
             <PopupMenu
-              Button={({ onClick }) => (
-                <NavButton as={StyledLink} onClick={onClick} whiteSpace="nowrap">
+              closingEvent="mouseover"
+              Button={({ onMouseOver, onClick, popupOpen }) => (
+                <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
                   <FormattedMessage defaultMessage="Solutions" />
-                  <ChevronDown size={20} />
+                  {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                 </NavButton>
               )}
               placement="bottom"
@@ -118,10 +119,11 @@ const TopBarV2 = ({ showSearch }) => {
             </PopupMenu>
 
             <PopupMenu
-              Button={({ onClick }) => (
-                <NavButton as={StyledLink} onClick={onClick} whiteSpace="nowrap">
+              closingEvent="mouseover"
+              Button={({ onClick, onMouseOver, popupOpen }) => (
+                <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
                   <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
-                  <ChevronDown size={20} />
+                  {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                 </NavButton>
               )}
               placement="bottom"
@@ -146,10 +148,11 @@ const TopBarV2 = ({ showSearch }) => {
             </PopupMenu>
 
             <PopupMenu
-              Button={({ onClick }) => (
-                <NavButton as={StyledLink} onClick={onClick} whiteSpace="nowrap">
+              closingEvent="mouseover"
+              Button={({ onClick, onMouseOver, popupOpen }) => (
+                <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
                   <FormattedMessage id="company" defaultMessage="Company" />
-                  <ChevronDown size={20} />
+                  {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                 </NavButton>
               )}
               placement="bottom"
