@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useQuery } from '@apollo/client';
 import { defineMessages, useIntl } from 'react-intl';
+
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -33,29 +36,6 @@ const messages = defineMessages({
 });
 
 /*
- * Calculates the approximate value for 1 unit of a given crypto currency in the collective currency.
- * Uses the Cryptonator API (https://www.cryptonator.com/api/)
- */
-const getCryptoExchangeRate = async (cryptoCurrency, collectiveCurrency) => {
-  if (!cryptoCurrency || !collectiveCurrency) {
-    return null;
-  }
-  try {
-    const response = await fetch(`https://api.cryptonator.com/api/ticker/${cryptoCurrency}-${collectiveCurrency}`);
-    const body = await response.json();
-    if (!body.success || body.error !== '') {
-      throw new Error(`Cryptonator Error: ${body.error}`);
-    }
-    return body.ticker.price;
-  } catch (error) {
-    // we don't want the user to see any errors; simply don't show the conversion amount
-    // eslint-disable-next-line no-console
-    console.error(error);
-    return null;
-  }
-};
-
-/*
  * Validates the user entered crypto currency amount.
  *
  * 1) For invalid values such as negatives.
@@ -71,30 +51,27 @@ const validateCryptoCurrencyAmount = (touched, amount, minimumAmount, cryptoCurr
 
 const StepDetailsCrypto = ({ onChange, data, collective }) => {
   const intl = useIntl();
+
   const [selectedCryptoCurrency, setSelectedCryptoCurrency] = useState(data.currency);
   const [amount, setAmount] = useState(data.amount);
   const [convertedAmount, setConvertedAmount] = useState(null);
-  const [cryptoExchangeRate, setCryptoExchangeRate] = useState(null);
   const [touched, setTouched] = useState(false);
   const collectiveCurrency = collective.currency;
   const dispatchChange = (field, value) => {
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
 
-  const storeCryptoExchangeRate = async (cryptoCurrency, collectiveCurrency) => {
-    const exchangeRate = await getCryptoExchangeRate(cryptoCurrency, collectiveCurrency);
-    setCryptoExchangeRate(exchangeRate);
-  };
+  const { data: fxData } = useQuery(cryptoExchangeRateQuery, {
+    context: API_V2_CONTEXT,
+    variables: { cryptoCurrency: selectedCryptoCurrency.value, collectiveCurrency },
+    skip: !selectedCryptoCurrency,
+  });
 
   useEffect(() => {
-    storeCryptoExchangeRate(selectedCryptoCurrency.value, collectiveCurrency);
-  }, []);
-
-  useEffect(() => {
-    if (cryptoExchangeRate) {
-      setConvertedAmount(amount * cryptoExchangeRate);
+    if (fxData) {
+      setConvertedAmount(amount * fxData.cryptoExchangeRate);
     }
-  }, [amount, cryptoExchangeRate]);
+  }, [amount, fxData]);
 
   return (
     <Box width={1}>
@@ -107,7 +84,6 @@ const StepDetailsCrypto = ({ onChange, data, collective }) => {
         defaultValue={selectedCryptoCurrency}
         onChange={cryptoCurrency => {
           setSelectedCryptoCurrency(cryptoCurrency);
-          storeCryptoExchangeRate(cryptoCurrency.value, collectiveCurrency);
           dispatchChange('currency', cryptoCurrency);
         }}
         isSearchable={false}
@@ -183,5 +159,11 @@ StepDetailsCrypto.propTypes = {
     currency: PropTypes.object,
   }),
 };
+
+export const cryptoExchangeRateQuery = gqlV2/* GraphQL */ `
+  query CryptoExchangeRateQuery($cryptoCurrency: String!, $collectiveCurrency: String!) {
+    cryptoExchangeRate(cryptoCurrency: $cryptoCurrency, collectiveCurrency: $collectiveCurrency)
+  }
+`;
 
 export default StepDetailsCrypto;

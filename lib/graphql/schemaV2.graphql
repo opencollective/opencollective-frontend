@@ -8282,6 +8282,17 @@ type Query {
     """
     id: String!
   ): Conversation
+  cryptoExchangeRate(
+    """
+    Crypto currency symbol. Example: BTC
+    """
+    cryptoCurrency: String!
+
+    """
+    Fiat currency symbol. Example: USD
+    """
+    collectiveCurrency: String!
+  ): String
   event(
     """
     The public id identifying the Event (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
