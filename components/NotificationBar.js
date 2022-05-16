@@ -2,8 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import classNames from 'classnames';
+import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import AcceptRejectButtons from './host-dashboard/AcceptRejectButtons';
@@ -11,6 +13,7 @@ import { processApplicationMutation } from './host-dashboard/PendingApplication'
 import Container from './Container';
 import { Flex } from './Grid';
 import { H1, P } from './Text';
+import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const logo = '/static/images/opencollective-icon.svg';
 
@@ -80,13 +83,13 @@ const OCBar = styled.div`
 `;
 
 const PendingApplicationActions = ({ collective, refetch }) => {
-  const [isLoading, setLoading] = React.useState(false);
-  const [callProcessApplication] = useMutation(processApplicationMutation, {
+  const intl = useIntl();
+  const { addToast } = useToasts();
+  const [callProcessApplication, { loading }] = useMutation(processApplicationMutation, {
     context: API_V2_CONTEXT,
   });
 
   const processApplication = async (action, message) => {
-    setLoading(true);
     try {
       await callProcessApplication({
         variables: {
@@ -100,9 +103,8 @@ const PendingApplicationActions = ({ collective, refetch }) => {
       if (refetch) {
         await refetch();
       }
-      setLoading(false);
-    } catch {
-      // Ignore errors
+    } catch (e) {
+      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
     }
   };
 
@@ -110,7 +112,7 @@ const PendingApplicationActions = ({ collective, refetch }) => {
     <Flex flexWrap="wrap" alignItems="center" justifyContent="center">
       <AcceptRejectButtons
         collective={collective}
-        isLoading={isLoading}
+        isLoading={loading}
         onApprove={() => processApplication('APPROVE')}
         onReject={message => processApplication('REJECT', message)}
       />
