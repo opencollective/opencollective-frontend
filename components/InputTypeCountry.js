@@ -97,6 +97,13 @@ class InputTypeCountry extends Component {
     );
   });
 
+  filterOptions(candidate, input) {
+    if (input) {
+      return candidate.data.country?.toLowerCase()?.includes(input.toLowerCase());
+    }
+    return true;
+  }
+
   render() {
     const { defaultValue, value, intl, onChange, locale, name, inputId, ...props } = this.props;
     return (
@@ -105,6 +112,7 @@ class InputTypeCountry extends Component {
         inputId={inputId}
         minWidth={150}
         options={this.getOptions(locale || intl.locale, defaultValue)}
+        filterOption={this.filterOptions}
         onChange={({ value }) => onChange(value)}
         value={!isUndefined(value) ? this.getSelectedOption(locale || intl.locale, value) : undefined}
         defaultValue={defaultValue ? this.getSelectedOption(locale || intl.locale, defaultValue) : undefined}
