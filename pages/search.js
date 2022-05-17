@@ -141,7 +141,7 @@ class SearchPage extends React.Component {
       type: query.type ? decodeURIComponent(query.type).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
       country: query.country || null,
-      sortBy: query.sortBy || 'ACTIVITY',
+      sortBy: query.sortBy || (query.q ? 'RANK' : 'ACTIVITY'),
       tag: query.tag?.length > 0 ? query.tag.split(',') : [],
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
