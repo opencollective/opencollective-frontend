@@ -59,7 +59,7 @@
     "express-winston": "4.2.0",
     "express-ws": "5.0.2",
     "file-saver": "2.0.5",
-    "focus-trap-react": "8.9.2",
+    "focus-trap-react": "8.11.1",
     "formik": "2.2.9",
     "glob": "7.2.3",
     "graphql": "16.3.0",
