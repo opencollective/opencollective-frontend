@@ -93,6 +93,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('toast-notification').should('not.exist');
 
       // Start editing
+      cy.getByDataCy('more-actions').click();
       cy.getByDataCy('edit-expense-btn').click();
       cy.getByDataCy('expense-next').click();
       cy.get('input[name="description"]').type(' edited');
@@ -431,7 +432,8 @@ describe('New expense flow', () => {
       // ---- 2. Edit VAT rate ----
 
       // Start editing
-      cy.get('[data-cy="edit-expense-btn"]:visible').click();
+      cy.getByDataCy('more-actions').click();
+      cy.getByDataCy('edit-expense-btn').click({ force: true });
       cy.getByDataCy('expense-next').click();
 
       // Add new item
@@ -455,7 +457,8 @@ describe('New expense flow', () => {
 
       // ---- 3. Remove VAT ----
       // Start editing
-      cy.get('[data-cy="edit-expense-btn"]:visible').click();
+      cy.get('[data-cy="more-actions"]:visible').click();
+      cy.getByDataCy('edit-expense-btn').click({ force: true });
       cy.getByDataCy('expense-next').click();
 
       // Disable VAT
