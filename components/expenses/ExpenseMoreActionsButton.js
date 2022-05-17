@@ -109,7 +109,11 @@ const ExpenseMoreActionsButton = ({ expense, collective, onError, onEdit, isDisa
                 {({ isLoading, downloadInvoice }) => (
                   <Action loading={isLoading} onClick={downloadInvoice} disabled={isDisabled}>
                     <IconDownload size="16px" />
-                    <FormattedMessage id="Download" defaultMessage="Download" />
+                    {isLoading ? (
+                      <FormattedMessage id="loading" defaultMessage="loading" />
+                    ) : (
+                      <FormattedMessage id="Download" defaultMessage="Download" />
+                    )}
                   </Action>
                 )}
               </ExpenseInvoiceDownloadHelper>
