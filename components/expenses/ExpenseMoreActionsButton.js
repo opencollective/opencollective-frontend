@@ -33,15 +33,21 @@ const Action = styled.button`
   background: transparent;
   outline: none;
   text-align: inherit;
+  text-transform: capitalize;
 
-  color: ${props => props.theme.colors[props.color]?.[500] || props.color || props.theme.colors.black[900]};
+  color: ${props => props.theme.colors.black[900]};
 
   :hover {
-    color: ${props => props.theme.colors[props.color]?.[300] || props.color || props.theme.colors.black[700]};
+    color: ${props => props.theme.colors.black[700]};
+  }
+
+  :focus {
+    color: ${props => props.theme.colors.black[700]};
+    text-decoration: underline;
   }
 
   &[disabled] {
-    color: ${props => props.theme.colors[props.color]?.[200] || props.color || props.theme.colors.black[600]};
+    color: ${props => props.theme.colors.black[600]};
   }
 
   > svg {
