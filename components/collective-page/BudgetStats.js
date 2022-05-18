@@ -82,23 +82,28 @@ const BudgetStats = ({ collective, stats }) => {
       <StatContainer>
         <StatTitle>
           <ShowChart size="12px" />
-
-          <DefinedTerm
-            term={Terms.TOTAL_RAISED}
-            textTransform="uppercase"
-            color="black.700"
-            extraTooltipContent={
-              <Box mt={2}>
-                <FormattedMessage
-                  id="budgetSection-raised-total"
-                  defaultMessage="Total contributed before fees: {amount}"
-                  values={{
-                    amount: formatCurrency(stats?.totalAmountRaised.valueInCents || 0, collective.currency, { locale }),
-                  }}
-                />
-              </Box>
-            }
-          />
+          {collective.isHost ? (
+            <DefinedTerm term={Terms.TOTAL_INCOME} textTransform="uppercase" color="black.700" />
+          ) : (
+            <DefinedTerm
+              term={Terms.TOTAL_RAISED}
+              textTransform="uppercase"
+              color="black.700"
+              extraTooltipContent={
+                <Box mt={2}>
+                  <FormattedMessage
+                    id="budgetSection-raised-total"
+                    defaultMessage="Total contributed before fees: {amount}"
+                    values={{
+                      amount: formatCurrency(stats?.totalAmountRaised.valueInCents || 0, collective.currency, {
+                        locale,
+                      }),
+                    }}
+                  />
+                </Box>
+              }
+            />
+          )}
         </StatTitle>
         <StatAmount amount={stats.totalNetAmountRaised.valueInCents} currency={collective.currency} />
       </StatContainer>
@@ -158,6 +163,7 @@ BudgetStats.propTypes = {
     isArchived: PropTypes.bool,
     settings: PropTypes.object,
     host: PropTypes.object,
+    isHost: PropTypes.bool,
   }).isRequired,
 
   /** Stats */

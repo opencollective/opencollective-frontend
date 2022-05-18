@@ -22,6 +22,7 @@ export const Terms = {
   ESTIMATED_BUDGET: 'ESTIMATED_BUDGET',
   EXPENSE_TYPE: 'EXPENSE_TYPE',
   TOTAL_RAISED: 'TOTAL_RAISED',
+  TOTAL_INCOME: 'TOTAL_INCOME',
 };
 
 const TranslatedTerms = defineMessages({
@@ -52,6 +53,10 @@ const TranslatedTerms = defineMessages({
   [Terms.TOTAL_RAISED]: {
     id: 'budgetSection-raised',
     defaultMessage: 'Total raised',
+  },
+  [Terms.TOTAL_INCOME]: {
+    id: 'budgetSection-income',
+    defaultMessage: 'Total income',
   },
 });
 
@@ -87,6 +92,10 @@ const TranslatedDefinitions = defineMessages({
   [Terms.TOTAL_RAISED]: {
     id: 'budgetSection-raised-definition',
     defaultMessage: 'Total net amount available to spend after fees.',
+  },
+  [Terms.TOTAL_INCOME]: {
+    id: 'budgetSection-total-income-definition',
+    defaultMessage: 'Net all time, including host fees and direct contributions.',
   },
 });
 
