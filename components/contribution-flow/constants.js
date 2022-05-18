@@ -279,7 +279,7 @@ export const CRYPTO_CURRENCIES = [
       </Flex>
     ),
     labelWithoutImage: '1INCH (1inch)',
-    value: '1INCH',
+    value: 'INCH',
     minDonation: 0.01,
   },
   {

@@ -56,22 +56,21 @@ const StepDetailsCrypto = ({ onChange, data, collective }) => {
   const [amount, setAmount] = useState(data.amount);
   const [convertedAmount, setConvertedAmount] = useState(null);
   const [touched, setTouched] = useState(false);
-  const collectiveCurrency = collective.currency;
   const dispatchChange = (field, value) => {
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
 
-  const { data: fxData } = useQuery(cryptoExchangeRateQuery, {
+  const { data: cryptoExchangeRateData } = useQuery(cryptoExchangeRateQuery, {
     context: API_V2_CONTEXT,
-    variables: { cryptoCurrency: selectedCryptoCurrency.value, collectiveCurrency },
+    variables: { cryptoCurrency: selectedCryptoCurrency.value, collectiveCurrency: collective.currency },
     skip: !selectedCryptoCurrency,
   });
 
   useEffect(() => {
-    if (fxData) {
-      setConvertedAmount(amount * fxData.cryptoExchangeRate);
+    if (cryptoExchangeRateData && cryptoExchangeRateData.cryptoExchangeRate) {
+      setConvertedAmount(amount * cryptoExchangeRateData.cryptoExchangeRate);
     }
-  }, [amount, fxData]);
+  }, [amount, cryptoExchangeRateData]);
 
   return (
     <Box width={1}>
@@ -122,7 +121,7 @@ const StepDetailsCrypto = ({ onChange, data, collective }) => {
           ~
           <FormattedMoneyAmount
             amount={convertedAmount * 100}
-            currency={collectiveCurrency}
+            currency={collective.currency}
             amountStyles={{ fontWeight: '400' }}
           />
         </Box>
@@ -161,7 +160,7 @@ StepDetailsCrypto.propTypes = {
 };
 
 export const cryptoExchangeRateQuery = gqlV2/* GraphQL */ `
-  query CryptoExchangeRateQuery($cryptoCurrency: String!, $collectiveCurrency: String!) {
+  query CryptoExchangeRateQuery($cryptoCurrency: CryptoCurrency!, $collectiveCurrency: Currency!) {
     cryptoExchangeRate(cryptoCurrency: $cryptoCurrency, collectiveCurrency: $collectiveCurrency)
   }
 `;
