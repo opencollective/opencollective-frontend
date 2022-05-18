@@ -10,7 +10,6 @@ import { Plus as PlusIcon } from '@styled-icons/feather/Plus';
 import { UserCheck as ApprovedIcon } from '@styled-icons/feather/UserCheck';
 import { UserMinus as UnapprovedIcon } from '@styled-icons/feather/UserMinus';
 import { Update as UpdateIcon } from '@styled-icons/material/Update';
-import { escape } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled, { useTheme } from 'styled-components';
 
@@ -203,7 +202,7 @@ const ThreadActivity = ({ activity }) => {
           {details && (
             <Fragment>
               <br />
-              {escape(details)}
+              {details}
             </Fragment>
           )}
         </ActivityParagraph>
