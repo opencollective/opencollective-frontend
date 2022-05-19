@@ -60,15 +60,15 @@ const StepDetailsCrypto = ({ onChange, data, collective }) => {
     onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
   };
 
-  const { data: cryptoExchangeRateData } = useQuery(cryptoExchangeRateQuery, {
+  const { data: cryptoExchangeRateData } = useQuery(exchangeRateQuery, {
     context: API_V2_CONTEXT,
-    variables: { cryptoCurrency: selectedCryptoCurrency.value, collectiveCurrency: collective.currency },
+    variables: { fromCurrency: selectedCryptoCurrency.value, toCurrency: collective.currency },
     skip: !selectedCryptoCurrency,
   });
 
   useEffect(() => {
-    if (cryptoExchangeRateData && cryptoExchangeRateData.cryptoExchangeRate) {
-      setConvertedAmount(amount * cryptoExchangeRateData.cryptoExchangeRate);
+    if (cryptoExchangeRateData && cryptoExchangeRateData.exchangeRate) {
+      setConvertedAmount(amount * cryptoExchangeRateData.exchangeRate);
     }
   }, [amount, cryptoExchangeRateData]);
 
@@ -159,9 +159,9 @@ StepDetailsCrypto.propTypes = {
   }),
 };
 
-export const cryptoExchangeRateQuery = gqlV2/* GraphQL */ `
-  query CryptoExchangeRateQuery($cryptoCurrency: CryptoCurrency!, $collectiveCurrency: Currency!) {
-    cryptoExchangeRate(cryptoCurrency: $cryptoCurrency, collectiveCurrency: $collectiveCurrency)
+export const exchangeRateQuery = gqlV2/* GraphQL */ `
+  query ExchangeRateQuery($fromCurrency: Currency!, $toCurrency: Currency!) {
+    exchangeRate(fromCurrency: $fromCurrency, toCurrency: $toCurrency)
   }
 `;
 
