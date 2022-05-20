@@ -15,7 +15,7 @@ import SignInOrJoinFree from '../../components/SignInOrJoinFree';
 import { useUser } from '../../components/UserProvider';
 
 const applicationQuery = gqlV2`
-  query ExistingOAuthAuthorization($clientId: String!) {
+  query OAuthAuthorization($clientId: String!) {
     application(clientId: $clientId) {
       id
       name
