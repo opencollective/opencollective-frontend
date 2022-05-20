@@ -7357,6 +7357,22 @@ type Query {
     """
     orderBy: OrderByInput
   ): AccountCollection!
+  application(
+    """
+    The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+    """
+    id: String
+
+    """
+    The legacy public id identifying the application (ie: 4242)
+    """
+    legacyId: Int
+
+    """
+    The clientId for the application.
+    """
+    clientId: String
+  ): Application
   collective(
     """
     The public id identifying the Collective (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -9132,6 +9148,29 @@ enum CountryISO {
   EH
 }
 
+"""
+An oAuth application or a personal token
+"""
+type Application {
+  id: String!
+  legacyId: Int!
+  type: ApplicationType
+  name: String
+  description: String
+  apiKey: String
+  clientId: String
+  clientSecret: String
+  callbackUrl: String
+}
+
+"""
+All application types
+"""
+enum ApplicationType {
+  API_KEY
+  OAUTH
+}
+
 input ExpenseReferenceInput {
   """
   The public id identifying the expense (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -10313,6 +10352,17 @@ type Mutation {
     """
     inviteMembers: [InviteMemberInput]
   ): Collective
+  createEvent(
+    """
+    Information about the Event to create (name, slug, description, tags, settings)
+    """
+    event: EventCreateInput!
+
+    """
+    Reference to the parent Account creating the Event.
+    """
+    account: AccountReferenceInput!
+  ): Event
   createFund(
     """
     Information about the collective to create (name, slug, description, tags, ...)
@@ -10341,292 +10391,6 @@ type Mutation {
     """
     parent: AccountReferenceInput
   ): Project
-  createEvent(
-    """
-    Information about the Event to create (name, slug, description, tags, settings)
-    """
-    event: EventCreateInput!
-
-    """
-    Reference to the parent Account creating the Event.
-    """
-    account: AccountReferenceInput!
-  ): Event
-  editComment(comment: CommentUpdateInput!): Comment
-  deleteComment(id: String!): Comment
-  createComment(comment: CommentCreateInput!): Comment
-
-  """
-  Connect external account to Open Collective Account
-  """
-  createConnectedAccount(
-    """
-    Connected Account data
-    """
-    connectedAccount: ConnectedAccountCreateInput!
-
-    """
-    Account where the external account will be connected
-    """
-    account: AccountReferenceInput!
-  ): ConnectedAccount
-
-  """
-  Delete ConnectedAccount
-  """
-  deleteConnectedAccount(
-    """
-    ConnectedAccount reference containing either id or legacyId
-    """
-    connectedAccount: ConnectedAccountReferenceInput!
-  ): ConnectedAccount
-
-  """
-  Create a conversation
-  """
-  createConversation(
-    """
-    Conversation's title
-    """
-    title: String!
-
-    """
-    The body of the conversation initial comment
-    """
-    html: String!
-
-    """
-    ID of the Collective where the conversation will be created
-    """
-    CollectiveId: String!
-
-    """
-    A list of tags for this conversation
-    """
-    tags: [String]
-  ): Conversation
-  editConversation(
-    """
-    Conversation's id
-    """
-    id: String!
-
-    """
-    Conversation's title
-    """
-    title: String!
-
-    """
-    A list of tags for this conversation
-    """
-    tags: [String]
-  ): Conversation
-
-  """
-  Returns true if user is following, false otherwise. Must be authenticated.
-  """
-  followConversation(
-    """
-    Conversation's id
-    """
-    id: String!
-
-    """
-    Set this to false to unfollow the conversation
-    """
-    isActive: Boolean = true
-  ): Boolean
-
-  """
-  Submit an expense to a collective
-  """
-  createExpense(
-    """
-    Expense data
-    """
-    expense: ExpenseCreateInput!
-
-    """
-    Account where the expense will be created
-    """
-    account: AccountReferenceInput!
-
-    """
-    Recurring Expense information
-    """
-    recurring: RecurringExpenseInput
-  ): Expense!
-
-  """
-  To update an existing expense
-  """
-  editExpense(
-    """
-    Expense data
-    """
-    expense: ExpenseUpdateInput!
-
-    """
-    Expense draft key if invited to submit expense
-    """
-    draftKey: String
-  ): Expense!
-
-  """
-  Delete an expense. Only work if the expense is rejected - please check permissions.canDelete.
-  """
-  deleteExpense(
-    """
-    Reference of the expense to delete
-    """
-    expense: ExpenseReferenceInput!
-  ): Expense!
-
-  """
-  Process the expense with the given action
-  """
-  processExpense(
-    """
-    Reference of the expense to process
-    """
-    expense: ExpenseReferenceInput!
-
-    """
-    The action to trigger
-    """
-    action: ExpenseProcessAction!
-
-    """
-    Message to be attached to the action activity.
-    """
-    message: String
-
-    """
-    If action is related to a payment, this object used for the payment parameters
-    """
-    paymentParams: ProcessExpensePaymentParams
-  ): Expense!
-
-  """
-  Persist an Expense as a draft and invite someone to edit and submit it.
-  """
-  draftExpenseAndInviteUser(
-    """
-    Expense data
-    """
-    expense: ExpenseInviteDraftInput!
-
-    """
-    Account where the expense will be created
-    """
-    account: AccountReferenceInput!
-  ): Expense!
-
-  """
-  To re-send the invitation to complete a draft expense
-  """
-  resendDraftExpenseInvite(
-    """
-    Reference of the expense to process
-    """
-    expense: ExpenseReferenceInput!
-  ): Expense!
-
-  """
-  To verify and unverified expense.
-  """
-  verifyExpense(
-    """
-    Reference of the expense to process
-    """
-    expense: ExpenseReferenceInput!
-
-    """
-    Expense draft key if invited to submit expense
-    """
-    draftKey: String
-  ): Expense!
-  addEmojiReaction(
-    """
-    The emoji associated with the reaction
-    """
-    emoji: String!
-
-    """
-    A unique identifier for the comment id associated with this reaction
-    """
-    comment: CommentReferenceInput
-
-    """
-    A unique identifier for the update id associated with this reaction
-    """
-    update: UpdateReferenceInput
-  ): EmojiReactionResponse!
-  removeEmojiReaction(
-    comment: CommentReferenceInput
-    update: UpdateReferenceInput
-    emoji: String!
-  ): EmojiReactionResponse!
-
-  """
-  Apply to an host with a collective
-  """
-  applyToHost(
-    """
-    Account applying to the host.
-    """
-    collective: AccountReferenceInput!
-
-    """
-    Host to apply to.
-    """
-    host: AccountReferenceInput!
-
-    """
-    A message to attach for the host to review the application
-    """
-    message: String
-
-    """
-    Further information about collective applying to host
-    """
-    applicationData: JSON
-  ): Account!
-
-  """
-  Reply to a host application
-  """
-  processHostApplication(
-    """
-    The account that applied to the host
-    """
-    account: AccountReferenceInput!
-
-    """
-    The host concerned by the application
-    """
-    host: AccountReferenceInput!
-
-    """
-    What to do with the application
-    """
-    action: ProcessHostApplicationAction!
-
-    """
-    A message to attach as a reason for the action
-    """
-    message: String
-  ): ProcessHostApplicationResponse!
-
-  """
-  [Root only] Removes the host for an account
-  """
-  removeHost(
-    """
-    The account to unhost
-    """
-    account: AccountReferenceInput!
-  ): Account!
 
   """
   Edit the settings for the given account
@@ -10753,6 +10517,224 @@ type Mutation {
     """
     policies: [Policy]
   ): Account!
+  createApplication(application: ApplicationCreateInput!): Application
+  updateApplication(application: ApplicationUpdateInput!): Application
+  deleteApplication(application: ApplicationReferenceInput!): Application
+  editComment(comment: CommentUpdateInput!): Comment
+  deleteComment(id: String!): Comment
+  createComment(comment: CommentCreateInput!): Comment
+
+  """
+  Connect external account to Open Collective Account
+  """
+  createConnectedAccount(
+    """
+    Connected Account data
+    """
+    connectedAccount: ConnectedAccountCreateInput!
+
+    """
+    Account where the external account will be connected
+    """
+    account: AccountReferenceInput!
+  ): ConnectedAccount
+
+  """
+  Delete ConnectedAccount
+  """
+  deleteConnectedAccount(
+    """
+    ConnectedAccount reference containing either id or legacyId
+    """
+    connectedAccount: ConnectedAccountReferenceInput!
+  ): ConnectedAccount
+
+  """
+  Create a conversation
+  """
+  createConversation(
+    """
+    Conversation's title
+    """
+    title: String!
+
+    """
+    The body of the conversation initial comment
+    """
+    html: String!
+
+    """
+    ID of the Collective where the conversation will be created
+    """
+    CollectiveId: String!
+
+    """
+    A list of tags for this conversation
+    """
+    tags: [String]
+  ): Conversation
+  editConversation(
+    """
+    Conversation's id
+    """
+    id: String!
+
+    """
+    Conversation's title
+    """
+    title: String!
+
+    """
+    A list of tags for this conversation
+    """
+    tags: [String]
+  ): Conversation
+
+  """
+  Returns true if user is following, false otherwise. Must be authenticated.
+  """
+  followConversation(
+    """
+    Conversation's id
+    """
+    id: String!
+
+    """
+    Set this to false to unfollow the conversation
+    """
+    isActive: Boolean = true
+  ): Boolean
+  addEmojiReaction(
+    """
+    The emoji associated with the reaction
+    """
+    emoji: String!
+
+    """
+    A unique identifier for the comment id associated with this reaction
+    """
+    comment: CommentReferenceInput
+
+    """
+    A unique identifier for the update id associated with this reaction
+    """
+    update: UpdateReferenceInput
+  ): EmojiReactionResponse!
+  removeEmojiReaction(
+    comment: CommentReferenceInput
+    update: UpdateReferenceInput
+    emoji: String!
+  ): EmojiReactionResponse!
+
+  """
+  Submit an expense to a collective
+  """
+  createExpense(
+    """
+    Expense data
+    """
+    expense: ExpenseCreateInput!
+
+    """
+    Account where the expense will be created
+    """
+    account: AccountReferenceInput!
+
+    """
+    Recurring Expense information
+    """
+    recurring: RecurringExpenseInput
+  ): Expense!
+
+  """
+  To update an existing expense
+  """
+  editExpense(
+    """
+    Expense data
+    """
+    expense: ExpenseUpdateInput!
+
+    """
+    Expense draft key if invited to submit expense
+    """
+    draftKey: String
+  ): Expense!
+
+  """
+  Delete an expense. Only work if the expense is rejected - please check permissions.canDelete.
+  """
+  deleteExpense(
+    """
+    Reference of the expense to delete
+    """
+    expense: ExpenseReferenceInput!
+  ): Expense!
+
+  """
+  Process the expense with the given action
+  """
+  processExpense(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+
+    """
+    The action to trigger
+    """
+    action: ExpenseProcessAction!
+
+    """
+    Message to be attached to the action activity.
+    """
+    message: String
+
+    """
+    If action is related to a payment, this object used for the payment parameters
+    """
+    paymentParams: ProcessExpensePaymentParams
+  ): Expense!
+
+  """
+  Persist an Expense as a draft and invite someone to edit and submit it.
+  """
+  draftExpenseAndInviteUser(
+    """
+    Expense data
+    """
+    expense: ExpenseInviteDraftInput!
+
+    """
+    Account where the expense will be created
+    """
+    account: AccountReferenceInput!
+  ): Expense!
+
+  """
+  To re-send the invitation to complete a draft expense
+  """
+  resendDraftExpenseInvite(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+  ): Expense!
+
+  """
+  To verify and unverified expense.
+  """
+  verifyExpense(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+
+    """
+    Expense draft key if invited to submit expense
+    """
+    draftKey: String
+  ): Expense!
 
   """
   Sends an email for guest to confirm their emails and create their Open Collective account
@@ -10780,24 +10762,213 @@ type Mutation {
   ): ConfirmGuestAccountResponse!
 
   """
-  Create a new Payout Method to get paid through the platform
+  Apply to an host with a collective
   """
-  createPayoutMethod(
+  applyToHost(
     """
-    Payout Method data
+    Account applying to the host.
     """
-    payoutMethod: PayoutMethodInput!
+    collective: AccountReferenceInput!
 
     """
-    Account where the payout method will be associated
+    Host to apply to.
+    """
+    host: AccountReferenceInput!
+
+    """
+    A message to attach for the host to review the application
+    """
+    message: String
+
+    """
+    Further information about collective applying to host
+    """
+    applicationData: JSON
+  ): Account!
+
+  """
+  Reply to a host application
+  """
+  processHostApplication(
+    """
+    The account that applied to the host
     """
     account: AccountReferenceInput!
-  ): PayoutMethod
+
+    """
+    The host concerned by the application
+    """
+    host: AccountReferenceInput!
+
+    """
+    What to do with the application
+    """
+    action: ProcessHostApplicationAction!
+
+    """
+    A message to attach as a reason for the action
+    """
+    message: String
+  ): ProcessHostApplicationResponse!
 
   """
-  Remove the given payout method
+  [Root only] Removes the host for an account
   """
-  removePayoutMethod(payoutMethodId: String!): PayoutMethod!
+  removeHost(
+    """
+    The account to unhost
+    """
+    account: AccountReferenceInput!
+  ): Account!
+
+  """
+  Update the time which the user viewed the changelog updates
+  """
+  setChangelogViewDate(changelogViewDate: DateTime!): Individual!
+
+  """
+  Invite a new member to the Collective
+  """
+  inviteMember(
+    """
+    Reference to an account for the invitee
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the inviting Collective
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of the invitee
+    """
+    role: MemberRole!
+    description: String
+    since: DateTime
+  ): MemberInvitation!
+
+  """
+  Edit an existing member invitation of the Collective
+  """
+  editMemberInvitation(
+    """
+    Reference to an account for the member to edit.
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the Collective
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of member
+    """
+    role: MemberRole
+    description: String
+    since: DateTime
+  ): MemberInvitation
+
+  """
+  Endpoint to accept or reject an invitation to become a member
+  """
+  replyToMemberInvitation(
+    """
+    Reference to the invitation
+    """
+    invitation: MemberInvitationReferenceInput!
+
+    """
+    Whether this invitation should be accepted or declined
+    """
+    accept: Boolean!
+  ): Boolean!
+
+  """
+  Edit the public message for the given Member of a Collective
+  """
+  editPublicMessage(
+    """
+    Reference to an account for the donating Collective
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the receiving Collective
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    New public message
+    """
+    message: String
+  ): Member!
+
+  """
+  [Root only] Create a member entry directly. For non-root users, use `inviteMember`
+  """
+  createMember(
+    """
+    Reference to an account for the member
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    memberAccount will become a member of this account
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of the member
+    """
+    role: MemberRole!
+    description: String
+    since: DateTime
+  ): Member!
+
+  """
+  Edit an existing member of the Collective
+  """
+  editMember(
+    """
+    Reference to an account for the member to edit.
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the Collective
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of member
+    """
+    role: MemberRole
+    description: String
+    since: DateTime
+  ): Member!
+
+  """
+  Remove a member from the Collective
+  """
+  removeMember(
+    """
+    Reference to an account of member to remove
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    Reference to the Collective account
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of member
+    """
+    role: MemberRole!
+    isInvitation: Boolean
+  ): Boolean
 
   """
   To submit a new order
@@ -10913,6 +11084,81 @@ type Mutation {
   confirmCreditCard(paymentMethod: PaymentMethodReferenceInput!): CreditCardWithStripeError!
 
   """
+  Create a new Payout Method to get paid through the platform
+  """
+  createPayoutMethod(
+    """
+    Payout Method data
+    """
+    payoutMethod: PayoutMethodInput!
+
+    """
+    Account where the payout method will be associated
+    """
+    account: AccountReferenceInput!
+  ): PayoutMethod
+
+  """
+  Remove the given payout method
+  """
+  removePayoutMethod(payoutMethodId: String!): PayoutMethod!
+
+  """
+  [Root only] Clears the cache for a given account
+  """
+  clearCacheForAccount(
+    """
+    Account to clear the cache for
+    """
+    account: AccountReferenceInput!
+
+    """
+    Types of cache to clear
+    """
+    type: [AccountCacheType]! = [CLOUDFLARE, GRAPHQL_QUERIES, CONTRIBUTORS]
+  ): Account!
+
+  """
+  [Root only] Merge two accounts, returns the result account
+  """
+  mergeAccounts(
+    """
+    Account to merge from
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Account to merge to
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    If true, the result will be simulated and summarized in the response message
+    """
+    dryRun: Boolean! = true
+  ): MergeAccountsResponse!
+
+  """
+  [Root only] Ban accounts
+  """
+  banAccount(
+    """
+    Account(s) to ban
+    """
+    account: [AccountReferenceInput!]!
+
+    """
+    If true, the associated accounts will also be banned
+    """
+    includeAssociatedAccounts: Boolean!
+
+    """
+    If true, the result will be simulated and summarized in the response message
+    """
+    dryRun: Boolean!
+  ): BanAccountResponse!
+
+  """
   Add platform tips to a transaction
   """
   addPlatformTipToTransaction(
@@ -10951,160 +11197,11 @@ type Mutation {
     """
     message: String
   ): Transaction!
-
-  """
-  Edit the public message for the given Member of a Collective
-  """
-  editPublicMessage(
-    """
-    Reference to an account for the donating Collective
-    """
-    fromAccount: AccountReferenceInput!
-
-    """
-    Reference to an account for the receiving Collective
-    """
-    toAccount: AccountReferenceInput!
-
-    """
-    New public message
-    """
-    message: String
-  ): Member!
-
-  """
-  [Root only] Create a member entry directly. For non-root users, use `inviteMember`
-  """
-  createMember(
-    """
-    Reference to an account for the member
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    memberAccount will become a member of this account
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of the member
-    """
-    role: MemberRole!
-    description: String
-    since: DateTime
-  ): Member!
-
-  """
-  Edit an existing member of the Collective
-  """
-  editMember(
-    """
-    Reference to an account for the member to edit.
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    Reference to an account for the Collective
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of member
-    """
-    role: MemberRole
-    description: String
-    since: DateTime
-  ): Member!
-
-  """
-  Remove a member from the Collective
-  """
-  removeMember(
-    """
-    Reference to an account of member to remove
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    Reference to the Collective account
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of member
-    """
-    role: MemberRole!
-    isInvitation: Boolean
-  ): Boolean
-
-  """
-  Invite a new member to the Collective
-  """
-  inviteMember(
-    """
-    Reference to an account for the invitee
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    Reference to an account for the inviting Collective
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of the invitee
-    """
-    role: MemberRole!
-    description: String
-    since: DateTime
-  ): MemberInvitation!
-
-  """
-  Edit an existing member invitation of the Collective
-  """
-  editMemberInvitation(
-    """
-    Reference to an account for the member to edit.
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    Reference to an account for the Collective
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of member
-    """
-    role: MemberRole
-    description: String
-    since: DateTime
-  ): MemberInvitation
-
-  """
-  Endpoint to accept or reject an invitation to become a member
-  """
-  replyToMemberInvitation(
-    """
-    Reference to the invitation
-    """
-    invitation: MemberInvitationReferenceInput!
-
-    """
-    Whether this invitation should be accepted or declined
-    """
-    accept: Boolean!
-  ): Boolean!
   createUpdate(update: UpdateCreateInput!): Update!
   editUpdate(update: UpdateUpdateInput!): Update!
   publishUpdate(id: String!, notificationAudience: UpdateAudience): Update!
   unpublishUpdate(id: String!): Update!
   deleteUpdate(id: String!): Update!
-
-  """
-  Update the time which the user viewed the changelog updates
-  """
-  setChangelogViewDate(changelogViewDate: DateTime!): Individual!
 
   """
   Assign Virtual Card information to existing hosted collective
@@ -11230,61 +11327,6 @@ type Mutation {
     """
     virtualCard: VirtualCardReferenceInput!
   ): Boolean
-
-  """
-  [Root only] Clears the cache for a given account
-  """
-  clearCacheForAccount(
-    """
-    Account to clear the cache for
-    """
-    account: AccountReferenceInput!
-
-    """
-    Types of cache to clear
-    """
-    type: [AccountCacheType]! = [CLOUDFLARE, GRAPHQL_QUERIES, CONTRIBUTORS]
-  ): Account!
-
-  """
-  [Root only] Merge two accounts, returns the result account
-  """
-  mergeAccounts(
-    """
-    Account to merge from
-    """
-    fromAccount: AccountReferenceInput!
-
-    """
-    Account to merge to
-    """
-    toAccount: AccountReferenceInput!
-
-    """
-    If true, the result will be simulated and summarized in the response message
-    """
-    dryRun: Boolean! = true
-  ): MergeAccountsResponse!
-
-  """
-  [Root only] Ban accounts
-  """
-  banAccount(
-    """
-    Account(s) to ban
-    """
-    account: [AccountReferenceInput!]!
-
-    """
-    If true, the associated accounts will also be banned
-    """
-    includeAssociatedAccounts: Boolean!
-
-    """
-    If true, the result will be simulated and summarized in the response message
-    """
-    dryRun: Boolean!
-  ): BanAccountResponse!
 }
 
 input CollectiveCreateInput {
@@ -11320,6 +11362,24 @@ input InviteMemberInput {
   since: DateTime
 }
 
+input EventCreateInput {
+  name: String!
+  slug: String
+  description: String
+  tags: [String]
+  settings: JSON
+
+  """
+  The Event start date and time
+  """
+  startsAt: DateTime!
+
+  """
+  The Event end date and time
+  """
+  endsAt: DateTime!
+}
+
 input FundCreateInput {
   name: String!
   slug: String!
@@ -11345,22 +11405,87 @@ input ProjectCreateInput {
   settings: JSON
 }
 
-input EventCreateInput {
-  name: String!
-  slug: String
+"""
+Values that can be edited in Account's settings
+"""
+scalar AccountSettingsKey
+
+enum AccountFreezeAction {
+  FREEZE
+  UNFREEZE
+}
+
+"""
+Response for the addTwoFactorAuthTokenToIndividual mutation
+"""
+type AddTwoFactorAuthTokenToIndividualResponse {
+  """
+  The Individual that the 2FA has been enabled for
+  """
+  account: Individual!
+
+  """
+  The recovery codes for the Individual to write down
+  """
+  recoveryCodes: [String]
+}
+
+input AccountUpdateInput {
+  """
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String!
+  currency: Currency
+}
+
+"""
+Input type for Application
+"""
+input ApplicationCreateInput {
+  type: ApplicationType! = OAUTH
+  name: String
   description: String
-  tags: [String]
-  settings: JSON
+  callbackUrl: URL
+}
+
+"""
+Input type for Application
+"""
+input ApplicationUpdateInput {
+  """
+  The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
 
   """
-  The Event start date and time
+  The legacy public id identifying the application (ie: 4242)
   """
-  startsAt: DateTime!
+  legacyId: Int
 
   """
-  The Event end date and time
+  The clientId for the application.
   """
-  endsAt: DateTime!
+  clientId: String
+  name: String
+  description: String
+  callbackUrl: URL
+}
+
+input ApplicationReferenceInput {
+  """
+  The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the application (ie: 4242)
+  """
+  legacyId: Int
+
+  """
+  The clientId for the application.
+  """
+  clientId: String
 }
 
 input CommentUpdateInput {
@@ -11433,6 +11558,25 @@ input ConnectedAccountReferenceInput {
   The internal id of the account (ie: 580)
   """
   legacyId: Int
+}
+
+type EmojiReactionResponse {
+  """
+  Reference to the update corresponding to the emojis
+  """
+  update: Update
+
+  """
+  Reference to the comment corresponding to the emojis
+  """
+  comment: Comment
+}
+
+input CommentReferenceInput {
+  """
+  The public id identifying the comment
+  """
+  id: String
 }
 
 input ExpenseCreateInput {
@@ -11917,23 +12061,19 @@ input ExpenseInviteeOrganizationInput {
   website: String
 }
 
-type EmojiReactionResponse {
+"""
+Response for the confirmGuestAccount mutation
+"""
+type ConfirmGuestAccountResponse {
   """
-  Reference to the update corresponding to the emojis
+  The validated account
   """
-  update: Update
+  account: Account!
 
   """
-  Reference to the comment corresponding to the emojis
+  A token that can be used to sign in
   """
-  comment: Comment
-}
-
-input CommentReferenceInput {
-  """
-  The public id identifying the comment
-  """
-  id: String
+  accessToken: String!
 }
 
 type ProcessHostApplicationResponse {
@@ -11973,52 +12113,16 @@ enum ProcessHostApplicationAction {
   SEND_PUBLIC_MESSAGE
 }
 
-"""
-Values that can be edited in Account's settings
-"""
-scalar AccountSettingsKey
-
-enum AccountFreezeAction {
-  FREEZE
-  UNFREEZE
-}
-
-"""
-Response for the addTwoFactorAuthTokenToIndividual mutation
-"""
-type AddTwoFactorAuthTokenToIndividualResponse {
+input MemberInvitationReferenceInput {
   """
-  The Individual that the 2FA has been enabled for
+  The public id identifying the member invitation (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
   """
-  account: Individual!
+  id: String
 
   """
-  The recovery codes for the Individual to write down
+  The internal id of the invitation (ie: 580)
   """
-  recoveryCodes: [String]
-}
-
-input AccountUpdateInput {
-  """
-  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String!
-  currency: Currency
-}
-
-"""
-Response for the confirmGuestAccount mutation
-"""
-type ConfirmGuestAccountResponse {
-  """
-  The validated account
-  """
-  account: Account!
-
-  """
-  A token that can be used to sign in
-  """
-  accessToken: String!
+  legacyId: Int
 }
 
 type OrderWithPayment {
@@ -12346,6 +12450,41 @@ type CreditCardWithStripeError {
   stripeError: StripeError
 }
 
+enum AccountCacheType {
+  CLOUDFLARE
+  GRAPHQL_QUERIES
+  CONTRIBUTORS
+}
+
+type MergeAccountsResponse {
+  """
+  The resulting account
+  """
+  account: Account!
+
+  """
+  A message to display to the user about the result
+  """
+  message: String
+}
+
+type BanAccountResponse {
+  """
+  Whether the accounts can be banned
+  """
+  isAllowed: Boolean!
+
+  """
+  A summary of the changes
+  """
+  message: String
+
+  """
+  The accounts impacted by the mutation
+  """
+  accounts: [Account!]!
+}
+
 input TransactionReferenceInput {
   """
   The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -12354,18 +12493,6 @@ input TransactionReferenceInput {
 
   """
   The internal id of the transaction (ie: 580)
-  """
-  legacyId: Int
-}
-
-input MemberInvitationReferenceInput {
-  """
-  The public id identifying the member invitation (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String
-
-  """
-  The internal id of the invitation (ie: 580)
   """
   legacyId: Int
 }
@@ -12414,39 +12541,4 @@ enum VirtualCardProvider {
 
 input VirtualCardReferenceInput {
   id: String
-}
-
-enum AccountCacheType {
-  CLOUDFLARE
-  GRAPHQL_QUERIES
-  CONTRIBUTORS
-}
-
-type MergeAccountsResponse {
-  """
-  The resulting account
-  """
-  account: Account!
-
-  """
-  A message to display to the user about the result
-  """
-  message: String
-}
-
-type BanAccountResponse {
-  """
-  Whether the accounts can be banned
-  """
-  isAllowed: Boolean!
-
-  """
-  A summary of the changes
-  """
-  message: String
-
-  """
-  The accounts impacted by the mutation
-  """
-  accounts: [Account!]!
 }
