@@ -80,6 +80,7 @@ const OAuthAuthorizePage = () => {
             application={data.application}
             redirectUri={query['redirect_uri']}
             autoApprove={hasExistingAuthorization}
+            state={query['state']}
           />
         )}
       </Flex>

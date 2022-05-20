@@ -32,12 +32,13 @@ const TopAvatarsContainer = styled.div`
   gap: 28px;
 `;
 
-const fetchAuthorize = (application, redirectUri = null) => {
+const fetchAuthorize = (application, redirectUri = null, state = null) => {
   const authorizeParams = new URLSearchParams({
     /* eslint-disable camelcase */
     response_type: 'code',
     client_id: application.clientId,
     redirect_uri: redirectUri || application.redirectUri,
+    state,
     /* eslint-enable camelcase */
   });
 
@@ -51,7 +52,7 @@ const fetchAuthorize = (application, redirectUri = null) => {
   });
 };
 
-export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove }) => {
+export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove, state }) => {
   const { LoggedInUser } = useUser();
   const intl = useIntl();
   const router = useRouter();
@@ -63,7 +64,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
   } = useAsyncCall(async () => {
     let response = null;
     try {
-      response = await fetchAuthorize(application, redirectUri);
+      response = await fetchAuthorize(application, redirectUri, state);
     } catch {
       throw formatErrorType(intl, ERROR.NETWORK);
     }
@@ -163,5 +164,6 @@ ApplicationApproveScreen.propTypes = {
     }).isRequired,
   }).isRequired,
   redirectUri: PropTypes.string,
+  state: PropTypes.string,
   autoApprove: PropTypes.bool,
 };
