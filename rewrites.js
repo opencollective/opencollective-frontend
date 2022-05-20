@@ -23,8 +23,8 @@ exports.REWRITES = [
     destination: '/signinLinkSent',
   },
   {
-    source: '/oauth/signin',
-    destination: '/oauth/signin',
+    source: '/oauth/authorize',
+    destination: '/oauth/authorize',
   },
   {
     source: '/deleteCollective/confirmed',

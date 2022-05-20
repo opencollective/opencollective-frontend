@@ -165,7 +165,7 @@ ApplicationApproveScreen.propTypes = {
   redirectUri: PropTypes.string,
 };
 
-const SignInOAuthPage = () => {
+const OAuthAuthorizePage = () => {
   const { query } = useRouter();
   // TODO remove const { client_id, response_type, redirect_uri } = router.query;
   const { loadingLoggedInUser, LoggedInUser } = useUser();
@@ -210,4 +210,4 @@ const SignInOAuthPage = () => {
   );
 };
 
-export default SignInOAuthPage;
+export default OAuthAuthorizePage;
