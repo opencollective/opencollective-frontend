@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/fa-solid/Check';
+import { uniqBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -52,11 +53,19 @@ const fetchAuthorize = (application, redirectUri = null, state = null) => {
   });
 };
 
+const getAdministratedAccounts = user => {
+  return uniqBy(
+    user.memberOf.filter(m => m.role === 'ADMIN' && !m.collective?.isIncognito).map(m => m.collective),
+    'id',
+  );
+};
+
 export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove, state }) => {
   const { LoggedInUser } = useUser();
   const intl = useIntl();
   const router = useRouter();
   const [isRedirecting, setRedirecting] = React.useState(autoApprove);
+  const administratedAccounts = getAdministratedAccounts(LoggedInUser);
   const {
     call: callAuthorize,
     loading,
@@ -117,7 +126,11 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
           </P>
         </Flex>
         <Flex alignItems="center" mt={26}>
-          <Avatar size={48} />
+          <Avatar
+            size={48}
+            title={administratedAccounts.map(a => a.name).join(', ')}
+            collective={administratedAccounts[0]}
+          />
           <P fontSize="18px" color="black.700" ml={3}>
             <FormattedMessage defaultMessage="Access information about your Collective(s)" />
           </P>
