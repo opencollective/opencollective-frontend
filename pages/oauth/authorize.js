@@ -28,12 +28,19 @@ const applicationQuery = gqlV2`
         type
         imageUrl(height: 192)
       }
+      oauthAuthorization {
+        expiresAt
+      }
     }
   }
 `;
 
 // See https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1
 const REQUIRED_URL_PARAMS = ['response_type', 'client_id'];
+
+const isValidAuthorization = authorization => {
+  return authorization && new Date(authorization.expiresAt) > new Date();
+};
 
 const OAuthAuthorizePage = () => {
   const { query } = useRouter();
@@ -44,8 +51,7 @@ const OAuthAuthorizePage = () => {
   const queryParams = { skip: skipQuery, variables: queryVariables, context: API_V2_CONTEXT };
   const { data, error, loading: isLoadingAuthorization } = useQuery(applicationQuery, queryParams);
   const isLoading = loadingLoggedInUser || isLoadingAuthorization;
-  const hasExistingAuthorization = false; // TODO
-
+  const hasExistingAuthorization = isValidAuthorization(data?.application?.oauthAuthorization);
   return (
     <EmbeddedPage title="Authorize application">
       <Flex justifyContent="center" alignItems="center" py={[90, null, null, 180]} px={2}>
@@ -69,10 +75,12 @@ const OAuthAuthorizePage = () => {
           </MessageBox>
         ) : error ? (
           <MessageBoxGraphqlError error={error} />
-        ) : hasExistingAuthorization ? (
-          'Redirecting...' // TODO
         ) : (
-          <ApplicationApproveScreen application={data.application} redirectUri={query['redirect_uri']} />
+          <ApplicationApproveScreen
+            application={data.application}
+            redirectUri={query['redirect_uri']}
+            autoApprove={hasExistingAuthorization}
+          />
         )}
       </Flex>
     </EmbeddedPage>

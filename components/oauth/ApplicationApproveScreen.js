@@ -51,11 +51,11 @@ const fetchAuthorize = (application, redirectUri = null) => {
   });
 };
 
-export const ApplicationApproveScreen = ({ application, redirectUri }) => {
+export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove }) => {
   const { LoggedInUser } = useUser();
   const intl = useIntl();
   const router = useRouter();
-  const [isRedirecting, setRedirecting] = React.useState(false);
+  const [isRedirecting, setRedirecting] = React.useState(autoApprove);
   const {
     call: callAuthorize,
     loading,
@@ -76,6 +76,12 @@ export const ApplicationApproveScreen = ({ application, redirectUri }) => {
       throw new Error(body['error_description'] || body['error']);
     }
   });
+
+  React.useState(() => {
+    if (autoApprove) {
+      callAuthorize();
+    }
+  }, []);
 
   return (
     <Container position="relative">
@@ -157,4 +163,5 @@ ApplicationApproveScreen.propTypes = {
     }).isRequired,
   }).isRequired,
   redirectUri: PropTypes.string,
+  autoApprove: PropTypes.bool,
 };
