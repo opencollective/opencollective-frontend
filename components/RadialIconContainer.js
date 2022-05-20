@@ -16,7 +16,7 @@ const RadialIconContainer = styled.div`
 RadialIconContainer.propTypes = {
   color: PropTypes.string,
   bg: PropTypes.string,
-  size: PropTypes.string,
+  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 RadialIconContainer.defaultProps = {
