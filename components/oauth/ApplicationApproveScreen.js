@@ -31,39 +31,45 @@ const TopAvatarsContainer = styled.div`
   gap: 28px;
 `;
 
+const fetchAuthorize = (application, redirectUri = null) => {
+  const authorizeParams = new URLSearchParams({
+    /* eslint-disable camelcase */
+    response_type: 'code',
+    client_id: application.clientId,
+    redirect_uri: redirectUri || application.redirectUri,
+    /* eslint-enable camelcase */
+  });
+
+  return fetch(`/api/oauth/authorize?${authorizeParams.toString()}`, {
+    method: 'POST',
+    redirect: 'manual',
+    headers: {
+      ...addAuthTokenToHeader(),
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
+};
+
 export const ApplicationApproveScreen = ({ application, redirectUri }) => {
   const { LoggedInUser } = useUser();
   const intl = useIntl();
   const router = useRouter();
+  const [isRedirecting, setRedirecting] = React.useState(false);
   const {
     call: callAuthorize,
     loading,
     error,
   } = useAsyncCall(async () => {
-    const authorizeParams = new URLSearchParams({
-      /* eslint-disable camelcase */
-      response_type: 'code',
-      client_id: application.clientId,
-      redirect_uri: redirectUri || application.redirectUri,
-      /* eslint-enable camelcase */
-    });
-
     let response = null;
     try {
-      response = await fetch(`/api/oauth/authorize?${authorizeParams.toString()}`, {
-        method: 'POST',
-        redirect: 'manual',
-        headers: {
-          ...addAuthTokenToHeader(),
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      });
+      response = await fetchAuthorize(application, redirectUri);
     } catch {
       throw formatErrorType(intl, ERROR.NETWORK);
     }
 
     const body = await response.json();
     if (response.ok) {
+      setRedirecting(true);
       return router.push(body['redirect_uri']);
     } else {
       throw new Error(body['error_description'] || body['error']);
@@ -126,7 +132,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri }) => {
         <StyledButton minWidth={175} onClick={() => window.history.back()} disabled={loading}>
           <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
         </StyledButton>
-        <StyledButton minWidth={175} buttonStyle="primary" loading={loading} onClick={callAuthorize}>
+        <StyledButton minWidth={175} buttonStyle="primary" loading={loading || isRedirecting} onClick={callAuthorize}>
           <FormattedMessage defaultMessage="Authorize" />
         </StyledButton>
       </Flex>
