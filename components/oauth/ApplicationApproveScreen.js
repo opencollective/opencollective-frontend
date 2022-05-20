@@ -13,6 +13,7 @@ import Avatar from '../Avatar';
 import Container from '../Container';
 import { Flex } from '../Grid';
 import Image from '../Image';
+import LinkCollective from '../LinkCollective';
 import MessageBox from '../MessageBox';
 import RadialIconContainer from '../RadialIconContainer';
 import StyledButton from '../StyledButton';
@@ -80,11 +81,15 @@ export const ApplicationApproveScreen = ({ application, redirectUri }) => {
     <Container position="relative">
       <StyledCard maxWidth="520px" width="100%" px={24} py={32}>
         <TopAvatarsContainer>
-          <Avatar size={96} />
+          <Container size={96} bg="white.full" borderRadius="100%">
+            <LinkCollective collective={application.account}>
+              <Avatar size={96} collective={application.account} border="1px solid #DCDEE0" />
+            </LinkCollective>
+          </Container>
           <RadialIconContainer size="32px" bg="#29cc75">
             <Check size={12} />
           </RadialIconContainer>
-          <RadialIconContainer bg="blue.700" size={96}>
+          <RadialIconContainer bg="blue.700" size={96} border="1px solid #DCDEE0">
             <Image src="/static/images/oc-logo-inverted.svg" height={56} width={56} />
           </RadialIconContainer>
         </TopAvatarsContainer>
@@ -145,6 +150,11 @@ ApplicationApproveScreen.propTypes = {
     name: PropTypes.string,
     clientId: PropTypes.string.isRequired,
     redirectUri: PropTypes.string.isRequired,
+    account: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      slug: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
   redirectUri: PropTypes.string,
 };

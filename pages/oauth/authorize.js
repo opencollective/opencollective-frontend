@@ -21,6 +21,13 @@ const applicationQuery = gqlV2`
       name
       clientId
       redirectUri
+      account {
+        id
+        name
+        slug
+        type
+        imageUrl(height: 192)
+      }
     }
   }
 `;
