@@ -9160,7 +9160,9 @@ type Application {
   apiKey: String
   clientId: String
   clientSecret: String
-  callbackUrl: String
+  redirectUri: URL
+  account: Account!
+  oauthAuthorization: OAuthAuthorization
 }
 
 """
@@ -9169,6 +9171,29 @@ All application types
 enum ApplicationType {
   API_KEY
   OAUTH
+}
+
+"""
+An OAuth authorization
+"""
+type OAuthAuthorization {
+  account: Individual!
+  application: Application!
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime!
+
+  """
+  The time of last update
+  """
+  updatedAt: DateTime!
+
+  """
+  The time of expiration
+  """
+  expiresAt: DateTime!
 }
 
 input ExpenseReferenceInput {
@@ -11445,7 +11470,7 @@ input ApplicationCreateInput {
   type: ApplicationType! = OAUTH
   name: String
   description: String
-  callbackUrl: URL
+  redirectUri: URL
 }
 
 """
@@ -11468,7 +11493,7 @@ input ApplicationUpdateInput {
   clientId: String
   name: String
   description: String
-  callbackUrl: URL
+  redirectUri: URL
 }
 
 input ApplicationReferenceInput {
