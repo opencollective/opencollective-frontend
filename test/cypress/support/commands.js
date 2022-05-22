@@ -427,7 +427,7 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
   let authToken;
   return signinRequestAndReturnToken({ email: userEmail, slug: userSlug }, null).then(token => {
     authToken = token;
-    return graphqlV2Query(authToken, {
+    return graphqlQueryV2(authToken, {
       operationName: 'AccountHasTwoFactorAuth',
       query: `
         query AccountHasTwoFactorAuth($slug: String) {
@@ -455,7 +455,7 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
         };
         const token = secret;
 
-        return graphqlV2Query(authToken, {
+        return graphqlQueryV2(authToken, {
           operationName: 'AddTwoFactorAuthToIndividual',
           query: `
           mutation AddTwoFactorAuthToIndividual($account: AccountReferenceInput!, $token: String!) {
@@ -531,7 +531,7 @@ function signinRequestAndReturnToken(user, redirect) {
 
 function graphqlQuery(token, body) {
   return cy.request({
-    url: '/api/graphql',
+    url: '/api/graphql/v1',
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -543,19 +543,6 @@ function graphqlQuery(token, body) {
 }
 
 function graphqlQueryV2(token, body) {
-  return cy.request({
-    url: '/api/graphql/v2',
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
-}
-
-function graphqlV2Query(token, body) {
   return cy.request({
     url: '/api/graphql/v2',
     method: 'POST',
