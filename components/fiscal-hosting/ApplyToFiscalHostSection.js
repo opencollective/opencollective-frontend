@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
-import { Box, Flex } from '../Grid';
+import { Box, Flex, Grid } from '../Grid';
 import SectionSubTitle from '../home/SectionSubtitle';
 import SectionTitle from '../home/SectionTitle';
 import { getI18nLink } from '../I18nFormatters';
@@ -61,7 +61,7 @@ const groupHostsIntoSections = hosts =>
     [],
   );
 
-const Host = ({ id, name, logo, bgImage, location, collectivePath }) => {
+const Host = ({ id, name, logo, bgImage, location, color, collectivePath }) => {
   const intl = useIntl();
   return (
     <Container
@@ -80,6 +80,7 @@ const Host = ({ id, name, logo, bgImage, location, collectivePath }) => {
         display="flex"
         justifyContent="center"
         alignItems="center"
+        borderRadius="8px"
       >
         <Avatar radius="96px" src={logo} name={name} type="ORGANIZATION" />
       </Container>
@@ -93,7 +94,7 @@ const Host = ({ id, name, logo, bgImage, location, collectivePath }) => {
         <P
           fontSize={['15px', '18px']}
           lineHeight={['23px', '27px']}
-          color="black.600"
+          color={color || 'black.600'}
           lineSpacing={['-0.12px', '-0.2px']}
           fontWeight="normal"
           mt="16px"
@@ -105,7 +106,7 @@ const Host = ({ id, name, logo, bgImage, location, collectivePath }) => {
           <P
             fontSize={['15px', '24px']}
             lineHeight={['23px', '32px']}
-            color="black.800"
+            color={color || 'black.800'}
             letterSpacing={['-0.12px', '-0.8px']}
             fontWeight="bold"
             wordWrap="break-word"
@@ -120,17 +121,17 @@ const Host = ({ id, name, logo, bgImage, location, collectivePath }) => {
             textAlign="left"
             lineHeight={['25px', '24px', null, null, '27px']}
             letterSpacing={['-0.016em', '-0.16px', null, null, '-0.2px']}
-            color="black.600"
+            color={color || 'black.600'}
           >
             {intl.formatMessage(messages[`fiscalHosting.hosts.${id}`])}
           </P>
         </Box>
         <ApplyLink as={Link} href={collectivePath}>
-          <Span color="#3220A3">
+          <Span color={color || '#3220A3'}>
             <FormattedMessage id="Apply" defaultMessage="Apply" />
           </Span>
           <Span ml="8px">
-            <ArrowRight2 color="#3220A3" size="18" />
+            <ArrowRight2 color={color || '#3220A3'} size="18" />
           </Span>
         </ApplyLink>
       </Container>
@@ -146,9 +147,10 @@ Host.propTypes = {
   collectivePath: PropTypes.string,
   logo: PropTypes.string,
   bgImage: PropTypes.string,
+  color: PropTypes.string,
 };
 
-const HostDesktopCarousel = ({ display, controllerPosition }) => (
+const ApplyToHostDesktopCarousel = ({ display, controllerPosition }) => (
   <StyledCarousel controllerPosition={controllerPosition} width={1} display={display}>
     {groupHostsIntoSections(HOSTS).map((groupedHost, index) => (
       // eslint-disable-next-line react/no-array-index-key
@@ -163,9 +165,33 @@ const HostDesktopCarousel = ({ display, controllerPosition }) => (
   </StyledCarousel>
 );
 
-HostDesktopCarousel.propTypes = {
+ApplyToHostDesktopCarousel.propTypes = {
   display: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   controllerPosition: PropTypes.string,
+};
+
+export const ApplyToHostMobileCarousel = ({ color }) => (
+  <StyledCarousel display={[null, 'none']} width={1}>
+    {HOSTS.map(host => (
+      <Host key={host.id} color={color} {...host} />
+    ))}
+  </StyledCarousel>
+);
+
+ApplyToHostMobileCarousel.propTypes = {
+  color: PropTypes.string,
+};
+
+export const ApplyToHostGrid = ({ color }) => (
+  <Grid gridGap={1} gridTemplateColumns={'repeat(3, 1fr)'}>
+    {HOSTS.map(host => (
+      <Host key={host.id} color={color} {...host} />
+    ))}
+  </Grid>
+);
+
+ApplyToHostGrid.propTypes = {
+  color: PropTypes.string,
 };
 
 const ApplyToFiscalHosts = () => (
@@ -205,14 +231,10 @@ const ApplyToFiscalHosts = () => (
         />
       </SectionSubTitle>
     </Container>
-    <StyledCarousel display={[null, 'none']} width={1}>
-      {HOSTS.map(host => (
-        <Host key={host.id} {...host} />
-      ))}
-    </StyledCarousel>
+    <ApplyToHostMobileCarousel />
     <Flex mt={2} width={1} maxWidth="1200px">
-      <HostDesktopCarousel display={['none', 'block', 'none']} controllerPosition="bottom" />
-      <HostDesktopCarousel display={['none', null, 'block']} controllerPosition="side" />
+      <ApplyToHostDesktopCarousel display={['none', 'block', 'none']} controllerPosition="bottom" />
+      <ApplyToHostDesktopCarousel display={['none', null, 'block']} controllerPosition="side" />
     </Flex>
   </Flex>
 );

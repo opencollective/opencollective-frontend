@@ -10,6 +10,7 @@ export const getI18nLink = linkProps => chunks =>
 export const I18nBold = chunks => <strong>{chunks}</strong>;
 export const I18nItalic = chunks => <i>{chunks}</i>;
 
+export const I18nUnderline = chunks => <u>{chunks}</u>;
 export const I18nSupportLink = chunks => (
   <StyledLink as={Link} openInNewTab href="/contact">
     {chunks.length ? chunks : <FormattedMessage defaultMessage="support" />}
@@ -35,6 +36,7 @@ export const I18nPrivacyLink = msg => (
 const I18nFormatters = {
   strong: I18nBold,
   i: I18nItalic,
+  u: I18nUnderline,
   SupportLink: I18nSupportLink,
   SignInLink: I18nSignInLink,
   TOSLink: I18nTOSLink,
