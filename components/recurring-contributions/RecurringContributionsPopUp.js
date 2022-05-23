@@ -194,18 +194,26 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
                   defaultMessage="Why are you cancelling your subscription today? 🥺"
                 />
               </P>
-              <StyledHr width="90%" my={2} />
+              <StyledHr my={2} borderColor="black.200" />
               <StyledRadioList
+                id="cancel-reason-radio-list"
                 defaultValue="NO_LONGER_WANT_TO_SUPPORT"
                 onChange={e => setRadioListState(e.key)}
                 name="cancellation-reason"
                 options={['NO_LONGER_WANT_TO_SUPPORT', 'UPDATING_ORDER', 'OTHER']}
               >
                 {({ value, radio }) => (
-                  <P my={2} data-cy={value} fontWeight="normal">
+                  <Container
+                    display="flex"
+                    alignItems="center"
+                    my={2}
+                    data-cy={value}
+                    fontWeight="normal"
+                    fontSize="12px"
+                  >
                     <Span mx={2}>{radio}</Span>
-                    {intl.formatMessage(i18nReasons[value])}
-                  </P>
+                    <span>{intl.formatMessage(i18nReasons[value])}</span>
+                  </Container>
                 )}
               </StyledRadioList>
               {radioListState === 'OTHER' && (
@@ -217,7 +225,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
               )}
             </Container>
           </Flex>
-          <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
+          <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" my={1}>
             <Flex flexGrow={1} alignItems="center">
               <StyledHr width="100%" />
             </Flex>
