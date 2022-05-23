@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
@@ -85,15 +85,11 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
   const { addToast } = useToasts();
   const [menuState, setMenuState] = useState('mainMenu');
   const intl = useIntl();
-  const [radioListState, setRadioListState] = useState('NO_LONGER_WANT_TO_SUPPORT');
-  const [textAreaState, setTextAreaState] = useState('NO_LONGER_WANT_TO_SUPPORT');
+  const [cancelReason, setCancelReason] = useState('NO_LONGER_WANT_TO_SUPPORT');
+  const [cancelReasonMessage, setCancelReasonMessage] = useState('');
   const [submitCancellation, { loading: loadingCancellation }] = useMutation(cancelRecurringContributionMutation, {
     context: API_V2_CONTEXT,
   });
-
-  useEffect(() => {
-    setTextAreaState(radioListState);
-  }, [radioListState]);
 
   const mainMenu = menuState === 'mainMenu' && (status === 'ACTIVE' || status === 'ERROR');
   const cancelMenu = menuState === 'cancelMenu';
@@ -198,7 +194,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
               <StyledRadioList
                 id="cancel-reason-radio-list"
                 defaultValue="NO_LONGER_WANT_TO_SUPPORT"
-                onChange={e => setRadioListState(e.key)}
+                onChange={e => setCancelReason(e.key)}
                 name="cancellation-reason"
                 options={['NO_LONGER_WANT_TO_SUPPORT', 'UPDATING_ORDER', 'OTHER']}
               >
@@ -216,11 +212,16 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
                   </Container>
                 )}
               </StyledRadioList>
-              {radioListState === 'OTHER' && (
+              {cancelReason === 'OTHER' && (
                 <StyledTextarea
                   data-cy="cancellation-text-area"
-                  onChange={e => setTextAreaState(e.target.value)}
-                  value={textAreaState === 'OTHER' ? intl.formatMessage(i18nReasons['OTHER']) : textAreaState}
+                  onChange={e => setCancelReasonMessage(e.target.value)}
+                  value={cancelReasonMessage}
+                  fontSize="12px"
+                  placeholder={intl.formatMessage({ defaultMessage: 'Provide more details (optional)' })}
+                  height={70}
+                  width="100%"
+                  resize="none"
                 />
               )}
             </Container>
@@ -240,7 +241,11 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
               onClick={async () => {
                 try {
                   await submitCancellation({
-                    variables: { order: { id: contribution.id }, reason: textAreaState, reasonCode: radioListState },
+                    variables: {
+                      order: { id: contribution.id },
+                      reason: cancelReason === 'OTHER' ? cancelReasonMessage : '',
+                      reasonCode: cancelReason,
+                    },
                   });
                   onCloseEdit();
                   addToast({
