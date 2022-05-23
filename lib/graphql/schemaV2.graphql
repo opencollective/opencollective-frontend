@@ -6168,6 +6168,81 @@ type Individual implements Account {
   """
   host: Host
   hasSeenLatestChangelogEntry: Boolean!
+  oAuthAuthorizations(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthAuthorizationCollection
+}
+
+"""
+A collection of "OAuth Authorizations"
+"""
+type OAuthAuthorizationCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [OAuthAuthorization]
+}
+
+"""
+An OAuth authorization
+"""
+type OAuthAuthorization {
+  id: String
+  account: Individual!
+  application: Application!
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime!
+
+  """
+  The time of last update
+  """
+  updatedAt: DateTime!
+
+  """
+  The time of expiration
+  """
+  expiresAt: DateTime!
+
+  """
+  The account that created this authorization
+  """
+  createdByAccount: Individual!
+}
+
+"""
+An OAuth application or a personal token
+"""
+type Application {
+  id: String!
+  legacyId: Int!
+  type: ApplicationType
+  name: String
+  description: String
+  apiKey: String
+  clientId: String
+  clientSecret: String
+  redirectUri: URL
+  account: Account!
+  oAuthAuthorization: OAuthAuthorization
+}
+
+"""
+All application types
+"""
+enum ApplicationType {
+  API_KEY
+  OAUTH
 }
 
 """
@@ -9149,54 +9224,6 @@ enum CountryISO {
   EH
 }
 
-"""
-An oAuth application or a personal token
-"""
-type Application {
-  id: String!
-  legacyId: Int!
-  type: ApplicationType
-  name: String
-  description: String
-  apiKey: String
-  clientId: String
-  clientSecret: String
-  redirectUri: URL
-  account: Account!
-  oauthAuthorization: OAuthAuthorization
-}
-
-"""
-All application types
-"""
-enum ApplicationType {
-  API_KEY
-  OAUTH
-}
-
-"""
-An OAuth authorization
-"""
-type OAuthAuthorization {
-  account: Individual!
-  application: Application!
-
-  """
-  The time of creation
-  """
-  createdAt: DateTime!
-
-  """
-  The time of last update
-  """
-  updatedAt: DateTime!
-
-  """
-  The time of expiration
-  """
-  expiresAt: DateTime!
-}
-
 input ExpenseReferenceInput {
   """
   The public id identifying the expense (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -10995,6 +11022,12 @@ type Mutation {
     role: MemberRole!
     isInvitation: Boolean
   ): Boolean
+  revokeOAuthAuthorization(
+    """
+    Reference of the OAuth Authorization
+    """
+    oAuthAuthorization: OAuthAuthorizationReferenceInput!
+  ): OAuthAuthorization!
 
   """
   To submit a new order
@@ -12159,6 +12192,13 @@ input MemberInvitationReferenceInput {
   The internal id of the invitation (ie: 580)
   """
   legacyId: Int
+}
+
+input OAuthAuthorizationReferenceInput {
+  """
+  The id identifying the OAuth Authorization (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
 }
 
 type OrderWithPayment {

@@ -15,6 +15,7 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
 
+import AuthorizedApps from '../admin-panel/AuthorizedApps';
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
 import { Box, Flex } from '../Grid';
@@ -490,6 +491,9 @@ class EditCollectiveForm extends React.Component {
 
       case EDIT_COLLECTIVE_SECTIONS.WEBHOOKS:
         return <Webhooks collectiveSlug={collective.slug} />;
+
+      case EDIT_COLLECTIVE_SECTIONS.AUTHORIZED_APPS:
+        return <AuthorizedApps />;
 
       case EDIT_COLLECTIVE_SECTIONS.ADVANCED:
         return (
