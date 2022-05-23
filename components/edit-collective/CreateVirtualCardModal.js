@@ -92,7 +92,7 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
             assignee: { id: assignee.id },
             account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
             name: cardName,
-            monthlyLimit: { currency: collective.currency, valueInCents: monthlyLimit, value: monthlyLimit / 100 },
+            monthlyLimit: { currency: host.currency, valueInCents: monthlyLimit },
           },
         });
       } catch (e) {
@@ -246,8 +246,8 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
                 <StyledInputAmount
                   {...inputProps}
                   id="monthlyLimit"
-                  currency={formik.values.collective?.currency || 'USD'}
-                  prepend={formik.values.collective?.currency || 'USD'}
+                  currency={host.currency || 'USD'}
+                  prepend={host.currency || 'USD'}
                   onChange={value => formik.setFieldValue('monthlyLimit', value)}
                   value={formik.values.monthlyLimit}
                   disabled={isBusy}
