@@ -215,7 +215,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             <Flex alignItems="center">
               <Avatar collective={displayedHost} radius={24} />
               <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
-                {collective && (collective.isApproved || collective.id === displayedHost.id) ? (
+                {collective && collective.isApproved ? (
                   formatAccountName(displayedHost.name, displayedHost.legalName)
                 ) : (
                   <FormattedMessage
