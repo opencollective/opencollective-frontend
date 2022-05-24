@@ -904,6 +904,7 @@
   "errorMsg": "Erro: {error}",
   "errors.PM.Remove.HasActiveSubscriptions": "Este método de pagamento não pode ser removido porque tem contribuições financeiras recorrentes atreladas.",
   "ERs/eC": "{count, plural, one {# Grant} other {# Grants}}",
+  "ET/GW3": "Redirecting…",
   "event.create.btn": "Criar evento",
   "event.created": "Your Event has been created.",
   "Event.CreatedBy": "Criado por: {CollectiveLink}",

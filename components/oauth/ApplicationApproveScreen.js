@@ -12,9 +12,10 @@ import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
-import { Flex } from '../Grid';
+import { Box, Flex } from '../Grid';
 import Image from '../Image';
 import LinkCollective from '../LinkCollective';
+import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import RadialIconContainer from '../RadialIconContainer';
 import StyledButton from '../StyledButton';
@@ -75,6 +76,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
     try {
       response = await fetchAuthorize(application, redirectUri, state);
     } catch {
+      setRedirecting(false); // To show errors with autoApprove
       throw formatErrorType(intl, ERROR.NETWORK);
     }
 
@@ -83,6 +85,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
       setRedirecting(true);
       return router.push(body['redirect_uri']);
     } else {
+      setRedirecting(false); // To show errors with autoApprove
       throw new Error(body['error_description'] || body['error']);
     }
   });
@@ -94,8 +97,8 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
   }, []);
 
   return (
-    <Container position="relative">
-      <StyledCard maxWidth="520px" width="100%" px={24} py={32}>
+    <Container position="relative" mt="48px">
+      <StyledCard maxWidth="520px" width="100%" px={24} py={32} m="0 auto">
         <TopAvatarsContainer>
           <Container size={96} bg="white.full" borderRadius="100%">
             <LinkCollective collective={application.account}>
@@ -109,58 +112,73 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
             <Image src="/static/images/oc-logo-inverted.svg" height={56} width={56} />
           </RadialIconContainer>
         </TopAvatarsContainer>
-        <P fontWeight="700" fontSize="24px" textAlign="center" color="black.900" mb={32} mt={56}>
-          <FormattedMessage
-            defaultMessage="{applicationName} wants permission to:"
-            values={{ applicationName: application.name }}
-          />
-        </P>
-        <Flex alignItems="center">
-          <Avatar collective={LoggedInUser.collective} size={48} />
-          <P fontSize="18px" color="black.700" ml={3}>
-            <FormattedMessage
-              defaultMessage="Verify your identity on {service}"
-              values={{ service: 'Open Collective' }}
-            />{' '}
-            <strong>({LoggedInUser.collective.name})</strong>
-          </P>
-        </Flex>
-        <Flex alignItems="center" mt={26}>
-          <Avatar
-            size={48}
-            title={administratedAccounts.map(a => a.name).join(', ')}
-            collective={administratedAccounts[0]}
-          />
-          <P fontSize="18px" color="black.700" ml={3}>
-            <FormattedMessage defaultMessage="Access information about your Collective(s)" />
-          </P>
-        </Flex>
-        <Flex alignItems="center" mt={26}>
-          <Image src="/static/images/stars-exchange-rounded.png" width={48} height={48} />
-          <P fontSize="18px" color="black.700" ml={3}>
-            <FormattedMessage defaultMessage="Perform admin actions on your behalf" />
-          </P>
-        </Flex>
-        <MessageBox type="info" mt={40} fontSize="13px">
-          <FormattedMessage
-            defaultMessage="By authorizing {applicationName} you are giving access to all your Collectives."
-            values={{ applicationName: application.name }}
-          />
-        </MessageBox>
-        {error && (
-          <MessageBox type="error" withIcon mt={3}>
-            {error.toString()}
-          </MessageBox>
-        )}
+        <Box pt={56}>
+          {isRedirecting ? (
+            <Flex flexDirection="column" justifyContent="center" alignItems="center" pb={3}>
+              <P fontSize="16px" fontWeight="500" mb={4}>
+                <FormattedMessage defaultMessage="Redirecting…" />
+              </P>
+              <Loading />
+            </Flex>
+          ) : (
+            <React.Fragment>
+              <P fontWeight="700" fontSize="24px" textAlign="center" color="black.900" mb={32}>
+                <FormattedMessage
+                  defaultMessage="{applicationName} wants permission to:"
+                  values={{ applicationName: application.name }}
+                />
+              </P>
+              <Flex alignItems="center">
+                <Avatar collective={LoggedInUser.collective} size={48} />
+                <P fontSize="18px" color="black.700" ml={3}>
+                  <FormattedMessage
+                    defaultMessage="Verify your identity on {service}"
+                    values={{ service: 'Open Collective' }}
+                  />{' '}
+                  <strong>({LoggedInUser.collective.name})</strong>
+                </P>
+              </Flex>
+              <Flex alignItems="center" mt={26}>
+                <Avatar
+                  size={48}
+                  title={administratedAccounts.map(a => a.name).join(', ')}
+                  collective={administratedAccounts[0]}
+                />
+                <P fontSize="18px" color="black.700" ml={3}>
+                  <FormattedMessage defaultMessage="Access information about your Collective(s)" />
+                </P>
+              </Flex>
+              <Flex alignItems="center" mt={26}>
+                <Image src="/static/images/stars-exchange-rounded.png" width={48} height={48} />
+                <P fontSize="18px" color="black.700" ml={3}>
+                  <FormattedMessage defaultMessage="Perform admin actions on your behalf" />
+                </P>
+              </Flex>
+              <MessageBox type="info" mt={40} fontSize="13px">
+                <FormattedMessage
+                  defaultMessage="By authorizing {applicationName} you are giving access to all your Collectives."
+                  values={{ applicationName: application.name }}
+                />
+              </MessageBox>
+              {error && (
+                <MessageBox type="error" withIcon mt={3}>
+                  {error.toString()}
+                </MessageBox>
+              )}
+            </React.Fragment>
+          )}
+        </Box>
       </StyledCard>
-      <Flex mt={24} justifyContent="center" gap="24px">
-        <StyledButton minWidth={175} onClick={() => window.history.back()} disabled={loading}>
-          <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-        </StyledButton>
-        <StyledButton minWidth={175} buttonStyle="primary" loading={loading || isRedirecting} onClick={callAuthorize}>
-          <FormattedMessage defaultMessage="Authorize" />
-        </StyledButton>
-      </Flex>
+      {!isRedirecting && (
+        <Flex mt={24} justifyContent="center" gap="24px">
+          <StyledButton minWidth={175} onClick={() => window.history.back()} disabled={loading}>
+            <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+          </StyledButton>
+          <StyledButton minWidth={175} buttonStyle="primary" loading={loading || isRedirecting} onClick={callAuthorize}>
+            <FormattedMessage defaultMessage="Authorize" />
+          </StyledButton>
+        </Flex>
+      )}
     </Container>
   );
 };

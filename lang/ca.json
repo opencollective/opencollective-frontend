@@ -904,6 +904,7 @@
   "errorMsg": "Error: {error}",
   "errors.PM.Remove.HasActiveSubscriptions": "Aquest mètode de pagament no es pot suprimir perquè té contribucions financeres periòdiques actives.",
   "ERs/eC": "{count, plural, one {# Grant} other {# Grants}}",
+  "ET/GW3": "Redirecting…",
   "event.create.btn": "Crea un esdeveniment",
   "event.created": "Your Event has been created.",
   "Event.CreatedBy": "Creat per: {CollectiveLink}",

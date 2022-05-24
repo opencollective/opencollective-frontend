@@ -904,6 +904,7 @@
   "errorMsg": "Chyba: {error}",
   "errors.PM.Remove.HasActiveSubscriptions": "This payment method cannot be removed because it has active recurring financial contributions.",
   "ERs/eC": "{count, plural, one {# Grant} other {# Grants}}",
+  "ET/GW3": "Redirecting…",
   "event.create.btn": "Create Event",
   "event.created": "Your Event has been created.",
   "Event.CreatedBy": "Created by: {CollectiveLink}",

@@ -904,6 +904,7 @@
   "errorMsg": "错误：{error}",
   "errors.PM.Remove.HasActiveSubscriptions": "This payment method cannot be removed because it has active recurring financial contributions.",
   "ERs/eC": "{count, plural, one {# Grant} other {# Grants}}",
+  "ET/GW3": "Redirecting…",
   "event.create.btn": "创建事件",
   "event.created": "Your Event has been created.",
   "Event.CreatedBy": "由 {社群Link} 创建",

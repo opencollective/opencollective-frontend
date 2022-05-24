@@ -904,6 +904,7 @@
   "errorMsg": "Error: {error}",
   "errors.PM.Remove.HasActiveSubscriptions": "No se puede eliminar este método de pago porque tiene contribuciones económicas activas.",
   "ERs/eC": "{count, plural, one {# Subvención} other {# Subvenciones}}",
+  "ET/GW3": "Redirecting…",
   "event.create.btn": "Crear un Evento",
   "event.created": "Tu evento ha sido creado.",
   "Event.CreatedBy": "Creado por: {CollectiveLink}",
