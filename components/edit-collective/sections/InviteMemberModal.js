@@ -19,7 +19,7 @@ import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import MemberForm from './MemberForm';
 import { coreContributorsQuery } from './Members';
 
-const inviteMemberMutation = gqlV2/* GraphQL */ `
+export const inviteMemberMutation = gqlV2/* GraphQL */ `
   mutation InviteMember(
     $memberAccount: AccountReferenceInput!
     $account: AccountReferenceInput!
