@@ -53,7 +53,7 @@ const authorizedAppsQuery = gqlV2/* GraphQL */ `
 
 const revokeAuthorizationMutation = gqlV2/* GraphQL */ `
   mutation RevokeAuthorization($id: String!) {
-    revokeAuthorization(authorizationId: { id: $id }) {
+    revokeOAuthAuthorization(oAuthAuthorization: { id: $id }) {
       id
     }
   }
@@ -61,9 +61,13 @@ const revokeAuthorizationMutation = gqlV2/* GraphQL */ `
 
 const AuthorizedApps = ({ authorizations }) => {
   // TODO pagination
-  const [revokeAuthorization, { loading }] = useMutation(revokeAuthorizationMutation);
   const intl = useIntl();
   const { addToast } = useToasts();
+  const [revokeAuthorization, { loading }] = useMutation(revokeAuthorizationMutation, {
+    context: API_V2_CONTEXT,
+    refetchQueries: [{ query: authorizedAppsQuery, context: API_V2_CONTEXT }],
+    awaitRefetchQueries: true,
+  });
   return (
     <Box mt={3}>
       {authorizations.map((auth, index) => (
