@@ -17,7 +17,6 @@ import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
-import { useUser } from '../UserProvider';
 
 const authorizedAppsQuery = gqlV2/* GraphQL */ `
   query AuthorizedApps {
@@ -65,7 +64,6 @@ const AuthorizedApps = ({ authorizations }) => {
   const [revokeAuthorization, { loading }] = useMutation(revokeAuthorizationMutation);
   const intl = useIntl();
   const { addToast } = useToasts();
-  authorizations = [authorizations[0], authorizations[0]];
   return (
     <Box mt={3}>
       {authorizations.map((auth, index) => (
@@ -160,7 +158,7 @@ AuthorizedApps.propTypes = {
   ).isRequired,
 };
 
-const AuthorizedAppsSection = props => {
+const AuthorizedAppsSection = () => {
   const { data, loading, error } = useQuery(authorizedAppsQuery, { context: API_V2_CONTEXT });
   return loading ? (
     <LoadingPlaceholder height={300} />
