@@ -28,6 +28,7 @@ import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
 import { P } from '../../Text';
+import { TOAST_TYPE, withToasts } from '../../ToastProvider';
 import { withUser } from '../../UserProvider';
 import SettingsSubtitle from '../SettingsSubtitle';
 
@@ -79,6 +80,7 @@ class Members extends React.Component {
     LoggedInUser: PropTypes.object.isRequired,
     refetchLoggedInUser: PropTypes.func.isRequired,
     inviteMember: PropTypes.func.isRequired,
+    addToast: PropTypes.func.isRequired,
     /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
     /** @ignore from Apollo */
@@ -149,18 +151,32 @@ class Members extends React.Component {
     return members.map(member => member.member && member.member.id);
   });
 
-  resendInvite = member =>
-    this.props.inviteMember({
-      variables: {
-        memberAccount: { id: member.memberAccount.id },
-        account: { slug: this.props.collective.slug },
-        role: member.role,
-      },
-    });
+  resendInvite = async member => {
+    const { intl } = this.props;
+    try {
+      await this.props.inviteMember({
+        variables: {
+          memberAccount: { id: member.memberAccount.id },
+          account: { slug: this.props.collective.slug },
+          role: member.role,
+        },
+      });
+
+      this.props.addToast({
+        type: TOAST_TYPE.SUCCESS,
+        title: intl.formatMessage({ defaultMessage: 'Invitation sent' }),
+      });
+    } catch (e) {
+      this.props.addToast({
+        type: TOAST_TYPE.ERROR,
+        title: intl.formatMessage({ defaultMessage: 'Cannot send member invitation' }),
+        message: i18nGraphqlException(intl, e),
+      });
+    }
+  };
 
   renderMember = (member, index, nbAdmins, memberModalKey) => {
     const { intl, collective, LoggedInUser, refetchLoggedInUser } = this.props;
-
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
     const isInvitation = member.__typename === 'MemberInvitation';
     const collectiveId = get(member, 'memberAccount.id');
@@ -229,13 +245,7 @@ class Members extends React.Component {
                   </StyledTag>
                 </StyledTooltip>
               </TagContainer>
-              <StyledButton
-                data-cy="resend-invite-btn"
-                display="block"
-                fontSize="11px"
-                lineHeight="0"
-                onClick={() => this.resendInvite(member)}
-              >
+              <StyledButton data-cy="resend-invite-btn" buttonSize="tiny" onClick={() => this.resendInvite(member)}>
                 <FormattedMessage id="ResendInviteEmail" defaultMessage="Resend Invite" />
               </StyledButton>
             </React.Fragment>
@@ -252,7 +262,7 @@ class Members extends React.Component {
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
 
     return (
-      <React.Fragment className="EditMembers">
+      <React.Fragment>
         <Box className="members">
           {collective.type === 'COLLECTIVE' && (
             <SettingsSubtitle>
@@ -340,7 +350,6 @@ class Members extends React.Component {
 
   render() {
     const { data, intl } = this.props;
-
     if (data.loading) {
       return <Loading />;
     } else if (data.error) {
@@ -498,6 +507,6 @@ const addInviteMemberMutation = graphql(inviteMemberMutation, {
   }),
 });
 
-const inject = compose(withUser, injectIntl, addCoreContributorsData, addInviteMemberMutation);
+const inject = compose(withUser, injectIntl, withToasts, addCoreContributorsData, addInviteMemberMutation);
 
 export default inject(Members);
