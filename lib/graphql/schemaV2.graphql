@@ -98,6 +98,11 @@ interface Account {
     """
     accountType: [AccountType]
   ): MemberCollection!
+
+  """
+  Get pending member invitations for this account
+  """
+  memberInvitations(role: [MemberRole]): [MemberInvitation]
   memberOf(
     limit: Int! = 100
     offset: Int! = 0
@@ -417,7 +422,7 @@ interface Account {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
 }
 
 """
@@ -488,88 +493,147 @@ A field whose value conforms to the standard internet email address format as sp
 scalar EmailAddress
 
 """
-A collection of "MemberOf" (ie: Collective backed by an Organization)
+An invitation to join the members of a collective
 """
-type MemberOfCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [MemberOf]
-  roles: [MemberOfCollectionRoles]
-}
-
-"""
-An existing member role and account type combination used used to filter collections
-"""
-type MemberOfCollectionRoles {
-  type: AccountType!
+type MemberInvitation {
+  id: String!
+  createdAt: DateTime!
+  account: Account!
+  memberAccount: Account!
   role: MemberRole!
+  description: String
+  tier: Tier
+  since: DateTime
 }
 
-input AccountReferenceInput {
-  """
-  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String
-
-  """
-  The internal id of the account (ie: 580)
-  """
-  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
-
-  """
-  The slug identifying the account (ie: babel for https://opencollective.com/babel)
-  """
+"""
+Tier model
+"""
+type Tier {
+  id: String!
+  legacyId: Int!
   slug: String
+  name: String
+  description: String
+
+  """
+  Get all orders
+  """
+  orders(limit: Int! = 100, offset: Int! = 0, status: [OrderStatus]): OrderCollection!
+  amount: Amount!
+  type: TierType!
+  interval: TierInterval @deprecated(reason: "2020-08-24: Please use \"frequency\"")
+  frequency: TierFrequency!
+  presets: [Int]
+  maxQuantity: Int
+
+  """
+  Number of tickets available. Returns null if there is no limit.
+  """
+  availableQuantity: Int
+  customFields: JSON
+  amountType: TierAmountType!
+  minimumAmount: Amount!
+  endsAt: DateTime
 }
 
 """
-Input to order results
+A collection of "Orders"
 """
-input OrderByInput {
-  """
-  Field to order by.
-  """
-  field: OrderByFieldType!
-
-  """
-  Ordering direction.
-  """
-  direction: OrderDirection!
-}
-
-"""
-Possible fields you can use to order by
-"""
-enum OrderByFieldType {
-  CREATED_AT
-  MEMBER_COUNT
-  TOTAL_CONTRIBUTED
-
-  """
-  The financial activity of the collective (number of transactions)
-  """
-  ACTIVITY
-  RANK
-}
-
-"""
-Possible directions in which to order a list of items
-"""
-enum OrderDirection {
-  ASC
-  DESC
-}
-
-"""
-A collection of Transactions (Debit or Credit)
-"""
-type TransactionCollection implements Collection {
+type OrderCollection implements Collection {
   offset: Int
   limit: Int
   totalCount: Int
-  nodes: [Transaction]
-  kinds: [TransactionKind]
+  nodes: [Order]
+}
+
+"""
+Order model
+"""
+type Order {
+  id: String!
+  legacyId: Int!
+  description: String
+
+  """
+  Base order amount (without platform tip)
+  """
+  amount: Amount!
+
+  """
+  Total order amount, including all taxes and platform tip
+  """
+  totalAmount: Amount!
+  quantity: Int
+  status: OrderStatus
+  frequency: ContributionFrequency
+  nextChargeDate: DateTime
+  tier: Tier
+  fromAccount: Account
+  toAccount: Account
+
+  """
+  Transactions for this order ordered by createdAt ASC
+  """
+  transactions: [Transaction]!
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  WARNING: Total amount donated between collectives, though there will be edge cases especially when looking on the Order level, as the order id is not used in calculating this.
+  """
+  totalDonations: Amount!
+  paymentMethod: PaymentMethod
+
+  """
+  Platform Tip attached to the Order.
+  """
+  platformTipAmount: Amount
+  platformTipEligible: Boolean
+  tags: [String]!
+  taxes: [OrderTax]!
+
+  """
+  This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order.
+  """
+  membership: MemberOf
+
+  """
+  The permissions given to current logged in user for this order
+  """
+  permissions: OrderPermissions!
+
+  """
+  Data related to the order
+  """
+  data: JSON
+
+  """
+  Custom data related to the order, based on the fields described by tier.customFields. Must be authenticated as an admin of the fromAccount or toAccount (returns null otherwise)
+  """
+  customData: JSON
+}
+
+"""
+All order statuses
+"""
+enum OrderStatus {
+  ACTIVE
+  CANCELLED
+  ERROR
+  EXPIRED
+  NEW
+  PAID
+  PENDING
+  PLEDGED
+  REJECTED
+  REQUIRE_CLIENT_CONFIRMATION
+}
+
+enum ContributionFrequency {
+  MONTHLY
+  YEARLY
+  ONETIME
 }
 
 """
@@ -1714,6 +1778,14 @@ enum DateTimeField {
 }
 
 """
+Possible directions in which to order a list of items
+"""
+enum OrderDirection {
+  ASC
+  DESC
+}
+
+"""
 Type for Geographic location
 """
 type Location {
@@ -2118,163 +2190,6 @@ enum RecurringExpenseInterval {
 }
 
 """
-Order model
-"""
-type Order {
-  id: String!
-  legacyId: Int!
-  description: String
-
-  """
-  Base order amount (without platform tip)
-  """
-  amount: Amount!
-
-  """
-  Total order amount, including all taxes and platform tip
-  """
-  totalAmount: Amount!
-  quantity: Int
-  status: OrderStatus
-  frequency: ContributionFrequency
-  nextChargeDate: DateTime
-  tier: Tier
-  fromAccount: Account
-  toAccount: Account
-
-  """
-  Transactions for this order ordered by createdAt ASC
-  """
-  transactions: [Transaction]!
-  createdAt: DateTime
-  updatedAt: DateTime
-
-  """
-  WARNING: Total amount donated between collectives, though there will be edge cases especially when looking on the Order level, as the order id is not used in calculating this.
-  """
-  totalDonations: Amount!
-  paymentMethod: PaymentMethod
-
-  """
-  Platform Tip attached to the Order.
-  """
-  platformTipAmount: Amount
-  platformTipEligible: Boolean
-  tags: [String]!
-  taxes: [OrderTax]!
-
-  """
-  This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order.
-  """
-  membership: MemberOf
-
-  """
-  The permissions given to current logged in user for this order
-  """
-  permissions: OrderPermissions!
-
-  """
-  Data related to the order
-  """
-  data: JSON
-
-  """
-  Custom data related to the order, based on the fields described by tier.customFields. Must be authenticated as an admin of the fromAccount or toAccount (returns null otherwise)
-  """
-  customData: JSON
-}
-
-"""
-All order statuses
-"""
-enum OrderStatus {
-  ACTIVE
-  CANCELLED
-  ERROR
-  EXPIRED
-  NEW
-  PAID
-  PENDING
-  PLEDGED
-  REJECTED
-  REQUIRE_CLIENT_CONFIRMATION
-}
-
-enum ContributionFrequency {
-  MONTHLY
-  YEARLY
-  ONETIME
-}
-
-"""
-Tier model
-"""
-type Tier {
-  id: String!
-  legacyId: Int!
-  slug: String
-  name: String
-  description: String
-
-  """
-  Get all orders
-  """
-  orders(limit: Int! = 100, offset: Int! = 0, status: [OrderStatus]): OrderCollection!
-  amount: Amount!
-  type: TierType!
-  interval: TierInterval @deprecated(reason: "2020-08-24: Please use \"frequency\"")
-  frequency: TierFrequency!
-  presets: [Int]
-  maxQuantity: Int
-
-  """
-  Number of tickets available. Returns null if there is no limit.
-  """
-  availableQuantity: Int
-  customFields: JSON
-  amountType: TierAmountType!
-  minimumAmount: Amount!
-  endsAt: DateTime
-}
-
-"""
-A collection of "Orders"
-"""
-type OrderCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Order]
-}
-
-enum TierType {
-  TIER
-  MEMBERSHIP
-  DONATION
-  TICKET
-  SERVICE
-  PRODUCT
-}
-
-enum TierInterval {
-  month
-  year
-  flexible
-}
-
-enum TierFrequency {
-  MONTHLY
-  YEARLY
-  ONETIME
-  FLEXIBLE
-}
-
-enum TierAmountType {
-  FIXED
-  FLEXIBLE
-}
-
-"""
 PaymentMethod model
 """
 type PaymentMethod {
@@ -2440,6 +2355,26 @@ type Host implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -2760,7 +2695,7 @@ type Host implements Account & AccountWithContributions {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
 
   """
   Number of unique financial contributors.
@@ -3143,6 +3078,42 @@ enum ContributorRole {
   ACCOUNTANT
 }
 
+input AccountReferenceInput {
+  """
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the account (ie: 580)
+  """
+  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
+
+  """
+  The slug identifying the account (ie: babel for https://opencollective.com/babel)
+  """
+  slug: String
+}
+
+"""
+A collection of "MemberOf" (ie: Collective backed by an Organization)
+"""
+type MemberOfCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [MemberOf]
+  roles: [MemberOfCollectionRoles]
+}
+
+"""
+An existing member role and account type combination used used to filter collections
+"""
+type MemberOfCollectionRoles {
+  type: AccountType!
+  role: MemberRole!
+}
+
 """
 All supported expense types
 """
@@ -3161,6 +3132,47 @@ enum HostFeeStructure {
   Set a monthly retainer for this Collective
   """
   MONTHLY_RETAINER
+}
+
+"""
+Input to order results
+"""
+input OrderByInput {
+  """
+  Field to order by.
+  """
+  field: OrderByFieldType!
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection!
+}
+
+"""
+Possible fields you can use to order by
+"""
+enum OrderByFieldType {
+  CREATED_AT
+  MEMBER_COUNT
+  TOTAL_CONTRIBUTED
+
+  """
+  The financial activity of the collective (number of transactions)
+  """
+  ACTIVITY
+  RANK
+}
+
+"""
+A collection of Transactions (Debit or Credit)
+"""
+type TransactionCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Transaction]
+  kinds: [TransactionKind]
 }
 
 """
@@ -3505,6 +3517,7 @@ type CollectiveFeatures {
   The id of the account
   """
   id: String!
+  ALL: CollectiveFeatureStatus
   RECEIVE_FINANCIAL_CONTRIBUTIONS: CollectiveFeatureStatus
   RECURRING_CONTRIBUTIONS: CollectiveFeatureStatus
   TRANSACTIONS: CollectiveFeatureStatus
@@ -3569,8 +3582,20 @@ type VirtualCardCollection implements Collection {
   nodes: [VirtualCard]
 }
 
-enum Policy {
-  EXPENSE_AUTHOR_CANNOT_APPROVE
+type Policies {
+  EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
+  COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
+}
+
+type COLLECTIVE_MINIMUM_ADMINS {
+  numberOfAdmins: Int
+  applies: COLLECTIVE_MINIMUM_ADMINS_APPLIES
+  freeze: Boolean
+}
+
+enum COLLECTIVE_MINIMUM_ADMINS_APPLIES {
+  ALL_COLLECTIVES
+  NEW_COLLECTIVES
 }
 
 """
@@ -3983,6 +4008,28 @@ type ExpenseStats {
   grantsCount: Int!
 }
 
+"""
+Fields for the user permissions on an transaction
+"""
+type TransactionPermissions {
+  id: String!
+
+  """
+  Whether the current user can edit the transaction
+  """
+  canRefund: Boolean!
+
+  """
+  Whether the current user can download this transaction's invoice
+  """
+  canDownloadInvoice: Boolean!
+
+  """
+  Whether the current user can reject the transaction
+  """
+  canReject: Boolean!
+}
+
 type OrderTax {
   type: OrderTaxType!
   percentage: Int!
@@ -4005,26 +4052,31 @@ type OrderPermissions {
   canMarkAsPaid: Boolean!
 }
 
-"""
-Fields for the user permissions on an transaction
-"""
-type TransactionPermissions {
-  id: String!
+enum TierType {
+  TIER
+  MEMBERSHIP
+  DONATION
+  TICKET
+  SERVICE
+  PRODUCT
+}
 
-  """
-  Whether the current user can edit the transaction
-  """
-  canRefund: Boolean!
+enum TierInterval {
+  month
+  year
+  flexible
+}
 
-  """
-  Whether the current user can download this transaction's invoice
-  """
-  canDownloadInvoice: Boolean!
+enum TierFrequency {
+  MONTHLY
+  YEARLY
+  ONETIME
+  FLEXIBLE
+}
 
-  """
-  Whether the current user can reject the transaction
-  """
-  canReject: Boolean!
+enum TierAmountType {
+  FIXED
+  FLEXIBLE
 }
 
 """
@@ -4178,6 +4230,26 @@ type Bot implements Account {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -4498,7 +4570,7 @@ type Bot implements Account {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
 }
 
 """
@@ -4591,6 +4663,26 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -4911,7 +5003,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
 
   """
   Returns the Fiscal Host
@@ -5328,6 +5420,26 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -5648,7 +5760,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
 
   """
   Returns the Fiscal Host
@@ -5849,6 +5961,26 @@ type Individual implements Account {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -6167,7 +6299,7 @@ type Individual implements Account {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
   email: String
   isGuest: Boolean!
   isFollowingConversation(id: String!): Boolean!
@@ -6396,6 +6528,26 @@ type Organization implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -6714,7 +6866,7 @@ type Organization implements Account & AccountWithContributions {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
 
   """
   Number of unique financial contributors.
@@ -6929,6 +7081,26 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -7249,7 +7421,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
 
   """
   Returns the Fiscal Host
@@ -7703,6 +7875,11 @@ type Query {
     A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
     """
     account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
   ): [MemberInvitation]
   order(
     """
@@ -9366,6 +9543,26 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -9686,7 +9883,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
 
   """
   Returns the Fiscal Host
@@ -9775,20 +9972,6 @@ type HostCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Host]
-}
-
-"""
-An invitation to join the members of a collective
-"""
-type MemberInvitation {
-  id: String!
-  createdAt: DateTime!
-  account: Account!
-  memberAccount: Account!
-  role: MemberRole!
-  description: String
-  tier: Tier
-  since: DateTime
 }
 
 input OrderReferenceInput {
@@ -9893,6 +10076,26 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -10213,7 +10416,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
 
   """
   Returns the Fiscal Host
@@ -10577,7 +10780,7 @@ type Mutation {
     """
     The policy to be added
     """
-    policies: [Policy]
+    policies: JSON!
   ): Account!
   createApplication(application: ApplicationCreateInput!): Application
   updateApplication(application: ApplicationUpdateInput!): Application
@@ -10846,6 +11049,11 @@ type Mutation {
     Further information about collective applying to host
     """
     applicationData: JSON
+
+    """
+    A list of members to invite when applying to the host
+    """
+    inviteMembers: [InviteMemberInput]
   ): Account!
 
   """
