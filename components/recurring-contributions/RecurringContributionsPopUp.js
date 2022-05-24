@@ -5,18 +5,21 @@ import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
 import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
 import { XCircle } from '@styled-icons/boxicons-regular/XCircle';
 import themeGet from '@styled-system/theme-get';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
+import Container from '../Container';
 import { Flex } from '../Grid';
 import I18nFormatters from '../I18nFormatters';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { slideInUp } from '../StyledKeyframes';
-import { P } from '../Text';
+import StyledRadioList from '../StyledRadioList';
+import StyledTextarea from '../StyledTextarea';
+import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { withUser } from '../UserProvider';
 
@@ -59,10 +62,19 @@ const MenuSection = styled(Flex).attrs({
   width: 1,
 })``;
 
+const i18nReasons = defineMessages({
+  NO_LONGER_WANT_TO_SUPPORT: {
+    id: 'subscription.cancel.reason1',
+    defaultMessage: 'No longer want to back the collective',
+  },
+  UPDATING_ORDER: { id: 'subscription.cancel.reason2', defaultMessage: 'Changing payment method or amount' },
+  OTHER: { id: 'subscription.cancel.other', defaultMessage: 'Other' },
+});
+
 // GraphQL
 const cancelRecurringContributionMutation = gqlV2/* GraphQL */ `
-  mutation CancelRecurringContribution($order: OrderReferenceInput!) {
-    cancelOrder(order: $order) {
+  mutation CancelRecurringContribution($order: OrderReferenceInput!, $reason: String!, $reasonCode: String!) {
+    cancelOrder(order: $order, reason: $reason, reasonCode: $reasonCode) {
       id
       status
     }
@@ -72,6 +84,9 @@ const cancelRecurringContributionMutation = gqlV2/* GraphQL */ `
 const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, account }) => {
   const { addToast } = useToasts();
   const [menuState, setMenuState] = useState('mainMenu');
+  const intl = useIntl();
+  const [cancelReason, setCancelReason] = useState('NO_LONGER_WANT_TO_SUPPORT');
+  const [cancelReasonMessage, setCancelReasonMessage] = useState('');
   const [submitCancellation, { loading: loadingCancellation }] = useMutation(cancelRecurringContributionMutation, {
     context: API_V2_CONTEXT,
   });
@@ -168,11 +183,50 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
             <GrayXCircle size={26} onClick={onCloseEdit} />
           </Flex>
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
-            <P fontSize="14px" fontWeight="400">
-              <FormattedMessage id="subscription.menu.cancel.yes" defaultMessage="Are you sure? 🥺" />
-            </P>
+            <Container p={3}>
+              <P fontSize="15px" fontWeight="bold" mb="10" lineHeight="20px">
+                <FormattedMessage
+                  id="subscription.cancel.question"
+                  defaultMessage="Why are you cancelling your subscription today? 🥺"
+                />
+              </P>
+              <StyledHr my={2} borderColor="black.200" />
+              <StyledRadioList
+                id="cancel-reason-radio-list"
+                defaultValue="NO_LONGER_WANT_TO_SUPPORT"
+                onChange={e => setCancelReason(e.key)}
+                name="cancellation-reason"
+                options={['NO_LONGER_WANT_TO_SUPPORT', 'UPDATING_ORDER', 'OTHER']}
+              >
+                {({ value, radio }) => (
+                  <Container
+                    display="flex"
+                    alignItems="center"
+                    my={2}
+                    data-cy={value}
+                    fontWeight="normal"
+                    fontSize="12px"
+                  >
+                    <Span mx={2}>{radio}</Span>
+                    <span>{intl.formatMessage(i18nReasons[value])}</span>
+                  </Container>
+                )}
+              </StyledRadioList>
+              {cancelReason === 'OTHER' && (
+                <StyledTextarea
+                  data-cy="cancellation-text-area"
+                  onChange={e => setCancelReasonMessage(e.target.value)}
+                  value={cancelReasonMessage}
+                  fontSize="12px"
+                  placeholder={intl.formatMessage({ defaultMessage: 'Provide more details (optional)' })}
+                  height={70}
+                  width="100%"
+                  resize="none"
+                />
+              )}
+            </Container>
           </Flex>
-          <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
+          <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center" my={1}>
             <Flex flexGrow={1} alignItems="center">
               <StyledHr width="100%" />
             </Flex>
@@ -180,12 +234,19 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
           <Flex flexGrow={1 / 4} width={1} alignItems="center" justifyContent="center">
             <StyledButton
               buttonSize="tiny"
+              buttonStyle="secondary"
               minWidth={75}
               loading={loadingCancellation}
               data-cy="recurring-contribution-cancel-yes"
               onClick={async () => {
                 try {
-                  await submitCancellation({ variables: { order: { id: contribution.id } } });
+                  await submitCancellation({
+                    variables: {
+                      order: { id: contribution.id },
+                      reason: cancelReason === 'OTHER' ? cancelReasonMessage : '',
+                      reasonCode: cancelReason,
+                    },
+                  });
                   onCloseEdit();
                   addToast({
                     type: TOAST_TYPE.INFO,
@@ -203,18 +264,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
                 }
               }}
             >
-              <FormattedMessage id="yes" defaultMessage="Yes" />
-            </StyledButton>
-            <StyledButton
-              ml={2}
-              minWidth={95}
-              buttonSize="tiny"
-              buttonStyle="secondary"
-              disabled={loadingCancellation}
-              onClick={() => setMenuState('mainMenu')}
-              data-cy="recurring-contribution-cancel-no"
-            >
-              <FormattedMessage id="subscription.menu.cancel.no" defaultMessage="No, wait" />
+              <FormattedMessage id="submit" defaultMessage="Submit" />
             </StyledButton>
           </Flex>
         </MenuSection>

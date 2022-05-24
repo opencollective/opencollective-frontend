@@ -7910,7 +7910,8 @@ type Query {
     """
     tier: TierReferenceInput
   ): PaypalPlan!
-  loggedInAccount: Account
+  loggedInAccount: Individual
+  me: Individual
 }
 
 """
@@ -11008,6 +11009,16 @@ type Mutation {
     Object matching the OrderReferenceInput (id)
     """
     order: OrderReferenceInput!
+
+    """
+    Reason for cancelling subscription
+    """
+    reason: String
+
+    """
+    Category for cancelling subscription
+    """
+    reasonCode: String
   ): Order
 
   """

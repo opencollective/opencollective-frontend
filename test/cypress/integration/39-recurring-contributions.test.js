@@ -13,6 +13,7 @@ describe('Recurring contributions', () => {
         cy.contains('[data-cy="select-option"]', 'monthly').click();
         cy.get('[data-cy="tier-input-field-amount"] input').last().type('10');
         cy.getByDataCy('collective-save').click();
+        cy.wait(2000);
         cy.logout();
       })
       .then(() => {
@@ -146,15 +147,22 @@ describe('Recurring contributions', () => {
     });
   });
 
-  it('Can cancel an active contribution', () => {
+  it('Can cancel an active contribution with reasons displayed in modal, "other" displays text area', () => {
+    cy.clearInbox();
     cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
       cy.getByDataCy('recurring-contribution-edit-activate-button').first().contains('Edit');
       cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
       cy.getByDataCy('recurring-contribution-menu').should('exist');
       cy.getByDataCy('recurring-contribution-menu-cancel-option').click();
       cy.getByDataCy('recurring-contribution-cancel-menu').should('exist');
-      cy.getByDataCy('recurring-contribution-cancel-menu').contains('Are you sure?');
-      cy.getByDataCy('recurring-contribution-cancel-no').contains('No, wait');
+      cy.getByDataCy('recurring-contribution-cancel-menu').contains(
+        'Why are you cancelling your subscription today? 🥺',
+      );
+      cy.getByDataCy('NO_LONGER_WANT_TO_SUPPORT').contains('No longer want to back the collective');
+      cy.getByDataCy('UPDATING_ORDER').contains('Changing payment method or amount');
+      cy.getByDataCy('cancellation-text-area').should('not.exist');
+      cy.getByDataCy('OTHER').click();
+      cy.getByDataCy('cancellation-text-area').clear().type('Because I want to');
       cy.getByDataCy('recurring-contribution-cancel-yes')
         .click()
         .then(() => {
@@ -162,6 +170,8 @@ describe('Recurring contributions', () => {
           cy.getByDataCy('filter-button cancelled').click();
           cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
         });
+      cy.openEmail(({ subject }) => subject.includes(`Contribution cancelled to Test Collective`));
+      cy.contains('Because I want to');
     });
   });
 });
