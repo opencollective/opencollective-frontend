@@ -23,6 +23,10 @@ exports.REWRITES = [
     destination: '/signinLinkSent',
   },
   {
+    source: '/oauth/authorize',
+    destination: '/oauth/authorize',
+  },
+  {
     source: '/deleteCollective/confirmed',
     destination: '/confirmCollectiveDeletion',
   },
