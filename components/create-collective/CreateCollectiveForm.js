@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import { Form, Formik } from 'formik';
 import { get, trim } from 'lodash';
 import { withRouter } from 'next/router';
@@ -12,13 +12,16 @@ import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
 
 import Avatar from '../Avatar';
+import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
 import { getI18nLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
+import OnboardingProfileCard from '../onboarding-modal/OnboardingProfileCard';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
+import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
@@ -88,6 +91,7 @@ class CreateCollectiveForm extends React.Component {
     github: PropTypes.object,
     router: PropTypes.object.isRequired,
     popularTags: PropTypes.arrayOf(PropTypes.string),
+    loggedInUser: PropTypes.object,
   };
 
   hasHostTerms() {
@@ -102,7 +106,7 @@ class CreateCollectiveForm extends React.Component {
   }
 
   render() {
-    const { intl, error, host, loading, github, popularTags } = this.props;
+    const { intl, error, host, loading, github, popularTags, loggedInUser } = this.props;
     const hasHostTerms = this.hasHostTerms();
 
     const initialValues = {
@@ -112,6 +116,7 @@ class CreateCollectiveForm extends React.Component {
       message: '',
       tos: false,
       hostTos: false,
+      inviteMembers: [],
     };
 
     const validate = values => {
@@ -135,8 +140,8 @@ class CreateCollectiveForm extends React.Component {
     };
 
     const submit = values => {
-      const { description, name, slug, message, tags } = values;
-      this.props.onSubmit({ collective: { name, description, slug, tags }, message });
+      const { description, name, slug, message, tags, inviteMembers } = values;
+      this.props.onSubmit({ collective: { name, description, slug, tags }, message, inviteMembers });
     };
 
     return (
@@ -281,6 +286,66 @@ class CreateCollectiveForm extends React.Component {
                       <P fontSize="11px" color="black.600">
                         {intl.formatMessage(messages.descriptionHint)}
                       </P>
+                      {host && (
+                        <Box mt={3} mb={2}>
+                          <P {...LABEL_STYLES}>Add Administrators</P>
+                          <Flex mt={1} width="100%">
+                            <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
+                              <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
+                            </P>
+                            <Flex flexGrow={1} alignItems="center">
+                              <StyledHr width="100%" ml={2} />
+                            </Flex>
+                          </Flex>
+                          <Flex width="100%" flexWrap="wrap" data-cy="profile-card">
+                            <OnboardingProfileCard
+                              key={loggedInUser.collective.id}
+                              collective={loggedInUser.collective}
+                            />
+                            {values.inviteMembers?.map(invite => (
+                              <OnboardingProfileCard
+                                key={invite.memberAccount.id}
+                                collective={invite.memberAccount}
+                                removeAdmin={() =>
+                                  setFieldValue(
+                                    'inviteMembers',
+                                    values.inviteMembers.filter(i => i.memberAccount.id !== invite.memberAccount.id),
+                                  )
+                                }
+                              />
+                            ))}
+                          </Flex>
+                          <Flex mt={1} width="100%">
+                            <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
+                              <FormattedMessage id="InviteAdministrators" defaultMessage="Invite Administrators" />
+                            </P>
+                            <Flex flexGrow={1} alignItems="center">
+                              <StyledHr width="100%" ml={2} />
+                            </Flex>
+                          </Flex>
+                          <Box>
+                            <CollectivePickerAsync
+                              inputId="onboarding-admin-picker"
+                              creatable
+                              collective={null}
+                              types={['USER']}
+                              data-cy="admin-picker"
+                              filterResults={collectives =>
+                                collectives.filter(
+                                  collective =>
+                                    !values.inviteMembers.some(invite => invite.memberAccount.id === collective.id),
+                                )
+                              }
+                              onChange={option => {
+                                setFieldValue('inviteMembers', [
+                                  ...values.inviteMembers,
+                                  { role: 'ADMIN', memberAccount: option.value },
+                                ]);
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                      )}
                       <StyledInputFormikField
                         name="tags"
                         htmlFor="tags"
