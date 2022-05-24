@@ -64,7 +64,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
                   </Span>
                   <br />
                   <LinkCollective collective={host}>
-                    {collective && (collective.isApproved || collective.id === host.id) ? (
+                    {collective && collective.isApproved ? (
                       host.name
                     ) : (
                       <FormattedMessage
