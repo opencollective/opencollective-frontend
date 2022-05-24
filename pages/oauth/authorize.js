@@ -28,7 +28,7 @@ const applicationQuery = gqlV2`
         type
         imageUrl(height: 192)
       }
-      oauthAuthorization {
+      oAuthAuthorization {
         expiresAt
       }
     }
