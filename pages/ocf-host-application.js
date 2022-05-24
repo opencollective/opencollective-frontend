@@ -70,6 +70,7 @@ const formValues = {
     websiteAndSocialLinks: '',
   },
   termsOfServiceOC: false,
+  inviteMembers: [],
 };
 
 const OCFHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {

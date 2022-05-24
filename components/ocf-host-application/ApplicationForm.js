@@ -18,6 +18,7 @@ import { requireFields, verifyChecked, verifyEmailPattern, verifyFieldLength } f
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { i18nOCFApplicationFormLabel } from '../../lib/i18n/ocf-form';
 
+import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
 import OCFHostApplicationFAQ from '../faqs/OCFHostApplicationFAQ';
 import { Box, Flex } from '../Grid';
@@ -26,6 +27,7 @@ import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
+import OnboardingProfileCard from '../onboarding-modal/OnboardingProfileCard';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledHr from '../StyledHr';
@@ -46,6 +48,7 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
     $user: IndividualCreateInput
     $message: String
     $applicationData: JSON
+    $inviteMembers: [InviteMemberInput]
   ) {
     createCollective(
       collective: $collective
@@ -53,6 +56,7 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
       user: $user
       message: $message
       applicationData: $applicationData
+      inviteMembers: $inviteMembers
     ) {
       id
       slug
@@ -70,8 +74,15 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
     $host: AccountReferenceInput!
     $message: String
     $applicationData: JSON
+    $inviteMembers: [InviteMemberInput]
   ) {
-    applyToHost(collective: $collective, host: $host, message: $message, applicationData: $applicationData) {
+    applyToHost(
+      collective: $collective
+      host: $host
+      message: $message
+      applicationData: $applicationData
+      inviteMembers: $inviteMembers
+    ) {
       id
       slug
       ... on AccountWithHost {
@@ -139,12 +150,16 @@ const ApplicationForm = ({
     verifyChecked(errors, values, 'termsOfServiceOC');
     return errors;
   };
-  const submit = async ({ user, collective, applicationData }) => {
+  const submit = async ({ user, collective, applicationData, inviteMembers }) => {
     const variables = {
       collective,
       host: { legacyId: OPENCOLLECTIVE_FOUNDATION_ID },
       user,
       applicationData: prepareApplicationData(applicationData),
+      inviteMembers: inviteMembers.map(invite => ({
+        ...invite,
+        memberAccount: { legacyId: invite.memberAccount.id },
+      })),
       ...(canApplyWithCollective && { collective: { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug } }),
     };
 
@@ -538,6 +553,70 @@ const ApplicationForm = ({
                             defaultMessage="Check the sidebar for more info (250 characters max)"
                           />
                         </P>
+                      </Box>
+                      <Box width={['256px', '484px', '663px']} my={2}>
+                        <P fontSize="13px" lineHeight="16px" color="#4E5052">
+                          Add Administrators
+                        </P>
+                        <Flex mt={1} width="100%">
+                          <P my={2} fontSize="9px" textTransform="uppercase" color="black.700">
+                            <FormattedMessage id="Administrators" defaultMessage="Administrators" />
+                          </P>
+                          <Flex flexGrow={1} alignItems="center">
+                            <StyledHr width="100%" ml={2} />
+                          </Flex>
+                        </Flex>
+                        <Flex width="100%" flexWrap="wrap" data-cy="profile-card">
+                          {LoggedInUser ? (
+                            <OnboardingProfileCard
+                              key={LoggedInUser.collective.id}
+                              collective={LoggedInUser.collective}
+                            />
+                          ) : (
+                            <OnboardingProfileCard key="0" collective={values.user} />
+                          )}
+                          {values.inviteMembers?.map(invite => (
+                            <OnboardingProfileCard
+                              key={invite.memberAccount.id}
+                              collective={invite.memberAccount}
+                              removeAdmin={() =>
+                                setFieldValue(
+                                  'inviteMembers',
+                                  values.inviteMembers.filter(i => i.memberAccount.id !== invite.memberAccount.id),
+                                )
+                              }
+                            />
+                          ))}
+                        </Flex>
+                        <Flex mt={1} width="100%">
+                          <P my={2} fontSize="9px" textTransform="uppercase" color="black.700">
+                            <FormattedMessage id="InviteAdministrators" defaultMessage="Invite Administrators" />
+                          </P>
+                          <Flex flexGrow={1} alignItems="center">
+                            <StyledHr width="100%" ml={2} />
+                          </Flex>
+                        </Flex>
+                        <Box>
+                          <CollectivePickerAsync
+                            inputId="onboarding-admin-picker"
+                            creatable
+                            collective={null}
+                            types={['USER']}
+                            data-cy="admin-picker"
+                            filterResults={collectives =>
+                              collectives.filter(
+                                collective =>
+                                  !values.inviteMembers.some(invite => invite.memberAccount.id === collective.id),
+                              )
+                            }
+                            onChange={option => {
+                              setFieldValue('inviteMembers', [
+                                ...values.inviteMembers,
+                                { role: 'ADMIN', memberAccount: option.value },
+                              ]);
+                            }}
+                          />
+                        </Box>
                       </Box>
                       <Box width={['256px', '484px', '663px']} my={2}>
                         <StyledInputFormikField
