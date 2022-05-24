@@ -27,7 +27,7 @@ const authorizedAppsQuery = gqlV2/* GraphQL */ `
         nodes {
           id
           createdAt
-          createdByAccount {
+          account {
             id
             name
             slug
@@ -93,8 +93,8 @@ const AuthorizedApps = ({ authorizations }) => {
                       values={{
                         name: (
                           <Flex alignItems="center" ml={2}>
-                            <Avatar collective={auth.createdByAccount} size={24} mr={1} />
-                            <StyledLink as={LinkCollective} collective={auth.createdByAccount} color="black.700" />
+                            <Avatar collective={auth.account} size={24} mr={1} />
+                            <StyledLink as={LinkCollective} collective={auth.account} color="black.700" />
                           </Flex>
                         ),
                       }}
@@ -140,7 +140,7 @@ AuthorizedApps.propTypes = {
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       createdAt: PropTypes.string.isRequired,
-      createdByAccount: PropTypes.shape({
+      account: PropTypes.shape({
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
         slug: PropTypes.string.isRequired,
