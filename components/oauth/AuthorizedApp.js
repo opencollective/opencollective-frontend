@@ -15,8 +15,6 @@ import StyledLink from '../StyledLink';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-import { authorizedAppsQuery } from './queries';
-
 const revokeAuthorizationMutation = gqlV2/* GraphQL */ `
   mutation RevokeAuthorization($id: String!) {
     revokeOAuthAuthorization(oAuthAuthorization: { id: $id }) {
@@ -25,14 +23,14 @@ const revokeAuthorizationMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-export const AuthorizedApp = ({ authorization }) => {
+export const AuthorizedApp = ({ authorization, onRevoke }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
   const [revokeAuthorization, { loading }] = useMutation(revokeAuthorizationMutation, {
     context: API_V2_CONTEXT,
-    refetchQueries: [{ query: authorizedAppsQuery, context: API_V2_CONTEXT }],
-    awaitRefetchQueries: true,
+    onCompleted: onRevoke,
   });
+
   return (
     <Flex alignItems="center" justifyContent="space-between" maxWidth={776} mb={3} flexWrap="wrap">
       <Flex alignItems="center">
@@ -116,4 +114,5 @@ AuthorizedApp.propTypes = {
       }).isRequired,
     }).isRequired,
   }),
+  onRevoke: PropTypes.func,
 };
