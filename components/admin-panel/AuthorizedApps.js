@@ -9,14 +9,17 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import { I18nSupportLink } from '../I18nFormatters';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useUser } from '../UserProvider';
 
 const authorizedAppsQuery = gqlV2/* GraphQL */ `
   query AuthorizedApps {
@@ -164,12 +167,26 @@ AuthorizedApps.propTypes = {
 
 const AuthorizedAppsSection = () => {
   const { data, loading, error } = useQuery(authorizedAppsQuery, { context: API_V2_CONTEXT });
+  const { LoggedInUser } = useUser();
   return loading ? (
     <LoadingPlaceholder height={300} />
   ) : error ? (
     <MessageBoxGraphqlError error={error} />
   ) : !data?.loggedInAccount?.oAuthAuthorizations?.totalCount ? (
-    <FormattedMessage defaultMessage="You haven't configured any application yet" />
+    <div>
+      {LoggedInUser.collective.settings.oauthBeta ? (
+        <P>
+          <FormattedMessage defaultMessage="You haven't configured any application yet" />
+        </P>
+      ) : (
+        <MessageBox type="info" withIcon mt={3}>
+          <FormattedMessage
+            defaultMessage="We're beta-testing OAuth integrations for Open Collective. <SupportLink>Contact us</SupportLink> if you're interested to try it out early!"
+            values={{ SupportLink: I18nSupportLink }}
+          />
+        </MessageBox>
+      )}
+    </div>
   ) : (
     <AuthorizedApps authorizations={data.loggedInAccount.oAuthAuthorizations.nodes} />
   );
