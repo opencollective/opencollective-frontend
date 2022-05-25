@@ -45,7 +45,7 @@ const ContributeFAQ = ({ collective, isCrypto, ...props }) => (
         )}
       </Content>
     </Entry>
-    {collective.contributionPolicy && (
+    {(collective.contributionPolicy || collective.parent?.contributionPolicy) && (
       <Entry>
         <Title>
           <FormattedMessage
@@ -55,7 +55,11 @@ const ContributeFAQ = ({ collective, isCrypto, ...props }) => (
           />
         </Title>
         <Content>
-          <HTMLContent fontSize="13px" content={collective.contributionPolicy} />
+          {collective.contributionPolicy && <HTMLContent fontSize="13px" content={collective.contributionPolicy} />}
+          {collective.parent?.contributionPolicy &&
+            collective.parent.contributionPolicy !== collective.contributionPolicy && (
+              <HTMLContent fontSize="13px" content={collective.parent?.contributionPolicy} />
+            )}
         </Content>
       </Entry>
     )}
@@ -152,6 +156,10 @@ ContributeFAQ.propTypes = {
     name: PropTypes.string,
     contributionPolicy: PropTypes.string,
     host: PropTypes.shape({
+      name: PropTypes.string,
+      contributionPolicy: PropTypes.string,
+    }),
+    parent: PropTypes.shape({
       name: PropTypes.string,
       contributionPolicy: PropTypes.string,
     }),
