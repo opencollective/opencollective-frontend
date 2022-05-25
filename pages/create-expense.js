@@ -76,7 +76,7 @@ class CreateExpensePage extends React.Component {
       refetch: PropTypes.func,
       account: PropTypes.shape({
         id: PropTypes.string.isRequired,
-        parent: PropTypes.string,
+        parent: PropTypes.object,
         name: PropTypes.string.isRequired,
         slug: PropTypes.string.isRequired,
         description: PropTypes.string,
