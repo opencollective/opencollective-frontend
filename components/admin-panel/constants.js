@@ -63,6 +63,7 @@ export const COLLECTIVE_SECTIONS = {
   TWO_FACTOR_AUTH: 'two-factor-auth',
   VIRTUAL_CARDS: 'virtual-cards',
   WEBHOOKS: 'webhooks',
+  AUTHORIZED_APPS: 'authorized-apps',
 };
 
 export const LEGACY_COLLECTIVE_SETTINGS_SECTIONS = {
@@ -195,6 +196,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.WEBHOOKS]: {
     id: 'editCollective.menu.webhooks',
     defaultMessage: 'Webhooks',
+  },
+  [ALL_SECTIONS.AUTHORIZED_APPS]: {
+    defaultMessage: 'Authorized Apps',
   },
   [ALL_SECTIONS.TICKETS]: {
     id: 'section.tickets.title',
