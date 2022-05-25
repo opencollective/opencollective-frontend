@@ -906,6 +906,7 @@
   "errorMsg": "Ошибка: {error}",
   "errors.PM.Remove.HasActiveSubscriptions": "Этот способ оплаты не может быть удален, так как он имеет активные периодические финансовые вклады.",
   "ERs/eC": "{count, plural, one {# Grant} other {# Grants}}",
+  "ET/GW3": "Redirecting…",
   "event.create.btn": "Создать Мероприятие",
   "event.created": "Your Event has been created.",
   "Event.CreatedBy": "Создано: {CollectiveLink}",

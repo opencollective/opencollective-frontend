@@ -906,6 +906,7 @@
   "errorMsg": "Erreur : {error}",
   "errors.PM.Remove.HasActiveSubscriptions": "Ce moyen de paiement ne peut pas être supprimé car des contribution financières récurrentes lui sont liées.",
   "ERs/eC": "{count, plural, one {# Grant} other {# Grants}}",
+  "ET/GW3": "Redirecting…",
   "event.create.btn": "Créer un événement",
   "event.created": "Votre événement a été créé.",
   "Event.CreatedBy": "Créé par : {CollectiveLink}",

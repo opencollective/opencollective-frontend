@@ -906,6 +906,7 @@
   "errorMsg": "Błąd: {error}",
   "errors.PM.Remove.HasActiveSubscriptions": "Ta metoda płatności nie może zostać usunięta, ponieważ ma aktywne powtarzające się wkłady finansowe.",
   "ERs/eC": "{count, plural, one {# Dotacja} few {# Dotacje} many {# Dotacji} other {# Dotacji}}",
+  "ET/GW3": "Redirecting…",
   "event.create.btn": "Utwórz wydarzenie",
   "event.created": "Twoje wydarzenie zostało utworzone.",
   "Event.CreatedBy": "Stworzone przez: {CollectiveLink}",
