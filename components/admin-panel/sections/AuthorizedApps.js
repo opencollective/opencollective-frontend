@@ -3,23 +3,23 @@ import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { i18nGraphqlException } from '../../../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
-import Avatar from '../Avatar';
-import Container from '../Container';
-import { Box, Flex } from '../Grid';
-import { I18nSupportLink } from '../I18nFormatters';
-import LinkCollective from '../LinkCollective';
-import LoadingPlaceholder from '../LoadingPlaceholder';
-import MessageBox from '../MessageBox';
-import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
-import StyledButton from '../StyledButton';
-import StyledHr from '../StyledHr';
-import StyledLink from '../StyledLink';
-import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
-import { useUser } from '../UserProvider';
+import Avatar from '../../Avatar';
+import Container from '../../Container';
+import { Box, Flex } from '../../Grid';
+import { I18nSupportLink } from '../../I18nFormatters';
+import LinkCollective from '../../LinkCollective';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
+import MessageBox from '../../MessageBox';
+import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
+import StyledButton from '../../StyledButton';
+import StyledHr from '../../StyledHr';
+import StyledLink from '../../StyledLink';
+import { P, Span } from '../../Text';
+import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { useUser } from '../../UserProvider';
 
 const authorizedAppsQuery = gqlV2/* GraphQL */ `
   query AuthorizedApps {

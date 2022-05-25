@@ -15,7 +15,7 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
 
-import AuthorizedApps from '../admin-panel/AuthorizedApps';
+import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
 import { Box, Flex } from '../Grid';
