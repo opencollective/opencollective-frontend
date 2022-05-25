@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import Collapse from '../Collapse';
 import Container from '../Container';
@@ -8,33 +8,50 @@ import { Box } from '../Grid';
 import HTMLContent from '../HTMLContent';
 import { H5 } from '../Text';
 
-const msg = defineMessages({
-  policies: {
-    id: 'ExpensePolicies',
-    defaultMessage: 'Expense policies',
-  },
-});
-
 const ExpandableExpensePolicies = ({ host, collective, ...props }) => {
-  const { formatMessage } = useIntl();
-  const hostPolicy = host && host.expensePolicy;
-  const collectivePolicy = collective && collective.expensePolicy;
+  const hostPolicy = host?.expensePolicy;
+  const parentPolicy = collective?.parent?.expensePolicy;
+  const accountPolicy = collective?.expensePolicy;
 
-  if (!collectivePolicy && !hostPolicy) {
+  if (!accountPolicy && !parentPolicy && !hostPolicy) {
     return null;
   }
 
   return (
     <Box {...props}>
-      <Collapse title={<H5>{formatMessage(msg.policies)}</H5>} defaultIsOpen>
-        {host && host.expensePolicy && (
+      <Collapse
+        defaultIsOpen
+        title={
+          <H5>
+            <FormattedMessage id="ExpensePolicies" defaultMessage="Expense policies" />
+          </H5>
+        }
+      >
+        {hostPolicy && (
           <Container mb={2}>
-            <HTMLContent fontSize="12px" color="black.800" lineHeight="20px" content={host.expensePolicy} />
+            <HTMLContent fontSize="12px" color="black.800" lineHeight="20px" content={hostPolicy} />
           </Container>
         )}
-        {collective && collective.expensePolicy && collective.id !== host?.id && (
-          <Container>
-            <HTMLContent fontSize="12px" color="black.800" lineHeight="20px" content={collective.expensePolicy} />
+        {parentPolicy && collective.parent.id !== host?.id && parentPolicy !== accountPolicy && (
+          <Container mb={2}>
+            <HTMLContent
+              data-cy="expense-policy-html"
+              fontSize="12px"
+              color="black.800"
+              lineHeight="20px"
+              content={parentPolicy}
+            />
+          </Container>
+        )}
+        {accountPolicy && collective.id !== host?.id && (
+          <Container mb={2}>
+            <HTMLContent
+              data-cy="expense-policy-html"
+              fontSize="12px"
+              color="black.800"
+              lineHeight="20px"
+              content={accountPolicy}
+            />
           </Container>
         )}
       </Collapse>
@@ -46,6 +63,10 @@ ExpandableExpensePolicies.propTypes = {
   collective: PropTypes.shape({
     id: PropTypes.string,
     expensePolicy: PropTypes.string,
+    parent: PropTypes.shape({
+      id: PropTypes.string,
+      expensePolicy: PropTypes.string,
+    }),
   }),
   host: PropTypes.shape({
     id: PropTypes.string,

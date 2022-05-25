@@ -102,6 +102,7 @@ ExpenseInfoSidebar.propTypes = {
     id: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     type: PropTypes.string,
+    parent: PropTypes.object,
     isApproved: PropTypes.bool,
     stats: PropTypes.shape({
       balanceWithBlockedFunds: PropTypes.shape({

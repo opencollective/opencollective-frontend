@@ -282,6 +282,35 @@ Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEma
   });
 });
 
+Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, collective } = {}) => {
+  const project = {
+    name: 'test-project',
+    slug: randomSlug(),
+    description: 'make the world a better place',
+  };
+
+  return signinRequest({ email: userEmail }, null).then(response => {
+    const token = getTokenFromRedirectUrl(response.body.redirect);
+    return graphqlQueryV2(token, {
+      operationName: 'CreateProject',
+      query: `
+        mutation CreateProject($project: ProjectCreateInput!, $parent: AccountReferenceInput) {
+          createProject(project: $project, parent: $parent) {
+            id
+            name
+            slug
+            description
+            __typename
+          }
+        }
+      `,
+      variables: { project, parent: { slug: collective.slug } },
+    }).then(({ body }) => {
+      return body.data.createProject;
+    });
+  });
+});
+
 /**
  * Add a stripe credit card on the collective designated by `collectiveSlug`.
  */
