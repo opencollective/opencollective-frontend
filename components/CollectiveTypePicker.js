@@ -11,7 +11,7 @@ import StyledButton from './StyledButton';
 /** Return the caption associated to a given collective type */
 const getTypeCaption = type => {
   if (type === CollectiveType.USER) {
-    return <FormattedMessage id="user.create" defaultMessage="Create new user" />;
+    return <FormattedMessage id="User.InviteNew" defaultMessage="Invite new User" />;
   } else if (type === CollectiveType.ORGANIZATION) {
     return <FormattedMessage id="organization.create" defaultMessage="Create Organization" />;
   } else if (type === CollectiveType.COLLECTIVE) {
