@@ -1617,6 +1617,7 @@
   "menu.subscriptions": "Gérer les Contributions",
   "menu.transactions": "Transactions",
   "MessageSent": "Message envoyé",
+  "mGnvLd": "Cannot send member invitation",
   "mGSAXe": "{field} has invalid value \"{value}\". Expected: \"{expected}\"",
   "mLx6pg": "Supprimer la Carte",
   "month": "Monthly",
