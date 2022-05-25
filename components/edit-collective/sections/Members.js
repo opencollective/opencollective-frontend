@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Edit } from '@styled-icons/material/Edit';
-import { get, omit } from 'lodash';
+import { compose, get, omit } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -28,7 +28,9 @@ import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
 import { P } from '../../Text';
+import { withToasts } from '../../ToastProvider';
 import { withUser } from '../../UserProvider';
+import ResendMemberInviteBtn from '../ResendMemberInviteBtn';
 import SettingsSubtitle from '../SettingsSubtitle';
 
 import EditMemberModal from './EditMemberModal';
@@ -54,7 +56,7 @@ const AllCardsContainerMobile = styled.div`
 
 const TagContainer = styled(Box)`
   position: absolute;
-  bottom: 10%;
+  bottom: 16%;
 `;
 
 const InviteNewCard = styled(MemberContainer)`
@@ -78,6 +80,7 @@ class Members extends React.Component {
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
     refetchLoggedInUser: PropTypes.func.isRequired,
+    addToast: PropTypes.func.isRequired,
     /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
     /** @ignore from Apollo */
@@ -150,7 +153,6 @@ class Members extends React.Component {
 
   renderMember = (member, index, nbAdmins, memberModalKey) => {
     const { intl, collective, LoggedInUser, refetchLoggedInUser } = this.props;
-
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
     const isInvitation = member.__typename === 'MemberInvitation';
     const collectiveId = get(member, 'memberAccount.id');
@@ -210,15 +212,18 @@ class Members extends React.Component {
           <P fontSize="11px" lineHeight="16px" mx={2} fontWeight={400} mb={5}>
             {get(member, 'description')}
           </P>
-          <TagContainer>
-            {isInvitation && (
-              <StyledTooltip content={intl.formatMessage(this.messages.memberPendingDetails)}>
-                <StyledTag data-cy="member-pending-tag" textTransform="uppercase" display="block" type="info">
-                  <FormattedMessage id="Pending" defaultMessage="Pending" />
-                </StyledTag>
-              </StyledTooltip>
-            )}
-          </TagContainer>
+          {isInvitation && (
+            <React.Fragment>
+              <TagContainer>
+                <StyledTooltip content={intl.formatMessage(this.messages.memberPendingDetails)}>
+                  <StyledTag data-cy="member-pending-tag" textTransform="uppercase" display="block" type="info">
+                    <FormattedMessage id="Pending" defaultMessage="Pending" />
+                  </StyledTag>
+                </StyledTooltip>
+              </TagContainer>
+              <ResendMemberInviteBtn member={member} collective={collective} />
+            </React.Fragment>
+          )}
         </Flex>
       </MemberContainer>
     );
@@ -231,7 +236,7 @@ class Members extends React.Component {
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
 
     return (
-      <React.Fragment className="EditMembers">
+      <React.Fragment>
         <Box className="members">
           {collective.type === 'COLLECTIVE' && (
             <SettingsSubtitle>
@@ -319,7 +324,6 @@ class Members extends React.Component {
 
   render() {
     const { data, intl } = this.props;
-
     if (data.loading) {
       return <Loading />;
     } else if (data.error) {
@@ -436,4 +440,6 @@ const addCoreContributorsData = graphql(coreContributorsQuery, {
   }),
 });
 
-export default injectIntl(addCoreContributorsData(withUser(Members)));
+const inject = compose(withUser, injectIntl, withToasts, addCoreContributorsData);
+
+export default inject(Members);

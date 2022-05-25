@@ -1617,6 +1617,7 @@
   "menu.subscriptions": "管理贡献者",
   "menu.transactions": "Transactions",
   "MessageSent": "消息已发送",
+  "mGnvLd": "Cannot send member invitation",
   "mGSAXe": "{field} has invalid value \"{value}\". Expected: \"{expected}\"",
   "mLx6pg": "Delete Card",
   "month": "Monthly",
