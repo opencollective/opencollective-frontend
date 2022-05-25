@@ -122,6 +122,7 @@ const ApplicationForm = ({
   canApplyWithCollective,
   router,
   collective: collectiveWithSlug,
+  host,
 }) => {
   const intl = useIntl();
   const [submitApplication, { loading: submitting, error }] = useApplicationMutation(canApplyWithCollective);
@@ -559,8 +560,12 @@ const ApplicationForm = ({
                           Add Administrators
                         </P>
                         <Flex mt={1} width="100%">
-                          <P my={2} fontSize="9px" textTransform="uppercase" color="black.700">
-                            <FormattedMessage id="Administrators" defaultMessage="Administrators" />
+                          <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
+                            <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
+                            {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
+                              ` (${1 + values.inviteMembers?.length}/${
+                                host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins
+                              })`}
                           </P>
                           <Flex flexGrow={1} alignItems="center">
                             <StyledHr width="100%" ml={2} />
@@ -573,7 +578,7 @@ const ApplicationForm = ({
                               collective={LoggedInUser.collective}
                             />
                           ) : (
-                            <OnboardingProfileCard key="0" collective={values.user} />
+                            values.user?.name && <OnboardingProfileCard key="0" collective={values.user} />
                           )}
                           {values.inviteMembers?.map(invite => (
                             <OnboardingProfileCard
@@ -589,7 +594,7 @@ const ApplicationForm = ({
                           ))}
                         </Flex>
                         <Flex mt={1} width="100%">
-                          <P my={2} fontSize="9px" textTransform="uppercase" color="black.700">
+                          <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
                             <FormattedMessage id="InviteAdministrators" defaultMessage="Invite Administrators" />
                           </P>
                           <Flex flexGrow={1} alignItems="center">
@@ -617,6 +622,14 @@ const ApplicationForm = ({
                             }}
                           />
                         </Box>
+                        {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                          <MessageBox type="info" mt={3} fontSize="13px">
+                            <FormattedMessage
+                              defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
+                              values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                            />
+                          </MessageBox>
+                        )}
                       </Box>
                       <Box width={['256px', '484px', '663px']} my={2}>
                         <StyledInputFormikField
@@ -636,17 +649,6 @@ const ApplicationForm = ({
                             defaultMessage="If you have something to send us, please upload it to a storage service (Dropbox, Drive) and paste the sharing link here."
                           />
                         </P>
-                        <MessageBox type="info" withIcon fontSize="11px" lineHeight="16px" mt="20px">
-                          <FormattedMessage
-                            defaultMessage="Once your page is submitted, please be sure to have at least 2 admin (with First, Last Name) on your initiative's Team to ensure timely application processing. Instructions for adding admin <AdminAdditionDoc>here</AdminAdditionDoc>."
-                            values={{
-                              AdminAdditionDoc: getI18nLink({
-                                href: 'https://docs.opencollective.com/help/collectives/collective-settings/core-contributors',
-                                openInNewTab: true,
-                              }),
-                            }}
-                          />
-                        </MessageBox>
                       </Box>
                       <Box width={['256px', '484px', '663px']} mb={2} mt="20px">
                         <StyledHr />
@@ -749,6 +751,11 @@ ApplicationForm.propTypes = {
     type: PropTypes.string,
     isAdmin: PropTypes.bool,
     description: PropTypes.description,
+  }),
+  host: PropTypes.shape({
+    id: PropTypes.string,
+    slug: PropTypes.string,
+    policies: PropTypes.object,
   }),
   loadingCollective: PropTypes.bool,
   canApplyWithCollective: PropTypes.bool,

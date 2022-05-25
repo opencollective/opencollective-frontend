@@ -290,11 +290,15 @@ class CreateCollectiveForm extends React.Component {
                         <Box mt={3} mb={2}>
                           <P {...LABEL_STYLES}>Add Administrators</P>
                           <Flex mt={1} width="100%">
-                            <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
+                            <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
                               <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
+                              {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
+                                ` (${1 + values.inviteMembers.length}/${
+                                  host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins
+                                })`}
                             </P>
                             <Flex flexGrow={1} alignItems="center">
-                              <StyledHr width="100%" ml={2} />
+                              <StyledHr width="100%" ml={2} borderColor="black.300" />
                             </Flex>
                           </Flex>
                           <Flex width="100%" flexWrap="wrap" data-cy="profile-card">
@@ -316,11 +320,11 @@ class CreateCollectiveForm extends React.Component {
                             ))}
                           </Flex>
                           <Flex mt={1} width="100%">
-                            <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
+                            <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
                               <FormattedMessage id="InviteAdministrators" defaultMessage="Invite Administrators" />
                             </P>
                             <Flex flexGrow={1} alignItems="center">
-                              <StyledHr width="100%" ml={2} />
+                              <StyledHr width="100%" ml={2} borderColor="black.300" />
                             </Flex>
                           </Flex>
                           <Box>
@@ -344,6 +348,15 @@ class CreateCollectiveForm extends React.Component {
                               }}
                             />
                           </Box>
+
+                          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                            <MessageBox type="info" mt={3} fontSize="13px">
+                              <FormattedMessage
+                                defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
+                                values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                              />
+                            </MessageBox>
+                          )}
                         </Box>
                       )}
                       <StyledInputFormikField

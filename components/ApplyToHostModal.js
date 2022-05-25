@@ -56,6 +56,7 @@ const hostFields = gqlV2/* GraphQL */ `
     longDescription
     hostFeePercent
     settings
+    policies
   }
 `;
 
@@ -386,7 +387,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                     )}
                     {step === STEPS.APPLY && (
                       <React.Fragment>
-                        <Box mb={32}>
+                        <Box>
                           <StyledInputFormikField name="collective">
                             {({ form, field }) => (
                               <div>
@@ -432,16 +433,24 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                             )}
                           </StyledInputFormikField>
                         </Box>
-                        <Box mt={3} mb={2}>
+                        <StyledHr my="18px" width="100%" borderColor="black.300" />
+                        <Box>
                           <P fontSize="13px" lineHeight="16px" fontWeight="600" color="black.700">
                             <FormattedMessage defaultMessage="Minimum Administrators Required" />
                           </P>
                           <Flex mt={1} width="100%">
-                            <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
+                            <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
                               <FormattedMessage defaultMessage="Administrators" />
+                              {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
+                                values.collective &&
+                                ` (${
+                                  values.collective?.admins?.nodes.length +
+                                  values.collective?.memberInvitations?.length +
+                                  values.inviteMembers.length
+                                }/${host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins})`}
                             </P>
                             <Flex flexGrow={1} alignItems="center">
-                              <StyledHr width="100%" ml={2} />
+                              <StyledHr width="100%" ml={2} borderColor="black.300" />
                             </Flex>
                           </Flex>
                           <Flex width="100%" flexWrap="wrap" data-cy="profile-card">
@@ -469,11 +478,11 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                             ))}
                           </Flex>
                           <Flex mt={1} width="100%">
-                            <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
+                            <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
                               <FormattedMessage defaultMessage="Invite Administrators" />
                             </P>
                             <Flex flexGrow={1} alignItems="center">
-                              <StyledHr width="100%" ml={2} />
+                              <StyledHr width="100%" ml={2} borderColor="black.300" />
                             </Flex>
                           </Flex>
                           <Box>
@@ -497,7 +506,16 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                               }}
                             />
                           </Box>
+                          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                            <MessageBox type="info" mt={3} fontSize="13px">
+                              <FormattedMessage
+                                defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
+                                values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                              />
+                            </MessageBox>
+                          )}
                         </Box>
+                        <StyledHr my="18px" width="100%" borderColor="black.300" />
                         {isOCFHost ? (
                           <ApplicationDescription />
                         ) : (
@@ -505,7 +523,6 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                             <StyledInputFormikField
                               name="message"
                               htmlFor="apply-host-modal-message"
-                              mt={32}
                               label={
                                 <Span fontSize="13px" lineHeight="16px" fontWeight="600" color="black.700">
                                   {get(host, 'settings.applyMessage') || (
@@ -563,7 +580,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                   </Form>
                 )}
               </ModalBody>
-              <ModalFooter>
+              <ModalFooter isFullWidth>
                 {step === STEPS.INFORMATION && (
                   <Flex justifyContent="flex-end">
                     <StyledButton buttonStyle="primary" onClick={() => setStep(STEPS.APPLY)}>

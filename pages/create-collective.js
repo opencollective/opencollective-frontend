@@ -22,6 +22,7 @@ const createCollectiveHostQuery = gqlV2/* GraphQL */ `
       currency
       isOpenToApplications
       termsUrl
+      policies
     }
   }
 `;

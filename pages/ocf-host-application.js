@@ -35,6 +35,16 @@ const collectiveQuery = gqlV2/* GraphQL */ `
   }
 `;
 
+const hostQuery = gqlV2/* GraphQL */ `
+  query HostData {
+    account(slug: "foundation") {
+      id
+      slug
+      policies
+    }
+  }
+`;
+
 const messages = defineMessages({
   'error.title': {
     id: 'error.title',
@@ -82,6 +92,10 @@ const OCFHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
 
   const step = router.query.step || 'intro';
   const collectiveSlug = router.query.collectiveSlug;
+
+  const { data: hostData } = useQuery(hostQuery, {
+    context: API_V2_CONTEXT,
+  });
 
   const { data, loading: loadingCollective } = useQuery(collectiveQuery, {
     context: API_V2_CONTEXT,
@@ -131,6 +145,7 @@ const OCFHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
           loadingLoggedInUser={loadingLoggedInUser}
           LoggedInUser={LoggedInUser}
           collective={collective}
+          host={hostData?.account}
           loadingCollective={loadingCollective}
           canApplyWithCollective={canApplyWithCollective && !hasHost}
         />
