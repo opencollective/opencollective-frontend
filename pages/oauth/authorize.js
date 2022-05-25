@@ -51,7 +51,7 @@ const OAuthAuthorizePage = () => {
   const queryParams = { skip: skipQuery, variables: queryVariables, context: API_V2_CONTEXT };
   const { data, error, loading: isLoadingAuthorization } = useQuery(applicationQuery, queryParams);
   const isLoading = loadingLoggedInUser || isLoadingAuthorization;
-  const hasExistingAuthorization = isValidAuthorization(data?.application?.oauthAuthorization);
+  const hasExistingAuthorization = isValidAuthorization(data?.application?.oAuthAuthorization);
   return (
     <EmbeddedPage title="Authorize application">
       <Flex justifyContent="center" alignItems="center" py={[90, null, null, 180]} px={2}>
