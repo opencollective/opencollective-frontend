@@ -286,7 +286,7 @@ Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, colle
   const project = {
     name: 'test-project',
     slug: randomSlug(),
-    description: 'make the wordl a better palce',
+    description: 'make the world a better place',
   };
 
   return signinRequest({ email: userEmail }, null).then(response => {
@@ -306,7 +306,7 @@ Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, colle
       `,
       variables: { project, parent: { slug: collective.slug } },
     }).then(({ body }) => {
-      return body.data.createCollectiveFromGithub;
+      return body.data.createProject;
     });
   });
 });

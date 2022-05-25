@@ -535,22 +535,14 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-policy-html').contains('this is my test expense policy');
     });
 
-    it('Collectives display expense policies and projects inherit and display expense policy from parent collective', () => {
-      cy.login({ email: user.email, redirect: expenseUrl });
-      cy.get('[data-cy="edit-collective-btn"]:visible').click();
-      cy.getByDataCy('menu-item-policies').click();
+    it('Projects inherit and display expense policy from parent collective', () => {
+      cy.login({ email: user.email, redirect: `/${collective.slug}/admin/policies` });
       cy.getByDataCy('expense-policy-input').type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
-      cy.visit(expenseUrl);
-      cy.get('[data-cy="collective-navbar-actions-btn"]:visible').click();
-      cy.getByDataCy('submit-expense-dropdown').click();
-      cy.getByDataCy('expense-policy-html').contains('this is my test expense policy');
-      cy.createProject({ userEmail: user.email, collective });
-      cy.visit(`/${collective.slug}`);
-      cy.get('[data-cy="Projects"] [data-cy="contribute-btn"]').click();
-      cy.get('[data-cy="collective-navbar-actions-btn"]:visible').click();
-      cy.getByDataCy('submit-expense-dropdown').click();
-      cy.getByDataCy('expense-policy-html').contains('this is my test expense policy');
+      cy.createProject({ userEmail: user.email, collective }).then(project => {
+        cy.visit(`/${project.slug}/expenses/new`);
+        cy.getByDataCy('expense-policy-html').contains('this is my test expense policy');
+      });
     });
   });
 });
