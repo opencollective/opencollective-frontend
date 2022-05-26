@@ -37,6 +37,6 @@ describe('Contribution Flow: Create profile', () => {
     cy.get('[data-cy="cf-content"] input[name=email]').type(`{selectall}${email}`);
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
-    cy.contains(`We've sent it to ${email}.`);
+    cy.contains(`We've sent it to ${email}`);
   });
 });
