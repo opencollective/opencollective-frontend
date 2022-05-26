@@ -32,6 +32,7 @@ class Header extends React.Component {
     showSearch: PropTypes.bool,
     withTopBar: PropTypes.bool,
     menuItems: PropTypes.object,
+    menuItemsV2: PropTypes.object,
     /** If true, a no-robots meta will be added to the page */
     noRobots: PropTypes.bool,
     /** @ignore from injectIntl */
@@ -120,7 +121,7 @@ class Header extends React.Component {
         <div id="top" />
         {withTopBar &&
           (LoggedInUser?.collective?.settings?.useNewTopBar ? (
-            <TopBarV2 className={className} showSearch={this.props.showSearch} />
+            <TopBarV2 className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItemsV2} />
           ) : (
             <TopBar className={className} showSearch={this.props.showSearch} />
           ))}
