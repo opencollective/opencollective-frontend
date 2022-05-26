@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
+import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
 import { ExternalLink } from '@styled-icons/feather/ExternalLink';
 import { Mail } from '@styled-icons/feather/Mail';
 import { get } from 'lodash';
@@ -27,6 +28,7 @@ import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
 import StyledRoundButton from '../StyledRoundButton';
 import StyledTag from '../StyledTag';
+import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
@@ -227,6 +229,15 @@ const PendingApplication = ({ host, application, ...props }) => {
   });
   const hasNothingToShow = !application.message && !application.customData;
 
+  const requiresMinimumNumberOfAdmins = host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1;
+  const hasEnoughAdmins =
+    requiresMinimumNumberOfAdmins &&
+    application.account.admins.totalCount >= host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins;
+  const hasEnoughInvitedAdmins =
+    requiresMinimumNumberOfAdmins &&
+    application.account.admins.totalCount + application.account.memberInvitations.length >=
+      host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins;
+
   const processApplication = async (action, message, onSuccess) => {
     setIsDone(false);
     setLatestAction(action);
@@ -376,14 +387,32 @@ const PendingApplication = ({ host, application, ...props }) => {
             borderTop="1px solid #DCDEE0"
             boxShadow="0px -2px 4px 0px rgb(49 50 51 / 6%)"
           >
-            <Flex alignItems="center">
+            <Flex alignItems="center" gap="10px">
               <StyledRoundButton size={32} onClick={() => setShowContactModal(true)}>
                 <Mail size={15} color="#4E5052" />
               </StyledRoundButton>
+              {requiresMinimumNumberOfAdmins && hasEnoughInvitedAdmins && !hasEnoughAdmins && (
+                <StyledTooltip
+                  content={
+                    <FormattedMessage defaultMessage="This collective doesn’t satisfy the minimum admin requirements as admin invitations are still pending." />
+                  }
+                >
+                  <Span color="red.600">
+                    <AlertTriangle size={24} />
+                  </Span>
+                </StyledTooltip>
+              )}
             </Flex>
             <AcceptRejectButtons
               collective={collective}
               isLoading={loading}
+              disabled={requiresMinimumNumberOfAdmins && !hasEnoughInvitedAdmins}
+              disabledMessage={
+                requiresMinimumNumberOfAdmins &&
+                !hasEnoughInvitedAdmins && (
+                  <FormattedMessage defaultMessage="You can not approve this collective as it doesn’t satisfy the minimum admin policy set by you." />
+                )
+              }
               onApprove={() => processApplication(ACTIONS.APPROVE)}
               onReject={message => processApplication(ACTIONS.REJECT, message)}
             />
@@ -408,6 +437,7 @@ const PendingApplication = ({ host, application, ...props }) => {
 PendingApplication.propTypes = {
   host: PropTypes.shape({
     id: PropTypes.string,
+    policies: PropTypes.object,
   }).isRequired,
   application: PropTypes.shape({
     message: PropTypes.string,
@@ -424,6 +454,7 @@ PendingApplication.propTypes = {
       host: PropTypes.shape({
         id: PropTypes.string,
       }),
+      memberInvitations: PropTypes.array,
       admins: PropTypes.shape({
         totalCount: PropTypes.number,
         nodes: PropTypes.array,

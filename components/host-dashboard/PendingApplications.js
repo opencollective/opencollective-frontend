@@ -35,6 +35,7 @@ const pendingApplicationsQuery = gqlV2/* GraphQL */ `
       name
       type
       settings
+      policies
       pendingApplications(limit: $limit, offset: $offset, orderBy: $orderBy, searchTerm: $searchTerm) {
         offset
         limit
@@ -55,6 +56,10 @@ const pendingApplicationsQuery = gqlV2/* GraphQL */ `
             createdAt
             ... on AccountWithHost {
               ...ProcessHostApplicationFields
+            }
+            memberInvitations(role: [ADMIN]) {
+              id
+              role
             }
             admins: members(role: ADMIN) {
               totalCount
