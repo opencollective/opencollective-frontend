@@ -107,7 +107,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   return (
     <Fragment>
       {isEditingCover && <HeroBackgroundCropperModal collective={collective} onClose={() => editCover(false)} />}
-      <Container position="relative" minHeight={325} zIndex={999} data-cy="collective-hero">
+      <Container position="relative" minHeight={325} zIndex={1000} data-cy="collective-hero">
         <HeroBackground collective={collective} />
         {isAdmin && !isEditing && (
           <Container data-cy="edit-collective-display-features" position="absolute" right={25} top={25} zIndex={222}>

@@ -14,10 +14,10 @@ const Popup = styled(Box)`
   border-radius: 8px;
   background: white;
   box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
-  z-index: 1000;
+  z-index: ${props => props.zIndex || 1000};
 `;
 
-const PopupMenu = ({ Button, children, placement, onClose }) => {
+const PopupMenu = ({ Button, children, placement, onClose, zIndex }) => {
   const [isOpen, setOpen] = React.useState(false);
   const ref = React.useRef();
   useGlobalBlur(ref, outside => {
@@ -44,7 +44,9 @@ const PopupMenu = ({ Button, children, placement, onClose }) => {
           ]}
         >
           {({ style, ref }) => (
-            <Popup {...{ style, ref }}>{typeof children === 'function' ? children({ setOpen }) : children}</Popup>
+            <Popup zIndex={zIndex} {...{ style, ref }}>
+              {typeof children === 'function' ? children({ setOpen }) : children}
+            </Popup>
           )}
         </Popper>
       )}
@@ -57,6 +59,7 @@ PopupMenu.propTypes = {
   children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]).isRequired,
   placement: PropTypes.string,
   onClose: PropTypes.func,
+  zIndex: PropTypes.number,
 };
 
 export default PopupMenu;
