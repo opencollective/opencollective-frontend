@@ -271,35 +271,35 @@ const ExpenseSummary = ({
         collective={collective}
         isDraft={!isEditing && expense?.status === expenseStatus.DRAFT}
       />
-      <Container
-        display="flex"
-        width={1}
-        justifyContent="space-between"
-        flexDirection={['column-reverse', null, 'row']}
-        alignItems="flex-end"
-        borderTop="1px solid #DCDEE0"
-        mt={4}
-        pt={12}
-      >
-        <ExpenseMoreActionsButton onEdit={onEdit} expense={expense} mt={['16px', null, '8px']} />
-        {Boolean(
-          showProcessButtons && !isEditing && existsInAPI && collective && hasProcessButtons(expense?.permissions),
-        ) && (
-          <Flex flexWrap="wrap">
-            <ProcessExpenseButtons
-              expense={expense}
-              permissions={expense?.permissions}
-              collective={collective}
-              host={host}
-              onDelete={() => {
-                onDelete?.(expense);
-                onClose?.();
-              }}
-              displayMarkAsIncomplete
-            />
-          </Flex>
-        )}
-      </Container>
+      {!isEditing && (
+        <Container
+          display="flex"
+          width={1}
+          justifyContent="space-between"
+          flexDirection={['column-reverse', null, 'row']}
+          alignItems="flex-end"
+          borderTop="1px solid #DCDEE0"
+          mt={4}
+          pt={12}
+        >
+          <ExpenseMoreActionsButton onEdit={onEdit} expense={expense} mt={['16px', null, '8px']} />
+          {Boolean(showProcessButtons && existsInAPI && collective && hasProcessButtons(expense?.permissions)) && (
+            <Flex flexWrap="wrap">
+              <ProcessExpenseButtons
+                expense={expense}
+                permissions={expense?.permissions}
+                collective={collective}
+                host={host}
+                onDelete={() => {
+                  onDelete?.(expense);
+                  onClose?.();
+                }}
+                displayMarkAsIncomplete
+              />
+            </Flex>
+          )}
+        </Container>
+      )}
     </StyledCard>
   );
 };
