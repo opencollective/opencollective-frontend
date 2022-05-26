@@ -90,6 +90,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
           <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
             {menuItems.solutions && (
               <PopupMenu
+                zIndex={2000}
                 closingEvent="mouseover"
                 Button={({ onMouseOver, onClick, popupOpen }) => (
                   <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
@@ -122,6 +123,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
 
             {menuItems.product && (
               <PopupMenu
+                zIndex={2000}
                 closingEvent="mouseover"
                 Button={({ onClick, onMouseOver, popupOpen }) => (
                   <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
@@ -153,6 +155,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
 
             {menuItems.company && (
               <PopupMenu
+                zIndex={2000}
                 closingEvent="mouseover"
                 Button={({ onClick, onMouseOver, popupOpen }) => (
                   <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
