@@ -89,6 +89,7 @@ const TopBarV2 = ({ showSearch }) => {
         <Hide xs>
           <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
             <PopupMenu
+              zIndex={2000}
               Button={({ onClick }) => (
                 <NavButton as={StyledLink} onClick={onClick} whiteSpace="nowrap">
                   <FormattedMessage defaultMessage="Solutions" />
@@ -118,6 +119,7 @@ const TopBarV2 = ({ showSearch }) => {
             </PopupMenu>
 
             <PopupMenu
+              zIndex={2000}
               Button={({ onClick }) => (
                 <NavButton as={StyledLink} onClick={onClick} whiteSpace="nowrap">
                   <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
@@ -146,6 +148,7 @@ const TopBarV2 = ({ showSearch }) => {
             </PopupMenu>
 
             <PopupMenu
+              zIndex={2000}
               Button={({ onClick }) => (
                 <NavButton as={StyledLink} onClick={onClick} whiteSpace="nowrap">
                   <FormattedMessage id="company" defaultMessage="Company" />
