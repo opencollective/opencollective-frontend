@@ -30,6 +30,7 @@ import AddFundsBtn from '../AddFundsBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import Avatar from '../Avatar';
 import { Dimensions, Sections } from '../collective-page/_constants';
+import ContactCollectiveBtn from '../ContactCollectiveBtn';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
@@ -378,14 +379,16 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.CONTACT,
       component: (
-        <Link href={`/${collective.slug}/contact`}>
-          <ActionButton tabIndex="-1">
-            <Envelope size="1em" />
-            <Span ml={2}>
-              <FormattedMessage id="Contact" defaultMessage="Contact" />
-            </Span>
-          </ActionButton>
-        </Link>
+        <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
+          {btnProps => (
+            <ActionButton {...btnProps}>
+              <Envelope size="1em" />
+              <Span ml={2}>
+                <FormattedMessage id="Contact" defaultMessage="Contact" />
+              </Span>
+            </ActionButton>
+          )}
+        </ContactCollectiveBtn>
       ),
     };
   } else if (callsToAction.includes(NAVBAR_ACTION_TYPE.ADD_FUNDS) && collective.host) {
@@ -443,7 +446,8 @@ const CollectiveNavbar = ({
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
   const mainAction = getMainAction(collective, actionsArray, LoggedInUser);
-  const secondAction = actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type));
+  const secondAction =
+    actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type), LoggedInUser);
   const navbarRef = useRef();
   const mainContainerRef = useRef();
 

@@ -202,6 +202,17 @@ const ProcessExpenseButtons = ({
           }
         />
       )}
+      {permissions.canPay && (
+        <PayExpenseButton
+          {...getButtonProps('PAY')}
+          onClick={null}
+          onSubmit={triggerAction}
+          expense={expense}
+          collective={collective}
+          host={host}
+          error={error}
+        />
+      )}
       {permissions.canReject && (
         <StyledButton {...getButtonProps('REJECT')} buttonStyle="dangerSecondary" data-cy="reject-button">
           <RejectIcon size={14} />
@@ -227,17 +238,7 @@ const ProcessExpenseButtons = ({
           </ButtonLabel>
         </StyledButton>
       )}
-      {permissions.canPay && (
-        <PayExpenseButton
-          {...getButtonProps('PAY')}
-          onClick={null}
-          onSubmit={triggerAction}
-          expense={expense}
-          collective={collective}
-          host={host}
-          error={error}
-        />
-      )}
+
       {permissions.canUnapprove && (
         <StyledButton {...getButtonProps('UNAPPROVE')} buttonStyle="dangerSecondary" data-cy="unapprove-button">
           <UnapproveIcon size={12} />
@@ -288,6 +289,7 @@ ProcessExpenseButtons.propTypes = {
     canMarkAsSpam: PropTypes.bool,
     canPay: PropTypes.bool,
     canMarkAsUnpaid: PropTypes.bool,
+    canMarkAsIncomplete: PropTypes.bool,
     canUnschedulePayment: PropTypes.bool,
     canDelete: PropTypes.bool,
     approve: PropTypes.shape({
@@ -298,6 +300,7 @@ ProcessExpenseButtons.propTypes = {
   expense: PropTypes.shape({
     id: PropTypes.string,
     legacyId: PropTypes.number,
+    status: PropTypes.string,
   }).isRequired,
   /** The account where the expense has been submitted */
   collective: PropTypes.object.isRequired,
@@ -310,6 +313,7 @@ ProcessExpenseButtons.propTypes = {
   onDelete: PropTypes.func,
   /** Called when a modal is opened/closed with a boolean like (isOpen) */
   onModalToggle: PropTypes.func,
+  displayMarkAsIncomplete: PropTypes.bool,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {

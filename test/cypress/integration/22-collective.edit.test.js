@@ -31,6 +31,7 @@ describe('edit collective', () => {
     cy.createHostedCollective({ name: 'CollectiveToEdit' }).then(({ slug }) => {
       collectiveSlug = slug;
     });
+    cy.clearInbox();
   });
 
   beforeEach(() => {
@@ -56,6 +57,12 @@ describe('edit collective', () => {
     cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
     cy.getByDataCy('confirmation-modal-continue').click();
     cy.get('[data-cy="member-1"] [data-cy="member-pending-tag"]').should('exist');
+    cy.getInbox().should('have.length', 2);
+
+    // Re-send the invitation email
+    cy.getByDataCy('resend-invite-btn').should('exist').first().click({ force: true });
+    cy.wait(200); // Wait for email
+    cy.getInbox().should('have.length', 3);
 
     // Check invitation email
     cy.openEmail(({ subject }) => subject.includes('Invitation to join CollectiveToEdit'));
@@ -72,6 +79,7 @@ describe('edit collective', () => {
 
     cy.visit(`/${collectiveSlug}/admin/members`);
     cy.get('[data-cy="member-1"]').find('[data-cy="member-pending-tag"]').should('not.exist');
+    cy.getByDataCy('resend-invite-btn').should('not.exist');
   });
 
   it('edit info', () => {

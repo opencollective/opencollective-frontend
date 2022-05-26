@@ -1,37 +1,32 @@
 # Hiring
 
-## Come Work at a Mission Driven Tech Company with High Impact that Pays Well and Cares about You.
+## Come Work at a Mission Driven Tech Company with High Impact that Cares about You
 
-Are you a top-notch engineer, product manager, or operations person? Do you want to get paid well, have time to relax each week, and be respected for your passion for open source, mutual aid, and the commons? Come work with us!
+Do you want to get paid to work on your passion for open source, mutual aid, and the commons, while earning a good livelihood and having great work-life balance? Come work with us at [Open Collective](https://opencollective.com)!
 
 <!--include photo!-->
 
-Join us at [Open Collective](https://opencollective.com/e2c) -- a tech platform that enables a network of 600+ nonprofits, co-ops, and fiscal hosts to support 7000+ groups to raise and spend $35 million each year with full transparency. We love open source, mutual aid, climate justice, and the work of decentralized groups.
+Open Collective is a tech platform that enabled a network of 600+ nonprofits, co-ops, and fiscal hosts to support 7000+ groups to raise and spend $25 million last year with full transparency—and we're growing fast! We love open source, mutual aid, climate justice, and decentralized collaborative groups.
 
 <!--
 <strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>
 -->
 
-We're still hiring for the following roles:
+**We're hiring 2 Senior Software Engineers.**
 
-<ul>
-  <li><a href='#software-engineer'> 2 Senior Software Engineers</a></li>
-  <li><a href='#operations-manager'>Operations Manager</a></li>
-</ul>
-
-Pay is transparent and is based on [where you live](https://docs.google.com/spreadsheets/d/1TvdgSmFbfB6Cj8vnWm01v7wZmo42QpcSvCK8tgIzDW0/edit#gid=165029136).
+Pay is transparent and based on [where you live](https://docs.google.com/spreadsheets/d/1TvdgSmFbfB6Cj8vnWm01v7wZmo42QpcSvCK8tgIzDW0/edit#gid=165029136).
 
 ## But first, a little about us
 
-Open Collective is on a mission to help communities around the world be sustainable. On Open Collective, groups like open source projects, neighbourhood associations, mutual aid groups and more can collect and spend money transparently, invite collaboration, and help their communities thrive.
+On Open Collective, groups like open source projects, neighbourhood associations, mutual aid groups and more can collect and spend money transparently, invite collaboration, and help their communities thrive.
 
 Watch this video about what we do and why we are passionate about it:
 
 <iframe src="https://www.youtube.com/embed/bbtQcW4E_RU?start=39" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen width="854" height="480" frameborder="0"></iframe>
 
-Like the movements that we support, we value openness and transparency. We strive to create inclusive, respectful and sustainable communities and we're 100% Open Source. If you want to know more about us, you can already join our [Slack](https://slack.opencollective.com) and check out the [Open Collective Way](https://docs.opencollective.com/help/about/the-open-collective-way) to learn more about how we operate and what we stand for.
+Like the movements that we support, we value openness and transparency. We strive to create inclusive, respectful and sustainable communities and we're 100% open source. If you want to know more about us, join our open [Slack](https://slack.opencollective.com), read [our blog](https://blog.opencollective.com), and check out the [Open Collective Way](https://docs.opencollective.com/help/about/the-open-collective-way) to understand our values and how we work.
 
-We are a remote-first team that loves distributed leadership and autonomy within collaboration around the world: Aix-en-Provence, Auckland, Brussels, Berlin, Guadalajara, New York, Madrid, Paris, Shropshire, Navi Mumbai, Vancouver and Wellington. This start-up culture is truly different – the culture is one of care, listening, rigor, and autonomy within collaboration. If you are used to cut-throat dynamics and all-nighters, you will be happy to find another world is possible, and it is amazing.
+We are a fully remote team that loves distributed collaboration around the world: Spain, France, Belgium, Germany, Romania, UK, US, Canada, Mexico, Brazil, India, New Zealand. This start-up culture is truly different – one of care, listening, rigor, and autonomy within collaboration. If you are used to cut-throat dynamics and overwork, you will be happy to find another way is possible.
 
 We are building and maintaining money management software for the commons.
 
@@ -41,56 +36,20 @@ We are looking for a senior "full-stack" software engineer who’s excited about
 
 ### We think you’d be great at this if you:
 
-- Are comfortable in a remote environment that is at the same time highly collaborative (we [apply](https://github.com/opencollective/opencollective/issues/2267) a [seeking feedback process](https://reinventingorganizationswiki.com/theory/decision-making/)) and autonomous (you can run a feature end to end on your own!)
+- Are comfortable in a remote environment that is at the same time highly collaborative _and_ autonomous (you can run a feature end to end on your own, while communicating about it!)
 
-- Are based within 6 hours of Central European Time:
-
-  - to optimize timezone overlaps with the current engineering team (who are predominantly based in Europe)
+- Are based within 6 hours of Central European Time (to optimize timezone overlaps with the current engineering team), e.g. Europe, Africa, central Asia, North and South America.
 
 - Have significant experience as a full stack engineer using JavaScript (<em>"senior"</em>)
 
-- Are familiar with the technologies used in our two main projects:
+- Are familiar with our technology stack:
 
-  - our GraphQL API (powered by Node, PostgreSQL and Sequelize)
-  - our Web App (powered by Next.js, React and Apollo).
+  - GraphQL API powered by Node, PostgreSQL and Sequelize
+  - Web app powered by Next.js, React and Apollo
 
 - You are excited about our mission and share our philosophy.
 
-<h2 id='operations-manager'>Operations Manager</h2>
-
-We are looking for an operations manager who is excited about building and enabling a team building and using technology to empower communities.
-
-### We think you’d be great at this if you:
-
-- Are comfortable in a remote environment that is at the same time highly collaborative (we [apply](https://github.com/opencollective/opencollective/issues/2267) a [seeking feedback process](https://reinventingorganizationswiki.com/theory/decision-making/)) and autonomous (you will own complete features and products!)
-
-- Are based within 4 hours of Central European (UTC+1) or New Zealand Standard time (UTC+12):
-
-  - to optimize timezone overlaps with the current platform (based in Europe) or operations team (who are based in New Zealand)
-
-- Have significant experience leading operations at a US-based, non-profit organisation offering fiscal-sponsorship as a service to member projects:
-
-  - Have a solid understanding of the legal and tax compliance issues involved
-  - Are comfortable guiding and working with accounting and legal counsel to meet those requirements
-  - Have a good understanding of employment law and HR policies
-
-- Are comfortable with the processes, tools and risks involved in growing and supporting a community of member projects, including but not limited to:
-
-  - managing contracts, invoices, and payments (we use Xero, HelloSign, Metabse, and _lots_ of spreadsheets)
-  - managing vendor registration and supplier agremeements
-  - working with PEOs to manage employment of contractors and employees, inc. management of benefits
-  - supporting accountants to prepare accounts, file taxes and issue 1099s
-  - supporting leadership to make effective strategic decisions on growth, development, risks and mitigation.
-
-- You have experience working within or adjacent to open source and/or solidarity economy communities, are excited about our mission, and share our philosophy.
-
-<!--
-## Want to apply spontaneously?
--->
-
 ## Interested?
-
-### Senior Software Engineer position
 
 Please [email us](mailto:info@opencollective.com) with "Senior Software Engineer" as subject.
 
@@ -101,15 +60,3 @@ Your message should be convincing enough for us to consider your candidature and
 - Experience. What is your greatest achievment in software engineering? Can you tell us about a past project you're proud of (it doesn’t have to be an engineering one or even a technical one.)? What do you think you can bring to Open Collective?
 
 As part of our screening process, we'll also ask you to make a small contribution to [our codebase](https://github.com/opencollective). Have a look, do one now or be ready for it!
-
-### Senior Product Manager position
-
-Please [email us](mailto:info@opencollective.com) who you are, your experience and skills, and why you’re interested. This can take the form of a traditional CV, a website, video, or however you like to communicate.
-
-### Operations position
-
-Please [email us](mailto:info@opencollective.com) who you are, your experience and skills, and why you’re interested. This can take the form of a traditional CV, a website, video, or however you like to communicate.
-
-## Join us today!
-
-We operate as an open community and everything we do is Open Source. There is always opportunities for volunteer work and also even paid work with our [Bounty Program](https://docs.opencollective.com/help/contributing/development/bounties)! Feel free to join our community on [Slack](https://slack.opencollective.com) and [GitHub](https://github.com/opencollective).

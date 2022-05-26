@@ -14,6 +14,10 @@
             "name": "react-intl",
             "importNames": ["FormattedHTMLMessage"],
             "message": "FormattedHTMLMessage is not allowed, please rely on the standard FormattedMessage."
+          },
+          {
+            "name": "next/link",
+            "message": "Next Link is not supposed to be used direclty. Please use components/Link instead."
           }
         ]
       }

@@ -184,6 +184,11 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={COLLECTIVE_SECTIONS.WEBHOOKS}
             if={isOneOfTypes(collective, [COLLECTIVE, USER, EVENT])}
           />
+          <MenuLink
+            collective={collective}
+            section={COLLECTIVE_SECTIONS.AUTHORIZED_APPS}
+            if={isType(collective, USER)}
+          />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH} if={isIndividual} />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ADVANCED} />
         </MenuGroup>

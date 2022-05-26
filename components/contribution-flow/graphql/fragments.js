@@ -72,8 +72,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
         ...ContributionFlowHostFields
       }
     }
-    ... on Event {
-      endsAt
+    ... on AccountWithParent {
       parent {
         id
         slug
@@ -81,19 +80,14 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
         location {
           id
           country
+        }
+        ... on AccountWithContributions {
+          contributionPolicy
         }
       }
     }
-    ... on Project {
-      parent {
-        id
-        slug
-        settings
-        location {
-          id
-          country
-        }
-      }
+    ... on Event {
+      endsAt
     }
   }
   ${contributionFlowHostFieldsFragment}

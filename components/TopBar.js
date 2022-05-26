@@ -143,7 +143,7 @@ class TopBar extends React.Component {
             <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
               {merged.discover && (
                 <NavLinkContainer>
-                  <Link href="/discover">
+                  <Link href="/search">
                     <NavLink as={Container}>
                       <FormattedMessage id="menu.discover" defaultMessage="Discover" />
                     </NavLink>

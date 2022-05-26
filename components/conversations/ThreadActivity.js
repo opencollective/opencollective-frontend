@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { CheckCircle as CheckIcon } from '@styled-icons/boxicons-regular/CheckCircle';
 import { Ban as RejectedIcon } from '@styled-icons/fa-solid/Ban';
@@ -18,7 +18,7 @@ import DateTime from '../DateTime';
 import { Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import StyledLink from '../StyledLink';
-import { Span } from '../Text';
+import { P, Span } from '../Text';
 
 /**
  * Defines activities display metadata.
@@ -121,6 +121,14 @@ const ACTIVITIES_INFO = {
       defaultMessage: 'Expense marked as spam',
     }),
   },
+  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE: {
+    type: 'warning',
+    icon: UnapprovedIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.MarkedAsIncomplete',
+      defaultMessage: 'Expense marked as incomplete',
+    }),
+  },
 };
 
 const getActivityColor = (activityType, theme) => {
@@ -145,13 +153,16 @@ export const isSupportedActivity = activity => {
   return Object.prototype.hasOwnProperty.call(ACTIVITIES_INFO, activity.type);
 };
 
-const ActivityMessage = styled.div`
+const ActivityParagraph = styled(P)`
+  padding: 10px 12px;
+  border-left: 4px solid ${props => props.activityColor};
+  border-radius: 0;
+`;
+
+const ActivityMessage = styled.span`
   font-size: 10px;
   font-weight: 600;
-  padding: 10px 12px;
-  border-left: 4px solid ${props => props.color};
   background: white;
-  border-radius: 0;
   color: ${props => props.color};
 `;
 
@@ -160,6 +171,8 @@ const ThreadActivity = ({ activity }) => {
   const theme = useTheme();
   const activityColor = getActivityColor(activity.type, theme);
   const message = ACTIVITIES_INFO[activity.type]?.message;
+  const details = activity.data?.message || activity.data?.error?.message;
+
   return (
     <div>
       {activity.individual && (
@@ -184,10 +197,15 @@ const ThreadActivity = ({ activity }) => {
         </Flex>
       )}
       {message && (
-        <ActivityMessage color={activityColor}>
-          {formatMessage(message)}
-          {activity.data?.error?.message ? `: ${activity.data.error.message}` : ''}
-        </ActivityMessage>
+        <ActivityParagraph activityColor={activityColor} mt={1} fontSize="12px" whiteSpace="pre-line">
+          <ActivityMessage color={activityColor}>{formatMessage(message)}</ActivityMessage>
+          {details && (
+            <Fragment>
+              <br />
+              {details}
+            </Fragment>
+          )}
+        </ActivityParagraph>
       )}
     </div>
   );
@@ -202,6 +220,7 @@ ThreadActivity.propTypes = {
       error: PropTypes.shape({
         message: PropTypes.string,
       }),
+      message: PropTypes.string,
     }),
     individual: PropTypes.shape({
       id: PropTypes.string.isRequired,

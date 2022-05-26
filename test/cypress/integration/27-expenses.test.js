@@ -93,6 +93,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('toast-notification').should('not.exist');
 
       // Start editing
+      cy.getByDataCy('more-actions').click();
       cy.getByDataCy('edit-expense-btn').click();
       cy.getByDataCy('expense-next').click();
       cy.get('input[name="description"]').type(' edited');
@@ -431,7 +432,8 @@ describe('New expense flow', () => {
       // ---- 2. Edit VAT rate ----
 
       // Start editing
-      cy.get('[data-cy="edit-expense-btn"]:visible').click();
+      cy.getByDataCy('more-actions').click();
+      cy.getByDataCy('edit-expense-btn').click({ force: true });
       cy.getByDataCy('expense-next').click();
 
       // Add new item
@@ -455,7 +457,8 @@ describe('New expense flow', () => {
 
       // ---- 3. Remove VAT ----
       // Start editing
-      cy.get('[data-cy="edit-expense-btn"]:visible').click();
+      cy.get('[data-cy="more-actions"]:visible').click();
+      cy.getByDataCy('edit-expense-btn').click({ force: true });
       cy.getByDataCy('expense-next').click();
 
       // Disable VAT
@@ -518,6 +521,28 @@ describe('New expense flow', () => {
       cy.url().should('eq', `${Cypress.config().baseUrl}/${collective.slug}/expenses`);
       cy.visit(expenseUrl);
       cy.getByDataCy('error-page').contains('Not found');
+    });
+
+    it('Displays expense policy', () => {
+      cy.login({ email: user.email, redirect: expenseUrl });
+      cy.get('[data-cy="edit-collective-btn"]:visible').click();
+      cy.getByDataCy('menu-item-policies').click();
+      cy.getByDataCy('expense-policy-input').type('this is my test expense policy');
+      cy.getByDataCy('submit-policy-btn').click();
+      cy.visit(expenseUrl);
+      cy.get('[data-cy="collective-navbar-actions-btn"]:visible').click();
+      cy.getByDataCy('submit-expense-dropdown').click();
+      cy.getByDataCy('expense-policy-html').contains('this is my test expense policy');
+    });
+
+    it('Projects inherit and display expense policy from parent collective', () => {
+      cy.login({ email: user.email, redirect: `/${collective.slug}/admin/policies` });
+      cy.getByDataCy('expense-policy-input').type('this is my test expense policy');
+      cy.getByDataCy('submit-policy-btn').click();
+      cy.createProject({ userEmail: user.email, collective }).then(project => {
+        cy.visit(`/${project.slug}/expenses/new`);
+        cy.getByDataCy('expense-policy-html').contains('this is my test expense policy');
+      });
     });
   });
 });

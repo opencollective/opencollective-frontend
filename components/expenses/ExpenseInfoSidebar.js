@@ -64,7 +64,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
                   </Span>
                   <br />
                   <LinkCollective collective={host}>
-                    {collective && (collective.isApproved || collective.id === host.id) ? (
+                    {collective && collective.isApproved ? (
                       host.name
                     ) : (
                       <FormattedMessage
@@ -102,6 +102,7 @@ ExpenseInfoSidebar.propTypes = {
     id: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     type: PropTypes.string,
+    parent: PropTypes.object,
     isApproved: PropTypes.bool,
     stats: PropTypes.shape({
       balanceWithBlockedFunds: PropTypes.shape({

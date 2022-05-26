@@ -95,7 +95,7 @@ const MoreFeatures = () => (
           <P fontSize="18px" lineHeight="26px" color="black.700" fontWeight="500">
             <FormattedMessage
               id="howItWorks.virtualCards.description"
-              defaultMessage="Spend money anywhere you’d use a credit or debit card online, linked directly to your Open Collective funds (this beta feature is only available to certain fiscal hosts)"
+              defaultMessage="Spend money anywhere you’d use a credit or debit card online, linked directly to your Open Collective funds (this beta feature is only available to certain fiscal hosts)."
             />
           </P>
         </Box>

@@ -24,7 +24,6 @@ import CommentForm from '../components/conversations/CommentForm';
 import { commentFieldsFragment } from '../components/conversations/graphql';
 import Thread from '../components/conversations/Thread';
 import ErrorPage from '../components/ErrorPage';
-import ExpenseAdminActions from '../components/expenses/ExpenseAdminActions';
 import ExpenseAttachedFiles from '../components/expenses/ExpenseAttachedFiles';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
@@ -475,7 +474,6 @@ class ExpensePage extends React.Component {
     const isDraft = expense?.status === expenseStatus.DRAFT;
     const hasAttachedFiles = (isInvoiceOrSettlement && canSeeInvoiceInfo) || expense?.attachedFiles?.length > 0;
     const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
-    const hasHeaderMsg = error || showTaxFormMsg;
     const isMissingReceipt =
       expense?.status === expenseStatus.PAID &&
       expense?.type === expenseTypes.CHARGE &&
@@ -506,25 +504,7 @@ class ExpensePage extends React.Component {
           callsToAction={{ hasSubmitExpense: status === PAGE_STATUS.VIEW }}
         />
         <Flex flexDirection={['column', 'row']} my={[4, 5]} data-cy="expense-page-content">
-          <Container
-            display={['none', null, null, 'flex']}
-            justifyContent="flex-end"
-            width={SIDE_MARGIN_WIDTH}
-            minWidth={90}
-            pt={hasHeaderMsg ? 240 : 80}
-          >
-            <Flex flexDirection="column" alignItems="center" width={90}>
-              {status === PAGE_STATUS.VIEW && (
-                <ExpenseAdminActions
-                  expense={expense}
-                  collective={collective}
-                  permissions={expense?.permissions}
-                  onError={error => this.setState({ error })}
-                  onEdit={this.onEditBtnClick}
-                />
-              )}
-            </Flex>
-          </Container>
+          <Box width={SIDE_MARGIN_WIDTH}></Box>
           <Box
             flex="1 1 650px"
             minWidth={300}
@@ -573,7 +553,6 @@ class ExpensePage extends React.Component {
                   isEditing={status === PAGE_STATUS.EDIT_SUMMARY}
                   isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
                   collective={collective}
-                  onError={error => this.setState({ error })}
                   onEdit={this.onEditBtnClick}
                   onDelete={this.onDelete}
                   suggestedTags={this.getSuggestedTags(collective)}

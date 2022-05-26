@@ -559,7 +559,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
         currency
         stats {
           id
-          totalAmountReceived {
+          totalAmountReceived(useCache: true) {
             currency
             valueInCents
           }

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { pick } from 'lodash';
-import NextLink from 'next/link';
+import NextLink from 'next/link'; // eslint-disable-line no-restricted-imports
 import { Scrollchor } from 'react-scrollchor';
 
 class Link extends React.Component {

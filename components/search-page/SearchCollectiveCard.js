@@ -15,8 +15,6 @@ import StyledCollectiveCard from './StyledCollectiveCard';
 
 /**
  * A card to show a collective on the search page.
- *
- * TODO: This component is mostly copies from ../DiscoverCollectiveCard.js added until we completely deprecate the discover page.
  */
 const SearchCollectiveCard = ({ collective, ...props }) => {
   return (
@@ -113,13 +111,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
 
 SearchCollectiveCard.propTypes = {
   collective: PropTypes.shape({
-    type: PropTypes.oneOf([
-      CollectiveType.COLLECTIVE,
-      CollectiveType.ORGANIZATION,
-      CollectiveType.EVENT,
-      CollectiveType.PROJECT,
-      CollectiveType.FUND,
-    ]).isRequired,
+    type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
     currency: PropTypes.string,
     description: PropTypes.string,
     isHost: PropTypes.bool,
