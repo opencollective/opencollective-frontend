@@ -217,10 +217,6 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
     value: n,
     label: formatMessage(messages['requiredAdmins.numberOfAdmins'], { admins: n }),
   }));
-  const minAdminsApplies = [
-    { value: 'NEW_COLLECTIVES', label: <FormattedMessage defaultMessage="New Collectives Only" /> },
-    { value: 'ALL_COLLECTIVES', label: <FormattedMessage defaultMessage="All Collectives" /> },
-  ];
 
   return (
     <Flex flexDirection="column">
@@ -338,43 +334,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                 )}
               />
             </StyledInputField>
-            <StyledInputField
-              disabled={isSubmittingSettings}
-              labelFontSize="13px"
-              labelFontWeight="700"
-              label={<FormattedMessage defaultMessage="Whom does this apply to" />}
-              flexGrow={1}
-            >
-              <StyledSelect
-                inputId="applies"
-                isSearchable={false}
-                options={minAdminsApplies}
-                onChange={option =>
-                  formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
-                    ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
-                    applies: option.value,
-                  })
-                }
-                value={minAdminsApplies.find(
-                  option => option.value === formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.applies,
-                )}
-              />
-            </StyledInputField>
           </Flex>
-          <StyledCheckbox
-            name="minAdminsFreeze"
-            label={<FormattedMessage defaultMessage="Freeze collectives that don’t meet the minimum requirement" />}
-            onChange={({ checked }) => {
-              formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
-                ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
-                freeze: checked,
-              });
-            }}
-            checked={Boolean(formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze)}
-          />
-          <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
-            <FormattedMessage defaultMessage="Freezing the collective will prevent them from accepting and distributing contributions till they meet the requirements. This is a security measure to make sure the admins are within their rights. Read More." />
-          </P>
         </Container>
         <Container>
           <SettingsSectionTitle mt={4}>
