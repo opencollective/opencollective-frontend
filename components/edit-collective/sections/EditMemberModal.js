@@ -78,7 +78,7 @@ const removeMemberMutation = gqlV2/* GraphQL */ `
 `;
 
 const EditMemberModal = props => {
-  const { intl, member, collective, isLastAdmin, cancelHandler, LoggedInUser, refetchLoggedInUser } = props;
+  const { intl, member, collective, canRemove, isLastAdmin, cancelHandler, LoggedInUser, refetchLoggedInUser } = props;
 
   const { addToast } = useToasts();
 
@@ -291,7 +291,7 @@ const EditMemberModal = props => {
             ) : (
               <StyledButton
                 mt={4}
-                disabled={false}
+                disabled={!canRemove}
                 buttonSize="tiny"
                 buttonStyle="dangerSecondary"
                 data-cy="remove-member"
@@ -344,6 +344,11 @@ EditMemberModal.propTypes = {
   LoggedInUser: PropTypes.object.isRequired,
   refetchLoggedInUser: PropTypes.func.isRequired,
   router: PropTypes.object,
+  canRemove: PropTypes.bool,
+};
+
+EditMemberModal.defaultProps = {
+  canRemove: true,
 };
 
 export default withRouter(EditMemberModal);

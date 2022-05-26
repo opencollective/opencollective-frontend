@@ -52,6 +52,7 @@ export const adminPanelQuery = gqlV2/* GraphQL */ `
           slug
           name
           settings
+          policies
         }
       }
       ... on AccountWithHost {
