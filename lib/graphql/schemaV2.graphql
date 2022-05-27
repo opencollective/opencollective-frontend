@@ -6213,11 +6213,6 @@ type OAuthAuthorization {
   The time of expiration
   """
   expiresAt: DateTime!
-
-  """
-  The account that created this authorization
-  """
-  createdByAccount: Individual!
 }
 
 """
@@ -7512,6 +7507,12 @@ type Query {
     """
     draftKey: String
   ): Expense
+  emailExists(
+    """
+    Email of user
+    """
+    email: String
+  ): Boolean
   expenses(
     """
     The number of results to fetch (default 10, max 1000)
