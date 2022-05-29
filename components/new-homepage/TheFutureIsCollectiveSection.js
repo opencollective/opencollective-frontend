@@ -1,11 +1,11 @@
 import React, { Fragment, useState } from 'react';
 import { RightArrow } from '@styled-icons/boxicons-regular/RightArrow';
-import Link from 'next/link';
 import { FormattedMessage } from 'react-intl';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledModal from '../StyledModal';
 import { H1, P, Span } from '../Text';
