@@ -43,12 +43,16 @@ const MemberForm = props => {
   const initialValues = {
     description: get(member, 'description') || '',
     role: get(member, 'role') || roles.ADMIN,
-    since: get(member, 'since') ? new Date(get(member, 'since')).toISOString() : new Date().toISOString(),
+    since: get(member, 'since')
+      ? dayjs(get(member, 'since')).format('YYYY-MM-DD')
+      : dayjs(new Date()).format('YYYY-MM-DD'),
   };
 
   const submit = values => {
-    values.since = dayjs(values.since).toISOString();
-    triggerSubmit(values);
+    triggerSubmit({
+      ...values,
+      since: dayjs(values.since).toISOString(),
+    });
   };
 
   const getOptions = arr => {
@@ -139,13 +143,16 @@ const MemberForm = props => {
                 label={<P fontWeight="bold">{intl.formatMessage(memberFormMessages.sinceLabel)}</P>}
                 mt={3}
               >
-                {({ field }) => (
+                {({ form, field }) => (
                   <StyledInput
                     {...field}
-                    min={'1970-01-01'}
-                    max={'2100-01-01'}
                     required
-                    value={field.value?.split('T')[0]}
+                    onChange={event => {
+                      if (event.target.value) {
+                        form.setFieldValue(field.name, event.target.value);
+                      }
+                    }}
+                    value={field.value}
                   />
                 )}
               </StyledInputFormikField>
