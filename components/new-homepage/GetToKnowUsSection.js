@@ -24,13 +24,18 @@ const StyledListItem = styled(ListItem)`
     width: 1em;
     margin-left: -1em;
   }
+
+  a:hover {
+    text-decoration: underline;
+    text-decoration-color: #1869f5;
+  }
 `;
 
 const GetToKnowUs = () => {
   return (
     <Flex flexDirection="column" px="16px" justifyContent="center" alignItems="center">
       <Flex flexDirection="column" alignItems="center">
-        <Box width={['288px', '700px', '880px']}>
+        <Box maxWidth={['288px', '700px', '880px']}>
           <H2
             letterSpacing={['-0.008em', '-0.04em']}
             fontSize={['32px', '40px', '52px']}
@@ -43,7 +48,7 @@ const GetToKnowUs = () => {
             <FormattedMessage id="home.getToKnowUs" defaultMessage="Get to know us." />
           </H2>
         </Box>
-        <Box width={['288px', '700px', '768px']}>
+        <Box maxWidth={['288px', '700px', '768px']}>
           <P
             fontSize={['18px', '20px']}
             letterSpacing={[null, '-0.008em']}
@@ -61,7 +66,7 @@ const GetToKnowUs = () => {
       </Flex>
       <Flex flexDirection={['column', 'row']} my="32px">
         <Container
-          width={['288px', '342px', '470px', null, '536px']}
+          maxWidth={['288px', '342px', '470px', null, '536px']}
           py="48px"
           px="32px"
           border="2px solid"
@@ -72,66 +77,94 @@ const GetToKnowUs = () => {
           <H3 fontSize={['32px']} lineHeight={['40px']} letterSpacing={['-0.008em']} color="primary.900">
             <FormattedMessage id="home.exploreAndLearn" defaultMessage={'Explore and learn'} />
           </H3>
-          <P my="24px" fontSize="18px" lineHeight="26px" fontWeight="500" color="black.800">
+          <P my="24px" fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" color="black.800">
             <FormattedMessage
               defaultMessage={'Check out these amazing Collectives—explore their transparent budgets and activities.'}
             />
           </P>
           <ListContainer>
-            <StyledListItem fontSize="18px" lineHeight="26px" fontWeight="500" color="black.800" mb="24px">
+            <StyledListItem
+              fontSize="20px"
+              lineHeight="28px"
+              letterSpacing="-0.008em"
+              fontWeight="500"
+              color="black.800"
+              mb="24px"
+            >
               <FormattedMessage
                 values={{
                   link: getI18nLink({
                     href: 'https://blog.opencollective.com',
                     openInNewTab: true,
                     color: 'black.800',
+                    textDecoration: 'underline',
                   }),
-                  u: I18nUnderline,
                 }}
-                defaultMessage={'<link><u>Read our blog</u></link>'}
+                defaultMessage={'<link>Read our blog</link>'}
               />
             </StyledListItem>
-            <StyledListItem fontSize="18px" lineHeight="26px" fontWeight="500" color="black.800" mb="24px">
+            <StyledListItem
+              fontSize="20px"
+              lineHeight="28px"
+              letterSpacing="-0.008em"
+              fontWeight="500"
+              color="black.800"
+              mb="24px"
+            >
               <FormattedMessage
                 values={{
                   link: getI18nLink({
                     href: '/e2c',
                     color: 'black.800',
+                    textDecoration: 'underline',
                   }),
                   u: I18nUnderline,
                 }}
-                defaultMessage={'<link><u>Our exit strategy</u></link>'}
+                defaultMessage={'<link>Our exit strategy</link>'}
               />
             </StyledListItem>
-            <StyledListItem fontSize="18px" lineHeight="26px" fontWeight="500" color="black.800" mb="24px">
+            <StyledListItem
+              fontSize="20px"
+              lineHeight="28px"
+              letterSpacing="-0.008em"
+              fontWeight="500"
+              color="black.800"
+              mb="24px"
+            >
               <FormattedMessage
                 values={{
                   link: getI18nLink({
                     href: '/become-a-sponsor',
                     color: 'black.800',
+                    textDecoration: 'underline',
                   }),
-                  u: I18nUnderline,
                 }}
-                defaultMessage={'<link><u>More about Sponsors</u></link>'}
+                defaultMessage={'<link>More about Sponsors</link>'}
               />
             </StyledListItem>
-            <StyledListItem fontSize="18px" lineHeight="26px" fontWeight="500" color="black.800">
+            <StyledListItem
+              fontSize="20px"
+              lineHeight="28px"
+              letterSpacing="-0.008em"
+              fontWeight="500"
+              color="black.800"
+            >
               <FormattedMessage
                 values={{
                   link: getI18nLink({
                     href: 'https://blog.opencollective.com/tag/case-studies/',
                     openInNewTab: true,
                     color: 'black.800',
+                    textDecoration: 'underline',
                   }),
-                  u: I18nUnderline,
                 }}
-                defaultMessage={'<link><u>Communities that use Open Collective</u></link>'}
+                defaultMessage={'<link>Communities that use Open Collective</link>'}
               />
             </StyledListItem>
           </ListContainer>
         </Container>
         <Container
-          width={['288px', '342px', '470px', null, '536px']}
+          maxWidth={['288px', '342px', '470px', null, '536px']}
           py="48px"
           px="32px"
           border="2px solid"
@@ -142,60 +175,87 @@ const GetToKnowUs = () => {
           <H3 fontSize={['32px']} lineHeight={['40px']} letterSpacing={['-0.008em']} color="primary.900">
             <FormattedMessage id="home.helpAndSupport" defaultMessage={'Help and support'} />
           </H3>
-          <P my="24px" fontSize="18px" lineHeight="26px" fontWeight="500" color="black.800">
+          <P my="24px" fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" color="black.800">
             <FormattedMessage
               defaultMessage={'Check out these amazing Collectives—explore their transparent budgets and activities.'}
             />
           </P>
           <ListContainer>
-            <StyledListItem fontSize="18px" lineHeight="26px" fontWeight="500" color="black.800" mb="24px">
+            <StyledListItem
+              fontSize="20px"
+              lineHeight="28px"
+              letterSpacing="-0.008em"
+              fontWeight="500"
+              color="black.800"
+              mb="24px"
+            >
               <FormattedMessage
                 values={{
                   link: getI18nLink({
                     href: '/help',
                     color: 'black.800',
+                    textDecoration: 'underline',
                   }),
-                  u: I18nUnderline,
                 }}
-                defaultMessage={'<link><u>Visit the support page</u></link>'}
+                defaultMessage={'<link>Visit the support page</link>'}
               />
             </StyledListItem>
-            <StyledListItem fontSize="18px" lineHeight="26px" fontWeight="500" color="black.800" mb="24px">
+            <StyledListItem
+              fontSize="20px"
+              lineHeight="28px"
+              letterSpacing="-0.008em"
+              fontWeight="500"
+              color="black.800"
+              mb="24px"
+            >
               <FormattedMessage
                 values={{
                   link: getI18nLink({
                     href: 'https://docs.opencollective.com',
                     openInNewTab: true,
                     color: 'black.800',
+                    textDecoration: 'underline',
                   }),
-                  u: I18nUnderline,
                 }}
-                defaultMessage={'<link><u>Read through our documentation</u></link>'}
+                defaultMessage={'<link>Read through our documentation</link>'}
               />
             </StyledListItem>
-            <StyledListItem fontSize="18px" lineHeight="26px" fontWeight="500" color="black.800" mb="24px">
+            <StyledListItem
+              fontSize="20px"
+              lineHeight="28px"
+              letterSpacing="-0.008em"
+              fontWeight="500"
+              color="black.800"
+              mb="24px"
+            >
               <FormattedMessage
                 values={{
                   link: getI18nLink({
                     href: 'https://slack.opencollective.com/',
                     openInNewTab: true,
                     color: 'black.800',
+                    textDecoration: 'underline',
                   }),
-                  u: I18nUnderline,
                 }}
-                defaultMessage={'<link><u>Slack and email</u></link>'}
+                defaultMessage={'<link>Slack and email</link>'}
               />
             </StyledListItem>
-            <StyledListItem fontSize="18px" lineHeight="26px" fontWeight="500" color="black.800">
+            <StyledListItem
+              fontSize="20px"
+              lineHeight="28px"
+              letterSpacing="-0.008em"
+              fontWeight="500"
+              color="black.800"
+            >
               <FormattedMessage
                 values={{
                   link: getI18nLink({
                     href: '/pricing',
                     color: 'black.800',
+                    textDecoration: 'underline',
                   }),
-                  u: I18nUnderline,
                 }}
-                defaultMessage={'<link><u>Pricing and Business Model</u></link>'}
+                defaultMessage={'<link>Pricing and Business Model</link>'}
               />
             </StyledListItem>
           </ListContainer>

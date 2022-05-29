@@ -29,7 +29,7 @@ const TheFutureIsCollective = () => {
               <FormattedMessage id="home.futureIsCollective" defaultMessage={'The future is collective.'} />
             </H1>
           </Box>
-          <Box my={[4, '40px']} width={['288px', '768px', '780px']}>
+          <Box my={[4, '40px']} maxWidth={['288px', '768px', '780px']}>
             <P
               fontSize={['16px', '20px', null, null, '18px']}
               letterSpacing={[null, '-0.008em', null, null, '-0.2px']}
@@ -66,7 +66,7 @@ const TheFutureIsCollective = () => {
               my={['12px', null, 0]}
               width={['288px', '196px']}
               fontSize="16px"
-              lineHeight="20px" // TODO Fix border color and text decoration
+              lineHeight="20px"
             >
               <Span mr={'14px'} textDecoration="underline">
                 <FormattedMessage id="home.makeCommunitySection.watchVideo" defaultMessage="Watch Video" />
@@ -94,8 +94,8 @@ const TheFutureIsCollective = () => {
           </Box>
           <Box display={['none', null, 'block']}>
             <NextIllustration
-              width={956}
-              height={552}
+              width={992}
+              height={561}
               alt="The future is collective."
               src="/static/images/new-home/budget-illustration-md.png"
             />
@@ -114,7 +114,7 @@ const TheFutureIsCollective = () => {
               title="YouTube video"
               width="100%"
               height="400px"
-              src="https://www.youtube.com/embed/IBU5fSILAe8"
+              src="https://www.youtube-nocookie.com/embed/IBU5fSILAe8"
               frameBorder="0"
               allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

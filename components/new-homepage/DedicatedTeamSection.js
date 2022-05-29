@@ -11,8 +11,8 @@ import { H2, P } from '../Text';
 const DedicatedTeam = () => {
   return (
     <Flex flexDirection="column" justifyContent="center" alignItems="center">
-      <Flex flexDirection="column" alignItems="center" px="16px" mb={[0, '50px']}>
-        <Box width={['288px', '700px', '880px']}>
+      <Flex flexDirection="column" alignItems="center" px="16px" mb={[0, '73px']}>
+        <Box maxWidth={['288px', '700px', '880px']}>
           <H2
             letterSpacing={['-0.008em', '-0.04em']}
             fontSize={['32px', '40px', '52px']}
@@ -28,7 +28,7 @@ const DedicatedTeam = () => {
             />
           </H2>
         </Box>
-        <Box width={['288px', '700px', '768px']}>
+        <Box maxWidth={['288px', '700px', '768px']}>
           <P
             fontSize={['18px', '20px']}
             letterSpacing={[null, '-0.008em']}
@@ -46,7 +46,7 @@ const DedicatedTeam = () => {
           </P>
         </Box>
       </Flex>
-      <Flex flexDirection="column" alignItems="center">
+      <Flex flexDirection="column" alignItems="center" maxWidth="100%" overflow="hidden">
         <Container
           width={[null, '768px', '1024px', null, '1176px']}
           display={[null, 'flex']}
