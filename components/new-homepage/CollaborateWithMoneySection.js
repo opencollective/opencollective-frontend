@@ -1,7 +1,7 @@
 import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { Box, Flex, Grid } from '../Grid';
+import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
 import { H2, H5, P } from '../Text';
 
@@ -56,12 +56,12 @@ const CollaborateWithMoney = () => {
   const intl = useIntl();
 
   return (
-    <Flex px="16px" flexDirection="column" alignItems="center" my={4}>
+    <Flex px="16px" flexDirection="column" alignItems="center" my="64px">
       <Flex flexDirection={['column', 'row']} alignItems="center">
         <Box width={['206px']}>
           <NextIllustration src="/static/images/new-home/collaborate-with-money.png" width={239} height={257} />
         </Box>
-        <Box width={['288px', '421px', '594px']} textAlign={['center', 'left']} ml={[null, '40px']}>
+        <Box maxWidth={['288px', '421px', '594px']} textAlign={['center', 'left']} ml={[null, '40px']}>
           <H2
             letterSpacing={['-0.008em', '-0.04em']}
             fontSize={['32px', '40px']}
@@ -87,15 +87,21 @@ const CollaborateWithMoney = () => {
           </P>
         </Box>
       </Flex>
-      <Grid
+      <Flex
+        flexDirection={['column', 'row']}
+        flexWrap="wrap"
+        my="48px"
+        mb={[null, null, 0]}
+        maxWidth={['288px', '724px', '1024px', null, '1280px']}
         justifyContent="center"
-        gridGap={['24px', null, '46px', null, '112px']}
-        gridTemplateColumns={[null, `repeat(3, 1fr)`, `repeat(3, 288px)`]}
-        mt="50px"
-        width={[null, '700px', 1]}
       >
         {features.map(feature => (
-          <Box key={feature} mb={4} width={['288px', 1]}>
+          <Box
+            key={feature}
+            mb={[4, null, '78px']}
+            width={['288px', '195px', '288px']}
+            mx={[null, '12px', '23px', null, '56px']}
+          >
             <Box mb="18px">
               <NextIllustration
                 width={56}
@@ -114,7 +120,7 @@ const CollaborateWithMoney = () => {
             </Box>
           </Box>
         ))}
-      </Grid>
+      </Flex>
     </Flex>
   );
 };

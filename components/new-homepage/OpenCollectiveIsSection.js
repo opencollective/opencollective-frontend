@@ -13,22 +13,19 @@ import { H2, H3, P } from '../Text';
 import NetworkOfCollectives from './NetworkOfCollecetives';
 
 const OvalShapeWrapper = styled(Container)`
-  border-radius: 50% / 4%;
-  border-bottom-right-radius: 50px;
-  border-bottom-left-radius: 50px;
-
-  @media screen and (min-width: 40em) {
-    border-radius: 80% / 2%;
-    border-bottom-right-radius: 50px;
-    border-bottom-left-radius: 50px;
-  }
+  background-image: url('/static/images/new-home/oval-bg.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-bottom-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+  background-position-x: center;
 `;
 
 const OpenCollectiveIs = () => {
   return (
     <Flex flexDirection="column" alignItems="center" mt="48px">
       <Flex px="16px" justifyContent="center" alignItems="center">
-        <Box width="288px" mb="135px">
+        <Box width={['288px', 1]} mb="135px">
           <H2
             letterSpacing={['-0.008em', '-0.04em']}
             fontSize={['32px', '40px', '52px']}
@@ -58,7 +55,6 @@ const OpenCollectiveIs = () => {
       <OvalShapeWrapper
         minHeight="500px"
         width="100%"
-        backgroundColor="primary.900"
         position="relative"
         display="flex"
         flexDirection="column"
@@ -132,7 +128,7 @@ const OpenCollectiveIs = () => {
           <Box display={['none', 'block']} width="100%">
             <ApplyToHostGrid color="white.full" />
           </Box>
-          <StyledLink as={Link} buttonStyle="standard" mt="48px" buttonSize="medium" href="/discover">
+          <StyledLink as={Link} buttonStyle="standard" mt="48px" mb="64px" buttonSize="medium" href="/discover">
             <FormattedMessage id="home.discoverMoreHome" defaultMessage="Discover More Hosts" />
           </StyledLink>
         </Flex>
