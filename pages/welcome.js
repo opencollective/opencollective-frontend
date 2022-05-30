@@ -1,5 +1,5 @@
 import React from 'react';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import Container from '../components/Container';
 import { Box, Flex } from '../components/Grid';
@@ -10,42 +10,15 @@ import StyledCard from '../components/StyledCard';
 import StyledLink from '../components/StyledLink';
 import { useUser } from '../components/UserProvider';
 
-const messages = defineMessages({
-  welcomeMessage: {
-    defaultMessage: 'Welcome to Open Collective!',
-  },
-  welcomeDescription: {
-    defaultMessage:
-      'Now that you have created your personal account, there are a couple of things you can do from here...',
-  },
-  createCollectiveDescription: {
-    defaultMessage:
-      'Create a Collective to be able to accept donations, apply for grants, and manage your budget transparently.',
-  },
-  createOrgDescription: {
-    defaultMessage:
-      'Create a profile for your business to appear as financial contributor, enable your employees to contribute on behalf of your company, and more.',
-  },
-  engageHeading: {
-    defaultMessage: 'Contribute and engage with more Collectives',
-  },
-  engageDescription: {
-    defaultMessage:
-      'Discover active Collectives in the platform, contribute and engage with the communities that represent you.',
-  },
-  goToSettings: {
-    defaultMessage: 'Go to settings',
-  },
-  viewDocs: {
-    defaultMessage: 'View documentation',
-  },
-});
+import Custom404 from './404';
 
 const Welcome = () => {
-  const { formatMessage } = useIntl();
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser, loadingLoggedInUser } = useUser();
+  if (!loadingLoggedInUser && !LoggedInUser) {
+    return <Custom404 />;
+  }
   return (
-    <Page description={formatMessage(messages.welcomeMessage)}>
+    <Page title="Welcome to Open Collective!">
       <Flex flexDirection={['column', 'row']} mb="61px" mt="112px" justifyContent="center" alignItems="center">
         <Flex alignItems="center" mr={[0, '64px']} flexDirection={['column', 'row']}>
           <Box>
@@ -58,10 +31,10 @@ const Welcome = () => {
           </Box>
           <Container pl="16px" pr={['16px', 0]} width={['100%', '404px']}>
             <Flex fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
-              {formatMessage(messages.welcomeMessage)}
+              <FormattedMessage defaultMessage="Welcome to Open Collective!" />
             </Flex>
             <Flex fontSize="18px" fontWeight="400" color="black.800" lineHeight="26px" pt="14px">
-              {formatMessage(messages.welcomeDescription)}
+              <FormattedMessage defaultMessage="Now that you have created your personal account, there are a couple of things you can do from here..." />
             </Flex>
           </Container>
         </Flex>
@@ -87,7 +60,7 @@ const Welcome = () => {
                     <FormattedMessage id="collective.create" defaultMessage="Create Collective" />
                   </Flex>
                   <Flex fontSize="15px" fontWeight="500" color="black.700" lineHeight="22px" pt="14px">
-                    {formatMessage(messages.createCollectiveDescription)}
+                    <FormattedMessage defaultMessage="Create a Collective to be able to accept donations, apply for grants, and manage your budget transparently." />
                   </Flex>
                 </Box>
                 <Box pl="39px">
@@ -104,7 +77,7 @@ const Welcome = () => {
                     <FormattedMessage id="organization.create" defaultMessage="Create Organization" />
                   </Flex>
                   <Flex fontSize="15px" fontWeight="500" color="black.700" lineHeight="22px" pt="14px">
-                    {formatMessage(messages.createOrgDescription)}
+                    <FormattedMessage defaultMessage="Create a profile for your business to appear as financial contributor, enable your employees to contribute on behalf of your company, and more." />
                   </Flex>
                 </Box>
                 <Box pl="39px">
@@ -118,10 +91,10 @@ const Welcome = () => {
               <Flex alignItems="center" p="13px">
                 <Box width="386px">
                   <Flex fontSize="18px" fontWeight="700" color="black.900" lineHeight="26px">
-                    {formatMessage(messages.engageHeading)}
+                    <FormattedMessage defaultMessage="Contribute and engage with more Collectives" />
                   </Flex>
                   <Flex fontSize="15px" fontWeight="500" color="black.700" lineHeight="22px" pt="14px">
-                    {formatMessage(messages.engageDescription)}
+                    <FormattedMessage defaultMessage="Discover active Collectives in the platform, contribute and engage with the communities that represent you." />
                   </Flex>
                 </Box>
                 <Box pl="39px">
@@ -131,10 +104,14 @@ const Welcome = () => {
             </Container>
           </Link>
           <Flex justifyContent="space-between" width={['100%', '472px']} pl="13px" pr="13px" pb="32px" pt="40px">
-            <StyledLink href={`${LoggedInUser?.collective?.slug}/admin`}>
-              {formatMessage(messages.goToSettings)}
+            {LoggedInUser && (
+              <StyledLink href={`${LoggedInUser.collective?.slug}/admin`}>
+                <FormattedMessage defaultMessage="Go to settings" />
+              </StyledLink>
+            )}
+            <StyledLink href={`/help`}>
+              <FormattedMessage defaultMessage="View documentation" />
             </StyledLink>
-            <StyledLink href={`/help`}>{formatMessage(messages.viewDocs)}</StyledLink>
           </Flex>
         </StyledCard>
       </Flex>
