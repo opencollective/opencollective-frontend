@@ -1,14 +1,15 @@
 import React from 'react';
+import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
-import { getI18nLink, I18nUnderline } from '../I18nFormatters';
 import Link from '../Link';
 import ListItem from '../ListItem';
 import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
 import { H2, H3, H5, P } from '../Text';
 
 const ListContainer = styled.ul`
@@ -18,16 +19,21 @@ const ListContainer = styled.ul`
 const StyledListItem = styled(ListItem)`
   &::before {
     content: '• ';
-    color: #1869f5;
+    color: ${themeGet('colors.primary.600')};
     font-weight: bold;
     display: inline-block;
     width: 1em;
     margin-left: -1em;
   }
 
+  a {
+    text-decoration-color: ${themeGet('colors.black.500')};
+  }
+
   a:hover {
+    color: ${themeGet('colors.black.800')};
     text-decoration: underline;
-    text-decoration-color: #1869f5;
+    text-decoration-color: ${themeGet('colors.primary.600')};
   }
 `;
 
@@ -83,25 +89,15 @@ const GetToKnowUs = () => {
             />
           </P>
           <ListContainer>
-            <StyledListItem
-              fontSize="20px"
-              lineHeight="28px"
-              letterSpacing="-0.008em"
-              fontWeight="500"
-              color="black.800"
-              mb="24px"
-            >
-              <FormattedMessage
-                values={{
-                  link: getI18nLink({
-                    href: 'https://blog.opencollective.com',
-                    openInNewTab: true,
-                    color: 'black.800',
-                    textDecoration: 'underline',
-                  }),
-                }}
-                defaultMessage={'<link>Read our blog</link>'}
-              />
+            <StyledListItem fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" mb="24px">
+              <StyledLink
+                color="black.800"
+                href="https://blog.opencollective.com"
+                openInNewTab
+                textDecoration="underline"
+              >
+                <FormattedMessage defaultMessage={'Read our blog'} />
+              </StyledLink>
             </StyledListItem>
             <StyledListItem
               fontSize="20px"
@@ -111,36 +107,14 @@ const GetToKnowUs = () => {
               color="black.800"
               mb="24px"
             >
-              <FormattedMessage
-                values={{
-                  link: getI18nLink({
-                    href: '/e2c',
-                    color: 'black.800',
-                    textDecoration: 'underline',
-                  }),
-                  u: I18nUnderline,
-                }}
-                defaultMessage={'<link>Our exit strategy</link>'}
-              />
+              <StyledLink color="black.800" href="/e2c" textDecoration="underline">
+                <FormattedMessage defaultMessage={'Our exit strategy'} />
+              </StyledLink>
             </StyledListItem>
-            <StyledListItem
-              fontSize="20px"
-              lineHeight="28px"
-              letterSpacing="-0.008em"
-              fontWeight="500"
-              color="black.800"
-              mb="24px"
-            >
-              <FormattedMessage
-                values={{
-                  link: getI18nLink({
-                    href: '/become-a-sponsor',
-                    color: 'black.800',
-                    textDecoration: 'underline',
-                  }),
-                }}
-                defaultMessage={'<link>More about Sponsors</link>'}
-              />
+            <StyledListItem fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" mb="24px">
+              <StyledLink color="black.800" href="/become-a-sponsor" textDecoration="underline">
+                <FormattedMessage defaultMessage={'More about Sponsors'} />
+              </StyledLink>
             </StyledListItem>
             <StyledListItem
               fontSize="20px"
@@ -149,17 +123,14 @@ const GetToKnowUs = () => {
               fontWeight="500"
               color="black.800"
             >
-              <FormattedMessage
-                values={{
-                  link: getI18nLink({
-                    href: 'https://blog.opencollective.com/tag/case-studies/',
-                    openInNewTab: true,
-                    color: 'black.800',
-                    textDecoration: 'underline',
-                  }),
-                }}
-                defaultMessage={'<link>Communities that use Open Collective</link>'}
-              />
+              <StyledLink
+                color="black.800"
+                href="https://blog.opencollective.com/tag/case-studies/"
+                textDecoration="underline"
+                openInNewTab
+              >
+                <FormattedMessage defaultMessage={'Communities that use Open Collective'} />
+              </StyledLink>
             </StyledListItem>
           </ListContainer>
         </Container>
@@ -189,16 +160,9 @@ const GetToKnowUs = () => {
               color="black.800"
               mb="24px"
             >
-              <FormattedMessage
-                values={{
-                  link: getI18nLink({
-                    href: '/help',
-                    color: 'black.800',
-                    textDecoration: 'underline',
-                  }),
-                }}
-                defaultMessage={'<link>Visit the support page</link>'}
-              />
+              <StyledLink color="black.800" href="/help" textDecoration="underline">
+                <FormattedMessage defaultMessage={'Visit the support page'} />
+              </StyledLink>
             </StyledListItem>
             <StyledListItem
               fontSize="20px"
@@ -208,17 +172,14 @@ const GetToKnowUs = () => {
               color="black.800"
               mb="24px"
             >
-              <FormattedMessage
-                values={{
-                  link: getI18nLink({
-                    href: 'https://docs.opencollective.com',
-                    openInNewTab: true,
-                    color: 'black.800',
-                    textDecoration: 'underline',
-                  }),
-                }}
-                defaultMessage={'<link>Read through our documentation</link>'}
-              />
+              <StyledLink
+                color="black.800"
+                href="https://docs.opencollective.com"
+                textDecoration="underline"
+                openInNewTab
+              >
+                <FormattedMessage defaultMessage={'Read through our documentation'} />
+              </StyledLink>
             </StyledListItem>
             <StyledListItem
               fontSize="20px"
@@ -228,17 +189,14 @@ const GetToKnowUs = () => {
               color="black.800"
               mb="24px"
             >
-              <FormattedMessage
-                values={{
-                  link: getI18nLink({
-                    href: 'https://slack.opencollective.com/',
-                    openInNewTab: true,
-                    color: 'black.800',
-                    textDecoration: 'underline',
-                  }),
-                }}
-                defaultMessage={'<link>Slack and email</link>'}
-              />
+              <StyledLink
+                color="black.800"
+                href="https://slack.opencollective.com/"
+                textDecoration="underline"
+                openInNewTab
+              >
+                <FormattedMessage defaultMessage={'Slack and email'} />
+              </StyledLink>
             </StyledListItem>
             <StyledListItem
               fontSize="20px"
@@ -247,16 +205,9 @@ const GetToKnowUs = () => {
               fontWeight="500"
               color="black.800"
             >
-              <FormattedMessage
-                values={{
-                  link: getI18nLink({
-                    href: '/pricing',
-                    color: 'black.800',
-                    textDecoration: 'underline',
-                  }),
-                }}
-                defaultMessage={'<link>Pricing and Business Model</link>'}
-              />
+              <StyledLink color="black.800" href="/pricing" textDecoration="underline" openInNewTab>
+                <FormattedMessage defaultMessage={'Pricing and Business Model'} />
+              </StyledLink>
             </StyledListItem>
           </ListContainer>
         </Container>
