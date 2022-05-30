@@ -141,7 +141,7 @@ class SearchPage extends React.Component {
       type: query.type ? decodeURIComponent(query.type).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
       country: query.country || null,
-      sortBy: query.sortBy || 'ACTIVITY',
+      sortBy: query.sortBy || (query.q ? 'RANK' : 'ACTIVITY'),
       tag: query.tag?.length > 0 ? query.tag.split(',') : [],
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
@@ -229,15 +229,6 @@ class SearchPage extends React.Component {
     const { router } = this.props;
     const { q } = form;
 
-    /*
-     * Make sure we don't perform the re-fetch if search term is empty
-     *
-     * TODO: Remove this once, https://github.com/opencollective/opencollective/issues/5454 is done
-     */
-    if (q.value?.trim()?.length === 0) {
-      return;
-    }
-
     const query = { q: q.value, type: router.query.type };
     router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
   };
@@ -292,7 +283,7 @@ class SearchPage extends React.Component {
     const getSortOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
     const sortOptions = [
       getSortOption('ACTIVITY'),
-      getSortOption('RANK'),
+      this.props.term ? getSortOption('RANK') : undefined,
       getSortOption('CREATED_AT.DESC'),
       getSortOption('CREATED_AT.ASC'),
     ];
@@ -362,7 +353,7 @@ class SearchPage extends React.Component {
                 <StyledSelectFilter
                   inputId="sort-filter"
                   value={this.props.sortBy ? getSortOption(this.props.sortBy) : sortOptions[0]}
-                  options={sortOptions}
+                  options={sortOptions.filter(sortOption => sortOption)}
                   onChange={sortBy => this.changeSort(sortBy)}
                   minWidth={[0, '200px']}
                 />
