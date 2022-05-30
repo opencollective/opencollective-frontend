@@ -88,6 +88,7 @@ describe('Accept financial contributions flow', () => {
           cy.getByDataCy('afc-host-apply-button').click();
         });
       cy.contains('BrusselsTogether is a platform for the new generation of associations transparent by design.');
+      cy.getByDataCy('host-apply-modal-next').click();
       cy.getByDataCy('afc-host-submit-button').click();
       cy.url().should('include', '/success');
       cy.contains('You have applied to be hosted by BrusselsTogether ASBL');

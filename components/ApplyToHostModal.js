@@ -583,7 +583,11 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
               <ModalFooter isFullWidth>
                 {step === STEPS.INFORMATION && (
                   <Flex justifyContent="flex-end">
-                    <StyledButton buttonStyle="primary" onClick={() => setStep(STEPS.APPLY)}>
+                    <StyledButton
+                      data-cy="host-apply-modal-next"
+                      buttonStyle="primary"
+                      onClick={() => setStep(STEPS.APPLY)}
+                    >
                       <FormattedMessage defaultMessage="Next" />
                     </StyledButton>
                   </Flex>
