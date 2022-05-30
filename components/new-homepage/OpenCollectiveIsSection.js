@@ -10,7 +10,7 @@ import Link from '../Link';
 import StyledLink from '../StyledLink';
 import { H2, H3, P } from '../Text';
 
-import NetworkOfCollectives from './NetworkOfCollecetives';
+import NetworkOfCollectives from './NetworkOfCollectives';
 
 const OvalShapeWrapper = styled(Container)`
   background-image: url('/static/images/new-home/oval-bg.svg');
