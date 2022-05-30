@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular';
 import copy from 'copy-to-clipboard';
-import { isNil, pickBy, truncate } from 'lodash';
+import { differenceWith, isNil, pickBy, truncate } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -279,6 +279,7 @@ class SearchPage extends React.Component {
     const { data, intl } = this.props;
     const { error, loading, accounts, tagStats } = data || {};
     const tags = this.props.tag || [];
+    const hiddenSelectedTags = differenceWith(tags, tagStats?.nodes, (selectedTag, { tag }) => selectedTag === tag);
 
     if (error) {
       return <ErrorPage data={this.props.data} />;
@@ -403,6 +404,18 @@ class SearchPage extends React.Component {
                         {truncate(node.tag, { length: 20 })}
                       </FilterButton>
                     ))}
+                  {hiddenSelectedTags?.map(tag => (
+                    <FilterButton
+                      as={StyledTag}
+                      key={tag}
+                      title={tag}
+                      variant="rounded-right"
+                      $isSelected={tags.includes(tag)}
+                      onClick={() => this.changeTags(tag)}
+                    >
+                      {truncate(tag, { length: 20 })}
+                    </FilterButton>
+                  ))}
                 </Flex>
               </Container>
             )}
