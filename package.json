@@ -21,7 +21,7 @@
     "@sentry/browser": "6.19.7",
     "@sentry/node": "6.19.7",
     "@shopify/address": "3.2.0",
-    "@stripe/react-stripe-js": "1.8.0",
+    "@stripe/react-stripe-js": "1.8.1",
     "@stripe/stripe-js": "1.31.0",
     "@styled-icons/boxicons-regular": "10.38.0",
     "@styled-icons/boxicons-solid": "10.38.0",
