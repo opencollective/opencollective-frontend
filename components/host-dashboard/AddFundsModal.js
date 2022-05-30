@@ -300,11 +300,6 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     return null;
   }
 
-  // No modal if loading (otherwise we'll compute the wrong hostFeePercent)
-  if (loading) {
-    return null;
-  }
-
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
   const canAddHostFee = host.plan?.hostFees && collective.id !== host.id;
@@ -331,6 +326,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       <CollectiveModalHeader collective={collective} onClick={handleClose} />
       <Formik
         initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective })}
+        enableReinitialize={true}
         validate={validate}
         onSubmit={async values => {
           if (!fundDetails.showPlatformTipModal) {
