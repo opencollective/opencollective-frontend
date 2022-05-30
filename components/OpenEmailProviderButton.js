@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import StyledButton from './StyledButton';
+import Container from './Container';
 import StyledLink from './StyledLink';
 
 /** Returns info about email's provider, or null if unknown provider */
@@ -25,22 +25,18 @@ const getProvider = email => {
 
 /**
  * If email is recognized as a known provider (GMail/Hotmail), a button will be displayed
- * with a link to directly open user's inbox. Otherwise this will return null;
+ * with a link to directly open user's inbox. Otherwise, this will return null;
  */
 const OpenEmailProviderButton = ({ email, children }) => {
   const provider = getProvider(email);
   return !provider
     ? null
     : children(
-        <StyledLink data-cy="open-inbox-link" href={provider.link}>
-          <StyledButton buttonStyle="primary" minWidth={200} mx={2} my={3}>
-            <FormattedMessage
-              id="OpenInbox"
-              defaultMessage="Open {providerName}"
-              values={{ providerName: provider.name }}
-            />
-          </StyledButton>
-        </StyledLink>,
+        <Container mt="24px" mb="24px">
+          <StyledLink data-cy="open-inbox-link" href={provider.link}>
+            <FormattedMessage defaultMessage="Go to your mail" />
+          </StyledLink>
+        </Container>,
       );
 };
 
