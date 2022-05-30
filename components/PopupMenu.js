@@ -14,7 +14,7 @@ const Popup = styled(Box)`
   border-radius: 8px;
   background: white;
   box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
-  z-index: ${props => props.zIndex || 1000};
+  z-index: ${props => props.zIndex ?? 1000};
 `;
 
 const PopupMenu = ({ Button, children, placement, onClose, zIndex }) => {
