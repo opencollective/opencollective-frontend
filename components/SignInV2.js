@@ -8,12 +8,11 @@ import { Box, Flex } from './Grid';
 import Image from './Image';
 import Link from './Link';
 import StyledButton from './StyledButton';
-import StyledHr from './StyledHr';
 import StyledInput from './StyledInput';
 import StyledLink from './StyledLink';
 import { Span } from './Text';
 
-const SignInFooterLink = styled(StyledLink)`
+export const SignInFooterLink = styled(StyledLink)`
   color: #323334;
   font-size: 13px;
   font-weight: 400;

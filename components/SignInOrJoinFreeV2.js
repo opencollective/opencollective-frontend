@@ -11,18 +11,19 @@ import { isEmail } from 'validator';
 import { signin } from '../lib/api';
 import { getWebsiteUrl } from '../lib/utils';
 
-import CreateProfileFAQ from './faqs/CreateProfileFAQ';
+import Container from './Container';
 import CreateProfileV2 from './CreateProfileV2';
 import { Box, Flex } from './Grid';
-import I18nFormatters, { I18nSupportLink } from './I18nFormatters';
+import { I18nSupportLink } from './I18nFormatters';
 import Loading from './Loading';
-import SignInV2 from './SignInV2';
+import SignInV2, { SignInFooterLink } from './SignInV2';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
+import StyledHr from './StyledHr';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
-import { H5, P } from './Text';
 import { TOAST_TYPE, withToasts } from './ToastProvider';
+import { H5, P, Span } from './Text';
 
 const messages = defineMessages({
   twoFactorAuthCodeInputLabel: {
@@ -60,10 +61,6 @@ class SignInOrJoinFreeV2 extends React.Component {
       signin: PropTypes.string,
       join: PropTypes.string,
     }),
-    /** To customize which forms should be displayed */
-    createProfileTabs: PropTypes.arrayOf(PropTypes.oneOf(['personal', 'organization'])),
-    /** To replace the default labels */
-    createProfileLabels: PropTypes.shape({ personal: PropTypes.string, organization: PropTypes.string }),
     /** Label for signIn, defaults to "Continue with your email" */
     signInLabel: PropTypes.node,
     intl: PropTypes.object,
@@ -338,31 +335,33 @@ class SignInOrJoinFreeV2 extends React.Component {
             ) : (
               <Flex flexDirection="column" width={1} alignItems="center">
                 <Flex justifyContent="center" width={1}>
-                  <Box width={[0, null, null, 1 / 5]} />
-                  <Box maxWidth={480} mx={[2, 4]} width="100%">
+                  <Box maxWidth={575} mx={[2, 4]} width="100%">
                     <CreateProfileV2
                       email={email}
                       onEmailChange={email => this.setState({ email, unknownEmailError: false })}
-                      onPersonalSubmit={this.createProfile}
-                      onOrgSubmit={this.createProfile}
+                      onSubmit={this.createProfile}
                       onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
                       submitting={submitting}
-                      labels={this.props.createProfileLabels}
-                      tabs={this.props.createProfileTabs}
                     />
-                    <P mt={4} color="black.500" fontSize="12px" mb={3} data-cy="join-conditions" textAlign="center">
-                      <FormattedMessage
-                        id="SignIn.legal"
-                        defaultMessage="By joining, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
-                        values={I18nFormatters}
-                      />
-                    </P>
                   </Box>
-
-                  <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
                 </Flex>
               </Flex>
             )}
+            <Container mt="128px" pl={['20px', '20px', '144px']} pr={['20px', '20px', '144px']} width={1}>
+              <StyledHr borderStyle="solid" borderColor="black.200" mb="16px" />
+              <Flex justifyContent="space-between">
+                <Span>
+                  <SignInFooterLink href="/privacypolicy">
+                    <FormattedMessage defaultMessage="Read our privacy policy" />
+                  </SignInFooterLink>
+                </Span>
+                <Span>
+                  <SignInFooterLink href="/contact">
+                    <FormattedMessage defaultMessage="Contact support" />
+                  </SignInFooterLink>
+                </Span>
+              </Flex>
+            </Container>
           </Fragment>
         )}
       </Flex>

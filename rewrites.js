@@ -11,6 +11,10 @@ exports.REWRITES = [
     destination: '/fiscal-hosting',
   },
   {
+    source: '/welcome-to-oc',
+    destination: '/welcome',
+  },
+  {
     source: '/:pageSlug(widgets|tos|privacypolicy|hiring)',
     destination: '/staticPage',
   },

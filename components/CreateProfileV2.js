@@ -5,48 +5,38 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import { getI18nLink } from './I18nFormatters';
+import Image from './Image';
 import Link from './Link';
+import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledCheckbox from './StyledCheckbox';
+import StyledHr from './StyledHr';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
-import StyledInputGroup from './StyledInputGroup';
 import StyledLink from './StyledLink';
-import { P, Span } from './Text';
+import { P } from './Text';
 
 const messages = defineMessages({
   heading: {
     defaultMessage: 'Create your personal account',
+  },
+  subHeading: {
+    defaultMessage: 'Set up your personal details to continue',
   },
   newsletter: {
     id: 'newsletter.label',
     defaultMessage: 'Receive our monthly newsletter',
   },
   nameLabel: {
-    id: 'Fields.displayName',
-    defaultMessage: 'Display name',
-  },
-  legalName: {
-    id: 'LegalName',
-    defaultMessage: 'Legal Name',
-  },
-  orgName: {
-    id: 'Organization.Name',
-    defaultMessage: 'Organization name',
+    defaultMessage: 'Your name',
   },
   email: {
-    id: 'Email',
-    defaultMessage: 'Email',
+    defaultMessage: 'Your email',
   },
-  website: {
-    id: 'Fields.website',
-    defaultMessage: 'Website',
-  },
-  profileNameError: {
-    id: 'CreateProfile.name.conflict',
-    defaultMessage:
-      "You can't use the same name for your Personal and Organization profiles. Personal profiles represent individual people, who can be administrators of Organization profiles.",
+  disclaimer: {
+    defaultMessage: 'I agree with the terms of service of Open Collective',
   },
 });
 
@@ -110,8 +100,25 @@ NewsletterCheckBox.propTypes = {
   checked: PropTypes.bool,
 };
 
-const useForm = ({ onEmailChange, errors, formatMessage }) => {
-  const [state, setState] = useState({ errors, newsletterOptIn: false });
+const TOSCheckBox = ({ onChange, checked }) => {
+  const intl = useIntl();
+  return (
+    <StyledCheckbox
+      onChange={({ checked, name }) => onChange({ target: { name, value: checked } })}
+      checked={checked}
+      name="tosOptIn"
+      label={intl.formatMessage(messages.disclaimer)}
+    />
+  );
+};
+
+TOSCheckBox.propTypes = {
+  onChange: PropTypes.func,
+  checked: PropTypes.bool,
+};
+
+const useForm = ({ onEmailChange, errors }) => {
+  const [state, setState] = useState({ errors, newsletterOptIn: false, tosOptIn: false });
 
   return {
     getFieldProps: name => ({
@@ -122,21 +129,15 @@ const useForm = ({ onEmailChange, errors, formatMessage }) => {
       width: 1,
       onChange: ({ target }) => {
         // Email state is not local so any changes should be handled separately
-        let value = target.value,
-          error = null;
+        let value = target.value;
         if (target.name === 'email') {
           value = undefined;
           onEmailChange(target.value);
-        } else if (
-          (target.name === 'name' && target.value === state.orgName) ||
-          (target.name === 'orgName' && target.value === state.name)
-        ) {
-          error = formatMessage(messages.profileNameError);
         }
         setState({
           ...state,
           [target.name]: value,
-          errors: { ...state.errors, [target.name]: error },
+          errors: state.errors,
         });
       },
       onInvalid: event => {
@@ -157,315 +158,132 @@ const useForm = ({ onEmailChange, errors, formatMessage }) => {
   };
 };
 
-const DEFAULT_LABELS = {
-  personal: <FormattedMessage id="contribution.createPersoProfile" defaultMessage="Create Personal Profile" />,
-  organization: <FormattedMessage id="contribution.createOrgProfile" defaultMessage="Create Organization Profile" />,
-};
-
-const CreateProfileV2 = ({
-  email,
-  submitting,
-  errors,
-  onEmailChange,
-  onPersonalSubmit,
-  onOrgSubmit,
-  onSecondaryAction,
-  labels,
-  tabs,
-  ...props
-}) => {
+const CreateProfileV2 = ({ email, submitting, errors, onEmailChange, onSubmit, ...props }) => {
   const { formatMessage } = useIntl();
-  const [activeTab, setActiveTab] = useState(tabs[0]);
   const { getFieldError, getFieldProps, state } = useForm({ onEmailChange, errors, formatMessage });
   const isValid = isEmpty(compact(values(state.errors)));
 
   return (
-    <StyledCard width={1} maxWidth={480} {...props}>
+    <React.Fragment>
       <Flex>
-        {tabs.map(tab => (
-          <Tab
-            key={tab}
-            active={activeTab === tab}
-            setActive={() => setActiveTab(tab)}
-            data-cy={`createProfile-tab-${tab}`}
-          >
-            {labels?.[tab] || DEFAULT_LABELS[tab]}
-          </Tab>
-        ))}
+        <Image src="/static/images/create-profile-page-logo.png" alt="Open Collective logo" height={160} width={160} />
+        <Container mt="16px">
+          <Flex fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
+            {formatMessage(messages.heading)}
+          </Flex>
+          <Flex fontSize="16px" fontWeight="500" color="black.700" lineHeight="24px" pt="14px">
+            {formatMessage(messages.subHeading)}
+          </Flex>
+        </Container>
       </Flex>
-
-      {activeTab === 'personal' && (
-        <Box
-          as="form"
-          p={4}
-          onSubmit={event => {
-            event.preventDefault();
-            const data = pick(state, ['name', 'legalName', 'newsletterOptIn']);
-            onPersonalSubmit({ ...data, email });
-          }}
-          method="POST"
-        >
-          <Box mb={24}>
-            <StyledInputField
-              htmlFor="name"
-              label={formatMessage(messages.nameLabel)}
-              error={getFieldError('name')}
-              required
-            >
-              {inputProps => (
-                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g., John Doe" />
-              )}
-            </StyledInputField>
-          </Box>
-          <Box mb={24}>
-            <StyledInputField
-              name="legalName"
-              htmlFor="legalName"
-              required={false}
-              label={formatMessage(messages.legalName)}
-              mt={3}
-              isPrivate
-              hint={
-                <FormattedMessage
-                  id="legalName.description"
-                  defaultMessage="The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name."
-                />
-              }
-            >
-              {inputProps => (
-                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g., John Dawson" />
-              )}
-            </StyledInputField>
-          </Box>
-
-          <Box mb={24}>
-            <StyledInputField htmlFor="email" label={formatMessage(messages.email)} error={getFieldError('email')}>
-              {inputProps => (
-                <StyledInput
-                  {...inputProps}
-                  {...getFieldProps(inputProps.name)}
-                  type="email"
-                  placeholder="e.g., yourname@yourhost.com"
-                  value={email}
-                  onKeyDown={e => {
-                    // See https://github.com/facebook/react/issues/6368
-                    if (e.key === ' ') {
-                      e.preventDefault();
-                    }
-                  }}
-                  required
-                />
-              )}
-            </StyledInputField>
-          </Box>
-
-          <Box mb={4}>
-            <NewsletterCheckBox checked={state.newsletterOptIn} {...getFieldProps('newsletterOptIn')} />
-          </Box>
-
-          <StyledButton
-            buttonStyle="primary"
-            disabled={!email || !state.name || !isValid}
-            width={1}
-            type="submit"
-            fontWeight="600"
-            loading={submitting}
+      <Box
+        as="form"
+        onSubmit={event => {
+          event.preventDefault();
+          const data = pick(state, ['name', 'newsletterOptIn', 'tosOptIn']);
+          onSubmit({ ...data, email });
+        }}
+        method="POST"
+      >
+        <StyledCard mt="16px" width={1} maxWidth={575} {...props}>
+          <Flex
+            fontSize="18px"
+            fontWeight="700"
+            color="black.900"
+            lineHeight="26px"
+            pt="31px"
+            pl={4}
+            alignItems="center"
+            justifyContent="space-between"
           >
-            {DEFAULT_LABELS.personal}
-          </StyledButton>
-        </Box>
-      )}
-
-      {activeTab === 'organization' && (
-        <Box
-          as="form"
-          p={4}
-          onSubmit={event => {
-            event.preventDefault();
-            const data = pick(state, [
-              'name',
-              'legalName',
-              'orgName',
-              'orgLegalName',
-              'website',
-              'githubHandle',
-              'twitterHandle',
-              'newsletterOptIn',
-            ]);
-            onOrgSubmit({ ...data, email });
-          }}
-          method="POST"
-        >
-          <P fontSize="16px" lineHeight="24px" color="black.900" mb={24} fontWeight="600">
             <FormattedMessage id="CreateProfile.PersonalInfo" defaultMessage="Your personal information" />
-          </P>
-          <Box mb={24}>
-            <StyledInputField
-              htmlFor="name"
-              label={formatMessage(messages.nameLabel)}
-              error={getFieldError('name')}
-              required
-            >
-              {inputProps => (
-                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g., John Doe" />
-              )}
-            </StyledInputField>
-          </Box>
-          <Box mb={24}>
-            <StyledInputField
-              name="legalName"
-              htmlFor="legalName"
-              required={false}
-              label={formatMessage(messages.legalName)}
-              mt={3}
-              isPrivate
-              hint={
-                <FormattedMessage
-                  id="legalName.description"
-                  defaultMessage="The legal name is private and shared with the hosts for donation receipts, tax forms and when you submit an expense. This name is not displayed publicly and it must be your legal name."
-                />
-              }
-            >
-              {inputProps => (
-                <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g., John Dawson" />
-              )}
-            </StyledInputField>
-          </Box>
-          <Box mb={24}>
-            <StyledInputField label="Email" htmlFor="email" error={getFieldError('email')}>
-              {inputProps => (
-                <StyledInput
-                  {...inputProps}
-                  {...getFieldProps(inputProps.name)}
-                  type="email"
-                  value={email}
-                  placeholder="e.g., yourname@yourhost.com"
-                  onKeyDown={e => {
-                    // See https://github.com/facebook/react/issues/6368
-                    if (e.key === ' ') {
-                      e.preventDefault();
-                    }
-                  }}
-                  required
-                />
-              )}
-            </StyledInputField>
-          </Box>
+            <StyledHr height="0.5px" borderColor="black.400" flex="1" ml={3} mr={4} />
+          </Flex>
+          <Box p={4}>
+            <Box mb={24}>
+              <StyledInputField
+                htmlFor="name"
+                labelFontSize="16px"
+                labelFontWeight={700}
+                labelColor="black.800"
+                label={formatMessage(messages.nameLabel)}
+                error={getFieldError('name')}
+                required
+              >
+                {inputProps => (
+                  <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g., John Doe" />
+                )}
+              </StyledInputField>
+            </Box>
 
-          <P fontSize="16px" lineHeight="24px" color="black.900" mb={24} fontWeight="600">
-            <FormattedMessage id="CreateProfile.OrgInfo" defaultMessage="Organization info" />
-          </P>
-          <Box mb={24}>
-            <StyledInputField
-              htmlFor="orgName"
-              label={formatMessage(messages.orgName)}
-              error={getFieldError('orgName')}
-            >
-              {inputProps => (
-                <StyledInput
-                  {...inputProps}
-                  {...getFieldProps(inputProps.name)}
-                  placeholder="e.g., AirBnb, Women Who Code"
-                  required
-                />
-              )}
-            </StyledInputField>
-          </Box>
-          <Box mb={24}>
-            <StyledInputField
-              name="orgLegalName"
-              htmlFor="orgLegalName"
-              required={false}
-              label={formatMessage(messages.legalName)}
-              mt={3}
-              isPrivate
-            >
-              {inputProps => (
-                <StyledInput
-                  {...inputProps}
-                  {...getFieldProps(inputProps.name)}
-                  placeholder="e.g., Open Collective Inc."
-                />
-              )}
-            </StyledInputField>
-          </Box>
+            <Box mb={24}>
+              <StyledInputField
+                labelColor="black.800"
+                labelFontSize="16px"
+                labelFontWeight={700}
+                htmlFor="email"
+                label={formatMessage(messages.email)}
+                error={getFieldError('email')}
+              >
+                {inputProps => (
+                  <StyledInput
+                    {...inputProps}
+                    {...getFieldProps(inputProps.name)}
+                    type="email"
+                    placeholder="e.g., yourname@yourhost.com"
+                    value={email}
+                    onKeyDown={e => {
+                      // See https://github.com/facebook/react/issues/6368
+                      if (e.key === ' ') {
+                        e.preventDefault();
+                      }
+                    }}
+                    required
+                  />
+                )}
+              </StyledInputField>
+            </Box>
+            <StyledHr height="2px" borderColor="black.200" flex="1" />
 
-          <Box mb={24}>
-            <StyledInputField
-              htmlFor="website"
-              label={formatMessage(messages.website)}
-              error={getFieldError('website')}
-              required={false}
-            >
-              {inputProps => (
-                <StyledInput
-                  {...inputProps}
-                  {...getFieldProps(inputProps.name)}
-                  type="url"
-                  placeholder="https://website.com"
-                />
-              )}
-            </StyledInputField>
+            <Box mt="17px">
+              <NewsletterCheckBox checked={state.newsletterOptIn} {...getFieldProps('newsletterOptIn')} />
+            </Box>
+            <Box mt="17px">
+              <TOSCheckBox checked={state.tosOptIn} {...getFieldProps('tosOptIn')} />
+            </Box>
           </Box>
-
-          <Box mb={24}>
-            <StyledInputField
-              htmlFor="githubHandle"
-              label="GitHub"
-              required={false}
-              error={getFieldError('githubHandle')}
-            >
-              {inputProps => (
-                <StyledInputGroup
-                  {...inputProps}
-                  {...getFieldProps(inputProps.name)}
-                  prepend="github.com/"
-                  placeholder="username"
-                />
-              )}
-            </StyledInputField>
+        </StyledCard>
+        <MessageBox type="info" mt="24px">
+          <Box fontSize="13px" fontWeight={700}>
+            <FormattedMessage defaultMessage="Do you want to create an organization profile?" />
           </Box>
-
-          <Box mb={24}>
-            <StyledInputField
-              htmlFor="twitterHandle"
-              label="Twitter"
-              required={false}
-              error={getFieldError('twitterHandle')}
-            >
-              {inputProps => <StyledInputGroup {...inputProps} {...getFieldProps(inputProps.name)} prepend="@" />}
-            </StyledInputField>
+          <Box mt="8px" fontSize="12px" fontWeight={400}>
+            <FormattedMessage
+              defaultMessage="You are creating your personal account first, once inside, you will be able to create a profile for your business to appear as financial contributor, enable your employees to contribute on behalf of your company, and more. <Link>Read more about organizations</Link>"
+              values={{
+                Link: getI18nLink({
+                  href: `https://docs.opencollective.com/help/financial-contributors/organizations#what-is-an-organization`,
+                  openInNewTab: true,
+                }),
+              }}
+            />
           </Box>
-
-          <Box mb={4}>
-            <NewsletterCheckBox checked={state.newsletterOptIn} {...getFieldProps('newsletterOptIn')} />
-          </Box>
-
+        </MessageBox>
+        <Flex justifyContent="center">
           <StyledButton
+            mt="24px"
             buttonStyle="primary"
-            disabled={!email || !state.name || !state.orgName || !isValid}
-            width={1}
+            disabled={!email || !state.name || !isValid || !state.tosOptIn}
+            width="234px"
             type="submit"
-            fontWeight="600"
+            fontWeight="500"
             loading={submitting}
           >
-            {DEFAULT_LABELS.organization}
+            <FormattedMessage defaultMessage="Create account and continue" />
           </StyledButton>
-        </Box>
-      )}
-
-      <Container alignItems="center" bg="black.50" display="flex" justifyContent="center" px={4} py={3}>
-        <Span color="black.700" mr={1} fontSize="14px">
-          <FormattedMessage id="CreateProfile.AlreadyHaveAnAccount" defaultMessage="Already have an account?" />
-        </Span>{' '}
-        <Span fontSize="14px">
-          <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
-            <FormattedMessage id="signIn" defaultMessage="Sign In" />
-            &nbsp;→
-          </SecondaryAction>
-        </Span>
-      </Container>
-    </StyledCard>
+        </Flex>
+      </Box>
+    </React.Fragment>
   );
 };
 
@@ -473,21 +291,13 @@ CreateProfileV2.propTypes = {
   /** a map of errors to the matching field name, e.g., `{ email: 'Invalid email' }` will display that message until the email field */
   errors: PropTypes.objectOf(PropTypes.string),
   /** handles submissions of personal profile form */
-  onPersonalSubmit: PropTypes.func.isRequired,
-  /** handles submission of organization profile form */
-  onOrgSubmit: PropTypes.func.isRequired,
-  /** handles redirect from profile create, i.e. Sign In */
-  onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
+  onSubmit: PropTypes.func.isRequired,
   /** Disable submit and show a spinner on button when set to true */
   submitting: PropTypes.bool,
   /** Set the value of email input */
   email: PropTypes.string.isRequired,
   /** handles changes in the email input */
   onEmailChange: PropTypes.func.isRequired,
-  /** To customize which forms should be displayed */
-  tabs: PropTypes.arrayOf(PropTypes.oneOf(['personal', 'organization'])).isRequired,
-  /** To replace the default labels */
-  labels: PropTypes.shape({ personal: PropTypes.string, organization: PropTypes.string }),
   /** All props from `StyledCard` */
   ...StyledCard.propTypes,
 };
@@ -495,7 +305,6 @@ CreateProfileV2.propTypes = {
 CreateProfileV2.defaultProps = {
   errors: {},
   submitting: false,
-  tabs: ['personal', 'organization'],
 };
 
 export default CreateProfileV2;
