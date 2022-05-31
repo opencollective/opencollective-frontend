@@ -38,7 +38,7 @@ We are looking for a senior "full-stack" software engineer who’s excited about
   - very high (e.g. NY, SF) $126-$144k
   - high(e.g. London, Paris) $112-$128k
   - medium (e.g. Vancouver, Berlin, Madrid) $84-$108k (€79-€103k)
-  - low (e.g. Kyiv, Lagos, Buenos Aires) $84-$96k
+  - low (e.g. Kyiv, Lagos, Buenos Aires) $70-$90k (€66-€86k)
 - Fully remote team, but we'd like you to be based within 6 hours of CET for timezone overlap, e.g. Europe, Africa, central Asia, or North and South America.
 - Full time role, with a very flexible schedule.
 - Opportunity to grow in the role, with support for professional development and encouragement to influence strategy and share ideas.
