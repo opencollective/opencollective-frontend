@@ -85,7 +85,12 @@ export default class SignInV2 extends React.Component {
       <React.Fragment>
         <Box maxWidth={390}>
           <Flex justifyContent="center">
-            <Image src="/static/images/sign-in-page-logo.png" alt="Open Collective logo" height={128} width={128} />
+            <Image
+              src="/static/images/oc-logo-watercolor-256.png"
+              alt="Open Collective logo"
+              height={128}
+              width={128}
+            />
           </Flex>
           <Flex as="label" fontWeight={700} htmlFor="email" fontSize="32px" mb={12} mt="48px" justifyContent="center">
             {label || <FormattedMessage defaultMessage="Continue with your email" />}

@@ -2012,6 +2012,10 @@ enum ActivityType {
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
   COLLECTIVE_MEMBER_CREATED
+  COLLECTIVE_CORE_MEMBER_ADDED
+  COLLECTIVE_CORE_MEMBER_INVITED
+  COLLECTIVE_CORE_MEMBER_REMOVED
+  COLLECTIVE_CORE_MEMBER_EDITED
   COLLECTIVE_TRANSACTION_CREATED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
@@ -4918,7 +4922,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -5001,7 +5005,7 @@ interface AccountWithHost {
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   Fees percentage that the platform takes for this collective
@@ -5654,7 +5658,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -7252,7 +7256,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -7507,12 +7511,6 @@ type Query {
     """
     draftKey: String
   ): Expense
-  emailExists(
-    """
-    Email of user
-    """
-    email: String
-  ): Boolean
   expenses(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9694,7 +9692,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -10220,7 +10218,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
