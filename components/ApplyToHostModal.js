@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { Form, Formik } from 'formik';
-import { get, isNil, map } from 'lodash';
+import { get, isNil, map, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
@@ -61,10 +61,40 @@ const hostFields = gqlV2/* GraphQL */ `
 `;
 
 const applyToHostQuery = gqlV2/* GraphQL */ `
-  query ApplyToHost($hostSlug: String!) {
+  query ApplyToHost($hostSlug: String!, $collectiveSlug: String!) {
     host(slug: $hostSlug) {
       id
       ...ApplyToHostFields
+    }
+    account(slug: $collectiveSlug) {
+      id
+      slug
+      name
+      type
+      memberInvitations(role: [ADMIN]) {
+        id
+        role
+        memberAccount {
+          id
+          type
+          slug
+          name
+          imageUrl
+        }
+      }
+      admins: members(role: ADMIN) {
+        nodes {
+          id
+          role
+          account {
+            id
+            type
+            slug
+            name
+            imageUrl
+          }
+        }
+      }
     }
   }
   ${hostFields}
@@ -233,7 +263,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   const query = collective ? applyToHostQuery : applyToHostWithAccountsQuery;
   const { data, loading, error } = useQuery(query, {
     ...GQL_CONTEXT,
-    variables: { hostSlug },
+    variables: { hostSlug, collectiveSlug: collective?.slug },
     fetchPolicy: 'network-only',
   });
   const [applyToHost, { loading: submitting }] = useMutation(applyToHostMutation, GQL_CONTEXT);
@@ -243,7 +273,11 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   const contentRef = React.useRef();
   const canApply = Boolean(data?.host?.isOpenToApplications);
   const collectives = map(get(data, 'loggedInAccount.memberOf.nodes'), 'account');
-  const selectedCollective = collective || (collectives.length === 1 ? collectives[0] : undefined);
+  const selectedCollective = collective
+    ? { ...collective, ...pick(data?.account, ['admins', 'memberInvitations']) }
+    : collectives.length === 1
+    ? collectives[0]
+    : undefined;
   const host = data?.host;
   const isOCFHost = host?.legacyId === OPENCOLLECTIVE_FOUNDATION_ID;
   const useTwoSteps = !isNil(data?.host?.longDescription);
