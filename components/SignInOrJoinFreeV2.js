@@ -16,13 +16,13 @@ import CreateProfileV2 from './CreateProfileV2';
 import { Box, Flex } from './Grid';
 import I18nFormatters, { I18nSupportLink } from './I18nFormatters';
 import Loading from './Loading';
-import MessageBoxGraphqlError from './MessageBoxGraphqlError';
 import SignInV2 from './SignInV2';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import { H5, P } from './Text';
+import { TOAST_TYPE, withToasts } from './ToastProvider';
 
 const messages = defineMessages({
   twoFactorAuthCodeInputLabel: {
@@ -71,6 +71,7 @@ class SignInOrJoinFreeV2 extends React.Component {
     submitTwoFactorAuthenticatorCode: PropTypes.func,
     submitRecoveryCode: PropTypes.func,
     router: PropTypes.object,
+    addToast: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -133,8 +134,11 @@ class SignInOrJoinFreeV2 extends React.Component {
       }
       window.scrollTo(0, 0);
     } catch (e) {
-      this.setState({ error: e.message || 'Server error', submitting: false });
-      window.scrollTo(0, 0);
+      this.props.addToast({
+        type: TOAST_TYPE.ERROR,
+        message: e.message || 'Server error',
+      });
+      this.setState({ submitting: false });
     }
   };
 
@@ -166,8 +170,11 @@ class SignInOrJoinFreeV2 extends React.Component {
       await this.props.router.push({ pathname: '/signin/sent', query: { email: user.email } });
       window.scrollTo(0, 0);
     } catch (error) {
-      this.setState({ error: error.message, submitting: false });
-      window.scrollTo(0, 0);
+      this.props.addToast({
+        type: TOAST_TYPE.ERROR,
+        message: error.message || 'Server error',
+      });
+      this.setState({ submitting: false });
     }
   };
 
@@ -313,7 +320,6 @@ class SignInOrJoinFreeV2 extends React.Component {
 
     return (
       <Flex flexDirection="column" width={1} alignItems="center">
-        {error && <MessageBoxGraphqlError error={error} mb={[3, 4]} />}
         {enforceTwoFactorAuthForLoggedInUser ? (
           this.renderTwoFactorAuthBoxes(useRecoveryCodes)
         ) : (
@@ -382,4 +388,4 @@ const signupMutation = gql`
 
 export const addSignupMutation = graphql(signupMutation, { name: 'createUser' });
 
-export default injectIntl(addSignupMutation(withRouter(SignInOrJoinFreeV2)));
+export default withToasts(injectIntl(addSignupMutation(withRouter(SignInOrJoinFreeV2))));
