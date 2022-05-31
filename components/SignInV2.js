@@ -222,12 +222,12 @@ export default class SignInV2 extends React.Component {
           <StyledHr borderStyle="solid" borderColor="black.200" mb="16px" />
           <Flex justifyContent="space-between" flexDirection={['column', 'row']} alignItems="center">
             <Span>
-              <SignInFooterLink href="/privacypolicy">
+              <SignInFooterLink href="/privacypolicy" textDecoration="underline">
                 <FormattedMessage defaultMessage="Read our privacy policy" />
               </SignInFooterLink>
             </Span>
             <Span mt={['32px', 0]}>
-              <SignInFooterLink href="/contact">
+              <SignInFooterLink href="/contact" textDecoration="underline">
                 <FormattedMessage defaultMessage="Contact support" />
               </SignInFooterLink>
             </Span>
