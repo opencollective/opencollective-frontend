@@ -347,16 +347,22 @@ class SignInOrJoinFreeV2 extends React.Component {
                 </Flex>
               </Flex>
             )}
-            <Container mt="128px" pl={['20px', '20px', '144px']} pr={['20px', '20px', '144px']} width={1}>
+            <Container
+              mt="128px"
+              pl={['20px', '20px', '144px']}
+              pr={['20px', '20px', '144px']}
+              maxWidth="880px"
+              width={1}
+            >
               <StyledHr borderStyle="solid" borderColor="black.200" mb="16px" />
-              <Flex justifyContent="space-between">
+              <Flex justifyContent="space-between" flexDirection={['column', 'row']} alignItems="center">
                 <Span>
-                  <SignInFooterLink href="/privacypolicy">
+                  <SignInFooterLink href="/privacypolicy" textDecoration="underline">
                     <FormattedMessage defaultMessage="Read our privacy policy" />
                   </SignInFooterLink>
                 </Span>
-                <Span>
-                  <SignInFooterLink href="/contact">
+                <Span mt={['32px', 0]}>
+                  <SignInFooterLink href="/contact" textDecoration="underline">
                     <FormattedMessage defaultMessage="Contact support" />
                   </SignInFooterLink>
                 </Span>
