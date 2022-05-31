@@ -36,7 +36,7 @@ We are looking for a senior "full-stack" software engineer who’s excited about
 
 - Financial transparency is our thing! Pay is as follows, with [location-based cost of living adjustments](https://www.numbeo.com/cost-of-living/):
   - very high (e.g. NY, SF) $126-$144k
-  - high(e.g. London, Paris) $112-$128k
+  - high(e.g. London, Paris) $98-$126k (€93-€119k)
   - medium (e.g. Vancouver, Berlin, Madrid) $84-$108k (€79-€103k)
   - low (e.g. Kyiv, Lagos, Buenos Aires) $70-$90k (€66-€86k)
 - Fully remote team, but we'd like you to be based within 6 hours of CET for timezone overlap, e.g. Europe, Africa, central Asia, or North and South America.
