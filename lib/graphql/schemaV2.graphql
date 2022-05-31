@@ -4918,7 +4918,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -5001,7 +5001,7 @@ interface AccountWithHost {
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   Fees percentage that the platform takes for this collective
@@ -5654,7 +5654,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -6213,11 +6213,6 @@ type OAuthAuthorization {
   The time of expiration
   """
   expiresAt: DateTime!
-
-  """
-  The account that created this authorization
-  """
-  createdByAccount: Individual!
 }
 
 """
@@ -7257,7 +7252,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -9693,7 +9688,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -10219,7 +10214,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
