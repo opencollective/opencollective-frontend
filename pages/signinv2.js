@@ -38,7 +38,7 @@ class SigninV2Page extends React.Component {
   }
 
   static propTypes = {
-    form: PropTypes.oneOf(['signinv2', 'create-account']).isRequired,
+    form: PropTypes.oneOf(['signinv2', 'create-accountv2']).isRequired,
     token: PropTypes.string,
     email: PropTypes.string,
     next: PropTypes.string,
@@ -70,7 +70,7 @@ class SigninV2Page extends React.Component {
 
     if (oldState.isRobot && !this.state.isRobot) {
       this.initialize();
-    } else if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-account') {
+    } else if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-accountv2') {
       // --- User logged in ---
       this.setState({ success: true });
       // Avoid redirect loop: replace '/signinv2' redirects by '/'
@@ -116,7 +116,7 @@ class SigninV2Page extends React.Component {
 
   getRoutes() {
     const { next } = this.props;
-    const routes = { signin: '/signinv2', join: '/create-account' };
+    const routes = { signin: '/signinv2', join: '/create-accountv2' };
     if (!next) {
       return routes;
     } else {
@@ -155,7 +155,7 @@ class SigninV2Page extends React.Component {
       );
     } else if ((loadingLoggedInUser || this.state.success) && token) {
       return <Loading />;
-    } else if (!loadingLoggedInUser && LoggedInUser && form === 'create-account') {
+    } else if (!loadingLoggedInUser && LoggedInUser && form === 'create-accountv2') {
       return (
         <MessageBox type="warning" withIcon>
           <FormattedMessage

@@ -5,7 +5,6 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
-import { getI18nLink } from './I18nFormatters';
 import Image from './Image';
 import Link from './Link';
 import MessageBox from './MessageBox';
@@ -255,18 +254,19 @@ const CreateProfileV2 = ({ email, submitting, errors, onEmailChange, onSubmit, .
         </StyledCard>
         <MessageBox type="info" mt="24px">
           <Box fontSize="13px" fontWeight={700}>
-            <FormattedMessage defaultMessage="Do you want to create an organization profile?" />
+            <FormattedMessage defaultMessage="Do you want to create an account for your organization?" />
           </Box>
-          <Box mt="8px" fontSize="12px" fontWeight={400}>
-            <FormattedMessage
-              defaultMessage="You are creating your personal account first, once inside, you will be able to create a profile for your business to appear as financial contributor, enable your employees to contribute on behalf of your company, and more. <Link>Read more about organizations</Link>"
-              values={{
-                Link: getI18nLink({
-                  href: `https://docs.opencollective.com/help/financial-contributors/organizations#what-is-an-organization`,
-                  openInNewTab: true,
-                }),
-              }}
-            />
+          <Box mt="8px" fontSize="12px" fontWeight={400} lineHeight="18px">
+            <FormattedMessage defaultMessage="You are creating your personal account first, once inside, you will be able to create a profile for your company." />
+            <Box mt="8px">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://docs.opencollective.com/help/financial-contributors/organizations#what-is-an-organization"
+              >
+                <FormattedMessage defaultMessage="Read more about organization accounts" />
+              </a>
+            </Box>
           </Box>
         </MessageBox>
         <Flex justifyContent="center">

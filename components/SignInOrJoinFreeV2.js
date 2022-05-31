@@ -22,8 +22,8 @@ import StyledCard from './StyledCard';
 import StyledHr from './StyledHr';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
-import { TOAST_TYPE, withToasts } from './ToastProvider';
 import { H5, P, Span } from './Text';
+import { TOAST_TYPE, withToasts } from './ToastProvider';
 
 const messages = defineMessages({
   twoFactorAuthCodeInputLabel: {
@@ -53,9 +53,9 @@ class SignInOrJoinFreeV2 extends React.Component {
     /** Whether user can signup from there */
     disableSignup: PropTypes.bool,
     /** Use this prop to use this as a controlled component */
-    form: PropTypes.oneOf(['signin', 'create-account']),
+    form: PropTypes.oneOf(['signin', 'create-accountv2']),
     /** Set the initial view for the component */
-    defaultForm: PropTypes.oneOf(['signin', 'create-account']),
+    defaultForm: PropTypes.oneOf(['signin', 'create-accountv2']),
     /** If provided, component will use links instead of buttons to make the switch */
     routes: PropTypes.shape({
       signin: PropTypes.string,
@@ -321,11 +321,11 @@ class SignInOrJoinFreeV2 extends React.Component {
           this.renderTwoFactorAuthBoxes(useRecoveryCodes)
         ) : (
           <Fragment>
-            {displayedForm !== 'create-account' ? (
+            {displayedForm !== 'create-accountv2' ? (
               <SignInV2
                 email={email}
                 onEmailChange={email => this.setState({ email, unknownEmailError: false })}
-                onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
+                onSecondaryAction={routes.join || (() => this.switchForm('create-accountv2'))}
                 onSubmit={email => this.signIn(email, false)}
                 loading={submitting}
                 unknownEmail={unknownEmailError}

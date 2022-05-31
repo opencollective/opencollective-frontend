@@ -107,6 +107,10 @@ exports.REWRITES = [
     destination: '/signin',
   },
   {
+    source: '/:form(create-accountv2)',
+    destination: '/signinv2',
+  },
+  {
     source: '/:collectiveSlug/:verb(contribute|donate)/button',
     destination: '/button',
   },
