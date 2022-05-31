@@ -9,7 +9,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
 import { signin } from '../lib/api';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { getWebsiteUrl } from '../lib/utils';
 
 import CreateProfileFAQ from './faqs/CreateProfileFAQ';
@@ -72,11 +71,6 @@ class SignInOrJoinFreeV2 extends React.Component {
     submitTwoFactorAuthenticatorCode: PropTypes.func,
     submitRecoveryCode: PropTypes.func,
     router: PropTypes.object,
-    /** emailExistenceQuery binding */
-    data: PropTypes.shape({
-      emailExists: PropTypes.bool,
-      refetch: PropTypes.func,
-    }),
   };
 
   constructor(props) {
@@ -94,7 +88,7 @@ class SignInOrJoinFreeV2 extends React.Component {
   componentDidMount() {
     // Auto signin if an email is provided
     if (this.props.email && isEmail(this.props.email)) {
-      this.signIn(this.props.email);
+      this.signIn(this.props.email, false);
     }
   }
 
@@ -111,7 +105,7 @@ class SignInOrJoinFreeV2 extends React.Component {
     return encodeURIComponent(this.props.redirect || currentPath || '/');
   }
 
-  signIn = async email => {
+  signIn = async (email, createProfile) => {
     if (this.state.submitting) {
       return false;
     }
@@ -119,26 +113,25 @@ class SignInOrJoinFreeV2 extends React.Component {
     this.setState({ submitting: true, error: null });
 
     try {
-      await this.props.data.refetch({ email });
-      const userExists = this.props.data.emailExists;
-      if (userExists) {
-        const response = await signin({
-          user: { email },
-          redirect: this.getRedirectURL(),
-          websiteUrl: getWebsiteUrl(),
-        });
-
-        // In dev/test, API directly returns a redirect URL for emails like
-        // test*@opencollective.com.
-        if (response.redirect) {
-          await this.props.router.replace(response.redirect);
-        } else {
-          await this.props.router.push({ pathname: '/signin/sent', query: { email } });
-        }
-        window.scrollTo(0, 0);
-      } else {
+      const response = await signin({
+        user: { email },
+        redirect: this.getRedirectURL(),
+        websiteUrl: getWebsiteUrl(),
+        createProfile: createProfile,
+      });
+      if (response.error?.errorCode === 'EMAIL_DOES_NOT_EXIST') {
         this.setState({ unknownEmailError: true, submitting: false });
+        return;
       }
+
+      // In dev/test, API directly returns a redirect URL for emails like
+      // test*@opencollective.com.
+      if (response.redirect) {
+        await this.props.router.replace(response.redirect);
+      } else {
+        await this.props.router.push({ pathname: '/signin/sent', query: { email } });
+      }
+      window.scrollTo(0, 0);
     } catch (e) {
       this.setState({ error: e.message || 'Server error', submitting: false });
       window.scrollTo(0, 0);
@@ -325,12 +318,12 @@ class SignInOrJoinFreeV2 extends React.Component {
           this.renderTwoFactorAuthBoxes(useRecoveryCodes)
         ) : (
           <Fragment>
-            {displayedForm !== 'create-accountv2' ? (
+            {displayedForm !== 'create-account' ? (
               <SignInV2
                 email={email}
                 onEmailChange={email => this.setState({ email, unknownEmailError: false })}
-                onSecondaryAction={routes.join || (() => this.switchForm('create-accountv2'))}
-                onSubmit={this.signIn}
+                onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
+                onSubmit={email => this.signIn(email, false)}
                 loading={submitting}
                 unknownEmail={unknownEmailError}
                 label={this.props.signInLabel}
@@ -387,22 +380,6 @@ const signupMutation = gql`
   }
 `;
 
-const emailExistenceQuery = gqlV2/* GraphQL */ `
-  query emailExistenceQuery($email: String) {
-    emailExists(email: $email)
-  }
-`;
-
 export const addSignupMutation = graphql(signupMutation, { name: 'createUser' });
 
-export const addEmailExistenceQuery = graphql(emailExistenceQuery, {
-  options: props => ({
-    context: API_V2_CONTEXT,
-    variables: {
-      email: props.email,
-    },
-    skip: props => !props.email,
-  }),
-});
-
-export default injectIntl(addSignupMutation(addEmailExistenceQuery(withRouter(SignInOrJoinFreeV2))));
+export default injectIntl(addSignupMutation(withRouter(SignInOrJoinFreeV2)));
