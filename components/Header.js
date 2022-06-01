@@ -30,6 +30,7 @@ class Header extends React.Component {
     title: PropTypes.string,
     metaTitle: PropTypes.string,
     showSearch: PropTypes.bool,
+    showProfileMenu: PropTypes.bool,
     withTopBar: PropTypes.bool,
     menuItems: PropTypes.object,
     menuItemsV2: PropTypes.object,
@@ -121,9 +122,19 @@ class Header extends React.Component {
         <div id="top" />
         {withTopBar &&
           (LoggedInUser?.collective?.settings?.useNewTopBar ? (
-            <TopBarV2 className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItemsV2} />
+            <TopBarV2
+              className={className}
+              showSearch={this.props.showSearch}
+              menuItems={this.props.menuItemsV2}
+              showProfileMenu={this.props.showProfileMenu}
+            />
           ) : (
-            <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
+            <TopBar
+              className={className}
+              showSearch={this.props.showSearch}
+              menuItems={this.props.menuItems}
+              showProfileMenu={this.props.showProfileMenu}
+            />
           ))}
         <GlobalWarnings collective={this.props.collective} />
       </header>

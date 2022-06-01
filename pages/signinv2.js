@@ -10,7 +10,6 @@ import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isValidRelativeUrl } from '../lib/utils';
 
 import Body from '../components/Body';
-import Footer from '../components/Footer';
 import { Flex } from '../components/Grid';
 import Header from '../components/Header';
 import Loading from '../components/Loading';
@@ -216,13 +215,15 @@ class SigninV2Page extends React.Component {
         <Header
           title="Login"
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
+          menuItems={{ discover: false, docs: false, howItWorks: false, pricing: false }}
+          showSearch={false}
+          showProfileMenu={false}
         />
         <Body>
           <Flex flexDirection="column" alignItems="center" my={[4, 6]} p={2}>
             {this.renderContent()}
           </Flex>
         </Body>
-        <Footer />
       </div>
     );
   }

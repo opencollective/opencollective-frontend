@@ -56,7 +56,7 @@ const NavItem = styled(StyledLink)`
   }
 `;
 
-const TopBarV2 = ({ showSearch, menuItems }) => {
+const TopBarV2 = ({ showSearch, menuItems, showProfileMenu = true }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const ref = useRef();
 
@@ -208,7 +208,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
           <ChangelogTrigger />
         </Hide>
       </Container>
-      <TopBarProfileMenu />
+      {showProfileMenu && <TopBarProfileMenu />}
       <Hide sm md lg>
         <TopBarMobileMenuV2 showMobileMenu={showMobileMenu} closeMenu={toggleMobileMenu} />
         <Box mx={3} onClick={toggleMobileMenu}>
@@ -223,11 +223,13 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
 
 TopBarV2.propTypes = {
   showSearch: PropTypes.bool,
+  showProfileMenu: PropTypes.bool,
   menuItems: PropTypes.object,
 };
 
 TopBarV2.defaultProps = {
   showSearch: true,
+  showProfileMenu: true,
   menuItems: { solutions: true, product: true, company: true, docs: true },
 };
 
