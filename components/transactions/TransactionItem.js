@@ -35,7 +35,7 @@ import { useUser } from '../UserProvider';
 
 import TransactionDetails from './TransactionDetails';
 
-const { CONTRIBUTION, ADDED_FUNDS } = TransactionKind;
+const { CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP } = TransactionKind;
 
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' • ';
@@ -307,11 +307,9 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             {isExpense && getExpenseStatusTag(expense, isRefund, isRefunded)}
           </Flex>
         </Flex>
-        {hasOrder && [CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
+        {hasOrder && [CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP].includes(transaction.kind) && (
           <Container borderTop={['1px solid #E8E9EB', 'none']} mt={3} pt={[2, 0]}>
-            {[CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
-              <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
-            )}
+            <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
             {transactionDetailsLink()}
           </Container>
         )}
@@ -321,7 +319,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             {transactionDetailsLink()}
           </Container>
         )}
-        {!isExpense && (!hasOrder || ![CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind)) && (
+        {!isExpense && (!hasOrder || ![CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP].includes(transaction.kind)) && (
           <Container mt={3} pt={[2, 0]}>
             <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
           </Container>
