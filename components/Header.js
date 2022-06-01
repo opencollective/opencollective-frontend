@@ -123,7 +123,7 @@ class Header extends React.Component {
           (LoggedInUser?.collective?.settings?.useNewTopBar ? (
             <TopBarV2 className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItemsV2} />
           ) : (
-            <TopBar className={className} showSearch={this.props.showSearch} />
+            <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
           ))}
         <GlobalWarnings collective={this.props.collective} />
       </header>
