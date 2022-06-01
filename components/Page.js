@@ -23,6 +23,7 @@ const Page = ({
   menuItems,
   canonicalURL,
   collective,
+  menuItemsV2,
   showFooter = true,
 }) => {
   if (data.error) {
@@ -44,6 +45,7 @@ const Page = ({
         canonicalURL={canonicalURL}
         collective={collective}
         menuItems={menuItems}
+        menuItemsV2={menuItemsV2}
         LoggedInUser={LoggedInUser}
       />
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
@@ -71,6 +73,7 @@ Page.propTypes = {
   twitterHandle: PropTypes.string,
   collective: PropTypes.object,
   menuItems: PropTypes.object,
+  menuItemsV2: PropTypes.object,
   showFooter: PropTypes.bool,
 };
 

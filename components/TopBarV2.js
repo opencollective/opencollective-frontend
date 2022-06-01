@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
+import { ChevronDown, ChevronUp } from '@styled-icons/boxicons-regular';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -56,7 +56,7 @@ const NavItem = styled(StyledLink)`
   }
 `;
 
-const TopBarV2 = ({ showSearch }) => {
+const TopBarV2 = ({ showSearch, menuItems }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const ref = useRef();
 
@@ -88,106 +88,119 @@ const TopBarV2 = ({ showSearch }) => {
       <Flex alignItems="center" justifyContent={['flex-end', 'flex-end', 'center']} flex="1 1 auto">
         <Hide xs>
           <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
-            <PopupMenu
-              zIndex={2000}
-              Button={({ onClick }) => (
-                <NavButton as={StyledLink} onClick={onClick} whiteSpace="nowrap">
-                  <FormattedMessage defaultMessage="Solutions" />
-                  <ChevronDown size={20} />
-                </NavButton>
-              )}
-              placement="bottom"
-            >
-              <NavLinkContainer>
-                {/* TODO: Add this part back when the /collectives page is designed */}
-                {/* <Link href="/collectives">*/}
-                {/*  <NavItem as={Container} mt={16} mb={16}>*/}
-                {/*    <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />*/}
-                {/*  </NavItem>*/}
-                {/* </Link>*/}
-                <Link href="/become-a-sponsor">
-                  <NavItem as={Container} mt={16} mb={16}>
-                    <FormattedMessage defaultMessage="For Sponsors" />
-                  </NavItem>
-                </Link>
-                <Link href="/become-a-host">
-                  <NavItem as={Container} mt={16} mb={16}>
-                    <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
-                  </NavItem>
-                </Link>
-              </NavLinkContainer>
-            </PopupMenu>
+            {menuItems.solutions && (
+              <PopupMenu
+                zIndex={2000}
+                closingEvent="mouseover"
+                Button={({ onMouseOver, onClick, popupOpen }) => (
+                  <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
+                    <FormattedMessage defaultMessage="Solutions" />
+                    {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                  </NavButton>
+                )}
+                placement="bottom"
+              >
+                <NavLinkContainer>
+                  {/* TODO: Add this part back when the /collectives page is designed */}
+                  {/* <Link href="/collectives">*/}
+                  {/*  <NavItem as={Container} mt={16} mb={16}>*/}
+                  {/*    <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />*/}
+                  {/*  </NavItem>*/}
+                  {/* </Link>*/}
+                  <Link href="/become-a-sponsor">
+                    <NavItem as={Container} mt={16} mb={16}>
+                      <FormattedMessage defaultMessage="For Sponsors" />
+                    </NavItem>
+                  </Link>
+                  <Link href="/become-a-host">
+                    <NavItem as={Container} mt={16} mb={16}>
+                      <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
+                    </NavItem>
+                  </Link>
+                </NavLinkContainer>
+              </PopupMenu>
+            )}
 
-            <PopupMenu
-              zIndex={2000}
-              Button={({ onClick }) => (
-                <NavButton as={StyledLink} onClick={onClick} whiteSpace="nowrap">
-                  <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
-                  <ChevronDown size={20} />
-                </NavButton>
-              )}
-              placement="bottom"
-            >
-              <NavLinkContainer>
-                <Link href="/pricing">
-                  <NavItem as={Container} mt={16} mb={16}>
-                    <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
-                  </NavItem>
-                </Link>
-                <Link href="/how-it-works">
-                  <NavItem as={Container}>
-                    <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
-                  </NavItem>
-                </Link>
-                <Link href="/fiscal-hosting">
-                  <NavItem as={Container} mt={16} mb={16}>
-                    <FormattedMessage id="editCollective.fiscalHosting" defaultMessage="Fiscal Hosting" />
-                  </NavItem>
-                </Link>
-              </NavLinkContainer>
-            </PopupMenu>
+            {menuItems.product && (
+              <PopupMenu
+                zIndex={2000}
+                closingEvent="mouseover"
+                Button={({ onClick, onMouseOver, popupOpen }) => (
+                  <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
+                    <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
+                    {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                  </NavButton>
+                )}
+                placement="bottom"
+              >
+                <NavLinkContainer>
+                  <Link href="/pricing">
+                    <NavItem as={Container} mt={16} mb={16}>
+                      <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
+                    </NavItem>
+                  </Link>
+                  <Link href="/how-it-works">
+                    <NavItem as={Container}>
+                      <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
+                    </NavItem>
+                  </Link>
+                  <Link href="/fiscal-hosting">
+                    <NavItem as={Container} mt={16} mb={16}>
+                      <FormattedMessage id="editCollective.fiscalHosting" defaultMessage="Fiscal Hosting" />
+                    </NavItem>
+                  </Link>
+                </NavLinkContainer>
+              </PopupMenu>
+            )}
 
-            <PopupMenu
-              zIndex={2000}
-              Button={({ onClick }) => (
-                <NavButton as={StyledLink} onClick={onClick} whiteSpace="nowrap">
-                  <FormattedMessage id="company" defaultMessage="Company" />
-                  <ChevronDown size={20} />
+            {menuItems.company && (
+              <PopupMenu
+                zIndex={2000}
+                closingEvent="mouseover"
+                Button={({ onClick, onMouseOver, popupOpen }) => (
+                  <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
+                    <FormattedMessage id="company" defaultMessage="Company" />
+                    {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                  </NavButton>
+                )}
+                placement="bottom"
+              >
+                <NavLinkContainer>
+                  <a href="https://blog.opencollective.com/">
+                    <NavItem as={Container} mt={16} mb={16}>
+                      <FormattedMessage id="company.blog" defaultMessage="Blog" />
+                    </NavItem>
+                  </a>
+                  <Link href="/e2c">
+                    <NavItem as={Container} mb={16}>
+                      <FormattedMessage id="OC.e2c" defaultMessage="Exit to Community" />
+                    </NavItem>
+                  </Link>
+                </NavLinkContainer>
+              </PopupMenu>
+            )}
+            {menuItems.docs && (
+              <Link href="/help">
+                <NavButton as={Container} whiteSpace="nowrap">
+                  <FormattedMessage defaultMessage="Help & Support" />
                 </NavButton>
-              )}
-              placement="bottom"
-            >
-              <NavLinkContainer>
-                <a href="https://blog.opencollective.com/">
-                  <NavItem as={Container} mt={16} mb={16}>
-                    <FormattedMessage id="company.blog" defaultMessage="Blog" />
-                  </NavItem>
-                </a>
-                <Link href="/e2c">
-                  <NavItem as={Container} mb={16}>
-                    <FormattedMessage id="OC.e2c" defaultMessage="Exit to Community" />
-                  </NavItem>
-                </Link>
-              </NavLinkContainer>
-            </PopupMenu>
-            <Link href="/help">
-              <NavButton as={Container} whiteSpace="nowrap">
-                <FormattedMessage defaultMessage="Help & Support" />
-              </NavButton>
-            </Link>
-            <Container borderRight="2px solid #DCDDE0" height="20px" padding="5px" />
+              </Link>
+            )}
+            {showSearch && menuItems.docs && <Container borderRight="2px solid #DCDDE0" height="20px" padding="5px" />}
           </NavList>
         </Hide>
-        <NavButton as={StyledLink} href="/search">
-          <Flex>
-            <SearchIcon fill="#75777A" size={18} />
-            <Hide xs sm>
-              <Span ml="5px">
-                <FormattedMessage id="Search" defaultMessage="Search" />
-              </Span>
-            </Hide>
-          </Flex>
-        </NavButton>
+        {showSearch && (
+          <NavButton as={Link} href="/search">
+            <Flex>
+              <SearchIcon fill="#75777A" size={18} />
+              <Hide xs sm>
+                <Span ml="5px">
+                  <FormattedMessage id="Search" defaultMessage="Search" />
+                </Span>
+              </Hide>
+            </Flex>
+          </NavButton>
+        )}
       </Flex>
 
       <Container mr={3}>
@@ -210,10 +223,12 @@ const TopBarV2 = ({ showSearch }) => {
 
 TopBarV2.propTypes = {
   showSearch: PropTypes.bool,
+  menuItems: PropTypes.object,
 };
 
 TopBarV2.defaultProps = {
   showSearch: true,
+  menuItems: { solutions: true, product: true, company: true, docs: true },
 };
 
 export default TopBarV2;
