@@ -209,7 +209,7 @@ class Members extends React.Component {
             <FormattedMessage id="user.since.label" defaultMessage="Since" />:{' '}
             <FormattedDate value={get(member, 'since')} />
           </P>
-          <P fontSize="11px" lineHeight="16px" mx={2} fontWeight={400} mb={5}>
+          <P fontSize="11px" lineHeight="16px" mx={2} minHeight={16} fontWeight={400} mb={5}>
             {get(member, 'description')}
           </P>
           {isInvitation && (
