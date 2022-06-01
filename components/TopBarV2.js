@@ -190,7 +190,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
           </NavList>
         </Hide>
         {showSearch && (
-          <NavButton as={StyledLink} href="/search">
+          <NavButton as={Link} href="/search">
             <Flex>
               <SearchIcon fill="#75777A" size={18} />
               <Hide xs sm>
