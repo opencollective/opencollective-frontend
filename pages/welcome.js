@@ -1,5 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import Container from '../components/Container';
 import { Box, Flex } from '../components/Grid';
@@ -12,6 +13,12 @@ import { useUser } from '../components/UserProvider';
 
 import Custom404 from './404';
 
+const WelcomeOptionContainer = styled(Container)`
+  &:hover {
+    background-color: #f5faff;
+  }
+`;
+
 const Welcome = () => {
   const { LoggedInUser, loadingLoggedInUser } = useUser();
   if (!loadingLoggedInUser && !LoggedInUser) {
@@ -20,16 +27,11 @@ const Welcome = () => {
   return (
     <Page title="Welcome to Open Collective!">
       <Flex flexDirection={['column', 'row']} mb="61px" mt="112px" justifyContent="center" alignItems="center">
-        <Flex alignItems="center" mr={[0, '64px']} flexDirection={['column', 'row']}>
+        <Flex textAlign="center" flexDirection="column" pr={[0, '48px']}>
           <Box>
-            <Image
-              src="/static/images/create-profile-page-logo.png"
-              alt="Open Collective logo"
-              height={160}
-              width={160}
-            />
+            <Image src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective logo" height={96} width={96} />
           </Box>
-          <Container pl="16px" pr={['16px', 0]} width={['100%', '404px']}>
+          <Container pt="40px" pl="16px" pr={['16px', 0]} width={['100%', '404px']}>
             <Flex fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
               <FormattedMessage defaultMessage="Welcome to Open Collective!" />
             </Flex>
@@ -53,7 +55,7 @@ const Welcome = () => {
             {LoggedInUser?.collective?.name}
           </Flex>
           <Link href="/create">
-            <Container mt="16px" background="#F5FAFF" width={['300px', '472px']} borderRadius="8px">
+            <WelcomeOptionContainer mt="16px" width={['300px', '472px']} borderRadius="8px">
               <Flex alignItems="center" p="13px">
                 <Box width="386px">
                   <Flex fontSize="18px" fontWeight="700" color="black.900" lineHeight="26px">
@@ -64,13 +66,13 @@ const Welcome = () => {
                   </Flex>
                 </Box>
                 <Box pl="39px">
-                  <Image src="/static/images/left-arrow.png" alt="Left Arrow" width="22px" height="20px" />
+                  <Image src="/static/images/right-arrow.png" alt="Right Arrow" width="22px" height="20px" />
                 </Box>
               </Flex>
-            </Container>
+            </WelcomeOptionContainer>
           </Link>
           <Link href="/organizations/new">
-            <Container mt="16px" width={['300px', '472px']} borderRadius="8px">
+            <WelcomeOptionContainer mt="16px" width={['300px', '472px']} borderRadius="8px">
               <Flex alignItems="center" p="13px">
                 <Box width="386px">
                   <Flex fontSize="18px" fontWeight="700" color="black.900" lineHeight="26px">
@@ -81,13 +83,13 @@ const Welcome = () => {
                   </Flex>
                 </Box>
                 <Box pl="39px">
-                  <Image src="/static/images/left-arrow.png" alt="Left Arrow" width="22px" height="20px" />
+                  <Image src="/static/images/right-arrow.png" alt="Right Arrow" width="22px" height="20px" />
                 </Box>
               </Flex>
-            </Container>
+            </WelcomeOptionContainer>
           </Link>
           <Link href="/search">
-            <Container mt="16px" width={['300px', '472px']} borderRadius="8px">
+            <WelcomeOptionContainer mt="16px" width={['300px', '472px']} borderRadius="8px">
               <Flex alignItems="center" p="13px">
                 <Box width="386px">
                   <Flex fontSize="18px" fontWeight="700" color="black.900" lineHeight="26px">
@@ -98,10 +100,10 @@ const Welcome = () => {
                   </Flex>
                 </Box>
                 <Box pl="39px">
-                  <Image src="/static/images/left-arrow.png" alt="Left Arrow" width="22px" height="20px" />
+                  <Image src="/static/images/right-arrow.png" alt="Right Arrow" width="22px" height="20px" />
                 </Box>
               </Flex>
-            </Container>
+            </WelcomeOptionContainer>
           </Link>
           <Flex justifyContent="space-between" width={['100%', '472px']} pl="13px" pr="13px" pb="32px" pt="40px">
             {LoggedInUser && (

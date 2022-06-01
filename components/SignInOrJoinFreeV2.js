@@ -100,7 +100,11 @@ class SignInOrJoinFreeV2 extends React.Component {
     if (window.location.search) {
       currentPath = currentPath + window.location.search;
     }
-    return encodeURIComponent(this.props.redirect || currentPath || '/');
+    let redirectUrl = this.props.redirect;
+    if (currentPath === '/create-accountv2' && redirectUrl === '/') {
+      redirectUrl = '/welcome-to-oc';
+    }
+    return encodeURIComponent(redirectUrl || currentPath || '/');
   }
 
   signIn = async (email, createProfile) => {
@@ -335,12 +339,12 @@ class SignInOrJoinFreeV2 extends React.Component {
             ) : (
               <Flex flexDirection="column" width={1} alignItems="center">
                 <Flex justifyContent="center" width={1}>
-                  <Box maxWidth={575} mx={[2, 4]} width="100%">
+                  <Box maxWidth={535} mx={[2, 4]} width="100%">
                     <CreateProfileV2
                       email={email}
                       onEmailChange={email => this.setState({ email, unknownEmailError: false })}
                       onSubmit={this.createProfile}
-                      onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
+                      onSecondaryAction={routes.signin || (() => this.switchForm('signinv2'))}
                       submitting={submitting}
                     />
                   </Box>

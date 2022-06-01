@@ -15,7 +15,7 @@ import StyledHr from './StyledHr';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import StyledLink from './StyledLink';
-import { P } from './Text';
+import { P, Span } from './Text';
 
 const messages = defineMessages({
   heading: {
@@ -157,24 +157,24 @@ const useForm = ({ onEmailChange, errors }) => {
   };
 };
 
-const CreateProfileV2 = ({ email, submitting, errors, onEmailChange, onSubmit, ...props }) => {
+const CreateProfileV2 = ({ email, submitting, errors, onEmailChange, onSubmit, onSecondaryAction, ...props }) => {
   const { formatMessage } = useIntl();
   const { getFieldError, getFieldProps, state } = useForm({ onEmailChange, errors, formatMessage });
   const isValid = isEmpty(compact(values(state.errors)));
 
   return (
     <React.Fragment>
-      <Flex>
-        <Image src="/static/images/create-profile-page-logo.png" alt="Open Collective logo" height={160} width={160} />
-        <Container mt="16px">
-          <Flex fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
-            {formatMessage(messages.heading)}
-          </Flex>
-          <Flex fontSize="16px" fontWeight="500" color="black.700" lineHeight="24px" pt="14px">
-            {formatMessage(messages.subHeading)}
-          </Flex>
-        </Container>
-      </Flex>
+      <Container textAlign="center">
+        <Box>
+          <Image src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective logo" height={96} width={96} />
+        </Box>
+        <Box pt="48px" fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
+          {formatMessage(messages.heading)}
+        </Box>
+        <Box fontSize="16px" fontWeight="500" color="black.700" lineHeight="24px" pt="14px">
+          {formatMessage(messages.subHeading)}
+        </Box>
+      </Container>
       <Box
         as="form"
         onSubmit={event => {
@@ -270,6 +270,14 @@ const CreateProfileV2 = ({ email, submitting, errors, onEmailChange, onSubmit, .
           </Box>
         </MessageBox>
         <Flex justifyContent="center">
+          <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
+            <StyledButton mt="24px" mr="16px" width="120px">
+              &larr;{` `}
+              <Span fontWeight="500" fontSize="14px">
+                <FormattedMessage defaultMessage="Go back" />
+              </Span>
+            </StyledButton>
+          </SecondaryAction>
           <StyledButton
             mt="24px"
             buttonStyle="primary"
