@@ -43,8 +43,11 @@ export const getSettingsQuery = gqlV2/* GraphQL */ `
       isHost
       settings
       policies {
+        EXPENSE_AUTHOR_CANNOT_APPROVE
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
+          applies
+          freeze
         }
       }
     }

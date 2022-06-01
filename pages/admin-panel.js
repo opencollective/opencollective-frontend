@@ -56,6 +56,8 @@ export const adminPanelQuery = gqlV2/* GraphQL */ `
             EXPENSE_AUTHOR_CANNOT_APPROVE
             COLLECTIVE_MINIMUM_ADMINS {
               numberOfAdmins
+              applies
+              freeze
             }
           }
         }

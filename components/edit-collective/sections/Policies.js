@@ -7,7 +7,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
-import { stripHTML } from '../../../lib/utils';
+import { stripHTML, omitDeep } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
@@ -19,6 +19,7 @@ import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import MessageBox from '../../MessageBox';
 
 import { getSettingsQuery } from './EditCollectivePage';
 import SettingsSectionTitle from './SettingsSectionTitle';
@@ -56,6 +57,8 @@ const setPoliciesMutation = gqlV2/* GraphQL */ `
         EXPENSE_AUTHOR_CANNOT_APPROVE
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
+          applies
+          freeze
         }
       }
     }
@@ -176,7 +179,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             account: {
               legacyId: collective.id,
             },
-            policies,
+            policies: omitDeep(policies, ['__typename']),
           },
         }),
       ]);
@@ -222,6 +225,10 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
     value: n,
     label: formatMessage(messages['requiredAdmins.numberOfAdmins'], { admins: n }),
   }));
+  const minAdminsApplies = [
+    { value: 'NEW_COLLECTIVES', label: <FormattedMessage defaultMessage="New Collectives Only" /> },
+    { value: 'ALL_COLLECTIVES', label: <FormattedMessage defaultMessage="All Collectives" /> },
+  ];
 
   return (
     <Flex flexDirection="column">
@@ -339,7 +346,49 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                 )}
               />
             </StyledInputField>
+            <StyledInputField
+              disabled={isSubmittingSettings}
+              labelFontSize="13px"
+              labelFontWeight="700"
+              label={<FormattedMessage defaultMessage="Whom does this apply to" />}
+              flexGrow={1}
+            >
+              <StyledSelect
+                inputId="applies"
+                isSearchable={false}
+                options={minAdminsApplies}
+                onChange={option =>
+                  formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
+                    ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
+                    applies: option.value,
+                  })
+                }
+                value={minAdminsApplies.find(
+                  option => option.value === formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.applies,
+                )}
+              />
+            </StyledInputField>
           </Flex>
+          <StyledCheckbox
+            name="minAdminsFreeze"
+            label={<FormattedMessage defaultMessage="Freeze collectives that don’t meet the minimum requirement" />}
+            onChange={({ checked }) => {
+              formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
+                ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
+                freeze: checked,
+              });
+            }}
+            checked={Boolean(formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze)}
+          />
+          <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
+            <FormattedMessage defaultMessage="Freezing the collective will prevent them from accepting and distributing contributions till they meet the requirements. This is a security measure to make sure the admins are within their rights. Read More." />
+          </P>
+          {formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.applies === 'ALL_COLLECTIVES' &&
+            formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze && (
+              <MessageBox type="warning" mt={2} fontSize="13px">
+                <FormattedMessage defaultMessage="Some collectives hosted by you may not fulfil the minimum admin requirements. If you choose to apply the setting to all collectives, the collectives that don't comply will be frozen till they meet the minimum requirements for admins." />
+              </MessageBox>
+            )}
         </Container>
         <Container>
           <SettingsSectionTitle mt={4}>
