@@ -9,6 +9,7 @@ import { truncate } from '../lib/utils';
 
 import GlobalWarnings from './GlobalWarnings';
 import TopBar from './TopBar';
+import TopBarV2 from './TopBarV2';
 
 const messages = defineMessages({
   defaultTitle: {
@@ -31,10 +32,12 @@ class Header extends React.Component {
     showSearch: PropTypes.bool,
     withTopBar: PropTypes.bool,
     menuItems: PropTypes.object,
+    menuItemsV2: PropTypes.object,
     /** If true, a no-robots meta will be added to the page */
     noRobots: PropTypes.bool,
     /** @ignore from injectIntl */
     intl: PropTypes.object,
+    LoggedInUser: PropTypes.object,
   };
 
   static defaultProps = {
@@ -95,7 +98,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { css, className, canonicalURL, withTopBar } = this.props;
+    const { css, className, canonicalURL, withTopBar, LoggedInUser } = this.props;
     return (
       <header>
         <Head>
@@ -116,9 +119,12 @@ class Header extends React.Component {
           {canonicalURL && <link rel="canonical" href={canonicalURL} />}
         </Head>
         <div id="top" />
-        {withTopBar && (
-          <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
-        )}
+        {withTopBar &&
+          (LoggedInUser?.collective?.settings?.useNewTopBar ? (
+            <TopBarV2 className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItemsV2} />
+          ) : (
+            <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
+          ))}
         <GlobalWarnings collective={this.props.collective} />
       </header>
     );
