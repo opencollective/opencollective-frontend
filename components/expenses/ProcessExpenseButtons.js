@@ -135,6 +135,15 @@ const PermissionButton = ({ icon, label, permission, ...props }) => {
   return button;
 };
 
+PermissionButton.propTypes = {
+  icon: PropTypes.element.isRequired,
+  label: PropTypes.element.isRequired,
+  permission: PropTypes.shape({
+    allowed: PropTypes.bool,
+    reason: PropTypes.string,
+  }).isRequired,
+};
+
 /**
  * All the buttons to process an expense, displayed in a React.Fragment to let the parent
  * in charge of the layout.
