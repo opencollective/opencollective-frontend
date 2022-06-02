@@ -157,7 +157,16 @@ const useForm = ({ onEmailChange, errors }) => {
   };
 };
 
-const CreateProfileV2 = ({ email, submitting, errors, onEmailChange, onSubmit, onSecondaryAction, ...props }) => {
+const CreateProfileV2 = ({
+  email,
+  submitting,
+  errors,
+  onEmailChange,
+  onSubmit,
+  onSecondaryAction,
+  emailAlreadyExists,
+  ...props
+}) => {
   const { formatMessage } = useIntl();
   const { getFieldError, getFieldProps, state } = useForm({ onEmailChange, errors, formatMessage });
   const isValid = isEmpty(compact(values(state.errors)));
@@ -269,6 +278,21 @@ const CreateProfileV2 = ({ email, submitting, errors, onEmailChange, onSubmit, o
             </Box>
           </Box>
         </MessageBox>
+        {emailAlreadyExists && (
+          <MessageBox type="warning" mt="24px">
+            <Box fontSize="14px" fontWeight={400} lineHeight="20px">
+              <FormattedMessage
+                defaultMessage="{email} is already registered on Open Collective. Would you like to sign-in instead?"
+                values={{ email: <strong>{email}</strong> }}
+              />
+              <Box mt="8px">
+                <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
+                  <FormattedMessage defaultMessage="Sign me in" />
+                </SecondaryAction>
+              </Box>
+            </Box>
+          </MessageBox>
+        )}
         <Flex justifyContent="center">
           <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
             <StyledButton mt="24px" mr="16px" width="120px">
@@ -306,6 +330,8 @@ CreateProfileV2.propTypes = {
   email: PropTypes.string.isRequired,
   /** handles changes in the email input */
   onEmailChange: PropTypes.func.isRequired,
+  /** specifies whether the email is already registered **/
+  emailAlreadyExists: PropTypes.bool,
   /** All props from `StyledCard` */
   ...StyledCard.propTypes,
 };

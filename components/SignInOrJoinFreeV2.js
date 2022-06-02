@@ -3,7 +3,7 @@ import { PropTypes } from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Field, Form, Formik } from 'formik';
-import { pick } from 'lodash';
+import { get, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { isEmail } from 'validator';
@@ -171,11 +171,14 @@ class SignInOrJoinFreeV2 extends React.Component {
       await this.props.router.push({ pathname: '/signin/sent', query: { email: user.email } });
       window.scrollTo(0, 0);
     } catch (error) {
-      this.props.addToast({
-        type: TOAST_TYPE.ERROR,
-        message: error.message || 'Server error',
-      });
-      this.setState({ submitting: false });
+      const emailAlreadyExists = get(error, 'graphQLErrors.0.extensions.code') === 'EMAIL_ALREADY_EXISTS';
+      if (!emailAlreadyExists) {
+        this.props.addToast({
+          type: TOAST_TYPE.ERROR,
+          message: error.message || 'Server error',
+        });
+      }
+      this.setState({ submitting: false, emailAlreadyExists });
     }
   };
 
@@ -346,6 +349,7 @@ class SignInOrJoinFreeV2 extends React.Component {
                       onSubmit={this.createProfile}
                       onSecondaryAction={routes.signin || (() => this.switchForm('signinv2'))}
                       submitting={submitting}
+                      emailAlreadyExists={this.state.emailAlreadyExists}
                     />
                   </Box>
                 </Flex>
