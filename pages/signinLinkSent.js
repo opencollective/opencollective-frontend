@@ -1,21 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { PaperPlane } from '@styled-icons/boxicons-regular/PaperPlane';
-import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 import { isEmail } from 'validator';
 
 import Container from '../components/Container';
-import { Box, Flex } from '../components/Grid';
+import { Box } from '../components/Grid';
 import { getI18nLink } from '../components/I18nFormatters';
+import Image from '../components/Image';
 import OpenEmailProviderButton from '../components/OpenEmailProviderButton';
 import Page from '../components/Page';
-import { H3, P } from '../components/Text';
-
-const Icon = styled(PaperPlane)`
-  color: ${themeGet('colors.primary.300')};
-`;
+import { P } from '../components/Text';
 
 class SignInLinkSent extends Component {
   static async getInitialProps({ res, query = {}, router }) {
@@ -37,24 +31,22 @@ class SignInLinkSent extends Component {
     const { email } = this.props;
     const isValidEmail = email && isEmail(email);
     return (
-      <Page title="Login Link Sent" noRobots>
-        <Container pt={[4, 5]} pb={6} px={3} background="linear-gradient(180deg, #EBF4FF, #FFFFFF)" textAlign="center">
-          <Flex justifyContent="center" mb={4}>
-            <Icon size="60" />
-          </Flex>
-          <H3 as="h1" fontWeight="bold">
+      <Page title="Login Link Sent" noRobots showFooter={false}>
+        <Container pt={[4, 5]} pb={6} px={3} textAlign="center">
+          <Image src="/static/images/sign-in-illustration.png" width="624px" height="372px" />
+          <P fontSize="32px" lineHeight="40px" fontWeight={700} color="black.900">
             <FormattedMessage id="SignIn.LinkSent" defaultMessage="Your magic link is on its way!" />
-          </H3>
+          </P>
           {isValidEmail && (
-            <P fontSize="16px" lineHeight="24px" color="black.900" mt={4}>
+            <P fontSize="20px" lineHeight="28px" color="black.800" fontWeight={500} mt={4}>
               <FormattedMessage
-                id="SignIn.SentTo"
-                defaultMessage="We've sent it to {email}."
+                defaultMessage="We've sent it to {email}"
                 values={{ email: <strong>{email}</strong> }}
               />
             </P>
           )}
-          <P color="black.700" fontSize="14px" lineHeight="18px" my={4}>
+          <OpenEmailProviderButton email={email}>{button => <Box mt={3}>{button}</Box>}</OpenEmailProviderButton>
+          <P color="black.800" fontSize="16px" fontWeight={500} lineHeight="24px" my={4}>
             <FormattedMessage
               id="SignIn.SuccessDetails"
               defaultMessage="You’ll be redirected from the link in the email, you can safely close this tab."
@@ -71,7 +63,6 @@ class SignInLinkSent extends Component {
               }}
             />
           </P>
-          <OpenEmailProviderButton email={email}>{button => <Box mt={3}>{button}</Box>}</OpenEmailProviderButton>
         </Container>
       </Page>
     );

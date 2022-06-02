@@ -113,7 +113,7 @@ describe('signin', () => {
     cy.get('input[name=email]').type(`{selectall}${email}`);
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
-    cy.contains(`We've sent it to ${email}.`);
+    cy.contains(`We've sent it to ${email}`);
   });
 
   it('can signup a user with gmail and show Open Gmail button ', () => {
@@ -125,7 +125,7 @@ describe('signin', () => {
     cy.get('input[name=email]').type(`{selectall}${gmailEmail}`);
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
-    cy.contains(`We've sent it to ${gmailEmail}.`);
+    cy.contains(`We've sent it to ${gmailEmail}`);
     cy.getByDataCy('open-inbox-link').should(
       'have.prop',
       'href',
@@ -142,7 +142,7 @@ describe('signin', () => {
     cy.get('input[name=email]').type(`{selectall}${hotmail}`);
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
-    cy.contains(`We've sent it to ${hotmail}.`);
+    cy.contains(`We've sent it to ${hotmail}`);
     cy.getByDataCy('open-inbox-link').should('have.prop', 'href', 'https://outlook.live.com/mail/inbox');
   });
 
@@ -172,7 +172,7 @@ describe('signin', () => {
     cy.get('input[name=email]').type(`{selectall}${email}`);
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
-    cy.contains(`We've sent it to ${email}.`);
+    cy.contains(`We've sent it to ${email}`);
   });
 });
 

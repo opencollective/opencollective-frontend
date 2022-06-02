@@ -85,6 +85,10 @@ const accountOrdersQuery = gqlV2/* GraphQL */ `
           slug
           name
           imageUrl
+          isHost
+          ... on AccountWithHost {
+            bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
+          }
         }
         permissions {
           id

@@ -108,9 +108,11 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
           <RadialIconContainer size="32px" bg="#29cc75">
             <Check size={12} />
           </RadialIconContainer>
-          <RadialIconContainer bg="blue.700" size={96} border="1px solid #DCDEE0">
-            <Image src="/static/images/oc-logo-inverted.svg" height={56} width={56} />
-          </RadialIconContainer>
+          <Container borderRadius="50%" border="1px solid #DCDEE0">
+            <RadialIconContainer size={96} bg="blue.700">
+              <Image src="/static/images/oc-logo-inverted.svg" height={56} width={56} />
+            </RadialIconContainer>
+          </Container>
         </TopAvatarsContainer>
         <Box pt={56}>
           {isRedirecting ? (

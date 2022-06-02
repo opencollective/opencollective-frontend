@@ -142,6 +142,7 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
         }
       }
       ... on AccountWithHost {
+        addedFundsHostFeePercent: hostFeePercent(paymentMethodType: HOST)
         host {
           id
           isTrustedHost
@@ -302,7 +303,8 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
   const canAddHostFee = host.plan?.hostFees && collective.id !== host.id;
-  const defaultHostFeePercent = canAddHostFee && collective.hostFeePercent ? collective.hostFeePercent : 0;
+  const hostFeePercent = data?.account.addedFundsHostFeePercent || collective.hostFeePercent;
+  const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const canAddPlatformTip = data?.account?.host?.isTrustedHost;
 
   const handleClose = () => {
@@ -324,6 +326,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       <CollectiveModalHeader collective={collective} onClick={handleClose} />
       <Formik
         initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective })}
+        enableReinitialize={true}
         validate={validate}
         onSubmit={async values => {
           if (!fundDetails.showPlatformTipModal) {

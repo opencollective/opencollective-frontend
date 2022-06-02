@@ -645,6 +645,10 @@ const ExpenseFormBody = ({
                       }
                       setShowResetModal(false);
                     }}
+                    {...(editingExpense && {
+                      continueLabel: formatMessage({ defaultMessage: 'Yes, cancel editing' }),
+                      cancelLabel: formatMessage({ defaultMessage: 'No, continue editing' }),
+                    })}
                   />
                 ) : (
                   <StyledButton

@@ -386,6 +386,7 @@ class CreateExpensePage extends React.Component {
                                 }}
                                 collective={collective}
                                 borderless
+                                isEditing
                               />
                               {hasFeature(collective, FEATURES.RECURRING_EXPENSES) && (
                                 <ExpenseRecurringForm

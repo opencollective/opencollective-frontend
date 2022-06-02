@@ -23,6 +23,8 @@ const Page = ({
   menuItems,
   canonicalURL,
   collective,
+  menuItemsV2,
+  showFooter = true,
 }) => {
   if (data.error) {
     return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
@@ -43,9 +45,11 @@ const Page = ({
         canonicalURL={canonicalURL}
         collective={collective}
         menuItems={menuItems}
+        menuItemsV2={menuItemsV2}
+        LoggedInUser={LoggedInUser}
       />
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
-      <Footer />
+      {showFooter && <Footer />}
     </Fragment>
   );
 };
@@ -69,6 +73,8 @@ Page.propTypes = {
   twitterHandle: PropTypes.string,
   collective: PropTypes.object,
   menuItems: PropTypes.object,
+  menuItemsV2: PropTypes.object,
+  showFooter: PropTypes.bool,
 };
 
 Page.defaultProps = {
