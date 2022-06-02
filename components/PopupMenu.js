@@ -48,7 +48,7 @@ const PopupMenu = ({ Button, children, placement, onClose, closingEvent, zIndex 
           ]}
         >
           {({ style, ref }) => (
-            <Popup mt="-1px" zIndex={zIndex} {...{ style, ref }}>
+            <Popup mt="-10px" zIndex={zIndex} {...{ style, ref }}>
               {typeof children === 'function' ? children({ setOpen }) : children}
             </Popup>
           )}

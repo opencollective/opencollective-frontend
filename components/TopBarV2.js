@@ -40,8 +40,17 @@ const NavButton = styled(StyledButton)`
   padding: 10px;
   @media (hover: hover) {
     :hover {
+      background-color: white !important;
       text-decoration: underline;
     }
+  }
+  :focus {
+    text-decoration: underline;
+    background-color: white;
+    border-radius: 1px;
+  }
+  :active {
+    color: black;
   }
 `;
 
@@ -93,7 +102,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
                 zIndex={2000}
                 closingEvent="mouseover"
                 Button={({ onMouseOver, onClick, popupOpen }) => (
-                  <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
+                  <NavButton isBorderless onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
                     <FormattedMessage defaultMessage="Solutions" />
                     {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </NavButton>
@@ -126,7 +135,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
                 zIndex={2000}
                 closingEvent="mouseover"
                 Button={({ onClick, onMouseOver, popupOpen }) => (
-                  <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
+                  <NavButton isBorderless onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
                     <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
                     {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </NavButton>
@@ -158,7 +167,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
                 zIndex={2000}
                 closingEvent="mouseover"
                 Button={({ onClick, onMouseOver, popupOpen }) => (
-                  <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
+                  <NavButton isBorderless onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
                     <FormattedMessage id="company" defaultMessage="Company" />
                     {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </NavButton>
