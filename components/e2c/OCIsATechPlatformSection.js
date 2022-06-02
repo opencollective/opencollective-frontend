@@ -65,7 +65,7 @@ enables a network of:"
         </H2>
       </Box>
       <Box width="194px">
-        <StyledLink buttonStyle="standard" buttonSize="medium" href="/discover" fontWeight="500">
+        <StyledLink buttonStyle="standard" buttonSize="medium" href="/search" fontWeight="500">
           <FormattedMessage id="e2c.browseCollectives" defaultMessage="Browse Collectives" />
         </StyledLink>
       </Box>
