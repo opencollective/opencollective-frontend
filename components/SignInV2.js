@@ -166,12 +166,10 @@ export default class SignInV2 extends React.Component {
                   <StyledButton
                     data-cy="signin-btn"
                     buttonStyle="primary"
-                    height={32}
-                    lineHeight={0}
                     fontWeight="500"
                     disabled={!email || error}
                     loading={loading}
-                    minWidth={232}
+                    minWidth={157}
                     type="submit"
                     whiteSpace="nowrap"
                   >
