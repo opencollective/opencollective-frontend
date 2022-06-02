@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { isURL } from 'validator';
 
 import { isRelativeHref, isTrustedRedirectHost } from '../lib/url-helpers';
+import { isValidRelativeUrl } from '../lib/utils';
 
 import Container from '../components/Container';
 import { Flex } from '../components/Grid';
@@ -54,7 +55,7 @@ const ExternalRedirectPage = () => {
   React.useEffect(() => {
     if (router && !query.url) {
       router.push(fallback);
-    } else if (query.url[0] === '/') {
+    } else if (isValidRelativeUrl(query.url)) {
       router.push(query.url);
     } else if (!isValidExternalRedirect(query.url)) {
       router.push(fallback);
@@ -63,7 +64,7 @@ const ExternalRedirectPage = () => {
     } else {
       setReady(true);
     }
-  }, [router, query]);
+  }, [router, query.url]);
 
   return (
     <Page>
