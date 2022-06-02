@@ -1,3 +1,8 @@
+import '@formatjs/intl-displaynames/polyfill';
+import '@formatjs/intl-displaynames/locale-data/en'; // locale-data for en
+import '@formatjs/intl-numberformat/polyfill';
+import '@formatjs/intl-numberformat/locale-data/en'; // locale-data for en
+
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { ApolloProvider } from '@apollo/client';
