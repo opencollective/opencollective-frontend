@@ -12496,11 +12496,6 @@ input OrderUpdateInput {
   Amount intended as tip for the platform
   """
   platformTip: AmountInput
-
-  """
-  Host fee percent to be applied to the order
-  """
-  hostFeePercent: Float
 }
 
 """
