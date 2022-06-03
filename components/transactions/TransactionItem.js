@@ -108,7 +108,7 @@ const getExpenseStatusTag = (expense, isRefund, isRefunded) => {
   if (isRefunded) {
     expenseStatusLabel = expenseStatus.REFUNDED;
   } else if (isRefund) {
-    expenseStatusLabel = expenseStatus.COMPLETED;
+    expenseStatusLabel = 'COMPLETED';
   } else {
     expenseStatusLabel = expense?.status || expenseStatus.PAID;
   }
