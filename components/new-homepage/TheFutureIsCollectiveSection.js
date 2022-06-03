@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
+import { I18nBold } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledModal from '../StyledModal';
@@ -41,8 +42,11 @@ const TheFutureIsCollective = () => {
               <FormattedMessage
                 id="home.futureIsCollective.description"
                 defaultMessage={
-                  'Get access to money with nonprofit, co-op, or business status now. Join the movement for budget transparency and community-control of technology.'
+                  'Open Collective is a <b>legal and financial</b> toolbox for grassroots groups. It’s a <b>fundraising + legal status + money management</b> platform for your community. What do you want to do?'
                 }
+                values={{
+                  b: I18nBold,
+                }}
               />
             </P>
           </Box>
@@ -92,12 +96,20 @@ const TheFutureIsCollective = () => {
               src="/static/images/new-home/budget-illustration-sm.png"
             />
           </Box>
-          <Box display={['none', null, 'block']}>
+          <Box display={['none', null, 'block', null, 'none']}>
             <NextIllustration
-              width={992}
-              height={561}
+              width={978}
+              height={610}
               alt="The future is collective."
               src="/static/images/new-home/budget-illustration-md.png"
+            />
+          </Box>
+          <Box display={['none', null, null, null, 'block']}>
+            <NextIllustration
+              width={1014}
+              height={619}
+              alt="The future is collective."
+              src="/static/images/new-home/budget-illustration-lg.png"
             />
           </Box>
         </Flex>
