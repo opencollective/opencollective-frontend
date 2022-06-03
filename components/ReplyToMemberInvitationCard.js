@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import roles from '../lib/constants/roles';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import formatMemberRole from '../lib/i18n/member-role';
+import { formatDate } from '../lib/utils';
 
 import Avatar from './Avatar';
 import { Box, Flex } from './Grid';
@@ -21,6 +23,10 @@ import StyledCheckbox from './StyledCheckbox';
 import StyledTag from './StyledTag';
 import { H3, P } from './Text';
 import { withUser } from './UserProvider';
+
+const CenteredParagraph = styled(P)`
+  text-align: center;
+`;
 
 const messages = defineMessages({
   emailDetails: {
@@ -95,6 +101,37 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
           <H3>{invitation.account.name}</H3>
         </Flex>
       </LinkCollective>
+      <br />
+      <Flex flexDirection="column" alignItems="center">
+        <CenteredParagraph>
+          {invitation.inviter ? (
+            <FormattedMessage
+              id="MemberInvitation.detailsInviter"
+              defaultMessage="Invited by {inviter} on {date}"
+              values={{
+                inviter: invitation.inviter.name,
+                date: formatDate(invitation.createdAt, {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                }),
+              }}
+            />
+          ) : (
+            <FormattedMessage
+              id="MemberInvitation.detailsDate"
+              defaultMessage="Invited on {date}"
+              values={{
+                date: formatDate(invitation.createdAt, {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                }),
+              }}
+            />
+          )}
+        </CenteredParagraph>
+      </Flex>
       <hr />
       <StyledTag textTransform="uppercase">{formatMemberRole(intl, invitation.role)}</StyledTag>
       {hasRoleDescription(invitation.role) && (
@@ -178,6 +215,10 @@ ReplyToMemberInvitationCard.propTypes = {
         termsUrl: PropTypes.string,
       }),
     }),
+    inviter: PropTypes.shape({
+      name: PropTypes.string,
+    }),
+    createdAt: PropTypes.date,
   }),
   /** @ignore form withUser */
   refetchLoggedInUser: PropTypes.func,

@@ -16,6 +16,9 @@ const memberInvitationsPageQuery = gqlV2`
   query MemberInvitationsPage($memberAccount: AccountReferenceInput!) {
     memberInvitations(memberAccount: $memberAccount) {
       id
+      inviter {
+        name
+      }
       createdAt
       role
       description

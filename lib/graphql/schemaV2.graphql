@@ -9773,6 +9773,11 @@ An invitation to join the members of a collective
 """
 type MemberInvitation {
   id: String!
+
+  """
+  The person who invited the member, if any
+  """
+  inviter: Individual
   createdAt: DateTime!
   account: Account!
   memberAccount: Account!
