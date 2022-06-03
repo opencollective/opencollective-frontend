@@ -210,7 +210,7 @@ class Members extends React.Component {
             <FormattedDate value={get(member, 'since')} />
           </P>
           <Box mb={5} overflow="hidden" height={32}>
-            <P fontSize="11px" lineHeight="16px" mx={2} minHeight={16} fontWeight={400}>
+            <P fontSize="11px" lineHeight="16px" mx={2} fontWeight={400}>
               {truncate(get(member, 'description'), {
                 length: 30,
               })}
