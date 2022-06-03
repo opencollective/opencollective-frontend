@@ -46,27 +46,26 @@ const DedicatedTeam = () => {
           </P>
         </Box>
       </Flex>
-      <Flex flexDirection="column" alignItems="center" maxWidth="100%" overflow="hidden">
+      <Flex flexDirection="column" alignItems="center" width={1} maxWidth="100%" overflow="hidden">
         <Container
-          width={[null, '768px', '1024px', null, '1176px']}
+          width={[1, '768px', '1024px', null, '1176px']}
           display={[null, 'flex']}
           my={['24px', '70px']}
           position="relative"
-          overflowX={['hidden', 'unset']}
         >
           <Container
-            width={[null, '292px', '400px']}
-            left={['33px', '50px']}
+            width={[1, '292px', '400px']}
+            left={['15%', '50px']}
             position="relative"
             top={['30px', 0]}
             zIndex={['1', 'unset']}
           >
             <NextIllustration width={400} height={269} src="/static/images/new-home/team-picture-2.png" />
           </Container>
-          <Container width={[null, '257px', '353px']} top={[null, '-63px']} right={['45px', 0]} position="relative">
+          <Container width={[1, '257px', '353px']} top={[null, '-63px']} right={['13%', 0]} position="relative">
             <NextIllustration width={353} height={237} src="/static/images/new-home/team-picture-1.png" />
           </Container>
-          <Container width={[null, '274px', '376px']} position="relative" left={['66px', '-40px']} top={['-42px', 0]}>
+          <Container width={[1, '274px', '376px']} position="relative" left={['21%', '-40px']} top={['-42px', 0]}>
             <NextIllustration width={376} height={252} src="/static/images/new-home/team-picture-3.png" />
           </Container>
         </Container>

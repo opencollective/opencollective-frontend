@@ -131,7 +131,7 @@ const RaiseMoney = () => {
           </P>
         </Box>
         <Box px="16px">
-          <Link href="/">
+          <Link href="/search?q=&type=COLLECTIVE">
             <LinkContainer
               mt="72px"
               maxWidth={['288px', '700px', '956px', null, '1200px']}

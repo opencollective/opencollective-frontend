@@ -462,8 +462,8 @@ const collectives = [
     ),
   },
   {
-    id: 'six',
-    path: '#',
+    id: 'platform6-coop',
+    path: '/platform6-coop',
     image: {
       width: 366,
       height: 328,
@@ -506,7 +506,7 @@ const NetworkOfCollectives = () => {
             as="svg"
             width={['320px', '877px']}
             height={['724px', '465px']}
-            viewBox={['0 0 320 724', '0 0 877 431']}
+            viewBox={['0 0 320 724', '0 0 877 465']}
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
