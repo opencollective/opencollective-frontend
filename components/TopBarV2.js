@@ -56,12 +56,6 @@ const NavItem = styled(StyledLink)`
   }
 `;
 
-const LogoContainer = styled(Container)`
-  @media (min-width: 641px) and (max-width: 710px) {
-    display: none;
-  }
-`;
-
 const TopBarV2 = ({ showSearch, menuItems }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const ref = useRef();
@@ -82,9 +76,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
     >
       <Link href="/">
         <Flex alignItems="center">
-          <LogoContainer>
-            <Image width="36" height="36" src="/static/images/opencollective-icon.png" alt="Open Collective logo" />
-          </LogoContainer>
+          <Image width="36" height="36" src="/static/images/opencollective-icon.png" alt="Open Collective logo" />
           <Hide xs sm md>
             <Box mx={2}>
               <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
@@ -94,7 +86,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
       </Link>
 
       <Flex alignItems="center" justifyContent={['flex-end', 'flex-end', 'center']} flex="1 1 auto">
-        <Hide xs>
+        <Hide xs sm>
           <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
             {menuItems.solutions && (
               <PopupMenu
@@ -217,7 +209,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
         </Hide>
       </Container>
       <TopBarProfileMenu />
-      <Hide sm md lg>
+      <Hide md lg>
         <TopBarMobileMenuV2 showMobileMenu={showMobileMenu} closeMenu={toggleMobileMenu} />
         <Box mx={3} onClick={toggleMobileMenu}>
           <Flex as="a">
