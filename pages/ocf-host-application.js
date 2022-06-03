@@ -40,7 +40,11 @@ const hostQuery = gqlV2/* GraphQL */ `
     account(slug: "foundation") {
       id
       slug
-      policies
+      policies {
+        COLLECTIVE_MINIMUM_ADMINS {
+          numberOfAdmins
+        }
+      }
     }
   }
 `;

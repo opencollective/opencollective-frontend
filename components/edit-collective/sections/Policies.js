@@ -52,7 +52,12 @@ const setPoliciesMutation = gqlV2/* GraphQL */ `
   mutation SetPolicies($account: AccountReferenceInput!, $policies: JSON!) {
     setPolicies(account: $account, policies: $policies) {
       id
-      policies
+      policies {
+        EXPENSE_AUTHOR_CANNOT_APPROVE
+        COLLECTIVE_MINIMUM_ADMINS {
+          numberOfAdmins
+        }
+      }
     }
   }
 `;

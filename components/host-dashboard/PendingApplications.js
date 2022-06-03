@@ -35,7 +35,11 @@ const pendingApplicationsQuery = gqlV2/* GraphQL */ `
       name
       type
       settings
-      policies
+      policies {
+        COLLECTIVE_MINIMUM_ADMINS {
+          numberOfAdmins
+        }
+      }
       pendingApplications(limit: $limit, offset: $offset, orderBy: $orderBy, searchTerm: $searchTerm) {
         offset
         limit

@@ -22,7 +22,11 @@ const createCollectiveHostQuery = gqlV2/* GraphQL */ `
       currency
       isOpenToApplications
       termsUrl
-      policies
+      policies {
+        COLLECTIVE_MINIMUM_ADMINS {
+          numberOfAdmins
+        }
+      }
     }
   }
 `;

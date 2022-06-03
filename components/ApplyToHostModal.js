@@ -56,7 +56,11 @@ const hostFields = gqlV2/* GraphQL */ `
     longDescription
     hostFeePercent
     settings
-    policies
+    policies {
+      COLLECTIVE_MINIMUM_ADMINS {
+        numberOfAdmins
+      }
+    }
   }
 `;
 

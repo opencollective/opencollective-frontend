@@ -52,7 +52,12 @@ export const adminPanelQuery = gqlV2/* GraphQL */ `
           slug
           name
           settings
-          policies
+          policies {
+            EXPENSE_AUTHOR_CANNOT_APPROVE
+            COLLECTIVE_MINIMUM_ADMINS {
+              numberOfAdmins
+            }
+          }
         }
       }
       ... on AccountWithHost {

@@ -42,7 +42,11 @@ export const getSettingsQuery = gqlV2/* GraphQL */ `
       isActive
       isHost
       settings
-      policies
+      policies {
+        COLLECTIVE_MINIMUM_ADMINS {
+          numberOfAdmins
+        }
+      }
     }
   }
 `;
