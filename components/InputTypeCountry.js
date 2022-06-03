@@ -99,7 +99,10 @@ class InputTypeCountry extends Component {
 
   filterOptions(candidate, input) {
     if (input) {
-      return candidate.data.country?.toLowerCase()?.includes(input.toLowerCase());
+      return (
+        candidate.data.country?.toLowerCase()?.includes(input.toLowerCase()) ||
+        candidate.data.value?.toLowerCase() === input.toLowerCase()
+      );
     }
     return true;
   }
