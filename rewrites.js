@@ -11,7 +11,7 @@ exports.REWRITES = [
     destination: '/fiscal-hosting',
   },
   {
-    source: '/welcome-to-oc',
+    source: '/welcome',
     destination: '/welcome',
   },
   {

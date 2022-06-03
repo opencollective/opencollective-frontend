@@ -24,6 +24,7 @@ import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import { H5, P, Span } from './Text';
 import { TOAST_TYPE, withToasts } from './ToastProvider';
+import { i18nGraphqlException } from '../lib/errors';
 
 const messages = defineMessages({
   twoFactorAuthCodeInputLabel: {
@@ -102,7 +103,7 @@ class SignInOrJoinFreeV2 extends React.Component {
     }
     let redirectUrl = this.props.redirect;
     if (currentPath === '/create-accountv2' && redirectUrl === '/') {
-      redirectUrl = '/welcome-to-oc';
+      redirectUrl = '/welcome';
     }
     return encodeURIComponent(redirectUrl || currentPath || '/');
   }
@@ -175,7 +176,7 @@ class SignInOrJoinFreeV2 extends React.Component {
       if (!emailAlreadyExists) {
         this.props.addToast({
           type: TOAST_TYPE.ERROR,
-          message: error.message || 'Server error',
+          message: i18nGraphqlException(this.props.intl, error),
         });
       }
       this.setState({ submitting: false, emailAlreadyExists });
