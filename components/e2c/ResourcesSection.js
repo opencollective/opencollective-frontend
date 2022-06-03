@@ -83,12 +83,12 @@ const ResourcesSection = () => {
           controlsTopPosition={30}
           containerProps={{ hideScrollbar: true }}
         >
-          {blogEntries.map((blogEntry, index) => (
+          {blogEntries.map(blogEntry => (
             <Container
               display="flex"
               flexDirection="column"
               minWidth={['288px', '276px', '380px', null, '360px']}
-              key={index.toString()}
+              key={blogEntry.link}
               mx={['8px', '20px']}
             >
               <Box width={['224px', '100%']} mb="32px">

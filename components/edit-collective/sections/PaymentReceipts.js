@@ -190,8 +190,11 @@ const Receipts = ({ invoices }) => {
           </H3>
           <StyledHr width={['60%', '80%']} borderStyle="solid" borderColor="#C4C7CC" />
         </Flex>
-        {byMonthYear[monthYear].map((invoice, index) => (
-          <ReceiptCard key={index.toString()} {...{ ...invoice, loadingInvoice, downloadInvoice, dateFrom, dateTo }} />
+        {byMonthYear[monthYear].map(invoice => (
+          <ReceiptCard
+            key={`${invoice.year}-${invoice.month}-${invoice.slug}`}
+            {...{ ...invoice, loadingInvoice, downloadInvoice, dateFrom, dateTo }}
+          />
         ))}
       </Flex>
     );
