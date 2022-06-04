@@ -81,6 +81,7 @@ class SignInOrJoinFreeV2 extends React.Component {
       unknownEmailError: false,
       email: props.email || props.defaultEmail || '',
       useRecoveryCodes: null,
+      emailAlreadyExists: false,
     };
   }
 
@@ -332,7 +333,7 @@ class SignInOrJoinFreeV2 extends React.Component {
             {displayedForm !== 'create-accountv2' ? (
               <SignInV2
                 email={email}
-                onEmailChange={email => this.setState({ email, unknownEmailError: false })}
+                onEmailChange={email => this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })}
                 onSecondaryAction={routes.join || (() => this.switchForm('create-accountv2'))}
                 onSubmit={email => this.signIn(email, false)}
                 loading={submitting}
@@ -346,7 +347,9 @@ class SignInOrJoinFreeV2 extends React.Component {
                   <Box maxWidth={535} mx={[2, 4]} width="100%">
                     <CreateProfileV2
                       email={email}
-                      onEmailChange={email => this.setState({ email, unknownEmailError: false })}
+                      onEmailChange={email =>
+                        this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })
+                      }
                       onSubmit={this.createProfile}
                       onSecondaryAction={routes.signin || (() => this.switchForm('signinv2'))}
                       submitting={submitting}
