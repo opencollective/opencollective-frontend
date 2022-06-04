@@ -9,6 +9,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
 import { signin } from '../lib/api';
+import { i18nGraphqlException } from '../lib/errors';
 import { getWebsiteUrl } from '../lib/utils';
 
 import Container from './Container';
@@ -24,7 +25,6 @@ import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import { H5, P, Span } from './Text';
 import { TOAST_TYPE, withToasts } from './ToastProvider';
-import { i18nGraphqlException } from '../lib/errors';
 
 const messages = defineMessages({
   twoFactorAuthCodeInputLabel: {

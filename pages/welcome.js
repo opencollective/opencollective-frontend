@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -11,8 +12,6 @@ import StyledCard from '../components/StyledCard';
 import StyledLink from '../components/StyledLink';
 import { useUser } from '../components/UserProvider';
 
-import Custom404 from './404';
-
 const WelcomeOptionContainer = styled(Container)`
   &:hover {
     background-color: #f5faff;
@@ -21,8 +20,9 @@ const WelcomeOptionContainer = styled(Container)`
 
 const Welcome = () => {
   const { LoggedInUser, loadingLoggedInUser } = useUser();
+  const router = useRouter();
   if (!loadingLoggedInUser && !LoggedInUser) {
-    return <Custom404 />;
+    router.push('/');
   }
   return (
     <Page title="Welcome to Open Collective!">
