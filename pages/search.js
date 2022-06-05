@@ -411,7 +411,7 @@ class SearchPage extends React.Component {
               </Container>
             )}
           </Flex>
-          <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
+          <Flex mb="64px" justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
             {loading
               ? Array.from(new Array(12)).map((_, index) => (
                   // eslint-disable-next-line react/no-array-index-key
