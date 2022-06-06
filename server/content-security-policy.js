@@ -39,6 +39,7 @@ const COMMON_DIRECTIVES = {
     'sentry.io',
     '*.sentry.io',
     'atlas.shopifycloud.com',
+    'atlas.shopifysvc.com',
     'country-service.shopifycloud.com',
     'maps.googleapis.com',
     'https://wise.com',
