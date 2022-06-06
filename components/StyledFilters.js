@@ -12,7 +12,7 @@ const FilterButton = styled(StyledButton).attrs({
 })`
   font-size: 14px;
   font-weight: 400;
-  height: 32px;
+  height: 34px;
   margin-right: 8px;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -24,13 +24,21 @@ const FilterButton = styled(StyledButton).attrs({
     props.$isSelected &&
     css`
       &,
-      &:active,
+      &:hover,
       &:focus {
         background-color: ${props => props.theme.colors.primary[100]};
         border: 1px solid ${props => props.theme.colors.primary[700]};
         box-shadow: none;
       }
     `}
+
+  &:active {
+    background-color: ${props => props.theme.colors.primary[100]};
+    color: ${props => props.theme.colors.primary[800]};
+  }
+  &:focus {
+    border: 2px solid #050505;
+  }
 `;
 
 /**
