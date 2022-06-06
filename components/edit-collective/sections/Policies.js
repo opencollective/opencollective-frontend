@@ -7,10 +7,11 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
-import { stripHTML, omitDeep } from '../../../lib/utils';
+import { omitDeep, stripHTML } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
+import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
@@ -19,7 +20,6 @@ import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
-import MessageBox from '../../MessageBox';
 
 import { getSettingsQuery } from './EditCollectivePage';
 import SettingsSectionTitle from './SettingsSectionTitle';
