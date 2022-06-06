@@ -100,9 +100,15 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
             {menuItems.solutions && (
               <PopupMenu
                 zIndex={2000}
-                closingEvent="mouseover"
-                Button={({ onMouseOver, onClick, popupOpen }) => (
-                  <NavButton isBorderless onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
+                closingEvents={['focusin', 'mouseover']}
+                Button={({ onMouseOver, onClick, popupOpen, onFocus }) => (
+                  <NavButton
+                    isBorderless
+                    onMouseOver={onMouseOver}
+                    onFocus={onFocus}
+                    onClick={onClick}
+                    whiteSpace="nowrap"
+                  >
                     <FormattedMessage defaultMessage="Solutions" />
                     {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </NavButton>
@@ -133,9 +139,15 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
             {menuItems.product && (
               <PopupMenu
                 zIndex={2000}
-                closingEvent="mouseover"
-                Button={({ onClick, onMouseOver, popupOpen }) => (
-                  <NavButton isBorderless onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
+                closingEvents={['focusin', 'mouseover']}
+                Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
+                  <NavButton
+                    isBorderless
+                    onMouseOver={onMouseOver}
+                    onFocus={onFocus}
+                    onClick={onClick}
+                    whiteSpace="nowrap"
+                  >
                     <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
                     {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </NavButton>
@@ -165,9 +177,15 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
             {menuItems.company && (
               <PopupMenu
                 zIndex={2000}
-                closingEvent="mouseover"
-                Button={({ onClick, onMouseOver, popupOpen }) => (
-                  <NavButton isBorderless onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
+                closingEvents={['focusin', 'mouseover']}
+                Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
+                  <NavButton
+                    isBorderless
+                    onMouseOver={onMouseOver}
+                    onFocus={onFocus}
+                    onClick={onClick}
+                    whiteSpace="nowrap"
+                  >
                     <FormattedMessage id="company" defaultMessage="Company" />
                     {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </NavButton>
