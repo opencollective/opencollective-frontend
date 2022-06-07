@@ -20,7 +20,7 @@ const ContactCollectiveBtn = ({ children, collective, LoggedInUser }) => {
 ContactCollectiveBtn.propTypes = {
   children: PropTypes.func.isRequired,
   collective: PropTypes.object.isRequired,
-  LoggedInUser: PropTypes.object.isRequired,
+  LoggedInUser: PropTypes.object,
 };
 
 const DefaultContactCollectiveButton = props => (
