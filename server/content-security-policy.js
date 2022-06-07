@@ -132,12 +132,19 @@ const getHeaderValueFromDirectives = directives => {
  * Get a config compatible with Helmet's format
  */
 const getContentSecurityPolicyConfig = () => {
-  if (env === 'development' || env === 'e2e') {
+  if (env === 'development') {
     return {
       reportOnly: true,
       directives: generateDirectives({
         blockAllMixedContent: false,
         scriptSrc: [UNSAFE_INLINE, UNSAFE_EVAL], // For NextJS scripts
+      }),
+    };
+  } else if (env === 'e2e') {
+    return {
+      reportOnly: false,
+      directives: generateDirectives({
+        blockAllMixedContent: false,
       }),
     };
   } else if (env === 'staging') {
