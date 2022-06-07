@@ -18,7 +18,7 @@ export const collectivePageQuery = gql`
       backgroundImage
       backgroundImageUrl
       twitterHandle
-      githubHandle
+      repositoryUrl
       website
       tags
       company

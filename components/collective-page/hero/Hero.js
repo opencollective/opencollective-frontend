@@ -2,7 +2,6 @@ import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Palette } from '@styled-icons/boxicons-regular/Palette';
 import { Camera } from '@styled-icons/feather/Camera';
-import { Github } from '@styled-icons/feather/Github';
 import { Globe } from '@styled-icons/feather/Globe';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
@@ -12,8 +11,9 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { githubProfileUrl, twitterProfileUrl } from '../../../lib/url-helpers';
+import { twitterProfileUrl } from '../../../lib/url-helpers';
 
+import CodeRepositoryIcon from '../../CodeRepositoryIcon';
 import ContactCollectiveBtn from '../../ContactCollectiveBtn';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
@@ -268,17 +268,6 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       </StyledRoundButton>
                     </StyledLink>
                   )}
-                  {collective.githubHandle && (
-                    <StyledLink
-                      data-cy="githubProfileUrl"
-                      href={githubProfileUrl(collective.githubHandle)}
-                      openInNewTab
-                    >
-                      <StyledRoundButton size={32} mr={3} title="GitHub" aria-label="GitHub link">
-                        <Github size={12} />
-                      </StyledRoundButton>
-                    </StyledLink>
-                  )}
                   {collective.website && (
                     <StyledLink data-cy="collectiveWebsite" href={collective.website} openInNewTabNoFollow>
                       <StyledRoundButton
@@ -289,6 +278,16 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       >
                         <Globe size={14} />
                       </StyledRoundButton>
+                    </StyledLink>
+                  )}
+                  {collective.repositoryUrl && (
+                    <StyledLink data-cy="repositoryUrl" href={collective.repositoryUrl} openInNewTabNoFollow>
+                      <StyledButton buttonSize="tiny" color="black.700" height={32} mr={3}>
+                        <CodeRepositoryIcon size={12} repositoryUrl={collective.repositoryUrl} />
+                        <Span ml={2}>
+                          <FormattedMessage defaultMessage="Code repository" />
+                        </Span>
+                      </StyledButton>
                     </StyledLink>
                   )}
                 </Flex>
@@ -431,7 +430,7 @@ Hero.propTypes = {
     backgroundImageUrl: PropTypes.string,
     canContact: PropTypes.bool,
     twitterHandle: PropTypes.string,
-    githubHandle: PropTypes.string,
+    repositoryUrl: PropTypes.string,
     website: PropTypes.string,
     description: PropTypes.string,
     isHost: PropTypes.bool,
