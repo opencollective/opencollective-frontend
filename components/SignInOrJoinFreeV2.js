@@ -120,10 +120,6 @@ class SignInOrJoinFreeV2 extends React.Component {
         websiteUrl: getWebsiteUrl(),
         createProfile: createProfile,
       });
-      if (response.error?.errorCode === 'EMAIL_DOES_NOT_EXIST') {
-        this.setState({ unknownEmailError: true, submitting: false });
-        return;
-      }
 
       // In dev/test, API directly returns a redirect URL for emails like
       // test*@opencollective.com.
@@ -134,11 +130,15 @@ class SignInOrJoinFreeV2 extends React.Component {
       }
       window.scrollTo(0, 0);
     } catch (e) {
-      this.props.addToast({
-        type: TOAST_TYPE.ERROR,
-        message: e.message || 'Server error',
-      });
-      this.setState({ submitting: false });
+      if (e.json?.errorCode === 'EMAIL_DOES_NOT_EXIST') {
+        this.setState({ unknownEmailError: true, submitting: false });
+      } else {
+        this.props.addToast({
+          type: TOAST_TYPE.ERROR,
+          message: e.message || 'Server error',
+        });
+        this.setState({ submitting: false });
+      }
     }
   };
 
