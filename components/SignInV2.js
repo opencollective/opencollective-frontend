@@ -122,6 +122,9 @@ export default class SignInV2 extends React.Component {
                 data-cy="signIn-form"
                 onSubmit={event => {
                   event.preventDefault();
+                  if (error) {
+                    return;
+                  }
                   onSubmit(email);
                   this.setState({ unknownEmail: this.props.unknownEmail });
                 }}
@@ -167,7 +170,7 @@ export default class SignInV2 extends React.Component {
                     data-cy="signin-btn"
                     buttonStyle="primary"
                     fontWeight="500"
-                    disabled={!email || error}
+                    disabled={!email}
                     loading={loading}
                     minWidth={157}
                     type="submit"
