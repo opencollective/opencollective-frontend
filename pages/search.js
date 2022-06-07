@@ -283,8 +283,6 @@ class SearchPage extends React.Component {
 
     const { limit = 20, offset, totalCount = 0 } = accounts || {};
     const showTagFilterSection = (accounts?.nodes?.length > 0 || tags.length > 0) && tagStats?.nodes?.length > 0;
-    const showCountriesFilterSection = accounts?.nodes?.length > 0 || this.props?.country;
-    const showSortFilterSection = accounts?.nodes?.length > 0;
     const getSortOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
     const sortOptions = [
       getSortOption('ACTIVITY'),
@@ -350,36 +348,32 @@ class SearchPage extends React.Component {
           </Flex>
           <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
           <Flex flexDirection={['column', 'row']}>
-            {showSortFilterSection && (
-              <Container pr={[0, '19px']}>
-                <FilterLabel htmlFor="sort-filter-type">
-                  <FormattedMessage defaultMessage="Sort" />
-                </FilterLabel>
-                <StyledSelectFilter
-                  inputId="sort-filter"
-                  value={this.props.sortBy ? getSortOption(this.props.sortBy) : sortOptions[0]}
-                  options={sortOptions.filter(sortOption => sortOption)}
-                  onChange={sortBy => this.changeSort(sortBy)}
-                  minWidth={[0, '200px']}
-                />
-              </Container>
-            )}
-            {showCountriesFilterSection && (
-              <Container pt={['20px', 0]}>
-                <FilterLabel htmlFor="country-filter-type">
-                  <FormattedMessage id="collective.country.label" defaultMessage="Country" />
-                </FilterLabel>
-                <InputTypeCountry
-                  inputId="search-country-filter"
-                  as={StyledSelectFilter}
-                  value={this.props.country || 'ALL'}
-                  customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
-                  onChange={country => this.changeCountry(country)}
-                  minWidth={[0, '200px']}
-                  fontSize="12px"
-                />
-              </Container>
-            )}
+            <Container pr={[0, '19px']}>
+              <FilterLabel htmlFor="sort-filter-type">
+                <FormattedMessage defaultMessage="Sort" />
+              </FilterLabel>
+              <StyledSelectFilter
+                inputId="sort-filter"
+                value={this.props.sortBy ? getSortOption(this.props.sortBy) : sortOptions[0]}
+                options={sortOptions.filter(sortOption => sortOption)}
+                onChange={sortBy => this.changeSort(sortBy)}
+                minWidth={[0, '200px']}
+              />
+            </Container>
+            <Container pt={['20px', 0]}>
+              <FilterLabel htmlFor="country-filter-type">
+                <FormattedMessage id="collective.country.label" defaultMessage="Country" />
+              </FilterLabel>
+              <InputTypeCountry
+                inputId="search-country-filter"
+                as={StyledSelectFilter}
+                value={this.props.country || 'ALL'}
+                customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
+                onChange={country => this.changeCountry(country)}
+                minWidth={[0, '200px']}
+                fontSize="12px"
+              />
+            </Container>
             {showTagFilterSection && (
               <Container pl={[0, '23px']} pt={['20px', 0]}>
                 <FilterLabel htmlFor="tag-filter-type">
