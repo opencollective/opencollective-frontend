@@ -281,6 +281,7 @@ const WhoIsFiscalHosting = () => {
 
         <StyledCarousel display={['none', 'block']} width="100%" maxWidth="1200px" controllerPosition="side">
           {Object.keys(WHO_IS_FISCAL_HOSTING_FOR).map((categories, index) => (
+            // eslint-disable-next-line react/no-array-index-key
             <PotentialUsers key={index.toString()} users={WHO_IS_FISCAL_HOSTING_FOR[categories]} />
           ))}
         </StyledCarousel>

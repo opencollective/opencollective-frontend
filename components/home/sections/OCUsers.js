@@ -48,7 +48,7 @@ const users = [
     type: 'Open Source Projects',
     description: '',
     collectivePath: '/babel',
-    learnMorePath: '/discover?show=open%20source',
+    learnMorePath: '/search?tag=open%20source',
     picture: '/static/images/home/oc-users-babel.png',
   },
   {
@@ -179,7 +179,7 @@ const OCUsers = () => {
         </Container>
       </Flex>
       <Box mt={4}>
-        <StyledLink as={Link} buttonStyle="standard" buttonSize="medium" href="/discover">
+        <StyledLink as={Link} buttonStyle="standard" buttonSize="medium" href="/search">
           <FormattedMessage id="home.discover" defaultMessage="Discover more" />
         </StyledLink>
       </Box>

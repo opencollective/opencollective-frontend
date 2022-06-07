@@ -18,7 +18,7 @@ describe('the NotFound page when logged out', () => {
   });
 
   it('has a nice comforting little buddy', () => {
-    cy.get('[data-cy="not-found"]').should('contain', '¯\\\\_(ツ)_/¯');
+    cy.get('[data-cy="not-found"]').should('contain', `¯\\_(ツ)_/¯`);
   });
 
   it('includes a button to search for the collective', () => {

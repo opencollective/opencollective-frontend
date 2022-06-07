@@ -32,7 +32,7 @@ const nextConfig = {
         NEW_ADMIN_DASHBOARD: false,
         WISE_ENVIRONMENT: 'sandbox',
         HCAPTCHA_SITEKEY: false,
-        CAPTCHA_ENABLED: true,
+        CAPTCHA_ENABLED: false,
         CAPTCHA_PROVIDER: 'HCAPTCHA',
       }),
     );

@@ -36,7 +36,7 @@ export const validateGuestProfile = (stepProfile, stepDetails) => {
 };
 
 const getSignInLinkQueryParams = email => {
-  const params = { next: typeof window !== undefined ? window.location.pathname : '' };
+  const params = { next: typeof window !== 'undefined' ? window.location.pathname : '' };
   return email ? { ...params, email } : params;
 };
 

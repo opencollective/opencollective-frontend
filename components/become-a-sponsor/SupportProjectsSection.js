@@ -187,7 +187,7 @@ const SupportProjects = () => (
           </Span>
         </P>
       </Box>
-      <Link href="/discover">
+      <Link href="/search">
         <StyledButton
           minWidth={['185px', '167px', null, null, '185px']}
           my={[2, null, 0]}
