@@ -229,7 +229,12 @@ class SearchPage extends React.Component {
     const { router } = this.props;
     const { q } = form;
 
-    const query = { q: q.value, type: router.query.type };
+    const query = {
+      q: q.value,
+      type: router.query.type,
+      country: router.query.country,
+      sortBy: q.value === '' && router.query.sortBy === 'RANK' ? 'ACTIVITY' : router.query.sortBy,
+    };
     router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
   };
 
@@ -411,7 +416,7 @@ class SearchPage extends React.Component {
               </Container>
             )}
           </Flex>
-          <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
+          <Flex mb="64px" justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
             {loading
               ? Array.from(new Array(12)).map((_, index) => (
                   // eslint-disable-next-line react/no-array-index-key

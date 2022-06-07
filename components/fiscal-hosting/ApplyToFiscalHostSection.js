@@ -151,6 +151,7 @@ Host.propTypes = {
 const HostDesktopCarousel = ({ display, controllerPosition }) => (
   <StyledCarousel controllerPosition={controllerPosition} width={1} display={display}>
     {groupHostsIntoSections(HOSTS).map((groupedHost, index) => (
+      // eslint-disable-next-line react/no-array-index-key
       <Container display={['none', 'flex']} key={index.toString()} justifyContent="center" width={1}>
         {groupedHost.map(host => (
           <Fragment key={host.id}>

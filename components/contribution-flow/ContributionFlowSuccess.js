@@ -284,7 +284,7 @@ class ContributionFlowSuccess extends React.Component {
                 )}
                 {!isEmbed && (
                   <Box my={4}>
-                    <Link href={{ pathname: '/discover', query: { show: getMainTag(order.toAccount) } }}>
+                    <Link href={{ pathname: '/search', query: { show: getMainTag(order.toAccount) } }}>
                       <P color="black.800" fontWeight={500}>
                         <FormattedMessage
                           id="NewContributionFlow.Success.DiscoverMore"

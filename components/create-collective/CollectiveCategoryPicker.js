@@ -78,7 +78,7 @@ const CollectiveCategoryPicker = () => {
                 {formatMessage(messages.opensource)}
               </StyledButton>
             </Link>
-            <ExamplesLink href="/discover?show=opensource" openInNewTab>
+            <ExamplesLink href="/search?tag=opensource" openInNewTab>
               <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
             </ExamplesLink>
           </Flex>
@@ -107,7 +107,7 @@ const CollectiveCategoryPicker = () => {
                 {formatMessage(messages.community)}
               </StyledButton>
             </Link>
-            <ExamplesLink href="/discover?show=community" openInNewTab>
+            <ExamplesLink href="/search?tag=community" openInNewTab>
               <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
             </ExamplesLink>
           </Flex>
