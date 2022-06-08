@@ -557,6 +557,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
         slug
         name
         location {
+          id
           country
         }
         tags
@@ -586,6 +587,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
             slug
             backgroundImageUrl
             location {
+              id
               country
             }
           }

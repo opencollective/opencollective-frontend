@@ -468,9 +468,8 @@ describe('New expense flow', () => {
       cy.getByDataCy('save-expense-btn').should('not.exist'); // wait for form to be submitted
 
       // Check final expense page
-      cy.getByDataCy('expense-invoiced-amount').should('contain', '$221.50');
-      cy.getByDataCy('tax-VAT-expense-amount-line').should('contain', '$39.21');
-      cy.getByDataCy('expense-items-total-amount').should('contain', '$260.71');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '$221.50');
+      cy.getByDataCy('expense-invoiced-amount').should('not.exist'); // No breakdown if there's no taxes
     });
   });
 

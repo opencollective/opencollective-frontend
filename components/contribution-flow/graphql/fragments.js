@@ -9,6 +9,7 @@ const contributionFlowHostFieldsFragment = gqlV2/* GraphQL */ `
     settings
     contributionPolicy
     location {
+      id
       country
     }
     paypalClientId
