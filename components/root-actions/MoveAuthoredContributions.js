@@ -196,6 +196,7 @@ const MoveAuthoredContributions = () => {
       <StyledInputField htmlFor="fromAccount" label="Account that authored the contribution" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync
+            skipGuests={false}
             inputId={id}
             collective={fromAccount}
             isClearable
