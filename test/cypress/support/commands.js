@@ -161,6 +161,7 @@ Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserE
             name
             settings
             location {
+              id
               country
             }
           }
