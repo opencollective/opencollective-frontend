@@ -14,6 +14,7 @@ import Hide from './Hide';
 import Image from './Image';
 import Link from './Link';
 import PopupMenu from './PopupMenu';
+import SearchModal from './Search';
 import SearchIcon from './SearchIcon';
 import StyledButton from './StyledButton';
 import StyledLink from './StyledLink';
@@ -38,6 +39,7 @@ const NavButton = styled(StyledButton)`
   font-weight: 500;
   font-size: 16px;
   padding: 10px;
+  cursor: pointer;
   @media (hover: hover) {
     :hover {
       background-color: white !important;
@@ -67,6 +69,7 @@ const NavItem = styled(StyledLink)`
 
 const TopBarV2 = ({ showSearch, menuItems }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
 
   const toggleMobileMenu = () => {
@@ -217,7 +220,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
           </NavList>
         </Hide>
         {showSearch && (
-          <NavButton as={Link} href="/search">
+          <NavButton as={Container} onClick={() => setShowSearchModal(true)}>
             <Flex>
               <SearchIcon fill="#75777A" size={18} />
               <Hide xs sm>
@@ -228,6 +231,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
             </Flex>
           </NavButton>
         )}
+        {showSearchModal && <SearchModal onClose={() => setShowSearchModal(false)} />}
       </Flex>
 
       <Container mr={3}>

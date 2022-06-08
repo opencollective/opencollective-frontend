@@ -12,7 +12,7 @@ const messages = defineMessages({
 });
 
 /**
- * A wrapper arround `SearchForm` that holds state and interacts with parent
+ * A wrapper around `SearchForm` that holds state and interacts with parent
  * through `onSubmit`, rather than `onChange`.
  */
 const SearchBar = ({ onSubmit, defaultValue, ...props }) => {
