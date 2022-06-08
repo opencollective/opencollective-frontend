@@ -23,8 +23,9 @@ import Link from '../../Link';
 import LinkCollective from '../../LinkCollective';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
+import { Dropdown, DropdownContent } from '../../StyledDropdown';
 import StyledLink from '../../StyledLink';
-import StyledModal, { ModalBody, ModalHeader } from '../../StyledModal';
+import StyledModal from '../../StyledModal';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import { H1, Span } from '../../Text';
@@ -76,6 +77,24 @@ const StyledShortDescription = styled.h2`
   }
 `;
 
+const HiddenTagDropdownContainer = styled(Box)`
+  text-align: center;
+  width: 132px;
+  max-height: 300px;
+  overflow: auto;
+`;
+
+const HiddenTagItem = styled(StyledLink)`
+  color: #323334;
+  font-weight: 500;
+  font-size: 14px;
+  @media (hover: hover) {
+    :hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
 /**
  * Collective's page Hero/Banner/Cover component.
  */
@@ -84,7 +103,6 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const { LoggedInUser } = useUser();
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
-  const [showTagsModal, setShowTagsModal] = React.useState(false);
   const isEditing = hasColorPicker || isEditingCover;
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isEvent = collective.type === CollectiveType.EVENT;
@@ -98,6 +116,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const tagCount = collective.tags?.length;
   const displayedTags = collective.tags?.slice(0, 3);
   const hiddenTags = collective.tags?.slice(3);
+  const numberOfHiddenTags = hiddenTags?.length;
 
   // Cancel edit mode when user navigates out to another collective
   useEffect(() => {
@@ -171,9 +190,9 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                   >
                     <I18nCollectiveTags tags={collective.type} />
                   </StyledTag>
-                  <Container borderRight="1px solid #C3C6CB" height="22px" padding="5px" mt={['5px', 0]} />
                   {tagCount > 0 && (
                     <Fragment>
+                      <Container borderRight="1px solid #C3C6CB" height="22px" padding="5px" mt={['5px', 0]} />
                       {displayedTags.map(tag => (
                         <Link key={tag} href={`/search?tag=${tag}`}>
                           <StyledTag variant="rounded-right" ml="10px" mt={['5px', 0]} fontWeight={500}>
@@ -182,33 +201,46 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                         </Link>
                       ))}
                       {tagCount > 3 && (
-                        <StyledLink onClick={() => setShowTagsModal(true)}>
-                          <StyledTag variant="rounded-right" ml="10px" mt={['5px', 0]} fontWeight={500}>
-                            <FormattedMessage
-                              id="expenses.countMore"
-                              defaultMessage="+ {count} more"
-                              values={{ count: tagCount - 3 }}
-                            />
-                          </StyledTag>
-                        </StyledLink>
-                      )}
-                      {showTagsModal && (
-                        <StyledModal width="432px" onClose={() => setShowTagsModal(false)}>
-                          <ModalHeader pb="26px">
-                            <FormattedMessage defaultMessage="Open Collective Tags" />
-                          </ModalHeader>
-                          <ModalBody>
-                            <Flex flexWrap="wrap">
-                              {hiddenTags.map(tag => (
-                                <Link key={tag} href={`/search?tag=${tag}`}>
-                                  <StyledTag variant="rounded-right" ml="10px" fontWeight={500} mt="5px">
-                                    <I18nCollectiveTags tags={tag} />
-                                  </StyledTag>
-                                </Link>
-                              ))}
-                            </Flex>
-                          </ModalBody>
-                        </StyledModal>
+                        <Dropdown trigger="click">
+                          {({ triggerProps, dropdownProps }) => (
+                            <React.Fragment>
+                              <StyledTag
+                                as={StyledButton}
+                                border="none"
+                                variant="rounded-right"
+                                ml="10px"
+                                mt={['5px', 0]}
+                                fontWeight={500}
+                                {...triggerProps}
+                              >
+                                <FormattedMessage
+                                  id="expenses.countMore"
+                                  defaultMessage="+ {count} more"
+                                  values={{ count: tagCount - 3 }}
+                                />
+                              </StyledTag>
+                              <DropdownContent {...dropdownProps} style={{ marginTop: '6px' }}>
+                                <HiddenTagDropdownContainer>
+                                  {hiddenTags.slice(0, numberOfHiddenTags - 1).map(tag => (
+                                    <Fragment key={tag}>
+                                      <Link href={`/search?tag=${tag}`}>
+                                        <HiddenTagItem as={Container} mt={16} mb={16}>
+                                          <I18nCollectiveTags tags={tag} />
+                                        </HiddenTagItem>
+                                      </Link>
+                                      <hr />
+                                    </Fragment>
+                                  ))}
+                                  <Link href={`/search?tag=${hiddenTags[numberOfHiddenTags - 1]}`}>
+                                    <HiddenTagItem as={Container} mt={16} mb={16}>
+                                      <I18nCollectiveTags tags={hiddenTags[numberOfHiddenTags - 1]} />
+                                    </HiddenTagItem>
+                                  </Link>
+                                </HiddenTagDropdownContainer>
+                              </DropdownContent>
+                            </React.Fragment>
+                          )}
+                        </Dropdown>
                       )}
                     </Fragment>
                   )}
