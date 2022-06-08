@@ -258,7 +258,7 @@ type UserDetails {
   CollectiveId: Int
   collective: CollectiveInterface
   username: String @deprecated(reason: "2022-01-13: Not used anymore. Will be ignored")
-  name: String
+  name: String @deprecated(reason: "2022-06-02: Please use collective.name")
   image: String
   email: String
   emailWaitingForValidation: String
@@ -3430,6 +3430,11 @@ type Query {
     Whether to skip recent accounts (48h)
     """
     skipRecentAccounts: Boolean = false
+
+    """
+    Whether to skip guest accounts
+    """
+    skipGuests: Boolean = true
 
     """
     Limit the amount of results. Defaults to 20
