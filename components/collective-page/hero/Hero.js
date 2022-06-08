@@ -219,7 +219,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                                   values={{ count: tagCount - 3 }}
                                 />
                               </StyledTag>
-                              <DropdownContent {...dropdownProps}>
+                              <DropdownContent {...dropdownProps} style={{ marginTop: '6px' }}>
                                 <HiddenTagDropdownContainer>
                                   {hiddenTags.slice(0, numberOfHiddenTags - 1).map(tag => (
                                     <Fragment key={tag}>
