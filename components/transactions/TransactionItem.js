@@ -106,7 +106,7 @@ const KindTag = styled(StyledTag).attrs({
 const getExpenseStatusTag = (expense, isRefund, isRefunded) => {
   let expenseStatusLabel;
   if (isRefunded) {
-    expenseStatusLabel = expenseStatus.REFUNDED;
+    expenseStatusLabel = 'REFUNDED';
   } else if (isRefund) {
     expenseStatusLabel = 'COMPLETED';
   } else {
