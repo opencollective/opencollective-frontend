@@ -675,6 +675,7 @@ export const collectiveSourcePaymentMethodsQuery = gql`
       }
     }
     allHosts(limit: 100, onlyOpenHosts: false, minNbCollectivesHosted: 1) {
+      id
       collectives {
         id
         type

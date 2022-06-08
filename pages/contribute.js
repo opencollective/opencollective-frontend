@@ -360,6 +360,7 @@ const contributePageQuery = gql`
         slug
       }
       features {
+        id
         ...NavbarFields
       }
       host {
@@ -395,12 +396,15 @@ const contributePageQuery = gql`
         tiersIds
       }
       tiers {
+        id
         ...ContributeCardTierFields
       }
       events(includePastEvents: true, includeInactive: true) {
+        id
         ...ContributeCardEventFields
       }
       projects {
+        id
         ...ContributeCardProjectFields
       }
       connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
@@ -422,6 +426,7 @@ const contributePageQuery = gql`
             }
           }
           contributors(limit: $nbContributorsPerContributeCard) {
+            id
             ...ContributeCardContributorFields
           }
         }

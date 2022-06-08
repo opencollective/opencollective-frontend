@@ -407,6 +407,7 @@ export const coreContributorsQuery = gqlV2/* GraphQL */ `
       }
       members(role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {
         nodes {
+          id
           ...MemberFields
         }
       }

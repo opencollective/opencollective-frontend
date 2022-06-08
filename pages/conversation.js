@@ -50,6 +50,7 @@ const conversationPageQuery = gqlV2/* GraphQL */ `
       imageUrl
       twitterHandle
       features {
+        id
         ...NavbarFields
       }
       conversationsTags {
@@ -69,11 +70,13 @@ const conversationPageQuery = gqlV2/* GraphQL */ `
       createdAt
       tags
       body {
+        id
         ...CommentFields
       }
       comments(limit: 100, offset: $offset) {
         totalCount
         nodes {
+          id
           ...CommentFields
         }
       }

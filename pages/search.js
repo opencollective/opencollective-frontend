@@ -603,6 +603,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
 
     tagStats(searchTerm: $term) {
       nodes {
+        id
         tag
       }
     }

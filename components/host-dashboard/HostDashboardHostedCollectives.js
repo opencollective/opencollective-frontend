@@ -76,6 +76,7 @@ const hostedCollectivesQuery = gqlV2/* GraphQL */ `
             settings
             createdAt
             stats {
+              id
               balance {
                 valueInCents
               }

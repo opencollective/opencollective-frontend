@@ -172,6 +172,7 @@ const contributionsSectionStaticQuery = gqlV2/* GraphQL */ `
           id
           role
           tier {
+            id
             name
             description
           }
@@ -228,6 +229,7 @@ const contributionsSectionQuery = gqlV2/* GraphQL */ `
           id
           role
           tier {
+            id
             name
             description
           }

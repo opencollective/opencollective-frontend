@@ -168,6 +168,7 @@ export const updatesQuery = gqlV2/* GraphQL */ `
         }
       }
       features {
+        id
         ...NavbarFields
       }
       updates(limit: $limit, offset: $offset, searchTerm: $searchTerm, orderBy: $orderBy) {

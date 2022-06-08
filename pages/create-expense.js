@@ -496,6 +496,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       isArchived
       expensePolicy
       features {
+        id
         ...NavbarFields
         MULTI_CURRENCY_EXPENSES
       }
@@ -505,6 +506,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       }
 
       stats {
+        id
         balanceWithBlockedFunds {
           valueInCents
           currency
@@ -514,6 +516,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       ... on AccountWithHost {
         isApproved
         host {
+          id
           ...CreateExpenseHostFields
         }
       }
@@ -525,6 +528,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
         isActive
         # NOTE: This will be the account itself in this case
         host {
+          id
           ...CreateExpenseHostFields
         }
       }
@@ -538,6 +542,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       }
     }
     loggedInAccount {
+      id
       ...LoggedInAccountExpensePayoutFields
     }
   }
@@ -561,6 +566,7 @@ const createExpenseMutation = gqlV2/* GraphQL */ `
     $recurring: RecurringExpenseInput
   ) {
     createExpense(expense: $expense, account: $account, recurring: $recurring) {
+      id
       ...ExpensePageExpenseFields
     }
   }
@@ -575,6 +581,7 @@ const addCreateExpenseMutation = graphql(createExpenseMutation, {
 const draftExpenseAndInviteUserMutation = gqlV2/* GraphQL */ `
   mutation DraftExpenseAndInviteUser($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
     draftExpenseAndInviteUser(expense: $expense, account: $account) {
+      id
       ...ExpensePageExpenseFields
     }
   }

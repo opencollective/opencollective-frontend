@@ -42,6 +42,11 @@
       { "env": "apollo", "projectName": "opencollective" },
       { "env": "apollo", "tagName": "gqlV2", "projectName": "opencollective_v2" }
     ],
+    "graphql/required-fields": [
+      "error",
+      { "env": "apollo", "projectName": "opencollective", "requiredFields": ["id"] },
+      { "env": "apollo", "tagName": "gqlV2", "projectName": "opencollective_v2", "requiredFields": ["id"] }
+    ],
     "graphql/named-operations": ["error"],
     "graphql/capitalized-type-name": ["error"],
     "graphql/no-deprecated-fields": ["warn"],

@@ -335,6 +335,7 @@ class ContributionFlowSuccess extends React.Component {
 const orderSuccessQuery = gqlV2/* GraphQL */ `
   query NewContributionFlowOrderSuccess($order: OrderReferenceInput!) {
     order(order: $order) {
+      id
       ...OrderSuccessFragment
     }
   }

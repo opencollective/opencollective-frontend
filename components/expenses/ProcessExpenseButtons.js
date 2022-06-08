@@ -33,6 +33,7 @@ const processExpenseMutation = gqlV2/* GraphQL */ `
     $paymentParams: ProcessExpensePaymentParams
   ) {
     processExpense(expense: { id: $id, legacyId: $legacyId }, action: $action, paymentParams: $paymentParams) {
+      id
       ...ExpensePageExpenseFields
     }
   }

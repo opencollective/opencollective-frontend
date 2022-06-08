@@ -12,7 +12,7 @@ import MemberInvitationsList from '../components/MemberInvitationsList';
 import MessageBox from '../components/MessageBox';
 import { H1 } from '../components/Text';
 
-const memberInvitationsPageQuery = gqlV2`
+const memberInvitationsPageQuery = gqlV2/* GraphQL */ `
   query MemberInvitationsPage($memberAccount: AccountReferenceInput!) {
     memberInvitations(memberAccount: $memberAccount) {
       id
@@ -28,6 +28,7 @@ const memberInvitationsPageQuery = gqlV2`
         isHost
         ... on AccountWithHost {
           host {
+            id
             name
             termsUrl
           }
