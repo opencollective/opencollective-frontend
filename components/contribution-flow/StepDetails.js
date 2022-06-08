@@ -35,16 +35,17 @@ const getCustomFields = (collective, tier) => {
 const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, isEmbed }) => {
   const intl = useIntl();
   const amount = data?.amount;
+  const currency = tier?.amount.currency || collective.currency;
+  const presets = getTierPresets(tier, collective.type, currency);
   const getDefaultOtherAmountSelected = () => isNil(amount) || !presets?.includes(amount);
-  const presets = React.useMemo(() => getTierPresets(tier, collective.type), [tier, collective.type]);
   const [isOtherAmountSelected, setOtherAmountSelected] = React.useState(getDefaultOtherAmountSelected);
   const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
-  const minAmount = getTierMinAmount(tier);
+  const { LoggedInUser } = useUser();
+
+  const minAmount = getTierMinAmount(tier, currency);
   const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
-  const { LoggedInUser } = useUser();
   const customFields = getCustomFields(collective, tier);
-  const currency = tier?.amount.currency || collective.currency;
   const selectedInterval = data?.interval !== INTERVALS.flexible ? data?.interval : null;
   const supportsRecurring = canContributeRecurring(collective, LoggedInUser) && (!tier || tier?.interval);
   const isFixedInterval = tier?.interval && tier.interval !== INTERVALS.flexible;
