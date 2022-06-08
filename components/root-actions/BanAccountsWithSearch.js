@@ -47,6 +47,7 @@ export const searchQuery = gqlV2/* GraphQL */ `
         website
         currency
         location {
+          id
           country
         }
         stats {

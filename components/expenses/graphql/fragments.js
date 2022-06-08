@@ -174,6 +174,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       type
       isAdmin
       location {
+        id
         address
         country
       }
