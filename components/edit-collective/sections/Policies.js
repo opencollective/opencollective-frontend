@@ -149,7 +149,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
       contributionPolicy: collectiveContributionPolicy || '',
       expensePolicy: collectiveExpensePolicy || '',
       disablePublicExpenseSubmission: collectiveDisableExpenseSubmission || false,
-      policies: data?.account?.policies || {},
+      policies: omitDeep(data?.account?.policies || {}, ['__typename']),
     },
     async onSubmit(values) {
       const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission, policies } = values;
@@ -179,7 +179,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             account: {
               legacyId: collective.id,
             },
-            policies: omitDeep(policies, ['__typename']),
+            policies,
           },
         }),
       ]);
@@ -217,7 +217,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
 
   React.useEffect(() => {
     if (data) {
-      formik.setFieldValue('policies', data.account?.policies || {});
+      formik.setFieldValue('policies', omitDeep(data?.account?.policies || {}, ['__typename']));
     }
   }, [data]);
 
