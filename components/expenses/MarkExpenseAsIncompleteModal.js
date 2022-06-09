@@ -25,6 +25,7 @@ const messages = defineMessages({
 const processExpenseMutation = gqlV2/* GraphQL */ `
   mutation ProcessExpense($id: String, $legacyId: Int, $action: ExpenseProcessAction!, $message: String) {
     processExpense(expense: { id: $id, legacyId: $legacyId }, action: $action, message: $message) {
+      id
       ...ExpensePageExpenseFields
     }
   }

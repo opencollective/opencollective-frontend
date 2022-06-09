@@ -381,10 +381,12 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
         tag
       }
       features {
+        id
         ...NavbarFields
       }
 
       stats {
+        id
         balanceWithBlockedFunds {
           valueInCents
           currency
@@ -394,6 +396,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       ... on AccountWithHost {
         isApproved
         host {
+          id
           ...ExpenseHostFields
         }
       }
@@ -441,6 +444,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       offset
       limit
       nodes {
+        id
         ...ExpensesListFieldsFragment
       }
     }

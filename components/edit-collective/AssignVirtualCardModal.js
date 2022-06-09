@@ -54,6 +54,7 @@ const collectiveMembersQuery = gqlV2/* GraphQL */ `
       id
       members(role: ADMIN) {
         nodes {
+          id
           account {
             id
             name

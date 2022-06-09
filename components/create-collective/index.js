@@ -197,6 +197,7 @@ const tagStatsQuery = gqlV2/* GraphQL */ `
   query CreateCollectivePageQuery {
     tagStats {
       nodes {
+        id
         tag
       }
     }

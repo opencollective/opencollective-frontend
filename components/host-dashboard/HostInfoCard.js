@@ -49,6 +49,7 @@ export const hostInfoCardFields = gqlV2/* GraphQL */ `
       currency
     }
     stats {
+      id
       balance {
         valueInCents
       }

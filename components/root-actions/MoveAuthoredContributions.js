@@ -54,6 +54,7 @@ const ordersQuery = gqlV2/* GraphQL */ `
   query AuthoredOrdersRoot($account: AccountReferenceInput!) {
     orders(account: $account, filter: OUTGOING, limit: 100, includeIncognito: true) {
       nodes {
+        id
         ...MoveOrdersFields
       }
     }
@@ -64,6 +65,7 @@ const ordersQuery = gqlV2/* GraphQL */ `
 const moveOrdersMutation = gqlV2/* GraphQL */ `
   mutation MoveOrders($orders: [OrderReferenceInput!]!, $fromAccount: AccountReferenceInput!, $makeIncognito: Boolean) {
     moveOrders(orders: $orders, fromAccount: $fromAccount, makeIncognito: $makeIncognito) {
+      id
       ...MoveOrdersFields
     }
   }

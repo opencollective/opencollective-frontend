@@ -40,6 +40,7 @@ const pendingApplicationsQuery = gqlV2/* GraphQL */ `
         limit
         totalCount
         nodes {
+          id
           message
           customData
           account {

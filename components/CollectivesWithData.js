@@ -129,6 +129,7 @@ const collectivesQuery = gql`
       orderDirection: $orderDirection
       slugs: $slugs
     ) {
+      id
       total
       collectives {
         id
@@ -145,6 +146,7 @@ const collectivesQuery = gql`
           id
           yearlyBudget
           backers {
+            id
             all
           }
         }

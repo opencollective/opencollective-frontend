@@ -246,6 +246,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       currency
       expensePolicy
       features {
+        id
         ...NavbarFields
         MULTI_CURRENCY_EXPENSES
       }
@@ -270,6 +271,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       ... on AccountWithHost {
         isApproved
         host {
+          id
           ...ExpenseHostFields
           transferwise {
             id
@@ -284,6 +286,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isHost
         isActive
         host {
+          id
           ...ExpenseHostFields
           transferwise {
             id
@@ -356,6 +359,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       }
     }
     recurringExpense {
+      id
       interval
       endsAt
     }
