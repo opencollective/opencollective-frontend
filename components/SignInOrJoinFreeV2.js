@@ -330,7 +330,7 @@ class SignInOrJoinFreeV2 extends React.Component {
           this.renderTwoFactorAuthBoxes(useRecoveryCodes)
         ) : (
           <Fragment>
-            {displayedForm !== 'create-accountv2' ? (
+            {displayedForm !== 'create-accountv2' && !error ? (
               <SignInV2
                 email={email}
                 onEmailChange={email => this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })}

@@ -82,6 +82,7 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
           name
           currency
           location {
+            id
             address
             country
           }

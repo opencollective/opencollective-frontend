@@ -258,7 +258,7 @@ type UserDetails {
   CollectiveId: Int
   collective: CollectiveInterface
   username: String @deprecated(reason: "2022-01-13: Not used anymore. Will be ignored")
-  name: String
+  name: String @deprecated(reason: "2022-06-02: Please use collective.name")
   image: String
   email: String
   emailWaitingForValidation: String
