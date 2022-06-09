@@ -59,6 +59,7 @@ const hostFields = gqlV2/* GraphQL */ `
 const applyToHostQuery = gqlV2/* GraphQL */ `
   query ApplyToHost($hostSlug: String!) {
     host(slug: $hostSlug) {
+      id
       ...ApplyToHostFields
     }
   }
@@ -71,6 +72,7 @@ const applyToHostQuery = gqlV2/* GraphQL */ `
 const applyToHostWithAccountsQuery = gqlV2/* GraphQL */ `
   query ApplyToHostWithAccounts($hostSlug: String!) {
     host(slug: $hostSlug) {
+      id
       ...ApplyToHostFields
     }
     loggedInAccount {
@@ -107,6 +109,7 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
         isActive
         isApproved
         host {
+          id
           ...ApplyToHostFields
         }
       }

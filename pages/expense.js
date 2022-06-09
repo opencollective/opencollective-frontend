@@ -72,10 +72,12 @@ const messages = defineMessages({
 const expensePageQuery = gqlV2/* GraphQL */ `
   query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalPaidExpensesDateFrom: DateTime) {
     expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
+      id
       ...ExpensePageExpenseFields
       comments(limit: 100, offset: $offset) {
         totalCount
         nodes {
+          id
           ...CommentFields
         }
       }
@@ -105,6 +107,7 @@ const expensePageQuery = gqlV2/* GraphQL */ `
     }
 
     loggedInAccount {
+      id
       ...LoggedInAccountExpensePayoutFields
     }
   }
@@ -117,6 +120,7 @@ const expensePageQuery = gqlV2/* GraphQL */ `
 const editExpenseMutation = gqlV2/* GraphQL */ `
   mutation EditExpense($expense: ExpenseUpdateInput!, $draftKey: String) {
     editExpense(expense: $expense, draftKey: $draftKey) {
+      id
       ...ExpensePageExpenseFields
     }
   }
@@ -127,6 +131,7 @@ const editExpenseMutation = gqlV2/* GraphQL */ `
 const verifyExpenseMutation = gqlV2/* GraphQL */ `
   mutation VerifyExpense($expense: ExpenseReferenceInput!, $draftKey: String) {
     verifyExpense(expense: $expense, draftKey: $draftKey) {
+      id
       ...ExpensePageExpenseFields
     }
   }

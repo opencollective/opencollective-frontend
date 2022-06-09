@@ -138,6 +138,7 @@ const collectiveContactPageQuery = gql`
       imageUrl
       twitterHandle
       features {
+        id
         ...NavbarFields
       }
     }

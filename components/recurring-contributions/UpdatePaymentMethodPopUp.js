@@ -66,12 +66,14 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
     account(id: $accountId) {
       id
       paymentMethods(enumType: [CREDITCARD, GIFTCARD, PREPAID]) {
+        id
         ...UpdatePaymentMethodFragment
       }
     }
     order(order: { id: $orderId }) {
       id
       paymentMethod {
+        id
         ...UpdatePaymentMethodFragment
       }
     }

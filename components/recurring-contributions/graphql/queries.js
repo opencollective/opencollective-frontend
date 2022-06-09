@@ -12,6 +12,7 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
       settings
       imageUrl
       features {
+        id
         ...NavbarFields
       }
       ... on AccountWithParent {

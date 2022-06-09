@@ -117,6 +117,7 @@ export const contributeCardTierFieldsFragment = gql`
       }
     }
     contributors(limit: $nbContributorsPerContributeCard) {
+      id
       ...ContributeCardContributorFields
     }
   }
@@ -139,6 +140,7 @@ export const contributeCardEventFieldsFragment = gql`
       type
     }
     contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
+      id
       ...ContributeCardContributorFields
     }
     stats {
@@ -165,6 +167,7 @@ export const contributeCardProjectFieldsFragment = gql`
     isArchived
     backgroundImageUrl(height: 208)
     contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER]) {
+      id
       ...ContributeCardContributorFields
     }
     stats {

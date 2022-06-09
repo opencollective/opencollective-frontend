@@ -104,6 +104,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
         slug
         name
         stats {
+          id
           balance {
             valueInCents
           }
@@ -137,6 +138,7 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
       ... on Organization {
         tiers {
           nodes {
+            id
             ...AddFundsTierFields
           }
         }
@@ -151,6 +153,7 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
       ... on AccountWithContributions {
         tiers {
           nodes {
+            id
             ...AddFundsTierFields
           }
         }
