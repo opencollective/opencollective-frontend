@@ -133,7 +133,7 @@ class OnboardingModal extends React.Component {
     editCollectiveMembers: PropTypes.func,
     editCollectiveContact: PropTypes.func,
     showOnboardingModal: PropTypes.bool,
-    memberInvitationsQuery: PropTypes.object,
+    data: PropTypes.object,
     setShowOnboardingModal: PropTypes.func,
     intl: PropTypes.object.isRequired,
     router: PropTypes.object,
@@ -259,7 +259,7 @@ class OnboardingModal extends React.Component {
   };
 
   render() {
-    const { collective, LoggedInUser, showOnboardingModal, mode, memberInvitationsQuery } = this.props;
+    const { collective, LoggedInUser, showOnboardingModal, mode, data } = this.props;
     const { step, isSubmitting, error, noOverlay } = this.state;
 
     return (
@@ -357,7 +357,7 @@ class OnboardingModal extends React.Component {
                             values={values}
                             errors={errors}
                             touched={touched}
-                            memberInvitations={memberInvitationsQuery?.account?.memberInvitations || []}
+                            memberInvitations={data?.memberInvitations || []}
                           />
                           {error && (
                             <MessageBox type="error" withIcon mt={2}>
@@ -428,24 +428,21 @@ const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, 
 });
 
 const addMemberInvitationQuery = graphql(
-  gqlV2`
+  gqlV2/* GraphQL */ `
     query MemberInvitationsQuery($slug: String!) {
-      account(slug: $slug) {
-        memberInvitations(role: [ADMIN]) {
+      memberInvitations(account: { slug: $slug }, role: [ADMIN]) {
+        id
+        role
+        memberAccount {
           id
-          role
-          memberAccount {
-            id
-            name
-            imageUrl
-            slug
-          }
+          name
+          imageUrl
+          slug
         }
       }
     }
   `,
   {
-    name: 'memberInvitationsQuery',
     options: props => ({
       variables: { slug: props.collective.slug },
       context: API_V2_CONTEXT,
