@@ -383,7 +383,7 @@ class TopBarProfileMenu extends React.Component {
     const { LoggedInUser } = this.props;
 
     return (
-      <StyledProfileButton isBorderless onClick={this.toggleProfileMenu}>
+      <StyledProfileButton isBorderless textAlign="left" onClick={this.toggleProfileMenu}>
         <Flex alignItems="center" data-cy="user-menu-trigger">
           <Flex>
             <Avatar collective={get(LoggedInUser, 'collective')} radius="40px" mr={2} />
