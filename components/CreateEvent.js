@@ -65,7 +65,6 @@ class CreateEvent extends React.Component {
     this.setState({ status: 'loading' });
     EventInputType.type = 'EVENT';
     EventInputType.ParentCollectiveId = parentCollective.id;
-    EventInputType.tiers = EventInputType.tiers.filter(tier => tier.name);
     EventInputType.settings = { disableCustomContributions: true };
     try {
       const res = await this.props.createCollective(EventInputType);
@@ -95,7 +94,7 @@ class CreateEvent extends React.Component {
   async handleTemplateChange(event) {
     delete event.id;
     delete event.slug;
-    this.setState({ event, tiers: event.tiers });
+    this.setState({ event });
   }
 
   render() {
