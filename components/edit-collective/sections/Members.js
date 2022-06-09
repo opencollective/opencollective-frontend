@@ -8,6 +8,7 @@ import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'rea
 import styled from 'styled-components';
 
 import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
+import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
@@ -252,23 +253,24 @@ class Members extends React.Component {
           <P lineHeight="20px" letterSpacing="normal">
             <FormattedMessage defaultMessage="Core Contributors are the people closely associated with your Collective, who will show up on your Collective page as part of the team. Collective Admins are Core Contributors with extra permissions, like editing the Collective settings and approving expenses. Admins get notifications of activity on your Collective. " />
           </P>
-          {collective.type === 'COLLECTIVE' && host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
-            <P lineHeight="20px" letterSpacing="normal" mt={3}>
-              <FormattedMessage
-                defaultMessage="Your host requires that Collectives have {numberOfAdmins, plural, one {# active administrator} other {# active administrators} }."
-                values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
-              />
-              {host?.policies?.COLLECTIVE_MINIMUM_ADMINS.freeze && (
-                <React.Fragment>
-                  &nbsp;
-                  <FormattedMessage
-                    defaultMessage="In case of a shortfall, your collective will be frozen until the minimum required administrators are added."
-                    values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
-                  />
-                </React.Fragment>
-              )}
-            </P>
-          )}
+          {[CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(collective.type) &&
+            host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+              <P lineHeight="20px" letterSpacing="normal" mt={3}>
+                <FormattedMessage
+                  defaultMessage="Your host requires that Collectives have {numberOfAdmins, plural, one {# active administrator} other {# active administrators} }."
+                  values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                />
+                {host?.policies?.COLLECTIVE_MINIMUM_ADMINS.freeze && (
+                  <React.Fragment>
+                    &nbsp;
+                    <FormattedMessage
+                      defaultMessage="In case of a shortfall, your collective will be frozen until the minimum required administrators are added."
+                      values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                    />
+                  </React.Fragment>
+                )}
+              </P>
+            )}
 
           <StyledHr mt={4} borderColor="black.200" flex="1 1" />
 
