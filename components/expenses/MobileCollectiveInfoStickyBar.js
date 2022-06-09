@@ -66,7 +66,7 @@ const MobileCollectiveInfoStickyBar = ({ isLoading, collective, host }) => {
             </P>
             <LinkCollective collective={host}>
               <P color="black.600" fontSize="11px" fontWeight="bold" truncateOverflow maxWidth={135}>
-                {collective && collective.isApproved ? (
+                {collective?.isActive ? (
                   host.name
                 ) : (
                   <FormattedMessage
@@ -92,7 +92,7 @@ MobileCollectiveInfoStickyBar.propTypes = {
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     type: PropTypes.string,
-    isApproved: PropTypes.bool,
+    isActive: PropTypes.bool,
     stats: PropTypes.shape({
       balanceWithBlockedFunds: PropTypes.shape({
         valueInCents: PropTypes.number.isRequired,
