@@ -557,7 +557,7 @@ const ApplicationForm = ({
                       </Box>
                       <Box width={['256px', '484px', '663px']} my={2}>
                         <P fontSize="13px" lineHeight="16px" color="#4E5052">
-                          Add Administrators
+                          <FormattedMessage id="onboarding.admins.header" defaultMessage="Add administrators" />
                         </P>
                         <Flex mt={1} width="100%">
                           <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">

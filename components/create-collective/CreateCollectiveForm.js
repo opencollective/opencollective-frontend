@@ -288,7 +288,9 @@ class CreateCollectiveForm extends React.Component {
                       </P>
                       {host && (
                         <Box mt={3} mb={2}>
-                          <P {...LABEL_STYLES}>Add Administrators</P>
+                          <P {...LABEL_STYLES}>
+                            <FormattedMessage id="onboarding.admins.header" defaultMessage="Add administrators" />
+                          </P>
                           <Flex mt={1} width="100%">
                             <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
                               <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />

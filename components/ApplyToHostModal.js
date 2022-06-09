@@ -461,7 +461,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                           </P>
                           <Flex mt={1} width="100%">
                             <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
-                              <FormattedMessage defaultMessage="Administrators" />
+                              <FormattedMessage id="administrators" defaultMessage="Administrators" />
                               {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
                                 values.collective &&
                                 ` (${
@@ -500,7 +500,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                           </Flex>
                           <Flex mt={1} width="100%">
                             <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
-                              <FormattedMessage defaultMessage="Invite Administrators" />
+                              <FormattedMessage id="InviteAdministrators" defaultMessage="Invite Administrators" />
                             </P>
                             <Flex flexGrow={1} alignItems="center">
                               <StyledHr width="100%" ml={2} borderColor="black.300" />
