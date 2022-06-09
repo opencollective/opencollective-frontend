@@ -64,6 +64,40 @@ const hostFields = gqlV2/* GraphQL */ `
   }
 `;
 
+const accountFields = gqlV2/* GraphQL */ `
+  fragment ApplyToHostAccountFields on Account {
+    id
+    slug
+    name
+    type
+    imageUrl
+    memberInvitations(role: [ADMIN]) {
+      id
+      role
+      memberAccount {
+        id
+        type
+        slug
+        name
+        imageUrl
+      }
+    }
+    admins: members(role: ADMIN) {
+      nodes {
+        id
+        role
+        account {
+          id
+          type
+          slug
+          name
+          imageUrl
+        }
+      }
+    }
+  }
+`;
+
 const applyToHostQuery = gqlV2/* GraphQL */ `
   query ApplyToHost($hostSlug: String!, $collectiveSlug: String!) {
     host(slug: $hostSlug) {
@@ -72,36 +106,11 @@ const applyToHostQuery = gqlV2/* GraphQL */ `
     }
     account(slug: $collectiveSlug) {
       id
-      slug
-      name
-      type
-      memberInvitations(role: [ADMIN]) {
-        id
-        role
-        memberAccount {
-          id
-          type
-          slug
-          name
-          imageUrl
-        }
-      }
-      admins: members(role: ADMIN) {
-        nodes {
-          id
-          role
-          account {
-            id
-            type
-            slug
-            name
-            imageUrl
-          }
-        }
-      }
+      ...ApplyToHostAccountFields
     }
   }
   ${hostFields}
+  ${accountFields}
 `;
 
 /**
@@ -120,34 +129,7 @@ const applyToHostWithAccountsQuery = gqlV2/* GraphQL */ `
           id
           account {
             id
-            slug
-            name
-            type
-            imageUrl
-            admins: members(role: ADMIN) {
-              nodes {
-                id
-                role
-                account {
-                  id
-                  type
-                  slug
-                  name
-                  imageUrl
-                }
-              }
-            }
-            memberInvitations(role: [ADMIN]) {
-              id
-              role
-              memberAccount {
-                id
-                type
-                slug
-                name
-                imageUrl
-              }
-            }
+            ...ApplyToHostAccountFields
             ... on AccountWithHost {
               host {
                 id
@@ -160,6 +142,7 @@ const applyToHostWithAccountsQuery = gqlV2/* GraphQL */ `
     }
   }
   ${hostFields}
+  ${accountFields}
 `;
 
 const applyToHostMutation = gqlV2/* GraphQL */ `
