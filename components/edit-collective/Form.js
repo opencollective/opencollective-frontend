@@ -895,6 +895,7 @@ class EditCollectiveForm extends React.Component {
 
                 <Container className="backToProfile" fontSize="1.3rem" margin="1rem">
                   <Link
+                    data-cy="edit-collective-back-to-profile"
                     href={
                       isEvent ? `/${collective.parentCollective.slug}/events/${collective.slug}` : `/${collective.slug}`
                     }
