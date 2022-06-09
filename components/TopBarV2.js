@@ -220,7 +220,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
           </NavList>
         </Hide>
         {showSearch && (
-          <NavButton as={Container} onClick={() => setShowSearchModal(true)}>
+          <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
             <Flex>
               <SearchIcon fill="#75777A" size={18} />
               <Hide xs sm>
