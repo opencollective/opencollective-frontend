@@ -363,9 +363,8 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                     applies: option.value,
                   })
                 }
-                value={minAdminsApplies.find(
-                  option => option.value === formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.applies,
-                )}
+                disabled
+                value={minAdminsApplies[0]}
               />
             </StyledInputField>
           </Flex>
