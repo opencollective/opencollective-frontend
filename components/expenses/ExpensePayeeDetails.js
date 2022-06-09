@@ -215,7 +215,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             <Flex alignItems="center">
               <Avatar collective={displayedHost} radius={24} />
               <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
-                {collective && collective.isApproved ? (
+                {collective?.isActive ? (
                   formatAccountName(displayedHost.name, displayedHost.legalName)
                 ) : (
                   <FormattedMessage
@@ -360,7 +360,7 @@ ExpensePayeeDetails.propTypes = {
   borderless: PropTypes.bool,
   collective: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    isApproved: PropTypes.bool,
+    isActive: PropTypes.bool,
   }),
 };
 
