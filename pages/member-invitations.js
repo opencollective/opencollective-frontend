@@ -17,7 +17,10 @@ const memberInvitationsPageQuery = gqlV2`
     memberInvitations(memberAccount: $memberAccount) {
       id
       inviter {
+        id
+        slug
         name
+        type
       }
       createdAt
       role
