@@ -16,8 +16,8 @@ import Page from '../components/Page';
 import { TOAST_TYPE, useToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
-const collectiveQuery = gqlV2/* GraphQL */ `
-  query CollectiveData($slug: String) {
+const ocfCollectiveApplicationQuery = gqlV2/* GraphQL */ `
+  query OcfCollectiveApplicationPage($slug: String) {
     account(slug: $slug) {
       id
       slug
@@ -35,8 +35,8 @@ const collectiveQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const hostQuery = gqlV2/* GraphQL */ `
-  query HostData {
+const ocfHostApplicationPageQuery = gqlV2/* GraphQL */ `
+  query OcfHostApplicationPage {
     account(slug: "foundation") {
       id
       slug
@@ -97,11 +97,11 @@ const OCFHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
   const step = router.query.step || 'intro';
   const collectiveSlug = router.query.collectiveSlug;
 
-  const { data: hostData } = useQuery(hostQuery, {
+  const { data: hostData } = useQuery(ocfHostApplicationPageQuery, {
     context: API_V2_CONTEXT,
   });
 
-  const { data, loading: loadingCollective } = useQuery(collectiveQuery, {
+  const { data, loading: loadingCollective } = useQuery(ocfCollectiveApplicationQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: collectiveSlug },
     skip: !(LoggedInUser && collectiveSlug && step === 'form'),
