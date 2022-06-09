@@ -22,7 +22,7 @@ export const getExpenseStatusMsgType = status => {
     case expenseStatus.APPROVED:
       return 'info';
     case expenseStatus.PAID:
-    case expenseStatus.COMPLETED:
+    case 'COMPLETED':
       return 'success';
   }
 };
