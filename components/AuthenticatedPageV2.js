@@ -21,16 +21,16 @@ import { withUser } from './UserProvider';
  * ## Usage
  *
  * ```jsx
- * <AuthenticatedPage>
+ * <AuthenticatedPageV2>
  *   {(LoggedInUser) => (
  *     <div>
  *       Hello {LoggedInUser.collective.name}!
  *     </div>
  *   )}
- * </AuthenticatedPage>
+ * </AuthenticatedPageV2>
  * ```
  */
-class AuthenticatedPage extends React.Component {
+class AuthenticatedPageV2 extends React.Component {
   static propTypes = {
     /** A child renderer to call when user is properly authenticated */
     children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
@@ -103,4 +103,4 @@ class AuthenticatedPage extends React.Component {
   }
 }
 
-export default withUser(AuthenticatedPage);
+export default withUser(AuthenticatedPageV2);
