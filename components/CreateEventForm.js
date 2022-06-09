@@ -6,7 +6,6 @@ import { defineMessages, injectIntl } from 'react-intl';
 
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../lib/date-utils';
 
-import Tickets from './edit-collective/sections/Tickets';
 import Container from './Container';
 import InputField from './InputField';
 import StyledButton from './StyledButton';
@@ -30,7 +29,6 @@ class CreateEventForm extends React.Component {
     event.slug = event.slug ? event.slug.replace(/.*\//, '') : '';
     this.state = {
       event,
-      tiers: event.tiers || [{}],
       disabled: false,
       showDeleteModal: false,
       validStartDate: true,
@@ -78,7 +76,7 @@ class CreateEventForm extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.event && (!prevProps.event || this.props.event.name !== prevProps.event.name)) {
-      this.setState({ event: this.props.event, tiers: this.props.event.tiers });
+      this.setState({ event: this.props.event });
     }
   }
 
@@ -132,7 +130,7 @@ class CreateEventForm extends React.Component {
   }
 
   async handleSubmit() {
-    this.props.onSubmit({ ...this.state.event, tiers: this.state.tiers });
+    this.props.onSubmit({ ...this.state.event });
   }
 
   getFieldDefaultValue(field) {
@@ -250,15 +248,6 @@ class CreateEventForm extends React.Component {
               ),
             )}
           </div>
-          {['e2e', 'ci'].includes(process.env.OC_ENV) && (
-            <Tickets
-              title="Tickets"
-              tiers={this.state.tiers}
-              collective={{ ...event, type: 'EVENT' }}
-              currency={event.parentCollective.currency}
-              onChange={tiers => this.setState({ tiers })}
-            />
-          )}
         </Container>
         <Container margin="5rem auto 1rem" textAlign="center">
           <StyledButton
