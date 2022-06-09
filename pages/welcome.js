@@ -1,13 +1,12 @@
 import React from 'react';
-import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import AuthenticatedPageV2 from '../components/AuthenticatedPageV2';
 import Container from '../components/Container';
 import { Box, Flex } from '../components/Grid';
 import Image from '../components/Image';
 import Link from '../components/Link';
-import Page from '../components/Page';
 import StyledCard from '../components/StyledCard';
 import StyledLink from '../components/StyledLink';
 import { useUser } from '../components/UserProvider';
@@ -19,13 +18,11 @@ const WelcomeOptionContainer = styled(Container)`
 `;
 
 const Welcome = () => {
-  const { LoggedInUser, loadingLoggedInUser } = useUser();
-  const router = useRouter();
-  if (!loadingLoggedInUser && !LoggedInUser) {
-    router.push('/');
-  }
+  ``;
+  const { LoggedInUser } = useUser();
+
   return (
-    <Page title="Welcome to Open Collective!">
+    <AuthenticatedPageV2 title="Welcome to Open Collective!">
       <Flex flexDirection={['column', 'row']} mb="61px" mt="112px" justifyContent="center" alignItems="center">
         <Flex textAlign="center" flexDirection="column" pr={[0, '48px']}>
           <Box>
@@ -117,7 +114,7 @@ const Welcome = () => {
           </Flex>
         </StyledCard>
       </Flex>
-    </Page>
+    </AuthenticatedPageV2>
   );
 };
 
