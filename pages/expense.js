@@ -530,7 +530,7 @@ class ExpensePage extends React.Component {
               <MessageBox type="warning" withIcon={true} mb={4}>
                 <FormattedMessage
                   id="expenseNeedsTaxFormMessage.msg"
-                  defaultMessage="We need your tax information before we can pay you. You will receive an email with a link to fill out a form. If you have not received the email within 24 hours, check your spam, then contact <I18nSupportLink></I18nSupportLink>. Questions? See <Link>help docs about taxes</Link>."
+                  defaultMessage="We need your tax information before we can pay you. You will receive an email with a link to fill out a form. If you have not received the email within 24 hours, check your spam, then contact <I18nSupportLink>support</I18nSupportLink>. Questions? See <Link>help docs about taxes</Link>."
                   values={{
                     I18nSupportLink,
                     Link: getI18nLink({

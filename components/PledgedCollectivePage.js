@@ -207,7 +207,7 @@ const PledgedCollectivePage = ({ collective }) => {
             <P fontSize="12px" color="black.500" mt={3}>
               <FormattedMessage
                 id="pledge.contactToClaim"
-                defaultMessage="To claim this Collective, contact <SupportLink></SupportLink>."
+                defaultMessage="To claim this Collective, contact <SupportLink>support</SupportLink>."
                 values={I18nFormatters}
               />
             </P>

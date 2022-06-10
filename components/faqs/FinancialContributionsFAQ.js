@@ -2,11 +2,10 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { Box } from '../Grid';
+import I18nFormatters from '../I18nFormatters';
 import StyledLink from '../StyledLink';
 
 import FAQ, { Content, Entry, Title } from './FAQ';
-
-const supportEmail = 'support@opencollective.com';
 
 const FinancialContributionsFAQ = props => (
   <FAQ {...props}>
@@ -45,8 +44,8 @@ const FinancialContributionsFAQ = props => (
       <Content>
         <FormattedMessage
           id="acceptContributions.FAQ.idNotIncludedDetails"
-          defaultMessage="If the unique ID is not included, it can be hard to find and confirm a transaction. If you sent the money but it has not been confirmed, contact {email} and we will help track it down."
-          values={{ email: <a href={`mailto:${supportEmail}`}>{supportEmail}</a> }}
+          defaultMessage="If the unique ID is not included, it can be hard to find and confirm a transaction. If you sent the money but it has not been confirmed, <SupportLink>contact support</SupportLink> and we will help track it down."
+          values={I18nFormatters}
         />
       </Content>
     </Entry>

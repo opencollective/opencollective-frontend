@@ -480,7 +480,7 @@ class CreateGiftCardsForm extends Component {
         <MessageBox type="info" fontSize="13px" withIcon mb={4}>
           <FormattedMessage
             id="GiftCard.Limitinfo"
-            defaultMessage="Your account is currently limited to {limit} gift cards per day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
+            defaultMessage="Your account is currently limited to {limit} gift cards per day. If you want to increase that limit, please contact <SupportLink>support</SupportLink>."
             values={{
               SupportLink: I18nSupportLink,
               limit: get(collectiveSettings, `giftCardsMaxDailyCount`) || 100,

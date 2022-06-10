@@ -2,13 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { create, Mode } from '@transferwise/approve-api-action-helpers';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { addAuthTokenToHeader } from '../../lib/api';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
+import { I18nSupportLink } from '../I18nFormatters';
 import TransferwiseIcon from '../icons/TransferwiseIcon';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
@@ -41,6 +42,7 @@ const ScheduledExpensesBanner = ({ host, onSubmit, secondButton, expenses }) => 
     scheduledExpenses.refetch();
   }, [expenses]);
   const { addToast } = useToasts();
+  const intl = useIntl();
   const [showConfirmationModal, setConfirmationModalDisplay] = React.useState(false);
 
   const hasScheduledExpenses = scheduledExpenses.data?.expenses?.totalCount > 0;
@@ -71,10 +73,17 @@ const ScheduledExpensesBanner = ({ host, onSubmit, secondButton, expenses }) => 
     } catch (e) {
       const message = e?.response
         ? await e.response.text()
-        : 'There was an error trying to process this batch, please contact support@opencollective.com';
+        : intl.formatMessage(
+            {
+              defaultMessage:
+                'There was an error trying to process this batch, please <SupportLink>contact support</SupportLink>',
+            },
+            { SupportLink: I18nSupportLink },
+          );
+
       addToast({
         type: TOAST_TYPE.ERROR,
-        title: 'Batch payment failed',
+        title: intl.formatMessage({ defaultMessage: 'Batch payment failed' }),
         message,
       });
     }

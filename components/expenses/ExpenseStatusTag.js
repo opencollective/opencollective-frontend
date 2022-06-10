@@ -6,6 +6,7 @@ import expenseStatus from '../../lib/constants/expense-status';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
 
 import { Flex } from '../Grid';
+import I18nFormatters from '../I18nFormatters';
 import StyledTag from '../StyledTag';
 import StyledTooltip from '../StyledTooltip';
 
@@ -96,7 +97,8 @@ const ExpenseStatusTag = ({ status, showTaxFormTag, showTaxFormMsg, ...props }) 
           content={() => (
             <FormattedMessage
               id="expenseNeedsTaxForm.hover"
-              defaultMessage="We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks. Need help? Contact support@opencollective.com"
+              defaultMessage="We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks. Need help? Contact <SupportLink>support</SupportLink>"
+              values={I18nFormatters}
             />
           )}
         >
