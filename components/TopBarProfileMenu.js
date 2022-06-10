@@ -383,27 +383,27 @@ class TopBarProfileMenu extends React.Component {
     const { LoggedInUser } = this.props;
 
     return (
-      <StyledProfileButton isBorderless textAlign="left" onClick={this.toggleProfileMenu}>
-        <Flex alignItems="center" data-cy="user-menu-trigger">
-          <Flex>
+      <React.Fragment>
+        <StyledProfileButton isBorderless onClick={this.toggleProfileMenu}>
+          <Flex alignItems="center" data-cy="user-menu-trigger">
             <Avatar collective={get(LoggedInUser, 'collective')} radius="40px" mr={2} />
-            <Hide sm md lg>
-              <Container mx={-20} my={-1}>
-                <ChangelogTrigger height="24px" width="24px" backgroundSize="9.49px 13.5px" />
-              </Container>
+            <Hide xs>
+              <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
             </Hide>
           </Flex>
-          <Hide xs>
-            <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
-          </Hide>
-          {showProfileMenu && (
-            <React.Fragment>
-              <HideGlobalScroll />
-              {this.renderProfileMenu()}
-            </React.Fragment>
-          )}
-        </Flex>
-      </StyledProfileButton>
+        </StyledProfileButton>
+        <Hide sm md lg>
+          <Container position="absolute" mx={27} my={-47}>
+            <ChangelogTrigger height="24px" width="24px" backgroundSize="9.49px 13.5px" />
+          </Container>
+        </Hide>
+        {showProfileMenu && (
+          <React.Fragment>
+            <HideGlobalScroll />
+            {this.renderProfileMenu()}
+          </React.Fragment>
+        )}
+      </React.Fragment>
     );
   }
 
