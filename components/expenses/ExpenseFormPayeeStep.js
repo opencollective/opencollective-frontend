@@ -233,7 +233,6 @@ const ExpenseFormPayeeStep = ({
               setLocationFromPayee(formik, payee);
             }
           }}
-          limit={5}
           styles={{
             menu: {
               borderRadius: '16px',
