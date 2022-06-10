@@ -3,7 +3,7 @@ describe('New host page', () => {
    * About section is already tested in `04-collective.test.js`
    */
   before(() => {
-    cy.visit('/opensourceorg');
+    cy.visit('/opensource');
   });
 
   it('Should not have no-index meta', () => {

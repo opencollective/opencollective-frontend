@@ -8,6 +8,7 @@ import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'rea
 import styled from 'styled-components';
 
 import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
+import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
@@ -24,6 +25,7 @@ import Link from '../../Link';
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
+import StyledHr from '../../StyledHr';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
@@ -31,7 +33,6 @@ import { P } from '../../Text';
 import { withToasts } from '../../ToastProvider';
 import { withUser } from '../../UserProvider';
 import ResendMemberInviteBtn from '../ResendMemberInviteBtn';
-import SettingsSubtitle from '../SettingsSubtitle';
 
 import EditMemberModal from './EditMemberModal';
 import InviteMemberModal from './InviteMemberModal';
@@ -78,6 +79,7 @@ const EMPTY_MEMBERS = [{}];
 class Members extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
+    host: PropTypes.object,
     LoggedInUser: PropTypes.object.isRequired,
     refetchLoggedInUser: PropTypes.func.isRequired,
     addToast: PropTypes.func.isRequired,
@@ -152,7 +154,8 @@ class Members extends React.Component {
   });
 
   renderMember = (member, index, nbAdmins, memberModalKey) => {
-    const { intl, collective, LoggedInUser, refetchLoggedInUser } = this.props;
+    const { intl, collective, host, LoggedInUser, refetchLoggedInUser } = this.props;
+
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
     const isInvitation = member.__typename === 'MemberInvitation';
     const collectiveId = get(member, 'memberAccount.id');
@@ -185,6 +188,11 @@ class Members extends React.Component {
               isLastAdmin={isLastAdmin}
               LoggedInUser={LoggedInUser}
               refetchLoggedInUser={refetchLoggedInUser}
+              canRemove={
+                host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins
+                  ? isInvitation || nbAdmins > host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins
+                  : true
+              }
             />
           ) : (
             <StyledRoundButton
@@ -234,25 +242,50 @@ class Members extends React.Component {
   };
 
   renderSection() {
-    const { intl, collective } = this.props;
+    const { intl, collective, host } = this.props;
     const { members, error } = this.state;
     const nbAdmins = members.filter(m => m.role === roles.ADMIN && m.id).length;
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
 
     return (
       <React.Fragment>
-        <Box className="members">
-          {collective.type === 'COLLECTIVE' && (
-            <SettingsSubtitle>
-              <FormattedMessage
-                id="members.edit.description"
-                defaultMessage="Note: Only Collective Admins can edit this Collective and approve expenses."
-              />
-            </SettingsSubtitle>
-          )}
+        <Box className="members" mt={3}>
+          <P lineHeight="20px" letterSpacing="normal">
+            <FormattedMessage defaultMessage="Core Contributors are the people closely associated with your Collective, who will show up on your Collective page as part of the team. Collective Admins are Core Contributors with extra permissions, like editing the Collective settings and approving expenses. Admins get notifications of activity on your Collective. " />
+          </P>
+          {[CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(collective.type) &&
+            host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+              <P lineHeight="20px" letterSpacing="normal" mt={3}>
+                <FormattedMessage
+                  defaultMessage="Your host requires that Collectives have {numberOfAdmins, plural, one {# active administrator} other {# active administrators} }."
+                  values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                />
+                {host?.policies?.COLLECTIVE_MINIMUM_ADMINS.freeze && (
+                  <React.Fragment>
+                    &nbsp;
+                    <FormattedMessage
+                      defaultMessage="In case of a shortfall, your collective will be frozen until the minimum required administrators are added."
+                      values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                    />
+                  </React.Fragment>
+                )}
+              </P>
+            )}
+
+          <StyledHr mt={4} borderColor="black.200" flex="1 1" />
+
+          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
+            nbAdmins < host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins && (
+              <MessageBox type="error" mt={4} fontSize="13px">
+                <FormattedMessage
+                  defaultMessage="Your collective doesn’t meet the requirements of having a minimum of {numberOfAdmins, plural, one {# administrator} other {# administrators} }. Add more administrators to comply with your host’s policy."
+                  values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                />
+              </MessageBox>
+            )}
 
           <Hide md lg>
-            <Grid>
+            <Grid mt={4}>
               <HorizontalScroller container={AllCardsContainerMobile}>
                 <Flex mx={2}>
                   <InviteNewCard mt={2} mx={2}>
@@ -278,7 +311,7 @@ class Members extends React.Component {
             </Grid>
           </Hide>
           <Hide xs sm>
-            <Grid gridGap={20} gridTemplateColumns="repeat(auto-fill, 164px)">
+            <Grid mt={4} gridGap={20} gridTemplateColumns="repeat(auto-fill, 164px)">
               {this.state.showInviteModal ? (
                 <InviteMemberModal
                   intl={intl}

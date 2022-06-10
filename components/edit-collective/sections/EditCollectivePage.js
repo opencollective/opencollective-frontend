@@ -42,7 +42,14 @@ export const getSettingsQuery = gqlV2/* GraphQL */ `
       isActive
       isHost
       settings
-      policies
+      policies {
+        EXPENSE_AUTHOR_CANNOT_APPROVE
+        COLLECTIVE_MINIMUM_ADMINS {
+          numberOfAdmins
+          applies
+          freeze
+        }
+      }
     }
   }
 `;
