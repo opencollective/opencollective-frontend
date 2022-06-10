@@ -86,7 +86,7 @@ describe('edit collective', () => {
     cy.get('.name.inputField input', { timeout: 10000 }).type(' edited');
     cy.get('.description.inputField input').type(' edited');
     cy.get('.twitterHandle.inputField input').type('{selectall}opencollect');
-    cy.get('.githubHandle.inputField input').type('{selectall}@AwesomeHandle');
+    cy.get('input[name="repositoryUrl"]').type('{selectall}https://github.com/AwesomeHandle');
     cy.get('.website.inputField input').type('{selectall}opencollective.com');
     cy.wait(500);
     cy.get('.actions > [data-cy="collective-save"]').click(); // save changes
@@ -94,7 +94,7 @@ describe('edit collective', () => {
     cy.wait(500);
     cy.get('[data-cy="collective-hero"] [data-cy="collective-title"]').contains('edited');
     cy.get('[data-cy="collective-hero"] a[href="https://twitter.com/opencollect"] [title="Twitter"]');
-    cy.get('[data-cy="collective-hero"] a[href="https://github.com/AwesomeHandle"] [title="GitHub"]');
+    cy.contains('[data-cy="collective-hero"] a[href="https://github.com/AwesomeHandle"]', 'Code repository');
     cy.get('[data-cy="collective-hero"] a[href="https://opencollective.com"] [title="Website"]');
   });
 

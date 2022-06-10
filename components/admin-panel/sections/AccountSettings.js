@@ -60,7 +60,7 @@ const AccountSettings = ({ account, section }) => {
       'expensePolicy',
       'website',
       'twitterHandle',
-      'githubHandle',
+      'repositoryUrl',
       'location',
       'privateInstructions',
       'startsAt',
