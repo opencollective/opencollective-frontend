@@ -56,12 +56,12 @@ class TopBar extends React.Component {
   static propTypes = {
     showSearch: PropTypes.bool,
     menuItems: PropTypes.object,
-    showProfileMenu: PropTypes.bool,
+    showProfileAndChangelogMenu: PropTypes.bool,
   };
 
   static defaultProps = {
     showSearch: true,
-    showProfileMenu: true,
+    showProfileAndChangelogMenu: true,
     menuItems: {
       discover: true,
       docs: true,
@@ -96,7 +96,7 @@ class TopBar extends React.Component {
   };
 
   render() {
-    const { showSearch, menuItems, showProfileMenu } = this.props;
+    const { showSearch, menuItems, showProfileAndChangelogMenu } = this.props;
     const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
     const merged = { ...defaultMenu, ...menuItems };
     return (
@@ -180,12 +180,16 @@ class TopBar extends React.Component {
             </NavList>
           </Hide>
         </Flex>
-        <Container mr={3}>
-          <Hide xs>
-            <ChangelogTrigger />
-          </Hide>
-        </Container>
-        {showProfileMenu && <TopBarProfileMenu />}
+        {showProfileAndChangelogMenu && (
+          <React.Fragment>
+            <Container mr={3}>
+              <Hide xs>
+                <ChangelogTrigger />
+              </Hide>
+            </Container>
+            <TopBarProfileMenu />
+          </React.Fragment>
+        )}
         <Hide sm md lg>
           <TopBarMobileMenu
             showMobileMenu={this.state.showMobileMenu}

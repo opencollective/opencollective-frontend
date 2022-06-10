@@ -145,7 +145,7 @@ class SignInOrJoinFree extends React.Component {
       return false;
     }
     const user = pick(data, ['email', 'name', 'legalName', 'newsletterOptIn']);
-    const organizationData = pick(data, ['orgName', 'orgLegalName', 'githubHandle', 'twitterHandle', 'website']);
+    const organizationData = pick(data, ['orgName', 'orgLegalName', 'repositoryUrl', 'twitterHandle', 'website']);
     const organization = Object.keys(organizationData).length > 0 ? organizationData : null;
     if (organization) {
       organization.name = organization.orgName;
@@ -267,7 +267,7 @@ class SignInOrJoinFree extends React.Component {
               <P>
                 <FormattedMessage
                   id="login.twoFactorAuth.support"
-                  defaultMessage="If you can't login with 2FA or recovery codes, please contact <SupportLink></SupportLink>."
+                  defaultMessage="If you can't login with 2FA or recovery codes, please contact <SupportLink>support</SupportLink>."
                   values={{
                     SupportLink: I18nSupportLink,
                   }}

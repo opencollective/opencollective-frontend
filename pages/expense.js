@@ -72,10 +72,12 @@ const messages = defineMessages({
 const expensePageQuery = gqlV2/* GraphQL */ `
   query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalPaidExpensesDateFrom: DateTime) {
     expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
+      id
       ...ExpensePageExpenseFields
       comments(limit: 100, offset: $offset) {
         totalCount
         nodes {
+          id
           ...CommentFields
         }
       }
@@ -105,6 +107,7 @@ const expensePageQuery = gqlV2/* GraphQL */ `
     }
 
     loggedInAccount {
+      id
       ...LoggedInAccountExpensePayoutFields
     }
   }
@@ -117,6 +120,7 @@ const expensePageQuery = gqlV2/* GraphQL */ `
 const editExpenseMutation = gqlV2/* GraphQL */ `
   mutation EditExpense($expense: ExpenseUpdateInput!, $draftKey: String) {
     editExpense(expense: $expense, draftKey: $draftKey) {
+      id
       ...ExpensePageExpenseFields
     }
   }
@@ -127,6 +131,7 @@ const editExpenseMutation = gqlV2/* GraphQL */ `
 const verifyExpenseMutation = gqlV2/* GraphQL */ `
   mutation VerifyExpense($expense: ExpenseReferenceInput!, $draftKey: String) {
     verifyExpense(expense: $expense, draftKey: $draftKey) {
+      id
       ...ExpensePageExpenseFields
     }
   }
@@ -525,7 +530,7 @@ class ExpensePage extends React.Component {
               <MessageBox type="warning" withIcon={true} mb={4}>
                 <FormattedMessage
                   id="expenseNeedsTaxFormMessage.msg"
-                  defaultMessage="We need your tax information before we can pay you. You will receive an email with a link to fill out a form. If you have not received the email within 24 hours, check your spam, then contact <I18nSupportLink></I18nSupportLink>. Questions? See <Link>help docs about taxes</Link>."
+                  defaultMessage="We need your tax information before we can pay you. You will receive an email with a link to fill out a form. If you have not received the email within 24 hours, check your spam, then contact <I18nSupportLink>support</I18nSupportLink>. Questions? See <Link>help docs about taxes</Link>."
                   values={{
                     I18nSupportLink,
                     Link: getI18nLink({

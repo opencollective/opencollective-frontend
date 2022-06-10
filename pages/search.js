@@ -15,7 +15,7 @@ import { parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
-import { Box, Flex } from '../components/Grid';
+import { Box, Flex, Grid } from '../components/Grid';
 import Hide from '../components/Hide';
 import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
@@ -38,6 +38,11 @@ const CollectiveCardContainer = styled.div`
   width: 275px;
   animation: ${fadeIn} 0.2s;
 `;
+
+const AllCardsContainer = styled(Grid).attrs({
+  width: [null, '100%'],
+  gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 2fr))',
+})``;
 
 const FILTERS = {
   ALL: 'ALL',
@@ -283,8 +288,6 @@ class SearchPage extends React.Component {
 
     const { limit = 20, offset, totalCount = 0 } = accounts || {};
     const showTagFilterSection = (accounts?.nodes?.length > 0 || tags.length > 0) && tagStats?.nodes?.length > 0;
-    const showCountriesFilterSection = accounts?.nodes?.length > 0 || this.props?.country;
-    const showSortFilterSection = accounts?.nodes?.length > 0;
     const getSortOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
     const sortOptions = [
       getSortOption('ACTIVITY'),
@@ -350,36 +353,32 @@ class SearchPage extends React.Component {
           </Flex>
           <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
           <Flex flexDirection={['column', 'row']}>
-            {showSortFilterSection && (
-              <Container pr={[0, '19px']}>
-                <FilterLabel htmlFor="sort-filter-type">
-                  <FormattedMessage defaultMessage="Sort" />
-                </FilterLabel>
-                <StyledSelectFilter
-                  inputId="sort-filter"
-                  value={this.props.sortBy ? getSortOption(this.props.sortBy) : sortOptions[0]}
-                  options={sortOptions.filter(sortOption => sortOption)}
-                  onChange={sortBy => this.changeSort(sortBy)}
-                  minWidth={[0, '200px']}
-                />
-              </Container>
-            )}
-            {showCountriesFilterSection && (
-              <Container pt={['20px', 0]}>
-                <FilterLabel htmlFor="country-filter-type">
-                  <FormattedMessage id="collective.country.label" defaultMessage="Country" />
-                </FilterLabel>
-                <InputTypeCountry
-                  inputId="search-country-filter"
-                  as={StyledSelectFilter}
-                  value={this.props.country || 'ALL'}
-                  customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
-                  onChange={country => this.changeCountry(country)}
-                  minWidth={[0, '200px']}
-                  fontSize="12px"
-                />
-              </Container>
-            )}
+            <Container pr={[0, '19px']}>
+              <FilterLabel htmlFor="sort-filter-type">
+                <FormattedMessage defaultMessage="Sort" />
+              </FilterLabel>
+              <StyledSelectFilter
+                inputId="sort-filter"
+                value={this.props.sortBy ? getSortOption(this.props.sortBy) : sortOptions[0]}
+                options={sortOptions.filter(sortOption => sortOption)}
+                onChange={sortBy => this.changeSort(sortBy)}
+                minWidth={[0, '200px']}
+              />
+            </Container>
+            <Container pt={['20px', 0]}>
+              <FilterLabel htmlFor="country-filter-type">
+                <FormattedMessage id="collective.country.label" defaultMessage="Country" />
+              </FilterLabel>
+              <InputTypeCountry
+                inputId="search-country-filter"
+                as={StyledSelectFilter}
+                value={this.props.country || 'ALL'}
+                customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
+                onChange={country => this.changeCountry(country)}
+                minWidth={[0, '200px']}
+                fontSize="12px"
+              />
+            </Container>
             {showTagFilterSection && (
               <Container pl={[0, '23px']} pt={['20px', 0]}>
                 <FilterLabel htmlFor="tag-filter-type">
@@ -416,23 +415,25 @@ class SearchPage extends React.Component {
               </Container>
             )}
           </Flex>
-          <Flex mb="64px" justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
-            {loading
-              ? Array.from(new Array(12)).map((_, index) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <Flex key={index} my={3} mx={2}>
-                    <CollectiveCardContainer>
-                      <LoadingPlaceholder height={336} borderRadius="16px" />
-                    </CollectiveCardContainer>
-                  </Flex>
-                ))
-              : accounts?.nodes?.map(collective => (
-                  <Flex key={collective.slug} my={3} mx={2}>
-                    <CollectiveCardContainer key={collective.id}>
-                      <SearchCollectiveCard collective={collective} />
-                    </CollectiveCardContainer>
-                  </Flex>
-                ))}
+          <Flex mb="64px" justifyContent="center" flexWrap="wrap">
+            <AllCardsContainer>
+              {loading
+                ? Array.from(new Array(12)).map((_, index) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <Flex key={index} my={3} mx={2}>
+                      <CollectiveCardContainer>
+                        <LoadingPlaceholder height={336} borderRadius="16px" />
+                      </CollectiveCardContainer>
+                    </Flex>
+                  ))
+                : accounts?.nodes?.map(collective => (
+                    <Flex key={collective.slug} my={3} mx={2}>
+                      <CollectiveCardContainer key={collective.id}>
+                        <SearchCollectiveCard collective={collective} />
+                      </CollectiveCardContainer>
+                    </Flex>
+                  ))}
+            </AllCardsContainer>
 
             {accounts?.nodes?.length === 0 && (
               <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
@@ -473,7 +474,7 @@ class SearchPage extends React.Component {
                   </Container>
                   <Container fontSize="18px" lineHeight="26px" pt={16}>
                     <FormattedMessage
-                      defaultMessage="Still no luck? Contact <SupportLink></SupportLink> or find us in <SlackLink>Slack</SlackLink>"
+                      defaultMessage="Still no luck? Contact <SupportLink>support</SupportLink> or find us in <SlackLink>Slack</SlackLink>"
                       values={{
                         SupportLink: I18nSupportLink,
                         SlackLink: getI18nLink({
@@ -603,6 +604,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
 
     tagStats(searchTerm: $term) {
       nodes {
+        id
         tag
       }
     }

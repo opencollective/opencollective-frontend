@@ -35,7 +35,7 @@ const PageFeatureNotSupported = ({ showContactSupportLink, ...props }) => {
               {' '}
               <FormattedMessage
                 id="ContactSupportForDetails"
-                defaultMessage="Please contact <SupportLink></SupportLink> for more details."
+                defaultMessage="Please contact <SupportLink>support</SupportLink> for more details."
                 values={{ SupportLink: I18nSupportLink }}
               />
             </React.Fragment>

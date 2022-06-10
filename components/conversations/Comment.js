@@ -21,6 +21,7 @@ import { commentFieldsFragment } from './graphql';
 const editCommentMutation = gqlV2/* GraphQL */ `
   mutation EditComment($comment: CommentUpdateInput!) {
     editComment(comment: $comment) {
+      id
       ...CommentFields
     }
   }

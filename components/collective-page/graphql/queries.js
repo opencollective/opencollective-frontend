@@ -18,7 +18,7 @@ export const collectivePageQuery = gql`
       backgroundImage
       backgroundImageUrl
       twitterHandle
-      githubHandle
+      repositoryUrl
       website
       tags
       company
@@ -40,9 +40,11 @@ export const collectivePageQuery = gql`
       canApply
       canContact
       features {
+        id
         ...NavbarFields
       }
       ordersFromCollective(subscriptionsOnly: true) {
+        id
         isSubscriptionActive
       }
       memberOf(onlyActiveCollectives: true, limit: 1) {
@@ -65,6 +67,7 @@ export const collectivePageQuery = gql`
           organizations
         }
         transactions {
+          id
           all
         }
       }
@@ -86,6 +89,7 @@ export const collectivePageQuery = gql`
         twitterHandle
         type
         coreContributors: contributors(roles: [ADMIN, MEMBER]) {
+          id
           ...ContributorsFields
         }
       }
@@ -106,18 +110,23 @@ export const collectivePageQuery = gql`
         }
       }
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {
+        id
         ...ContributorsFields
       }
       financialContributors: contributors(roles: [BACKER], limit: 150) {
+        id
         ...ContributorsFields
       }
       tiers {
+        id
         ...ContributeCardTierFields
       }
       events(includePastEvents: true, includeInactive: true) {
+        id
         ...ContributeCardEventFields
       }
       projects {
+        id
         ...ContributeCardProjectFields
       }
       connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
@@ -139,11 +148,13 @@ export const collectivePageQuery = gql`
             }
           }
           contributors(limit: $nbContributorsPerContributeCard) {
+            id
             ...ContributeCardContributorFields
           }
         }
       }
       updates(limit: 3, onlyPublishedUpdates: true) {
+        id
         ...UpdatesFields
       }
       plan {

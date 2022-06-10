@@ -15,8 +15,9 @@ const collectivePickerSearchQuery = gql`
     $types: [TypeOfCollective]
     $limit: Int
     $hostCollectiveIds: [Int]
+    $skipGuests: Boolean
   ) {
-    search(term: $term, types: $types, limit: $limit, hostCollectiveIds: $hostCollectiveIds) {
+    search(term: $term, types: $types, limit: $limit, hostCollectiveIds: $hostCollectiveIds, skipGuests: $skipGuests) {
       id
       collectives {
         id
@@ -100,6 +101,7 @@ const CollectivePickerAsync = ({
   emptyCustomOptions,
   noCache,
   isLoading,
+  skipGuests,
   ...props
 }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
@@ -113,7 +115,7 @@ const CollectivePickerAsync = ({
   // If preload is true, trigger a first query on mount or when one of the query param changes
   React.useEffect(() => {
     if (term || preload) {
-      throttledSearch(searchCollectives, { term: term || '', types, limit, hostCollectiveIds });
+      throttledSearch(searchCollectives, { term: term || '', types, limit, hostCollectiveIds, skipGuests });
     }
   }, [types, limit, hostCollectiveIds, term]);
 
@@ -166,11 +168,13 @@ CollectivePickerAsync.propTypes = {
   creatable: PropTypes.bool,
   /** If true, a permanent option to invite a new user will be displayed in the select */
   invitable: PropTypes.bool,
+  skipGuests: PropTypes.bool,
   onInvite: PropTypes.func,
 };
 
 CollectivePickerAsync.defaultProps = {
   preload: false,
+  skipGuests: true,
   limit: 20,
   searchQuery: collectivePickerSearchQuery,
 };

@@ -36,7 +36,8 @@ interface Account {
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -2376,7 +2377,8 @@ type Host implements Account & AccountWithContributions {
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -4113,7 +4115,8 @@ type Bot implements Account {
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -4525,7 +4528,8 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -5261,7 +5265,8 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -5781,7 +5786,8 @@ type Individual implements Account {
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -6327,7 +6333,8 @@ type Organization implements Account & AccountWithContributions {
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -6859,7 +6866,8 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -9295,7 +9303,8 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -9821,7 +9830,8 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -11402,7 +11412,8 @@ input CollectiveCreateInput {
   slug: String!
   description: String!
   tags: [String]
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   settings: JSON
 }
 

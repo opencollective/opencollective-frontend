@@ -206,6 +206,7 @@ const updateQuery = gqlV2/* GraphQL */ `
         }
       }
       features {
+        id
         ...NavbarFields
       }
       conversationsTags {
@@ -254,6 +255,7 @@ const updateQuery = gqlV2/* GraphQL */ `
       comments(limit: 100, offset: $offset) {
         totalCount
         nodes {
+          id
           ...CommentFields
         }
       }

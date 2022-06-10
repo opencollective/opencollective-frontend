@@ -13,6 +13,7 @@ import Body from '../components/Body';
 import { Flex } from '../components/Grid';
 import Header from '../components/Header';
 import Loading from '../components/Loading';
+import LoadingGrid from '../components/LoadingGrid';
 import MessageBox from '../components/MessageBox';
 import SignInOrJoinFreeV2 from '../components/SignInOrJoinFreeV2';
 import { P } from '../components/Text';
@@ -30,7 +31,7 @@ class SigninV2Page extends React.Component {
     return {
       token,
       next,
-      form: form || 'signin',
+      form: form || 'signinv2',
       isSuspiciousUserAgent: isSuspiciousUserAgent(req?.get('User-Agent')),
       email: email && isEmail(email) ? email : null,
     };
@@ -53,7 +54,7 @@ class SigninV2Page extends React.Component {
   constructor(props) {
     super(props);
     this.robotsDetector = new RobotsDetector();
-    this.state = { error: null, success: null, isRobot: props.isSuspiciousUserAgent };
+    this.state = { error: null, success: null, isRobot: props.isSuspiciousUserAgent, redirecting: false };
   }
 
   componentDidMount() {
@@ -71,7 +72,7 @@ class SigninV2Page extends React.Component {
       this.initialize();
     } else if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-accountv2') {
       // --- User logged in ---
-      this.setState({ success: true });
+      this.setState({ success: true, redirecting: true });
       // Avoid redirect loop: replace '/signinv2' redirects by '/'
       const { next } = this.props;
       const redirect = next && next.match(/^\/?signinv2[?/]?/) ? null : next;
@@ -168,6 +169,10 @@ class SigninV2Page extends React.Component {
 
     const error = errorLoggedInUser || this.state.error;
 
+    if (loadingLoggedInUser || this.state.redirecting) {
+      return <LoadingGrid />;
+    }
+
     return (
       <React.Fragment>
         {error && !error.includes('Two-factor authentication is enabled') && (
@@ -215,9 +220,10 @@ class SigninV2Page extends React.Component {
         <Header
           title="Login"
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
+          menuItemsV2={{ solutions: false, product: false, company: false, docs: false }}
           menuItems={{ discover: false, docs: false, howItWorks: false, pricing: false }}
           showSearch={false}
-          showProfileMenu={false}
+          showProfileAndChangelogMenu={false}
         />
         <Body>
           <Flex flexDirection="column" alignItems="center" my={[4, 6]} p={2}>

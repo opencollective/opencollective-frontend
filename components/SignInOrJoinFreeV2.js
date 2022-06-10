@@ -54,9 +54,9 @@ class SignInOrJoinFreeV2 extends React.Component {
     /** Whether user can signup from there */
     disableSignup: PropTypes.bool,
     /** Use this prop to use this as a controlled component */
-    form: PropTypes.oneOf(['signin', 'create-accountv2']),
+    form: PropTypes.oneOf(['signinv2', 'create-accountv2']),
     /** Set the initial view for the component */
-    defaultForm: PropTypes.oneOf(['signin', 'create-accountv2']),
+    defaultForm: PropTypes.oneOf(['signinv2', 'create-accountv2']),
     /** If provided, component will use links instead of buttons to make the switch */
     routes: PropTypes.shape({
       signin: PropTypes.string,
@@ -75,7 +75,7 @@ class SignInOrJoinFreeV2 extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      form: this.props.defaultForm || 'signin',
+      form: this.props.defaultForm || 'signinv2',
       error: null,
       submitting: false,
       unknownEmailError: false,

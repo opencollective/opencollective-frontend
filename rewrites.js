@@ -27,10 +27,6 @@ exports.REWRITES = [
     destination: '/signinLinkSent',
   },
   {
-    source: '/signinv2/sent',
-    destination: '/signinLinkSent',
-  },
-  {
     source: '/oauth/authorize',
     destination: '/oauth/authorize',
   },

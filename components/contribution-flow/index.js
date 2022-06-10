@@ -112,6 +112,7 @@ class ContributionFlow extends React.Component {
     disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
     fixedInterval: PropTypes.string,
     fixedAmount: PropTypes.number,
+    quantity: PropTypes.number,
     platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
     hideHeader: PropTypes.bool,
@@ -155,7 +156,7 @@ class ContributionFlow extends React.Component {
       showSignIn: false,
       createdOrder: null,
       stepDetails: {
-        quantity: 1,
+        quantity: (Number.isSafeInteger(props.quantity) && props.quantity) || 1,
         interval: props.fixedInterval || getDefaultInterval(props.tier),
         amount: isCryptoFlow ? '' : props.fixedAmount || getDefaultTierAmount(props.tier, props.collective, currency),
         platformContribution: props.platformContribution,

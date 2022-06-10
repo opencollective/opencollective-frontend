@@ -40,8 +40,15 @@ const NavButton = styled(StyledButton)`
   padding: 10px;
   @media (hover: hover) {
     :hover {
-      text-decoration: underline;
+      background-color: white !important;
     }
+  }
+  :focus {
+    background-color: white;
+    border-radius: 1px;
+  }
+  :active {
+    color: black;
   }
 `;
 
@@ -56,7 +63,7 @@ const NavItem = styled(StyledLink)`
   }
 `;
 
-const TopBarV2 = ({ showSearch, menuItems, showProfileMenu = true }) => {
+const TopBarV2 = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const ref = useRef();
 
@@ -91,9 +98,15 @@ const TopBarV2 = ({ showSearch, menuItems, showProfileMenu = true }) => {
             {menuItems.solutions && (
               <PopupMenu
                 zIndex={2000}
-                closingEvent="mouseover"
-                Button={({ onMouseOver, onClick, popupOpen }) => (
-                  <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
+                closingEvents={['focusin', 'mouseover']}
+                Button={({ onMouseOver, onClick, popupOpen, onFocus }) => (
+                  <NavButton
+                    isBorderless
+                    onMouseOver={onMouseOver}
+                    onFocus={onFocus}
+                    onClick={onClick}
+                    whiteSpace="nowrap"
+                  >
                     <FormattedMessage defaultMessage="Solutions" />
                     {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </NavButton>
@@ -124,9 +137,15 @@ const TopBarV2 = ({ showSearch, menuItems, showProfileMenu = true }) => {
             {menuItems.product && (
               <PopupMenu
                 zIndex={2000}
-                closingEvent="mouseover"
-                Button={({ onClick, onMouseOver, popupOpen }) => (
-                  <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
+                closingEvents={['focusin', 'mouseover']}
+                Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
+                  <NavButton
+                    isBorderless
+                    onMouseOver={onMouseOver}
+                    onFocus={onFocus}
+                    onClick={onClick}
+                    whiteSpace="nowrap"
+                  >
                     <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
                     {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </NavButton>
@@ -156,9 +175,15 @@ const TopBarV2 = ({ showSearch, menuItems, showProfileMenu = true }) => {
             {menuItems.company && (
               <PopupMenu
                 zIndex={2000}
-                closingEvent="mouseover"
-                Button={({ onClick, onMouseOver, popupOpen }) => (
-                  <NavButton as={StyledLink} onMouseOver={onMouseOver} onClick={onClick} whiteSpace="nowrap">
+                closingEvents={['focusin', 'mouseover']}
+                Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
+                  <NavButton
+                    isBorderless
+                    onMouseOver={onMouseOver}
+                    onFocus={onFocus}
+                    onClick={onClick}
+                    whiteSpace="nowrap"
+                  >
                     <FormattedMessage id="company" defaultMessage="Company" />
                     {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </NavButton>
@@ -203,12 +228,16 @@ const TopBarV2 = ({ showSearch, menuItems, showProfileMenu = true }) => {
         )}
       </Flex>
 
-      <Container mr={3}>
-        <Hide xs>
-          <ChangelogTrigger />
-        </Hide>
-      </Container>
-      {showProfileMenu && <TopBarProfileMenu />}
+      {showProfileAndChangelogMenu && (
+        <React.Fragment>
+          <Container mr={3}>
+            <Hide xs>
+              <ChangelogTrigger />
+            </Hide>
+          </Container>
+          <TopBarProfileMenu />
+        </React.Fragment>
+      )}
       <Hide md lg>
         <TopBarMobileMenuV2 showMobileMenu={showMobileMenu} closeMenu={toggleMobileMenu} />
         <Box mx={3} onClick={toggleMobileMenu}>
@@ -223,13 +252,13 @@ const TopBarV2 = ({ showSearch, menuItems, showProfileMenu = true }) => {
 
 TopBarV2.propTypes = {
   showSearch: PropTypes.bool,
-  showProfileMenu: PropTypes.bool,
+  showProfileAndChangelogMenu: PropTypes.bool,
   menuItems: PropTypes.object,
 };
 
 TopBarV2.defaultProps = {
   showSearch: true,
-  showProfileMenu: true,
+  showProfileAndChangelogMenu: true,
   menuItems: { solutions: true, product: true, company: true, docs: true },
 };
 

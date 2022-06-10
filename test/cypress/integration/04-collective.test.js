@@ -42,7 +42,7 @@ describe('Collective page', () => {
   describe('Hero', () => {
     it('Must have links to twitter, github and website', () => {
       cy.get('[data-cy=twitterProfileUrl]').should('have.attr', 'href', 'https://twitter.com/testCollective');
-      cy.get('[data-cy=githubProfileUrl]').should('have.attr', 'href', 'https://github.com/testCollective');
+      cy.get('[data-cy=repositoryUrl]').should('have.attr', 'href', 'https://github.com/testCollective');
       cy.get('[data-cy=collectiveWebsite]').should('have.attr', 'href', 'https://opencollective.com/testCollective');
     });
 
