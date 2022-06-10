@@ -10,13 +10,15 @@ const FilterButton = styled(StyledButton).attrs({
   buttonSize: 'tiny',
   buttonStyle: 'standard',
 })`
+  font-size: 14px;
+  font-weight: 400;
   height: 32px;
   margin-right: 8px;
   padding-top: 4px;
   padding-bottom: 4px;
-  background: #f7f8fa;
+  background: #f9fafb;
   border-color: white;
-  color: #76777a;
+  color: ${props => props.theme.colors.black[800]};
 
   ${props =>
     props.$isSelected &&
@@ -25,7 +27,8 @@ const FilterButton = styled(StyledButton).attrs({
       &:active,
       &:focus {
         background-color: ${props => props.theme.colors.primary[100]};
-        color: ${props => props.theme.colors.primary[800]};
+        border: 1px solid ${props => props.theme.colors.primary[700]};
+        box-shadow: none;
       }
     `}
 `;
