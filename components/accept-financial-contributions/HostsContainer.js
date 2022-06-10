@@ -131,6 +131,7 @@ const hostsQuery = gqlV2/* GraphQL */ `
         totalHostedCollectives
         hostFeePercent
         stats {
+          id
           yearlyBudgetManaged {
             value
           }

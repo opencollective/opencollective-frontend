@@ -159,9 +159,11 @@ const membersQuery = gql`
       role
       createdAt
       collective {
+        id
         name
       }
       stats {
+        id
         totalDonations
       }
       tier {

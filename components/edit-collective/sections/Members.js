@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Edit } from '@styled-icons/material/Edit';
-import { compose, get, omit } from 'lodash';
+import { compose, get, omit, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -209,9 +209,13 @@ class Members extends React.Component {
             <FormattedMessage id="user.since.label" defaultMessage="Since" />:{' '}
             <FormattedDate value={get(member, 'since')} />
           </P>
-          <P fontSize="11px" lineHeight="16px" mx={2} fontWeight={400} mb={5}>
-            {get(member, 'description')}
-          </P>
+          <Box mb={5} overflow="hidden" height={32}>
+            <P fontSize="11px" lineHeight="16px" mx={2} fontWeight={400}>
+              {truncate(get(member, 'description'), {
+                length: 30,
+              })}
+            </P>
+          </Box>
           {isInvitation && (
             <React.Fragment>
               <TagContainer>
@@ -407,6 +411,7 @@ export const coreContributorsQuery = gqlV2/* GraphQL */ `
       }
       members(role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {
         nodes {
+          id
           ...MemberFields
         }
       }

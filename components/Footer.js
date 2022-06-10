@@ -346,7 +346,7 @@ const Footer = () => {
             <SocialLink href="https://slack.opencollective.com" aria-label="Open Collective Slack link">
               <Slack size={16} />
             </SocialLink>
-            <SocialLink href="mailto:info@opencollective.com" aria-label="Open Collective Email link">
+            <SocialLink as={Link} href="/contact" aria-label="Contact Open Collective">
               <Mail size={16} />
             </SocialLink>
           </Container>

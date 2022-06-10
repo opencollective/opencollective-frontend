@@ -53,6 +53,7 @@ export const tierPageQuery = gql`
           }
         }
         features {
+          id
           ...NavbarFields
         }
         admins: members(role: "ADMIN") {

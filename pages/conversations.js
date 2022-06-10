@@ -229,6 +229,7 @@ const conversationsPageQuery = gqlV2/* GraphQL */ `
         isApproved
       }
       features {
+        id
         ...NavbarFields
       }
     }

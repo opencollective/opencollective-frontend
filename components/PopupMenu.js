@@ -17,7 +17,7 @@ const Popup = styled(Box)`
   z-index: ${props => props.zIndex ?? 1000};
 `;
 
-const PopupMenu = ({ Button, children, placement, onClose, closingEvent, zIndex }) => {
+const PopupMenu = ({ Button, children, placement, onClose, closingEvents, zIndex }) => {
   const [isOpen, setOpen] = React.useState(false);
   const ref = React.useRef();
   useGlobalBlur(
@@ -28,12 +28,17 @@ const PopupMenu = ({ Button, children, placement, onClose, closingEvent, zIndex 
         onClose?.();
       }
     },
-    closingEvent,
+    closingEvents,
   );
 
   return (
     <Box ref={ref}>
-      <Button onMouseOver={() => setOpen(true)} onClick={() => setOpen(!isOpen)} popupOpen={isOpen} />
+      <Button
+        onMouseOver={() => setOpen(true)}
+        onClick={() => setOpen(!isOpen)}
+        onFocus={() => setOpen(true)}
+        popupOpen={isOpen}
+      />
       {isOpen && (
         <Popper
           placement={placement || 'bottom'}
@@ -48,7 +53,7 @@ const PopupMenu = ({ Button, children, placement, onClose, closingEvent, zIndex 
           ]}
         >
           {({ style, ref }) => (
-            <Popup mt="-1px" zIndex={zIndex} {...{ style, ref }}>
+            <Popup mt="-10px" zIndex={zIndex} {...{ style, ref }}>
               {typeof children === 'function' ? children({ setOpen }) : children}
             </Popup>
           )}
@@ -65,10 +70,10 @@ PopupMenu.propTypes = {
   onClose: PropTypes.func,
   zIndex: PropTypes.number,
   /*
-   * The mouse or keyboard event that is passed to close the popup menu.
-   * For example, mouseover, mousedown, mouseup etc.
+   * The mouse or keyboard events that are passed to close the popup menu.
+   * For example, mouseover, mousedown, mouseup, blur, focusin, focusout etc.
    */
-  closingEvent: PropTypes.string,
+  closingEvents: PropTypes.array,
 };
 
 export default PopupMenu;

@@ -154,7 +154,7 @@ class NotificationBar extends React.Component {
     const isHostAdmin = LoggedInUser && LoggedInUser.isHostAdmin(collective);
 
     return (
-      <NotificationBarContainer className={classNames(status, 'NotificationBar')}>
+      <NotificationBarContainer className={classNames(status, 'NotificationBar')} data-cy="notification-bar">
         {status === 'error' && (
           <ErrorMessageContainer>
             <CollectiveLogo src={logo} alt="Open Collective logo" />

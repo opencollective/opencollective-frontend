@@ -149,7 +149,6 @@ class OnboardingModal extends React.Component {
 
     this.messages = defineMessages({
       twitterError: { id: 'onboarding.error.twitter', defaultMessage: 'Please enter a valid Twitter handle.' },
-      githubError: { id: 'onboarding.error.github', defaultMessage: 'Please enter a valid GitHub URL.' },
       websiteError: { id: 'onboarding.error.website', defaultMessage: 'Please enter a valid URL.' },
     });
   }
@@ -245,15 +244,8 @@ class OnboardingModal extends React.Component {
       errors.website = this.props.intl.formatMessage(this.messages['websiteError']);
     }
 
-    // https://github.com/shinnn/github-username-regex
-    if (
-      values.githubHandle !== '' &&
-      !matches(
-        values.githubHandle,
-        /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}(?:\/(?:[a-z\d_]|[-.]{1,99}(?=[a-z\d_])){1,99}){0,1}$/i,
-      )
-    ) {
-      errors.githubHandle = this.props.intl.formatMessage(this.messages['githubError']);
+    if (values.repositoryUrl && !isURL(values.repositoryUrl)) {
+      errors.repositoryUrl = this.props.intl.formatMessage(this.messages.websiteError);
     }
 
     // https://stackoverflow.com/questions/11361044/twitter-name-validation
@@ -333,12 +325,16 @@ class OnboardingModal extends React.Component {
                   </Flex>
                 </ResponsiveModalHeader>
                 <Formik
-                  initialValues={{ website: '', twitterHandle: '', githubHandle: '' }}
+                  validate={this.validateFormik}
+                  validateOnBlur={true}
+                  initialValues={{
+                    website: collective.website?.replace(/^https?:\/\//, '') || '',
+                    twitterHandle: collective.twitterHandle || '',
+                    repositoryUrl: collective.repositoryUrl?.replace(/^https?:\/\//, '') || '',
+                  }}
                   onSubmit={values => {
                     this.submitCollectiveInfo(values);
                   }}
-                  validate={this.validateFormik}
-                  validateOnBlur={true}
                 >
                   {({ values, handleSubmit, errors, touched }) => (
                     <FormWithStyles>
@@ -419,7 +415,7 @@ const editCollectiveContactMutation = gql`
       id
       website
       twitterHandle
-      githubHandle
+      repositoryUrl
     }
   }
 `;

@@ -33,6 +33,7 @@ export const adminPanelQuery = gqlV2/* GraphQL */ `
       isIncognito
       imageUrl(height: 256)
       features {
+        id
         ...NavbarFields
         VIRTUAL_CARDS
         USE_PAYMENT_METHODS

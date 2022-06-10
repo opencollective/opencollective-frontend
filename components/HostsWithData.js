@@ -115,6 +115,7 @@ const hostsQuery = gql`
       orderBy: $orderBy
       orderDirection: $orderDirection
     ) {
+      id
       total
       collectives {
         id
@@ -130,6 +131,7 @@ const hostsQuery = gql`
         stats {
           id
           collectives {
+            id
             hosted
           }
         }

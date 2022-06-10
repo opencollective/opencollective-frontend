@@ -188,6 +188,7 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
       tags
       description
       githubHandle
+      repositoryUrl
       legacyId
     }
   }
@@ -197,6 +198,7 @@ const tagStatsQuery = gqlV2/* GraphQL */ `
   query CreateCollectivePageQuery {
     tagStats {
       nodes {
+        id
         tag
       }
     }

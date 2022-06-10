@@ -81,11 +81,7 @@ const PledgedCollectivePage = ({ collective }) => {
     },
   );
 
-  let website = collective.website;
-  if (!website && collective.githubHandle) {
-    website = `https://github.com/${collective.githubHandle}`;
-  }
-
+  const website = collective.website || collective.repositoryUrl;
   return (
     <Page title={collective.name}>
       <Container
@@ -207,7 +203,7 @@ const PledgedCollectivePage = ({ collective }) => {
             <P fontSize="12px" color="black.500" mt={3}>
               <FormattedMessage
                 id="pledge.contactToClaim"
-                defaultMessage="To claim this Collective, contact <SupportLink></SupportLink>."
+                defaultMessage="To claim this Collective, contact <SupportLink>support</SupportLink>."
                 values={I18nFormatters}
               />
             </P>
@@ -225,7 +221,7 @@ PledgedCollectivePage.propTypes = {
     slug: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     website: PropTypes.string,
-    githubHandle: PropTypes.string,
+    repositoryUrl: PropTypes.string,
   }).isRequired,
 };
 

@@ -50,6 +50,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
       platformFeePercent
       platformContributionAvailable
       host {
+        id
         ...ContributionFlowHostFields
       }
     }
@@ -70,6 +71,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
     ... on AccountWithHost {
       hostFeePercent
       host {
+        id
         ...ContributionFlowHostFields
       }
     }
@@ -168,11 +170,13 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
       }
       ... on AccountWithHost {
         host {
+          id
           ...OrderSuccessHostFragment
         }
       }
       ... on Organization {
         host {
+          id
           ...OrderSuccessHostFragment
           ... on AccountWithContributions {
             # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
@@ -191,6 +195,7 @@ export const orderResponseFragment = gqlV2/* GraphQL */ `
   fragment OrderResponseFragment on OrderWithPayment {
     guestToken
     order {
+      id
       ...OrderSuccessFragment
     }
     stripeError {

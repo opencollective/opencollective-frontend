@@ -123,7 +123,6 @@ class Header extends React.Component {
         {withTopBar &&
           (LoggedInUser?.collective?.settings?.useNewTopBar ? (
             <TopBarV2
-              className={className}
               showSearch={this.props.showSearch}
               menuItems={this.props.menuItemsV2}
               showProfileAndChangelogMenu={this.props.showProfileAndChangelogMenu}

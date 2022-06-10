@@ -51,6 +51,7 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
     $orderBy: ChronologicalOrderInput
   ) {
     host(slug: $hostSlug) {
+      id
       ...ExpenseHostFields
       ...HostInfoCardFields
       transferwise {
@@ -77,6 +78,7 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
       offset
       limit
       nodes {
+        id
         ...ExpensesListFieldsFragment
         ...ExpensesListAdminFieldsFragment
       }
