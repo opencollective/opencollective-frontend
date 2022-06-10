@@ -41,11 +41,9 @@ const NavButton = styled(StyledButton)`
   @media (hover: hover) {
     :hover {
       background-color: white !important;
-      text-decoration: underline;
     }
   }
   :focus {
-    text-decoration: underline;
     background-color: white;
     border-radius: 1px;
   }
