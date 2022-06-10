@@ -51,6 +51,7 @@ class SearchForm extends React.Component {
       onSubmit = this.handleSubmit,
       placeholder = 'Search...',
       width = 1,
+      autoFocus,
       defaultValue,
       value,
       onChange,
@@ -74,6 +75,7 @@ class SearchForm extends React.Component {
             as={StyledInput}
             type="search"
             name="q"
+            autoFocus={autoFocus}
             placeholder={placeholder}
             py={1}
             pl={3}
@@ -99,12 +101,13 @@ SearchForm.propTypes = {
   onSubmit: PropTypes.func,
   placeholder: PropTypes.string,
   backgroundColor: PropTypes.string,
-  width: PropTypes.number,
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   onChange: PropTypes.func,
   borderRadius: PropTypes.string,
   height: PropTypes.string,
   router: PropTypes.object,
   disabled: PropTypes.bool,
+  autoFocus: PropTypes.bool,
 };
 
 export default withRouter(SearchForm);
