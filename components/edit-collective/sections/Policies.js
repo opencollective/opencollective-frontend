@@ -309,86 +309,89 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             />
           </P>
         </Container>
-        <Container>
-          <SettingsSectionTitle mt={4}>
-            <FormattedMessage id="editCollective.admins.header" defaultMessage="Required Admins" />
-          </SettingsSectionTitle>
-          <P mb={2}>
-            <FormattedMessage
-              id="editCollective.admins.description"
-              defaultMessage="Please specify the minimum number of admins a collective needs to have for being accepted by your fiscal host and to accept contributions."
-            />
-          </P>
-          <Flex gap="12px 24px" mb={3} mt={2} flexDirection={['column', 'row']}>
-            <StyledInputField
-              disabled={isSubmittingSettings}
-              labelFontSize="13px"
-              labelFontWeight="700"
-              label={<FormattedMessage defaultMessage="Minimum number of admins" />}
-              flexGrow={1}
-            >
-              <StyledSelect
-                inputId="numberOfAdmins"
-                isSearchable={false}
-                options={numberOfAdminsOptions}
-                onChange={option => {
-                  if (option.value === 0) {
-                    formik.setFieldValue('policies', omit(formik.values.policies, ['COLLECTIVE_MINIMUM_ADMINS']));
-                  } else {
+
+        {collective?.isHost && (
+          <Container>
+            <SettingsSectionTitle mt={4}>
+              <FormattedMessage id="editCollective.admins.header" defaultMessage="Required Admins" />
+            </SettingsSectionTitle>
+            <P mb={2}>
+              <FormattedMessage
+                id="editCollective.admins.description"
+                defaultMessage="Please specify the minimum number of admins a collective needs to have for being accepted by your fiscal host and to accept contributions."
+              />
+            </P>
+            <Flex gap="12px 24px" mb={3} mt={2} flexDirection={['column', 'row']}>
+              <StyledInputField
+                disabled={isSubmittingSettings}
+                labelFontSize="13px"
+                labelFontWeight="700"
+                label={<FormattedMessage defaultMessage="Minimum number of admins" />}
+                flexGrow={1}
+              >
+                <StyledSelect
+                  inputId="numberOfAdmins"
+                  isSearchable={false}
+                  options={numberOfAdminsOptions}
+                  onChange={option => {
+                    if (option.value === 0) {
+                      formik.setFieldValue('policies', omit(formik.values.policies, ['COLLECTIVE_MINIMUM_ADMINS']));
+                    } else {
+                      formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
+                        ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
+                        numberOfAdmins: option.value,
+                      });
+                    }
+                  }}
+                  value={numberOfAdminsOptions.find(
+                    option => option.value === (formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins || 0),
+                  )}
+                />
+              </StyledInputField>
+              <StyledInputField
+                disabled={isSubmittingSettings}
+                labelFontSize="13px"
+                labelFontWeight="700"
+                label={<FormattedMessage defaultMessage="Whom does this apply to" />}
+                flexGrow={1}
+              >
+                <StyledSelect
+                  inputId="applies"
+                  isSearchable={false}
+                  options={minAdminsApplies}
+                  onChange={option =>
                     formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
                       ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
-                      numberOfAdmins: option.value,
-                    });
+                      applies: option.value,
+                    })
                   }
-                }}
-                value={numberOfAdminsOptions.find(
-                  option => option.value === (formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins || 0),
-                )}
-              />
-            </StyledInputField>
-            <StyledInputField
-              disabled={isSubmittingSettings}
-              labelFontSize="13px"
-              labelFontWeight="700"
-              label={<FormattedMessage defaultMessage="Whom does this apply to" />}
-              flexGrow={1}
-            >
-              <StyledSelect
-                inputId="applies"
-                isSearchable={false}
-                options={minAdminsApplies}
-                onChange={option =>
-                  formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
-                    ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
-                    applies: option.value,
-                  })
-                }
-                disabled
-                value={minAdminsApplies[0]}
-              />
-            </StyledInputField>
-          </Flex>
-          <StyledCheckbox
-            name="minAdminsFreeze"
-            label={<FormattedMessage defaultMessage="Freeze collectives that don’t meet the minimum requirement" />}
-            onChange={({ checked }) => {
-              formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
-                ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
-                freeze: checked,
-              });
-            }}
-            checked={Boolean(formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze)}
-          />
-          <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
-            <FormattedMessage defaultMessage="Freezing the collective will prevent them from accepting and distributing contributions till they meet the requirements. This is a security measure to make sure the admins are within their rights. Read More." />
-          </P>
-          {formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.applies === 'ALL_COLLECTIVES' &&
-            formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze && (
-              <MessageBox type="warning" mt={2} fontSize="13px">
-                <FormattedMessage defaultMessage="Some collectives hosted by you may not fulfil the minimum admin requirements. If you choose to apply the setting to all collectives, the collectives that don't comply will be frozen till they meet the minimum requirements for admins." />
-              </MessageBox>
-            )}
-        </Container>
+                  disabled
+                  value={minAdminsApplies[0]}
+                />
+              </StyledInputField>
+            </Flex>
+            <StyledCheckbox
+              name="minAdminsFreeze"
+              label={<FormattedMessage defaultMessage="Freeze collectives that don’t meet the minimum requirement" />}
+              onChange={({ checked }) => {
+                formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
+                  ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
+                  freeze: checked,
+                });
+              }}
+              checked={Boolean(formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze)}
+            />
+            <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
+              <FormattedMessage defaultMessage="Freezing the collective will prevent them from accepting and distributing contributions till they meet the requirements. This is a security measure to make sure the admins are within their rights. Read More." />
+            </P>
+            {formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.applies === 'ALL_COLLECTIVES' &&
+              formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze && (
+                <MessageBox type="warning" mt={2} fontSize="13px">
+                  <FormattedMessage defaultMessage="Some collectives hosted by you may not fulfil the minimum admin requirements. If you choose to apply the setting to all collectives, the collectives that don't comply will be frozen till they meet the minimum requirements for admins." />
+                </MessageBox>
+              )}
+          </Container>
+        )}
         <Container>
           <SettingsSectionTitle mt={4}>
             <FormattedMessage id="editCollective.expenseApprovalsPolicy.header" defaultMessage="Expense approvals" />
