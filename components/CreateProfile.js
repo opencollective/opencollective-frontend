@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { compact, isEmpty, pick, values } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import CodeRepositoryIcon from './CodeRepositoryIcon';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Link from './Link';
@@ -285,7 +286,7 @@ const CreateProfile = ({
               'orgName',
               'orgLegalName',
               'website',
-              'githubHandle',
+              'repositoryUrl',
               'twitterHandle',
               'newsletterOptIn',
             ]);
@@ -407,17 +408,17 @@ const CreateProfile = ({
 
           <Box mb={24}>
             <StyledInputField
-              htmlFor="githubHandle"
-              label="GitHub"
+              htmlFor="repositoryUrl"
+              label={formatMessage({ defaultMessage: 'Code repository' })}
               required={false}
-              error={getFieldError('githubHandle')}
+              error={getFieldError('repositoryUrl')}
             >
               {inputProps => (
                 <StyledInputGroup
                   {...inputProps}
                   {...getFieldProps(inputProps.name)}
-                  prepend="github.com/"
-                  placeholder="username"
+                  prepend={<CodeRepositoryIcon repositoryUrl={state.repositoryUrl || ''} size="14px" color="#555" />}
+                  placeholder="https://github.com/my-org/my-repo"
                 />
               )}
             </StyledInputField>

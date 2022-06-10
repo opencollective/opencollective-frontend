@@ -188,6 +188,7 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
       tags
       description
       githubHandle
+      repositoryUrl
       legacyId
     }
   }

@@ -16,6 +16,7 @@ import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
 
 import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
+import CodeRepositoryIcon from '../CodeRepositoryIcon';
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
 import { Box, Flex } from '../Grid';
@@ -678,12 +679,12 @@ class EditCollectiveForm extends React.Component {
           when: () => collective.type !== EVENT,
         },
         {
-          name: 'githubHandle',
+          name: 'repositoryUrl',
           type: 'text',
-          pre: 'https://github.com/',
-          maxLength: 140, // 39 (Max length of GitHub org name) + 100 (Max length of repo name) + 1 (for the '/' sign)
-          placeholder: '',
-          label: 'Github',
+          pre: <CodeRepositoryIcon repositoryUrl={this.state.collective.repositoryUrl} size={16} color="#757677" />,
+          maxLength: 2048,
+          label: intl.formatMessage({ defaultMessage: 'Code repository' }),
+          placeholder: 'https://github.com/my-organization/my-repo',
           when: () => collective.type !== EVENT,
         },
         {

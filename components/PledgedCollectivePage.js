@@ -81,11 +81,7 @@ const PledgedCollectivePage = ({ collective }) => {
     },
   );
 
-  let website = collective.website;
-  if (!website && collective.githubHandle) {
-    website = `https://github.com/${collective.githubHandle}`;
-  }
-
+  const website = collective.website || collective.repositoryUrl;
   return (
     <Page title={collective.name}>
       <Container
@@ -225,7 +221,7 @@ PledgedCollectivePage.propTypes = {
     slug: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     website: PropTypes.string,
-    githubHandle: PropTypes.string,
+    repositoryUrl: PropTypes.string,
   }).isRequired,
 };
 
