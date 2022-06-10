@@ -121,7 +121,7 @@ class Header extends React.Component {
         <div id="top" />
         {withTopBar &&
           (LoggedInUser?.collective?.settings?.useNewTopBar ? (
-            <TopBarV2 className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItemsV2} />
+            <TopBarV2 showSearch={this.props.showSearch} menuItems={this.props.menuItemsV2} />
           ) : (
             <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
           ))}
