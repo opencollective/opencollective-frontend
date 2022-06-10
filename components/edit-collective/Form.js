@@ -19,6 +19,7 @@ import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
 import { Box, Flex } from '../Grid';
+import { I18nSupportLink } from '../I18nFormatters';
 import InputField from '../InputField';
 import Link from '../Link';
 import OrdersWithData from '../orders/OrdersWithData';
@@ -231,10 +232,6 @@ class EditCollectiveForm extends React.Component {
       'currency.placeholder': {
         id: 'collective.currency.placeholder',
         defaultMessage: 'Select currency',
-      },
-      'currency.warning': {
-        id: 'collective.currency.warning',
-        defaultMessage: `Active Collectives, Funds and Fiscal Hosts can't edit their currency. Contact support@opencollective.com if this is an issue.`,
       },
       'address.label': {
         id: 'collective.address.label',
@@ -752,7 +749,13 @@ class EditCollectiveForm extends React.Component {
           options: currencyOptions,
           description:
             ([COLLECTIVE, FUND].includes(collective.type) && collective.isActive) || collective.isHost
-              ? intl.formatMessage(this.messages['currency.warning'])
+              ? intl.formatMessage(
+                  {
+                    id: 'collective.currency.warning',
+                    defaultMessage: `Active Collectives, Funds and Fiscal Hosts can't edit their currency. Contact <SupportLink>support</SupportLink> if this is an issue.`,
+                  },
+                  { SupportLink: I18nSupportLink },
+                )
               : null,
           when: () => ![EVENT, PROJECT].includes(collective.type),
           // Active Collectives, Funds and Fiscal Hosts can't edit their currency.

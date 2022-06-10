@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import I18nFormatters from './I18nFormatters';
 import { P } from './Text';
 import { useUser } from './UserProvider';
 
@@ -42,7 +43,8 @@ const GlobalWarnings = ({ collective }) => {
       <GlobalWarningContainer>
         <FormattedMessage
           id="warning.limitedAccount"
-          defaultMessage="Your account is currently limited. If you think this is a mistake, please contact support@opencollective.com."
+          defaultMessage="Your account is currently limited. If you think this is a mistake, please <SupportLink>contact support</SupportLink>."
+          values={I18nFormatters}
         />
       </GlobalWarningContainer>
     );

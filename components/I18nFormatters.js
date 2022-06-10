@@ -1,4 +1,5 @@
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 
 import Link from './Link';
 import StyledLink from './StyledLink';
@@ -8,9 +9,10 @@ export const getI18nLink = linkProps => chunks =>
   <StyledLink {...linkProps}>{linkProps?.children || chunks}</StyledLink>;
 export const I18nBold = chunks => <strong>{chunks}</strong>;
 export const I18nItalic = chunks => <i>{chunks}</i>;
+
 export const I18nSupportLink = chunks => (
-  <StyledLink href="mailto:support@opencollective.com">
-    {chunks.length ? chunks : 'support@opencollective.com'}
+  <StyledLink as={Link} openInNewTab href="/contact">
+    {chunks.length ? chunks : <FormattedMessage defaultMessage="support" />}
   </StyledLink>
 );
 export const I18nSignInLink = chunks => (
