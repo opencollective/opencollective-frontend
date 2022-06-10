@@ -30,7 +30,7 @@ class Header extends React.Component {
     title: PropTypes.string,
     metaTitle: PropTypes.string,
     showSearch: PropTypes.bool,
-    showProfileMenu: PropTypes.bool,
+    showProfileAndChangelogMenu: PropTypes.bool,
     withTopBar: PropTypes.bool,
     menuItems: PropTypes.object,
     menuItemsV2: PropTypes.object,
@@ -126,14 +126,14 @@ class Header extends React.Component {
               className={className}
               showSearch={this.props.showSearch}
               menuItems={this.props.menuItemsV2}
-              showProfileMenu={this.props.showProfileMenu}
+              showProfileAndChangelogMenu={this.props.showProfileAndChangelogMenu}
             />
           ) : (
             <TopBar
               className={className}
               showSearch={this.props.showSearch}
               menuItems={this.props.menuItems}
-              showProfileMenu={this.props.showProfileMenu}
+              showProfileAndChangelogMenu={this.props.showProfileAndChangelogMenu}
             />
           ))}
         <GlobalWarnings collective={this.props.collective} />
