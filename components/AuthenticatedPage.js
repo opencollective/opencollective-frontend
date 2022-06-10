@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
@@ -42,6 +43,7 @@ class AuthenticatedPage extends React.Component {
     loadingLoggedInUser: PropTypes.bool,
     /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
+    router: PropTypes.object,
   };
 
   renderContent(loadingLoggedInUser, LoggedInUser) {
@@ -58,7 +60,11 @@ class AuthenticatedPage extends React.Component {
                   defaultMessage="You need to be logged in to continue."
                 />
               </MessageBox>
-              <SignInOrJoinFree form="signin" disableSignup={this.props.disableSignup} />
+              <SignInOrJoinFree
+                form="signin"
+                routes={{ join: `/create-account?next=${encodeURIComponent(this.props.router.asPath)}` }}
+                disableSignup={this.props.disableSignup}
+              />
             </Flex>
           )}
         </Container>
@@ -92,4 +98,4 @@ class AuthenticatedPage extends React.Component {
   }
 }
 
-export default withUser(AuthenticatedPage);
+export default withRouter(withUser(AuthenticatedPage));
