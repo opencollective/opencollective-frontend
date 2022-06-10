@@ -115,6 +115,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
                   </NavButton>
                 )}
                 placement="bottom"
+                popupMarginTop="-10px"
               >
                 <NavLinkContainer>
                   {/* TODO: Add this part back when the /collectives page is designed */}
@@ -154,6 +155,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
                   </NavButton>
                 )}
                 placement="bottom"
+                popupMarginTop="-10px"
               >
                 <NavLinkContainer>
                   <Link href="/pricing">
@@ -192,6 +194,7 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
                   </NavButton>
                 )}
                 placement="bottom"
+                popupMarginTop="-10px"
               >
                 <NavLinkContainer>
                   <a href="https://blog.opencollective.com/">

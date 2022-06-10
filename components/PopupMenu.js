@@ -17,7 +17,7 @@ const Popup = styled(Box)`
   z-index: ${props => props.zIndex ?? 1000};
 `;
 
-const PopupMenu = ({ Button, children, placement, onClose, closingEvents, zIndex }) => {
+const PopupMenu = ({ Button, children, placement, onClose, closingEvents, zIndex, popupMarginTop }) => {
   const [isOpen, setOpen] = React.useState(false);
   const ref = React.useRef();
   useGlobalBlur(
@@ -53,7 +53,7 @@ const PopupMenu = ({ Button, children, placement, onClose, closingEvents, zIndex
           ]}
         >
           {({ style, ref }) => (
-            <Popup mt="-10px" zIndex={zIndex} {...{ style, ref }}>
+            <Popup mt={popupMarginTop} zIndex={zIndex} {...{ style, ref }}>
               {typeof children === 'function' ? children({ setOpen }) : children}
             </Popup>
           )}
@@ -74,6 +74,7 @@ PopupMenu.propTypes = {
    * For example, mouseover, mousedown, mouseup, blur, focusin, focusout etc.
    */
   closingEvents: PropTypes.array,
+  popupMarginTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default PopupMenu;
