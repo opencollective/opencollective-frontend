@@ -22,13 +22,18 @@ const createCollectiveHostQuery = gqlV2/* GraphQL */ `
       currency
       isOpenToApplications
       termsUrl
+      policies {
+        COLLECTIVE_MINIMUM_ADMINS {
+          numberOfAdmins
+        }
+      }
     }
   }
 `;
 
 const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
   const router = useRouter();
-  const slug = router.query.hostCollectiveSlug;
+  const slug = router.query.hostCollectiveSlug || (router.query.category === 'opensource' ? 'opensource' : undefined);
   const skipQuery = !LoggedInUser || !slug;
   const { loading, error, data } = useQuery(createCollectiveHostQuery, {
     context: API_V2_CONTEXT,

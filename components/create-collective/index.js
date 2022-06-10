@@ -52,7 +52,7 @@ class CreateCollective extends Component {
     this.createCollective = this.createCollective.bind(this);
   }
 
-  async createCollective({ collective, message }) {
+  async createCollective({ collective, message, inviteMembers }) {
     // set state to loading
     this.setState({ creating: true });
 
@@ -73,6 +73,10 @@ class CreateCollective extends Component {
           host: this.props.host ? { slug: this.props.host.slug } : null,
           automateApprovalWithGithub: this.state.githubInfo ? true : false,
           message,
+          inviteMembers: inviteMembers.map(invite => ({
+            ...invite,
+            memberAccount: { legacyId: invite.memberAccount.id },
+          })),
         },
       });
       const newCollective = res.data.createCollective;
@@ -164,6 +168,7 @@ class CreateCollective extends Component {
         loading={this.state.creating}
         error={error}
         popularTags={popularTags}
+        loggedInUser={LoggedInUser}
       />
     );
   }
@@ -175,12 +180,14 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
     $host: AccountReferenceInput
     $automateApprovalWithGithub: Boolean
     $message: String
+    $inviteMembers: [InviteMemberInput]
   ) {
     createCollective(
       collective: $collective
       host: $host
       automateApprovalWithGithub: $automateApprovalWithGithub
       message: $message
+      inviteMembers: $inviteMembers
     ) {
       id
       name

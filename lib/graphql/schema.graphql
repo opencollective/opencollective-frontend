@@ -1076,6 +1076,7 @@ type CollectiveFeatures {
   The id of the account
   """
   id: String!
+  ALL: CollectiveFeatureStatus
   RECEIVE_FINANCIAL_CONTRIBUTIONS: CollectiveFeatureStatus
   RECURRING_CONTRIBUTIONS: CollectiveFeatureStatus
   TRANSACTIONS: CollectiveFeatureStatus
