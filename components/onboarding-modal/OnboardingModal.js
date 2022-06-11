@@ -10,6 +10,7 @@ import { isURL, matches } from 'validator';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { compose } from '../../lib/utils';
 
 import Container from '../../components/Container';
@@ -132,6 +133,7 @@ class OnboardingModal extends React.Component {
     editCollectiveMembers: PropTypes.func,
     editCollectiveContact: PropTypes.func,
     showOnboardingModal: PropTypes.bool,
+    data: PropTypes.object,
     setShowOnboardingModal: PropTypes.func,
     intl: PropTypes.object.isRequired,
     router: PropTypes.object,
@@ -257,7 +259,7 @@ class OnboardingModal extends React.Component {
   };
 
   render() {
-    const { collective, LoggedInUser, showOnboardingModal, mode } = this.props;
+    const { collective, LoggedInUser, showOnboardingModal, mode, data } = this.props;
     const { step, isSubmitting, error, noOverlay } = this.state;
 
     return (
@@ -355,6 +357,7 @@ class OnboardingModal extends React.Component {
                             values={values}
                             errors={errors}
                             touched={touched}
+                            memberInvitations={data?.memberInvitations || []}
                           />
                           {error && (
                             <MessageBox type="error" withIcon mt={2}>
@@ -424,6 +427,33 @@ const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, 
   name: 'editCollectiveContact',
 });
 
-const addGraphql = compose(addEditCollectiveMembersMutation, addEditCollectiveContactMutation);
+const addMemberInvitationQuery = graphql(
+  gqlV2/* GraphQL */ `
+    query MemberInvitationsQuery($slug: String!) {
+      memberInvitations(account: { slug: $slug }, role: [ADMIN]) {
+        id
+        role
+        memberAccount {
+          id
+          name
+          imageUrl
+          slug
+        }
+      }
+    }
+  `,
+  {
+    options: props => ({
+      variables: { slug: props.collective.slug },
+      context: API_V2_CONTEXT,
+    }),
+  },
+);
+
+const addGraphql = compose(
+  addEditCollectiveMembersMutation,
+  addEditCollectiveContactMutation,
+  addMemberInvitationQuery,
+);
 
 export default injectIntl(addGraphql(withRouter(OnboardingModal)));
