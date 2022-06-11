@@ -272,7 +272,7 @@ class SignInOrJoinFreeV2 extends React.Component {
               <P>
                 <FormattedMessage
                   id="login.twoFactorAuth.support"
-                  defaultMessage="If you can't login with 2FA or recovery codes, please contact <SupportLink></SupportLink>."
+                  defaultMessage="If you can't login with 2FA or recovery codes, please contact <SupportLink>support</SupportLink>."
                   values={{
                     SupportLink: I18nSupportLink,
                   }}
