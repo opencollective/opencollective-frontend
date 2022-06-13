@@ -8,9 +8,10 @@ import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
 import Link from '../Link';
 import ListItem from '../ListItem';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
-import { H2, H3, H5, P } from '../Text';
+import { H3, H5, P } from '../Text';
 
 const ListContainer = styled.ul`
   padding-left: 20px;
@@ -42,32 +43,17 @@ const GetToKnowUs = () => {
     <Flex flexDirection="column" px="16px" justifyContent="center" alignItems="center">
       <Flex flexDirection="column" alignItems="center">
         <Box maxWidth={['288px', '700px', '880px']}>
-          <H2
-            letterSpacing={['-0.008em', '-0.04em']}
-            fontSize={['32px', '40px', '52px']}
-            lineHeight={['40px', '48px', '56px']}
-            textAlign="center"
-            color="primary.900"
-            fontWeight="700"
-            mb={3}
-          >
+          <SectionTitle textAlign="center" mb={3}>
             <FormattedMessage id="home.getToKnowUs" defaultMessage="Get to know us." />
-          </H2>
+          </SectionTitle>
         </Box>
         <Box maxWidth={['288px', '700px', '768px']}>
-          <P
-            fontSize={['18px', '20px']}
-            letterSpacing={[null, '-0.008em']}
-            lineHeight={['26px', '28px']}
-            textAlign="center"
-            color="black.800"
-            fontWeight="500"
-          >
+          <SectionDescription textAlign="center" color="black.800">
             <FormattedMessage
               id="home.getToKnowUs.description"
               defaultMessage={'Browse stories, blog posts, resources, and get support from the community.'}
             />
-          </P>
+          </SectionDescription>
         </Box>
       </Flex>
       <Flex flexDirection={['column', 'row']} my="32px">

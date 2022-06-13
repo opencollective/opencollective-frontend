@@ -5,45 +5,30 @@ import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
 import Link from '../Link';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
 import StyledButton from '../StyledButton';
-import { H2, P } from '../Text';
 
 const DedicatedTeam = () => {
   return (
     <Flex flexDirection="column" justifyContent="center" alignItems="center">
       <Flex flexDirection="column" alignItems="center" px="16px" mb={[0, '73px']}>
         <Box maxWidth={['288px', '700px', '880px']}>
-          <H2
-            letterSpacing={['-0.008em', '-0.04em']}
-            fontSize={['32px', '40px', '52px']}
-            lineHeight={['40px', '48px', '56px']}
-            textAlign="center"
-            color="primary.900"
-            fontWeight="700"
-            mb={3}
-          >
+          <SectionTitle textAlign="center" mb={3}>
             <FormattedMessage
               id="home.weDedicatedTeam"
               defaultMessage="We are a dedicated team of people working to spread power and wealth"
             />
-          </H2>
+          </SectionTitle>
         </Box>
         <Box maxWidth={['288px', '700px', '768px']}>
-          <P
-            fontSize={['18px', '20px']}
-            letterSpacing={[null, '-0.008em']}
-            lineHeight={['26px', '28px']}
-            textAlign="center"
-            color="black.800"
-            fontWeight="500"
-          >
+          <SectionDescription textAlign="center" fontWeight="500">
             <FormattedMessage
               id="home.weDedicatedTeam.description"
               defaultMessage={
                 'Open Collective is made possible by an international team of people who are committed to community-control of technology. Connect with us.'
               }
             />
-          </P>
+          </SectionDescription>
         </Box>
       </Flex>
       <Flex flexDirection="column" alignItems="center" width={1} maxWidth="100%" overflow="hidden">

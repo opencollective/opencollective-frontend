@@ -3,7 +3,8 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
-import { H2, H5, P } from '../Text';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
+import { H5, P } from '../Text';
 
 const messages = defineMessages({
   'home.payment': {
@@ -62,29 +63,16 @@ const CollaborateWithMoney = () => {
           <NextIllustration src="/static/images/new-home/collaborate-with-money.png" width={239} height={257} />
         </Box>
         <Box maxWidth={['288px', '421px', '594px']} textAlign={['center', 'left']} ml={[null, '40px']}>
-          <H2
-            letterSpacing={['-0.008em', '-0.04em']}
-            fontSize={['32px', '40px']}
-            lineHeight={['40px', '48px']}
-            color="primary.900"
-            fontWeight="700"
-            mb={['8px', 3]}
-          >
+          <SectionTitle mb={['8px', 3]}>
             <FormattedMessage id="home.collaborateWithMoney" defaultMessage={'Collaborate with money'} />
-          </H2>
+          </SectionTitle>
 
-          <P
-            fontSize={['16px', '18px', '20px']}
-            lineHeight={['24px', '26px', '28px']}
-            fontWeight="500"
-            color="black.800"
-            letterSpacing={[null, null, '-0.008em']}
-          >
+          <SectionDescription textAlign={['center', 'left']}>
             <FormattedMessage
               id="home.collaborateWithMoney.description"
               defaultMessage={'A shared account to fundraise and manage money, connect with your people, and more.'}
             />
-          </P>
+          </SectionDescription>
         </Box>
       </Flex>
       <Flex
