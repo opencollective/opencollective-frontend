@@ -340,7 +340,7 @@ class SearchPage extends React.Component {
               />
             </Hide>
             <Hide md lg>
-              <FilterLabel htmlFor="profile-filter-type">
+              <FilterLabel htmlFor="collective-filter-type">
                 <FormattedMessage defaultMessage="Profile Type" />
               </FilterLabel>
               <StyledSelectFilter
