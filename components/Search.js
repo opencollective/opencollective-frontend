@@ -29,10 +29,12 @@ const SearchModal = ({ onClose }) => {
           <Flex>
             <SearchForm
               autoFocus
-              width={['230px', '248px', '536px']}
+              width={['180px', '248px', '536px']}
               borderRadius="100px"
               fontSize="12px"
               placeholder={intl.formatMessage({ defaultMessage: 'Search for Collectives, organizations, and more...' })}
+              showSearchButton
+              searchButtonStyles={{ width: '32px', height: '32px' }}
             />
             <Span mt="12px" ml={['10px', '25px']}>
               <CloseIcon onClick={onClose} style={{ width: '14px', height: '14px' }} />

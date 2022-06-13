@@ -7,6 +7,7 @@ import { borderRadius, fontSize, height } from 'styled-system';
 import { Box, Flex } from './Grid';
 import SearchIcon from './SearchIcon';
 import StyledInput from './StyledInput';
+import StyledRoundButton from './StyledRoundButton';
 
 const SearchInputContainer = styled(Flex)`
   border: solid 1px var(--silver-four);
@@ -87,6 +88,15 @@ class SearchForm extends React.Component {
             onChange={onChange && (e => onChange(e.target.value))}
             disabled={disabled}
           />
+          {this.props.showSearchButton && (
+            <StyledRoundButton
+              style={{ backgroundColor: '#F9FAFB', color: '#323334', ...this.props.searchButtonStyles }}
+              isBorderless
+              mr="20px"
+            >
+              →
+            </StyledRoundButton>
+          )}
         </SearchInputContainer>
       </form>
     );
@@ -108,6 +118,8 @@ SearchForm.propTypes = {
   router: PropTypes.object,
   disabled: PropTypes.bool,
   autoFocus: PropTypes.bool,
+  showSearchButton: PropTypes.bool,
+  searchButtonStyles: PropTypes.object,
 };
 
 export default withRouter(SearchForm);
