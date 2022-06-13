@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -13,13 +12,15 @@ import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledCarousel from '../StyledCarousel';
 import StyledLink from '../StyledLink';
-import { P, Span } from '../Text';
+import { P } from '../Text';
 
 import { HOSTS } from './constants';
 
 const ApplyLink = styled(StyledLink)`
+  border-radius: 16px;
+
   &:hover {
-    text-decoration: underline !important;
+    background: rgba(255, 255, 255, 0.2);
   }
 `;
 
@@ -64,78 +65,72 @@ const groupHostsIntoSections = hosts =>
 const Host = ({ id, name, logo, bgImage, location, color, collectivePath }) => {
   const intl = useIntl();
   return (
-    <Container
-      textAlign="center"
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      mx={[null, 2, null, null, 3]}
-      my={3}
-    >
-      <Container
-        width={['288px', '205px', '250px', null, '304px']}
-        height={['210px', '218px', '250px', null, '256px']}
-        background={`url("/static/images/become-a-host/${bgImage}.png") no-repeat`}
-        backgroundSize={['contain', 'cover', '100% 100%']}
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        borderRadius="8px"
-      >
-        <Avatar radius="96px" src={logo} name={name} type="ORGANIZATION" />
-      </Container>
+    <ApplyLink as={Link} href={collectivePath}>
       <Container
         textAlign="center"
         display="flex"
         flexDirection="column"
-        alignItems="flex-start"
-        width={['288px', '205px', '250px', null, '304px']}
+        alignItems="center"
+        mx={[null, 2, null, null, 3]}
+        my={3}
       >
-        <P
-          fontSize={['15px', '18px']}
-          lineHeight={['23px', '27px']}
-          color={color || 'black.600'}
-          lineSpacing={['-0.12px', '-0.2px']}
-          fontWeight="normal"
-          mt="16px"
-          mb="12px"
+        <Container
+          width={['288px', '205px', '270px', null, '360px']}
+          height={['210px', '218px', '218px', null, '256px']}
+          background={`url("/static/images/become-a-host/${bgImage}.png") no-repeat`}
+          backgroundSize={['contain', 'cover', '100% 100%']}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          borderRadius="8px"
         >
-          {location}
-        </P>
-        <Box mb={2}>
+          <Avatar radius="96px" src={logo} name={name} type="ORGANIZATION" />
+        </Container>
+        <Container
+          textAlign="center"
+          display="flex"
+          flexDirection="column"
+          alignItems="flex-start"
+          width={['288px', '205px', '270px', null, '360px']}
+        >
           <P
-            fontSize={['15px', '24px']}
-            lineHeight={['23px', '32px']}
-            color={color || 'black.800'}
-            letterSpacing={['-0.12px', '-0.8px']}
-            fontWeight="bold"
-            wordWrap="break-word"
-            textAlign="left"
-          >
-            {name}
-          </P>
-        </Box>
-        <Box my={2}>
-          <P
-            fontSize={['15px', '16px', null, null, '18px']}
-            textAlign="left"
-            lineHeight={['25px', '24px', null, null, '27px']}
-            letterSpacing={['-0.016em', '-0.16px', null, null, '-0.2px']}
+            fontSize={['15px', '18px']}
+            lineHeight={['23px', '27px']}
             color={color || 'black.600'}
+            lineSpacing={['-0.12px', '-0.2px']}
+            fontWeight="normal"
+            mt="16px"
+            mb="12px"
           >
-            {intl.formatMessage(messages[`fiscalHosting.hosts.${id}`])}
+            {location}
           </P>
-        </Box>
-        <ApplyLink as={Link} href={collectivePath}>
-          <Span color={color || '#3220A3'}>
-            <FormattedMessage id="Apply" defaultMessage="Apply" />
-          </Span>
-          <Span ml="8px">
-            <ArrowRight2 color={color || '#3220A3'} size="18" />
-          </Span>
-        </ApplyLink>
+          <Box mb={2}>
+            <P
+              fontSize={['15px', '24px']}
+              lineHeight={['23px', '32px']}
+              color={color || 'black.800'}
+              letterSpacing={['-0.12px', '-0.8px']}
+              fontWeight="bold"
+              wordWrap="break-word"
+              textAlign="left"
+            >
+              {name}
+            </P>
+          </Box>
+          <Box my={2}>
+            <P
+              fontSize={['15px', '16px', null, null, '18px']}
+              textAlign="left"
+              lineHeight={['25px', '24px', null, null, '27px']}
+              letterSpacing={['-0.016em', '-0.16px', null, null, '-0.2px']}
+              color={color || 'black.600'}
+            >
+              {intl.formatMessage(messages[`fiscalHosting.hosts.${id}`])}
+            </P>
+          </Box>
+        </Container>
       </Container>
-    </Container>
+    </ApplyLink>
   );
 };
 
@@ -183,7 +178,7 @@ ApplyToHostMobileCarousel.propTypes = {
 };
 
 export const ApplyToHostGrid = ({ color }) => (
-  <Grid gridGap={1} gridTemplateColumns={'repeat(3, 1fr)'}>
+  <Grid gridGap={[1, null, null, null, '48px']} gridTemplateColumns={'repeat(3, 1fr)'}>
     {HOSTS.map(host => (
       <Host key={host.id} color={color} {...host} />
     ))}

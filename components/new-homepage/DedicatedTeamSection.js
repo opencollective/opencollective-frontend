@@ -24,7 +24,7 @@ const DedicatedTeam = () => {
           >
             <FormattedMessage
               id="home.weDedicatedTeam"
-              defaultMessage="We are a dedicated team of people working to spread power and wealth."
+              defaultMessage="We are a dedicated team of people working to spread power and wealth"
             />
           </H2>
         </Box>
