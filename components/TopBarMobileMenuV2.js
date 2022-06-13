@@ -52,8 +52,8 @@ class TopBarMobileMenu extends React.Component {
         bg="white.full"
         width="100%"
         position="absolute"
-        right={[0, 16]}
-        top={[69, 75]}
+        right={[0, 0, 16]}
+        top={[69, 69, 75]}
         p={3}
         zIndex={3000}
         borderRadius="0px 0px 16px 16px"
