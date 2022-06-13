@@ -462,13 +462,13 @@ const collectives = [
     ),
   },
   {
-    id: 'platform6-coop',
-    path: '/platform6-coop',
+    id: 'oce',
+    path: '/europe',
     image: {
       width: 366,
       height: 328,
       transform: 'translate(-0.0940322 -0.0371346) scale(0.00317229)',
-      xlinkHref: '/static/images/new-home/six-logo.png',
+      xlinkHref: '/static/images/new-home/oce-logo.png',
     },
     render: id => (
       <React.Fragment>
@@ -506,7 +506,6 @@ const NetworkOfCollectives = () => {
             as="svg"
             width={['320px', '877px']}
             height={['724px', '465px']}
-            viewBox={['0 0 320 724', '0 0 877 465']}
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"

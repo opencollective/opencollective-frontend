@@ -70,7 +70,7 @@ const CollaborateWithMoney = () => {
             fontWeight="700"
             mb={['8px', 3]}
           >
-            <FormattedMessage id="home.collaborateWithMoney" defaultMessage={'Collaborate with money.'} />
+            <FormattedMessage id="home.collaborateWithMoney" defaultMessage={'Collaborate with money'} />
           </H2>
 
           <P

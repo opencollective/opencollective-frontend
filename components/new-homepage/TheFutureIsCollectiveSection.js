@@ -27,7 +27,7 @@ const TheFutureIsCollective = () => {
               color="primary.900"
               fontWeight={['700', '900']}
             >
-              <FormattedMessage id="home.futureIsCollective" defaultMessage={'The future is collective.'} />
+              <FormattedMessage id="home.futureIsCollective" defaultMessage={'The future is collective'} />
             </H1>
           </Box>
           <Box my={[4, '40px']} maxWidth={['288px', '768px', '780px']}>

@@ -85,7 +85,7 @@ const GetToKnowUs = () => {
           </H3>
           <P my="24px" fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" color="black.800">
             <FormattedMessage
-              defaultMessage={'Check out these amazing Collectives—explore their transparent budgets and activities.'}
+              defaultMessage={'Read more about how we operate and what projects we have for the present and future.'}
             />
           </P>
           <ListContainer>
@@ -113,7 +113,7 @@ const GetToKnowUs = () => {
             </StyledListItem>
             <StyledListItem fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" mb="24px">
               <StyledLink color="black.800" href="/become-a-sponsor" textDecoration="underline">
-                <FormattedMessage defaultMessage={'More about Sponsors'} />
+                <FormattedMessage defaultMessage={'Info for financial sponsors'} />
               </StyledLink>
             </StyledListItem>
             <StyledListItem
@@ -129,7 +129,7 @@ const GetToKnowUs = () => {
                 textDecoration="underline"
                 openInNewTab
               >
-                <FormattedMessage defaultMessage={'Communities that use Open Collective'} />
+                <FormattedMessage defaultMessage={'Case studies'} />
               </StyledLink>
             </StyledListItem>
           </ListContainer>
@@ -148,7 +148,7 @@ const GetToKnowUs = () => {
           </H3>
           <P my="24px" fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" color="black.800">
             <FormattedMessage
-              defaultMessage={'Check out these amazing Collectives—explore their transparent budgets and activities.'}
+              defaultMessage={'Learn more about how it all works: our philosophy and business model.'}
             />
           </P>
           <ListContainer>
