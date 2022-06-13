@@ -26,7 +26,7 @@ Sentry.init({
     /^No collective found with slug/, // We throw exceptions for these, but they're not really errors
     /Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this/, // Creates a lot of noise in Sentry but it does not seem to have a real impact
   ],
-  blacklistUrls: [
+  denyUrls: [
     // Chrome extensions
     /extensions\//i,
     /^chrome:\/\//i,
