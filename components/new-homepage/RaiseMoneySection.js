@@ -9,8 +9,9 @@ import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
 import { getI18nLink, I18nUnderline } from '../I18nFormatters';
 import Link from '../Link';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
 import StyledLink from '../StyledLink';
-import { H2, H3, P } from '../Text';
+import { H3, P } from '../Text';
 
 const LinkContainer = styled(Container)`
   &:hover {
@@ -41,31 +42,16 @@ const RaiseMoney = () => {
     <Flex flexDirection="column" justifyContent="center" alignItems="center" mt="72px">
       <Flex flexDirection="column" alignItems="center">
         <Box mb="50px" px="16px">
-          <H2
-            letterSpacing={['-0.008em', '-0.04em']}
-            fontSize={['32px', '40px', '52px']}
-            lineHeight={['40px', '48px', '56px']}
-            textAlign="center"
-            color="primary.900"
-            fontWeight="700"
-            mb={3}
-          >
+          <SectionTitle textAlign="center" mb={3}>
             <FormattedMessage id="home.raiseMoney" defaultMessage={'Raise money with full transparency'} />
-          </H2>
+          </SectionTitle>
 
-          <P
-            fontSize={['18px', '20px']}
-            letterSpacing={[null, '-0.008em']}
-            lineHeight={['26px', '28px']}
-            textAlign="center"
-            color="black.800"
-            fontWeight="500"
-          >
+          <SectionDescription textAlign="center">
             <FormattedMessage
               id="home.raiseMoney.description"
               defaultMessage={'We do the paperwork so you can focus on your mission.'}
             />
-          </P>
+          </SectionDescription>
         </Box>
 
         <Flex justifyContent="center" width="100vw" overflow="hidden">

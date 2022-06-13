@@ -7,9 +7,10 @@ import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
 import { I18nBold } from '../I18nFormatters';
 import Link from '../Link';
+import { MainDescription, MainTitle } from '../marketing/Text';
 import StyledButton from '../StyledButton';
 import StyledModal from '../StyledModal';
-import { H1, P, Span } from '../Text';
+import { Span } from '../Text';
 
 const TheFutureIsCollective = () => {
   const [showModal, setShowModal] = useState(false);
@@ -19,26 +20,12 @@ const TheFutureIsCollective = () => {
       <Flex justifyContent="center" alignItems="center" px="16px" mt="40px">
         <Flex flexDirection="column" alignItems="center">
           <Box>
-            <H1
-              letterSpacing={['-0.04em', '0.012em']}
-              fontSize={['52px', '64px', '72px']}
-              lineHeight={['56px', '80px', '88px']}
-              textAlign="center"
-              color="primary.900"
-              fontWeight={['700', '900']}
-            >
+            <MainTitle textAlign="center">
               <FormattedMessage id="home.futureIsCollective" defaultMessage={'The future is collective'} />
-            </H1>
+            </MainTitle>
           </Box>
-          <Box my={[4, '40px']} maxWidth={['288px', '768px', '780px']}>
-            <P
-              fontSize={['16px', '20px', null, null, '18px']}
-              letterSpacing={[null, '-0.008em', null, null, '-0.2px']}
-              lineHeight={['24px', '28px', null, null, '27px']}
-              textAlign="center"
-              color="black.800"
-              fontWeight="500"
-            >
+          <Box my={[4, '40px']} maxWidth={['288px', '608px', '768px', null, '896px']}>
+            <MainDescription>
               <FormattedMessage
                 id="home.futureIsCollective.description"
                 defaultMessage={
@@ -48,7 +35,7 @@ const TheFutureIsCollective = () => {
                   b: I18nBold,
                 }}
               />
-            </P>
+            </MainDescription>
           </Box>
           <Box mb="40px" display="flex" flexDirection={['column', 'row']} alignItems="center">
             <Link href="/create">

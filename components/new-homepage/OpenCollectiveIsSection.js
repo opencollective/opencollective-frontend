@@ -7,8 +7,9 @@ import { ApplyToHostGrid, ApplyToHostMobileCarousel } from '../fiscal-hosting/Ap
 import { Box, Flex } from '../Grid';
 import NextIllustration from '../home/HomeNextIllustration';
 import Link from '../Link';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
 import StyledLink from '../StyledLink';
-import { H2, H3, P } from '../Text';
+import { H3, P } from '../Text';
 
 import NetworkOfCollectives from './NetworkOfCollectives';
 
@@ -26,30 +27,15 @@ const OpenCollectiveIs = () => {
     <Flex flexDirection="column" alignItems="center" mt="48px">
       <Flex px="16px" justifyContent="center" alignItems="center">
         <Box width={['288px', 1]} mb="135px">
-          <H2
-            letterSpacing={['-0.008em', '-0.04em']}
-            fontSize={['32px', '40px', '52px']}
-            lineHeight={['40px', '48px', '56px']}
-            textAlign="center"
-            color="primary.900"
-            fontWeight="700"
-            mb={3}
-          >
+          <SectionTitle textAlign="center" mb={3}>
             <FormattedMessage id="home.OCIs" defaultMessage={'Open Collective is'} />
-          </H2>
-          <P
-            fontSize={['18px', '20px']}
-            letterSpacing={[null, '-0.008em']}
-            lineHeight={['26px', '28px']}
-            textAlign="center"
-            color="black.800"
-            fontWeight="500"
-          >
+          </SectionTitle>
+          <SectionDescription textAlign="center">
             <FormattedMessage
               id="home.OCIs.description"
               defaultMessage={'…an open finances platform for communities.'}
             />
-          </P>
+          </SectionDescription>
         </Box>
       </Flex>
       <OvalShapeWrapper
