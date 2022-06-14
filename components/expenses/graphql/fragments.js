@@ -240,6 +240,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       name
       type
       imageUrl
+      isActive
       description
       settings
       twitterHandle
