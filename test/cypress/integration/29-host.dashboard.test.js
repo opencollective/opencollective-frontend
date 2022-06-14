@@ -19,6 +19,7 @@ describe('host dashboard', () => {
     it('mark pending application approved', () => {
       const collectiveSlug = randomSlug();
       cy.get('[data-cy="host-apply-btn"]:visible').click();
+      cy.getByDataCy('host-apply-modal-next').click();
       cy.getByDataCy('host-apply-collective-picker').click();
       cy.getByDataCy('host-apply-new-collective-link').click();
       cy.get(`input[name="name"]`).type('Cavies United');

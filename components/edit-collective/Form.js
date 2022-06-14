@@ -62,6 +62,7 @@ const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, USER } = CollectiveType;
 class EditCollectiveForm extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
+    host: PropTypes.object,
     status: PropTypes.string, // loading, saved
     section: PropTypes.string,
     onSubmit: PropTypes.func,
@@ -390,7 +391,7 @@ class EditCollectiveForm extends React.Component {
   }
 
   renderSection(section) {
-    const { collective, LoggedInUser } = this.props;
+    const { collective, host, LoggedInUser } = this.props;
 
     switch (section) {
       case EDIT_COLLECTIVE_SECTIONS.INFO:
@@ -417,7 +418,7 @@ class EditCollectiveForm extends React.Component {
         );
 
       case EDIT_COLLECTIVE_SECTIONS.MEMBERS:
-        return <Members collective={collective} />;
+        return <Members collective={collective} host={host} />;
 
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS:
         return <PaymentMethods collectiveSlug={collective.slug} />;

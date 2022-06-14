@@ -313,14 +313,17 @@ class SearchPage extends React.Component {
           textAlign="center"
         >
           <Flex justifyContent="center" flex="1 1 1" width={['288px', 1]}>
-            <SearchFormContainer>
+            <SearchFormContainer mb={['20px', '48px']}>
               <SearchForm
                 borderRadius="100px"
                 fontSize="16px"
-                placeholder="Search by name, slug, tag, description..."
+                height="58px"
+                placeholder={intl.formatMessage({ defaultMessage: 'Search by name, slug, tag, description...' })}
                 value={this.state.term}
                 onChange={value => this.setState({ term: value })}
                 onSubmit={this.refetch}
+                showSearchButton
+                searchButtonStyles={{ minWidth: '40px', height: '40px' }}
               />
             </SearchFormContainer>
           </Flex>
@@ -340,6 +343,9 @@ class SearchPage extends React.Component {
               />
             </Hide>
             <Hide md lg>
+              <FilterLabel htmlFor="collective-filter-type">
+                <FormattedMessage defaultMessage="Profile Type" />
+              </FilterLabel>
               <StyledSelectFilter
                 inputId="collective-type-filter"
                 value={{ label: intl.formatMessage(I18nFilters[selectedTypeFilter]), value: selectedTypeFilter }}

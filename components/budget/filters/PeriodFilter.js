@@ -49,13 +49,6 @@ const getIntervalFromValue = value => {
 const getNewInterval = (interval, changeField, newValue) => {
   const newInterval = { ...interval };
   newInterval[changeField] = newValue;
-
-  // Reset interval in case fromDate is after toDate
-  if (isValidDate(newInterval.from) && isValidDate(newInterval.to) && newInterval.from > newInterval.to) {
-    const fieldToReset = changeField === 'from' ? 'to' : 'from';
-    newInterval[fieldToReset] = '';
-  }
-
   return newInterval;
 };
 
@@ -122,10 +115,19 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
   const intl = useIntl();
   const intervalFromValue = React.useMemo(() => getIntervalFromValue(value), [value]);
   const [tmpDateInterval, setTmpDateInterval] = React.useState(intervalFromValue);
+  const [isValidDateInterval, setIsValidDateInterval] = React.useState(true);
   const formattedMin = stripTime(minDate);
 
   const setDate = (changeField, date) => {
-    setTmpDateInterval(getNewInterval(tmpDateInterval, changeField, date));
+    const newInterval = getNewInterval(tmpDateInterval, changeField, date, setIsValidDateInterval);
+    setTmpDateInterval(newInterval);
+
+    // Add warning in case fromDate is after toDate
+    if (isValidDate(newInterval.from) && isValidDate(newInterval.to) && newInterval.from > newInterval.to) {
+      setIsValidDateInterval(false);
+    } else if (isValidDate(newInterval.from) && isValidDate(newInterval.to) && newInterval.from < newInterval.to) {
+      setIsValidDateInterval(true);
+    }
   };
 
   return (
@@ -242,6 +244,11 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
               />
             )}
           </StyledInputField>
+          {!isValidDateInterval && (
+            <Span display="block" color="red.500" pt={2} fontSize="10px" lineHeight="14px" aria-live="assertive">
+              <FormattedMessage defaultMessage="Start Date should be before the End Date" />
+            </Span>
+          )}
           <Flex mt={2}>
             <StyledButton
               buttonSize="medium"
@@ -250,6 +257,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
               flex="1"
               onClick={() => {
                 setTmpDateInterval(DEFAULT_INTERVAL);
+                setIsValidDateInterval(true);
                 setOpen(false);
                 onChange(null);
               }}

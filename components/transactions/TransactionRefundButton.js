@@ -33,7 +33,7 @@ const TransactionRefundButton = props => {
       setError(error);
       return;
     }
-    props.onMutationSuccess();
+    props?.onMutationSuccess();
     setEnabled(false);
   };
 

@@ -146,6 +146,7 @@ const AccountSettings = ({ account, section }) => {
   return (
     <SettingsForm
       collective={collective}
+      host={account?.host}
       LoggedInUser={LoggedInUser}
       onSubmit={handleEditCollective}
       status={state.status}

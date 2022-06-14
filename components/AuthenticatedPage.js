@@ -58,7 +58,7 @@ class AuthenticatedPage extends React.Component {
                   defaultMessage="You need to be logged in to continue."
                 />
               </MessageBox>
-              <SignInOrJoinFree form="signin" disableSignup={this.props.disableSignup} />
+              <SignInOrJoinFree defaultForm="signin" disableSignup={this.props.disableSignup} />
             </Flex>
           )}
         </Container>
