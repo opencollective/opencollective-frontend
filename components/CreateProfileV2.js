@@ -136,7 +136,7 @@ const useForm = ({ onEmailChange, errors }) => {
         setState({
           ...state,
           [target.name]: value,
-          errors: state.errors,
+          errors: { ...state.errors, [target.name]: null },
         });
       },
       onInvalid: event => {
