@@ -218,7 +218,7 @@ class SigninV2Page extends React.Component {
     return (
       <div className="LoginPage">
         <Header
-          title="Login"
+          title="Sign In"
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
           menuItemsV2={{ solutions: false, product: false, company: false, docs: false }}
           menuItems={{ discover: false, docs: false, howItWorks: false, pricing: false }}
