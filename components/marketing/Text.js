@@ -28,7 +28,6 @@ export const MainDescription = styled(P)`
   font-size: 16px;
   line-height: 24px;
   color: ${themeGet('colors.black.800')};
-  text-align: center;
 
   @media screen and (min-width: 40em) {
     font-size: 20px;
