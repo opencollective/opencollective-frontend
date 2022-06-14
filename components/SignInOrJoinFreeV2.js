@@ -6,6 +6,7 @@ import { Field, Form, Formik } from 'formik';
 import { get, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 import { isEmail } from 'validator';
 
 import { signin } from '../lib/api';
@@ -16,8 +17,9 @@ import Container from './Container';
 import CreateProfileV2 from './CreateProfileV2';
 import { Box, Flex } from './Grid';
 import { I18nSupportLink } from './I18nFormatters';
+import Link from './Link';
 import Loading from './Loading';
-import SignInV2, { SignInFooterLink } from './SignInV2';
+import SignInV2 from './SignInV2';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledHr from './StyledHr';
@@ -36,6 +38,15 @@ const messages = defineMessages({
     defaultMessage: 'Please enter one of your alphanumeric recovery codes.',
   },
 });
+
+const SignInFooterLink = styled(Link)`
+  color: #323334;
+  font-size: 13px;
+  font-weight: 400;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
 
 /**
  * Shows a SignIn form by default, with the ability to switch to SignUp form. It

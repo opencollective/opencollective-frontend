@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -11,15 +10,6 @@ import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
 import StyledLink from './StyledLink';
 import { Span } from './Text';
-
-const SignInFooterLink = styled(Link)`
-  color: #323334;
-  font-size: 13px;
-  font-weight: 400;
-  &:hover {
-    text-decoration: underline;
-  }
-`;
 
 /**
  * Component for handing user sign-in or redirecting to sign-up.
@@ -146,6 +136,9 @@ export default class SignInV2 extends React.Component {
                     // See https://github.com/facebook/react/issues/6368
                     if (e.key === ' ') {
                       e.preventDefault();
+                    } else if (e.key === 'Enter') {
+                      onEmailChange(e.target.value);
+                      this.setState({ error: e.target.validationMessage, showError: true });
                     }
                   }}
                   onBlur={() => this.setState({ showError: true })}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import AuthenticatedPageV2 from '../components/AuthenticatedPageV2';
@@ -18,11 +18,11 @@ const WelcomeOptionContainer = styled(Container)`
 `;
 
 const Welcome = () => {
-  ``;
   const { LoggedInUser } = useUser();
+  const intl = useIntl();
 
   return (
-    <AuthenticatedPageV2 title="Welcome to Open Collective!">
+    <AuthenticatedPageV2 title={intl.formatMessage({ defaultMessage: 'Welcome to Open Collective!' })}>
       <Flex flexDirection={['column', 'row']} mb="61px" mt="112px" justifyContent="center" alignItems="center">
         <Flex textAlign="center" flexDirection="column" pr={[0, '48px']}>
           <Box>

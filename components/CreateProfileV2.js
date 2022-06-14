@@ -282,7 +282,7 @@ const CreateProfileV2 = ({
           <MessageBox type="warning" mt="24px">
             <Box fontSize="14px" fontWeight={400} lineHeight="20px">
               <FormattedMessage
-                defaultMessage="{email} is already registered on Open Collective. Would you like to sign-in instead?"
+                defaultMessage="{email} is already registered on Open Collective. Would you like to Sign In instead?"
                 values={{ email: <strong>{email}</strong> }}
               />
               <Box mt="8px">
