@@ -13,7 +13,7 @@ import StyledInput from './StyledInput';
 import StyledLink from './StyledLink';
 import { Span } from './Text';
 
-const SignInFooterLink = styled(StyledLink)`
+const SignInFooterLink = styled(Link)`
   color: #323334;
   font-size: 13px;
   font-weight: 400;
