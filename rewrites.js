@@ -79,6 +79,10 @@ exports.REWRITES = [
     destination: '/signin',
   },
   {
+    source: '/signinv2/:token?',
+    destination: '/signinv2',
+  },
+  {
     source: '/confirm/email/:token',
     destination: '/confirmEmail',
   },

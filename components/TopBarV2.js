@@ -65,7 +65,7 @@ const NavItem = styled(StyledLink)`
   }
 `;
 
-const TopBarV2 = ({ showSearch, menuItems }) => {
+const TopBarV2 = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
@@ -235,12 +235,16 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
         {showSearchModal && <SearchModal onClose={() => setShowSearchModal(false)} />}
       </Flex>
 
-      <Container mr={3}>
-        <Hide xs>
-          <ChangelogTrigger />
-        </Hide>
-      </Container>
-      <TopBarProfileMenu />
+      {showProfileAndChangelogMenu && (
+        <React.Fragment>
+          <Container mr={3}>
+            <Hide xs>
+              <ChangelogTrigger />
+            </Hide>
+          </Container>
+          <TopBarProfileMenu />
+        </React.Fragment>
+      )}
       <Hide md lg>
         <TopBarMobileMenuV2 showMobileMenu={showMobileMenu} closeMenu={toggleMobileMenu} />
         <Box mx={3} onClick={toggleMobileMenu}>
@@ -255,11 +259,13 @@ const TopBarV2 = ({ showSearch, menuItems }) => {
 
 TopBarV2.propTypes = {
   showSearch: PropTypes.bool,
+  showProfileAndChangelogMenu: PropTypes.bool,
   menuItems: PropTypes.object,
 };
 
 TopBarV2.defaultProps = {
   showSearch: true,
+  showProfileAndChangelogMenu: true,
   menuItems: { solutions: true, product: true, company: true, docs: true },
 };
 
