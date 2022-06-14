@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
-import * as Sentry from '@sentry/browser';
 import { toUpper } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { getEnvVar } from '../lib/env-utils';
 import useRecaptcha from '../lib/hooks/useRecaptcha';
 import { parseToBoolean } from '../lib/utils';
+import { Sentry } from '../server/sentry';
 
 import { Box } from './Grid';
 import StyledCheckbox from './StyledCheckbox';

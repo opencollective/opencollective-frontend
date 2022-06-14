@@ -25,7 +25,6 @@ Router.onRouteChangeComplete = () => NProgress.done();
 Router.onRouteChangeError = () => NProgress.done();
 
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
-import sentryLib from '../server/sentry';
 
 import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
 import GlobalToasts from '../components/GlobalToasts';
@@ -49,11 +48,6 @@ class OpenCollectiveFrontendApp extends App {
     locale: PropTypes.string,
     messages: PropTypes.object,
   };
-
-  constructor() {
-    super(...arguments);
-    this.state = { hasError: false, errorEventId: undefined };
-  }
 
   static async getInitialProps({ Component, ctx, client }) {
     // Get the `locale` and `messages` from the request object on the server.
@@ -81,25 +75,10 @@ class OpenCollectiveFrontendApp extends App {
         }
       }
     } catch (error) {
-      return { ...props, hasError: true, errorEventId: sentryLib.captureException(error, ctx) };
+      return props;
     }
 
     return props;
-  }
-
-  static getDerivedStateFromProps(props, state) {
-    // If there was an error generated within getInitialProps, and we haven't
-    // yet seen an error, we add it to this.state here
-    return {
-      hasError: props.hasError || state.hasError || false,
-      errorEventId: props.errorEventId || state.errorEventId || undefined,
-    };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    const errorEventId = sentryLib.captureException(error, { errorInfo });
-    this.setState({ hasError: true, errorEventId });
-    super.componentDidCatch(error, errorInfo);
   }
 
   componentDidMount() {

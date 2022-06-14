@@ -1,5 +1,6 @@
 require('./env');
 
+const { withSentryConfig } = require('@sentry/nextjs');
 const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
@@ -9,7 +10,7 @@ const nextConfig = {
   images: {
     disableStaticImages: true,
   },
-  webpack: (config, { webpack, isServer, buildId }) => {
+  webpack: (config, { webpack }) => {
     config.plugins.push(
       // Ignore __tests__
       new webpack.IgnorePlugin({ resourceRegExp: /[\\/]__tests__[\\/]/ }),
@@ -34,31 +35,6 @@ const nextConfig = {
         CAPTCHA_PROVIDER: 'HCAPTCHA',
       }),
     );
-
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        'process.env.SENTRY_RELEASE': JSON.stringify(buildId),
-      }),
-    );
-
-    // XXX See https://github.com/zeit/next.js/blob/canary/examples/with-sentry-simple/next.config.js
-    // In `pages/_app.js`, Sentry is imported from @sentry/node. While
-    // @sentry/browser will run in a Node.js environment, @sentry/node will use
-    // Node.js-only APIs to catch even more unhandled exceptions.
-    //
-    // This works well when Next.js is SSRing your page on a server with
-    // Node.js, but it is not what we want when your client-side bundle is being
-    // executed by a browser.
-    //
-    // Luckily, Next.js will call this webpack function twice, once for the
-    // server and once for the client. Read more:
-    // https://nextjs.org/docs#customizing-webpack-config
-    //
-    // So ask Webpack to replace @sentry/node imports with @sentry/browser when
-    // building the browser's bundle
-    if (!isServer) {
-      config.resolve.alias['@sentry/node'] = '@sentry/browser';
-    }
 
     if (process.env.WEBPACK_BUNDLE_ANALYZER) {
       // eslint-disable-next-line node/no-unpublished-require
@@ -204,4 +180,16 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+const sentryWebpackPluginOptions = {
+  // Additional config options for the Sentry Webpack plugin. Keep in mind that
+  // the following options are set automatically, and overriding them is not
+  // recommended:
+  //   release, url, org, project, authToken, configFile, stripPrefix,
+  //   urlPrefix, include, ignore
+
+  silent: true, // Suppresses all logs
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options.
+};
+
+module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOptions);
