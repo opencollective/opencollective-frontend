@@ -497,6 +497,11 @@ An invitation to join the members of a collective
 """
 type MemberInvitation {
   id: String!
+
+  """
+  The person who invited the member, if any
+  """
+  inviter: Individual
   createdAt: DateTime!
   account: Account!
   memberAccount: Account!
@@ -2087,6 +2092,7 @@ enum ActivityType {
   COLLECTIVE_MEMBER_CREATED
   COLLECTIVE_CORE_MEMBER_ADDED
   COLLECTIVE_CORE_MEMBER_INVITED
+  COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED
   COLLECTIVE_CORE_MEMBER_REMOVED
   COLLECTIVE_CORE_MEMBER_EDITED
   COLLECTIVE_TRANSACTION_CREATED

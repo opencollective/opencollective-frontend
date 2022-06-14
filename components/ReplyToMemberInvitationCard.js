@@ -8,6 +8,7 @@ import roles from '../lib/constants/roles';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import formatMemberRole from '../lib/i18n/member-role';
+import { formatDate } from '../lib/utils';
 
 import Avatar from './Avatar';
 import { Box, Flex } from './Grid';
@@ -95,6 +96,37 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
           <H3>{invitation.account.name}</H3>
         </Flex>
       </LinkCollective>
+      <br />
+      <Flex flexDirection="column" alignItems="center">
+        <P textAlign="center">
+          {invitation.inviter ? (
+            <FormattedMessage
+              id="MemberInvitation.detailsInviter"
+              defaultMessage="Invited by {inviter} on {date}"
+              values={{
+                inviter: <LinkCollective collective={invitation.inviter} />,
+                date: formatDate(invitation.createdAt, {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                }),
+              }}
+            />
+          ) : (
+            <FormattedMessage
+              id="MemberInvitation.detailsDate"
+              defaultMessage="Invited on {date}"
+              values={{
+                date: formatDate(invitation.createdAt, {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                }),
+              }}
+            />
+          )}
+        </P>
+      </Flex>
       <hr />
       <StyledTag textTransform="uppercase">{formatMemberRole(intl, invitation.role)}</StyledTag>
       {hasRoleDescription(invitation.role) && (
@@ -178,6 +210,10 @@ ReplyToMemberInvitationCard.propTypes = {
         termsUrl: PropTypes.string,
       }),
     }),
+    inviter: PropTypes.shape({
+      name: PropTypes.string,
+    }),
+    createdAt: PropTypes.string,
   }),
   /** @ignore form withUser */
   refetchLoggedInUser: PropTypes.func,
