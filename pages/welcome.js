@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import AuthenticatedPageV2 from '../components/AuthenticatedPageV2';
+import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
 import { Box, Flex } from '../components/Grid';
 import Image from '../components/Image';
@@ -22,7 +22,7 @@ const Welcome = () => {
   const intl = useIntl();
 
   return (
-    <AuthenticatedPageV2 title={intl.formatMessage({ defaultMessage: 'Welcome to Open Collective!' })}>
+    <AuthenticatedPage title={intl.formatMessage({ defaultMessage: 'Welcome to Open Collective!' })}>
       <Flex flexDirection={['column', 'row']} mb="61px" mt="112px" justifyContent="center" alignItems="center">
         <Flex textAlign="center" flexDirection="column" pr={[0, '48px']}>
           <Box>
@@ -114,7 +114,7 @@ const Welcome = () => {
           </Flex>
         </StyledCard>
       </Flex>
-    </AuthenticatedPageV2>
+    </AuthenticatedPage>
   );
 };
 

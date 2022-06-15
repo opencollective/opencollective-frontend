@@ -83,10 +83,6 @@ exports.REWRITES = [
     destination: '/signin',
   },
   {
-    source: '/signinv2/:token?',
-    destination: '/signinv2',
-  },
-  {
     source: '/confirm/email/:token',
     destination: '/confirmEmail',
   },
@@ -101,10 +97,6 @@ exports.REWRITES = [
   {
     source: '/:form(create-account)',
     destination: '/signin',
-  },
-  {
-    source: '/:form(create-accountv2)',
-    destination: '/signinv2',
   },
   {
     source: '/:collectiveSlug/:verb(contribute|donate)/button',

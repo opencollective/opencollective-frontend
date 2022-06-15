@@ -47,7 +47,7 @@ class AuthenticatedPage extends React.Component {
   renderContent(loadingLoggedInUser, LoggedInUser) {
     if (!LoggedInUser) {
       return (
-        <Container display="flex" justifyContent="center" py={[5, null, 6]} px={2}>
+        <Container mt="128px" mb="128px">
           {loadingLoggedInUser ? (
             <Loading />
           ) : (
@@ -58,7 +58,11 @@ class AuthenticatedPage extends React.Component {
                   defaultMessage="You need to be logged in to continue."
                 />
               </MessageBox>
-              <SignInOrJoinFree defaultForm="signin" disableSignup={this.props.disableSignup} />
+              <SignInOrJoinFree
+                form="signin"
+                routes={{ signin: '/signin', join: '/create-account' }}
+                disableSignup={this.props.disableSignup}
+              />
             </Flex>
           )}
         </Container>
@@ -85,7 +89,14 @@ class AuthenticatedPage extends React.Component {
     const { LoggedInUser, loadingLoggedInUser, ...pageProps } = this.props;
 
     return (
-      <Page noRobots {...pageProps}>
+      <Page
+        showSearch={false}
+        showFooter={false}
+        noRobots
+        {...pageProps}
+        menuItems={{ discover: false, docs: false, howItWorks: false, pricing: false }}
+        showProfileMenu={false}
+      >
         {this.renderContent(loadingLoggedInUser, LoggedInUser)}
       </Page>
     );
