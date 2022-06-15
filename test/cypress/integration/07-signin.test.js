@@ -28,7 +28,7 @@ describe('signin', () => {
     cy.visit('/signin?token=InvalidToken');
     cy.contains('Sign In failed: Token rejected.');
     cy.contains('You can ask for a new sign in link using the form below.');
-    cy.contains('Sign in using your email address:');
+    cy.contains('Sign in or create a personal account to continue');
     cy.get('input[name=email]').should('exist');
   });
 
@@ -36,7 +36,7 @@ describe('signin', () => {
     cy.visit(`/signin?token=${generateToken(null, -100000)}`);
     cy.contains('Sign In failed: Token rejected.');
     cy.contains('You can ask for a new sign in link using the form below.');
-    cy.contains('Sign in using your email address:');
+    cy.contains('Sign in or create a personal account to continue');
     cy.get('input[name=email]').should('exist');
   });
 
@@ -95,11 +95,12 @@ describe('signin', () => {
     cy.visit('/signin');
 
     // Go to CreateProfile
-    cy.contains('a', 'Join Free').click();
+    cy.contains('a', 'Sign Up').click();
 
     // Test frontend validations
     cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=email]').type('IncorrectValue');
+    cy.get('[data-cy=checkbox-tosOptIn]').click();
     cy.get('button[type=submit]').click();
     cy.contains("Please include an '@' in the email address. 'IncorrectValue' is missing an '@'.");
 
@@ -120,9 +121,10 @@ describe('signin', () => {
     // Submit the form using the email providers--gmail)
     const gmailEmail = randomGmailEmail(false);
     cy.visit('/signin');
-    cy.contains('a', 'Join Free').click();
+    cy.contains('a', 'Sign Up').click();
     cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=email]').type(`{selectall}${gmailEmail}`);
+    cy.get('[data-cy=checkbox-tosOptIn]').click();
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
     cy.contains(`We've sent it to ${gmailEmail}`);
@@ -137,42 +139,14 @@ describe('signin', () => {
     // Submit the form using the email providers--hotmail
     const hotmail = randomHotMail(false);
     cy.visit('/signin');
-    cy.contains('a', 'Join Free').click();
+    cy.contains('a', 'Sign Up').click();
     cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=email]').type(`{selectall}${hotmail}`);
+    cy.get('[data-cy=checkbox-tosOptIn]').click();
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
     cy.contains(`We've sent it to ${hotmail}`);
     cy.getByDataCy('open-inbox-link').should('have.prop', 'href', 'https://outlook.live.com/mail/inbox');
-  });
-
-  it('can signup as organization', () => {
-    cy.visit('/signin');
-
-    // Go to CreateProfile
-    cy.contains('a', 'Join Free').click();
-
-    // Select "Create oganization"
-    cy.contains('Create Organization Profile').click();
-
-    // Test frontend validations
-    cy.get('input[name=name]').type('Dummy Name');
-    cy.get('input[name=orgName]').type('Test Organization');
-    cy.get('input[name=email]').type('IncorrectValue');
-    cy.get('button[type=submit]').click();
-    cy.contains("Please include an '@' in the email address. 'IncorrectValue' is missing an '@'.");
-
-    // Test backend validations
-    cy.get('input[name=email]').type('{selectall}Incorrect@value');
-    cy.get('button[type=submit]').click();
-    cy.contains('Validation error: Email must be valid');
-
-    // Submit the form with correct values
-    const email = randomEmail(false);
-    cy.get('input[name=email]').type(`{selectall}${email}`);
-    cy.get('button[type=submit]').click();
-    cy.contains('Your magic link is on its way!');
-    cy.contains(`We've sent it to ${email}`);
   });
 });
 

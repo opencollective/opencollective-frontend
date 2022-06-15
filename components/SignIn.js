@@ -18,11 +18,11 @@ export default class SignIn extends React.Component {
   static propTypes = {
     /** handles the email input submission, a.k.a Sign In */
     onSubmit: PropTypes.func.isRequired,
-    /** handles the redirect from sign-in, a.k.a Join Free. Accepts URLs (string) or custom action func */
+    /** handles the redirect from sign-in, a.k.a Sign Up. Accepts URLs (string) or custom action func */
     onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
     /** When set to true, will show a spinner in Sign In button and will disable all actions */
     loading: PropTypes.bool,
-    /** Whether user can click on "Join Free" */
+    /** Whether user can click on "Sign Up" */
     showSecondaryAction: PropTypes.bool,
     /** Set this to true to display the unknown email message */
     unknownEmail: PropTypes.bool,
@@ -97,12 +97,12 @@ export default class SignIn extends React.Component {
             {label || <FormattedMessage defaultMessage="Continue with your email" />}
           </Flex>
           <Flex fontWeight={400} fontSize="16px" color="black.700" mb="50px" justifyContent="center">
-            {label || <FormattedMessage defaultMessage="Sign in or create a personal account to continue" />}
+            <FormattedMessage defaultMessage="Sign in or create a personal account to continue" />
           </Flex>
           {!this.state.unknownEmail ? (
             <React.Fragment>
               <Container fontWeight={600} fontSize="13px" alignItems="left" mb="4px" width="100%">
-                {label || <FormattedMessage id="Form.yourEmail" defaultMessage="Your email address" />}
+                <FormattedMessage id="Form.yourEmail" defaultMessage="Your email address" />
               </Container>
               <Container
                 as="form"

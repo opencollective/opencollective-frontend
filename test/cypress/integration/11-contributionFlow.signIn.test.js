@@ -12,11 +12,11 @@ describe('Contribution Flow: Sign In', () => {
     cy.get('button[data-cy="cf-next-step"]').click();
 
     cy.getByDataCy('cf-profile-signin-btn').click();
-    cy.contains('[data-cy="cf-content"] button', 'Join Free →').click();
-    cy.contains('[data-cy="cf-content"] button', 'Sign In').click();
+    cy.contains('[data-cy="cf-content"] button', 'Sign Up').click();
+    cy.contains('[data-cy="cf-content"] button', '← Go back').click();
 
-    cy.get('[data-cy="cf-content"] input[name=email]').type('zzzzzzzzzzzzz');
     cy.get('[data-cy="cf-content"] button[type=submit]').should('be.disabled');
+    cy.get('[data-cy="cf-content"] input[name=email]').type('zzzzzzzzzzzzz');
     cy.get('[data-cy="cf-content"] input[name=email]').blur();
     cy.contains("Please include an '@' in the email address. 'zzzzzzzzzzzzz' is missing an '@'.");
   });
@@ -27,9 +27,11 @@ describe('Contribution Flow: Sign In', () => {
 
     cy.getByDataCy('cf-profile-signin-btn').click();
 
-    cy.get('[data-cy="cf-content"] input[name=email]').type(randomEmail());
+    const randEmail = randomEmail();
+
+    cy.get('[data-cy="cf-content"] input[name=email]').type(randEmail);
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
-    cy.contains('There is no user with this email address. Join for free!');
+    cy.contains(`${randEmail} is not registered yet on Open Collective. Would you like to register with this email?`);
   });
 
   it('Works if given a valid email', () => {
