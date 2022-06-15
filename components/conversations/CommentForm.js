@@ -124,7 +124,7 @@ const CommentForm = ({
           <SignInOrJoinFree
             routes={{ join: getRedirectUrl(router, id) }}
             signInLabel={formatMessage(messages.signInLabel)}
-            withShadow
+            asModal
           />
         </ContainerOverlay>
       )}

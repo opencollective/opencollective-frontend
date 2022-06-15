@@ -20,6 +20,7 @@ import { I18nSupportLink } from './I18nFormatters';
 import Link from './Link';
 import Loading from './Loading';
 import SignIn from './SignIn';
+import SignInModal from './SignInModal';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledHr from './StyledHr';
@@ -81,6 +82,7 @@ class SignInOrJoinFree extends React.Component {
     submitRecoveryCode: PropTypes.func,
     router: PropTypes.object,
     addToast: PropTypes.func.isRequired,
+    asModal: PropTypes.bool,
   };
 
   constructor(props) {
@@ -342,16 +344,29 @@ class SignInOrJoinFree extends React.Component {
         ) : (
           <Fragment>
             {displayedForm !== 'create-account' && !error ? (
-              <SignIn
-                email={email}
-                onEmailChange={email => this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })}
-                onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
-                onSubmit={email => this.signIn(email, false)}
-                loading={submitting}
-                unknownEmail={unknownEmailError}
-                label={this.props.signInLabel}
-                showSecondaryAction={!this.props.disableSignup}
-              />
+              this.props.asModal ? (
+                <SignInModal
+                  email={email}
+                  onEmailChange={email => this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })}
+                  onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
+                  onSubmit={email => this.signIn(email, false)}
+                  loading={submitting}
+                  unknownEmail={unknownEmailError}
+                  label={this.props.signInLabel}
+                  showSecondaryAction={!this.props.disableSignup}
+                />
+              ) : (
+                <SignIn
+                  email={email}
+                  onEmailChange={email => this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })}
+                  onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
+                  onSubmit={email => this.signIn(email, false)}
+                  loading={submitting}
+                  unknownEmail={unknownEmailError}
+                  label={this.props.signInLabel}
+                  showSecondaryAction={!this.props.disableSignup}
+                />
+              )
             ) : (
               <Flex flexDirection="column" width={1} alignItems="center">
                 <Flex justifyContent="center" width={1}>

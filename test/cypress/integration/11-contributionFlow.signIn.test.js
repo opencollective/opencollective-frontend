@@ -12,9 +12,6 @@ describe('Contribution Flow: Sign In', () => {
     cy.get('button[data-cy="cf-next-step"]').click();
 
     cy.getByDataCy('cf-profile-signin-btn').click();
-    cy.contains('[data-cy="cf-content"] button', 'Sign Up').click();
-    cy.contains('[data-cy="cf-content"] button', '← Go back').click();
-
     cy.get('[data-cy="cf-content"] button[type=submit]').should('be.disabled');
     cy.get('[data-cy="cf-content"] input[name=email]').type('zzzzzzzzzzzzz');
     cy.get('[data-cy="cf-content"] input[name=email]').blur();
