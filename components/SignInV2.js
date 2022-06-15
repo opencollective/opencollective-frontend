@@ -1,26 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Image from './Image';
 import Link from './Link';
 import StyledButton from './StyledButton';
-import StyledHr from './StyledHr';
 import StyledInput from './StyledInput';
 import StyledLink from './StyledLink';
 import { Span } from './Text';
-
-const SignInFooterLink = styled(Link)`
-  color: #323334;
-  font-size: 13px;
-  font-weight: 400;
-  &:hover {
-    text-decoration: underline;
-  }
-`;
 
 /**
  * Component for handing user sign-in or redirecting to sign-up.
@@ -147,6 +136,9 @@ export default class SignInV2 extends React.Component {
                     // See https://github.com/facebook/react/issues/6368
                     if (e.key === ' ') {
                       e.preventDefault();
+                    } else if (e.key === 'Enter') {
+                      onEmailChange(e.target.value);
+                      this.setState({ error: e.target.validationMessage, showError: true });
                     }
                   }}
                   onBlur={() => this.setState({ showError: true })}
@@ -219,21 +211,6 @@ export default class SignInV2 extends React.Component {
             </Container>
           )}
         </Box>
-        <Container mt="128px" pl={['20px', '20px', '144px']} pr={['20px', '20px', '144px']} maxWidth="880px" width={1}>
-          <StyledHr borderStyle="solid" borderColor="black.200" mb="16px" />
-          <Flex justifyContent="space-between" flexDirection={['column', 'row']} alignItems="center">
-            <Span>
-              <SignInFooterLink href="/privacypolicy">
-                <FormattedMessage defaultMessage="Read our privacy policy" />
-              </SignInFooterLink>
-            </Span>
-            <Span mt={['32px', 0]}>
-              <SignInFooterLink href="/contact">
-                <FormattedMessage defaultMessage="Contact support" />
-              </SignInFooterLink>
-            </Span>
-          </Flex>
-        </Container>
       </React.Fragment>
     );
   }

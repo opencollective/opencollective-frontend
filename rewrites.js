@@ -11,6 +11,10 @@ exports.REWRITES = [
     destination: '/fiscal-hosting',
   },
   {
+    source: '/welcome',
+    destination: '/welcome',
+  },
+  {
     source: '/:pageSlug(widgets|tos|privacypolicy|hiring)',
     destination: '/staticPage',
   },
@@ -97,6 +101,10 @@ exports.REWRITES = [
   {
     source: '/:form(create-account)',
     destination: '/signin',
+  },
+  {
+    source: '/:form(create-accountv2)',
+    destination: '/signinv2',
   },
   {
     source: '/:collectiveSlug/:verb(contribute|donate)/button',

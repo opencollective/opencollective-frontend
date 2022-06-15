@@ -25,6 +25,7 @@ const Page = ({
   collective,
   menuItemsV2,
   showFooter = true,
+  showProfileMenu = true,
 }) => {
   if (data.error) {
     return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
@@ -47,6 +48,7 @@ const Page = ({
         menuItems={menuItems}
         menuItemsV2={menuItemsV2}
         LoggedInUser={LoggedInUser}
+        showProfileMenu={showProfileMenu}
       />
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       {showFooter && <Footer />}
@@ -75,6 +77,7 @@ Page.propTypes = {
   menuItems: PropTypes.object,
   menuItemsV2: PropTypes.object,
   showFooter: PropTypes.bool,
+  showProfileMenu: PropTypes.bool,
 };
 
 Page.defaultProps = {

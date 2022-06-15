@@ -3,25 +3,29 @@ import { PropTypes } from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Field, Form, Formik } from 'formik';
-import { pick } from 'lodash';
+import { get, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 import { isEmail } from 'validator';
 
 import { signin } from '../lib/api';
+import { i18nGraphqlException } from '../lib/errors';
 import { getWebsiteUrl } from '../lib/utils';
 
-import CreateProfileFAQ from './faqs/CreateProfileFAQ';
+import Container from './Container';
 import CreateProfileV2 from './CreateProfileV2';
 import { Box, Flex } from './Grid';
-import I18nFormatters, { I18nSupportLink } from './I18nFormatters';
+import { I18nSupportLink } from './I18nFormatters';
+import Link from './Link';
 import Loading from './Loading';
 import SignInV2 from './SignInV2';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
+import StyledHr from './StyledHr';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
-import { H5, P } from './Text';
+import { H5, P, Span } from './Text';
 import { TOAST_TYPE, withToasts } from './ToastProvider';
 
 const messages = defineMessages({
@@ -34,6 +38,15 @@ const messages = defineMessages({
     defaultMessage: 'Please enter one of your alphanumeric recovery codes.',
   },
 });
+
+const SignInFooterLink = styled(Link)`
+  color: #323334;
+  font-size: 13px;
+  font-weight: 400;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
 
 /**
  * Shows a SignIn form by default, with the ability to switch to SignUp form. It
@@ -52,18 +65,14 @@ class SignInOrJoinFreeV2 extends React.Component {
     /** Whether user can signup from there */
     disableSignup: PropTypes.bool,
     /** Use this prop to use this as a controlled component */
-    form: PropTypes.oneOf(['signinv2', 'create-account']),
+    form: PropTypes.oneOf(['signinv2', 'create-accountv2']),
     /** Set the initial view for the component */
-    defaultForm: PropTypes.oneOf(['signinv2', 'create-account']),
+    defaultForm: PropTypes.oneOf(['signinv2', 'create-accountv2']),
     /** If provided, component will use links instead of buttons to make the switch */
     routes: PropTypes.shape({
       signin: PropTypes.string,
       join: PropTypes.string,
     }),
-    /** To customize which forms should be displayed */
-    createProfileTabs: PropTypes.arrayOf(PropTypes.oneOf(['personal', 'organization'])),
-    /** To replace the default labels */
-    createProfileLabels: PropTypes.shape({ personal: PropTypes.string, organization: PropTypes.string }),
     /** Label for signIn, defaults to "Continue with your email" */
     signInLabel: PropTypes.node,
     intl: PropTypes.object,
@@ -83,6 +92,7 @@ class SignInOrJoinFreeV2 extends React.Component {
       unknownEmailError: false,
       email: props.email || props.defaultEmail || '',
       useRecoveryCodes: null,
+      emailAlreadyExists: false,
     };
   }
 
@@ -103,7 +113,11 @@ class SignInOrJoinFreeV2 extends React.Component {
     if (window.location.search) {
       currentPath = currentPath + window.location.search;
     }
-    return encodeURIComponent(this.props.redirect || currentPath || '/');
+    let redirectUrl = this.props.redirect;
+    if (currentPath.includes('/create-accountv2') && redirectUrl === '/') {
+      redirectUrl = '/welcome';
+    }
+    return encodeURIComponent(redirectUrl || currentPath || '/');
   }
 
   signIn = async (email, createProfile) => {
@@ -170,11 +184,14 @@ class SignInOrJoinFreeV2 extends React.Component {
       await this.props.router.push({ pathname: '/signin/sent', query: { email: user.email } });
       window.scrollTo(0, 0);
     } catch (error) {
-      this.props.addToast({
-        type: TOAST_TYPE.ERROR,
-        message: error.message || 'Server error',
-      });
-      this.setState({ submitting: false });
+      const emailAlreadyExists = get(error, 'graphQLErrors.0.extensions.code') === 'EMAIL_ALREADY_EXISTS';
+      if (!emailAlreadyExists) {
+        this.props.addToast({
+          type: TOAST_TYPE.ERROR,
+          message: i18nGraphqlException(this.props.intl, error),
+        });
+      }
+      this.setState({ submitting: false, emailAlreadyExists });
     }
   };
 
@@ -324,11 +341,11 @@ class SignInOrJoinFreeV2 extends React.Component {
           this.renderTwoFactorAuthBoxes(useRecoveryCodes)
         ) : (
           <Fragment>
-            {displayedForm !== 'create-account' && !error ? (
+            {displayedForm !== 'create-accountv2' && !error ? (
               <SignInV2
                 email={email}
-                onEmailChange={email => this.setState({ email, unknownEmailError: false })}
-                onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
+                onEmailChange={email => this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })}
+                onSecondaryAction={routes.join || (() => this.switchForm('create-accountv2'))}
                 onSubmit={email => this.signIn(email, false)}
                 loading={submitting}
                 unknownEmail={unknownEmailError}
@@ -338,31 +355,42 @@ class SignInOrJoinFreeV2 extends React.Component {
             ) : (
               <Flex flexDirection="column" width={1} alignItems="center">
                 <Flex justifyContent="center" width={1}>
-                  <Box width={[0, null, null, 1 / 5]} />
-                  <Box maxWidth={480} mx={[2, 4]} width="100%">
+                  <Box maxWidth={535} mx={[2, 4]} width="100%">
                     <CreateProfileV2
                       email={email}
-                      onEmailChange={email => this.setState({ email, unknownEmailError: false })}
-                      onPersonalSubmit={this.createProfile}
-                      onOrgSubmit={this.createProfile}
-                      onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
+                      onEmailChange={email =>
+                        this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })
+                      }
+                      onSubmit={this.createProfile}
+                      onSecondaryAction={routes.signin || (() => this.switchForm('signinv2'))}
                       submitting={submitting}
-                      labels={this.props.createProfileLabels}
-                      tabs={this.props.createProfileTabs}
+                      emailAlreadyExists={this.state.emailAlreadyExists}
                     />
-                    <P mt={4} color="black.500" fontSize="12px" mb={3} data-cy="join-conditions" textAlign="center">
-                      <FormattedMessage
-                        id="SignIn.legal"
-                        defaultMessage="By joining, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
-                        values={I18nFormatters}
-                      />
-                    </P>
                   </Box>
-
-                  <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
                 </Flex>
               </Flex>
             )}
+            <Container
+              mt="128px"
+              pl={['20px', '20px', '144px']}
+              pr={['20px', '20px', '144px']}
+              maxWidth="880px"
+              width={1}
+            >
+              <StyledHr borderStyle="solid" borderColor="black.200" mb="16px" />
+              <Flex justifyContent="space-between" flexDirection={['column', 'row']} alignItems="center">
+                <Span>
+                  <SignInFooterLink href="/privacypolicy">
+                    <FormattedMessage defaultMessage="Read our privacy policy" />
+                  </SignInFooterLink>
+                </Span>
+                <Span mt={['32px', 0]}>
+                  <SignInFooterLink href="/contact">
+                    <FormattedMessage defaultMessage="Contact support" />
+                  </SignInFooterLink>
+                </Span>
+              </Flex>
+            </Container>
           </Fragment>
         )}
       </Flex>
