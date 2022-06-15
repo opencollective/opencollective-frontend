@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { compact, isEmpty, pick, values } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+
+import FormPersister from '../lib/form-persister';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -154,6 +156,7 @@ const useForm = ({ onEmailChange, errors }) => {
       }
     },
     state,
+    setState,
   };
 };
 
@@ -168,8 +171,33 @@ const CreateProfileV2 = ({
   ...props
 }) => {
   const { formatMessage } = useIntl();
-  const { getFieldError, getFieldProps, state } = useForm({ onEmailChange, errors, formatMessage });
+  const { getFieldError, getFieldProps, state, setState } = useForm({ onEmailChange, errors, formatMessage });
   const isValid = isEmpty(compact(values(state.errors)));
+  const [formPersister] = React.useState(new FormPersister());
+
+  // Load values from localstorage
+  useEffect(() => {
+    if (!email) {
+      return;
+    }
+
+    if (!state.name && !state.newsletterOptIn && !state.tosOptIn) {
+      const id = `create-account-${email}`;
+      formPersister.setFormId(id);
+    }
+
+    const formValues = formPersister.loadValues();
+    if (formValues && !state.name && !state.newsletterOptIn && !state.tosOptIn) {
+      setState({ name: formValues.name, newsletterOptIn: formValues.newsletterOptIn, tosOptIn: formValues.tosOptIn });
+    }
+  });
+
+  // Save values in localstorage
+  useEffect(() => {
+    if (state.name || state.newsletterOptIn || state.tosOptIn || !formPersister.loadValues()) {
+      formPersister.saveValues({ name: state.name, tosOptIn: state.tosOptIn, newsletterOptIn: state.newsletterOptIn });
+    }
+  }, [state.name, state.newsletterOptIn, state.tosOptIn]);
 
   return (
     <React.Fragment>
@@ -308,6 +336,7 @@ const CreateProfileV2 = ({
             disabled={!email || !state.name || !isValid || !state.tosOptIn}
             width="234px"
             type="submit"
+            onClick={() => formPersister.clearValues()}
             fontWeight="500"
             loading={submitting}
           >
