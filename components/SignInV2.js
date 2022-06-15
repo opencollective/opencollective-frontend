@@ -176,10 +176,10 @@ export default class SignInV2 extends React.Component {
               {this.props.showSecondaryAction && (
                 <Box>
                   <Flex color="black.800" mr={1} fontSize="14px" justifyContent="center">
-                    <FormattedMessage id="signin.noAccount" defaultMessage="Don't have an account?" />
+                    <FormattedMessage defaultMessage="Don't have one?" />
                   </Flex>
                   <Flex fontSize="14px" justifyContent="center" mt={2}>
-                    {this.renderSecondaryAction(<FormattedMessage defaultMessage="Sign Up" />)}
+                    {this.renderSecondaryAction(<FormattedMessage defaultMessage="Create an account" />)}
                   </Flex>
                 </Box>
               )}
@@ -195,12 +195,12 @@ export default class SignInV2 extends React.Component {
               fontWeight={400}
             >
               <FormattedMessage
-                defaultMessage="{email} is not registered yet on Open Collective. Would you like to register with this email?"
+                defaultMessage="{email} does not exist on Open Collective. Would you like to create an account with this email?"
                 values={{ email: <strong>{email}</strong> }}
               />{' '}
               <Box mt="24px">
                 <Span mr="40px">
-                  {this.renderSecondaryAction(<FormattedMessage defaultMessage="Yes, sign me up!" />, {
+                  {this.renderSecondaryAction(<FormattedMessage defaultMessage="Yes, create an account" />, {
                     underlineOnHover: true,
                   })}
                 </Span>
