@@ -1,4 +1,69 @@
 """
+An OAuth application or a personal token
+"""
+type Application {
+  id: String!
+  legacyId: Int!
+  type: ApplicationType
+    @deprecated(
+      reason: "2022-06-16: This Application object will only be used for OAuth tokens. Use PersonalToken for user tokens"
+    )
+  name: String
+  description: String
+  apiKey: String
+    @deprecated(
+      reason: "2022-06-16: This Application object will only be used for OAuth tokens. Use PersonalToken for user tokens"
+    )
+  clientId: String
+  clientSecret: String
+  redirectUri: URL
+  account: Account!
+  oAuthAuthorization: OAuthAuthorization
+}
+
+"""
+All application types
+"""
+enum ApplicationType {
+  API_KEY
+  OAUTH
+}
+
+"""
+A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
+"""
+scalar URL
+
+"""
+An OAuth authorization
+"""
+type OAuthAuthorization {
+  id: String
+  account: Individual!
+  application: Application!
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime!
+
+  """
+  The time of last update
+  """
+  updatedAt: DateTime!
+
+  """
+  The time of expiration
+  """
+  expiresAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
+
+"""
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
 """
 interface Account {
@@ -370,6 +435,21 @@ interface Account {
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -446,11 +526,6 @@ enum ImageFormat {
   gif
   svg
 }
-
-"""
-A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
-"""
-scalar DateTime
 
 """
 A collection of "Members" (ie: Organization backing a Collective)
@@ -1875,11 +1950,6 @@ type ExpenseAttachedFile {
 }
 
 """
-A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
-"""
-scalar URL
-
-"""
 Fields for an expense item
 """
 type ExpenseItem {
@@ -2095,6 +2165,7 @@ enum ActivityType {
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
   COLLECTIVE_VIRTUAL_CARD_ADDED
+  CONTRIBUTION_REJECTED
   ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
@@ -2110,6 +2181,7 @@ enum ActivityType {
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT
   DEACTIVATED_COLLECTIVE_AS_HOST
   VIRTUAL_CARD_REQUESTED
+  PAYMENT_FAILED
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -2646,6 +2718,21 @@ type Host implements Account & AccountWithContributions {
   The list of connected accounts (Stripe, Twitter, etc ...)
   """
   connectedAccounts: [ConnectedAccount]
+
+  """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
 
   """
   The address associated to this account. This field is always public for collectives and events.
@@ -3299,6 +3386,16 @@ enum ConnectedAccountService {
   privacy
   thegivingblock
   meetup @deprecated(reason: "Not using this service anymore")
+}
+
+"""
+A collection of "Application"
+"""
+type OAuthApplicationCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Application]
 }
 
 """
@@ -4523,6 +4620,21 @@ type Bot implements Account {
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -4954,6 +5066,21 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   The list of connected accounts (Stripe, Twitter, etc ...)
   """
   connectedAccounts: [ConnectedAccount]
+
+  """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
 
   """
   The address associated to this account. This field is always public for collectives and events.
@@ -5713,6 +5840,21 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -6253,6 +6395,21 @@ type Individual implements Account {
   """
   connectedAccounts: [ConnectedAccount]
 
+  """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
   "\n          Address. This field is public for hosts, otherwise:\n            - Users can see their own address\n            - Hosts can see the address of users submitting expenses to their collectives\n        "
   location: Location
   categories: [String]!
@@ -6332,55 +6489,6 @@ type OAuthAuthorizationCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [OAuthAuthorization]
-}
-
-"""
-An OAuth authorization
-"""
-type OAuthAuthorization {
-  id: String
-  account: Individual!
-  application: Application!
-
-  """
-  The time of creation
-  """
-  createdAt: DateTime!
-
-  """
-  The time of last update
-  """
-  updatedAt: DateTime!
-
-  """
-  The time of expiration
-  """
-  expiresAt: DateTime!
-}
-
-"""
-An OAuth application or a personal token
-"""
-type Application {
-  id: String!
-  legacyId: Int!
-  type: ApplicationType
-  name: String
-  description: String
-  apiKey: String
-  clientId: String
-  clientSecret: String
-  redirectUri: URL
-  account: Account!
-  oAuthAuthorization: OAuthAuthorization
-}
-
-"""
-All application types
-"""
-enum ApplicationType {
-  API_KEY
-  OAUTH
 }
 
 """
@@ -6819,6 +6927,21 @@ type Organization implements Account & AccountWithContributions {
   The list of connected accounts (Stripe, Twitter, etc ...)
   """
   connectedAccounts: [ConnectedAccount]
+
+  """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
 
   "\n          Address. This field is public for hosts, otherwise:\n            - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.\n            - Hosts can see the address of organizations submitting expenses to their collectives.\n        "
   location: Location
@@ -7372,6 +7495,21 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   The list of connected accounts (Stripe, Twitter, etc ...)
   """
   connectedAccounts: [ConnectedAccount]
+
+  """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
 
   """
   The address associated to this account. This field is always public for collectives and events.
@@ -9836,6 +9974,21 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -10367,6 +10520,21 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   The list of connected accounts (Stripe, Twitter, etc ...)
   """
   connectedAccounts: [ConnectedAccount]
+
+  """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
 
   """
   The address associated to this account. This field is always public for collectives and events.
@@ -11734,6 +11902,11 @@ input ApplicationCreateInput {
   name: String
   description: String
   redirectUri: URL
+
+  """
+  The account to use as the owner of the application. Defaults to currently logged in user.
+  """
+  account: AccountReferenceInput
 }
 
 """
