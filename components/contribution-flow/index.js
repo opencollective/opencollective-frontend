@@ -116,6 +116,7 @@ class ContributionFlow extends React.Component {
     platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
     hideHeader: PropTypes.bool,
+    hideFAQ: PropTypes.bool,
     loadingLoggedInUser: PropTypes.bool,
     hideCreditCardPostalCode: PropTypes.bool,
     isEmbed: PropTypes.bool,
@@ -498,6 +499,7 @@ class ContributionFlow extends React.Component {
         'defaultEmail',
         'defaultName',
         'useTheme',
+        'hideFAQ',
         'hideHeader',
         'hideCreditCardPostalCode',
       ]),
@@ -893,23 +895,24 @@ class ContributionFlow extends React.Component {
                     </Box>
                   )}
                 </Box>
-
-                <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
-                  <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
-                    <SafeTransactionMessage />
-                    <Box mt={4}>
-                      <ContributionSummary
-                        collective={collective}
-                        stepDetails={stepDetails}
-                        stepSummary={stepSummary}
-                        stepPayment={stepPayment}
-                        currency={currency}
-                        isCrypto={isCrypto}
-                      />
+                {!this.props.hideFAQ && (
+                  <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
+                    <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
+                      <SafeTransactionMessage />
+                      <Box mt={4}>
+                        <ContributionSummary
+                          collective={collective}
+                          stepDetails={stepDetails}
+                          stepSummary={stepSummary}
+                          stepPayment={stepPayment}
+                          currency={currency}
+                          isCrypto={isCrypto}
+                        />
+                      </Box>
+                      <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} isCrypto={isCrypto} />
                     </Box>
-                    <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} isCrypto={isCrypto} />
                   </Box>
-                </Box>
+                )}
               </Grid>
             )}
           </Container>

@@ -80,6 +80,7 @@ class NewContributionFlowPage extends React.Component {
       defaultEmail: query.defaultEmail && isEmail(query.defaultEmail) ? query.defaultEmail : null,
       defaultName: query.defaultName,
       useTheme: query.useTheme ? parseToBoolean(query.useTheme) : false,
+      hideFAQ: query.hideFAQ ? parseToBoolean(query.hideFAQ) : false,
       hideHeader: query.hideHeader ? parseToBoolean(query.hideHeader) : false,
       backgroundColor: backgroundColor && isHexColor(backgroundColor) ? backgroundColor : undefined,
       error: query.error,
@@ -119,6 +120,7 @@ class NewContributionFlowPage extends React.Component {
     loadingLoggedInUser: PropTypes.bool,
     useTheme: PropTypes.bool,
     hideHeader: PropTypes.bool,
+    hideFAQ: PropTypes.bool,
     tags: PropTypes.arrayOf(PropTypes.string),
     step: PropTypes.oneOf(Object.values(STEPS)),
     router: PropTypes.object,
@@ -186,6 +188,7 @@ class NewContributionFlowPage extends React.Component {
             isEmbed
             useTheme={this.props.useTheme}
             hideHeader={this.props.hideHeader}
+            hideFAQ={this.props.hideFAQ}
             collective={account}
             host={account.host}
             tier={tier}
