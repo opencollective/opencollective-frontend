@@ -1,7 +1,7 @@
-// eslint-disable-next-line node/no-unpublished-import
-import { defineConfig } from 'cypress';
+// eslint-disable-next-line node/no-unpublished-require
+const { defineConfig } = require('cypress');
 
-export default defineConfig({
+module.exports = defineConfig({
   viewportWidth: 1200,
   viewportHeight: 1660,
   projectId: 'yt5kwm',
@@ -10,12 +10,7 @@ export default defineConfig({
   video: false,
   chromeWebSecurity: false,
   scrollBehavior: 'center',
-  blockHosts: [
-    'wtfismyip.com',
-    'images.opencollective.com',
-    'images-staging.opencollective.com',
-    'localhost:3001',
-  ],
+  blockHosts: ['wtfismyip.com', 'images.opencollective.com', 'images-staging.opencollective.com', 'localhost:3001'],
   env: {
     MAILDEV_URL: 'http://localhost:1080',
     codeCoverage: {
@@ -30,7 +25,7 @@ export default defineConfig({
       // eslint-disable-next-line node/no-unpublished-require
       require('@cypress/code-coverage/task')(on, config);
 
-      on('before:browser:launch', (browser: { name: string }, launchOptions) => {
+      on('before:browser:launch', (browser, launchOptions) => {
         if (browser.name === 'chrome') {
           launchOptions.args.push('--lang=en-US');
         }
@@ -45,4 +40,4 @@ export default defineConfig({
     supportFile: 'test/cypress/support/index.js',
     baseUrl: 'http://localhost:3000',
   },
-})
+});
