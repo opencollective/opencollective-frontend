@@ -373,9 +373,13 @@ class SignInOrJoinFree extends React.Component {
                   <Box maxWidth={535} mx={[2, 4]} width="100%">
                     <CreateProfile
                       email={email}
+                      name={this.state.name}
+                      newsletterOptIn={this.state.newsletterOptIn}
+                      tosOptIn={this.state.tosOptIn}
                       onEmailChange={email =>
                         this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })
                       }
+                      onFieldChange={(name, value) => this.setState({ [name]: value })}
                       onSubmit={this.createProfile}
                       onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
                       submitting={submitting}
