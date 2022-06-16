@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Box, Flex } from './Grid';
+import Link from './Link';
 import SearchForm from './SearchForm';
 import StyledLink from './StyledLink';
 import StyledModal, { CloseIcon, ModalBody } from './StyledModal';
@@ -23,6 +24,7 @@ const SearchModal = ({ onClose }) => {
       height="128px"
       onClose={onClose}
       overflow="hidden"
+      className="searchModal"
     >
       <ModalBody>
         <Flex height="48px" alignItems="center" flexDirection="column">
@@ -41,7 +43,7 @@ const SearchModal = ({ onClose }) => {
             </Span>
           </Flex>
           <Box pt="16px" fontSize="13px">
-            <StyledLink href="/search">
+            <StyledLink as={Link} href="/search">
               <FormattedMessage id="home.discoverCollectives" defaultMessage="Discover Collectives" />
             </StyledLink>
           </Box>
