@@ -9,6 +9,7 @@ import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
 import StyledLink from './StyledLink';
+import StyledLinkButton from './StyledLinkButton';
 import { Span } from './Text';
 
 /**
@@ -59,15 +60,14 @@ export default class SignIn extends React.Component {
         {message}
       </StyledLink>
     ) : (
-      <StyledButton
-        asLink
+      <StyledLinkButton
         fontSize="14px"
         onClick={onSecondaryAction}
         disabled={loading}
         data-cy="signin-secondary-action-btn"
       >
         {message}
-      </StyledButton>
+      </StyledLinkButton>
     );
   }
 

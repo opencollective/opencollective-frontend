@@ -14,7 +14,6 @@ import StyledCheckbox from './StyledCheckbox';
 import StyledHr from './StyledHr';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
-import StyledLink from './StyledLink';
 import { P, Span } from './Text';
 
 const messages = defineMessages({
@@ -66,11 +65,19 @@ Tab.propTypes = {
 
 const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
   return typeof onSecondaryAction === 'string' ? (
-    <StyledLink as={Link} href={onSecondaryAction} disabled={loading} fontSize="14px">
+    <StyledButton
+      as={Link}
+      mt="24px"
+      mr="16px"
+      width="120px"
+      href={onSecondaryAction}
+      disabled={loading}
+      fontSize="14px"
+    >
       {children}
-    </StyledLink>
+    </StyledButton>
   ) : (
-    <StyledButton asLink fontSize="14px" onClick={onSecondaryAction} disabled={loading}>
+    <StyledButton mt="24px" mr="16px" width="120px" fontSize="14px" onClick={onSecondaryAction} disabled={loading}>
       {children}
     </StyledButton>
   );
@@ -295,12 +302,12 @@ const CreateProfile = ({
         )}
         <Flex justifyContent="center">
           <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
-            <StyledButton mt="24px" mr="16px" width="120px">
+            <Span>
               &larr;{` `}
               <Span fontWeight="500" fontSize="14px">
                 <FormattedMessage defaultMessage="Go back" />
               </Span>
-            </StyledButton>
+            </Span>
           </SecondaryAction>
           <StyledButton
             mt="24px"
