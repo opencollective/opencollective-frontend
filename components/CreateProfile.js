@@ -17,12 +17,6 @@ import StyledInputField from './StyledInputField';
 import { P, Span } from './Text';
 
 const messages = defineMessages({
-  heading: {
-    defaultMessage: 'Create your personal account',
-  },
-  subHeading: {
-    defaultMessage: 'Set up your personal details to continue',
-  },
   newsletter: {
     id: 'newsletter.label',
     defaultMessage: 'Receive our monthly newsletter',
@@ -172,6 +166,9 @@ const CreateProfile = ({
   onSubmit,
   onSecondaryAction,
   emailAlreadyExists,
+  isOauth,
+  oAuthAppName,
+  oAuthAppImage,
   ...props
 }) => {
   const { formatMessage } = useIntl();
@@ -181,14 +178,44 @@ const CreateProfile = ({
   return (
     <React.Fragment>
       <Container textAlign="center">
-        <Box>
-          <Image src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective logo" height={96} width={96} />
-        </Box>
+        {isOauth ? (
+          <React.Fragment>
+            <Box pb={40}>
+              <Image
+                src="/static/images/oc-logo-icon-newhomepage.svg"
+                alt="Open Collective logo"
+                height={56}
+                width={56}
+              />
+            </Box>
+            <Box>
+              <img
+                src={oAuthAppImage}
+                alt="Open Collective logo"
+                height={104}
+                width={104}
+                style={{ borderRadius: 10 }}
+              />
+            </Box>
+          </React.Fragment>
+        ) : (
+          <Box>
+            <Image src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective logo" height={96} width={96} />
+          </Box>
+        )}
         <Box pt="48px" fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
-          {formatMessage(messages.heading)}
+          {isOauth ? (
+            <FormattedMessage defaultMessage="Create an account in Open Collective" />
+          ) : (
+            <FormattedMessage defaultMessage="Create your personal account" />
+          )}
         </Box>
         <Box fontSize="16px" fontWeight="500" color="black.700" lineHeight="24px" pt="14px">
-          {formatMessage(messages.subHeading)}
+          {isOauth ? (
+            <FormattedMessage defaultMessage="and connect with {oAuthAppName}" values={{ oAuthAppName }} />
+          ) : (
+            <FormattedMessage defaultMessage="Set up your personal details to continue" />
+          )}
         </Box>
       </Container>
       <Box
@@ -341,6 +368,13 @@ CreateProfile.propTypes = {
   emailAlreadyExists: PropTypes.bool,
   /** All props from `StyledCard` */
   ...StyledCard.propTypes,
+  /** Oauth Sign In **/
+  isOauth: PropTypes.bool,
+  /** Oauth App Name **/
+  oAuthAppName: PropTypes.string,
+  /** Oauth App Image URL **/
+  oAuthAppImage: PropTypes.string,
+  data: PropTypes.object,
 };
 
 CreateProfile.defaultProps = {

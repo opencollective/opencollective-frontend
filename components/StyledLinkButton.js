@@ -16,6 +16,7 @@ const StyledLinkButton = styled.button`
 
   :hover {
     color: ${props => props.hoverColor};
+    text-decoration: underline;
   }
 
   ${variant({

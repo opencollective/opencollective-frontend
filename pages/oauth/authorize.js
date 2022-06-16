@@ -19,8 +19,6 @@ const applicationQuery = gqlV2`
     application(clientId: $clientId) {
       id
       name
-      clientId
-      redirectUri
       account {
         id
         name
@@ -47,7 +45,7 @@ const OAuthAuthorizePage = () => {
   const { query } = useRouter();
   const { loadingLoggedInUser, LoggedInUser } = useUser();
   const missingParams = REQUIRED_URL_PARAMS.filter(key => !query[key]);
-  const skipQuery = !LoggedInUser || loadingLoggedInUser || missingParams.length;
+  const skipQuery = missingParams.length;
   const queryVariables = { clientId: query['client_id'] };
   const queryParams = { skip: skipQuery, variables: queryVariables, context: API_V2_CONTEXT };
   const { data, error, loading: isLoadingAuthorization } = useQuery(applicationQuery, queryParams);
@@ -59,7 +57,12 @@ const OAuthAuthorizePage = () => {
         {isLoading ? (
           <Loading />
         ) : !LoggedInUser ? (
-          <SignInOrJoinFree />
+          <SignInOrJoinFree
+            isOauth
+            oAuthAppName={data?.application?.name}
+            oAuthAppImage={data?.application?.account?.imageUrl}
+            clientId={query['client_id']}
+          />
         ) : missingParams.length ? (
           <MessageBox withIcon type="error">
             <FormattedMessage
