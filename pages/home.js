@@ -13,8 +13,6 @@ import WeAreOpenSection from '../components/home/sections/WeAreOpen';
 import WhatCanYouDoSection from '../components/home/sections/WhatCanYouDo';
 import Page from '../components/Page';
 
-const menuItems = { pricing: true, howItWorks: true };
-
 const messages = defineMessages({
   defaultTitle: {
     id: 'OC.tagline',
@@ -25,7 +23,7 @@ const messages = defineMessages({
 const HomePage = () => {
   const { formatMessage } = useIntl();
   return (
-    <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
+    <Page description={formatMessage(messages.defaultTitle)}>
       <Banner />
       <MakeCommunitySection />
       <WhatCanYouDoSection />

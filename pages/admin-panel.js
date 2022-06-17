@@ -9,9 +9,9 @@ import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import { AdminPanelContext } from '../components/admin-panel/AdminPanelContext';
 import AdminPanelSection from '../components/admin-panel/AdminPanelSection';
+import AdminPanelTopBar from '../components/admin-panel/AdminPanelTopBar';
 import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/admin-panel/constants';
 import AdminPanelSideBar from '../components/admin-panel/SideBar';
-import AdminPanelTopBar from '../components/admin-panel/TopBar';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import { Flex, Grid } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
