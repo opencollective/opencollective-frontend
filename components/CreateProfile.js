@@ -63,7 +63,7 @@ Tab.propTypes = {
   'data-cy': PropTypes.string,
 };
 
-const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
+const SecondaryAction = ({ children, loading, onSecondaryAction, style }) => {
   return typeof onSecondaryAction === 'string' ? (
     <StyledButton
       as={Link}
@@ -73,11 +73,20 @@ const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
       href={onSecondaryAction}
       disabled={loading}
       fontSize="14px"
+      {...style}
     >
       {children}
     </StyledButton>
   ) : (
-    <StyledButton mt="24px" mr="16px" width="120px" fontSize="14px" onClick={onSecondaryAction} disabled={loading}>
+    <StyledButton
+      mt="24px"
+      mr="16px"
+      width="120px"
+      fontSize="14px"
+      onClick={onSecondaryAction}
+      disabled={loading}
+      {...style}
+    >
       {children}
     </StyledButton>
   );
@@ -87,6 +96,7 @@ SecondaryAction.propTypes = {
   children: PropTypes.node,
   loading: PropTypes.bool,
   onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+  style: PropTypes.object,
 };
 
 const NewsletterCheckBox = ({ onChange, checked }) => {
@@ -293,7 +303,11 @@ const CreateProfile = ({
                 values={{ email: <strong>{email}</strong> }}
               />
               <Box mt="8px">
-                <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
+                <SecondaryAction
+                  onSecondaryAction={onSecondaryAction}
+                  loading={submitting}
+                  style={{ background: 'none', border: 0, padding: 0 }}
+                >
                   <FormattedMessage defaultMessage="Sign me in" />
                 </SecondaryAction>
               </Box>
