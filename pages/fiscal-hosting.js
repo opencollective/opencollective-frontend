@@ -11,6 +11,8 @@ import WhoIsFiscalHosting from '../components/fiscal-hosting/WhoIsFiscalHostingF
 import JoinUs from '../components/home/sections/JoinUs';
 import Page from '../components/Page';
 
+const menuItems = { pricing: true, howItWorks: true };
+
 const messages = defineMessages({
   defaultTitle: {
     id: 'OC.tagline',
@@ -21,7 +23,7 @@ const messages = defineMessages({
 const FiscalHosting = () => {
   const { formatMessage } = useIntl();
   return (
-    <Page description={formatMessage(messages.defaultTitle)}>
+    <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
       <APlaceToGrowAndThrive />
       <WhatIsFiscalHost />
       <WhatAreTheBenefits />
