@@ -61,7 +61,6 @@ const OAuthAuthorizePage = () => {
             isOauth
             oAuthAppName={data?.application?.name}
             oAuthAppImage={data?.application?.account?.imageUrl}
-            clientId={query['client_id']}
           />
         ) : missingParams.length ? (
           <MessageBox withIcon type="error">
