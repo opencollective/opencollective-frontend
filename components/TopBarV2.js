@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown, ChevronUp } from '@styled-icons/boxicons-regular';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
-import NProgress from 'nprogress';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -70,14 +69,6 @@ const TopBarV2 = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
-
-  useEffect(() => {
-    if (showSearchModal) {
-      NProgress.configure({ parent: '.searchModal' });
-    } else {
-      NProgress.configure({ parent: 'body' });
-    }
-  }, [showSearchModal]);
 
   const toggleMobileMenu = () => {
     setShowMobileMenu(!showMobileMenu);
