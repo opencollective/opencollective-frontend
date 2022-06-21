@@ -126,11 +126,7 @@ export default class SignInV2 extends React.Component {
                   minWidth={120}
                   onChange={({ target }) => {
                     onEmailChange(target.value);
-                    // Feel free to remove the setTimeout when that issue is fixed
-                    // https://bugzilla.mozilla.org/show_bug.cgi?id=1524212
-                    setTimeout(() => {
-                      this.setState({ error: target.validationMessage, showError: false });
-                    }, 0);
+                    this.setState({ error: target.validationMessage, showError: false });
                   }}
                   onKeyDown={e => {
                     // See https://github.com/facebook/react/issues/6368
