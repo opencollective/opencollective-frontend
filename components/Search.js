@@ -6,6 +6,7 @@ import { Box, Flex } from './Grid';
 import Link from './Link';
 import SearchForm from './SearchForm';
 import StyledLink from './StyledLink';
+import StyledLinkButton from './StyledLinkButton';
 import StyledModal, { CloseIcon, ModalBody } from './StyledModal';
 import { Span } from './Text';
 
@@ -39,7 +40,9 @@ const SearchModal = ({ onClose }) => {
               searchButtonStyles={{ width: '32px', height: '32px' }}
             />
             <Span mt="12px" ml={['10px', '25px']}>
-              <CloseIcon onClick={onClose} style={{ width: '14px', height: '14px' }} />
+              <StyledLinkButton onClick={onClose}>
+                <CloseIcon style={{ width: '14px', height: '14px' }} />
+              </StyledLinkButton>
             </Span>
           </Flex>
           <Box pt="16px" fontSize="13px">
