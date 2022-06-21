@@ -8,6 +8,8 @@ import { Box, Flex } from './Grid';
 import SearchIcon from './SearchIcon';
 import StyledInput from './StyledInput';
 import StyledRoundButton from './StyledRoundButton';
+import StyledSpinner from './StyledSpinner';
+import { Span } from './Text';
 
 const SearchInputContainer = styled(Flex)`
   border: solid 1px var(--silver-four);
@@ -40,9 +42,15 @@ const SearchButton = styled(Flex)`
 `;
 
 class SearchForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { isLoading: false };
+  }
+
   handleSubmit = event => {
     event.preventDefault();
     const searchInput = event.target.elements.q;
+    this.setState({ isLoading: true });
     this.props.router.push({ pathname: '/search', query: { q: searchInput.value } });
   };
 
@@ -94,7 +102,7 @@ class SearchForm extends React.Component {
               isBorderless
               mr="20px"
             >
-              →
+              {this.state.isLoading ? <StyledSpinner size="20px" /> : <Span>→</Span>}
             </StyledRoundButton>
           )}
         </SearchInputContainer>
