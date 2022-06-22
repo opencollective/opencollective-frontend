@@ -115,8 +115,8 @@ TOSCheckBox.propTypes = {
   checked: PropTypes.bool,
 };
 
-const useForm = ({ onEmailChange, errors }) => {
-  const [state, setState] = useState({ errors, newsletterOptIn: false, tosOptIn: false });
+const useForm = ({ onEmailChange, onFieldChange, name, newsletterOptIn, tosOptIn, errors }) => {
+  const [state, setState] = useState({ errors, name, newsletterOptIn, tosOptIn });
 
   return {
     getFieldProps: name => ({
@@ -131,6 +131,8 @@ const useForm = ({ onEmailChange, errors }) => {
         if (target.name === 'email') {
           value = undefined;
           onEmailChange(target.value);
+        } else {
+          onFieldChange(target.name, value);
         }
         setState({
           ...state,
@@ -158,16 +160,28 @@ const useForm = ({ onEmailChange, errors }) => {
 
 const CreateProfileV2 = ({
   email,
+  name,
+  newsletterOptIn,
+  tosOptIn,
   submitting,
   errors,
   onEmailChange,
+  onFieldChange,
   onSubmit,
   onSecondaryAction,
   emailAlreadyExists,
   ...props
 }) => {
   const { formatMessage } = useIntl();
-  const { getFieldError, getFieldProps, state } = useForm({ onEmailChange, errors, formatMessage });
+  const { getFieldError, getFieldProps, state } = useForm({
+    onEmailChange,
+    onFieldChange,
+    name,
+    newsletterOptIn,
+    tosOptIn,
+    errors,
+    formatMessage,
+  });
   const isValid = isEmpty(compact(values(state.errors)));
 
   return (
@@ -218,7 +232,12 @@ const CreateProfileV2 = ({
                 required
               >
                 {inputProps => (
-                  <StyledInput {...inputProps} {...getFieldProps(inputProps.name)} placeholder="e.g., John Doe" />
+                  <StyledInput
+                    {...inputProps}
+                    {...getFieldProps(inputProps.name)}
+                    value={name}
+                    placeholder="e.g., John Doe"
+                  />
                 )}
               </StyledInputField>
             </Box>
@@ -327,8 +346,16 @@ CreateProfileV2.propTypes = {
   submitting: PropTypes.bool,
   /** Set the value of email input */
   email: PropTypes.string.isRequired,
+  /** Set the value of name input */
+  name: PropTypes.string.isRequired,
+  /** Set the value of newsLetterOptIn input */
+  newsletterOptIn: PropTypes.bool.isRequired,
+  /** Set the value of tosOptIn input */
+  tosOptIn: PropTypes.bool.isRequired,
   /** handles changes in the email input */
   onEmailChange: PropTypes.func.isRequired,
+  /** handles changes in input fields */
+  onFieldChange: PropTypes.func.isRequired,
   /** specifies whether the email is already registered **/
   emailAlreadyExists: PropTypes.bool,
   /** All props from `StyledCard` */
