@@ -49,15 +49,26 @@ class SearchForm extends React.Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    const searchInput = event.target.elements.q;
-    this.setState({ isLoading: true });
-    this.props.router.push({ pathname: '/search', query: { q: searchInput.value } });
+    /*
+     * Here we set the loading state for a few seconds to show
+     * the loading spinner in place of the search button within the search bar.
+     */
+    this.setState({ isLoading: true }, () => {
+      setTimeout(() => {
+        this.setState({ isLoading: false });
+      }, 3000);
+    });
+    if (this.props.onSubmit) {
+      this.props.onSubmit(event);
+    } else {
+      const searchInput = event.target.elements.q;
+      this.props.router.push({ pathname: '/search', query: { q: searchInput.value } });
+    }
   };
 
   render() {
     const {
       fontSize,
-      onSubmit = this.handleSubmit,
       placeholder = 'Search...',
       width = 1,
       autoFocus,
@@ -69,7 +80,7 @@ class SearchForm extends React.Component {
       disabled,
     } = this.props;
     return (
-      <form action="/search" method="GET" onSubmit={onSubmit}>
+      <form action="/search" method="GET" onSubmit={this.handleSubmit}>
         <SearchInputContainer
           borderRadius={borderRadius}
           height={height}
