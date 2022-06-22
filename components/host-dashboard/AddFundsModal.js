@@ -331,7 +331,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
         initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective })}
         enableReinitialize={true}
         validate={validate}
-        onSubmit={async values => {
+        onSubmit={async (values, formik) => {
           if (!fundDetails.showPlatformTipModal) {
             const result = await submitAddFunds({
               variables: {
@@ -351,6 +351,17 @@ const AddFundsModal = ({ host, collective, ...props }) => {
               description: resultOrder.description,
               source: resultOrder.fromAccount,
               tier: resultOrder.tier,
+            });
+            /*
+             * Since `enableReinitialize` is used in this form, during the second step (platform tip step)
+             * the form values will be reset. The validate function in this form
+             * requires `amount`, `fromAccount` and `description` so we should
+             * set them as otherwise the form will not be submittable.
+             */
+            formik.setValues({
+              amount: values.amount,
+              fromAccount: resultOrder.fromAccount,
+              description: resultOrder.description,
             });
           } else if (selectedOption.value !== 0) {
             const creditTransaction = addFundsResponse.addFunds.transactions.filter(

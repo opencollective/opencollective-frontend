@@ -300,7 +300,8 @@ class SearchPage extends React.Component {
     return (
       <Page title="Search" showSearch={false}>
         <Container
-          backgroundImage="url(/static/images/search-background.png)"
+          backgroundImage="url(/static/images/home/fiscalhost-blue-bg-lg.png)"
+          style={{ transform: 'rotate(180deg)' }}
           backgroundPosition="center top"
           backgroundSize="cover"
           backgroundRepeat="no-repeat"
@@ -312,7 +313,7 @@ class SearchPage extends React.Component {
           justifyContent="center"
           textAlign="center"
         >
-          <Flex justifyContent="center" flex="1 1 1" width={['288px', 1]}>
+          <Flex justifyContent="center" flex="1 1 1" width={['288px', 1]} style={{ transform: 'rotate(180deg)' }}>
             <SearchFormContainer mb={['20px', '48px']}>
               <SearchForm
                 borderRadius="100px"
