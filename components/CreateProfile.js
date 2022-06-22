@@ -14,6 +14,7 @@ import StyledCheckbox from './StyledCheckbox';
 import StyledHr from './StyledHr';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
+import StyledLinkButton from './StyledLinkButton';
 import { P, Span } from './Text';
 
 const messages = defineMessages({
@@ -24,8 +25,7 @@ const messages = defineMessages({
     defaultMessage: 'Set up your personal details to continue',
   },
   newsletter: {
-    id: 'newsletter.label',
-    defaultMessage: 'Receive our monthly newsletter',
+    defaultMessage: 'Subscribe to our monthly newsletter',
   },
   nameLabel: {
     defaultMessage: 'Your name',
@@ -63,9 +63,11 @@ Tab.propTypes = {
   'data-cy': PropTypes.string,
 };
 
-const SecondaryAction = ({ children, loading, onSecondaryAction, style }) => {
+const SecondaryAction = ({ children, loading, onSecondaryAction, asLink, style }) => {
+  const Button = asLink ? StyledLinkButton : StyledButton;
+
   return typeof onSecondaryAction === 'string' ? (
-    <StyledButton
+    <Button
       as={Link}
       mt="24px"
       mr="16px"
@@ -73,22 +75,22 @@ const SecondaryAction = ({ children, loading, onSecondaryAction, style }) => {
       href={onSecondaryAction}
       disabled={loading}
       fontSize="14px"
-      {...style}
+      style={style}
     >
       {children}
-    </StyledButton>
+    </Button>
   ) : (
-    <StyledButton
+    <Button
       mt="24px"
       mr="16px"
       width="120px"
       fontSize="14px"
       onClick={onSecondaryAction}
       disabled={loading}
-      {...style}
+      style={style}
     >
       {children}
-    </StyledButton>
+    </Button>
   );
 };
 
@@ -97,6 +99,7 @@ SecondaryAction.propTypes = {
   loading: PropTypes.bool,
   onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
   style: PropTypes.object,
+  asLink: PropTypes.bool,
 };
 
 const NewsletterCheckBox = ({ onChange, checked }) => {
@@ -271,10 +274,10 @@ const CreateProfile = ({
             <StyledHr height="2px" borderColor="black.200" flex="1" />
 
             <Box mt="17px">
-              <NewsletterCheckBox checked={state.newsletterOptIn} {...getFieldProps('newsletterOptIn')} />
+              <TOSCheckBox checked={state.tosOptIn} {...getFieldProps('tosOptIn')} />
             </Box>
             <Box mt="17px">
-              <TOSCheckBox checked={state.tosOptIn} {...getFieldProps('tosOptIn')} />
+              <NewsletterCheckBox checked={state.newsletterOptIn} {...getFieldProps('newsletterOptIn')} />
             </Box>
           </Box>
         </StyledCard>
@@ -306,7 +309,8 @@ const CreateProfile = ({
                 <SecondaryAction
                   onSecondaryAction={onSecondaryAction}
                   loading={submitting}
-                  style={{ background: 'none', border: 0, padding: 0 }}
+                  asLink
+                  style={{ textDecoration: 'underline' }}
                 >
                   <FormattedMessage defaultMessage="Sign me in" />
                 </SecondaryAction>

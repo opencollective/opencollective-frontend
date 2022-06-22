@@ -1148,7 +1148,7 @@ type PlanType {
   transferwisePayouts: Int
   transferwisePayoutsLimit: Int
   hostFees: Boolean
-  hostFeeSharePercent: Int
+  hostFeeSharePercent: Float
   platformTips: Boolean
 }
 

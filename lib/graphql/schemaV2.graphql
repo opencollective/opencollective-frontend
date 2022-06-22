@@ -1,4 +1,63 @@
 """
+An OAuth application or a personal token
+"""
+type Application {
+  id: String!
+  legacyId: Int!
+  type: ApplicationType
+  name: String
+  description: String
+  apiKey: String
+  clientId: String
+  clientSecret: String
+  redirectUri: URL
+  account: Account!
+  oAuthAuthorization: OAuthAuthorization
+}
+
+"""
+All application types
+"""
+enum ApplicationType {
+  API_KEY
+  OAUTH
+}
+
+"""
+A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
+"""
+scalar URL
+
+"""
+An OAuth authorization
+"""
+type OAuthAuthorization {
+  id: String
+  account: Individual!
+  application: Application!
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime!
+
+  """
+  The time of last update
+  """
+  updatedAt: DateTime!
+
+  """
+  The time of expiration
+  """
+  expiresAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
+
+"""
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
 """
 interface Account {
@@ -446,11 +505,6 @@ enum ImageFormat {
   gif
   svg
 }
-
-"""
-A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
-"""
-scalar DateTime
 
 """
 A collection of "Members" (ie: Organization backing a Collective)
@@ -1875,11 +1929,6 @@ type ExpenseAttachedFile {
 }
 
 """
-A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
-"""
-scalar URL
-
-"""
 Fields for an expense item
 """
 type ExpenseItem {
@@ -2095,6 +2144,7 @@ enum ActivityType {
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
   COLLECTIVE_VIRTUAL_CARD_ADDED
+  CONTRIBUTION_REJECTED
   ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
@@ -2110,6 +2160,7 @@ enum ActivityType {
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT
   DEACTIVATED_COLLECTIVE_AS_HOST
   VIRTUAL_CARD_REQUESTED
+  PAYMENT_FAILED
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -3671,7 +3722,7 @@ type HostPlan {
   """
   Charge on revenues made through Host Fees.
   """
-  hostFeeSharePercent: Int
+  hostFeeSharePercent: Float
 
   """
   Ability to collect Platform Tips.
@@ -3731,7 +3782,7 @@ type HostMetrics {
   """
   Host fee sharing percent
   """
-  hostFeeSharePercent: Int
+  hostFeeSharePercent: Float
 }
 
 """
@@ -6332,55 +6383,6 @@ type OAuthAuthorizationCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [OAuthAuthorization]
-}
-
-"""
-An OAuth authorization
-"""
-type OAuthAuthorization {
-  id: String
-  account: Individual!
-  application: Application!
-
-  """
-  The time of creation
-  """
-  createdAt: DateTime!
-
-  """
-  The time of last update
-  """
-  updatedAt: DateTime!
-
-  """
-  The time of expiration
-  """
-  expiresAt: DateTime!
-}
-
-"""
-An OAuth application or a personal token
-"""
-type Application {
-  id: String!
-  legacyId: Int!
-  type: ApplicationType
-  name: String
-  description: String
-  apiKey: String
-  clientId: String
-  clientSecret: String
-  redirectUri: URL
-  account: Account!
-  oAuthAuthorization: OAuthAuthorization
-}
-
-"""
-All application types
-"""
-enum ApplicationType {
-  API_KEY
-  OAUTH
 }
 
 """
