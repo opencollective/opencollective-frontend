@@ -25,8 +25,7 @@ const messages = defineMessages({
     defaultMessage: 'Set up your personal details to continue',
   },
   newsletter: {
-    id: 'newsletter.label',
-    defaultMessage: 'Receive our monthly newsletter',
+    defaultMessage: 'Subscribe to our monthly newsletter',
   },
   nameLabel: {
     defaultMessage: 'Your name',
@@ -273,10 +272,10 @@ const CreateProfileV2 = ({
             <StyledHr height="2px" borderColor="black.200" flex="1" />
 
             <Box mt="17px">
-              <NewsletterCheckBox checked={state.newsletterOptIn} {...getFieldProps('newsletterOptIn')} />
+              <TOSCheckBox checked={state.tosOptIn} {...getFieldProps('tosOptIn')} />
             </Box>
             <Box mt="17px">
-              <TOSCheckBox checked={state.tosOptIn} {...getFieldProps('tosOptIn')} />
+              <NewsletterCheckBox checked={state.newsletterOptIn} {...getFieldProps('newsletterOptIn')} />
             </Box>
           </Box>
         </StyledCard>

@@ -633,11 +633,7 @@ class ExpensePage extends React.Component {
                             name="newsletterOptIn"
                             label={
                               <span>
-                                <FormattedMessage
-                                  id="newsletter.label"
-                                  defaultMessage="Receive our monthly newsletter"
-                                />
-                                .
+                                <FormattedMessage defaultMessage="Subscribe to our monthly newsletter" />.
                               </span>
                             }
                             required
