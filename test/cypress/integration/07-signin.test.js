@@ -95,7 +95,7 @@ describe('signin', () => {
     cy.visit('/signin');
 
     // Go to CreateProfile
-    cy.contains('a', 'Sign Up').click();
+    cy.contains('a', 'Create an account').click();
 
     // Test frontend validations
     cy.get('input[name=name]').type('Dummy Name');
@@ -122,7 +122,7 @@ describe('signin', () => {
     cy.visit('/signin');
 
     // Go to CreateProfile
-    cy.contains('a', 'Sign Up').click();
+    cy.contains('a', 'Create an account').click();
 
     cy.get('input[name=name]').type('John');
 
@@ -144,7 +144,7 @@ describe('signin', () => {
     cy.visit('/signin?next=how-it-works');
 
     // Go to CreateProfile
-    cy.contains('a', 'Sign Up').click();
+    cy.contains('a', 'Create an account').click();
 
     cy.get('input[name=name]').type('Esther');
 
@@ -165,7 +165,7 @@ describe('signin', () => {
     // Submit the form using the email providers--gmail)
     const gmailEmail = randomGmailEmail(false);
     cy.visit('/signin');
-    cy.contains('a', 'Sign Up').click();
+    cy.contains('a', 'Create an account').click();
     cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=email]').type(`{selectall}${gmailEmail}`);
     cy.get('[data-cy=checkbox-tosOptIn]').click();
@@ -183,7 +183,7 @@ describe('signin', () => {
     // Submit the form using the email providers--hotmail
     const hotmail = randomHotMail(false);
     cy.visit('/signin');
-    cy.contains('a', 'Sign Up').click();
+    cy.contains('a', 'Create an account').click();
     cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=email]').type(`{selectall}${hotmail}`);
     cy.get('[data-cy=checkbox-tosOptIn]').click();

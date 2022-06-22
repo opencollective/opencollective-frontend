@@ -14,7 +14,7 @@ describe('Contribution Flow: Create profile', () => {
     cy.contains('[data-cy="cf-content"] button', 'Go back to contribute as a guest').click();
     // Should be able to sign in
     cy.getByDataCy('cf-profile-signin-btn').click();
-    cy.contains('[data-cy="cf-content"] button', 'Sign Up').click();
+    cy.contains('[data-cy="cf-content"] button', 'Create an account').click();
     cy.contains('[data-cy="cf-content"] button', '← Go back');
 
     // Set name
