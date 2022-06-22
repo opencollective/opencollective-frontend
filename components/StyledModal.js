@@ -13,6 +13,7 @@ import Avatar from './Avatar';
 import Container from './Container';
 import { Flex } from './Grid';
 import { fadeIn } from './StyledKeyframes';
+import StyledLinkButton from './StyledLinkButton';
 import { P, Span } from './Text';
 
 const Wrapper = styled(Flex)`
@@ -120,7 +121,9 @@ export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }) => (
     {children || <div />}
     {!hideCloseIcon && (
       <Span style={{ alignItems: 'center', display: 'flex' }}>
-        <CloseIcon onClick={onClose} />
+        <StyledLinkButton onClick={onClose}>
+          <CloseIcon onClick={onClose} />
+        </StyledLinkButton>
       </Span>
     )}
   </Header>

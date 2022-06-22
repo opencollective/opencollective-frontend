@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { Box, Flex } from '../Grid';
 import Image from '../Image';
 import { DropdownArrow, DropdownContent } from '../StyledDropdown';
+import StyledLinkButton from '../StyledLinkButton';
 import { P } from '../Text';
 
 const ChangeLogNotificationDropdownArrow = styled(DropdownArrow)`
@@ -51,7 +52,9 @@ const ChangelogNotificationDropdown = ({ onClose }) => {
             <P fontSize="14px" fontWeight="700" color="black.800" mb={3} mr={3}>
               <FormattedMessage id="ChangelogNotification.firstLine" defaultMessage="We have new stuff for you!" />
             </P>
-            <CloseIcon onClick={onClose} />
+            <StyledLinkButton onClick={onClose}>
+              <CloseIcon onClick={onClose} />
+            </StyledLinkButton>
           </Flex>
           <P fontSize="14px" color="black.800">
             <FormattedMessage
