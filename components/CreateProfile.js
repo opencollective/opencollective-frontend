@@ -180,23 +180,17 @@ const CreateProfile = ({
       <Container textAlign="center">
         {isOauth ? (
           <React.Fragment>
-            <Box pb={40}>
-              <Image
-                src="/static/images/oc-logo-icon-newhomepage.svg"
-                alt="Open Collective logo"
-                height={56}
-                width={56}
-              />
-            </Box>
-            <Box>
-              <img
-                src={oAuthAppImage}
-                alt="Open Collective logo"
-                height={104}
-                width={104}
-                style={{ borderRadius: 10 }}
-              />
-            </Box>
+            <Flex justifyContent="center" mb={40}>
+              <Box minWidth={104}>
+                <Image src="/static/images/oc-logo-oauth.png" alt="Open Collective logo" height={104} width={104} />
+              </Box>
+              <Box ml={24} mr={24} mt={32} minWidth={40}>
+                <Image src="/static/images/oauth-flow-connect.png" alt="OAuth Connect" height={40} width={40} />
+              </Box>
+              <Box minWidth={104}>
+                <img src={oAuthAppImage} alt="OAuth Logo" height={104} width={104} style={{ borderRadius: 10 }} />
+              </Box>
+            </Flex>
           </React.Fragment>
         ) : (
           <Box>

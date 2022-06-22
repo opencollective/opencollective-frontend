@@ -104,21 +104,21 @@ export default class SignIn extends React.Component {
           {this.props.isOauth ? (
             <React.Fragment>
               <Flex justifyContent="center" mb={40}>
-                <Image
-                  src="/static/images/oc-logo-icon-newhomepage.svg"
-                  alt="Open Collective logo"
-                  height={56}
-                  width={56}
-                />
-              </Flex>
-              <Flex justifyContent="center">
-                <img
-                  src={this.props.oAuthAppImage}
-                  alt="OAuth Logo"
-                  height={96}
-                  width={96}
-                  style={{ borderRadius: 10 }}
-                />
+                <Box minWidth={104}>
+                  <Image src="/static/images/oc-logo-oauth.png" alt="Open Collective logo" height={104} width={104} />
+                </Box>
+                <Box ml={24} mr={24} mt={32} minWidth={40}>
+                  <Image src="/static/images/oauth-flow-connect.png" alt="OAuth Connect" height={40} width={40} />
+                </Box>
+                <Box minWidth={104}>
+                  <img
+                    src={this.props.oAuthAppImage}
+                    alt="OAuth Logo"
+                    height={104}
+                    width={104}
+                    style={{ borderRadius: 10 }}
+                  />
+                </Box>
               </Flex>
             </React.Fragment>
           ) : (

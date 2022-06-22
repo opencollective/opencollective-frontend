@@ -100,18 +100,16 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
     <Container position="relative" mt="48px">
       <StyledCard maxWidth="520px" width="100%" px={24} py={32} m="0 auto">
         <TopAvatarsContainer>
-          <Container size={96} bg="white.full" borderRadius="100%">
+          <Container>
             <LinkCollective collective={application.account}>
-              <Avatar size={96} collective={application.account} border="1px solid #DCDEE0" />
+              <Avatar size={96} collective={application.account} />
             </LinkCollective>
           </Container>
-          <RadialIconContainer size="32px" bg="#29cc75">
-            <Check size={12} />
+          <RadialIconContainer size="40px" bg="#29cc75">
+            <Check width="18px" height="15px" />
           </RadialIconContainer>
-          <Container borderRadius="50%" border="1px solid #DCDEE0">
-            <RadialIconContainer size={96} bg="blue.700">
-              <Image src="/static/images/oc-logo-inverted.svg" height={56} width={56} />
-            </RadialIconContainer>
+          <Container>
+            <Image src="/static/images/oc-oauth-connect-logo.png" height={96} width={96} />
           </Container>
         </TopAvatarsContainer>
         <Box pt={56}>
@@ -172,7 +170,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
         </Box>
       </StyledCard>
       {!isRedirecting && (
-        <Flex mt={24} justifyContent="center" gap="24px">
+        <Flex mt={24} justifyContent="center" gap="24px" flexWrap="wrap">
           <StyledButton minWidth={175} onClick={() => window.history.back()} disabled={loading}>
             <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
           </StyledButton>
