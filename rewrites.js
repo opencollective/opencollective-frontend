@@ -288,10 +288,6 @@ exports.REWRITES = [
     destination: '/new-homepage',
   },
   {
-    source: '/discover',
-    destination: '/discover',
-  },
-  {
     source: '/search',
     destination: '/search',
   },
