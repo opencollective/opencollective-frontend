@@ -12,10 +12,11 @@ export const checkRequiresAddress = values => {
   const expenseTypesRequiringAddress = [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST, expenseTypes.GRANT];
 
   return (
-    values.payee &&
-    (collectiveTypesRequiringAddress.includes(values.payee.type) || values.payee.isHost) &&
-    !values.payee.isInvite &&
-    expenseTypesRequiringAddress.includes(values.type)
+    expenseTypesRequiringAddress.includes(values.type) &&
+    (values.payee?.isNewUser ||
+      (values.payee &&
+        !values.payee.isInvite &&
+        (collectiveTypesRequiringAddress.includes(values.payee.type) || values.payee.isHost)))
   );
 };
 
