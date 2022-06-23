@@ -60,7 +60,11 @@ const CollaborateWithMoney = () => {
     <Flex px="16px" flexDirection="column" alignItems="center" my="64px">
       <Flex flexDirection={['column', 'row']} alignItems="center">
         <Box width={['206px']}>
-          <NextIllustration src="/static/images/new-home/collaborate-with-money.png" width={239} height={257} />
+          <NextIllustration
+            src="/static/images/new-home/collaborate-withMoney-illustration.png"
+            width={239}
+            height={257}
+          />
         </Box>
         <Box maxWidth={['288px', '421px', '594px']} textAlign={['center', 'left']} ml={[null, '40px']}>
           <SectionTitle mb={['8px', 3]}>

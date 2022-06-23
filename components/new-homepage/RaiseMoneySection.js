@@ -286,7 +286,7 @@ const RaiseMoney = () => {
             <NextIllustration
               width={558}
               height={418}
-              src="/static/images/fiscal-hosting/tax-exempt.png"
+              src="/static/images/new-home/fiscal-hosting-illustration.png"
               alt="Fiscal hosting"
             />
           </Box>
@@ -329,7 +329,7 @@ const RaiseMoney = () => {
             <NextIllustration
               width={558}
               height={418}
-              src="/static/images/fiscal-hosting/tax-exempt.png"
+              src="/static/images/new-home/shared-account-illustration.png"
               alt="Fiscal hosting"
             />
           </Box>
@@ -372,7 +372,7 @@ const RaiseMoney = () => {
             <NextIllustration
               width={558}
               height={418}
-              src="/static/images/fiscal-hosting/tax-exempt.png"
+              src="/static/images/new-home/powerfulTool-illustration.png"
               alt="Fiscal hosting"
             />
           </Box>
