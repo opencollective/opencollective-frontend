@@ -8,8 +8,6 @@ import { Box, Flex } from './Grid';
 import SearchIcon from './SearchIcon';
 import StyledInput from './StyledInput';
 import StyledRoundButton from './StyledRoundButton';
-import StyledSpinner from './StyledSpinner';
-import { Span } from './Text';
 
 const SearchInputContainer = styled(Flex)`
   border: solid 1px var(--silver-four);
@@ -42,33 +40,16 @@ const SearchButton = styled(Flex)`
 `;
 
 class SearchForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { isLoading: false };
-  }
-
   handleSubmit = event => {
     event.preventDefault();
-    /*
-     * Here we set the loading state for a few seconds to show
-     * the loading spinner in place of the search button within the search bar.
-     */
-    this.setState({ isLoading: true }, () => {
-      setTimeout(() => {
-        this.setState({ isLoading: false });
-      }, 3000);
-    });
-    if (this.props.onSubmit) {
-      this.props.onSubmit(event);
-    } else {
-      const searchInput = event.target.elements.q;
-      this.props.router.push({ pathname: '/search', query: { q: searchInput.value } });
-    }
+    const searchInput = event.target.elements.q;
+    this.props.router.push({ pathname: '/search', query: { q: searchInput.value } });
   };
 
   render() {
     const {
       fontSize,
+      onSubmit = this.handleSubmit,
       placeholder = 'Search...',
       width = 1,
       autoFocus,
@@ -80,7 +61,7 @@ class SearchForm extends React.Component {
       disabled,
     } = this.props;
     return (
-      <form action="/search" method="GET" onSubmit={this.handleSubmit}>
+      <form action="/search" method="GET" onSubmit={onSubmit}>
         <SearchInputContainer
           borderRadius={borderRadius}
           height={height}
@@ -113,7 +94,7 @@ class SearchForm extends React.Component {
               isBorderless
               mr="20px"
             >
-              {this.state.isLoading ? <StyledSpinner size="20px" /> : <Span>→</Span>}
+              →
             </StyledRoundButton>
           )}
         </SearchInputContainer>

@@ -30,6 +30,7 @@ const SearchBar = ({ onSubmit, defaultValue, ...props }) => {
       value={value}
       onChange={setValue}
       onSubmit={event => {
+        event.preventDefault();
         const searchInput = event.target.elements.q;
         onSubmit(searchInput.value || null);
       }}
