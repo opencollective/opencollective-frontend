@@ -96,6 +96,9 @@ const nextConfig = {
     config.module.rules.unshift({
       test: /public[\\/].*\.(html)$/,
       loader: 'html-loader',
+      options: {
+        esModule: false,
+      },
     });
 
     // Load images in base64
