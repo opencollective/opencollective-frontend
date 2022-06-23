@@ -90,7 +90,7 @@
     "react-popper": "2.3.0",
     "react-scrollchor": "7.0.2",
     "react-select": "5.3.2",
-    "react-swipeable": "6.2.2",
+    "react-swipeable": "7.0.0",
     "react-text-mask": "^5.4.3",
     "react-window": "1.8.7",
     "redis": "3.1.2",
