@@ -143,6 +143,11 @@ const Menu = ({ collective, isAccountantOnly }) => {
           />
           <MenuLink
             collective={collective}
+            section={COLLECTIVE_SECTIONS.THANK_YOU_EMAIL}
+            if={isOneOfTypes(collective, [COLLECTIVE, EVENT, PROJECT])}
+          />
+          <MenuLink
+            collective={collective}
             section={COLLECTIVE_SECTIONS.EXPORT}
             if={isOneOfTypes(collective, [COLLECTIVE, EVENT, PROJECT])}
           />

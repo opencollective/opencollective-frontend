@@ -21,6 +21,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   COLLECTIVE_PAGE: 'collective-page',
   CONNECTED_ACCOUNTS: 'connected-accounts',
   POLICIES: 'policies',
+  THANK_YOU_EMAIL: 'thank-you-email',
   EXPORT: 'export',
   HOST: 'host',
   MEMBERS: 'members',
@@ -78,6 +79,9 @@ const SECTION_LABELS = defineMessages({
   [EDIT_COLLECTIVE_SECTIONS.POLICIES]: {
     id: 'editCollective.menu.policies',
     defaultMessage: 'Policies',
+  },
+  [EDIT_COLLECTIVE_SECTIONS.NOTIFICATIONS]: {
+    defaultMessage: 'Notifications',
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST]: {
     id: 'Fiscalhost',

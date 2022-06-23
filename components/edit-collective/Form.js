@@ -49,6 +49,7 @@ import PaymentReceipts from './sections/PaymentReceipts';
 import Policies from './sections/Policies';
 import ReceivingMoney from './sections/ReceivingMoney';
 import SendingMoney from './sections/SendingMoney';
+import ThankYouEmail from './sections/ThankYouEmail';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
@@ -548,6 +549,10 @@ class EditCollectiveForm extends React.Component {
       // Policies and moderation
       case EDIT_COLLECTIVE_SECTIONS.POLICIES:
         return <Policies collective={collective} />;
+
+      // Policies and moderation
+      case EDIT_COLLECTIVE_SECTIONS.THANK_YOU_EMAIL:
+        return <ThankYouEmail collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS:
         return <HostVirtualCardsSettings collective={collective} />;
