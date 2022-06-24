@@ -56,22 +56,6 @@ export const HOSTS = [
     logo: '/static/images/become-a-host/osc-logo.png',
   },
   {
-    id: 'socialchangenestcollective',
-    name: 'Social Change Nest',
-    location: '🇬🇧 United Kingdom',
-    collectivePath: '/the-social-change-nest/apply',
-    bgImage: 'socialchangenest',
-    logo: '/static/images/become-a-host/socialchangenest-logo.png',
-  },
-  {
-    id: 'allForClimate',
-    name: 'All for climate',
-    location: ' 🇪🇺 Europe',
-    collectivePath: '/allforclimate/apply',
-    bgImage: 'allforclimate-collective',
-    logo: '/static/images/become-a-host/climate-logo.png',
-  },
-  {
     id: 'OCE',
     name: 'Open Collective Europe',
     location: ' 🇪🇺 Europe',
@@ -86,6 +70,22 @@ export const HOSTS = [
     collectivePath: '/ocnz/apply',
     bgImage: 'ocn-bg',
     logo: '/static/images/fiscal-hosting/ocn.png',
+  },
+  {
+    id: 'socialchangenestcollective',
+    name: 'Social Change Nest',
+    location: '🇬🇧 United Kingdom',
+    collectivePath: '/the-social-change-nest/apply',
+    bgImage: 'socialchangenest',
+    logo: '/static/images/become-a-host/socialchangenest-logo.png',
+  },
+  {
+    id: 'allForClimate',
+    name: 'All for climate',
+    location: ' 🇪🇺 Europe',
+    collectivePath: '/allforclimate/apply',
+    bgImage: 'allforclimate-collective-bg',
+    logo: '/static/images/fiscal-hosting/allforclimate-collective-logo.png',
   },
 ];
 

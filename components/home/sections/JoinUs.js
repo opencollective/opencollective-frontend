@@ -72,17 +72,18 @@ export const JoinUsActionContainer = ({ title, description, link }) => {
       <Wrapper
         color="black.900"
         className="linkWrapper"
-        my={[1, null, 4]}
-        width={['288px', '648px', '569px', null, '594px']}
+        my={[1, 3, 4]}
+        width={['288px', '436px', '569px', null, '594px']}
       >
         <Box width={['192px', 1]}>
           <H3
-            fontSize={['24px', '32px']}
+            fontSize={['24px', null, '32px']}
             textAlign="left"
-            lineHeight={['25px', '40px']}
-            letterSpacing={['-0.08px', '-1.2px']}
+            lineHeight={['25px', null, '40px']}
+            letterSpacing={['-0.08px', null, '-1.2px']}
             mb={2}
             fontWeight="bold"
+            color="primary.900"
           >
             {title}
           </H3>
@@ -113,22 +114,25 @@ const JoinUs = ({ page }) => (
       alignItems={'center'}
       justifyContent="center"
     >
-      <Box my={[2, 3, null, 5]} width={[null, '648px', '569px', '335px', '309px']} mr={[null, null, null, 5]}>
+      <Box my={[2, 3, null, 5]} width={[null, '438px', '569px', '335px', '309px']} mr={[null, null, null, 5]}>
         <H1
           mb={2}
           mt={[5, null, null, 0]}
           fontSize={['32px', '40px', null, '52px']}
           lineHeight={['40px', '48px', null, '56px']}
           letterSpacing={['-1.2px', '-1.6px', null, '-2px']}
+          color="primary.900"
+          textAlign={['center', null, 'left']}
         >
           <FormattedMessage id="home.joinUsSection.title" defaultMessage="Join the movement" />
         </H1>
-        <Box my={(null, null, null, null, 3)} width={['288px', 1, null, '335px']}>
+        <Box my={(null, null, null, null, 3)} width={['288px', '438px', null, '335px']}>
           <SectionSubtitle
             fontSize={['20px', null, null, '24px']}
             lineHeight={['28px', null, null, '32px']}
             letterSpacing={['-0.6px', null, null, '-0.8px']}
             color={['black.800', null, null, 'black.900']}
+            textAlign={['center', null, 'left']}
           >
             {page === 'becomeAHost' ? (
               <FormattedMessage
@@ -136,10 +140,7 @@ const JoinUs = ({ page }) => (
                 defaultMessage="Open Collective makes fiscal sponsorship shine. Grantees and project participants will love the simplicity and accessibility, and you’ll love the huge reduction of overheads."
               />
             ) : (
-              <FormattedMessage
-                id="home.joinUsSection.subtitle"
-                defaultMessage="Be part of the new generation of communities."
-              />
+              <FormattedMessage defaultMessage="Collective finances. Collective technology. Collective power." />
             )}
           </SectionSubtitle>
         </Box>
@@ -152,7 +153,7 @@ const JoinUs = ({ page }) => (
             page === 'becomeAHost' ? (
               <FormattedMessage id="becomeAHost.create" defaultMessage="Join as a Fiscal Host" />
             ) : (
-              <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
+              <FormattedMessage defaultMessage="Get started now free!" />
             )
           }
           description={<FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now!" />}
@@ -163,24 +164,20 @@ const JoinUs = ({ page }) => (
           description={
             <FormattedMessage
               id="home.joinUsSection.ourStories"
-              defaultMessage="Open Collective aims to foster transparency and sustainability in communities around the world. See how you can participate."
+              defaultMessage="Open Collective aims to foster transparency and sustainability in communities around the world, see how you could."
             />
           }
         />
-        <Wrapper
-          color="black.900"
-          my={4}
-          width={['288px', '648px', '569px', null, '594px']}
-          className="newsletterWrapper"
-        >
+        <Wrapper color="black.900" width={['288px', '436px', '569px', null, '594px']} className="newsletterWrapper">
           <Container>
             <H3
-              fontSize={['24px', '32px']}
+              fontSize={['24px', null, '32px']}
               textAlign="left"
-              lineHeight={['25px', '40px']}
-              letterSpacing={['-0.08px', '-1.2px']}
+              lineHeight={['25px', null, '40px']}
+              letterSpacing={['-0.08px', null, '-1.2px']}
               mb={2}
               fontWeight="bold"
+              color="primary.900"
             >
               <FormattedMessage id="home.joinUsSection.newsletter" defaultMessage="Subscribe to our newsletter" />
             </H3>
