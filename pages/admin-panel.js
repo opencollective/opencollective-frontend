@@ -17,7 +17,7 @@ import { Flex, Grid } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
-import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import SignInOrJoinFreeV2 from '../components/SignInOrJoinFreeV2';
 import { useUser } from '../components/UserProvider';
 
 export const adminPanelQuery = gqlV2/* GraphQL */ `
@@ -189,7 +189,7 @@ const AdminPanelPage = () => {
             <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
               {blocker}
             </MessageBox>
-            {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
+            {!LoggedInUser && <SignInOrJoinFreeV2 form="signinv2" disableSignup />}
           </Flex>
         ) : (
           <Grid

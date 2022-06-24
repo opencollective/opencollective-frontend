@@ -7,7 +7,7 @@ import { Flex } from './Grid';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import Page from './Page';
-import SignInOrJoinFree from './SignInOrJoinFree';
+import SignInOrJoinFreeV2 from './SignInOrJoinFreeV2';
 import { withUser } from './UserProvider';
 
 /**
@@ -58,7 +58,7 @@ class AuthenticatedPage extends React.Component {
                   defaultMessage="You need to be logged in to continue."
                 />
               </MessageBox>
-              <SignInOrJoinFree defaultForm="signin" disableSignup={this.props.disableSignup} />
+              <SignInOrJoinFreeV2 defaultForm="signinv2" disableSignup={this.props.disableSignup} />
             </Flex>
           )}
         </Container>
