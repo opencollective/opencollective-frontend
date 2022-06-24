@@ -31,14 +31,14 @@ class SigninV2Page extends React.Component {
     return {
       token,
       next,
-      form: form || 'signinv2',
+      form: form || 'signin',
       isSuspiciousUserAgent: isSuspiciousUserAgent(req?.get('User-Agent')),
       email: email && isEmail(email) ? email : null,
     };
   }
 
   static propTypes = {
-    form: PropTypes.oneOf(['signinv2', 'create-accountv2']).isRequired,
+    form: PropTypes.oneOf(['signin', 'create-account']).isRequired,
     token: PropTypes.string,
     email: PropTypes.string,
     next: PropTypes.string,
@@ -70,12 +70,12 @@ class SigninV2Page extends React.Component {
 
     if (oldState.isRobot && !this.state.isRobot) {
       this.initialize();
-    } else if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-accountv2') {
+    } else if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-account') {
       // --- User logged in ---
       this.setState({ success: true, redirecting: true });
-      // Avoid redirect loop: replace '/signinv2' redirects by '/'
+      // Avoid redirect loop: replace '/signin' redirects by '/'
       const { next } = this.props;
-      const redirect = next && next.match(/^\/?signinv2[?/]?/) ? null : next;
+      const redirect = next && next.match(/^\/?signin[?/]?/) ? null : next;
       await this.props.router.replace(redirect || '/');
       window.scroll(0, 0);
     } else if (this.props.token && oldProps.token !== this.props.token) {
@@ -116,7 +116,7 @@ class SigninV2Page extends React.Component {
 
   getRoutes() {
     const { next } = this.props;
-    const routes = { signin: '/signinv2', join: '/create-accountv2' };
+    const routes = { signin: '/signin', join: '/create-account' };
     if (!next) {
       return routes;
     } else {
@@ -155,7 +155,7 @@ class SigninV2Page extends React.Component {
       );
     } else if ((loadingLoggedInUser || this.state.success) && token) {
       return <Loading />;
-    } else if (!loadingLoggedInUser && LoggedInUser && form === 'create-accountv2') {
+    } else if (!loadingLoggedInUser && LoggedInUser && form === 'create-account') {
       return (
         <MessageBox type="warning" withIcon>
           <FormattedMessage
@@ -218,7 +218,7 @@ class SigninV2Page extends React.Component {
     return (
       <div className="LoginPage">
         <Header
-          title={this.props.form === 'signinv2' ? 'Sign In' : 'Create Account'}
+          title={this.props.form === 'signin' ? 'Sign In' : 'Create Account'}
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
           menuItemsV2={{ solutions: false, product: false, company: false, docs: false }}
           menuItems={{ discover: false, docs: false, howItWorks: false, pricing: false }}
