@@ -15,11 +15,11 @@ import Header from '../components/Header';
 import Loading from '../components/Loading';
 import LoadingGrid from '../components/LoadingGrid';
 import MessageBox from '../components/MessageBox';
-import SignInOrJoinFreeV2 from '../components/SignInOrJoinFreeV2';
+import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-class SigninV2Page extends React.Component {
+class SigninPage extends React.Component {
   static getInitialProps({ query: { token, next, form, email }, req }) {
     // Decode next URL if URI encoded
     if (next && next.startsWith('%2F')) {
@@ -193,7 +193,7 @@ class SigninV2Page extends React.Component {
             )}
           </MessageBox>
         )}
-        <SignInOrJoinFreeV2
+        <SignInOrJoinFree
           email={this.props.email}
           redirect={next || '/'}
           form={form}
@@ -235,4 +235,4 @@ class SigninV2Page extends React.Component {
   }
 }
 
-export default withUser(withRouter(SigninV2Page));
+export default withUser(withRouter(SigninPage));
