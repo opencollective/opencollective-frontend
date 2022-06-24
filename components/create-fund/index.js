@@ -9,7 +9,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
-import SignInOrJoinFree from '../SignInOrJoinFree';
+import SignInOrJoinFreeV2 from '../SignInOrJoinFreeV2';
 import { H1, P } from '../Text';
 import { withUser } from '../UserProvider';
 
@@ -106,7 +106,7 @@ class CreateFund extends Component {
               </P>
             </Box>
           </Flex>
-          <SignInOrJoinFree />
+          <SignInOrJoinFreeV2 />
         </Flex>
       );
     }
