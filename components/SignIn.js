@@ -9,6 +9,7 @@ import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
 import StyledLink from './StyledLink';
+import StyledLinkButton from './StyledLinkButton';
 import { Span } from './Text';
 
 /**
@@ -45,10 +46,11 @@ export default class SignIn extends React.Component {
     }
   }
 
-  renderSecondaryAction(message, style) {
+  renderSecondaryAction(message, asLink, style) {
     const { loading, onSecondaryAction } = this.props;
+    const Button = asLink ? StyledLinkButton : StyledButton;
     return typeof onSecondaryAction === 'string' ? (
-      <StyledLink
+      <Button
         as={Link}
         href={onSecondaryAction}
         disabled={loading}
@@ -57,9 +59,9 @@ export default class SignIn extends React.Component {
         {...style}
       >
         {message}
-      </StyledLink>
+      </Button>
     ) : (
-      <StyledButton
+      <Button
         asLink
         fontSize="14px"
         onClick={onSecondaryAction}
@@ -67,7 +69,7 @@ export default class SignIn extends React.Component {
         data-cy="signin-secondary-action-btn"
       >
         {message}
-      </StyledButton>
+      </Button>
     );
   }
 
@@ -175,7 +177,7 @@ export default class SignIn extends React.Component {
                     <FormattedMessage defaultMessage="Don't have one?" />
                   </Flex>
                   <Flex fontSize="14px" justifyContent="center" mt={2}>
-                    {this.renderSecondaryAction(<FormattedMessage defaultMessage="Create an account" />)}
+                    {this.renderSecondaryAction(<FormattedMessage defaultMessage="Create an account" />, true)}
                   </Flex>
                 </Box>
               )}
@@ -196,7 +198,7 @@ export default class SignIn extends React.Component {
               />{' '}
               <Box mt="24px">
                 <Span mr="40px">
-                  {this.renderSecondaryAction(<FormattedMessage defaultMessage="Yes, create an account" />, {
+                  {this.renderSecondaryAction(<FormattedMessage defaultMessage="Yes, create an account" />, false, {
                     underlineOnHover: true,
                   })}
                 </Span>
