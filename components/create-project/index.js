@@ -12,7 +12,7 @@ import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
-import SignInOrJoinFree from '../SignInOrJoinFree';
+import SignInOrJoinFreeV2 from '../SignInOrJoinFreeV2';
 import { H1, P } from '../Text';
 import { withUser } from '../UserProvider';
 
@@ -82,7 +82,7 @@ class CreateProject extends Component {
               </P>
             </Box>
           </Flex>
-          <SignInOrJoinFree />
+          <SignInOrJoinFreeV2 />
         </Flex>
       );
     } else if (parent?.isFrozen) {

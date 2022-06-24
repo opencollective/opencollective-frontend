@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import SignInOrJoinFree from '../SignInOrJoinFree';
+import SignInOrJoinFreeV2 from '../SignInOrJoinFreeV2';
 import StyledButton from '../StyledButton';
 
 const SignInToContributeAsAnOrganization = ({ onCancel, ...props }) => {
@@ -12,21 +12,7 @@ const SignInToContributeAsAnOrganization = ({ onCancel, ...props }) => {
         &larr;{' '}
         <FormattedMessage id="ContributionFlow.goBackToGuest" defaultMessage="Go back to contribute as a guest" />
       </StyledButton>
-      <SignInOrJoinFree
-        {...props}
-        defaultForm="signin"
-        createProfileLabels={{
-          personal: (
-            <FormattedMessage id="ContributionFlow.CreateUserLabel" defaultMessage="Contribute as an individual" />
-          ),
-          organization: (
-            <FormattedMessage
-              id="ContributionFlow.CreateOrganizationLabel"
-              defaultMessage="Contribute as an organization"
-            />
-          ),
-        }}
-      />
+      <SignInOrJoinFreeV2 {...props} defaultForm="signinv2" />
     </React.Fragment>
   );
 };

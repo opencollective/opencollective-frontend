@@ -1,7 +1,7 @@
 import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
-import CreateProfile from '../../components/CreateProfile';
+import CreateProfileV2 from '../../components/CreateProfileV2';
 
-<Meta title="Design system/CreateProfile" component={CreateProfile} />
+<Meta title="Design system/CreateProfileV2" component={CreateProfileV2} />
 
 <Canvas>
   <Story name="Default">
@@ -10,9 +10,7 @@ import CreateProfile from '../../components/CreateProfile';
       const [email, setEmail] = React.useState('');
       return (
         <div>
-          <CreateProfile
-            onPersonalSubmit={data => setAction(`Personal Create data: ${JSON.stringify(data)}`)}
-            onOrgSubmit={data => setAction(`Org Create data: ${JSON.stringify(data)}`)}
+          <CreateProfileV2
             onSecondaryAction={() => setAction('Secondary action button was clicked!')}
             onEmailChange={setEmail}
             email={email}
@@ -33,9 +31,7 @@ Displays passed in errors:
       const [email, setEmail] = React.useState('');
       return (
         <div>
-          <CreateProfile
-            onPersonalSubmit={data => setAction(`Personal Create data: ${JSON.stringify(data)}`)}
-            onOrgSubmit={data => setAction(`Org Create data: ${JSON.stringify(data)}`)}
+          <CreateProfileV2
             onSecondaryAction={() => setAction('Secondary action button was clicked!')}
             onEmailChange={setEmail}
             email={email}

@@ -11,7 +11,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
-import SignInOrJoinFree from '../SignInOrJoinFree';
+import SignInOrJoinFreeV2 from '../SignInOrJoinFreeV2';
 import { H1, P } from '../Text';
 import { withUser } from '../UserProvider';
 
@@ -142,7 +142,7 @@ class CreateCollective extends Component {
               </P>
             </Box>
           </Flex>
-          <SignInOrJoinFree createProfileTabs={['personal']} />
+          <SignInOrJoinFreeV2 />
         </Flex>
       );
     }
