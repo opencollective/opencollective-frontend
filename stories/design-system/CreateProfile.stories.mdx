@@ -1,7 +1,7 @@
 import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
-import CreateProfileV2 from '../../components/CreateProfileV2';
+import CreateProfile from '../../components/CreateProfile';
 
-<Meta title="Design system/CreateProfileV2" component={CreateProfileV2} />
+<Meta title="Design system/CreateProfile" component={CreateProfile} />
 
 <Canvas>
   <Story name="Default">
@@ -10,7 +10,7 @@ import CreateProfileV2 from '../../components/CreateProfileV2';
       const [email, setEmail] = React.useState('');
       return (
         <div>
-          <CreateProfileV2
+          <CreateProfile
             onSecondaryAction={() => setAction('Secondary action button was clicked!')}
             onEmailChange={setEmail}
             email={email}
@@ -31,7 +31,7 @@ Displays passed in errors:
       const [email, setEmail] = React.useState('');
       return (
         <div>
-          <CreateProfileV2
+          <CreateProfile
             onSecondaryAction={() => setAction('Secondary action button was clicked!')}
             onEmailChange={setEmail}
             email={email}

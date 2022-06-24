@@ -12,7 +12,7 @@ import { addEditCollectiveMembersMutation } from './onboarding-modal/OnboardingM
 import Container from './Container';
 import CreateOrganizationForm from './CreateOrganizationForm';
 import { Box, Flex } from './Grid';
-import SignInOrJoinFreeV2 from './SignInOrJoinFreeV2';
+import SignInOrJoinFree from './SignInOrJoinFree';
 import { H1, P } from './Text';
 
 class CreateOrganization extends React.Component {
@@ -127,7 +127,7 @@ class CreateOrganization extends React.Component {
                 </P>
               </Box>
             </Flex>
-            <SignInOrJoinFreeV2 />
+            <SignInOrJoinFree />
           </Flex>
         )}
         {LoggedInUser && (

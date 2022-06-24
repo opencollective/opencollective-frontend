@@ -158,7 +158,7 @@ const useForm = ({ onEmailChange, onFieldChange, name, newsletterOptIn, tosOptIn
   };
 };
 
-const CreateProfileV2 = ({
+const CreateProfile = ({
   email,
   name,
   newsletterOptIn,
@@ -337,7 +337,7 @@ const CreateProfileV2 = ({
   );
 };
 
-CreateProfileV2.propTypes = {
+CreateProfile.propTypes = {
   /** a map of errors to the matching field name, e.g., `{ email: 'Invalid email' }` will display that message until the email field */
   errors: PropTypes.objectOf(PropTypes.string),
   /** handles submissions of personal profile form */
@@ -362,9 +362,9 @@ CreateProfileV2.propTypes = {
   ...StyledCard.propTypes,
 };
 
-CreateProfileV2.defaultProps = {
+CreateProfile.defaultProps = {
   errors: {},
   submitting: false,
 };
 
-export default CreateProfileV2;
+export default CreateProfile;
