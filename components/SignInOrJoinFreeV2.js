@@ -19,6 +19,7 @@ import { Box, Flex } from './Grid';
 import { I18nSupportLink } from './I18nFormatters';
 import Link from './Link';
 import Loading from './Loading';
+import SignInModal from './SignInModal';
 import SignInV2 from './SignInV2';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
@@ -65,9 +66,9 @@ class SignInOrJoinFreeV2 extends React.Component {
     /** Whether user can signup from there */
     disableSignup: PropTypes.bool,
     /** Use this prop to use this as a controlled component */
-    form: PropTypes.oneOf(['signinv2', 'create-accountv2']),
+    form: PropTypes.oneOf(['signin', 'create-account']),
     /** Set the initial view for the component */
-    defaultForm: PropTypes.oneOf(['signinv2', 'create-accountv2']),
+    defaultForm: PropTypes.oneOf(['signin', 'create-account']),
     /** If provided, component will use links instead of buttons to make the switch */
     routes: PropTypes.shape({
       signin: PropTypes.string,
@@ -81,12 +82,13 @@ class SignInOrJoinFreeV2 extends React.Component {
     submitRecoveryCode: PropTypes.func,
     router: PropTypes.object,
     addToast: PropTypes.func.isRequired,
+    asModal: PropTypes.bool,
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      form: this.props.defaultForm || 'signinv2',
+      form: this.props.defaultForm || 'signin',
       error: null,
       submitting: false,
       unknownEmailError: false,
@@ -114,7 +116,7 @@ class SignInOrJoinFreeV2 extends React.Component {
       currentPath = currentPath + window.location.search;
     }
     let redirectUrl = this.props.redirect;
-    if (currentPath.includes('/create-accountv2') && redirectUrl === '/') {
+    if (currentPath.includes('/create-account') && redirectUrl === '/') {
       redirectUrl = '/welcome';
     }
     return encodeURIComponent(redirectUrl || currentPath || '/');
@@ -341,17 +343,30 @@ class SignInOrJoinFreeV2 extends React.Component {
           this.renderTwoFactorAuthBoxes(useRecoveryCodes)
         ) : (
           <Fragment>
-            {displayedForm !== 'create-accountv2' && !error ? (
-              <SignInV2
-                email={email}
-                onEmailChange={email => this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })}
-                onSecondaryAction={routes.join || (() => this.switchForm('create-accountv2'))}
-                onSubmit={email => this.signIn(email, false)}
-                loading={submitting}
-                unknownEmail={unknownEmailError}
-                label={this.props.signInLabel}
-                showSecondaryAction={!this.props.disableSignup}
-              />
+            {displayedForm !== 'create-account' && !error ? (
+              this.props.asModal ? (
+                <SignInModal
+                  email={email}
+                  onEmailChange={email => this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })}
+                  onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
+                  onSubmit={email => this.signIn(email, false)}
+                  loading={submitting}
+                  unknownEmail={unknownEmailError}
+                  label={this.props.signInLabel}
+                  showSecondaryAction={!this.props.disableSignup}
+                />
+              ) : (
+                <SignInV2
+                  email={email}
+                  onEmailChange={email => this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })}
+                  onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
+                  onSubmit={email => this.signIn(email, false)}
+                  loading={submitting}
+                  unknownEmail={unknownEmailError}
+                  label={this.props.signInLabel}
+                  showSecondaryAction={!this.props.disableSignup}
+                />
+              )
             ) : (
               <Flex flexDirection="column" width={1} alignItems="center">
                 <Flex justifyContent="center" width={1}>
@@ -366,7 +381,7 @@ class SignInOrJoinFreeV2 extends React.Component {
                       }
                       onFieldChange={(name, value) => this.setState({ [name]: value })}
                       onSubmit={this.createProfile}
-                      onSecondaryAction={routes.signin || (() => this.switchForm('signinv2'))}
+                      onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
                       submitting={submitting}
                       emailAlreadyExists={this.state.emailAlreadyExists}
                     />

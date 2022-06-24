@@ -142,7 +142,7 @@ class CreateCollective extends Component {
               </P>
             </Box>
           </Flex>
-          <SignInOrJoinFreeV2 createProfileTabs={['personal']} />
+          <SignInOrJoinFreeV2 />
         </Flex>
       );
     }

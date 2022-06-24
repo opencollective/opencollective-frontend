@@ -59,8 +59,8 @@ class AuthenticatedPageV2 extends React.Component {
                 />
               </MessageBox>
               <SignInOrJoinFreeV2
-                form="signinv2"
-                routes={{ signin: '/signinv2', join: '/create-accountv2' }}
+                form="signin"
+                routes={{ signin: '/signin', join: '/create-account' }}
                 disableSignup={this.props.disableSignup}
               />
             </Flex>
