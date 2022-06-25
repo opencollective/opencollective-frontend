@@ -205,7 +205,7 @@ export const getUpdatesVariables = (slug, orderBy = null, searchTerm = null) => 
     collectiveSlug: slug,
     offset: 0,
     limit: UPDATES_PER_PAGE * 2,
-    orderBy: { field: 'CREATED_AT', direction: orderBy === 'oldest' ? 'ASC' : 'DESC' },
+    orderBy: { field: 'PUBLISHED_AT', direction: orderBy === 'oldest' ? 'ASC' : 'DESC' },
     searchTerm: searchTerm,
   };
 };
