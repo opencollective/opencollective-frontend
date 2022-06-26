@@ -8,7 +8,7 @@ import Container from '../../Container';
 import { Box } from '../../Grid';
 import LocationComponent from '../../Location';
 import { P } from '../../Text';
-import { useUser } from '../../UserProvider';
+import { useLoggedInUser } from '../../UserProvider';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
@@ -17,7 +17,7 @@ const isEmptyOnlineLocation = event => {
 };
 
 const Location = ({ collective: event, refetch }) => {
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
   const prevLoggedInUser = React.useRef(LoggedInUser);
 
   React.useEffect(() => {
