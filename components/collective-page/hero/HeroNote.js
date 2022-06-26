@@ -1,4 +1,4 @@
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
 
 const HeroNote = styled.div`

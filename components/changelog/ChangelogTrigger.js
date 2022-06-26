@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import { cloneDeep } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
