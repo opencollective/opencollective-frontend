@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import EmbeddedPage from '../../components/EmbeddedPage';
 import { Flex } from '../../components/Grid';
@@ -12,7 +13,6 @@ import MessageBox from '../../components/MessageBox';
 import MessageBoxGraphqlError from '../../components/MessageBoxGraphqlError';
 import { ApplicationApproveScreen } from '../../components/oauth/ApplicationApproveScreen';
 import SignInOrJoinFree from '../../components/SignInOrJoinFree';
-import { useLoggedInUser } from '../../components/UserProvider';
 
 const applicationQuery = gqlV2`
   query OAuthAuthorization($clientId: String!) {

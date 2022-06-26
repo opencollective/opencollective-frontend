@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
 import { getI18nLink } from '../I18nFormatters';
@@ -18,7 +19,6 @@ import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
-import { useLoggedInUser } from '../UserProvider';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import DeleteExpenseButton from './DeleteExpenseButton';

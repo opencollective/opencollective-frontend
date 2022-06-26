@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { isEmptyCollectiveLocation } from '../../../lib/collective.lib';
+import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import Container from '../../Container';
 import { Box } from '../../Grid';
 import LocationComponent from '../../Location';
 import { P } from '../../Text';
-import { useLoggedInUser } from '../../UserProvider';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 

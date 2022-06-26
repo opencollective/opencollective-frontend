@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import { addAuthTokenToHeader } from '../../lib/api';
 import { ERROR, formatErrorType } from '../../lib/errors';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -21,7 +22,6 @@ import RadialIconContainer from '../RadialIconContainer';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import { P } from '../Text';
-import { useLoggedInUser } from '../UserProvider';
 
 const TopAvatarsContainer = styled.div`
   display: flex;

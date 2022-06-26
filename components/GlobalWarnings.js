@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+
 import I18nFormatters from './I18nFormatters';
 import { P } from './Text';
-import { useLoggedInUser } from './UserProvider';
 
 const GlobalWarningContainer = styled.div`
   width: 100;
