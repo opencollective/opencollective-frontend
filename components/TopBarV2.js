@@ -118,12 +118,11 @@ const TopBarV2 = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
                 popupMarginTop="-10px"
               >
                 <NavLinkContainer>
-                  {/* TODO: Add this part back when the /collectives page is designed */}
-                  {/* <Link href="/collectives">*/}
-                  {/*  <NavItem as={Container} mt={16} mb={16}>*/}
-                  {/*    <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />*/}
-                  {/*  </NavItem>*/}
-                  {/* </Link>*/}
+                  <Link href="/collectives">
+                    <NavItem as={Container} mt={16} mb={16}>
+                      <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />
+                    </NavItem>
+                  </Link>
                   <Link href="/become-a-sponsor">
                     <NavItem as={Container} mt={16} mb={16}>
                       <FormattedMessage defaultMessage="For Sponsors" />
