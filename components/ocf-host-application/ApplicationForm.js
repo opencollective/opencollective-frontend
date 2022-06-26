@@ -19,10 +19,10 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { i18nOCFApplicationFormLabel } from '../../lib/i18n/ocf-form';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import OCFHostApplicationFAQ from '../faqs/OCFHostApplicationFAQ';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';

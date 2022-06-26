@@ -4,10 +4,10 @@ import themeGet from '@styled-system/theme-get';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
+import SectionTitle from '../collectives/SectionTitle';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
-import SectionTitle from '../home/SectionTitle';
 import StyledCarousel from '../StyledCarousel';
 import { H4, P, Span } from '../Text';
 

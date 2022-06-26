@@ -2,8 +2,8 @@ import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex, Grid } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';

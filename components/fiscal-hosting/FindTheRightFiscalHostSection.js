@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import Illustration from '../collectives/HomeIllustration';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
-import Illustration from '../home/HomeIllustration';
 import StyledCarousel from '../StyledCarousel';
 import { H2, H3, P } from '../Text';
 

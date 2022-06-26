@@ -13,9 +13,9 @@ import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-
 
 import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import { getI18nLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
 import OnboardingProfileCard from '../onboarding-modal/OnboardingProfileCard';

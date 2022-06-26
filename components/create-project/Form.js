@@ -8,9 +8,9 @@ import styled from 'styled-components';
 import { suggestSlug } from '../../lib/collective.lib';
 
 import CollectiveNavbar from '../collective-navbar';
+import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
