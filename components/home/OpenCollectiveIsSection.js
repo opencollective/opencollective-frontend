@@ -2,10 +2,10 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { ApplyToHostGrid, ApplyToHostMobileCarousel } from '../fiscal-hosting/ApplyToFiscalHostSection';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import Link from '../Link';
 import { SectionDescription, SectionTitle } from '../marketing/Text';
 import StyledLink from '../StyledLink';

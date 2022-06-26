@@ -3,9 +3,9 @@ import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import Link from '../Link';
 import ListItem from '../ListItem';
 import { SectionDescription, SectionTitle } from '../marketing/Text';
