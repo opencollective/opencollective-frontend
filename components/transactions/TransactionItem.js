@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import expenseStatus from '../../lib/constants/expense-status';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nTransactionKind, i18nTransactionType } from '../../lib/i18n/transaction';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -31,7 +32,6 @@ import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 import TransactionStatusTag from '../TransactionStatusTag';
-import { useLoggedInUser } from '../UserProvider';
 
 import TransactionDetails from './TransactionDetails';
 

@@ -10,8 +10,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import languages from '../lib/constants/locales';
-
-import { useLoggedInUser } from '../components/UserProvider';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
 import TranslateIcon from './icons/TranslateIcon';
 import Container from './Container';

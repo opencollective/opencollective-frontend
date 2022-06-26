@@ -2,6 +2,8 @@ import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import StyledHr from '../StyledHr';
@@ -9,7 +11,6 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledInputLocation from '../StyledInputLocation';
 import { P, Span } from '../Text';
-import { useLoggedInUser } from '../UserProvider';
 
 import ContributeProfilePicker from './ContributeProfilePicker';
 import StepProfileInfoMessage from './StepProfileInfoMessage';

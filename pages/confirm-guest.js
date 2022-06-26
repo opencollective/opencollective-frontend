@@ -7,6 +7,7 @@ import { useTheme } from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { removeGuestTokens } from '../lib/guest-accounts';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
 import Container from '../components/Container';
 import { Box } from '../components/Grid';
@@ -17,7 +18,6 @@ import MessageBoxGraphqlError from '../components/MessageBoxGraphqlError';
 import Page from '../components/Page';
 import StyledSpinner from '../components/StyledSpinner';
 import { P } from '../components/Text';
-import { useLoggedInUser } from '../components/UserProvider';
 
 const STATUS = {
   SUBMITTING: 'SUBMITTING',

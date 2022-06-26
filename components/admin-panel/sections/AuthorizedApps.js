@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import { Box, Flex } from '../../Grid';
 import { I18nSupportLink } from '../../I18nFormatters';
@@ -15,7 +16,6 @@ import { authorizedAppsQuery } from '../../oauth/queries';
 import Pagination from '../../Pagination';
 import StyledHr from '../../StyledHr';
 import { P } from '../../Text';
-import { useLoggedInUser } from '../../UserProvider';
 
 const AuthorizedAppsSection = () => {
   const router = useRouter() || {};
