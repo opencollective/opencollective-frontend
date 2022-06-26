@@ -22,7 +22,7 @@ const messages = defineMessages({
   },
 });
 
-const HomePage = () => {
+const CollectivesPage = () => {
   const { formatMessage } = useIntl();
   return (
     <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
@@ -40,7 +40,7 @@ const HomePage = () => {
   );
 };
 
-HomePage.getInitialProps = ({ req, res }) => {
+CollectivesPage.getInitialProps = ({ req, res }) => {
   if (res && req && (req.language || req.locale === 'en')) {
     res.set('Cache-Control', 'public, s-maxage=3600');
   }
@@ -55,4 +55,4 @@ HomePage.getInitialProps = ({ req, res }) => {
   return { skipDataFromTree };
 };
 
-export default HomePage;
+export default CollectivesPage;
