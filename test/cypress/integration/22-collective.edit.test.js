@@ -31,6 +31,8 @@ describe('edit collective', () => {
     cy.createHostedCollective({ name: 'CollectiveToEdit' }).then(({ slug }) => {
       collectiveSlug = slug;
     });
+    // Give it a few ms to actually receive the email before we clean the inbox
+    cy.wait(200);
     cy.clearInbox();
   });
 
