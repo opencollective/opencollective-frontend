@@ -52,9 +52,9 @@ class SignInOrJoinFree extends React.Component {
     /** Whether user can signup from there */
     disableSignup: PropTypes.bool,
     /** Use this prop to use this as a controlled component */
-    form: PropTypes.oneOf(['signin', 'create-account']),
+    form: PropTypes.oneOf(['signinv1', 'create-accountv1']),
     /** Set the initial view for the component */
-    defaultForm: PropTypes.oneOf(['signin', 'create-account']),
+    defaultForm: PropTypes.oneOf(['signinv1', 'create-accountv1']),
     /** If provided, component will use links instead of buttons to make the switch */
     routes: PropTypes.shape({
       signin: PropTypes.string,
@@ -78,7 +78,7 @@ class SignInOrJoinFree extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      form: this.props.defaultForm || 'signin',
+      form: this.props.defaultForm || 'signinv1',
       error: null,
       submitting: false,
       unknownEmailError: false,
@@ -320,11 +320,11 @@ class SignInOrJoinFree extends React.Component {
           this.renderTwoFactorAuthBoxes(useRecoveryCodes)
         ) : (
           <Fragment>
-            {displayedForm !== 'create-account' ? (
+            {displayedForm !== 'create-accountv1' ? (
               <SignIn
                 email={email}
                 onEmailChange={email => this.setState({ email, unknownEmailError: false })}
-                onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
+                onSecondaryAction={routes.join || (() => this.switchForm('create-accountv1'))}
                 onSubmit={this.signIn}
                 loading={submitting}
                 unknownEmail={unknownEmailError}
@@ -342,7 +342,7 @@ class SignInOrJoinFree extends React.Component {
                       onEmailChange={email => this.setState({ email, unknownEmailError: false })}
                       onPersonalSubmit={this.createProfile}
                       onOrgSubmit={this.createProfile}
-                      onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
+                      onSecondaryAction={routes.signin || (() => this.switchForm('signinv1'))}
                       submitting={submitting}
                       labels={this.props.createProfileLabels}
                       tabs={this.props.createProfileTabs}
