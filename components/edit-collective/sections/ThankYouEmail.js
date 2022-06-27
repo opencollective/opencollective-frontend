@@ -87,7 +87,7 @@ const ThankYouEmail = ({ collective }) => {
   return (
     <Container>
       <P fontSize="14px" fontWeight={400} lineHeight="20ppx">
-        <FormattedMessage defaultMessage="Add a custom message to be sent to your users whenever they receive a mail after a contribution to your Collective, a project, or tickets for events." />
+        <FormattedMessage defaultMessage="Add a custom message to be included in the email sent to financial contributors of your Collective, Project, or Event." />
       </P>
       <StyledHr mt="32px" mb="34px" borderStyle="dotted" />
       <Container maxWidth="1000px">
@@ -107,13 +107,13 @@ const ThankYouEmail = ({ collective }) => {
       {[CollectiveType.EVENT, CollectiveType.PROJECT].includes(collective.type) ? (
         <MessageBox type="info" mt="24px">
           <P fontSize="13px" fontWeight={400} lineHeight="20px">
-            <FormattedMessage defaultMessage="The above text will override the customized email response set by the parent collective of this event or project." />
+            <FormattedMessage defaultMessage="The above text will override the customized message set by the parent Collective of this Event or Project." />
           </P>
         </MessageBox>
       ) : (
         <MessageBox type="info" mt="24px">
           <P fontSize="13px" fontWeight={400} lineHeight="20px">
-            <FormattedMessage defaultMessage="The above text will be considered as a global customized email response for all of your events and projects. You also have the possibility to customize each if you like from the settings in events or projects." />
+            <FormattedMessage defaultMessage="The above text will be considered as the default customized email response for all contributions to your Collective, and all of your Events and Projects. You also have the ability to customize the messages for Events & Projects from within their individual Setting's Menus." />
           </P>
         </MessageBox>
       )}

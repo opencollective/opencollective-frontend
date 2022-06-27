@@ -156,7 +156,7 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Policies',
   },
   [ALL_SECTIONS.THANK_YOU_EMAIL]: {
-    defaultMessage: 'Thank You Email',
+    defaultMessage: 'Custom Email',
   },
   [ALL_SECTIONS.HOST]: {
     id: 'Fiscalhost',
