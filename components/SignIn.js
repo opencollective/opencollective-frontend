@@ -14,7 +14,7 @@ import { Span } from './Text';
 /**
  * Component for handing user sign-in or redirecting to sign-up.
  */
-export default class SignInV2 extends React.Component {
+export default class SignIn extends React.Component {
   static propTypes = {
     /** handles the email input submission, a.k.a Sign In */
     onSubmit: PropTypes.func.isRequired,
