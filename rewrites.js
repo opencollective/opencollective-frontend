@@ -79,10 +79,6 @@ exports.REWRITES = [
     destination: '/external-redirect',
   },
   {
-    source: '/signinv1/:token?',
-    destination: '/signinv1',
-  },
-  {
     source: '/signin/:token?',
     destination: '/signinv2',
   },
@@ -97,10 +93,6 @@ exports.REWRITES = [
   {
     source: '/email/unsubscribe/:email/:slug/:type/:token',
     destination: '/unsubscribeEmail',
-  },
-  {
-    source: '/:form(create-accountv1)',
-    destination: '/signinv1',
   },
   {
     source: '/:form(create-account)',
