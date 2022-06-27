@@ -11,8 +11,8 @@ import Loading from '../../components/Loading';
 import MessageBox from '../../components/MessageBox';
 import MessageBoxGraphqlError from '../../components/MessageBoxGraphqlError';
 import { ApplicationApproveScreen } from '../../components/oauth/ApplicationApproveScreen';
-import SignInOrJoinFreeV2 from '../../components/SignInOrJoinFreeV2';
-import { useLoggedInUser } from '../../components/UserProvider';
+import SignInOrJoinFree from '../../components/SignInOrJoinFree';
+import { useUser } from '../../components/UserProvider';
 
 const applicationQuery = gqlV2`
   query OAuthAuthorization($clientId: String!) {
@@ -59,7 +59,7 @@ const OAuthAuthorizePage = () => {
         {isLoading ? (
           <Loading />
         ) : !LoggedInUser ? (
-          <SignInOrJoinFreeV2 />
+          <SignInOrJoinFree />
         ) : missingParams.length ? (
           <MessageBox withIcon type="error">
             <FormattedMessage

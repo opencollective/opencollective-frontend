@@ -1,7 +1,7 @@
 import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
-import SignInV2 from '../../components/SignInV2';
+import SignIn from '../../components/SignIn';
 
-<Meta title="Design system/SignInV2" component={SignInV2} />
+<Meta title="Design system/SignIn" component={SignIn} />
 
 "Sign In" button stays disabled until there is a value in the email input.
 
@@ -16,7 +16,7 @@ Uses the built-in browser email validation to block submission until valid.
       const [email, setEmail] = React.useState('');
       return (
         <div>
-          <SignInV2
+          <SignIn
             onSubmit={value => setAction(`The form was submitted with a value of ${value}`)}
             onSecondaryAction={() => setAction('Secondary action was clicked')}
             onEmailChange={setEmail}
@@ -34,9 +34,7 @@ Uses the built-in browser email validation to block submission until valid.
 <Canvas>
   <Story name="Loading / Submitting">
     {() => {
-      return (
-        <SignInV2 loading onSubmit={() => {}} onSecondaryAction={() => {}} email="test+betree@opencollective.com" />
-      );
+      return <SignIn loading onSubmit={() => {}} onSecondaryAction={() => {}} email="test+betree@opencollective.com" />;
     }}
   </Story>
 </Canvas>
@@ -47,12 +45,7 @@ Uses the built-in browser email validation to block submission until valid.
   <Story name="With Unknown Email">
     {() => {
       return (
-        <SignInV2
-          onSubmit={() => {}}
-          onSecondaryAction={() => {}}
-          unknownEmail
-          email="test+betree@opencollective.com"
-        />
+        <SignIn onSubmit={() => {}} onSecondaryAction={() => {}} unknownEmail email="test+betree@opencollective.com" />
       );
     }}
   </Story>
