@@ -5,10 +5,10 @@ import { FormattedMessage } from 'react-intl';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Image from './Image';
-import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
 import StyledLink from './StyledLink';
+import StyledLinkButton from './StyledLinkButton';
 import { Span } from './Text';
 
 /**
@@ -45,29 +45,28 @@ export default class SignIn extends React.Component {
     }
   }
 
-  renderSecondaryAction(message, style) {
+  renderSecondaryAction(message) {
     const { loading, onSecondaryAction } = this.props;
     return typeof onSecondaryAction === 'string' ? (
       <StyledLink
-        as={Link}
         href={onSecondaryAction}
         disabled={loading}
         fontSize="14px"
         data-cy="signin-secondary-action-btn"
-        {...style}
+        underlineOnHover
       >
         {message}
       </StyledLink>
     ) : (
-      <StyledButton
-        asLink
+      <StyledLinkButton
         fontSize="14px"
         onClick={onSecondaryAction}
         disabled={loading}
         data-cy="signin-secondary-action-btn"
+        underlineOnHover
       >
         {message}
-      </StyledButton>
+      </StyledLinkButton>
     );
   }
 
@@ -196,9 +195,7 @@ export default class SignIn extends React.Component {
               />{' '}
               <Box mt="24px">
                 <Span mr="40px">
-                  {this.renderSecondaryAction(<FormattedMessage defaultMessage="Yes, create an account" />, {
-                    underlineOnHover: true,
-                  })}
+                  {this.renderSecondaryAction(<FormattedMessage defaultMessage="Yes, create an account" />)}
                 </Span>
                 <StyledLink onClick={() => this.setState({ unknownEmail: false })} underlineOnHover={true}>
                   <FormattedMessage defaultMessage="No, use a different email" />

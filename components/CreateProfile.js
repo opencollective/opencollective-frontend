@@ -14,7 +14,7 @@ import StyledCheckbox from './StyledCheckbox';
 import StyledHr from './StyledHr';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
-import StyledLink from './StyledLink';
+import StyledLinkButton from './StyledLinkButton';
 import { P, Span } from './Text';
 
 const messages = defineMessages({
@@ -63,15 +63,16 @@ Tab.propTypes = {
   'data-cy': PropTypes.string,
 };
 
-const SecondaryAction = ({ children, loading, onSecondaryAction }) => {
+const SecondaryAction = ({ children, loading, onSecondaryAction, asLink }) => {
+  const Button = asLink ? StyledLinkButton : StyledButton;
   return typeof onSecondaryAction === 'string' ? (
-    <StyledLink as={Link} href={onSecondaryAction} disabled={loading} fontSize="14px">
+    <Button as={Link} mt="24px" mr="16px" width="120px" href={onSecondaryAction} disabled={loading} fontSize="14px">
       {children}
-    </StyledLink>
+    </Button>
   ) : (
-    <StyledButton asLink fontSize="14px" onClick={onSecondaryAction} disabled={loading}>
+    <Button mt="24px" mr="16px" width="120px" fontSize="14px" onClick={onSecondaryAction} disabled={loading}>
       {children}
-    </StyledButton>
+    </Button>
   );
 };
 
@@ -79,6 +80,8 @@ SecondaryAction.propTypes = {
   children: PropTypes.node,
   loading: PropTypes.bool,
   onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+  style: PropTypes.object,
+  asLink: PropTypes.bool,
 };
 
 const NewsletterCheckBox = ({ onChange, checked }) => {
@@ -304,7 +307,7 @@ const CreateProfile = ({
                 values={{ email: <strong>{email}</strong> }}
               />
               <Box mt="8px">
-                <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
+                <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting} asLink>
                   <FormattedMessage defaultMessage="Sign me in" />
                 </SecondaryAction>
               </Box>
@@ -313,12 +316,12 @@ const CreateProfile = ({
         )}
         <Flex justifyContent="center">
           <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting}>
-            <StyledButton mt="24px" mr="16px" width="120px">
+            <Span>
               &larr;{` `}
               <Span fontWeight="500" fontSize="14px">
                 <FormattedMessage defaultMessage="Go back" />
               </Span>
-            </StyledButton>
+            </Span>
           </SecondaryAction>
           <StyledButton
             mt="24px"
