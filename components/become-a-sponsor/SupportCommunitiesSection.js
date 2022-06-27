@@ -18,7 +18,7 @@ const SupportCommunities = () => (
           fontSize={['24px', null, null, null, '30px']}
           lineHeight={['32px', null, null, null, '48px']}
           letterSpacing={['-1.2px', '-1.6px']}
-          color="black.900"
+          color="primary.900"
           mb={['24px', 3]}
         >
           <FormattedMessage
