@@ -25,7 +25,7 @@ import Loading from '../components/Loading';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import { recurringContributionsQuery } from '../components/recurring-contributions/graphql/queries';
 import RecurringContributionsContainer from '../components/recurring-contributions/RecurringContributionsContainer';
-import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import SignInOrJoinFreeV2 from '../components/SignInOrJoinFreeV2';
 import StyledFilters from '../components/StyledFilters';
 import StyledHr from '../components/StyledHr';
 import { P, Span } from '../components/Text';
@@ -164,7 +164,7 @@ class recurringContributionsPage extends React.Component {
                 defaultMessage="You need to be logged in as the admin of this account to view this page."
               />
             </P>
-            {!LoggedInUser && <SignInOrJoinFree />}
+            {!LoggedInUser && <SignInOrJoinFreeV2 />}
           </Container>
         ) : (
           <Container>

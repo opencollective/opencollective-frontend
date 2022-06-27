@@ -31,14 +31,14 @@ class SigninPage extends React.Component {
     return {
       token,
       next,
-      form: form || 'signin',
+      form: form || 'signinv1',
       isSuspiciousUserAgent: isSuspiciousUserAgent(req?.get('User-Agent')),
       email: email && isEmail(email) ? email : null,
     };
   }
 
   static propTypes = {
-    form: PropTypes.oneOf(['signin', 'create-account']).isRequired,
+    form: PropTypes.oneOf(['signinv1', 'create-accountv1']).isRequired,
     token: PropTypes.string,
     email: PropTypes.string,
     next: PropTypes.string,
@@ -70,7 +70,7 @@ class SigninPage extends React.Component {
 
     if (oldState.isRobot && !this.state.isRobot) {
       this.initialize();
-    } else if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-account') {
+    } else if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-accountv1') {
       // --- User logged in ---
       this.setState({ success: true });
       // Avoid redirect loop: replace '/signin' redirects by '/'
@@ -116,7 +116,7 @@ class SigninPage extends React.Component {
 
   getRoutes() {
     const { next } = this.props;
-    const routes = { signin: '/signin', join: '/create-account' };
+    const routes = { signin: '/signinv1', join: '/create-accountv1' };
     if (!next) {
       return routes;
     } else {
@@ -155,7 +155,7 @@ class SigninPage extends React.Component {
       );
     } else if ((loadingLoggedInUser || this.state.success) && token) {
       return <Loading />;
-    } else if (!loadingLoggedInUser && LoggedInUser && form === 'create-account') {
+    } else if (!loadingLoggedInUser && LoggedInUser && form === 'create-accountv1') {
       return (
         <MessageBox type="warning" withIcon>
           <FormattedMessage
