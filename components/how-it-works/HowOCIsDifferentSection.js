@@ -6,6 +6,7 @@ import { display } from 'styled-system';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex } from '../Grid';
+import { SectionTitle } from '../marketing/Text';
 import { H3, P } from '../Text';
 
 const Title = styled(H3)`
@@ -15,7 +16,7 @@ const Title = styled(H3)`
   font-weight: bold;
   margin-bottom: 16px;
   margin-top: 16px;
-  color: ${themeGet('colors.black.800')};
+  color: ${themeGet('colors.primary.900')};
   ${display}
 
   @media screen and (min-width: 40em) {
@@ -47,14 +48,9 @@ const HowOCIsDifferent = () => {
   return (
     <Flex mx={[3, 4]} my={4} mt={['88px', null, '120px']} flexDirection="column" alignItems="center" textAlign="center">
       <Box width={['288px', '100%']}>
-        <H3
-          fontSize={['32px', '40px']}
-          lineHeight={['40px', '48px']}
-          letterSpacing={['-0.008em', '-0.04em']}
-          color="black.900"
-        >
+        <SectionTitle>
           <FormattedMessage id="howItWorks.HowOCIsDifferent.title" defaultMessage="Open Collective is different" />
-        </H3>
+        </SectionTitle>
       </Box>
 
       <Flex

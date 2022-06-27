@@ -4,8 +4,9 @@ import { FormattedMessage } from 'react-intl';
 import Illustration from '../collectives/HomeIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
 import StyledLink from '../StyledLink';
-import { H2, H3, P } from '../Text';
+import { H3, P } from '../Text';
 
 const MoreFeatures = () => (
   <Flex
@@ -17,29 +18,17 @@ const MoreFeatures = () => (
   >
     <Container display="flex" flexDirection="column" alignItems="center" mx={3}>
       <Box mb={['24px', 3, null, null, '24px']} width={['288px', 1]}>
-        <H2
-          fontSize={['32px', null, null, null, '40px']}
-          lineHeight={['40px', null, null, null, '48px']}
-          letterSpacing={['-0.008em', null, null, '-0.04em']}
-          color="black.900"
-          textAlign="center"
-        >
+        <SectionTitle textAlign="center">
           <FormattedMessage id="howItWorks.muchMore" defaultMessage="And so much more!" />
-        </H2>
+        </SectionTitle>
       </Box>
       <Box width={['288px', 1]}>
-        <P
-          fontSize={['16px', '20px', '24px']}
-          lineHeight={['24px', '28px', '32px']}
-          textAlign="center"
-          color="black.700"
-          fontWeight="500"
-        >
+        <SectionDescription textAlign="center">
           <FormattedMessage
             id="home.weAreOpenSection.subtitle"
             defaultMessage="We not only help you be transparent, we are too!"
           />
-        </P>
+        </SectionDescription>
       </Box>
     </Container>
     <Flex
@@ -136,7 +125,7 @@ const MoreFeatures = () => (
     <Box mt="74px">
       <StyledLink
         width="100%"
-        buttonStyle="standard"
+        buttonStyle="marketingSecondary"
         buttonSize="medium"
         href="https://docs.opencollective.com/help/"
         fontWeight="500"

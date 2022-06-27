@@ -6,7 +6,8 @@ import styled from 'styled-components';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
-import { H2, H3 } from '../Text';
+import { SectionTitle } from '../marketing/Text';
+import { H3 } from '../Text';
 
 const Wrapper = styled(Container)`
   display: flex;
@@ -31,15 +32,9 @@ const MoreAboutFiscalHosting = () => {
   return (
     <Flex flexDirection="column" justifyContent="center" alignItems="center" px="16px" my={[4, '100px']}>
       <Box mb={['24px', '56px']} width={['288px', 1]}>
-        <H2
-          fontSize={['32px', '40px']}
-          lineHeight={['40px', '48px']}
-          letterSpacing={['-0.008em', '-0.04em']}
-          color="black.900"
-          textAlign="center"
-        >
+        <SectionTitle textAlign="center">
           <FormattedMessage id="howItWorks.moreAboutFiscalHosting" defaultMessage="More about fiscal hosting" />
-        </H2>
+        </SectionTitle>
       </Box>
       <Flex flexDirection={['column', null, 'row']}>
         <Link href="/fiscal-hosting">
