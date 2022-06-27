@@ -1,6 +1,7 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
+import Banner from '../components/collectives/Banner';
 import JoinUsSection from '../components/collectives/sections/JoinUs';
 import CollaborateWithMoney from '../components/home/CollaborateWithMoneySection';
 import DedicatedTeam from '../components/home/DedicatedTeamSection';
@@ -23,6 +24,7 @@ const HomePage = () => {
   const { formatMessage } = useIntl();
   return (
     <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
+      <Banner />
       <TheFutureIsCollective />
       <RaiseMoney />
       <OpenCollectiveIs />

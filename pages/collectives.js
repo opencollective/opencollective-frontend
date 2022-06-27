@@ -1,7 +1,6 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
-import Banner from '../components/collectives/Banner';
 import CreateCollective from '../components/collectives/sections/CreateCollective';
 import FeaturesSection from '../components/collectives/sections/Features';
 import FiscalHostSection from '../components/collectives/sections/FiscalHost';
@@ -26,7 +25,6 @@ const CollectivesPage = () => {
   const { formatMessage } = useIntl();
   return (
     <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
-      <Banner />
       <MakeCommunitySection />
       <WhatCanYouDoSection />
       <FeaturesSection />
