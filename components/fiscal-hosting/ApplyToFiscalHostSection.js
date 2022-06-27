@@ -4,12 +4,11 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import Avatar from '../Avatar';
-import SectionSubTitle from '../collectives/SectionSubtitle';
-import SectionTitle from '../collectives/SectionTitle';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
 import StyledCarousel from '../StyledCarousel';
 import StyledLink from '../StyledLink';
 import { P } from '../Text';
@@ -20,7 +19,7 @@ const ApplyLink = styled(StyledLink)`
   border-radius: 16px;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: ${props => props.hoverColor || 'rgba(255, 255, 255, 0.2)'};
   }
 `;
 
@@ -62,10 +61,10 @@ const groupHostsIntoSections = hosts =>
     [],
   );
 
-const Host = ({ id, name, logo, bgImage, location, color, collectivePath }) => {
+const Host = ({ id, name, logo, bgImage, location, color, collectivePath, hoverColor }) => {
   const intl = useIntl();
   return (
-    <ApplyLink as={Link} href={collectivePath}>
+    <ApplyLink as={Link} href={collectivePath} hoverColor={hoverColor || null}>
       <Container
         textAlign="center"
         display="flex"
@@ -143,6 +142,7 @@ Host.propTypes = {
   logo: PropTypes.string,
   bgImage: PropTypes.string,
   color: PropTypes.string,
+  hoverColor: PropTypes.string,
 };
 
 const ApplyToHostDesktopCarousel = ({ display, controllerPosition }) => (
@@ -152,7 +152,7 @@ const ApplyToHostDesktopCarousel = ({ display, controllerPosition }) => (
       <Container display={['none', 'flex']} key={index.toString()} justifyContent="center" width={1}>
         {groupedHost.map(host => (
           <Fragment key={host.id}>
-            <Host {...host} />
+            <Host {...host} hoverColor="rgba(20, 110, 255, 0.05)" />
           </Fragment>
         ))}
       </Container>
@@ -191,25 +191,11 @@ ApplyToHostGrid.propTypes = {
 
 const ApplyToFiscalHosts = () => (
   <Flex my={4} flexDirection="column" mx={[3, 4]} alignItems="center">
-    <SectionTitle
-      textAlign="center"
-      fontSize={['24px', '32px']}
-      lineHeight={['32px', '40px']}
-      letterSpacing={['-0.008em', '-1.2px']}
-      mb="8px"
-    >
+    <SectionTitle textAlign="center" mb="8px">
       <FormattedMessage id="fiscalHosting.applyToFiscalHost" defaultMessage="Apply to one of our Fiscal Hosts" />
     </SectionTitle>
     <Container width={['286px', '648px']} textAlign="center" mb={4}>
-      <SectionSubTitle
-        color="black.700"
-        fontWeight="500"
-        textAlign="center"
-        fontSize={['16px', '20px']}
-        lineHeight={['24px', '28px']}
-        letterSpacing={[null, '-0.6px']}
-        my="0"
-      >
+      <SectionDescription textAlign="center" my="0">
         <FormattedMessage
           id="fiscalHosting.applyToFiscalHost.description"
           defaultMessage="<orgsAroundTheWorldLink>Organizations around the world</orgsAroundTheWorldLink> are using Open Collective to host multiple projects, groups and communities. Find out more about them! Or you can <createYourOwnFiscalHostLink>create your own fiscal host</createYourOwnFiscalHostLink>."
@@ -224,7 +210,7 @@ const ApplyToFiscalHosts = () => (
             }),
           }}
         />
-      </SectionSubTitle>
+      </SectionDescription>
     </Container>
     <ApplyToHostMobileCarousel />
     <Flex mt={2} width={1} maxWidth="1200px">

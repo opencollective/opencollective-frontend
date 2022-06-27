@@ -4,10 +4,9 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
-import SectionSubtitle from '../collectives/SectionSubtitle';
-import SectionTitle from '../collectives/SectionTitle';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
 import StyledCarousel from '../StyledCarousel';
 import { H3, P } from '../Text';
 
@@ -242,7 +241,7 @@ const WhoIsFiscalHosting = () => {
 
           <Box width={['288px', '392px', null, null, '657px']} mr={[null, '29px', '93px']}>
             <Box textAlign={['center', 'left']}>
-              <SectionTitle fontSize="32px" lineHeight="40px" letterSpacing="-1.2px" color="black.800">
+              <SectionTitle>
                 <FormattedMessage
                   id="fiscalHosting.whoIsFiscalHostingFor.title"
                   defaultMessage="Who is fiscal hosting for?"
@@ -251,17 +250,12 @@ const WhoIsFiscalHosting = () => {
             </Box>
 
             <Box my={2} textAlign={['center', 'left']}>
-              <SectionSubtitle
-                color={['black.600', 'black.700']}
-                fontSize={['16px', '20px']}
-                lineHeight={['24px', '28px']}
-                letterSpacing={['-0.16px', '-0.6px']}
-              >
+              <SectionDescription>
                 <FormattedMessage
                   id="fiscalHosting.whoIsFiscalHostingFor.subtitle"
                   defaultMessage="There are multiple cases where fiscal hosting can be valuable for a project."
                 />
-              </SectionSubtitle>
+              </SectionDescription>
             </Box>
           </Box>
         </Container>

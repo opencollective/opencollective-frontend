@@ -5,9 +5,9 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
-import SectionTitle from '../collectives/SectionTitle';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import { SectionTitle } from '../marketing/Text';
 import StyledCarousel from '../StyledCarousel';
 import { H4, P, Span } from '../Text';
 
@@ -220,7 +220,7 @@ const Feature = ({ id, learnMoreLink, intl }) => (
   <Container width={1} display="flex" mr={2} flexDirection="column">
     <FeatureTitle intl={intl} id={id} activeFeature={id} display={['flex', 'none']} />
     <Container mb={[2, 3, 5]} ml={[null, null, 4]} width={[null, null, '400px', null, '624px']} textAlign="left">
-      <H4 display={['none', 'block']} letterSpacing="-0.4px" fontWeight="bold" color="black.800" my={3}>
+      <H4 display={['none', 'block']} letterSpacing="-0.4px" fontWeight="bold" color="primary.900" my={3}>
         {intl.formatMessage(messages[`fiscalHosting.feature.${id}`])}
       </H4>
       <FeatureDescription learnMoreLink={learnMoreLink} intl={intl} id={id} display={['none', 'block']} />
@@ -251,8 +251,8 @@ const HowToUseOpenCollective = () => {
   const intl = useIntl();
 
   return (
-    <Flex mx={[3, 4]} flexDirection="column" textAlign="center" my={[4, null, 0]}>
-      <SectionTitle mb="0">
+    <Flex mx={[3, 4]} flexDirection="column" textAlign="center" my={[4, null, 5]}>
+      <SectionTitle>
         <FormattedMessage id="fiscalHosting.howCanAFiscalHostHelp" defaultMessage="How can a fiscal host help?" />
       </SectionTitle>
       <Flex
