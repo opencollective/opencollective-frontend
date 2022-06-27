@@ -99,7 +99,7 @@ const BrowseTopics = () => {
               fontSize={['32px']}
               lineHeight={['40px']}
               letterSpacing={['-0.008em']}
-              color="black.900"
+              color="primary.900"
               textAlign="center"
             >
               <FormattedMessage id="helpAndSupport.browseTopics" defaultMessage="Browse Topics" />
@@ -107,7 +107,7 @@ const BrowseTopics = () => {
           </Box>
           <Box display={['none', 'inline-block']}>
             <Link href="https://docs.opencollective.com" openInNewTab>
-              <StyledButton minWidth={110} buttonStyle="dark" whiteSpace="nowrap">
+              <StyledButton minWidth={110} buttonStyle="marketing" whiteSpace="nowrap">
                 <FormattedMessage id="helpAndSupport.viewAll" defaultMessage="View All" />
               </StyledButton>
             </Link>
@@ -164,7 +164,7 @@ const BrowseTopics = () => {
         }
         actions={
           <Link href="/contact">
-            <StyledButton minWidth={134} buttonStyle="dark" whiteSpace="nowrap">
+            <StyledButton minWidth={134} buttonStyle="marketing" whiteSpace="nowrap">
               <FormattedMessage id="contactUs" defaultMessage="Contact us" />
             </StyledButton>
           </Link>

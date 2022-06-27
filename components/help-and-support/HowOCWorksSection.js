@@ -5,28 +5,23 @@ import { FormattedMessage } from 'react-intl';
 import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
 import { H2, P, Span } from '../Text';
 
 const HowOCWorks = () => (
   <Flex flexDirection="column" px={3} alignItems="center" my="58px">
     <Box textAlign="center" mb={3} width={['304px', '660px', '768px']}>
-      <H2
-        fontSize={['32px', '40px']}
-        lineHeight={['40px', '48px']}
-        letterSpacing={['-0.008em', '-0.04em']}
-        mb={3}
-        color="black.900"
-      >
+      <SectionTitle mb={3}>
         <FormattedMessage id="helpAndSupport.howOCWorks" defaultMessage="This is how Open Collective works" />
-      </H2>
+      </SectionTitle>
     </Box>
     <Box textAlign="center" width={['288px', '660px', '768px']}>
-      <P mb="24px" fontSize={['16px', '24px']} lineHeight={['24px', '32px']} color="black.700" fontWeight="500">
+      <SectionDescription mb="24px">
         <FormattedMessage
           id="helpAndSupport.howOCWorks.description"
           defaultMessage="Open Collective enables all kinds of collaborative groups, initiatives, and projects to raise, manage, and spend money transparently."
         />
-      </P>
+      </SectionDescription>
       <Link href="/how-it-works">
         <Span color="ocBrandColors.600" fontSize="16px" lineHeight="24px">
           <FormattedMessage defaultMessage="How it works" id="howItWorks" />
@@ -59,7 +54,7 @@ const HowOCWorks = () => (
           lineHeight={['40px', '48px']}
           letterSpacing={['-0.008em', '-0.04em']}
           mb={3}
-          color="black.900"
+          color="primary.900"
         >
           <FormattedMessage id="helpAndSupport.getToKnowUs" defaultMessage="Get to know us!" />
         </H2>
@@ -83,7 +78,7 @@ const HowOCWorks = () => (
           lineHeight={['40px', '48px']}
           letterSpacing={['-0.008em', '-0.04em']}
           mb={3}
-          color="black.900"
+          color="primary.900"
           display={['none', null, 'block']}
         >
           <FormattedMessage id="helpAndSupport.getToKnowUs" defaultMessage="Get to know us!" />

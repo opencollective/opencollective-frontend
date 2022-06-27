@@ -33,7 +33,7 @@ const HowCanWeHelp = () => {
             fontSize={['32px', '40px', null, null, '52px']}
             lineHeight={['40px', '48px', null, null, '56px']}
             textAlign={['center', null, null, null, 'left']}
-            color="black.900"
+            color="primary.900"
             whiteSpace={[null, null, 'pre-line']}
           >
             <FormattedMessage id="helpAndSupport.title" defaultMessage="Hi, How can we help?" />
