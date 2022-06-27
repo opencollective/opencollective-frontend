@@ -6,9 +6,10 @@ import styled from 'styled-components';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import { SectionTitle } from '../marketing/Text';
 import StyledCarousel from '../StyledCarousel';
 import StyledLink from '../StyledLink';
-import { H2, P } from '../Text';
+import { P } from '../Text';
 
 const CollectiveNameLink = styled(StyledLink)`
   &:hover {
@@ -164,15 +165,9 @@ const CaseStudies = () => {
       px="16px"
       my={[4, null, null, null, '118px']}
     >
-      <H2
-        fontSize={['28px', '32px', null, null, '40px']}
-        lineHeight={['36px', '40px', null, null, '48px']}
-        color="black.800"
-        letterSpacing="-0.008em"
-        mb={[4, 3]}
-      >
+      <SectionTitle mb={[4, 3]}>
         <FormattedMessage id="becomeAHost.caseStudies" defaultMessage="Case studies" />
-      </H2>
+      </SectionTitle>
 
       <StyledCarousel width="288px" options={caseStudies} display={[null, 'none']}>
         {caseStudies.map(caseStudy => (
@@ -186,7 +181,7 @@ const CaseStudies = () => {
         ))}
       </Container>
       <Box mt={4}>
-        <StyledLink buttonStyle="standard" buttonSize="medium" href="/search?isHost=true" fontWeight="500">
+        <StyledLink buttonStyle="marketingSecondary" buttonSize="medium" href="/search?isHost=true" fontWeight="500">
           <FormattedMessage id="becomeAHost.discoverMore" defaultMessage="Discover more hosts" />
         </StyledLink>
       </Box>

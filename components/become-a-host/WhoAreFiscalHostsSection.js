@@ -107,7 +107,7 @@ const WhoAreFiscalHosts = () => {
       >
         <Box width={['288px', '392px', '396px', null, '448px']}>
           <H2
-            color="black.800"
+            color="primary.900"
             fontSize={['28px', '32px', null, null, '40px']}
             lineHeight={['36px', '40px', null, null, '48px']}
             letterSpacing={['-0.008em', null, null, null, '-0.04em']}
