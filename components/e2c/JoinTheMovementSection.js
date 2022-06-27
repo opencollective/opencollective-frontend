@@ -1,12 +1,11 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import SectionSubtitle from '../../components/collectives/SectionSubtitle';
-
 import { JoinUsActionContainer, JoinUsWrapper } from '../collectives/sections/JoinUs';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import { H1, Span } from '../Text';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
+import { Span } from '../Text';
 
 const JoinTheMovement = () => (
   <JoinUsWrapper py={[5, null, null, 4]} width={1}>
@@ -25,25 +24,12 @@ const JoinTheMovement = () => (
         mr={[null, null, null, 5]}
       >
         <Box width={[null, '408px', '569px', '335px', '406px']}>
-          <H1
-            mb={2}
-            mt={[5, null, null, 0]}
-            fontSize={['32px', '40px', null, '52px']}
-            lineHeight={['40px', '48px', null, '56px']}
-            letterSpacing={['-1.2px', '-1.6px', null, '-2px']}
-            textAlign={['center', null, 'left']}
-          >
+          <SectionTitle mb={2} mt={[5, null, null, 0]} textAlign={['center', null, 'left']}>
             <FormattedMessage id="e2c.joinTheMovement" defaultMessage="Join the movement and support us" />
-          </H1>
+          </SectionTitle>
         </Box>
         <Box my={(null, null, null, null, 3)} width={['288px', '438px', null, '335px', '400px']}>
-          <SectionSubtitle
-            fontSize={['20px', null, null, '24px']}
-            lineHeight={['28px', null, null, '32px']}
-            letterSpacing={['-0.6px', null, null, '-0.8px']}
-            color={['black.800', null, null, 'black.900']}
-            textAlign={['center', null, 'left']}
-          >
+          <SectionDescription textAlign={['center', null, 'left']}>
             <FormattedMessage
               id="home.joinUsSection.subtitle"
               defaultMessage="Be part of the new generation of communities."
@@ -51,7 +37,7 @@ const JoinTheMovement = () => (
             <Span display={['none', 'inline-block']}>
               <FormattedMessage defaultMessage={'There are a couple of ways for you to contribute:'} />
             </Span>
-          </SectionSubtitle>
+          </SectionDescription>
         </Box>
       </Box>
 

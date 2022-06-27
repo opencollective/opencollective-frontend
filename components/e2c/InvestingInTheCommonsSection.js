@@ -5,7 +5,8 @@ import styled from 'styled-components';
 import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex } from '../Grid';
 import { getI18nLink, I18nBold } from '../I18nFormatters';
-import { H2, H4, P, Span } from '../Text';
+import { SectionTitle } from '../marketing/Text';
+import { H4, P, Span } from '../Text';
 
 const ListItem = styled.li`
   margin-left: 20px;
@@ -20,15 +21,9 @@ const InvestingInTheCommons = () => {
   return (
     <Flex flexDirection="column" justifyContent="center" alignItems="center" px="16px" my={['56px', '80px', '104px']}>
       <Box width={['288px', 1]} mb={['40px', '64px']}>
-        <H2
-          letterSpacing="-0.04em"
-          fontSize={['32px', '40px']}
-          lineHeight={['40px', '48px']}
-          textAlign="center"
-          color="black.900"
-        >
+        <SectionTitle textAlign="center">
           <FormattedMessage id="e2c.investingInCommons" defaultMessage="Investing in the commons" />
-        </H2>
+        </SectionTitle>
       </Box>
       <Flex flexDirection={['column', 'row-reverse']} alignItems={[null, 'center']}>
         <Box
@@ -56,7 +51,7 @@ const InvestingInTheCommons = () => {
             fontSize={['24px', '32px']}
             lineHeight={['32px', '40px']}
             letterSpacing="-0.008em"
-            color="black.800"
+            color="primary.900"
           >
             <FormattedMessage id="e2c.challengingBusiness" defaultMessage="Challenging business as usual" />
           </H4>
@@ -100,7 +95,7 @@ const InvestingInTheCommons = () => {
             fontSize={['24px', '32px']}
             lineHeight={['32px', '40px']}
             letterSpacing="-0.008em"
-            color="black.800"
+            color="primary.900"
           >
             <FormattedMessage id="e2c.transparentFinances" defaultMessage="Transparent finances" />
           </H4>

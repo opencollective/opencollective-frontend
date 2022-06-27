@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import { MainDescription, MainTitle } from '../marketing/Text';
 import { H1, P } from '../Text';
 
 const StyledIframe = styled.iframe`
@@ -22,23 +23,17 @@ const ExitToCommunity = () => {
     >
       <Container display="flex" flexDirection="column" alignItems="center">
         <Box mt={[3, 0]} mb="24px" width={['288px', 1]}>
-          <H1
-            letterSpacing="-0.008em"
-            fontSize={['32px', '40px', '52px']}
-            lineHeight={['40px', '48px', '56px']}
-            textAlign="center"
-            color="black.900"
-          >
+          <MainTitle textAlign="center">
             <FormattedMessage id="e2c.title" defaultMessage="Exit to Community #E2C" />
-          </H1>
+          </MainTitle>
         </Box>
         <Box width={['288px', '650px']}>
-          <P fontSize="18px" lineHeight="26px" textAlign="center" fontWeight="500" color="black.800">
+          <MainDescription>
             <FormattedMessage
               id="e2c.description"
               defaultMessage="Join us as we transition from a privately owned company to a structure that allows us to share power and revenue with you. "
             />
-          </P>
+          </MainDescription>
         </Box>
         <Container
           borderRadius="16px"

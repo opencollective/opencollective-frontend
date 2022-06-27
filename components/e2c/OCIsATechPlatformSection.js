@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import { SectionTitle } from '../marketing/Text';
 import StyledLink from '../StyledLink';
 import { H2 } from '../Text';
 
@@ -11,19 +12,13 @@ const OCIsATechPlatform = () => {
   return (
     <Flex flexDirection="column" justifyContent="center" alignItems="center" px="16px" my={['56px', '80px', '104px']}>
       <Box width={['288px', '698px']} mb="40px">
-        <H2
-          letterSpacing="-0.008em"
-          fontSize={['28px', '32px']}
-          lineHeight={['36px', '40px']}
-          textAlign="center"
-          color="black.900"
-        >
+        <SectionTitle textAlign="center">
           <FormattedMessage
             id="e2c.OCIsATechPlatform"
             defaultMessage="Today, Open Collective is a tech platform that
 enables a network of:"
           />
-        </H2>
+        </SectionTitle>
       </Box>
       <Container
         display={['block', 'flex', 'none']}
@@ -56,7 +51,7 @@ enables a network of:"
           fontSize={['32px', '40px']}
           lineHeight={['40px', '48px']}
           textAlign="center"
-          color="black.900"
+          color="primary.900"
         >
           <FormattedMessage
             id="e2c.OCstat"
@@ -65,7 +60,7 @@ enables a network of:"
         </H2>
       </Box>
       <Box width="194px">
-        <StyledLink buttonStyle="standard" buttonSize="medium" href="/search" fontWeight="500">
+        <StyledLink buttonStyle="marketingSecondary" buttonSize="medium" href="/search" fontWeight="500">
           <FormattedMessage id="e2c.browseCollectives" defaultMessage="Browse Collectives" />
         </StyledLink>
       </Box>
