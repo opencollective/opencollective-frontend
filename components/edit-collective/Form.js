@@ -16,6 +16,7 @@ import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
 
 import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
+import ForDevelopers from '../admin-panel/sections/ForDevelopers';
 import CodeRepositoryIcon from '../CodeRepositoryIcon';
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
@@ -493,6 +494,9 @@ class EditCollectiveForm extends React.Component {
 
       case EDIT_COLLECTIVE_SECTIONS.AUTHORIZED_APPS:
         return <AuthorizedApps />;
+
+      case EDIT_COLLECTIVE_SECTIONS.FOR_DEVELOPERS:
+        return <ForDevelopers accountSlug={collective.slug} />;
 
       case EDIT_COLLECTIVE_SECTIONS.ADVANCED:
         return (
