@@ -16,6 +16,8 @@ import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
 import StyledLink from '../components/StyledLink';
 
+const menuItems = { pricing: true };
+
 const messages = defineMessages({
   defaultTitle: {
     id: 'OC.helpAndSupport',
@@ -72,7 +74,7 @@ const HelpAndSupport = ({ action, formConfirmation }) => {
   const { formatMessage } = useIntl();
 
   return (
-    <Page description={formatMessage(messages.defaultTitle)}>
+    <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
       {action === 'contact' ? (
         renderFormContent(formConfirmation)
       ) : (
