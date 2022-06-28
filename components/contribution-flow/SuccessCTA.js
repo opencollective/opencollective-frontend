@@ -6,9 +6,9 @@ import styled, { css } from 'styled-components';
 
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
+import Newsletter from '../collectives/Newsletter';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Newsletter from '../home/Newsletter';
 import Link from '../Link';
 import StyledLink from '../StyledLink';
 import { H3, P, Span } from '../Text';

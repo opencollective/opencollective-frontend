@@ -9,7 +9,7 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledInputLocation from '../StyledInputLocation';
 import { P, Span } from '../Text';
-import { useUser } from '../UserProvider';
+import { useLoggedInUser } from '../UserProvider';
 
 import ContributeProfilePicker from './ContributeProfilePicker';
 import StepProfileInfoMessage from './StepProfileInfoMessage';
@@ -54,7 +54,7 @@ const getProfileInfo = (stepProfile, profiles) => {
 };
 
 const StepProfileLoggedInForm = ({ defaultProfileSlug, onChange, canUseIncognito, collective, data, stepDetails }) => {
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
   const getProfileArgs = [LoggedInUser, collective, canUseIncognito];
   const profiles = React.useMemo(() => getContributorProfiles(...getProfileArgs), getProfileArgs);
   const defaultProfile = getDefaultProfile(data, profiles, defaultProfileSlug);

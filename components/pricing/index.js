@@ -1,14 +1,14 @@
 import React from 'react';
 import { ArrowDown } from '@styled-icons/remix-line/ArrowDown';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import { throttle } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { createGlobalStyle } from 'styled-components';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import PricingFAQ from '../faqs/PricingFAQ';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import I18nFormatters, { getI18nLink, I18nBold } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';

@@ -1,11 +1,11 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import SectionSubtitle from '../../components/home/SectionSubtitle';
+import SectionSubtitle from '../../components/collectives/SectionSubtitle';
 
+import { JoinUsActionContainer, JoinUsWrapper } from '../collectives/sections/JoinUs';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import { JoinUsActionContainer, JoinUsWrapper } from '../home/sections/JoinUs';
 import { H1, Span } from '../Text';
 
 const JoinTheMovement = () => (

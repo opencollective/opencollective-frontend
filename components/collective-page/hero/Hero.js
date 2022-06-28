@@ -31,7 +31,7 @@ import StyledTag from '../../StyledTag';
 import { H1, Span } from '../../Text';
 import TruncatedTextWithTooltip from '../../TruncatedTextWithTooltip';
 import UserCompany from '../../UserCompany';
-import { useUser } from '../../UserProvider';
+import { useLoggedInUser } from '../../UserProvider';
 import ContainerSectionContent from '../ContainerSectionContent';
 
 import CollectiveColorPicker from './CollectiveColorPicker';
@@ -100,7 +100,7 @@ const HiddenTagItem = styled(StyledLink)`
  */
 const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const intl = useIntl();
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
   const isEditing = hasColorPicker || isEditingCover;

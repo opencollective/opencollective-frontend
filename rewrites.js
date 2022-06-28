@@ -80,10 +80,6 @@ exports.REWRITES = [
   },
   {
     source: '/signin/:token?',
-    destination: '/signin',
-  },
-  {
-    source: '/signinv2/:token?',
     destination: '/signinv2',
   },
   {
@@ -100,10 +96,6 @@ exports.REWRITES = [
   },
   {
     source: '/:form(create-account)',
-    destination: '/signin',
-  },
-  {
-    source: '/:form(create-accountv2)',
     destination: '/signinv2',
   },
   {
@@ -119,7 +111,7 @@ exports.REWRITES = [
     destination: '/create-project',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',
     destination: '/admin-panel',
   },
   {
@@ -282,6 +274,10 @@ exports.REWRITES = [
   {
     source: '/',
     destination: '/home',
+  },
+  {
+    source: '/collectives',
+    destination: '/collectives',
   },
   {
     source: '/search',

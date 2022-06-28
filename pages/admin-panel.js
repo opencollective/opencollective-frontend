@@ -17,8 +17,8 @@ import { Flex, Grid } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
-import SignInOrJoinFree from '../components/SignInOrJoinFree';
-import { useUser } from '../components/UserProvider';
+import SignInOrJoinFreeV2 from '../components/SignInOrJoinFreeV2';
+import { useLoggedInUser } from '../components/UserProvider';
 
 export const adminPanelQuery = gqlV2/* GraphQL */ `
   query AdminPanel($slug: String!) {
@@ -153,7 +153,7 @@ const AdminPanelPage = () => {
   const router = useRouter();
   const { slug, section } = router.query;
   const intl = useIntl();
-  const { LoggedInUser, loadingLoggedInUser } = useUser();
+  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
 
   const account = data?.account;
@@ -189,7 +189,7 @@ const AdminPanelPage = () => {
             <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
               {blocker}
             </MessageBox>
-            {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
+            {!LoggedInUser && <SignInOrJoinFreeV2 form="signin" disableSignup />}
           </Flex>
         ) : (
           <Grid
