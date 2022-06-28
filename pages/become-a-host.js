@@ -8,8 +8,6 @@ import WhoAreFiscalHosts from '../components/become-a-host/WhoAreFiscalHostsSect
 import JoinUs from '../components/home/sections/JoinUs';
 import Page from '../components/Page';
 
-const menuItems = { pricing: true, howItWorks: true };
-
 const messages = defineMessages({
   defaultTitle: {
     id: 'OC.tagline',
@@ -20,7 +18,7 @@ const messages = defineMessages({
 const BecomeAHost = () => {
   const { formatMessage } = useIntl();
   return (
-    <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
+    <Page description={formatMessage(messages.defaultTitle)}>
       <FiscalSponsorship />
       <WhoAreFiscalHosts />
       <WhatAreTheBenefits />

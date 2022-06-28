@@ -9,8 +9,6 @@ import HowOCWorks from '../components/how-it-works/HowOCWorksSection';
 import MoreAboutFiscalHosting from '../components/how-it-works/MoreAboutFHSection';
 import Page from '../components/Page';
 
-const menuItems = { pricing: true };
-
 const messages = defineMessages({
   defaultTitle: {
     id: 'OC.howItWorks',
@@ -29,7 +27,7 @@ const messages = defineMessages({
 const HowItWorks = () => {
   const { formatMessage } = useIntl();
   return (
-    <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
+    <Page description={formatMessage(messages.defaultTitle)}>
       <HowOCWorks />
       <HowOCIsDifferent />
       <MoreAboutFiscalHosting />

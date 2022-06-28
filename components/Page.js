@@ -23,7 +23,6 @@ const Page = ({
   menuItems,
   canonicalURL,
   collective,
-  menuItemsV2,
   showFooter = true,
   showProfileMenu = true,
 }) => {
@@ -46,7 +45,6 @@ const Page = ({
         canonicalURL={canonicalURL}
         collective={collective}
         menuItems={menuItems}
-        menuItemsV2={menuItemsV2}
         LoggedInUser={LoggedInUser}
         showProfileMenu={showProfileMenu}
       />
@@ -75,7 +73,6 @@ Page.propTypes = {
   twitterHandle: PropTypes.string,
   collective: PropTypes.object,
   menuItems: PropTypes.object,
-  menuItemsV2: PropTypes.object,
   showFooter: PropTypes.bool,
   showProfileMenu: PropTypes.bool,
 };
