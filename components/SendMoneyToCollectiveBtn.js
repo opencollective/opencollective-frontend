@@ -70,7 +70,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
           store.writeFragment({
             fragment: collectiveBalanceFragment,
             id: `CollectiveStatsType:${fromCollective.id}`,
-            data: { balance },
+            data: { id: fromCollective.id, balance },
           });
         },
       });
