@@ -15,32 +15,12 @@ import SignInOrJoinFree from '../../components/SignInOrJoinFree';
 import { useLoggedInUser } from '../../components/UserProvider';
 
 const applicationQuery = gqlV2`
-  query OAuthAuthorization($clientId: String!) {
+  query OAuthAuthorization($clientId: String!, $withoutLoggedInUser: Boolean!) {
     application(clientId: $clientId) {
       id
       name
-      account {
-        id
-        name
-        slug
-        type
-        imageUrl(height: 192)
-      }
-      oAuthAuthorization {
-        id
-        expiresAt
-      }
-    }
-  }
-`;
-
-const applicationQueryLoggedInUser = gqlV2`
-  query OAuthAuthorizationLoggedInUser($clientId: String!) {
-    application(clientId: $clientId) {
-      id
-      name
-      clientId
-      redirectUri
+      clientId @skip(if: $withoutLoggedInUser)
+      redirectUri @skip(if: $withoutLoggedInUser)
       account {
         id
         name
@@ -68,13 +48,9 @@ const OAuthAuthorizePage = () => {
   const { loadingLoggedInUser, LoggedInUser } = useLoggedInUser();
   const missingParams = REQUIRED_URL_PARAMS.filter(key => !query[key]);
   const skipQuery = missingParams.length;
-  const queryVariables = { clientId: query['client_id'] };
+  const queryVariables = { clientId: query['client_id'], withoutLoggedInUser: !LoggedInUser };
   const queryParams = { skip: skipQuery, variables: queryVariables, context: API_V2_CONTEXT };
-  const {
-    data,
-    error,
-    loading: isLoadingAuthorization,
-  } = useQuery(LoggedInUser ? applicationQueryLoggedInUser : applicationQuery, queryParams);
+  const { data, error, loading: isLoadingAuthorization } = useQuery(applicationQuery, queryParams);
   const isLoading = loadingLoggedInUser || isLoadingAuthorization;
   const hasExistingAuthorization = isValidAuthorization(data?.application?.oAuthAuthorization);
   return (
