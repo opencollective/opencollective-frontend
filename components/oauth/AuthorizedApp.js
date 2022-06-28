@@ -32,7 +32,14 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
   });
 
   return (
-    <Flex alignItems="center" justifyContent="space-between" maxWidth={776} mb={3} flexWrap="wrap">
+    <Flex
+      data-cy="connected-oauth-app"
+      alignItems="center"
+      justifyContent="space-between"
+      maxWidth={776}
+      mb={3}
+      flexWrap="wrap"
+    >
       <Flex alignItems="center">
         <Avatar collective={authorization.application.account} size={64} />
         <Box ml={24}>
@@ -65,6 +72,7 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
       </Flex>
       <Container ml={2} textAlign="center" mt={2} width={['100%', 'auto']}>
         <StyledButton
+          data-cy="oauth-app-revoke-btn"
           buttonSize="small"
           buttonStyle="dangerSecondary"
           isBorderless

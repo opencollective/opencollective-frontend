@@ -17,19 +17,20 @@ import { P } from './Text';
 const StyledInputFormikField = ({ name, validate, children, isFastField, flex, width, display, ...props }) => {
   const intl = useIntl();
   const FieldComponent = isFastField ? FastField : Field;
+  const htmlFor = props.htmlFor || `input-${name}`;
   return (
     <FieldComponent name={name} validate={validate}>
       {({ field, form, meta }) => (
         <Container flex={flex} width={width} display={display}>
-          <StyledInputField error={Boolean(meta.error)} {...props}>
+          <StyledInputField error={Boolean(meta.error)} {...props} htmlFor={htmlFor}>
             <React.Fragment>
               {children({
                 form,
                 meta,
                 field: {
                   ...field,
-                  name: name || props.htmlFor,
-                  id: props.htmlFor,
+                  name: name || htmlFor,
+                  id: htmlFor,
                   type: props.inputType,
                   disabled: props.disabled,
                   required: props.required,

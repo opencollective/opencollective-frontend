@@ -48,10 +48,12 @@ export const FISCAL_HOST_SECTIONS = {
 
 export const COLLECTIVE_SECTIONS = {
   ADVANCED: 'advanced',
+  AUTHORIZED_APPS: 'authorized-apps',
   COLLECTIVE_GOALS: 'goals',
   COLLECTIVE_PAGE: 'collective-page',
   CONNECTED_ACCOUNTS: 'connected-accounts',
   EXPORT: 'export',
+  FOR_DEVELOPERS: 'for-developers',
   HOST: 'host',
   INFO: 'info',
   PAYMENT_METHODS: 'payment-methods',
@@ -63,7 +65,6 @@ export const COLLECTIVE_SECTIONS = {
   TWO_FACTOR_AUTH: 'two-factor-auth',
   VIRTUAL_CARDS: 'virtual-cards',
   WEBHOOKS: 'webhooks',
-  AUTHORIZED_APPS: 'authorized-apps',
 };
 
 export const LEGACY_COLLECTIVE_SETTINGS_SECTIONS = {
@@ -199,6 +200,9 @@ export const SECTION_LABELS = defineMessages({
   },
   [ALL_SECTIONS.AUTHORIZED_APPS]: {
     defaultMessage: 'Authorized Apps',
+  },
+  [ALL_SECTIONS.FOR_DEVELOPERS]: {
+    defaultMessage: 'For developers',
   },
   [ALL_SECTIONS.TICKETS]: {
     id: 'section.tickets.title',

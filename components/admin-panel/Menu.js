@@ -65,6 +65,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
   } else {
     return (
       <React.Fragment>
+        {/** Host settings */}
         <MenuGroup if={isHost} mb={24}>
           <MenuSectionHeader>
             <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
@@ -80,6 +81,8 @@ const Menu = ({ collective, isAccountantOnly }) => {
           />
           <MenuLink collective={collective} section={HOST_SECTIONS.REPORTS} isBeta />
         </MenuGroup>
+
+        {/** Organization settings */}
         <MenuGroup if={isHost || isType(collective, ORGANIZATION)}>
           <MenuSectionHeader>
             <FormattedMessage id="Settings" defaultMessage="Settings" />
@@ -190,6 +193,12 @@ const Menu = ({ collective, isAccountantOnly }) => {
             if={isType(collective, USER)}
           />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH} if={isIndividual} />
+          {/* TODO(OAuth): No menu entry while we-re testing this. Open the URL directly!:
+            <MenuLink
+            collective={collective}
+            section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS}
+            if={isOneOfTypes(collective, [COLLECTIVE, ORGANIZATION, USER])}
+          /> */}
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ADVANCED} />
         </MenuGroup>
         <MenuGroup if={isSelfHostedAccount(collective) && !isAccountantOnly} mt={24}>

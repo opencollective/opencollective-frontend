@@ -1,4 +1,69 @@
 """
+An OAuth application or a personal token
+"""
+type Application {
+  id: String!
+  legacyId: Int!
+  type: ApplicationType
+    @deprecated(
+      reason: "2022-06-16: This Application object will only be used for OAuth tokens. Use PersonalToken for user tokens"
+    )
+  name: String
+  description: String
+  apiKey: String
+    @deprecated(
+      reason: "2022-06-16: This Application object will only be used for OAuth tokens. Use PersonalToken for user tokens"
+    )
+  clientId: String
+  clientSecret: String
+  redirectUri: URL
+  account: Account!
+  oAuthAuthorization: OAuthAuthorization
+}
+
+"""
+All application types
+"""
+enum ApplicationType {
+  API_KEY
+  OAUTH
+}
+
+"""
+A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
+"""
+scalar URL
+
+"""
+An OAuth authorization
+"""
+type OAuthAuthorization {
+  id: String
+  account: Individual!
+  application: Application!
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime!
+
+  """
+  The time of last update
+  """
+  updatedAt: DateTime!
+
+  """
+  The time of expiration
+  """
+  expiresAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
+
+"""
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
 """
 interface Account {
@@ -370,6 +435,21 @@ interface Account {
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -448,11 +528,6 @@ enum ImageFormat {
 }
 
 """
-A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
-"""
-scalar DateTime
-
-"""
 A collection of "Members" (ie: Organization backing a Collective)
 """
 type MemberCollection implements Collection {
@@ -497,6 +572,11 @@ An invitation to join the members of a collective
 """
 type MemberInvitation {
   id: String!
+
+  """
+  The person who invited the member, if any
+  """
+  inviter: Individual
   createdAt: DateTime!
   account: Account!
   memberAccount: Account!
@@ -1875,11 +1955,6 @@ type ExpenseAttachedFile {
 }
 
 """
-A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
-"""
-scalar URL
-
-"""
 Fields for an expense item
 """
 type ExpenseItem {
@@ -2095,6 +2170,7 @@ enum ActivityType {
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
   COLLECTIVE_VIRTUAL_CARD_ADDED
+  CONTRIBUTION_REJECTED
   ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
@@ -2110,6 +2186,7 @@ enum ActivityType {
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT
   DEACTIVATED_COLLECTIVE_AS_HOST
   VIRTUAL_CARD_REQUESTED
+  PAYMENT_FAILED
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -2648,6 +2725,21 @@ type Host implements Account & AccountWithContributions {
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -2697,6 +2789,18 @@ type Host implements Account & AccountWithContributions {
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Number of unique financial contributors.
@@ -3302,6 +3406,16 @@ enum ConnectedAccountService {
 }
 
 """
+A collection of "Application"
+"""
+type OAuthApplicationCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Application]
+}
+
+"""
 Stats for the Account
 """
 type AccountStats {
@@ -3326,6 +3440,11 @@ type AccountStats {
     """
     dateTo: DateTime
   ): Amount!
+
+  """
+  The consolidated amount of all the events and projects combined.
+  """
+  consolidatedBalance: Amount!
 
   """
   Average amount spent per month based on the last 90 days
@@ -3600,6 +3719,27 @@ enum COLLECTIVE_MINIMUM_ADMINS_APPLIES {
 }
 
 """
+A collection of webhooks
+"""
+type WebhookCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Webhook]
+}
+
+"""
+An webhook attached to an account
+"""
+type Webhook {
+  id: String!
+  legacyId: Int!
+  activityType: ActivityType
+  webhookUrl: URL
+  account: Account!
+}
+
+"""
 The name of the current plan and its characteristics.
 """
 type HostPlan {
@@ -3671,7 +3811,7 @@ type HostPlan {
   """
   Charge on revenues made through Host Fees.
   """
-  hostFeeSharePercent: Int
+  hostFeeSharePercent: Float
 
   """
   Ability to collect Platform Tips.
@@ -3731,7 +3871,7 @@ type HostMetrics {
   """
   Host fee sharing percent
   """
-  hostFeeSharePercent: Int
+  hostFeeSharePercent: Float
 }
 
 """
@@ -4523,6 +4663,21 @@ type Bot implements Account {
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -4572,6 +4727,18 @@ type Bot implements Account {
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 }
 
 """
@@ -4956,6 +5123,21 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -5005,6 +5187,18 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -5713,6 +5907,21 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -5762,6 +5971,18 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -5860,6 +6081,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   The Event end date and time
   """
   endsAt: DateTime
+
+  """
+  Timezone of the Event (TZ database format, e.g. UTC or Europe/Berlin)
+  """
+  timezone: String
 }
 
 """
@@ -6253,6 +6479,21 @@ type Individual implements Account {
   """
   connectedAccounts: [ConnectedAccount]
 
+  """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
   "\n          Address. This field is public for hosts, otherwise:\n            - Users can see their own address\n            - Hosts can see the address of users submitting expenses to their collectives\n        "
   location: Location
   categories: [String]!
@@ -6301,6 +6542,18 @@ type Individual implements Account {
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
   email: String
   isGuest: Boolean!
   isFollowingConversation(id: String!): Boolean!
@@ -6332,55 +6585,6 @@ type OAuthAuthorizationCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [OAuthAuthorization]
-}
-
-"""
-An OAuth authorization
-"""
-type OAuthAuthorization {
-  id: String
-  account: Individual!
-  application: Application!
-
-  """
-  The time of creation
-  """
-  createdAt: DateTime!
-
-  """
-  The time of last update
-  """
-  updatedAt: DateTime!
-
-  """
-  The time of expiration
-  """
-  expiresAt: DateTime!
-}
-
-"""
-An OAuth application or a personal token
-"""
-type Application {
-  id: String!
-  legacyId: Int!
-  type: ApplicationType
-  name: String
-  description: String
-  apiKey: String
-  clientId: String
-  clientSecret: String
-  redirectUri: URL
-  account: Account!
-  oAuthAuthorization: OAuthAuthorization
-}
-
-"""
-All application types
-"""
-enum ApplicationType {
-  API_KEY
-  OAUTH
 }
 
 """
@@ -6820,6 +7024,21 @@ type Organization implements Account & AccountWithContributions {
   """
   connectedAccounts: [ConnectedAccount]
 
+  """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
   "\n          Address. This field is public for hosts, otherwise:\n            - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.\n            - Hosts can see the address of organizations submitting expenses to their collectives.\n        "
   location: Location
   categories: [String]!
@@ -6868,6 +7087,18 @@ type Organization implements Account & AccountWithContributions {
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Number of unique financial contributors.
@@ -7374,6 +7605,21 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -7423,6 +7669,18 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -9836,6 +10094,21 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -9885,6 +10158,18 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -10369,6 +10654,21 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -10418,6 +10718,18 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
   policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -10783,6 +11095,12 @@ type Mutation {
     """
     policies: JSON!
   ): Account!
+  deleteAccount(
+    """
+    Reference to the Account to be deleted.
+    """
+    account: AccountReferenceInput!
+  ): Account
   createApplication(application: ApplicationCreateInput!): Application
   updateApplication(application: ApplicationUpdateInput!): Application
   deleteApplication(application: ApplicationReferenceInput!): Application
@@ -11614,6 +11932,9 @@ type Mutation {
     """
     virtualCard: VirtualCardReferenceInput!
   ): Boolean
+  createWebhook(webhook: WebhookCreateInput!): Webhook
+  updateWebhook(webhook: WebhookUpdateInput!): Webhook
+  deleteWebhook(webhook: WebhookReferenceInput!): Webhook
 }
 
 input CollectiveCreateInput {
@@ -11666,6 +11987,11 @@ input EventCreateInput {
   The Event end date and time
   """
   endsAt: DateTime!
+
+  """
+  Timezone of the Event (TZ database format, e.g. UTC or Europe/Berlin)
+  """
+  timezone: String!
 }
 
 input FundCreateInput {
@@ -11734,6 +12060,11 @@ input ApplicationCreateInput {
   name: String
   description: String
   redirectUri: URL
+
+  """
+  The account to use as the owner of the application. Defaults to currently logged in user.
+  """
+  account: AccountReferenceInput
 }
 
 """
@@ -12841,4 +13172,45 @@ enum VirtualCardProvider {
 
 input VirtualCardReferenceInput {
   id: String
+}
+
+"""
+Input type for Webhooks
+"""
+input WebhookCreateInput {
+  """
+  The account to attach the Webhook
+  """
+  account: AccountReferenceInput!
+  activityType: ActivityType! = ACTIVITY_ALL
+  webhookUrl: URL!
+}
+
+"""
+Input type to update a Webhook
+"""
+input WebhookUpdateInput {
+  """
+  The public id identifying the webhook (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the webhook (ie: 4242)
+  """
+  legacyId: Int
+  activityType: ActivityType! = ACTIVITY_ALL
+  webhookUrl: URL!
+}
+
+input WebhookReferenceInput {
+  """
+  The public id identifying the webhook (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the webhook (ie: 4242)
+  """
+  legacyId: Int
 }

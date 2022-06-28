@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import { MainDescription, MainTitle } from '../marketing/Text';
-import { H1, P } from '../Text';
 
 const StyledIframe = styled.iframe`
   border: 0.8px solid rgba(50, 51, 52, 0.1);

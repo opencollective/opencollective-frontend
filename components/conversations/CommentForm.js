@@ -14,7 +14,7 @@ import ContainerOverlay from '../ContainerOverlay';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
-import SignInOrJoinFree from '../SignInOrJoinFree';
+import SignInOrJoinFreeV2 from '../SignInOrJoinFreeV2';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
@@ -121,7 +121,7 @@ const CommentForm = ({
     <Container id={id} position="relative">
       {!loadingLoggedInUser && !LoggedInUser && (
         <ContainerOverlay backgroundType="white">
-          <SignInOrJoinFree
+          <SignInOrJoinFreeV2
             routes={{ join: getRedirectUrl(router, id) }}
             signInLabel={formatMessage(messages.signInLabel)}
             withShadow

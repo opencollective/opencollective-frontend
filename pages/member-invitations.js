@@ -16,6 +16,12 @@ const memberInvitationsPageQuery = gqlV2/* GraphQL */ `
   query MemberInvitationsPage($memberAccount: AccountReferenceInput!) {
     memberInvitations(memberAccount: $memberAccount) {
       id
+      inviter {
+        id
+        slug
+        name
+        type
+      }
       createdAt
       role
       description
