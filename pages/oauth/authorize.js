@@ -12,7 +12,7 @@ import MessageBox from '../../components/MessageBox';
 import MessageBoxGraphqlError from '../../components/MessageBoxGraphqlError';
 import { ApplicationApproveScreen } from '../../components/oauth/ApplicationApproveScreen';
 import SignInOrJoinFree from '../../components/SignInOrJoinFree';
-import { useUser } from '../../components/UserProvider';
+import { useLoggedInUser } from '../../components/UserProvider';
 
 const applicationQuery = gqlV2`
   query OAuthAuthorization($clientId: String!) {
@@ -45,7 +45,7 @@ const isValidAuthorization = authorization => {
 
 const OAuthAuthorizePage = () => {
   const { query } = useRouter();
-  const { loadingLoggedInUser, LoggedInUser } = useUser();
+  const { loadingLoggedInUser, LoggedInUser } = useLoggedInUser();
   const missingParams = REQUIRED_URL_PARAMS.filter(key => !query[key]);
   const skipQuery = !LoggedInUser || loadingLoggedInUser || missingParams.length;
   const queryVariables = { clientId: query['client_id'] };

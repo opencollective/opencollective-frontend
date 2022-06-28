@@ -18,7 +18,7 @@ import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
-import { useUser } from '../components/UserProvider';
+import { useLoggedInUser } from '../components/UserProvider';
 
 export const adminPanelQuery = gqlV2/* GraphQL */ `
   query AdminPanel($slug: String!) {
@@ -153,7 +153,7 @@ const AdminPanelPage = () => {
   const router = useRouter();
   const { slug, section } = router.query;
   const intl = useIntl();
-  const { LoggedInUser, loadingLoggedInUser } = useUser();
+  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
 
   const account = data?.account;

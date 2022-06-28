@@ -1,18 +1,17 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ArrowRight } from '@styled-icons/feather/ArrowRight';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
+import { SectionDescription, SectionTitle } from '../../marketing/Text';
 import StyledCarousel from '../../StyledCarousel';
 import StyledLink from '../../StyledLink';
 import { H4, P, Span } from '../../Text';
 import NextIllustration from '../HomeNextIllustration';
-import SectionSubtitle from '../SectionSubtitle';
-import SectionTitle from '../SectionTitle';
 
 const SelectFeatureButton = styled.button`
   width: 100%;
@@ -236,7 +235,7 @@ const Feature = ({ id, learnMoreLink, intl }) => (
   <Container width={1} display="flex" mr={2} flexDirection="column">
     <FeatureTitle intl={intl} id={id} activeFeature={id} display={[null, 'none']} />
     <Container mb={[2, 3, 5]} ml={[null, null, 4]} width={[null, null, '400px', null, '624px']} textAlign="left">
-      <H4 display={['none', 'block']} letterSpacing="-0.4px" fontWeight="bold" color="black.800" my={3}>
+      <H4 display={['none', 'block']} letterSpacing="-0.4px" fontWeight="bold" color="primary.900" my={3}>
         {intl.formatMessage(messages[`home.feature.${id}`])}
       </H4>
       <FeatureDescription learnMoreLink={learnMoreLink} intl={intl} id={id} display={['none', 'block']} />
@@ -266,16 +265,16 @@ const Features = ({ sectionTitle, sectionSubtitle }) => {
 
   return (
     <Flex mx={[3, 4]} flexDirection="column" textAlign="center" my={[4, null, 0]}>
-      <SectionTitle>
+      <SectionTitle mb={3}>
         {sectionTitle || (
           <FormattedMessage id="home.featureSection.title" defaultMessage="How to use Open Collective" />
         )}
       </SectionTitle>
-      <SectionSubtitle>
+      <SectionDescription>
         {sectionSubtitle || (
           <FormattedMessage id="home.featureSection.subTitle" defaultMessage="Discover our features." />
         )}
-      </SectionSubtitle>
+      </SectionDescription>
       <Flex
         flexDirection={['column', 'row-reverse']}
         alignItems={[null, 'flex-start', null, null, 'center']}

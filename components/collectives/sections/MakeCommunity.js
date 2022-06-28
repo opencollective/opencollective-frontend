@@ -6,9 +6,10 @@ import styled from 'styled-components';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
+import { MainDescription, MainTitle } from '../../marketing/Text';
 import StyledButton from '../../StyledButton';
 import StyledModal from '../../StyledModal';
-import { H1, H2, P, Span } from '../../Text';
+import { H2, P, Span } from '../../Text';
 import NextIllustration from '../HomeNextIllustration';
 
 const SustainTextWrapper = styled(Span)`
@@ -42,13 +43,7 @@ const MakeCommunity = () => {
       >
         <Flex flexDirection="column" alignItems={['center', 'flex-start']} mr={[null, null, null, null, 3]}>
           <Box width={[null, null, '458px', null, '558px']}>
-            <H1
-              my={[3, null, 3]}
-              letterSpacing={['-1.2px', '-1.6px', null, null, '-2px']}
-              fontSize={['32px', '40px', null, null, '52px']}
-              lineHeight={['40px', '48px', null, null, '56px']}
-              textAlign={['center', 'left']}
-            >
+            <MainTitle my={[3, null, 3]} textAlign={['center', 'left']}>
               <Span>
                 <FormattedMessage
                   id="home.makeCommunitySection.title.makeYourCommunity"
@@ -62,19 +57,10 @@ const MakeCommunity = () => {
                   }}
                 />
               </Span>
-            </H1>
+            </MainTitle>
           </Box>
           <Box width={['288px', '306px', '342px', null, '558px']}>
-            <P
-              fontSize={['15px', '16px', null, null, '18px']}
-              color="black.800"
-              mt={1}
-              mb={4}
-              letterSpacing={['-0.12px', '-0.16px', null, null, '-0.2px']}
-              lineHeight={['23px', '24px', null, null, '27px']}
-              textAlign={['center', 'left']}
-              fontWeight="500"
-            >
+            <MainDescription mt={1} mb={4} textAlign={['center', 'left']}>
               <FormattedMessage
                 id="home.makeCommunitySection.description"
                 defaultMessage="Community is about trust and sharing. Open Collective lets you manage your finances so everyone can see where money comes from and where it goes."
@@ -85,11 +71,11 @@ const MakeCommunity = () => {
                   defaultMessage="Collect and spend money transparently."
                 />
               </Span>
-            </P>
+            </MainDescription>
           </Box>
           <Box display="flex" flexDirection={['column', 'row']} alignItems="center">
             <Link href="/create">
-              <StyledButton minWidth={158} my={[2, null, 0]} mr={[0, 3]} buttonStyle="dark" whiteSpace="nowrap">
+              <StyledButton minWidth={158} my={[2, null, 0]} mr={[0, 3]} buttonStyle="marketing" whiteSpace="nowrap">
                 <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
               </StyledButton>
             </Link>
@@ -132,7 +118,7 @@ const MakeCommunity = () => {
           letterSpacing={['-0.6px', '-0.8px']}
           fontSize={['20px', '24px']}
           lineHeight={['28px', '32px']}
-          color="black.800"
+          color="primary.900"
           display={[null, 'none']}
           textAlign="center"
         >
@@ -152,7 +138,7 @@ const MakeCommunity = () => {
             letterSpacing={[null, '-0.8px']}
             fontSize={[null, '24px']}
             lineHeight={[null, '32px']}
-            color="black.800"
+            color="primary.900"
             display={['none', 'block']}
           >
             <FormattedMessage id="home.whatIsGreatAboutOC" defaultMessage="What's great about Open Collective?" />

@@ -169,7 +169,7 @@ class SigninV2Page extends React.Component {
 
     const error = errorLoggedInUser || this.state.error;
 
-    if (loadingLoggedInUser || this.state.redirecting) {
+    if (loadingLoggedInUser || this.state.redirecting || (token && !error)) {
       return <LoadingGrid />;
     }
 

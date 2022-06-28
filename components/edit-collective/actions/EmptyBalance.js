@@ -34,7 +34,7 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
           values={{ type: collective.type }}
         />
       </P>
-      {!collective.host.hostCollective && (
+      {[CollectiveType.FUND, CollectiveType.COLLECTIVE].includes(collective.type) && !collective.host.hostCollective && (
         <P color="rgb(224, 183, 0)" my={2}>
           <FormattedMessage
             id="collective.balance.notAvailable"

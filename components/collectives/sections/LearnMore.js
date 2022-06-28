@@ -221,10 +221,10 @@ const LearnMore = ({ page }) => {
       {page !== 'e2c' && (
         <Container display="flex" flexDirection={['column', 'row']} alignItems="center" justifyContent="center">
           <Box width={['288px', '332px', null, null, '360px']} textAlign={['center', 'left']} mr={[null, 4]}>
-            <H3 color="color.800" fontSize="24px" lineHeight="32px" letterSpacing="-0.12px" my={2}>
+            <H3 color="primary.900" fontSize="24px" lineHeight="32px" letterSpacing="-0.12px" my={2}>
               <FormattedMessage id="home.contributeToPlatform" defaultMessage="Contribute to the platform!" />
             </H3>
-            <P color="color.700" fontSize="18px" lineHeight="27px" letterSpacing="-0.2px" my={3}>
+            <P color="black.700" fontSize="18px" lineHeight="27px" letterSpacing="-0.2px" my={3}>
               <FormattedMessage
                 id="home.contributeToPlatform.description"
                 defaultMessage="Open Collective is free for charitable initiatives. We rely on generosity of contributors like you to make this possible."

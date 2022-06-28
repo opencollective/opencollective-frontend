@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import styled, { css } from 'styled-components';
 import { size, typography } from 'styled-system';
 

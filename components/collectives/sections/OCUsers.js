@@ -6,11 +6,10 @@ import styled from 'styled-components';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
+import { SectionDescription, SectionTitle } from '../../marketing/Text';
 import StyledCarousel from '../../StyledCarousel';
 import StyledLink from '../../StyledLink';
 import { P } from '../../Text';
-import SectionSubTitle from '../SectionSubtitle';
-import SectionTitle from '../SectionTitle';
 
 const Img = styled.img`
   max-width: 100%;
@@ -140,29 +139,16 @@ User.propTypes = {
 const OCUsers = () => {
   return (
     <Flex my={4} flexDirection="column" mx={[3, 4]} alignItems="center">
-      <SectionTitle
-        textAlign="center"
-        fontSize={[null, '32px']}
-        lineHeight={[null, '40px']}
-        letterSpacing={[null, '-1.2px']}
-      >
+      <SectionTitle textAlign="center" mb={3}>
         <FormattedMessage id="home.OCUsersSection.title" defaultMessage="Who is using Open Collective?" />
       </SectionTitle>
       <Container width={['286px', '548px', null, '768px', '991px']} mb={4} textAlign="center">
-        <SectionSubTitle
-          color="black.700"
-          fontWeight="500"
-          textAlign="center"
-          mb={4}
-          fontSize={[null, '20px']}
-          lineHeight={[null, '28px']}
-          letterSpacing={[null, '-0.6px']}
-        >
+        <SectionDescription textAlign="center" mb={4}>
           <FormattedMessage
             id="home.OCUsersSection.subtitle"
             defaultMessage="Communities around the world are using Open Collective. Find out more about them!"
           />
-        </SectionSubTitle>
+        </SectionDescription>
       </Container>
       <StyledCarousel options={users} display={[null, 'none']} width={1}>
         {users.map(user => (

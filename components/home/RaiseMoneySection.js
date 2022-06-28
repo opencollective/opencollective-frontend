@@ -4,9 +4,9 @@ import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import { getI18nLink, I18nUnderline } from '../I18nFormatters';
 import Link from '../Link';
 import { SectionDescription, SectionTitle } from '../marketing/Text';

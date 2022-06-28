@@ -276,8 +276,8 @@ exports.REWRITES = [
     destination: '/home',
   },
   {
-    source: '/new-homepage',
-    destination: '/new-homepage',
+    source: '/collectives',
+    destination: '/collectives',
   },
   {
     source: '/search',

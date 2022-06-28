@@ -8,10 +8,10 @@ import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import { Span } from '../Text';
-import { useUser } from '../UserProvider';
+import { useLoggedInUser } from '../UserProvider';
 
 const Newsletter = ({ defaultEmail }) => {
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
   return (
     <Container>
       <Flex>

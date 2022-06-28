@@ -1,9 +1,9 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import Illustration from '../collectives/HomeIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import { H1, P } from '../Text';

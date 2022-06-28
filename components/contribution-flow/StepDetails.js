@@ -21,7 +21,7 @@ import StyledAmountPicker, { OTHER_AMOUNT_KEY } from '../StyledAmountPicker';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import { H5, P, Span } from '../Text';
-import { useUser } from '../UserProvider';
+import { useLoggedInUser } from '../UserProvider';
 
 import ChangeTierWarningModal from './ChangeTierWarningModal';
 import PlatformTipInput from './PlatformTipInput';
@@ -40,7 +40,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
   const getDefaultOtherAmountSelected = () => isNil(amount) || !presets?.includes(amount);
   const [isOtherAmountSelected, setOtherAmountSelected] = React.useState(getDefaultOtherAmountSelected);
   const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
 
   const minAmount = getTierMinAmount(tier, currency);
   const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;

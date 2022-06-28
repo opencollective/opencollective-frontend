@@ -31,7 +31,7 @@ import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 import TransactionStatusTag from '../TransactionStatusTag';
-import { useUser } from '../UserProvider';
+import { useLoggedInUser } from '../UserProvider';
 
 import TransactionDetails from './TransactionDetails';
 
@@ -141,7 +141,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
     isOrderRejected,
   } = transaction;
 
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
   const [isExpanded, setExpanded] = React.useState(false);
   const intl = useIntl();
 

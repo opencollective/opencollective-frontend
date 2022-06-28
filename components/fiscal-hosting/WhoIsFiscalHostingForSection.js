@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
+import SectionSubtitle from '../collectives/SectionSubtitle';
+import SectionTitle from '../collectives/SectionTitle';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
-import SectionSubtitle from '../home/SectionSubtitle';
-import SectionTitle from '../home/SectionTitle';
 import StyledCarousel from '../StyledCarousel';
 import { H3, P } from '../Text';
 
