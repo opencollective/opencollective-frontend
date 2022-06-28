@@ -22,7 +22,7 @@ import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
-import SignInOrJoinFreeV2 from '../components/SignInOrJoinFreeV2';
+import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledLink from '../components/StyledLink';
 import { withUser } from '../components/UserProvider';
 
@@ -109,9 +109,7 @@ class CreateConversationPage extends React.Component {
               <Container position="relative">
                 {!loadingLoggedInUser && !LoggedInUser && (
                   <ContainerOverlay>
-                    <SignInOrJoinFreeV2
-                      routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }}
-                    />
+                    <SignInOrJoinFree routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }} />
                   </ContainerOverlay>
                 )}
                 <Box maxWidth={1160} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>

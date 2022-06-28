@@ -15,7 +15,7 @@ import Header from '../components/Header';
 import Loading from '../components/Loading';
 import LoadingGrid from '../components/LoadingGrid';
 import MessageBox from '../components/MessageBox';
-import SignInOrJoinFreeV2 from '../components/SignInOrJoinFreeV2';
+import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
@@ -193,7 +193,7 @@ class SigninV2Page extends React.Component {
             )}
           </MessageBox>
         )}
-        <SignInOrJoinFreeV2
+        <SignInOrJoinFree
           email={this.props.email}
           redirect={next || '/'}
           form={form}

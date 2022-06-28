@@ -80,7 +80,7 @@ exports.REWRITES = [
   },
   {
     source: '/signin/:token?',
-    destination: '/signinv2',
+    destination: '/signin',
   },
   {
     source: '/confirm/email/:token',
@@ -96,7 +96,7 @@ exports.REWRITES = [
   },
   {
     source: '/:form(create-account)',
-    destination: '/signinv2',
+    destination: '/signin',
   },
   {
     source: '/:collectiveSlug/:verb(contribute|donate)/button',
