@@ -8,7 +8,7 @@ import { getCollectiveImage } from '../lib/image-utils';
 import { truncate } from '../lib/utils';
 
 import GlobalWarnings from './GlobalWarnings';
-import TopBarV2 from './TopBarV2';
+import TopBar from './TopBar';
 
 const messages = defineMessages({
   defaultTitle: {
@@ -120,7 +120,7 @@ class Header extends React.Component {
         </Head>
         <div id="top" />
         {withTopBar && (
-          <TopBarV2
+          <TopBar
             showSearch={this.props.showSearch}
             menuItems={this.props.menuItemsV2}
             showProfileAndChangelogMenu={this.props.showProfileAndChangelogMenu}

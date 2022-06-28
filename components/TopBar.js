@@ -19,7 +19,7 @@ import SearchIcon from './SearchIcon';
 import StyledButton from './StyledButton';
 import StyledLink from './StyledLink';
 import { Span } from './Text';
-import TopBarMobileMenuV2 from './TopBarMobileMenuV2';
+import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
 
 const NavList = styled(Flex)`
@@ -65,7 +65,7 @@ const NavItem = styled(StyledLink)`
   }
 `;
 
-const TopBarV2 = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
+const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
@@ -245,7 +245,7 @@ const TopBarV2 = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
         </React.Fragment>
       )}
       <Hide md lg>
-        <TopBarMobileMenuV2 showMobileMenu={showMobileMenu} closeMenu={toggleMobileMenu} />
+        <TopBarMobileMenu showMobileMenu={showMobileMenu} closeMenu={toggleMobileMenu} />
         <Box mx={3} onClick={toggleMobileMenu}>
           <Flex as="a">
             <MenuIcon color="#aaaaaa" size={24} />
@@ -256,16 +256,16 @@ const TopBarV2 = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
   );
 };
 
-TopBarV2.propTypes = {
+TopBar.propTypes = {
   showSearch: PropTypes.bool,
   showProfileAndChangelogMenu: PropTypes.bool,
   menuItems: PropTypes.object,
 };
 
-TopBarV2.defaultProps = {
+TopBar.defaultProps = {
   showSearch: true,
   showProfileAndChangelogMenu: true,
   menuItems: { solutions: true, product: true, company: true, docs: true },
 };
 
-export default TopBarV2;
+export default TopBar;
