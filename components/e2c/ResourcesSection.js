@@ -2,10 +2,10 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
+import Newsletter from '../collectives/Newsletter';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
-import Newsletter from '../home/Newsletter';
 import HorizontalScroller from '../HorizontalScroller';
 import StyledLink from '../StyledLink';
 import { H2, P, Span } from '../Text';

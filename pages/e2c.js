@@ -1,14 +1,14 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
+import LearnMore from '../components/collectives/sections/LearnMore';
+import WeAreOpen from '../components/collectives/sections/WeAreOpen';
 import ExitToCommunity from '../components/e2c/ExitToCommunitySection';
 import InvestingInTheCommons from '../components/e2c/InvestingInTheCommonsSection';
 import JoinTheMovement from '../components/e2c/JoinTheMovementSection';
 import OCIsATechPlatform from '../components/e2c/OCIsATechPlatformSection';
 import ResourcesSection from '../components/e2c/ResourcesSection';
 import WhatDoesE2CMean from '../components/e2c/WhatDoesE2CMeanSection';
-import LearnMore from '../components/home/sections/LearnMore';
-import WeAreOpen from '../components/home/sections/WeAreOpen';
 import Page from '../components/Page';
 
 const menuItems = { pricing: true };

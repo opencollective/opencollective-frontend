@@ -4,8 +4,8 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { display } from 'styled-system';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import { H3, P } from '../Text';
 
 const Title = styled(H3)`

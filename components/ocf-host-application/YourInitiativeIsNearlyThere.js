@@ -3,9 +3,9 @@ import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import StyledLink from '../StyledLink';
 import { H1, H3, P } from '../Text';
 

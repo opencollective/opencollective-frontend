@@ -1,6 +1,7 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
+import JoinUs from '../components/collectives/sections/JoinUs';
 import APlaceToGrowAndThrive from '../components/fiscal-hosting/APlaceToGrowAndThriveSection';
 import ApplyToFiscalHosts from '../components/fiscal-hosting/ApplyToFiscalHostSection';
 import FindTheRightFiscalHost from '../components/fiscal-hosting/FindTheRightFiscalHostSection';
@@ -8,7 +9,6 @@ import HowCanAFiscalHostHelp from '../components/fiscal-hosting/HowCanAFiscalHos
 import WhatAreTheBenefits from '../components/fiscal-hosting/WhatAreTheBenefitsSection';
 import WhatIsFiscalHost from '../components/fiscal-hosting/WhatIsFiscalHostSection';
 import WhoIsFiscalHosting from '../components/fiscal-hosting/WhoIsFiscalHostingForSection';
-import JoinUs from '../components/home/sections/JoinUs';
 import Page from '../components/Page';
 
 const menuItems = { pricing: true, howItWorks: true };

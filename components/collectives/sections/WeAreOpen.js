@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import { H2 } from '../../Text';
+import { SectionTitle } from '../../marketing/Text';
 import NextIllustration from '../HomeNextIllustration';
 import SectionSubtitle from '../SectionSubtitle';
 
@@ -17,14 +17,9 @@ const WeAreOpen = () => (
       mr={[null, 2, 5]}
     >
       <Box textAlign={['center', 'left']} width={['288px', 1]}>
-        <H2
-          fontSize={['32px', null, null, null, '40px']}
-          lineHeight={['40px', null, null, null, '48px']}
-          letterSpacing={['-0.008em', null, null, null, '-0.04em']}
-          color="black.800"
-        >
+        <SectionTitle mb={3} color="black.800">
           <FormattedMessage id="home.weAreOpenSection.title" defaultMessage="We are open in every way" />
-        </H2>
+        </SectionTitle>
       </Box>
       <Box display={['block', 'none']} my={3}>
         <NextIllustration

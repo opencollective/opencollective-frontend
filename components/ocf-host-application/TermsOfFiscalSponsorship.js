@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { FormattedMessage } from 'react-intl';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledCheckbox from '../StyledCheckbox';

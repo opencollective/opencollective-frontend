@@ -2,9 +2,9 @@ import React, { Fragment, useState } from 'react';
 import { RightArrow } from '@styled-icons/boxicons-regular/RightArrow';
 import { FormattedMessage } from 'react-intl';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import { I18nBold } from '../I18nFormatters';
 import Link from '../Link';
 import { MainDescription, MainTitle } from '../marketing/Text';

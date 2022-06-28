@@ -4,10 +4,10 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import Avatar from '../Avatar';
+import SectionSubTitle from '../collectives/SectionSubtitle';
+import SectionTitle from '../collectives/SectionTitle';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
-import SectionSubTitle from '../home/SectionSubtitle';
-import SectionTitle from '../home/SectionTitle';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledCarousel from '../StyledCarousel';

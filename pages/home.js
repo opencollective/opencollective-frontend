@@ -1,16 +1,14 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
-import Banner from '../components/home/Banner';
-import CreateCollective from '../components/home/sections/CreateCollective';
-import FeaturesSection from '../components/home/sections/Features';
-import FiscalHostSection from '../components/home/sections/FiscalHost';
-import JoinUsSection from '../components/home/sections/JoinUs';
-import LearnMoreSection from '../components/home/sections/LearnMore';
-import MakeCommunitySection from '../components/home/sections/MakeCommunity';
-import OCUsersSection from '../components/home/sections/OCUsers';
-import WeAreOpenSection from '../components/home/sections/WeAreOpen';
-import WhatCanYouDoSection from '../components/home/sections/WhatCanYouDo';
+import Banner from '../components/collectives/Banner';
+import JoinUsSection from '../components/collectives/sections/JoinUs';
+import CollaborateWithMoney from '../components/home/CollaborateWithMoneySection';
+import DedicatedTeam from '../components/home/DedicatedTeamSection';
+import GetToKnowUs from '../components/home/GetToKnowUsSection';
+import OpenCollectiveIs from '../components/home/OpenCollectiveIsSection';
+import RaiseMoney from '../components/home/RaiseMoneySection';
+import TheFutureIsCollective from '../components/home/TheFutureIsCollectiveSection';
 import Page from '../components/Page';
 
 const menuItems = { pricing: true, howItWorks: true };
@@ -27,14 +25,12 @@ const HomePage = () => {
   return (
     <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
       <Banner />
-      <MakeCommunitySection />
-      <WhatCanYouDoSection />
-      <FeaturesSection />
-      <FiscalHostSection />
-      <CreateCollective />
-      <OCUsersSection />
-      <WeAreOpenSection />
-      <LearnMoreSection />
+      <TheFutureIsCollective />
+      <RaiseMoney />
+      <OpenCollectiveIs />
+      <CollaborateWithMoney />
+      <DedicatedTeam />
+      <GetToKnowUs />
       <JoinUsSection />
     </Page>
   );

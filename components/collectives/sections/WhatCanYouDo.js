@@ -5,10 +5,9 @@ import styled from 'styled-components';
 import { display } from 'styled-system';
 
 import { Box, Flex } from '../../Grid';
+import { SectionDescription, SectionTitle } from '../../marketing/Text';
 import { H3, P } from '../../Text';
 import NextIllustration from '../HomeNextIllustration';
-import SectionSubTitle from '../SectionSubtitle';
-import SectionTitle from '../SectionTitle';
 
 const Title = styled(H3)`
   font-size: 20px;
@@ -17,7 +16,7 @@ const Title = styled(H3)`
   font-weight: bold;
   margin-bottom: 16px;
   margin-top: 16px;
-  color: ${themeGet('colors.black.800')};
+  color: ${themeGet('colors.primary.900')};
   ${display}
 
   @media screen and (min-width: 40em) {
@@ -51,16 +50,16 @@ const Description = styled(P)`
 const WhatCanYouDo = () => {
   return (
     <Flex mx={[3, 4]} my={4} flexDirection="column" alignItems="center" textAlign="center">
-      <SectionTitle>
+      <SectionTitle mb={3}>
         <FormattedMessage id="home.whatCanYouDoSection.title" defaultMessage="What can you do with Open Collective?" />
       </SectionTitle>
       <Box width={['288px', '548px', '708px', null, '755px']} textAlign="center">
-        <SectionSubTitle fontSize="20px" lineHeight="28px" letterSpacing="-0.6px" color="black.700">
+        <SectionDescription color="black.700">
           <FormattedMessage
             id="home.whatCanYouDoSection.subTitle"
             defaultMessage="Accept donations and sponsorships, celebrate your supporters, pay expenses, and keep everyone up to date — all in one place."
           />
-        </SectionSubTitle>
+        </SectionDescription>
       </Box>
       <Flex
         my="32px"
