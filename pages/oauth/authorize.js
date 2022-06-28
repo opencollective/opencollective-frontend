@@ -12,7 +12,7 @@ import MessageBox from '../../components/MessageBox';
 import MessageBoxGraphqlError from '../../components/MessageBoxGraphqlError';
 import { ApplicationApproveScreen } from '../../components/oauth/ApplicationApproveScreen';
 import SignInOrJoinFree from '../../components/SignInOrJoinFree';
-import { useUser } from '../../components/UserProvider';
+import { useLoggedInUser } from '../../components/UserProvider';
 
 const applicationQuery = gqlV2`
   query OAuthAuthorization($clientId: String!) {
