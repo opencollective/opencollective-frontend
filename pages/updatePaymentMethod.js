@@ -20,7 +20,7 @@ import Link from '../components/Link';
 import Loading from '../components/Loading';
 import NewCreditCardForm from '../components/NewCreditCardForm';
 import Page from '../components/Page';
-import SignInOrJoinFreeV2 from '../components/SignInOrJoinFreeV2';
+import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { withStripeLoader } from '../components/StripeProvider';
 import StyledButton from '../components/StyledButton';
 import { H1, H5 } from '../components/Text';
@@ -174,7 +174,7 @@ class UpdatePaymentPage extends React.Component {
       return (
         <Page>
           <Flex justifyContent="center" p={5}>
-            <SignInOrJoinFreeV2 />
+            <SignInOrJoinFree />
           </Flex>
         </Page>
       );

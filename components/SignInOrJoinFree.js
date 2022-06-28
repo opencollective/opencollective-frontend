@@ -14,12 +14,12 @@ import { i18nGraphqlException } from '../lib/errors';
 import { getWebsiteUrl } from '../lib/utils';
 
 import Container from './Container';
-import CreateProfileV2 from './CreateProfileV2';
+import CreateProfile from './CreateProfile';
 import { Box, Flex } from './Grid';
 import { I18nSupportLink } from './I18nFormatters';
 import Link from './Link';
 import Loading from './Loading';
-import SignInV2 from './SignInV2';
+import SignIn from './SignIn';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledHr from './StyledHr';
@@ -52,7 +52,7 @@ const SignInFooterLink = styled(Link)`
  * Shows a SignIn form by default, with the ability to switch to SignUp form. It
  * also has the API methods binded, so you can use it directly.
  */
-class SignInOrJoinFreeV2 extends React.Component {
+class SignInOrJoinFree extends React.Component {
   static propTypes = {
     /** Redirect URL */
     redirect: PropTypes.string,
@@ -342,7 +342,7 @@ class SignInOrJoinFreeV2 extends React.Component {
         ) : (
           <Fragment>
             {displayedForm !== 'create-account' && !error ? (
-              <SignInV2
+              <SignIn
                 email={email}
                 onEmailChange={email => this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })}
                 onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
@@ -356,7 +356,7 @@ class SignInOrJoinFreeV2 extends React.Component {
               <Flex flexDirection="column" width={1} alignItems="center">
                 <Flex justifyContent="center" width={1}>
                   <Box maxWidth={535} mx={[2, 4]} width="100%">
-                    <CreateProfileV2
+                    <CreateProfile
                       email={email}
                       name={this.state.name}
                       newsletterOptIn={this.state.newsletterOptIn}
@@ -420,4 +420,4 @@ const signupMutation = gql`
 
 export const addSignupMutation = graphql(signupMutation, { name: 'createUser' });
 
-export default withToasts(injectIntl(addSignupMutation(withRouter(SignInOrJoinFreeV2))));
+export default withToasts(injectIntl(addSignupMutation(withRouter(SignInOrJoinFree))));
