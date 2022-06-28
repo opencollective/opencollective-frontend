@@ -33,6 +33,12 @@ export default class SignIn extends React.Component {
     email: PropTypes.string.isRequired,
     /** handles changes in the email input */
     onEmailChange: PropTypes.func.isRequired,
+    /** Oauth Sign In **/
+    isOauth: PropTypes.bool,
+    /** Oauth App Name **/
+    oAuthAppName: PropTypes.string,
+    /** Oauth App Image **/
+    oAuthAppImage: PropTypes.string,
   };
 
   constructor(props) {
@@ -72,20 +78,60 @@ export default class SignIn extends React.Component {
     );
   }
 
+  getSignInPageHeading(unknownEmail) {
+    if (this.props.isOauth && unknownEmail) {
+      return <FormattedMessage defaultMessage="Sign in to your Open Collective account" />;
+    } else if (this.props.isOauth) {
+      return <FormattedMessage defaultMessage="Continue with your Open Collective account" />;
+    } else {
+      return this.props.label || <FormattedMessage defaultMessage="Continue with your email" />;
+    }
+  }
+
+  getSignInPageSubHeading(oAuthAppName) {
+    if (this.props.isOauth) {
+      return <FormattedMessage defaultMessage="and connect with {oAuthAppName}" values={{ oAuthAppName }} />;
+    } else {
+      return <FormattedMessage defaultMessage="Sign in or create a personal account to continue" />;
+    }
+  }
+
   render() {
     const { onSubmit, loading, email, onEmailChange, label } = this.props;
     const { error, showError } = this.state;
     return (
       <React.Fragment>
         <Box maxWidth={390}>
-          <Flex justifyContent="center">
-            <Image
-              src="/static/images/oc-logo-watercolor-256.png"
-              alt="Open Collective logo"
-              height={128}
-              width={128}
-            />
-          </Flex>
+          {this.props.isOauth ? (
+            <React.Fragment>
+              <Flex justifyContent="center" mb={40}>
+                <Box minWidth={104}>
+                  <Image src="/static/images/oc-logo-oauth.png" alt="Open Collective logo" height={104} width={104} />
+                </Box>
+                <Box ml={24} mr={24} mt={32} minWidth={40}>
+                  <Image src="/static/images/oauth-flow-connect.png" alt="OAuth Connect" height={40} width={40} />
+                </Box>
+                <Box minWidth={104}>
+                  <img
+                    src={this.props.oAuthAppImage}
+                    alt="OAuth Logo"
+                    height={104}
+                    width={104}
+                    style={{ borderRadius: 10 }}
+                  />
+                </Box>
+              </Flex>
+            </React.Fragment>
+          ) : (
+            <Flex justifyContent="center">
+              <Image
+                src="/static/images/oc-logo-watercolor-256.png"
+                alt="Open Collective logo"
+                height={128}
+                width={128}
+              />
+            </Flex>
+          )}
           <Flex
             as="label"
             fontWeight={700}
@@ -93,12 +139,12 @@ export default class SignIn extends React.Component {
             fontSize={label ? '24px' : ['24px', '32px']}
             mb={12}
             mt="48px"
-            justifyContent="center"
+            textAlign="center"
           >
-            {label || <FormattedMessage defaultMessage="Continue with your email" />}
+            {label || this.getSignInPageHeading(this.state.unknownEmail)}
           </Flex>
           <Flex fontWeight={400} fontSize="16px" color="black.700" mb="50px" justifyContent="center">
-            <FormattedMessage defaultMessage="Sign in or create a personal account to continue" />
+            {this.getSignInPageSubHeading(this.props.oAuthAppName)}
           </Flex>
           {!this.state.unknownEmail ? (
             <React.Fragment>
