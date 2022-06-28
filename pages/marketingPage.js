@@ -33,6 +33,10 @@ function importAll(r) {
   return map;
 }
 
+function getmenuItem() {
+  return { pricing: false, howItWorks: false };
+}
+
 class MarketingPage extends React.Component {
   static getInitialProps({ query: { pageSlug } }) {
     return { pageSlug };
@@ -81,7 +85,7 @@ class MarketingPage extends React.Component {
     return (
       <Fragment>
         <div>
-          <Header LoggedInUser={LoggedInUser} />
+          <Header LoggedInUser={LoggedInUser} menuItems={getmenuItem()} />
           <Body>
             <style type="text/css" dangerouslySetInnerHTML={{ __html: style }} />
             <div className={className} dangerouslySetInnerHTML={{ __html: html }} />

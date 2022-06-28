@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { ChevronDown, ChevronUp } from '@styled-icons/boxicons-regular';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { rotateMixin } from '../lib/constants/animations';
 import theme from '../lib/theme';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
@@ -13,14 +13,23 @@ import { Box, Flex } from './Grid';
 import Hide from './Hide';
 import Image from './Image';
 import Link from './Link';
-import PopupMenu from './PopupMenu';
-import SearchModal from './Search';
+import SearchForm from './SearchForm';
 import SearchIcon from './SearchIcon';
-import StyledButton from './StyledButton';
 import StyledLink from './StyledLink';
-import { Span } from './Text';
 import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
+
+const Logo = styled.img.attrs({
+  src: '/static/images/opencollective-icon.svg',
+  alt: 'Open Collective logo',
+})`
+  ${({ animate }) => (animate ? rotateMixin : null)};
+`;
+
+const SearchFormContainer = styled(Box)`
+  max-width: 30rem;
+  min-width: 10rem;
+`;
 
 const NavList = styled(Flex)`
   list-style: none;
@@ -31,242 +40,171 @@ const NavList = styled(Flex)`
 
 const NavLinkContainer = styled(Box)`
   text-align: center;
-  width: 140px;
 `;
+NavLinkContainer.defaultProps = {
+  as: 'li',
+  px: [1, 2, 3],
+};
 
-const NavButton = styled(StyledButton)`
-  color: #323334;
+const NavLink = styled(StyledLink)`
+  color: #313233;
   font-weight: 500;
-  font-size: 16px;
-  padding: 10px;
-  cursor: pointer;
-  @media (hover: hover) {
-    :hover {
-      background-color: white !important;
-    }
-  }
-  :focus {
-    background-color: white;
-    border-radius: 1px;
-  }
-  :active {
-    color: black;
-  }
+  font-size: 1.4rem;
 `;
 
-const NavItem = styled(StyledLink)`
-  color: #323334;
-  font-weight: 500;
-  font-size: 14px;
-  @media (hover: hover) {
-    :hover {
-      text-decoration: underline;
-    }
-  }
-`;
-
-const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showSearchModal, setShowSearchModal] = useState(false);
-  const ref = useRef();
-
-  const toggleMobileMenu = () => {
-    setShowMobileMenu(!showMobileMenu);
+class TopBar extends React.Component {
+  static propTypes = {
+    showSearch: PropTypes.bool,
+    menuItems: PropTypes.object,
+    showProfileAndChangelogMenu: PropTypes.bool,
   };
 
-  return (
-    <Flex
-      px={3}
-      py={showSearch ? 2 : 3}
-      alignItems="center"
-      flexDirection="row"
-      justifyContent="space-around"
-      css={{ height: theme.sizes.navbarHeight, background: 'white' }}
-      ref={ref}
-    >
-      <Link href="/">
-        <Flex alignItems="center">
-          <Image width="36" height="36" src="/static/images/opencollective-icon.png" alt="Open Collective logo" />
-          <Hide xs sm md>
-            <Box mx={2}>
-              <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
+  static defaultProps = {
+    showSearch: true,
+    showProfileAndChangelogMenu: true,
+    menuItems: {
+      discover: true,
+      docs: true,
+      howItWorks: false,
+      pricing: false,
+    },
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = { showMobileMenu: false };
+    this.ref = React.createRef();
+  }
+
+  componentDidMount() {
+    document.addEventListener('click', this.onClickOutside);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('click', this.onClickOutside);
+  }
+
+  onClickOutside = e => {
+    const ref = this.ref.current;
+    if (this.state.showMobileMenu && ref && !ref.contains(e.target)) {
+      this.setState({ showMobileMenu: false });
+    }
+  };
+
+  toggleMobileMenu = () => {
+    this.setState(state => ({ showMobileMenu: !state.showMobileMenu }));
+  };
+
+  render() {
+    const { showSearch, menuItems, showProfileAndChangelogMenu } = this.props;
+    const defaultMenu = { discover: true, docs: true, howItWorks: false, pricing: false };
+    const merged = { ...defaultMenu, ...menuItems };
+    return (
+      <Flex
+        px={3}
+        py={showSearch ? 2 : 3}
+        alignItems="center"
+        flexDirection="row"
+        justifyContent="space-around"
+        css={{ height: theme.sizes.navbarHeight, background: 'white' }}
+        ref={this.ref}
+      >
+        <Link href="/">
+          <Flex alignItems="center">
+            <Logo width="36" height="36" />
+            <Hide xs>
+              <Box mx={2}>
+                <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
+              </Box>
+            </Hide>
+          </Flex>
+        </Link>
+
+        {showSearch && (
+          <Flex justifyContent="flex-end" flex="1 1 auto">
+            <Hide xs sm md>
+              <SearchFormContainer p={2}>
+                <SearchForm borderRadius="6px" fontSize="14px" py="1px" />
+              </SearchFormContainer>
+            </Hide>
+          </Flex>
+        )}
+
+        <Flex alignItems="center" justifyContent={['flex-end', 'flex-start']} flex="1 1 auto">
+          <Hide lg>
+            <Box mx={3}>
+              <Link href="/search">
+                <Flex>
+                  <SearchIcon fill="#aaaaaa" size={24} />
+                </Flex>
+              </Link>
             </Box>
           </Hide>
-        </Flex>
-      </Link>
 
-      <Flex alignItems="center" justifyContent={['flex-end', 'flex-end', 'center']} flex="1 1 auto">
-        <Hide xs sm>
-          <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
-            {menuItems.solutions && (
-              <PopupMenu
-                zIndex={2000}
-                closingEvents={['focusin', 'mouseover']}
-                Button={({ onMouseOver, onClick, popupOpen, onFocus }) => (
-                  <NavButton
-                    isBorderless
-                    onMouseOver={onMouseOver}
-                    onFocus={onFocus}
-                    onClick={onClick}
-                    whiteSpace="nowrap"
-                  >
-                    <FormattedMessage defaultMessage="Solutions" />
-                    {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                  </NavButton>
-                )}
-                placement="bottom"
-                popupMarginTop="-10px"
-              >
+          <Hide xs>
+            <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
+              {merged.discover && (
                 <NavLinkContainer>
-                  {/* TODO: Add this part back when the /collectives page is designed */}
-                  {/* <Link href="/collectives">*/}
-                  {/*  <NavItem as={Container} mt={16} mb={16}>*/}
-                  {/*    <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />*/}
-                  {/*  </NavItem>*/}
-                  {/* </Link>*/}
-                  <Link href="/become-a-sponsor">
-                    <NavItem as={Container} mt={16} mb={16}>
-                      <FormattedMessage defaultMessage="For Sponsors" />
-                    </NavItem>
-                  </Link>
-                  <Link href="/become-a-host">
-                    <NavItem as={Container} mt={16} mb={16}>
-                      <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
-                    </NavItem>
+                  <Link href="/search">
+                    <NavLink as={Container}>
+                      <FormattedMessage id="menu.discover" defaultMessage="Discover" />
+                    </NavLink>
                   </Link>
                 </NavLinkContainer>
-              </PopupMenu>
-            )}
-
-            {menuItems.product && (
-              <PopupMenu
-                zIndex={2000}
-                closingEvents={['focusin', 'mouseover']}
-                Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
-                  <NavButton
-                    isBorderless
-                    onMouseOver={onMouseOver}
-                    onFocus={onFocus}
-                    onClick={onClick}
-                    whiteSpace="nowrap"
-                  >
-                    <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
-                    {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                  </NavButton>
-                )}
-                placement="bottom"
-                popupMarginTop="-10px"
-              >
+              )}
+              {merged.howItWorks && (
+                <NavLinkContainer>
+                  <Link href="/how-it-works">
+                    <NavLink as={Container}>
+                      <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
+                    </NavLink>
+                  </Link>
+                </NavLinkContainer>
+              )}
+              {merged.pricing && (
                 <NavLinkContainer>
                   <Link href="/pricing">
-                    <NavItem as={Container} mt={16} mb={16}>
+                    <NavLink as={Container}>
                       <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
-                    </NavItem>
-                  </Link>
-                  <Link href="/how-it-works">
-                    <NavItem as={Container}>
-                      <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
-                    </NavItem>
-                  </Link>
-                  <Link href="/fiscal-hosting">
-                    <NavItem as={Container} mt={16} mb={16}>
-                      <FormattedMessage id="editCollective.fiscalHosting" defaultMessage="Fiscal Hosting" />
-                    </NavItem>
+                    </NavLink>
                   </Link>
                 </NavLinkContainer>
-              </PopupMenu>
-            )}
-
-            {menuItems.company && (
-              <PopupMenu
-                zIndex={2000}
-                closingEvents={['focusin', 'mouseover']}
-                Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
-                  <NavButton
-                    isBorderless
-                    onMouseOver={onMouseOver}
-                    onFocus={onFocus}
-                    onClick={onClick}
-                    whiteSpace="nowrap"
-                  >
-                    <FormattedMessage id="company" defaultMessage="Company" />
-                    {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                  </NavButton>
-                )}
-                placement="bottom"
-                popupMarginTop="-10px"
-              >
+              )}
+              {merged.docs && (
                 <NavLinkContainer>
-                  <a href="https://blog.opencollective.com/">
-                    <NavItem as={Container} mt={16} mb={16}>
-                      <FormattedMessage id="company.blog" defaultMessage="Blog" />
-                    </NavItem>
-                  </a>
-                  <Link href="/e2c">
-                    <NavItem as={Container} mb={16}>
-                      <FormattedMessage id="OC.e2c" defaultMessage="Exit to Community" />
-                    </NavItem>
-                  </Link>
+                  <NavLink href="/help">
+                    <FormattedMessage id="menu.docs" defaultMessage="Docs & Help" />
+                  </NavLink>
                 </NavLinkContainer>
-              </PopupMenu>
-            )}
-            {menuItems.docs && (
-              <Link href="/help">
-                <NavButton as={Container} whiteSpace="nowrap">
-                  <FormattedMessage defaultMessage="Help & Support" />
-                </NavButton>
-              </Link>
-            )}
-            {showSearch && menuItems.docs && <Container borderRight="2px solid #DCDDE0" height="20px" padding="5px" />}
-          </NavList>
-        </Hide>
-        {showSearch && (
-          <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
-            <Flex>
-              <SearchIcon fill="#75777A" size={18} />
-              <Hide xs sm>
-                <Span ml="5px">
-                  <FormattedMessage id="Search" defaultMessage="Search" />
-                </Span>
+              )}
+            </NavList>
+          </Hide>
+        </Flex>
+        {showProfileAndChangelogMenu && (
+          <React.Fragment>
+            <Container mr={3}>
+              <Hide xs>
+                <ChangelogTrigger />
               </Hide>
-            </Flex>
-          </NavButton>
+            </Container>
+            <TopBarProfileMenu />
+          </React.Fragment>
         )}
-        {showSearchModal && <SearchModal onClose={() => setShowSearchModal(false)} />}
+        <Hide sm md lg>
+          <TopBarMobileMenu
+            showMobileMenu={this.state.showMobileMenu}
+            menuItems={merged}
+            closeMenu={this.toggleMobileMenu}
+          />
+          <Box mx={3} onClick={this.toggleMobileMenu}>
+            <Flex as="a">
+              <MenuIcon color="#aaaaaa" size={24} />
+            </Flex>
+          </Box>
+        </Hide>
       </Flex>
-
-      {showProfileAndChangelogMenu && (
-        <React.Fragment>
-          <Container mr={3}>
-            <Hide xs>
-              <ChangelogTrigger />
-            </Hide>
-          </Container>
-          <TopBarProfileMenu />
-        </React.Fragment>
-      )}
-      <Hide md lg>
-        <TopBarMobileMenu showMobileMenu={showMobileMenu} closeMenu={toggleMobileMenu} />
-        <Box mx={3} onClick={toggleMobileMenu}>
-          <Flex as="a">
-            <MenuIcon color="#aaaaaa" size={24} />
-          </Flex>
-        </Box>
-      </Hide>
-    </Flex>
-  );
-};
-
-TopBar.propTypes = {
-  showSearch: PropTypes.bool,
-  showProfileAndChangelogMenu: PropTypes.bool,
-  menuItems: PropTypes.object,
-};
-
-TopBar.defaultProps = {
-  showSearch: true,
-  showProfileAndChangelogMenu: true,
-  menuItems: { solutions: true, product: true, company: true, docs: true },
-};
+    );
+  }
+}
 
 export default TopBar;
