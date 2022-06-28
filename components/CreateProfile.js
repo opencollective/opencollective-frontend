@@ -80,7 +80,6 @@ SecondaryAction.propTypes = {
   children: PropTypes.node,
   loading: PropTypes.bool,
   onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-  style: PropTypes.object,
   asLink: PropTypes.bool,
 };
 
