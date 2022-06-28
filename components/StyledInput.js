@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import propTypes from '@styled-system/prop-types';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import styled, { css } from 'styled-components';
 import { background, border, color, flexbox, layout, space, typography } from 'styled-system';
 

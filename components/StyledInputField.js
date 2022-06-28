@@ -52,6 +52,8 @@ const StyledInputField = ({
   htmlFor = htmlFor || (name ? `input-${name}` : undefined);
   const displayOptionalLabel = hideOptionalLabel ? false : required === false;
   const displayRequiredLabel = useRequiredLabel ? required === true : false;
+  labelFontWeight = labelProps?.fontWeight || labelFontWeight;
+  labelFontSize = labelProps?.labelFontSize || labelFontSize;
   const labelContent = label && (
     <Span color={labelColor} fontSize={labelFontSize} fontWeight={labelFontWeight}>
       {label}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import { Editor, EditorState } from 'draft-js';
 import { debounce, omit, uniq } from 'lodash';
 import { FormattedMessage } from 'react-intl';

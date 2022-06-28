@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import css from '@styled-system/css';
+import { css } from '@styled-system/css';
 import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
