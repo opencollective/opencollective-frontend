@@ -22,7 +22,7 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
 import { P, Span } from '../Text';
-import { useUser } from '../UserProvider';
+import { useLoggedInUser } from '../UserProvider';
 
 const validate = values => {
   const errors = {};
@@ -56,7 +56,7 @@ const validate = values => {
 const ContactForm = () => {
   const intl = useIntl();
   const router = useRouter();
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { getFieldProps, handleSubmit, errors, touched, setFieldValue } = useFormik({

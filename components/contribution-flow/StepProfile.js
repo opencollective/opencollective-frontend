@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Box } from '../Grid';
-import { useUser } from '../UserProvider';
+import { useLoggedInUser } from '../UserProvider';
 
 import StepProfileGuestForm from './StepProfileGuestForm';
 import StepProfileLoggedInForm from './StepProfileLoggedInForm';
@@ -19,7 +19,7 @@ const StepProfile = ({
   onSignInClick,
   isEmbed,
 }) => {
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
   return (
     <Box width={1}>
       {LoggedInUser ? (

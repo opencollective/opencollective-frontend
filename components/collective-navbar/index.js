@@ -39,7 +39,7 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import { fadeIn } from '../StyledKeyframes';
 import { Span } from '../Text';
-import { useUser } from '../UserProvider';
+import { useLoggedInUser } from '../UserProvider';
 
 import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { NAVBAR_CATEGORIES } from './constants';
@@ -433,7 +433,7 @@ const CollectiveNavbar = ({
 }) => {
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
   const isAccountant = LoggedInUser?.hasRole(roles.ACCOUNTANT, collective);
   isAdmin = isAdmin || LoggedInUser?.canEditCollective(collective);
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);

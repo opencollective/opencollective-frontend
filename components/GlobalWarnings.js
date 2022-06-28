@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import I18nFormatters from './I18nFormatters';
 import { P } from './Text';
-import { useUser } from './UserProvider';
+import { useLoggedInUser } from './UserProvider';
 
 const GlobalWarningContainer = styled.div`
   width: 100;
@@ -23,7 +23,7 @@ const GlobalWarningContainer = styled.div`
  * Displays warnings related to the user account.
  */
 const GlobalWarnings = ({ collective }) => {
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
 
   if (collective?.isFrozen) {
     // Frozen collectives

@@ -17,7 +17,7 @@ import MessageBoxGraphqlError from '../components/MessageBoxGraphqlError';
 import Page from '../components/Page';
 import StyledSpinner from '../components/StyledSpinner';
 import { P } from '../components/Text';
-import { useUser } from '../components/UserProvider';
+import { useLoggedInUser } from '../components/UserProvider';
 
 const STATUS = {
   SUBMITTING: 'SUBMITTING',
@@ -51,7 +51,7 @@ const ConfirmGuestPage = () => {
   const intl = useIntl();
   const theme = useTheme();
   const router = useRouter();
-  const { login } = useUser();
+  const { login } = useLoggedInUser();
   const [status, setStatus] = React.useState(STATUS.SUBMITTING);
   const [callConfirmGuestAccount, { error, data }] = useMutation(confirmGuestAccountMutation, MUTATION_OPTS);
   const { token, email } = router.query;

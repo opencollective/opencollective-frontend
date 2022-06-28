@@ -21,7 +21,7 @@ import RadialIconContainer from '../RadialIconContainer';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import { P } from '../Text';
-import { useUser } from '../UserProvider';
+import { useLoggedInUser } from '../UserProvider';
 
 const TopAvatarsContainer = styled.div`
   display: flex;
@@ -62,7 +62,7 @@ const getAdministratedAccounts = user => {
 };
 
 export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove, state }) => {
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
   const [isRedirecting, setRedirecting] = React.useState(autoApprove);
