@@ -81,6 +81,7 @@ class SignInOrJoinFree extends React.Component {
     submitRecoveryCode: PropTypes.func,
     router: PropTypes.object,
     addToast: PropTypes.func.isRequired,
+    hideFooter: PropTypes.bool,
   };
 
   constructor(props) {
@@ -374,27 +375,29 @@ class SignInOrJoinFree extends React.Component {
                 </Flex>
               </Flex>
             )}
-            <Container
-              mt="128px"
-              pl={['20px', '20px', '144px']}
-              pr={['20px', '20px', '144px']}
-              maxWidth="880px"
-              width={1}
-            >
-              <StyledHr borderStyle="solid" borderColor="black.200" mb="16px" />
-              <Flex justifyContent="space-between" flexDirection={['column', 'row']} alignItems="center">
-                <Span>
-                  <SignInFooterLink href="/privacypolicy">
-                    <FormattedMessage defaultMessage="Read our privacy policy" />
-                  </SignInFooterLink>
-                </Span>
-                <Span mt={['32px', 0]}>
-                  <SignInFooterLink href="/contact">
-                    <FormattedMessage defaultMessage="Contact support" />
-                  </SignInFooterLink>
-                </Span>
-              </Flex>
-            </Container>
+            {!this.props.hideFooter && (
+              <Container
+                mt="128px"
+                pl={['20px', '20px', '144px']}
+                pr={['20px', '20px', '144px']}
+                maxWidth="880px"
+                width={1}
+              >
+                <StyledHr borderStyle="solid" borderColor="black.200" mb="16px" />
+                <Flex justifyContent="space-between" flexDirection={['column', 'row']} alignItems="center">
+                  <Span>
+                    <SignInFooterLink href="/privacypolicy">
+                      <FormattedMessage defaultMessage="Read our privacy policy" />
+                    </SignInFooterLink>
+                  </Span>
+                  <Span mt={['32px', 0]}>
+                    <SignInFooterLink href="/contact">
+                      <FormattedMessage defaultMessage="Contact support" />
+                    </SignInFooterLink>
+                  </Span>
+                </Flex>
+              </Container>
+            )}
           </Fragment>
         )}
       </Flex>

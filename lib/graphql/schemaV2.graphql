@@ -4239,7 +4239,7 @@ Fields for a currency fx rate
 """
 type CurrencyExchangeRate {
   """
-  Exchange rate value as a percentage
+  Exchange rate value as a scalar (e.g 1.15 or 0.86)
   """
   value: Float!
 
