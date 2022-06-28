@@ -28,8 +28,9 @@ const HomePage = () => {
   return (
     <Page
       menuItems={menuItems}
+      metaTitle={formatMessage(messages.defaultTitle)}
       title={formatMessage(messages.defaultTitle)}
-      description={formatMessage(messages.defaultTitle)}
+      description={formatMessage(messages.defaultDescription)}
     >
       <Banner />
       <TheFutureIsCollective />
