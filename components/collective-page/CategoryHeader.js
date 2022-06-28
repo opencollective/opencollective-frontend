@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Info } from '@styled-icons/feather/Info';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowDown } from '@styled-icons/remix-line/ArrowDown';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import { throttle } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { createGlobalStyle } from 'styled-components';

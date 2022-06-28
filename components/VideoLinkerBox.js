@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { VideoPlus } from '@styled-icons/boxicons-regular/VideoPlus';
 import { ArrowDownCircle } from '@styled-icons/feather/ArrowDownCircle';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
