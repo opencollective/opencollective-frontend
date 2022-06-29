@@ -114,7 +114,14 @@ const OpenCollectiveIs = () => {
           <Box display={['none', 'block']} width="100%">
             <ApplyToHostGrid color="white.full" />
           </Box>
-          <StyledLink as={Link} buttonStyle="standard" mt="48px" mb="64px" buttonSize="medium" href="/discover">
+          <StyledLink
+            as={Link}
+            buttonStyle="standard"
+            mt="48px"
+            mb="64px"
+            buttonSize="medium"
+            href="/search?isHost=true"
+          >
             <FormattedMessage id="home.discoverMoreHome" defaultMessage="Discover More Hosts" />
           </StyledLink>
         </Flex>
