@@ -90,7 +90,7 @@ export default class SignIn extends React.Component {
             as="label"
             fontWeight={700}
             htmlFor="email"
-            fontSize={['24px', '32px']}
+            fontSize={label ? '24px' : ['24px', '32px']}
             mb={12}
             mt="48px"
             justifyContent="center"
@@ -98,12 +98,12 @@ export default class SignIn extends React.Component {
             {label || <FormattedMessage defaultMessage="Continue with your email" />}
           </Flex>
           <Flex fontWeight={400} fontSize="16px" color="black.700" mb="50px" justifyContent="center">
-            {label || <FormattedMessage defaultMessage="Sign in or create a personal account to continue" />}
+            <FormattedMessage defaultMessage="Sign in or create a personal account to continue" />
           </Flex>
           {!this.state.unknownEmail ? (
             <React.Fragment>
               <Container fontWeight={600} fontSize="13px" alignItems="left" mb="4px" width="100%">
-                {label || <FormattedMessage id="Form.yourEmail" defaultMessage="Your email address" />}
+                <FormattedMessage id="Form.yourEmail" defaultMessage="Your email address" />
               </Container>
               <Container
                 as="form"
