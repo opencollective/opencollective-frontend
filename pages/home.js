@@ -15,15 +15,23 @@ const menuItems = { pricing: true, howItWorks: true };
 
 const messages = defineMessages({
   defaultTitle: {
-    id: 'OC.tagline',
-    defaultMessage: 'Make your community sustainable. Collect and spend money transparently.',
+    defaultMessage: 'Raise and spend money with full transparency.',
+  },
+  defaultDescription: {
+    defaultMessage:
+      'Open Collective is a legal and financial toolbox for groups. It’s a fundraising + legal status + money management platform for your community. What do you want to do?',
   },
 });
 
 const HomePage = () => {
   const { formatMessage } = useIntl();
   return (
-    <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
+    <Page
+      menuItems={menuItems}
+      metaTitle={formatMessage(messages.defaultTitle)}
+      title={formatMessage(messages.defaultTitle)}
+      description={formatMessage(messages.defaultDescription)}
+    >
       <Banner />
       <TheFutureIsCollective />
       <RaiseMoney />

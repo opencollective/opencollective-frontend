@@ -75,7 +75,7 @@ class Header extends React.Component {
     const image = this.props.image || (collective && getCollectiveImage(collective));
     const description = this.props.description || collective?.description || collective?.longDescription;
     const metaTitle = this.props.metaTitle || (title ? `${title} - Open Collective` : 'Open Collective');
-    const defaultImage = `https://opencollective.com/static/images/opencollective-og-default.png`;
+    const defaultImage = `https://opencollective.com/static/images/opencollective-og.png`;
 
     const metas = [
       { property: 'twitter:site', content: '@opencollect' },

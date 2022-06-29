@@ -56,7 +56,7 @@ const DedicatedTeam = () => {
         </Container>
 
         <Box mb={['40px', null, '102px']}>
-          <Link href="/support">
+          <Link href="/contact">
             <StyledButton
               width="142px"
               my={['12px', null, 0]}
