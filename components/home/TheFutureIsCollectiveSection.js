@@ -25,7 +25,7 @@ const TheFutureIsCollective = () => {
             </MainTitle>
           </Box>
           <Box my={[4, '40px']} maxWidth={['288px', '608px', '768px', null, '896px']}>
-            <MainDescription>
+            <MainDescription textAlign="center">
               <FormattedMessage
                 id="home.futureIsCollective.description"
                 defaultMessage={
