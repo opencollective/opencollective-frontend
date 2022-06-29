@@ -388,12 +388,10 @@ class CreateExpensePage extends React.Component {
                                 borderless
                                 isEditing
                               />
-                              {hasFeature(collective, FEATURES.RECURRING_EXPENSES) && (
-                                <ExpenseRecurringForm
-                                  recurring={this.state.recurring}
-                                  onChange={recurring => this.setState({ recurring })}
-                                />
-                              )}
+                              <ExpenseRecurringForm
+                                recurring={this.state.recurring}
+                                onChange={recurring => this.setState({ recurring })}
+                              />
                             </StyledCard>
                             <Box mt={24}>
                               <ExpenseNotesForm
