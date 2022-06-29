@@ -161,8 +161,11 @@ class Members extends React.Component {
     const collectiveId = get(member, 'memberAccount.id');
     const memberCollective = member.account || member.memberAccount;
     const memberKey = member.id ? `member-${member.id}` : `collective-${collectiveId}`;
+    const isAdmin = this.state.currentMember?.role === roles.ADMIN;
     const isLastAdmin =
-      nbAdmins === 1 && this.state.currentMember?.role === roles.ADMIN && this.state.currentMember?.id;
+      isAdmin &&
+      this.state.currentMember?.id &&
+      nbAdmins <= (host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins || 1);
 
     return (
       <MemberContainer
@@ -188,11 +191,7 @@ class Members extends React.Component {
               isLastAdmin={isLastAdmin}
               LoggedInUser={LoggedInUser}
               refetchLoggedInUser={refetchLoggedInUser}
-              canRemove={
-                host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins
-                  ? isInvitation || nbAdmins > host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins
-                  : true
-              }
+              canRemove={!(isInvitation || isLastAdmin)}
             />
           ) : (
             <StyledRoundButton
