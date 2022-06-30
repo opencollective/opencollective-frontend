@@ -166,7 +166,7 @@ const CreateProfile = ({
   onSubmit,
   onSecondaryAction,
   emailAlreadyExists,
-  isOauth,
+  isOAuth,
   oAuthAppName,
   oAuthAppImage,
   ...props
@@ -186,7 +186,7 @@ const CreateProfile = ({
   return (
     <React.Fragment>
       <Container textAlign="center">
-        {isOauth ? (
+        {isOAuth ? (
           <React.Fragment>
             <Flex justifyContent="center" mb={40}>
               <Box minWidth={104}>
@@ -206,14 +206,14 @@ const CreateProfile = ({
           </Box>
         )}
         <Box pt="48px" fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
-          {isOauth ? (
+          {isOAuth ? (
             <FormattedMessage defaultMessage="Create an account in Open Collective" />
           ) : (
             <FormattedMessage defaultMessage="Create your personal account" />
           )}
         </Box>
         <Box fontSize="16px" fontWeight="500" color="black.700" lineHeight="24px" pt="14px">
-          {isOauth ? (
+          {isOAuth ? (
             <FormattedMessage defaultMessage="and connect with {oAuthAppName}" values={{ oAuthAppName }} />
           ) : (
             <FormattedMessage defaultMessage="Set up your personal details to continue" />
@@ -384,7 +384,7 @@ CreateProfile.propTypes = {
   /** All props from `StyledCard` */
   ...StyledCard.propTypes,
   /** Oauth Sign In **/
-  isOauth: PropTypes.bool,
+  isOAuth: PropTypes.bool,
   /** Oauth App Name **/
   oAuthAppName: PropTypes.string,
   /** Oauth App Image URL **/

@@ -34,7 +34,7 @@ export default class SignIn extends React.Component {
     /** handles changes in the email input */
     onEmailChange: PropTypes.func.isRequired,
     /** Oauth Sign In **/
-    isOauth: PropTypes.bool,
+    isOAuth: PropTypes.bool,
     /** Oauth App Name **/
     oAuthAppName: PropTypes.string,
     /** Oauth App Image **/
@@ -79,9 +79,9 @@ export default class SignIn extends React.Component {
   }
 
   getSignInPageHeading(unknownEmail) {
-    if (this.props.isOauth && unknownEmail) {
+    if (this.props.isOAuth && unknownEmail) {
       return <FormattedMessage defaultMessage="Sign in to your Open Collective account" />;
-    } else if (this.props.isOauth) {
+    } else if (this.props.isOAuth) {
       return <FormattedMessage defaultMessage="Continue with your Open Collective account" />;
     } else {
       return this.props.label || <FormattedMessage defaultMessage="Continue with your email" />;
@@ -89,7 +89,7 @@ export default class SignIn extends React.Component {
   }
 
   getSignInPageSubHeading(oAuthAppName) {
-    if (this.props.isOauth) {
+    if (this.props.isOAuth) {
       return <FormattedMessage defaultMessage="and connect with {oAuthAppName}" values={{ oAuthAppName }} />;
     } else {
       return <FormattedMessage defaultMessage="Sign in or create a personal account to continue" />;
@@ -102,7 +102,7 @@ export default class SignIn extends React.Component {
     return (
       <React.Fragment>
         <Box maxWidth={390}>
-          {this.props.isOauth ? (
+          {this.props.isOAuth ? (
             <React.Fragment>
               <Flex justifyContent="center" mb={40}>
                 <Box minWidth={104}>

@@ -14,6 +14,12 @@ import { ApplicationApproveScreen } from '../../components/oauth/ApplicationAppr
 import SignInOrJoinFree from '../../components/SignInOrJoinFree';
 import { useLoggedInUser } from '../../components/UserProvider';
 
+/*
+ * The query to get application details for OAuth. Note that
+ * clientId and redirectUri is only available if the user is logged in,
+ * so we skip otherwise. For example in the sign in screen we need
+ * account details but the user haven't logged in yet.
+ */
 const applicationQuery = gqlV2`
   query OAuthAuthorization($clientId: String!, $withoutLoggedInUser: Boolean!) {
     application(clientId: $clientId) {
@@ -60,7 +66,7 @@ const OAuthAuthorizePage = () => {
           <Loading />
         ) : !LoggedInUser ? (
           <SignInOrJoinFree
-            isOauth
+            isOAuth
             oAuthAppName={data?.application?.name}
             oAuthAppImage={data?.application?.account?.imageUrl}
           />

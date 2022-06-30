@@ -82,7 +82,7 @@ class SignInOrJoinFree extends React.Component {
     router: PropTypes.object,
     addToast: PropTypes.func.isRequired,
     hideFooter: PropTypes.bool,
-    isOauth: PropTypes.bool,
+    isOAuth: PropTypes.bool,
     oAuthAppName: PropTypes.string,
     oAuthAppImage: PropTypes.string,
   };
@@ -97,7 +97,7 @@ class SignInOrJoinFree extends React.Component {
       email: props.email || props.defaultEmail || '',
       useRecoveryCodes: null,
       emailAlreadyExists: false,
-      isOauth: this.props.isOauth,
+      isOAuth: this.props.isOAuth,
       oAuthAppName: this.props.oAuthAppName,
       oAuthAppImage: this.props.oAuthAppImage,
     };
@@ -114,7 +114,7 @@ class SignInOrJoinFree extends React.Component {
     // Update local state
     this.setState({
       form,
-      isOauth: oAuthDetails.isOauth,
+      isOAuth: oAuthDetails.isOAuth,
       oAuthAppName: oAuthDetails.oAuthAppName,
       oAuthAppImage: oAuthDetails.oAuthAppImage,
     });
@@ -361,7 +361,7 @@ class SignInOrJoinFree extends React.Component {
                   routes.join ||
                   (() =>
                     this.switchForm('create-account', {
-                      isOauth: this.props.isOauth,
+                      isOAuth: this.props.isOAuth,
                       oAuthAppName: this.props.oAuthAppName,
                       oAuthAppImage: this.props.oAuthAppImage,
                     }))
@@ -371,7 +371,7 @@ class SignInOrJoinFree extends React.Component {
                 unknownEmail={unknownEmailError}
                 label={this.props.signInLabel}
                 showSecondaryAction={!this.props.disableSignup}
-                isOauth={this.props.isOauth}
+                isOAuth={this.props.isOAuth}
                 oAuthAppName={this.props.oAuthAppName}
                 oAuthAppImage={this.props.oAuthAppImage}
               />
@@ -392,7 +392,7 @@ class SignInOrJoinFree extends React.Component {
                       onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
                       submitting={submitting}
                       emailAlreadyExists={this.state.emailAlreadyExists}
-                      isOauth={this.state.isOauth}
+                      isOAuth={this.state.isOAuth}
                       oAuthAppName={this.state.oAuthAppName}
                       oAuthAppImage={this.state.oAuthAppImage}
                     />
