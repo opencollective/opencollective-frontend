@@ -2,6 +2,8 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
 import { Box, Flex } from '../components/Grid';
@@ -9,7 +11,6 @@ import Image from '../components/Image';
 import Link from '../components/Link';
 import StyledCard from '../components/StyledCard';
 import StyledLink from '../components/StyledLink';
-import { useLoggedInUser } from '../components/UserProvider';
 
 const WelcomeOptionContainer = styled(Container)`
   &:hover {

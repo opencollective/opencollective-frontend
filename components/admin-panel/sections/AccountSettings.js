@@ -10,12 +10,12 @@ import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { editCollectiveMutation } from '../../../lib/graphql/mutations';
 import { editCollectivePageQuery } from '../../../lib/graphql/queries';
+import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import { adminPanelQuery } from '../../../pages/admin-panel';
 import SettingsForm from '../../edit-collective/Form';
 import Loading from '../../Loading';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
-import { useLoggedInUser } from '../../UserProvider';
 
 const AccountSettings = ({ account, section }) => {
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();

@@ -8,6 +8,7 @@ import styled, { useTheme } from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { getAllGuestEmails } from '../lib/guest-accounts';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
 import Container from '../components/Container';
 import { Box } from '../components/Grid';
@@ -20,7 +21,6 @@ import StyledButton from '../components/StyledButton';
 import StyledCard from '../components/StyledCard';
 import StyledRadioList from '../components/StyledRadioList';
 import { H4, P, Span } from '../components/Text';
-import { useLoggedInUser } from '../components/UserProvider';
 
 const STATUS = {
   SUBMITTING: 'SUBMITTING',

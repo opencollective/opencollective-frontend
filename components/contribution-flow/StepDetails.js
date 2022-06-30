@@ -8,6 +8,7 @@ import { canContributeRecurring, hostIsTaxDeductibeInTheUs } from '../../lib/col
 import INTERVALS from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nInterval } from '../../lib/i18n/interval';
 import { getTierMinAmount, getTierPresets } from '../../lib/tier-utils';
 
@@ -21,7 +22,6 @@ import StyledAmountPicker, { OTHER_AMOUNT_KEY } from '../StyledAmountPicker';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import { H5, P, Span } from '../Text';
-import { useLoggedInUser } from '../UserProvider';
 
 import ChangeTierWarningModal from './ChangeTierWarningModal';
 import PlatformTipInput from './PlatformTipInput';
