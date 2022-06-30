@@ -14,19 +14,13 @@ import { ApplicationApproveScreen } from '../../components/oauth/ApplicationAppr
 import SignInOrJoinFree from '../../components/SignInOrJoinFree';
 import { useLoggedInUser } from '../../components/UserProvider';
 
-/*
- * The query to get application details for OAuth. Note that
- * clientId and redirectUri is only available if the user is logged in,
- * so we skip otherwise. For example in the sign in screen we need
- * account details but the user haven't logged in yet.
- */
 const applicationQuery = gqlV2`
-  query OAuthAuthorization($clientId: String!, $withoutLoggedInUser: Boolean!) {
+  query OAuthAuthorization($clientId: String!) {
     application(clientId: $clientId) {
       id
       name
-      clientId @skip(if: $withoutLoggedInUser)
-      redirectUri @skip(if: $withoutLoggedInUser)
+      clientId
+      redirectUri
       account {
         id
         name
@@ -54,7 +48,7 @@ const OAuthAuthorizePage = () => {
   const { loadingLoggedInUser, LoggedInUser } = useLoggedInUser();
   const missingParams = REQUIRED_URL_PARAMS.filter(key => !query[key]);
   const skipQuery = missingParams.length;
-  const queryVariables = { clientId: query['client_id'], withoutLoggedInUser: !LoggedInUser };
+  const queryVariables = { clientId: query['client_id'] };
   const queryParams = { skip: skipQuery, variables: queryVariables, context: API_V2_CONTEXT };
   const { data, error, loading: isLoadingAuthorization } = useQuery(applicationQuery, queryParams);
   const isLoading = loadingLoggedInUser || isLoadingAuthorization;
