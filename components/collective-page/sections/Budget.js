@@ -16,6 +16,8 @@ import { expenseHostFields, expensesListFieldsFragment } from '../../expenses/gr
 import { Box, Flex } from '../../Grid';
 import Image from '../../Image';
 import Link from '../../Link';
+import { getI18nLink } from '../../I18nFormatters';
+import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledCard from '../../StyledCard';
 import StyledFilters from '../../StyledFilters';
@@ -33,6 +35,10 @@ const budgetSectionAccountFieldsFragment = gqlV2/* GraphQL */ `
     stats {
       id
       balance {
+        valueInCents
+        currency
+      }
+      consolidatedBalance {
         valueInCents
         currency
       }
@@ -296,6 +302,28 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
             <BudgetStats collective={collective} stats={data?.account?.stats} />
           )}
         </StyledCard>
+        <Container>
+          {data?.account?.stats.consolidatedBalance.valueInCents !== data?.account?.stats.balance.valueInCents && (
+            <P>
+              <FormattedMessage
+                defaultMessage="Inclusive of <linkEvents>Events</linkEvents> and <linkProjects>Projects</linkProjects> ({amount})"
+                values={{
+                  linkEvents: getI18nLink({ href: '#section-events' }),
+                  linkProjects: getI18nLink({ href: '#section-projects' }),
+                  amount: (
+                    <FormattedMoneyAmount
+                      amount={
+                        data?.account?.stats.consolidatedBalance.valueInCents -
+                        data?.account?.stats.balance.valueInCents
+                      }
+                      currency={data?.account?.stats.consolidatedBalance.currency}
+                    />
+                  ),
+                }}
+              />
+            </P>
+          )}
+        </Container>
       </Flex>
     </ContainerSectionContent>
   );

@@ -77,7 +77,7 @@ const BudgetStats = ({ collective, stats }) => {
           </Container>
           <FormattedMessage id="CollectivePage.SectionBudget.Balance" defaultMessage="Today’s balance" />
         </StatTitle>
-        <StatAmount amount={stats.balance.valueInCents} currency={collective.currency} />
+        <StatAmount amount={stats.consolidatedBalance.valueInCents} currency={collective.currency} />
       </StatContainer>
       <StatContainer>
         <StatTitle>
@@ -169,6 +169,7 @@ BudgetStats.propTypes = {
   /** Stats */
   stats: PropTypes.shape({
     balance: AmountPropTypeShape.isRequired,
+    consolidatedBalance: AmountPropTypeShape.isRequired,
     yearlyBudget: AmountPropTypeShape.isRequired,
     activeRecurringContributions: PropTypes.object,
     totalAmountReceived: AmountPropTypeShape,
