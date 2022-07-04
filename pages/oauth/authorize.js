@@ -47,7 +47,7 @@ const OAuthAuthorizePage = () => {
   const { query } = useRouter();
   const { loadingLoggedInUser, LoggedInUser } = useLoggedInUser();
   const missingParams = REQUIRED_URL_PARAMS.filter(key => !query[key]);
-  const skipQuery = !LoggedInUser || loadingLoggedInUser || missingParams.length;
+  const skipQuery = missingParams.length;
   const queryVariables = { clientId: query['client_id'] };
   const queryParams = { skip: skipQuery, variables: queryVariables, context: API_V2_CONTEXT };
   const { data, error, loading: isLoadingAuthorization } = useQuery(applicationQuery, queryParams);
@@ -59,7 +59,11 @@ const OAuthAuthorizePage = () => {
         {isLoading ? (
           <Loading />
         ) : !LoggedInUser ? (
-          <SignInOrJoinFree />
+          <SignInOrJoinFree
+            isOAuth
+            oAuthAppName={data?.application?.name}
+            oAuthAppImage={data?.application?.account?.imageUrl}
+          />
         ) : missingParams.length ? (
           <MessageBox withIcon type="error">
             <FormattedMessage
