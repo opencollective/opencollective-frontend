@@ -33,11 +33,6 @@ module.exports = (expressApp, nextApp) => {
     next();
   });
 
-  app.use('/_next/static', (req, res, next) => {
-    res.set('Cache-Control', 'public, max-age=31536000, immutable');
-    next();
-  });
-
   app.use((req, res, next) => {
     if (req.query.language && intl.supportedLanguages.includes(req.query.language) && req.query.set) {
       res.cookie('language', req.language);

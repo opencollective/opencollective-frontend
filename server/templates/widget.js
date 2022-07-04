@@ -84,7 +84,7 @@
     this.loading.className = 'oc-loading-container';
     this.logo = document.createElement('img');
     this.logo.className = 'oc-loading';
-    this.logo.src = '{{host}}/static/images/opencollective-icon.svg';
+    this.logo.src = '{{host}}/static/images/opencollective-icon.png';
     this.loading.appendChild(this.logo);
     this.iframe = document.createElement('iframe');
     this.iframe.id = this.id;

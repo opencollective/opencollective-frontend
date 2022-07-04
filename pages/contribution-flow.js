@@ -202,7 +202,16 @@ class NewContributionFlowPage extends React.Component {
       return <ErrorPage error={error} />;
     }
 
-    return <Page {...this.getPageMetadata()}>{this.renderPageContent()}</Page>;
+    return (
+      <Page
+        {...this.getPageMetadata()}
+        showFooter={false}
+        menuItemsV2={{ solutions: false, product: false, company: false, docs: false }}
+        showSearch={false}
+      >
+        {this.renderPageContent()}
+      </Page>
+    );
   }
 }
 

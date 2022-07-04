@@ -10,8 +10,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import languages from '../lib/constants/locales';
-
-import { useUser } from '../components/UserProvider';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
 import TranslateIcon from './icons/TranslateIcon';
 import Container from './Container';
@@ -168,8 +167,8 @@ const navigation = {
   join: {
     createACollective: '/create',
     aboutFiscalHosting: '/fiscal-hosting',
-    discover: '/discover',
-    findAFiscalHost: '/hosts',
+    discover: '/search',
+    findAFiscalHost: '/search?isHost=true',
     becomeASponsor: '/become-a-sponsor',
     becomeAHost: '/become-a-host',
   },
@@ -212,23 +211,7 @@ const generateLanguageOptions = () => {
     const language = languages[key];
     return {
       value: key,
-      label: (
-        <Flex
-          alignItems="center"
-          justifyContent="flex-start"
-          fontSize="12px"
-          color="black.800"
-          lineHeight="18px"
-          fontWeight="500"
-          letterSpacing="-0.04px"
-          title={`${language.name} - ${language.nativeName} (${language.completion})`}
-        >
-          <Span fontSize="24px">{language.flag}</Span>&nbsp;
-          <Span whiteSpace="nowrap" ml={1}>
-            {truncate(`${language.name} - ${language.nativeName}`, { length: 23 })} ({language.completion})
-          </Span>
-        </Flex>
-      ),
+      label: `${truncate(`${language.name} - ${language.nativeName}`, { length: 23 })} (${language.completion})`,
     };
   });
 };
@@ -237,7 +220,13 @@ const Footer = () => {
   const intl = useIntl();
   const languageOptions = React.useMemo(generateLanguageOptions);
   const defaultLanguage = languageOptions.find(language => language.value === intl.locale);
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
+  const formatLanguageOptionLabel = ({ value, label }, { context }) => (
+    <Span fontSize="12px" fontWeight={context === 'menu' && value === intl.locale ? 'bold' : 'normal'}>
+      {label}
+    </Span>
+  );
+
   return (
     <FooterContainer>
       <Container
@@ -329,8 +318,8 @@ const Footer = () => {
                 defaultValue={defaultLanguage}
                 borderRadius="10px"
                 menuPlacement="auto"
-                isSearchable={false}
                 width={1}
+                formatOptionLabel={formatLanguageOptionLabel}
               />
             </Container>
           </Container>
@@ -356,7 +345,7 @@ const Footer = () => {
             <SocialLink href="https://slack.opencollective.com" aria-label="Open Collective Slack link">
               <Slack size={16} />
             </SocialLink>
-            <SocialLink href="mailto:info@opencollective.com" aria-label="Open Collective Email link">
+            <SocialLink as={Link} href="/contact" aria-label="Contact Open Collective">
               <Mail size={16} />
             </SocialLink>
           </Container>
@@ -454,6 +443,7 @@ const Footer = () => {
               onChange={({ value }) => switchLanguage(value)}
               defaultValue={defaultLanguage}
               menuPlacement="auto"
+              formatOptionLabel={formatLanguageOptionLabel}
             />
           </Container>
         </Container>

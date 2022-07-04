@@ -186,7 +186,7 @@ const CaseStudies = () => {
         ))}
       </Container>
       <Box mt={4}>
-        <StyledLink buttonStyle="standard" buttonSize="medium" href="/hosts" fontWeight="500">
+        <StyledLink buttonStyle="standard" buttonSize="medium" href="/search?isHost=true" fontWeight="500">
           <FormattedMessage id="becomeAHost.discoverMore" defaultMessage="Discover more hosts" />
         </StyledLink>
       </Box>

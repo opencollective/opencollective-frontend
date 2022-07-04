@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { CardElement } from '@stripe/react-stripe-js';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import { first, get, merge, pick, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -66,12 +66,14 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
     account(id: $accountId) {
       id
       paymentMethods(enumType: [CREDITCARD, GIFTCARD, PREPAID]) {
+        id
         ...UpdatePaymentMethodFragment
       }
     }
     order(order: { id: $orderId }) {
       id
       paymentMethod {
+        id
         ...UpdatePaymentMethodFragment
       }
     }

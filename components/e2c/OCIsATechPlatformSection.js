@@ -1,9 +1,9 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import StyledLink from '../StyledLink';
 import { H2 } from '../Text';
 
@@ -65,7 +65,7 @@ enables a network of:"
         </H2>
       </Box>
       <Box width="194px">
-        <StyledLink buttonStyle="standard" buttonSize="medium" href="/discover" fontWeight="500">
+        <StyledLink buttonStyle="standard" buttonSize="medium" href="/search" fontWeight="500">
           <FormattedMessage id="e2c.browseCollectives" defaultMessage="Browse Collectives" />
         </StyledLink>
       </Box>

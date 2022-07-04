@@ -13,6 +13,7 @@ import Avatar from './Avatar';
 import Container from './Container';
 import { Flex } from './Grid';
 import { fadeIn } from './StyledKeyframes';
+import StyledLinkButton from './StyledLinkButton';
 import { P, Span } from './Text';
 
 const Wrapper = styled(Flex)`
@@ -120,7 +121,9 @@ export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }) => (
     {children || <div />}
     {!hideCloseIcon && (
       <Span style={{ alignItems: 'center', display: 'flex' }}>
-        <CloseIcon onClick={onClose} />
+        <StyledLinkButton onClick={onClose}>
+          <CloseIcon onClick={onClose} />
+        </StyledLinkButton>
       </Span>
     )}
   </Header>
@@ -175,12 +178,16 @@ ModalFooter.defaultProps = {
   dividerMargin: '2rem 0',
 };
 
+const DefaultTrapContainer = props => {
+  return <FocusTrap focusTrapOptions={{ clickOutsideDeactivates: true }} {...props} />;
+};
+
 /**
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
  * a styled `Container`.
  */
 const StyledModal = ({ children, onClose, usePortal, trapFocus, ignoreEscapeKey, ...props }) => {
-  const TrapContainer = trapFocus ? FocusTrap : React.Fragment;
+  const TrapContainer = trapFocus ? DefaultTrapContainer : React.Fragment;
   const onEscape = React.useCallback(() => {
     if (!ignoreEscapeKey) {
       onClose();
@@ -195,7 +202,7 @@ const StyledModal = ({ children, onClose, usePortal, trapFocus, ignoreEscapeKey,
       <React.Fragment>
         <GlobalModalStyle />
         <Wrapper>
-          <TrapContainer focusTrapOptions={{ clickOutsideDeactivates: true }}>
+          <TrapContainer>
             <Modal {...props}>
               {React.Children.map(children, child => {
                 if (child.type.displayName === 'Header') {
@@ -214,7 +221,7 @@ const StyledModal = ({ children, onClose, usePortal, trapFocus, ignoreEscapeKey,
       <React.Fragment>
         <GlobalModalStyle />
         <Wrapper zindex={props.zindex}>
-          <TrapContainer focusTrapOptions={{ clickOutsideDeactivates: true }}>
+          <TrapContainer>
             <Modal {...props}>
               {React.Children.map(children, child => {
                 if (child.type?.displayName === 'Header') {

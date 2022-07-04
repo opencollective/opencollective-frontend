@@ -76,6 +76,7 @@ class CreateExpensePage extends React.Component {
       refetch: PropTypes.func,
       account: PropTypes.shape({
         id: PropTypes.string.isRequired,
+        parent: PropTypes.object,
         name: PropTypes.string.isRequired,
         slug: PropTypes.string.isRequired,
         description: PropTypes.string,
@@ -212,10 +213,10 @@ class CreateExpensePage extends React.Component {
           'recipientNote',
           'items',
           'attachedFiles',
-          'payee',
           'payeeLocation',
           'payoutMethod',
         ]);
+        expenseDraft['payee'] = pick(expense.payee, ['id', 'slug', 'name', 'email', 'isInvite', 'organization']);
         const result = await this.props.draftExpenseAndInviteUser({
           variables: {
             account: { id: this.props.data.account.id },
@@ -385,13 +386,12 @@ class CreateExpensePage extends React.Component {
                                 }}
                                 collective={collective}
                                 borderless
+                                isEditing
                               />
-                              {hasFeature(collective, FEATURES.RECURRING_EXPENSES) && (
-                                <ExpenseRecurringForm
-                                  recurring={this.state.recurring}
-                                  onChange={recurring => this.setState({ recurring })}
-                                />
-                              )}
+                              <ExpenseRecurringForm
+                                recurring={this.state.recurring}
+                                onChange={recurring => this.setState({ recurring })}
+                              />
                             </StyledCard>
                             <Box mt={24}>
                               <ExpenseNotesForm
@@ -494,6 +494,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       isArchived
       expensePolicy
       features {
+        id
         ...NavbarFields
         MULTI_CURRENCY_EXPENSES
       }
@@ -503,6 +504,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       }
 
       stats {
+        id
         balanceWithBlockedFunds {
           valueInCents
           currency
@@ -512,6 +514,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       ... on AccountWithHost {
         isApproved
         host {
+          id
           ...CreateExpenseHostFields
         }
       }
@@ -523,6 +526,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
         isActive
         # NOTE: This will be the account itself in this case
         host {
+          id
           ...CreateExpenseHostFields
         }
       }
@@ -531,10 +535,12 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
         parent {
           id
           slug
+          expensePolicy
         }
       }
     }
     loggedInAccount {
+      id
       ...LoggedInAccountExpensePayoutFields
     }
   }
@@ -558,6 +564,7 @@ const createExpenseMutation = gqlV2/* GraphQL */ `
     $recurring: RecurringExpenseInput
   ) {
     createExpense(expense: $expense, account: $account, recurring: $recurring) {
+      id
       ...ExpensePageExpenseFields
     }
   }
@@ -572,6 +579,7 @@ const addCreateExpenseMutation = graphql(createExpenseMutation, {
 const draftExpenseAndInviteUserMutation = gqlV2/* GraphQL */ `
   mutation DraftExpenseAndInviteUser($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
     draftExpenseAndInviteUser(expense: $expense, account: $account) {
+      id
       ...ExpensePageExpenseFields
     }
   }

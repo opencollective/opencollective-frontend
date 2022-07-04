@@ -29,6 +29,8 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   TICKETS: 'tickets',
   TIERS: 'tiers',
   GIFT_CARDS: 'gift-cards',
+  AUTHORIZED_APPS: 'authorized-apps',
+  FOR_DEVELOPERS: 'for-developers',
   WEBHOOKS: 'webhooks',
   PENDING_ORDERS: 'pending-orders',
   TWO_FACTOR_AUTH: 'two-factor-auth',

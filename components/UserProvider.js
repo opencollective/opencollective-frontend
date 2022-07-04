@@ -4,9 +4,9 @@ import { withApollo } from '@apollo/client/react/hoc';
 import { isEqual } from 'lodash';
 import Router from 'next/router';
 
+import withLoggedInUser from '../lib/hooks/withLoggedInUser';
 import { LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
-import withLoggedInUser from '../lib/withLoggedInUser';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,
@@ -72,7 +72,6 @@ class UserProvider extends React.Component {
 
   logout = async () => {
     removeFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    removeFromLocalStorage(LOCAL_STORAGE_KEYS.LOGGED_IN_USER);
     await this.props.client.resetStore();
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
   };
@@ -159,8 +158,8 @@ const withUser = WrappedComponent => {
   return WithUser;
 };
 
-const useUser = () => React.useContext(UserContext);
+const useLoggedInUser = () => React.useContext(UserContext);
 
 export default withApollo(withLoggedInUser(UserProvider));
 
-export { UserConsumer, withUser, useUser };
+export { UserConsumer, withUser, useLoggedInUser };

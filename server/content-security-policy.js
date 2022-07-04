@@ -39,8 +39,10 @@ const COMMON_DIRECTIVES = {
     'sentry.io',
     '*.sentry.io',
     'atlas.shopifycloud.com',
+    'atlas.shopifysvc.com',
     'country-service.shopifycloud.com',
     'maps.googleapis.com',
+    'https://wise.com',
     'https://transferwise.com',
     'https://sandbox.transferwise.tech',
     'https://hcaptcha.com',
@@ -63,6 +65,7 @@ const COMMON_DIRECTIVES = {
     'https://cdn.matomo.cloud',
   ],
   frameSrc: [
+    'blob:', // For expense invoice previews in the modal, as they're rendered in a blob
     'www.youtube.com',
     'www.youtube-nocookie.com',
     'opencollective.com',
@@ -70,6 +73,7 @@ const COMMON_DIRECTIVES = {
     'js.stripe.com',
     '*.paypal.com',
     '*.openstreetmap.org',
+    'https://wise.com',
     'https://transferwise.com',
     'https://sandbox.transferwise.tech',
     'https://hcaptcha.com',
@@ -149,7 +153,7 @@ const getContentSecurityPolicyConfig = () => {
     };
   } else if (env === 'production') {
     return {
-      reportOnly: true,
+      reportOnly: false,
       directives: generateDirectives({
         imgSrc: [
           'opencollective-production.s3.us-west-1.amazonaws.com',

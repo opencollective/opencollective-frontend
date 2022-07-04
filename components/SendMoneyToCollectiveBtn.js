@@ -70,7 +70,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
           store.writeFragment({
             fragment: collectiveBalanceFragment,
             id: `CollectiveStatsType:${fromCollective.id}`,
-            data: { balance },
+            data: { id: fromCollective.id, balance },
           });
         },
       });
@@ -134,6 +134,7 @@ const addPaymentMethodsData = graphql(paymentMethodsQuery, {
 
 const collectiveBalanceFragment = gql`
   fragment StatFieldsFragment on CollectiveStatsType {
+    id
     balance
   }
 `;
@@ -144,7 +145,9 @@ const sendMoneyToCollectiveMutation = gqlV2/* GraphQL */ `
       order {
         id
         fromAccount {
+          id
           stats {
+            id
             balance {
               valueInCents
             }

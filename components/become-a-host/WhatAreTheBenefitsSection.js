@@ -2,10 +2,10 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import Illustration from '../collectives/HomeIllustration';
+import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
-import NextIllustration from '../home/HomeNextIllustration';
 import { H2, H3, P } from '../Text';
 
 const ScreenShotWrapper = styled(Illustration)`

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "> Starting maildev server"
-npx maildev@1.1.0 &
+npx maildev@2.0.4 &
 MAILDEV_PID=$!
 
 echo "> Starting api server"
@@ -70,7 +70,7 @@ wait_for_service IMAGES 127.0.0.1 3001
 echo ""
 echo "> Running cypress tests"
 
-npx cypress run ${CYPRESS_RECORD} --env OC_ENV=$OC_ENV
+npx cypress run ${CYPRESS_RECORD} --env OC_ENV=$OC_ENV --spec "test/cypress/integration/${CYPRESS_TEST_FILES}"
 
 RETURN_CODE=$?
 if [ $RETURN_CODE -ne 0 ]; then

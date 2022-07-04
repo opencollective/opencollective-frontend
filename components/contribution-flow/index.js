@@ -112,9 +112,11 @@ class ContributionFlow extends React.Component {
     disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
     fixedInterval: PropTypes.string,
     fixedAmount: PropTypes.number,
+    quantity: PropTypes.number,
     platformContribution: PropTypes.number,
     skipStepDetails: PropTypes.bool,
     hideHeader: PropTypes.bool,
+    hideFAQ: PropTypes.bool,
     loadingLoggedInUser: PropTypes.bool,
     hideCreditCardPostalCode: PropTypes.bool,
     isEmbed: PropTypes.bool,
@@ -142,6 +144,7 @@ class ContributionFlow extends React.Component {
     this.captchaRef = React.createRef();
 
     const isCryptoFlow = props.paymentFlow === PAYMENT_FLOW.CRYPTO;
+    const currency = isCryptoFlow ? CRYPTO_CURRENCIES[0] : props.tier?.amount?.currency || props.collective.currency;
     this.state = {
       error: null,
       stripe: null,
@@ -154,11 +157,11 @@ class ContributionFlow extends React.Component {
       showSignIn: false,
       createdOrder: null,
       stepDetails: {
-        quantity: 1,
+        quantity: (Number.isSafeInteger(props.quantity) && props.quantity) || 1,
         interval: props.fixedInterval || getDefaultInterval(props.tier),
-        amount: isCryptoFlow ? '' : props.fixedAmount || getDefaultTierAmount(props.tier),
+        amount: isCryptoFlow ? '' : props.fixedAmount || getDefaultTierAmount(props.tier, props.collective, currency),
         platformContribution: props.platformContribution,
-        currency: isCryptoFlow ? CRYPTO_CURRENCIES[0] : props.tier?.amount?.currency || props.collective.currency,
+        currency,
       },
     };
   }
@@ -496,6 +499,7 @@ class ContributionFlow extends React.Component {
         'defaultEmail',
         'defaultName',
         'useTheme',
+        'hideFAQ',
         'hideHeader',
         'hideCreditCardPostalCode',
       ]),
@@ -571,7 +575,8 @@ class ContributionFlow extends React.Component {
     const { intl, fixedInterval, fixedAmount, collective, host, tier, LoggedInUser, paymentFlow } = this.props;
     const { stepDetails, stepProfile, stepPayment, stepSummary } = this.state;
     const isFixedContribution = this.isFixedContribution(tier, fixedAmount, fixedInterval);
-    const minAmount = this.getTierMinAmount(tier);
+    const currency = tier?.amount.currency || collective.currency;
+    const minAmount = this.getTierMinAmount(tier, currency);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
     const isStepProfileCompleted = Boolean((stepProfile && LoggedInUser) || stepProfile?.isGuest);
     const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
@@ -598,7 +603,6 @@ class ContributionFlow extends React.Component {
             stepDetails.platformContribution &&
             stepDetails.platformContribution / stepDetails.amount >= 0.5
           ) {
-            const currency = tier?.amount.currency || collective.currency;
             return confirm(
               intl.formatMessage(OTHER_MESSAGES.tipAmountContributionWarning, {
                 contributionAmount: formatCurrency(stepDetails.amount, currency, { locale: intl.locale }),
@@ -801,7 +805,7 @@ class ContributionFlow extends React.Component {
                 isSubmitted={this.state.isSubmitted}
                 loading={isValidating || isLoading}
                 currency={currency}
-                isFreeTier={this.getTierMinAmount(tier) === 0}
+                isFreeTier={this.getTierMinAmount(tier, currency) === 0}
               />
             </StepsProgressBox>
             {/* main container */}
@@ -891,23 +895,24 @@ class ContributionFlow extends React.Component {
                     </Box>
                   )}
                 </Box>
-
-                <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
-                  <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
-                    <SafeTransactionMessage />
-                    <Box mt={4}>
-                      <ContributionSummary
-                        collective={collective}
-                        stepDetails={stepDetails}
-                        stepSummary={stepSummary}
-                        stepPayment={stepPayment}
-                        currency={currency}
-                        isCrypto={isCrypto}
-                      />
+                {!this.props.hideFAQ && (
+                  <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
+                    <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
+                      <SafeTransactionMessage />
+                      <Box mt={4}>
+                        <ContributionSummary
+                          collective={collective}
+                          stepDetails={stepDetails}
+                          stepSummary={stepSummary}
+                          stepPayment={stepPayment}
+                          currency={currency}
+                          isCrypto={isCrypto}
+                        />
+                      </Box>
+                      <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} isCrypto={isCrypto} />
                     </Box>
-                    <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} isCrypto={isCrypto} />
                   </Box>
-                </Box>
+                )}
               </Grid>
             )}
           </Container>

@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Github } from '@styled-icons/fa-brands/Github';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { Field } from 'formik';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -11,6 +10,7 @@ import StyledHr from '../../components/StyledHr';
 import StyledInputField from '../../components/StyledInputField';
 import StyledInputGroup from '../../components/StyledInputGroup';
 
+import CodeRepositoryIcon from '../CodeRepositoryIcon';
 import { Box, Flex } from '../Grid';
 import { H1, P } from '../Text';
 
@@ -22,9 +22,9 @@ class OnboardingContentBox extends React.Component {
     slug: PropTypes.string,
     step: PropTypes.number,
     collective: PropTypes.object,
+    memberInvitations: PropTypes.object,
     LoggedInUser: PropTypes.object,
     updateAdmins: PropTypes.func,
-    addContact: PropTypes.func,
     intl: PropTypes.object.isRequired,
     values: PropTypes.object,
     errors: PropTypes.object,
@@ -47,9 +47,8 @@ class OnboardingContentBox extends React.Component {
   }
 
   componentDidMount() {
-    const member = this.props.LoggedInUser.memberOf.filter(member => member.collective.id === this.props.collective.id);
     this.setState({
-      admins: [{ role: 'ADMIN', member: this.props.LoggedInUser.collective, id: member[0].id }],
+      admins: [],
     });
   }
 
@@ -64,7 +63,7 @@ class OnboardingContentBox extends React.Component {
   };
 
   render() {
-    const { slug, step, collective, updateAdmins, intl, LoggedInUser, values, errors, touched } = this.props;
+    const { slug, step, collective, updateAdmins, intl, values, errors, touched } = this.props;
     const { admins } = this.state;
 
     return (
@@ -108,18 +107,18 @@ class OnboardingContentBox extends React.Component {
                 <StyledHr width="100%" ml={2} />
               </Flex>
             </Flex>
-            {admins.length > 0 && (
-              <Flex px={3} width="100%" flexWrap="wrap" data-cy="profile-card">
-                {admins.map(admin => (
-                  <OnboardingProfileCard
-                    key={admin.member.id}
-                    collective={admin.member}
-                    adminCollective={LoggedInUser.collective}
-                    removeAdmin={this.removeAdmin}
-                  />
-                ))}
-              </Flex>
-            )}
+            <Flex px={3} width="100%" flexWrap="wrap" data-cy="profile-card">
+              <OnboardingProfileCard
+                key={this.props.LoggedInUser.collective.id}
+                collective={this.props.LoggedInUser.collective}
+              />
+              {this.props.memberInvitations.map(admin => (
+                <OnboardingProfileCard key={admin.memberAccount.id} collective={admin.memberAccount} isPending />
+              ))}
+              {admins.map(admin => (
+                <OnboardingProfileCard key={admin.member.id} collective={admin.member} removeAdmin={this.removeAdmin} />
+              ))}
+            </Flex>
             <Flex px={3} width="100%">
               <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
                 <FormattedMessage id="onboarding.admins.invite" defaultMessage="Invite administrators" />
@@ -211,22 +210,27 @@ class OnboardingContentBox extends React.Component {
                 </StyledInputField>
               </Flex>
               <Flex alignItems="center">
-                <Github size={20} color="black.500" />
+                <CodeRepositoryIcon
+                  repositoryUrl={values.repositoryUrl}
+                  size={16}
+                  color="#333"
+                  title={intl.formatMessage({ defaultMessage: 'Code repository' })}
+                />
                 <StyledInputField
                   ml={2}
                   my={2}
-                  htmlFor="githubHandle"
-                  name="githubHandle"
+                  htmlFor="repositoryUrl"
+                  name="repositoryUrl"
                   flexGrow={1}
-                  value={values.githubHandle}
-                  error={touched.githubHandle && errors.githubHandle}
+                  value={values.repositoryUrl}
+                  error={touched.repositoryUrl && errors.repositoryUrl}
                 >
                   {inputProps => (
                     <Field
                       as={StyledInputGroup}
                       type="text"
-                      placeholder="agoraos"
-                      prepend="github.com/"
+                      placeholder="github.com/my-organization/my-repo"
+                      prepend="https://"
                       {...inputProps}
                     />
                   )}

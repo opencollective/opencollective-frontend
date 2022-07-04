@@ -152,6 +152,7 @@ const createConversationPageQuery = gqlV2/* GraphQL */ `
         tag
       }
       features {
+        id
         ...NavbarFields
       }
 

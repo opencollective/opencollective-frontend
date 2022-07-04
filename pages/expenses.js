@@ -29,6 +29,7 @@ import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
 import ExpensesList from '../components/expenses/ExpensesList';
 import ExpenseTags from '../components/expenses/ExpenseTags';
+import { parseChronologicalOrderInput } from '../components/expenses/filters/ExpensesOrder';
 import { expenseHostFields, expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box, Flex } from '../components/Grid';
 import ScheduledExpensesBanner from '../components/host-dashboard/ScheduledExpensesBanner';
@@ -72,6 +73,7 @@ class ExpensePage extends React.Component {
       payout,
       period,
       searchTerm,
+      orderBy,
     } = query;
     return {
       parentCollectiveSlug,
@@ -86,6 +88,7 @@ class ExpensePage extends React.Component {
         amount,
         tag,
         searchTerm,
+        orderBy,
       },
     };
   }
@@ -252,6 +255,7 @@ class ExpensePage extends React.Component {
                       collective={data.account}
                       filters={this.props.query}
                       onChange={queryParams => this.updateFilters(queryParams, data.account)}
+                      wrap={false}
                     />
                   ) : (
                     <LoadingPlaceholder height={70} />
@@ -359,6 +363,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
     $dateFrom: DateTime
     $dateTo: DateTime
     $searchTerm: String
+    $orderBy: ChronologicalOrderInput
   ) {
     account(slug: $collectiveSlug) {
       id
@@ -369,6 +374,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       name
       currency
       isArchived
+      isActive
       settings
       createdAt
       expensesTags {
@@ -376,10 +382,12 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
         tag
       }
       features {
+        id
         ...NavbarFields
       }
 
       stats {
+        id
         balanceWithBlockedFunds {
           valueInCents
           currency
@@ -389,6 +397,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       ... on AccountWithHost {
         isApproved
         host {
+          id
           ...ExpenseHostFields
         }
       }
@@ -430,11 +439,13 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       dateFrom: $dateFrom
       dateTo: $dateTo
       searchTerm: $searchTerm
+      orderBy: $orderBy
     ) {
       totalCount
       offset
       limit
       nodes {
+        id
         ...ExpensesListFieldsFragment
       }
     }
@@ -458,6 +469,7 @@ const addExpensesPageData = graphql(expensesPageQuery, {
   options: props => {
     const amountRange = parseAmountRange(props.query.amount);
     const { from: dateFrom, to: dateTo } = parseDateInterval(props.query.period);
+    const orderBy = props.query.orderBy && parseChronologicalOrderInput(props.query.orderBy);
     return {
       context: API_V2_CONTEXT,
       variables: {
@@ -472,6 +484,7 @@ const addExpensesPageData = graphql(expensesPageQuery, {
         payoutMethodType: props.query.payout,
         dateFrom,
         dateTo,
+        orderBy,
         searchTerm: props.query.searchTerm,
       },
     };

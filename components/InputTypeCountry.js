@@ -6,15 +6,11 @@ import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import fetchGeoLocation from '../lib/geolocation_api';
+import { getIntlDisplayNames } from '../lib/i18n';
 
 import { Flex } from './Grid';
 import StyledSelect from './StyledSelect';
 import { Span } from './Text';
-
-export const getCountryName = (locale, country) => {
-  const countryNames = new Intl.DisplayNames(locale, { type: 'region' });
-  return countryNames.of(country);
-};
 
 class InputTypeCountry extends Component {
   static propTypes = {
@@ -46,6 +42,11 @@ class InputTypeCountry extends Component {
 
   static defaultProps = { name: 'country', customOptions: [] };
 
+  constructor(props) {
+    super(props);
+    this.countryNames = getIntlDisplayNames(props.intl.locale, 'region');
+  }
+
   async componentDidMount() {
     if (this.props.autoDetect && !this.props.value && !this.props.defaultValue) {
       const country = await fetchGeoLocation();
@@ -58,7 +59,7 @@ class InputTypeCountry extends Component {
   }
 
   generateCountryLabel(locale, countryCode) {
-    const countryName = getCountryName(locale, countryCode);
+    const countryName = this.countryNames.of(countryCode);
     const emoji = getEmojiByCountryCode(countryCode);
     return (
       <Flex fontSize="14px" lineHeight="20px" fontWeight="500" title={countryName}>
@@ -70,12 +71,15 @@ class InputTypeCountry extends Component {
   }
 
   getOptions = memoizeOne(locale => {
-    const options = Object.keys(countryData).map(code => ({
-      value: code,
-      label: this.generateCountryLabel(locale, code),
-    }));
+    const options = Object.keys(countryData).map(code => {
+      return {
+        value: code,
+        country: this.countryNames.of(code),
+        label: this.generateCountryLabel(locale, code),
+      };
+    });
 
-    return [...this.props.customOptions, ...orderBy(options, 'label')];
+    return [...this.props.customOptions, ...orderBy(options, 'country')];
   });
 
   getSelectedOption = memoizeOne((locale, country) => {
@@ -93,6 +97,16 @@ class InputTypeCountry extends Component {
     );
   });
 
+  filterOptions(candidate, input) {
+    if (input) {
+      return (
+        candidate.data.country?.toLowerCase()?.includes(input.toLowerCase()) ||
+        candidate.data.value?.toLowerCase() === input.toLowerCase()
+      );
+    }
+    return true;
+  }
+
   render() {
     const { defaultValue, value, intl, onChange, locale, name, inputId, ...props } = this.props;
     return (
@@ -101,6 +115,7 @@ class InputTypeCountry extends Component {
         inputId={inputId}
         minWidth={150}
         options={this.getOptions(locale || intl.locale, defaultValue)}
+        filterOption={this.filterOptions}
         onChange={({ value }) => onChange(value)}
         value={!isUndefined(value) ? this.getSelectedOption(locale || intl.locale, value) : undefined}
         defaultValue={defaultValue ? this.getSelectedOption(locale || intl.locale, defaultValue) : undefined}

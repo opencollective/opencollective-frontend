@@ -6,10 +6,11 @@ import { AngleDoubleDown } from '@styled-icons/fa-solid/AngleDoubleDown';
 import { cloneDeep, get, set } from 'lodash';
 import Dropzone from 'react-dropzone';
 import Cropper from 'react-easy-crop';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { upload } from '../../../lib/api';
+import { formatErrorMessage, getErrorFromXhrUpload, i18nGraphqlException } from '../../../lib/errors';
 import { useElementSize } from '../../../lib/hooks/useElementSize';
 import { mergeRefs } from '../../../lib/react-utils';
 
@@ -61,6 +62,7 @@ const EmptyDropzoneContainer = styled.div`
 
 const HeroBackgroundCropperModal = ({ onClose, collective }) => {
   const [isSubmitting, setSubmitting] = React.useState(false); // Not using Apollo to have a common flag with file upload
+  const intl = useIntl();
   const { addToast } = useToasts();
   const [editBackground] = useMutation(editCollectiveBackgroundMutation);
   const containerSize = useElementSize({ defaultWidth: 600 });
@@ -198,55 +200,62 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                       minWidth={75}
                       loading={isSubmitting}
                       onClick={async () => {
-                        {
-                          try {
-                            setSubmitting(true);
+                        setSubmitting(true);
 
-                            // We intentionally use the raw image URL rather than image service here
-                            // because the `backgroundImage` column is not supposed to store the
-                            // images service address
-                            let imgURL = collective.backgroundImage;
-
-                            // Upload image if changed or remove it
-                            if (uploadedImage === KEY_IMG_REMOVE) {
-                              imgURL = null;
-                            } else if (uploadedImage) {
-                              imgURL = await upload(uploadedImage);
-                            }
-
-                            // Update settings
-                            const result = await editBackground({
-                              variables: {
-                                id: collective.id,
-                                backgroundImage: imgURL,
-                                settings: set(cloneDeep(collective.settings), 'collectivePage.background', {
-                                  crop,
-                                  zoom,
-                                  mediaSize,
-                                  isAlignedRight,
-                                }),
-                              },
-                            });
-
-                            // Reset
-                            const base = get(result, 'data.editCollective.settings.collectivePage.background');
-                            onCropChange((base && base.crop) || DEFAULT_BACKGROUND_CROP);
-                            onZoomChange((base && base.zoom) || 1);
-                            setUploadedImage(null);
-
-                            // Show a toast and close the modal
-                            addToast({
-                              type: TOAST_TYPE.SUCCESS,
-                              title: <FormattedMessage defaultMessage="Cover updated" />,
-                              message: (
-                                <FormattedMessage defaultMessage="The page might take a few seconds to fully update" />
-                              ),
-                            });
-
-                            onClose();
-                          } finally {
-                            setSubmitting(false);
+                        // We intentionally use the raw image URL rather than image service here
+                        // because the `backgroundImage` column is not supposed to store the
+                        // images service address
+                        let imgURL = collective.backgroundImage;
+                        try {
+                          // Upload image if changed or remove it
+                          if (uploadedImage === KEY_IMG_REMOVE) {
+                            imgURL = null;
+                          } else if (uploadedImage) {
+                            imgURL = await upload(uploadedImage);
                           }
+                        } catch (e) {
+                          const error = getErrorFromXhrUpload(e);
+                          addToast({ type: TOAST_TYPE.ERROR, message: formatErrorMessage(intl, error) });
+                          return;
+                        } finally {
+                          setSubmitting(false);
+                        }
+
+                        // Update settings
+                        try {
+                          const result = await editBackground({
+                            variables: {
+                              id: collective.id,
+                              backgroundImage: imgURL,
+                              settings: set(cloneDeep(collective.settings), 'collectivePage.background', {
+                                crop,
+                                zoom,
+                                mediaSize,
+                                isAlignedRight,
+                              }),
+                            },
+                          });
+
+                          // Reset
+                          const base = get(result, 'data.editCollective.settings.collectivePage.background');
+                          onCropChange((base && base.crop) || DEFAULT_BACKGROUND_CROP);
+                          onZoomChange((base && base.zoom) || 1);
+                          setUploadedImage(null);
+
+                          // Show a toast and close the modal
+                          addToast({
+                            type: TOAST_TYPE.SUCCESS,
+                            title: <FormattedMessage defaultMessage="Cover updated" />,
+                            message: (
+                              <FormattedMessage defaultMessage="The page might take a few seconds to fully update" />
+                            ),
+                          });
+
+                          onClose();
+                        } catch (e) {
+                          addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+                        } finally {
+                          setSubmitting(false);
                         }
                       }}
                     >

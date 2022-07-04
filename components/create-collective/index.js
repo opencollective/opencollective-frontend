@@ -5,6 +5,7 @@ import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
+import { IGNORED_TAGS } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
@@ -27,6 +28,16 @@ class CreateCollective extends Component {
     refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
     router: PropTypes.object.isRequired, // from withRouter
     createCollective: PropTypes.func.isRequired, // addCreateCollectiveMutation
+    data: PropTypes.shape({
+      // from addTagStatsQuery
+      tagStats: PropTypes.shape({
+        nodes: PropTypes.arrayOf(
+          PropTypes.shape({
+            tag: PropTypes.string,
+          }),
+        ),
+      }),
+    }),
   };
 
   constructor(props) {
@@ -41,13 +52,15 @@ class CreateCollective extends Component {
     this.createCollective = this.createCollective.bind(this);
   }
 
-  async createCollective({ collective, message }) {
+  async createCollective({ collective, message, inviteMembers }) {
     // set state to loading
     this.setState({ creating: true });
 
     // prepare object
+    collective.tags = collective.tags
+      ? [...collective.tags, this.props.router.query.category]
+      : [this.props.router.query.category];
 
-    collective.tags = [this.props.router.query.category];
     if (this.state.githubInfo) {
       collective.githubHandle = this.state.githubInfo.handle;
     }
@@ -60,6 +73,10 @@ class CreateCollective extends Component {
           host: this.props.host ? { slug: this.props.host.slug } : null,
           automateApprovalWithGithub: this.state.githubInfo ? true : false,
           message,
+          inviteMembers: inviteMembers.map(invite => ({
+            ...invite,
+            memberAccount: { legacyId: invite.memberAccount.id },
+          })),
         },
       });
       const newCollective = res.data.createCollective;
@@ -79,9 +96,11 @@ class CreateCollective extends Component {
   }
 
   render() {
-    const { LoggedInUser, host, router } = this.props;
+    const { LoggedInUser, host, router, data } = this.props;
     const { error } = this.state;
     const { category, step, token } = router.query;
+    const tags = data?.tagStats?.nodes?.filter(node => !IGNORED_TAGS.includes(node.tag));
+    const popularTags = tags?.map(value => value.tag);
 
     if (host && !host.isOpenToApplications) {
       return (
@@ -148,6 +167,8 @@ class CreateCollective extends Component {
         onChange={this.handleChange}
         loading={this.state.creating}
         error={error}
+        popularTags={popularTags}
+        loggedInUser={LoggedInUser}
       />
     );
   }
@@ -159,12 +180,14 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
     $host: AccountReferenceInput
     $automateApprovalWithGithub: Boolean
     $message: String
+    $inviteMembers: [InviteMemberInput]
   ) {
     createCollective(
       collective: $collective
       host: $host
       automateApprovalWithGithub: $automateApprovalWithGithub
       message: $message
+      inviteMembers: $inviteMembers
     ) {
       id
       name
@@ -172,7 +195,19 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
       tags
       description
       githubHandle
+      repositoryUrl
       legacyId
+    }
+  }
+`;
+
+const tagStatsQuery = gqlV2/* GraphQL */ `
+  query CreateCollectivePageQuery {
+    tagStats {
+      nodes {
+        id
+        tag
+      }
     }
   }
 `;
@@ -182,4 +217,10 @@ const addCreateCollectiveMutation = graphql(createCollectiveMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
-export default withRouter(withUser(addCreateCollectiveMutation(injectIntl(CreateCollective))));
+const addTagStatsQuery = graphql(tagStatsQuery, {
+  options: {
+    context: API_V2_CONTEXT,
+  },
+});
+
+export default withRouter(withUser(addCreateCollectiveMutation(addTagStatsQuery(injectIntl(CreateCollective)))));

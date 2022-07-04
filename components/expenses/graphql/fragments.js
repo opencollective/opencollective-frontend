@@ -50,6 +50,13 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
           ... on Organization {
             host {
               id
+              payoutMethods {
+                id
+                type
+                name
+                data
+                isSaved
+              }
             }
           }
           location {
@@ -174,6 +181,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       type
       isAdmin
       location {
+        id
         address
         country
       }
@@ -239,12 +247,14 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       name
       type
       imageUrl
+      isActive
       description
       settings
       twitterHandle
       currency
       expensePolicy
       features {
+        id
         ...NavbarFields
         MULTI_CURRENCY_EXPENSES
       }
@@ -269,6 +279,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       ... on AccountWithHost {
         isApproved
         host {
+          id
           ...ExpenseHostFields
           transferwise {
             id
@@ -283,6 +294,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         isHost
         isActive
         host {
+          id
           ...ExpenseHostFields
           transferwise {
             id
@@ -333,6 +345,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       canMarkAsSpam
       canPay
       canMarkAsUnpaid
+      canMarkAsIncomplete
       canComment
       canUnschedulePayment
       approve {
@@ -354,6 +367,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       }
     }
     recurringExpense {
+      id
       interval
       endsAt
     }
@@ -416,6 +430,7 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
       canMarkAsSpam
       canPay
       canMarkAsUnpaid
+      canMarkAsIncomplete
       canSeeInvoiceInfo
       canEditTags
       canUnschedulePayment

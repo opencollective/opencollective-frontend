@@ -24,6 +24,7 @@ import { commentFieldsFragment } from './graphql';
 const createCommentMutation = gqlV2/* GraphQL */ `
   mutation CreateComment($comment: CommentCreateInput!) {
     createComment(comment: $comment) {
+      id
       ...CommentFields
     }
   }
@@ -120,11 +121,13 @@ const CommentForm = ({
     <Container id={id} position="relative">
       {!loadingLoggedInUser && !LoggedInUser && (
         <ContainerOverlay backgroundType="white">
-          <SignInOrJoinFree
-            routes={{ join: getRedirectUrl(router, id) }}
-            signInLabel={formatMessage(messages.signInLabel)}
-            withShadow
-          />
+          <Container p="25px" background="white" borderRadius={10} boxShadow="0px 9px 14px 1px #dedede">
+            <SignInOrJoinFree
+              routes={{ join: getRedirectUrl(router, id) }}
+              signInLabel={formatMessage(messages.signInLabel)}
+              hideFooter
+            />
+          </Container>
         </ContainerOverlay>
       )}
       <form onSubmit={submitForm} data-cy="comment-form">

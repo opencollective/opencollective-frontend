@@ -499,7 +499,11 @@ class Host extends React.Component {
                         defaultMessage="Suggested Hosts"
                       />
                     </H4>
-                    <StyledLink as={Link} fontSize="13px" href="/hosts">
+                    <StyledLink
+                      as={Link}
+                      fontSize="13px"
+                      href={`${collective.slug}/accept-financial-contributions/host`}
+                    >
                       <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all Fiscal Hosts" />
                     </StyledLink>
                   </Container>

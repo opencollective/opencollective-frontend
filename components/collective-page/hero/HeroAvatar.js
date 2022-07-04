@@ -9,6 +9,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { upload } from '../../../lib/api';
+import { isIndividualAccount } from '../../../lib/collective.lib';
 import { AVATAR_HEIGHT_RANGE, AVATAR_WIDTH_RANGE } from '../../../lib/constants/collectives';
 import { getAvatarBorderRadius } from '../../../lib/image-utils';
 
@@ -139,6 +140,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
   if (!isAdmin) {
     return <Avatar collective={collective} radius={AVATAR_SIZE} />;
   } else if (!editing) {
+    const imgType = isIndividualAccount(collective) ? 'AVATAR' : 'LOGO';
     return (
       <Fragment>
         <Dropzone
@@ -159,7 +161,11 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
                       <StyledButton buttonSize="tiny" minWidth={120}>
                         <Camera size={12} />
                         <Span ml={2} css={{ verticalAlign: 'center' }}>
-                          <FormattedMessage id="HeroAvatar.Edit" defaultMessage="Edit logo" />
+                          <FormattedMessage
+                            id="HeroAvatar.Edit"
+                            defaultMessage="Edit {imgType, select, AVATAR {avatar} other {logo}}"
+                            values={{ imgType }}
+                          />
                         </Span>
                       </StyledButton>
                       {collective.image && (
@@ -173,7 +179,11 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
                           }}
                         >
                           <Span ml={2} css={{ verticalAlign: 'center' }}>
-                            <FormattedMessage id="HeroAvatar.Remove" defaultMessage="Remove logo" />
+                            <FormattedMessage
+                              id="HeroAvatar.Remove"
+                              defaultMessage="Remove {imgType, select, AVATAR {avatar} other {logo}}"
+                              values={{ imgType }}
+                            />
                           </Span>
                         </StyledButton>
                       )}
@@ -201,7 +211,13 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
             onClose={() => {
               setshowModal(false);
             }}
-            header={<FormattedMessage id="HeroAvatar.Remove" defaultMessage="Remove logo" />}
+            header={
+              <FormattedMessage
+                id="HeroAvatar.Remove"
+                defaultMessage="Remove {imgType, select, AVATAR {avatar} other {logo}}"
+                values={{ imgType }}
+              />
+            }
             continueHandler={async () => {
               setSubmitting(true); // Need this because `upload` is not a graphql function
 

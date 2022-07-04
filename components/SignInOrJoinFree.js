@@ -3,26 +3,30 @@ import { PropTypes } from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Field, Form, Formik } from 'formik';
-import { pick } from 'lodash';
+import { get, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import styled from 'styled-components';
 import { isEmail } from 'validator';
 
-import { checkUserExistence, signin } from '../lib/api';
+import { signin } from '../lib/api';
+import { i18nGraphqlException } from '../lib/errors';
 import { getWebsiteUrl } from '../lib/utils';
 
-import CreateProfileFAQ from './faqs/CreateProfileFAQ';
+import Container from './Container';
 import CreateProfile from './CreateProfile';
 import { Box, Flex } from './Grid';
-import I18nFormatters, { I18nSupportLink } from './I18nFormatters';
+import { I18nSupportLink } from './I18nFormatters';
+import Link from './Link';
 import Loading from './Loading';
-import MessageBoxGraphqlError from './MessageBoxGraphqlError';
 import SignIn from './SignIn';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
+import StyledHr from './StyledHr';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
-import { H5, P } from './Text';
+import { H5, P, Span } from './Text';
+import { TOAST_TYPE, withToasts } from './ToastProvider';
 
 const messages = defineMessages({
   twoFactorAuthCodeInputLabel: {
@@ -34,6 +38,15 @@ const messages = defineMessages({
     defaultMessage: 'Please enter one of your alphanumeric recovery codes.',
   },
 });
+
+const SignInFooterLink = styled(Link)`
+  color: #323334;
+  font-size: 13px;
+  font-weight: 400;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
 
 /**
  * Shows a SignIn form by default, with the ability to switch to SignUp form. It
@@ -60,19 +73,18 @@ class SignInOrJoinFree extends React.Component {
       signin: PropTypes.string,
       join: PropTypes.string,
     }),
-    /** To customize which forms should be displayed */
-    createProfileTabs: PropTypes.arrayOf(PropTypes.oneOf(['personal', 'organization'])),
-    /** To replace the default labels */
-    createProfileLabels: PropTypes.shape({ personal: PropTypes.string, organization: PropTypes.string }),
-    /** To display a box shadow below the card */
-    withShadow: PropTypes.bool,
-    /** Label for signIn, defaults to "Sign in using your email address:" */
+    /** Label for signIn, defaults to "Continue with your email" */
     signInLabel: PropTypes.node,
     intl: PropTypes.object,
     enforceTwoFactorAuthForLoggedInUser: PropTypes.bool,
     submitTwoFactorAuthenticatorCode: PropTypes.func,
     submitRecoveryCode: PropTypes.func,
     router: PropTypes.object,
+    addToast: PropTypes.func.isRequired,
+    hideFooter: PropTypes.bool,
+    isOAuth: PropTypes.bool,
+    oAuthAppName: PropTypes.string,
+    oAuthAppImage: PropTypes.string,
   };
 
   constructor(props) {
@@ -84,19 +96,28 @@ class SignInOrJoinFree extends React.Component {
       unknownEmailError: false,
       email: props.email || props.defaultEmail || '',
       useRecoveryCodes: null,
+      emailAlreadyExists: false,
+      isOAuth: this.props.isOAuth,
+      oAuthAppName: this.props.oAuthAppName,
+      oAuthAppImage: this.props.oAuthAppImage,
     };
   }
 
   componentDidMount() {
     // Auto signin if an email is provided
     if (this.props.email && isEmail(this.props.email)) {
-      this.signIn(this.props.email);
+      this.signIn(this.props.email, false);
     }
   }
 
-  switchForm = form => {
+  switchForm = (form, oAuthDetails = {}) => {
     // Update local state
-    this.setState({ form });
+    this.setState({
+      form,
+      isOAuth: oAuthDetails.isOAuth,
+      oAuthAppName: oAuthDetails.oAuthAppName,
+      oAuthAppImage: oAuthDetails.oAuthAppImage,
+    });
   };
 
   getRedirectURL() {
@@ -104,10 +125,14 @@ class SignInOrJoinFree extends React.Component {
     if (window.location.search) {
       currentPath = currentPath + window.location.search;
     }
-    return encodeURIComponent(this.props.redirect || currentPath || '/');
+    let redirectUrl = this.props.redirect;
+    if (currentPath.includes('/create-account') && redirectUrl === '/') {
+      redirectUrl = '/welcome';
+    }
+    return encodeURIComponent(redirectUrl || currentPath || '/');
   }
 
-  signIn = async email => {
+  signIn = async (email, createProfile) => {
     if (this.state.submitting) {
       return false;
     }
@@ -115,28 +140,31 @@ class SignInOrJoinFree extends React.Component {
     this.setState({ submitting: true, error: null });
 
     try {
-      const userExists = await checkUserExistence(email);
-      if (userExists) {
-        const response = await signin({
-          user: { email },
-          redirect: this.getRedirectURL(),
-          websiteUrl: getWebsiteUrl(),
-        });
+      const response = await signin({
+        user: { email },
+        redirect: this.getRedirectURL(),
+        websiteUrl: getWebsiteUrl(),
+        createProfile: createProfile,
+      });
 
-        // In dev/test, API directly returns a redirect URL for emails like
-        // test*@opencollective.com.
-        if (response.redirect) {
-          await this.props.router.replace(response.redirect);
-        } else {
-          await this.props.router.push({ pathname: '/signin/sent', query: { email } });
-        }
-        window.scrollTo(0, 0);
+      // In dev/test, API directly returns a redirect URL for emails like
+      // test*@opencollective.com.
+      if (response.redirect) {
+        await this.props.router.replace(response.redirect);
       } else {
-        this.setState({ unknownEmailError: true, submitting: false });
+        await this.props.router.push({ pathname: '/signin/sent', query: { email } });
       }
-    } catch (e) {
-      this.setState({ error: e.message || 'Server error', submitting: false });
       window.scrollTo(0, 0);
+    } catch (e) {
+      if (e.json?.errorCode === 'EMAIL_DOES_NOT_EXIST') {
+        this.setState({ unknownEmailError: true, submitting: false });
+      } else {
+        this.props.addToast({
+          type: TOAST_TYPE.ERROR,
+          message: e.message || 'Server error',
+        });
+        this.setState({ submitting: false });
+      }
     }
   };
 
@@ -168,8 +196,14 @@ class SignInOrJoinFree extends React.Component {
       await this.props.router.push({ pathname: '/signin/sent', query: { email: user.email } });
       window.scrollTo(0, 0);
     } catch (error) {
-      this.setState({ error: error.message, submitting: false });
-      window.scrollTo(0, 0);
+      const emailAlreadyExists = get(error, 'graphQLErrors.0.extensions.code') === 'EMAIL_ALREADY_EXISTS';
+      if (!emailAlreadyExists) {
+        this.props.addToast({
+          type: TOAST_TYPE.ERROR,
+          message: i18nGraphqlException(this.props.intl, error),
+        });
+      }
+      this.setState({ submitting: false, emailAlreadyExists });
     }
   };
 
@@ -267,7 +301,7 @@ class SignInOrJoinFree extends React.Component {
               <P>
                 <FormattedMessage
                   id="login.twoFactorAuth.support"
-                  defaultMessage="If you can't login with 2FA or recovery codes, please contact <SupportLink></SupportLink>."
+                  defaultMessage="If you can't login with 2FA or recovery codes, please contact <SupportLink>support</SupportLink>."
                   values={{
                     SupportLink: I18nSupportLink,
                   }}
@@ -315,50 +349,79 @@ class SignInOrJoinFree extends React.Component {
 
     return (
       <Flex flexDirection="column" width={1} alignItems="center">
-        {error && <MessageBoxGraphqlError error={error} mb={[3, 4]} />}
         {enforceTwoFactorAuthForLoggedInUser ? (
           this.renderTwoFactorAuthBoxes(useRecoveryCodes)
         ) : (
           <Fragment>
-            {displayedForm !== 'create-account' ? (
+            {displayedForm !== 'create-account' && !error ? (
               <SignIn
                 email={email}
-                onEmailChange={email => this.setState({ email })}
-                onSecondaryAction={routes.join || (() => this.switchForm('create-account'))}
-                onSubmit={this.signIn}
+                onEmailChange={email => this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })}
+                onSecondaryAction={
+                  routes.join ||
+                  (() =>
+                    this.switchForm('create-account', {
+                      isOAuth: this.props.isOAuth,
+                      oAuthAppName: this.props.oAuthAppName,
+                      oAuthAppImage: this.props.oAuthAppImage,
+                    }))
+                }
+                onSubmit={email => this.signIn(email, false)}
                 loading={submitting}
                 unknownEmail={unknownEmailError}
-                withShadow={this.props.withShadow}
                 label={this.props.signInLabel}
                 showSecondaryAction={!this.props.disableSignup}
+                isOAuth={this.props.isOAuth}
+                oAuthAppName={this.props.oAuthAppName}
+                oAuthAppImage={this.props.oAuthAppImage}
               />
             ) : (
               <Flex flexDirection="column" width={1} alignItems="center">
                 <Flex justifyContent="center" width={1}>
-                  <Box width={[0, null, null, 1 / 5]} />
-                  <Box maxWidth={480} mx={[2, 4]} width="100%">
+                  <Box maxWidth={535} mx={[2, 4]} width="100%">
                     <CreateProfile
                       email={email}
-                      onEmailChange={email => this.setState({ email })}
-                      onPersonalSubmit={this.createProfile}
-                      onOrgSubmit={this.createProfile}
+                      name={this.state.name}
+                      newsletterOptIn={this.state.newsletterOptIn}
+                      tosOptIn={this.state.tosOptIn}
+                      onEmailChange={email =>
+                        this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })
+                      }
+                      onFieldChange={(name, value) => this.setState({ [name]: value })}
+                      onSubmit={this.createProfile}
                       onSecondaryAction={routes.signin || (() => this.switchForm('signin'))}
                       submitting={submitting}
-                      labels={this.props.createProfileLabels}
-                      tabs={this.props.createProfileTabs}
+                      emailAlreadyExists={this.state.emailAlreadyExists}
+                      isOAuth={this.state.isOAuth}
+                      oAuthAppName={this.state.oAuthAppName}
+                      oAuthAppImage={this.state.oAuthAppImage}
                     />
-                    <P mt={4} color="black.500" fontSize="12px" mb={3} data-cy="join-conditions" textAlign="center">
-                      <FormattedMessage
-                        id="SignIn.legal"
-                        defaultMessage="By joining, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
-                        values={I18nFormatters}
-                      />
-                    </P>
                   </Box>
-
-                  <CreateProfileFAQ mt={4} display={['none', null, 'block']} width={1 / 5} minWidth="335px" />
                 </Flex>
               </Flex>
+            )}
+            {!this.props.hideFooter && (
+              <Container
+                mt="128px"
+                pl={['20px', '20px', '144px']}
+                pr={['20px', '20px', '144px']}
+                maxWidth="880px"
+                width={1}
+              >
+                <StyledHr borderStyle="solid" borderColor="black.200" mb="16px" />
+                <Flex justifyContent="space-between" flexDirection={['column', 'row']} alignItems="center">
+                  <Span>
+                    <SignInFooterLink href="/privacypolicy">
+                      <FormattedMessage defaultMessage="Read our privacy policy" />
+                    </SignInFooterLink>
+                  </Span>
+                  <Span mt={['32px', 0]}>
+                    <SignInFooterLink href="/contact">
+                      <FormattedMessage defaultMessage="Contact support" />
+                    </SignInFooterLink>
+                  </Span>
+                </Flex>
+              </Container>
             )}
           </Fragment>
         )}
@@ -385,4 +448,4 @@ const signupMutation = gql`
 
 export const addSignupMutation = graphql(signupMutation, { name: 'createUser' });
 
-export default injectIntl(addSignupMutation(withRouter(SignInOrJoinFree)));
+export default withToasts(injectIntl(addSignupMutation(withRouter(SignInOrJoinFree))));

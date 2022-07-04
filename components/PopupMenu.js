@@ -14,22 +14,31 @@ const Popup = styled(Box)`
   border-radius: 8px;
   background: white;
   box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
-  z-index: 1000;
+  z-index: ${props => props.zIndex ?? 1000};
 `;
 
-const PopupMenu = ({ Button, children, placement, onClose }) => {
+const PopupMenu = ({ Button, children, placement, onClose, closingEvents, zIndex, popupMarginTop }) => {
   const [isOpen, setOpen] = React.useState(false);
   const ref = React.useRef();
-  useGlobalBlur(ref, outside => {
-    if (isOpen && outside) {
-      setOpen(false);
-      onClose?.();
-    }
-  });
+  useGlobalBlur(
+    ref,
+    outside => {
+      if (isOpen && outside) {
+        setOpen(false);
+        onClose?.();
+      }
+    },
+    closingEvents,
+  );
 
   return (
     <Box ref={ref}>
-      <Button onClick={() => setOpen(!isOpen)} />
+      <Button
+        onMouseOver={() => setOpen(true)}
+        onClick={() => setOpen(!isOpen)}
+        onFocus={() => setOpen(true)}
+        popupOpen={isOpen}
+      />
       {isOpen && (
         <Popper
           placement={placement || 'bottom'}
@@ -44,7 +53,9 @@ const PopupMenu = ({ Button, children, placement, onClose }) => {
           ]}
         >
           {({ style, ref }) => (
-            <Popup {...{ style, ref }}>{typeof children === 'function' ? children({ setOpen }) : children}</Popup>
+            <Popup mt={popupMarginTop} zIndex={zIndex} {...{ style, ref }}>
+              {typeof children === 'function' ? children({ setOpen }) : children}
+            </Popup>
           )}
         </Popper>
       )}
@@ -57,6 +68,13 @@ PopupMenu.propTypes = {
   children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]).isRequired,
   placement: PropTypes.string,
   onClose: PropTypes.func,
+  zIndex: PropTypes.number,
+  /*
+   * The mouse or keyboard events that are passed to close the popup menu.
+   * For example, mouseover, mousedown, mouseup, blur, focusin, focusout etc.
+   */
+  closingEvents: PropTypes.array,
+  popupMarginTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default PopupMenu;

@@ -1,11 +1,11 @@
 import React from 'react';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
@@ -245,7 +245,7 @@ const ForCollectiveCard = () => {
                 <FormattedMessage id="home.create" defaultMessage="Create a Collective" />
               </StyledButton>
             </Link>
-            <Link href="/hosts">
+            <Link href="/search?isHost=true">
               <StyledButton
                 buttonStyle="secondary"
                 py="8px"

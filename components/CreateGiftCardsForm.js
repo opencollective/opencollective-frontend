@@ -4,7 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { RadioButtonChecked } from '@styled-icons/material/RadioButtonChecked';
 import { RadioButtonUnchecked } from '@styled-icons/material/RadioButtonUnchecked';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { get, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -480,7 +480,7 @@ class CreateGiftCardsForm extends Component {
         <MessageBox type="info" fontSize="13px" withIcon mb={4}>
           <FormattedMessage
             id="GiftCard.Limitinfo"
-            defaultMessage="Your account is currently limited to {limit} gift cards per day. If you want to increase that limit, please contact <SupportLink></SupportLink>."
+            defaultMessage="Your account is currently limited to {limit} gift cards per day. If you want to increase that limit, please contact <SupportLink>support</SupportLink>."
             values={{
               SupportLink: I18nSupportLink,
               limit: get(collectiveSettings, `giftCardsMaxDailyCount`) || 100,
@@ -675,6 +675,7 @@ export const collectiveSourcePaymentMethodsQuery = gql`
       }
     }
     allHosts(limit: 100, onlyOpenHosts: false, minNbCollectivesHosted: 1) {
+      id
       collectives {
         id
         type

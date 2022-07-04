@@ -269,7 +269,7 @@ class SectionContribute extends React.PureComponent {
               </P>
             </Flex>
             <Box my={5}>
-              <Link href={`/${collective.slug}/accept-financial-contributions`}>
+              <Link href={`/${collective.parentCollective?.slug || collective.slug}/accept-financial-contributions`}>
                 <StyledButton buttonStyle="primary" buttonSize="large">
                   <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
                 </StyledButton>

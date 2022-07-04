@@ -125,6 +125,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         canReject
       }
       paymentMethod {
+        id
         type
       }
       order {

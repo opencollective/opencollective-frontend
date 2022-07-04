@@ -35,7 +35,6 @@ class NewCreditCardFormWithoutStripe extends React.Component {
   static propTypes = {
     intl: PropTypes.object.isRequired,
     name: PropTypes.string,
-    profileType: PropTypes.string, // USER or ORGANIZATION
     error: PropTypes.string,
     hasSaveCheckBox: PropTypes.bool,
     hidePostalCode: PropTypes.bool,
@@ -66,17 +65,6 @@ class NewCreditCardFormWithoutStripe extends React.Component {
       this.props.onReady({ stripe: this.props.stripe, stripeElements: this.props.stripeElements });
     }
   }
-
-  getProfileType = () => {
-    const { profileType } = this.props;
-    if (!profileType) {
-      return '';
-    } else if (profileType === 'INDIVIDUAL') {
-      return 'user';
-    } else {
-      return profileType.toLowerCase();
-    }
-  };
 
   onCheckboxChange = e => {
     if (this.props.useLegacyCallback) {

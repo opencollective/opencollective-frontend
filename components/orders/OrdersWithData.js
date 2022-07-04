@@ -8,6 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { parseDateInterval } from '../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
@@ -20,7 +21,6 @@ import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
-import { useUser } from '../UserProvider';
 
 import OrdersFilters from './OrdersFilters';
 import OrdersList from './OrdersList';
@@ -85,6 +85,10 @@ const accountOrdersQuery = gqlV2/* GraphQL */ `
           slug
           name
           imageUrl
+          isHost
+          ... on AccountWithHost {
+            bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
+          }
         }
         permissions {
           id
@@ -148,7 +152,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
   const queryVariables = { accountSlug, ...getVariablesFromQuery(router.query, status) };
   const queryParams = { variables: queryVariables, context: API_V2_CONTEXT };
   const { data, error, loading, variables, refetch } = useQuery(accountOrdersQuery, queryParams);
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
   const prevLoggedInUser = usePrevious(LoggedInUser);
 
   // Refetch data when user logs in

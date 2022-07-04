@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
 import { getI18nLink } from '../I18nFormatters';
@@ -18,7 +19,6 @@ import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
-import { useUser } from '../UserProvider';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import DeleteExpenseButton from './DeleteExpenseButton';
@@ -33,6 +33,7 @@ const processExpenseMutation = gqlV2/* GraphQL */ `
     $paymentParams: ProcessExpensePaymentParams
   ) {
     processExpense(expense: { id: $id, legacyId: $legacyId }, action: $action, paymentParams: $paymentParams) {
+      id
       ...ExpensePageExpenseFields
     }
   }
@@ -135,6 +136,15 @@ const PermissionButton = ({ icon, label, permission, ...props }) => {
   return button;
 };
 
+PermissionButton.propTypes = {
+  icon: PropTypes.element.isRequired,
+  label: PropTypes.element.isRequired,
+  permission: PropTypes.shape({
+    allowed: PropTypes.bool,
+    reason: PropTypes.string,
+  }).isRequired,
+};
+
 /**
  * All the buttons to process an expense, displayed in a React.Fragment to let the parent
  * in charge of the layout.
@@ -155,7 +165,7 @@ const ProcessExpenseButtons = ({
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
   const intl = useIntl();
   const { addToast } = useToasts();
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
 
   const triggerAction = async (action, paymentParams) => {
     // Prevent submitting the action if another one is being submitted at the same time
@@ -202,6 +212,17 @@ const ProcessExpenseButtons = ({
           }
         />
       )}
+      {permissions.canPay && (
+        <PayExpenseButton
+          {...getButtonProps('PAY')}
+          onClick={null}
+          onSubmit={triggerAction}
+          expense={expense}
+          collective={collective}
+          host={host}
+          error={error}
+        />
+      )}
       {permissions.canReject && (
         <StyledButton {...getButtonProps('REJECT')} buttonStyle="dangerSecondary" data-cy="reject-button">
           <RejectIcon size={14} />
@@ -227,17 +248,7 @@ const ProcessExpenseButtons = ({
           </ButtonLabel>
         </StyledButton>
       )}
-      {permissions.canPay && (
-        <PayExpenseButton
-          {...getButtonProps('PAY')}
-          onClick={null}
-          onSubmit={triggerAction}
-          expense={expense}
-          collective={collective}
-          host={host}
-          error={error}
-        />
-      )}
+
       {permissions.canUnapprove && (
         <StyledButton {...getButtonProps('UNAPPROVE')} buttonStyle="dangerSecondary" data-cy="unapprove-button">
           <UnapproveIcon size={12} />
@@ -288,6 +299,7 @@ ProcessExpenseButtons.propTypes = {
     canMarkAsSpam: PropTypes.bool,
     canPay: PropTypes.bool,
     canMarkAsUnpaid: PropTypes.bool,
+    canMarkAsIncomplete: PropTypes.bool,
     canUnschedulePayment: PropTypes.bool,
     canDelete: PropTypes.bool,
     approve: PropTypes.shape({
@@ -298,6 +310,7 @@ ProcessExpenseButtons.propTypes = {
   expense: PropTypes.shape({
     id: PropTypes.string,
     legacyId: PropTypes.number,
+    status: PropTypes.string,
   }).isRequired,
   /** The account where the expense has been submitted */
   collective: PropTypes.object.isRequired,
@@ -310,6 +323,7 @@ ProcessExpenseButtons.propTypes = {
   onDelete: PropTypes.func,
   /** Called when a modal is opened/closed with a boolean like (isOpen) */
   onModalToggle: PropTypes.func,
+  displayMarkAsIncomplete: PropTypes.bool,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {

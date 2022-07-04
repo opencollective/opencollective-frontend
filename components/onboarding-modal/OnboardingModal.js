@@ -10,6 +10,7 @@ import { isURL, matches } from 'validator';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { compose } from '../../lib/utils';
 
 import Container from '../../components/Container';
@@ -132,6 +133,7 @@ class OnboardingModal extends React.Component {
     editCollectiveMembers: PropTypes.func,
     editCollectiveContact: PropTypes.func,
     showOnboardingModal: PropTypes.bool,
+    data: PropTypes.object,
     setShowOnboardingModal: PropTypes.func,
     intl: PropTypes.object.isRequired,
     router: PropTypes.object,
@@ -149,7 +151,6 @@ class OnboardingModal extends React.Component {
 
     this.messages = defineMessages({
       twitterError: { id: 'onboarding.error.twitter', defaultMessage: 'Please enter a valid Twitter handle.' },
-      githubError: { id: 'onboarding.error.github', defaultMessage: 'Please enter a valid GitHub URL.' },
       websiteError: { id: 'onboarding.error.website', defaultMessage: 'Please enter a valid URL.' },
     });
   }
@@ -245,15 +246,8 @@ class OnboardingModal extends React.Component {
       errors.website = this.props.intl.formatMessage(this.messages['websiteError']);
     }
 
-    // https://github.com/shinnn/github-username-regex
-    if (
-      values.githubHandle !== '' &&
-      !matches(
-        values.githubHandle,
-        /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}(?:\/(?:[a-z\d_]|[-.]{1,99}(?=[a-z\d_])){1,99}){0,1}$/i,
-      )
-    ) {
-      errors.githubHandle = this.props.intl.formatMessage(this.messages['githubError']);
+    if (values.repositoryUrl && !isURL(values.repositoryUrl)) {
+      errors.repositoryUrl = this.props.intl.formatMessage(this.messages.websiteError);
     }
 
     // https://stackoverflow.com/questions/11361044/twitter-name-validation
@@ -265,7 +259,7 @@ class OnboardingModal extends React.Component {
   };
 
   render() {
-    const { collective, LoggedInUser, showOnboardingModal, mode } = this.props;
+    const { collective, LoggedInUser, showOnboardingModal, mode, data } = this.props;
     const { step, isSubmitting, error, noOverlay } = this.state;
 
     return (
@@ -333,12 +327,16 @@ class OnboardingModal extends React.Component {
                   </Flex>
                 </ResponsiveModalHeader>
                 <Formik
-                  initialValues={{ website: '', twitterHandle: '', githubHandle: '' }}
+                  validate={this.validateFormik}
+                  validateOnBlur={true}
+                  initialValues={{
+                    website: collective.website?.replace(/^https?:\/\//, '') || '',
+                    twitterHandle: collective.twitterHandle || '',
+                    repositoryUrl: collective.repositoryUrl?.replace(/^https?:\/\//, '') || '',
+                  }}
                   onSubmit={values => {
                     this.submitCollectiveInfo(values);
                   }}
-                  validate={this.validateFormik}
-                  validateOnBlur={true}
                 >
                   {({ values, handleSubmit, errors, touched }) => (
                     <FormWithStyles>
@@ -359,6 +357,7 @@ class OnboardingModal extends React.Component {
                             values={values}
                             errors={errors}
                             touched={touched}
+                            memberInvitations={data?.memberInvitations || []}
                           />
                           {error && (
                             <MessageBox type="error" withIcon mt={2}>
@@ -419,7 +418,7 @@ const editCollectiveContactMutation = gql`
       id
       website
       twitterHandle
-      githubHandle
+      repositoryUrl
     }
   }
 `;
@@ -428,6 +427,33 @@ const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, 
   name: 'editCollectiveContact',
 });
 
-const addGraphql = compose(addEditCollectiveMembersMutation, addEditCollectiveContactMutation);
+const addMemberInvitationQuery = graphql(
+  gqlV2/* GraphQL */ `
+    query MemberInvitationsQuery($slug: String!) {
+      memberInvitations(account: { slug: $slug }, role: [ADMIN]) {
+        id
+        role
+        memberAccount {
+          id
+          name
+          imageUrl
+          slug
+        }
+      }
+    }
+  `,
+  {
+    options: props => ({
+      variables: { slug: props.collective.slug },
+      context: API_V2_CONTEXT,
+    }),
+  },
+);
+
+const addGraphql = compose(
+  addEditCollectiveMembersMutation,
+  addEditCollectiveContactMutation,
+  addMemberInvitationQuery,
+);
 
 export default injectIntl(addGraphql(withRouter(OnboardingModal)));

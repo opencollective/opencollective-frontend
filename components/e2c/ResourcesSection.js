@@ -2,10 +2,10 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
+import Newsletter from '../collectives/Newsletter';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
-import Newsletter from '../home/Newsletter';
 import HorizontalScroller from '../HorizontalScroller';
 import StyledLink from '../StyledLink';
 import { H2, P, Span } from '../Text';
@@ -83,12 +83,12 @@ const ResourcesSection = () => {
           controlsTopPosition={30}
           containerProps={{ hideScrollbar: true }}
         >
-          {blogEntries.map((blogEntry, index) => (
+          {blogEntries.map(blogEntry => (
             <Container
               display="flex"
               flexDirection="column"
               minWidth={['288px', '276px', '380px', null, '360px']}
-              key={index.toString()}
+              key={blogEntry.link}
               mx={['8px', '20px']}
             >
               <Box width={['224px', '100%']} mb="32px">

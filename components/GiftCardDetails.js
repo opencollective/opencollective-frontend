@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 import { FormattedDate, FormattedMessage, injectIntl } from 'react-intl';

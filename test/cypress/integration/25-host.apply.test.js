@@ -12,6 +12,7 @@ describe('apply to host', () => {
     }
 
     cy.get('[data-cy="host-apply-btn"]:visible').click();
+    cy.getByDataCy('host-apply-modal-next').click();
     cy.getByDataCy('host-apply-collective-picker').click();
     cy.getByDataCy('host-apply-new-collective-link').click();
     cy.get('#email').type('testuser@opencollective.com');

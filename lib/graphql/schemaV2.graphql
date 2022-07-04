@@ -1,4 +1,69 @@
 """
+An OAuth application or a personal token
+"""
+type Application {
+  id: String!
+  legacyId: Int!
+  type: ApplicationType
+    @deprecated(
+      reason: "2022-06-16: This Application object will only be used for OAuth tokens. Use PersonalToken for user tokens"
+    )
+  name: String
+  description: String
+  apiKey: String
+    @deprecated(
+      reason: "2022-06-16: This Application object will only be used for OAuth tokens. Use PersonalToken for user tokens"
+    )
+  clientId: String
+  clientSecret: String
+  redirectUri: URL
+  account: Account!
+  oAuthAuthorization: OAuthAuthorization
+}
+
+"""
+All application types
+"""
+enum ApplicationType {
+  API_KEY
+  OAUTH
+}
+
+"""
+A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
+"""
+scalar URL
+
+"""
+An OAuth authorization
+"""
+type OAuthAuthorization {
+  id: String
+  account: Individual!
+  application: Application!
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime!
+
+  """
+  The time of last update
+  """
+  updatedAt: DateTime!
+
+  """
+  The time of expiration
+  """
+  expiresAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
+
+"""
 Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization)
 """
 interface Account {
@@ -36,7 +101,8 @@ interface Account {
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -97,6 +163,11 @@ interface Account {
     """
     accountType: [AccountType]
   ): MemberCollection!
+
+  """
+  Get pending member invitations for this account
+  """
+  memberInvitations(role: [MemberRole]): [MemberInvitation]
   memberOf(
     limit: Int! = 100
     offset: Int! = 0
@@ -364,6 +435,21 @@ interface Account {
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -416,7 +502,7 @@ interface Account {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
 }
 
 """
@@ -440,11 +526,6 @@ enum ImageFormat {
   gif
   svg
 }
-
-"""
-A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
-"""
-scalar DateTime
 
 """
 A collection of "Members" (ie: Organization backing a Collective)
@@ -487,84 +568,152 @@ A field whose value conforms to the standard internet email address format as sp
 scalar EmailAddress
 
 """
-A collection of "MemberOf" (ie: Collective backed by an Organization)
+An invitation to join the members of a collective
 """
-type MemberOfCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [MemberOf]
-  roles: [MemberOfCollectionRoles]
-}
+type MemberInvitation {
+  id: String!
 
-"""
-An existing member role and account type combination used used to filter collections
-"""
-type MemberOfCollectionRoles {
-  type: AccountType!
+  """
+  The person who invited the member, if any
+  """
+  inviter: Individual
+  createdAt: DateTime!
+  account: Account!
+  memberAccount: Account!
   role: MemberRole!
+  description: String
+  tier: Tier
+  since: DateTime
 }
 
-input AccountReferenceInput {
-  """
-  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String
-
-  """
-  The internal id of the account (ie: 580)
-  """
-  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
-
-  """
-  The slug identifying the account (ie: babel for https://opencollective.com/babel)
-  """
+"""
+Tier model
+"""
+type Tier {
+  id: String!
+  legacyId: Int!
   slug: String
+  name: String
+  description: String
+
+  """
+  Get all orders
+  """
+  orders(limit: Int! = 100, offset: Int! = 0, status: [OrderStatus]): OrderCollection!
+  amount: Amount!
+  type: TierType!
+  interval: TierInterval @deprecated(reason: "2020-08-24: Please use \"frequency\"")
+  frequency: TierFrequency!
+  presets: [Int]
+  maxQuantity: Int
+
+  """
+  Number of tickets available. Returns null if there is no limit.
+  """
+  availableQuantity: Int
+  customFields: JSON
+  amountType: TierAmountType!
+  minimumAmount: Amount!
+  endsAt: DateTime
 }
 
 """
-Input to order results
+A collection of "Orders"
 """
-input OrderByInput {
-  """
-  Field to order by.
-  """
-  field: OrderByFieldType!
-
-  """
-  Ordering direction.
-  """
-  direction: OrderDirection!
-}
-
-"""
-Possible fields you can use to order by
-"""
-enum OrderByFieldType {
-  CREATED_AT
-  MEMBER_COUNT
-  TOTAL_CONTRIBUTED
-  ACTIVITY
-  RANK
-}
-
-"""
-Possible directions in which to order a list of items
-"""
-enum OrderDirection {
-  ASC
-  DESC
-}
-
-"""
-A collection of Transactions (Debit or Credit)
-"""
-type TransactionCollection implements Collection {
+type OrderCollection implements Collection {
   offset: Int
   limit: Int
   totalCount: Int
-  nodes: [Transaction]
-  kinds: [TransactionKind]
+  nodes: [Order]
+}
+
+"""
+Order model
+"""
+type Order {
+  id: String!
+  legacyId: Int!
+  description: String
+
+  """
+  Base order amount (without platform tip)
+  """
+  amount: Amount!
+
+  """
+  Total order amount, including all taxes and platform tip
+  """
+  totalAmount: Amount!
+  quantity: Int
+  status: OrderStatus
+  frequency: ContributionFrequency
+  nextChargeDate: DateTime
+  tier: Tier
+  fromAccount: Account
+  toAccount: Account
+
+  """
+  Transactions for this order ordered by createdAt ASC
+  """
+  transactions: [Transaction]!
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  WARNING: Total amount donated between collectives, though there will be edge cases especially when looking on the Order level, as the order id is not used in calculating this.
+  """
+  totalDonations: Amount!
+  paymentMethod: PaymentMethod
+
+  """
+  Platform Tip attached to the Order.
+  """
+  platformTipAmount: Amount
+  platformTipEligible: Boolean
+  tags: [String]!
+  taxes: [OrderTax]!
+
+  """
+  This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order.
+  """
+  membership: MemberOf
+
+  """
+  The permissions given to current logged in user for this order
+  """
+  permissions: OrderPermissions!
+
+  """
+  Data related to the order
+  """
+  data: JSON
+
+  """
+  Custom data related to the order, based on the fields described by tier.customFields. Must be authenticated as an admin of the fromAccount or toAccount (returns null otherwise)
+  """
+  customData: JSON
+}
+
+"""
+All order statuses
+"""
+enum OrderStatus {
+  ACTIVE
+  CANCELLED
+  ERROR
+  EXPIRED
+  NEW
+  PAID
+  PENDING
+  PLEDGED
+  REJECTED
+  REQUIRE_CLIENT_CONFIRMATION
+}
+
+enum ContributionFrequency {
+  MONTHLY
+  YEARLY
+  ONETIME
 }
 
 """
@@ -1634,6 +1783,7 @@ enum ExpenseStatus {
   DRAFT
   UNVERIFIED
   PENDING
+  INCOMPLETE
   APPROVED
   REJECTED
   PROCESSING
@@ -1641,6 +1791,7 @@ enum ExpenseStatus {
   PAID
   SCHEDULED_FOR_PAYMENT
   SPAM
+  CANCELED
 }
 
 """
@@ -1704,6 +1855,14 @@ enum DateTimeField {
   The creation time of a resource
   """
   CREATED_AT
+}
+
+"""
+Possible directions in which to order a list of items
+"""
+enum OrderDirection {
+  ASC
+  DESC
 }
 
 """
@@ -1794,11 +1953,6 @@ type ExpenseAttachedFile {
   id: String!
   url: URL
 }
-
-"""
-A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
-"""
-scalar URL
 
 """
 Fields for an expense item
@@ -1908,6 +2062,11 @@ type ExpensePermissions {
   canMarkAsUnpaid: Boolean!
 
   """
+  Whether the current user can mark this expense as incomplete
+  """
+  canMarkAsIncomplete: Boolean!
+
+  """
   Whether the current user can comment and see comments for this expense
   """
   canComment: Boolean!
@@ -1989,6 +2148,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_PAID
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM
+  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
   COLLECTIVE_EXPENSE_PROCESSING
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
@@ -1999,27 +2159,48 @@ enum ActivityType {
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
+  COLLECTIVE_MEMBER_INVITED
   COLLECTIVE_MEMBER_CREATED
+  COLLECTIVE_CORE_MEMBER_ADDED
+  COLLECTIVE_CORE_MEMBER_INVITED
+  COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED
+  COLLECTIVE_CORE_MEMBER_REMOVED
+  COLLECTIVE_CORE_MEMBER_EDITED
   COLLECTIVE_TRANSACTION_CREATED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
   COLLECTIVE_VIRTUAL_CARD_ADDED
+  CONTRIBUTION_REJECTED
   ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
   SUBSCRIPTION_CANCELED
   TICKET_CONFIRMED
   USER_CREATED
+  USER_NEW_TOKEN
+  USER_CHANGE_EMAIL
+  USER_PAYMENT_METHOD_CREATED
+  USER_CARD_CLAIMED
+  USER_CARD_INVITED
   WEBHOOK_STRIPE_RECEIVED
   WEBHOOK_PAYPAL_RECEIVED
   COLLECTIVE_MONTHLY
   ORDERS_SUSPICIOUS
+  ORDER_PROCESSING
+  ORDER_PROCESSING_CRYPTO
   BACKYOURSTACK_DISPATCH_CONFIRMED
   ACTIVATED_COLLECTIVE_AS_HOST
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT
   DEACTIVATED_COLLECTIVE_AS_HOST
   VIRTUAL_CARD_REQUESTED
+  VIRTUAL_CARD_CHARGE_DECLINED
+  PAYMENT_FAILED
+  PAYMENT_CREDITCARD_EXPIRING
+  TAXFORM_REQUEST
+  CONVERSATION_COMMENT_CREATED
+  UPDATE_COMMENT_CREATED
+  EXPENSE_COMMENT_CREATED
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -2098,156 +2279,6 @@ enum RecurringExpenseInterval {
   month
   quarter
   year
-}
-
-"""
-Order model
-"""
-type Order {
-  id: String!
-  legacyId: Int!
-  description: String
-
-  """
-  Base order amount (without platform tip)
-  """
-  amount: Amount!
-
-  """
-  Total order amount, including all taxes and platform tip
-  """
-  totalAmount: Amount!
-  quantity: Int
-  status: OrderStatus
-  frequency: ContributionFrequency
-  nextChargeDate: DateTime
-  tier: Tier
-  fromAccount: Account
-  toAccount: Account
-
-  """
-  Transactions for this order ordered by createdAt ASC
-  """
-  transactions: [Transaction]!
-  createdAt: DateTime
-  updatedAt: DateTime
-
-  """
-  WARNING: Total amount donated between collectives, though there will be edge cases especially when looking on the Order level, as the order id is not used in calculating this.
-  """
-  totalDonations: Amount!
-  paymentMethod: PaymentMethod
-
-  """
-  Platform Tip attached to the Order.
-  """
-  platformTipAmount: Amount
-  platformTipEligible: Boolean
-  tags: [String]!
-  taxes: [OrderTax]!
-
-  """
-  This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order.
-  """
-  membership: MemberOf
-
-  """
-  The permissions given to current logged in user for this order
-  """
-  permissions: OrderPermissions!
-
-  """
-  Data related to the order
-  """
-  data: JSON
-
-  """
-  Custom data related to the order, based on the fields described by tier.customFields. Must be authenticated as an admin of the fromAccount or toAccount (returns null otherwise)
-  """
-  customData: JSON
-}
-
-"""
-All order statuses
-"""
-enum OrderStatus {
-  ACTIVE
-  CANCELLED
-  ERROR
-  EXPIRED
-  NEW
-  PAID
-  PENDING
-  PLEDGED
-  REJECTED
-  REQUIRE_CLIENT_CONFIRMATION
-}
-
-enum ContributionFrequency {
-  MONTHLY
-  YEARLY
-  ONETIME
-}
-
-"""
-Tier model
-"""
-type Tier {
-  id: String!
-  legacyId: Int!
-  slug: String
-  name: String
-  description: String
-
-  """
-  Get all orders
-  """
-  orders(limit: Int! = 100, offset: Int! = 0, status: [OrderStatus]): OrderCollection!
-  amount: Amount!
-  type: TierType!
-  interval: TierInterval @deprecated(reason: "2020-08-24: Please use \"frequency\"")
-  frequency: ContributionFrequency
-  presets: [Int]
-  maxQuantity: Int
-
-  """
-  Number of tickets available. Returns null if there is no limit.
-  """
-  availableQuantity: Int
-  customFields: JSON
-  amountType: TierAmountType!
-  minimumAmount: Amount!
-  endsAt: DateTime
-}
-
-"""
-A collection of "Orders"
-"""
-type OrderCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Order]
-}
-
-enum TierType {
-  TIER
-  MEMBERSHIP
-  DONATION
-  TICKET
-  SERVICE
-  PRODUCT
-}
-
-enum TierInterval {
-  month
-  year
-  flexible
-}
-
-enum TierAmountType {
-  FIXED
-  FLEXIBLE
 }
 
 """
@@ -2353,7 +2384,8 @@ type Host implements Account & AccountWithContributions {
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -2415,6 +2447,26 @@ type Host implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -2687,6 +2739,21 @@ type Host implements Account & AccountWithContributions {
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -2735,7 +2802,19 @@ type Host implements Account & AccountWithContributions {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Number of unique financial contributors.
@@ -2829,17 +2908,17 @@ type Host implements Account & AccountWithContributions {
     """
     The start date of the time series
     """
-    dateFrom: DateTime!
+    dateFrom: DateTime
 
     """
     The end date of the time series
     """
-    dateTo: DateTime!
+    dateTo: DateTime
 
     """
     The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
     """
-    timeUnit: TimeUnit!
+    timeUnit: TimeUnit
   ): HostMetricsTimeSeries!
 
   """
@@ -3118,6 +3197,42 @@ enum ContributorRole {
   ACCOUNTANT
 }
 
+input AccountReferenceInput {
+  """
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the account (ie: 580)
+  """
+  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
+
+  """
+  The slug identifying the account (ie: babel for https://opencollective.com/babel)
+  """
+  slug: String
+}
+
+"""
+A collection of "MemberOf" (ie: Collective backed by an Organization)
+"""
+type MemberOfCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [MemberOf]
+  roles: [MemberOfCollectionRoles]
+}
+
+"""
+An existing member role and account type combination used used to filter collections
+"""
+type MemberOfCollectionRoles {
+  type: AccountType!
+  role: MemberRole!
+}
+
 """
 All supported expense types
 """
@@ -3136,6 +3251,47 @@ enum HostFeeStructure {
   Set a monthly retainer for this Collective
   """
   MONTHLY_RETAINER
+}
+
+"""
+Input to order results
+"""
+input OrderByInput {
+  """
+  Field to order by.
+  """
+  field: OrderByFieldType!
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection!
+}
+
+"""
+Possible fields you can use to order by
+"""
+enum OrderByFieldType {
+  CREATED_AT
+  MEMBER_COUNT
+  TOTAL_CONTRIBUTED
+
+  """
+  The financial activity of the collective (number of transactions)
+  """
+  ACTIVITY
+  RANK
+}
+
+"""
+A collection of Transactions (Debit or Credit)
+"""
+type TransactionCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Transaction]
+  kinds: [TransactionKind]
 }
 
 """
@@ -3264,6 +3420,16 @@ enum ConnectedAccountService {
 }
 
 """
+A collection of "Application"
+"""
+type OAuthApplicationCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Application]
+}
+
+"""
 Stats for the Account
 """
 type AccountStats {
@@ -3288,6 +3454,11 @@ type AccountStats {
     """
     dateTo: DateTime
   ): Amount!
+
+  """
+  The consolidated amount of all the events and projects combined.
+  """
+  consolidatedBalance: Amount!
 
   """
   Average amount spent per month based on the last 90 days
@@ -3322,6 +3493,11 @@ type AccountStats {
     Computes contributions from the last x months. Cannot be used with startDate/endDate
     """
     periodInMonths: Int
+
+    """
+    Set this to true to use cached data
+    """
+    useCache: Boolean! = false
   ): Amount!
 
   """
@@ -3475,6 +3651,7 @@ type CollectiveFeatures {
   The id of the account
   """
   id: String!
+  ALL: CollectiveFeatureStatus
   RECEIVE_FINANCIAL_CONTRIBUTIONS: CollectiveFeatureStatus
   RECURRING_CONTRIBUTIONS: CollectiveFeatureStatus
   TRANSACTIONS: CollectiveFeatureStatus
@@ -3539,8 +3716,41 @@ type VirtualCardCollection implements Collection {
   nodes: [VirtualCard]
 }
 
-enum Policy {
-  EXPENSE_AUTHOR_CANNOT_APPROVE
+type Policies {
+  EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
+  COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
+}
+
+type COLLECTIVE_MINIMUM_ADMINS {
+  numberOfAdmins: Int
+  applies: COLLECTIVE_MINIMUM_ADMINS_APPLIES
+  freeze: Boolean
+}
+
+enum COLLECTIVE_MINIMUM_ADMINS_APPLIES {
+  ALL_COLLECTIVES
+  NEW_COLLECTIVES
+}
+
+"""
+A collection of webhooks
+"""
+type WebhookCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Webhook]
+}
+
+"""
+An webhook attached to an account
+"""
+type Webhook {
+  id: String!
+  legacyId: Int!
+  activityType: ActivityType
+  webhookUrl: URL
+  account: Account!
 }
 
 """
@@ -3615,7 +3825,7 @@ type HostPlan {
   """
   Charge on revenues made through Host Fees.
   """
-  hostFeeSharePercent: Int
+  hostFeeSharePercent: Float
 
   """
   Ability to collect Platform Tips.
@@ -3675,13 +3885,28 @@ type HostMetrics {
   """
   Host fee sharing percent
   """
-  hostFeeSharePercent: Int
+  hostFeeSharePercent: Float
 }
 
 """
 Host metrics time series
 """
 type HostMetricsTimeSeries {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime!
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime!
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+
   """
   History of the collected platform tips
   """
@@ -3701,6 +3926,26 @@ type HostMetricsTimeSeries {
   History of the total money managed by this host
   """
   totalMoneyManaged: TimeSeriesAmount!
+
+  """
+  History of the total money received by this host
+  """
+  totalReceived: TimeSeriesAmountWithKind!
+
+  """
+  History of the total money spent by this host
+  """
+  totalSpent: TimeSeriesAmountWithKind!
+}
+
+enum TimeUnit {
+  SECOND
+  MINUTE
+  HOUR
+  DAY
+  WEEK
+  MONTH
+  YEAR
 }
 
 """
@@ -3745,16 +3990,6 @@ interface TimeSeries {
   timeUnit: TimeUnit!
 }
 
-enum TimeUnit {
-  SECOND
-  MINUTE
-  HOUR
-  DAY
-  WEEK
-  MONTH
-  YEAR
-}
-
 type TimeSeriesAmountNode {
   date: DateTime!
   amount: Amount!
@@ -3795,6 +4030,37 @@ enum TransactionSettlementStatus {
   OWED
   INVOICED
   SETTLED
+}
+
+"""
+Amounts with settlements time series
+"""
+type TimeSeriesAmountWithKind implements TimeSeries {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime!
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime!
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+
+  """
+  Time series data points
+  """
+  nodes: [TimeSeriesAmountWithKindNode!]!
+}
+
+type TimeSeriesAmountWithKindNode {
+  date: DateTime!
+  amount: Amount!
+  kind: TransactionKind!
 }
 
 """
@@ -3844,6 +4110,7 @@ type ContributionStats {
   The contribution amounts over time
   """
   contributionAmountOverTime: TimeSeriesAmount
+    @deprecated(reason: "2022-04-21: Please use hostMetricsTimeSeries.totalReceived")
 
   """
   Number of one time contributions
@@ -3873,7 +4140,7 @@ type ExpenseStats {
   """
   The total number of expenses over time
   """
-  expenseAmountOverTime: TimeSeriesAmount
+  expenseAmountOverTime: TimeSeriesAmount @deprecated(reason: "2022-04-21: Please use hostMetricsTimeSeries.totalSpent")
 
   """
   The daily average paid in expenses
@@ -3894,28 +4161,6 @@ type ExpenseStats {
   Number of grants
   """
   grantsCount: Int!
-}
-
-type OrderTax {
-  type: OrderTaxType!
-  percentage: Int!
-}
-
-"""
-Fields for the user permissions on an order
-"""
-type OrderPermissions {
-  id: String!
-
-  """
-  Whether the current user can mark this order as expired
-  """
-  canMarkAsExpired: Boolean!
-
-  """
-  Whether the current user can mark this order as unpaid
-  """
-  canMarkAsPaid: Boolean!
 }
 
 """
@@ -3940,6 +4185,55 @@ type TransactionPermissions {
   canReject: Boolean!
 }
 
+type OrderTax {
+  type: OrderTaxType!
+  percentage: Int!
+}
+
+"""
+Fields for the user permissions on an order
+"""
+type OrderPermissions {
+  id: String!
+
+  """
+  Whether the current user can mark this order as expired
+  """
+  canMarkAsExpired: Boolean!
+
+  """
+  Whether the current user can mark this order as unpaid
+  """
+  canMarkAsPaid: Boolean!
+}
+
+enum TierType {
+  TIER
+  MEMBERSHIP
+  DONATION
+  TICKET
+  SERVICE
+  PRODUCT
+}
+
+enum TierInterval {
+  month
+  year
+  flexible
+}
+
+enum TierFrequency {
+  MONTHLY
+  YEARLY
+  ONETIME
+  FLEXIBLE
+}
+
+enum TierAmountType {
+  FIXED
+  FLEXIBLE
+}
+
 """
 A financial amount.
 """
@@ -3959,7 +4253,7 @@ Fields for a currency fx rate
 """
 type CurrencyExchangeRate {
   """
-  Exchange rate value as a percentage
+  Exchange rate value as a scalar (e.g 1.15 or 0.86)
   """
   value: Float!
 
@@ -4028,7 +4322,8 @@ type Bot implements Account {
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -4090,6 +4385,26 @@ type Bot implements Account {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -4362,6 +4677,21 @@ type Bot implements Account {
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -4410,7 +4740,19 @@ type Bot implements Account {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 }
 
 """
@@ -4440,7 +4782,8 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -4502,6 +4845,26 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -4774,6 +5137,21 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -4822,7 +5200,19 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -4837,7 +5227,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -4920,7 +5310,7 @@ interface AccountWithHost {
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   Fees percentage that the platform takes for this collective
@@ -5176,7 +5566,8 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -5238,6 +5629,26 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -5510,6 +5921,21 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -5558,7 +5984,19 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -5573,7 +6011,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -5657,6 +6095,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   The Event end date and time
   """
   endsAt: DateTime
+
+  """
+  Timezone of the Event (TZ database format, e.g. UTC or Europe/Berlin)
+  """
+  timezone: String
 }
 
 """
@@ -5696,7 +6139,8 @@ type Individual implements Account {
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -5758,6 +6202,26 @@ type Individual implements Account {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -6029,6 +6493,21 @@ type Individual implements Account {
   """
   connectedAccounts: [ConnectedAccount]
 
+  """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
   "\n          Address. This field is public for hosts, otherwise:\n            - Users can see their own address\n            - Hosts can see the address of users submitting expenses to their collectives\n        "
   location: Location
   categories: [String]!
@@ -6076,7 +6555,19 @@ type Individual implements Account {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
   email: String
   isGuest: Boolean!
   isFollowingConversation(id: String!): Boolean!
@@ -6087,6 +6578,27 @@ type Individual implements Account {
   """
   host: Host
   hasSeenLatestChangelogEntry: Boolean!
+  oAuthAuthorizations(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthAuthorizationCollection
+}
+
+"""
+A collection of "OAuth Authorizations"
+"""
+type OAuthAuthorizationCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [OAuthAuthorization]
 }
 
 """
@@ -6172,7 +6684,8 @@ type Organization implements Account & AccountWithContributions {
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -6234,6 +6747,26 @@ type Organization implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -6505,7 +7038,22 @@ type Organization implements Account & AccountWithContributions {
   """
   connectedAccounts: [ConnectedAccount]
 
-  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see the addresses of the collectives they're admin of\n            - Hosts can see the address of organizations submitting expenses to their collectives\n        "
+  """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.\n            - Hosts can see the address of organizations submitting expenses to their collectives.\n        "
   location: Location
   categories: [String]!
   stats: AccountStats
@@ -6552,7 +7100,19 @@ type Organization implements Account & AccountWithContributions {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Number of unique financial contributors.
@@ -6704,7 +7264,8 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -6766,6 +7327,26 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -7038,6 +7619,21 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -7086,7 +7682,19 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -7101,7 +7709,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -7257,6 +7865,9 @@ type Query {
     Only accounts that support one of these payment services will be returned
     """
     supportedPaymentMethodService: [PaymentMethodService]
+      @deprecated(
+        reason: "2022-04-22: Introduced for Hacktoberfest. Reference: https://github.com/opencollective/opencollective-api/pull/7440#issuecomment-1121504508"
+      )
 
     """
     Whether to skip recent suspicious accounts (48h)
@@ -7269,10 +7880,26 @@ type Query {
     country: [CountryISO]
 
     """
-    The order of results
+    The order of results. Defaults to [RANK, DESC] (or [CREATED_AT, DESC] if `supportedPaymentMethodService` is provided)
     """
     orderBy: OrderByInput
   ): AccountCollection!
+  application(
+    """
+    The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+    """
+    id: String
+
+    """
+    The legacy public id identifying the application (ie: 4242)
+    """
+    legacyId: Int
+
+    """
+    The clientId for the application.
+    """
+    clientId: String
+  ): Application
   collective(
     """
     The public id identifying the Collective (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -7521,6 +8148,11 @@ type Query {
     A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
     """
     account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
   ): [MemberInvitation]
   order(
     """
@@ -7810,7 +8442,8 @@ type Query {
     """
     tier: TierReferenceInput
   ): PaypalPlan!
-  loggedInAccount: Account
+  loggedInAccount: Individual
+  me: Individual
 }
 
 """
@@ -9077,6 +9710,7 @@ enum ExpenseStatusFilter {
   DRAFT
   UNVERIFIED
   PENDING
+  INCOMPLETE
   APPROVED
   REJECTED
   PROCESSING
@@ -9084,6 +9718,7 @@ enum ExpenseStatusFilter {
   PAID
   SCHEDULED_FOR_PAYMENT
   SPAM
+  CANCELED
 
   """
   Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
@@ -9118,7 +9753,8 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -9180,6 +9816,26 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -9452,6 +10108,21 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -9500,7 +10171,19 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -9515,7 +10198,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -9591,20 +10274,6 @@ type HostCollection implements Collection {
   nodes: [Host]
 }
 
-"""
-An invitation to join the members of a collective
-"""
-type MemberInvitation {
-  id: String!
-  createdAt: DateTime!
-  account: Account!
-  memberAccount: Account!
-  role: MemberRole!
-  description: String
-  tier: Tier
-  since: DateTime
-}
-
 input OrderReferenceInput {
   """
   The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -9644,7 +10313,8 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   tags: [String]
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   currency: String
   expensePolicy: String
 
@@ -9706,6 +10376,26 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
   ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -9978,6 +10668,21 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   connectedAccounts: [ConnectedAccount]
 
   """
+  (Authenticated) The list of applications created by this account
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
   The address associated to this account. This field is always public for collectives and events.
   """
   location: Location
@@ -10026,7 +10731,19 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   ): VirtualCardCollection!
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-  policies: [Policy]
+  policies: Policies!
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
 
   """
   Returns the Fiscal Host
@@ -10041,7 +10758,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   Fees percentage that the host takes for this collective
   """
-  hostFeePercent: Float
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
   How much platform fees are charged for this account
@@ -10227,6 +10944,17 @@ type Mutation {
     """
     inviteMembers: [InviteMemberInput]
   ): Collective
+  createEvent(
+    """
+    Information about the Event to create (name, slug, description, tags, settings)
+    """
+    event: EventCreateInput!
+
+    """
+    Reference to the parent Account creating the Event.
+    """
+    account: AccountReferenceInput!
+  ): Event
   createFund(
     """
     Information about the collective to create (name, slug, description, tags, ...)
@@ -10255,287 +10983,6 @@ type Mutation {
     """
     parent: AccountReferenceInput
   ): Project
-  createEvent(
-    """
-    Information about the Event to create (name, slug, description, tags, settings)
-    """
-    event: EventCreateInput!
-
-    """
-    Reference to the parent Account creating the Event.
-    """
-    account: AccountReferenceInput!
-  ): Event
-  editComment(comment: CommentUpdateInput!): Comment
-  deleteComment(id: String!): Comment
-  createComment(comment: CommentCreateInput!): Comment
-
-  """
-  Connect external account to Open Collective Account
-  """
-  createConnectedAccount(
-    """
-    Connected Account data
-    """
-    connectedAccount: ConnectedAccountCreateInput!
-
-    """
-    Account where the external account will be connected
-    """
-    account: AccountReferenceInput!
-  ): ConnectedAccount
-
-  """
-  Delete ConnectedAccount
-  """
-  deleteConnectedAccount(
-    """
-    ConnectedAccount reference containing either id or legacyId
-    """
-    connectedAccount: ConnectedAccountReferenceInput!
-  ): ConnectedAccount
-
-  """
-  Create a conversation
-  """
-  createConversation(
-    """
-    Conversation's title
-    """
-    title: String!
-
-    """
-    The body of the conversation initial comment
-    """
-    html: String!
-
-    """
-    ID of the Collective where the conversation will be created
-    """
-    CollectiveId: String!
-
-    """
-    A list of tags for this conversation
-    """
-    tags: [String]
-  ): Conversation
-  editConversation(
-    """
-    Conversation's id
-    """
-    id: String!
-
-    """
-    Conversation's title
-    """
-    title: String!
-
-    """
-    A list of tags for this conversation
-    """
-    tags: [String]
-  ): Conversation
-
-  """
-  Returns true if user is following, false otherwise. Must be authenticated.
-  """
-  followConversation(
-    """
-    Conversation's id
-    """
-    id: String!
-
-    """
-    Set this to false to unfollow the conversation
-    """
-    isActive: Boolean = true
-  ): Boolean
-
-  """
-  Submit an expense to a collective
-  """
-  createExpense(
-    """
-    Expense data
-    """
-    expense: ExpenseCreateInput!
-
-    """
-    Account where the expense will be created
-    """
-    account: AccountReferenceInput!
-
-    """
-    Recurring Expense information
-    """
-    recurring: RecurringExpenseInput
-  ): Expense!
-
-  """
-  To update an existing expense
-  """
-  editExpense(
-    """
-    Expense data
-    """
-    expense: ExpenseUpdateInput!
-
-    """
-    Expense draft key if invited to submit expense
-    """
-    draftKey: String
-  ): Expense!
-
-  """
-  Delete an expense. Only work if the expense is rejected - please check permissions.canDelete.
-  """
-  deleteExpense(
-    """
-    Reference of the expense to delete
-    """
-    expense: ExpenseReferenceInput!
-  ): Expense!
-
-  """
-  Process the expense with the given action
-  """
-  processExpense(
-    """
-    Reference of the expense to process
-    """
-    expense: ExpenseReferenceInput!
-
-    """
-    The action to trigger
-    """
-    action: ExpenseProcessAction!
-
-    """
-    If action is related to a payment, this object used for the payment parameters
-    """
-    paymentParams: ProcessExpensePaymentParams
-  ): Expense!
-
-  """
-  Persist an Expense as a draft and invite someone to edit and submit it.
-  """
-  draftExpenseAndInviteUser(
-    """
-    Expense data
-    """
-    expense: ExpenseInviteDraftInput!
-
-    """
-    Account where the expense will be created
-    """
-    account: AccountReferenceInput!
-  ): Expense!
-
-  """
-  To re-send the invitation to complete a draft expense
-  """
-  resendDraftExpenseInvite(
-    """
-    Reference of the expense to process
-    """
-    expense: ExpenseReferenceInput!
-  ): Expense!
-
-  """
-  To verify and unverified expense.
-  """
-  verifyExpense(
-    """
-    Reference of the expense to process
-    """
-    expense: ExpenseReferenceInput!
-
-    """
-    Expense draft key if invited to submit expense
-    """
-    draftKey: String
-  ): Expense!
-  addEmojiReaction(
-    """
-    The emoji associated with the reaction
-    """
-    emoji: String!
-
-    """
-    A unique identifier for the comment id associated with this reaction
-    """
-    comment: CommentReferenceInput
-
-    """
-    A unique identifier for the update id associated with this reaction
-    """
-    update: UpdateReferenceInput
-  ): EmojiReactionResponse!
-  removeEmojiReaction(
-    comment: CommentReferenceInput
-    update: UpdateReferenceInput
-    emoji: String!
-  ): EmojiReactionResponse!
-
-  """
-  Apply to an host with a collective
-  """
-  applyToHost(
-    """
-    Account applying to the host.
-    """
-    collective: AccountReferenceInput!
-
-    """
-    Host to apply to.
-    """
-    host: AccountReferenceInput!
-
-    """
-    A message to attach for the host to review the application
-    """
-    message: String
-
-    """
-    Further information about collective applying to host
-    """
-    applicationData: JSON
-  ): Account!
-
-  """
-  Reply to a host application
-  """
-  processHostApplication(
-    """
-    The account that applied to the host
-    """
-    account: AccountReferenceInput!
-
-    """
-    The host concerned by the application
-    """
-    host: AccountReferenceInput!
-
-    """
-    What to do with the application
-    """
-    action: ProcessHostApplicationAction!
-
-    """
-    A message to attach as a reason for the action
-    """
-    message: String
-  ): ProcessHostApplicationResponse!
-
-  """
-  [Root only] Removes the host for an account
-  """
-  removeHost(
-    """
-    The account to unhost
-    """
-    account: AccountReferenceInput!
-  ): Account!
 
   """
   Edit the settings for the given account
@@ -10649,41 +11096,6 @@ type Mutation {
   ): Host!
 
   """
-  [Root only] Clears the cache for a given account
-  """
-  clearCacheForAccount(
-    """
-    Account to clear the cache for
-    """
-    account: AccountReferenceInput!
-
-    """
-    Types of cache to clear
-    """
-    type: [AccountCacheType]! = [CLOUDFLARE, GRAPHQL_QUERIES, CONTRIBUTORS]
-  ): Account!
-
-  """
-  [Root only] Merge two accounts, returns the result account
-  """
-  mergeAccounts(
-    """
-    Account to merge from
-    """
-    fromAccount: AccountReferenceInput!
-
-    """
-    Account to merge to
-    """
-    toAccount: AccountReferenceInput!
-
-    """
-    If true, the result will be simulated and summarized in the response message
-    """
-    dryRun: Boolean! = true
-  ): MergeAccountsResponse!
-
-  """
   Adds or removes a policy on a given account
   """
   setPolicies(
@@ -10695,8 +11107,232 @@ type Mutation {
     """
     The policy to be added
     """
-    policies: [Policy]
+    policies: JSON!
   ): Account!
+  deleteAccount(
+    """
+    Reference to the Account to be deleted.
+    """
+    account: AccountReferenceInput!
+  ): Account
+  createApplication(application: ApplicationCreateInput!): Application
+  updateApplication(application: ApplicationUpdateInput!): Application
+  deleteApplication(application: ApplicationReferenceInput!): Application
+  editComment(comment: CommentUpdateInput!): Comment
+  deleteComment(id: String!): Comment
+  createComment(comment: CommentCreateInput!): Comment
+
+  """
+  Connect external account to Open Collective Account
+  """
+  createConnectedAccount(
+    """
+    Connected Account data
+    """
+    connectedAccount: ConnectedAccountCreateInput!
+
+    """
+    Account where the external account will be connected
+    """
+    account: AccountReferenceInput!
+  ): ConnectedAccount
+
+  """
+  Delete ConnectedAccount
+  """
+  deleteConnectedAccount(
+    """
+    ConnectedAccount reference containing either id or legacyId
+    """
+    connectedAccount: ConnectedAccountReferenceInput!
+  ): ConnectedAccount
+
+  """
+  Create a conversation
+  """
+  createConversation(
+    """
+    Conversation's title
+    """
+    title: String!
+
+    """
+    The body of the conversation initial comment
+    """
+    html: String!
+
+    """
+    ID of the Collective where the conversation will be created
+    """
+    CollectiveId: String!
+
+    """
+    A list of tags for this conversation
+    """
+    tags: [String]
+  ): Conversation
+  editConversation(
+    """
+    Conversation's id
+    """
+    id: String!
+
+    """
+    Conversation's title
+    """
+    title: String!
+
+    """
+    A list of tags for this conversation
+    """
+    tags: [String]
+  ): Conversation
+
+  """
+  Returns true if user is following, false otherwise. Must be authenticated.
+  """
+  followConversation(
+    """
+    Conversation's id
+    """
+    id: String!
+
+    """
+    Set this to false to unfollow the conversation
+    """
+    isActive: Boolean = true
+  ): Boolean
+  addEmojiReaction(
+    """
+    The emoji associated with the reaction
+    """
+    emoji: String!
+
+    """
+    A unique identifier for the comment id associated with this reaction
+    """
+    comment: CommentReferenceInput
+
+    """
+    A unique identifier for the update id associated with this reaction
+    """
+    update: UpdateReferenceInput
+  ): EmojiReactionResponse!
+  removeEmojiReaction(
+    comment: CommentReferenceInput
+    update: UpdateReferenceInput
+    emoji: String!
+  ): EmojiReactionResponse!
+
+  """
+  Submit an expense to a collective
+  """
+  createExpense(
+    """
+    Expense data
+    """
+    expense: ExpenseCreateInput!
+
+    """
+    Account where the expense will be created
+    """
+    account: AccountReferenceInput!
+
+    """
+    Recurring Expense information
+    """
+    recurring: RecurringExpenseInput
+  ): Expense!
+
+  """
+  To update an existing expense
+  """
+  editExpense(
+    """
+    Expense data
+    """
+    expense: ExpenseUpdateInput!
+
+    """
+    Expense draft key if invited to submit expense
+    """
+    draftKey: String
+  ): Expense!
+
+  """
+  Delete an expense. Only work if the expense is rejected - please check permissions.canDelete.
+  """
+  deleteExpense(
+    """
+    Reference of the expense to delete
+    """
+    expense: ExpenseReferenceInput!
+  ): Expense!
+
+  """
+  Process the expense with the given action
+  """
+  processExpense(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+
+    """
+    The action to trigger
+    """
+    action: ExpenseProcessAction!
+
+    """
+    Message to be attached to the action activity.
+    """
+    message: String
+
+    """
+    If action is related to a payment, this object used for the payment parameters
+    """
+    paymentParams: ProcessExpensePaymentParams
+  ): Expense!
+
+  """
+  Persist an Expense as a draft and invite someone to edit and submit it.
+  """
+  draftExpenseAndInviteUser(
+    """
+    Expense data
+    """
+    expense: ExpenseInviteDraftInput!
+
+    """
+    Account where the expense will be created
+    """
+    account: AccountReferenceInput!
+  ): Expense!
+
+  """
+  To re-send the invitation to complete a draft expense
+  """
+  resendDraftExpenseInvite(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+  ): Expense!
+
+  """
+  To verify and unverified expense.
+  """
+  verifyExpense(
+    """
+    Reference of the expense to process
+    """
+    expense: ExpenseReferenceInput!
+
+    """
+    Expense draft key if invited to submit expense
+    """
+    draftKey: String
+  ): Expense!
 
   """
   Sends an email for guest to confirm their emails and create their Open Collective account
@@ -10724,24 +11360,224 @@ type Mutation {
   ): ConfirmGuestAccountResponse!
 
   """
-  Create a new Payout Method to get paid through the platform
+  Apply to an host with a collective
   """
-  createPayoutMethod(
+  applyToHost(
     """
-    Payout Method data
+    Account applying to the host.
     """
-    payoutMethod: PayoutMethodInput!
+    collective: AccountReferenceInput!
 
     """
-    Account where the payout method will be associated
+    Host to apply to.
+    """
+    host: AccountReferenceInput!
+
+    """
+    A message to attach for the host to review the application
+    """
+    message: String
+
+    """
+    Further information about collective applying to host
+    """
+    applicationData: JSON
+
+    """
+    A list of members to invite when applying to the host
+    """
+    inviteMembers: [InviteMemberInput]
+  ): Account!
+
+  """
+  Reply to a host application
+  """
+  processHostApplication(
+    """
+    The account that applied to the host
     """
     account: AccountReferenceInput!
-  ): PayoutMethod
+
+    """
+    The host concerned by the application
+    """
+    host: AccountReferenceInput!
+
+    """
+    What to do with the application
+    """
+    action: ProcessHostApplicationAction!
+
+    """
+    A message to attach as a reason for the action
+    """
+    message: String
+  ): ProcessHostApplicationResponse!
 
   """
-  Remove the given payout method
+  [Root only] Removes the host for an account
   """
-  removePayoutMethod(payoutMethodId: String!): PayoutMethod!
+  removeHost(
+    """
+    The account to unhost
+    """
+    account: AccountReferenceInput!
+  ): Account!
+
+  """
+  Update the time which the user viewed the changelog updates
+  """
+  setChangelogViewDate(changelogViewDate: DateTime!): Individual!
+
+  """
+  Invite a new member to the Collective
+  """
+  inviteMember(
+    """
+    Reference to an account for the invitee
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the inviting Collective
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of the invitee
+    """
+    role: MemberRole!
+    description: String
+    since: DateTime
+  ): MemberInvitation!
+
+  """
+  Edit an existing member invitation of the Collective
+  """
+  editMemberInvitation(
+    """
+    Reference to an account for the member to edit.
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the Collective
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of member
+    """
+    role: MemberRole
+    description: String
+    since: DateTime
+  ): MemberInvitation
+
+  """
+  Endpoint to accept or reject an invitation to become a member
+  """
+  replyToMemberInvitation(
+    """
+    Reference to the invitation
+    """
+    invitation: MemberInvitationReferenceInput!
+
+    """
+    Whether this invitation should be accepted or declined
+    """
+    accept: Boolean!
+  ): Boolean!
+
+  """
+  Edit the public message for the given Member of a Collective
+  """
+  editPublicMessage(
+    """
+    Reference to an account for the donating Collective
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the receiving Collective
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    New public message
+    """
+    message: String
+  ): Member!
+
+  """
+  [Root only] Create a member entry directly. For non-root users, use `inviteMember`
+  """
+  createMember(
+    """
+    Reference to an account for the member
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    memberAccount will become a member of this account
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of the member
+    """
+    role: MemberRole!
+    description: String
+    since: DateTime
+  ): Member!
+
+  """
+  Edit an existing member of the Collective
+  """
+  editMember(
+    """
+    Reference to an account for the member to edit.
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    Reference to an account for the Collective
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of member
+    """
+    role: MemberRole
+    description: String
+    since: DateTime
+  ): Member!
+
+  """
+  Remove a member from the Collective
+  """
+  removeMember(
+    """
+    Reference to an account of member to remove
+    """
+    memberAccount: AccountReferenceInput!
+
+    """
+    Reference to the Collective account
+    """
+    account: AccountReferenceInput!
+
+    """
+    Role of member
+    """
+    role: MemberRole!
+    isInvitation: Boolean
+  ): Boolean
+  revokeOAuthAuthorization(
+    """
+    Reference of the OAuth Authorization
+    """
+    oAuthAuthorization: OAuthAuthorizationReferenceInput!
+  ): OAuthAuthorization!
 
   """
   To submit a new order
@@ -10756,6 +11592,16 @@ type Mutation {
     Object matching the OrderReferenceInput (id)
     """
     order: OrderReferenceInput!
+
+    """
+    Reason for cancelling subscription
+    """
+    reason: String
+
+    """
+    Category for cancelling subscription
+    """
+    reasonCode: String
   ): Order
 
   """
@@ -10857,6 +11703,81 @@ type Mutation {
   confirmCreditCard(paymentMethod: PaymentMethodReferenceInput!): CreditCardWithStripeError!
 
   """
+  Create a new Payout Method to get paid through the platform
+  """
+  createPayoutMethod(
+    """
+    Payout Method data
+    """
+    payoutMethod: PayoutMethodInput!
+
+    """
+    Account where the payout method will be associated
+    """
+    account: AccountReferenceInput!
+  ): PayoutMethod
+
+  """
+  Remove the given payout method
+  """
+  removePayoutMethod(payoutMethodId: String!): PayoutMethod!
+
+  """
+  [Root only] Clears the cache for a given account
+  """
+  clearCacheForAccount(
+    """
+    Account to clear the cache for
+    """
+    account: AccountReferenceInput!
+
+    """
+    Types of cache to clear
+    """
+    type: [AccountCacheType]! = [CLOUDFLARE, GRAPHQL_QUERIES, CONTRIBUTORS]
+  ): Account!
+
+  """
+  [Root only] Merge two accounts, returns the result account
+  """
+  mergeAccounts(
+    """
+    Account to merge from
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    Account to merge to
+    """
+    toAccount: AccountReferenceInput!
+
+    """
+    If true, the result will be simulated and summarized in the response message
+    """
+    dryRun: Boolean! = true
+  ): MergeAccountsResponse!
+
+  """
+  [Root only] Ban accounts
+  """
+  banAccount(
+    """
+    Account(s) to ban
+    """
+    account: [AccountReferenceInput!]!
+
+    """
+    If true, the associated accounts will also be banned
+    """
+    includeAssociatedAccounts: Boolean!
+
+    """
+    If true, the result will be simulated and summarized in the response message
+    """
+    dryRun: Boolean!
+  ): BanAccountResponse!
+
+  """
   Add platform tips to a transaction
   """
   addPlatformTipToTransaction(
@@ -10895,160 +11816,11 @@ type Mutation {
     """
     message: String
   ): Transaction!
-
-  """
-  Edit the public message for the given Member of a Collective
-  """
-  editPublicMessage(
-    """
-    Reference to an account for the donating Collective
-    """
-    fromAccount: AccountReferenceInput!
-
-    """
-    Reference to an account for the receiving Collective
-    """
-    toAccount: AccountReferenceInput!
-
-    """
-    New public message
-    """
-    message: String
-  ): Member!
-
-  """
-  [Root only] Create a member entry directly. For non-root users, use `inviteMember`
-  """
-  createMember(
-    """
-    Reference to an account for the member
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    memberAccount will become a member of this account
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of the member
-    """
-    role: MemberRole!
-    description: String
-    since: DateTime
-  ): Member!
-
-  """
-  Edit an existing member of the Collective
-  """
-  editMember(
-    """
-    Reference to an account for the member to edit.
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    Reference to an account for the Collective
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of member
-    """
-    role: MemberRole
-    description: String
-    since: DateTime
-  ): Member!
-
-  """
-  Remove a member from the Collective
-  """
-  removeMember(
-    """
-    Reference to an account of member to remove
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    Reference to the Collective account
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of member
-    """
-    role: MemberRole!
-    isInvitation: Boolean
-  ): Boolean
-
-  """
-  Invite a new member to the Collective
-  """
-  inviteMember(
-    """
-    Reference to an account for the invitee
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    Reference to an account for the inviting Collective
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of the invitee
-    """
-    role: MemberRole!
-    description: String
-    since: DateTime
-  ): MemberInvitation!
-
-  """
-  Edit an existing member invitation of the Collective
-  """
-  editMemberInvitation(
-    """
-    Reference to an account for the member to edit.
-    """
-    memberAccount: AccountReferenceInput!
-
-    """
-    Reference to an account for the Collective
-    """
-    account: AccountReferenceInput!
-
-    """
-    Role of member
-    """
-    role: MemberRole
-    description: String
-    since: DateTime
-  ): MemberInvitation
-
-  """
-  Endpoint to accept or reject an invitation to become a member
-  """
-  replyToMemberInvitation(
-    """
-    Reference to the invitation
-    """
-    invitation: MemberInvitationReferenceInput!
-
-    """
-    Whether this invitation should be accepted or declined
-    """
-    accept: Boolean!
-  ): Boolean!
   createUpdate(update: UpdateCreateInput!): Update!
   editUpdate(update: UpdateUpdateInput!): Update!
   publishUpdate(id: String!, notificationAudience: UpdateAudience): Update!
   unpublishUpdate(id: String!): Update!
   deleteUpdate(id: String!): Update!
-
-  """
-  Update the time which the user viewed the changelog updates
-  """
-  setChangelogViewDate(changelogViewDate: DateTime!): Individual!
 
   """
   Assign Virtual Card information to existing hosted collective
@@ -11174,6 +11946,9 @@ type Mutation {
     """
     virtualCard: VirtualCardReferenceInput!
   ): Boolean
+  createWebhook(webhook: WebhookCreateInput!): Webhook
+  updateWebhook(webhook: WebhookUpdateInput!): Webhook
+  deleteWebhook(webhook: WebhookReferenceInput!): Webhook
 }
 
 input CollectiveCreateInput {
@@ -11181,7 +11956,8 @@ input CollectiveCreateInput {
   slug: String!
   description: String!
   tags: [String]
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   settings: JSON
 }
 
@@ -11209,6 +11985,29 @@ input InviteMemberInput {
   since: DateTime
 }
 
+input EventCreateInput {
+  name: String!
+  slug: String
+  description: String
+  tags: [String]
+  settings: JSON
+
+  """
+  The Event start date and time
+  """
+  startsAt: DateTime!
+
+  """
+  The Event end date and time
+  """
+  endsAt: DateTime!
+
+  """
+  Timezone of the Event (TZ database format, e.g. UTC or Europe/Berlin)
+  """
+  timezone: String!
+}
+
 input FundCreateInput {
   name: String!
   slug: String!
@@ -11234,22 +12033,92 @@ input ProjectCreateInput {
   settings: JSON
 }
 
-input EventCreateInput {
-  name: String!
-  slug: String
+"""
+Values that can be edited in Account's settings
+"""
+scalar AccountSettingsKey
+
+enum AccountFreezeAction {
+  FREEZE
+  UNFREEZE
+}
+
+"""
+Response for the addTwoFactorAuthTokenToIndividual mutation
+"""
+type AddTwoFactorAuthTokenToIndividualResponse {
+  """
+  The Individual that the 2FA has been enabled for
+  """
+  account: Individual!
+
+  """
+  The recovery codes for the Individual to write down
+  """
+  recoveryCodes: [String]
+}
+
+input AccountUpdateInput {
+  """
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String!
+  currency: Currency
+}
+
+"""
+Input type for Application
+"""
+input ApplicationCreateInput {
+  type: ApplicationType! = OAUTH
+  name: String
   description: String
-  tags: [String]
-  settings: JSON
+  redirectUri: URL
 
   """
-  The Event start date and time
+  The account to use as the owner of the application. Defaults to currently logged in user.
   """
-  startsAt: DateTime!
+  account: AccountReferenceInput
+}
+
+"""
+Input type for Application
+"""
+input ApplicationUpdateInput {
+  """
+  The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
 
   """
-  The Event end date and time
+  The legacy public id identifying the application (ie: 4242)
   """
-  endsAt: DateTime!
+  legacyId: Int
+
+  """
+  The clientId for the application.
+  """
+  clientId: String
+  name: String
+  description: String
+  redirectUri: URL
+}
+
+input ApplicationReferenceInput {
+  """
+  The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the application (ie: 4242)
+  """
+  legacyId: Int
+
+  """
+  The clientId for the application.
+  """
+  clientId: String
 }
 
 input CommentUpdateInput {
@@ -11322,6 +12191,25 @@ input ConnectedAccountReferenceInput {
   The internal id of the account (ie: 580)
   """
   legacyId: Int
+}
+
+type EmojiReactionResponse {
+  """
+  Reference to the update corresponding to the emojis
+  """
+  update: Update
+
+  """
+  Reference to the comment corresponding to the emojis
+  """
+  comment: Comment
+}
+
+input CommentReferenceInput {
+  """
+  The public id identifying the comment
+  """
+  id: String
 }
 
 input ExpenseCreateInput {
@@ -11475,6 +12363,10 @@ Input to set taxes for an expense
 """
 input ExpenseTaxInput {
   type: TaxType!
+
+  """
+  Tax rate as a float number between 0 and 1
+  """
   rate: Float!
 
   """
@@ -11687,6 +12579,11 @@ enum ExpenseProcessAction {
   To mark the expense as spam
   """
   MARK_AS_SPAM
+
+  """
+  To mark the expense as incomplete and notify the payee it requires more information
+  """
+  MARK_AS_INCOMPLETE
 }
 
 """
@@ -11797,23 +12694,19 @@ input ExpenseInviteeOrganizationInput {
   website: String
 }
 
-type EmojiReactionResponse {
+"""
+Response for the confirmGuestAccount mutation
+"""
+type ConfirmGuestAccountResponse {
   """
-  Reference to the update corresponding to the emojis
+  The validated account
   """
-  update: Update
+  account: Account!
 
   """
-  Reference to the comment corresponding to the emojis
+  A token that can be used to sign in
   """
-  comment: Comment
-}
-
-input CommentReferenceInput {
-  """
-  The public id identifying the comment
-  """
-  id: String
+  accessToken: String!
 }
 
 type ProcessHostApplicationResponse {
@@ -11853,70 +12746,23 @@ enum ProcessHostApplicationAction {
   SEND_PUBLIC_MESSAGE
 }
 
-"""
-Values that can be edited in Account's settings
-"""
-scalar AccountSettingsKey
+input MemberInvitationReferenceInput {
+  """
+  The public id identifying the member invitation (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
 
-enum AccountFreezeAction {
-  FREEZE
-  UNFREEZE
+  """
+  The internal id of the invitation (ie: 580)
+  """
+  legacyId: Int
 }
 
-"""
-Response for the addTwoFactorAuthTokenToIndividual mutation
-"""
-type AddTwoFactorAuthTokenToIndividualResponse {
+input OAuthAuthorizationReferenceInput {
   """
-  The Individual that the 2FA has been enabled for
+  The id identifying the OAuth Authorization (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
   """
-  account: Individual!
-
-  """
-  The recovery codes for the Individual to write down
-  """
-  recoveryCodes: [String]
-}
-
-input AccountUpdateInput {
-  """
-  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String!
-  currency: Currency
-}
-
-enum AccountCacheType {
-  CLOUDFLARE
-  GRAPHQL_QUERIES
-  CONTRIBUTORS
-}
-
-type MergeAccountsResponse {
-  """
-  The resulting account
-  """
-  account: Account!
-
-  """
-  A message to display to the user about the result
-  """
-  message: String
-}
-
-"""
-Response for the confirmGuestAccount mutation
-"""
-type ConfirmGuestAccountResponse {
-  """
-  The validated account
-  """
-  account: Account!
-
-  """
-  A token that can be used to sign in
-  """
-  accessToken: String!
+  id: String
 }
 
 type OrderWithPayment {
@@ -12215,6 +13061,11 @@ input OrderUpdateInput {
   Amount intended as tip for the platform
   """
   platformTip: AmountInput
+
+  """
+  Host fee percent to be applied to the order
+  """
+  hostFeePercent: Float
 }
 
 """
@@ -12244,6 +13095,41 @@ type CreditCardWithStripeError {
   stripeError: StripeError
 }
 
+enum AccountCacheType {
+  CLOUDFLARE
+  GRAPHQL_QUERIES
+  CONTRIBUTORS
+}
+
+type MergeAccountsResponse {
+  """
+  The resulting account
+  """
+  account: Account!
+
+  """
+  A message to display to the user about the result
+  """
+  message: String
+}
+
+type BanAccountResponse {
+  """
+  Whether the accounts can be banned
+  """
+  isAllowed: Boolean!
+
+  """
+  A summary of the changes
+  """
+  message: String
+
+  """
+  The accounts impacted by the mutation
+  """
+  accounts: [Account!]!
+}
+
 input TransactionReferenceInput {
   """
   The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -12252,18 +13138,6 @@ input TransactionReferenceInput {
 
   """
   The internal id of the transaction (ie: 580)
-  """
-  legacyId: Int
-}
-
-input MemberInvitationReferenceInput {
-  """
-  The public id identifying the member invitation (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String
-
-  """
-  The internal id of the invitation (ie: 580)
   """
   legacyId: Int
 }
@@ -12312,4 +13186,45 @@ enum VirtualCardProvider {
 
 input VirtualCardReferenceInput {
   id: String
+}
+
+"""
+Input type for Webhooks
+"""
+input WebhookCreateInput {
+  """
+  The account to attach the Webhook
+  """
+  account: AccountReferenceInput!
+  activityType: ActivityType! = ACTIVITY_ALL
+  webhookUrl: URL!
+}
+
+"""
+Input type to update a Webhook
+"""
+input WebhookUpdateInput {
+  """
+  The public id identifying the webhook (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the webhook (ie: 4242)
+  """
+  legacyId: Int
+  activityType: ActivityType! = ACTIVITY_ALL
+  webhookUrl: URL!
+}
+
+input WebhookReferenceInput {
+  """
+  The public id identifying the webhook (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the webhook (ie: 4242)
+  """
+  legacyId: Int
 }

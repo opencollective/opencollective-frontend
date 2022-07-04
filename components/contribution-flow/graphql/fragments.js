@@ -9,6 +9,7 @@ const contributionFlowHostFieldsFragment = gqlV2/* GraphQL */ `
     settings
     contributionPolicy
     location {
+      id
       country
     }
     paypalClientId
@@ -49,6 +50,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
       platformFeePercent
       platformContributionAvailable
       host {
+        id
         ...ContributionFlowHostFields
       }
     }
@@ -69,31 +71,26 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
     ... on AccountWithHost {
       hostFeePercent
       host {
+        id
         ...ContributionFlowHostFields
+      }
+    }
+    ... on AccountWithParent {
+      parent {
+        id
+        slug
+        settings
+        location {
+          id
+          country
+        }
+        ... on AccountWithContributions {
+          contributionPolicy
+        }
       }
     }
     ... on Event {
       endsAt
-      parent {
-        id
-        slug
-        settings
-        location {
-          id
-          country
-        }
-      }
-    }
-    ... on Project {
-      parent {
-        id
-        slug
-        settings
-        location {
-          id
-          country
-        }
-      }
     }
   }
   ${contributionFlowHostFieldsFragment}
@@ -173,11 +170,13 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
       }
       ... on AccountWithHost {
         host {
+          id
           ...OrderSuccessHostFragment
         }
       }
       ... on Organization {
         host {
+          id
           ...OrderSuccessHostFragment
           ... on AccountWithContributions {
             # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
@@ -196,6 +195,7 @@ export const orderResponseFragment = gqlV2/* GraphQL */ `
   fragment OrderResponseFragment on OrderWithPayment {
     guestToken
     order {
+      id
       ...OrderSuccessFragment
     }
     stripeError {

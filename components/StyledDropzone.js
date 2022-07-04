@@ -228,7 +228,7 @@ StyledDropzone.propTypes = {
   /** Whether the dropzone should accept multiple files */
   isMulti: PropTypes.bool,
   /** Filetypes to accept */
-  accept: PropTypes.string,
+  accept: PropTypes.object,
   /** Min file size */
   minSize: PropTypes.number,
   /** Max file size */

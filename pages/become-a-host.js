@@ -5,7 +5,7 @@ import CaseStudies from '../components/become-a-host/CaseStudiesSection';
 import FiscalSponsorship from '../components/become-a-host/FiscalSponsorshipSection';
 import WhatAreTheBenefits from '../components/become-a-host/WhatAreTheBenefitsSection';
 import WhoAreFiscalHosts from '../components/become-a-host/WhoAreFiscalHostsSection';
-import JoinUs from '../components/home/sections/JoinUs';
+import JoinUs from '../components/collectives/sections/JoinUs';
 import Page from '../components/Page';
 
 const menuItems = { pricing: true, howItWorks: true };

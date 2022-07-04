@@ -14,6 +14,7 @@ import { parseAmountRange } from '../budget/filters/AmountFilter';
 import DismissibleMessage from '../DismissibleMessage';
 import ExpensesFilters from '../expenses/ExpensesFilters';
 import ExpensesList from '../expenses/ExpensesList';
+import { parseChronologicalOrderInput } from '../expenses/filters/ExpensesOrder';
 import {
   expenseHostFields,
   expensesListAdminFieldsFragment,
@@ -47,8 +48,10 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
     $dateFrom: DateTime
     $dateTo: DateTime
     $searchTerm: String
+    $orderBy: ChronologicalOrderInput
   ) {
     host(slug: $hostSlug) {
+      id
       ...ExpenseHostFields
       ...HostInfoCardFields
       transferwise {
@@ -69,11 +72,13 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
       dateFrom: $dateFrom
       dateTo: $dateTo
       searchTerm: $searchTerm
+      orderBy: $orderBy
     ) {
       totalCount
       offset
       limit
       nodes {
+        id
         ...ExpensesListFieldsFragment
         ...ExpensesListAdminFieldsFragment
       }
@@ -115,6 +120,7 @@ const isValidStatus = status => {
 const getVariablesFromQuery = query => {
   const amountRange = parseAmountRange(query.amount);
   const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
+  const orderBy = query.orderBy && parseChronologicalOrderInput(query.orderBy);
   return {
     offset: parseInt(query.offset) || 0,
     limit: (parseInt(query.limit) || NB_EXPENSES_DISPLAYED) * 2,
@@ -126,6 +132,7 @@ const getVariablesFromQuery = query => {
     payoutMethodType: query.payout,
     dateFrom,
     dateTo,
+    orderBy,
     searchTerm: query.searchTerm,
   };
 };
@@ -134,7 +141,7 @@ const ROUTE_PARAMS = ['hostCollectiveSlug', 'view', 'slug', 'section'];
 
 const hasParams = query => {
   return Object.entries(query).some(([key, value]) => {
-    return ![...ROUTE_PARAMS, 'offset', 'limit', 'paypalApprovalError'].includes(key) && value;
+    return ![...ROUTE_PARAMS, 'offset', 'limit', 'paypalApprovalError', 'orderBy'].includes(key) && value;
   });
 };
 

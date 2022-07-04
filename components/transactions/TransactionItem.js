@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import expenseStatus from '../../lib/constants/expense-status';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nTransactionKind, i18nTransactionType } from '../../lib/i18n/transaction';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -31,11 +32,10 @@ import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 import TransactionStatusTag from '../TransactionStatusTag';
-import { useUser } from '../UserProvider';
 
 import TransactionDetails from './TransactionDetails';
 
-const { CONTRIBUTION, ADDED_FUNDS } = TransactionKind;
+const { CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP } = TransactionKind;
 
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' • ';
@@ -106,9 +106,9 @@ const KindTag = styled(StyledTag).attrs({
 const getExpenseStatusTag = (expense, isRefund, isRefunded) => {
   let expenseStatusLabel;
   if (isRefunded) {
-    expenseStatusLabel = expenseStatus.REFUNDED;
+    expenseStatusLabel = 'REFUNDED';
   } else if (isRefund) {
-    expenseStatusLabel = expenseStatus.COMPLETED;
+    expenseStatusLabel = 'COMPLETED';
   } else {
     expenseStatusLabel = expense?.status || expenseStatus.PAID;
   }
@@ -141,7 +141,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
     isOrderRejected,
   } = transaction;
 
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
   const [isExpanded, setExpanded] = React.useState(false);
   const intl = useIntl();
 
@@ -307,11 +307,9 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             {isExpense && getExpenseStatusTag(expense, isRefund, isRefunded)}
           </Flex>
         </Flex>
-        {hasOrder && [CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
+        {hasOrder && [CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP].includes(transaction.kind) && (
           <Container borderTop={['1px solid #E8E9EB', 'none']} mt={3} pt={[2, 0]}>
-            {[CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind) && (
-              <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
-            )}
+            <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
             {transactionDetailsLink()}
           </Container>
         )}
@@ -321,7 +319,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             {transactionDetailsLink()}
           </Container>
         )}
-        {!isExpense && (!hasOrder || ![CONTRIBUTION, ADDED_FUNDS].includes(transaction.kind)) && (
+        {!isExpense && (!hasOrder || ![CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP].includes(transaction.kind)) && (
           <Container mt={3} pt={[2, 0]}>
             <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
           </Container>

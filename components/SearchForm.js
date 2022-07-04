@@ -7,6 +7,9 @@ import { borderRadius, fontSize, height } from 'styled-system';
 import { Box, Flex } from './Grid';
 import SearchIcon from './SearchIcon';
 import StyledInput from './StyledInput';
+import StyledRoundButton from './StyledRoundButton';
+import StyledSpinner from './StyledSpinner';
+import { Span } from './Text';
 
 const SearchInputContainer = styled(Flex)`
   border: solid 1px var(--silver-four);
@@ -39,10 +42,16 @@ const SearchButton = styled(Flex)`
 `;
 
 class SearchForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { isLoading: false };
+  }
+
   handleSubmit = event => {
-    const searchInput = event.target.elements.q;
-    this.props.router.push({ pathname: '/search', query: { q: searchInput.value } });
     event.preventDefault();
+    const searchInput = event.target.elements.q;
+    this.setState({ isLoading: true });
+    this.props.router.push({ pathname: '/search', query: { q: searchInput.value } });
   };
 
   render() {
@@ -51,11 +60,13 @@ class SearchForm extends React.Component {
       onSubmit = this.handleSubmit,
       placeholder = 'Search...',
       width = 1,
+      autoFocus,
       defaultValue,
       value,
       onChange,
       borderRadius = '20px',
       height = '46px',
+      disabled,
     } = this.props;
     return (
       <form action="/search" method="GET" onSubmit={onSubmit}>
@@ -73,6 +84,7 @@ class SearchForm extends React.Component {
             as={StyledInput}
             type="search"
             name="q"
+            autoFocus={autoFocus}
             placeholder={placeholder}
             py={1}
             pl={3}
@@ -82,7 +94,17 @@ class SearchForm extends React.Component {
             defaultValue={defaultValue}
             value={value}
             onChange={onChange && (e => onChange(e.target.value))}
+            disabled={disabled}
           />
+          {this.props.showSearchButton && (
+            <StyledRoundButton
+              style={{ backgroundColor: '#F9FAFB', color: '#323334', ...this.props.searchButtonStyles }}
+              isBorderless
+              mr="20px"
+            >
+              {this.state.isLoading ? <StyledSpinner size="20px" /> : <Span>→</Span>}
+            </StyledRoundButton>
+          )}
         </SearchInputContainer>
       </form>
     );
@@ -97,11 +119,15 @@ SearchForm.propTypes = {
   onSubmit: PropTypes.func,
   placeholder: PropTypes.string,
   backgroundColor: PropTypes.string,
-  width: PropTypes.number,
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   onChange: PropTypes.func,
   borderRadius: PropTypes.string,
   height: PropTypes.string,
   router: PropTypes.object,
+  disabled: PropTypes.bool,
+  autoFocus: PropTypes.bool,
+  showSearchButton: PropTypes.bool,
+  searchButtonStyles: PropTypes.object,
 };
 
 export default withRouter(SearchForm);

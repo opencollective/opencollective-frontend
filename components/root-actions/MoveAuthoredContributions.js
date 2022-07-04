@@ -54,6 +54,7 @@ const ordersQuery = gqlV2/* GraphQL */ `
   query AuthoredOrdersRoot($account: AccountReferenceInput!) {
     orders(account: $account, filter: OUTGOING, limit: 100, includeIncognito: true) {
       nodes {
+        id
         ...MoveOrdersFields
       }
     }
@@ -64,6 +65,7 @@ const ordersQuery = gqlV2/* GraphQL */ `
 const moveOrdersMutation = gqlV2/* GraphQL */ `
   mutation MoveOrders($orders: [OrderReferenceInput!]!, $fromAccount: AccountReferenceInput!, $makeIncognito: Boolean) {
     moveOrders(orders: $orders, fromAccount: $fromAccount, makeIncognito: $makeIncognito) {
+      id
       ...MoveOrdersFields
     }
   }
@@ -196,6 +198,7 @@ const MoveAuthoredContributions = () => {
       <StyledInputField htmlFor="fromAccount" label="Account that authored the contribution" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync
+            skipGuests={false}
             inputId={id}
             collective={fromAccount}
             isClearable

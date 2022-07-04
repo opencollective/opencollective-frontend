@@ -102,7 +102,7 @@ class HostsContainer extends React.Component {
           </AllCardsContainer>
         </Hide>
         <Flex justifyContent="center" mt={[2, 0]} width={['100%', null, '90%']}>
-          <Link href="/hosts">
+          <Link href="/search?isHost=true">
             <StyledButton fontSize="13px" buttonStyle="dark" minHeight="36px" mt={[2, 3]} mb={3} px={4}>
               {intl.formatMessage(this.messages.seeMoreHosts)}
             </StyledButton>
@@ -131,6 +131,7 @@ const hostsQuery = gqlV2/* GraphQL */ `
         totalHostedCollectives
         hostFeePercent
         stats {
+          id
           yearlyBudgetManaged {
             value
           }

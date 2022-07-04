@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Facebook } from '@styled-icons/fa-brands/Facebook';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -284,7 +284,7 @@ class ContributionFlowSuccess extends React.Component {
                 )}
                 {!isEmbed && (
                   <Box my={4}>
-                    <Link href={{ pathname: '/discover', query: { show: getMainTag(order.toAccount) } }}>
+                    <Link href={{ pathname: '/search', query: { show: getMainTag(order.toAccount) } }}>
                       <P color="black.800" fontWeight={500}>
                         <FormattedMessage
                           id="NewContributionFlow.Success.DiscoverMore"
@@ -335,6 +335,7 @@ class ContributionFlowSuccess extends React.Component {
 const orderSuccessQuery = gqlV2/* GraphQL */ `
   query NewContributionFlowOrderSuccess($order: OrderReferenceInput!) {
     order(order: $order) {
+      id
       ...OrderSuccessFragment
     }
   }

@@ -94,7 +94,12 @@ const getPayoutMethodsFromPayee = payee => {
     const hostPayoutMethods = get(payee, 'host.payoutMethods') || EMPTY_ARRAY;
     let hostSuitablePayoutMethods = hostPayoutMethods
       .filter(payoutMethod => payoutMethod.type === PayoutMethodType.BANK_ACCOUNT)
-      .filter(payoutMethod => !payoutMethod.name || !payoutMethod.name?.includes('Ops account'));
+      .filter(
+        payoutMethod =>
+          !payoutMethod.name ||
+          payoutMethod.name.includes('Collectives account') ||
+          payoutMethod.name.includes('Main account'),
+      );
     if (hostSuitablePayoutMethods.length === 0) {
       hostSuitablePayoutMethods = hostPayoutMethods.filter(
         payoutMethod => payoutMethod.type === PayoutMethodType.PAYPAL,
@@ -220,7 +225,7 @@ const ExpenseFormPayeeStep = ({
               );
 
               const payee = existingProfile || {
-                ...pick(value, ['id', 'name', 'slug', 'email']),
+                ...pick(value, ['id', 'name', 'slug', 'email', 'type']),
                 isInvite: !isNewlyCreatedProfile,
               };
 
@@ -233,7 +238,6 @@ const ExpenseFormPayeeStep = ({
               setLocationFromPayee(formik, payee);
             }
           }}
-          limit={5}
           styles={{
             menu: {
               borderRadius: '16px',

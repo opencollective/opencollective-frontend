@@ -2,15 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
-import { filter, get, isEmpty, size, without } from 'lodash';
+import { filter, get, isEmpty, omit, size } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
-import { stripHTML } from '../../../lib/utils';
+import { omitDeep, stripHTML } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
+import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
@@ -49,10 +50,17 @@ const editCollectiveMutation = gql/* GraphQL */ `
 `;
 
 const setPoliciesMutation = gqlV2/* GraphQL */ `
-  mutation SetPolicies($account: AccountReferenceInput!, $policies: [Policy]) {
+  mutation SetPolicies($account: AccountReferenceInput!, $policies: JSON!) {
     setPolicies(account: $account, policies: $policies) {
       id
-      policies
+      policies {
+        EXPENSE_AUTHOR_CANNOT_APPROVE
+        COLLECTIVE_MINIMUM_ADMINS {
+          numberOfAdmins
+          applies
+          freeze
+        }
+      }
     }
   }
 `;
@@ -90,6 +98,9 @@ const messages = defineMessages({
     id: 'collective.expensePolicy.allowExpense',
     defaultMessage:
       'Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees)',
+  },
+  'requiredAdmins.numberOfAdmins': {
+    defaultMessage: '{admins, plural, =0 {Do not enforce minimum number of admins} one {# Admin} other {# Admins} }',
   },
 });
 
@@ -138,7 +149,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
       contributionPolicy: collectiveContributionPolicy || '',
       expensePolicy: collectiveExpensePolicy || '',
       disablePublicExpenseSubmission: collectiveDisableExpenseSubmission || false,
-      policies: data?.account?.policies || [],
+      policies: omitDeep(data?.account?.policies || {}, ['__typename']),
     },
     async onSubmit(values) {
       const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission, policies } = values;
@@ -153,23 +164,25 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
         },
       });
       const selectedRejectCategories = selected.map(option => option.value);
-      await updateCategories({
-        variables: {
-          account: {
-            legacyId: collective.id,
+      await Promise.all([
+        updateCategories({
+          variables: {
+            account: {
+              legacyId: collective.id,
+            },
+            key: 'moderation',
+            value: { rejectedCategories: selectedRejectCategories },
           },
-          key: 'moderation',
-          value: { rejectedCategories: selectedRejectCategories },
-        },
-      });
-      await setPolicies({
-        variables: {
-          account: {
-            legacyId: collective.id,
+        }),
+        setPolicies({
+          variables: {
+            account: {
+              legacyId: collective.id,
+            },
+            policies,
           },
-          policies,
-        },
-      });
+        }),
+      ]);
 
       addToast({
         type: TOAST_TYPE.SUCCESS,
@@ -204,9 +217,18 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
 
   React.useEffect(() => {
     if (data) {
-      formik.setFieldValue('policies', data.account?.policies || []);
+      formik.setFieldValue('policies', omitDeep(data?.account?.policies || {}, ['__typename']));
     }
   }, [data]);
+
+  const numberOfAdminsOptions = [0, 2, 3, 4, 5].map(n => ({
+    value: n,
+    label: formatMessage(messages['requiredAdmins.numberOfAdmins'], { admins: n }),
+  }));
+  const minAdminsApplies = [
+    { value: 'NEW_COLLECTIVES', label: <FormattedMessage defaultMessage="New Collectives Only" /> },
+    { value: 'ALL_COLLECTIVES', label: <FormattedMessage defaultMessage="All Collectives" /> },
+  ];
 
   return (
     <Flex flexDirection="column">
@@ -262,6 +284,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
           >
             {inputProps => (
               <RichTextEditor
+                data-cy="expense-policy-input"
                 withBorders
                 showCount
                 maxLength={EXPENSE_POLICY_MAX_LENGTH}
@@ -286,6 +309,89 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             />
           </P>
         </Container>
+
+        {collective?.isHost && (
+          <Container>
+            <SettingsSectionTitle mt={4}>
+              <FormattedMessage id="editCollective.admins.header" defaultMessage="Required Admins" />
+            </SettingsSectionTitle>
+            <P mb={2}>
+              <FormattedMessage
+                id="editCollective.admins.description"
+                defaultMessage="Please specify the minimum number of admins a collective needs to have for being accepted by your fiscal host and to accept contributions."
+              />
+            </P>
+            <Flex gap="12px 24px" mb={3} mt={2} flexDirection={['column', 'row']}>
+              <StyledInputField
+                disabled={isSubmittingSettings}
+                labelFontSize="13px"
+                labelFontWeight="700"
+                label={<FormattedMessage defaultMessage="Minimum number of admins" />}
+                flexGrow={1}
+              >
+                <StyledSelect
+                  inputId="numberOfAdmins"
+                  isSearchable={false}
+                  options={numberOfAdminsOptions}
+                  onChange={option => {
+                    if (option.value === 0) {
+                      formik.setFieldValue('policies', omit(formik.values.policies, ['COLLECTIVE_MINIMUM_ADMINS']));
+                    } else {
+                      formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
+                        ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
+                        numberOfAdmins: option.value,
+                      });
+                    }
+                  }}
+                  value={numberOfAdminsOptions.find(
+                    option => option.value === (formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins || 0),
+                  )}
+                />
+              </StyledInputField>
+              <StyledInputField
+                disabled={isSubmittingSettings}
+                labelFontSize="13px"
+                labelFontWeight="700"
+                label={<FormattedMessage defaultMessage="Whom does this apply to" />}
+                flexGrow={1}
+              >
+                <StyledSelect
+                  inputId="applies"
+                  isSearchable={false}
+                  options={minAdminsApplies}
+                  onChange={option =>
+                    formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
+                      ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
+                      applies: option.value,
+                    })
+                  }
+                  disabled
+                  value={minAdminsApplies[0]}
+                />
+              </StyledInputField>
+            </Flex>
+            <StyledCheckbox
+              name="minAdminsFreeze"
+              label={<FormattedMessage defaultMessage="Freeze collectives that don’t meet the minimum requirement" />}
+              onChange={({ checked }) => {
+                formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
+                  ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
+                  freeze: checked,
+                });
+              }}
+              checked={Boolean(formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze)}
+            />
+            <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
+              <FormattedMessage defaultMessage="Freezing the collective will prevent them from accepting and distributing contributions till they meet the requirements. This is a security measure to make sure the admins are within their rights. Read More." />
+            </P>
+            {formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.applies === 'ALL_COLLECTIVES' &&
+              formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze && (
+                <MessageBox type="warning" mt={2} fontSize="13px">
+                  <FormattedMessage defaultMessage="Some collectives hosted by you may not fulfil the minimum admin requirements. If you choose to apply the setting to all collectives, the collectives that don't comply will be frozen till they meet the minimum requirements for admins." />
+                </MessageBox>
+              )}
+          </Container>
+        )}
         <Container>
           <SettingsSectionTitle mt={4}>
             <FormattedMessage id="editCollective.expenseApprovalsPolicy.header" defaultMessage="Expense approvals" />
@@ -301,15 +407,15 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             onChange={() =>
               formik.setFieldValue(
                 'policies',
-                formik.values.policies?.includes('EXPENSE_AUTHOR_CANNOT_APPROVE')
-                  ? without(formik.values.policies, 'EXPENSE_AUTHOR_CANNOT_APPROVE')
-                  : [...formik.values.policies, 'EXPENSE_AUTHOR_CANNOT_APPROVE'],
+                formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']
+                  ? omit(formik.values.policies, ['EXPENSE_AUTHOR_CANNOT_APPROVE'])
+                  : { ...formik.values.policies, EXPENSE_AUTHOR_CANNOT_APPROVE: true },
               )
             }
-            checked={Boolean(formik.values.policies?.includes('EXPENSE_AUTHOR_CANNOT_APPROVE'))}
+            checked={Boolean(formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'])}
             disabled={
               isSettingPolicies ||
-              (numberOfAdmins < 2 && Boolean(!formik.values.policies?.includes('EXPENSE_AUTHOR_CANNOT_APPROVE')))
+              (numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']))
             }
           />
           {collective?.isHost && (
@@ -320,7 +426,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               />
             </P>
           )}
-          {numberOfAdmins < 2 && Boolean(!formik.values.policies?.includes('EXPENSE_AUTHOR_CANNOT_APPROVE')) && (
+          {numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']) && (
             <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
               <FormattedMessage
                 id="editCollective.expenseApprovalsPolicy.authorCannotApprove.minAdminRequired"
@@ -364,6 +470,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
         </Container>
         <Flex mt={5} mb={3} alignItems="center" justifyContent="center">
           <StyledButton
+            data-cy="submit-policy-btn"
             buttonStyle="primary"
             mx={2}
             minWidth={200}

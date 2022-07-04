@@ -1,9 +1,9 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import Illustration from '../collectives/HomeIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
 import StyledLink from '../StyledLink';
 import { H2, H3, P } from '../Text';
 
@@ -95,7 +95,7 @@ const MoreFeatures = () => (
           <P fontSize="18px" lineHeight="26px" color="black.700" fontWeight="500">
             <FormattedMessage
               id="howItWorks.virtualCards.description"
-              defaultMessage="Spend money anywhere you’d use a credit or debit card online, linked directly to your Open Collective funds (this beta feature is only available to certain fiscal hosts)"
+              defaultMessage="Spend money anywhere you’d use a credit or debit card online, linked directly to your Open Collective funds (this beta feature is only available to certain fiscal hosts)."
             />
           </P>
         </Box>
