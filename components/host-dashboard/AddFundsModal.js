@@ -387,6 +387,11 @@ const AddFundsModal = ({ host, collective, ...props }) => {
         {({ values, isSubmitting }) => {
           const hostFeePercent = isNaN(values.hostFeePercent) ? defaultHostFeePercent : values.hostFeePercent;
           const hostFee = Math.round(values.amount * (hostFeePercent / 100));
+          const receiptTemplates = collective.host.settings?.invoice?.templates;
+          const receiptTemplateTitles = [{ value: 'default', label: receiptTemplates?.default?.title }];
+          if (receiptTemplates?.alternative?.title) {
+            receiptTemplateTitles.push({ value: 'alternate', label: receiptTemplates?.alternative?.title });
+          }
 
           const defaultSources = [];
           defaultSources.push({ value: host, label: <DefaultCollectiveLabel value={host} /> });
@@ -508,6 +513,25 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       </StyledInputFormikField>
                     )}
                   </Flex>
+                  {Object.keys(receiptTemplates).length > 1 && (
+                    <Container width="100%">
+                      <StyledInputFormikField
+                        name="receipt-template"
+                        htmlFor="receipt-template"
+                        label={<FormattedMessage defaultMessage="Choose receipt" />}
+                        mt={3}
+                      >
+                        {({ form, field }) => (
+                          <StyledSelect
+                            id={field.id}
+                            options={receiptTemplateTitles}
+                            defaultValue={receiptTemplateTitles[0]}
+                            onChange={value => form.setFieldValue(field.name, value)}
+                          />
+                        )}
+                      </StyledInputFormikField>
+                    </Container>
+                  )}
                   <P fontSize="14px" lineHeight="17px" fontWeight="500" mt={4}>
                     <FormattedMessage id="Details" defaultMessage="Details" />
                   </P>
@@ -715,6 +739,13 @@ AddFundsModal.propTypes = {
     currency: PropTypes.string,
     hostFeePercent: PropTypes.number,
     slug: PropTypes.string,
+    host: PropTypes.shape({
+      settings: PropTypes.shape({
+        invoice: PropTypes.shape({
+          templates: PropTypes.object,
+        }),
+      }),
+    }),
   }).isRequired,
   onClose: PropTypes.func,
 };
