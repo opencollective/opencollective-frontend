@@ -1418,7 +1418,7 @@
   "home.feature.manageExpenses": "경비 관리하기",
   "home.feature.manageExpenses.description": "기여자와 공급 업체는 영수증과 인보이스를 쉽게 제출할 수 있습니다. 이를 승인하거나 거부하면 잔액이 자동으로 업데이트됩니다.",
   "home.feature.receiveContributions": "기여 받기",
-  "home.feature.receiveContributions.description": "신용카드, 계좌이체, Paypal을 통한 결제를 받을 수 있습니다. 맞춤 티어를 설정하고 목표를 설정하여 후원자가 기부하도록 동기를 부여하세요.",
+  "home.feature.receiveContributions.description": "신용카드, 계좌이체, PayPal을 통한 결제를 받을 수 있습니다. 맞춤 티어를 설정하고 목표를 설정하여 후원자가 기부하도록 동기를 부여하세요.",
   "home.feature.shareBudget": "예산안 공유하기",
   "home.feature.shareBudget.description": "모든 사람들이 돈이 어디서 오고 가는지 알 수 있습니다. 스프레드시트나 추가적인 작업 없이 명확성과 책임감을 얻을 수 있습니다!",
   "home.featureSection.subTitle": "기능에 대해서 알아보세요.",
