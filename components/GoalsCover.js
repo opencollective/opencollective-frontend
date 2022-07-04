@@ -45,6 +45,7 @@ const GoalContainer = styled.div`
     font-size: 13px;
     text-align: right;
     color: inherit;
+    white-space: nowrap;
   }
 
   .amount {
