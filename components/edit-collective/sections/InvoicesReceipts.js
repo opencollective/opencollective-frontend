@@ -33,11 +33,13 @@ const InvoicesReceipts = ({ collective }) => {
 
   // For invoice Title
   const defaultReceiptTitle = get(collective.settings, 'invoice.templates.default.title');
-  const defaultAlternativeReceiptTitle = get(collective.settings, 'invoice.templates.alternative.title');
+  const defaultAlternativeReceiptTitle = get(collective.settings, 'invoice.templates.alternative.title', null);
   const [setSettings, { loading, error, data }] = useMutation(editCollectiveSettingsMutation);
   const [receiptTitle, setReceiptTitle] = React.useState(defaultReceiptTitle);
   const [alternativeReceiptTitle, setAlternativeReceiptTitle] = React.useState(defaultAlternativeReceiptTitle);
-  const [showAlternativeReceiptsSection, setShowAlternativeReceiptsSection] = React.useState(false);
+  const [showAlternativeReceiptsSection, setShowAlternativeReceiptsSection] = React.useState(
+    defaultAlternativeReceiptTitle !== null,
+  );
   const [showPreview, setShowPreview] = React.useState(false);
   const isTouched = receiptTitle !== defaultReceiptTitle || alternativeReceiptTitle !== defaultAlternativeReceiptTitle;
   const isSaved =
