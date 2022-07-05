@@ -38,6 +38,22 @@ const { FIXED, FLEXIBLE } = AmountTypes;
 const SIMPLIFIED_TIER_TYPES = [TIER, SERVICE, PRODUCT, DONATION];
 const DEFAULT_TIER_TYPES = [...SIMPLIFIED_TIER_TYPES, MEMBERSHIP];
 
+const getReceiptTemplates = host => {
+  const receiptTemplates = host?.settings?.invoice?.templates;
+
+  const receiptTemplateTitles = [];
+  if (receiptTemplates?.default?.title?.length > 0) {
+    receiptTemplateTitles.push({
+      value: receiptTemplates?.default,
+      label: receiptTemplates?.default?.title,
+    });
+  }
+  if (receiptTemplates?.alternative?.title?.length > 0) {
+    receiptTemplateTitles.push({ value: receiptTemplates?.alternative, label: receiptTemplates?.alternative?.title });
+  }
+  return receiptTemplateTitles;
+};
+
 class Tiers extends React.Component {
   static propTypes = {
     tiers: PropTypes.arrayOf(PropTypes.object).isRequired,
@@ -187,6 +203,12 @@ class Tiers extends React.Component {
         id: 'tier.standalonePage',
         defaultMessage: 'Standalone page',
       },
+      chooseReceipt: {
+        defaultMessage: 'Choose receipt',
+      },
+      chooseReceiptDescription: {
+        defaultMessage: 'Choose between the receipts templates available.',
+      },
       standalonePageDescription: {
         id: 'tier.standalonePageDescription',
         defaultMessage:
@@ -308,6 +330,14 @@ class Tiers extends React.Component {
             },
           }),
       },
+      {
+        name: 'invoiceTemplate',
+        type: 'select',
+        label: intl.formatMessage(this.messages['chooseReceipt']),
+        description: intl.formatMessage(this.messages['chooseReceiptDescription']),
+        options: collective => getReceiptTemplates(collective.host),
+        when: (tier, collective) => getReceiptTemplates(collective.host).length > 1,
+      },
     ];
   }
 
@@ -387,9 +417,18 @@ class Tiers extends React.Component {
       tier.name = '';
     }
 
+    let defaultInvoiceOption;
+    const receiptTemplates = getReceiptTemplates(collective.host);
+    if (receiptTemplates.length > 0) {
+      defaultInvoiceOption = tier.invoiceTemplate
+        ? getReceiptTemplates(collective.host).filter(template => template.label === tier.invoiceTemplate.title)[0]
+            .value
+        : getReceiptTemplates(collective.host)[0].value;
+    }
     const defaultValues = {
       ...tier,
       type: tier.type || this.defaultType,
+      invoiceTemplate: defaultInvoiceOption,
     };
 
     return (

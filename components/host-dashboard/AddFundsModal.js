@@ -524,7 +524,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       </StyledInputFormikField>
                     )}
                   </Flex>
-                  {receiptTemplateTitles.length > 0 && (
+                  {receiptTemplateTitles.length > 1 && (
                     <Container width="100%">
                       <StyledInputFormikField
                         name="invoiceTemplate"

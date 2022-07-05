@@ -54,6 +54,12 @@ const InvoicesReceipts = ({ collective }) => {
     get(data, 'editCollective.settings.invoice.templates.default.info') === info &&
     get(data, 'editCollective.settings.invoice.templates.alternative.info') === alternativeInfo;
 
+  const deleteAlternativeReceipt = () => {
+    setAlternativeReceiptTitle(null);
+    setAlternativeInfo(null);
+    setShowAlternativeReceiptsSection(false);
+  };
+
   return (
     <Container>
       <SettingsSectionTitle>
@@ -195,7 +201,7 @@ const InvoicesReceipts = ({ collective }) => {
               pb="7px"
               pl="18px"
               pr="16px"
-              onClick={() => setShowAlternativeReceiptsSection(false)}
+              onClick={() => deleteAlternativeReceipt()}
             >
               <Trash size={14} color="#CC2955" />
               <Span fontSize="14px" fontWeight={500} lineHeight="18px" style={{ color: '#CC2955' }}>
