@@ -490,6 +490,7 @@ type Tier {
   ): [Contributor]
   stats: TierStatsType
   data: JSON
+  invoiceTemplate: InvoiceTemplate
 }
 
 """
@@ -682,6 +683,21 @@ type ContributorsStats {
   Number of collectives
   """
   collectives: Int
+}
+
+"""
+Represents a receipt template.
+"""
+type InvoiceTemplate {
+  """
+  The title of the template.
+  """
+  title: String
+
+  """
+  Information about the particular template.
+  """
+  info: String
 }
 
 """
@@ -2613,6 +2629,7 @@ type Expense implements Transaction {
   createdAt: DateString
   updatedAt: DateString
   paymentMethod: PaymentMethodType
+  invoiceTemplate: InvoiceTemplate
   description: String
   expense: ExpenseType
 }
@@ -2710,6 +2727,7 @@ interface Transaction {
   createdAt: DateString
   updatedAt: DateString
   refundTransaction: Transaction
+  invoiceTemplate: InvoiceTemplate
 }
 
 """
@@ -2779,6 +2797,7 @@ type Order implements Transaction {
   createdAt: DateString
   updatedAt: DateString
   paymentMethod: PaymentMethodType
+  invoiceTemplate: InvoiceTemplate
   description: String
   publicMessage: String
   order: OrderType
