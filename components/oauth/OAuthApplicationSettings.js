@@ -5,6 +5,7 @@ import { Form, Formik } from 'formik';
 import { pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -20,7 +21,7 @@ import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
-import { H3, H4, P, Span } from '../Text';
+import { H3, H4, P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import WarnIfUnsavedChanges from '../WarnIfUnsavedChanges';
 
@@ -58,15 +59,17 @@ const updateApplicationMutation = gqlV2/* GraphQL */ `
   ${applicationSettingsFragment}
 `;
 
+const SecretContainer = styled.span`
+  overflow-wrap: anywhere;
+  user-select: all;
+  margin-right: 8px;
+`;
+
 const ObfuscatedClientSecret = ({ secret }) => {
   const [show, setShow] = React.useState(false);
   return (
     <P>
-      {show && (
-        <Span data-cy="unhidden-secret" overflowWrap="anywhere" mr={2}>
-          {secret}
-        </Span>
-      )}
+      {show && <SecretContainer data-cy="unhidden-secret">{secret}</SecretContainer>}
       <StyledLink data-cy="show-secret-btn" as="button" color="blue.600" onClick={() => setShow(!show)}>
         {show ? <FormattedMessage id="Hide" defaultMessage="Hide" /> : <FormattedMessage defaultMessage="Show" />}
       </StyledLink>
