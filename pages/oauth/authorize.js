@@ -86,6 +86,7 @@ const OAuthAuthorizePage = () => {
             redirectUri={query['redirect_uri']}
             autoApprove={hasExistingAuthorization}
             state={query['state']}
+            scope={query['scope']}
           />
         )}
       </Flex>

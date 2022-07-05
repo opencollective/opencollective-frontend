@@ -34,7 +34,7 @@ const TopAvatarsContainer = styled.div`
   gap: 28px;
 `;
 
-const fetchAuthorize = (application, redirectUri = null, state = null) => {
+const fetchAuthorize = (application, redirectUri = null, state = null, scope = null) => {
   const authorizeParams = new URLSearchParams({
     /* eslint-disable camelcase */
     response_type: 'code',
@@ -43,6 +43,10 @@ const fetchAuthorize = (application, redirectUri = null, state = null) => {
     state,
     /* eslint-enable camelcase */
   });
+
+  if (scope) {
+    authorizeParams.set('scope', scope);
+  }
 
   return fetch(`/api/oauth/authorize?${authorizeParams.toString()}`, {
     method: 'POST',
@@ -61,7 +65,7 @@ const getAdministratedAccounts = user => {
   );
 };
 
-export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove, state }) => {
+export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove, state, scope }) => {
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
@@ -74,7 +78,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
   } = useAsyncCall(async () => {
     let response = null;
     try {
-      response = await fetchAuthorize(application, redirectUri, state);
+      response = await fetchAuthorize(application, redirectUri, state, scope);
     } catch {
       setRedirecting(false); // To show errors with autoApprove
       throw formatErrorType(intl, ERROR.NETWORK);
@@ -196,5 +200,6 @@ ApplicationApproveScreen.propTypes = {
   }).isRequired,
   redirectUri: PropTypes.string,
   state: PropTypes.string,
+  scope: PropTypes.string,
   autoApprove: PropTypes.bool,
 };
