@@ -97,18 +97,18 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
   }, []);
 
   return (
-    <Container position="relative" mt="48px">
+    <Container position="relative" mt="48px" width="100%">
       <StyledCard maxWidth="520px" width="100%" px={24} py={32} m="0 auto">
         <TopAvatarsContainer>
-          <Container>
+          <Container flex="0 0 96px">
             <LinkCollective collective={application.account}>
               <Avatar size={96} collective={application.account} />
             </LinkCollective>
           </Container>
-          <RadialIconContainer size="40px" bg="#29cc75">
+          <RadialIconContainer flex="0 0 40px" height="40px" bg="#29cc75">
             <Check width="18px" height="15px" />
           </RadialIconContainer>
-          <Container>
+          <Container flex="0 0 96px">
             <Image src="/static/images/oc-oauth-connect-logo.png" height={96} width={96} />
           </Container>
         </TopAvatarsContainer>
@@ -174,7 +174,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
           <StyledButton minWidth={175} onClick={() => window.history.back()} disabled={loading}>
             <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
           </StyledButton>
-          <StyledButton minWidth={175} buttonStyle="primary" loading={loading || isRedirecting} onClick={callAuthorize}>
+          <StyledButton minWidth={175} buttonStyle="primary" loading={loading} onClick={callAuthorize}>
             <FormattedMessage defaultMessage="Authorize" />
           </StyledButton>
         </Flex>
