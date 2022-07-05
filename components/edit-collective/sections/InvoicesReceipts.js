@@ -32,6 +32,7 @@ const InvoicesReceipts = ({ collective }) => {
   const intl = useIntl();
 
   // For invoice Title
+  const defaultReceiptTitlePlaceholder = 'Payment Receipt';
   const defaultReceiptTitle = get(collective.settings, 'invoice.templates.default.title');
   const defaultAlternativeReceiptTitle = get(collective.settings, 'invoice.templates.alternative.title', null);
   const [setSettings, { loading, error, data }] = useMutation(editCollectiveSettingsMutation);
@@ -73,7 +74,7 @@ const InvoicesReceipts = ({ collective }) => {
           defaultMessage="You can customize the title (and add custom text) on automatically generated receipts for financial contributions to your Collective(s), e.g., 'donation receipt' or 'tax receipt' or a phrase appropriate for your legal entity type, language, and location. Keep this field empty to use the default title:"
         />
         {/** Un-localized on purpose, because it's not localized in the actual invoice */}
-        &nbsp;<i>Payment Receipt</i>.
+        &nbsp;<i>{defaultReceiptTitlePlaceholder}</i>.
       </P>
       {error && (
         <MessageBox type="error" fontSize="14px" withIcon mb={3}>
@@ -85,7 +86,7 @@ const InvoicesReceipts = ({ collective }) => {
           <FormattedMessage defaultMessage="Receipt title" />
         </Box>
         <StyledInput
-          placeholder="Payment Receipt"
+          placeholder={defaultReceiptTitlePlaceholder}
           defaultValue={receiptTitle}
           onChange={e => setReceiptTitle(e.target.value)}
           width="100%"
@@ -93,7 +94,9 @@ const InvoicesReceipts = ({ collective }) => {
           mt="6px"
         />
         <P mt="6px">
-          <FormattedMessage defaultMessage="Keep this field empty to use the default title: Payment receipt." />
+          <FormattedMessage
+            defaultMessage={`Keep this field empty to use the default title: ${defaultReceiptTitlePlaceholder}.`}
+          />
         </P>
         <Flex justifyContent="space-between" flexDirection={['column', 'row']} pt="26px">
           <Box color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px">
@@ -234,7 +237,7 @@ const InvoicesReceipts = ({ collective }) => {
                   ...collective.settings,
                   invoice: {
                     templates: {
-                      default: { title: receiptTitle, info: info },
+                      default: { title: receiptTitle || defaultReceiptTitlePlaceholder, info: info },
                       alternative: { title: alternativeReceiptTitle, info: alternativeInfo },
                     },
                   },
