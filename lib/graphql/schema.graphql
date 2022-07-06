@@ -490,7 +490,6 @@ type Tier {
   ): [Contributor]
   stats: TierStatsType
   data: JSON
-  invoiceTemplate: InvoiceTemplate
 }
 
 """
@@ -683,21 +682,6 @@ type ContributorsStats {
   Number of collectives
   """
   collectives: Int
-}
-
-"""
-Represents a receipt template.
-"""
-type InvoiceTemplate {
-  """
-  The title of the template.
-  """
-  title: String
-
-  """
-  Information about the particular template.
-  """
-  info: String
 }
 
 """
@@ -2680,6 +2664,21 @@ enum OrderTaxType {
 }
 
 """
+Represents a receipt template.
+"""
+type InvoiceTemplate {
+  """
+  The title of the template.
+  """
+  title: String
+
+  """
+  Information about the particular template.
+  """
+  info: String
+}
+
+"""
 Transaction interface
 """
 interface Transaction {
@@ -3999,6 +3998,11 @@ input TierInputType {
   End of the campaign
   """
   endsAt: String
+
+  """
+  Invoice receipt template
+  """
+  invoiceTemplate: InvoiceTemplateInput
 }
 
 """
@@ -4021,6 +4025,21 @@ enum CustomFieldType {
   date
   radio
   url
+}
+
+"""
+Input type for receipt template.
+"""
+input InvoiceTemplateInput {
+  """
+  The title of the template.
+  """
+  title: String
+
+  """
+  Information about the particular template.
+  """
+  info: String
 }
 
 """

@@ -87,8 +87,8 @@ const InvoicesReceipts = ({ collective }) => {
         </Box>
         <StyledInput
           placeholder={defaultReceiptTitlePlaceholder}
-          defaultValue={receiptTitle}
-          onChange={e => setReceiptTitle(e.target.value)}
+          defaultValue={defaultReceiptTitlePlaceholder === receiptTitle || receiptTitle === null ? null : receiptTitle}
+          onChange={e => setReceiptTitle(e.target.value === '' ? defaultReceiptTitlePlaceholder : e.target.value)}
           width="100%"
           maxWidth={414}
           mt="6px"
