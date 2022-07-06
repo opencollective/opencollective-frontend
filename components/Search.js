@@ -25,7 +25,6 @@ const SearchModal = ({ onClose }) => {
       height="128px"
       onClose={onClose}
       overflow="hidden"
-      className="searchModal"
     >
       <ModalBody>
         <Flex height="48px" alignItems="center" flexDirection="column">
