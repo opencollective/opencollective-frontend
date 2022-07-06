@@ -126,6 +126,8 @@ const CommentForm = ({
               routes={{ join: getRedirectUrl(router, id) }}
               signInLabel={formatMessage(messages.signInLabel)}
               hideFooter
+              showSubHeading={false}
+              showOCLogo={false}
             />
           </Container>
         </ContainerOverlay>

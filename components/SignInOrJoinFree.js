@@ -85,6 +85,8 @@ class SignInOrJoinFree extends React.Component {
     isOAuth: PropTypes.bool,
     oAuthAppName: PropTypes.string,
     oAuthAppImage: PropTypes.string,
+    showSubHeading: PropTypes.bool,
+    showOCLogo: PropTypes.bool,
   };
 
   constructor(props) {
@@ -370,6 +372,8 @@ class SignInOrJoinFree extends React.Component {
                 loading={submitting}
                 unknownEmail={unknownEmailError}
                 label={this.props.signInLabel}
+                showSubHeading={this.props.showSubHeading}
+                showOCLogo={this.props.showOCLogo}
                 showSecondaryAction={!this.props.disableSignup}
                 isOAuth={this.props.isOAuth}
                 oAuthAppName={this.props.oAuthAppName}
