@@ -118,16 +118,10 @@ export default class SignIn extends React.Component {
                   <Image src="/static/images/oc-logo-oauth.png" height={104} width={104} />
                 </Box>
                 <Box ml={24} mr={24} mt={32} minWidth={40}>
-                  <Image src="/static/images/oauth-flow-connect.png" alt="OAuth Connect" height={40} width={40} />
+                  <Image src="/static/images/oauth-flow-connect.png" height={40} width={40} />
                 </Box>
                 <Box minWidth={104}>
-                  <img
-                    src={this.props.oAuthAppImage}
-                    alt="OAuth Logo"
-                    height={104}
-                    width={104}
-                    style={{ borderRadius: 10 }}
-                  />
+                  <img src={this.props.oAuthAppImage} alt="" height={104} width={104} style={{ borderRadius: 10 }} />
                 </Box>
               </Flex>
             </React.Fragment>
