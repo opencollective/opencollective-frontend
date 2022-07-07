@@ -246,27 +246,6 @@
       "prettier --write"
     ]
   },
-  "bit": {
-    "env": {
-      "compiler": "bit.envs/compilers/react@1.0.14"
-    },
-    "overrides": {
-      "*": {
-        "dependencies": {
-          "react": "-",
-          "react-dom": "-",
-          "styled-components": "-"
-        },
-        "peerDependencies": {
-          "react": "+",
-          "react-dom": "+",
-          "styled-components": "+"
-        }
-      }
-    },
-    "componentsDefaultDirectory": "components/{name}",
-    "packageManager": "npm"
-  },
   "depcheck": {
     "ignores": [
       "@formatjs/intl-relativetimeformat",
