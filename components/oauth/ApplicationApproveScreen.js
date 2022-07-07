@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/fa-solid/Check';
-import { uniqBy } from 'lodash';
+// import { uniqBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -34,6 +34,54 @@ const TopAvatarsContainer = styled.div`
   gap: 28px;
 `;
 
+const SCOPES = {
+  email: {
+    label: <FormattedMessage defaultMessage="Access your email address." />,
+  },
+  account: {
+    label: <FormattedMessage defaultMessage="Manage your account, collectives and organizations." />,
+  },
+  orders: {
+    label: <FormattedMessage defaultMessage="Create and manage contributions." />,
+  },
+  expenses: {
+    label: <FormattedMessage defaultMessage="Create and manage expenses." />,
+  },
+  virtualCards: {
+    label: <FormattedMessage defaultMessage="Create and manage virtual cards." />,
+  },
+  paymentMethods: {
+    label: <FormattedMessage defaultMessage="Create and manage payment methods (for contributions)" />,
+  },
+  payoutMethods: {
+    label: <FormattedMessage defaultMessage="Create and manage payout methods (for expenses)" />,
+  },
+  transactions: {
+    label: <FormattedMessage defaultMessage="Refund and reject recorded transactions." />,
+  },
+  updates: {
+    label: <FormattedMessage defaultMessage="Create and manage updates." />,
+  },
+  conversations: {
+    label: <FormattedMessage defaultMessage="Create and manage conversations." />,
+  },
+  webhooks: {
+    label: <FormattedMessage defaultMessage="Create and manage webhooks." />,
+  },
+  applications: {
+    label: <FormattedMessage defaultMessage="Create and manage OAuth applications." />,
+  },
+  connectedAccounts: {
+    label: <FormattedMessage defaultMessage="Create and manage connected accounts." />,
+  },
+  host: {
+    label: <FormattedMessage defaultMessage="Perform administrative operations for fiscal hosts." />,
+  },
+  root: {
+    label: <FormattedMessage defaultMessage="Perform critical administrative operations. " />,
+  },
+};
+
 const fetchAuthorize = (application, redirectUri = null, state = null, scope = null) => {
   const authorizeParams = new URLSearchParams({
     /* eslint-disable camelcase */
@@ -58,19 +106,19 @@ const fetchAuthorize = (application, redirectUri = null, state = null, scope = n
   });
 };
 
-const getAdministratedAccounts = user => {
-  return uniqBy(
-    user.memberOf.filter(m => m.role === 'ADMIN' && !m.collective?.isIncognito).map(m => m.collective),
-    'id',
-  );
-};
+// const getAdministratedAccounts = user => {
+//   return uniqBy(
+//     user.memberOf.filter(m => m.role === 'ADMIN' && !m.collective?.isIncognito).map(m => m.collective),
+//     'id',
+//   );
+// };
 
 export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove, state, scope }) => {
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
   const [isRedirecting, setRedirecting] = React.useState(autoApprove);
-  const administratedAccounts = getAdministratedAccounts(LoggedInUser);
+  // const administratedAccounts = getAdministratedAccounts(LoggedInUser);
   const {
     call: callAuthorize,
     loading,
@@ -99,6 +147,10 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
       callAuthorize();
     }
   }, []);
+
+  const requestedScopes = scope.split(',');
+
+  console.log({ requestedScopes });
 
   return (
     <Container position="relative" mt="48px" width="100%">
@@ -133,31 +185,27 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
                 />
               </P>
               <Flex alignItems="center">
-                <Avatar collective={LoggedInUser.collective} size={48} />
-                <P fontSize="18px" color="black.700" ml={3}>
+                <Avatar collective={LoggedInUser.collective} size={32} />
+                <P fontSize="16px" color="black.700" ml={3}>
                   <FormattedMessage
                     defaultMessage="Verify your identity on {service}"
                     values={{ service: 'Open Collective' }}
                   />{' '}
+                  <br />
                   <strong>({LoggedInUser.collective.name})</strong>
                 </P>
               </Flex>
-              <Flex alignItems="center" mt={26}>
-                <Avatar
-                  size={48}
-                  title={administratedAccounts.map(a => a.name).join(', ')}
-                  collective={administratedAccounts[0]}
-                />
-                <P fontSize="18px" color="black.700" ml={3}>
-                  <FormattedMessage defaultMessage="Access information about your Collective(s)" />
-                </P>
-              </Flex>
-              <Flex alignItems="center" mt={26}>
-                <Image src="/static/images/stars-exchange-rounded.png" width={48} height={48} />
-                <P fontSize="18px" color="black.700" ml={3}>
-                  <FormattedMessage defaultMessage="Perform admin actions on your behalf" />
-                </P>
-              </Flex>
+              {requestedScopes.map(
+                scope =>
+                  SCOPES[scope] && (
+                    <Flex alignItems="center" mt={26}>
+                      <Image src="/static/images/stars-exchange-rounded.png" width={32} height={32} />
+                      <P fontSize="16px" color="black.700" ml={3}>
+                        {SCOPES[scope].label}
+                      </P>
+                    </Flex>
+                  ),
+              )}
               <MessageBox type="info" mt={40} fontSize="13px">
                 <FormattedMessage
                   defaultMessage="By authorizing {applicationName} you are giving access to all your Collectives."
