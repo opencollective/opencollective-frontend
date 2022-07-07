@@ -4,6 +4,7 @@ import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
@@ -80,6 +81,13 @@ const prepareCommentParams = (html, conversationId, expenseId, updateId) => {
   return comment;
 };
 
+export const SignInOverlayBackground = styled(Container)`
+  padding: 25px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0px 9px 14px 1px #dedede;
+`;
+
 /**
  * Form for users to post comments on either expenses, conversations or updates.
  * If user is not logged in, the form will default to a sign in/up form.
@@ -121,7 +129,7 @@ const CommentForm = ({
     <Container id={id} position="relative">
       {!loadingLoggedInUser && !LoggedInUser && (
         <ContainerOverlay backgroundType="white">
-          <Container p="25px" background="white" borderRadius={10} boxShadow="0px 9px 14px 1px #dedede">
+          <SignInOverlayBackground>
             <SignInOrJoinFree
               routes={{ join: getRedirectUrl(router, id) }}
               signInLabel={formatMessage(messages.signInLabel)}
@@ -129,7 +137,7 @@ const CommentForm = ({
               showSubHeading={false}
               showOCLogo={false}
             />
-          </Container>
+          </SignInOverlayBackground>
         </ContainerOverlay>
       )}
       <form onSubmit={submitForm} data-cy="comment-form">

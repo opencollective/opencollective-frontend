@@ -19,6 +19,7 @@ import CollectiveNavbar from '../components/collective-navbar';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
+import { SignInOverlayBackground } from '../components/conversations/CommentForm';
 import ErrorPage from '../components/ErrorPage';
 import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
 import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
@@ -343,7 +344,14 @@ class CreateExpensePage extends React.Component {
                   position={['fixed', null, 'absolute']}
                   justifyContent={['center', null, 'flex-start']}
                 >
-                  <SignInOrJoinFree routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }} />
+                  <SignInOverlayBackground>
+                    <SignInOrJoinFree
+                      showOCLogo={false}
+                      showSubHeading={false}
+                      hideFooter
+                      routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }}
+                    />
+                  </SignInOverlayBackground>
                 </ContainerOverlay>
               )}
               <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>

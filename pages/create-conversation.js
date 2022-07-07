@@ -15,6 +15,7 @@ import { collectiveNavbarFieldsFragment } from '../components/collective-page/gr
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
+import { SignInOverlayBackground } from '../components/conversations/CommentForm';
 import CreateConversationForm from '../components/conversations/CreateConversationForm';
 import ErrorPage from '../components/ErrorPage';
 import { Box } from '../components/Grid';
@@ -109,7 +110,14 @@ class CreateConversationPage extends React.Component {
               <Container position="relative">
                 {!loadingLoggedInUser && !LoggedInUser && (
                   <ContainerOverlay>
-                    <SignInOrJoinFree routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }} />
+                    <SignInOverlayBackground>
+                      <SignInOrJoinFree
+                        showOCLogo={false}
+                        showSubHeading={false}
+                        hideFooter
+                        routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }}
+                      />
+                    </SignInOverlayBackground>
                   </ContainerOverlay>
                 )}
                 <Box maxWidth={1160} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
