@@ -55,6 +55,7 @@ const Location = ({ collective: event, refetch }) => {
                 marginTop: 3,
                 background: 'transparent',
                 border: 'none',
+                fontFamily: "'Inter', sans-serif",
               }}
             >
               {event.privateInstructions}
