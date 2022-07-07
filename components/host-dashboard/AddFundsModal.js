@@ -79,7 +79,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
     $amount: AmountInput!
     $description: String!
     $hostFeePercent: Float!
-    $invoiceTemplate: InvoiceTemplateInput
+    $invoiceTemplate: String
   ) {
     addFunds(
       account: $account
@@ -316,12 +316,12 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
     receiptTemplateTitles.push({
-      value: receiptTemplates?.default,
+      value: 'default',
       label: receiptTemplates?.default?.title,
     });
   }
   if (receiptTemplates?.alternative?.title?.length > 0) {
-    receiptTemplateTitles.push({ value: receiptTemplates?.alternative, label: receiptTemplates?.alternative?.title });
+    receiptTemplateTitles.push({ value: 'alternative', label: receiptTemplates?.alternative?.title });
   }
 
   const handleClose = () => {

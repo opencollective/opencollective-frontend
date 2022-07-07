@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/client/react/components';
 import { getApplicableTaxes } from '@opencollective/taxes';
-import { cloneDeep, get, head, set } from 'lodash';
+import { cloneDeep, get, set } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -44,12 +44,11 @@ const getReceiptTemplates = host => {
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
     receiptTemplateTitles.push({
-      value: receiptTemplates?.default,
-      label: receiptTemplates?.default?.title,
+      default: receiptTemplates?.default?.title,
     });
   }
   if (receiptTemplates?.alternative?.title?.length > 0) {
-    receiptTemplateTitles.push({ value: receiptTemplates?.alternative, label: receiptTemplates?.alternative?.title });
+    receiptTemplateTitles.push({ alternative: receiptTemplates?.alternative?.title });
   }
   return receiptTemplateTitles;
 };
@@ -416,20 +415,10 @@ class Tiers extends React.Component {
     if (!tier.name) {
       tier.name = '';
     }
-
-    let defaultInvoiceOption;
-    const receiptTemplates = getReceiptTemplates(collective.host);
-    if (receiptTemplates.length > 0) {
-      defaultInvoiceOption = tier.data.invoiceTemplate
-        ? head(
-            getReceiptTemplates(collective.host).filter(template => template.label === tier.data.invoiceTemplate.title),
-          )?.value
-        : getReceiptTemplates(collective.host)[0].value;
-    }
     const defaultValues = {
       ...tier,
       type: tier.type || this.defaultType,
-      invoiceTemplate: defaultInvoiceOption,
+      invoiceTemplate: tier.data.invoiceTemplate,
     };
 
     return (
