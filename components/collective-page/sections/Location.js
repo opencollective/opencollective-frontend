@@ -48,9 +48,17 @@ const Location = ({ collective: event, refetch }) => {
             <P fontWeight="bold" fontSize="18px">
               <FormattedMessage id="event.privateInstructions.label" defaultMessage="Private instructions" />
             </P>
-            <P mt={3} fontSize="14px">
+            <pre
+              style={{
+                whiteSpace: 'pre-wrap',
+                fontSize: '14px',
+                marginTop: 3,
+                background: 'transparent',
+                border: 'none',
+              }}
+            >
               {event.privateInstructions}
-            </P>
+            </pre>
           </Container>
         )}
       </ContainerSectionContent>
