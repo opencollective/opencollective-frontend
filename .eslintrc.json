@@ -1,10 +1,20 @@
 {
-  "extends": ["opencollective", "plugin:styled-components-a11y/recommended"],
+  "extends": ["opencollective", "plugin:styled-components-a11y/recommended", "plugin:import/typescript"],
   "env": { "jest": true },
-  "plugins": ["graphql", "react-hooks", "simple-import-sort", "formatjs", "styled-components-a11y"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "graphql",
+    "react-hooks",
+    "simple-import-sort",
+    "formatjs",
+    "styled-components-a11y"
+  ],
   "rules": {
     "no-console": "error",
     "require-atomic-updates": "off",
+    // typescript
+    "node/no-missing-import": ["error", { "tryExtensions": [".js", ".ts", ".tsx"] }],
     "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
     "no-restricted-imports": [
       "error",
