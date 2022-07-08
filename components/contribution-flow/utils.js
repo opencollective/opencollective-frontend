@@ -39,10 +39,11 @@ const memberCanBeUsedToContribute = (member, account, canUseIncognito) => {
   }
 };
 
-export const getContributorProfiles = (loggedInUser, collective, canUseIncognito) => {
+export const getContributeProfiles = (loggedInUser, collective, tier) => {
   if (!loggedInUser) {
     return [];
   } else {
+    const canUseIncognito = collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET');
     const filteredMembers = loggedInUser.memberOf.filter(member =>
       memberCanBeUsedToContribute(member, collective, canUseIncognito),
     );

@@ -112,11 +112,10 @@ const formatProfileOption = (option, _, intl) => {
   );
 };
 
-const ContributeProfilePicker = ({ profiles, canUseIncognito, onChange, defaultSelectedProfile }) => {
+const ContributeProfilePicker = ({ profiles, selectedProfile, canUseIncognito, onChange }) => {
   const intl = useIntl();
   const getOptionsArgs = [intl, profiles, canUseIncognito];
   const options = React.useMemo(() => getProfileOptions(...getOptionsArgs), getOptionsArgs);
-  const [selectedProfile, setSelectedProfile] = React.useState(defaultSelectedProfile);
   return (
     <CollectivePicker
       data-cy="contribute-profile-picker"
@@ -129,10 +128,7 @@ const ContributeProfilePicker = ({ profiles, canUseIncognito, onChange, defaultS
       excludeAdminFields
       types={[CollectiveType.ORGANIZATION]}
       formatOptionLabel={formatProfileOption}
-      onChange={({ value }) => {
-        setSelectedProfile(value);
-        onChange(value);
-      }}
+      onChange={({ value }) => onChange(value)}
       styles={{
         menu: { borderRadius: '16px' },
         menuList: { padding: '8px' },
@@ -146,7 +142,7 @@ ContributeProfilePicker.propTypes = {
   profiles: PropTypes.array,
   canUseIncognito: PropTypes.bool,
   onChange: PropTypes.func,
-  defaultSelectedProfile: PropTypes.object,
+  selectedProfile: PropTypes.object,
 };
 
 export default ContributeProfilePicker;

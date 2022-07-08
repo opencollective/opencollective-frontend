@@ -71,6 +71,8 @@ const ContributionFlowUrlParametersConfig = {
    * @example tag1,tag2
    */
   tags: { type: 'stringArray' },
+  /** To hide the steps on top. Will also hide the "previous" button on step payment */
+  hideSteps: { type: 'boolean' },
   // ---- Aliases for legacy compatibility ----
   /**
    * The default amount in cents
@@ -84,9 +86,6 @@ const ContributionFlowUrlParametersConfig = {
   defaultEmail: { type: 'alias', on: 'email' },
   /** @deprecated Use `name` instead */
   defaultName: { type: 'alias', on: 'name' },
-  // ---- Deprecated fields ----
-  /** @private */
-  skipStepDetails: { type: 'boolean' },
 };
 
 const EmbedContributionFlowUrlParametersConfig = {
