@@ -86,7 +86,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
     >
       <Link href="/">
         <Flex alignItems="center">
-          <Image width="36" height="36" src="/static/images/opencollective-icon.png" alt="Open Collective logo" />
+          <Image width="36" height="36" src="/static/images/opencollective-icon.png" alt="Open Collective" />
           <Hide xs sm md>
             <Box mx={2}>
               <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />

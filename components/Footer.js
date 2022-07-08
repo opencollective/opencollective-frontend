@@ -256,7 +256,7 @@ const Footer = () => {
             <Flex my="12px">
               <Image
                 src="/static/images/opencollectivelogo-footer-n.svg"
-                alt="Open Collective logo"
+                alt="Open Collective"
                 height={28}
                 width={167}
               />

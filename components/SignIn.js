@@ -115,7 +115,7 @@ export default class SignIn extends React.Component {
             <React.Fragment>
               <Flex justifyContent="center" mb={40}>
                 <Box minWidth={104}>
-                  <Image src="/static/images/oc-logo-oauth.png" alt="Open Collective logo" height={104} width={104} />
+                  <Image src="/static/images/oc-logo-oauth.png" height={104} width={104} />
                 </Box>
                 <Box ml={24} mr={24} mt={32} minWidth={40}>
                   <Image src="/static/images/oauth-flow-connect.png" alt="OAuth Connect" height={40} width={40} />
@@ -136,7 +136,6 @@ export default class SignIn extends React.Component {
               <Flex justifyContent="center" mb="48px">
                 <Image
                   src="/static/images/oc-logo-watercolor-256.png"
-                  alt="Open Collective logo"
                   height={128}
                   width={128}
                 />
