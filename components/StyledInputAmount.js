@@ -5,7 +5,7 @@ import { isNil, isUndefined } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import { Currency } from '../lib/constants/currency';
-import { floatAmountToCents, getCurrencySymbol } from '../lib/currency-utils';
+import { floatAmountToCents, getCurrencySymbol, getStepForCurrency } from '../lib/currency-utils';
 import { getIntlDisplayNames } from '../lib/i18n';
 
 import Container from './Container';
@@ -156,7 +156,7 @@ const StyledInputAmount = ({
   return (
     <StyledInputGroup
       maxWidth="10em"
-      step="0.01"
+      step={getStepForCurrency(currency)}
       {...props}
       min={minAmount}
       max={isUndefined(max) ? max : max / 100}
