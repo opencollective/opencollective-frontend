@@ -134,11 +134,7 @@ export default class SignIn extends React.Component {
           ) : (
             this.props.showOCLogo && (
               <Flex justifyContent="center" mb="48px">
-                <Image
-                  src="/static/images/oc-logo-watercolor-256.png"
-                  height={128}
-                  width={128}
-                />
+                <Image src="/static/images/oc-logo-watercolor-256.png" height={128} width={128} />
               </Flex>
             )
           )}
