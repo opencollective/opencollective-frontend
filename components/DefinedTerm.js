@@ -23,6 +23,7 @@ export const Terms = {
   EXPENSE_TYPE: 'EXPENSE_TYPE',
   TOTAL_RAISED: 'TOTAL_RAISED',
   TOTAL_INCOME: 'TOTAL_INCOME',
+  BALANCE: 'BALANCE',
 };
 
 const TranslatedTerms = defineMessages({
@@ -57,6 +58,10 @@ const TranslatedTerms = defineMessages({
   [Terms.TOTAL_INCOME]: {
     id: 'budgetSection-income',
     defaultMessage: 'Total income',
+  },
+  [Terms.BALANCE]: {
+    id: 'CollectivePage.SectionBudget.Balance',
+    defaultMessage: 'Today’s balance',
   },
 });
 
@@ -96,6 +101,11 @@ const TranslatedDefinitions = defineMessages({
   [Terms.TOTAL_INCOME]: {
     id: 'budgetSection-total-income-definition',
     defaultMessage: 'Net all time, including host fees and direct contributions.',
+  },
+  [Terms.BALANCE]: {
+    id: 'budgetSection-balance-definition',
+    defaultMessage:
+      'The current balance of the account. Not including Projects and Events, not including processing transactions.',
   },
 });
 
