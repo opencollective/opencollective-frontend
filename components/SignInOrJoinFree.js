@@ -48,6 +48,13 @@ const SignInFooterLink = styled(Link)`
   }
 `;
 
+export const SignInOverlayBackground = styled(Container)`
+  padding: 25px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0px 9px 14px 1px #dedede;
+`;
+
 /**
  * Shows a SignIn form by default, with the ability to switch to SignUp form. It
  * also has the API methods binded, so you can use it directly.

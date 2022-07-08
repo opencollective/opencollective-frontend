@@ -4,7 +4,6 @@ import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
@@ -15,7 +14,7 @@ import ContainerOverlay from '../ContainerOverlay';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
-import SignInOrJoinFree from '../SignInOrJoinFree';
+import SignInOrJoinFree, { SignInOverlayBackground } from '../SignInOrJoinFree';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
@@ -80,13 +79,6 @@ const prepareCommentParams = (html, conversationId, expenseId, updateId) => {
   }
   return comment;
 };
-
-export const SignInOverlayBackground = styled(Container)`
-  padding: 25px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0px 9px 14px 1px #dedede;
-`;
 
 /**
  * Form for users to post comments on either expenses, conversations or updates.

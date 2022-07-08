@@ -15,7 +15,6 @@ import { collectiveNavbarFieldsFragment } from '../components/collective-page/gr
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
-import { SignInOverlayBackground } from '../components/conversations/CommentForm';
 import CreateConversationForm from '../components/conversations/CreateConversationForm';
 import ErrorPage from '../components/ErrorPage';
 import { Box } from '../components/Grid';
@@ -23,7 +22,7 @@ import Link from '../components/Link';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
-import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import SignInOrJoinFree, { SignInOverlayBackground } from '../components/SignInOrJoinFree';
 import StyledLink from '../components/StyledLink';
 import { withUser } from '../components/UserProvider';
 
