@@ -14,7 +14,7 @@ import ContainerOverlay from '../ContainerOverlay';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
-import SignInOrJoinFree from '../SignInOrJoinFree';
+import SignInOrJoinFree, { SignInOverlayBackground } from '../SignInOrJoinFree';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
@@ -121,13 +121,15 @@ const CommentForm = ({
     <Container id={id} position="relative">
       {!loadingLoggedInUser && !LoggedInUser && (
         <ContainerOverlay backgroundType="white">
-          <Container p="25px" background="white" borderRadius={10} boxShadow="0px 9px 14px 1px #dedede">
+          <SignInOverlayBackground>
             <SignInOrJoinFree
               routes={{ join: getRedirectUrl(router, id) }}
               signInLabel={formatMessage(messages.signInLabel)}
               hideFooter
+              showSubHeading={false}
+              showOCLogo={false}
             />
-          </Container>
+          </SignInOverlayBackground>
         </ContainerOverlay>
       )}
       <form onSubmit={submitForm} data-cy="comment-form">

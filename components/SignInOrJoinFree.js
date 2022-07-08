@@ -48,6 +48,13 @@ const SignInFooterLink = styled(Link)`
   }
 `;
 
+export const SignInOverlayBackground = styled(Container)`
+  padding: 25px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0px 9px 14px 1px #dedede;
+`;
+
 /**
  * Shows a SignIn form by default, with the ability to switch to SignUp form. It
  * also has the API methods binded, so you can use it directly.
@@ -85,6 +92,8 @@ class SignInOrJoinFree extends React.Component {
     isOAuth: PropTypes.bool,
     oAuthAppName: PropTypes.string,
     oAuthAppImage: PropTypes.string,
+    showSubHeading: PropTypes.bool,
+    showOCLogo: PropTypes.bool,
   };
 
   constructor(props) {
@@ -370,6 +379,8 @@ class SignInOrJoinFree extends React.Component {
                 loading={submitting}
                 unknownEmail={unknownEmailError}
                 label={this.props.signInLabel}
+                showSubHeading={this.props.showSubHeading}
+                showOCLogo={this.props.showOCLogo}
                 showSecondaryAction={!this.props.disableSignup}
                 isOAuth={this.props.isOAuth}
                 oAuthAppName={this.props.oAuthAppName}

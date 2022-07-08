@@ -39,6 +39,15 @@ export default class SignIn extends React.Component {
     oAuthAppName: PropTypes.string,
     /** Oauth App Image **/
     oAuthAppImage: PropTypes.string,
+    /** Show/hide subheading **/
+    showSubHeading: PropTypes.bool,
+    /** Show/hide Open Collective Logo **/
+    showOCLogo: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    showSubHeading: true,
+    showOCLogo: true,
   };
 
   constructor(props) {
@@ -123,14 +132,16 @@ export default class SignIn extends React.Component {
               </Flex>
             </React.Fragment>
           ) : (
-            <Flex justifyContent="center">
-              <Image
-                src="/static/images/oc-logo-watercolor-256.png"
-                alt="Open Collective logo"
-                height={128}
-                width={128}
-              />
-            </Flex>
+            this.props.showOCLogo && (
+              <Flex justifyContent="center" mb="48px">
+                <Image
+                  src="/static/images/oc-logo-watercolor-256.png"
+                  alt="Open Collective logo"
+                  height={128}
+                  width={128}
+                />
+              </Flex>
+            )
           )}
           <Flex
             as="label"
@@ -138,14 +149,15 @@ export default class SignIn extends React.Component {
             htmlFor="email"
             fontSize={label ? '24px' : ['24px', '32px']}
             mb={12}
-            mt="48px"
             textAlign="center"
           >
             {label || this.getSignInPageHeading(this.state.unknownEmail)}
           </Flex>
-          <Flex fontWeight={400} fontSize="16px" color="black.700" mb="50px" justifyContent="center">
-            {this.getSignInPageSubHeading(this.props.oAuthAppName)}
-          </Flex>
+          {this.props.showSubHeading && (
+            <Flex fontWeight={400} fontSize="16px" color="black.700" mb="50px" justifyContent="center">
+              {this.getSignInPageSubHeading(this.props.oAuthAppName)}
+            </Flex>
+          )}
           {!this.state.unknownEmail ? (
             <React.Fragment>
               <Container fontWeight={600} fontSize="13px" alignItems="left" mb="4px" width="100%">
