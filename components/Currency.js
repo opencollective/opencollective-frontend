@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
-import { formatCurrency, getCurrencySymbol } from '../lib/currency-utils';
+import { formatCurrency, getCurrencySymbol, getPrecisionForCurrency } from '../lib/currency-utils';
 
 import { Span } from './Text';
 
@@ -13,9 +13,12 @@ import { Span } from './Text';
  */
 const Currency = ({ formatWithSeparators, currency, precision, value, ...styles }) => {
   const { locale } = useIntl();
-  if (precision === 'auto') {
+  const currencyPrecision = getPrecisionForCurrency(currency);
+  if (currencyPrecision === 0) {
+    precision = 0;
+  } else if (precision === 'auto') {
     precision = value % 100 === 0 ? 0 : 2;
-  } else if (precision < 2 && value < 100) {
+  } else if (value < 100 && (!precision || precision < 2)) {
     // Force precision if number is < $1 to never display $0 for small amounts
     precision = 2;
   }

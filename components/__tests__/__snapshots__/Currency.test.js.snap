@@ -33,6 +33,16 @@ exports[`Currency currency format with separators 3`] = `
 </span>
 `;
 
+exports[`Currency overrides precision if amount is below 100 for decimal currency 1`] = `
+<span
+  className="Text__P-sc-3suny7-0-span hdWHPl"
+  fontSize="inherit"
+  letterSpacing="-0.4px"
+>
+  $0.99
+</span>
+`;
+
 exports[`Currency renders default options 1`] = `
 <span
   className="Text__P-sc-3suny7-0-span hdWHPl"
@@ -50,5 +60,35 @@ exports[`Currency renders default options 2`] = `
   letterSpacing="-0.4px"
 >
   19 000 $
+</span>
+`;
+
+exports[`Currency renders default options 3`] = `
+<span
+  className="Text__P-sc-3suny7-0-span hdWHPl"
+  fontSize="inherit"
+  letterSpacing="-0.4px"
+>
+  ¥42
+</span>
+`;
+
+exports[`Currency rounds amount if value is below 100 for zero decimal currency 1`] = `
+<span
+  className="Text__P-sc-3suny7-0-span hdWHPl"
+  fontSize="inherit"
+  letterSpacing="-0.4px"
+>
+  ¥1
+</span>
+`;
+
+exports[`Currency rounds amount if value is below 100 for zero decimal currency 2`] = `
+<span
+  className="Text__P-sc-3suny7-0-span hdWHPl"
+  fontSize="inherit"
+  letterSpacing="-0.4px"
+>
+  ¥0
 </span>
 `;
