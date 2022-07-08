@@ -15,7 +15,7 @@ const Currency = ({ formatWithSeparators, currency, precision, value, ...styles 
   const { locale } = useIntl();
   if (precision === 'auto') {
     precision = value % 100 === 0 ? 0 : 2;
-  } else if (precision < 2 && value < 100) {
+  } else if (value < 100 && (!precision || precision < 2)) {
     // Force precision if number is < $1 to never display $0 for small amounts
     precision = 2;
   }
