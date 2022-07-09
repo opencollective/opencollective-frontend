@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/fa-solid/Check';
-// import { uniqBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -38,26 +37,23 @@ const SCOPES = {
   email: {
     label: <FormattedMessage defaultMessage="Access your email address." />,
   },
+  incognito: {
+    label: <FormattedMessage defaultMessage="Access your incognito account." />,
+  },
   account: {
     label: <FormattedMessage defaultMessage="Manage your account, collectives and organizations." />,
   },
-  orders: {
-    label: <FormattedMessage defaultMessage="Create and manage contributions." />,
-  },
   expenses: {
-    label: <FormattedMessage defaultMessage="Create and manage expenses." />,
+    label: <FormattedMessage defaultMessage="Create and manage expenses, payout methods." />,
   },
-  virtualCards: {
-    label: <FormattedMessage defaultMessage="Create and manage virtual cards." />,
-  },
-  paymentMethods: {
-    label: <FormattedMessage defaultMessage="Create and manage payment methods (for contributions)" />,
-  },
-  payoutMethods: {
-    label: <FormattedMessage defaultMessage="Create and manage payout methods (for expenses)" />,
+  orders: {
+    label: <FormattedMessage defaultMessage="Create and manage contributions, payment methods." />,
   },
   transactions: {
     label: <FormattedMessage defaultMessage="Refund and reject recorded transactions." />,
+  },
+  virtualCards: {
+    label: <FormattedMessage defaultMessage="Create and manage virtual cards." />,
   },
   updates: {
     label: <FormattedMessage defaultMessage="Create and manage updates." />,
@@ -68,18 +64,21 @@ const SCOPES = {
   webhooks: {
     label: <FormattedMessage defaultMessage="Create and manage webhooks." />,
   },
+  host: {
+    label: <FormattedMessage defaultMessage="Administrate fiscal hosts." />,
+  },
+  /* We disable those scopes for now */
+  /*
   applications: {
     label: <FormattedMessage defaultMessage="Create and manage OAuth applications." />,
   },
   connectedAccounts: {
     label: <FormattedMessage defaultMessage="Create and manage connected accounts." />,
   },
-  host: {
-    label: <FormattedMessage defaultMessage="Perform administrative operations for fiscal hosts." />,
-  },
   root: {
     label: <FormattedMessage defaultMessage="Perform critical administrative operations. " />,
   },
+  */
 };
 
 const fetchAuthorize = (application, redirectUri = null, state = null, scope = null) => {
@@ -106,19 +105,11 @@ const fetchAuthorize = (application, redirectUri = null, state = null, scope = n
   });
 };
 
-// const getAdministratedAccounts = user => {
-//   return uniqBy(
-//     user.memberOf.filter(m => m.role === 'ADMIN' && !m.collective?.isIncognito).map(m => m.collective),
-//     'id',
-//   );
-// };
-
 export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove, state, scope }) => {
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
   const [isRedirecting, setRedirecting] = React.useState(autoApprove);
-  // const administratedAccounts = getAdministratedAccounts(LoggedInUser);
   const {
     call: callAuthorize,
     loading,
@@ -148,9 +139,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
     }
   }, []);
 
-  const requestedScopes = scope.split(',');
-
-  console.log({ requestedScopes });
+  const requestedScopes = scope?.split(',').filter(scope => SCOPES[scope]);
 
   return (
     <Container position="relative" mt="48px" width="100%">
@@ -195,22 +184,20 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
                   <strong>({LoggedInUser.collective.name})</strong>
                 </P>
               </Flex>
-              {requestedScopes.map(
-                scope =>
-                  SCOPES[scope] && (
+              {Object.entries(SCOPES).map(
+                ([scope, { label }]) =>
+                  requestedScopes &&
+                  requestedScopes.includes(scope) && (
                     <Flex alignItems="center" mt={26}>
                       <Image src="/static/images/stars-exchange-rounded.png" width={32} height={32} />
                       <P fontSize="16px" color="black.700" ml={3}>
-                        {SCOPES[scope].label}
+                        {label}
                       </P>
                     </Flex>
                   ),
               )}
               <MessageBox type="info" mt={40} fontSize="13px">
-                <FormattedMessage
-                  defaultMessage="By authorizing {applicationName} you are giving access to all your Collectives."
-                  values={{ applicationName: application.name }}
-                />
+                <FormattedMessage defaultMessage="These permissions are granted to all the accounts you're administrating, including your personal profile." />
               </MessageBox>
               {error && (
                 <MessageBox type="error" withIcon mt={3}>

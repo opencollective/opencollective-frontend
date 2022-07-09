@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import { difference } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -31,6 +32,7 @@ const applicationQuery = gqlV2`
       oAuthAuthorization {
         id
         expiresAt
+        scope
       }
     }
   }
@@ -39,8 +41,12 @@ const applicationQuery = gqlV2`
 // See https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1
 const REQUIRED_URL_PARAMS = ['response_type', 'client_id'];
 
-const isValidAuthorization = authorization => {
-  return authorization && new Date(authorization.expiresAt) > new Date();
+const isValidAuthorization = (authorization, requestedScopes) => {
+  return (
+    authorization &&
+    new Date(authorization.expiresAt) > new Date() &&
+    difference(requestedScopes, authorization.scope).length === 0
+  );
 };
 
 const OAuthAuthorizePage = () => {
@@ -52,7 +58,9 @@ const OAuthAuthorizePage = () => {
   const queryParams = { skip: skipQuery, variables: queryVariables, context: API_V2_CONTEXT };
   const { data, error, loading: isLoadingAuthorization } = useQuery(applicationQuery, queryParams);
   const isLoading = loadingLoggedInUser || isLoadingAuthorization;
-  const hasExistingAuthorization = isValidAuthorization(data?.application?.oAuthAuthorization);
+  const requestedScopes = query.scope ? query.scope.split(',').map(s => s.trim().toLowerCase()) : [];
+  const hasExistingAuthorization = isValidAuthorization(data?.application?.oAuthAuthorization, requestedScopes);
+
   return (
     <EmbeddedPage title="Authorize application">
       <Flex justifyContent="center" alignItems="center" py={[90, null, null, 180]} px={2}>
