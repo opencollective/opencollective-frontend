@@ -92,17 +92,6 @@ const BudgetStats = ({ collective, stats }) => {
                     }}
                   />
                 </Box>
-                <Box mt={2}>
-                  <FormattedMessage
-                    id="budgetSection-balance-withBlockedFunds"
-                    defaultMessage="Total available to spend including processing transactions: {amount}"
-                    values={{
-                      amount: formatCurrency(stats?.balanceWithBlockedFunds.valueInCents || 0, collective.currency, {
-                        locale,
-                      }),
-                    }}
-                  />
-                </Box>
               </Fragment>
             }
           />
@@ -203,7 +192,6 @@ BudgetStats.propTypes = {
   stats: PropTypes.shape({
     balance: AmountPropTypeShape.isRequired,
     consolidatedBalance: AmountPropTypeShape.isRequired,
-    balanceWithBlockedFunds: AmountPropTypeShape.isRequired,
     yearlyBudget: AmountPropTypeShape.isRequired,
     activeRecurringContributions: PropTypes.object,
     totalAmountReceived: AmountPropTypeShape,
