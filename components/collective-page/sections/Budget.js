@@ -40,10 +40,6 @@ const budgetSectionAccountFieldsFragment = gqlV2/* GraphQL */ `
         valueInCents
         currency
       }
-      balanceWithBlockedFunds {
-        valueInCents
-        currency
-      }
       yearlyBudget {
         valueInCents
         currency

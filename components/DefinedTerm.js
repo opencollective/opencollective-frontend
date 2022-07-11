@@ -104,8 +104,7 @@ const TranslatedDefinitions = defineMessages({
   },
   [Terms.BALANCE]: {
     id: 'budgetSection-balance-definition',
-    defaultMessage:
-      'The current balance of the account. Not including Projects and Events, not including processing transactions.',
+    defaultMessage: 'The current balance of the account. Not including Projects and Events.',
   },
 });
 
