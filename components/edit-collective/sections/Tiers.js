@@ -42,13 +42,14 @@ const getReceiptTemplates = host => {
   const receiptTemplates = host?.settings?.invoice?.templates;
 
   const receiptTemplateTitles = [];
-  if (receiptTemplates?.default?.title?.length > 0) {
+  if (receiptTemplates?.default) {
     receiptTemplateTitles.push({
-      default: receiptTemplates?.default?.title,
+      value: 'default',
+      label: receiptTemplates.default.title,
     });
   }
-  if (receiptTemplates?.alternative?.title?.length > 0) {
-    receiptTemplateTitles.push({ alternative: receiptTemplates?.alternative?.title });
+  if (receiptTemplates?.alternative) {
+    receiptTemplateTitles.push({ value: 'alternative', label: receiptTemplates.alternative.title });
   }
   return receiptTemplateTitles;
 };
@@ -418,7 +419,7 @@ class Tiers extends React.Component {
     const defaultValues = {
       ...tier,
       type: tier.type || this.defaultType,
-      invoiceTemplate: tier.data.invoiceTemplate,
+      invoiceTemplate: tier.data?.invoiceTemplate,
     };
 
     return (

@@ -42,7 +42,7 @@ const InvoicesReceipts = ({ collective }) => {
     defaultAlternativeReceiptTitle !== null,
   );
   const [showPreview, setShowPreview] = React.useState(false);
-  const isTouched = receiptTitle !== defaultReceiptTitle || alternativeReceiptTitle !== defaultAlternativeReceiptTitle;
+  const [isFieldChanged, setIsFieldChanged] = React.useState(false);
   const isSaved =
     get(data, 'editCollective.settings.invoice.templates.default.title') === receiptTitle &&
     get(data, 'editCollective.settings.invoice.templates.alternative.title') === alternativeReceiptTitle;
@@ -52,7 +52,6 @@ const InvoicesReceipts = ({ collective }) => {
   const defaultAlternativeInfo = get(collective.settings, 'invoice.templates.alternative.info');
   const [info, setInfo] = React.useState(defaultInfo);
   const [alternativeInfo, setAlternativeInfo] = React.useState(defaultAlternativeInfo);
-  const infoIsTouched = info !== defaultInfo || alternativeInfo !== defaultAlternativeInfo;
   const infoIsSaved =
     get(data, 'editCollective.settings.invoice.templates.default.info') === info &&
     get(data, 'editCollective.settings.invoice.templates.alternative.info') === alternativeInfo;
@@ -61,6 +60,28 @@ const InvoicesReceipts = ({ collective }) => {
     setAlternativeReceiptTitle(null);
     setAlternativeInfo(null);
     setShowAlternativeReceiptsSection(false);
+    setIsFieldChanged(true);
+  };
+
+  const getInvoiceTemplatesObj = () => {
+    if (!alternativeReceiptTitle && !alternativeInfo) {
+      return {
+        templates: {
+          default: { title: receiptTitle || defaultReceiptTitlePlaceholder, info: info },
+        },
+      };
+    }
+    return {
+      templates: {
+        default: { title: receiptTitle || defaultReceiptTitlePlaceholder, info: info },
+        alternative: { title: alternativeReceiptTitle, info: alternativeInfo },
+      },
+    };
+  };
+
+  const onChange = (value, stateFunction) => {
+    stateFunction(value);
+    setIsFieldChanged(true);
   };
 
   return (
@@ -88,7 +109,9 @@ const InvoicesReceipts = ({ collective }) => {
         <StyledInput
           placeholder={defaultReceiptTitlePlaceholder}
           defaultValue={defaultReceiptTitlePlaceholder === receiptTitle || receiptTitle === null ? null : receiptTitle}
-          onChange={e => setReceiptTitle(e.target.value === '' ? defaultReceiptTitlePlaceholder : e.target.value)}
+          onChange={e =>
+            onChange(e.target.value === '' ? defaultReceiptTitlePlaceholder : e.target.value, setReceiptTitle)
+          }
           width="100%"
           maxWidth={414}
           mt="6px"
@@ -121,7 +144,7 @@ const InvoicesReceipts = ({ collective }) => {
         <StyledTextarea
           placeholder={intl.formatMessage(messages.extraInfoPlaceholder)}
           defaultValue={info}
-          onChange={e => setInfo(e.target.value)}
+          onChange={e => onChange(e.target.value, setInfo)}
           width="100%"
           height="150px"
           fontSize="13px"
@@ -159,14 +182,11 @@ const InvoicesReceipts = ({ collective }) => {
               <StyledInput
                 placeholder="Custom Receipt"
                 defaultValue={alternativeReceiptTitle}
-                onChange={e => setAlternativeReceiptTitle(e.target.value)}
+                onChange={e => onChange(e.target.value, setAlternativeReceiptTitle)}
                 width="100%"
                 maxWidth={414}
                 mt="6px"
               />
-              <P mt="6px">
-                <FormattedMessage defaultMessage="Keep this field empty to use the default title: Custom receipt." />
-              </P>
               <Flex justifyContent="space-between" flexDirection={['column', 'row']} pt="26px">
                 <Box color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px">
                   <FormattedMessage defaultMessage="Custom Message" />
@@ -190,7 +210,7 @@ const InvoicesReceipts = ({ collective }) => {
               <StyledTextarea
                 placeholder={intl.formatMessage(messages.extraInfoPlaceholder)}
                 defaultValue={alternativeInfo}
-                onChange={e => setAlternativeInfo(e.target.value)}
+                onChange={e => onChange(e.target.value, setAlternativeInfo)}
                 width="100%"
                 height="150px"
                 fontSize="13px"
@@ -228,23 +248,19 @@ const InvoicesReceipts = ({ collective }) => {
           mt="24px"
           maxWidth={200}
           loading={loading}
-          disabled={!isTouched && !infoIsTouched}
-          onClick={() =>
+          disabled={!isFieldChanged}
+          onClick={() => {
             setSettings({
               variables: {
                 id: collective.id,
                 settings: {
                   ...collective.settings,
-                  invoice: {
-                    templates: {
-                      default: { title: receiptTitle || defaultReceiptTitlePlaceholder, info: info },
-                      alternative: { title: alternativeReceiptTitle, info: alternativeInfo },
-                    },
-                  },
+                  invoice: getInvoiceTemplatesObj(),
                 },
               },
-            })
-          }
+            });
+            setIsFieldChanged(false);
+          }}
         >
           {isSaved && infoIsSaved ? (
             <FormattedMessage id="saved" defaultMessage="Saved" />
