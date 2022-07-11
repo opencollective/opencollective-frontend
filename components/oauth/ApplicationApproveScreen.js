@@ -83,14 +83,20 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
     const body = await response.json();
     if (response.ok) {
       setRedirecting(true);
-      return router.push(body['redirect_uri']);
+      if (autoApprove) {
+        setTimeout(() => {
+          return router.push(body['redirect_uri']);
+        }, 1000);
+      } else {
+        return router.push(body['redirect_uri']);
+      }
     } else {
       setRedirecting(false); // To show errors with autoApprove
       throw new Error(body['error_description'] || body['error']);
     }
   });
 
-  React.useState(() => {
+  React.useEffect(() => {
     if (autoApprove) {
       callAuthorize();
     }
