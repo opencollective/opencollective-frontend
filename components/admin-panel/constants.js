@@ -59,6 +59,7 @@ export const COLLECTIVE_SECTIONS = {
   PAYMENT_METHODS: 'payment-methods',
   PAYMENT_RECEIPTS: 'payment-receipts',
   POLICIES: 'policies',
+  CUSTOM_EMAIL: 'custom-email',
   TEAM: 'members',
   TICKETS: 'tickets',
   TIERS: 'tiers',
@@ -153,6 +154,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.POLICIES]: {
     id: 'editCollective.menu.policies',
     defaultMessage: 'Policies',
+  },
+  [ALL_SECTIONS.CUSTOM_EMAIL]: {
+    defaultMessage: 'Custom Email',
   },
   [ALL_SECTIONS.HOST]: {
     id: 'Fiscalhost',

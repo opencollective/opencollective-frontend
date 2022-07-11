@@ -35,6 +35,7 @@ import EmptyBalance from './actions/EmptyBalance';
 // Sections
 import CollectiveGoals from './sections/CollectiveGoals';
 import ConnectedAccounts from './sections/ConnectedAccounts';
+import CustomMessage from './sections/CustomMessage';
 import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
 import FiscalHosting from './sections/FiscalHosting';
@@ -548,6 +549,10 @@ class EditCollectiveForm extends React.Component {
       // Policies and moderation
       case EDIT_COLLECTIVE_SECTIONS.POLICIES:
         return <Policies collective={collective} />;
+
+      // Policies and moderation
+      case EDIT_COLLECTIVE_SECTIONS.CUSTOM_EMAIL:
+        return <CustomMessage collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS:
         return <HostVirtualCardsSettings collective={collective} />;
