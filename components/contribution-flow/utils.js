@@ -39,11 +39,18 @@ const memberCanBeUsedToContribute = (member, account, canUseIncognito) => {
   }
 };
 
+/**
+ * Cannot use contributions for events and "Tickets" tiers, because we need the ticket holder's identity
+ */
+export const canUseIncognitoForContribution = (collective, tier) => {
+  return collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET');
+};
+
 export const getContributeProfiles = (loggedInUser, collective, tier) => {
   if (!loggedInUser) {
     return [];
   } else {
-    const canUseIncognito = collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET');
+    const canUseIncognito = canUseIncognitoForContribution(collective, tier);
     const filteredMembers = loggedInUser.memberOf.filter(member =>
       memberCanBeUsedToContribute(member, collective, canUseIncognito),
     );

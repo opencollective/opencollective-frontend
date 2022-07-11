@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import { CollectiveType } from '../../lib/constants/collectives';
-
 import { Flex } from '../Grid';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
@@ -16,6 +14,7 @@ import StepDetailsCrypto from './StepDetailsCrypto';
 import StepPayment from './StepPayment';
 import StepProfile from './StepProfile';
 import StepSummary from './StepSummary';
+import { canUseIncognitoForContribution } from './utils';
 
 class ContributionFlowStepContainer extends React.Component {
   static propTypes = {
@@ -105,7 +104,7 @@ class ContributionFlowStepContainer extends React.Component {
             defaultName={this.props.defaultName}
             onChange={this.props.onChange}
             data={stepProfile}
-            canUseIncognito={collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET')}
+            canUseIncognito={canUseIncognitoForContribution(collective, tier)}
             onSignInClick={this.props.onSignInClick}
             isEmbed={isEmbed}
           />
