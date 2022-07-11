@@ -50,7 +50,7 @@ import SafeTransactionMessage from './SafeTransactionMessage';
 import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
 import { validateGuestProfile } from './StepProfileGuestForm';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
-import { getGQLV2AmountInput, getTotalAmount, NEW_CREDIT_CARD_KEY } from './utils';
+import { getContributeProfiles, getGQLV2AmountInput, getTotalAmount, NEW_CREDIT_CARD_KEY } from './utils';
 
 const StepsProgressBox = styled(Box)`
   min-height: 120px;
@@ -123,6 +123,7 @@ class ContributionFlow extends React.Component {
       tags: PropTypes.arrayOf(PropTypes.string),
       hideFAQ: PropTypes.bool,
       hideHeader: PropTypes.bool,
+      hideSteps: PropTypes.bool,
       backgroundColor: PropTypes.bool,
       useTheme: PropTypes.bool,
       skipStepDetails: PropTypes.bool,
@@ -159,7 +160,7 @@ class ContributionFlow extends React.Component {
       stripeElements: null,
       isSubmitted: false,
       isSubmitting: false,
-      stepProfile: null,
+      stepProfile: this.getDefaultStepProfile(),
       stepPayment: null,
       stepSummary: null,
       showSignIn: false,
@@ -176,10 +177,24 @@ class ContributionFlow extends React.Component {
 
   componentDidUpdate(oldProps) {
     if (oldProps.LoggedInUser && !this.props.LoggedInUser) {
+      // User has logged out, reset the state
       this.setState({ stepProfile: null, stepSummary: null, stepPayment: null });
       this.pushStepRoute(STEPS.PROFILE);
+    } else if (!oldProps.LoggedInUser && this.props.LoggedInUser) {
+      // User has logged in, reset the state
+      if (this.state.stepProfile.isGuest) {
+        const previousEmail = this.state.stepProfile.email;
+        const newStepProfile = this.getDefaultStepProfile();
+        const hasChangedEmail = previousEmail && previousEmail !== newStepProfile.email;
+        this.setState({ stepProfile: newStepProfile, stepSummary: null, stepPayment: null });
+        if (hasChangedEmail && ![STEPS.DETAILS, STEPS.PROFILE].includes(this.state.step)) {
+          this.pushStepRoute(STEPS.PROFILE); // Force user to re-fill profile
+        }
+      }
     }
   }
+
+  // ---- Order submission & error handling ----
 
   submitOrder = async () => {
     const { stepDetails, stepProfile, stepSummary } = this.state;
@@ -317,7 +332,7 @@ class ContributionFlow extends React.Component {
       }
     } else {
       const email = this.state.stepProfile?.email;
-      return this.pushStepRoute('success', { OrderId: order.id, email });
+      return this.pushStepRoute('success', { replace: true, query: { OrderId: order.id, email } });
     }
   };
 
@@ -325,6 +340,35 @@ class ContributionFlow extends React.Component {
     this.setState({ error });
     this.scrollToTop();
   };
+
+  // ---- Getters ----
+
+  getContributeProfiles = memoizeOne(getContributeProfiles);
+
+  getDefaultStepProfile() {
+    const { LoggedInUser, collective, tier, queryParams } = this.props;
+    const profiles = this.getContributeProfiles(LoggedInUser, collective, tier);
+
+    // If there's a default profile slug, enforce it
+    if (queryParams.contributeAs) {
+      const contributorProfile = profiles.find(({ slug }) => slug === queryParams.contributeAs);
+      if (contributorProfile) {
+        return contributorProfile;
+      }
+    }
+
+    // Otherwise to the logged-in user personal profile, if any
+    if (profiles[0]) {
+      return profiles[0];
+    }
+
+    // Otherwise, it's a guest contribution
+    return {
+      isGuest: true,
+      email: queryParams.email || '',
+      name: queryParams.name || '',
+    };
+  }
 
   getPaymentMethod = async () => {
     const { stepPayment, stripe, stripeElements } = this.state;
@@ -490,7 +534,7 @@ class ContributionFlow extends React.Component {
   };
 
   /** Navigate to another step, ensuring all route params are preserved */
-  pushStepRoute = async (stepName, newQueryParams = {}) => {
+  pushStepRoute = async (stepName, { query: newQueryParams, replace = false } = {}) => {
     // Reset errors if any
     if (this.state.error) {
       this.setState({ error: null });
@@ -501,7 +545,8 @@ class ContributionFlow extends React.Component {
     const queryHelper = isEmbed ? EmbedContributionFlowUrlQueryHelper : ContributionFlowUrlQueryHelper;
     const encodedQueryParams = { ...queryHelper.encode(queryParams), ...newQueryParams };
     const route = this.getRoute(stepName === 'details' ? '' : stepName);
-    await router.push({ pathname: route, query: omitBy(encodedQueryParams, value => !value) });
+    const navigateFn = replace ? router.replace : router.push;
+    await navigateFn({ pathname: route, query: omitBy(encodedQueryParams, value => !value) });
     this.scrollToTop();
   };
 
@@ -572,7 +617,9 @@ class ContributionFlow extends React.Component {
     const currency = tier?.amount.currency || collective.currency;
     const minAmount = this.getTierMinAmount(tier, currency);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
-    const isStepProfileCompleted = Boolean((stepProfile && LoggedInUser) || stepProfile?.isGuest);
+    const isStepProfileCompleted = Boolean(
+      (stepProfile && LoggedInUser) || (stepProfile?.isGuest && validateGuestProfile(stepProfile, stepDetails)),
+    );
     const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
 
     const steps = [
@@ -728,7 +775,7 @@ class ContributionFlow extends React.Component {
 
   cryptoOrderCompleted = () => {
     const { createdOrder } = this.state;
-    this.pushStepRoute('success', { OrderId: createdOrder.id });
+    this.pushStepRoute('success', { replace: true, query: { OrderId: createdOrder.id } });
   };
 
   render() {
@@ -756,7 +803,6 @@ class ContributionFlow extends React.Component {
         currentStepName={this.props.step}
         onStepChange={this.onStepChange}
         onComplete={isCrypto && isSubmitted ? this.cryptoOrderCompleted : this.submitOrder}
-        skip={queryParams.skipStepDetails ? ['details'] : null}
       >
         {({
           steps,
@@ -785,23 +831,25 @@ class ContributionFlow extends React.Component {
                 <ContributionFlowHeader collective={collective} isEmbed={isEmbed} />
               </Box>
             )}
-            <StepsProgressBox mb={3} width={[1.0, 0.8]}>
-              <ContributionFlowStepsProgress
-                steps={steps}
-                currentStep={currentStep}
-                lastVisitedStep={lastVisitedStep}
-                goToStep={goToStep}
-                stepProfile={stepProfile}
-                stepDetails={stepDetails}
-                stepPayment={stepPayment}
-                stepSummary={stepSummary}
-                isCrypto={isCrypto}
-                isSubmitted={this.state.isSubmitted}
-                loading={isValidating || isLoading}
-                currency={currency}
-                isFreeTier={this.getTierMinAmount(tier, currency) === 0}
-              />
-            </StepsProgressBox>
+            {!queryParams.hideSteps && (
+              <StepsProgressBox mb={3} width={[1.0, 0.8]}>
+                <ContributionFlowStepsProgress
+                  steps={steps}
+                  currentStep={currentStep}
+                  lastVisitedStep={lastVisitedStep}
+                  goToStep={goToStep}
+                  stepProfile={stepProfile}
+                  stepDetails={stepDetails}
+                  stepPayment={stepPayment}
+                  stepSummary={stepSummary}
+                  isCrypto={isCrypto}
+                  isSubmitted={this.state.isSubmitted}
+                  loading={isValidating || isLoading}
+                  currency={currency}
+                  isFreeTier={this.getTierMinAmount(tier, currency) === 0}
+                />
+              </StepsProgressBox>
+            )}
             {/* main container */}
             {(currentStep.name !== STEPS.DETAILS && loadingLoggedInUser) || !isValidStep ? (
               <Box py={[4, 5]}>
@@ -844,7 +892,6 @@ class ContributionFlow extends React.Component {
                     isCrypto={isCrypto}
                     showFeesOnTop={this.canHavePlatformTips()}
                     onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
-                    defaultProfileSlug={queryParams.contributeAs}
                     defaultEmail={queryParams.email}
                     defaultName={queryParams.name}
                     taxes={this.getApplicableTaxes(collective, host, tier?.type)}
@@ -854,6 +901,7 @@ class ContributionFlow extends React.Component {
                     order={this.state.createdOrder}
                     disabledPaymentMethodTypes={queryParams.disabledPaymentMethodTypes}
                     hideCreditCardPostalCode={queryParams.hideCreditCardPostalCode}
+                    contributeProfiles={this.getContributeProfiles(LoggedInUser, collective, tier)}
                   />
                   {!nextStep && shouldDisplayCaptcha && (
                     <Flex mt={40} justifyContent="center">
@@ -867,7 +915,13 @@ class ContributionFlow extends React.Component {
                     <ContributionFlowButtons
                       goNext={goNext}
                       // for crypto flow the user should not be able to go back after the order is created at checkout step
-                      goBack={isCrypto && currentStep.name === 'checkout' ? null : goBack}
+                      // we also don't want to show the back button when linking directly to the payment step with `hideSteps=true`
+                      goBack={
+                        (isCrypto && currentStep.name === STEPS.CHECKOUT) ||
+                        (queryParams.hideSteps && currentStep.name === STEPS.PAYMENT)
+                          ? null
+                          : goBack
+                      }
                       step={currentStep}
                       prevStep={prevStep}
                       nextStep={nextStep}

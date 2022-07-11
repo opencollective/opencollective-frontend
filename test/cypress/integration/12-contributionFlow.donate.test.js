@@ -78,10 +78,9 @@ describe('Contribution Flow: Donate', () => {
       cy.go('back');
 
       // Steps should be reset
-      cy.checkStepsProgress({ enabled: 'details', disabled: ['profile', 'payment'] });
+      cy.checkStepsProgress({ enabled: ['details', 'profile'], disabled: 'payment' });
 
       // Previous credit card should be added to the account
-      cy.get('button[data-cy="cf-next-step"]').click();
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.contains('#PaymentMethod label:first', 'VISA ****');
       cy.get('#PaymentMethod label:first input[type=radio]').should('be.checked');
