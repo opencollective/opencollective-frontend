@@ -11,28 +11,9 @@ import { Box, Flex } from '../../Grid';
 import MessageBox from '../../MessageBox';
 import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
-import StyledCheckbox from '../../StyledCheckbox';
 import StyledHr from '../../StyledHr';
 import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
-
-const AdditionalSettingsCheckBox = ({ onChange, checked }) => {
-  return (
-    <StyledCheckbox
-      onChange={({ checked, name }) => onChange({ target: { name, value: checked } })}
-      checked={checked}
-      name="additionalSettings"
-      label={
-        <FormattedMessage defaultMessage="Inherit the above collective level custom message to all tiers, event and projects if no custom message is set at the respective levels." />
-      }
-    />
-  );
-};
-
-AdditionalSettingsCheckBox.propTypes = {
-  onChange: PropTypes.func,
-  checked: PropTypes.bool,
-};
 
 const updateCustomMessageMutation = gqlV2/* GraphQL */ `
   mutation UpdateCustomMessage($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
@@ -45,10 +26,11 @@ const updateCustomMessageMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const ThankYouEmail = ({ collective }) => {
+const CustomMessage = ({ collective }) => {
   const thankYouMessage =
-    collective?.settings?.thankYouEmailMessage || collective?.parentCollective?.settings?.thankYouEmailMessage;
+    collective?.settings?.customEmailMessage || collective?.parentCollective?.settings?.customEmailMessage;
   const [customMessage, setCustomMessage] = useState(thankYouMessage);
+  const [isModified, setIsModified] = useState(false);
   const { addToast } = useToasts();
 
   const [updateCustomEmailMessage, { loading }] = useMutation(updateCustomMessageMutation, {
@@ -78,10 +60,16 @@ const ThankYouEmail = ({ collective }) => {
     await updateCustomEmailMessage({
       variables: {
         account: { legacyId: collective.id },
-        key: 'thankYouEmailMessage',
-        value: message,
+        key: 'customEmailMessage',
+        value: message || '',
       },
     });
+    setIsModified(false);
+  };
+
+  const onChange = async value => {
+    setCustomMessage(value);
+    setIsModified(true);
   };
 
   return (
@@ -96,7 +84,7 @@ const ThankYouEmail = ({ collective }) => {
         </Box>
         <RichTextEditor
           inputName="message"
-          onChange={e => setCustomMessage(e.target.value)}
+          onChange={e => onChange(e.target.value)}
           defaultValue={customMessage}
           withBorders
           editorMinHeight="150px"
@@ -119,7 +107,7 @@ const ThankYouEmail = ({ collective }) => {
       )}
       <Flex justifyContent={['center', 'left']}>
         <StyledButton
-          disable={loading}
+          disabled={loading || !isModified}
           mt="35px"
           buttonStyle="primary"
           width="157px"
@@ -132,20 +120,20 @@ const ThankYouEmail = ({ collective }) => {
   );
 };
 
-ThankYouEmail.propTypes = {
+CustomMessage.propTypes = {
   collective: PropTypes.shape({
     id: PropTypes.number,
     type: PropTypes.string,
     settings: PropTypes.shape({
-      thankYouEmailMessage: PropTypes.string,
+      customEmailMessage: PropTypes.string,
     }),
     parentCollective: PropTypes.shape({
       settings: PropTypes.shape({
-        thankYouEmailMessage: PropTypes.string,
+        customEmailMessage: PropTypes.string,
       }),
     }),
   }),
   isInheritSettings: PropTypes.bool,
 };
 
-export default ThankYouEmail;
+export default CustomMessage;

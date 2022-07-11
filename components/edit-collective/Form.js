@@ -35,6 +35,7 @@ import EmptyBalance from './actions/EmptyBalance';
 // Sections
 import CollectiveGoals from './sections/CollectiveGoals';
 import ConnectedAccounts from './sections/ConnectedAccounts';
+import CustomMessage from './sections/CustomMessage';
 import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
 import FiscalHosting from './sections/FiscalHosting';
@@ -49,7 +50,6 @@ import PaymentReceipts from './sections/PaymentReceipts';
 import Policies from './sections/Policies';
 import ReceivingMoney from './sections/ReceivingMoney';
 import SendingMoney from './sections/SendingMoney';
-import ThankYouEmail from './sections/ThankYouEmail';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
@@ -551,8 +551,8 @@ class EditCollectiveForm extends React.Component {
         return <Policies collective={collective} />;
 
       // Policies and moderation
-      case EDIT_COLLECTIVE_SECTIONS.THANK_YOU_EMAIL:
-        return <ThankYouEmail collective={collective} />;
+      case EDIT_COLLECTIVE_SECTIONS.CUSTOM_EMAIL:
+        return <CustomMessage collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS:
         return <HostVirtualCardsSettings collective={collective} />;

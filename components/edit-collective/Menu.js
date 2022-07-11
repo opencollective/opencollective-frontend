@@ -21,7 +21,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   COLLECTIVE_PAGE: 'collective-page',
   CONNECTED_ACCOUNTS: 'connected-accounts',
   POLICIES: 'policies',
-  THANK_YOU_EMAIL: 'thank-you-email',
+  CUSTOM_EMAIL: 'custom-email',
   EXPORT: 'export',
   HOST: 'host',
   MEMBERS: 'members',
