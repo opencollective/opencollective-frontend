@@ -9,10 +9,11 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import MessageBox from '../../MessageBox';
+import PreviewModal from '../../PreviewModal';
 import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
 import StyledHr from '../../StyledHr';
-import { P } from '../../Text';
+import { P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
 const updateCustomMessageMutation = gqlV2/* GraphQL */ `
@@ -31,6 +32,7 @@ const CustomMessage = ({ collective }) => {
     collective?.settings?.customEmailMessage || collective?.parentCollective?.settings?.customEmailMessage;
   const [customMessage, setCustomMessage] = useState(thankYouMessage);
   const [isModified, setIsModified] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const { addToast } = useToasts();
 
   const [updateCustomEmailMessage, { loading }] = useMutation(updateCustomMessageMutation, {
@@ -79,9 +81,26 @@ const CustomMessage = ({ collective }) => {
       </P>
       <StyledHr mt="32px" mb="34px" borderStyle="dotted" />
       <Container maxWidth="1000px">
-        <Box mb={2} fontSize="18px" fontWeight={700} lineHeight="26px">
-          <FormattedMessage defaultMessage="Custom Message" />
-        </Box>
+        <Flex justifyContent="space-between" flexDirection={['column', 'row']}>
+          <Box mb={2} fontSize="18px" fontWeight={700} lineHeight="26px">
+            <FormattedMessage defaultMessage="Custom Message" />
+          </Box>
+          <StyledButton
+            buttonStyle="secondary"
+            buttonSize="tiny"
+            maxWidth="78px"
+            pt="4px"
+            pb="4px"
+            pl="14px"
+            pr="14px"
+            height="24px"
+            onClick={() => setShowPreview(true)}
+          >
+            <Span fontSize="13px" fontWeight={500} lineHeight="16px">
+              <FormattedMessage defaultMessage="Preview" />
+            </Span>
+          </StyledButton>
+        </Flex>
         <RichTextEditor
           inputName="message"
           onChange={e => onChange(e.target.value)}
@@ -116,6 +135,18 @@ const CustomMessage = ({ collective }) => {
           <FormattedMessage id="save" defaultMessage="Save" />
         </StyledButton>
       </Flex>
+      {showPreview && (
+        <PreviewModal
+          heading={<FormattedMessage defaultMessage="Preview Notification" />}
+          subheading={
+            <FormattedMessage defaultMessage="This is the preview of the email template which your financial contributor will receive." />
+          }
+          onClose={() => setShowPreview(false)}
+          previewImage="/static/images/custom-email-preview.png"
+          imgHeight="456px"
+          imgWidth="809px"
+        />
+      )}
     </Container>
   );
 };
