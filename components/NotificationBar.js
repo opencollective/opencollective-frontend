@@ -157,7 +157,7 @@ class NotificationBar extends React.Component {
       <NotificationBarContainer className={classNames(status, 'NotificationBar')} data-cy="notification-bar">
         {status === 'error' && (
           <ErrorMessageContainer>
-            <CollectiveLogo src={logo} alt="Open Collective logo" />
+            <CollectiveLogo src={logo} alt="" />
             {error && <p>{error}</p>}
           </ErrorMessageContainer>
         )}
