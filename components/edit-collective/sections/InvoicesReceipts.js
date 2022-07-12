@@ -271,9 +271,11 @@ const InvoicesReceipts = ({ collective }) => {
       </Flex>
       {showPreview && (
         <PreviewModal
-          alt="Receipt Preview"
+          heading={<FormattedMessage defaultMessage="Receipt Preview" />}
           onClose={() => setShowPreview(false)}
           previewImage="/static/images/invoice-title-preview.jpg"
+          imgHeight="548.6px"
+          imgWidth="667px"
         />
       )}
     </Container>

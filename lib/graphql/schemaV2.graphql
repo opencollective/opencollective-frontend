@@ -716,6 +716,7 @@ type Tier {
   amountType: TierAmountType!
   minimumAmount: Amount!
   endsAt: DateTime
+  invoiceTemplate: String!
 }
 
 """
@@ -5604,6 +5605,7 @@ type Credit implements Transaction {
   """
   merchantId: String
   balanceInHostCurrency: Amount
+  invoiceTemplate: String!
 }
 
 """
@@ -5708,6 +5710,7 @@ type Debit implements Transaction {
   """
   merchantId: String
   balanceInHostCurrency: Amount
+  invoiceTemplate: String!
 }
 
 """
@@ -11203,6 +11206,7 @@ type Mutation {
     amount: AmountInput!
     description: String!
     hostFeePercent: Float
+    invoiceTemplate: String
   ): Order!
 
   """
