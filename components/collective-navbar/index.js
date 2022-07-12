@@ -150,6 +150,13 @@ const CollectiveName = styled(LinkCollective).attrs({
   }
 `;
 
+const RightContainer = styled(Container)`
+  flex-shrink: 0;
+  @media screen and (min-width: 64em) {
+    width: 100%;
+  }
+`;
+
 const CategoriesContainer = styled(Container)`
   background-color: #ffffff;
   max-height: calc(100vh - 70px);
@@ -472,7 +479,7 @@ const CollectiveNavbar = ({
         minHeight={NAVBAR_HEIGHT}
       >
         {/** Collective info */}
-        <InfosContainer px={[3, 0]} py={[2, 1]}>
+        <InfosContainer px={[3, 0]} py={[2, 1]} flexGrow="1">
           <Flex alignItems="center" maxWidth={['90%', '100%']} flex="1 1">
             <BackButtonAndAvatar data-hide-on-desktop={isInHero}>
               {showBackButton && (
@@ -536,10 +543,9 @@ const CollectiveNavbar = ({
         {/** Main navbar items */}
 
         {!onlyInfos && (
-          <Container
+          <RightContainer
             overflowY="auto"
             display={['block', 'flex']}
-            width="100%"
             justifyContent="space-between"
             flexDirection={['column', 'row']}
           >
@@ -573,8 +579,8 @@ const CollectiveNavbar = ({
               display={isExpanded ? 'flex' : ['none', 'flex']}
               flexDirection={['column', 'row']}
               flexBasis="fit-content"
-              marginLeft={[0, 'auto']}
               backgroundColor="#fff"
+              flexShrink="0"
               zIndex={1}
             >
               {mainAction && (
@@ -606,7 +612,7 @@ const CollectiveNavbar = ({
                 </Container>
               )}
             </Container>
-          </Container>
+          </RightContainer>
         )}
       </NavbarContentContainer>
     </NavBarContainer>
