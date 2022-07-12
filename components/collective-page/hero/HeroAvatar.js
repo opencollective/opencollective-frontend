@@ -19,6 +19,7 @@ import Container from '../../Container';
 import { Box } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
+import { DROPZONE_ACCEPT_IMAGES } from '../../StyledDropzone';
 import { P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import { editCollectiveAvatarMutation } from '../graphql/mutations';
@@ -146,7 +147,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
         <Dropzone
           style={{}}
           multiple={false}
-          accept="image/jpeg, image/png"
+          accept={DROPZONE_ACCEPT_IMAGES}
           disabled={submitting}
           inputProps={{ style: { width: 1 } }}
           onDrop={onDropImage}
