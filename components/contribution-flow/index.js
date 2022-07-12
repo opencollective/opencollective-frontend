@@ -4,7 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { CardElement } from '@stripe/react-stripe-js';
-import { find, get, intersection, isEmpty, isNil, omitBy, pick, set } from 'lodash';
+import { find, get, intersection, isEmpty, isEqual, isNil, omitBy, pick, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -192,6 +192,22 @@ class ContributionFlow extends React.Component {
           this.pushStepRoute(STEPS.PROFILE); // Force user to re-fill profile
         }
       }
+    }
+
+    // Reflect state changes in the URL
+    const currentUrlState = this.props.queryParams;
+    const expectedUrlState = { amount: this.state.stepDetails.amount, interval: this.state.stepDetails.interval };
+    if (!isEqual(currentUrlState, omitBy(expectedUrlState, isNil))) {
+      const route = this.getRoute(this.props.step);
+      const queryHelper = this.getQueryHelper();
+      this.props.router.replace(
+        {
+          pathname: route,
+          query: omitBy(queryHelper.encode(expectedUrlState), isNil),
+        },
+        undefined,
+        { scroll: false, shallow: true },
+      );
     }
   }
 
@@ -542,13 +558,17 @@ class ContributionFlow extends React.Component {
     }
 
     // Navigate to the new route
-    const { isEmbed, router, queryParams } = this.props;
-    const queryHelper = isEmbed ? EmbedContributionFlowUrlQueryHelper : ContributionFlowUrlQueryHelper;
+    const { router, queryParams } = this.props;
+    const queryHelper = this.getQueryHelper();
     const encodedQueryParams = { ...queryHelper.encode(queryParams), ...newQueryParams };
     const route = this.getRoute(stepName === 'details' ? '' : stepName);
     const navigateFn = replace ? router.replace : router.push;
-    await navigateFn({ pathname: route, query: omitBy(encodedQueryParams, value => !value) });
+    await navigateFn({ pathname: route, query: omitBy(encodedQueryParams, value => !value) }, null, { shallow: true });
     this.scrollToTop();
+  };
+
+  getQueryHelper = () => {
+    return this.props.isEmbed ? EmbedContributionFlowUrlQueryHelper : ContributionFlowUrlQueryHelper;
   };
 
   /** Get the route for the given step. Doesn't include query string. */

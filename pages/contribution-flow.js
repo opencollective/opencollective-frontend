@@ -42,7 +42,7 @@ class NewContributionFlowPage extends React.Component {
       step: query.step || 'details',
       paymentFlow: query.paymentFlow,
       // Query parameters
-      queryParams: ContributionFlowUrlQueryHelper.decode(query),
+      query,
       error: query.error,
     };
   }
@@ -65,7 +65,7 @@ class NewContributionFlowPage extends React.Component {
     loadingLoggedInUser: PropTypes.bool,
     step: PropTypes.oneOf(Object.values(STEPS)),
     router: PropTypes.object,
-    queryParams: PropTypes.object,
+    query: PropTypes.object,
   };
 
   componentDidMount() {
@@ -131,7 +131,7 @@ class NewContributionFlowPage extends React.Component {
           step={step}
           verb={this.props.verb}
           paymentFlow={paymentFlow}
-          queryParams={this.props.queryParams}
+          queryParams={ContributionFlowUrlQueryHelper.decode(this.props.query)}
           error={error}
         />
       );
