@@ -143,7 +143,7 @@ const CustomMessage = ({ collective }) => {
           }
           onClose={() => setShowPreview(false)}
           previewImage="/static/images/custom-email-preview.png"
-          imgHeight="456px"
+          imgHeight="715px"
           imgWidth="809px"
         />
       )}
