@@ -6,6 +6,7 @@ import Illustration from '../collectives/HomeIllustration';
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
 import { H2, H3, P } from '../Text';
 
 const ScreenShotWrapper = styled(Illustration)`
@@ -17,33 +18,20 @@ const WhatAreTheBenefits = () => {
     <Flex mt={['96px', '80px', null, null, '104px']} mb="80px" flexDirection="column">
       <Container display="flex" flexDirection="column" alignItems="center" mx={3}>
         <Box mb={[2, 3]} width={['288px', 1]}>
-          <H2
-            fontSize={['28px', '32px', null, null, '40px']}
-            lineHeight={['36px', '40px', null, null, '48px']}
-            letterSpacing={['-0.008em', null, null, '-0.04em']}
-            color={['black.900', null, null, null, 'black.800']}
-            textAlign="center"
-          >
+          <SectionTitle textAlign="center">
             <FormattedMessage
               id="becomeAHost.whatAreTheBenefits"
               defaultMessage="What are the benefits to host with us?"
             />
-          </H2>
+          </SectionTitle>
         </Box>
         <Box width={['288px', '548px', null, null, '755px']}>
-          <P
-            fontSize={['16px', '20px', null, null, '24px']}
-            lineHeight={['24px', '28px', null, null, '32px']}
-            letterSpacing="-0.008em"
-            textAlign="center"
-            color="black.700"
-            fontWeight="500"
-          >
+          <SectionDescription textAlign="center">
             <FormattedMessage
               id="becomeAHost.whatAreTheBenefits.description"
               defaultMessage="Accept donations and sponsorship, celebrate your supporters, pay expenses, and keep everyone up to date — all in one place."
             />
-          </P>
+          </SectionDescription>
         </Box>
       </Container>
       <Flex
@@ -190,7 +178,7 @@ const WhatAreTheBenefits = () => {
             />
           </Container>
           <Box width="304px" mb="24px" display={[null, 'none']} mt="27px">
-            <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="black.900" textAlign="center">
+            <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="primary.900" textAlign="center">
               <FormattedMessage
                 id="becomeAHost.benefit.keepTrack"
                 defaultMessage="Keep track {lineBreak} of all the budgets"
@@ -234,7 +222,7 @@ const WhatAreTheBenefits = () => {
               fontSize={['24px', null, null, null, '30px']}
               lineHeight={['32px', null, null, null, '40px']}
               letterSpacing="-0.008em"
-              color="black.900"
+              color="primary.900"
               display={['none', 'block']}
               mb={3}
             >
@@ -279,7 +267,7 @@ const WhatAreTheBenefits = () => {
             />
           </Container>
           <Box width="304px" mb="24px" display={[null, 'none']} mr={['10px', 0]}>
-            <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="black.900" textAlign="center">
+            <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="primary.900" textAlign="center">
               <FormattedMessage
                 id="becomeAHost.benefit.easyExpense"
                 defaultMessage="Easy expense {lineBreak} management"
@@ -323,7 +311,7 @@ const WhatAreTheBenefits = () => {
               fontSize={['24px', null, null, null, '30px']}
               lineHeight={['32px', null, null, null, '40px']}
               letterSpacing="-0.008em"
-              color="black.900"
+              color="primary.900"
               display={['none', 'block']}
               mb={3}
             >
@@ -369,7 +357,7 @@ const WhatAreTheBenefits = () => {
             />
           </Container>
           <Box width="304px" mb="24px" display={[null, 'none']} mt={['27px', 0]}>
-            <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="black.900" textAlign="center">
+            <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="primary.900" textAlign="center">
               <FormattedMessage
                 id="becomeAHost.benefit.combineFunding"
                 defaultMessage="Combine {lineBreak} funding sources"
@@ -413,7 +401,7 @@ const WhatAreTheBenefits = () => {
               fontSize={['24px', null, null, null, '30px']}
               lineHeight={['32px', null, null, null, '40px']}
               letterSpacing="-0.008em"
-              color="black.900"
+              color="primary.900"
               display={['none', 'block']}
               mb={3}
             >
@@ -472,7 +460,7 @@ const WhatAreTheBenefits = () => {
             />
           </Container>
           <Box width="304px" mb="24px" display={[null, 'none']}>
-            <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="black.900" textAlign="center">
+            <H2 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="primary.900" textAlign="center">
               <FormattedMessage id="becomeAHost.benefit.inDepthReports" defaultMessage="In-depth reports" />
             </H2>
           </Box>
@@ -513,7 +501,7 @@ const WhatAreTheBenefits = () => {
               fontSize={['24px', null, null, null, '30px']}
               lineHeight={['32px', null, null, null, '40px']}
               letterSpacing="-0.008em"
-              color="black.900"
+              color="primary.900"
               display={['none', 'block']}
               mb={3}
             >
