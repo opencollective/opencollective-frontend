@@ -18,6 +18,7 @@ import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { Box, Flex } from '../../Grid';
 import StyledButton from '../../StyledButton';
+import { DROPZONE_ACCEPT_IMAGES } from '../../StyledDropzone';
 import StyledInputSlider from '../../StyledInputSlider';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { Span } from '../../Text';
@@ -92,7 +93,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
         </Span>
       </ModalHeader>
 
-      <Dropzone onDrop={onDrop} multiple={false} accept="image/jpeg, image/png">
+      <Dropzone onDrop={onDrop} multiple={false} accept={DROPZONE_ACCEPT_IMAGES}>
         {({ isDragActive, isDragAccept, getRootProps, getInputProps, open }) => {
           const rootProps = getRootProps();
           return (
