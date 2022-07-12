@@ -8,6 +8,7 @@ import { getOauthAppSettingsRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
 import { Box, Flex, Grid } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
 import Image from '../Image';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -67,7 +68,15 @@ const OAuthApplicationsList = ({ accountSlug, onApplicationCreated, offset = 0 }
         )}
       </Flex>
       <P my={2} color="black.700">
-        <FormattedMessage defaultMessage="You can register new apps that you developed using Open Collective's API." />
+        <FormattedMessage defaultMessage="You can register new apps that you developed using Open Collective's API." />{' '}
+        <FormattedMessage
+          defaultMessage="For more information about OAuth applications, check <link>our documentation</link>."
+          values={{
+            link: getI18nLink({
+              href: 'https://docs.opencollective.com/help/developers/oauth',
+            }),
+          }}
+        />
       </P>
       <Box my={4}>
         {error ? (
