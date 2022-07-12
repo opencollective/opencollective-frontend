@@ -11,7 +11,7 @@ const PricingFAQ = props => (
     {...props}
     title="FAQ's"
     titleProps={{
-      color: '#1153D6',
+      color: '#0C2D66',
       fontSize: '28px',
       fontWeight: '500',
       lineHeight: '36px',

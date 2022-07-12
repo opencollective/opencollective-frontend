@@ -126,7 +126,7 @@ const ForCollectiveCard = () => {
           <H3
             fontSize={['18px', '20px']}
             lineHeight={['26px', '28px']}
-            color="black.900"
+            color="primary.900"
             fontWeight="500"
             letterSpacing={[null, '-0.008em']}
           >
@@ -144,7 +144,7 @@ const ForCollectiveCard = () => {
             fontSize={['18px', '20px']}
             lineHeight={['26px', '28px']}
             letterSpacing={[null, '-0.008em']}
-            color="blue.700"
+            color="primary.900"
             mb="16px"
           >
             <FormattedMessage id="pricing.forCollective.fees.header" defaultMessage="We help you thrive" />
