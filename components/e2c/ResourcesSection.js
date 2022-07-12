@@ -7,6 +7,7 @@ import Newsletter from '../collectives/Newsletter';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import HorizontalScroller from '../HorizontalScroller';
+import { SectionTitle } from '../marketing/Text';
 import StyledLink from '../StyledLink';
 import { H2, P, Span } from '../Text';
 
@@ -68,15 +69,9 @@ const ResourcesSection = () => {
         mb={['51px', '96px']}
       >
         <Box mb="72px">
-          <H2
-            letterSpacing="-0.008em"
-            fontSize={['32px', '40px']}
-            lineHeight={['40px', '48px']}
-            textAlign="center"
-            color="black.900"
-          >
+          <SectionTitle textAlign="center">
             <FormattedMessage id="e2c.resources" defaultMessage="Resources" />
-          </H2>
+          </SectionTitle>
         </Box>
         <HorizontalScroller
           container={ResourceContainer}
@@ -149,7 +144,7 @@ const LearnWithUs = () => (
         />
       </Box>
       <Box width={['288px', '330px', '458px', null, '524px']}>
-        <H2 letterSpacing="-0.008em" fontSize="32px" lineHeight="40px" color="black.900" mb="24px">
+        <H2 letterSpacing="-0.008em" fontSize="32px" lineHeight="40px" color="primary.900" mb="24px">
           <FormattedMessage id="e2c.learnWithUs" defaultMessage="Learn with us" />
         </H2>
         <P fontSize="18px" lineHeight="26px" color="black.800" fontWeight="500" mb="24px">
