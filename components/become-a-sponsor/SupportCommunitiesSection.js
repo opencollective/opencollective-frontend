@@ -18,7 +18,7 @@ const SupportCommunities = () => (
           fontSize={['24px', null, null, null, '30px']}
           lineHeight={['32px', null, null, null, '48px']}
           letterSpacing={['-1.2px', '-1.6px']}
-          color="black.900"
+          color="primary.900"
           mb={['24px', 3]}
         >
           <FormattedMessage
@@ -39,7 +39,7 @@ const SupportCommunities = () => (
           lineHeight={['23px', '24px', null, null, '28px']}
           letterSpacing={['-0.12px', 'normal', null, null, '-0.16px']}
           color="black.800"
-          fontWeight={[null, '500']}
+          fontWeight="500"
         >
           <FormattedMessage
             id="becomeASponsor.supportCommunities.description"
