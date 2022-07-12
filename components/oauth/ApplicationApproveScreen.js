@@ -140,6 +140,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
   }, []);
 
   const requestedScopes = scope?.split(',').filter(scope => SCOPES[scope]);
+  const filteredScopes = Object.entries(SCOPES).filter(([scope]) => requestedScopes && requestedScopes.includes(scope));
 
   return (
     <Container position="relative" mt="48px" width="100%">
@@ -184,18 +185,14 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
                   <strong>({LoggedInUser.collective.name})</strong>
                 </P>
               </Flex>
-              {Object.entries(SCOPES).map(
-                ([scope, { label }]) =>
-                  requestedScopes &&
-                  requestedScopes.includes(scope) && (
-                    <Flex alignItems="center" mt={26}>
-                      <Image src="/static/images/stars-exchange-rounded.png" width={32} height={32} />
-                      <P fontSize="16px" color="black.700" ml={3}>
-                        {label}
-                      </P>
-                    </Flex>
-                  ),
-              )}
+              {filteredScopes.map(([scope, { label }]) => (
+                <Flex key={scope} alignItems="center" mt={26}>
+                  <Image src="/static/images/stars-exchange-rounded.png" width={32} height={32} />
+                  <P fontSize="16px" color="black.700" ml={3}>
+                    {label}
+                  </P>
+                </Flex>
+              ))}
               <MessageBox type="info" mt={40} fontSize="13px">
                 <FormattedMessage defaultMessage="These permissions are granted to all the accounts you're administrating, including your personal profile." />
               </MessageBox>
