@@ -1,8 +1,8 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
 import { H1, P } from '../Text';
 
 const HowCanWeHelp = () => {

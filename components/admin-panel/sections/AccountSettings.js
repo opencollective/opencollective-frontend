@@ -10,15 +10,15 @@ import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { editCollectiveMutation } from '../../../lib/graphql/mutations';
 import { editCollectivePageQuery } from '../../../lib/graphql/queries';
+import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import { adminPanelQuery } from '../../../pages/admin-panel';
 import SettingsForm from '../../edit-collective/Form';
 import Loading from '../../Loading';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
-import { useUser } from '../../UserProvider';
 
 const AccountSettings = ({ account, section }) => {
-  const { LoggedInUser, refetchLoggedInUser } = useUser();
+  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const router = useRouter();
   const [state, setState] = React.useState({ status: undefined, result: undefined });
   const { addToast } = useToasts();
@@ -60,7 +60,7 @@ const AccountSettings = ({ account, section }) => {
       'expensePolicy',
       'website',
       'twitterHandle',
-      'githubHandle',
+      'repositoryUrl',
       'location',
       'privateInstructions',
       'startsAt',
@@ -146,6 +146,7 @@ const AccountSettings = ({ account, section }) => {
   return (
     <SettingsForm
       collective={collective}
+      host={account?.host}
       LoggedInUser={LoggedInUser}
       onSubmit={handleEditCollective}
       status={state.status}

@@ -35,11 +35,17 @@ const pendingApplicationsQuery = gqlV2/* GraphQL */ `
       name
       type
       settings
+      policies {
+        COLLECTIVE_MINIMUM_ADMINS {
+          numberOfAdmins
+        }
+      }
       pendingApplications(limit: $limit, offset: $offset, orderBy: $orderBy, searchTerm: $searchTerm) {
         offset
         limit
         totalCount
         nodes {
+          id
           message
           customData
           account {
@@ -54,6 +60,10 @@ const pendingApplicationsQuery = gqlV2/* GraphQL */ `
             createdAt
             ... on AccountWithHost {
               ...ProcessHostApplicationFields
+            }
+            memberInvitations(role: [ADMIN]) {
+              id
+              role
             }
             admins: members(role: ADMIN) {
               totalCount

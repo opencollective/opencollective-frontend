@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
 import { truncate } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl, useIntl } from 'react-intl';

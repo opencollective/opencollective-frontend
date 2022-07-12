@@ -8,6 +8,7 @@ import { canContributeRecurring, hostIsTaxDeductibeInTheUs } from '../../lib/col
 import INTERVALS from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nInterval } from '../../lib/i18n/interval';
 import { getTierMinAmount, getTierPresets } from '../../lib/tier-utils';
 
@@ -21,7 +22,6 @@ import StyledAmountPicker, { OTHER_AMOUNT_KEY } from '../StyledAmountPicker';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import { H5, P, Span } from '../Text';
-import { useUser } from '../UserProvider';
 
 import ChangeTierWarningModal from './ChangeTierWarningModal';
 import PlatformTipInput from './PlatformTipInput';
@@ -35,16 +35,17 @@ const getCustomFields = (collective, tier) => {
 const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, isEmbed }) => {
   const intl = useIntl();
   const amount = data?.amount;
+  const currency = tier?.amount.currency || collective.currency;
+  const presets = getTierPresets(tier, collective.type, currency);
   const getDefaultOtherAmountSelected = () => isNil(amount) || !presets?.includes(amount);
-  const presets = React.useMemo(() => getTierPresets(tier, collective.type), [tier, collective.type]);
   const [isOtherAmountSelected, setOtherAmountSelected] = React.useState(getDefaultOtherAmountSelected);
   const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
-  const minAmount = getTierMinAmount(tier);
+  const { LoggedInUser } = useLoggedInUser();
+
+  const minAmount = getTierMinAmount(tier, currency);
   const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
-  const { LoggedInUser } = useUser();
   const customFields = getCustomFields(collective, tier);
-  const currency = tier?.amount.currency || collective.currency;
   const selectedInterval = data?.interval !== INTERVALS.flexible ? data?.interval : null;
   const supportsRecurring = canContributeRecurring(collective, LoggedInUser) && (!tier || tier?.interval);
   const isFixedInterval = tier?.interval && tier.interval !== INTERVALS.flexible;

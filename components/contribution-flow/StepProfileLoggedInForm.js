@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
@@ -9,31 +9,12 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledInputLocation from '../StyledInputLocation';
 import { P, Span } from '../Text';
-import { useUser } from '../UserProvider';
 
 import ContributeProfilePicker from './ContributeProfilePicker';
 import StepProfileInfoMessage from './StepProfileInfoMessage';
-import { contributionRequiresAddress, contributionRequiresLegalName, getContributorProfiles } from './utils';
+import { contributionRequiresAddress, contributionRequiresLegalName } from './utils';
 
 export const NEW_ORGANIZATION_KEY = 'newOrg';
-
-const getDefaultProfile = (stepProfile, profiles, defaultProfileSlug) => {
-  // If there's a default profile slug, enforce it
-  if (defaultProfileSlug) {
-    const contributorProfile = profiles.find(({ slug }) => slug === defaultProfileSlug);
-    if (contributorProfile) {
-      return contributorProfile;
-    }
-  }
-
-  // Otherwise use the state-defined profile
-  if (stepProfile) {
-    return stepProfile;
-  }
-
-  // If none defined yet, fallback to the logged-in user personal profile, if any
-  return profiles?.[0] || null;
-};
 
 const getProfileInfo = (stepProfile, profiles) => {
   if (stepProfile?.isIncognito) {
@@ -53,19 +34,9 @@ const getProfileInfo = (stepProfile, profiles) => {
   }
 };
 
-const StepProfileLoggedInForm = ({ defaultProfileSlug, onChange, canUseIncognito, collective, data, stepDetails }) => {
-  const { LoggedInUser } = useUser();
-  const getProfileArgs = [LoggedInUser, collective, canUseIncognito];
-  const profiles = React.useMemo(() => getContributorProfiles(...getProfileArgs), getProfileArgs);
-  const defaultProfile = getDefaultProfile(data, profiles, defaultProfileSlug);
+const StepProfileLoggedInForm = ({ profiles, onChange, canUseIncognito, collective, data, stepDetails }) => {
   const profileInfo = getProfileInfo(data, profiles);
   const isContributingFromSameHost = data?.host?.id === collective.host.legacyId;
-
-  // set initial default profile so it shows in Steps Progress as well
-  // TODO: This looks like a hack. Maybe the state should be set in an upper component
-  useEffect(() => {
-    onChange({ stepProfile: defaultProfile, stepPayment: null, stepSummary: null });
-  }, [defaultProfile?.id]);
 
   return (
     <Fragment>
@@ -73,10 +44,8 @@ const StepProfileLoggedInForm = ({ defaultProfileSlug, onChange, canUseIncognito
         <ContributeProfilePicker
           profiles={profiles}
           canUseIncognito={canUseIncognito}
-          defaultSelectedProfile={defaultProfile}
-          onChange={profile => {
-            onChange({ stepProfile: profile });
-          }}
+          selectedProfile={data}
+          onChange={profile => onChange({ stepProfile: profile })}
         />
       </Box>
       {!isContributingFromSameHost && contributionRequiresLegalName(stepDetails) && (
@@ -153,7 +122,7 @@ StepProfileLoggedInForm.propTypes = {
   data: PropTypes.object,
   stepDetails: PropTypes.object,
   onChange: PropTypes.func,
-  defaultProfileSlug: PropTypes.string,
+  profiles: PropTypes.arrayOf(PropTypes.object),
   canUseIncognito: PropTypes.bool,
   collective: PropTypes.shape({
     host: PropTypes.shape({

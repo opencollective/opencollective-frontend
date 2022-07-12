@@ -10,7 +10,7 @@ import { Close } from '@styled-icons/material/Close';
 import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import { get, pickBy, without } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
@@ -22,6 +22,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import roles from '../../lib/constants/roles';
 import { getEnvVar } from '../../lib/env-utils';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute, getSettingsRoute } from '../../lib/url-helpers';
 import { parseToBoolean } from '../../lib/utils';
 
@@ -30,6 +31,7 @@ import AddFundsBtn from '../AddFundsBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import Avatar from '../Avatar';
 import { Dimensions, Sections } from '../collective-page/_constants';
+import ContactCollectiveBtn from '../ContactCollectiveBtn';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
@@ -38,7 +40,6 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import { fadeIn } from '../StyledKeyframes';
 import { Span } from '../Text';
-import { useUser } from '../UserProvider';
 
 import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { NAVBAR_CATEGORIES } from './constants';
@@ -378,14 +379,16 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.CONTACT,
       component: (
-        <Link href={`/${collective.slug}/contact`}>
-          <ActionButton tabIndex="-1">
-            <Envelope size="1em" />
-            <Span ml={2}>
-              <FormattedMessage id="Contact" defaultMessage="Contact" />
-            </Span>
-          </ActionButton>
-        </Link>
+        <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
+          {btnProps => (
+            <ActionButton {...btnProps}>
+              <Envelope size="1em" />
+              <Span ml={2}>
+                <FormattedMessage id="Contact" defaultMessage="Contact" />
+              </Span>
+            </ActionButton>
+          )}
+        </ContactCollectiveBtn>
       ),
     };
   } else if (callsToAction.includes(NAVBAR_ACTION_TYPE.ADD_FUNDS) && collective.host) {
@@ -430,7 +433,7 @@ const CollectiveNavbar = ({
 }) => {
   const intl = useIntl();
   const [isExpanded, setExpanded] = React.useState(false);
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
   const isAccountant = LoggedInUser?.hasRole(roles.ACCOUNTANT, collective);
   isAdmin = isAdmin || LoggedInUser?.canEditCollective(collective);
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
@@ -443,7 +446,8 @@ const CollectiveNavbar = ({
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
   const mainAction = getMainAction(collective, actionsArray, LoggedInUser);
-  const secondAction = actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type));
+  const secondAction =
+    actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type), LoggedInUser);
   const navbarRef = useRef();
   const mainContainerRef = useRef();
 

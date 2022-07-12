@@ -7,6 +7,8 @@ import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
 import { Box, Grid } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
+import BanAccounts from '../components/root-actions/BanAccounts';
+import BanAccountsWithSearch from '../components/root-actions/BanAccountsWithSearch';
 import ClearCacheForAccountForm from '../components/root-actions/ClearCacheForAccountForm';
 import ConnectAccountsForm from '../components/root-actions/ConnectAccountsForm';
 import MergeAccountsForm from '../components/root-actions/MergeAccountsForm';
@@ -20,6 +22,10 @@ import { H1, H2, H3, P, Span } from '../components/Text';
 const GRID_TEMPLATE_COLUMNS = ['1fr', 'minmax(220px, 1fr) 6fr'];
 
 const MENU = [
+  {
+    id: 'Accounts',
+    type: 'category',
+  },
   { id: 'Clear cache', title: 'Clear cache for account', Component: ClearCacheForAccountForm },
   { id: 'Connect accounts', Component: ConnectAccountsForm },
   {
@@ -29,6 +35,10 @@ const MENU = [
     description: `Before merging user accounts, you must always make sure that the person who requested it own both emails. Merging means payment methods are merged too, so if we just merge 2 accounts because someones ask for it without verifying we could end up in a very bad situation.\nA simple way to do that is to send a unique random code to the other account they want to claim and ask them to share this code.`,
   },
   { id: 'Unhost account', Component: UnhostAccountForm },
+  {
+    id: 'Contributions',
+    type: 'category',
+  },
   {
     id: 'Move authored contributions',
     Component: MoveAuthoredContributions,
@@ -41,6 +51,21 @@ const MENU = [
     Component: MoveReceivedContributions,
     description: `This tool is meant to edit the account that received a contribution.
     Use it to move contributions to different tiers, sub-projects, events, etc.`,
+  },
+  {
+    id: 'Moderation',
+    type: 'category',
+  },
+  {
+    id: 'Ban accounts',
+    Component: BanAccounts,
+    isDangerous: true,
+    description: 'Use this action to ban an account or a network of accounts.',
+  },
+  {
+    id: 'Search & destroy',
+    Component: BanAccountsWithSearch,
+    isDangerous: true,
   },
 ];
 
@@ -60,16 +85,25 @@ const MenuEntry = styled.button`
     props.isActive &&
     css`
       font-weight: 800;
-      background: #f3f3f3;
+      background: #f5faff;
     `}
 
   &: hover {
     background: #f9f9f9;
   }
+
+  ${props =>
+    props.$type === 'category' &&
+    css`
+      cursor: default;
+      background: #f9f9f9;
+      border-bottom: 1px solid #eaeaea;
+      box-shadow: 0px -3px 6px #eaeaea;
+    `}
 `;
 
 const RootActionsPage = () => {
-  const [selectedMenuEntry, setSelectedMenuEntry] = React.useState(MENU[0]);
+  const [selectedMenuEntry, setSelectedMenuEntry] = React.useState(MENU[1]);
   const router = useRouter();
   const showHiddenActions = Boolean(router.query.showHiddenActions);
   return (
@@ -86,7 +120,8 @@ const RootActionsPage = () => {
               key={menuEntry.id}
               title={menuEntry.title || menuEntry.id}
               isActive={selectedMenuEntry.id === menuEntry.id}
-              onClick={() => setSelectedMenuEntry(menuEntry)}
+              onClick={() => (menuEntry.type === 'category' ? null : setSelectedMenuEntry(menuEntry))}
+              $type={menuEntry.type}
             >
               {menuEntry.id}
             </MenuEntry>

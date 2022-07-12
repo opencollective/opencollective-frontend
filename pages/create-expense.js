@@ -36,7 +36,7 @@ import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
-import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import SignInOrJoinFree, { SignInOverlayBackground } from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import StyledCard from '../components/StyledCard';
 import { H1 } from '../components/Text';
@@ -76,6 +76,7 @@ class CreateExpensePage extends React.Component {
       refetch: PropTypes.func,
       account: PropTypes.shape({
         id: PropTypes.string.isRequired,
+        parent: PropTypes.object,
         name: PropTypes.string.isRequired,
         slug: PropTypes.string.isRequired,
         description: PropTypes.string,
@@ -342,7 +343,14 @@ class CreateExpensePage extends React.Component {
                   position={['fixed', null, 'absolute']}
                   justifyContent={['center', null, 'flex-start']}
                 >
-                  <SignInOrJoinFree routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }} />
+                  <SignInOverlayBackground>
+                    <SignInOrJoinFree
+                      showOCLogo={false}
+                      showSubHeading={false}
+                      hideFooter
+                      routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }}
+                    />
+                  </SignInOverlayBackground>
                 </ContainerOverlay>
               )}
               <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
@@ -385,13 +393,12 @@ class CreateExpensePage extends React.Component {
                                 }}
                                 collective={collective}
                                 borderless
+                                isEditing
                               />
-                              {hasFeature(collective, FEATURES.RECURRING_EXPENSES) && (
-                                <ExpenseRecurringForm
-                                  recurring={this.state.recurring}
-                                  onChange={recurring => this.setState({ recurring })}
-                                />
-                              )}
+                              <ExpenseRecurringForm
+                                recurring={this.state.recurring}
+                                onChange={recurring => this.setState({ recurring })}
+                              />
                             </StyledCard>
                             <Box mt={24}>
                               <ExpenseNotesForm
@@ -494,6 +501,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       isArchived
       expensePolicy
       features {
+        id
         ...NavbarFields
         MULTI_CURRENCY_EXPENSES
       }
@@ -503,6 +511,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       }
 
       stats {
+        id
         balanceWithBlockedFunds {
           valueInCents
           currency
@@ -512,6 +521,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       ... on AccountWithHost {
         isApproved
         host {
+          id
           ...CreateExpenseHostFields
         }
       }
@@ -523,6 +533,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
         isActive
         # NOTE: This will be the account itself in this case
         host {
+          id
           ...CreateExpenseHostFields
         }
       }
@@ -531,10 +542,12 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
         parent {
           id
           slug
+          expensePolicy
         }
       }
     }
     loggedInAccount {
+      id
       ...LoggedInAccountExpensePayoutFields
     }
   }
@@ -558,6 +571,7 @@ const createExpenseMutation = gqlV2/* GraphQL */ `
     $recurring: RecurringExpenseInput
   ) {
     createExpense(expense: $expense, account: $account, recurring: $recurring) {
+      id
       ...ExpensePageExpenseFields
     }
   }
@@ -572,6 +586,7 @@ const addCreateExpenseMutation = graphql(createExpenseMutation, {
 const draftExpenseAndInviteUserMutation = gqlV2/* GraphQL */ `
   mutation DraftExpenseAndInviteUser($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
     draftExpenseAndInviteUser(expense: $expense, account: $account) {
+      id
       ...ExpensePageExpenseFields
     }
   }

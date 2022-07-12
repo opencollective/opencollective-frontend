@@ -3,19 +3,19 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular';
 import copy from 'copy-to-clipboard';
-import { isNil, pickBy, truncate } from 'lodash';
+import { differenceWith, isNil, pickBy, truncate } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
-import PledgedCollectiveCard from '../components/discover/PledgedCollectiveCard';
 import ErrorPage from '../components/ErrorPage';
-import { Box, Flex } from '../components/Grid';
+import { Box, Flex, Grid } from '../components/Grid';
 import Hide from '../components/Hide';
 import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
@@ -38,6 +38,11 @@ const CollectiveCardContainer = styled.div`
   width: 275px;
   animation: ${fadeIn} 0.2s;
 `;
+
+const AllCardsContainer = styled(Grid).attrs({
+  width: [null, '100%'],
+  gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 2fr))',
+})``;
 
 const FILTERS = {
   ALL: 'ALL',
@@ -98,6 +103,8 @@ const constructSortByQuery = sortByValue => {
   let query = {};
   if (sortByValue === 'ACTIVITY') {
     query = { field: 'ACTIVITY', direction: 'DESC' };
+  } else if (sortByValue === 'RANK') {
+    query = { field: 'RANK', direction: 'DESC' };
   } else if (sortByValue === 'CREATED_AT.DESC') {
     query = { field: 'CREATED_AT', direction: 'DESC' };
   } else if (sortByValue === 'CREATED_AT.ASC') {
@@ -130,7 +137,6 @@ const FilterButton = styled(StyledButton).attrs({
     `}
 `;
 
-export const IGNORED_TAGS = ['community', 'user'];
 const DEFAULT_SEARCH_TYPES = ['COLLECTIVE', 'EVENT', 'ORGANIZATION', 'FUND', 'PROJECT'];
 
 class SearchPage extends React.Component {
@@ -140,7 +146,7 @@ class SearchPage extends React.Component {
       type: query.type ? decodeURIComponent(query.type).split(',') : DEFAULT_SEARCH_TYPES,
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
       country: query.country || null,
-      sortBy: query.sortBy || 'ACTIVITY',
+      sortBy: query.sortBy || (query.q ? 'RANK' : 'ACTIVITY'),
       tag: query.tag?.length > 0 ? query.tag.split(',') : [],
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
@@ -158,18 +164,26 @@ class SearchPage extends React.Component {
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object,
     addToast: PropTypes.func.isRequired, // from withToasts
+    isHost: PropTypes.bool,
+    type: PropTypes.array,
   };
 
   constructor(props) {
     super(props);
     this.onClick = this.onClick.bind(this);
-    const { router } = this.props;
-    if (router.query.isHost) {
-      this.state = { filter: 'HOST' };
-    } else if (router.query.type) {
-      this.state = { filter: router.query.type };
+    const term = props.term;
+    if (this.props.isHost) {
+      this.state = { filter: 'HOST', term };
+    } else if (this.props.type.length === 1) {
+      this.state = { filter: this.props.type[0], term };
     } else {
-      this.state = { filter: 'ALL' };
+      this.state = { filter: 'ALL', term };
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.term !== this.props.term) {
+      this.setState({ term: this.props.term });
     }
   }
 
@@ -220,16 +234,12 @@ class SearchPage extends React.Component {
     const { router } = this.props;
     const { q } = form;
 
-    /*
-     * Make sure we don't perform the re-fetch if search term is empty
-     *
-     * TODO: Remove this once, https://github.com/opencollective/opencollective/issues/5454 is done
-     */
-    if (q.value?.trim()?.length === 0) {
-      return;
-    }
-
-    const query = { q: q.value, type: router.query.type };
+    const query = {
+      q: q.value,
+      type: router.query.type,
+      country: router.query.country,
+      sortBy: q.value === '' && router.query.sortBy === 'RANK' ? 'ACTIVITY' : router.query.sortBy,
+    };
     router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
   };
 
@@ -267,9 +277,10 @@ class SearchPage extends React.Component {
   };
 
   render() {
-    const { router, data, term = '', intl } = this.props;
+    const { data, intl } = this.props;
     const { error, loading, accounts, tagStats } = data || {};
-    const tags = router?.query?.tag?.split(',') || [];
+    const tags = this.props.tag || [];
+    const hiddenSelectedTags = differenceWith(tags, tagStats?.nodes, (selectedTag, { tag }) => selectedTag === tag);
 
     if (error) {
       return <ErrorPage data={this.props.data} />;
@@ -277,15 +288,20 @@ class SearchPage extends React.Component {
 
     const { limit = 20, offset, totalCount = 0 } = accounts || {};
     const showTagFilterSection = (accounts?.nodes?.length > 0 || tags.length > 0) && tagStats?.nodes?.length > 0;
-    const showCountriesFilterSection = accounts?.nodes?.length > 0 || router?.query?.country;
-    const showSortFilterSection = accounts?.nodes?.length > 0;
     const getSortOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
-    const sortOptions = [getSortOption('ACTIVITY'), getSortOption('CREATED_AT.DESC'), getSortOption('CREATED_AT.ASC')];
+    const sortOptions = [
+      getSortOption('ACTIVITY'),
+      this.props.term ? getSortOption('RANK') : undefined,
+      getSortOption('CREATED_AT.DESC'),
+      getSortOption('CREATED_AT.ASC'),
+    ];
+    const selectedTypeFilter = this.props.isHost ? 'HOST' : this.props.type.length === 1 ? this.props.type[0] : 'ALL';
 
     return (
       <Page title="Search" showSearch={false}>
         <Container
-          backgroundImage="url(/static/images/search-background.png)"
+          backgroundImage="url(/static/images/home/fiscalhost-blue-bg-lg.png)"
+          style={{ transform: 'rotate(180deg)' }}
           backgroundPosition="center top"
           backgroundSize="cover"
           backgroundRepeat="no-repeat"
@@ -297,14 +313,18 @@ class SearchPage extends React.Component {
           justifyContent="center"
           textAlign="center"
         >
-          <Flex justifyContent="center" flex="1 1 1" width={['288px', 1]}>
-            <SearchFormContainer>
+          <Flex justifyContent="center" flex="1 1 1" width={['288px', 1]} style={{ transform: 'rotate(180deg)' }}>
+            <SearchFormContainer mb={['20px', '48px']}>
               <SearchForm
                 borderRadius="100px"
                 fontSize="16px"
-                placeholder="Search by name, slug, tag, description..."
-                defaultValue={term}
+                height="58px"
+                placeholder={intl.formatMessage({ defaultMessage: 'Search by name, slug, tag, description...' })}
+                value={this.state.term}
+                onChange={value => this.setState({ term: value })}
                 onSubmit={this.refetch}
+                showSearchButton
+                searchButtonStyles={{ minWidth: '40px', height: '40px' }}
               />
             </SearchFormContainer>
           </Flex>
@@ -315,7 +335,7 @@ class SearchPage extends React.Component {
               <StyledFilters
                 filters={Object.keys(FILTERS)}
                 getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
-                selected={this.state.filter}
+                selected={selectedTypeFilter}
                 minButtonWidth="95px"
                 onChange={filter => {
                   this.setState({ filter: filter });
@@ -324,9 +344,12 @@ class SearchPage extends React.Component {
               />
             </Hide>
             <Hide md lg>
+              <FilterLabel htmlFor="collective-filter-type">
+                <FormattedMessage defaultMessage="Profile Type" />
+              </FilterLabel>
               <StyledSelectFilter
                 inputId="collective-type-filter"
-                value={{ label: intl.formatMessage(I18nFilters[this.state.filter]), value: this.state.filter }}
+                value={{ label: intl.formatMessage(I18nFilters[selectedTypeFilter]), value: selectedTypeFilter }}
                 options={Object.keys(FILTERS).map(key => ({ label: intl.formatMessage(I18nFilters[key]), value: key }))}
                 onChange={({ value }) => {
                   this.setState({ filter: value });
@@ -337,36 +360,32 @@ class SearchPage extends React.Component {
           </Flex>
           <StyledHr mt="30px" mb="24px" flex="1" borderStyle="solid" borderColor="rgba(50, 51, 52, 0.2)" />
           <Flex flexDirection={['column', 'row']}>
-            {showSortFilterSection && (
-              <Container pr={[0, '19px']}>
-                <FilterLabel htmlFor="sort-filter-type">
-                  <FormattedMessage defaultMessage="Sort" />
-                </FilterLabel>
-                <StyledSelectFilter
-                  inputId="sort-filter"
-                  value={this.props.sortBy ? getSortOption(this.props.sortBy) : sortOptions[0]}
-                  options={sortOptions}
-                  onChange={sortBy => this.changeSort(sortBy)}
-                  minWidth={[0, '200px']}
-                />
-              </Container>
-            )}
-            {showCountriesFilterSection && (
-              <Container pt={['20px', 0]}>
-                <FilterLabel htmlFor="country-filter-type">
-                  <FormattedMessage id="collective.country.label" defaultMessage="Country" />
-                </FilterLabel>
-                <InputTypeCountry
-                  inputId="search-country-filter"
-                  as={StyledSelectFilter}
-                  defaultValue={this.props.country || 'ALL'}
-                  customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
-                  onChange={country => this.changeCountry(country)}
-                  minWidth={[0, '200px']}
-                  fontSize="12px"
-                />
-              </Container>
-            )}
+            <Container pr={[0, '19px']}>
+              <FilterLabel htmlFor="sort-filter-type">
+                <FormattedMessage defaultMessage="Sort" />
+              </FilterLabel>
+              <StyledSelectFilter
+                inputId="sort-filter"
+                value={this.props.sortBy ? getSortOption(this.props.sortBy) : sortOptions[0]}
+                options={sortOptions.filter(sortOption => sortOption)}
+                onChange={sortBy => this.changeSort(sortBy)}
+                minWidth={[0, '200px']}
+              />
+            </Container>
+            <Container pt={['20px', 0]}>
+              <FilterLabel htmlFor="country-filter-type">
+                <FormattedMessage id="collective.country.label" defaultMessage="Country" />
+              </FilterLabel>
+              <InputTypeCountry
+                inputId="search-country-filter"
+                as={StyledSelectFilter}
+                value={this.props.country || 'ALL'}
+                customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
+                onChange={country => this.changeCountry(country)}
+                minWidth={[0, '200px']}
+                fontSize="12px"
+              />
+            </Container>
             {showTagFilterSection && (
               <Container pl={[0, '23px']} pt={['20px', 0]}>
                 <FilterLabel htmlFor="tag-filter-type">
@@ -387,33 +406,41 @@ class SearchPage extends React.Component {
                         {truncate(node.tag, { length: 20 })}
                       </FilterButton>
                     ))}
+                  {hiddenSelectedTags?.map(tag => (
+                    <FilterButton
+                      as={StyledTag}
+                      key={tag}
+                      title={tag}
+                      variant="rounded-right"
+                      $isSelected={tags.includes(tag)}
+                      onClick={() => this.changeTags(tag)}
+                    >
+                      {truncate(tag, { length: 20 })}
+                    </FilterButton>
+                  ))}
                 </Flex>
               </Container>
             )}
           </Flex>
-          <Flex justifyContent={['center', 'center', 'flex-start']} flexWrap="wrap">
-            {loading
-              ? Array.from(new Array(12)).map((_, index) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <Flex key={index} my={3} mx={2}>
-                    <CollectiveCardContainer>
-                      <LoadingPlaceholder height={336} borderRadius="16px" />
-                    </CollectiveCardContainer>
-                  </Flex>
-                ))
-              : accounts?.nodes?.map(collective => (
-                  <Flex key={collective.slug} my={3} mx={2}>
-                    {collective.isPledged ? (
-                      <CollectiveCardContainer key={collective.id}>
-                        <PledgedCollectiveCard collective={collective} />
+          <Flex mb="64px" justifyContent="center" flexWrap="wrap">
+            <AllCardsContainer>
+              {loading
+                ? Array.from(new Array(12)).map((_, index) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <Flex key={index} my={3} mx={2}>
+                      <CollectiveCardContainer>
+                        <LoadingPlaceholder height={336} borderRadius="16px" />
                       </CollectiveCardContainer>
-                    ) : (
+                    </Flex>
+                  ))
+                : accounts?.nodes?.map(collective => (
+                    <Flex key={collective.slug} my={3} mx={2}>
                       <CollectiveCardContainer key={collective.id}>
                         <SearchCollectiveCard collective={collective} />
                       </CollectiveCardContainer>
-                    )}
-                  </Flex>
-                ))}
+                    </Flex>
+                  ))}
+            </AllCardsContainer>
 
             {accounts?.nodes?.length === 0 && (
               <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
@@ -454,7 +481,7 @@ class SearchPage extends React.Component {
                   </Container>
                   <Container fontSize="18px" lineHeight="26px" pt={16}>
                     <FormattedMessage
-                      defaultMessage="Still no luck? Contact <SupportLink></SupportLink> or find us in <SlackLink>Slack</SlackLink>"
+                      defaultMessage="Still no luck? Contact <SupportLink>support</SupportLink> or find us in <SlackLink>Slack</SlackLink>"
                       values={{
                         SupportLink: I18nSupportLink,
                         SlackLink: getI18nLink({
@@ -538,27 +565,19 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
         slug
         name
         location {
+          id
           country
         }
         tags
         isHost
-        imageUrl
-        backgroundImageUrl
+        imageUrl(height: 96)
+        backgroundImageUrl(height: 208)
         description
-        longDescription
         website
         currency
         stats {
           id
-          totalAmountSpent {
-            currency
-            valueInCents
-          }
-          yearlyBudget {
-            currency
-            valueInCents
-          }
-          totalAmountReceived {
+          totalAmountReceived(useCache: true) {
             currency
             valueInCents
           }
@@ -575,12 +594,13 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
             id
             slug
             backgroundImageUrl
+            location {
+              id
+              country
+            }
           }
         }
         backers: members(role: BACKER) {
-          totalCount
-        }
-        memberOf(role: BACKER) {
           totalCount
         }
       }
@@ -591,6 +611,7 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
 
     tagStats(searchTerm: $term) {
       nodes {
+        id
         tag
       }
     }

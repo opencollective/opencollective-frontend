@@ -20,7 +20,6 @@ import ExpandableExpensePolicies from './ExpandableExpensePolicies';
  */
 const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
   const balanceWithBlockedFunds = collective?.stats.balanceWithBlockedFunds;
-
   return (
     <Box width="100%">
       <Box display={['none', 'block']}>
@@ -64,7 +63,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
                   </Span>
                   <br />
                   <LinkCollective collective={host}>
-                    {collective && (collective.isApproved || collective.id === host.id) ? (
+                    {collective?.isActive ? (
                       host.name
                     ) : (
                       <FormattedMessage
@@ -102,7 +101,8 @@ ExpenseInfoSidebar.propTypes = {
     id: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     type: PropTypes.string,
-    isApproved: PropTypes.bool,
+    parent: PropTypes.object,
+    isActive: PropTypes.bool,
     stats: PropTypes.shape({
       balanceWithBlockedFunds: PropTypes.shape({
         valueInCents: PropTypes.number.isRequired,

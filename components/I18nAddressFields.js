@@ -117,7 +117,7 @@ const ZoneSelect = ({ info, required, value, name, label, onChange, id, error, .
 };
 
 ZoneSelect.propTypes = {
-  info: PropTypes.array.isRequired,
+  info: PropTypes.array,
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   error: PropTypes.any,
@@ -304,7 +304,7 @@ const I18nAddressFields = ({
 
 I18nAddressFields.propTypes = {
   /** ISO country code passed down from ExpenseFormPayeeStep. */
-  selectedCountry: PropTypes.string.isRequired,
+  selectedCountry: PropTypes.string,
   name: PropTypes.string,
   prefix: PropTypes.string,
   required: PropTypes.bool,

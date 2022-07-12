@@ -36,6 +36,10 @@ const budgetSectionAccountFieldsFragment = gqlV2/* GraphQL */ `
         valueInCents
         currency
       }
+      consolidatedBalance {
+        valueInCents
+        currency
+      }
       yearlyBudget {
         valueInCents
         currency
@@ -72,10 +76,12 @@ export const budgetSectionQuery = gqlV2/* GraphQL */ `
     expenses(account: { slug: $slug }, limit: $limit, includeChildrenExpenses: true) {
       totalCount
       nodes {
+        id
         ...ExpensesListFieldsFragment
       }
     }
     account(slug: $slug) {
+      id
       ...BudgetSectionAccountFields
     }
   }
@@ -87,6 +93,7 @@ export const budgetSectionQuery = gqlV2/* GraphQL */ `
 export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
   query BudgetSectionWithHost($slug: String!, $hostSlug: String!, $limit: Int!, $kind: [TransactionKind]) {
     host(slug: $hostSlug) {
+      id
       ...ExpenseHostFields
     }
     transactions(
@@ -102,10 +109,12 @@ export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
     expenses(account: { slug: $slug }, limit: $limit, includeChildrenExpenses: true) {
       totalCount
       nodes {
+        id
         ...ExpensesListFieldsFragment
       }
     }
     account(slug: $slug) {
+      id
       ...BudgetSectionAccountFields
     }
   }

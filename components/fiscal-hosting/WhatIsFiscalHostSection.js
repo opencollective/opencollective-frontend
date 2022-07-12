@@ -1,8 +1,8 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import Illustration from '../collectives/HomeIllustration';
 import { Box, Flex } from '../Grid';
-import Illustration from '../home/HomeIllustration';
 import { H2, P } from '../Text';
 
 const WhatIsFiscalHost = () => (

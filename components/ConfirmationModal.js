@@ -30,6 +30,13 @@ const confirmBtnMsgs = defineMessages({
 });
 
 /**
+ * A special value to return from the `continueHandler` to terminate the modal. Its loading state
+ * will therefore not be updated to false, which will prevent the "Warning: Can't perform a React state update on an unmounted component"
+ * issue.
+ */
+export const CONFIRMATION_MODAL_TERMINATE = { __CONFIRMATION_MODAL_TERMINATE: true };
+
+/**
  * ConfirmationModal component. Uses `StyledModal` to create a reusable modal mainly for
  * confirmation purpose.
  */
@@ -76,11 +83,14 @@ const ConfirmationModal = ({
             loading={submitting}
             disabled={disableSubmit}
             onClick={async () => {
+              let result;
               try {
                 setSubmitting(true);
-                await continueHandler();
+                result = await continueHandler();
               } finally {
-                setSubmitting(false);
+                if (result !== CONFIRMATION_MODAL_TERMINATE) {
+                  setSubmitting(false);
+                }
               }
             }}
           >

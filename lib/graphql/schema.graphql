@@ -172,7 +172,8 @@ interface CollectiveInterface {
   expenses(type: String, limit: Int, offset: Int, status: String, includeHostedCollectives: Boolean): [ExpenseType]
   role: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
@@ -258,7 +259,7 @@ type UserDetails {
   CollectiveId: Int
   collective: CollectiveInterface
   username: String @deprecated(reason: "2022-01-13: Not used anymore. Will be ignored")
-  name: String
+  name: String @deprecated(reason: "2022-06-02: Please use collective.name")
   image: String
   email: String
   emailWaitingForValidation: String
@@ -1075,6 +1076,7 @@ type CollectiveFeatures {
   The id of the account
   """
   id: String!
+  ALL: CollectiveFeatureStatus
   RECEIVE_FINANCIAL_CONTRIBUTIONS: CollectiveFeatureStatus
   RECURRING_CONTRIBUTIONS: CollectiveFeatureStatus
   TRANSACTIONS: CollectiveFeatureStatus
@@ -1146,7 +1148,7 @@ type PlanType {
   transferwisePayouts: Int
   transferwisePayoutsLimit: Int
   hostFees: Boolean
-  hostFeeSharePercent: Int
+  hostFeeSharePercent: Float
   platformTips: Boolean
 }
 
@@ -1506,7 +1508,12 @@ type Collective implements CollectiveInterface {
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+
+  """
+  The URL of the repository
+  """
+  repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
@@ -1742,7 +1749,12 @@ type Event implements CollectiveInterface {
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+
+  """
+  The URL of the repository
+  """
+  repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
@@ -1978,7 +1990,12 @@ type Fund implements CollectiveInterface {
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+
+  """
+  The URL of the repository
+  """
+  repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
@@ -2214,7 +2231,12 @@ type Organization implements CollectiveInterface {
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+
+  """
+  The URL of the repository
+  """
+  repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
@@ -2451,7 +2473,12 @@ type Project implements CollectiveInterface {
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+
+  """
+  The URL of the repository
+  """
+  repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
@@ -2926,7 +2953,12 @@ type User implements CollectiveInterface {
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+
+  """
+  The URL of the repository
+  """
+  repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
@@ -3164,7 +3196,12 @@ type Vendor implements CollectiveInterface {
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
   role: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+
+  """
+  The URL of the repository
+  """
+  repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
   events(
@@ -3432,6 +3469,11 @@ type Query {
     skipRecentAccounts: Boolean = false
 
     """
+    Whether to skip guest accounts
+    """
+    skipGuests: Boolean = true
+
+    """
     Limit the amount of results. Defaults to 20
     """
     limit: Int = 20
@@ -3551,6 +3593,7 @@ This is the root mutation
 type Mutation {
   createCollective(collective: CollectiveInputType!): CollectiveInterface
   createCollectiveFromGithub(collective: CollectiveInputType!): CollectiveInterface
+    @deprecated(reason: "2022-05-03: This mutation is deprecated and can only be used in test environments.")
   editCollective(collective: CollectiveInputType!): CollectiveInterface
   deleteCollective(id: Int!): CollectiveInterface
   deleteUserCollective(id: Int!): CollectiveInterface
@@ -3820,7 +3863,8 @@ input CollectiveInputType {
   company: String
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   description: String
   longDescription: String
   expensePolicy: String
@@ -3987,7 +4031,8 @@ input CollectiveAttributesInputType {
   expensePolicy: String
   website: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   location: LocationInputType
   startsAt: String
   endsAt: String
@@ -4030,7 +4075,8 @@ input UserInputType {
   username: String @deprecated(reason: "2022-01-13: Not used anymore. Will be ignored")
   description: String
   twitterHandle: String
-  githubHandle: String
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String
   website: String
   newsletterOptIn: Boolean
   location: LocationInputType

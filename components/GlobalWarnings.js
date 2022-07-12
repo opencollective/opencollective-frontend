@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+
+import I18nFormatters from './I18nFormatters';
 import { P } from './Text';
-import { useUser } from './UserProvider';
 
 const GlobalWarningContainer = styled.div`
   width: 100;
@@ -22,7 +24,7 @@ const GlobalWarningContainer = styled.div`
  * Displays warnings related to the user account.
  */
 const GlobalWarnings = ({ collective }) => {
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
 
   if (collective?.isFrozen) {
     // Frozen collectives
@@ -42,7 +44,8 @@ const GlobalWarnings = ({ collective }) => {
       <GlobalWarningContainer>
         <FormattedMessage
           id="warning.limitedAccount"
-          defaultMessage="Your account is currently limited. If you think this is a mistake, please contact support@opencollective.com."
+          defaultMessage="Your account is currently limited. If you think this is a mistake, please <SupportLink>contact support</SupportLink>."
+          values={I18nFormatters}
         />
       </GlobalWarningContainer>
     );

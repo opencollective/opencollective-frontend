@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Edit } from '@styled-icons/material/Edit';
-import { get, omit } from 'lodash';
+import { compose, get, omit, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { defineMessages, FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
+import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
@@ -24,12 +25,14 @@ import Link from '../../Link';
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
+import StyledHr from '../../StyledHr';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
 import { P } from '../../Text';
+import { withToasts } from '../../ToastProvider';
 import { withUser } from '../../UserProvider';
-import SettingsSubtitle from '../SettingsSubtitle';
+import ResendMemberInviteBtn from '../ResendMemberInviteBtn';
 
 import EditMemberModal from './EditMemberModal';
 import InviteMemberModal from './InviteMemberModal';
@@ -54,7 +57,7 @@ const AllCardsContainerMobile = styled.div`
 
 const TagContainer = styled(Box)`
   position: absolute;
-  bottom: 10%;
+  bottom: 16%;
 `;
 
 const InviteNewCard = styled(MemberContainer)`
@@ -76,8 +79,10 @@ const EMPTY_MEMBERS = [{}];
 class Members extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
+    host: PropTypes.object,
     LoggedInUser: PropTypes.object.isRequired,
     refetchLoggedInUser: PropTypes.func.isRequired,
+    addToast: PropTypes.func.isRequired,
     /** @ignore from injectIntl */
     intl: PropTypes.object.isRequired,
     /** @ignore from Apollo */
@@ -149,15 +154,18 @@ class Members extends React.Component {
   });
 
   renderMember = (member, index, nbAdmins, memberModalKey) => {
-    const { intl, collective, LoggedInUser, refetchLoggedInUser } = this.props;
+    const { intl, collective, host, LoggedInUser, refetchLoggedInUser } = this.props;
 
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
     const isInvitation = member.__typename === 'MemberInvitation';
     const collectiveId = get(member, 'memberAccount.id');
     const memberCollective = member.account || member.memberAccount;
     const memberKey = member.id ? `member-${member.id}` : `collective-${collectiveId}`;
+    const isAdmin = this.state.currentMember?.role === roles.ADMIN;
     const isLastAdmin =
-      nbAdmins === 1 && this.state.currentMember?.role === roles.ADMIN && this.state.currentMember?.id;
+      isAdmin &&
+      this.state.currentMember?.id &&
+      nbAdmins <= (host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins || 1);
 
     return (
       <MemberContainer
@@ -183,6 +191,7 @@ class Members extends React.Component {
               isLastAdmin={isLastAdmin}
               LoggedInUser={LoggedInUser}
               refetchLoggedInUser={refetchLoggedInUser}
+              canRemove={!(isInvitation || isLastAdmin)}
             />
           ) : (
             <StyledRoundButton
@@ -207,43 +216,75 @@ class Members extends React.Component {
             <FormattedMessage id="user.since.label" defaultMessage="Since" />:{' '}
             <FormattedDate value={get(member, 'since')} />
           </P>
-          <P fontSize="11px" lineHeight="16px" mx={2} fontWeight={400} mb={5}>
-            {get(member, 'description')}
-          </P>
-          <TagContainer>
-            {isInvitation && (
-              <StyledTooltip content={intl.formatMessage(this.messages.memberPendingDetails)}>
-                <StyledTag data-cy="member-pending-tag" textTransform="uppercase" display="block" type="info">
-                  <FormattedMessage id="Pending" defaultMessage="Pending" />
-                </StyledTag>
-              </StyledTooltip>
-            )}
-          </TagContainer>
+          <Box mb={5} overflow="hidden" height={32}>
+            <P fontSize="11px" lineHeight="16px" mx={2} fontWeight={400}>
+              {truncate(get(member, 'description'), {
+                length: 30,
+              })}
+            </P>
+          </Box>
+          {isInvitation && (
+            <React.Fragment>
+              <TagContainer>
+                <StyledTooltip content={intl.formatMessage(this.messages.memberPendingDetails)}>
+                  <StyledTag data-cy="member-pending-tag" textTransform="uppercase" display="block" type="info">
+                    <FormattedMessage id="Pending" defaultMessage="Pending" />
+                  </StyledTag>
+                </StyledTooltip>
+              </TagContainer>
+              <ResendMemberInviteBtn member={member} collective={collective} />
+            </React.Fragment>
+          )}
         </Flex>
       </MemberContainer>
     );
   };
 
   renderSection() {
-    const { intl, collective } = this.props;
+    const { intl, collective, host } = this.props;
     const { members, error } = this.state;
     const nbAdmins = members.filter(m => m.role === roles.ADMIN && m.id).length;
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
 
     return (
-      <React.Fragment className="EditMembers">
-        <Box className="members">
-          {collective.type === 'COLLECTIVE' && (
-            <SettingsSubtitle>
-              <FormattedMessage
-                id="members.edit.description"
-                defaultMessage="Note: Only Collective Admins can edit this Collective and approve expenses."
-              />
-            </SettingsSubtitle>
-          )}
+      <React.Fragment>
+        <Box className="members" mt={3}>
+          <P lineHeight="20px" letterSpacing="normal">
+            <FormattedMessage defaultMessage="Core Contributors are the people closely associated with your Collective, who will show up on your Collective page as part of the team. Collective Admins are Core Contributors with extra permissions, like editing the Collective settings and approving expenses. Admins get notifications of activity on your Collective. " />
+          </P>
+          {[CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(collective.type) &&
+            host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+              <P lineHeight="20px" letterSpacing="normal" mt={3}>
+                <FormattedMessage
+                  defaultMessage="Your host requires that Collectives have {numberOfAdmins, plural, one {# active administrator} other {# active administrators} }."
+                  values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                />
+                {host?.policies?.COLLECTIVE_MINIMUM_ADMINS.freeze && (
+                  <React.Fragment>
+                    &nbsp;
+                    <FormattedMessage
+                      defaultMessage="In case of a shortfall, your collective will be frozen until the minimum required administrators are added."
+                      values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                    />
+                  </React.Fragment>
+                )}
+              </P>
+            )}
+
+          <StyledHr mt={4} borderColor="black.200" flex="1 1" />
+
+          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
+            nbAdmins < host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins && (
+              <MessageBox type="error" mt={4} fontSize="13px">
+                <FormattedMessage
+                  defaultMessage="Your collective doesn’t meet the requirements of having a minimum of {numberOfAdmins, plural, one {# administrator} other {# administrators} }. Add more administrators to comply with your host’s policy."
+                  values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                />
+              </MessageBox>
+            )}
 
           <Hide md lg>
-            <Grid>
+            <Grid mt={4}>
               <HorizontalScroller container={AllCardsContainerMobile}>
                 <Flex mx={2}>
                   <InviteNewCard mt={2} mx={2}>
@@ -269,7 +310,7 @@ class Members extends React.Component {
             </Grid>
           </Hide>
           <Hide xs sm>
-            <Grid gridGap={20} gridTemplateColumns="repeat(auto-fill, 164px)">
+            <Grid mt={4} gridGap={20} gridTemplateColumns="repeat(auto-fill, 164px)">
               {this.state.showInviteModal ? (
                 <InviteMemberModal
                   intl={intl}
@@ -319,7 +360,6 @@ class Members extends React.Component {
 
   render() {
     const { data, intl } = this.props;
-
     if (data.loading) {
       return <Loading />;
     } else if (data.error) {
@@ -403,6 +443,7 @@ export const coreContributorsQuery = gqlV2/* GraphQL */ `
       }
       members(role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {
         nodes {
+          id
           ...MemberFields
         }
       }
@@ -436,4 +477,6 @@ const addCoreContributorsData = graphql(coreContributorsQuery, {
   }),
 });
 
-export default injectIntl(addCoreContributorsData(withUser(Members)));
+const inject = compose(withUser, injectIntl, withToasts, addCoreContributorsData);
+
+export default inject(Members);

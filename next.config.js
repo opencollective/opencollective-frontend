@@ -32,7 +32,7 @@ const nextConfig = {
         NEW_ADMIN_DASHBOARD: false,
         WISE_ENVIRONMENT: 'sandbox',
         HCAPTCHA_SITEKEY: false,
-        CAPTCHA_ENABLED: true,
+        CAPTCHA_ENABLED: false,
         CAPTCHA_PROVIDER: 'HCAPTCHA',
       }),
     );
@@ -96,6 +96,9 @@ const nextConfig = {
     config.module.rules.unshift({
       test: /public[\\/].*\.(html)$/,
       loader: 'html-loader',
+      options: {
+        esModule: false,
+      },
     });
 
     // Load images in base64
@@ -191,6 +194,12 @@ const nextConfig = {
       {
         source: '/hosts',
         destination: '/search?isHost=true',
+        permanent: true,
+      },
+      // Redirect legacy /discover page link to new /search page
+      {
+        source: '/discover',
+        destination: '/search',
         permanent: true,
       },
     ];

@@ -10,16 +10,16 @@ import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isValidRelativeUrl } from '../lib/utils';
 
 import Body from '../components/Body';
-import Footer from '../components/Footer';
 import { Flex } from '../components/Grid';
 import Header from '../components/Header';
 import Loading from '../components/Loading';
+import LoadingGrid from '../components/LoadingGrid';
 import MessageBox from '../components/MessageBox';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-class SigninPage extends React.Component {
+class SigninV2Page extends React.Component {
   static getInitialProps({ query: { token, next, form, email }, req }) {
     // Decode next URL if URI encoded
     if (next && next.startsWith('%2F')) {
@@ -54,7 +54,7 @@ class SigninPage extends React.Component {
   constructor(props) {
     super(props);
     this.robotsDetector = new RobotsDetector();
-    this.state = { error: null, success: null, isRobot: props.isSuspiciousUserAgent };
+    this.state = { error: null, success: null, isRobot: props.isSuspiciousUserAgent, redirecting: false };
   }
 
   componentDidMount() {
@@ -72,7 +72,7 @@ class SigninPage extends React.Component {
       this.initialize();
     } else if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-account') {
       // --- User logged in ---
-      this.setState({ success: true });
+      this.setState({ success: true, redirecting: true });
       // Avoid redirect loop: replace '/signin' redirects by '/'
       const { next } = this.props;
       const redirect = next && next.match(/^\/?signin[?/]?/) ? null : next;
@@ -169,6 +169,10 @@ class SigninPage extends React.Component {
 
     const error = errorLoggedInUser || this.state.error;
 
+    if (loadingLoggedInUser || this.state.redirecting || (token && !error)) {
+      return <LoadingGrid />;
+    }
+
     return (
       <React.Fragment>
         {error && !error.includes('Two-factor authentication is enabled') && (
@@ -214,18 +218,21 @@ class SigninPage extends React.Component {
     return (
       <div className="LoginPage">
         <Header
-          title="Login"
+          title={this.props.form === 'signin' ? 'Sign In' : 'Create Account'}
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
+          menuItemsV2={{ solutions: false, product: false, company: false, docs: false }}
+          menuItems={{ discover: false, docs: false, howItWorks: false, pricing: false }}
+          showSearch={false}
+          showProfileAndChangelogMenu={false}
         />
         <Body>
           <Flex flexDirection="column" alignItems="center" my={[4, 6]} p={2}>
             {this.renderContent()}
           </Flex>
         </Body>
-        <Footer />
       </div>
     );
   }
 }
 
-export default withUser(withRouter(SigninPage));
+export default withUser(withRouter(SigninV2Page));

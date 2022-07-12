@@ -4,11 +4,10 @@ import { gql, useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { getErrorFromGraphqlException } from '../lib/errors';
-
 import Container from './Container';
 import { Box } from './Grid';
 import MessageBox from './MessageBox';
+import MessageBoxGraphqlError from './MessageBoxGraphqlError';
 import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
@@ -100,11 +99,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose }) => {
           />
         )}
       </StyledInputField>
-      {error && (
-        <MessageBox type="error" withIcon mt={3}>
-          {error.message}
-        </MessageBox>
-      )}
+      {error && <MessageBoxGraphqlError error={error} mt={3} />}
       <Container mt={2}>
         <FormattedMessage defaultMessage="Message needs to be at least 10 characters long" />
       </Container>
@@ -135,7 +130,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose }) => {
                 onClose();
               }
             } catch (e) {
-              setError(getErrorFromGraphqlException(e));
+              setError(e);
             }
           }}
         >

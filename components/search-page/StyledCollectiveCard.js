@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { injectIntl, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../../lib/collective.lib';
+import { IGNORED_TAGS } from '../../lib/constants/collectives';
 import { getIntlDisplayNames } from '../../lib/i18n';
 
-import { IGNORED_TAGS } from '../../pages/search';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import I18nCollectiveTags from '../I18nCollectiveTags';
@@ -161,8 +161,9 @@ const StyledCollectiveCard = ({
 }) => {
   const intl = useIntl();
   const regionNames = getIntlDisplayNames(intl.locale, 'region');
-  const countryString = collective.location?.country
-    ? `${getFlagEmoji(collective.location.country)} ${regionNames.of(collective.location.country)}`
+  const collectiveCountry = collective.location?.country || collective.parent?.location?.country;
+  const countryString = collectiveCountry
+    ? `${getFlagEmoji(collectiveCountry)} ${regionNames.of(collectiveCountry)}`
     : null;
 
   return (
@@ -251,12 +252,14 @@ StyledCollectiveCard.propTypes = {
     host: PropTypes.shape({
       // TODO: getCollectiveMainTag should be based on slug
       id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      location: PropTypes.shape({ country: PropTypes.string }),
     }),
     parentCollective: PropTypes.shape({
       backgroundImageUrl: PropTypes.string,
     }),
     parent: PropTypes.shape({
       backgroundImageUrl: PropTypes.string,
+      location: PropTypes.shape({ country: PropTypes.string }),
     }),
   }).isRequired,
   borderRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -270,4 +273,4 @@ StyledCollectiveCard.defaultProps = {
   useLink: true,
 };
 
-export default injectIntl(StyledCollectiveCard);
+export default StyledCollectiveCard;

@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import NextIllustration from '../collectives/HomeNextIllustration';
+import SectionSubtitle from '../collectives/SectionSubtitle';
+import SectionTitle from '../collectives/SectionTitle';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
-import NextIllustration from '../home/HomeNextIllustration';
-import SectionSubtitle from '../home/SectionSubtitle';
-import SectionTitle from '../home/SectionTitle';
 import StyledCarousel from '../StyledCarousel';
 import { H3, P } from '../Text';
 
@@ -281,6 +281,7 @@ const WhoIsFiscalHosting = () => {
 
         <StyledCarousel display={['none', 'block']} width="100%" maxWidth="1200px" controllerPosition="side">
           {Object.keys(WHO_IS_FISCAL_HOSTING_FOR).map((categories, index) => (
+            // eslint-disable-next-line react/no-array-index-key
             <PotentialUsers key={index.toString()} users={WHO_IS_FISCAL_HOSTING_FOR[categories]} />
           ))}
         </StyledCarousel>

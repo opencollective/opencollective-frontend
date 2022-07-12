@@ -11,6 +11,10 @@ exports.REWRITES = [
     destination: '/fiscal-hosting',
   },
   {
+    source: '/welcome',
+    destination: '/welcome',
+  },
+  {
     source: '/:pageSlug(widgets|tos|privacypolicy|hiring)',
     destination: '/staticPage',
   },
@@ -21,6 +25,10 @@ exports.REWRITES = [
   {
     source: '/signin/sent',
     destination: '/signinLinkSent',
+  },
+  {
+    source: '/oauth/authorize',
+    destination: '/oauth/authorize',
   },
   {
     source: '/deleteCollective/confirmed',
@@ -103,7 +111,7 @@ exports.REWRITES = [
     destination: '/create-project',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',
     destination: '/admin-panel',
   },
   {
@@ -268,8 +276,8 @@ exports.REWRITES = [
     destination: '/home',
   },
   {
-    source: '/discover',
-    destination: '/discover',
+    source: '/collectives',
+    destination: '/collectives',
   },
   {
     source: '/search',

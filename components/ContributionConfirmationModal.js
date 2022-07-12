@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -12,6 +12,7 @@ import { Box, Flex } from './Grid';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
 import StyledInputAmount from './StyledInputAmount';
+import StyledInputPercentage from './StyledInputPercentage';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
@@ -39,16 +40,21 @@ const confirmContributionMutation = gqlV2/* GraphQL */ `
 `;
 
 const ContributionConfirmationModal = ({ order, onClose }) => {
+  const defaultHostFeePercent = order.toAccount.bankTransfersHostFeePercent;
   const platformTipAmount = order.platformTipAmount?.valueInCents || 0;
   const amountInitiated = order.amount.valueInCents + platformTipAmount;
   const currency = order.amount.currency;
   const [amountReceived, setAmountReceived] = useState(amountInitiated);
   const [platformTip, setPlatformTip] = useState(platformTipAmount);
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
+  const [hostFeePercent, setHostFeePercent] = useState(defaultHostFeePercent);
   const intl = useIntl();
   const { addToast } = useToasts();
   const [confirmOrder, { loading }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
-  const netAmount = amountReceived - platformTip;
+  const amount = amountReceived - platformTip;
+  const hostFee = Math.round(amount * hostFeePercent) / 100;
+  const netAmount = amount - paymentProcessorFee - hostFee;
+  const canAddHostFee = !order.toAccount.isHost;
 
   const triggerAction = async () => {
     // Prevent submitting the action if another one is being submitted at the same time
@@ -60,8 +66,8 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
       id: order.id,
     };
 
-    if (netAmount !== order.amount.valueInCents) {
-      orderUpdate.amount = { valueInCents: netAmount, currency };
+    if (amount !== order.amount.valueInCents) {
+      orderUpdate.amount = { valueInCents: amount, currency };
     }
 
     if (paymentProcessorFee !== 0) {
@@ -70,6 +76,10 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
 
     if (platformTip !== order.platformTipAmount?.valueInCents) {
       orderUpdate.platformTip = { valueInCents: platformTip, currency };
+    }
+
+    if (defaultHostFeePercent !== hostFeePercent) {
+      orderUpdate.hostFeePercent = hostFeePercent;
     }
 
     try {
@@ -132,7 +142,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
         <Container>
           <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
             <Span fontSize="14px" lineHeight="20px" fontWeight="400">
-              <FormattedMessage defaultMessage="Payment processor fees" values={{ collective: order.toAccount.name }} />
+              <FormattedMessage id="contribution.paymentFee" defaultMessage="Payment processor fee" />
             </Span>
             <StyledInputAmount
               name="paymentProcessorFee"
@@ -159,16 +169,71 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
             />
           </Flex>
         </Container>
+        {canAddHostFee && (
+          <Fragment>
+            <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
+            <Container>
+              <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
+                <Span fontSize="14px" lineHeight="20px" fontWeight="400">
+                  <FormattedMessage id="HostFee" defaultMessage="Host fee" />
+                </Span>
+                <StyledInputPercentage
+                  name="hostFeePercent"
+                  data-cy="host-fee-percent"
+                  value={hostFeePercent}
+                  onChange={value => setHostFeePercent(value)}
+                />
+              </Flex>
+            </Container>
+          </Fragment>
+        )}
         <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
         <Container>
           <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
             <Span fontSize="14px" lineHeight="20px" fontWeight="500">
               <FormattedMessage
-                defaultMessage="Net Amount for {collective}:"
+                defaultMessage="Amount for {collective}:"
                 values={{ collective: order.toAccount.name }}
               />
             </Span>
             <Box fontSize="16px" lineHeight="24px" fontWeight="700" ml="16px">
+              <FormattedMoneyAmount amount={amount} currency={currency} precision={2} amountStyles={null} />
+            </Box>
+          </Flex>
+        </Container>
+        <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
+        <Container>
+          <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
+            <Span fontSize="12px" lineHeight="20px" fontWeight="500">
+              <FormattedMessage defaultMessage="Payment Processor Fee:" />
+            </Span>
+            <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
+              <FormattedMoneyAmount
+                amount={paymentProcessorFee}
+                currency={currency}
+                precision={2}
+                amountStyles={null}
+              />
+            </Box>
+          </Flex>
+          {canAddHostFee && (
+            <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
+              <Span fontSize="12px" lineHeight="20px" fontWeight="500">
+                <FormattedMessage defaultMessage="Host Fee:" />
+              </Span>
+              <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
+                <FormattedMoneyAmount amount={hostFee} currency={currency} precision={2} amountStyles={null} />
+              </Box>
+            </Flex>
+          )}
+          <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
+            <Span fontSize="12px" lineHeight="20px" fontWeight="500">
+              <FormattedMessage
+                defaultMessage="Net Amount for {collective}:"
+                values={{ collective: order.toAccount.name }}
+              />
+            </Span>
+            <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
               <FormattedMoneyAmount amount={netAmount} currency={currency} precision={2} amountStyles={null} />
             </Box>
           </Flex>
@@ -195,9 +260,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
             <FormattedMessage
               defaultMessage="Confirm contribution of {amount}"
               values={{
-                amount: (
-                  <FormattedMoneyAmount amount={netAmount} currency={currency} precision={2} amountStyles={null} />
-                ),
+                amount: <FormattedMoneyAmount amount={amount} currency={currency} precision={2} amountStyles={null} />,
               }}
             />
           </StyledButton>

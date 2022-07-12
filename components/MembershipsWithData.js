@@ -123,6 +123,7 @@ const membershipsQuery = gql`
       role
       createdAt
       stats {
+        id
         totalDonations
       }
       tier {
@@ -141,6 +142,7 @@ const membershipsQuery = gql`
         stats {
           id
           backers {
+            id
             all
           }
           yearlyBudget

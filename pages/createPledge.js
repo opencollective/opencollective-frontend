@@ -2,7 +2,7 @@ import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import themeGet from '@styled-system/theme-get';
+import { themeGet } from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -649,7 +649,7 @@ class CreatePledgePage extends React.Component {
                 </summary>
                 <FormattedMessage
                   id="createPledge.faq.howToClaim"
-                  defaultMessage="You’ll need to contact <SupportLink></SupportLink> to prove that you are an admin of this project."
+                  defaultMessage="You’ll need to contact <SupportLink>support</SupportLink> to prove that you are an admin of this project."
                   values={I18nFormatters}
                 />
               </Details>

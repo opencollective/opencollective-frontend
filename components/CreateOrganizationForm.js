@@ -75,7 +75,7 @@ const placeholders = {
 const CreateOrganizationForm = props => {
   const { intl, error, loading, LoggedInUser, onSubmit, updateAdmins } = props;
   const [authorization, setAuthorization] = useState(false);
-  const [admins, setAdmins] = useState([{ role: 'ADMIN', member: LoggedInUser.collective }]);
+  const [admins, setAdmins] = useState([]);
   const initialValues = {
     name: '',
     legalName: '',
@@ -353,11 +353,14 @@ const CreateOrganizationForm = props => {
                         <Flex data-cy="org-profile-card" mt={2}>
                           {admins.length > 0 && (
                             <Flex width="100%" flexWrap="wrap">
+                              <OnboardingProfileCard
+                                key={LoggedInUser.collective.id}
+                                collective={LoggedInUser.collective}
+                              />
                               {admins.map(admin => (
                                 <OnboardingProfileCard
                                   key={admin.member.id}
                                   collective={admin.member}
-                                  adminCollective={LoggedInUser.collective}
                                   removeAdmin={removeAdmin}
                                 />
                               ))}

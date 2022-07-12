@@ -11,7 +11,6 @@ import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import { pickBy } from 'lodash';
-import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -24,7 +23,7 @@ import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
 import AssignVirtualCardBtn from '../AssignVirtualCardBtn';
-import ContactCollectiveModal from '../ContactCollectiveModal';
+import ContactCollectiveBtn from '../ContactCollectiveBtn';
 import Container from '../Container';
 import CreateVirtualCardBtn from '../CreateVirtualCardBtn';
 import { Box, Flex } from '../Grid';
@@ -183,8 +182,6 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
   const hasNewAdminPanel = parseToBoolean(getEnvVar('NEW_ADMIN_DASHBOARD'));
-  const [showContactModal, setShowContactModal] = React.useState(false);
-  const router = useRouter();
 
   // Do not render the menu if there are no available CTAs
   if (isEmpty) {
@@ -243,7 +240,11 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasSubmitExpense && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE}>
-                        <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/expenses/new`}>
+                        <StyledLink
+                          data-cy="submit-expense-dropdown"
+                          as={Link}
+                          href={`${getCollectivePageRoute(collective)}/expenses/new`}
+                        >
                           <Container p={ITEM_PADDING}>
                             <Receipt size="20px" />
                             <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
@@ -305,17 +306,14 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasContact && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CONTACT}>
-                        <StyledButton
-                          onClick={() =>
-                            LoggedInUser ? setShowContactModal(true) : router.push(`/${collective.slug}/contact`)
-                          }
-                          borderRadius={0}
-                          p={ITEM_PADDING}
-                          isBorderless
-                        >
-                          <Envelope size="20px" />
-                          <FormattedMessage id="Contact" defaultMessage="Contact" />
-                        </StyledButton>
+                        <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
+                          {btnProps => (
+                            <StyledButton {...btnProps} borderRadius={0} p={ITEM_PADDING} isBorderless>
+                              <Envelope size="20px" />
+                              <FormattedMessage id="Contact" defaultMessage="Contact" />
+                            </StyledButton>
+                          )}
+                        </ContactCollectiveBtn>
                       </MenuItem>
                     )}
                     {callsToAction.hasApply && (
@@ -388,9 +386,6 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
           )}
         </ActionsDropdown>
       </Box>
-      {showContactModal && (
-        <ContactCollectiveModal collective={collective} onClose={() => setShowContactModal(false)} />
-      )}
     </Container>
   );
 };

@@ -22,6 +22,7 @@ import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
 import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
+import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
 import StyledLink from './StyledLink';
 import { P, Span } from './Text';
@@ -49,6 +50,11 @@ const ViewProfileLink = styled(StyledLink)`
     border-color: black;
     color: black;
   }
+`;
+
+const StyledProfileButton = styled(StyledButton)`
+  padding: 0;
+  background-color: white !important;
 `;
 
 const UserMenuLinkEntry = props => {
@@ -377,17 +383,19 @@ class TopBarProfileMenu extends React.Component {
     const { LoggedInUser } = this.props;
 
     return (
-      <Flex alignItems="center" onClick={this.toggleProfileMenu} data-cy="user-menu-trigger">
-        <Flex>
-          <Avatar collective={get(LoggedInUser, 'collective')} radius="40px" mr={2} />
-          <Hide sm md lg>
-            <Container mx={-20} my={-1}>
-              <ChangelogTrigger height="24px" width="24px" backgroundSize="9.49px 13.5px" />
-            </Container>
-          </Hide>
-        </Flex>
-        <Hide xs>
-          <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
+      <React.Fragment>
+        <StyledProfileButton isBorderless onClick={this.toggleProfileMenu}>
+          <Flex alignItems="center" data-cy="user-menu-trigger">
+            <Avatar collective={get(LoggedInUser, 'collective')} radius="40px" mr={2} />
+            <Hide xs>
+              <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
+            </Hide>
+          </Flex>
+        </StyledProfileButton>
+        <Hide sm md lg>
+          <Container position="absolute" mx={27} my={-47}>
+            <ChangelogTrigger height="24px" width="24px" backgroundSize="9.49px 13.5px" />
+          </Container>
         </Hide>
         {showProfileMenu && (
           <React.Fragment>
@@ -395,7 +403,7 @@ class TopBarProfileMenu extends React.Component {
             {this.renderProfileMenu()}
           </React.Fragment>
         )}
-      </Flex>
+      </React.Fragment>
     );
   }
 

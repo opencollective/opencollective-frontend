@@ -111,16 +111,9 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
     });
   }
 
-  let route;
-  if (tierType === ContributionTypes.TICKET) {
-    route = `${getCollectivePageRoute(collective)}/order/${tier.id}`;
-  } else {
-    route = `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}/checkout`;
-  }
-
   return (
     <Contribute
-      route={route}
+      route={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}/checkout`}
       title={<TierTitle collective={collective} tier={tier} />}
       type={tierType}
       buttonText={tier.button}

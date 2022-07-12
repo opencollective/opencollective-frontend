@@ -19,11 +19,6 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.get('button[data-cy="cf-next-step"]').click();
 
     cy.useAnyPaymentMethod();
-    cy.get('[data-cy=captcha] > div > iframe').then(recaptchaIframe => {
-      const body = recaptchaIframe.contents();
-      cy.wrap(body).find('#checkbox').should('be.visible').click();
-    });
-    cy.wait(500);
     cy.contains('button[data-cy="cf-next-step"]', 'Contribute $400.42').click();
 
     cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -53,10 +48,6 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.get('input[name=email]').type(`{selectall}${email}`);
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.useAnyPaymentMethod();
-    cy.get('[data-cy=captcha] > div > iframe').then(recaptchaIframe => {
-      const body = recaptchaIframe.contents();
-      cy.wrap(body).find('#checkbox').should('be.visible').click();
-    });
     cy.wait(500);
     cy.contains('button[data-cy="cf-next-step"]', 'Contribute $10').click();
 
@@ -111,10 +102,6 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.get('input[name=email]').type(`{selectall}${firstEmail}`);
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.useAnyPaymentMethod();
-      cy.get('[data-cy=captcha] > div > iframe').then(recaptchaIframe => {
-        const body = recaptchaIframe.contents();
-        cy.wrap(body).find('#checkbox').should('be.visible').click();
-      });
       cy.wait(500);
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $10').click();
 
@@ -144,11 +131,6 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.get('input[name=email]').type(`{selectall}${firstEmail}`);
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.useAnyPaymentMethod();
-      cy.get('[data-cy=captcha] > div > iframe').then(recaptchaIframe => {
-        const body = recaptchaIframe.contents();
-        cy.wrap(body).find('#checkbox').should('be.visible').click();
-      });
-      cy.wait(500);
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $500').click();
 
       cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
@@ -189,10 +171,6 @@ describe('Contribution Flow: Guest contributions', () => {
 
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.useAnyPaymentMethod();
-      cy.get('[data-cy=captcha] > div > iframe').then(recaptchaIframe => {
-        const body = recaptchaIframe.contents();
-        cy.wrap(body).find('#checkbox').should('be.visible').click();
-      });
       cy.wait(500);
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $5,000').click();
 

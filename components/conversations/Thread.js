@@ -15,9 +15,7 @@ import ThreadActivity, { getActivityIcon, isSupportedActivity } from './ThreadAc
 const CommentIcon = styled(CommentIconLib).attrs({
   size: 16,
   color: '#9a9a9a',
-})`
-  margin-top: 8px;
-`;
+})``;
 
 const ItemContainer = styled.div`
   width: 100%;
@@ -58,7 +56,7 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
               <Box key={`comment-${item.id}`}>
                 <Flex>
                   <Flex flexDirection="column" alignItems="center" width="40px">
-                    <Box mb={2}>
+                    <Box my={2}>
                       <CommentIcon />
                     </Box>
                     <Container width="1px" height="100%" background="#E8E9EB" />
@@ -81,7 +79,7 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
               <Box key={`activity-${item.id}`}>
                 <Flex>
                   <Flex flexDirection="column" alignItems="center" width="40px">
-                    <Box mb={2}>{getActivityIcon(item, theme)}</Box>
+                    <Box my={2}>{getActivityIcon(item, theme)}</Box>
                     <Container width="1px" height="100%" background="#E8E9EB" />
                   </Flex>
                   <ItemContainer isLast={idx + 1 === items.length}>

@@ -244,7 +244,7 @@ const ProfileMenuMemberships = ({ user }) => {
         })}
       {hasNoMemberships && (
         <P textAlign="center" mb={2}>
-          <StyledLink as={Link} href="/discover" color="blue.900">
+          <StyledLink as={Link} href="/search" color="blue.900">
             <FormattedMessage defaultMessage="Discover Collectives to Support" />
           </StyledLink>
         </P>

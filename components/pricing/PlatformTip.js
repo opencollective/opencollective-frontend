@@ -1,8 +1,8 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import Illustration from '../collectives/HomeIllustration';
 import Container from '../Container';
-import Illustration from '../home/HomeIllustration';
 import { getI18nLink, I18nBold } from '../I18nFormatters';
 import { P } from '../Text';
 

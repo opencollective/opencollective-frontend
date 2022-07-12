@@ -10,6 +10,7 @@ import styled, { css } from 'styled-components';
 import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../collective-page/graphql/queries';
@@ -34,7 +35,6 @@ import StyledSelect from '../StyledSelect';
 import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
-import { useUser } from '../UserProvider';
 
 import illustration from '../contribution-flow/fees-on-top-illustration.png';
 
@@ -104,6 +104,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
         slug
         name
         stats {
+          id
           balance {
             valueInCents
           }
@@ -137,11 +138,13 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
       ... on Organization {
         tiers {
           nodes {
+            id
             ...AddFundsTierFields
           }
         }
       }
       ... on AccountWithHost {
+        addedFundsHostFeePercent: hostFeePercent(paymentMethodType: HOST)
         host {
           id
           isTrustedHost
@@ -150,6 +153,7 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
       ... on AccountWithContributions {
         tiers {
           nodes {
+            id
             ...AddFundsTierFields
           }
         }
@@ -244,7 +248,7 @@ const getTiersOptions = (intl, tiers) => {
 };
 
 const AddFundsModal = ({ host, collective, ...props }) => {
-  const { LoggedInUser } = useUser();
+  const { LoggedInUser } = useLoggedInUser();
   const [fundDetails, setFundDetails] = useState({});
   const { addToast } = useToasts();
   const intl = useIntl();
@@ -302,7 +306,8 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
   const canAddHostFee = host.plan?.hostFees && collective.id !== host.id;
-  const defaultHostFeePercent = canAddHostFee && collective.hostFeePercent ? collective.hostFeePercent : 0;
+  const hostFeePercent = data?.account.addedFundsHostFeePercent || collective.hostFeePercent;
+  const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const canAddPlatformTip = data?.account?.host?.isTrustedHost;
 
   const handleClose = () => {
@@ -324,8 +329,9 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       <CollectiveModalHeader collective={collective} onClick={handleClose} />
       <Formik
         initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective })}
+        enableReinitialize={true}
         validate={validate}
-        onSubmit={async values => {
+        onSubmit={async (values, formik) => {
           if (!fundDetails.showPlatformTipModal) {
             const result = await submitAddFunds({
               variables: {
@@ -345,6 +351,17 @@ const AddFundsModal = ({ host, collective, ...props }) => {
               description: resultOrder.description,
               source: resultOrder.fromAccount,
               tier: resultOrder.tier,
+            });
+            /*
+             * Since `enableReinitialize` is used in this form, during the second step (platform tip step)
+             * the form values will be reset. The validate function in this form
+             * requires `amount`, `fromAccount` and `description` so we should
+             * set them as otherwise the form will not be submittable.
+             */
+            formik.setValues({
+              amount: values.amount,
+              fromAccount: resultOrder.fromAccount,
+              description: resultOrder.description,
             });
           } else if (selectedOption.value !== 0) {
             const creditTransaction = addFundsResponse.addFunds.transactions.filter(

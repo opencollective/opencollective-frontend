@@ -6,11 +6,10 @@ import { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
 
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
-import { floatAmountToCents } from '../lib/currency-utils';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
-import { compose, parseToBoolean } from '../lib/utils';
+import { compose } from '../lib/utils';
 
 import Container from '../components/Container';
 import { PAYMENT_FLOW, STEPS } from '../components/contribution-flow/constants';
@@ -24,6 +23,7 @@ import {
   contributionFlowAccountWithTierQuery,
 } from '../components/contribution-flow/graphql/queries';
 import ContributionFlowContainer from '../components/contribution-flow/index';
+import { ContributionFlowUrlQueryHelper } from '../components/contribution-flow/query-parameters';
 import { getContributionFlowMetadata } from '../components/contribution-flow/utils';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
@@ -34,48 +34,16 @@ import { withUser } from '../components/UserProvider';
 
 class NewContributionFlowPage extends React.Component {
   static getInitialProps({ query }) {
-    // Whitelist interval
-    if (['monthly', 'yearly'].includes(query.interval)) {
-      query.interval = query.interval.replace('ly', '');
-    } else if (!['month', 'year'].includes(query.interval)) {
-      query.interval = null;
-    }
-
-    if (query.data) {
-      try {
-        query.data = JSON.parse(query.data);
-      } catch (err) {
-        // TODO: this should be reported to the user
-        // eslint-disable-next-line no-console
-        console.error(err);
-      }
-    }
-
-    const getFloatAmount = amountStr => {
-      return !amountStr ? null : floatAmountToCents(parseFloat(amountStr));
-    };
-
     return {
+      // Route parameters
       collectiveSlug: query.eventSlug || query.collectiveSlug,
-      totalAmount: getFloatAmount(query.amount) || parseInt(query.totalAmount) || null,
-      platformContribution: getFloatAmount(query.platformContribution),
-      step: query.step || 'details',
       tierId: parseInt(query.tierId) || null,
-      quantity: parseInt(query.quantity) || 1,
-      description: query.description ? decodeURIComponent(query.description) : undefined,
-      interval: query.interval,
       verb: query.verb,
+      step: query.step || 'details',
       paymentFlow: query.paymentFlow,
-      hideCreditCardPostalCode: parseToBoolean(query.hideCreditCardPostalCode),
-      redirect: query.redirect,
-      customData: query.data,
-      skipStepDetails: query.skipStepDetails ? parseToBoolean(query.skipStepDetails) : false,
-      contributeAs: query.contributeAs,
-      disabledPaymentMethodTypes: query.disabledPaymentMethodTypes
-        ? query.disabledPaymentMethodTypes.split(',')
-        : undefined,
+      // Query parameters
+      queryParams: ContributionFlowUrlQueryHelper.decode(query),
       error: query.error,
-      tags: query.tags ? query.tags.split(',') : undefined,
     };
   }
 
@@ -83,19 +51,8 @@ class NewContributionFlowPage extends React.Component {
     collectiveSlug: PropTypes.string.isRequired,
     verb: PropTypes.string,
     paymentFlow: PropTypes.string,
-    redirect: PropTypes.string,
-    description: PropTypes.string,
-    disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
-    quantity: PropTypes.number,
-    totalAmount: PropTypes.number,
-    platformContribution: PropTypes.number,
-    interval: PropTypes.string,
     tierId: PropTypes.number,
-    customData: PropTypes.object,
     error: PropTypes.string,
-    contributeAs: PropTypes.string,
-    skipStepDetails: PropTypes.bool,
-    hideCreditCardPostalCode: PropTypes.bool,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
@@ -106,9 +63,9 @@ class NewContributionFlowPage extends React.Component {
     loadStripe: PropTypes.func,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
-    tags: PropTypes.arrayOf(PropTypes.string),
     step: PropTypes.oneOf(Object.values(STEPS)),
     router: PropTypes.object,
+    queryParams: PropTypes.object,
   };
 
   componentDidMount() {
@@ -174,18 +131,7 @@ class NewContributionFlowPage extends React.Component {
           step={step}
           verb={this.props.verb}
           paymentFlow={paymentFlow}
-          redirect={this.props.redirect}
-          description={this.props.description}
-          defaultQuantity={this.props.quantity}
-          disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
-          fixedInterval={this.props.interval}
-          fixedAmount={this.props.totalAmount}
-          platformContribution={this.props.platformContribution}
-          customData={this.props.customData}
-          skipStepDetails={this.props.skipStepDetails}
-          hideCreditCardPostalCode={this.props.hideCreditCardPostalCode}
-          contributeAs={this.props.contributeAs}
-          tags={this.props.tags}
+          queryParams={this.props.queryParams}
           error={error}
         />
       );
@@ -202,7 +148,16 @@ class NewContributionFlowPage extends React.Component {
       return <ErrorPage error={error} />;
     }
 
-    return <Page {...this.getPageMetadata()}>{this.renderPageContent()}</Page>;
+    return (
+      <Page
+        {...this.getPageMetadata()}
+        showFooter={false}
+        menuItemsV2={{ solutions: false, product: false, company: false, docs: false }}
+        showSearch={false}
+      >
+        {this.renderPageContent()}
+      </Page>
+    );
   }
 }
 

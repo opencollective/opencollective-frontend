@@ -4,12 +4,13 @@ import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import Image from './Image';
 import Link from './Link';
 import StyledButton from './StyledButton';
-import StyledCard from './StyledCard';
 import StyledInput from './StyledInput';
 import StyledLink from './StyledLink';
-import { H5, Span } from './Text';
+import StyledLinkButton from './StyledLinkButton';
+import { Span } from './Text';
 
 /**
  * Component for handing user sign-in or redirecting to sign-up.
@@ -22,21 +23,43 @@ export default class SignIn extends React.Component {
     onSecondaryAction: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
     /** When set to true, will show a spinner in Sign In button and will disable all actions */
     loading: PropTypes.bool,
-    /** To display a box shadow below the card */
-    withShadow: PropTypes.bool,
     /** Whether user can click on "Join Free" */
     showSecondaryAction: PropTypes.bool,
     /** Set this to true to display the unknown email message */
     unknownEmail: PropTypes.bool,
-    /** Label, defaults to "Sign in using your email address:" */
+    /** Label, defaults to "Continue with your email" */
     label: PropTypes.node,
     /** Set the value of email input */
     email: PropTypes.string.isRequired,
     /** handles changes in the email input */
     onEmailChange: PropTypes.func.isRequired,
+    /** Oauth Sign In **/
+    isOAuth: PropTypes.bool,
+    /** Oauth App Name **/
+    oAuthAppName: PropTypes.string,
+    /** Oauth App Image **/
+    oAuthAppImage: PropTypes.string,
+    /** Show/hide subheading **/
+    showSubHeading: PropTypes.bool,
+    /** Show/hide Open Collective Logo **/
+    showOCLogo: PropTypes.bool,
   };
 
-  state = { error: null, showError: false };
+  static defaultProps = {
+    showSubHeading: true,
+    showOCLogo: true,
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = { error: null, showError: false };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.unknownEmail !== this.props.unknownEmail) {
+      this.setState({ unknownEmail: this.props.unknownEmail });
+    }
+  }
 
   renderSecondaryAction(message) {
     const { loading, onSecondaryAction } = this.props;
@@ -47,110 +70,196 @@ export default class SignIn extends React.Component {
         disabled={loading}
         fontSize="14px"
         data-cy="signin-secondary-action-btn"
+        underlineOnHover
       >
-        {message}&nbsp;→
+        {message}
       </StyledLink>
     ) : (
-      <StyledButton
-        asLink
+      <StyledLinkButton
         fontSize="14px"
         onClick={onSecondaryAction}
         disabled={loading}
         data-cy="signin-secondary-action-btn"
+        underlineOnHover
       >
-        {message}&nbsp;→
-      </StyledButton>
+        {message}
+      </StyledLinkButton>
     );
   }
 
+  getSignInPageHeading(unknownEmail) {
+    if (this.props.isOAuth && unknownEmail) {
+      return <FormattedMessage defaultMessage="Sign in to your Open Collective account" />;
+    } else if (this.props.isOAuth) {
+      return <FormattedMessage defaultMessage="Continue with your Open Collective account" />;
+    } else {
+      return this.props.label || <FormattedMessage defaultMessage="Continue with your email" />;
+    }
+  }
+
+  getSignInPageSubHeading(oAuthAppName) {
+    if (this.props.isOAuth) {
+      return <FormattedMessage defaultMessage="and connect with {oAuthAppName}" values={{ oAuthAppName }} />;
+    } else {
+      return <FormattedMessage defaultMessage="Sign in or create a personal account to continue" />;
+    }
+  }
+
   render() {
-    const { onSubmit, loading, unknownEmail, email, onEmailChange, withShadow, label } = this.props;
+    const { onSubmit, loading, email, onEmailChange, label } = this.props;
     const { error, showError } = this.state;
     return (
-      <StyledCard maxWidth={480} width={1} boxShadow={withShadow ? '0px 9px 14px 1px #dedede' : undefined}>
-        <Box py={4} px={[3, 4]}>
-          <H5 as="label" fontWeight="bold" htmlFor="email" mb={3} textAlign="left" display="block">
-            {label || <FormattedMessage id="signin.usingEmail" defaultMessage="Sign in using your email address:" />}
-          </H5>
-          <Flex
-            as="form"
-            method="POST"
-            noValidate
-            data-cy="signIn-form"
-            onSubmit={event => {
-              event.preventDefault();
-              onSubmit(email);
-            }}
-          >
-            <StyledInput
-              error={!!error}
-              fontSize="14px"
-              id="email"
-              name="email"
-              minWidth={120}
-              onChange={({ target }) => {
-                onEmailChange(target.value);
-                // Feel free to remove the setTimeout when that issue is fixed
-                // https://bugzilla.mozilla.org/show_bug.cgi?id=1524212
-                setTimeout(() => {
-                  this.setState({ error: target.validationMessage, showError: false });
-                }, 0);
-              }}
-              onKeyDown={e => {
-                // See https://github.com/facebook/react/issues/6368
-                if (e.key === ' ') {
-                  e.preventDefault();
-                }
-              }}
-              onBlur={() => this.setState({ showError: true })}
-              onInvalid={event => {
-                event.preventDefault();
-                this.setState({ error: event.target.validationMessage });
-              }}
-              placeholder="e.g., yourname@yourhost.com"
-              required
-              value={email}
-              type="email"
-              width={1}
-            />
-            <StyledButton
-              data-cy="signin-btn"
-              buttonStyle="primary"
-              fontWeight="600"
-              disabled={!email || error}
-              loading={loading}
-              minWidth={100}
-              ml={3}
-              type="submit"
-              whiteSpace="nowrap"
-            >
-              <FormattedMessage id="signIn" defaultMessage="Sign In" />
-            </StyledButton>
-          </Flex>
-          {error && showError && (
-            <Span display="block" color="red.500" pt={2} fontSize="10px" lineHeight="14px" aria-live="assertive">
-              {error}
-            </Span>
+      <React.Fragment>
+        <Box maxWidth={390}>
+          {this.props.isOAuth ? (
+            <React.Fragment>
+              <Flex justifyContent="center" mb={40}>
+                <Box minWidth={104}>
+                  <Image src="/static/images/oc-logo-oauth.png" height={104} width={104} />
+                </Box>
+                <Box ml={24} mr={24} mt={32} minWidth={40}>
+                  <Image src="/static/images/oauth-flow-connect.png" alt="OAuth Connect" height={40} width={40} />
+                </Box>
+                <Box minWidth={104}>
+                  <img
+                    src={this.props.oAuthAppImage}
+                    alt="OAuth Logo"
+                    height={104}
+                    width={104}
+                    style={{ borderRadius: 10 }}
+                  />
+                </Box>
+              </Flex>
+            </React.Fragment>
+          ) : (
+            this.props.showOCLogo && (
+              <Flex justifyContent="center" mb="48px">
+                <Image src="/static/images/oc-logo-watercolor-256.png" height={128} width={128} />
+              </Flex>
+            )
           )}
-          {unknownEmail && (
-            <Span display="block" color="black.600" pt={2} fontSize="10px" lineHeight="14px" aria-live="assertive">
-              <FormattedMessage id="signin.unknownEmail" defaultMessage="There is no user with this email address." />{' '}
-              {this.renderSecondaryAction(<FormattedMessage id="signin.joinForFree" defaultMessage="Join for free!" />)}
-            </Span>
+          <Flex
+            as="label"
+            fontWeight={700}
+            htmlFor="email"
+            fontSize={label ? '24px' : ['24px', '32px']}
+            mb={12}
+            textAlign="center"
+          >
+            {label || this.getSignInPageHeading(this.state.unknownEmail)}
+          </Flex>
+          {this.props.showSubHeading && (
+            <Flex fontWeight={400} fontSize="16px" color="black.700" mb="50px" justifyContent="center">
+              {this.getSignInPageSubHeading(this.props.oAuthAppName)}
+            </Flex>
+          )}
+          {!this.state.unknownEmail ? (
+            <React.Fragment>
+              <Container fontWeight={600} fontSize="13px" alignItems="left" mb="4px" width="100%">
+                <FormattedMessage id="Form.yourEmail" defaultMessage="Your email address" />
+              </Container>
+              <Container
+                as="form"
+                method="POST"
+                noValidate
+                data-cy="signIn-form"
+                onSubmit={event => {
+                  event.preventDefault();
+                  if (error) {
+                    return;
+                  }
+                  onSubmit(email);
+                  this.setState({ unknownEmail: this.props.unknownEmail });
+                }}
+              >
+                <StyledInput
+                  error={!!error}
+                  fontSize="14px"
+                  id="email"
+                  name="email"
+                  minWidth={120}
+                  onChange={({ target }) => {
+                    onEmailChange(target.value);
+                    this.setState({ error: target.validationMessage, showError: false });
+                  }}
+                  onKeyDown={e => {
+                    // See https://github.com/facebook/react/issues/6368
+                    if (e.key === ' ') {
+                      e.preventDefault();
+                    } else if (e.key === 'Enter') {
+                      onEmailChange(e.target.value);
+                      this.setState({ error: e.target.validationMessage, showError: true });
+                    }
+                  }}
+                  onBlur={() => this.setState({ showError: true })}
+                  onInvalid={event => {
+                    event.preventDefault();
+                    this.setState({ error: event.target.validationMessage });
+                  }}
+                  placeholder="e.g., yourname@yourhost.com"
+                  required
+                  value={email}
+                  type="email"
+                  width={1}
+                />
+                {error && showError && (
+                  <Span display="block" color="red.500" pt={2} fontSize="10px" lineHeight="14px" aria-live="assertive">
+                    {error}
+                  </Span>
+                )}
+                <Flex justifyContent="center" mb="24px" mt="26px">
+                  <StyledButton
+                    data-cy="signin-btn"
+                    buttonStyle="primary"
+                    fontWeight="500"
+                    disabled={!email}
+                    loading={loading}
+                    minWidth={157}
+                    type="submit"
+                    whiteSpace="nowrap"
+                  >
+                    <FormattedMessage id="actions.continue" defaultMessage="Continue" />
+                  </StyledButton>
+                </Flex>
+              </Container>
+
+              {this.props.showSecondaryAction && (
+                <Box>
+                  <Flex color="black.800" mr={1} fontSize="14px" justifyContent="center">
+                    <FormattedMessage defaultMessage="Don't have one?" />
+                  </Flex>
+                  <Flex fontSize="14px" justifyContent="center" mt={2}>
+                    {this.renderSecondaryAction(<FormattedMessage defaultMessage="Create an account" />)}
+                  </Flex>
+                </Box>
+              )}
+            </React.Fragment>
+          ) : (
+            <Container
+              textAlign="center"
+              display="block"
+              color="black.800"
+              fontSize="14px"
+              lineHeight="20px"
+              aria-live="assertive"
+              fontWeight={400}
+            >
+              <FormattedMessage
+                defaultMessage="{email} does not exist on Open Collective. Would you like to create an account with this email?"
+                values={{ email: <strong>{email}</strong> }}
+              />{' '}
+              <Box mt="24px">
+                <Span mr="40px">
+                  {this.renderSecondaryAction(<FormattedMessage defaultMessage="Yes, create an account" />)}
+                </Span>
+                <StyledLink onClick={() => this.setState({ unknownEmail: false })} underlineOnHover={true}>
+                  <FormattedMessage defaultMessage="No, use a different email" />
+                </StyledLink>
+              </Box>
+            </Container>
           )}
         </Box>
-
-        {this.props.showSecondaryAction && (
-          <Container alignItems="center" bg="black.50" px={[3, 4]} py={3} display="flex" justifyContent="center">
-            <Span color="black.700" mr={1} fontSize="14px">
-              <FormattedMessage id="signin.noAccount" defaultMessage="Don't have an account?" />
-            </Span>{' '}
-            <Span fontSize="14px">
-              {this.renderSecondaryAction(<FormattedMessage id="signin.joinFree" defaultMessage="Join Free" />)}
-            </Span>
-          </Container>
-        )}
-      </StyledCard>
+      </React.Fragment>
     );
   }
 }

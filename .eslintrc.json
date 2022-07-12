@@ -14,6 +14,10 @@
             "name": "react-intl",
             "importNames": ["FormattedHTMLMessage"],
             "message": "FormattedHTMLMessage is not allowed, please rely on the standard FormattedMessage."
+          },
+          {
+            "name": "next/link",
+            "message": "Next Link is not supposed to be used direclty. Please use components/Link instead."
           }
         ]
       }
@@ -37,6 +41,11 @@
       "error",
       { "env": "apollo", "projectName": "opencollective" },
       { "env": "apollo", "tagName": "gqlV2", "projectName": "opencollective_v2" }
+    ],
+    "graphql/required-fields": [
+      "error",
+      { "env": "apollo", "projectName": "opencollective", "requiredFields": ["id"] },
+      { "env": "apollo", "tagName": "gqlV2", "projectName": "opencollective_v2", "requiredFields": ["id"] }
     ],
     "graphql/named-operations": ["error"],
     "graphql/capitalized-type-name": ["error"],

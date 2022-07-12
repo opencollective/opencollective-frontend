@@ -17,6 +17,10 @@ import StyledSpinner from './StyledSpinner';
 import { P, Span } from './Text';
 import UploadedFilePreview from './UploadedFilePreview';
 
+export const DROPZONE_ACCEPT_IMAGES = { 'image/*': ['.jpeg', '.png'] };
+export const DROPZONE_ACCEPT_PDF = { 'application/pdf': ['.pdf'] };
+export const DROPZONE_ACCEPT_ALL = { ...DROPZONE_ACCEPT_IMAGES, ...DROPZONE_ACCEPT_PDF };
+
 const Dropzone = styled(Container)`
   border: 1px dashed #c4c7cc;
   border-radius: 10px;
@@ -228,7 +232,7 @@ StyledDropzone.propTypes = {
   /** Whether the dropzone should accept multiple files */
   isMulti: PropTypes.bool,
   /** Filetypes to accept */
-  accept: PropTypes.string,
+  accept: PropTypes.object,
   /** Min file size */
   minSize: PropTypes.number,
   /** Max file size */

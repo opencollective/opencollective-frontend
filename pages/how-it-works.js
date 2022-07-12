@@ -1,8 +1,8 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
-import Features from '../components/home/sections/Features';
-import JoinUs from '../components/home/sections/JoinUs';
+import Features from '../components/collectives/sections/Features';
+import JoinUs from '../components/collectives/sections/JoinUs';
 import MoreFeatures from '../components/how-it-works/AndSoMuchMoreSection';
 import HowOCIsDifferent from '../components/how-it-works/HowOCIsDifferentSection';
 import HowOCWorks from '../components/how-it-works/HowOCWorksSection';

@@ -25,34 +25,42 @@ const PAYPAL_MAX_AMOUNT = 999999999; // See MAX_VALUE_EXCEEDED https://developer
 const memberCanBeUsedToContribute = (member, account, canUseIncognito) => {
   if (member.role !== roles.ADMIN) {
     return false;
-  } else if (member.collective.id === account.legacyId) {
-    // Collective can't contribute to itself
-    return false;
   } else if (!canUseIncognito && member.collective.isIncognito) {
     // Incognito can't be used to contribute if not allowed
     return false;
   } else if (
-    member.collective.type === CollectiveType.COLLECTIVE &&
+    [CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(member.collective.type) &&
     member.collective.host?.id !== account.host.legacyId
   ) {
-    // If the contributing account is fiscally hosted, the host mush be the same as the one you're contributing to
+    // If the contributing account is fiscally hosted, the host must be the same as the one you're contributing to
     return false;
   } else {
     return true;
   }
 };
 
-export const getContributorProfiles = (loggedInUser, collective, canUseIncognito) => {
+/**
+ * Cannot use contributions for events and "Tickets" tiers, because we need the ticket holder's identity
+ */
+export const canUseIncognitoForContribution = (collective, tier) => {
+  return collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET');
+};
+
+export const getContributeProfiles = (loggedInUser, collective, tier) => {
   if (!loggedInUser) {
     return [];
   } else {
+    const canUseIncognito = canUseIncognitoForContribution(collective, tier);
     const filteredMembers = loggedInUser.memberOf.filter(member =>
       memberCanBeUsedToContribute(member, collective, canUseIncognito),
     );
     const personalProfile = { email: loggedInUser.email, image: loggedInUser.image, ...loggedInUser.collective };
     const contributorProfiles = [personalProfile];
     filteredMembers.forEach(member => {
-      contributorProfiles.push(member.collective);
+      // Account can't contribute to itself
+      if (member.collective.id !== collective.legacyId) {
+        contributorProfiles.push(member.collective);
+      }
       if (!isEmpty(member.collective.children)) {
         const childrenOfSameHost = member.collective.children.filter(
           child => child.host.id === collective.host.legacyId,

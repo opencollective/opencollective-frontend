@@ -15,7 +15,7 @@ const PlatformTipsCollected = ({ host, isLoading }) => {
   return (
     <Container p={24} bg="blue.50" border="1px solid" borderColor="blue.700" borderRadius="8px">
       <Flex alignItems="center" my={2}>
-        <Image src="/static/images/opencollective-icon.svg" width={14} height={14} alt="" />
+        <Image src="/static/images/opencollective-icon.png" width={14} height={14} alt="" />
         <P textTransform="uppercase" ml={2} fontSize="12px" fontWeight="500" color="black.700" letterSpacing="0.06em">
           <FormattedMessage id="PlatformTipsCollected" defaultMessage="Platform Tips" />
         </P>

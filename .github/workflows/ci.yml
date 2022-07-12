@@ -32,10 +32,10 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: '14.x'
+          node-version: '16.x'
 
       - name: Restore node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: node-modules
         with:
           path: node_modules
@@ -43,7 +43,7 @@ jobs:
 
       - name: Restore .npm cache
         if: steps.node-modules.outputs.cache-hit != 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}-${{ secrets.CACHE_VERSION }}
@@ -69,10 +69,10 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: '14.x'
+          node-version: '16.x'
 
       - name: Restore node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: node-modules
         with:
           path: node_modules
@@ -80,7 +80,7 @@ jobs:
 
       - name: Restore .npm cache
         if: steps.node-modules.outputs.cache-hit != 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}-${{ secrets.CACHE_VERSION }}
@@ -106,10 +106,10 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: '14.x'
+          node-version: '16.x'
 
       - name: Restore node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: node-modules
         with:
           path: node_modules
@@ -117,7 +117,7 @@ jobs:
 
       - name: Restore .npm cache
         if: steps.node-modules.outputs.cache-hit != 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}-${{ secrets.CACHE_VERSION }}
@@ -143,10 +143,10 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: '14.x'
+          node-version: '16.x'
 
       - name: Restore node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: node-modules
         with:
           path: node_modules
@@ -154,7 +154,7 @@ jobs:
 
       - name: Restore .npm cache
         if: steps.node-modules.outputs.cache-hit != 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}-${{ secrets.CACHE_VERSION }}
@@ -180,10 +180,10 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: '14.x'
+          node-version: '16.x'
 
       - name: Restore node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: node-modules
         with:
           path: node_modules
@@ -191,7 +191,7 @@ jobs:
 
       - name: Restore .npm cache
         if: steps.node-modules.outputs.cache-hit != 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}-${{ secrets.CACHE_VERSION }}
@@ -204,7 +204,7 @@ jobs:
         run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
 
       - name: Restore .next cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .next/cache
           key: ${{ runner.os }}-next-cache-${{ github.sha }}
@@ -213,7 +213,7 @@ jobs:
             ${{ runner.os }}-next-cache-
 
       - name: Cache build
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .next
           key: ${{ runner.os }}-next-build-${{ github.sha }}
@@ -233,10 +233,10 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: '14.x'
+          node-version: '16.x'
 
       - name: Restore node_modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: node-modules
         with:
           path: node_modules
@@ -244,7 +244,7 @@ jobs:
 
       - name: Restore .npm cache
         if: steps.node-modules.outputs.cache-hit != 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}-${{ secrets.CACHE_VERSION }}

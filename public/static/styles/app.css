@@ -195,6 +195,11 @@ a {
   display: none;
 }
 
+#nprogress {
+  position: relative;
+  z-index: 10000;
+}
+
 #nprogress .spinner {
   display: none;
 }

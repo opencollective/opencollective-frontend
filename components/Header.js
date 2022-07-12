@@ -29,12 +29,15 @@ class Header extends React.Component {
     title: PropTypes.string,
     metaTitle: PropTypes.string,
     showSearch: PropTypes.bool,
+    showProfileAndChangelogMenu: PropTypes.bool,
     withTopBar: PropTypes.bool,
     menuItems: PropTypes.object,
+    menuItemsV2: PropTypes.object,
     /** If true, a no-robots meta will be added to the page */
     noRobots: PropTypes.bool,
     /** @ignore from injectIntl */
     intl: PropTypes.object,
+    LoggedInUser: PropTypes.object,
   };
 
   static defaultProps = {
@@ -72,7 +75,7 @@ class Header extends React.Component {
     const image = this.props.image || (collective && getCollectiveImage(collective));
     const description = this.props.description || collective?.description || collective?.longDescription;
     const metaTitle = this.props.metaTitle || (title ? `${title} - Open Collective` : 'Open Collective');
-    const defaultImage = `https://opencollective.com/static/images/opencollective-og-default.png`;
+    const defaultImage = `https://opencollective.com/static/images/opencollective-og.png`;
 
     const metas = [
       { property: 'twitter:site', content: '@opencollect' },
@@ -95,7 +98,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { css, className, canonicalURL, withTopBar } = this.props;
+    const { css, canonicalURL, withTopBar } = this.props;
     return (
       <header>
         <Head>
@@ -117,7 +120,11 @@ class Header extends React.Component {
         </Head>
         <div id="top" />
         {withTopBar && (
-          <TopBar className={className} showSearch={this.props.showSearch} menuItems={this.props.menuItems} />
+          <TopBar
+            showSearch={this.props.showSearch}
+            menuItems={this.props.menuItemsV2}
+            showProfileAndChangelogMenu={this.props.showProfileAndChangelogMenu}
+          />
         )}
         <GlobalWarnings collective={this.props.collective} />
       </header>

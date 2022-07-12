@@ -48,15 +48,18 @@ export const FISCAL_HOST_SECTIONS = {
 
 export const COLLECTIVE_SECTIONS = {
   ADVANCED: 'advanced',
+  AUTHORIZED_APPS: 'authorized-apps',
   COLLECTIVE_GOALS: 'goals',
   COLLECTIVE_PAGE: 'collective-page',
   CONNECTED_ACCOUNTS: 'connected-accounts',
   EXPORT: 'export',
+  FOR_DEVELOPERS: 'for-developers',
   HOST: 'host',
   INFO: 'info',
   PAYMENT_METHODS: 'payment-methods',
   PAYMENT_RECEIPTS: 'payment-receipts',
   POLICIES: 'policies',
+  CUSTOM_EMAIL: 'custom-email',
   TEAM: 'members',
   TICKETS: 'tickets',
   TIERS: 'tiers',
@@ -152,6 +155,9 @@ export const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.policies',
     defaultMessage: 'Policies',
   },
+  [ALL_SECTIONS.CUSTOM_EMAIL]: {
+    defaultMessage: 'Custom Email',
+  },
   [ALL_SECTIONS.HOST]: {
     id: 'Fiscalhost',
     defaultMessage: 'Fiscal Host',
@@ -195,6 +201,12 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.WEBHOOKS]: {
     id: 'editCollective.menu.webhooks',
     defaultMessage: 'Webhooks',
+  },
+  [ALL_SECTIONS.AUTHORIZED_APPS]: {
+    defaultMessage: 'Authorized Apps',
+  },
+  [ALL_SECTIONS.FOR_DEVELOPERS]: {
+    defaultMessage: 'For developers',
   },
   [ALL_SECTIONS.TICKETS]: {
     id: 'section.tickets.title',

@@ -15,9 +15,13 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
 
+import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
+import ForDevelopers from '../admin-panel/sections/ForDevelopers';
+import CodeRepositoryIcon from '../CodeRepositoryIcon';
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
 import { Box, Flex } from '../Grid';
+import { I18nSupportLink } from '../I18nFormatters';
 import InputField from '../InputField';
 import Link from '../Link';
 import OrdersWithData from '../orders/OrdersWithData';
@@ -31,6 +35,7 @@ import EmptyBalance from './actions/EmptyBalance';
 // Sections
 import CollectiveGoals from './sections/CollectiveGoals';
 import ConnectedAccounts from './sections/ConnectedAccounts';
+import CustomMessage from './sections/CustomMessage';
 import EditCollectivePage from './sections/EditCollectivePage';
 import Export from './sections/Export';
 import FiscalHosting from './sections/FiscalHosting';
@@ -59,6 +64,7 @@ const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, USER } = CollectiveType;
 class EditCollectiveForm extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
+    host: PropTypes.object,
     status: PropTypes.string, // loading, saved
     section: PropTypes.string,
     onSubmit: PropTypes.func,
@@ -231,10 +237,6 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.currency.placeholder',
         defaultMessage: 'Select currency',
       },
-      'currency.warning': {
-        id: 'collective.currency.warning',
-        defaultMessage: `Active Collectives, Funds and Fiscal Hosts can't edit their currency. Contact support@opencollective.com if this is an issue.`,
-      },
       'address.label': {
         id: 'collective.address.label',
         defaultMessage: 'Address',
@@ -391,7 +393,7 @@ class EditCollectiveForm extends React.Component {
   }
 
   renderSection(section) {
-    const { collective, LoggedInUser } = this.props;
+    const { collective, host, LoggedInUser } = this.props;
 
     switch (section) {
       case EDIT_COLLECTIVE_SECTIONS.INFO:
@@ -418,7 +420,7 @@ class EditCollectiveForm extends React.Component {
         );
 
       case EDIT_COLLECTIVE_SECTIONS.MEMBERS:
-        return <Members collective={collective} />;
+        return <Members collective={collective} host={host} />;
 
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS:
         return <PaymentMethods collectiveSlug={collective.slug} />;
@@ -491,6 +493,12 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.WEBHOOKS:
         return <Webhooks collectiveSlug={collective.slug} />;
 
+      case EDIT_COLLECTIVE_SECTIONS.AUTHORIZED_APPS:
+        return <AuthorizedApps />;
+
+      case EDIT_COLLECTIVE_SECTIONS.FOR_DEVELOPERS:
+        return <ForDevelopers accountSlug={collective.slug} />;
+
       case EDIT_COLLECTIVE_SECTIONS.ADVANCED:
         return (
           <Box>
@@ -541,6 +549,10 @@ class EditCollectiveForm extends React.Component {
       // Policies and moderation
       case EDIT_COLLECTIVE_SECTIONS.POLICIES:
         return <Policies collective={collective} />;
+
+      // Policies and moderation
+      case EDIT_COLLECTIVE_SECTIONS.CUSTOM_EMAIL:
+        return <CustomMessage collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS:
         return <HostVirtualCardsSettings collective={collective} />;
@@ -677,12 +689,12 @@ class EditCollectiveForm extends React.Component {
           when: () => collective.type !== EVENT,
         },
         {
-          name: 'githubHandle',
+          name: 'repositoryUrl',
           type: 'text',
-          pre: 'https://github.com/',
-          maxLength: 140, // 39 (Max length of GitHub org name) + 100 (Max length of repo name) + 1 (for the '/' sign)
-          placeholder: '',
-          label: 'Github',
+          pre: <CodeRepositoryIcon repositoryUrl={this.state.collective.repositoryUrl} size={16} color="#757677" />,
+          maxLength: 2048,
+          label: intl.formatMessage({ defaultMessage: 'Code repository' }),
+          placeholder: 'https://github.com/my-organization/my-repo',
           when: () => collective.type !== EVENT,
         },
         {
@@ -748,7 +760,13 @@ class EditCollectiveForm extends React.Component {
           options: currencyOptions,
           description:
             ([COLLECTIVE, FUND].includes(collective.type) && collective.isActive) || collective.isHost
-              ? intl.formatMessage(this.messages['currency.warning'])
+              ? intl.formatMessage(
+                  {
+                    id: 'collective.currency.warning',
+                    defaultMessage: `Active Collectives, Funds and Fiscal Hosts can't edit their currency. Contact <SupportLink>support</SupportLink> if this is an issue.`,
+                  },
+                  { SupportLink: I18nSupportLink },
+                )
               : null,
           when: () => ![EVENT, PROJECT].includes(collective.type),
           // Active Collectives, Funds and Fiscal Hosts can't edit their currency.
@@ -891,6 +909,7 @@ class EditCollectiveForm extends React.Component {
 
                 <Container className="backToProfile" fontSize="1.3rem" margin="1rem">
                   <Link
+                    data-cy="edit-collective-back-to-profile"
                     href={
                       isEvent ? `/${collective.parentCollective.slug}/events/${collective.slug}` : `/${collective.slug}`
                     }

@@ -14,7 +14,7 @@ import ContainerOverlay from '../ContainerOverlay';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
-import SignInOrJoinFree from '../SignInOrJoinFree';
+import SignInOrJoinFree, { SignInOverlayBackground } from '../SignInOrJoinFree';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
@@ -24,6 +24,7 @@ import { commentFieldsFragment } from './graphql';
 const createCommentMutation = gqlV2/* GraphQL */ `
   mutation CreateComment($comment: CommentCreateInput!) {
     createComment(comment: $comment) {
+      id
       ...CommentFields
     }
   }
@@ -120,11 +121,15 @@ const CommentForm = ({
     <Container id={id} position="relative">
       {!loadingLoggedInUser && !LoggedInUser && (
         <ContainerOverlay backgroundType="white">
-          <SignInOrJoinFree
-            routes={{ join: getRedirectUrl(router, id) }}
-            signInLabel={formatMessage(messages.signInLabel)}
-            withShadow
-          />
+          <SignInOverlayBackground>
+            <SignInOrJoinFree
+              routes={{ join: getRedirectUrl(router, id) }}
+              signInLabel={formatMessage(messages.signInLabel)}
+              hideFooter
+              showSubHeading={false}
+              showOCLogo={false}
+            />
+          </SignInOverlayBackground>
         </ContainerOverlay>
       )}
       <form onSubmit={submitForm} data-cy="comment-form">

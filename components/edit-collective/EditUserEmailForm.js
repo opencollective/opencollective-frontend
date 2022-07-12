@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
 import { Box, Flex } from '../Grid';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
@@ -75,70 +76,74 @@ class EditUserEmailForm extends React.Component {
         <SettingsSectionTitle>
           <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" />
         </SettingsSectionTitle>
-        <Flex flexWrap="wrap">
-          <StyledInput
-            name="email"
-            type="email"
-            value={isNil(newEmail) ? LoggedInUser.email : newEmail}
-            mr={3}
-            my={2}
-            disabled={!data.LoggedInUser || loading}
-            onChange={e => {
-              this.setState({ step: 'form', error: null, newEmail: e.target.value, isTouched: true });
-            }}
-            onBlur={() => {
-              if (newEmail && !isValid) {
-                this.setState({
-                  error: <FormattedMessage id="error.email.invalid" defaultMessage="Invalid email address" />,
-                });
-              }
-            }}
-          />
-          <Flex my={2}>
-            <StyledButton
-              minWidth={180}
-              disabled={!isTouched || !newEmail || !isValid || isDone}
-              loading={isSubmitting}
-              mr={2}
-              onClick={async () => {
-                this.setState({ isSubmitting: true });
-                try {
-                  const { data } = await updateUserEmail({ variables: { email: newEmail } });
+        {LoggedInUser ? (
+          <Flex flexWrap="wrap">
+            <StyledInput
+              name="email"
+              type="email"
+              value={isNil(newEmail) ? LoggedInUser.email : newEmail}
+              mr={3}
+              my={2}
+              disabled={!data.LoggedInUser || loading}
+              onChange={e => {
+                this.setState({ step: 'form', error: null, newEmail: e.target.value, isTouched: true });
+              }}
+              onBlur={() => {
+                if (newEmail && !isValid) {
                   this.setState({
-                    step: LoggedInUser.email === newEmail ? 'initial' : 'success',
-                    error: null,
-                    newEmail: data.updateUserEmail.emailWaitingForValidation || LoggedInUser.email,
-                    isSubmitting: false,
-                    isTouched: false,
+                    error: <FormattedMessage id="error.email.invalid" defaultMessage="Invalid email address" />,
                   });
-                } catch (e) {
-                  this.setState({ error: e.message, isSubmitting: false });
                 }
               }}
-            >
-              <FormattedMessage id="EditUserEmailForm.submit" defaultMessage="Confirm new email" />
-            </StyledButton>
-
-            {isDone && (
+            />
+            <Flex my={2}>
               <StyledButton
                 minWidth={180}
-                disabled={step === 'already-sent'}
-                loading={isResendingConfirmation}
+                disabled={!isTouched || !newEmail || !isValid || isDone}
+                loading={isSubmitting}
+                mr={2}
                 onClick={async () => {
-                  this.setState({ isResendingConfirmation: true });
+                  this.setState({ isSubmitting: true });
                   try {
-                    await updateUserEmail({ variables: { email: newEmail } });
-                    this.setState({ isResendingConfirmation: false, step: 'already-sent', error: null });
+                    const { data } = await updateUserEmail({ variables: { email: newEmail } });
+                    this.setState({
+                      step: LoggedInUser.email === newEmail ? 'initial' : 'success',
+                      error: null,
+                      newEmail: data.updateUserEmail.emailWaitingForValidation || LoggedInUser.email,
+                      isSubmitting: false,
+                      isTouched: false,
+                    });
                   } catch (e) {
-                    this.setState({ error: e.message, isResendingConfirmation: false });
+                    this.setState({ error: e.message, isSubmitting: false });
                   }
                 }}
               >
-                <FormattedMessage id="EditUserEmailForm.reSend" defaultMessage="Re-send confirmation" />
+                <FormattedMessage id="EditUserEmailForm.submit" defaultMessage="Confirm new email" />
               </StyledButton>
-            )}
+
+              {isDone && (
+                <StyledButton
+                  minWidth={180}
+                  disabled={step === 'already-sent'}
+                  loading={isResendingConfirmation}
+                  onClick={async () => {
+                    this.setState({ isResendingConfirmation: true });
+                    try {
+                      await updateUserEmail({ variables: { email: newEmail } });
+                      this.setState({ isResendingConfirmation: false, step: 'already-sent', error: null });
+                    } catch (e) {
+                      this.setState({ error: e.message, isResendingConfirmation: false });
+                    }
+                  }}
+                >
+                  <FormattedMessage id="EditUserEmailForm.reSend" defaultMessage="Re-send confirmation" />
+                </StyledButton>
+              )}
+            </Flex>
           </Flex>
-        </Flex>
+        ) : (
+          <LoadingPlaceholder height={63} />
+        )}
         {error && (
           <Span p={2} color="red.500" fontSize="12px">
             {error}
@@ -170,7 +175,7 @@ const loggedInUserEmailQuery = gql`
   }
 `;
 
-const addloggedInUserEmailData = graphql(loggedInUserEmailQuery, {
+const addLoggedInUserEmailData = graphql(loggedInUserEmailQuery, {
   options: {
     fetchPolicy: 'network-only',
   },
@@ -190,4 +195,4 @@ const addUpdateUserEmailMutation = graphql(updateUserEmailMutation, {
   name: 'updateUserEmail',
 });
 
-export default addUpdateUserEmailMutation(addloggedInUserEmailData(EditUserEmailForm));
+export default addUpdateUserEmailMutation(addLoggedInUserEmailData(EditUserEmailForm));

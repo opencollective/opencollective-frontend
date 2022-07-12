@@ -70,6 +70,7 @@ const transactionsPageQuery = gqlV2/* GraphQL */ `
       currency
       settings
       features {
+        id
         ...NavbarFields
       }
       ... on AccountWithParent {
