@@ -7,7 +7,9 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../lib/errors';
 
+import { editCollectiveSettingsMutation } from '../../collective-page/graphql/mutations';
 import Container from '../../Container';
+import SettingsSectionTitle from '../../edit-collective/sections/SettingsSectionTitle';
 import { Box, Flex } from '../../Grid';
 import MessageBox from '../../MessageBox';
 import PreviewModal from '../../PreviewModal';
@@ -16,9 +18,6 @@ import StyledHr from '../../StyledHr';
 import StyledInput from '../../StyledInput';
 import StyledTextarea from '../../StyledTextarea';
 import { P, Span } from '../../Text';
-import { editCollectiveSettingsMutation } from '../mutations';
-
-import SettingsSectionTitle from './SettingsSectionTitle';
 
 const messages = defineMessages({
   extraInfoPlaceholder: {

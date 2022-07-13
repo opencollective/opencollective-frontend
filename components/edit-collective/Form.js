@@ -17,6 +17,7 @@ import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils
 
 import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
 import ForDevelopers from '../admin-panel/sections/ForDevelopers';
+import InvoicesReceipts from '../admin-panel/sections/InvoicesReceipts';
 import CodeRepositoryIcon from '../CodeRepositoryIcon';
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
@@ -43,7 +44,6 @@ import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
 import HostTwoFactorAuth from './sections/HostTwoFactorAuth';
 import HostVirtualCardsSettings from './sections/HostVirtualCardsSettings';
-import InvoicesReceipts from './sections/InvoicesReceipts';
 import Members from './sections/Members';
 import PaymentMethods from './sections/PaymentMethods';
 import PaymentReceipts from './sections/PaymentReceipts';
