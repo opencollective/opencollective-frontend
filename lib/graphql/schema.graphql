@@ -2613,6 +2613,7 @@ type Expense implements Transaction {
   createdAt: DateString
   updatedAt: DateString
   paymentMethod: PaymentMethodType
+  invoiceTemplate: String
   description: String
   expense: ExpenseType
 }
@@ -2710,6 +2711,7 @@ interface Transaction {
   createdAt: DateString
   updatedAt: DateString
   refundTransaction: Transaction
+  invoiceTemplate: String
 }
 
 """
@@ -2779,6 +2781,7 @@ type Order implements Transaction {
   createdAt: DateString
   updatedAt: DateString
   paymentMethod: PaymentMethodType
+  invoiceTemplate: String
   description: String
   publicMessage: String
   order: OrderType
@@ -3498,12 +3501,12 @@ type InvoiceType {
   """
   Title for the invoice. Depending on the type of legal entity, a host should issue an Invoice or a Receipt.
   """
-  title: String
+  title: String @deprecated(reason: "Replaced by host.settings.invoice.templates.[templateName].title")
 
   """
   more info about the invoice, which is then printed on receipts that go to financial contributors.
   """
-  extraInfo: String
+  extraInfo: String @deprecated(reason: "Replaced by host.settings.invoice.templates.[templateName].info")
 
   """
   dateFrom and dateTo will be set for any invoice over a period of time. They will not be set for an invoice for a single transaction.
@@ -3980,6 +3983,11 @@ input TierInputType {
   End of the campaign
   """
   endsAt: String
+
+  """
+  Invoice receipt template
+  """
+  invoiceTemplate: String
 }
 
 """
