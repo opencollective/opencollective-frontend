@@ -1,5 +1,6 @@
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
+import { typography } from 'styled-system';
 
 import { H1, H2, P } from '../Text';
 
@@ -21,6 +22,8 @@ export const MainTitle = styled(H1)`
     font-size: 64px;
     line-height: 72px;
   }
+
+  ${typography};
 `;
 
 export const MainDescription = styled(P)`

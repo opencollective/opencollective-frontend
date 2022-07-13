@@ -20,7 +20,12 @@ const TheFutureIsCollective = () => {
       <Flex justifyContent="center" alignItems="center" px="16px" mt="40px">
         <Flex flexDirection="column" alignItems="center">
           <Box>
-            <MainTitle textAlign="center">
+            <MainTitle
+              fontSize={['52px', '64px', '72px']}
+              lineHeight={['56px', '80px', '88px']}
+              letterSpacing={['-0.04em', '0.012em', null]}
+              textAlign="center"
+            >
               <FormattedMessage id="home.futureIsCollective" defaultMessage={'The future is collective'} />
             </MainTitle>
           </Box>
