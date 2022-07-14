@@ -86,6 +86,15 @@ const StepDetailsCrypto = ({ onChange, data, collective }) => {
     setCryptoExchangeRate(exchangeRate);
   };
 
+  const setCryptoAmount = amount => {
+    setAmount(amount);
+    if (amount >= selectedCryptoCurrency.minDonation) {
+      dispatchChange('amount', amount);
+    } else {
+      dispatchChange('amount', null);
+    }
+  };
+
   useEffect(() => {
     storeCryptoExchangeRate(selectedCryptoCurrency.value, collectiveCurrency);
   }, []);
@@ -95,6 +104,11 @@ const StepDetailsCrypto = ({ onChange, data, collective }) => {
       setConvertedAmount(amount * cryptoExchangeRate);
     }
   }, [amount, cryptoExchangeRate]);
+
+  useEffect(() => {
+    setCryptoAmount(amount);
+    setTouched(true);
+  }, []);
 
   return (
     <Box width={1}>
@@ -124,12 +138,7 @@ const StepDetailsCrypto = ({ onChange, data, collective }) => {
         defaultValue={amount}
         onChange={({ target }) => {
           const amount = parseFloat(target.value);
-          setAmount(amount);
-          if (amount >= selectedCryptoCurrency.minDonation) {
-            dispatchChange('amount', amount);
-          } else {
-            dispatchChange('amount', null);
-          }
+          setCryptoAmount(amount);
         }}
         onBlur={() => setTouched(true)}
         autoFocus

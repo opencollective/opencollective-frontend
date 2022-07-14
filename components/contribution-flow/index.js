@@ -168,7 +168,7 @@ class ContributionFlow extends React.Component {
       stepDetails: {
         quantity: queryParams.quantity || 1,
         interval: queryParams.interval || getDefaultInterval(props.tier),
-        amount: isCryptoFlow ? '' : queryParams.amount || getDefaultTierAmount(tier, collective, currency),
+        amount: queryParams.amount || getDefaultTierAmount(tier, collective, currency, isCryptoFlow),
         platformContribution: queryParams.platformTip,
         currency,
       },
@@ -541,9 +541,9 @@ class ContributionFlow extends React.Component {
     }
 
     // Navigate to the new route
-    const { isEmbed, router, queryParams } = this.props;
+    const { isEmbed, router, queryParams, paymentFlow } = this.props;
     const queryHelper = isEmbed ? EmbedContributionFlowUrlQueryHelper : ContributionFlowUrlQueryHelper;
-    const encodedQueryParams = { ...queryHelper.encode(queryParams), ...newQueryParams };
+    const encodedQueryParams = { ...queryHelper.encode({ ...queryParams, paymentFlow }), ...newQueryParams };
     const route = this.getRoute(stepName === 'details' ? '' : stepName);
     const navigateFn = replace ? router.replace : router.push;
     await navigateFn({ pathname: route, query: omitBy(encodedQueryParams, value => !value) });
