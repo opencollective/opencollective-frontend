@@ -5,10 +5,11 @@ import styled from 'styled-components';
 import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex, Grid } from '../Grid';
 import Link from '../Link';
+import { SectionTitle } from '../marketing/Text';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledLink from '../StyledLink';
-import { H3, P } from '../Text';
+import { P } from '../Text';
 
 import NeedHelp from './NeedHelpSection';
 
@@ -95,19 +96,13 @@ const BrowseTopics = () => {
           justifyContent="space-between"
         >
           <Box>
-            <H3
-              fontSize={['32px']}
-              lineHeight={['40px']}
-              letterSpacing={['-0.008em']}
-              color="black.900"
-              textAlign="center"
-            >
+            <SectionTitle textAlign="center">
               <FormattedMessage id="helpAndSupport.browseTopics" defaultMessage="Browse Topics" />
-            </H3>
+            </SectionTitle>
           </Box>
           <Box display={['none', 'inline-block']}>
             <Link href="https://docs.opencollective.com" openInNewTab>
-              <StyledButton minWidth={110} buttonStyle="dark" whiteSpace="nowrap">
+              <StyledButton minWidth={110} buttonStyle="marketing" whiteSpace="nowrap">
                 <FormattedMessage id="helpAndSupport.viewAll" defaultMessage="View All" />
               </StyledButton>
             </Link>
@@ -148,7 +143,7 @@ const BrowseTopics = () => {
         </Grid>
         <Box mt="24px" display={[null, 'none']}>
           <Link href="/">
-            <StyledButton minWidth={288} my={[2, null, 0]} mr={[0, 3]} buttonStyle="dark" whiteSpace="nowrap">
+            <StyledButton minWidth={288} my={[2, null, 0]} mr={[0, 3]} buttonStyle="marketing" whiteSpace="nowrap">
               <FormattedMessage id="helpAndSupport.viewAll" defaultMessage="View All" />
             </StyledButton>
           </Link>
@@ -164,7 +159,7 @@ const BrowseTopics = () => {
         }
         actions={
           <Link href="/contact">
-            <StyledButton minWidth={134} buttonStyle="dark" whiteSpace="nowrap">
+            <StyledButton minWidth={134} buttonStyle="marketing" whiteSpace="nowrap">
               <FormattedMessage id="contactUs" defaultMessage="Contact us" />
             </StyledButton>
           </Link>

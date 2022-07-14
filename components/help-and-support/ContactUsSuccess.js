@@ -41,7 +41,7 @@ const ContactUsSuccess = () => (
         />
       </Box>
       <Box ml={['4px', 3]}>
-        <H2 fontSize={['24px', '32px']} lineHeight={['32px', '40px']} letterSpacing="-0.008em" color="black.900">
+        <H2 fontSize={['24px', '32px']} lineHeight={['32px', '40px']} letterSpacing="-0.008em" color="primary.900">
           <FormattedMessage id="helpAndSupport.messageConfirmation" defaultMessage="We’ve received your message. ✅" />
         </H2>
       </Box>

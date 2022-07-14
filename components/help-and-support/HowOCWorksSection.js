@@ -5,28 +5,23 @@ import { FormattedMessage } from 'react-intl';
 import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
-import { H2, P, Span } from '../Text';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
+import { Span } from '../Text';
 
 const HowOCWorks = () => (
   <Flex flexDirection="column" px={3} alignItems="center" my="58px">
-    <Box textAlign="center" mb={3} width={['304px', '660px', '768px']}>
-      <H2
-        fontSize={['32px', '40px']}
-        lineHeight={['40px', '48px']}
-        letterSpacing={['-0.008em', '-0.04em']}
-        mb={3}
-        color="black.900"
-      >
+    <Box textAlign="center" mb={3} width={['304px', '660px', 1, null, '1152px']}>
+      <SectionTitle mb={3}>
         <FormattedMessage id="helpAndSupport.howOCWorks" defaultMessage="This is how Open Collective works" />
-      </H2>
+      </SectionTitle>
     </Box>
     <Box textAlign="center" width={['288px', '660px', '768px']}>
-      <P mb="24px" fontSize={['16px', '24px']} lineHeight={['24px', '32px']} color="black.700" fontWeight="500">
+      <SectionDescription mb="24px">
         <FormattedMessage
           id="helpAndSupport.howOCWorks.description"
           defaultMessage="Open Collective enables all kinds of collaborative groups, initiatives, and projects to raise, manage, and spend money transparently."
         />
-      </P>
+      </SectionDescription>
       <Link href="/how-it-works">
         <Span color="ocBrandColors.600" fontSize="16px" lineHeight="24px">
           <FormattedMessage defaultMessage="How it works" id="howItWorks" />
@@ -54,15 +49,9 @@ const HowOCWorks = () => (
     </Box>
     <Flex flexDirection={['column', null, 'row']} alignItems="center" my={['56px', null, '127px']}>
       <Box order={[null, 1]} display={[null, null, 'none']}>
-        <H2
-          fontSize={['32px', '40px']}
-          lineHeight={['40px', '48px']}
-          letterSpacing={['-0.008em', '-0.04em']}
-          mb={3}
-          color="black.900"
-        >
+        <SectionTitle mb={3}>
           <FormattedMessage id="helpAndSupport.getToKnowUs" defaultMessage="Get to know us!" />
-        </H2>
+        </SectionTitle>
       </Box>
       <Box mt="16px" order={[null, 3]} width={['216px', '320px', '448px']}>
         <NextIllustration
@@ -78,28 +67,15 @@ const HowOCWorks = () => (
         order={[null, 2]}
         mr={[null, null, '72px']}
       >
-        <H2
-          fontSize={['32px', '40px']}
-          lineHeight={['40px', '48px']}
-          letterSpacing={['-0.008em', '-0.04em']}
-          mb={3}
-          color="black.900"
-          display={['none', null, 'block']}
-        >
+        <SectionTitle mb={3} display={['none', null, 'block']}>
           <FormattedMessage id="helpAndSupport.getToKnowUs" defaultMessage="Get to know us!" />
-        </H2>
-        <P
-          mb={['16px', '24px']}
-          fontSize={['16px', '24px']}
-          lineHeight={['24px', '32px']}
-          color="black.700"
-          fontWeight="500"
-        >
+        </SectionTitle>
+        <SectionDescription mb={['16px', '24px']}>
           <FormattedMessage
             id="helpAndSupport.getToKnowUs.description"
             defaultMessage="We know making the case up the chain is not always easy. For all you heroes inside companies, we put together some resources to help you succeed."
           />
-        </P>
+        </SectionDescription>
         <Link href="/how-it-works">
           <Span color="ocBrandColors.600" fontSize="16px" lineHeight="24px">
             <FormattedMessage defaultMessage="Know more about us" id="knowMoreAboutUs" />

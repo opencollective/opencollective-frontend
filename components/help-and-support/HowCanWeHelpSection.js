@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex } from '../Grid';
-import { H1, P } from '../Text';
+import { MainDescription, MainTitle } from '../marketing/Text';
 
 const HowCanWeHelp = () => {
   return (
@@ -27,31 +27,18 @@ const HowCanWeHelp = () => {
         alignItems={['center', null, null, null, 'flex-start']}
         ml={[null, null, null, null, '34px']}
       >
-        <Box mb={[3, '24px']} width={['288px', '383px', '413px', null, '555px']}>
-          <H1
-            letterSpacing={['-0.08em', '-0.04em']}
-            fontSize={['32px', '40px', null, null, '52px']}
-            lineHeight={['40px', '48px', null, null, '56px']}
-            textAlign={['center', null, null, null, 'left']}
-            color="black.900"
-            whiteSpace={[null, null, 'pre-line']}
-          >
+        <Box mb={[3, '24px']} width={['288px', '576px', '685px']}>
+          <MainTitle textAlign={['center', null, null, null, 'left']} whiteSpace={[null, null, 'pre-line']}>
             <FormattedMessage id="helpAndSupport.title" defaultMessage="Hi, How can we help?" />
-          </H1>
+          </MainTitle>
         </Box>
         <Box width={['288px', '597px']}>
-          <P
-            fontSize={['16px', '24px']}
-            lineHeight={['24px', '32px']}
-            textAlign={['center', null, null, null, 'left']}
-            fontWeight="500"
-            color="black.800"
-          >
+          <MainDescription textAlign={['center', null, null, null, 'left']}>
             <FormattedMessage
               id="helpAndSupport.description"
               defaultMessage="Our support team is available from Monday to Friday. Please expect a response within 3 business days."
             />
-          </P>
+          </MainDescription>
         </Box>
       </Flex>
     </Flex>
