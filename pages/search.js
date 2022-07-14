@@ -35,12 +35,12 @@ import { H1, P, Span } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 
 const CollectiveCardContainer = styled.div`
-  width: 275px;
   animation: ${fadeIn} 0.2s;
 `;
 
 const AllCardsContainer = styled(Grid).attrs({
-  width: [null, '100%'],
+  width: '100%',
+  maxWidth: 1200,
   gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 2fr))',
 })``;
 
@@ -329,7 +329,7 @@ class SearchPage extends React.Component {
             </SearchFormContainer>
           </Flex>
         </Container>
-        <Container mx="auto" px={3} width={[1, 0.85]} maxWidth={1200}>
+        <Container mx="auto" px={3} width={1} maxWidth={1200}>
           <Flex mb={4} mx="auto" flexDirection={['column', 'row']} justifyContent="center">
             <Hide xs sm>
               <StyledFilters
@@ -427,18 +427,18 @@ class SearchPage extends React.Component {
               {loading
                 ? Array.from(new Array(12)).map((_, index) => (
                     // eslint-disable-next-line react/no-array-index-key
-                    <Flex key={index} my={3} mx={2}>
+                    <Box key={index} my={3} mx={2}>
                       <CollectiveCardContainer>
                         <LoadingPlaceholder height={336} borderRadius="16px" />
                       </CollectiveCardContainer>
-                    </Flex>
+                    </Box>
                   ))
                 : accounts?.nodes?.map(collective => (
-                    <Flex key={collective.slug} my={3} mx={2}>
+                    <Box key={collective.slug} my={3} mx={2}>
                       <CollectiveCardContainer key={collective.id}>
                         <SearchCollectiveCard collective={collective} />
                       </CollectiveCardContainer>
-                    </Flex>
+                    </Box>
                   ))}
             </AllCardsContainer>
 
