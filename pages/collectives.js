@@ -12,8 +12,6 @@ import WeAreOpenSection from '../components/collectives/sections/WeAreOpen';
 import WhatCanYouDoSection from '../components/collectives/sections/WhatCanYouDo';
 import Page from '../components/Page';
 
-const menuItems = { pricing: true, howItWorks: true };
-
 const messages = defineMessages({
   defaultTitle: {
     id: 'OC.tagline',
@@ -24,7 +22,7 @@ const messages = defineMessages({
 const CollectivesPage = () => {
   const { formatMessage } = useIntl();
   return (
-    <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
+    <Page description={formatMessage(messages.defaultTitle)}>
       <MakeCommunitySection />
       <WhatCanYouDoSection />
       <FeaturesSection />
