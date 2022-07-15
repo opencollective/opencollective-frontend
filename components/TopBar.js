@@ -30,8 +30,9 @@ const NavList = styled(Flex)`
 `;
 
 const NavLinkContainer = styled(Box)`
-  text-align: center;
-  width: 140px;
+  text-align: left;
+  padding: 0 16px 0 16px;
+  width: 158px;
 `;
 
 const NavButton = styled(StyledButton)`
@@ -40,9 +41,11 @@ const NavButton = styled(StyledButton)`
   font-size: 16px;
   padding: 10px;
   cursor: pointer;
+  box-shadow: none !important;
   @media (hover: hover) {
     :hover {
       background-color: white !important;
+      color: #0c2d66;
     }
   }
   :focus {
@@ -50,7 +53,7 @@ const NavButton = styled(StyledButton)`
     border-radius: 1px;
   }
   :active {
-    color: black;
+    color: #0c2d66;
   }
 `;
 
@@ -60,7 +63,8 @@ const NavItem = styled(StyledLink)`
   font-size: 14px;
   @media (hover: hover) {
     :hover {
-      text-decoration: underline;
+      color: #0c2d66;
+      font-weight: 600;
     }
   }
 `;

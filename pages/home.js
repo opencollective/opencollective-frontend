@@ -45,18 +45,23 @@ const HomePage = () => {
 };
 
 HomePage.getInitialProps = ({ req, res }) => {
-  if (res && req && (req.language || req.locale === 'en')) {
+  setBrowserCachingPolicy(req, res);
+
+  return { skipDataFromTree: skipDataFromTree(req) };
+};
+
+const setBrowserCachingPolicy = (req, res) => {
+  if (isRequestLanguageSetOrLocaleEnglish(req, res)) {
     res.set('Cache-Control', 'public, s-maxage=3600');
   }
+};
 
-  let skipDataFromTree = false;
+const isRequestLanguageSetOrLocaleEnglish = (req, res) => {
+  return res && req && (req.language || req.locale === 'en');
+};
 
-  // If on server side
-  if (req) {
-    skipDataFromTree = true;
-  }
-
-  return { skipDataFromTree };
+const skipDataFromTree = req => {
+  return req ? true : false;
 };
 
 export default HomePage;
