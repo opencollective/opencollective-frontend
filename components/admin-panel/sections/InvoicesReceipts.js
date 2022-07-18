@@ -251,7 +251,7 @@ const InvoicesReceipts = ({ collective }) => {
           onClick={() => {
             setSettings({
               variables: {
-                id: collective.id,
+                id: collective.legacyId,
                 settings: {
                   ...collective.settings,
                   invoice: getInvoiceTemplatesObj(),
@@ -283,7 +283,7 @@ const InvoicesReceipts = ({ collective }) => {
 
 InvoicesReceipts.propTypes = {
   collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    legacyId: PropTypes.number.isRequired,
     settings: PropTypes.object,
   }).isRequired,
 };

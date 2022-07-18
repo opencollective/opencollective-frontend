@@ -17,7 +17,6 @@ import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils
 
 import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
 import ForDevelopers from '../admin-panel/sections/ForDevelopers';
-import InvoicesReceipts from '../admin-panel/sections/InvoicesReceipts';
 import CodeRepositoryIcon from '../CodeRepositoryIcon';
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
@@ -515,9 +514,6 @@ class EditCollectiveForm extends React.Component {
 
       case EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING:
         return <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />;
-
-      case EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS:
-        return <InvoicesReceipts collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY:
         return <ReceivingMoney collective={collective} />;

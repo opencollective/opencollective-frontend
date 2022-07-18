@@ -279,6 +279,11 @@ interface Account {
     """
     orderByRoles: Boolean
   ): MemberOfCollection
+
+  """
+  Returns the emails of the account. Individuals only have one, but organizations can have multiple emails.
+  """
+  emails: [EmailAddress!]
   transactions(
     """
     The number of results to fetch (default 10, max 1000)
@@ -2182,18 +2187,18 @@ type ExpensePermissions {
   Whether the current user can unschedule this expense payment
   """
   canUnschedulePayment: Boolean!
-  edit: Permission
-  editTags: Permission
-  delete: Permission
-  seeInvoiceInfo: Permission
-  pay: Permission
-  approve: Permission
-  unapprove: Permission
-  reject: Permission
-  markAsSpam: Permission
-  markAsUnpaid: Permission
-  comment: Permission
-  unschedulePayment: Permission
+  edit: Permission!
+  editTags: Permission!
+  delete: Permission!
+  seeInvoiceInfo: Permission!
+  pay: Permission!
+  approve: Permission!
+  unapprove: Permission!
+  reject: Permission!
+  markAsSpam: Permission!
+  markAsUnpaid: Permission!
+  comment: Permission!
+  unschedulePayment: Permission!
 }
 
 type Permission {
@@ -2268,6 +2273,7 @@ enum ActivityType {
   COLLECTIVE_UNFROZEN
   COLLECTIVE_MEMBER_INVITED
   COLLECTIVE_MEMBER_CREATED
+  COLLECTIVE_MONTHLY_REPORT
   COLLECTIVE_CORE_MEMBER_ADDED
   COLLECTIVE_CORE_MEMBER_INVITED
   COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED
@@ -2293,9 +2299,13 @@ enum ActivityType {
   WEBHOOK_STRIPE_RECEIVED
   WEBHOOK_PAYPAL_RECEIVED
   COLLECTIVE_MONTHLY
-  ORDERS_SUSPICIOUS
+  ORDER_CANCELED_ARCHIVED_COLLECTIVE
   ORDER_PROCESSING
   ORDER_PROCESSING_CRYPTO
+  ORDER_PENDING_CONTRIBUTION_NEW
+  ORDER_PENDING_CONTRIBUTION_REMINDER
+  ORDER_THANKYOU
+  ORDERS_SUSPICIOUS
   BACKYOURSTACK_DISPATCH_CONFIRMED
   ACTIVATED_COLLECTIVE_AS_HOST
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT
@@ -2303,6 +2313,7 @@ enum ActivityType {
   VIRTUAL_CARD_REQUESTED
   VIRTUAL_CARD_CHARGE_DECLINED
   PAYMENT_FAILED
+  PAYMENT_CREDITCARD_CONFIRMATION
   PAYMENT_CREDITCARD_EXPIRING
   TAXFORM_REQUEST
   CONVERSATION_COMMENT_CREATED
@@ -2621,6 +2632,11 @@ type Host implements Account & AccountWithContributions {
     """
     orderByRoles: Boolean
   ): MemberOfCollection!
+
+  """
+  Returns the emails of the account. Individuals only have one, but organizations can have multiple emails.
+  """
+  emails: [EmailAddress!]
   transactions(
     """
     The number of results to fetch (default 10, max 1000)
@@ -2943,6 +2959,11 @@ type Host implements Account & AccountWithContributions {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
 
   """
   Number of unique financial contributors.
@@ -3882,6 +3903,18 @@ type Webhook {
 }
 
 """
+Fields for the user permissions on an account
+"""
+type AccountPermissions {
+  id: String!
+
+  """
+  Whether the current user can mark this order as expired
+  """
+  addFunds: Permission!
+}
+
+"""
 The name of the current plan and its characteristics.
 """
 type HostPlan {
@@ -4580,6 +4613,11 @@ type Bot implements Account {
     """
     orderByRoles: Boolean
   ): MemberOfCollection!
+
+  """
+  Returns the emails of the account. Individuals only have one, but organizations can have multiple emails.
+  """
+  emails: [EmailAddress!]
   transactions(
     """
     The number of results to fetch (default 10, max 1000)
@@ -4902,6 +4940,11 @@ type Bot implements Account {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
 }
 
 """
@@ -5061,6 +5104,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     orderByRoles: Boolean
   ): MemberOfCollection!
+
+  """
+  Returns the emails of the account. Individuals only have one, but organizations can have multiple emails.
+  """
+  emails: [EmailAddress!]
   transactions(
     """
     The number of results to fetch (default 10, max 1000)
@@ -5383,6 +5431,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
 
   """
   Returns the Fiscal Host
@@ -5870,6 +5923,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     orderByRoles: Boolean
   ): MemberOfCollection!
+
+  """
+  Returns the emails of the account. Individuals only have one, but organizations can have multiple emails.
+  """
+  emails: [EmailAddress!]
   transactions(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6194,6 +6252,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   ): WebhookCollection!
 
   """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
+
+  """
   Returns the Fiscal Host
   """
   host: Host
@@ -6464,6 +6527,11 @@ type Individual implements Account {
     """
     orderByRoles: Boolean
   ): MemberOfCollection!
+
+  """
+  Returns the emails of the account. Individuals only have one, but organizations can have multiple emails.
+  """
+  emails: [EmailAddress!]
   transactions(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6786,6 +6854,11 @@ type Individual implements Account {
   ): WebhookCollection!
 
   """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
+
+  """
   Email for the account. For authenticated user: scope: "email".
   """
   email: String
@@ -7034,6 +7107,11 @@ type Organization implements Account & AccountWithContributions {
     """
     orderByRoles: Boolean
   ): MemberOfCollection!
+
+  """
+  Returns the emails of the account. Individuals only have one, but organizations can have multiple emails.
+  """
+  emails: [EmailAddress!]
   transactions(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7356,6 +7434,11 @@ type Organization implements Account & AccountWithContributions {
   ): WebhookCollection!
 
   """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
+
+  """
   Number of unique financial contributors.
   """
   totalFinancialContributors(
@@ -7635,6 +7718,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     orderByRoles: Boolean
   ): MemberOfCollection!
+
+  """
+  Returns the emails of the account. Individuals only have one, but organizations can have multiple emails.
+  """
+  emails: [EmailAddress!]
   transactions(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7957,6 +8045,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
 
   """
   Returns the Fiscal Host
@@ -10150,6 +10243,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     orderByRoles: Boolean
   ): MemberOfCollection!
+
+  """
+  Returns the emails of the account. Individuals only have one, but organizations can have multiple emails.
+  """
+  emails: [EmailAddress!]
   transactions(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10472,6 +10570,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
 
   """
   Returns the Fiscal Host
@@ -10731,6 +10834,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     orderByRoles: Boolean
   ): MemberOfCollection!
+
+  """
+  Returns the emails of the account. Individuals only have one, but organizations can have multiple emails.
+  """
+  emails: [EmailAddress!]
   transactions(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11053,6 +11161,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
 
   """
   Returns the Fiscal Host
