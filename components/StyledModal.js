@@ -120,7 +120,7 @@ export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }) => (
   <Header {...props}>
     {children || <div />}
     {!hideCloseIcon && (
-      <Span style={{ alignItems: 'center', display: 'flex' }}>
+      <Span style={{ alignItems: 'center', display: 'flex' }} ml={2}>
         <StyledLinkButton onClick={onClose}>
           <CloseIcon onClick={onClose} />
         </StyledLinkButton>
