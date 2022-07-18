@@ -257,3 +257,39 @@ jobs:
         run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
 
       - run: npm run test:jest
+
+  typescript:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2-beta
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Restore node_modules
+        uses: actions/cache@v3
+        id: node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}-${{ secrets.CACHE_VERSION }}
+
+      - name: Restore .npm cache
+        if: steps.node-modules.outputs.cache-hit != 'true'
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}-${{ secrets.CACHE_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}-${{ secrets.CACHE_VERSION }}
+            ${{ runner.os }}-npm-cache-
+
+      - name: Install dependencies
+        if: steps.node-modules.outputs.cache-hit != 'true'
+        run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
+
+      - run: npm run type:check
