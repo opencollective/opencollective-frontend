@@ -124,6 +124,4 @@ const BanAccount = () => {
   );
 };
 
-BanAccount.propTypes = {};
-
 export default BanAccount;
