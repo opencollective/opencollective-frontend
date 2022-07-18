@@ -2567,7 +2567,7 @@
   "vwq8lO": "{isRefund, select, true {Reembolso de la} other {}} Tarifa del Procesador de Pagos{hasPaymentProcessorCover, select, true { (cubierta por el Anfitrión)} false {} other {}}: {paymentProcessorFee}",
   "W/V6+Y": "Colapsar",
   "W4SaxY": "Local",
-  "Warning.AccountHolderNameNotValid": "Asegúrese de que este nombre coincide exactamente con el que figura en los datos de su cuenta bancaria, de lo contrario el pago podría fallar.",
+  "Warning.AccountHolderNameNotValid": "Full names for personal recipients. They must include more than one name, and both first and last name must have more than one character.",
   "warning.discardUnsavedChanges": "¿Está seguro de que desea descartar los cambios no guardados?",
   "Warning.Important": "Importante",
   "Warning.LegalNameNotMatchBankAccountName": "Por lo general, el nombre legal debe coincidir con el nombre del titular de la cuenta bancaria. De lo contrario, los pagos pueden retrasarse. Si el pago es a una Organización, seleccione o cree el perfil de esa Organización como beneficiario en lugar de su perfil individual.",

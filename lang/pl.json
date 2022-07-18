@@ -2567,7 +2567,7 @@
   "vwq8lO": "{isRefund, select, true {Refunded} other {}} Payment Processor Fee{hasPaymentProcessorCover, select, true { (covered by the Host)} false {} other {}}: {paymentProcessorFee}",
   "W/V6+Y": "Zwiń",
   "W4SaxY": "Lokalna",
-  "Warning.AccountHolderNameNotValid": "Upewnij się, że ta nazwa odpowiada dokładnie temu, co jest zawarte w danych Twojego konta bankowego, w przeciwnym razie płatność może się nie powieść.",
+  "Warning.AccountHolderNameNotValid": "Full names for personal recipients. They must include more than one name, and both first and last name must have more than one character.",
   "warning.discardUnsavedChanges": "Czy jesteś pewien, że chcesz porzucić niezapisane zmiany?",
   "Warning.Important": "Ważne",
   "Warning.LegalNameNotMatchBankAccountName": "The legal name should match the bank account holder name in most cases. Otherwise payments may be delayed. If the payment is to an organization, please select or create that organization's profile instead of your individual profile as the payee.",
