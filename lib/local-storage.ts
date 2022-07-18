@@ -22,7 +22,7 @@ export const LOCAL_STORAGE_KEYS = {
  * A helper to get a value from localStorage.
  * Returns the value, or null if no value exists or if storage is unavailable.
  */
-export const getFromLocalStorage = key => {
+export const getFromLocalStorage = (key: string): string => {
   try {
     return window.localStorage.getItem(key);
   } catch (e) {
@@ -34,7 +34,7 @@ export const getFromLocalStorage = key => {
  * A helper to set a value in localStorage.
  * Ignores errors about full, disallowed or unsupported storage.
  */
-export const setLocalStorage = (key, value) => {
+export const setLocalStorage = (key: string, value: string): void => {
   try {
     window.localStorage.setItem(key, value);
   } catch (e) {
@@ -46,7 +46,7 @@ export const setLocalStorage = (key, value) => {
  * A helper to remove an entry in localStorage.
  * Ignores errors about full, disallowed or unsupported storage.
  */
-export const removeFromLocalStorage = key => {
+export const removeFromLocalStorage = (key: string): void => {
   try {
     window.localStorage.removeItem(key);
   } catch (e) {
