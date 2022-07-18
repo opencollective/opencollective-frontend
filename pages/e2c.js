@@ -11,8 +11,6 @@ import ResourcesSection from '../components/e2c/ResourcesSection';
 import WhatDoesE2CMean from '../components/e2c/WhatDoesE2CMeanSection';
 import Page from '../components/Page';
 
-const menuItems = { pricing: true };
-
 const messages = defineMessages({
   defaultTitle: {
     id: 'OC.e2c',
@@ -23,7 +21,7 @@ const messages = defineMessages({
 const E2C = () => {
   const { formatMessage } = useIntl();
   return (
-    <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
+    <Page description={formatMessage(messages.defaultTitle)}>
       <ExitToCommunity />
       <WhatDoesE2CMean />
       <InvestingInTheCommons />
