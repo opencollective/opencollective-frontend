@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Add } from '@styled-icons/material/Add';
 import { Close } from '@styled-icons/material/Close';
 import { cloneDeep, difference, get, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { isURL } from 'validator';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -25,24 +26,7 @@ import StyledInputGroup from '../../StyledInputGroup';
 import StyledSelect from '../../StyledSelect';
 import { Label, P, Span } from '../../Text';
 
-const messages = defineMessages({
-  'webhooks.url.label': {
-    id: 'webhooks.url.label',
-    defaultMessage: 'URL',
-  },
-  'webhooks.types.label': {
-    id: 'webhooks.types.label',
-    defaultMessage: 'Activity',
-  },
-  'webhooks.remove': {
-    id: 'webhooks.remove',
-    defaultMessage: 'Remove webhook',
-  },
-  'webhooks.save': {
-    id: 'webhooks.save',
-    defaultMessage: 'Save {count} webhooks',
-  },
-});
+import WebhookActivityInfoModal, { hasWebhookEventInfo } from './WebhookActivityInfoModal';
 
 const EMPTY_WEBHOOKS = [];
 
@@ -59,6 +43,7 @@ class Webhooks extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      moreInfoModal: null,
       modified: false,
       webhooks: cloneDeep(this.getWebhooksFromProps(props)),
       isLoaded: false,
@@ -189,14 +174,14 @@ class Webhooks extends React.Component {
           >
             <Close size="1.2em" />
             {'  '}
-            {intl.formatMessage(messages['webhooks.remove'])}
+            <FormattedMessage id="webhooks.remove" defaultMessage="Remove webhook" />
           </StyledButton>
         </Box>
 
         <Box width={[1, 0.75]}>
           <Box mb={4}>
             <Label fontSize="14px" mb={1}>
-              {intl.formatMessage(messages['webhooks.url.label'])}
+              <FormattedMessage id="webhooks.url.label" defaultMessage="URL" />
             </Label>
             <StyledInputGroup
               type="type"
@@ -209,19 +194,39 @@ class Webhooks extends React.Component {
           </Box>
           <Box>
             <Label fontSize="14px" mb={1}>
-              {intl.formatMessage(messages['webhooks.types.label'])}
+              <FormattedMessage id="webhooks.types.label" defaultMessage="Activity" />
             </Label>
-            <StyledSelect
-              isSearchable={false}
-              inputId="event-type-select"
-              options={this.getEventTypes(data.Collective.type, data.Collective.isHost).map(eventType => ({
-                label: i18nWebhookEventType(intl, eventType),
-                value: eventType,
-              }))}
-              value={{ label: i18nWebhookEventType(intl, webhook.type), value: webhook.type }}
-              onChange={({ value }) => this.editWebhook(index, 'type', value)}
-            />
+            <Flex alignItems="center">
+              <StyledSelect
+                minWidth={300}
+                isSearchable={false}
+                inputId="event-type-select"
+                options={this.getEventTypes(data.Collective.type, data.Collective.isHost).map(eventType => ({
+                  label: i18nWebhookEventType(intl, eventType),
+                  value: eventType,
+                }))}
+                value={{ label: i18nWebhookEventType(intl, webhook.type), value: webhook.type }}
+                onChange={({ value }) => this.editWebhook(index, 'type', value)}
+              />
+              {hasWebhookEventInfo(webhook.type) && (
+                <StyledButton
+                  buttonSize="tiny"
+                  isBorderless
+                  title={intl.formatMessage({ id: 'moreInfo', defaultMessage: 'More info' })}
+                  onClick={() => this.setState({ moreInfoModal: webhook.type })}
+                  ml={2}
+                >
+                  <InfoCircle size={24} color="#a3a3a3" />
+                </StyledButton>
+              )}
+            </Flex>
           </Box>
+          {this.state.moreInfoModal && (
+            <WebhookActivityInfoModal
+              activity={this.state.moreInfoModal}
+              onClose={() => this.setState({ moreInfoModal: null })}
+            />
+          )}
         </Box>
       </Flex>
     );
