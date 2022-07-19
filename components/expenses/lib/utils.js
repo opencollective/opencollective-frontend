@@ -9,7 +9,7 @@ import { validateTaxVAT } from '../ExpenseVATFormikFields';
 
 export const checkRequiresAddress = values => {
   const collectiveTypesRequiringAddress = [CollectiveType.INDIVIDUAL, CollectiveType.USER, CollectiveType.ORGANIZATION];
-  const expenseTypesRequiringAddress = [expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST, expenseTypes.GRANT];
+  const expenseTypesRequiringAddress = [expenseTypes.INVOICE, expenseTypes.GRANT];
 
   return (
     expenseTypesRequiringAddress.includes(values.type) &&

@@ -165,11 +165,11 @@ const ExpenseTypeRadioSelect = ({ name, onChange, value, options = {} }) => {
             isChecked={value === expenseTypes.INVOICE}
             onChange={onChange}
           />
-          {options.fundingRequest && (
+          {options.hasGrant && (
             <ExpenseTypeOption
               name={name}
               type={expenseTypes.GRANT}
-              isChecked={value === expenseTypes.FUNDING_REQUEST || value === expenseTypes.GRANT}
+              isChecked={value === expenseTypes.GRANT}
               onChange={onChange}
             />
           )}
