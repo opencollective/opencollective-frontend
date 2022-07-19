@@ -103,6 +103,20 @@ Cypress.Commands.add('openEmail', emailMatcher => {
 });
 
 /**
+ * Gets an email in maildev.
+ *
+ * API must be configured to use maildev
+ * - configured by default in development, e2e and ci environments
+ * - otherwise MAILDEV_CLIENT=true and MAILDEV_SERVER=true
+ *
+ * @param emailMatcher {func} - used to find the email. Gets passed an email. To see the
+ *  list of all fields, check https://github.com/djfarrelly/MailDev/blob/master/docs/rest.md
+ */
+Cypress.Commands.add('getEmail', emailMatcher => {
+  return getEmail(emailMatcher);
+});
+
+/**
  * Clear maildev inbox.
  */
 Cypress.Commands.add('clearInbox', () => {
@@ -625,13 +639,22 @@ function fillStripeInput(params) {
 }
 
 function loopOpenEmail(emailMatcher, timeout = 8000) {
-  return cy.getInbox().then(body => {
-    const email = body.find(emailMatcher);
+  return getEmail(emailMatcher, timeout).then(email => {
+    return cy.openExternalLink(`${Cypress.env('MAILDEV_URL')}/email/${email.id}/html`);
+  });
+}
+
+function getEmail(emailMatcher, timeout = 8000) {
+  if (timeout < 0) {
+    return assert.fail('getEmail timed out');
+  }
+
+  return cy.getInbox().then(inbox => {
+    const email = inbox.find(emailMatcher);
     if (email) {
-      return cy.openExternalLink(`${Cypress.env('MAILDEV_URL')}/email/${email.id}/html`);
-    } else if (timeout > 0) {
-      cy.wait(100);
-      return loopOpenEmail(emailMatcher, timeout - 100);
+      return cy.wrap(email);
     }
+    cy.wait(100);
+    return getEmail(emailMatcher, timeout - 100);
   });
 }
