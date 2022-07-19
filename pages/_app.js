@@ -19,7 +19,11 @@ import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
 
-Router.onRouteChangeStart = () => NProgress.start();
+Router.onRouteChangeStart = (url, { shallow }) => {
+  if (!shallow) {
+    NProgress.start();
+  }
+};
 
 Router.onRouteChangeComplete = () => NProgress.done();
 

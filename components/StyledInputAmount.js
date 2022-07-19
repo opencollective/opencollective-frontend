@@ -146,7 +146,7 @@ const StyledInputAmount = ({
       if (parsedValue === null || isNaN(parsedValue)) {
         onChange(parsedValue, e);
       } else if (!e.target.checkValidity() || parsedValue !== valueWithIgnoredComma) {
-        onChange(e.target.value ? NaN : null, e);
+        onChange(isNaN(e.target.value) ? NaN : null, e);
       } else {
         onChange(floatAmountToCents(parsedValue), e);
       }
