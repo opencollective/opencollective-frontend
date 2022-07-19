@@ -7,7 +7,9 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../lib/errors';
 
+import { editCollectiveSettingsMutation } from '../../collective-page/graphql/mutations';
 import Container from '../../Container';
+import SettingsSectionTitle from '../../edit-collective/sections/SettingsSectionTitle';
 import { Box, Flex } from '../../Grid';
 import MessageBox from '../../MessageBox';
 import PreviewModal from '../../PreviewModal';
@@ -16,9 +18,7 @@ import StyledHr from '../../StyledHr';
 import StyledInput from '../../StyledInput';
 import StyledTextarea from '../../StyledTextarea';
 import { P, Span } from '../../Text';
-import { editCollectiveSettingsMutation } from '../mutations';
-
-import SettingsSectionTitle from './SettingsSectionTitle';
+import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
 const messages = defineMessages({
   extraInfoPlaceholder: {
@@ -30,6 +30,7 @@ const messages = defineMessages({
 
 const InvoicesReceipts = ({ collective }) => {
   const intl = useIntl();
+  const { addToast } = useToasts();
 
   // For invoice Title
   const defaultReceiptTitlePlaceholder = 'Payment Receipt';
@@ -45,7 +46,7 @@ const InvoicesReceipts = ({ collective }) => {
   const [isFieldChanged, setIsFieldChanged] = React.useState(false);
   const isSaved =
     get(data, 'editCollective.settings.invoice.templates.default.title') === receiptTitle &&
-    get(data, 'editCollective.settings.invoice.templates.alternative.title') === alternativeReceiptTitle;
+    get(data, 'editCollective.settings.invoice.templates.alternative.title', null) === alternativeReceiptTitle;
 
   // For invoice extra info
   const defaultInfo = get(collective.settings, 'invoice.templates.default.info');
@@ -252,7 +253,7 @@ const InvoicesReceipts = ({ collective }) => {
           onClick={() => {
             setSettings({
               variables: {
-                id: collective.id,
+                id: collective.legacyId,
                 settings: {
                   ...collective.settings,
                   invoice: getInvoiceTemplatesObj(),
@@ -260,6 +261,10 @@ const InvoicesReceipts = ({ collective }) => {
               },
             });
             setIsFieldChanged(false);
+            addToast({
+              type: TOAST_TYPE.SUCCESS,
+              message: <FormattedMessage defaultMessage="Invoices updated successfully" />,
+            });
           }}
         >
           {isSaved && infoIsSaved ? (
@@ -284,7 +289,7 @@ const InvoicesReceipts = ({ collective }) => {
 
 InvoicesReceipts.propTypes = {
   collective: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    legacyId: PropTypes.number.isRequired,
     settings: PropTypes.object,
   }).isRequired,
 };
