@@ -18,6 +18,7 @@ import StyledHr from '../../StyledHr';
 import StyledInput from '../../StyledInput';
 import StyledTextarea from '../../StyledTextarea';
 import { P, Span } from '../../Text';
+import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
 const messages = defineMessages({
   extraInfoPlaceholder: {
@@ -29,6 +30,7 @@ const messages = defineMessages({
 
 const InvoicesReceipts = ({ collective }) => {
   const intl = useIntl();
+  const { addToast } = useToasts();
 
   // For invoice Title
   const defaultReceiptTitlePlaceholder = 'Payment Receipt';
@@ -44,7 +46,7 @@ const InvoicesReceipts = ({ collective }) => {
   const [isFieldChanged, setIsFieldChanged] = React.useState(false);
   const isSaved =
     get(data, 'editCollective.settings.invoice.templates.default.title') === receiptTitle &&
-    get(data, 'editCollective.settings.invoice.templates.alternative.title') === alternativeReceiptTitle;
+    get(data, 'editCollective.settings.invoice.templates.alternative.title', null) === alternativeReceiptTitle;
 
   // For invoice extra info
   const defaultInfo = get(collective.settings, 'invoice.templates.default.info');
@@ -259,6 +261,10 @@ const InvoicesReceipts = ({ collective }) => {
               },
             });
             setIsFieldChanged(false);
+            addToast({
+              type: TOAST_TYPE.SUCCESS,
+              message: <FormattedMessage defaultMessage="Invoices updated successfully" />,
+            });
           }}
         >
           {isSaved && infoIsSaved ? (
