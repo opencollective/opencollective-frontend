@@ -430,8 +430,7 @@ class CreateExpensePage extends React.Component {
                                   loading={this.state.isSubmitting}
                                   minWidth={175}
                                 >
-                                  {this.state.expense?.type === expenseTypes.FUNDING_REQUEST ||
-                                  this.state.expense?.type === expenseTypes.GRANT ? (
+                                  {this.state.expense?.type === expenseTypes.GRANT ? (
                                     <FormattedMessage id="ExpenseForm.SubmitRequest" defaultMessage="Submit request" />
                                   ) : (
                                     <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />

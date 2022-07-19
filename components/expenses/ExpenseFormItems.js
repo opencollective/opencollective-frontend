@@ -68,7 +68,7 @@ class ExpenseFormItems extends React.PureComponent {
 
   componentDidMount() {
     const { values } = this.props.form;
-    if ([expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST, expenseTypes.GRANT].includes(values.type)) {
+    if ([expenseTypes.INVOICE, expenseTypes.GRANT].includes(values.type)) {
       this.addDefaultItem();
     }
   }
@@ -77,7 +77,7 @@ class ExpenseFormItems extends React.PureComponent {
     const { values, touched } = this.props.form;
 
     if (oldProps.form.values.type !== values.type) {
-      if ([expenseTypes.INVOICE, expenseTypes.FUNDING_REQUEST, expenseTypes.GRANT].includes(values.type)) {
+      if ([expenseTypes.INVOICE, expenseTypes.GRANT].includes(values.type)) {
         this.addDefaultItem();
       } else if (!touched.items && values.items?.length === 1) {
         const firstItem = values.items[0];
@@ -183,7 +183,7 @@ class ExpenseFormItems extends React.PureComponent {
   render() {
     const { values, errors, setFieldValue } = this.props.form;
     const requireFile = attachmentRequiresFile(values.type);
-    const isGrant = values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT;
+    const isGrant = values.type === expenseTypes.GRANT;
     const isCreditCardCharge = values.type === expenseTypes.CHARGE;
     const items = values.items || [];
     const hasItems = items.length > 0;
