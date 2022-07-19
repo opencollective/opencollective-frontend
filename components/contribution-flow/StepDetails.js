@@ -32,7 +32,7 @@ const getCustomFields = (collective, tier) => {
   return [...(tier?.customFields || []), ...(collective.host?.settings?.contributionFlow?.customFields || [])];
 };
 
-const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, isEmbed }) => {
+const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router, isEmbed }) => {
   const intl = useIntl();
   const amount = data?.amount;
   const currency = tier?.amount.currency || collective.currency;
@@ -211,15 +211,15 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
           <StyledHr borderColor="black.300" mt={16} mb={32} />
         </React.Fragment>
       )}
-      {showFeesOnTop && (
+      {showPlatformTip && (
         <Box mt={28}>
           <PlatformTipInput
             currency={currency}
             amount={data?.amount}
-            fees={data?.platformContribution}
+            value={data?.platformTip}
             interval={data?.interval}
             quantity={data?.quantity}
-            onChange={value => dispatchChange('platformContribution', value)}
+            onChange={value => dispatchChange('platformTip', value)}
             isEmbed={isEmbed}
           />
         </Box>
@@ -253,12 +253,12 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
 
 StepDetails.propTypes = {
   onChange: PropTypes.func,
-  showFeesOnTop: PropTypes.bool,
+  showPlatformTip: PropTypes.bool,
   isEmbed: PropTypes.bool,
   LoggedInUser: PropTypes.object,
   data: PropTypes.shape({
     amount: PropTypes.number,
-    platformContribution: PropTypes.number,
+    platformTip: PropTypes.number,
     quantity: PropTypes.number,
     interval: PropTypes.string,
     customData: PropTypes.object,

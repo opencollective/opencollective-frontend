@@ -1,3 +1,5 @@
+import { assign, pick } from 'lodash';
+
 import UrlQueryHelper from '../../lib/UrlQueryHelper';
 
 /**
@@ -49,6 +51,11 @@ const ContributionFlowUrlParametersConfig = {
    * @example John Doe
    */
   name: { type: 'string' },
+  /**
+   * Guest contributions only: The legal name to use to contribute
+   * @example John Doe
+   */
+  legalName: { type: 'string' },
   // -- Payment
   /** @private */
   hideCreditCardPostalCode: { type: 'boolean' },
@@ -113,6 +120,30 @@ const EmbedContributionFlowUrlParametersConfig = {
    * @example true
    */
   useTheme: { type: 'boolean' },
+};
+
+/**
+ * Returns an un-sanitized version of the URL query parameters
+ */
+export const stepsDataToUrlParamsData = (stepDetails, stepProfile) => {
+  const data = {};
+
+  // Step details
+  assign(data, pick(stepDetails, ['amount', 'interval', 'quantity', 'platformTip']));
+
+  // Step profile
+  if (stepProfile.slug) {
+    data.contributeAs = stepProfile.slug;
+  } else {
+    assign(data, pick(stepProfile, ['name', 'legalName', 'email']));
+  }
+
+  // Remove entries that are set to their default values
+  if (data.quantity === 1) {
+    delete data.quantity;
+  }
+
+  return data;
 };
 
 export const ContributionFlowUrlQueryHelper = new UrlQueryHelper(ContributionFlowUrlParametersConfig);
