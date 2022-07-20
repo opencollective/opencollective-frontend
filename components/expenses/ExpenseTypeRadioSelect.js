@@ -149,22 +149,27 @@ const Fieldset = styled.fieldset`
  * layout. See https://github.com/w3c/csswg-drafts/issues/321
  */
 const ExpenseTypeRadioSelect = ({ name, onChange, value, options = {} }) => {
+  console.log('Options', options);
   return (
     <StyledCard>
       <Fieldset onChange={onChange}>
         <Flex flexDirection={['column', 'row']} overflow="hidden">
-          <ExpenseTypeOption
-            name={name}
-            type={expenseTypes.RECEIPT}
-            isChecked={value === expenseTypes.RECEIPT}
-            onChange={onChange}
-          />
-          <ExpenseTypeOption
-            name={name}
-            type={expenseTypes.INVOICE}
-            isChecked={value === expenseTypes.INVOICE}
-            onChange={onChange}
-          />
+          {options.hasReceipt && (
+            <ExpenseTypeOption
+              name={name}
+              type={expenseTypes.RECEIPT}
+              isChecked={value === expenseTypes.RECEIPT}
+              onChange={onChange}
+            />
+          )}
+          {options.hasInvoice && (
+            <ExpenseTypeOption
+              name={name}
+              type={expenseTypes.INVOICE}
+              isChecked={value === expenseTypes.INVOICE}
+              onChange={onChange}
+            />
+          )}
           {options.hasGrant && (
             <ExpenseTypeOption
               name={name}

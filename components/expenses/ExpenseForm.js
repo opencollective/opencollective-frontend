@@ -6,7 +6,7 @@ import { first, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { accountSupportsGrants } from '../../lib/collective.lib';
+import { accountSupportsGrants, accountSupportsInvoices, accountSupportsReceipts } from '../../lib/collective.lib';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -419,6 +419,8 @@ const ExpenseFormBody = ({
           value={values.type}
           options={{
             hasGrant: accountSupportsGrants(collective, collective?.host),
+            hasReceipt: accountSupportsReceipts(collective, collective?.host),
+            hasInvoice: accountSupportsInvoices(collective, collective?.host),
           }}
         />
       )}
@@ -700,6 +702,9 @@ ExpenseFormBody.propTypes = {
       }),
       settings: PropTypes.shape({
         disableGrantsByDefault: PropTypes.bool,
+        allowGrantSubmission: PropTypes.bool,
+        allowInvoiceSubmission: PropTypes.bool,
+        allowReceiptSubmission: PropTypes.bool,
       }),
     }),
     settings: PropTypes.object,
