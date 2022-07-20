@@ -37,6 +37,7 @@
   "3I6uVw": "Delete app",
   "3PZa76": "Este mes",
   "3rFsRr": "Hemos creado un <AdminLink>administrador completamente nuevo</AdminLink> para hosts, ¡échale un vistazo! Esta URL desaparecerá pronto.",
+  "3RuqnL": "None of the payment providers currently active on your account supports recurring contributions. You can enable them by connecting Stripe or PayPal. Alternatively, you can remove the ability to contribute recurringly from the <TiersLink>tiers settings</TiersLink>.",
   "3SSaJO": "Reiniciar formulario",
   "3tJstK": "En este momento no se aceptan contribuciones a esta página",
   "3x3DF3": "¡Resultado de la búsqueda copiado!",
