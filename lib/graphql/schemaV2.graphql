@@ -1849,6 +1849,236 @@ enum Currency {
   Zambian Kwacha
   """
   ZMW
+
+  """
+  Bitcoin
+  """
+  BTC
+
+  """
+  Ethereum
+  """
+  ETH
+
+  """
+  Bitcoin Cash
+  """
+  BCH
+
+  """
+  Litecoin
+  """
+  LTC
+
+  """
+  Zcash
+  """
+  ZEC
+
+  """
+  Chainlink
+  """
+  LINK
+
+  """
+  Basic Attention Token
+  """
+  BAT
+
+  """
+  Dai
+  """
+  DAI
+
+  """
+  Orchid
+  """
+  OXT
+
+  """
+  Storj
+  """
+  STORJ
+
+  """
+  Amp
+  """
+  AMP
+
+  """
+  Ox
+  """
+  ZRX
+
+  """
+  Dogecoin
+  """
+  DOGE
+
+  """
+  Compound
+  """
+  COMP
+
+  """
+  Synthetix
+  """
+  SNX
+
+  """
+  Aave
+  """
+  AAVE
+
+  """
+  The Graph
+  """
+  GRT
+
+  """
+  Bancor
+  """
+  BNT
+
+  """
+  SushiSwap
+  """
+  SUSHI
+
+  """
+  Uniswap
+  """
+  UNI
+
+  """
+  Polygon
+  """
+  MATIC
+
+  """
+  Gemini Dollar
+  """
+  GUSD
+
+  """
+  Curve DAO Token
+  """
+  CRV
+
+  """
+  1inch
+  """
+  INCH
+
+  """
+  Balancer
+  """
+  BAL
+
+  """
+  UMA
+  """
+  UMA
+
+  """
+  Yearn Finance
+  """
+  YFI
+
+  """
+  Alchemix
+  """
+  ALCX
+
+  """
+  Sandbox
+  """
+  SAND
+
+  """
+  Injective Protocol
+  """
+  INJ
+
+  """
+  PAX Gold
+  """
+  PAXG
+
+  """
+  Enjin Coin
+  """
+  ENJ
+
+  """
+  Filecoin
+  """
+  FIL
+
+  """
+  Ankr
+  """
+  ANKR
+
+  """
+  Tezos
+  """
+  XTZ
+
+  """
+  Maker
+  """
+  MKR
+
+  """
+  Loopring
+  """
+  LRC
+
+  """
+  BarnBridge
+  """
+  BOND
+
+  """
+  Skale
+  """
+  SKL
+
+  """
+  Mirror Protocol
+  """
+  MIR
+
+  """
+  Livepeer
+  """
+  LPT
+
+  """
+  Mana
+  """
+  MANA
+
+  """
+  Fantom
+  """
+  FTM
+
+  """
+  Kyber
+  """
+  KNC
+
+  """
+  Cube
+  """
+  CUBE
+
+  """
+  Ren
+  """
+  REN
 }
 
 """
@@ -8282,16 +8512,16 @@ type Query {
     """
     id: String!
   ): Conversation
-  cryptoExchangeRate(
+  exchangeRate(
     """
-    Crypto currency symbol. Example: BTC
+    Currency from which to convert. Example: USD, CAD, BTC
     """
-    cryptoCurrency: CryptoCurrency!
+    fromCurrency: Currency!
 
     """
-    Fiat currency symbol. Example: USD
+    Currency to which the fromCurrency should be converted. Example: USD, CAD, BTC
     """
-    collectiveCurrency: Currency!
+    toCurrency: Currency!
   ): String
   event(
     """
@@ -10050,241 +10280,6 @@ enum CountryISO {
   Western Sahara
   """
   EH
-}
-
-"""
-All supported crypto currencies
-"""
-enum CryptoCurrency {
-  """
-  Bitcoin
-  """
-  BTC
-
-  """
-  Ethereum
-  """
-  ETH
-
-  """
-  Bitcoin Cash
-  """
-  BCH
-
-  """
-  Litecoin
-  """
-  LTC
-
-  """
-  Zcash
-  """
-  ZED
-
-  """
-  Chainlink
-  """
-  LINK
-
-  """
-  Basic Attention Token
-  """
-  BAT
-
-  """
-  Dai
-  """
-  DAI
-
-  """
-  Orchid
-  """
-  OXT
-
-  """
-  Storj
-  """
-  STORJ
-
-  """
-  Amp
-  """
-  AMP
-
-  """
-  Ox
-  """
-  ZRX
-
-  """
-  Dogecoin
-  """
-  DOGE
-
-  """
-  Compound
-  """
-  COMP
-
-  """
-  Synthetix
-  """
-  SNX
-
-  """
-  Aave
-  """
-  AAVE
-
-  """
-  The Graph
-  """
-  GRT
-
-  """
-  Bancor
-  """
-  BNT
-
-  """
-  SushiSwap
-  """
-  SUSHI
-
-  """
-  Uniswap
-  """
-  UNI
-
-  """
-  Polygon
-  """
-  MATIC
-
-  """
-  Gemini Dollar
-  """
-  GUSD
-
-  """
-  Curve DAO Token
-  """
-  CRV
-
-  """
-  1inch
-  """
-  INCH
-
-  """
-  Balancer
-  """
-  BAL
-
-  """
-  UMA
-  """
-  UMA
-
-  """
-  Yearn Finance
-  """
-  YFI
-
-  """
-  Alchemix
-  """
-  ALCX
-
-  """
-  Sandbox
-  """
-  SAND
-
-  """
-  Injective Protocol
-  """
-  INJ
-
-  """
-  PAX Gold
-  """
-  PAXG
-
-  """
-  Enjin Coin
-  """
-  ENJ
-
-  """
-  Filecoin
-  """
-  FIL
-
-  """
-  Ankr
-  """
-  ANKR
-
-  """
-  Tezos
-  """
-  XTZ
-
-  """
-  Maker
-  """
-  MKR
-
-  """
-  Loopring
-  """
-  LRC
-
-  """
-  BarnBridge
-  """
-  BOND
-
-  """
-  Skale
-  """
-  SKL
-
-  """
-  Mirror Protocol
-  """
-  MIR
-
-  """
-  Livepeer
-  """
-  LPT
-
-  """
-  Mana
-  """
-  MANA
-
-  """
-  Fantom
-  """
-  FTM
-
-  """
-  Kyber
-  """
-  KNC
-
-  """
-  Cube
-  """
-  CUBE
-
-  """
-  Ren
-  """
-  REN
 }
 
 input ExpenseReferenceInput {
