@@ -144,9 +144,9 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
   const collectiveContributionPolicy = get(collective, 'contributionPolicy', null);
   const collectiveExpensePolicy = get(collective, 'expensePolicy', null);
   const collectiveDisableExpenseSubmission = get(collective, 'settings.disablePublicExpenseSubmission', false);
-  const collectiveHasReceipt = get(collective, 'settings.expensesTypes.hasReceipt', true);
-  const collectiveHasInvoice = get(collective, 'settings.expensesTypes.hasInvoice', true);
-  const collectiveHasGrant = get(collective, 'settings.expensesTypes.hasGrant', false);
+  const collectiveHasReceipt = get(collective, 'settings.expenseTypes.hasReceipt', true);
+  const collectiveHasInvoice = get(collective, 'settings.expenseTypes.hasInvoice', true);
+  const collectiveHasGrant = get(collective, 'settings.expenseTypes.hasGrant', false);
   const numberOfAdmins = size(filter(collective.members, m => m.role === 'ADMIN'));
 
   const selectOptions = React.useMemo(() => {
@@ -188,7 +188,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             settings: {
               ...collective.settings,
               disablePublicExpenseSubmission,
-              expensesTypes: {
+              expenseTypes: {
                 hasReceipt,
                 hasInvoice,
                 hasGrant,
