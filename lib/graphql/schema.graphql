@@ -1105,6 +1105,7 @@ type CollectiveFeatures {
   ALIPAY: CollectiveFeatureStatus
   USE_PAYMENT_METHODS: CollectiveFeatureStatus
   EMIT_GIFT_CARDS: CollectiveFeatureStatus
+  EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
 }

@@ -609,6 +609,11 @@ interface Account {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
 }
 
 """
@@ -2319,6 +2324,7 @@ enum ActivityType {
   CONVERSATION_COMMENT_CREATED
   UPDATE_COMMENT_CREATED
   EXPENSE_COMMENT_CREATED
+  HOST_APPLICATION_CONTACT
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -2947,6 +2953,11 @@ type Host implements Account & AccountWithContributions {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -3829,6 +3840,7 @@ type CollectiveFeatures {
   ALIPAY: CollectiveFeatureStatus
   USE_PAYMENT_METHODS: CollectiveFeatureStatus
   EMIT_GIFT_CARDS: CollectiveFeatureStatus
+  EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
 }
@@ -3879,6 +3891,55 @@ type COLLECTIVE_MINIMUM_ADMINS {
 enum COLLECTIVE_MINIMUM_ADMINS_APPLIES {
   ALL_COLLECTIVES
   NEW_COLLECTIVES
+}
+
+type ActivitySubscriptions {
+  """
+  Unique identifier for this notification setting
+  """
+  id: String!
+
+  """
+  The channel this setting is notifying through
+  """
+  channel: ActivityChannel!
+
+  """
+  The type of Activity this setting is notifying about
+  """
+  type: String!
+
+  """
+  Wheter this notification setting is active or not
+  """
+  active: Boolean!
+  createdAt: DateTime!
+
+  """
+  If channel supports, this is the webhook URL we submit the notification to
+  """
+  webhookUrl: String
+
+  """
+  The account which this notification setting is applied to
+  """
+  account: Account
+
+  """
+  The user who defined the setting
+  """
+  individual: Individual!
+}
+
+"""
+All supported Activity channels we can broadcast to
+"""
+enum ActivityChannel {
+  gitter
+  slack
+  twitter
+  webhook
+  email
 }
 
 """
@@ -4928,6 +4989,11 @@ type Bot implements Account {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -5419,6 +5485,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6238,6 +6309,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6840,6 +6916,11 @@ type Individual implements Account {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6865,6 +6946,7 @@ type Individual implements Account {
   isGuest: Boolean!
   isFollowingConversation(id: String!): Boolean!
   hasTwoFactorAuth: Boolean
+  newsletterOptIn: Boolean
 
   """
   If the individual is a host account, this will return the matching Host object
@@ -7420,6 +7502,11 @@ type Organization implements Account & AccountWithContributions {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8033,6 +8120,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10558,6 +10650,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11149,6 +11246,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11897,6 +11999,11 @@ type Mutation {
   setChangelogViewDate(changelogViewDate: DateTime!): Individual!
 
   """
+  Update newsletter opt-in preference. Scope: "account".
+  """
+  setNewsletterOptIn(newsletterOptIn: Boolean!): Individual!
+
+  """
   Invite a new member to the Collective. Scope: "account".
   """
   inviteMember(
@@ -12457,6 +12564,18 @@ type Mutation {
   Delete webhook. Scope: "webhooks".
   """
   deleteWebhook(webhook: WebhookReferenceInput!): Webhook
+
+  """
+  Toggle email notification subscription for requesting logged-in user
+  """
+  toggleEmailNotification(
+    type: ActivityAndClassesType!
+
+    """
+    Scope account which this notification preference is applied to
+    """
+    account: AccountReferenceInput
+  ): ActivitySubscriptions
 }
 
 input CollectiveCreateInput {
@@ -13735,4 +13854,97 @@ input WebhookReferenceInput {
   The legacy public id identifying the webhook (ie: 4242)
   """
   legacyId: Int
+}
+
+enum ActivityAndClassesType {
+  ACTIVITY_ALL
+  CONNECTED_ACCOUNT_CREATED
+  COLLECTIVE_CREATED_GITHUB
+  COLLECTIVE_APPLY
+  COLLECTIVE_APPROVED
+  COLLECTIVE_REJECTED
+  COLLECTIVE_CREATED
+  COLLECTIVE_COMMENT_CREATED
+  COLLECTIVE_CONVERSATION_CREATED
+  COLLECTIVE_EXPENSE_CREATED
+  COLLECTIVE_EXPENSE_DELETED
+  COLLECTIVE_EXPENSE_UPDATED
+  COLLECTIVE_EXPENSE_REJECTED
+  COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_UNAPPROVED
+  COLLECTIVE_EXPENSE_PAID
+  COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
+  COLLECTIVE_EXPENSE_MARKED_AS_SPAM
+  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
+  COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
+  COLLECTIVE_EXPENSE_ERROR
+  COLLECTIVE_EXPENSE_INVITE_DRAFTED
+  COLLECTIVE_EXPENSE_RECURRING_DRAFTED
+  COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
+  COLLECTIVE_VIRTUAL_CARD_SUSPENDED
+  COLLECTIVE_FROZEN
+  COLLECTIVE_UNFROZEN
+  COLLECTIVE_MEMBER_INVITED
+  COLLECTIVE_MEMBER_CREATED
+  COLLECTIVE_MONTHLY_REPORT
+  COLLECTIVE_CORE_MEMBER_ADDED
+  COLLECTIVE_CORE_MEMBER_INVITED
+  COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED
+  COLLECTIVE_CORE_MEMBER_REMOVED
+  COLLECTIVE_CORE_MEMBER_EDITED
+  COLLECTIVE_TRANSACTION_CREATED
+  COLLECTIVE_UPDATE_CREATED
+  COLLECTIVE_UPDATE_PUBLISHED
+  COLLECTIVE_CONTACT
+  COLLECTIVE_VIRTUAL_CARD_ADDED
+  CONTRIBUTION_REJECTED
+  ORGANIZATION_COLLECTIVE_CREATED
+  SUBSCRIPTION_ACTIVATED
+  SUBSCRIPTION_CONFIRMED
+  SUBSCRIPTION_CANCELED
+  TICKET_CONFIRMED
+  USER_CREATED
+  USER_NEW_TOKEN
+  USER_CHANGE_EMAIL
+  USER_PAYMENT_METHOD_CREATED
+  USER_CARD_CLAIMED
+  USER_CARD_INVITED
+  WEBHOOK_STRIPE_RECEIVED
+  WEBHOOK_PAYPAL_RECEIVED
+  COLLECTIVE_MONTHLY
+  ORDER_CANCELED_ARCHIVED_COLLECTIVE
+  ORDER_PROCESSING
+  ORDER_PROCESSING_CRYPTO
+  ORDER_PENDING_CONTRIBUTION_NEW
+  ORDER_PENDING_CONTRIBUTION_REMINDER
+  ORDER_THANKYOU
+  ORDERS_SUSPICIOUS
+  BACKYOURSTACK_DISPATCH_CONFIRMED
+  ACTIVATED_COLLECTIVE_AS_HOST
+  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
+  DEACTIVATED_COLLECTIVE_AS_HOST
+  VIRTUAL_CARD_REQUESTED
+  VIRTUAL_CARD_CHARGE_DECLINED
+  PAYMENT_FAILED
+  PAYMENT_CREDITCARD_CONFIRMATION
+  PAYMENT_CREDITCARD_EXPIRING
+  TAXFORM_REQUEST
+  CONVERSATION_COMMENT_CREATED
+  UPDATE_COMMENT_CREATED
+  EXPENSE_COMMENT_CREATED
+  HOST_APPLICATION_CONTACT
+  ADDED_FUND_TO_ORG
+  COLLECTIVE_TRANSACTION_PAID
+  COLLECTIVE_USER_ADDED
+  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
+  COLLECTIVE_VIRTUAL_CARD_CREATED
+  COLLECTIVE
+  EXPENSES
+  CONTRIBUTIONS
+  ACTIVITIES_UPDATES
+  VIRTUAL_CARDS
+  FUND_EVENTS
+  REPORTS
 }
