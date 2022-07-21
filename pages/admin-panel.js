@@ -152,7 +152,7 @@ const getIsAccountantOnly = (LoggedInUser, account) => {
 
 const AdminPanelPage = () => {
   const router = useRouter();
-  const { slug, section } = router.query;
+  const { slug, section, subpath } = router.query;
   const intl = useIntl();
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
@@ -209,7 +209,7 @@ const AdminPanelPage = () => {
               display={['none', null, 'block']}
               isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
             />
-            <AdminPanelSection section={selectedSection} isLoading={isLoading} collective={account} />
+            <AdminPanelSection section={selectedSection} isLoading={isLoading} collective={account} subpath={subpath} />
           </Grid>
         )}
         ;
