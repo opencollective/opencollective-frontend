@@ -498,6 +498,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       twitterHandle
       currency
       isArchived
+      isActive
       expensePolicy
       features {
         id
