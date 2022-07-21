@@ -167,6 +167,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             if={['ACTIVE', 'AVAILABLE'].includes(collective.features.USE_PAYMENT_METHODS)}
           />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS} if={isIndividual} />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.NOTIFICATIONS} if={isIndividual} />
           <MenuLink
             collective={collective}
             section={ORG_BUDGET_SECTIONS.GIFT_CARDS}
