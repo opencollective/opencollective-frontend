@@ -140,7 +140,7 @@ const CustomMessage = ({ collective }) => {
           heading={<FormattedMessage defaultMessage="Preview Notification" />}
           subheading={
             collective.type === 'EVENT' ? (
-              <FormattedMessage defaultMessage="TThis is the preview of the email template which your ticket buyer will receive." />
+              <FormattedMessage defaultMessage="This is the preview of the email template which your ticket buyer will receive." />
             ) : (
               <FormattedMessage defaultMessage="This is the preview of the email template which your financial contributor will receive." />
             )
