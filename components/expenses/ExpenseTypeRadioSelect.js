@@ -149,7 +149,6 @@ const Fieldset = styled.fieldset`
  * layout. See https://github.com/w3c/csswg-drafts/issues/321
  */
 const ExpenseTypeRadioSelect = ({ name, onChange, value, options = {} }) => {
-  console.log('Options', options);
   return (
     <StyledCard>
       <Fieldset onChange={onChange}>
