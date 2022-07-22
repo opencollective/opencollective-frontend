@@ -15,7 +15,7 @@ const CollectiveContainer = styled(Flex)`
   border: 1px solid rgba(50, 51, 52, 0.1);
 `;
 
-const GroupView = ({ accounts, title, advancedSettings }) => {
+const GroupView = ({ accounts, title, advancedSettings, roleLabel }) => {
   const router = useRouter();
   const handleBack = () => router.push(`/${router.asPath.split('/').slice(1, 4).join('/')}`);
 
@@ -39,7 +39,7 @@ const GroupView = ({ accounts, title, advancedSettings }) => {
       <Flex mt={4} flexDirection="column">
         {accounts.map(account => (
           <CollectiveContainer key={account.id} mb={24} p={24} flexDirection="column">
-            <CollectiveSettings account={account} advancedSettings={advancedSettings} big />
+            <CollectiveSettings account={account} advancedSettings={advancedSettings} roleLabel={roleLabel} big />
           </CollectiveContainer>
         ))}
       </Flex>
@@ -68,6 +68,7 @@ GroupView.propTypes = {
     }),
   ),
   title: PropTypes.node,
+  roleLabel: PropTypes.node,
   advancedSettings: PropTypes.bool,
 };
 

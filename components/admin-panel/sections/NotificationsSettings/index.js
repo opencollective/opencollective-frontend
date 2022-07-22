@@ -224,8 +224,20 @@ const NotificationsSettings = ({ account, subpath }) => {
       [GROUP_VIEWS.ORGANIZATIONS]: orgs,
       [GROUP_VIEWS.BACKED]: backedAccounts,
     };
+    const roleLabel =
+      view === GROUP_VIEWS.BACKED ? (
+        <FormattedMessage id="NotificationSettings.Label.Backer" defaultMessage="Backer" />
+      ) : (
+        <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
+      );
+
     return (
-      <GroupView accounts={accountGroups[view]} title={titles[view]} advancedSettings={view !== GROUP_VIEWS.BACKED} />
+      <GroupView
+        accounts={accountGroups[view]}
+        title={titles[view]}
+        advancedSettings={view !== GROUP_VIEWS.BACKED}
+        roleLabel={roleLabel}
+      />
     );
   }
 
@@ -307,70 +319,78 @@ const NotificationsSettings = ({ account, subpath }) => {
         </Fragment>
       ) : (
         <Fragment>
-          <StyledCard mt={4} p="24px">
-            <P fontSize="18px" fontWeight="700" lineHeight="26px">
-              <FormattedMessage
-                id="NotificationsSettings.Activity.Title"
-                defaultMessage="Notifications regarding your activity"
-              />
-            </P>
-            <P lineHeight="20px" letterSpacing="0px" mt={2}>
-              <FormattedMessage
-                id="NotificationsSettings.Activity.Description"
-                defaultMessage="Notifications about the profiles you administer, you can set the categories of the notifications you want to receive under each profile."
-              />
-            </P>
-            <StyledHr my="24px" />
-            <P fontSize="18px" fontWeight="700" lineHeight="26px">
-              <FormattedMessage
-                id="NotificationsSettings.Activity.List.Title"
-                defaultMessage="What you are following:"
-              />
-            </P>
-
-            <Box mt={3}>
-              <P fontSize="15px" fontWeight="500" lineHeight="22px">
+          {accounts.length > 0 && (
+            <StyledCard mt={4} p="24px">
+              <P fontSize="18px" fontWeight="700" lineHeight="26px">
                 <FormattedMessage
-                  id="NotificationsSettings.Activity.List.HostSubtitle"
-                  defaultMessage="Collective you host"
-                />{' '}
-                <Span fontSize="14px" fontWeight="400" lineHeight="20px" color="black.700">
-                  ({hosts.length || 0})
-                </Span>
+                  id="NotificationsSettings.Activity.Title"
+                  defaultMessage="Notifications regarding your activity"
+                />
               </P>
-              {hosts.map(a => (
-                <CollectiveSettings key={a.id} account={a} advancedSettings mt={3} />
-              ))}
-            </Box>
+              <P lineHeight="20px" letterSpacing="0px" mt={2}>
+                <FormattedMessage
+                  id="NotificationsSettings.Activity.Description"
+                  defaultMessage="Notifications about the profiles you administer, you can set the categories of the notifications you want to receive under each profile."
+                />
+              </P>
+              <StyledHr my="24px" />
+              <P fontSize="18px" fontWeight="700" lineHeight="26px">
+                <FormattedMessage
+                  id="NotificationsSettings.Activity.List.Title"
+                  defaultMessage="What you are following:"
+                />
+              </P>
 
-            <GroupSettings
-              title={
-                <P fontSize="15px" fontWeight="500" lineHeight="22px">
-                  <FormattedMessage
-                    id="NotificationsSettings.Activity.List.CollectivesSubtitle"
-                    defaultMessage="Collectives you manage"
-                  />
-                </P>
-              }
-              accounts={collectives}
-              group={GROUP_VIEWS.COLLECTIVES}
-              mt={4}
-            />
+              {hosts.length > 0 && (
+                <Box mt={3}>
+                  <P fontSize="15px" fontWeight="500" lineHeight="22px">
+                    <FormattedMessage
+                      id="NotificationsSettings.Activity.List.HostSubtitle"
+                      defaultMessage="Collective you host"
+                    />{' '}
+                    <Span fontSize="14px" fontWeight="400" lineHeight="20px" color="black.700">
+                      ({hosts.length || 0})
+                    </Span>
+                  </P>
+                  {hosts.map(a => (
+                    <CollectiveSettings key={a.id} account={a} advancedSettings mt={3} />
+                  ))}
+                </Box>
+              )}
 
-            <GroupSettings
-              title={
-                <P fontSize="15px" fontWeight="500" lineHeight="22px">
-                  <FormattedMessage
-                    id="NotificationsSettings.Activity.List.OrganizationsSubtitle"
-                    defaultMessage="Organizations you manage"
-                  />
-                </P>
-              }
-              accounts={orgs}
-              group={GROUP_VIEWS.ORGANIZATIONS}
-              mt={4}
-            />
-          </StyledCard>
+              {collectives.length > 0 && (
+                <GroupSettings
+                  title={
+                    <P fontSize="15px" fontWeight="500" lineHeight="22px">
+                      <FormattedMessage
+                        id="NotificationsSettings.Activity.List.CollectivesSubtitle"
+                        defaultMessage="Collectives you manage"
+                      />
+                    </P>
+                  }
+                  accounts={collectives}
+                  group={GROUP_VIEWS.COLLECTIVES}
+                  mt={4}
+                />
+              )}
+
+              {orgs.length > 0 && (
+                <GroupSettings
+                  title={
+                    <P fontSize="15px" fontWeight="500" lineHeight="22px">
+                      <FormattedMessage
+                        id="NotificationsSettings.Activity.List.OrganizationsSubtitle"
+                        defaultMessage="Organizations you manage"
+                      />
+                    </P>
+                  }
+                  accounts={orgs}
+                  group={GROUP_VIEWS.ORGANIZATIONS}
+                  mt={4}
+                />
+              )}
+            </StyledCard>
+          )}
 
           <StyledCard mt={4} p="24px">
             <P fontSize="18px" fontWeight="700" lineHeight="26px">
@@ -403,47 +423,21 @@ const NotificationsSettings = ({ account, subpath }) => {
               </Flex>
               <StyledHr width="100%" mt={3} borderStyle="dashed" />
             </Box>
-            {/* <Box mt={3}>
-              <Flex alignItems="center" justifyContent="space-between">
-                <P fontSize="15px" fontWeight="500" lineHeight="22px">
-                  <FormattedMessage
-                    id="NotificationsSettings.Updates.InPlatform"
-                    defaultMessage="Receive in-platform updates (🔥)"
-                  />
-                </P>
-                <StyledSwitch />
-              </Flex>
-              <StyledHr width="100%" mt={3} borderStyle="dashed" />
-            </Box> */}
-            <GroupSettings
-              title={
-                <P fontSize="15px" fontWeight="500" lineHeight="22px">
-                  <FormattedMessage
-                    id="NotificationsSettings.Updates.CollectivesSupported"
-                    defaultMessage="Collectives you support"
-                  />
-                </P>
-              }
-              accounts={backedAccounts}
-              group={GROUP_VIEWS.BACKED}
-              mt={3}
-            />
-            {/* <Collapse
-              mt={3}
-              title={
-                <P fontSize="15px" fontWeight="500" lineHeight="22px">
-                  <FormattedMessage
-                    id="NotificationsSettings.Updates.CollectivesSupported"
-                    defaultMessage="Collectives you support"
-                  />{' '}
-                  ({backedAccounts.length || 0})
-                </P>
-              }
-            >
-              {backedAccounts.map(a => (
-                <CollectiveSettings key={a.id} account={a} />
-              ))}
-            </Collapse> */}
+            {backedAccounts.length > 0 && (
+              <GroupSettings
+                title={
+                  <P fontSize="15px" fontWeight="500" lineHeight="22px">
+                    <FormattedMessage
+                      id="NotificationsSettings.Updates.CollectivesSupported"
+                      defaultMessage="Collectives you support"
+                    />
+                  </P>
+                }
+                accounts={backedAccounts}
+                group={GROUP_VIEWS.BACKED}
+                mt={3}
+              />
+            )}
           </StyledCard>
         </Fragment>
       )}

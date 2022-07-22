@@ -16,7 +16,7 @@ import { P, Span } from '../../../Text';
 
 import ActivitySwitch from './ActivitySwitch';
 
-const CollectiveSettings = ({ account, advancedSettings, big, ...boxProps }) => {
+const CollectiveSettings = ({ account, advancedSettings, big, roleLabel, ...boxProps }) => {
   const intl = useIntl();
   const [displayAdvancedSettings, setDisplayAdvancedSettings] = React.useState(false);
 
@@ -31,7 +31,7 @@ const CollectiveSettings = ({ account, advancedSettings, big, ...boxProps }) => 
                 {account.name}
                 <br />
                 <Span fontSize="14px" lineHeight="20px" color="black.600">
-                  <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
+                  {roleLabel}
                 </Span>
               </P>
             </React.Fragment>
@@ -49,7 +49,16 @@ const CollectiveSettings = ({ account, advancedSettings, big, ...boxProps }) => 
                 <Avatar collective={account} radius={16} mr="6px" />
                 {account.name}
               </StyledTag>
-              {account.host && <Box>({account.host.totalHostedCollectives})</Box>}
+              {account.host && (
+                <Box>
+                  ({account.host.totalHostedCollectives}{' '}
+                  <FormattedMessage
+                    defaultMessage="{count, plural, one {collective} other {collectives}}"
+                    values={{ count: account.host.totalHostedCollectives }}
+                  />
+                  )
+                </Box>
+              )}
             </React.Fragment>
           )}
         </Flex>
@@ -131,7 +140,7 @@ CollectiveSettings.propTypes = {
   }),
   advancedSettings: PropTypes.bool,
   big: PropTypes.bool,
-  group: PropTypes.string,
+  roleLabel: PropTypes.node,
 };
 
 export default CollectiveSettings;
