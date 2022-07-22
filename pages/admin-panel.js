@@ -39,6 +39,7 @@ export const adminPanelQuery = gqlV2/* GraphQL */ `
         VIRTUAL_CARDS
         USE_PAYMENT_METHODS
         EMIT_GIFT_CARDS
+        EMAIL_NOTIFICATIONS_PANEL
       }
       ... on AccountWithParent {
         parent {
