@@ -29,7 +29,8 @@ const updateCustomMessageMutation = gqlV2/* GraphQL */ `
 
 const CustomMessage = ({ collective }) => {
   const thankYouMessage =
-    collective?.settings?.customEmailMessage || collective?.parentCollective?.settings?.customEmailMessage;
+    collective?.settings?.customEmailMessage?.thankYou ||
+    collective?.parentCollective?.settings?.customEmailMessage?.thankYou;
   const [customMessage, setCustomMessage] = useState(thankYouMessage);
   const [isModified, setIsModified] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -62,7 +63,7 @@ const CustomMessage = ({ collective }) => {
     await updateCustomEmailMessage({
       variables: {
         account: { legacyId: collective.id },
-        key: 'customEmailMessage',
+        key: 'customEmailMessage.thankYou',
         value: message || '',
       },
     });
@@ -156,11 +157,15 @@ CustomMessage.propTypes = {
     id: PropTypes.number,
     type: PropTypes.string,
     settings: PropTypes.shape({
-      customEmailMessage: PropTypes.string,
+      customEmailMessage: PropTypes.shape({
+        thankYou: PropTypes.string,
+      }),
     }),
     parentCollective: PropTypes.shape({
       settings: PropTypes.shape({
-        customEmailMessage: PropTypes.string,
+        customEmailMessage: PropTypes.shape({
+          thankYou: PropTypes.string,
+        }),
       }),
     }),
   }),
