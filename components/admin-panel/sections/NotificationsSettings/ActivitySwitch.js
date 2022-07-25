@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { ActivityClasses, ActivityTypes } from '../../../../lib/constants/activities';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 
-import StyledSwitch from '../../../StyledSwitch';
+import InputSwitch from '../../../InputSwitch';
 import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
 
 import { accountActivitySubscriptionsFragment } from './fragments';
@@ -38,10 +38,10 @@ const ActivitySwitch = ({ account, activityType }) => {
   const isIndeterminate =
     activityType === 'ACTIVITY_ALL' &&
     account.activitySubscriptions?.some(notification => notification.type !== ActivityTypes.ACTIVITY_ALL);
-  const subscribed = existingSetting ? existingSetting.active : isIndeterminate ? false : true;
+  const subscribed = existingSetting ? existingSetting.active : true;
   const isOverridedByAll = activityType !== 'ACTIVITY_ALL' && existingSetting?.type === ActivityTypes.ACTIVITY_ALL;
 
-  const [toggleEmailNotification, { loading }] = useMutation(toggleEmailNotificationMutation, {
+  const [toggleEmailNotification] = useMutation(toggleEmailNotificationMutation, {
     context: API_V2_CONTEXT,
     refetchQueries: [{ query: refetchEmailNotificationQuery, variables: { id: account.id }, context: API_V2_CONTEXT }],
   });
@@ -67,12 +67,13 @@ const ActivitySwitch = ({ account, activityType }) => {
   };
 
   return (
-    <StyledSwitch
+    <InputSwitch
       name={`${activityType}-switch`}
       checked={subscribed}
-      isLoading={loading || isIndeterminate}
       disabled={isIndeterminate || isOverridedByAll}
-      onChange={() => handleToggle({ type: activityType, account: { id: account.id } })}
+      onChange={event =>
+        handleToggle({ type: activityType, account: { id: account.id }, active: event.target.checked })
+      }
     />
   );
 };
