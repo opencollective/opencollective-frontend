@@ -320,19 +320,9 @@ const VirtualCard = props => {
             <Flex>
               <Box mt="19px" mr={4}>
                 <P fontSize="18px" fontWeight="700" lineHeight="26px">
-                  {
-                    // expireDate should be removed once https://github.com/opencollective/opencollective-api/pull/7307 is deployed to production
-                    props.privateData.expireDate || props.privateData.expiryDate
-                  }
+                  {props.privateData.expiryDate}
 
-                  <Action
-                    color="black"
-                    ml={2}
-                    onClick={
-                      // expireDate should be removed once https://github.com/opencollective/opencollective-api/pull/7307 is deployed to production
-                      handleCopy(props.privateData.expireDate || props.privateData.expiryDate)
-                    }
-                  >
+                  <Action color="black" ml={2} onClick={handleCopy(props.privateData.expiryDate)}>
                     <Copy size="18px" />
                   </Action>
                 </P>
