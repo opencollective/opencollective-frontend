@@ -17,6 +17,7 @@ const CollectiveContainer = styled(Flex)`
 
 const GroupView = ({ accounts, title, advancedSettings, roleLabel }) => {
   const router = useRouter();
+  // Return user to parent /user/admin/notifications page by removing the group name from the end of the URL
   const handleBack = () => router.push(`/${router.asPath.split('/').slice(1, 4).join('/')}`);
 
   return (
