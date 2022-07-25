@@ -48,6 +48,13 @@ const SignInFooterLink = styled(Link)`
   }
 `;
 
+export const SignInOverlayBackground = styled(Container)`
+  padding: 25px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0px 9px 14px 1px #dedede;
+`;
+
 /**
  * Shows a SignIn form by default, with the ability to switch to SignUp form. It
  * also has the API methods binded, so you can use it directly.
@@ -83,8 +90,14 @@ class SignInOrJoinFree extends React.Component {
     addToast: PropTypes.func.isRequired,
     hideFooter: PropTypes.bool,
     isOAuth: PropTypes.bool,
-    oAuthAppName: PropTypes.string,
-    oAuthAppImage: PropTypes.string,
+    showSubHeading: PropTypes.bool,
+    showOCLogo: PropTypes.bool,
+    oAuthApplication: PropTypes.shape({
+      name: PropTypes.string,
+      account: PropTypes.shape({
+        imageUrl: PropTypes.string,
+      }),
+    }),
   };
 
   constructor(props) {
@@ -98,8 +111,8 @@ class SignInOrJoinFree extends React.Component {
       useRecoveryCodes: null,
       emailAlreadyExists: false,
       isOAuth: this.props.isOAuth,
-      oAuthAppName: this.props.oAuthAppName,
-      oAuthAppImage: this.props.oAuthAppImage,
+      oAuthAppName: this.props.oAuthApplication?.name,
+      oAuthAppImage: this.props.oAuthApplication?.account?.imageUrl,
     };
   }
 
@@ -362,18 +375,20 @@ class SignInOrJoinFree extends React.Component {
                   (() =>
                     this.switchForm('create-account', {
                       isOAuth: this.props.isOAuth,
-                      oAuthAppName: this.props.oAuthAppName,
-                      oAuthAppImage: this.props.oAuthAppImage,
+                      oAuthAppName: this.props.oAuthApplication?.name,
+                      oAuthAppImage: this.props.oAuthApplication?.account?.imageUrl,
                     }))
                 }
                 onSubmit={email => this.signIn(email, false)}
                 loading={submitting}
                 unknownEmail={unknownEmailError}
                 label={this.props.signInLabel}
+                showSubHeading={this.props.showSubHeading}
+                showOCLogo={this.props.showOCLogo}
                 showSecondaryAction={!this.props.disableSignup}
                 isOAuth={this.props.isOAuth}
-                oAuthAppName={this.props.oAuthAppName}
-                oAuthAppImage={this.props.oAuthAppImage}
+                oAuthAppName={this.props.oAuthApplication?.name}
+                oAuthAppImage={this.props.oAuthApplication?.account?.imageUrl}
               />
             ) : (
               <Flex flexDirection="column" width={1} alignItems="center">

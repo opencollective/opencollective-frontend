@@ -36,7 +36,7 @@ import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
-import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import SignInOrJoinFree, { SignInOverlayBackground } from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import StyledCard from '../components/StyledCard';
 import { H1 } from '../components/Text';
@@ -343,7 +343,14 @@ class CreateExpensePage extends React.Component {
                   position={['fixed', null, 'absolute']}
                   justifyContent={['center', null, 'flex-start']}
                 >
-                  <SignInOrJoinFree routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }} />
+                  <SignInOverlayBackground>
+                    <SignInOrJoinFree
+                      showOCLogo={false}
+                      showSubHeading={false}
+                      hideFooter
+                      routes={{ join: `/create-account?next=${encodeURIComponent(router.asPath)}` }}
+                    />
+                  </SignInOverlayBackground>
                 </ContainerOverlay>
               )}
               <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
@@ -423,8 +430,7 @@ class CreateExpensePage extends React.Component {
                                   loading={this.state.isSubmitting}
                                   minWidth={175}
                                 >
-                                  {this.state.expense?.type === expenseTypes.FUNDING_REQUEST ||
-                                  this.state.expense?.type === expenseTypes.GRANT ? (
+                                  {this.state.expense?.type === expenseTypes.GRANT ? (
                                     <FormattedMessage id="ExpenseForm.SubmitRequest" defaultMessage="Submit request" />
                                   ) : (
                                     <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
@@ -492,6 +498,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       twitterHandle
       currency
       isArchived
+      isActive
       expensePolicy
       features {
         id

@@ -9,9 +9,17 @@ import StyledButton from './StyledButton';
 const ContactCollectiveBtn = ({ children, collective, LoggedInUser }) => {
   const [showModal, setShowModal] = React.useState(false);
   const router = useRouter();
+  const isOpenCollective = collective.slug === 'opencollective';
   return (
     <Fragment>
-      {children({ onClick: () => (LoggedInUser ? setShowModal(true) : router.push(`/${collective.slug}/contact`)) })}
+      {children({
+        onClick: () =>
+          isOpenCollective
+            ? router.push('/help')
+            : LoggedInUser
+            ? setShowModal(true)
+            : router.push(`/${collective.slug}/contact`),
+      })}
       {showModal && <ContactCollectiveModal collective={collective} onClose={() => setShowModal(null)} />}
     </Fragment>
   );

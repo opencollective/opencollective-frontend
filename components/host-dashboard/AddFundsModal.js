@@ -79,6 +79,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
     $amount: AmountInput!
     $description: String!
     $hostFeePercent: Float!
+    $invoiceTemplate: String
   ) {
     addFunds(
       account: $account
@@ -87,6 +88,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
       description: $description
       hostFeePercent: $hostFeePercent
       tier: $tier
+      invoiceTemplate: $invoiceTemplate
     ) {
       id
       description
@@ -309,6 +311,18 @@ const AddFundsModal = ({ host, collective, ...props }) => {
   const hostFeePercent = data?.account.addedFundsHostFeePercent || collective.hostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const canAddPlatformTip = data?.account?.host?.isTrustedHost;
+  const receiptTemplates = collective.host?.settings?.invoice?.templates;
+
+  const receiptTemplateTitles = [];
+  if (receiptTemplates?.default?.title?.length > 0) {
+    receiptTemplateTitles.push({
+      value: 'default',
+      label: receiptTemplates?.default?.title,
+    });
+  }
+  if (receiptTemplates?.alternative?.title?.length > 0) {
+    receiptTemplateTitles.push({ value: 'alternative', label: receiptTemplates?.alternative?.title });
+  }
 
   const handleClose = () => {
     setFundDetails({ showPlatformTipModal: false });
@@ -333,6 +347,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
         validate={validate}
         onSubmit={async (values, formik) => {
           if (!fundDetails.showPlatformTipModal) {
+            const defaultInvoiceTemplate = receiptTemplateTitles.length > 0 ? receiptTemplateTitles[0].value : null;
             const result = await submitAddFunds({
               variables: {
                 ...values,
@@ -341,6 +356,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                 fromAccount: buildAccountReference(values.fromAccount),
                 account: buildAccountReference(values.account),
                 tier: !values.tier ? null : { id: values.tier.id },
+                invoiceTemplate: values.invoiceTemplate?.value || defaultInvoiceTemplate,
               },
             });
 
@@ -508,6 +524,25 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       </StyledInputFormikField>
                     )}
                   </Flex>
+                  {receiptTemplateTitles.length > 1 && (
+                    <Container width="100%">
+                      <StyledInputFormikField
+                        name="invoiceTemplate"
+                        htmlFor="addFunds-invoiceTemplate"
+                        label={<FormattedMessage defaultMessage="Choose receipt" />}
+                        mt={3}
+                      >
+                        {({ form, field }) => (
+                          <StyledSelect
+                            id={field.id}
+                            options={receiptTemplateTitles}
+                            defaultValue={receiptTemplateTitles[0]}
+                            onChange={value => form.setFieldValue(field.name, value)}
+                          />
+                        )}
+                      </StyledInputFormikField>
+                    </Container>
+                  )}
                   <P fontSize="14px" lineHeight="17px" fontWeight="500" mt={4}>
                     <FormattedMessage id="Details" defaultMessage="Details" />
                   </P>
@@ -715,6 +750,13 @@ AddFundsModal.propTypes = {
     currency: PropTypes.string,
     hostFeePercent: PropTypes.number,
     slug: PropTypes.string,
+    host: PropTypes.shape({
+      settings: PropTypes.shape({
+        invoice: PropTypes.shape({
+          templates: PropTypes.object,
+        }),
+      }),
+    }),
   }).isRequired,
   onClose: PropTypes.func,
 };

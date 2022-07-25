@@ -33,7 +33,7 @@ const Welcome = () => {
       <Flex flexDirection={['column', 'row']} mb="61px" mt="112px" justifyContent="center" alignItems="center">
         <Flex textAlign="center" flexDirection="column" pr={[0, '48px']}>
           <Box>
-            <Image src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective logo" height={96} width={96} />
+            <Image src="/static/images/oc-logo-watercolor-256.png" height={96} width={96} />
           </Box>
           <Container pt="40px" pl="16px" pr={['16px', 0]} width={['100%', '404px']}>
             <Flex fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">

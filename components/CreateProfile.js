@@ -190,7 +190,7 @@ const CreateProfile = ({
           <React.Fragment>
             <Flex justifyContent="center" mb={40}>
               <Box minWidth={104}>
-                <Image src="/static/images/oc-logo-oauth.png" alt="Open Collective logo" height={104} width={104} />
+                <Image src="/static/images/oc-logo-oauth.png" height={104} width={104} />
               </Box>
               <Box ml={24} mr={24} mt={32} minWidth={40}>
                 <Image src="/static/images/oauth-flow-connect.png" alt="OAuth Connect" height={40} width={40} />
@@ -202,7 +202,7 @@ const CreateProfile = ({
           </React.Fragment>
         ) : (
           <Box>
-            <Image src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective logo" height={96} width={96} />
+            <Image src="/static/images/oc-logo-watercolor-256.png" height={96} width={96} />
           </Box>
         )}
         <Box pt="48px" fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">

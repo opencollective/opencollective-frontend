@@ -64,7 +64,7 @@ const ExpenseSummary = ({
 }) => {
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
-  const isGrant = expense?.type === expenseTypes.FUNDING_REQUEST || expense?.type === expenseTypes.GRANT;
+  const isGrant = expense?.type === expenseTypes.GRANT;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
   const expenseItems = expense?.items.length > 0 ? expense.items : expense?.draft?.items || [];

@@ -11,7 +11,7 @@ import StepProfileLoggedInForm from './StepProfileLoggedInForm';
 const StepProfile = ({
   collective,
   stepDetails,
-  defaultProfileSlug,
+  profiles,
   defaultEmail,
   defaultName,
   onChange,
@@ -25,7 +25,7 @@ const StepProfile = ({
     <Box width={1}>
       {LoggedInUser ? (
         <StepProfileLoggedInForm
-          defaultProfileSlug={defaultProfileSlug}
+          profiles={profiles}
           onChange={onChange}
           canUseIncognito={canUseIncognito}
           collective={collective}
@@ -48,7 +48,6 @@ const StepProfile = ({
 };
 
 StepProfile.propTypes = {
-  LoggedInUser: PropTypes.object,
   collective: PropTypes.object,
   stepDetails: PropTypes.shape({
     amount: PropTypes.number,
@@ -57,9 +56,9 @@ StepProfile.propTypes = {
   data: PropTypes.object,
   onChange: PropTypes.func,
   onSignInClick: PropTypes.func,
-  defaultProfileSlug: PropTypes.string,
-  defaultEmail: PropTypes.object,
-  defaultName: PropTypes.object,
+  profiles: PropTypes.arrayOf(PropTypes.object),
+  defaultEmail: PropTypes.string,
+  defaultName: PropTypes.string,
   canUseIncognito: PropTypes.bool,
   isEmbed: PropTypes.bool,
 };

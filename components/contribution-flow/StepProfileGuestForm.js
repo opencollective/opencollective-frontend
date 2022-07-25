@@ -46,13 +46,8 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defau
   const dispatchGenericEvent = e => dispatchChange(e.target.name, e.target.value);
 
   React.useEffect(() => {
-    if (!data) {
-      if (defaultName) {
-        dispatchChange('name', defaultName);
-      }
-      if (defaultEmail) {
-        dispatchChange('email', defaultEmail);
-      }
+    if (!data && (defaultName || defaultEmail)) {
+      onChange({ stepProfile: { ...data, isGuest: true, name: defaultName || '', email: defaultEmail || '' } });
     }
   }, [defaultEmail, defaultName]);
 

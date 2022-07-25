@@ -70,12 +70,7 @@ enables a network of:"
         </StyledLink>
       </Box>
       <Box my={['56px', '80px', '104px']}>
-        <NextIllustration
-          alt="Open collective logo illustration"
-          src="/static/images/e2c/oc-logo-illustration.png"
-          width={88}
-          height={87}
-        />
+        <NextIllustration src="/static/images/e2c/oc-logo-illustration.png" width={88} height={87} />
       </Box>
       <Box width={['288px', '100%', '784px']} mt="55px">
         <H2
@@ -95,12 +90,7 @@ enables a network of:"
         </H2>
       </Box>
       <Box width={['286px', '432px']} height={['168px', '317px']}>
-        <NextIllustration
-          alt="Open collective logo illustration"
-          src="/static/images/e2c/e2c-logo-illustration.png"
-          width={431}
-          height={317}
-        />
+        <NextIllustration src="/static/images/e2c/e2c-logo-illustration.png" width={431} height={317} />
       </Box>
     </Flex>
   );

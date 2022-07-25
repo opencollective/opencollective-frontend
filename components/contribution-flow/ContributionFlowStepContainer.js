@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import { CollectiveType } from '../../lib/constants/collectives';
-
 import { Flex } from '../Grid';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
@@ -16,6 +14,7 @@ import StepDetailsCrypto from './StepDetailsCrypto';
 import StepPayment from './StepPayment';
 import StepProfile from './StepProfile';
 import StepSummary from './StepSummary';
+import { canUseIncognitoForContribution } from './utils';
 
 class ContributionFlowStepContainer extends React.Component {
   static propTypes = {
@@ -27,7 +26,6 @@ class ContributionFlowStepContainer extends React.Component {
     showFeesOnTop: PropTypes.bool,
     onNewCardFormReady: PropTypes.func,
     onSignInClick: PropTypes.func,
-    defaultProfileSlug: PropTypes.string,
     defaultEmail: PropTypes.string,
     isEmbed: PropTypes.bool,
     defaultName: PropTypes.string,
@@ -39,6 +37,7 @@ class ContributionFlowStepContainer extends React.Component {
       name: PropTypes.string,
     }),
     isCrypto: PropTypes.bool,
+    contributeProfiles: PropTypes.arrayOf(PropTypes.object),
     mainState: PropTypes.shape({
       stepDetails: PropTypes.object,
       stepProfile: PropTypes.shape({
@@ -79,7 +78,7 @@ class ContributionFlowStepContainer extends React.Component {
   };
 
   renderStep = step => {
-    const { collective, mainState, tier, isEmbed, isCrypto, order, defaultProfileSlug } = this.props;
+    const { collective, mainState, tier, isEmbed, isCrypto, order } = this.props;
     const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
     switch (step) {
       case 'details':
@@ -98,14 +97,14 @@ class ContributionFlowStepContainer extends React.Component {
       case 'profile': {
         return (
           <StepProfile
+            profiles={this.props.contributeProfiles}
             collective={collective}
             stepDetails={stepDetails}
-            defaultProfileSlug={defaultProfileSlug}
             defaultEmail={this.props.defaultEmail}
             defaultName={this.props.defaultName}
             onChange={this.props.onChange}
             data={stepProfile}
-            canUseIncognito={collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET')}
+            canUseIncognito={canUseIncognitoForContribution(collective, tier)}
             onSignInClick={this.props.onSignInClick}
             isEmbed={isEmbed}
           />

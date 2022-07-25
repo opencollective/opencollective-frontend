@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { border, color, layout } from 'styled-system';
+import { border, color, flex, layout } from 'styled-system';
 
 const RadialIconContainer = styled.div`
   display: flex;
@@ -9,6 +9,7 @@ const RadialIconContainer = styled.div`
   border-radius: 50%;
 
   ${layout}
+  ${flex}
   ${color}
   ${border}
 `;

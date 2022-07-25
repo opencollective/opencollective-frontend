@@ -166,6 +166,7 @@
   "AllTransactions": "모든 거래",
   "AlRSkZ": "Confirm contribution of {amount}",
   "alternativeVerificationCriteria": "대체 검증 기준",
+  "amI2+/": "Some collectives hosted by you may not fulfill the minimum admin requirements. If you choose to apply the setting to all Collectives, the ones that don't comply will be frozen until they meet the minimum requirements for admins.",
   "Amj+Gh": "By contributing, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>.",
   "Amount": "{amount} {currencyCode}",
   "Amount.AllShort": "모두",

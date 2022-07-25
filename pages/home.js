@@ -11,8 +11,6 @@ import RaiseMoney from '../components/home/RaiseMoneySection';
 import TheFutureIsCollective from '../components/home/TheFutureIsCollectiveSection';
 import Page from '../components/Page';
 
-const menuItems = { pricing: true, howItWorks: true };
-
 const messages = defineMessages({
   defaultTitle: {
     defaultMessage: 'Raise and spend money with full transparency.',
@@ -27,7 +25,6 @@ const HomePage = () => {
   const { formatMessage } = useIntl();
   return (
     <Page
-      menuItems={menuItems}
       metaTitle={formatMessage(messages.defaultTitle)}
       title={formatMessage(messages.defaultTitle)}
       description={formatMessage(messages.defaultDescription)}

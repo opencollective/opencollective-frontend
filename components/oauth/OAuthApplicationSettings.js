@@ -5,6 +5,7 @@ import { Form, Formik } from 'formik';
 import { pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -58,15 +59,17 @@ const updateApplicationMutation = gqlV2/* GraphQL */ `
   ${applicationSettingsFragment}
 `;
 
+const CodeContainer = styled(Span)`
+  overflow-wrap: anywhere;
+  user-select: all;
+  margin-right: 8px;
+`;
+
 const ObfuscatedClientSecret = ({ secret }) => {
   const [show, setShow] = React.useState(false);
   return (
     <P>
-      {show && (
-        <Span data-cy="unhidden-secret" overflowWrap="anywhere" mr={2}>
-          {secret}
-        </Span>
-      )}
+      {show && <CodeContainer data-cy="unhidden-secret">{secret}</CodeContainer>}
       <StyledLink data-cy="show-secret-btn" as="button" color="blue.600" onClick={() => setShow(!show)}>
         {show ? <FormattedMessage id="Hide" defaultMessage="Hide" /> : <FormattedMessage defaultMessage="Show" />}
       </StyledLink>
@@ -106,20 +109,20 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
             </H3>
             <StyledHr ml={2} flex="1" borderColor="black.400" />
           </Flex>
-          <StyledCard maxWidth="543px" p={3} my={4}>
+          <StyledCard maxWidth="600px" p={3} my={4}>
             <H4 fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb="20px">
               <FormattedMessage defaultMessage="Client ID and client secret" />
             </H4>
             <Flex flexWrap="wrap" justifyContent="space-between">
-              <Flex flexDirection="column" width="50%">
+              <Flex flexDirection="column" width="35%">
                 <P fontSize="15px" fontWeight="500" color="black.800" mb={2}>
                   <FormattedMessage defaultMessage="Client ID" />
                 </P>
-                <P data-cy="oauth-app-client-id" fontSize="14px" color="black.800">
+                <CodeContainer data-cy="oauth-app-client-id" fontSize="14px" color="black.800" css={{}}>
                   {data.application.clientId}
-                </P>
+                </CodeContainer>
               </Flex>
-              <Flex flexDirection="column" width="50%">
+              <Flex flexDirection="column" width="65%">
                 <P fontSize="15px" fontWeight="500" color="black.800" mb={2}>
                   <FormattedMessage defaultMessage="Client secret" />
                 </P>

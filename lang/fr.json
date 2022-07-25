@@ -166,6 +166,7 @@
   "AllTransactions": "Toutes les transactions",
   "AlRSkZ": "Confirmer la contribution de {amount}",
   "alternativeVerificationCriteria": "critères de vérification alternatifs",
+  "amI2+/": "Some collectives hosted by you may not fulfill the minimum admin requirements. If you choose to apply the setting to all Collectives, the ones that don't comply will be frozen until they meet the minimum requirements for admins.",
   "Amj+Gh": "En contribuant, vous acceptez nos <TOSLink>Conditions Générales d'Utilisation</TOSLink> et notre <PrivacyPolicyLink>Politique de confidentialité</PrivacyPolicyLink>.",
   "Amount": "{amount} {currencyCode}",
   "Amount.AllShort": "Tout",

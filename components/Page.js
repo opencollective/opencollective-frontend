@@ -20,10 +20,9 @@ const Page = ({
   noRobots,
   twitterHandle,
   showSearch,
-  menuItems,
   canonicalURL,
   collective,
-  menuItemsV2,
+  menuItems,
   showFooter = true,
   showProfileAndChangelogMenu = true,
 }) => {
@@ -46,7 +45,6 @@ const Page = ({
         canonicalURL={canonicalURL}
         collective={collective}
         menuItems={menuItems}
-        menuItemsV2={menuItemsV2}
         LoggedInUser={LoggedInUser}
         showProfileAndChangelogMenu={showProfileAndChangelogMenu}
       />
@@ -75,7 +73,6 @@ Page.propTypes = {
   twitterHandle: PropTypes.string,
   collective: PropTypes.object,
   menuItems: PropTypes.object,
-  menuItemsV2: PropTypes.object,
   showFooter: PropTypes.bool,
   showProfileAndChangelogMenu: PropTypes.bool,
 };

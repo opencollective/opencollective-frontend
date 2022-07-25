@@ -11,7 +11,7 @@ const ExpenseTypeFilter = ({ onChange, value, ...props }) => {
   const intl = useIntl();
   const getOption = value => ({ label: i18nExpenseType(intl, value), value });
 
-  const expenseTypeKeys = Object.keys(expenseTypes).filter(key => !['DEFAULT', 'FUNDING_REQUEST'].includes(key));
+  const expenseTypeKeys = Object.keys(expenseTypes);
   expenseTypeKeys.unshift('ALL');
 
   return (

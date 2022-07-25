@@ -75,7 +75,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                   frequency={contribution.frequency}
                 />
               </P>
-              {!isNil(contribution.platformTipAmount?.valueInCents) && (
+              {Boolean(contribution.platformTipAmount?.valueInCents) && (
                 <StyledTooltip
                   content={() => (
                     <FormattedMessage
