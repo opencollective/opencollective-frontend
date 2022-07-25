@@ -613,7 +613,7 @@ interface Account {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
 }
 
 """
@@ -2957,7 +2957,7 @@ type Host implements Account & AccountWithContributions {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -3893,7 +3893,7 @@ enum COLLECTIVE_MINIMUM_ADMINS_APPLIES {
   NEW_COLLECTIVES
 }
 
-type ActivitySubscriptions {
+type ActivitySubscription {
   """
   Unique identifier for this notification setting
   """
@@ -4993,7 +4993,7 @@ type Bot implements Account {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -5489,7 +5489,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6313,7 +6313,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6920,7 +6920,7 @@ type Individual implements Account {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7506,7 +7506,7 @@ type Organization implements Account & AccountWithContributions {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7577,7 +7577,7 @@ type Organization implements Account & AccountWithContributions {
   """
   balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
-  email: String
+  email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
   """
   If the organization if a host account, this will return the matching Host object
@@ -8124,7 +8124,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10654,7 +10654,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11250,7 +11250,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscriptions]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -12566,16 +12566,17 @@ type Mutation {
   deleteWebhook(webhook: WebhookReferenceInput!): Webhook
 
   """
-  Toggle email notification subscription for requesting logged-in user
+  Set email notification subscription for requesting logged-in user
   """
-  toggleEmailNotification(
+  setEmailNotification(
     type: ActivityAndClassesType!
 
     """
     Scope account which this notification preference is applied to
     """
     account: AccountReferenceInput
-  ): ActivitySubscriptions
+    active: Boolean!
+  ): ActivitySubscription
 }
 
 input CollectiveCreateInput {

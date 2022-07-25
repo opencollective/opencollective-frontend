@@ -21,9 +21,9 @@ const refetchEmailNotificationQuery = gqlV2/* GraphQL */ `
   ${accountActivitySubscriptionsFragment}
 `;
 
-const toggleEmailNotificationMutation = gqlV2/* GraphQL */ `
-  mutation ToggleEmailNotification($type: ActivityAndClassesType!, $account: AccountReferenceInput) {
-    toggleEmailNotification(type: $type, account: $account) {
+const setEmailNotificationMutation = gqlV2/* GraphQL */ `
+  mutation SetEmailNotification($type: ActivityAndClassesType!, $account: AccountReferenceInput, $active: Boolean!) {
+    setEmailNotification(type: $type, account: $account, active: $active) {
       id
     }
   }
@@ -41,14 +41,14 @@ const ActivitySwitch = ({ account, activityType }) => {
   const subscribed = existingSetting ? existingSetting.active : true;
   const isOverridedByAll = activityType !== 'ACTIVITY_ALL' && existingSetting?.type === ActivityTypes.ACTIVITY_ALL;
 
-  const [toggleEmailNotification] = useMutation(toggleEmailNotificationMutation, {
+  const [setEmailNotification] = useMutation(setEmailNotificationMutation, {
     context: API_V2_CONTEXT,
     refetchQueries: [{ query: refetchEmailNotificationQuery, variables: { id: account.id }, context: API_V2_CONTEXT }],
   });
 
   const handleToggle = async variables => {
     try {
-      await toggleEmailNotification({ variables });
+      await setEmailNotification({ variables });
     } catch (e) {
       addToast({
         type: TOAST_TYPE.ERROR,
