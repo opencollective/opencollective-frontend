@@ -12,8 +12,11 @@ const CollectiveFilter = ({ onChange, virtualCardCollectives }) => {
 
   const getAllCollectives = () => {
     return sortBy(uniqBy(virtualCardCollectives, 'legacyId'), 'name').map(collective => {
+      const label = collective.parentAccount
+        ? `${collective.parentAccount.name} - ${collective.name}`
+        : collective.name;
       return {
-        label: collective.name,
+        label,
         value: String(collective.legacyId),
       };
     });
