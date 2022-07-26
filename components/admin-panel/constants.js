@@ -58,6 +58,7 @@ export const COLLECTIVE_SECTIONS = {
   INFO: 'info',
   PAYMENT_METHODS: 'payment-methods',
   PAYMENT_RECEIPTS: 'payment-receipts',
+  NOTIFICATIONS: 'notifications',
   POLICIES: 'policies',
   CUSTOM_EMAIL: 'custom-email',
   TEAM: 'members',
@@ -239,5 +240,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.HOSTED_COLLECTIVES]: {
     id: 'HostedCollectives',
     defaultMessage: 'Hosted Collectives',
+  },
+  [ALL_SECTIONS.NOTIFICATIONS]: {
+    id: 'NotificationsSettings.Title',
+    defaultMessage: 'Notifications settings',
   },
 });
