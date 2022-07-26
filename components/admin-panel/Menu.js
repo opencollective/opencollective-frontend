@@ -198,12 +198,11 @@ const Menu = ({ collective, isAccountantOnly }) => {
             if={isType(collective, USER)}
           />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH} if={isIndividual} />
-          {/* TODO(OAuth): No menu entry while we-re testing this. Open the URL directly!:
-            <MenuLink
+          <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS}
             if={isOneOfTypes(collective, [COLLECTIVE, ORGANIZATION, USER])}
-          /> */}
+          />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ADVANCED} />
         </MenuGroup>
         <MenuGroup if={isSelfHostedAccount(collective) && !isAccountantOnly} mt={24}>

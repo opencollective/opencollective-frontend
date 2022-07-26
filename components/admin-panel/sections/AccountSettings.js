@@ -93,6 +93,7 @@ const AccountSettings = ({ account, section }) => {
           'minimumAmount',
           'goal',
           'button',
+          'invoiceTemplate',
         ]),
       );
     }

@@ -24,6 +24,7 @@ export const adminPanelQuery = gqlV2/* GraphQL */ `
   query AdminPanel($slug: String!) {
     account(slug: $slug) {
       id
+      legacyId
       slug
       name
       isHost

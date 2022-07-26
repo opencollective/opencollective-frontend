@@ -43,7 +43,6 @@ import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
 import HostTwoFactorAuth from './sections/HostTwoFactorAuth';
 import HostVirtualCardsSettings from './sections/HostVirtualCardsSettings';
-import InvoicesReceipts from './sections/InvoicesReceipts';
 import Members from './sections/Members';
 import PaymentMethods from './sections/PaymentMethods';
 import PaymentReceipts from './sections/PaymentReceipts';
@@ -515,9 +514,6 @@ class EditCollectiveForm extends React.Component {
 
       case EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING:
         return <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />;
-
-      case EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS:
-        return <InvoicesReceipts collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY:
         return <ReceivingMoney collective={collective} />;

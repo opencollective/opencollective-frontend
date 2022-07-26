@@ -8,7 +8,7 @@ import { H3 } from '../../Text';
 const SettingsSectionTitle = ({ children, ...props }) => {
   return (
     <Flex alignItems="center" mb={3} width="100%" {...props}>
-      <H3 fontSize="14px" lineHeight="21px">
+      <H3 fontSize="18px" lineHeight="26px">
         {children}
       </H3>
       <StyledHr ml={2} flex="1 1" borderColor="black.400" />

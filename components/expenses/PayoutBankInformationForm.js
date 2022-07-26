@@ -107,7 +107,7 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
                       <MessageBox mt={2} fontSize="12px" type="warning" withIcon>
                         <FormattedMessage
                           id="Warning.AccountHolderNameNotValid"
-                          defaultMessage="Please make sure this name matches exactly what is written on your bank account details, otherwise the payment might fail."
+                          defaultMessage="Full names for personal recipients. They must include more than one name, and both first and last name must have more than one character."
                         />
                       </MessageBox>
                     )}

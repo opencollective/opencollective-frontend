@@ -32,7 +32,6 @@ class Header extends React.Component {
     showProfileAndChangelogMenu: PropTypes.bool,
     withTopBar: PropTypes.bool,
     menuItems: PropTypes.object,
-    menuItemsV2: PropTypes.object,
     /** If true, a no-robots meta will be added to the page */
     noRobots: PropTypes.bool,
     /** @ignore from injectIntl */
@@ -122,7 +121,7 @@ class Header extends React.Component {
         {withTopBar && (
           <TopBar
             showSearch={this.props.showSearch}
-            menuItems={this.props.menuItemsV2}
+            menuItems={this.props.menuItems}
             showProfileAndChangelogMenu={this.props.showProfileAndChangelogMenu}
           />
         )}

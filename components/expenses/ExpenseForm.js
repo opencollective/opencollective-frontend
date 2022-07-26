@@ -117,7 +117,7 @@ export const prepareExpenseForSubmit = expenseData => {
   // The collective picker still uses API V1 for when creating a new profile on the fly
   const payeeIdField = typeof expenseData.payee?.id === 'string' ? 'id' : 'legacyId';
   const isInvoice = expenseData.type === expenseTypes.INVOICE;
-  const isGrant = expenseData.type === expenseTypes.FUNDING_REQUEST || expenseData.type === expenseTypes.GRANT;
+  const isGrant = expenseData.type === expenseTypes.GRANT;
   const payee =
     expenseData.payee?.isNewUser || expenseData.payee?.isInvite
       ? pick(expenseData.payee, ['name', 'email', 'legalName', 'organization', 'newsletterOptIn'])
@@ -245,7 +245,7 @@ const ExpenseFormBody = ({
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
   const isReceipt = values.type === expenseTypes.RECEIPT;
-  const isGrant = values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT;
+  const isGrant = values.type === expenseTypes.GRANT;
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
   const isRecurring = expense && expense.recurringExpense !== null;
   const stepOneCompleted =
@@ -438,7 +438,7 @@ const ExpenseFormBody = ({
           }}
           value={values.type}
           options={{
-            fundingRequest: accountSupportsGrants(collective, collective?.host),
+            hasGrant: accountSupportsGrants(collective, collective?.host),
           }}
         />
       )}
@@ -468,7 +468,7 @@ const ExpenseFormBody = ({
                 lineHeight="26px"
                 fontWeight="bold"
               >
-                {values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT ? (
+                {values.type === expenseTypes.GRANT ? (
                   <FormattedMessage
                     id="Expense.EnterRequestSubject"
                     defaultMessage="Enter grant subject <small>(Public)</small>"
@@ -521,7 +521,7 @@ const ExpenseFormBody = ({
               width="100%"
               withOutline
               placeholder={
-                values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT
+                values.type === expenseTypes.GRANT
                   ? formatMessage(msg.grantSubjectPlaceholder)
                   : formatMessage(msg.descriptionPlaceholder)
               }
@@ -579,7 +579,7 @@ const ExpenseFormBody = ({
                 </FieldArray>
               </Box>
 
-              {(values.type === expenseTypes.FUNDING_REQUEST || values.type === expenseTypes.GRANT) && (
+              {values.type === expenseTypes.GRANT && (
                 <Box my={40}>
                   <ExpenseAttachedFilesForm
                     title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}

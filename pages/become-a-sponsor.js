@@ -8,8 +8,6 @@ import SupportProjectsSection from '../components/become-a-sponsor/SupportProjec
 import TransparencySection from '../components/become-a-sponsor/TransparencySection';
 import Page from '../components/Page';
 
-const menuItems = { pricing: true, howItWorks: true };
-
 const messages = defineMessages({
   defaultTitle: {
     id: 'OC.tagline',
@@ -20,7 +18,7 @@ const messages = defineMessages({
 const BecomeASponsor = () => {
   const { formatMessage } = useIntl();
   return (
-    <Page menuItems={menuItems} description={formatMessage(messages.defaultTitle)}>
+    <Page description={formatMessage(messages.defaultTitle)}>
       <SupportProjectsSection />
       <SupportCommunitiesSection />
       <TransparencySection />
