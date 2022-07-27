@@ -37,7 +37,7 @@ const MarkExpenseAsIncompleteModal = ({ expense, onClose }) => {
   const intl = useIntl();
   const [message, setMessage] = React.useState();
   const mutationOptions = { context: API_V2_CONTEXT };
-  const [processExpense] = useMutation(processExpenseMutation, mutationOptions);
+  const [processExpense, { loading }] = useMutation(processExpenseMutation, mutationOptions);
   const { addToast } = useToasts();
 
   const onConfirm = async () => {
@@ -83,7 +83,7 @@ const MarkExpenseAsIncompleteModal = ({ expense, onClose }) => {
       </ModalBody>
       <ModalFooter>
         <Flex gap="16px" justifyContent="flex-end">
-          <StyledButton buttonStyle="secondary" buttonSize="small" onClick={onConfirm}>
+          <StyledButton buttonStyle="secondary" buttonSize="small" onClick={onConfirm} minWidth={180} loading={loading}>
             <FormattedMessage defaultMessage="Confirm and mark as incomplete" />
           </StyledButton>
           <StyledButton buttonStyle="standard" buttonSize="small" onClick={onClose}>
