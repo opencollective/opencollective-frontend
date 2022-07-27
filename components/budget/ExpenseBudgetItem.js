@@ -103,6 +103,9 @@ const ExpenseBudgetItem = ({
   const pendingReceipt = isCharge && expense?.items?.every(i => i.url === null);
   const nbAttachedFiles = !isAdminView ? 0 : getNbAttachedFiles(expense);
   const isExpensePaidOrRejected = [expenseStatus.REJECTED, expenseStatus.PAID].includes(expense?.status);
+  const shouldDisplayStatusTagActions =
+    (isExpensePaidOrRejected || expense?.status === expenseStatus.APPROVED) &&
+    (hasProcessButtons(expense.permissions) || expense.permissions.canMarkAsIncomplete);
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency?.currency !== expense.currency;
 
@@ -240,7 +243,7 @@ const ExpenseBudgetItem = ({
               {isAdminView && (
                 <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} mb={0} py={0} mr="2px" fontSize="9px" />
               )}
-              {isExpensePaidOrRejected && hasProcessButtons(expense.permissions) ? (
+              {shouldDisplayStatusTagActions ? (
                 <AdminExpenseStatusTag host={host} collective={expense.account} expense={expense} p="3px 8px" />
               ) : (
                 <ExpenseStatusTag
