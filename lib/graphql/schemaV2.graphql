@@ -3369,31 +3369,6 @@ type TransactionCollection implements Collection {
   paymentMethodTypes: [PaymentMethodType]!
 }
 
-enum PaymentMethodType {
-  alipay @deprecated(reason: "Please use uppercase values")
-  creditcard @deprecated(reason: "Please use uppercase values")
-  prepaid @deprecated(reason: "Please use uppercase values")
-  payment @deprecated(reason: "Please use uppercase values")
-  subscription @deprecated(reason: "Please use uppercase values")
-  collective @deprecated(reason: "Please use uppercase values")
-  host @deprecated(reason: "Please use uppercase values")
-  adaptive @deprecated(reason: "Please use uppercase values")
-  giftcard @deprecated(reason: "Please use uppercase values")
-  manual @deprecated(reason: "Please use uppercase values")
-  crypto @deprecated(reason: "Please use uppercase values")
-  ALIPAY
-  CREDITCARD
-  PREPAID
-  PAYMENT
-  SUBSCRIPTION
-  COLLECTIVE
-  HOST
-  ADAPTIVE
-  GIFTCARD
-  MANUAL
-  CRYPTO
-}
-
 """
 Account orders filter (INCOMING or OUTGOING)
 """
