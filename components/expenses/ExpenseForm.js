@@ -701,10 +701,12 @@ ExpenseFormBody.propTypes = {
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
       settings: PropTypes.shape({
-        disableGrantsByDefault: PropTypes.bool,
-        allowGrantSubmission: PropTypes.bool,
-        allowInvoiceSubmission: PropTypes.bool,
-        allowReceiptSubmission: PropTypes.bool,
+        disableGrantsByDefault: PropTypes.bool, // TODO
+        expenseTypes: PropTypes.shape({
+          hasGrant: PropTypes.bool,
+          hasReceipt: PropTypes.bool,
+          hasInvoice: PropTypes.bool,
+        }),
       }),
     }),
     settings: PropTypes.object,
