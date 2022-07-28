@@ -16,6 +16,7 @@ import PreviewModal from '../../PreviewModal';
 import StyledButton from '../../StyledButton';
 import StyledHr from '../../StyledHr';
 import StyledInput from '../../StyledInput';
+import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
 import { P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
@@ -28,9 +29,15 @@ const messages = defineMessages({
   },
 });
 
+const BILL_TO_OPTIONS = [
+  { value: 'host', label: <FormattedMessage id="Member.Role.HOST" defaultMessage="Host" /> },
+  { value: 'collective', label: <FormattedMessage id="Collective" defaultMessage="Collective" /> },
+];
+
 const InvoicesReceipts = ({ collective }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
+  const getInTemplate = (account, template, field) => get(account, `settings.invoice.templates.${template}.${field}`);
 
   // For invoice Title
   const defaultReceiptTitlePlaceholder = 'Payment Receipt';
@@ -57,6 +64,14 @@ const InvoicesReceipts = ({ collective }) => {
     get(data, 'editCollective.settings.invoice.templates.default.info') === info &&
     get(data, 'editCollective.settings.invoice.templates.alternative.info') === alternativeInfo;
 
+  // For Bill To
+  const getBillToOption = value => BILL_TO_OPTIONS.find(option => option.value === value) || BILL_TO_OPTIONS[0];
+  const [defaultBillTo, setDefaultBillTo] = React.useState(getInTemplate(collective, 'default', 'billTo'));
+  const [alternativeBillTo, setAlternativeBillTo] = React.useState(getInTemplate(collective, 'alternative', 'billTo'));
+  const billToIsSaved =
+    getInTemplate(data?.editCollective, 'default', 'billTo') === defaultBillTo &&
+    getInTemplate(data?.editCollective, 'default', 'alternative') === alternativeBillTo;
+
   const deleteAlternativeReceipt = () => {
     setAlternativeReceiptTitle(null);
     setAlternativeInfo(null);
@@ -65,17 +80,15 @@ const InvoicesReceipts = ({ collective }) => {
   };
 
   const getInvoiceTemplatesObj = () => {
-    if (!alternativeReceiptTitle && !alternativeInfo) {
-      return {
-        templates: {
-          default: { title: receiptTitle || defaultReceiptTitlePlaceholder, info: info },
-        },
-      };
+    const defaultTemplate = { title: receiptTitle, info: info, billTo: defaultBillTo };
+
+    if (!alternativeReceiptTitle && !alternativeInfo && !alternativeBillTo) {
+      return { templates: { default: defaultTemplate } };
     }
     return {
       templates: {
-        default: { title: receiptTitle || defaultReceiptTitlePlaceholder, info: info },
-        alternative: { title: alternativeReceiptTitle, info: alternativeInfo },
+        default: defaultTemplate,
+        alternative: { title: alternativeReceiptTitle, info: alternativeInfo, billTo: alternativeBillTo },
       },
     };
   };
@@ -150,7 +163,16 @@ const InvoicesReceipts = ({ collective }) => {
           height="150px"
           fontSize="13px"
           mt="14px"
-          mb="23px"
+        />
+        <Box color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px" pt="26px">
+          <FormattedMessage defaultMessage="Bill To" />
+        </Box>
+        <StyledSelect
+          mt="6px"
+          mb={4}
+          options={BILL_TO_OPTIONS}
+          value={getBillToOption(defaultBillTo)}
+          onChange={({ value }) => onChange(value, setDefaultBillTo)}
         />
         <SettingsSectionTitle>
           <FormattedMessage defaultMessage="Alternative receipt template" />
@@ -218,6 +240,16 @@ const InvoicesReceipts = ({ collective }) => {
                 mt="14px"
               />
             </Flex>
+            <Box color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px" pt="26px">
+              <FormattedMessage defaultMessage="Bill To" />
+            </Box>
+            <StyledSelect
+              mt="6px"
+              mb={4}
+              options={BILL_TO_OPTIONS}
+              value={getBillToOption(alternativeBillTo)}
+              onChange={({ value }) => onChange(value, setAlternativeBillTo)}
+            />
             <StyledButton
               buttonStyle="danger"
               style={{ backgroundColor: 'white', background: 'none', borderColor: '#CC2955' }}
@@ -267,7 +299,7 @@ const InvoicesReceipts = ({ collective }) => {
             });
           }}
         >
-          {isSaved && infoIsSaved ? (
+          {isSaved && infoIsSaved && billToIsSaved ? (
             <FormattedMessage id="saved" defaultMessage="Saved" />
           ) : (
             <FormattedMessage id="save" defaultMessage="Save" />
