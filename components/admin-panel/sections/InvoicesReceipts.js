@@ -16,9 +16,10 @@ import PreviewModal from '../../PreviewModal';
 import StyledButton from '../../StyledButton';
 import StyledHr from '../../StyledHr';
 import StyledInput from '../../StyledInput';
+import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
-import { P, Span } from '../../Text';
+import { H2, P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
 const messages = defineMessages({
@@ -30,14 +31,21 @@ const messages = defineMessages({
 });
 
 const BILL_TO_OPTIONS = [
-  { value: 'host', label: <FormattedMessage id="Member.Role.HOST" defaultMessage="Host" /> },
+  {
+    value: 'host',
+    label: (
+      <FormattedMessage
+        defaultMessage="{value} (default)"
+        values={{ value: <FormattedMessage id="Member.Role.HOST" defaultMessage="Host" /> }}
+      />
+    ),
+  },
   { value: 'collective', label: <FormattedMessage id="Collective" defaultMessage="Collective" /> },
 ];
 
 const InvoicesReceipts = ({ collective }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
-  const getInTemplate = (account, template, field) => get(account, `settings.invoice.templates.${template}.${field}`);
 
   // For invoice Title
   const defaultReceiptTitlePlaceholder = 'Payment Receipt';
@@ -66,11 +74,9 @@ const InvoicesReceipts = ({ collective }) => {
 
   // For Bill To
   const getBillToOption = value => BILL_TO_OPTIONS.find(option => option.value === value) || BILL_TO_OPTIONS[0];
-  const [defaultBillTo, setDefaultBillTo] = React.useState(getInTemplate(collective, 'default', 'billTo'));
-  const [alternativeBillTo, setAlternativeBillTo] = React.useState(getInTemplate(collective, 'alternative', 'billTo'));
-  const billToIsSaved =
-    getInTemplate(data?.editCollective, 'default', 'billTo') === defaultBillTo &&
-    getInTemplate(data?.editCollective, 'default', 'alternative') === alternativeBillTo;
+  const getInExpenseTemplate = (account, field) => get(account, `settings.invoice.expenseTemplates.default.${field}`);
+  const [billTo, setBillTo] = React.useState(getInExpenseTemplate(collective, 'billTo'));
+  const billToIsSaved = getInExpenseTemplate(collective, 'billTo') === billTo;
 
   const deleteAlternativeReceipt = () => {
     setAlternativeReceiptTitle(null);
@@ -80,17 +86,14 @@ const InvoicesReceipts = ({ collective }) => {
   };
 
   const getInvoiceTemplatesObj = () => {
-    const defaultTemplate = { title: receiptTitle, info: info, billTo: defaultBillTo };
+    const templates = { default: { title: receiptTitle, info: info } };
+    const expenseTemplates = { default: { billTo } };
 
-    if (!alternativeReceiptTitle && !alternativeInfo && !alternativeBillTo) {
-      return { templates: { default: defaultTemplate } };
+    if (alternativeReceiptTitle || alternativeInfo) {
+      templates.alternative = { title: alternativeReceiptTitle, info: alternativeInfo };
     }
-    return {
-      templates: {
-        default: defaultTemplate,
-        alternative: { title: alternativeReceiptTitle, info: alternativeInfo, billTo: alternativeBillTo },
-      },
-    };
+
+    return { templates, expenseTemplates };
   };
 
   const onChange = (value, stateFunction) => {
@@ -100,8 +103,35 @@ const InvoicesReceipts = ({ collective }) => {
 
   return (
     <Container>
+      <H2 mb={3} fontSize="24px" lineHeight="32px" fontWeight="700">
+        <FormattedMessage id="becomeASponsor.invoiceReceipts" defaultMessage="Invoices & Receipts" />
+      </H2>
+      <Box mb={4}>
+        <SettingsSectionTitle>
+          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+        </SettingsSectionTitle>
+
+        <StyledInputField
+          name="expense-bill-to-select"
+          labelProps={{ fontSize: '16px', fontWeight: '700', lineHeight: '24px', color: 'black.800' }}
+          label={intl.formatMessage({ defaultMessage: 'Bill To' })}
+          hint={intl.formatMessage({
+            defaultMessage:
+              'Set this to "Collective" to use the collective info for generated invoices\' "Bill To" section. You need to make sure that this pattern is legal under your jurisdiction.',
+          })}
+        >
+          {({ id }) => (
+            <StyledSelect
+              inputId={id}
+              options={BILL_TO_OPTIONS}
+              value={getBillToOption(billTo)}
+              onChange={({ value }) => onChange(value, setBillTo)}
+            />
+          )}
+        </StyledInputField>
+      </Box>
       <SettingsSectionTitle>
-        <FormattedMessage id="EditHostInvoice.receiptsSettings" defaultMessage="Receipt Settings" />
+        <FormattedMessage defaultMessage="Financial contributions" />
       </SettingsSectionTitle>
       <P>
         <FormattedMessage
@@ -163,16 +193,7 @@ const InvoicesReceipts = ({ collective }) => {
           height="150px"
           fontSize="13px"
           mt="14px"
-        />
-        <Box color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px" pt="26px">
-          <FormattedMessage defaultMessage="Bill To" />
-        </Box>
-        <StyledSelect
-          mt="6px"
-          mb={4}
-          options={BILL_TO_OPTIONS}
-          value={getBillToOption(defaultBillTo)}
-          onChange={({ value }) => onChange(value, setDefaultBillTo)}
+          mb="23px"
         />
         <SettingsSectionTitle>
           <FormattedMessage defaultMessage="Alternative receipt template" />
@@ -240,16 +261,6 @@ const InvoicesReceipts = ({ collective }) => {
                 mt="14px"
               />
             </Flex>
-            <Box color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px" pt="26px">
-              <FormattedMessage defaultMessage="Bill To" />
-            </Box>
-            <StyledSelect
-              mt="6px"
-              mb={4}
-              options={BILL_TO_OPTIONS}
-              value={getBillToOption(alternativeBillTo)}
-              onChange={({ value }) => onChange(value, setAlternativeBillTo)}
-            />
             <StyledButton
               buttonStyle="danger"
               style={{ backgroundColor: 'white', background: 'none', borderColor: '#CC2955' }}
