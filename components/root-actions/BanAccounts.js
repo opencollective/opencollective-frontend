@@ -58,7 +58,9 @@ const BanAccount = () => {
   return (
     <div>
       <StyledInputField htmlFor="ban-accounts-picker" label="Account" flex="1 1">
-        {({ id }) => <CollectivePickerAsync inputId={id} onChange={setSelectedAccountsOptions} isMulti />}
+        {({ id }) => (
+          <CollectivePickerAsync inputId={id} onChange={setSelectedAccountsOptions} isMulti skipGuests={false} />
+        )}
       </StyledInputField>
 
       <Flex flexWrap="wrap" px={1} mt={2}>
