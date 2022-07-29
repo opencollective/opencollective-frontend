@@ -111,6 +111,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const parentIsHost = host && collective.parentCollective?.id === host.id;
   const firstConnectedAccount = first(collective.connectedTo);
   const connectedAccountIsHost = firstConnectedAccount && host && firstConnectedAccount.collective.id === host.id;
+  const displayedConnectedAccount = connectedAccountIsHost ? null : firstConnectedAccount;
   // get only unique references
   const companies = [...new Set(collective.company?.trim().toLowerCase().split(' '))];
   const tagCount = collective.tags?.length;
@@ -328,7 +329,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                         }}
                       />
                     </Container>
-                    {Boolean(!connectedAccountIsHost && firstConnectedAccount) && (
+                    {displayedConnectedAccount && (
                       <Container mx={1} color="black.700" my="12px">
                         <FormattedMessage
                           id="Collective.Hero.ParentCollective"
@@ -337,12 +338,12 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                             parentName: (
                               <StyledLink
                                 as={LinkCollective}
-                                collective={firstConnectedAccount.collective}
+                                collective={displayedConnectedAccount.collective}
                                 noTitle
                                 color="black.700"
                               >
                                 <TruncatedTextWithTooltip
-                                  value={firstConnectedAccount.collective.name}
+                                  value={displayedConnectedAccount.collective.name}
                                   cursor="pointer"
                                 />
                               </StyledLink>
@@ -406,7 +407,13 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
             </Fragment>
           )}
           <StyledShortDescription>{collective.description}</StyledShortDescription>
-          {isEvent && <HeroEventDetails collective={collective} />}
+          {isEvent && (
+            <HeroEventDetails
+              collective={collective}
+              host={host}
+              displayedConnectedAccount={displayedConnectedAccount}
+            />
+          )}
 
           {!collective.isHost && [CollectiveType.USER, CollectiveType.ORGANIZATION].includes(collective.type) && (
             <HeroTotalCollectiveContributionsWithData collective={collective} />
