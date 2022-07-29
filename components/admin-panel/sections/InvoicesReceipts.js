@@ -17,7 +17,7 @@ import StyledButton from '../../StyledButton';
 import StyledHr from '../../StyledHr';
 import StyledInput from '../../StyledInput';
 import StyledTextarea from '../../StyledTextarea';
-import { P, Span } from '../../Text';
+import { Label, P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
 const messages = defineMessages({
@@ -104,10 +104,11 @@ const InvoicesReceipts = ({ collective }) => {
         </MessageBox>
       )}
       <Flex flexWrap="wrap" flexDirection="column" width="100%">
-        <Box color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px" pt="26px">
+        <Label htmlFor="receipt-title" color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px" pt="26px">
           <FormattedMessage defaultMessage="Receipt title" />
-        </Box>
+        </Label>
         <StyledInput
+          inputId="receipt-title"
           placeholder={defaultReceiptTitlePlaceholder}
           defaultValue={defaultReceiptTitlePlaceholder === receiptTitle || receiptTitle === null ? null : receiptTitle}
           onChange={e =>
@@ -123,9 +124,9 @@ const InvoicesReceipts = ({ collective }) => {
           />
         </P>
         <Flex justifyContent="space-between" flexDirection={['column', 'row']} pt="26px">
-          <Box color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px">
+          <Label htmlFor="custom-message" color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px">
             <FormattedMessage defaultMessage="Custom Message" />
-          </Box>
+          </Label>
           <StyledButton
             buttonStyle="secondary"
             buttonSize="tiny"
@@ -143,6 +144,7 @@ const InvoicesReceipts = ({ collective }) => {
           </StyledButton>
         </Flex>
         <StyledTextarea
+          inputId="custom-message"
           placeholder={intl.formatMessage(messages.extraInfoPlaceholder)}
           defaultValue={info}
           onChange={e => onChange(e.target.value, setInfo)}
@@ -170,17 +172,28 @@ const InvoicesReceipts = ({ collective }) => {
             pr="16px"
             onClick={() => setShowAlternativeReceiptsSection(true)}
           >
-            <Plus size={14} color="#1869F5" />
-            <FormattedMessage defaultMessage="Add alternative receipt" />
+            <Flex fontSize="14px" fontWeight={500} lineHeight="18px" color="#1869F5">
+              <Box pr="10px">
+                <Plus size={17} />
+              </Box>
+              <FormattedMessage defaultMessage="Add alternative receipt" />
+            </Flex>
           </StyledButton>
         )}
         {showAlternativeReceiptsSection && (
           <Container mt="26px" mb="24px">
             <Flex flexWrap="wrap" flexDirection="column" width="100%">
-              <Box color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px">
+              <Label
+                htmlFor="alternative-receipt-title"
+                color="black.800"
+                fontSize="16px"
+                fontWeight={700}
+                lineHeight="24px"
+              >
                 <FormattedMessage defaultMessage="Receipt title" />
-              </Box>
+              </Label>
               <StyledInput
+                inputId="alternative-receipt-title"
                 placeholder="Custom Receipt"
                 defaultValue={alternativeReceiptTitle}
                 onChange={e => onChange(e.target.value, setAlternativeReceiptTitle)}
@@ -189,9 +202,15 @@ const InvoicesReceipts = ({ collective }) => {
                 mt="6px"
               />
               <Flex justifyContent="space-between" flexDirection={['column', 'row']} pt="26px">
-                <Box color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px">
+                <Label
+                  htmlFor="alternative-custom-message"
+                  color="black.800"
+                  fontSize="16px"
+                  fontWeight={700}
+                  lineHeight="24px"
+                >
                   <FormattedMessage defaultMessage="Custom Message" />
-                </Box>
+                </Label>
                 <StyledButton
                   buttonStyle="secondary"
                   buttonSize="tiny"
@@ -209,6 +228,7 @@ const InvoicesReceipts = ({ collective }) => {
                 </StyledButton>
               </Flex>
               <StyledTextarea
+                inputId="alternative-custom-message"
                 placeholder={intl.formatMessage(messages.extraInfoPlaceholder)}
                 defaultValue={alternativeInfo}
                 onChange={e => onChange(e.target.value, setAlternativeInfo)}
@@ -220,7 +240,9 @@ const InvoicesReceipts = ({ collective }) => {
             </Flex>
             <StyledButton
               buttonStyle="danger"
-              style={{ backgroundColor: 'white', background: 'none', borderColor: '#CC2955' }}
+              borderColor="#CC2955"
+              backgroundColor="white"
+              background="none"
               mt="24px"
               maxWidth={225}
               pt="7px"
@@ -229,10 +251,12 @@ const InvoicesReceipts = ({ collective }) => {
               pr="16px"
               onClick={() => deleteAlternativeReceipt()}
             >
-              <Trash size={14} color="#CC2955" />
-              <Span fontSize="14px" fontWeight={500} lineHeight="18px" style={{ color: '#CC2955' }}>
+              <Flex fontSize="14px" fontWeight={500} lineHeight="18px" color="#CC2955">
+                <Box pr="10px">
+                  <Trash size={17} />
+                </Box>
                 <FormattedMessage defaultMessage="Delete alternative receipt" />
-              </Span>
+              </Flex>
             </StyledButton>
           </Container>
         )}
