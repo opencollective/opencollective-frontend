@@ -250,7 +250,7 @@ const GetToKnowUs = () => {
           <Box display={['none', null, 'block']} mt="24px">
             <Link href="/e2c">
               <StyledButton
-                width="135px"
+                minWidth="135px"
                 my={['12px', null, 0]}
                 buttonStyle="marketing"
                 whiteSpace="nowrap"
