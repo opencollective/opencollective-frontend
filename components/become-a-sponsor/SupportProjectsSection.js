@@ -38,9 +38,15 @@ const SponsorBoxShadowWrapper = styled(SponsorWrapper)`
 `;
 
 const SupportProjects = () => (
-  <Flex flexDirection={['column', null, 'row-reverse']} alignItems="center" justifyContent="center" mx={3} mt="32px">
-    <Box width={['304px', '601px', '438px', null, '555px']} display={['block', null, 'none']}>
-      <MainTitle mb={3} textAlign={['center', null, 'left']}>
+  <Flex
+    flexDirection={['column', null, null, 'row-reverse']}
+    alignItems="center"
+    justifyContent="center"
+    mx={3}
+    mt="32px"
+  >
+    <Box width={['304px', '601px', null, '438px', '555px']} display={['block', null, null, 'none']}>
+      <MainTitle mb={3} textAlign={['center', null, null, 'left']}>
         <FormattedMessage id="becomeASponsor.supportProjects.title" defaultMessage="Support projects & communities" />
       </MainTitle>
     </Box>
@@ -155,13 +161,18 @@ const SupportProjects = () => (
       </Box>
     </Container>
 
-    <Flex flexDirection="column" alignItems={['center', null, 'flex-start']}>
-      <Box width={['304px', '306px', '458px', null, '555px']} display={['none', null, 'block']}>
+    <Flex flexDirection="column" alignItems={['center', null, null, 'flex-start']}>
+      <Box width={['304px', '306px', '458px', null, '555px']} display={['none', null, null, 'block']}>
         <MainTitle mb={3} textAlign={['center', 'left']}>
           <FormattedMessage id="becomeASponsor.supportProjects.title" defaultMessage="Support projects & communities" />
         </MainTitle>
       </Box>
-      <Box mt={3} mb="25px" width={['304px', '601px', '458px', null, '558px']} textAlign={['center', null, 'left']}>
+      <Box
+        mt={3}
+        mb="25px"
+        width={['304px', '601px', null, '458px', '558px']}
+        textAlign={['center', null, null, 'left']}
+      >
         <MainDescription fontWeight="500">
           <Span display={[null, 'none']}>
             <FormattedMessage
