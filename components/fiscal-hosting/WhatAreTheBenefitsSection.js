@@ -6,6 +6,7 @@ import { display } from 'styled-system';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex } from '../Grid';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
 import { H3, P } from '../Text';
 
 const Title = styled(H3)`
@@ -15,7 +16,7 @@ const Title = styled(H3)`
   font-weight: bold;
   margin-bottom: 16px;
   margin-top: 16px;
-  color: ${themeGet('colors.black.800')};
+  color: ${themeGet('colors.primary.900')};
   ${display}
 
   @media screen and (min-width: 40em) {
@@ -49,16 +50,16 @@ const Description = styled(P)`
 const WhatAreTheBenefits = () => {
   return (
     <Flex mx={[3, 4]} my={4} mt={['56px', null, '120px']} flexDirection="column" alignItems="center" textAlign="center">
-      <H3 fontSize={['24px', '32px']} lineHeight={['32px', '40px']} letterSpacing={['-0.008em']} color="black.900">
+      <SectionTitle>
         <FormattedMessage id="fiscalHosting.whatAreTheBenefits.title" defaultMessage="What are the benefits?" />
-      </H3>
-      <Box width={['288px', '548px', '708px', null, '755px']} textAlign="center" mb={['40px', null, 0]}>
-        <P fontSize={['16px', '20px']} lineHeight={['24px', '28px']} color="black.700" fontWeight="500">
+      </SectionTitle>
+      <Box width={['288px', '548px', '708px', null, '755px']} textAlign="center" mb={['40px', null, 0]} mt={[2, 3]}>
+        <SectionDescription>
           <FormattedMessage
             id="fiscalHosting.whatAreTheBenefits.subTitle"
             defaultMessage="Organizing takes work. Fiscal hosts are here to help."
           />
-        </P>
+        </SectionDescription>
       </Box>
       <Flex
         my="32px"

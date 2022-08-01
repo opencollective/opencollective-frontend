@@ -235,7 +235,7 @@ const LearnMore = ({ page }) => {
             <DonateButtonBG alt="" />
             <DonateButtonBGHover alt="" />
             <Link href="/opencollective/donate">
-              <DonateButton buttonStyle="dark" minWidth={'97'}>
+              <DonateButton buttonStyle="marketing" minWidth={97}>
                 <FormattedMessage id="home.donate" defaultMessage="Donate" />
               </DonateButton>
             </Link>

@@ -245,7 +245,7 @@ const ContactForm = () => {
                 type="submit"
                 width={['288px', '151px']}
                 buttonSize="medium"
-                buttonStyle="dark"
+                buttonStyle="marketing"
                 mb={['24px', 0]}
                 loading={isSubmitting}
               >

@@ -7,7 +7,8 @@ import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
-import { H2, H3, P } from '../Text';
+import { SectionTitle } from '../marketing/Text';
+import { H3, P } from '../Text';
 
 const IconWrapper = styled(Box)`
   display: flex;
@@ -106,14 +107,9 @@ const WhoAreFiscalHosts = () => {
         mb={[4, null, null, null, '69px']}
       >
         <Box width={['288px', '392px', '396px', null, '448px']}>
-          <H2
-            color="black.800"
-            fontSize={['28px', '32px', null, null, '40px']}
-            lineHeight={['36px', '40px', null, null, '48px']}
-            letterSpacing={['-0.008em', null, null, null, '-0.04em']}
-          >
+          <SectionTitle>
             <FormattedMessage id="becomeAHost.whoAreFiscalHosts" defaultMessage="Who are Fiscal Hosts?" />
-          </H2>
+          </SectionTitle>
         </Box>
         <Box
           ml={[0, '17px', '86px', null, '77px']}

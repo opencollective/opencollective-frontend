@@ -177,7 +177,7 @@ const ForFiscalHosts = () => {
             lineHeight={['26px', '28px']}
             fontWeight="500"
             letterSpacing={[null, '-0.00em']}
-            color="black.900"
+            color="primary.900"
           >
             <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
           </H3>
@@ -192,7 +192,7 @@ const ForFiscalHosts = () => {
         lineHeight={['26px', '28px']}
         fontWeight="500"
         letterSpacing="-0.008emd"
-        color="blue.700"
+        color="primary.900"
         mb="16px"
       >
         <FormattedMessage

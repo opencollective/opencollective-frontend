@@ -8,11 +8,11 @@ import Avatar from '../../Avatar';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
+import { SectionDescription, SectionTitle } from '../../marketing/Text';
 import StyledButton from '../../StyledButton';
 import StyledLink from '../../StyledLink';
-import { H2, H3, H5, P, Span } from '../../Text';
+import { H3, H5, P, Span } from '../../Text';
 import NextIllustration from '../HomeNextIllustration';
-import SectionTitle from '../SectionTitle';
 
 const Wrapper = styled(Container)`
   background-image: url('/static/images/home/fiscalhost-blue-bg-sm.png');
@@ -131,41 +131,29 @@ const FiscalHost = () => {
             color="black.900"
             mr={[null, null, 3, null, 4]}
             ml={[null, null, null, null, 4]}
+            alignItems={['center', null, null, null, 'flex-start']}
           >
-            <Box width={['268px', '648px', null, '456px', '657px']} textAlign="left">
+            <Box width={['268px', '576px', null, '456px', '657px']}>
               <SectionTitle
+                textAlign={['center', null, 'left']}
                 display={[null, null, null, null, 'none']}
-                color="black.900"
                 mt={[5, null, null, 0]}
-                fontSize={['32px', '40px']}
-                lineHeight={['40px', '48px']}
-                letterSpacing={['-1.2px', '-1.6px']}
               >
                 <FormattedMessage
                   id="home.fiscalHostSection.title"
                   defaultMessage="Do you need a Fiscal Host for your community?"
                 />
               </SectionTitle>
-              <H2
-                display={['none', null, null, null, 'block']}
-                color="black.900"
-                fontSize={['32px', '40px', null, null, '52px']}
-                lineHeight={['40px', '48px', null, null, '56px']}
-                letterSpacing={['-1.2px', '-1.6px', null, null, '-2px']}
-              >
+              <SectionTitle display={['none', null, null, null, 'block']}>
                 <FormattedMessage id="home.fiscalHostSection.title.xl" defaultMessage="Do you need a Fiscal Host?" />
-              </H2>
+              </SectionTitle>
             </Box>
             <Box width={['288px', '477px', null, '456px', '444px']}>
-              <P
+              <SectionDescription
+                textAlign={['center', null, 'left']}
                 display={[null, null, null, null, 'none']}
-                color="black.800"
                 mt={3}
                 mb={[2, 3]}
-                fontWeight="500"
-                fontSize={['15px', '20px']}
-                lineHeight={['23px', '28px']}
-                letterSpacing="-0.12px"
               >
                 <FormattedMessage
                   id="home.fiscalHostSection.explanation1"
@@ -177,22 +165,13 @@ const FiscalHost = () => {
                   {' '}
                   <FormattedMessage id="home.fiscalHostSection.weCanHelp" defaultMessage="We can help!" />
                 </Span>
-              </P>
-              <P
-                display={['none', null, null, null, 'block']}
-                color="black.800"
-                mt={3}
-                mb={[2, 4]}
-                fontWeight="500"
-                fontSize={'24px'}
-                lineHeight={'32px'}
-                letterSpacing={'-0.8px'}
-              >
+              </SectionDescription>
+              <SectionDescription display={['none', null, null, null, 'block']} color="black.800" mt={3} mb={[2, 4]}>
                 <FormattedMessage
                   id="home.fiscalHostSection.explanation2"
                   defaultMessage="Fiscal Hosts handle banking, taxes, accounting, legal, liability, and payments for you."
                 />
-              </P>
+              </SectionDescription>
             </Box>
           </Container>
           <Flex flexDirection="column" mt={3} width={1} ml={[null, null, 3, null, 5]}>
