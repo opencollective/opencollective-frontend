@@ -62,6 +62,9 @@ const Messages = defineMessages({
     id: 'Search',
     defaultMessage: 'Search',
   },
+  searchForUsers: {
+    defaultMessage: 'Search for Users by name or email',
+  },
 });
 
 /**
@@ -73,7 +76,11 @@ const getPlaceholder = (intl, types) => {
   if (nbTypes === 0 || nbTypes > 3) {
     return intl.formatMessage(Messages.search);
   } else if (nbTypes === 1) {
-    return intl.formatMessage(Messages.searchForType, { entity: formatCollectiveType(intl, types[0], 100) });
+    if (types[0] === CollectiveType.USER) {
+      return intl.formatMessage(Messages.searchForUsers);
+    } else {
+      return intl.formatMessage(Messages.searchForType, { entity: formatCollectiveType(intl, types[0], 100) });
+    }
   } else {
     // Format by passing a map of entities like { entity1: 'Collectives' }
     return intl.formatMessage(
