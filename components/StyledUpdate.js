@@ -229,12 +229,12 @@ class StyledUpdate extends Component {
     if (mode === 'summary') {
       return (
         <Link href={`${getCollectivePageRoute(collective)}/updates/${update.slug}`}>
-          <H5 data-cy="updateTitle">{update.title}</H5>
+          <H5 data-cy="updateTitle" color={!update.publishedAt ? 'black.500' : 'black.900'} >{update.title}</H5>
         </Link>
       );
     } else {
       return (
-        <H5 data-cy="updateTitle" mb={2}>
+        <H5 data-cy="updateTitle" color={!update.publishedAt ? 'black.500' : 'black.900'} mb={2}>
           {update.title}
         </H5>
       );
