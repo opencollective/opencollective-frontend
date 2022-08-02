@@ -13,8 +13,8 @@ import StyledTag from './StyledTag';
 import { Span } from './Text';
 
 const expensesSearchQuery = gqlV2/* GraphQL */ `
-  query ExpensesPickerSearchQuery($account: AccountReferenceInput, $searchTerm: String) {
-    expenses(account: $account, limit: 100, searchTerm: $searchTerm) {
+  query ExpensesPickerSearchQuery($account: AccountReferenceInput, $searchTerm: String, $status: ExpenseStatusFilter) {
+    expenses(account: $account, limit: 100, searchTerm: $searchTerm, status: $status) {
       nodes {
         id
         legacyId
@@ -79,9 +79,9 @@ const formatOptionLabel = option => {
 /**
  * Fetches expenses based on user search input.
  */
-const ExpensesPickerAsync = ({ inputId, noCache, account, ...props }) => {
+const ExpensesPickerAsync = ({ inputId, noCache, account, status, ...props }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
-  const variables = { account: getAccountInput(account) };
+  const variables = { account: getAccountInput(account), status };
   const queryParameters = { fetchPolicy, variables, context: API_V2_CONTEXT };
   const [searchExpenses, { loading, data }] = useLazyQuery(expensesSearchQuery, queryParameters);
   const [searchTerm, setSearchTerm] = React.useState('');
@@ -116,6 +116,7 @@ ExpensesPickerAsync.propTypes = {
   /** If true, results won't be cached (Apollo "network-only" mode) */
   noCache: PropTypes.bool,
   account: PropTypes.object,
+  status: PropTypes.string,
 };
 
 ExpensesPickerAsync.defaultProps = {};

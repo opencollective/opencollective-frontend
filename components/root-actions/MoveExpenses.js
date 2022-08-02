@@ -91,6 +91,7 @@ export default function MoveExpenses() {
             disabled={!sourceAccount}
             closeMenuOnSelect={false}
             account={sourceAccount}
+            noCache
             isMulti
             isClearable
           />
