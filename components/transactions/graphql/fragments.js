@@ -130,6 +130,7 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
       }
       order {
         id
+        legacyId
         status
       }
       expense {
