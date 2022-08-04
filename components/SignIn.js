@@ -110,7 +110,7 @@ export default class SignIn extends React.Component {
     const { error, showError } = this.state;
     return (
       <React.Fragment>
-        <Box maxWidth={390}>
+        <Box maxWidth={390} pl={['20px', 0]} pr={['20px', 0]}>
           {this.props.isOAuth ? (
             <React.Fragment>
               <Flex justifyContent="center" mb={40}>
@@ -138,6 +138,7 @@ export default class SignIn extends React.Component {
             htmlFor="email"
             fontSize={label ? '24px' : ['24px', '32px']}
             mb={12}
+            mt={3}
             textAlign="center"
           >
             {label || this.getSignInPageHeading(this.state.unknownEmail)}
