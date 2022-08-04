@@ -9,15 +9,7 @@ import StyledInput from '../../StyledInput';
 import StyledTextarea from '../../StyledTextarea';
 import { Label, P, Span } from '../../Text';
 
-const ReceiptTemplateForm = ({
-  defaultTemplate,
-  defaultReceiptTitle,
-  receiptInfo,
-  receiptTitlePlaceholder,
-  receiptInfoPlaceholder,
-  onChangeReceiptTitle,
-  onChangeReceiptInfo,
-}) => {
+const ReceiptTemplateForm = ({ defaultTemplate, value, onChange, placeholders }) => {
   const [showPreview, setShowPreview] = React.useState(false);
 
   return (
@@ -26,10 +18,10 @@ const ReceiptTemplateForm = ({
         <FormattedMessage defaultMessage="Receipt title" />
       </Label>
       <StyledInput
-        inputId="receipt-title"
-        placeholder={receiptTitlePlaceholder}
-        defaultValue={defaultReceiptTitle}
-        onChange={onChangeReceiptTitle}
+        id="receipt-title"
+        placeholder={placeholders.title}
+        defaultValue={value.title}
+        onChange={e => onChange(e.target.value, null)}
         width="100%"
         maxWidth={414}
         mt="6px"
@@ -38,7 +30,7 @@ const ReceiptTemplateForm = ({
         <P mt="6px">
           <FormattedMessage
             defaultMessage="Keep this field empty to use the default title: {receiptTitlePlaceholder}."
-            values={{ receiptTitlePlaceholder }}
+            values={{ receiptTitlePlaceholder: placeholders.title }}
           />
         </P>
       )}
@@ -63,10 +55,10 @@ const ReceiptTemplateForm = ({
         </StyledButton>
       </Flex>
       <StyledTextarea
-        inputId="custom-message"
-        placeholder={receiptInfoPlaceholder}
-        defaultValue={receiptInfo}
-        onChange={onChangeReceiptInfo}
+        id="custom-message"
+        placeholder={placeholders.info}
+        defaultValue={value.info}
+        onChange={e => onChange(null, e.target.value)}
         width="100%"
         height="150px"
         fontSize="13px"
@@ -88,12 +80,9 @@ const ReceiptTemplateForm = ({
 
 ReceiptTemplateForm.propTypes = {
   defaultTemplate: PropTypes.bool,
-  defaultReceiptTitle: PropTypes.string,
-  receiptInfo: PropTypes.string,
-  receiptInfoPlaceholder: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  receiptTitlePlaceholder: PropTypes.string,
-  onChangeReceiptTitle: PropTypes.func.isRequired,
-  onChangeReceiptInfo: PropTypes.func.isRequired,
+  value: PropTypes.shape({ title: PropTypes.string, info: PropTypes.string }),
+  onChange: PropTypes.func, // Gets an object like { title, info }
+  placeholders: PropTypes.object,
 };
 
 export default ReceiptTemplateForm;

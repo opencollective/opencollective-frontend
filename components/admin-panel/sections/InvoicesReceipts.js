@@ -78,8 +78,23 @@ const InvoicesReceipts = ({ collective }) => {
     };
   };
 
-  const onChange = (value, stateFunction) => {
-    stateFunction(value);
+  const onChangeDefault = (title, info) => {
+    if (title) {
+      setReceiptTitle(title === '' ? defaultReceiptTitlePlaceholder : title);
+    }
+    if (info) {
+      setInfo(info);
+    }
+    setIsFieldChanged(true);
+  };
+
+  const onChangeAlternate = (title, info) => {
+    if (title) {
+      setAlternativeReceiptTitle(title);
+    }
+    if (info) {
+      setAlternativeInfo(info);
+    }
     setIsFieldChanged(true);
   };
 
@@ -104,16 +119,15 @@ const InvoicesReceipts = ({ collective }) => {
       <Flex flexWrap="wrap" flexDirection="column" width="100%">
         <ReceiptTemplateForm
           defaultTemplate
-          defaultReceiptTitle={
-            defaultReceiptTitlePlaceholder === receiptTitle || receiptTitle === null ? null : receiptTitle
-          }
-          receiptTitlePlaceholder={defaultReceiptTitlePlaceholder}
-          receiptInfo={info}
-          receiptInfoPlaceholder={intl.formatMessage(messages.extraInfoPlaceholder)}
-          onChangeReceiptTitle={e =>
-            onChange(e.target.value === '' ? defaultReceiptTitlePlaceholder : e.target.value, setReceiptTitle)
-          }
-          onChangeReceiptInfo={e => onChange(e.target.value, setInfo)}
+          value={{
+            title: defaultReceiptTitlePlaceholder === receiptTitle || receiptTitle === null ? null : receiptTitle,
+            info,
+          }}
+          placeholders={{
+            title: defaultReceiptTitlePlaceholder,
+            info: intl.formatMessage(messages.extraInfoPlaceholder),
+          }}
+          onChange={onChangeDefault}
         />
         <SettingsSectionTitle>
           <FormattedMessage defaultMessage="Alternative receipt template" />
@@ -145,12 +159,9 @@ const InvoicesReceipts = ({ collective }) => {
           <Container mt="26px" mb="24px">
             <Flex flexWrap="wrap" flexDirection="column" width="100%">
               <ReceiptTemplateForm
-                defaultReceiptTitle={alternativeReceiptTitle}
-                receiptTitlePlaceholder="Custom Receipt"
-                receiptInfo={alternativeInfo}
-                receiptInfoPlaceholder={intl.formatMessage(messages.extraInfoPlaceholder)}
-                onChangeReceiptTitle={e => onChange(e.target.value, setAlternativeReceiptTitle)}
-                onChangeReceiptInfo={e => onChange(e.target.value, setAlternativeInfo)}
+                value={{ title: alternativeReceiptTitle, info: alternativeInfo }}
+                placeholders={{ title: 'Custom Receipt', info: intl.formatMessage(messages.extraInfoPlaceholder) }}
+                onChange={onChangeAlternate}
               />
             </Flex>
             <StyledButton
