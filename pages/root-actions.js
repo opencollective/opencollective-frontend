@@ -13,6 +13,7 @@ import ClearCacheForAccountForm from '../components/root-actions/ClearCacheForAc
 import ConnectAccountsForm from '../components/root-actions/ConnectAccountsForm';
 import MergeAccountsForm from '../components/root-actions/MergeAccountsForm';
 import MoveAuthoredContributions from '../components/root-actions/MoveAuthoredContributions';
+import MoveExpenses from '../components/root-actions/MoveExpenses';
 import MoveReceivedContributions from '../components/root-actions/MoveReceivedContributions';
 import UnhostAccountForm from '../components/root-actions/UnhostAccountForm';
 import StyledCard from '../components/StyledCard';
@@ -36,7 +37,7 @@ const MENU = [
   },
   { id: 'Unhost account', Component: UnhostAccountForm },
   {
-    id: 'Contributions',
+    id: 'Contributions & Expenses',
     type: 'category',
   },
   {
@@ -51,6 +52,11 @@ const MENU = [
     Component: MoveReceivedContributions,
     description: `This tool is meant to edit the account that received a contribution.
     Use it to move contributions to different tiers, sub-projects, events, etc.`,
+  },
+  {
+    id: 'Move expenses',
+    Component: MoveExpenses,
+    description: `This tool is meant to move expenses to another account.`,
   },
   {
     id: 'Moderation',
