@@ -10,10 +10,8 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import { getEnvVar } from '../lib/env-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { getSettingsRoute } from '../lib/url-helpers';
-import { parseToBoolean } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import Container from '../components/Container';
@@ -206,14 +204,12 @@ class HostDashboardPage extends React.Component {
                   <FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />
                 </LinkContainer>
               </Link>
-              {parseToBoolean(getEnvVar('HOST_DASHBOARD_REPORTS')) && (
-                <Link href={`/${slug}/dashboard/${HOST_SECTIONS.REPORTS}`}>
-                  <LinkContainer isActive={view === HOST_SECTIONS.REPORTS}>
-                    <ReportsIcon size="1.2em" />
-                    <FormattedMessage id="Reports" defaultMessage="Reports" />
-                  </LinkContainer>
-                </Link>
-              )}
+              <Link href={`/${slug}/dashboard/${HOST_SECTIONS.REPORTS}`}>
+                <LinkContainer isActive={view === HOST_SECTIONS.REPORTS}>
+                  <ReportsIcon size="1.2em" />
+                  <FormattedMessage id="Reports" defaultMessage="Reports" />
+                </LinkContainer>
+              </Link>
             </Container>
             <Box py={['32px', '60px']}>{this.renderView(host)}</Box>
           </React.Fragment>

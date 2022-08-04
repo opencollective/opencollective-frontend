@@ -1535,7 +1535,6 @@
   "home.whatIsGreatAboutOC.description": "Gestão de dinheiro tornada simples, além de ótimas ferramentas para o envolvimento da comunidade, relatórios de orçamento e patrocínio fiscal.",
   "Host": "Fiscal Host (Added Funds)",
   "host.applyTo": "Inscrever-se para {hostName}",
-  "host.dashboard": "Painel",
   "host.dashboard.tab.pendingApplications": "Solicitações pendentes",
   "host.deactivate": "Desativar como Administrador",
   "host.hostFee.help": "A Taxa de Administrador é o que um Administrador Fiscal cobra um Coletivo por seus serviços, tais como reter fundos, realizar de pagamentos de custo, atender a obrigações fiscais e acessar a plataforma de software Open Collective.",

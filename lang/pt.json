@@ -1535,7 +1535,6 @@
   "home.whatIsGreatAboutOC.description": "Money management made simple, plus great tools for community engagement, budget reporting, and fiscal sponsorship.",
   "Host": "Fiscal Host (Added Funds)",
   "host.applyTo": "Apply to {hostName}",
-  "host.dashboard": "Painel",
   "host.dashboard.tab.pendingApplications": "Inscrições pendentes",
   "host.deactivate": "Desativar como Organizador",
   "host.hostFee.help": "The Host Fee is what a Fiscal Host charges a Collective for its services, such as holding funds, making expense payouts, meeting tax obligations, and access to the Open Collective software platform.",
