@@ -147,7 +147,7 @@ class HostDashboardPage extends React.Component {
 
     const canEdit = LoggedInUser && host && LoggedInUser.canEditCollective(host);
 
-    const newAdminUrl = host.id && getSettingsRoute(host, view, true);
+    const newAdminUrl = host.id && getSettingsRoute(host, view);
     return (
       <Page collective={host} title={host.name || 'Host Dashboard'}>
         {data.account && (
