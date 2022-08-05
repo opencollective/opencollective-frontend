@@ -6,9 +6,10 @@ import styled from 'styled-components';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
 import StyledCarousel from '../StyledCarousel';
 import StyledLink from '../StyledLink';
-import { H2, P } from '../Text';
+import { P } from '../Text';
 
 const CollectiveNameLink = styled(StyledLink)`
   &:hover {
@@ -128,7 +129,6 @@ const CaseStudy = ({ bgImage, name, id, logo, learnMorePath }) => {
           lineHeight={['26px', '32px']}
           color="black.800"
           letterSpacing={[null, '-0.008em']}
-          textDecoration="underline"
         >
           {name}
         </CollectiveNameLink>
@@ -164,15 +164,18 @@ const CaseStudies = () => {
       px="16px"
       my={[4, null, null, null, '118px']}
     >
-      <H2
-        fontSize={['28px', '32px', null, null, '40px']}
-        lineHeight={['36px', '40px', null, null, '48px']}
-        color="black.800"
-        letterSpacing="-0.008em"
-        mb={[4, 3]}
-      >
-        <FormattedMessage id="becomeAHost.caseStudies" defaultMessage="Case studies" />
-      </H2>
+      <Box width={['288px', '648px', null, null, '1152px']} mb="8px">
+        <SectionTitle textAlign="center">
+          <FormattedMessage defaultMessage="Who is using Open Collective?" />
+        </SectionTitle>
+      </Box>
+      <Box mb={[4, 3]} width={['288px', '648px']}>
+        <SectionDescription textAlign="center">
+          <FormattedMessage
+            defaultMessage={'Communities around the world are using Open Collective. Find out more about them!'}
+          />
+        </SectionDescription>
+      </Box>
 
       <StyledCarousel width="288px" options={caseStudies} display={[null, 'none']}>
         {caseStudies.map(caseStudy => (
@@ -186,7 +189,7 @@ const CaseStudies = () => {
         ))}
       </Container>
       <Box mt={4}>
-        <StyledLink buttonStyle="standard" buttonSize="medium" href="/search?isHost=true" fontWeight="500">
+        <StyledLink buttonStyle="marketingSecondary" buttonSize="medium" href="/search?isHost=true" fontWeight="500">
           <FormattedMessage id="becomeAHost.discoverMore" defaultMessage="Discover more hosts" />
         </StyledLink>
       </Box>

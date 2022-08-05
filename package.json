@@ -63,7 +63,7 @@
     "formik": "2.2.9",
     "glob": "8.0.3",
     "graphql": "16.5.0",
-    "helmet": "5.1.0",
+    "helmet": "5.1.1",
     "jsdom": "20.0.0",
     "jsonwebtoken": "8.5.1",
     "load-script": "2.0.0",

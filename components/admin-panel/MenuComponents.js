@@ -66,7 +66,7 @@ export const MenuLink = ({ collective, section, children, onClick, isSelected, i
           {isBeta ? ' (Beta)' : ''}
         </StyledLink>
       ) : (
-        <Link href={getSettingsRoute(collective, section, true)} data-cy={`menu-item-${section}`}>
+        <Link href={getSettingsRoute(collective, section)} data-cy={`menu-item-${section}`}>
           {children}
           {isBeta ? ' (Beta)' : ''}
         </Link>

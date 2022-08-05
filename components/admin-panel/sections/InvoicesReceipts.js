@@ -14,7 +14,9 @@ import { Box, Flex } from '../../Grid';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledHr from '../../StyledHr';
-import { P, Span } from '../../Text';
+import StyledInputField from '../../StyledInputField';
+import StyledSelect from '../../StyledSelect';
+import { H2, P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
 import ReceiptTemplateForm from './ReceiptTemplateForm';
@@ -26,6 +28,19 @@ const messages = defineMessages({
       "Add any other text to appear on payment receipts, such as your organization's tax ID number, info about tax deductibility of contributions, or a custom thank you message.",
   },
 });
+
+const BILL_TO_OPTIONS = [
+  {
+    value: 'host',
+    label: (
+      <FormattedMessage
+        defaultMessage="{value} (default)"
+        values={{ value: <FormattedMessage id="Member.Role.HOST" defaultMessage="Host" /> }}
+      />
+    ),
+  },
+  { value: 'collective', label: <FormattedMessage id="Collective" defaultMessage="Collective" /> },
+];
 
 const InvoicesReceipts = ({ collective }) => {
   const intl = useIntl();
@@ -55,6 +70,12 @@ const InvoicesReceipts = ({ collective }) => {
     get(data, 'editCollective.settings.invoice.templates.default.info') === info &&
     get(data, 'editCollective.settings.invoice.templates.alternative.info') === alternativeInfo;
 
+  // For Bill To
+  const getBillToOption = value => BILL_TO_OPTIONS.find(option => option.value === value) || BILL_TO_OPTIONS[0];
+  const getInExpenseTemplate = (account, field) => get(account, `settings.invoice.expenseTemplates.default.${field}`);
+  const [billTo, setBillTo] = React.useState(getInExpenseTemplate(collective, 'billTo'));
+  const billToIsSaved = getInExpenseTemplate(collective, 'billTo') === billTo;
+
   const deleteAlternativeReceipt = () => {
     setAlternativeReceiptTitle(null);
     setAlternativeInfo(null);
@@ -63,19 +84,14 @@ const InvoicesReceipts = ({ collective }) => {
   };
 
   const getInvoiceTemplatesObj = () => {
-    if (!alternativeReceiptTitle && !alternativeInfo) {
-      return {
-        templates: {
-          default: { title: receiptTitle || defaultReceiptTitlePlaceholder, info: info },
-        },
-      };
+    const templates = { default: { title: receiptTitle, info: info } };
+    const expenseTemplates = { default: { billTo } };
+
+    if (alternativeReceiptTitle || alternativeInfo) {
+      templates.alternative = { title: alternativeReceiptTitle, info: alternativeInfo };
     }
-    return {
-      templates: {
-        default: { title: receiptTitle || defaultReceiptTitlePlaceholder, info: info },
-        alternative: { title: alternativeReceiptTitle, info: alternativeInfo },
-      },
-    };
+
+    return { templates, expenseTemplates };
   };
 
   const onChangeDefault = (title, info) => {
@@ -100,8 +116,35 @@ const InvoicesReceipts = ({ collective }) => {
 
   return (
     <Container>
+      <H2 mb={3} fontSize="24px" lineHeight="32px" fontWeight="700">
+        <FormattedMessage id="becomeASponsor.invoiceReceipts" defaultMessage="Invoices & Receipts" />
+      </H2>
+      <Box mb={4}>
+        <SettingsSectionTitle>
+          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+        </SettingsSectionTitle>
+
+        <StyledInputField
+          name="expense-bill-to-select"
+          labelProps={{ fontSize: '16px', fontWeight: '700', lineHeight: '24px', color: 'black.800' }}
+          label={intl.formatMessage({ defaultMessage: 'Bill To' })}
+          hint={intl.formatMessage({
+            defaultMessage:
+              'Set this to "Collective" to use the collective info for generated invoices\' "Bill To" section. You need to make sure that this pattern is legal under your jurisdiction.',
+          })}
+        >
+          {({ id }) => (
+            <StyledSelect
+              inputId={id}
+              options={BILL_TO_OPTIONS}
+              value={getBillToOption(billTo)}
+              onChange={({ value }) => onChange(value, setBillTo)}
+            />
+          )}
+        </StyledInputField>
+      </Box>
       <SettingsSectionTitle>
-        <FormattedMessage id="EditHostInvoice.receiptsSettings" defaultMessage="Receipt Settings" />
+        <FormattedMessage defaultMessage="Financial contributions" />
       </SettingsSectionTitle>
       <P pb="26px">
         <FormattedMessage
@@ -217,7 +260,7 @@ const InvoicesReceipts = ({ collective }) => {
             });
           }}
         >
-          {isSaved && infoIsSaved ? (
+          {isSaved && infoIsSaved && billToIsSaved ? (
             <FormattedMessage id="saved" defaultMessage="Saved" />
           ) : (
             <FormattedMessage id="save" defaultMessage="Save" />

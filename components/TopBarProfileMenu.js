@@ -94,10 +94,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
           ) : null
         }
       </Query>
-      <UserMenuLinkEntry
-        isMobileMenuLink={isMobileView}
-        href={getSettingsRoute(LoggedInUser.collective, null, LoggedInUser)}
-      >
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={getSettingsRoute(LoggedInUser.collective)}>
         <FormattedMessage id="Settings" defaultMessage="Settings" />
       </UserMenuLinkEntry>
       <UserMenuLinkEntry

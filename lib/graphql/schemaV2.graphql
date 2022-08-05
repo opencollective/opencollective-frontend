@@ -12360,6 +12360,21 @@ type Mutation {
   ): BanAccountResponse!
 
   """
+  [Root only] A mutation to move expenses from one account to another
+  """
+  moveExpenses(
+    """
+    The orders to move
+    """
+    expenses: [ExpenseReferenceInput!]!
+
+    """
+    The account to move the expenses to. This must be a non USER account.
+    """
+    destinationAccount: AccountReferenceInput!
+  ): [Expense]!
+
+  """
   Add platform tips to a transaction. Scope: "transactions".
   """
   addPlatformTipToTransaction(

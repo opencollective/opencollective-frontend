@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Mutation } from '@apollo/client/react/components';
 import { getApplicableTaxes } from '@opencollective/taxes';
-import { cloneDeep, get, set } from 'lodash';
+import { cloneDeep, get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -10,6 +10,7 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import intervals from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { getCurrencySymbol } from '../../../lib/currency-utils';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import { capitalize } from '../../../lib/utils';
@@ -27,7 +28,7 @@ import StyledCheckbox from '../../StyledCheckbox';
 import StyledLink from '../../StyledLink';
 import StyledLinkButton from '../../StyledLinkButton';
 import { P, Span } from '../../Text';
-import { editCollectiveSettingsMutation } from '../mutations';
+import { editAccountSettingsMutation } from '../mutations';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
@@ -488,7 +489,7 @@ class Tiers extends React.Component {
             <SettingsSectionTitle>
               <FormattedMessage id="ContributionsType.Flexible" defaultMessage="Flexible Contributions" />
             </SettingsSectionTitle>
-            <Mutation mutation={editCollectiveSettingsMutation}>
+            <Mutation mutation={editAccountSettingsMutation}>
               {(editSettings, { loading }) => (
                 <Flex flexWrap="wrap">
                   <Box mr={[0, null, 4]} css={{ pointerEvents: 'none', zoom: 0.75, filter: 'grayscale(0.3)' }}>
@@ -508,12 +509,13 @@ class Tiers extends React.Component {
                       width="auto"
                       isLoading={loading}
                       onChange={({ target }) => {
-                        const updatedCollective = cloneDeep(this.props.collective);
                         editSettings({
                           variables: {
-                            id: this.props.collective.id,
-                            settings: set(updatedCollective.settings, 'disableCustomContributions', !target.value),
+                            account: { legacyId: this.props.collective.id },
+                            key: 'disableCustomContributions',
+                            value: !target.value,
                           },
+                          context: API_V2_CONTEXT,
                         });
                       }}
                     />
@@ -526,7 +528,7 @@ class Tiers extends React.Component {
                 <SettingsSectionTitle mt={50}>
                   <FormattedMessage id="ContributionsType.Crypto" defaultMessage="Crypto Contributions" />
                 </SettingsSectionTitle>
-                <Mutation mutation={editCollectiveSettingsMutation}>
+                <Mutation mutation={editAccountSettingsMutation}>
                   {(editSettings, { loading }) => (
                     <Flex flexWrap="wrap">
                       <Box mr={[0, null, 4]} css={{ pointerEvents: 'none', zoom: 0.75, filter: 'grayscale(0.3)' }}>
@@ -546,12 +548,13 @@ class Tiers extends React.Component {
                           width="auto"
                           isLoading={loading}
                           onChange={({ target }) => {
-                            const updatedCollective = cloneDeep(this.props.collective);
                             editSettings({
                               variables: {
-                                id: this.props.collective.id,
-                                settings: set(updatedCollective.settings, 'disableCryptoContributions', !target.value),
+                                account: { legacyId: this.props.collective.id },
+                                key: 'disableCryptoContributions',
+                                value: !target.value,
                               },
+                              context: API_V2_CONTEXT,
                             });
                           }}
                         />

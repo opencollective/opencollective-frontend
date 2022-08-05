@@ -3,26 +3,21 @@ import { FormattedMessage } from 'react-intl';
 
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
+import { SectionTitle } from '../marketing/Text';
 import StyledCard from '../StyledCard';
 import StyledLink from '../StyledLink';
-import { H2, H3, P } from '../Text';
+import { H3, P } from '../Text';
 
 const WeAreHereIfYouWantToTalk = () => (
   <Flex flexDirection="column" px={3} alignItems="center" my="58px">
     <Box textAlign="center" mb="40px" width={['256px', '660px', '768px']}>
-      <H2
-        fontSize={['32px', '40px']}
-        lineHeight={['40px', '48px']}
-        letterSpacing={['-0.008em', '-0.04em']}
-        mb={3}
-        color="black.900"
-      >
+      <SectionTitle mb={3}>
         <FormattedMessage
           id="helpAndSupport.weAreHere"
           defaultMessage="We’re here if you
 want to talk!"
         />
-      </H2>
+      </SectionTitle>
     </Box>
     <Flex flexDirection={['column', 'row']} alignItems="center">
       <StyledCard

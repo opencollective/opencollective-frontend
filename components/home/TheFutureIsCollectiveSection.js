@@ -20,7 +20,12 @@ const TheFutureIsCollective = () => {
       <Flex justifyContent="center" alignItems="center" px="16px" mt="40px">
         <Flex flexDirection="column" alignItems="center">
           <Box>
-            <MainTitle textAlign="center">
+            <MainTitle
+              fontSize={['52px', '64px', '72px']}
+              lineHeight={['56px', '80px', '88px']}
+              letterSpacing={['-0.04em', '0.012em', null]}
+              textAlign="center"
+            >
               <FormattedMessage id="home.futureIsCollective" defaultMessage={'The future is collective'} />
             </MainTitle>
           </Box>
@@ -40,7 +45,7 @@ const TheFutureIsCollective = () => {
           <Box mb="40px" display="flex" flexDirection={['column', 'row']} alignItems="center">
             <Link href="/create">
               <StyledButton
-                width={['288px', '125px']}
+                minWidth={['288px', '125px']}
                 my={['12px', null, 0]}
                 mr={[0, '24px']}
                 buttonStyle="marketing"
@@ -55,7 +60,7 @@ const TheFutureIsCollective = () => {
             <StyledButton
               onClick={() => setShowModal(true)}
               my={['12px', null, 0]}
-              width={['288px', '196px']}
+              minWidth={['288px', '196px']}
               fontSize="16px"
               lineHeight="20px"
             >
