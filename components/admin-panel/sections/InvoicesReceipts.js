@@ -114,6 +114,11 @@ const InvoicesReceipts = ({ collective }) => {
     setIsFieldChanged(true);
   };
 
+  const onChange = (value, stateFunction) => {
+    stateFunction(value);
+    setIsFieldChanged(true);
+  };
+
   return (
     <Container>
       <H2 mb={3} fontSize="24px" lineHeight="32px" fontWeight="700">
