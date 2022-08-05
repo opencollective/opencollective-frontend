@@ -1536,7 +1536,6 @@
   "home.whatIsGreatAboutOC.description": "Administración de presupuesto enfocado en simplicidad; además de herramientas geniales para participar con tu comunidad, reporte de gastos y transacciones, y todo para ser hospedado fiscalmente por una organización host.",
   "Host": "Anfitrión Fiscal (Fondos Añadidos)",
   "host.applyTo": "Solicita a {hostName}",
-  "host.dashboard": "Panel",
   "host.dashboard.tab.pendingApplications": "Aplicaciones pendientes",
   "host.deactivate": "Desactivar como Anfitrión",
   "host.hostFee.help": "La Cuota de Anfitrión es lo que un Anfitrión Fiscal cobra a un Colectivo por sus servicios, tales como mantener fondos, realizar pagos de gastos, cumplir con obligaciones fiscales y acceder a la plataforma de software Open Collective.",
