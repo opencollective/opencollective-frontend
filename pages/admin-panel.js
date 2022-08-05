@@ -213,7 +213,6 @@ const AdminPanelPage = () => {
             <AdminPanelSection section={selectedSection} isLoading={isLoading} collective={account} subpath={subpath} />
           </Grid>
         )}
-        ;
       </Page>
     </AdminPanelContext.Provider>
   );
