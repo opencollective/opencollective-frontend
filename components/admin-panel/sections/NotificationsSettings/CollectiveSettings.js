@@ -5,7 +5,7 @@ import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ActivityClasses } from '../../../../lib/constants/activities';
-import { ActivityClassesI18N } from '../../../../lib/i18n/activities';
+import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 
 import Avatar from '../../../Avatar';
 import { Box, Flex } from '../../../Grid';

@@ -208,6 +208,13 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS}
             if={isOneOfTypes(collective, [COLLECTIVE, ORGANIZATION, USER])}
           />
+          <MenuLink
+            collective={collective}
+            section={COLLECTIVE_SECTIONS.ACTIVITY_LOG}
+            if={
+              ['development', 'staging'].includes(process.env.OC_ENV) || collective.settings?.earlyAccess?.activityLog
+            }
+          />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ADVANCED} />
         </MenuGroup>
         <MenuGroup if={isSelfHostedAccount(collective) && !isAccountantOnly} mt={24}>
@@ -234,6 +241,7 @@ Menu.propTypes = {
     type: PropTypes.string,
     isHost: PropTypes.bool,
     host: PropTypes.object,
+    settings: PropTypes.object,
     features: PropTypes.shape({
       USE_PAYMENT_METHODS: PropTypes.string,
       EMIT_GIFT_CARDS: PropTypes.string,

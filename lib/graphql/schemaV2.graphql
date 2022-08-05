@@ -613,7 +613,7 @@ interface Account {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
 }
 
 """
@@ -726,7 +726,7 @@ type Tier {
   amountType: TierAmountType!
   minimumAmount: Amount!
   endsAt: DateTime
-  invoiceTemplate: String!
+  invoiceTemplate: String
 }
 
 """
@@ -922,6 +922,7 @@ interface Transaction {
   The balance after the Transaction has run. Only for financially active accounts.
   """
   balanceInHostCurrency: Amount
+  invoiceTemplate: String
 }
 
 """
@@ -2262,6 +2263,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
   COLLECTIVE_EXPENSE_UNAPPROVED
+  COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM
@@ -2957,7 +2959,7 @@ type Host implements Account & AccountWithContributions {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -4993,7 +4995,7 @@ type Bot implements Account {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -5489,7 +5491,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -5729,7 +5731,7 @@ type Credit implements Transaction {
   """
   merchantId: String
   balanceInHostCurrency: Amount
-  invoiceTemplate: String!
+  invoiceTemplate: String
 }
 
 """
@@ -5834,7 +5836,7 @@ type Debit implements Transaction {
   """
   merchantId: String
   balanceInHostCurrency: Amount
-  invoiceTemplate: String!
+  invoiceTemplate: String
 }
 
 """
@@ -6313,7 +6315,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6920,7 +6922,7 @@ type Individual implements Account {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7506,7 +7508,7 @@ type Organization implements Account & AccountWithContributions {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8124,7 +8126,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8331,6 +8333,22 @@ type Query {
     """
     orderBy: OrderByInput
   ): AccountCollection!
+  activities(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    The account associated with the Activity
+    """
+    account: AccountReferenceInput!
+  ): ActivityCollection!
   application(
     """
     The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -10133,6 +10151,16 @@ enum CountryISO {
   EH
 }
 
+"""
+A collection of "Activities"
+"""
+type ActivityCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Activity]
+}
+
 input ExpenseReferenceInput {
   """
   The public id identifying the expense (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -10654,7 +10682,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11250,7 +11278,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -13888,6 +13916,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
   COLLECTIVE_EXPENSE_UNAPPROVED
+  COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM
