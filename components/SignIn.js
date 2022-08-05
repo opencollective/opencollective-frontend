@@ -110,7 +110,7 @@ export default class SignIn extends React.Component {
     const { error, showError } = this.state;
     return (
       <React.Fragment>
-        <Box maxWidth={390} pl={['20px', 0]} pr={['20px', 0]}>
+        <Box maxWidth={390} px={['20px', 0]}>
           {this.props.isOAuth ? (
             <React.Fragment>
               <Flex justifyContent="center" mb={40}>
