@@ -173,6 +173,7 @@ export default class SignIn extends React.Component {
                   name="email"
                   minWidth={120}
                   onChange={({ target }) => {
+                    target.value = target.value.trim();
                     onEmailChange(target.value);
                     this.setState({ error: target.validationMessage, showError: false });
                   }}
