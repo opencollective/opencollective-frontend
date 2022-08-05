@@ -59,7 +59,12 @@ const StyledTagBase = styled.div`
   text-align: center;
   white-space: nowrap;
   letter-spacing: 0.06em;
-
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+  &:hover {
+    max-width: 500px;
+  }
   ${variant({
     prop: 'variant',
     variants: {

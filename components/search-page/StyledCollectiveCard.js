@@ -201,7 +201,7 @@ const StyledCollectiveCard = ({
             )}
             <Container>
               {tag === undefined ? (
-                <StyledTag display="inline-block" variant="rounded-right" my={2} backgroundColor="blue.50">
+                <StyledTag display="inline-block" variant="rounded-right" mt={2} backgroundColor="blue.50">
                   <I18nCollectiveTags tags={getCollectiveMainTag(null, null, collective.type)} />
                 </StyledTag>
               ) : (
@@ -219,7 +219,14 @@ const StyledCollectiveCard = ({
                   .filter(tag => !IGNORED_TAGS.includes(tag))
                   .slice(0, 4)
                   .map(tag => (
-                    <StyledTag key={tag} display="inline-block" variant="rounded-right" m={1}>
+                    <StyledTag
+                      key={tag}
+                      display="inline-block"
+                      variant="rounded-right"
+                      m={1}
+                      maxHeight={'20px'}
+                      lineHeight={'16px'}
+                    >
                       {tag}
                     </StyledTag>
                   ))}

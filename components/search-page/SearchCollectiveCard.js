@@ -19,7 +19,7 @@ import StyledCollectiveCard from './StyledCollectiveCard';
 const SearchCollectiveCard = ({ collective, ...props }) => {
   return (
     <StyledCollectiveCard collective={collective} position="relative" {...props} data-cy="collective-card">
-      <Container p={3}>
+      <Container p={3} pt={2}>
         <Box data-cy="caption" mb={2}>
           {collective.isHost && collective.host ? (
             <React.Fragment>
@@ -92,7 +92,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
           )}
           {collective.description && (
             <Container fontSize="12px">
-              <Flex alignItems="center" justifyContent="space-between" mt={21.5} mb={4.5}>
+              <Flex alignItems="center" justifyContent="space-between" mt={10} mb={4.5}>
                 <Span textTransform="uppercase" color="black.700" fontWeight={500}>
                   <FormattedMessage defaultMessage="About Us" />
                 </Span>
