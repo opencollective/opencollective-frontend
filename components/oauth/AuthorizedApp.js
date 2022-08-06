@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
@@ -30,6 +30,7 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
     context: API_V2_CONTEXT,
     onCompleted: onRevoke,
   });
+  const lastUsedAt = authorization.lastUsedAt ? (new Date() - new Date(authorization.lastUsedAt)) / 1000 : null;
 
   return (
     <Flex
@@ -48,10 +49,19 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
           </P>
           <Container display="flex" alignItems="center" flexWrap="wrap" fontSize="12px" mt={2} color="black.700">
             <Span mr={1}>
-              <FormattedMessage
-                defaultMessage="Connected on {date, date, simple}"
-                values={{ date: new Date(authorization.createdAt) }}
-              />
+              {authorization.lastUsedAt ? (
+                <FormattedMessage
+                  defaultMessage="Last used {timeElapsed}"
+                  values={{
+                    timeElapsed: <FormattedRelativeTime value={lastUsedAt} updateIntervalInSeconds={60} />,
+                  }}
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="Connected on {date, date, simple}"
+                  values={{ date: new Date(authorization.createdAt) }}
+                />
+              )}
             </Span>
             <Flex alignItems="center">
               <FormattedMessage
