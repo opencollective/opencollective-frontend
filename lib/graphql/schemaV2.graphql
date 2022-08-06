@@ -58,6 +58,11 @@ type OAuthAuthorization {
   expiresAt: DateTime!
 
   """
+  The last time of token was used
+  """
+  lastUsedAt: DateTime
+
+  """
   The attached scopes.
   """
   scope: [OAuthScope]
