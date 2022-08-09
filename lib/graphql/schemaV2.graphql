@@ -569,7 +569,7 @@ interface Account {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -2915,7 +2915,7 @@ type Host implements Account & AccountWithContributions {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -3803,6 +3803,36 @@ type UpdateAudienceStats {
   The total number of emails to send
   """
   total: Int!
+}
+
+"""
+Input to order updates chronologically
+"""
+input UpdateChronologicalOrderInput {
+  """
+  Field to chronologically order by.
+  """
+  field: UpdateDateTimeField! = CREATED_AT
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection! = DESC
+}
+
+"""
+All possible DateTime fields for an update
+"""
+enum UpdateDateTimeField {
+  """
+  The creation time
+  """
+  CREATED_AT
+
+  """
+  The creation time
+  """
+  PUBLISHED_AT
 }
 
 """
@@ -4951,7 +4981,7 @@ type Bot implements Account {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -5447,7 +5477,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -6271,7 +6301,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -6878,7 +6908,7 @@ type Individual implements Account {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -7464,7 +7494,7 @@ type Organization implements Account & AccountWithContributions {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -8082,7 +8112,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -10158,7 +10188,7 @@ type ActivityCollection implements Collection {
   offset: Int
   limit: Int
   totalCount: Int
-  nodes: [Activity]
+  nodes: [Activity!]
 }
 
 input ExpenseReferenceInput {
@@ -10638,7 +10668,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -11234,7 +11264,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 

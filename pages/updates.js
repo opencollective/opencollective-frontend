@@ -148,7 +148,7 @@ export const updatesQuery = gqlV2/* GraphQL */ `
     $limit: Int
     $offset: Int
     $searchTerm: String
-    $orderBy: ChronologicalOrderInput
+    $orderBy: UpdateChronologicalOrderInput
   ) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
