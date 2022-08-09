@@ -225,12 +225,12 @@ const InvoicesReceipts = ({ collective }) => {
               pr="16px"
               onClick={() => deleteAlternativeReceipt()}
             >
-              <Flex fontSize="14px" fontWeight={500} lineHeight="18px" color="#CC2955">
+              <Span display="flex" fontSize="14px" fontWeight={500} lineHeight="18px" color="#CC2955">
                 <Box pr="10px">
                   <Trash size={17} />
                 </Box>
                 <FormattedMessage defaultMessage="Delete alternative receipt" />
-              </Flex>
+              </Span>
             </StyledButton>
           </Container>
         )}

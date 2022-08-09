@@ -9,16 +9,16 @@ import StyledInput from '../../StyledInput';
 import StyledTextarea from '../../StyledTextarea';
 import { Label, P, Span } from '../../Text';
 
-const ReceiptTemplateForm = ({ defaultTemplate, value, onChange, placeholders }) => {
+const ReceiptTemplateForm = ({ showTipForDefaultTitle, value, onChange, placeholders, template }) => {
   const [showPreview, setShowPreview] = React.useState(false);
 
   return (
     <React.Fragment>
-      <Label htmlFor="receipt-title" color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px">
+      <Label htmlFor={`receipt-title-${template}`} color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px">
         <FormattedMessage defaultMessage="Receipt title" />
       </Label>
       <StyledInput
-        id="receipt-title"
+        id={`receipt-title-${template}`}
         placeholder={placeholders.title}
         defaultValue={value.title}
         onChange={e => onChange(e.target.value, null)}
@@ -26,7 +26,7 @@ const ReceiptTemplateForm = ({ defaultTemplate, value, onChange, placeholders })
         maxWidth={414}
         mt="6px"
       />
-      {defaultTemplate && (
+      {showTipForDefaultTitle && (
         <P mt="6px">
           <FormattedMessage
             defaultMessage="Keep this field empty to use the default title: {receiptTitlePlaceholder}."
@@ -35,7 +35,13 @@ const ReceiptTemplateForm = ({ defaultTemplate, value, onChange, placeholders })
         </P>
       )}
       <Flex justifyContent="space-between" flexDirection={['column', 'row']} pt="26px">
-        <Label htmlFor="custom-message" color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px">
+        <Label
+          htmlFor={`custom-message-${template}`}
+          color="black.800"
+          fontSize="16px"
+          fontWeight={700}
+          lineHeight="24px"
+        >
           <FormattedMessage defaultMessage="Custom Message" />
         </Label>
         <StyledButton
@@ -55,7 +61,7 @@ const ReceiptTemplateForm = ({ defaultTemplate, value, onChange, placeholders })
         </StyledButton>
       </Flex>
       <StyledTextarea
-        id="custom-message"
+        id={`custom-message-${template}`}
         placeholder={placeholders.info}
         defaultValue={value.info}
         onChange={e => onChange(null, e.target.value)}
@@ -79,10 +85,11 @@ const ReceiptTemplateForm = ({ defaultTemplate, value, onChange, placeholders })
 };
 
 ReceiptTemplateForm.propTypes = {
-  defaultTemplate: PropTypes.bool,
-  value: PropTypes.shape({ title: PropTypes.string, info: PropTypes.string }),
-  onChange: PropTypes.func, // Gets an object like { title, info }
-  placeholders: PropTypes.object,
+  showTipForDefaultTitle: PropTypes.bool,
+  value: PropTypes.shape({ title: PropTypes.string, info: PropTypes.string }).isRequired,
+  onChange: PropTypes.func.isRequired, // Gets an object like { title, info }
+  placeholders: PropTypes.object.isRequired,
+  template: PropTypes.string,
 };
 
 export default ReceiptTemplateForm;
