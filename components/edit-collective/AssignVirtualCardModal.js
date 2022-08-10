@@ -91,6 +91,8 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
         cardNumber: values.cardNumber.replace(/\s+/g, ''),
         cvv: values.cvv,
         expiryDate: values.expiryDate,
+        // Should be removed once https://github.com/opencollective/opencollective-api/pull/7307 is deployed to production
+        expireDate: values.expiryDate,
       };
 
       try {
