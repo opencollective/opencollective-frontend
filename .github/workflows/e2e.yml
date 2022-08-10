@@ -47,7 +47,7 @@ jobs:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: postgis/postgis:13-3.1
+        image: postgis/postgis:14-3.1
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
