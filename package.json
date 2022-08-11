@@ -189,7 +189,7 @@
     "eslint-config-opencollective": "^3.0.3",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-cypress": "^2.12.1",
-    "eslint-plugin-formatjs": "^3.0.0",
+    "eslint-plugin-formatjs": "^4.0.0",
     "eslint-plugin-graphql": "^4.0.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-node": "^11.1.0",
