@@ -219,7 +219,7 @@ const StyledCollectiveCard = ({
                   .filter(tag => !IGNORED_TAGS.includes(tag))
                   .slice(0, 4)
                   .map(tag => (
-                    <StyledTag key={tag} display="inline-block" variant="rounded-right" m={1}>
+                    <StyledTag key={tag} display="inline-block" variant="truncated" m={1}>
                       {tag}
                     </StyledTag>
                   ))}

@@ -86,6 +86,18 @@ const StyledTagBase = styled.div`
         borderRadius: '12px 12px 12px 12px',
         padding: '3px 6px 3px 10px',
       },
+      truncated: {
+        ...defaultRoundedStyleProps,
+        borderRadius: '2px 12px 12px 2px',
+        padding: '3px 10px 3px 6px',
+        maxWidth: '10em',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        fontSize: '10px',
+        '&:hover': {
+          maxWidth: '100%',
+        },
+      },
     },
   })}
 
