@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular';
 import copy from 'copy-to-clipboard';
-import { differenceWith, isNil, pickBy, truncate } from 'lodash';
+import { differenceWith, isNil, pickBy, toLower, truncate, uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -147,7 +147,7 @@ class SearchPage extends React.Component {
       isHost: isNil(query.isHost) ? undefined : parseToBoolean(query.isHost),
       country: query.country || null,
       sortBy: query.sortBy || (query.q ? 'RANK' : 'ACTIVITY'),
-      tag: query.tag?.length > 0 ? query.tag.split(',').map(tag => tag.toLowerCase()) : [],
+      tag: query.tag?.length > 0 ? query.tag.split(',') : [],
       limit: Number(query.limit) || 20,
       offset: Number(query.offset) || 0,
     };
@@ -392,18 +392,21 @@ class SearchPage extends React.Component {
                   <FormattedMessage defaultMessage="Tags" />
                 </FilterLabel>
                 <Flex flexWrap="wrap">
-                  {tagStats?.nodes
-                    ?.filter(node => !IGNORED_TAGS.includes(node.tag))
-                    .map(node => (
+                  {uniqBy(
+                    tagStats?.nodes.map(node => node.tag),
+                    toLower,
+                  )
+                    ?.filter(tag => !IGNORED_TAGS.includes(tag))
+                    .map(tag => (
                       <FilterButton
                         as={StyledTag}
-                        key={node.tag}
-                        title={node.tag}
+                        key={tag}
+                        title={tag}
                         variant="rounded-right"
-                        $isSelected={tags.includes(node.tag)}
-                        onClick={() => this.changeTags(node.tag)}
+                        $isSelected={tags.includes(tag)}
+                        onClick={() => this.changeTags(tag)}
                       >
-                        {truncate(node.tag, { length: 20 })}
+                        {truncate(tag, { length: 20 })}
                       </FilterButton>
                     ))}
                   {hiddenSelectedTags?.map(tag => (
