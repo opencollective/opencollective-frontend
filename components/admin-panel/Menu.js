@@ -40,6 +40,13 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} />
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
           <MenuLink collective={collective} section={ALL_SECTIONS.WEBHOOKS} />
+          <MenuLink
+            collective={collective}
+            section={COLLECTIVE_SECTIONS.ACTIVITY_LOG}
+            if={
+              ['development', 'staging'].includes(process.env.OC_ENV) || collective.settings?.earlyAccess?.activityLog
+            }
+          />
           <MenuLink collective={collective} section={ALL_SECTIONS.ADVANCED} />
           {!isHostAccount(collective) && <MenuLink collective={collective} section={ALL_SECTIONS.FISCAL_HOSTING} />}
         </React.Fragment>
