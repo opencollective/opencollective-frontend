@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { parseDateInterval } from '../../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 import { ActivityLabelI18n } from '../../../../lib/i18n/activities';
 
@@ -21,9 +23,17 @@ import StyledCard from '../../../StyledCard';
 import StyledLink from '../../../StyledLink';
 import { P } from '../../../Text';
 
+import ActivityFilters from './ActivityFilters';
+
 const activityLogQuery = gqlV2/* GraphQL */ `
-  query AccountActivityLog($account: AccountReferenceInput!, $limit: Int, $offset: Int) {
-    activities(account: $account, limit: $limit, offset: $offset) {
+  query AccountActivityLog(
+    $account: AccountReferenceInput!
+    $limit: Int
+    $offset: Int
+    $dateFrom: DateTime
+    $dateTo: DateTime
+  ) {
+    activities(account: $account, limit: $limit, offset: $offset, dateFrom: $dateFrom, dateTo: $dateTo) {
       offset
       limit
       totalCount
@@ -62,11 +72,21 @@ const ACTIVITY_LIMIT = 10;
 const ActivityLog = ({ accountSlug }) => {
   const intl = useIntl();
   const router = useRouter();
-  const offset = parseInt(router.query.offset) || 0;
+  const routerQuery = omit(router.query, ['slug', 'section']);
+  const offset = parseInt(routerQuery.offset) || 0;
+  const { period } = routerQuery;
+  const { from: dateFrom, to: dateTo } = parseDateInterval(period);
   const { data, loading, error } = useQuery(activityLogQuery, {
-    variables: { account: { slug: accountSlug }, limit: ACTIVITY_LIMIT, offset },
+    variables: { account: { slug: accountSlug }, dateFrom, dateTo, limit: ACTIVITY_LIMIT, offset },
     context: API_V2_CONTEXT,
   });
+
+  const handleUpdateFilters = queryParams => {
+    return router.push({
+      pathname: `/${accountSlug}/admin/activity-log`,
+      query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
+    });
+  };
 
   return (
     <Box mt={3}>
@@ -81,43 +101,49 @@ const ActivityLog = ({ accountSlug }) => {
             defaultMessage="You must be an admin of this collective to see this page"
           />
         </MessageBox>
-      ) : !data.activities.totalCount ? (
-        <MessageBox type="info" withIcon>
-          <FormattedMessage defaultMessage="No activity yet" />
-        </MessageBox>
       ) : (
         <React.Fragment>
-          <ActivityLogContainer>
-            {data.activities.nodes.map(activity => (
-              <Box key={activity.id} px="16px" py="14px">
-                <P color="black.900" fontWeight="500" fontSize="14px">
-                  {ActivityLabelI18n[activity.type]
-                    ? intl.formatMessage(ActivityLabelI18n[activity.type])
-                    : activity.type}
-                </P>
-                <MetadataContainer>
-                  <FormattedMessage
-                    id="ByUser"
-                    defaultMessage="By {userName}"
-                    values={{
-                      userName: !activity.individual ? (
-                        <FormattedMessage id="user.unknown" defaultMessage="Unknown" />
-                      ) : (
-                        <StyledLink as={LinkCollective} color="black.700" collective={activity.individual}>
-                          <Flex alignItems="center" gridGap="8px">
-                            <Avatar radius={24} collective={activity.individual} />
-                            {activity.individual.name}
-                          </Flex>
-                        </StyledLink>
-                      ),
-                    }}
-                  />
-                  •
-                  <DateTime value={activity.createdAt} dateStyle="medium" />
-                </MetadataContainer>
-              </Box>
-            ))}
-          </ActivityLogContainer>
+          <ActivityFilters
+            filters={routerQuery}
+            onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
+          />
+          {!data.activities.totalCount ? (
+            <MessageBox type="info" withIcon>
+              <FormattedMessage defaultMessage="No activity yet" />
+            </MessageBox>
+          ) : (
+            <ActivityLogContainer>
+              {data.activities.nodes.map(activity => (
+                <Box key={activity.id} px="16px" py="14px">
+                  <P color="black.900" fontWeight="500" fontSize="14px">
+                    {ActivityLabelI18n[activity.type]
+                      ? intl.formatMessage(ActivityLabelI18n[activity.type])
+                      : activity.type}
+                  </P>
+                  <MetadataContainer>
+                    <FormattedMessage
+                      id="ByUser"
+                      defaultMessage="By {userName}"
+                      values={{
+                        userName: !activity.individual ? (
+                          <FormattedMessage id="user.unknown" defaultMessage="Unknown" />
+                        ) : (
+                          <StyledLink as={LinkCollective} color="black.700" collective={activity.individual}>
+                            <Flex alignItems="center" gridGap="8px">
+                              <Avatar radius={24} collective={activity.individual} />
+                              {activity.individual.name}
+                            </Flex>
+                          </StyledLink>
+                        ),
+                      }}
+                    />
+                    •
+                    <DateTime value={activity.createdAt} dateStyle="medium" />
+                  </MetadataContainer>
+                </Box>
+              ))}
+            </ActivityLogContainer>
+          )}
           <Container display="flex" justifyContent="center" fontSize="14px" my={3}>
             <Pagination
               offset={offset}

@@ -8378,6 +8378,16 @@ type Query {
     The account associated with the Activity
     """
     account: AccountReferenceInput!
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: DateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: DateTime = null
   ): ActivityCollection!
   application(
     """
