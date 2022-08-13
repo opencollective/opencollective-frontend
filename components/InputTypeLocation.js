@@ -143,15 +143,8 @@ class InputTypeLocation extends React.Component {
 
   handleChange(value) {
     if (!value) {
-      const location = {
-        name: null,
-        address: null,
-        lat: null,
-        long: null,
-        country: null,
-      };
-      this.setState({ value: location });
-      return this.props.onChange(location);
+      this.setState({ value: null });
+      return this.props.onChange(null);
     } else if (value.isOnline) {
       const location = { name: 'Online', address: value.address };
       this.setState({ value: location });
