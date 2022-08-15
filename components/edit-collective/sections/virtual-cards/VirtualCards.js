@@ -5,6 +5,7 @@ import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
+import { CollectiveType } from '../../../../lib/constants/collectives';
 import { parseDateInterval } from '../../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 
@@ -63,6 +64,7 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
           name
           last4
           data
+          provider
           privateData
           createdAt
           spendingLimitAmount
@@ -128,18 +130,27 @@ const VirtualCards = props => {
   return (
     <Box width={['366px', '764px']}>
       <Box>
-        <P>
-          <FormattedMessage
-            id="VirtualCards.Description"
-            defaultMessage="Use a virtual card to spend from your collective's budget. You can request multiple cards (review the host's policy to see how many). Your fiscal host will create the card for you and assign it a limit and a merchant. You will be notified by email once the card is assigned. <learnMoreLink>Learn more</learnMoreLink>"
-            values={{
-              learnMoreLink: getI18nLink({
-                href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
-                openInNewTabNoFollow: true,
-              }),
-            }}
-          />
-        </P>
+        {props.collective.type === CollectiveType.USER ? (
+          <P>
+            <FormattedMessage
+              id="VirtualCards.User.Description"
+              defaultMessage="You are the owner of these virtual cards, purchases made using these cards will be assigned to you and you will be responsible for uploading receipts."
+            />
+          </P>
+        ) : (
+          <P>
+            <FormattedMessage
+              id="VirtualCards.Description"
+              defaultMessage="Use a virtual card to spend from your collective's budget. You can request multiple cards (review the host's policy to see how many). Your fiscal host will create the card for you and assign it a limit and a merchant. You will be notified by email once the card is assigned. <learnMoreLink>Learn more</learnMoreLink>"
+              values={{
+                learnMoreLink: getI18nLink({
+                  href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
+                  openInNewTabNoFollow: true,
+                }),
+              }}
+            />
+          </P>
+        )}
         {props.collective.host?.settings?.virtualcards?.policy && (
           <P mt={3}>
             <Collapse
@@ -170,7 +181,16 @@ const VirtualCards = props => {
       </Box>
       <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
         {data.account.virtualCards.nodes.map(vc => (
-          <VirtualCard key={vc.id} {...vc} />
+          <VirtualCard
+            canEditVirtualCard={
+              props.collective.type === CollectiveType.USER &&
+              vc.provider === 'STRIPE' &&
+              (vc.data.state === 'OPEN' || vc.data.status === 'active')
+            }
+            showConfirmationModal={props.collective.type === CollectiveType.USER}
+            key={vc.id}
+            {...vc}
+          />
         ))}
       </Grid>
       <Flex mt={5} justifyContent="center">
@@ -190,6 +210,7 @@ const VirtualCards = props => {
 VirtualCards.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string,
+    type: PropTypes.string,
     virtualCards: PropTypes.object,
     virtualCardMerchants: PropTypes.array,
     host: PropTypes.object,
