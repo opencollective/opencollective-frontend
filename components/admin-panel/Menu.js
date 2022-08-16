@@ -22,6 +22,12 @@ import { MenuGroup, MenuLink, MenuSectionHeader, useSubmenu } from './MenuCompon
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
+const hasActivityLog = collective => {
+  return Boolean(
+    ['development', 'staging'].includes(process.env.OC_ENV) || collective.settings?.earlyAccess?.activityLog,
+  );
+};
+
 const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
   return (
     <React.Fragment>
@@ -43,9 +49,7 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.ACTIVITY_LOG}
-            if={
-              ['development', 'staging'].includes(process.env.OC_ENV) || collective.settings?.earlyAccess?.activityLog
-            }
+            if={hasActivityLog(collective)}
           />
           <MenuLink collective={collective} section={ALL_SECTIONS.ADVANCED} />
           {!isHostAccount(collective) && <MenuLink collective={collective} section={ALL_SECTIONS.FISCAL_HOSTING} />}
@@ -218,9 +222,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.ACTIVITY_LOG}
-            if={
-              ['development', 'staging'].includes(process.env.OC_ENV) || collective.settings?.earlyAccess?.activityLog
-            }
+            if={hasActivityLog(collective)}
           />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ADVANCED} />
         </MenuGroup>
