@@ -135,7 +135,7 @@ class ExpenseFormItems extends React.PureComponent {
       !isFeatureEnabled(collective, FEATURES.MULTI_CURRENCY_EXPENSES) ||
       payoutMethod?.type === PayoutMethodType.ACCOUNT_BALANCE
     ) {
-      return [collective.currency];
+      return [collective?.currency];
     }
 
     const { payoutMethod, currency } = form.values;
@@ -148,8 +148,8 @@ class ExpenseFormItems extends React.PureComponent {
       return uniq(
         [
           currency,
-          collective.currency,
-          collective.host?.currency,
+          collective?.currency,
+          collective?.host?.currency,
           payoutMethod?.currency,
           payoutMethod?.data?.currency,
         ].filter(Boolean),
