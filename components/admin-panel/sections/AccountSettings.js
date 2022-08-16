@@ -104,7 +104,11 @@ const AccountSettings = ({ account, section }) => {
         ]),
       );
     }
-    CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long', 'country']);
+    if (collective.location === null) {
+      CollectiveInputType.location = null;
+    } else {
+      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long', 'country']);
+    }
     setState({ ...state, status: 'loading' });
     try {
       const response = await editCollective({

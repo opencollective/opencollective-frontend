@@ -1,5 +1,6 @@
-import React, { Fragment } from 'react';
+import React, { createRef, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { Clear } from '@styled-icons/material/Clear';
 import { themeGet } from '@styled-system/theme-get';
 import { get } from 'lodash';
 import Geosuggest from 'react-geosuggest';
@@ -7,11 +8,18 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { isURL } from 'validator';
 
+import Container from './Container';
 import Location from './Location';
 import MessageBox from './MessageBox';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import { Span } from './Text';
+
+const ClearIcon = styled(Clear)`
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
+`;
 
 const GeoSuggestItem = styled(Geosuggest)`
   .geosuggest {
@@ -120,6 +128,7 @@ class InputTypeLocation extends React.Component {
         defaultMessage: 'Online',
       },
     });
+    this.geoSuggestRef = createRef();
   }
 
   componentDidUpdate(prevProps) {
@@ -134,8 +143,8 @@ class InputTypeLocation extends React.Component {
 
   handleChange(value) {
     if (!value) {
-      this.setState({ value: {} });
-      return this.props.onChange({});
+      this.setState({ value: null });
+      return this.props.onChange(null);
     } else if (value.isOnline) {
       const location = { name: 'Online', address: value.address };
       this.setState({ value: location });
@@ -180,19 +189,31 @@ class InputTypeLocation extends React.Component {
           </MessageBox>
         ) : (
           <Fragment>
-            <GeoSuggestItem
-              onSuggestSelect={event => this.handleChange(event)}
-              placeholder={this.props.placeholder}
-              initialValue={this.props.value?.name}
-              fixtures={[
-                {
-                  label: this.props.intl.formatMessage(this.messages.online),
-                  location: { lat: 0, lng: 0 },
-                  isOnline: true,
-                },
-              ]}
-              {...options}
-            />
+            <Container position="relative">
+              <GeoSuggestItem
+                ref={this.geoSuggestRef}
+                onSuggestSelect={event => this.handleChange(event)}
+                placeholder={this.props.placeholder}
+                initialValue={this.props.value?.name}
+                fixtures={[
+                  {
+                    label: this.props.intl.formatMessage(this.messages.online),
+                    location: { lat: 0, lng: 0 },
+                    isOnline: true,
+                  },
+                ]}
+                {...options}
+              />
+              <Container position="absolute" top="0.5em" right="1em">
+                <ClearIcon
+                  onClick={() => {
+                    this.geoSuggestRef.current.clear();
+                    this.handleChange(null);
+                  }}
+                />
+              </Container>
+            </Container>
+
             {this.state.value?.name === 'Online' ? (
               <StyledInputField
                 mt={3}
