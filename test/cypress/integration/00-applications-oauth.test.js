@@ -112,8 +112,6 @@ describe('OAuth Applications', () => {
     cy.getByDataCy('oauth-app-revoke-btn').click();
     cy.contains('[data-cy=toast-notification]:last', 'Authorization for My second App revoked');
     cy.getByDataCy('connected-oauth-app').should('not.exist');
-    cy.contains(
-      `We're beta-testing OAuth integrations for Open Collective. Contact us if you're interested to try it out early!`,
-    );
+    cy.contains(`No Authorized App yet`);
   });
 });
