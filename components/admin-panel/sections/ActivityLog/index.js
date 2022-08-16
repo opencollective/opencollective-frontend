@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -8,19 +9,21 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 import { ActivityLabelI18n } from '../../../../lib/i18n/activities';
 
 import Avatar from '../../../Avatar';
+import Container from '../../../Container';
 import DateTime from '../../../DateTime';
 import { Box, Flex } from '../../../Grid';
 import LinkCollective from '../../../LinkCollective';
 import Loading from '../../../Loading';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import Pagination from '../../../Pagination';
 import StyledCard from '../../../StyledCard';
 import StyledLink from '../../../StyledLink';
 import { P } from '../../../Text';
 
 const activityLogQuery = gqlV2/* GraphQL */ `
-  query AccountActivityLog($account: AccountReferenceInput!) {
-    activities(account: $account) {
+  query AccountActivityLog($account: AccountReferenceInput!, $limit: Int, $offset: Int) {
+    activities(account: $account, limit: $limit, offset: $offset) {
       offset
       limit
       totalCount
@@ -54,10 +57,14 @@ const MetadataContainer = styled.div`
   margin-top: 10px;
 `;
 
+const ACTIVITY_LIMIT = 10;
+
 const ActivityLog = ({ accountSlug }) => {
   const intl = useIntl();
+  const router = useRouter();
+  const offset = parseInt(router.query.offset) || 0;
   const { data, loading, error } = useQuery(activityLogQuery, {
-    variables: { account: { slug: accountSlug } },
+    variables: { account: { slug: accountSlug }, limit: ACTIVITY_LIMIT, offset },
     context: API_V2_CONTEXT,
   });
 
@@ -79,37 +86,47 @@ const ActivityLog = ({ accountSlug }) => {
           <FormattedMessage defaultMessage="No activity yet" />
         </MessageBox>
       ) : (
-        <ActivityLogContainer>
-          {data.activities.nodes.map(activity => (
-            <Box key={activity.id} px="16px" py="14px">
-              <P color="black.900" fontWeight="500" fontSize="14px">
-                {ActivityLabelI18n[activity.type]
-                  ? intl.formatMessage(ActivityLabelI18n[activity.type])
-                  : activity.type}
-              </P>
-              <MetadataContainer>
-                <FormattedMessage
-                  id="ByUser"
-                  defaultMessage="By {userName}"
-                  values={{
-                    userName: !activity.individual ? (
-                      <FormattedMessage id="user.unknown" defaultMessage="Unknown" />
-                    ) : (
-                      <StyledLink as={LinkCollective} color="black.700" collective={activity.individual}>
-                        <Flex alignItems="center" gridGap="8px">
-                          <Avatar radius={24} collective={activity.individual} />
-                          {activity.individual.name}
-                        </Flex>
-                      </StyledLink>
-                    ),
-                  }}
-                />
-                •
-                <DateTime value={activity.createdAt} dateStyle="medium" />
-              </MetadataContainer>
-            </Box>
-          ))}
-        </ActivityLogContainer>
+        <React.Fragment>
+          <ActivityLogContainer>
+            {data.activities.nodes.map(activity => (
+              <Box key={activity.id} px="16px" py="14px">
+                <P color="black.900" fontWeight="500" fontSize="14px">
+                  {ActivityLabelI18n[activity.type]
+                    ? intl.formatMessage(ActivityLabelI18n[activity.type])
+                    : activity.type}
+                </P>
+                <MetadataContainer>
+                  <FormattedMessage
+                    id="ByUser"
+                    defaultMessage="By {userName}"
+                    values={{
+                      userName: !activity.individual ? (
+                        <FormattedMessage id="user.unknown" defaultMessage="Unknown" />
+                      ) : (
+                        <StyledLink as={LinkCollective} color="black.700" collective={activity.individual}>
+                          <Flex alignItems="center" gridGap="8px">
+                            <Avatar radius={24} collective={activity.individual} />
+                            {activity.individual.name}
+                          </Flex>
+                        </StyledLink>
+                      ),
+                    }}
+                  />
+                  •
+                  <DateTime value={activity.createdAt} dateStyle="medium" />
+                </MetadataContainer>
+              </Box>
+            ))}
+          </ActivityLogContainer>
+          <Container display="flex" justifyContent="center" fontSize="14px" my={3}>
+            <Pagination
+              offset={offset}
+              total={data.activities.totalCount}
+              limit={ACTIVITY_LIMIT}
+              ignoredQueryParams={['slug', 'section']}
+            />
+          </Container>
+        </React.Fragment>
       )}
     </Box>
   );
