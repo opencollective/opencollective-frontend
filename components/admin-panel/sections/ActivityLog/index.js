@@ -32,8 +32,16 @@ const activityLogQuery = gqlV2/* GraphQL */ `
     $offset: Int
     $dateFrom: DateTime
     $dateTo: DateTime
+    $activityType: [ActivityAndClassesType]
   ) {
-    activities(account: $account, limit: $limit, offset: $offset, dateFrom: $dateFrom, dateTo: $dateTo) {
+    activities(
+      account: $account
+      limit: $limit
+      offset: $offset
+      dateFrom: $dateFrom
+      dateTo: $dateTo
+      activityType: $activityType
+    ) {
       offset
       limit
       totalCount
@@ -74,10 +82,10 @@ const ActivityLog = ({ accountSlug }) => {
   const router = useRouter();
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
-  const { period } = routerQuery;
+  const { period, type } = routerQuery;
   const { from: dateFrom, to: dateTo } = parseDateInterval(period);
   const { data, loading, error } = useQuery(activityLogQuery, {
-    variables: { account: { slug: accountSlug }, dateFrom, dateTo, limit: ACTIVITY_LIMIT, offset },
+    variables: { account: { slug: accountSlug }, dateFrom, dateTo, limit: ACTIVITY_LIMIT, offset, activityType: type },
     context: API_V2_CONTEXT,
   });
 

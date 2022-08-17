@@ -9,6 +9,8 @@ import PeriodFilter from '../../../budget/filters/PeriodFilter';
 import Container from '../../../Container';
 import { Box, Flex } from '../../../Grid';
 
+import ActivityTypeFilter from './ActivityTypeFilter';
+
 const FilterContainer = styled(Box)`
   margin-bottom: 24px;
   width: 210px;
@@ -43,6 +45,12 @@ const ActivityFilters = ({ filters, onChange }) => {
             <FormattedMessage id="Period" defaultMessage="Period" />
           </FilterLabel>
           <PeriodFilter {...getFilterProps('period', encodeDateInterval)} />
+        </FilterContainer>
+        <FilterContainer ml={[0, '19px']}>
+          <FilterLabel htmlFor="activity-filter-type">
+            <FormattedMessage id="transactions.type" defaultMessage="Type" />
+          </FilterLabel>
+          <ActivityTypeFilter {...getFilterProps('type')} />
         </FilterContainer>
       </Flex>
     </Container>
