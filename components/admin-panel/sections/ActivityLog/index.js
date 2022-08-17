@@ -24,6 +24,7 @@ import StyledLink from '../../../StyledLink';
 import { P } from '../../../Text';
 
 import ActivityFilters from './ActivityFilters';
+import LoadingPlaceholder from '../../../LoadingPlaceholder';
 
 const activityLogQuery = gqlV2/* GraphQL */ `
   query AccountActivityLog(
@@ -88,12 +89,18 @@ const ActivityLog = ({ accountSlug }) => {
     });
   };
 
+  if (error) {
+    return <MessageBoxGraphqlError error={error} />;
+  }
+
   return (
     <Box mt={3}>
+      <ActivityFilters
+        filters={routerQuery}
+        onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
+      />
       {loading ? (
-        <Loading />
-      ) : error ? (
-        <MessageBoxGraphqlError error={error} />
+        <LoadingPlaceholder width="100%" height={163} />
       ) : !data?.activities?.nodes ? (
         <MessageBox type="error" withIcon>
           <FormattedMessage
@@ -103,10 +110,6 @@ const ActivityLog = ({ accountSlug }) => {
         </MessageBox>
       ) : (
         <React.Fragment>
-          <ActivityFilters
-            filters={routerQuery}
-            onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
-          />
           {!data.activities.totalCount ? (
             <MessageBox type="info" withIcon>
               <FormattedMessage defaultMessage="No activity yet" />
@@ -144,15 +147,17 @@ const ActivityLog = ({ accountSlug }) => {
               ))}
             </ActivityLogContainer>
           )}
-          <Container display="flex" justifyContent="center" fontSize="14px" my={3}>
-            <Pagination
-              offset={offset}
-              total={data.activities.totalCount}
-              limit={ACTIVITY_LIMIT}
-              ignoredQueryParams={['slug', 'section']}
-            />
-          </Container>
         </React.Fragment>
+      )}
+      {data?.activities?.totalCount > ACTIVITY_LIMIT && (
+        <Container display="flex" justifyContent="center" fontSize="14px" my={3}>
+          <Pagination
+            offset={offset}
+            total={data.activities.totalCount}
+            limit={ACTIVITY_LIMIT}
+            ignoredQueryParams={['slug', 'section']}
+          />
+        </Container>
       )}
     </Box>
   );
