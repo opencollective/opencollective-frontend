@@ -19,6 +19,7 @@ import SectionContributors from './sections/Contributors';
 import SectionConversations from './sections/Conversations';
 import SectionEmpty from './sections/Empty';
 import SectionEvents from './sections/Events';
+import SectionFinancialOverview from './sections/FinancialOverview';
 import SectionGoals from './sections/Goals';
 import SectionLocation from './sections/Location';
 import SectionOurTeam from './sections/OurTeam';
@@ -189,6 +190,8 @@ class CollectivePage extends Component {
             expenses={this.props.expenses}
           />
         );
+      case Sections.FINANCIAL_OVERVIEW:
+        return <SectionFinancialOverview collective={this.props.collective} />;
       case Sections.TRANSACTIONS:
         return (
           <SectionTransactions

@@ -33,6 +33,7 @@ export const Sections = {
   // BUDGET/TRANSACTIONS
   TRANSACTIONS: 'transactions',
   BUDGET: 'budget',
+  FINANCIAL_OVERVIEW: 'financial-overview',
   // CONTRIBUTORS/PARTICIPANTS - is this a stand alone or in BUDGET as per Figma??
   CONTRIBUTORS: 'contributors',
   PARTICIPANTS: 'participants',
