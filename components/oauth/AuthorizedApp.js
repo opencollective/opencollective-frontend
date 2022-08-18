@@ -3,11 +3,14 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 
+import { isIndividualAccount } from '../../lib/collective.lib';
+import dayjs from '../../lib/dayjs';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
+import { generateDateTitle } from '../DateTime';
 import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import StyledButton from '../StyledButton';
@@ -30,7 +33,6 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
     context: API_V2_CONTEXT,
     onCompleted: onRevoke,
   });
-  const lastUsedAt = authorization.lastUsedAt ? (new Date() - new Date(authorization.lastUsedAt)) / 1000 : null;
 
   return (
     <Flex
@@ -48,35 +50,49 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
             {authorization.application.name}
           </P>
           <Container display="flex" alignItems="center" flexWrap="wrap" fontSize="12px" mt={2} color="black.700">
+            <time dateTime={authorization.createdAt} title={generateDateTitle(intl, new Date(authorization.createdAt))}>
+              <FormattedMessage defaultMessage="Connected on {date, date, simple}" values={{ date: new Date() }} />
+            </time>
             <Span mr={1}>
-              {authorization.lastUsedAt ? (
-                <FormattedMessage
-                  defaultMessage="Last used {timeElapsed}"
-                  values={{
-                    timeElapsed: <FormattedRelativeTime value={lastUsedAt} updateIntervalInSeconds={60} />,
-                  }}
-                />
-              ) : (
-                <FormattedMessage
-                  defaultMessage="Connected on {date, date, simple}"
-                  values={{ date: new Date(authorization.createdAt) }}
-                />
+              {authorization.lastUsedAt && (
+                <React.Fragment>
+                  &nbsp;•&nbsp;
+                  <time
+                    dateTime={authorization.lastUsedAt}
+                    title={generateDateTitle(intl, new Date(authorization.lastUsedAt))}
+                  >
+                    <FormattedMessage
+                      defaultMessage="Last used {timeElapsed}"
+                      values={{
+                        timeElapsed: (
+                          <FormattedRelativeTime
+                            value={dayjs(authorization.lastUsedAt).diff(dayjs(), 'second')}
+                            unit="second"
+                            updateIntervalInSeconds={60}
+                          />
+                        ),
+                      }}
+                    />
+                  </time>
+                </React.Fragment>
               )}
             </Span>
-            <Flex alignItems="center">
-              <FormattedMessage
-                id="CreatedBy"
-                defaultMessage="by {name}"
-                values={{
-                  name: (
-                    <Flex alignItems="center" ml={2}>
-                      <Avatar collective={authorization.account} size={24} mr={1} />
-                      <StyledLink as={LinkCollective} collective={authorization.account} color="black.700" />
-                    </Flex>
-                  ),
-                }}
-              />
-            </Flex>
+            {!isIndividualAccount(authorization.account) && (
+              <Flex alignItems="center">
+                <FormattedMessage
+                  id="CreatedBy"
+                  defaultMessage="by {name}"
+                  values={{
+                    name: (
+                      <Flex alignItems="center" ml={2}>
+                        <Avatar collective={authorization.account} size={24} mr={1} />
+                        <StyledLink as={LinkCollective} collective={authorization.account} color="black.700" />
+                      </Flex>
+                    ),
+                  }}
+                />
+              </Flex>
+            )}
           </Container>
         </Box>
       </Flex>
@@ -113,6 +129,7 @@ AuthorizedApp.propTypes = {
   authorization: PropTypes.shape({
     id: PropTypes.string.isRequired,
     createdAt: PropTypes.string.isRequired,
+    lastUsedAt: PropTypes.string.isRequired,
     account: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
