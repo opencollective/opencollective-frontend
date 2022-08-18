@@ -35,21 +35,18 @@ import SuccessCTA, { SUCCESS_CTA_TYPE } from './SuccessCTA';
 
 // Styled components
 const ContainerWithImage = styled(Container)`
-  @media screen and (max-width: 52em) {
+  @media screen and (max-width: 64em) {
     background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundMobile.png');
     background-position: top;
     background-repeat: no-repeat;
     background-size: 100% auto;
   }
 
-  @media screen and (min-width: 52em) {
+  @media screen and (min-width: 64em) {
     background: url('/static/images/new-contribution-flow/NewContributionFlowSuccessPageBackgroundDesktop.png');
     background-position: left;
     background-repeat: no-repeat;
     background-size: auto 100%;
-  }
-
-  @media screen and (min-width: 64em) {
     background-size: cover;
   }
 `;
@@ -237,8 +234,8 @@ class ContributionFlowSuccess extends React.Component {
     return (
       <Flex
         width={1}
-        minHeight={[400, 800]}
-        flexDirection={['column', null, 'row']}
+        minHeight="calc(100vh - 69px)"
+        flexDirection={['column', null, null, 'row']}
         justifyContent={[null, null, 'center']}
         css={{ height: '100%' }}
         data-cy="order-success"
@@ -253,7 +250,7 @@ class ContributionFlowSuccess extends React.Component {
               display="flex"
               alignItems="center"
               justifyContent="center"
-              width={['100%', null, '50%', '762px']}
+              width={['100%', null, null, '50%', '762px']}
               mb={[4, null, 0]}
               flexShrink={0}
             >
@@ -285,7 +282,7 @@ class ContributionFlowSuccess extends React.Component {
                 {!isEmbed && (
                   <Box my={4}>
                     <Link href={{ pathname: '/search', query: { show: getMainTag(order.toAccount) } }}>
-                      <P color="black.800" fontWeight={500}>
+                      <P color="black.800" fontWeight={500} textAlign="center">
                         <FormattedMessage
                           id="NewContributionFlow.Success.DiscoverMore"
                           defaultMessage="Discover more Collectives like {collective}"

@@ -144,6 +144,8 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
     fromAccount {
       id
       name
+      type
+      imageUrl(height: 48)
       ... on Individual {
         isGuest
       }
