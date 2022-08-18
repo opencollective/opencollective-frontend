@@ -179,6 +179,7 @@ const CollectiveSectionEntry = ({
         fontSize="11px"
         name={`show-section-${section}`}
         defaultValue={defaultValue}
+        value={defaultValue}
         options={options}
         minWidth={150}
         isSearchable={false}
@@ -352,6 +353,10 @@ const EditCollectivePage = ({ collective }) => {
     const sectionPath = getSectionPath(sections, selectedSection);
     set(newSections, `${sectionPath}.isEnabled`, isEnabled);
     set(newSections, `${sectionPath}.restrictedTo`, restrictedTo);
+    if ([Sections.FINANCIAL_OVERVIEW, Sections.BUDGET].includes(selectedSection)) {
+      const otherSection = selectedSection === Sections.BUDGET ? Sections.FINANCIAL_OVERVIEW : Sections.BUDGET;
+      set(newSections, `${getSectionPath(sections, otherSection)}.isEnabled`, !isEnabled);
+    }
     setSections(newSections);
     setDirty(true);
   };
