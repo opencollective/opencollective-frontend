@@ -306,6 +306,11 @@ interface Account {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -2312,6 +2317,7 @@ enum ActivityType {
   WEBHOOK_PAYPAL_RECEIVED
   COLLECTIVE_MONTHLY
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
+  OAUTH_APPLICATION_AUTHORIZED
   ORDER_PROCESSING
   ORDER_PROCESSING_CRYPTO
   ORDER_PENDING_CONTRIBUTION_NEW
@@ -2665,6 +2671,11 @@ type Host implements Account & AccountWithContributions {
     The transaction type (DEBIT or CREDIT)
     """
     type: TransactionType
+
+    """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -3459,6 +3470,11 @@ type TransactionCollection implements Collection {
   totalCount: Int
   nodes: [Transaction]
   kinds: [TransactionKind]
+
+  """
+  The types of payment methods used in this collection, regardless of the pagination
+  """
+  paymentMethodTypes: [PaymentMethodType]!
 }
 
 """
@@ -4733,6 +4749,11 @@ type Bot implements Account {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -5227,6 +5248,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The transaction type (DEBIT or CREDIT)
     """
     type: TransactionType
+
+    """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -6053,6 +6079,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -6662,6 +6693,11 @@ type Individual implements Account {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -7246,6 +7282,11 @@ type Organization implements Account & AccountWithContributions {
     The transaction type (DEBIT or CREDIT)
     """
     type: TransactionType
+
+    """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -7862,6 +7903,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     The transaction type (DEBIT or CREDIT)
     """
     type: TransactionType
+
+    """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -8828,6 +8874,11 @@ type Query {
     The transaction type (DEBIT or CREDIT)
     """
     type: TransactionType
+
+    """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -10430,6 +10481,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -11024,6 +11080,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     The transaction type (DEBIT or CREDIT)
     """
     type: TransactionType
+
+    """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -14005,6 +14066,7 @@ enum ActivityAndClassesType {
   WEBHOOK_PAYPAL_RECEIVED
   COLLECTIVE_MONTHLY
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
+  OAUTH_APPLICATION_AUTHORIZED
   ORDER_PROCESSING
   ORDER_PROCESSING_CRYPTO
   ORDER_PENDING_CONTRIBUTION_NEW
