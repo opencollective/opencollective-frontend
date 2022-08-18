@@ -596,6 +596,7 @@ interface Account {
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -2819,6 +2820,7 @@ type Host implements Account & AccountWithContributions {
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -5162,6 +5164,7 @@ type Bot implements Account {
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -5663,6 +5666,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -6492,6 +6496,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -7104,6 +7109,7 @@ type Individual implements Account {
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -7695,6 +7701,7 @@ type Organization implements Account & AccountWithContributions {
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -8318,6 +8325,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -11024,6 +11032,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -11625,6 +11634,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
+    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date

@@ -27,6 +27,7 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
     $offset: Int!
     $state: String
     $merchantAccount: AccountReferenceInput
+    $assignee: AccountReferenceInput
     $dateFrom: DateTime
     $dateTo: DateTime
   ) {
@@ -53,6 +54,7 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
         offset: $offset
         state: $state
         merchantAccount: $merchantAccount
+        assignee: $assignee
         dateFrom: $dateFrom
         dateTo: $dateTo
       ) {
@@ -102,6 +104,7 @@ const VirtualCards = props => {
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
   const { state, merchant, period } = routerQuery;
+  const assignee = props.collective.type === CollectiveType.USER ? { slug: props.collective.slug } : null;
   const { from: dateFrom, to: dateTo } = parseDateInterval(period);
   const { loading, data } = useQuery(virtualCardsQuery, {
     context: API_V2_CONTEXT,
@@ -111,6 +114,7 @@ const VirtualCards = props => {
       offset,
       state,
       merchantAccount: { slug: merchant },
+      assignee,
       dateFrom: dateFrom,
       dateTo: dateTo,
     },
