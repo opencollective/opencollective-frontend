@@ -15,7 +15,7 @@ import Container from '../../../Container';
 import DateTime from '../../../DateTime';
 import { Box, Flex } from '../../../Grid';
 import LinkCollective from '../../../LinkCollective';
-import Loading from '../../../Loading';
+import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
@@ -24,7 +24,6 @@ import StyledLink from '../../../StyledLink';
 import { P } from '../../../Text';
 
 import ActivityFilters from './ActivityFilters';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
 
 const activityLogQuery = gqlV2/* GraphQL */ `
   query AccountActivityLog(
@@ -89,17 +88,15 @@ const ActivityLog = ({ accountSlug }) => {
     });
   };
 
-  if (error) {
-    return <MessageBoxGraphqlError error={error} />;
-  }
-
   return (
     <Box mt={3}>
       <ActivityFilters
         filters={routerQuery}
         onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
       />
-      {loading ? (
+      {error ? (
+        <MessageBoxGraphqlError error={error} />
+      ) : loading ? (
         <LoadingPlaceholder width="100%" height={163} />
       ) : !data?.activities?.nodes ? (
         <MessageBox type="error" withIcon>
