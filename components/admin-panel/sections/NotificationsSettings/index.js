@@ -244,12 +244,12 @@ const NotificationsSettings = ({ account, subpath }) => {
   return (
     <Box>
       <P fontSize="24px" fontWeight="700" lineHeight="32px" mb={3}>
-        <FormattedMessage id="NotificationsSettings.Title" defaultMessage="Notifications settings" />
+        <FormattedMessage id="NotificationsSettings.Title" defaultMessage="Notifications Settings" />
       </P>
       <P lineHeight="20px" letterSpacing="0px">
         <FormattedMessage
           id="NotificationsSettings.Descripion"
-          defaultMessage="We will always let you know about important changes, but you can choose what else you hear about here. Manage email notifications for your individual profile as well as the collectives and organizations you are part of."
+          defaultMessage="We will always let you know about important changes, but you can customize other settings here. Manage email notifications for your individual profile as well as the collectives and organizations you are part of."
         />
       </P>
       <StyledCard mt={4} p="24px">
@@ -262,7 +262,7 @@ const NotificationsSettings = ({ account, subpath }) => {
         <P lineHeight="20px" letterSpacing="0px" mt={2}>
           <FormattedMessage
             id="NotificationsSettings.NecessaryNotifications.Description"
-            defaultMessage="There are some notifications we are complied to send you, and they can't be opted out of."
+            defaultMessage="There are some notifications we are required to send you, and they can't be opted out of."
           />
         </P>
         <StyledHr my="24px" />
@@ -330,7 +330,7 @@ const NotificationsSettings = ({ account, subpath }) => {
               <P lineHeight="20px" letterSpacing="0px" mt={2}>
                 <FormattedMessage
                   id="NotificationsSettings.Activity.Description"
-                  defaultMessage="Notifications about the profiles you administer, you can set the categories of the notifications you want to receive under each profile."
+                  defaultMessage="Notification settings about the profiles you administer."
                 />
               </P>
               <StyledHr my="24px" />
