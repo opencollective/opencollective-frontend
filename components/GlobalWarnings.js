@@ -5,8 +5,10 @@ import styled from 'styled-components';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
+import FreezeAccountModal from './host-dashboard/FreezeAccountModal';
 import I18nFormatters from './I18nFormatters';
-import { P } from './Text';
+import StyledButton from './StyledButton';
+import { P, Span } from './Text';
 
 const GlobalWarningContainer = styled.div`
   width: 100;
@@ -25,8 +27,13 @@ const GlobalWarningContainer = styled.div`
  */
 const GlobalWarnings = ({ collective }) => {
   const { LoggedInUser } = useLoggedInUser();
+  const [hasFreezeModal, setHasFreezeModal] = React.useState(false);
 
   if (collective?.isFrozen) {
+    const isLoggedInUserHostAdmin = LoggedInUser?.memberOf?.some(
+      member => collective.host?.id === member?.collective?.id,
+    );
+
     // Frozen collectives
     return (
       <GlobalWarningContainer>
@@ -36,6 +43,20 @@ const GlobalWarnings = ({ collective }) => {
         <P>
           <FormattedMessage defaultMessage="Contributions to this page cannot be accepted at this time" />
         </P>
+        {isLoggedInUserHostAdmin && (
+          <StyledButton
+            buttonStyle="warningSecondary"
+            mt={2}
+            onClick={() => {
+              setHasFreezeModal(true);
+            }}
+          >
+            <Span ml={3} fontSize="14px" lineHeight="20px" css={{ verticalAlign: 'middle' }}>
+              <FormattedMessage defaultMessage="Unfreeze Collective" />
+            </Span>
+          </StyledButton>
+        )}
+        {hasFreezeModal && <FreezeAccountModal collective={collective} onClose={() => setHasFreezeModal(false)} />}
       </GlobalWarningContainer>
     );
   } else if (LoggedInUser && LoggedInUser.isLimited) {
@@ -56,6 +77,7 @@ const GlobalWarnings = ({ collective }) => {
 
 GlobalWarnings.propTypes = {
   collective: PropTypes.shape({
+    host: PropTypes.object,
     isFrozen: PropTypes.bool,
   }),
 };

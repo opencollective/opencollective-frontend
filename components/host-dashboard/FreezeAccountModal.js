@@ -124,7 +124,9 @@ const FreezeAccountModal = ({ collective, ...props }) => {
             onClick={async () => {
               try {
                 const action = isUnfreezing ? 'UNFREEZE' : 'FREEZE';
-                const variables = { account: { id: collective.id }, message, action };
+                const accountInput =
+                  typeof collective.id === 'number' ? { legacyId: collective.id } : { id: collective.id };
+                const variables = { account: accountInput, message, action };
                 await editAccountFreezeStatus({ variables });
                 const successMsgArgs = { accountName: collective.name, accountSlug: collective.slug };
                 addToast({
