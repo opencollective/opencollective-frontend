@@ -134,7 +134,7 @@ class CollectivePage extends Component {
     window.scrollTo(0, 0);
   };
 
-  renderSection(section) {
+  renderSection(section, version) {
     switch (section) {
       case Sections.UPDATES:
         return (
@@ -183,15 +183,15 @@ class CollectivePage extends Component {
           />
         );
       case Sections.BUDGET:
-        return (
+        return version === 2 ? (
+          <SectionFinancialOverview collective={this.props.collective} />
+        ) : (
           <SectionBudget
             collective={this.props.collective}
             transactions={this.props.transactions}
             expenses={this.props.expenses}
           />
         );
-      case Sections.FINANCIAL_OVERVIEW:
-        return <SectionFinancialOverview collective={this.props.collective} />;
       case Sections.TRANSACTIONS:
         return (
           <SectionTransactions
@@ -299,7 +299,7 @@ class CollectivePage extends Component {
                         !sectionsWithoutPaddingBottom[section.name]
                       }
                     >
-                      {this.renderSection(section.name)}
+                      {this.renderSection(section.name, section.version)}
                     </SectionContainer>
                   ))}
                 </Fragment>
