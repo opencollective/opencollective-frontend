@@ -2136,7 +2136,6 @@
   "pricing.noHostFees": "{fee} if you don't charge Host Fees to your Collectives",
   "pricing.notes.paymentProcessor": "Payment processor fees apply when using <stripeLink></stripeLink>, <paypalLink></paypalLink>, or <transferwiseLink></transferwiseLink>.",
   "pricing.outsideFunds": "Outside funds",
-  "pricing.paymentProcessor": "(1) Payment processor fees apply when using <stripeLink></stripeLink>, <paypalLink></paypalLink>, or <transferwiseLink></transferwiseLink>.",
   "pricing.payoutFees": "{fee} No fees on outgoing payments",
   "pricing.platformFees": "{fee} No fees on incoming payments",
   "pricing.platformShareBreakdown": "(2) If your Host Fee is 10% and your Collectives bring in $1,000, the Host gets $100 and $15 (15%) is the Platform Share.",
