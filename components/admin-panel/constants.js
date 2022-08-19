@@ -247,6 +247,6 @@ export const SECTION_LABELS = defineMessages({
   },
   [ALL_SECTIONS.NOTIFICATIONS]: {
     id: 'NotificationsSettings.Title',
-    defaultMessage: 'Notifications settings',
+    defaultMessage: 'Notifications Settings',
   },
 });
