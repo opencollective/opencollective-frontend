@@ -15,7 +15,7 @@ import Container from '../../../Container';
 import DateTime from '../../../DateTime';
 import { Box, Flex } from '../../../Grid';
 import LinkCollective from '../../../LinkCollective';
-import Loading from '../../../Loading';
+import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
@@ -90,10 +90,14 @@ const ActivityLog = ({ accountSlug }) => {
 
   return (
     <Box mt={3}>
-      {loading ? (
-        <Loading />
-      ) : error ? (
+      <ActivityFilters
+        filters={routerQuery}
+        onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
+      />
+      {error ? (
         <MessageBoxGraphqlError error={error} />
+      ) : loading ? (
+        <LoadingPlaceholder width="100%" height={163} />
       ) : !data?.activities?.nodes ? (
         <MessageBox type="error" withIcon>
           <FormattedMessage
@@ -103,10 +107,6 @@ const ActivityLog = ({ accountSlug }) => {
         </MessageBox>
       ) : (
         <React.Fragment>
-          <ActivityFilters
-            filters={routerQuery}
-            onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
-          />
           {!data.activities.totalCount ? (
             <MessageBox type="info" withIcon>
               <FormattedMessage defaultMessage="No activity yet" />
@@ -144,15 +144,17 @@ const ActivityLog = ({ accountSlug }) => {
               ))}
             </ActivityLogContainer>
           )}
-          <Container display="flex" justifyContent="center" fontSize="14px" my={3}>
-            <Pagination
-              offset={offset}
-              total={data.activities.totalCount}
-              limit={ACTIVITY_LIMIT}
-              ignoredQueryParams={['slug', 'section']}
-            />
-          </Container>
         </React.Fragment>
+      )}
+      {data?.activities?.totalCount > ACTIVITY_LIMIT && (
+        <Container display="flex" justifyContent="center" fontSize="14px" my={3}>
+          <Pagination
+            offset={offset}
+            total={data.activities.totalCount}
+            limit={ACTIVITY_LIMIT}
+            ignoredQueryParams={['slug', 'section']}
+          />
+        </Container>
       )}
     </Box>
   );
