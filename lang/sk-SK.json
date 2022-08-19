@@ -2136,7 +2136,6 @@
   "pricing.noHostFees": "{fee} ak neúčtujete Poplatky Hostiteľa svojim Kolektívom",
   "pricing.notes.paymentProcessor": "Payment processor fees apply when using <stripeLink></stripeLink>, <paypalLink></paypalLink>, or <transferwiseLink></transferwiseLink>.",
   "pricing.outsideFunds": "Outside funds",
-  "pricing.paymentProcessor": "(1) Payment processor fees apply when using <stripeLink></stripeLink>, <paypalLink></paypalLink>, or <transferwiseLink></transferwiseLink>.",
   "pricing.payoutFees": "{fee} No fees on outgoing payments",
   "pricing.platformFees": "{fee} No fees on incoming payments",
   "pricing.platformShareBreakdown": "(2) Ak je váš Poplatok Hostiteľa 10 % a vaše Kolektívy prinesú 1 000 USD, hostiteľ dostane 100 USD a 15 USD (15 %) je Podiel Platformy.",

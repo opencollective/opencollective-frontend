@@ -2136,7 +2136,6 @@
   "pricing.noHostFees": "{fee} jeśli nie pobierasz opłat za zarządzanie dla swoich zbiorów",
   "pricing.notes.paymentProcessor": "Payment processor fees apply when using <stripeLink></stripeLink>, <paypalLink></paypalLink>, or <transferwiseLink></transferwiseLink>.",
   "pricing.outsideFunds": "Fundusze zewnętrzne",
-  "pricing.paymentProcessor": "(1) Payment processor fees apply when using <stripeLink></stripeLink>, <paypalLink></paypalLink>, or <transferwiseLink></transferwiseLink>.",
   "pricing.payoutFees": "{fee} Brak opłat za wychodzące płatności",
   "pricing.platformFees": "{fee} Brak opłat za przychodzące płatności",
   "pricing.platformShareBreakdown": "(2) Jeśli Twoja opłata dla gospodarza wynosi 10%, a Twoje zbiórki przyniosą 1000$, gospodarz otrzymuje 100$, a 15$ (15%) to udział dla Platformy.",

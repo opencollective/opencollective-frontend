@@ -2136,7 +2136,6 @@
   "pricing.noHostFees": "{fee} if you don't charge Host Fees to your Collectives",
   "pricing.notes.paymentProcessor": "Payment processor fees apply when using <stripeLink></stripeLink>, <paypalLink></paypalLink>, or <transferwiseLink></transferwiseLink>.",
   "pricing.outsideFunds": "Внешние фонды",
-  "pricing.paymentProcessor": "(1) Payment processor fees apply when using <stripeLink></stripeLink>, <paypalLink></paypalLink>, or <transferwiseLink></transferwiseLink>.",
   "pricing.payoutFees": "{fee} Без комиссий за исходящие платежи",
   "pricing.platformFees": "{fee} Без комиссий за входящие платежи",
   "pricing.platformShareBreakdown": "(2) Если комиссия вашего хоста составляет 10%, а ваши коллективы приносят 1000$, то хост получает 100$, а 15$ (15%) доля платформы.",

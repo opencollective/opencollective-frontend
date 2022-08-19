@@ -2136,7 +2136,6 @@
   "pricing.noHostFees": "{fee} si no cobras Tarifas de Anfitrión a tus Colectivos",
   "pricing.notes.paymentProcessor": "Se aplican tarifas del procesador de pagos cuando se utiliza <stripeLink></stripeLink>, <paypalLink></paypalLink> o <transferwiseLink></transferwiseLink>.",
   "pricing.outsideFunds": "Fondos externos",
-  "pricing.paymentProcessor": "(1) Se aplican tarifas del procesador de pagos cuando se utiliza <stripeLink></stripeLink>, <paypalLink></paypalLink> o <transferwiseLink></transferwiseLink>.",
   "pricing.payoutFees": "{fee} No se cobran comisiones por los pagos efectuados",
   "pricing.platformFees": "{fee} No se cobran comisiones por los pagos recibidos",
   "pricing.platformShareBreakdown": "(2) Si tu Tarifa de Anfitrión es del 10% y tus Colectivos ingresan $1.000 USD, el Anfitrión recibe $100 USD y $15 USD (15%) es la Cuota de la Plataforma.",
