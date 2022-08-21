@@ -775,7 +775,7 @@
   "createOrg.form.websiteLabel": "Website der Organisation",
   "createPledge.collectiveDetails": "Details des neuen Kollektivs:",
   "createPledge.conditions": "Im Moment können Sie nur für quelloffene Projekte mit einem GitHub-Repository oder einer GitHub-Organisation eine Zusage geben. Wir bitten das Projekt mindestens 100 Sterne auf GitHub vorzuweisen!",
-  "createPledge.faq.howToClaim": "You’ll need to contact <SupportLink>support</SupportLink> to prove that you are an admin of this project.",
+  "createPledge.faq.howToClaim": "Sie müssen den <SupportLink>Support</SupportLink> kontaktieren, um zu beweisen, dass Sie ein Administrator dieses Projekts sind.",
   "createPledge.faq.howToClaimSummary": "How do I claim a pledged collective?",
   "createPledge.faq.pay": "Once that pledged collective is claimed, we will email you to fulfill your pledge.",
   "createPledge.faq.paySummary": "Wann bezahle ich?",
