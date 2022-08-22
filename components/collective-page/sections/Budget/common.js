@@ -38,7 +38,11 @@ export const makeBudgetTableRow = (key, values) => {
   return values;
 };
 
-export const BudgetTable = ({ headers, rows, ...props }) => {
+export const BudgetTable = ({ headers, rows, truncate, ...props }) => {
+  if (truncate) {
+    rows = rows.slice(0, truncate);
+  }
+
   return (
     <Table mt={4} cellSpacing={0} cellPadding="10px" {...props}>
       <thead>
@@ -64,6 +68,7 @@ export const BudgetTable = ({ headers, rows, ...props }) => {
 BudgetTable.propTypes = {
   headers: PropTypes.arrayOf(PropTypes.node).isRequired,
   rows: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.node)),
+  truncate: PropTypes.number,
 };
 
 export const COLORS = ['#A3F89C', '#FFBF5F', '#8FC7FF', '#F89CE4', '#F89C9C'];
