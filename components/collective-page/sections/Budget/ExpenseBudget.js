@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { FormatListBulleted, Timeline } from '@styled-icons/material';
+import { BarChart, FormatListBulleted, Timeline } from '@styled-icons/material';
 import dayjs from 'dayjs';
 import { capitalize, sumBy } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { extractSeriesFromTimeSeries, formatAmountForLegend } from '../../../../lib/charts';
+import { alignSeries, extractSeriesFromTimeSeries, formatAmountForLegend } from '../../../../lib/charts';
 import { formatCurrency } from '../../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
@@ -78,6 +78,45 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
     groupNameTransformer: capitalize,
   });
 
+  const defaultApexOptions = {
+    legend: {
+      show: true,
+      horizontalAlign: 'left',
+    },
+    grid: {
+      xaxis: { lines: { show: true } },
+      yaxis: { lines: { show: false } },
+    },
+    stroke: {
+      curve: 'straight',
+      width: 1.5,
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    xaxis: {
+      labels: {
+        formatter: function (value) {
+          // Show data aggregated yearly
+          if (timeUnit === 'YEAR') {
+            return dayjs(value).utc().year();
+            // Show data aggregated monthly
+          } else if (timeUnit === 'MONTH') {
+            return dayjs(value).utc().format('MMM-YYYY');
+            // Show data aggregated by week or day
+          } else if (timeUnit === 'WEEK' || timeUnit === 'DAY') {
+            return dayjs(value).utc().format('DD-MMM-YYYY');
+          }
+        },
+      },
+    },
+    yaxis: {
+      labels: {
+        formatter: value => formatAmountForLegend(value, collective.currency, intl.locale),
+      },
+    },
+  };
+
   return (
     <Flex {...props}>
       <Flex justifyContent="space-between" alignItems="center" flexGrow={1}>
@@ -94,8 +133,11 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
           <GraphTypeButton active={graphType === GRAPH_TYPES.LIST} onClick={() => setGraphType(GRAPH_TYPES.LIST)}>
             <FormatListBulleted />
           </GraphTypeButton>
-          <GraphTypeButton active={graphType === GRAPH_TYPES.BAR} onClick={() => setGraphType(GRAPH_TYPES.BAR)}>
+          <GraphTypeButton active={graphType === GRAPH_TYPES.TIME} onClick={() => setGraphType(GRAPH_TYPES.TIME)}>
             <Timeline />
+          </GraphTypeButton>
+          <GraphTypeButton active={graphType === GRAPH_TYPES.BAR} onClick={() => setGraphType(GRAPH_TYPES.BAR)}>
+            <BarChart />
           </GraphTypeButton>
         </Flex>
       </Flex>
@@ -154,51 +196,33 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
               )}
             />
           )}
-          {graphType === GRAPH_TYPES.BAR && (
+          {graphType === GRAPH_TYPES.TIME && (
             <Box mt={4}>
               <Chart
                 type="area"
                 width="100%"
                 height="250px"
                 options={{
+                  ...defaultApexOptions,
                   chart: {
-                    id: 'chart-budget-expenses-overview',
+                    id: 'chart-budget-expenses-time-series',
                   },
-                  legend: {
-                    show: true,
-                    horizontalAlign: 'left',
-                  },
-                  grid: {
-                    xaxis: { lines: { show: true } },
-                    yaxis: { lines: { show: false } },
-                  },
-                  stroke: {
-                    curve: 'straight',
-                    width: 1.5,
-                  },
-                  dataLabels: {
-                    enabled: false,
-                  },
-                  xaxis: {
-                    labels: {
-                      formatter: function (value) {
-                        // Show data aggregated yearly
-                        if (timeUnit === 'YEAR') {
-                          return dayjs(value).utc().year();
-                          // Show data aggregated monthly
-                        } else if (timeUnit === 'MONTH') {
-                          return dayjs(value).utc().format('MMM-YYYY');
-                          // Show data aggregated by week or day
-                        } else if (timeUnit === 'WEEK' || timeUnit === 'DAY') {
-                          return dayjs(value).utc().format('DD-MMM-YYYY');
-                        }
-                      },
-                    },
-                  },
-                  yaxis: {
-                    labels: {
-                      formatter: value => formatAmountForLegend(value, collective.currency, intl.locale),
-                    },
+                }}
+                series={alignSeries(series)}
+              />
+            </Box>
+          )}
+          {graphType === GRAPH_TYPES.BAR && (
+            <Box mt={4}>
+              <Chart
+                type="bar"
+                width="100%"
+                height="250px"
+                options={{
+                  ...defaultApexOptions,
+                  chart: {
+                    id: 'chart-budget-expenses-stacked-bars',
+                    stacked: true,
                   },
                 }}
                 series={series}

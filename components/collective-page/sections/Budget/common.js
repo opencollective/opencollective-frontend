@@ -96,6 +96,7 @@ export const StatsCardContent = styled(Flex)`
 
 export const GRAPH_TYPES = {
   LIST: 'LIST',
+  TIME: 'TIME',
   BAR: 'BAR',
 };
 
