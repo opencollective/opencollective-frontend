@@ -6,6 +6,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 
 import { Flex } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
+import { PERIOD_FILTER_PRESETS } from '../../PeriodFilterPresetsSelect';
 import { withUser } from '../../UserProvider';
 import BudgetStats from '../BudgetStats';
 import ContainerSectionContent from '../ContainerSectionContent';
@@ -61,6 +62,7 @@ const SectionFinancialOverview = ({ collective, LoggedInUser }) => {
   const { data, refetch } = budgetQueryResult;
 
   const isLoading = budgetQueryResult.loading;
+  const defaultTimeInterval = PERIOD_FILTER_PRESETS.allTime.getInterval();
 
   // Refetch data when user logs in to refresh permissions
   React.useEffect(() => {
@@ -79,6 +81,7 @@ const SectionFinancialOverview = ({ collective, LoggedInUser }) => {
       <Flex flexDirection={['column', null, 'row']} alignItems="flex-start" gap={'48px'}>
         <ExpenseBudget
           collective={collective}
+          defaultTimeInterval={defaultTimeInterval}
           mt={4}
           flexDirection="column"
           flexGrow={1}
@@ -87,6 +90,7 @@ const SectionFinancialOverview = ({ collective, LoggedInUser }) => {
         />
         <ContributionsBudget
           collective={collective}
+          defaultTimeInterval={defaultTimeInterval}
           mt={4}
           flexDirection="column"
           flexGrow={1}

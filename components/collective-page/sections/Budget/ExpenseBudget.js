@@ -15,7 +15,7 @@ import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 import { Box, Flex } from '../../../Grid';
 import Link from '../../../Link';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
-import PeriodFilterPresetsSelect, { PERIOD_FILTER_PRESETS } from '../../../PeriodFilterPresetsSelect';
+import PeriodFilterPresetsSelect from '../../../PeriodFilterPresetsSelect';
 import StyledCard from '../../../StyledCard';
 import { P } from '../../../Text';
 
@@ -61,8 +61,8 @@ const budgetSectionExpenseQuery = gqlV2/* GraphQL */ `
     }
   }
 `;
-const ExpenseBudget = ({ collective, ...props }) => {
-  const [tmpDateInterval, setTmpDateInterval] = React.useState(PERIOD_FILTER_PRESETS.pastMonth.getInterval());
+const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
+  const [tmpDateInterval, setTmpDateInterval] = React.useState(defaultTimeInterval);
   const [graphType, setGraphType] = React.useState(GRAPH_TYPES.LIST);
   const { data, loading } = useQuery(budgetSectionExpenseQuery, {
     variables: { slug: collective.slug, ...tmpDateInterval },
@@ -221,6 +221,10 @@ ExpenseBudget.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
+  }),
+  defaultTimeInterval: PropTypes.shape({
+    from: PropTypes.object,
+    to: PropTypes.object,
   }),
 };
 
