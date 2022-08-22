@@ -209,7 +209,7 @@ const ActionsButton = props => {
                     {props.provider === 'STRIPE' && (
                       <Action
                         onClick={() =>
-                          props.showConfirmationModal ? setShowConfirmationModal(true) : handlePauseUnpause()
+                          props.confirmOnPauseCard ? setShowConfirmationModal(true) : handlePauseUnpause()
                         }
                         disabled={isLoading}
                       >
@@ -274,7 +274,7 @@ ActionsButton.propTypes = {
   onError: PropTypes.func,
   editHandler: PropTypes.func,
   deleteHandler: PropTypes.func,
-  showConfirmationModal: PropTypes.bool,
+  confirmOnPauseCard: PropTypes.bool,
 };
 
 const getLimitString = (spendingLimitAmount, spendingLimitInterval, currency, locale) => {
@@ -431,7 +431,7 @@ const VirtualCard = props => {
             onError={error => addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, error) })}
             editHandler={props.editHandler}
             deleteHandler={props.deleteHandler}
-            showConfirmationModal={props.showConfirmationModal}
+            confirmOnPauseCard={props.confirmOnPauseCard}
           />
         )}
         <Action onClick={() => setDisplayDetails(!displayDetails)}>
@@ -472,7 +472,7 @@ VirtualCard.propTypes = {
   spendingLimitInterval: PropTypes.string,
   currency: PropTypes.string,
   createdAt: PropTypes.string,
-  showConfirmationModal: PropTypes.bool,
+  confirmOnPauseCard: PropTypes.bool,
 };
 
 export default VirtualCard;

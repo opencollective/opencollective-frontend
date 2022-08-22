@@ -192,10 +192,9 @@ const Menu = ({ collective, isAccountantOnly }) => {
             collective={collective}
             section={COLLECTIVE_SECTIONS.VIRTUAL_CARDS}
             if={
-              getCollectiveTypeKey(collective.type) === USER ||
-              (isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT]) &&
-                hasFeature(collective.host, FEATURES.VIRTUAL_CARDS) &&
-                collective.isApproved)
+              isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT]) &&
+              hasFeature(collective.host, FEATURES.VIRTUAL_CARDS) &&
+              collective.isApproved
             }
           />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.TICKETS} if={isType(collective, EVENT)} />

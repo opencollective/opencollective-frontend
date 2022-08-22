@@ -27,7 +27,6 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
     $offset: Int!
     $state: String
     $merchantAccount: AccountReferenceInput
-    $assignee: AccountReferenceInput
     $dateFrom: DateTime
     $dateTo: DateTime
   ) {
@@ -54,7 +53,6 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
         offset: $offset
         state: $state
         merchantAccount: $merchantAccount
-        assignee: $assignee
         dateFrom: $dateFrom
         dateTo: $dateTo
       ) {
@@ -104,7 +102,6 @@ const VirtualCards = props => {
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
   const { state, merchant, period } = routerQuery;
-  const assignee = props.collective.type === CollectiveType.USER ? { slug: props.collective.slug } : null;
   const { from: dateFrom, to: dateTo } = parseDateInterval(period);
   const { loading, data } = useQuery(virtualCardsQuery, {
     context: API_V2_CONTEXT,
@@ -114,7 +111,6 @@ const VirtualCards = props => {
       offset,
       state,
       merchantAccount: { slug: merchant },
-      assignee,
       dateFrom: dateFrom,
       dateTo: dateTo,
     },
@@ -134,27 +130,18 @@ const VirtualCards = props => {
   return (
     <Box width={['366px', '764px']}>
       <Box>
-        {props.collective.type === CollectiveType.USER ? (
-          <P>
-            <FormattedMessage
-              id="VirtualCards.User.Description"
-              defaultMessage="You are the owner of these virtual cards, purchases made using these cards will be assigned to you and you will be responsible for uploading receipts."
-            />
-          </P>
-        ) : (
-          <P>
-            <FormattedMessage
-              id="VirtualCards.Description"
-              defaultMessage="Use a virtual card to spend from your collective's budget. You can request multiple cards (review the host's policy to see how many). Your fiscal host will create the card for you and assign it a limit and a merchant. You will be notified by email once the card is assigned. <learnMoreLink>Learn more</learnMoreLink>"
-              values={{
-                learnMoreLink: getI18nLink({
-                  href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
-                  openInNewTabNoFollow: true,
-                }),
-              }}
-            />
-          </P>
-        )}
+        <P>
+          <FormattedMessage
+            id="VirtualCards.Description"
+            defaultMessage="Use a virtual card to spend from your collective's budget. You can request multiple cards (review the host's policy to see how many). Your fiscal host will create the card for you and assign it a limit and a merchant. You will be notified by email once the card is assigned. <learnMoreLink>Learn more</learnMoreLink>"
+            values={{
+              learnMoreLink: getI18nLink({
+                href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
+                openInNewTabNoFollow: true,
+              }),
+            }}
+          />
+        </P>
         {props.collective.host?.settings?.virtualcards?.policy && (
           <P mt={3}>
             <Collapse
@@ -184,16 +171,12 @@ const VirtualCards = props => {
         </Flex>
       </Box>
       <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
-        {data.account.virtualCards.nodes.map(vc => (
+        {data.account.virtualCards.nodes.map(virtualCard => (
           <VirtualCard
-            canEditVirtualCard={
-              props.collective.type === CollectiveType.USER &&
-              vc.provider === 'STRIPE' &&
-              (vc.data.state === 'OPEN' || vc.data.status === 'active')
-            }
-            showConfirmationModal={props.collective.type === CollectiveType.USER}
-            key={vc.id}
-            {...vc}
+            canEditVirtualCard={virtualCard.data.status === 'active'}
+            confirmOnPauseCard={props.collective.type === CollectiveType.COLLECTIVE}
+            key={virtualCard.id}
+            {...virtualCard}
           />
         ))}
       </Grid>
