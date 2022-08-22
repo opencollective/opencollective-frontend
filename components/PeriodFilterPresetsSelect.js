@@ -30,7 +30,7 @@ export const PERIOD_FILTER_PRESETS = {
   },
   thisYear: {
     label: <FormattedMessage defaultMessage="This Year" />,
-    getInterval: () => ({ from: dayjs().startOf('year'), to: null }),
+    getInterval: () => ({ from: dayjs().startOf('year'), to: dayjs().endOf('day') }),
   },
   pastWeek: {
     label: <FormattedMessage defaultMessage="Past Week" />,
