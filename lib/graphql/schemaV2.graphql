@@ -1967,12 +1967,12 @@ input ChronologicalOrderInput {
   """
   Field to chronologically order by.
   """
-  field: DateTimeField = CREATED_AT
+  field: DateTimeField! = CREATED_AT
 
   """
   Ordering direction.
   """
-  direction: OrderDirection = DESC
+  direction: OrderDirection! = DESC
 }
 
 """
@@ -2242,14 +2242,34 @@ type Activity {
   createdAt: DateTime!
 
   """
-  The account concerned by this activity, if any
+  The account that authored by this activity, if any
+  """
+  fromAccount: Account
+
+  """
+  The account targeted by this activity, if any
   """
   account: Account
+
+  """
+  The host under which this activity happened, if any
+  """
+  host: Host
 
   """
   The person who triggered the action, if any
   """
   individual: Individual
+
+  """
+  The expense related to this activity, if any
+  """
+  expense: Expense
+
+  """
+  The order related to this activity, if any
+  """
+  order: Order
 
   """
   Data attached to this activity (if any)
@@ -2343,155 +2363,6 @@ enum ActivityType {
   COLLECTIVE_USER_ADDED
   COLLECTIVE_VIRTUAL_CARD_ASSIGNED
   COLLECTIVE_VIRTUAL_CARD_CREATED
-}
-
-"""
-Type for a required legal document
-"""
-enum LegalDocumentType {
-  """
-  US tax form (W9)
-  """
-  US_TAX_FORM
-}
-
-"""
-Fields for an expense quote
-"""
-type ExpenseQuote {
-  """
-  Amount of this item
-  """
-  totalAmount: Amount!
-
-  """
-  Amount of payment processor fee
-  """
-  paymentProcessorFeeAmount: Amount!
-
-  """
-  The date on which the item was created
-  """
-  estimatedDeliveryAt: DateTime!
-}
-
-"""
-A recurring expense object
-"""
-type RecurringExpense {
-  """
-  Unique identifier for this recurring expense
-  """
-  id: String!
-
-  """
-  The interval in which this recurring expense is created
-  """
-  interval: RecurringExpenseInterval!
-  account: Account!
-  fromAccount: Account!
-
-  """
-  The last time this recurring expense was paid for
-  """
-  lastDraftedAt: DateTime!
-
-  """
-  The time this expense will cease to be recurring
-  """
-  endsAt: DateTime
-
-  """
-  The last expense created by this recurring expense record paid for
-  """
-  lastExpenseCreated: Expense
-}
-
-"""
-All supported intervals for recurring expenses
-"""
-enum RecurringExpenseInterval {
-  day
-  week
-  month
-  quarter
-  year
-}
-
-"""
-PaymentMethod model
-"""
-type PaymentMethod {
-  id: String
-  legacyId: Int
-  name: String
-  service: PaymentMethodService
-  type: PaymentMethodType
-
-  """
-  Defines the type of the payment method. Meant to be moved to "type" in the future.
-  """
-  providerType: PaymentMethodLegacyType @deprecated(reason: "2021-03-02: Please use service + type")
-
-  """
-  Returns the balance amount and the currency of this paymentMethod
-  """
-  balance: Amount!
-  account: Account
-
-  """
-  For gift cards, this field will return to the source payment method
-  """
-  sourcePaymentMethod: PaymentMethod
-  data: JSON
-  limitedToHosts: [Host]
-  expiryDate: DateTime
-  createdAt: DateTime
-}
-
-enum PaymentMethodService {
-  PAYPAL
-  STRIPE
-  OPENCOLLECTIVE
-  PREPAID
-  THEGIVINGBLOCK
-}
-
-enum PaymentMethodType {
-  alipay @deprecated(reason: "Please use uppercase values")
-  creditcard @deprecated(reason: "Please use uppercase values")
-  prepaid @deprecated(reason: "Please use uppercase values")
-  payment @deprecated(reason: "Please use uppercase values")
-  subscription @deprecated(reason: "Please use uppercase values")
-  collective @deprecated(reason: "Please use uppercase values")
-  host @deprecated(reason: "Please use uppercase values")
-  adaptive @deprecated(reason: "Please use uppercase values")
-  giftcard @deprecated(reason: "Please use uppercase values")
-  manual @deprecated(reason: "Please use uppercase values")
-  crypto @deprecated(reason: "Please use uppercase values")
-  ALIPAY
-  CREDITCARD
-  PREPAID
-  PAYMENT
-  SUBSCRIPTION
-  COLLECTIVE
-  HOST
-  ADAPTIVE
-  GIFTCARD
-  MANUAL
-  CRYPTO
-}
-
-enum PaymentMethodLegacyType {
-  ALIPAY
-  CREDIT_CARD
-  GIFT_CARD
-  PREPAID_BUDGET
-  ACCOUNT_BALANCE
-  PAYPAL
-  BANK_TRANSFER
-  ADDED_FUNDS
-  CRYPTO
 }
 
 """
@@ -3477,6 +3348,31 @@ type TransactionCollection implements Collection {
   paymentMethodTypes: [PaymentMethodType]!
 }
 
+enum PaymentMethodType {
+  alipay @deprecated(reason: "Please use uppercase values")
+  creditcard @deprecated(reason: "Please use uppercase values")
+  prepaid @deprecated(reason: "Please use uppercase values")
+  payment @deprecated(reason: "Please use uppercase values")
+  subscription @deprecated(reason: "Please use uppercase values")
+  collective @deprecated(reason: "Please use uppercase values")
+  host @deprecated(reason: "Please use uppercase values")
+  adaptive @deprecated(reason: "Please use uppercase values")
+  giftcard @deprecated(reason: "Please use uppercase values")
+  manual @deprecated(reason: "Please use uppercase values")
+  crypto @deprecated(reason: "Please use uppercase values")
+  ALIPAY
+  CREDITCARD
+  PREPAID
+  PAYMENT
+  SUBSCRIPTION
+  COLLECTIVE
+  HOST
+  ADAPTIVE
+  GIFTCARD
+  MANUAL
+  CRYPTO
+}
+
 """
 Account orders filter (INCOMING or OUTGOING)
 """
@@ -3559,6 +3455,57 @@ type TagStat {
   Number of entries for this tag
   """
   count: Int!
+}
+
+"""
+PaymentMethod model
+"""
+type PaymentMethod {
+  id: String
+  legacyId: Int
+  name: String
+  service: PaymentMethodService
+  type: PaymentMethodType
+
+  """
+  Defines the type of the payment method. Meant to be moved to "type" in the future.
+  """
+  providerType: PaymentMethodLegacyType @deprecated(reason: "2021-03-02: Please use service + type")
+
+  """
+  Returns the balance amount and the currency of this paymentMethod
+  """
+  balance: Amount!
+  account: Account
+
+  """
+  For gift cards, this field will return to the source payment method
+  """
+  sourcePaymentMethod: PaymentMethod
+  data: JSON
+  limitedToHosts: [Host]
+  expiryDate: DateTime
+  createdAt: DateTime
+}
+
+enum PaymentMethodService {
+  PAYPAL
+  STRIPE
+  OPENCOLLECTIVE
+  PREPAID
+  THEGIVINGBLOCK
+}
+
+enum PaymentMethodLegacyType {
+  ALIPAY
+  CREDIT_CARD
+  GIFT_CARD
+  PREPAID_BUDGET
+  ACCOUNT_BALANCE
+  PAYPAL
+  BANK_TRANSFER
+  ADDED_FUNDS
+  CRYPTO
 }
 
 """
@@ -4436,6 +4383,79 @@ type ExpenseStats {
   Number of grants
   """
   grantsCount: Int!
+}
+
+"""
+Type for a required legal document
+"""
+enum LegalDocumentType {
+  """
+  US tax form (W9)
+  """
+  US_TAX_FORM
+}
+
+"""
+Fields for an expense quote
+"""
+type ExpenseQuote {
+  """
+  Amount of this item
+  """
+  totalAmount: Amount!
+
+  """
+  Amount of payment processor fee
+  """
+  paymentProcessorFeeAmount: Amount!
+
+  """
+  The date on which the item was created
+  """
+  estimatedDeliveryAt: DateTime!
+}
+
+"""
+A recurring expense object
+"""
+type RecurringExpense {
+  """
+  Unique identifier for this recurring expense
+  """
+  id: String!
+
+  """
+  The interval in which this recurring expense is created
+  """
+  interval: RecurringExpenseInterval!
+  account: Account!
+  fromAccount: Account!
+
+  """
+  The last time this recurring expense was paid for
+  """
+  lastDraftedAt: DateTime!
+
+  """
+  The time this expense will cease to be recurring
+  """
+  endsAt: DateTime
+
+  """
+  The last expense created by this recurring expense record paid for
+  """
+  lastExpenseCreated: Expense
+}
+
+"""
+All supported intervals for recurring expenses
+"""
+enum RecurringExpenseInterval {
+  day
+  week
+  month
+  quarter
+  year
 }
 
 """
@@ -8431,6 +8451,11 @@ type Query {
     account: AccountReferenceInput!
 
     """
+    How activities are related to the account
+    """
+    attribution: ActivityAttribution
+
+    """
     Only return activities that were created after this date
     """
     dateFrom: DateTime = null
@@ -10262,6 +10287,31 @@ type ActivityCollection implements Collection {
   nodes: [Activity!]
 }
 
+"""
+How an activity is related to an account
+"""
+enum ActivityAttribution {
+  """
+  Activities initiated by this account
+  """
+  AUTHORED
+
+  """
+  Activities that targeted this account
+  """
+  RECEIVED
+
+  """
+  Activities where author and target both points to this account (e.g. settings update)
+  """
+  SELF
+
+  """
+  Activities that happened on accounts hosted by this account
+  """
+  HOSTED_ACCOUNTS
+}
+
 enum ActivityAndClassesType {
   ACTIVITY_ALL
   CONNECTED_ACCOUNT_CREATED
@@ -11646,7 +11696,7 @@ This is the root mutation
 """
 type Mutation {
   """
-  Add funds to the given account. Scope: "account".
+  Add funds to the given account. Scope: "host".
   """
   addFunds(
     fromAccount: AccountReferenceInput!
