@@ -9,13 +9,15 @@ import styled from 'styled-components';
 import { ActivityAttribution } from '../../../../lib/constants/activities';
 import { parseDateInterval } from '../../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
-import { ActivityLabelI18n } from '../../../../lib/i18n/activities';
+import { ActivityDescriptionI18n } from '../../../../lib/i18n/activities';
+import formatMemberRole from '../../../../lib/i18n/member-role';
 
 import Avatar from '../../../Avatar';
 import Container from '../../../Container';
 import DateTime from '../../../DateTime';
 import { Box, Flex } from '../../../Grid';
 import LinkCollective from '../../../LinkCollective';
+import LinkExpense from '../../../LinkExpense';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -56,6 +58,44 @@ const activityLogQuery = gqlV2/* GraphQL */ `
         id
         createdAt
         type
+        data
+        fromAccount {
+          id
+          name
+          slug
+        }
+        account {
+          id
+          name
+          slug
+          ... on AccountWithParent {
+            parent {
+              id
+              slug
+            }
+          }
+        }
+        expense {
+          id
+          legacyId
+          description
+          account {
+            id
+            name
+            slug
+            ... on AccountWithParent {
+              parent {
+                id
+                slug
+              }
+            }
+          }
+        }
+        order {
+          id
+          legacyId
+          description
+        }
         individual {
           id
           slug
@@ -150,8 +190,27 @@ const ActivityLog = ({ accountSlug }) => {
               {data.activities.nodes.map(activity => (
                 <Box key={activity.id} px="16px" py="14px">
                   <P color="black.900" fontWeight="500" fontSize="14px">
-                    {ActivityLabelI18n[activity.type]
-                      ? intl.formatMessage(ActivityLabelI18n[activity.type])
+                    {ActivityDescriptionI18n[activity.type]
+                      ? intl.formatMessage(ActivityDescriptionI18n[activity.type], {
+                          FromAccount: () => <LinkCollective collective={activity.fromAccount} openInNewTab />,
+                          Account: () => <LinkCollective collective={activity.account} openInNewTab />,
+                          Expense: msg =>
+                            !activity.expense ? (
+                              msg
+                            ) : (
+                              <LinkExpense
+                                collective={activity.expense.account}
+                                expense={activity.expense}
+                                title={activity.expense.description}
+                                openInNewTab
+                              >
+                                {msg} #{activity.expense.legacyId}
+                              </LinkExpense>
+                            ),
+                          Host: () => <LinkCollective collective={activity.host} openInNewTab />,
+                          MemberRole: () =>
+                            activity.data?.member?.role ? formatMemberRole(intl, activity.data.member.role) : 'member',
+                        })
                       : activity.type}
                   </P>
                   <MetadataContainer>
