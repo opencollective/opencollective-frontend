@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { BarChart, FormatListBulleted, Timeline } from '@styled-icons/material';
-import dayjs from 'dayjs';
+import { BarChart, FormatListBulleted, PieChart, Timeline } from '@styled-icons/material';
 import { capitalize, sumBy } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { alignSeries, extractSeriesFromTimeSeries, formatAmountForLegend } from '../../../../lib/charts';
+import { alignSeries, extractSeriesFromTimeSeries } from '../../../../lib/charts';
 import { formatCurrency } from '../../../../lib/currency-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
@@ -26,6 +25,7 @@ import {
   COLORS,
   GRAPH_TYPES,
   GraphTypeButton,
+  makeApexOptions,
   makeBudgetTableRow,
   StatsCardContent,
   TagMarker,
@@ -42,6 +42,7 @@ const budgetSectionExpenseQuery = gqlV2/* GraphQL */ `
           label
           count
           amount {
+            value
             valueInCents
             currency
           }
@@ -78,44 +79,7 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
     groupNameTransformer: capitalize,
   });
 
-  const defaultApexOptions = {
-    legend: {
-      show: true,
-      horizontalAlign: 'left',
-    },
-    grid: {
-      xaxis: { lines: { show: true } },
-      yaxis: { lines: { show: false } },
-    },
-    stroke: {
-      curve: 'straight',
-      width: 1.5,
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    xaxis: {
-      labels: {
-        formatter: function (value) {
-          // Show data aggregated yearly
-          if (timeUnit === 'YEAR') {
-            return dayjs(value).utc().year();
-            // Show data aggregated monthly
-          } else if (timeUnit === 'MONTH') {
-            return dayjs(value).utc().format('MMM-YYYY');
-            // Show data aggregated by week or day
-          } else if (timeUnit === 'WEEK' || timeUnit === 'DAY') {
-            return dayjs(value).utc().format('DD-MMM-YYYY');
-          }
-        },
-      },
-    },
-    yaxis: {
-      labels: {
-        formatter: value => formatAmountForLegend(value, collective.currency, intl.locale),
-      },
-    },
-  };
+  const defaultApexOptions = makeApexOptions(collective.currency, timeUnit, intl);
 
   return (
     <Flex {...props}>
@@ -138,6 +102,9 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
           </GraphTypeButton>
           <GraphTypeButton active={graphType === GRAPH_TYPES.BAR} onClick={() => setGraphType(GRAPH_TYPES.BAR)}>
             <BarChart />
+          </GraphTypeButton>
+          <GraphTypeButton active={graphType === GRAPH_TYPES.PIE} onClick={() => setGraphType(GRAPH_TYPES.PIE)}>
+            <PieChart />
           </GraphTypeButton>
         </Flex>
       </Flex>
@@ -225,7 +192,27 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
                     stacked: true,
                   },
                 }}
-                series={series}
+                series={alignSeries(series)}
+              />
+            </Box>
+          )}
+          {graphType === GRAPH_TYPES.PIE && (
+            <Box mt={4}>
+              <Chart
+                type="pie"
+                width="100%"
+                height="300px"
+                options={{
+                  labels: data?.account?.stats.expensesTags.map(expenseTag => capitalize(expenseTag.label)),
+                  colors: COLORS,
+                  chart: {
+                    id: 'chart-budget-expenses-pie',
+                  },
+                  legend: { ...defaultApexOptions.legend, position: 'left' },
+                  xaxis: defaultApexOptions.xaxis,
+                  yaxis: defaultApexOptions.yaxis,
+                }}
+                series={data?.account?.stats.expensesTags.map(expenseTag => expenseTag.amount.value)}
               />
             </Box>
           )}

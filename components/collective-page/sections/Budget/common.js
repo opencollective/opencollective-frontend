@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import dayjs from 'dayjs';
 import styled from 'styled-components';
 import { margin } from 'styled-system';
 
-import { Flex } from '../../../Grid';
+import { formatAmountForLegend } from '../../../../lib/charts';
 
+import { Flex } from '../../../Grid';
 const Table = styled.table`
   ${margin}
   thead th {
@@ -98,6 +100,7 @@ export const GRAPH_TYPES = {
   LIST: 'LIST',
   TIME: 'TIME',
   BAR: 'BAR',
+  PIE: 'PIE',
 };
 
 export const GraphTypeButton = styled.button`
@@ -121,3 +124,52 @@ export const GraphTypeButton = styled.button`
     `
       : ''}
 `;
+
+export const makeApexOptions = (currency, timeUnit, intl) => ({
+  legend: {
+    show: true,
+    horizontalAlign: 'left',
+    fontSize: '16px',
+    fontFamily: 'inherit',
+    fontWeight: 500,
+    markers: {
+      width: 6,
+      height: 24,
+      radius: 8,
+      offsetY: 6,
+    },
+  },
+  colors: COLORS,
+  grid: {
+    xaxis: { lines: { show: true } },
+    yaxis: { lines: { show: false } },
+  },
+  stroke: {
+    curve: 'straight',
+    width: 1.5,
+  },
+  dataLabels: {
+    enabled: false,
+  },
+  xaxis: {
+    labels: {
+      formatter: function (value) {
+        // Show data aggregated yearly
+        if (timeUnit === 'YEAR') {
+          return dayjs(value).utc().year();
+          // Show data aggregated monthly
+        } else if (timeUnit === 'MONTH') {
+          return dayjs(value).utc().format('MMM-YYYY');
+          // Show data aggregated by week or day
+        } else if (timeUnit === 'WEEK' || timeUnit === 'DAY') {
+          return dayjs(value).utc().format('DD-MMM-YYYY');
+        }
+      },
+    },
+  },
+  yaxis: {
+    labels: {
+      formatter: value => formatAmountForLegend(value, currency, intl.locale),
+    },
+  },
+});
