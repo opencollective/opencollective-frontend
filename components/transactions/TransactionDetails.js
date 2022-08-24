@@ -99,6 +99,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
     hostFee,
     paymentMethod,
     paymentProcessorFee,
+    payoutMethod,
     amount,
     netAmount,
     permissions,
@@ -192,17 +193,23 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                   </DetailDescription>
                 </Box>
               )}
-              {expense?.payoutMethod && (
-                <Box>
-                  <DetailTitle>
-                    <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
-                  </DetailTitle>
-                  <DetailDescription>
-                    <PayoutMethodTypeWithIcon type={expense.payoutMethod.type} />
-                  </DetailDescription>
-                </Box>
-              )}
             </React.Fragment>
+          )}
+          {payoutMethod && (
+            <Box>
+              <DetailTitle>
+                <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
+              </DetailTitle>
+              <DetailDescription>
+                <PayoutMethodTypeWithIcon
+                  type={payoutMethod.type}
+                  color={'inherit'}
+                  fontWeight={'inherit'}
+                  fontSize={'inherit'}
+                  iconSize={16}
+                />
+              </DetailDescription>
+            </Box>
           )}
         </Box>
       </Flex>
