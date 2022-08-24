@@ -13,6 +13,7 @@ import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
 import LinkCollective from '../LinkCollective';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
+import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
@@ -188,6 +189,16 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                   </DetailTitle>
                   <DetailDescription>
                     <PaymentMethodTypeWithIcon type={paymentMethod.type} fontSize={11} iconSize={16} />
+                  </DetailDescription>
+                </Box>
+              )}
+              {expense?.payoutMethod && (
+                <Box>
+                  <DetailTitle>
+                    <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
+                  </DetailTitle>
+                  <DetailDescription>
+                    <PayoutMethodTypeWithIcon type={expense.payoutMethod.type} />
                   </DetailDescription>
                 </Box>
               )}
