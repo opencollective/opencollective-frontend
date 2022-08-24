@@ -8,12 +8,12 @@ import { TransactionKind, TransactionTypes } from '../../lib/constants/transacti
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { renderDetailsString, saveInvoice } from '../../lib/transactions';
 
+import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
 import LinkCollective from '../LinkCollective';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
-import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
@@ -299,6 +299,9 @@ TransactionDetails.propTypes = {
     taxAmount: PropTypes.object,
     taxInfo: PropTypes.object,
     paymentMethod: PropTypes.shape({
+      type: PropTypes.string,
+    }),
+    payoutMethod: PropTypes.shape({
       type: PropTypes.string,
     }),
     amount: PropTypes.shape({
