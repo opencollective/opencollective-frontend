@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { ActivityAttribution } from '../../../../lib/constants/activities';
 import { parseDateInterval } from '../../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 import { ActivityLabelI18n } from '../../../../lib/i18n/activities';
@@ -27,20 +28,26 @@ import ActivityFilters from './ActivityFilters';
 
 const activityLogQuery = gqlV2/* GraphQL */ `
   query AccountActivityLog(
-    $account: AccountReferenceInput!
+    $accountSlug: String!
     $limit: Int
     $offset: Int
     $dateFrom: DateTime
     $dateTo: DateTime
     $activityType: [ActivityAndClassesType]
+    $attribution: ActivityAttribution
   ) {
+    account(slug: $accountSlug) {
+      id
+      isHost
+    }
     activities(
-      account: $account
+      account: { slug: $accountSlug }
       limit: $limit
       offset: $offset
       dateFrom: $dateFrom
       dateTo: $dateTo
       activityType: $activityType
+      attribution: $attribution
     ) {
       offset
       limit
@@ -77,15 +84,33 @@ const MetadataContainer = styled.div`
 
 const ACTIVITY_LIMIT = 10;
 
+const getQueryVariables = (accountSlug, router) => {
+  const routerQuery = omit(router.query, ['slug', 'section']);
+  const offset = parseInt(routerQuery.offset) || 0;
+  const { period, type } = routerQuery;
+  const { from: dateFrom, to: dateTo } = parseDateInterval(period);
+  const attribution = Object.values(ActivityAttribution).includes(routerQuery.attribution)
+    ? routerQuery.attribution
+    : null;
+
+  return {
+    accountSlug,
+    dateFrom,
+    dateTo,
+    limit: ACTIVITY_LIMIT,
+    offset,
+    activityType: type,
+    attribution,
+  };
+};
+
 const ActivityLog = ({ accountSlug }) => {
   const intl = useIntl();
   const router = useRouter();
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
-  const { period, type } = routerQuery;
-  const { from: dateFrom, to: dateTo } = parseDateInterval(period);
   const { data, loading, error } = useQuery(activityLogQuery, {
-    variables: { account: { slug: accountSlug }, dateFrom, dateTo, limit: ACTIVITY_LIMIT, offset, activityType: type },
+    variables: getQueryVariables(accountSlug, router),
     context: API_V2_CONTEXT,
   });
 
@@ -101,6 +126,7 @@ const ActivityLog = ({ accountSlug }) => {
       <ActivityFilters
         filters={routerQuery}
         onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
+        account={data?.account}
       />
       {error ? (
         <MessageBoxGraphqlError error={error} />

@@ -9,6 +9,7 @@ import PeriodFilter from '../../../budget/filters/PeriodFilter';
 import Container from '../../../Container';
 import { Box, Flex } from '../../../Grid';
 
+import ActivityAttributionFilter from './ActivityAttributionFilter';
 import ActivityTypeFilter from './ActivityTypeFilter';
 
 const FilterContainer = styled(Box)`
@@ -25,7 +26,7 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const ActivityFilters = ({ filters, onChange }) => {
+const ActivityFilters = ({ filters, onChange, account }) => {
   const getFilterProps = (name, valueModifier) => {
     return {
       inputId: `activity-filter-${name}`,
@@ -52,6 +53,12 @@ const ActivityFilters = ({ filters, onChange }) => {
           </FilterLabel>
           <ActivityTypeFilter {...getFilterProps('type')} />
         </FilterContainer>
+        <FilterContainer ml={[0, '19px']}>
+          <FilterLabel htmlFor="activity-filter-attribution">
+            <FormattedMessage id="Activity.Attribution" defaultMessage="Attribution" />
+          </FilterLabel>
+          <ActivityAttributionFilter account={account} {...getFilterProps('attribution')} />
+        </FilterContainer>
       </Flex>
     </Container>
   );
@@ -60,6 +67,9 @@ const ActivityFilters = ({ filters, onChange }) => {
 ActivityFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
+  account: PropTypes.shape({
+    isHost: PropTypes.bool,
+  }),
 };
 
 export default React.memo(ActivityFilters);
