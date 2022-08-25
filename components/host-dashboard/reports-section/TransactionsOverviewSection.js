@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
-import { difference, flatten, uniq } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { alignSeries } from '../../../lib/charts';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { i18nTransactionKind } from '../../../lib/i18n/transaction';
 
@@ -243,18 +243,7 @@ const getSeries = (host, intl) => {
     },
   ];
 
-  // If a date doesn't have any data attached, API returns nothing.
-  // But we need to make sure all series show 0 in these cases rather than `NaN` which
-  // is shown by default by Apex charts.
-  const indexesBySeries = series.map(singleSeries => singleSeries.data.map(d => d.x));
-  const uniqueIndexes = uniq(flatten(indexesBySeries));
-  indexesBySeries.forEach((_, idx) => {
-    const missingIndexes = difference(uniqueIndexes, indexesBySeries[idx]);
-    if (missingIndexes.length) {
-      series[idx].data.push(...missingIndexes.map(x => ({ x, y: 0 })));
-      series[idx].data.sort((a, b) => new Date(a.x) - new Date(b.x));
-    }
-  });
+  alignSeries(series);
 
   return series;
 };
