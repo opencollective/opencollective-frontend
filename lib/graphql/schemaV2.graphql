@@ -8468,7 +8468,7 @@ type Query {
     """
     Only return activities that are of this type
     """
-    activityType: [ActivityAndClassesType] = null
+    type: [ActivityAndClassesType] = null
   ): ActivityCollection!
   application(
     """

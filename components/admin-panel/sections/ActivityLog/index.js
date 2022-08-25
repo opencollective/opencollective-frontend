@@ -33,7 +33,7 @@ const activityLogQuery = gqlV2/* GraphQL */ `
     $offset: Int
     $dateFrom: DateTime
     $dateTo: DateTime
-    $activityType: [ActivityAndClassesType]
+    $type: [ActivityAndClassesType]
     $attribution: ActivityAttribution
   ) {
     account(slug: $accountSlug) {
@@ -46,7 +46,7 @@ const activityLogQuery = gqlV2/* GraphQL */ `
       offset: $offset
       dateFrom: $dateFrom
       dateTo: $dateTo
-      activityType: $activityType
+      type: $type
       attribution: $attribution
     ) {
       offset
@@ -99,7 +99,7 @@ const getQueryVariables = (accountSlug, router) => {
     dateTo,
     limit: ACTIVITY_LIMIT,
     offset,
-    activityType: type,
+    type,
     attribution,
   };
 };
