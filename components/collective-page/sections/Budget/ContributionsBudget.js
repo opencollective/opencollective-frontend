@@ -38,7 +38,7 @@ const budgetSectionContributionsQuery = gqlV2/* GraphQL */ `
       currency
       stats {
         id
-        contributionsAmount(dateFrom: $from, dateTo: $to) {
+        contributionsAmount(dateFrom: $from, dateTo: $to, includeChildren: true) {
           label
           count
           amount {
@@ -47,7 +47,7 @@ const budgetSectionContributionsQuery = gqlV2/* GraphQL */ `
             currency
           }
         }
-        contributionsAmountTimeSeries(dateFrom: $from, dateTo: $to) {
+        contributionsAmountTimeSeries(dateFrom: $from, dateTo: $to, includeChildren: true) {
           timeUnit
           nodes {
             date
