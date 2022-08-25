@@ -11,11 +11,13 @@ import { parseDateInterval } from '../../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 import { ActivityDescriptionI18n } from '../../../../lib/i18n/activities';
 import formatMemberRole from '../../../../lib/i18n/member-role';
+import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
 import Avatar from '../../../Avatar';
 import Container from '../../../Container';
 import DateTime from '../../../DateTime';
 import { Box, Flex } from '../../../Grid';
+import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import LinkExpense from '../../../LinkExpense';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
@@ -35,11 +37,7 @@ const activityLogQuery = gqlV2/* GraphQL */ `
     $offset: Int
     $dateFrom: DateTime
     $dateTo: DateTime
-<<<<<<< HEAD
     $type: [ActivityAndClassesType!]
-=======
-    $activityType: [ActivityClass]
->>>>>>> caed6bf28 (refactor(Activities): Update to new ActivityClass type)
     $attribution: ActivityAttribution
   ) {
     account(slug: $accountSlug) {
@@ -99,6 +97,17 @@ const activityLogQuery = gqlV2/* GraphQL */ `
           id
           legacyId
           description
+          toAccount {
+            id
+            name
+            slug
+            ... on AccountWithParent {
+              parent {
+                id
+                slug
+              }
+            }
+          }
         }
         individual {
           id
@@ -116,6 +125,14 @@ const ActivityLogContainer = styled(StyledCard)`
   & > *:not(:last-child) {
     border-bottom: 1px solid #dcdde0;
   }
+
+  a {
+    color: black;
+    text-decoration: underline dotted;
+    &:hover {
+      color: #4e5052;
+    }
+  }
 `;
 
 const MetadataContainer = styled.div`
@@ -124,6 +141,13 @@ const MetadataContainer = styled.div`
   grid-gap: 8px;
   color: #4d4f51;
   margin-top: 10px;
+  a {
+    color: #4d4f51;
+    text-decoration: none;
+    &:hover {
+      color: #4e5052;
+    }
+  }
 `;
 
 const ACTIVITY_LIMIT = 10;
@@ -210,6 +234,20 @@ const ActivityLog = ({ accountSlug }) => {
                               >
                                 {msg} #{activity.expense.legacyId}
                               </LinkExpense>
+                            ),
+                          Order: msg =>
+                            !activity.order ? (
+                              msg
+                            ) : (
+                              <Link
+                                href={`${getCollectivePageRoute(activity.order.toAccount)}/orders?searchTerm=%23${
+                                  activity.order.legacyId
+                                }`}
+                                title={activity.order.description}
+                                openInNewTab
+                              >
+                                {msg} #{activity.order.legacyId}
+                              </Link>
                             ),
                           Host: () => <LinkCollective collective={activity.host} openInNewTab />,
                           MemberRole: () =>
