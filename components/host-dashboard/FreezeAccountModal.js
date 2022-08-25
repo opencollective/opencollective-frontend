@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
+import { collectivePageQuery } from '../collective-page/graphql/queries';
 import { Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../StyledModal';
@@ -127,7 +128,11 @@ const FreezeAccountModal = ({ collective, ...props }) => {
                 const accountInput =
                   typeof collective.id === 'number' ? { legacyId: collective.id } : { id: collective.id };
                 const variables = { account: accountInput, message, action };
-                await editAccountFreezeStatus({ variables });
+                await editAccountFreezeStatus({
+                  variables,
+                  refetchQueries: [{ query: collectivePageQuery, variables: { slug: collective.slug } }],
+                  awaitRefetchQueries: true,
+                });
                 const successMsgArgs = { accountName: collective.name, accountSlug: collective.slug };
                 addToast({
                   type: TOAST_TYPE.SUCCESS,
