@@ -33,7 +33,7 @@ const activityLogQuery = gqlV2/* GraphQL */ `
     $offset: Int
     $dateFrom: DateTime
     $dateTo: DateTime
-    $type: [ActivityAndClassesType]
+    $type: [ActivityAndClassesType!]
     $attribution: ActivityAttribution
   ) {
     account(slug: $accountSlug) {

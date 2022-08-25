@@ -8466,9 +8466,9 @@ type Query {
     dateTo: DateTime = null
 
     """
-    Only return activities that are of this type
+    Only return activities that are of this class/type
     """
-    type: [ActivityAndClassesType] = null
+    type: [ActivityAndClassesType!] = null
   ): ActivityCollection!
   application(
     """
