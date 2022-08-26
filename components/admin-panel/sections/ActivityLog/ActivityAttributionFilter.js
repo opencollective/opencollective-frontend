@@ -16,6 +16,10 @@ const getAcceptableAttributionValues = account => {
   }
 };
 
+export const isSupportedAttributionFilter = (account, filter) => {
+  return !filter || getAcceptableAttributionValues(account).includes(filter);
+};
+
 const ActivityAttributionFilter = ({ account, onChange, value, ...props }) => {
   const intl = useIntl();
   const getOption = value => ({ label: intl.formatMessage(ActivityAttributionI18n[value]), value });
