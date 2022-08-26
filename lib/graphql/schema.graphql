@@ -176,6 +176,7 @@ interface CollectiveInterface {
   repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
+    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -1105,6 +1106,7 @@ type CollectiveFeatures {
   ALIPAY: CollectiveFeatureStatus
   USE_PAYMENT_METHODS: CollectiveFeatureStatus
   EMIT_GIFT_CARDS: CollectiveFeatureStatus
+  EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
 }
@@ -1516,6 +1518,7 @@ type Collective implements CollectiveInterface {
   repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
+    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -1757,6 +1760,7 @@ type Event implements CollectiveInterface {
   repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
+    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -1998,6 +2002,7 @@ type Fund implements CollectiveInterface {
   repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
+    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -2239,6 +2244,7 @@ type Organization implements CollectiveInterface {
   repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
+    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -2302,7 +2308,7 @@ type Organization implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   hasVirtualCards: Boolean! @deprecated(reason: "2021-10-12: Use features.VIRTUAL_CARDS === ACTIVE")
-  email: String
+  email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 }
 
 """
@@ -2481,6 +2487,7 @@ type Project implements CollectiveInterface {
   repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
+    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -2964,6 +2971,7 @@ type User implements CollectiveInterface {
   repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
+    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -3207,6 +3215,7 @@ type Vendor implements CollectiveInterface {
   repositoryUrl: String
   website: String
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
+    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int

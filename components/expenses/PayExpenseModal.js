@@ -414,7 +414,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
                     showCurrencyCode={false}
                     amount={{
                       valueInCents: Math.round(totalAmount * expense.amountInAccountCurrency.exchangeRate.value),
-                      currency: expense.currency,
+                      currency: expense.amountInAccountCurrency.currency,
                       exchangeRate: expense.amountInAccountCurrency.exchangeRate,
                     }}
                   />

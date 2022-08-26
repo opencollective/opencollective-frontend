@@ -21,7 +21,7 @@ const WhatDoesE2CMean = () => {
             fontSize={['32px', '40px']}
             lineHeight={['40px', '48px']}
             textAlign={['center', null, 'left']}
-            color="black.900"
+            color="primary.900"
             display={[null, null, 'none']}
           >
             <FormattedMessage id="e2c.whatDoesE2CMean" defaultMessage="What does exit to community mean?" />
@@ -48,7 +48,7 @@ const WhatDoesE2CMean = () => {
               fontSize="40px"
               lineHeight="48px"
               textAlign={['center', null, 'left']}
-              color="black.900"
+              color="primary.900"
             >
               <FormattedMessage id="e2c.whatDoesE2CMean" defaultMessage="What does exit to community mean?" />
             </H2>

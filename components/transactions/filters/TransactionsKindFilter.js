@@ -32,6 +32,10 @@ const optionsToQueryString = options => {
 };
 
 export const parseTransactionKinds = str => {
+  if (str === 'ALL') {
+    return Object.values(TransactionKind);
+  }
+
   const result = str?.split(',');
   if (!result?.length || result.length === size(TransactionKind)) {
     return null;

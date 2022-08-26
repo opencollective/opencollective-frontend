@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
-import { cloneDeep, flatten, isEqual, set } from 'lodash';
+import { cloneDeep, flatten, get, isEqual, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -101,6 +101,7 @@ const getItemType = parent => {
 const CollectiveSectionEntry = ({
   parentItem,
   isEnabled,
+  version,
   restrictedTo,
   section,
   index,
@@ -149,9 +150,17 @@ const CollectiveSectionEntry = ({
   if (collectiveType !== CollectiveType.FUND && collectiveType !== CollectiveType.PROJECT) {
     options = options.filter(({ value }) => value !== 'ADMIN');
   }
-  // Can't hide the budget, expect if already hidden
-  if (section === 'budget' && isEnabled && !isEqual(restrictedTo, ['ADMIN'])) {
-    options = options.filter(({ value }) => value !== 'ADMIN' && value !== 'DISABLED');
+  // Can't hide the budget, except if already hidden
+  if (section === 'budget') {
+    if (isEnabled && !isEqual(restrictedTo, ['ADMIN'])) {
+      options = options.filter(({ value }) => value !== 'ADMIN' && value !== 'DISABLED');
+    }
+    options.push({
+      label: (
+        <FormattedMessage id="EditCollectivePage.ShowSection.AlwaysVisibleV2" defaultMessage="New version visible" />
+      ),
+      value: 'ALWAYS_V2',
+    });
   }
 
   let defaultValue;
@@ -159,6 +168,8 @@ const CollectiveSectionEntry = ({
     defaultValue = options.find(({ value }) => value === 'DISABLED');
   } else if (restrictedTo && restrictedTo.includes('ADMIN')) {
     defaultValue = options.find(({ value }) => value === 'ADMIN');
+  } else if (version === 2) {
+    defaultValue = options.find(({ value }) => value === 'ALWAYS_V2');
   } else {
     defaultValue = options.find(({ value }) => value === 'ALWAYS');
   }
@@ -183,9 +194,10 @@ const CollectiveSectionEntry = ({
         minWidth={150}
         isSearchable={false}
         onChange={({ value }) => {
-          const isEnabled = value !== 'DISABLED';
+          const isEnabled = value !== 'DISABLED' || value === 'ALWAYS_V2';
           const restrictedTo = value === 'ADMIN' ? ['ADMIN'] : [];
-          onSectionToggle(section, isEnabled, restrictedTo);
+          const version = value === 'ALWAYS_V2' ? 2 : 1;
+          onSectionToggle(section, { isEnabled, restrictedTo, version });
         }}
         formatOptionLabel={option => <Span fontSize="11px">{option.label}</Span>}
       />
@@ -219,6 +231,7 @@ CollectiveSectionEntry.propTypes = {
   restrictedTo: PropTypes.array,
   section: PropTypes.oneOf(Object.values(Sections)),
   index: PropTypes.number,
+  version: PropTypes.number,
   onMove: PropTypes.func,
   onDrop: PropTypes.func,
   onSectionToggle: PropTypes.func,
@@ -286,6 +299,7 @@ const MenuCategory = ({ item, index, collective, onMove, onDrop, onSectionToggle
               section={section.name}
               index={index}
               isEnabled={section.isEnabled}
+              version={section.version}
               collectiveType={collective.type}
               restrictedTo={section.restrictedTo}
               onMove={onMove}
@@ -347,11 +361,10 @@ const EditCollectivePage = ({ collective }) => {
     setDirty(true);
   };
 
-  const onSectionToggle = (selectedSection, isEnabled, restrictedTo) => {
+  const onSectionToggle = (selectedSection, { isEnabled, restrictedTo, version }) => {
     const newSections = cloneDeep(sections);
     const sectionPath = getSectionPath(sections, selectedSection);
-    set(newSections, `${sectionPath}.isEnabled`, isEnabled);
-    set(newSections, `${sectionPath}.restrictedTo`, restrictedTo);
+    set(newSections, `${sectionPath}`, { ...get(newSections, sectionPath), isEnabled, restrictedTo, version });
     setSections(newSections);
     setDirty(true);
   };
@@ -390,6 +403,7 @@ const EditCollectivePage = ({ collective }) => {
                         section={item.name}
                         index={index}
                         isEnabled={item.isEnabled}
+                        version={item.version}
                         collectiveType={collective.type}
                         restrictedTo={item.restrictedTo}
                         onMove={onMove}

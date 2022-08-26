@@ -58,6 +58,7 @@ export const COLLECTIVE_SECTIONS = {
   INFO: 'info',
   PAYMENT_METHODS: 'payment-methods',
   PAYMENT_RECEIPTS: 'payment-receipts',
+  NOTIFICATIONS: 'notifications',
   POLICIES: 'policies',
   CUSTOM_EMAIL: 'custom-email',
   TEAM: 'members',
@@ -66,6 +67,7 @@ export const COLLECTIVE_SECTIONS = {
   TWO_FACTOR_AUTH: 'two-factor-auth',
   VIRTUAL_CARDS: 'virtual-cards',
   WEBHOOKS: 'webhooks',
+  ACTIVITY_LOG: 'activity-log',
 };
 
 export const LEGACY_COLLECTIVE_SETTINGS_SECTIONS = {
@@ -95,6 +97,9 @@ export const PAGE_TITLES = defineMessages({
 });
 
 export const SECTION_LABELS = defineMessages({
+  [ALL_SECTIONS.ACTIVITY_LOG]: {
+    defaultMessage: 'Activity log',
+  },
   [ALL_SECTIONS.EXPENSES]: {
     id: 'Expenses',
     defaultMessage: 'Expenses',
@@ -239,5 +244,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.HOSTED_COLLECTIVES]: {
     id: 'HostedCollectives',
     defaultMessage: 'Hosted Collectives',
+  },
+  [ALL_SECTIONS.NOTIFICATIONS]: {
+    id: 'NotificationsSettings.Title',
+    defaultMessage: 'Notifications Settings',
   },
 });

@@ -177,7 +177,7 @@ const ForFiscalHosts = () => {
             lineHeight={['26px', '28px']}
             fontWeight="500"
             letterSpacing={[null, '-0.00em']}
-            color="black.900"
+            color="primary.900"
           >
             <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
           </H3>
@@ -192,7 +192,7 @@ const ForFiscalHosts = () => {
         lineHeight={['26px', '28px']}
         fontWeight="500"
         letterSpacing="-0.008emd"
-        color="blue.700"
+        color="primary.900"
         mb="16px"
       >
         <FormattedMessage
@@ -229,24 +229,25 @@ const ForFiscalHosts = () => {
             </Flex>
           </Box>
           <P fontSize="12px" lineHeight="18px" color="black.700">
+            (1){' '}
             <FormattedMessage
-              id="pricing.paymentProcessor"
-              defaultMessage="(1) Payment processor fees apply when using <stripeLink></stripeLink>, <paypalLink></paypalLink>, or <transferwiseLink></transferwiseLink>."
+              id="pricing.notes.paymentProcessor"
+              defaultMessage="Payment processor fees apply when using <stripeLink></stripeLink>, <paypalLink></paypalLink>, or <transferwiseLink></transferwiseLink>."
               values={{
                 stripeLink: getI18nLink({
                   href: 'https://stripe.com/pricing',
                   openInNewTab: true,
-                  text: 'Stripe',
+                  children: 'Stripe',
                 }),
                 paypalLink: getI18nLink({
                   href: 'https://paypal.com/pricing',
                   openInNewTab: true,
-                  text: 'PayPal',
+                  children: 'PayPal',
                 }),
                 transferwiseLink: getI18nLink({
                   href: 'https://wise.com/pricing',
                   openInNewTab: true,
-                  text: 'Wise',
+                  children: 'Wise',
                 }),
               }}
             />

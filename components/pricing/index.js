@@ -11,9 +11,10 @@ import PricingFAQ from '../faqs/PricingFAQ';
 import { Box, Flex } from '../Grid';
 import I18nFormatters, { getI18nLink, I18nBold } from '../I18nFormatters';
 import Link from '../Link';
+import { MainDescription, MainTitle } from '../marketing/Text';
 import StyledButton from '../StyledButton';
 import StyledHR from '../StyledHr';
-import { H1, H4, P } from '../Text';
+import { H4, P } from '../Text';
 
 import ForCollectiveCard from './ForCollectiveCard';
 import ForFiscalHosts from './ForFiscalHostCard';
@@ -144,28 +145,19 @@ const Pricing = () => {
           display="flex"
           flexDirection="column"
           alignItems="center"
-          width={['288px', '404px']}
+          width={['288px', '636px', '956px', null, '992px']}
         >
-          <H1
-            fontSize={['24px', '28px', '32px']}
-            lineHeight={['32px', '36px', '40px']}
-            letterSpacing={['-0.008em']}
-            color="black.900"
-            mb="14px"
-          >
-            <FormattedMessage id="pricing.title" defaultMessage="Open Collective Pricing" />
-          </H1>
-          <P
-            fontSize={['14px', '15px', '16px']}
-            lineHeight={['20px', '22px', '24px']}
-            fontWeight="500"
-            color="black.700"
-          >
-            <FormattedMessage
-              id="pricing.description"
-              defaultMessage="The platform supports sustainability for communities, and communities support sustainability for the platform."
-            />
-          </P>
+          <MainTitle mb="14px">
+            <FormattedMessage id="pricing.title" defaultMessage="Our Pricing Structure" />
+          </MainTitle>
+          <Box width={['288px', '404px']}>
+            <MainDescription color="black.700">
+              <FormattedMessage
+                id="pricing.description"
+                defaultMessage="The platform supports sustainability for communities, and communities support sustainability for the platform."
+              />
+            </MainDescription>
+          </Box>
         </Container>
       </Flex>
 
@@ -200,7 +192,7 @@ const Pricing = () => {
                 lineHeight={['26px', '28px']}
                 letterSpacing={[null, '-0.008em']}
                 fontWeight="500"
-                color="black.900"
+                color="primary.900"
                 mb="8px"
               >
                 <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />
@@ -236,7 +228,7 @@ const Pricing = () => {
             </Box>
           </Flex>
           <Box minHeight={['252px', null, '150px']} mb={[null, null, '24px']} mt={[null, null, '24px', '40px']}>
-            <H4 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="blue.700" fontWeight="500">
+            <H4 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="primary.900" fontWeight="500">
               <FormattedMessage id="pricing.collectiveCard.free" defaultMessage="Free – forever" />
             </H4>
             <ListWrapper as="ul">
@@ -305,7 +297,7 @@ const Pricing = () => {
                 lineHeight={['26px', '28px']}
                 letterSpacing={[null, '-0.008em']}
                 fontWeight="500"
-                color="black.900"
+                color="primary.900"
                 mb="8px"
               >
                 <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
@@ -338,7 +330,7 @@ const Pricing = () => {
           </Flex>
 
           <Box minHeight={['252px', null, '150px']} mb={[null, null, '24px']} mt={[null, null, '24px', '40px']}>
-            <H4 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="blue.700" fontWeight="500">
+            <H4 fontSize="24px" lineHeight="32px" letterSpacing="-0.008em" color="primary.900" fontWeight="500">
               <FormattedMessage id="pricing.fiscalHost.weSucceed" defaultMessage="We succeed if you succeed" />
             </H4>
             <ListWrapper as="ul">

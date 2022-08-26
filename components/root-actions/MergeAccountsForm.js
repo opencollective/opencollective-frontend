@@ -81,6 +81,7 @@ const MergeAccountsForm = () => {
               collective={fromAccount}
               isClearable
               noCache // Don't cache to prevent showing merged collectives
+              skipGuests={false}
             />
           )}
         </StyledInputField>
@@ -96,6 +97,7 @@ const MergeAccountsForm = () => {
               types={fromAccount ? [fromAccount.type] : undefined}
               isClearable
               noCache // Don't cache to prevent showing merged collectives
+              skipGuests={false}
             />
           )}
         </StyledInputField>

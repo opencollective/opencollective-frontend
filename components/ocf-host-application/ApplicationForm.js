@@ -143,8 +143,8 @@ const ApplicationForm = ({
 
     verifyEmailPattern(errors, values, 'user.email');
 
-    verifyFieldLength(intl, errors, values, 'collective.name', 1, 50);
-    verifyFieldLength(intl, errors, values, 'collective.slug', 1, 30);
+    // verifyFieldLength(intl, errors, values, 'collective.name', 1, 50);
+    // verifyFieldLength(intl, errors, values, 'collective.slug', 1, 30);
     verifyFieldLength(intl, errors, values, 'collective.description', 1, 250);
     verifyFieldLength(intl, errors, values, 'applicationData.missionImpactExplanation', 1, 250);
 
