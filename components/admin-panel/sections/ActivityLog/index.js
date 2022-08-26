@@ -29,6 +29,7 @@ import StyledLink from '../../../StyledLink';
 import { P } from '../../../Text';
 
 import ActivityFilters from './ActivityFilters';
+import { getActivityTypeFilterValuesFromKey } from './ActivityTypeFilter';
 
 const activityLogQuery = gqlV2/* GraphQL */ `
   query AccountActivityLog(
@@ -43,6 +44,7 @@ const activityLogQuery = gqlV2/* GraphQL */ `
     account(slug: $accountSlug) {
       id
       isHost
+      type
     }
     activities(
       account: { slug: $accountSlug }
@@ -167,7 +169,7 @@ const getQueryVariables = (accountSlug, router) => {
     dateTo,
     limit: ACTIVITY_LIMIT,
     offset,
-    type,
+    type: getActivityTypeFilterValuesFromKey(type),
     attribution,
   };
 };
