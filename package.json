@@ -20,7 +20,7 @@
     "@popperjs/core": "2.11.6",
     "@sentry/browser": "7.11.1",
     "@sentry/node": "7.11.1",
-    "@shopify/address": "4.0.5",
+    "@shopify/address": "4.0.6",
     "@stripe/react-stripe-js": "1.10.0",
     "@stripe/stripe-js": "1.35.0",
     "@styled-icons/boxicons-regular": "10.38.0",
