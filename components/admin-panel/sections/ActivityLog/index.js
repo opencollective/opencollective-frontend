@@ -9,13 +9,17 @@ import styled from 'styled-components';
 import { ActivityAttribution } from '../../../../lib/constants/activities';
 import { parseDateInterval } from '../../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
-import { ActivityLabelI18n } from '../../../../lib/i18n/activities';
+import { ActivityDescriptionI18n } from '../../../../lib/i18n/activities';
+import formatMemberRole from '../../../../lib/i18n/member-role';
+import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
 import Avatar from '../../../Avatar';
 import Container from '../../../Container';
 import DateTime from '../../../DateTime';
 import { Box, Flex } from '../../../Grid';
+import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
+import LinkExpense from '../../../LinkExpense';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -56,6 +60,55 @@ const activityLogQuery = gqlV2/* GraphQL */ `
         id
         createdAt
         type
+        data
+        fromAccount {
+          id
+          name
+          slug
+        }
+        account {
+          id
+          name
+          slug
+          ... on AccountWithParent {
+            parent {
+              id
+              slug
+            }
+          }
+        }
+        expense {
+          id
+          legacyId
+          description
+          account {
+            id
+            name
+            slug
+            ... on AccountWithParent {
+              parent {
+                id
+                slug
+              }
+            }
+          }
+        }
+        order {
+          id
+          legacyId
+          description
+          toAccount {
+            id
+            name
+            slug
+            ... on AccountWithParent {
+              parent {
+                id
+                slug
+              }
+            }
+          }
+        }
         individual {
           id
           slug
@@ -72,6 +125,14 @@ const ActivityLogContainer = styled(StyledCard)`
   & > *:not(:last-child) {
     border-bottom: 1px solid #dcdde0;
   }
+
+  a {
+    color: black;
+    text-decoration: underline dotted;
+    &:hover {
+      color: #4e5052;
+    }
+  }
 `;
 
 const MetadataContainer = styled.div`
@@ -80,6 +141,13 @@ const MetadataContainer = styled.div`
   grid-gap: 8px;
   color: #4d4f51;
   margin-top: 10px;
+  a {
+    color: #4d4f51;
+    text-decoration: none;
+    &:hover {
+      color: #4e5052;
+    }
+  }
 `;
 
 const ACTIVITY_LIMIT = 10;
@@ -150,8 +218,41 @@ const ActivityLog = ({ accountSlug }) => {
               {data.activities.nodes.map(activity => (
                 <Box key={activity.id} px="16px" py="14px">
                   <P color="black.900" fontWeight="500" fontSize="14px">
-                    {ActivityLabelI18n[activity.type]
-                      ? intl.formatMessage(ActivityLabelI18n[activity.type])
+                    {ActivityDescriptionI18n[activity.type]
+                      ? intl.formatMessage(ActivityDescriptionI18n[activity.type], {
+                          FromAccount: () => <LinkCollective collective={activity.fromAccount} openInNewTab />,
+                          Account: () => <LinkCollective collective={activity.account} openInNewTab />,
+                          Expense: msg =>
+                            !activity.expense ? (
+                              msg
+                            ) : (
+                              <LinkExpense
+                                collective={activity.expense.account}
+                                expense={activity.expense}
+                                title={activity.expense.description}
+                                openInNewTab
+                              >
+                                {msg} #{activity.expense.legacyId}
+                              </LinkExpense>
+                            ),
+                          Order: msg =>
+                            !activity.order ? (
+                              msg
+                            ) : (
+                              <Link
+                                href={`${getCollectivePageRoute(activity.order.toAccount)}/orders?searchTerm=%23${
+                                  activity.order.legacyId
+                                }`}
+                                title={activity.order.description}
+                                openInNewTab
+                              >
+                                {msg} #{activity.order.legacyId}
+                              </Link>
+                            ),
+                          Host: () => <LinkCollective collective={activity.host} openInNewTab />,
+                          MemberRole: () =>
+                            activity.data?.member?.role ? formatMemberRole(intl, activity.data.member.role) : 'member',
+                        })
                       : activity.type}
                   </P>
                   <MetadataContainer>
