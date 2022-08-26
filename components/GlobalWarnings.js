@@ -30,9 +30,7 @@ const GlobalWarnings = ({ collective }) => {
   const [hasFreezeModal, setHasFreezeModal] = React.useState(false);
 
   if (collective?.isFrozen) {
-    const isLoggedInUserHostAdmin = LoggedInUser?.memberOf?.some(
-      member => collective.host?.id === member?.collective?.id,
-    );
+    const isLoggedInUserHostAdmin = Boolean(LoggedInUser?.isHostAdmin(collective));
 
     // Frozen collectives
     return (
