@@ -3455,6 +3455,11 @@ type TagStat {
   Number of entries for this tag
   """
   count: Int!
+
+  """
+  Total amount for this tag
+  """
+  amount: Amount!
 }
 
 """
@@ -3662,6 +3667,176 @@ type AccountStats {
   """
   totalNetAmountReceived: Amount!
   activeRecurringContributions: JSON
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(
+    limit: Int! = 30
+
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    Include contributions to children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): [AmountStats]
+
+  """
+  History of the expense tags used by this collective.
+  """
+  expensesTagsTimeSeries(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+
+    """
+    Include expense to children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): TimeSeriesAmount!
+
+  """
+  Return amount stats for contributions (default, and only for now: one-time vs recurring)
+  """
+  contributionsAmount(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    Include contributions to children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): [AmountStats]
+
+  """
+  Return amount time series for contributions (default, and only for now: one-time vs recurring)
+  """
+  contributionsAmountTimeSeries(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+
+    """
+    Include contributions to children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): TimeSeriesAmount!
+}
+
+"""
+Statistics aith amounts
+"""
+type AmountStats {
+  """
+  Name/Label for the amount
+  """
+  label: String!
+
+  """
+  Total amount for this label
+  """
+  amount: Amount!
+
+  """
+  Number of entries for this label
+  """
+  count: Int
+}
+
+"""
+Amount time series
+"""
+type TimeSeriesAmount implements TimeSeries {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime!
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime!
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+
+  """
+  Time series data points
+  """
+  nodes: [TimeSeriesAmountNode!]!
+}
+
+interface TimeSeries {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime!
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime!
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+}
+
+enum TimeUnit {
+  SECOND
+  MINUTE
+  HOUR
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+type TimeSeriesAmountNode {
+  date: DateTime!
+  amount: Amount!
+  label: String
 }
 
 """
@@ -4158,63 +4333,6 @@ type HostMetricsTimeSeries {
   History of the total money spent by this host
   """
   totalSpent: TimeSeriesAmountWithKind!
-}
-
-enum TimeUnit {
-  SECOND
-  MINUTE
-  HOUR
-  DAY
-  WEEK
-  MONTH
-  YEAR
-}
-
-"""
-Amount time series
-"""
-type TimeSeriesAmount implements TimeSeries {
-  """
-  The start date of the time series
-  """
-  dateFrom: DateTime!
-
-  """
-  The end date of the time series
-  """
-  dateTo: DateTime!
-
-  """
-  The interval between two data points
-  """
-  timeUnit: TimeUnit!
-
-  """
-  Time series data points
-  """
-  nodes: [TimeSeriesAmountNode!]!
-}
-
-interface TimeSeries {
-  """
-  The start date of the time series
-  """
-  dateFrom: DateTime!
-
-  """
-  The end date of the time series
-  """
-  dateTo: DateTime!
-
-  """
-  The interval between two data points
-  """
-  timeUnit: TimeUnit!
-}
-
-type TimeSeriesAmountNode {
-  date: DateTime!
-  amount: Amount!
 }
 
 """
@@ -8466,9 +8584,9 @@ type Query {
     dateTo: DateTime = null
 
     """
-    Only return activities that are of this type
+    Only return activities that are of this class/type
     """
-    activityType: [ActivityAndClassesType] = null
+    type: [ActivityAndClassesType!] = null
   ): ActivityCollection!
   application(
     """
