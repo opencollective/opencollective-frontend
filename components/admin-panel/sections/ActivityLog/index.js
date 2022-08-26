@@ -185,8 +185,9 @@ const ActivityLog = ({ accountSlug }) => {
   });
 
   const handleUpdateFilters = queryParams => {
+    const pathname = router.asPath.split('?')[0];
     return router.push({
-      pathname: `/${accountSlug}/admin/activity-log`,
+      pathname,
       query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
     });
   };
