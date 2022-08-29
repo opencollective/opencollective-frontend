@@ -225,7 +225,6 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
               limit={variables.limit}
               offset={variables.offset}
               ignoredQueryParams={ROUTE_PARAMS}
-              scrollToTopOnChanges
             />
           </Flex>
         </React.Fragment>

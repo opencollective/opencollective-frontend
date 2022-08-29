@@ -77,7 +77,6 @@ const AuthorizedAppsSection = () => {
             limit={variables.limit}
             offset={variables.offset}
             ignoredQueryParams={['slug', 'section']}
-            scrollToTopOnChange
           />
         </Flex>
       )}

@@ -290,7 +290,6 @@ const ActivityLog = ({ accountSlug }) => {
             total={data.activities.totalCount}
             limit={ACTIVITY_LIMIT}
             ignoredQueryParams={['slug', 'section']}
-            scrollToTopOnChange
           />
         </Container>
       )}
