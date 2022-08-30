@@ -1,14 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`I18nCollectiveTags can ignore untranslated 1`] = `
-Array [
+[
   "Open source, ",
   "Meetup",
 ]
 `;
 
 exports[`I18nCollectiveTags can provide a custom renderer 1`] = `
-Array [
+[
   <div>
     HelloWorld
      is 
@@ -25,7 +25,7 @@ Array [
 exports[`I18nCollectiveTags renders a list of tag 1`] = `"Open source"`;
 
 exports[`I18nCollectiveTags renders a list of tag 2`] = `
-Array [
+[
   "not translated, ",
   "Open source, ",
   "Meetup",
