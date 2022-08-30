@@ -139,7 +139,9 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onBack, onNext }) =
   const { values, touched, errors } = formik;
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
   const [payeeType, setPayeeType] = React.useState(PAYEE_TYPE.USER);
-  const [showAdditionalInfo, setAdditionalInfo] = React.useState(false);
+  const [showAdditionalInfo, setAdditionalInfo] = React.useState(
+    !isEmpty(values.payeeLocation) || !isEmpty(values.payoutMethod),
+  );
 
   React.useEffect(() => {
     if (values.payee?.organization?.name && !touched.payee?.organization?.slug) {
