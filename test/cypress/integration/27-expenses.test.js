@@ -217,6 +217,8 @@ describe('New expense flow', () => {
         cy.get('input#input-payee').type('pia');
         cy.wait(2000);
         cy.get('#react-select-input-payee-option-0-0').click();
+        cy.getByDataCy('expense-next').click();
+        // TODO: Make sure there's no payout method input visible
 
         cy.get('input[name="description"]').type('Service Invoice');
         cy.get('input[name="items[0].amount"]').type('{selectall}4200');

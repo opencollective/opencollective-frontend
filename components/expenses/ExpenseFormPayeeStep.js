@@ -193,6 +193,7 @@ const ExpenseFormPayeeStep = ({
   onCancel,
   onNext,
   onInvite,
+  onChange,
   isOnBehalf,
   loggedInAccount,
 }) => {
@@ -233,9 +234,7 @@ const ExpenseFormPayeeStep = ({
                 payee.payoutMethods = [];
               }
 
-              formik.setFieldValue('payee', payee);
-              formik.setFieldValue('payoutMethod', null);
-              setLocationFromPayee(formik, payee);
+              onChange(payee);
             }
           }}
           styles={{
@@ -521,6 +520,7 @@ ExpenseFormPayeeStep.propTypes = {
   onCancel: PropTypes.func,
   onNext: PropTypes.func,
   onInvite: PropTypes.func,
+  onChange: PropTypes.func,
   isOnBehalf: PropTypes.bool,
   loggedInAccount: PropTypes.object,
   collective: PropTypes.shape({

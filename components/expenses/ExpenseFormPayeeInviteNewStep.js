@@ -130,7 +130,6 @@ export const validateExpenseFormPayeeInviteNewStep = values => {
   if (!get(errors, 'payee.email')) {
     verifyEmailPattern(errors, values, 'payee.email');
   }
-
   return errors;
 };
 
