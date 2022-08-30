@@ -26,7 +26,7 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
 import StyledCard from '../../../StyledCard';
 import StyledLink from '../../../StyledLink';
-import { P } from '../../../Text';
+import { P, Span } from '../../../Text';
 
 import { isSupportedAttributionFilter } from './ActivityAttributionFilter';
 import ActivityFilters from './ActivityFilters';
@@ -64,6 +64,7 @@ const activityLogQuery = gqlV2/* GraphQL */ `
         createdAt
         type
         data
+        isSystem
         fromAccount {
           id
           name
@@ -284,22 +285,30 @@ const ActivityLog = ({ accountSlug }) => {
                       : activity.type}
                   </P>
                   <MetadataContainer>
-                    <FormattedMessage
-                      id="ByUser"
-                      defaultMessage="By {userName}"
-                      values={{
-                        userName: !activity.individual ? (
-                          <FormattedMessage id="user.unknown" defaultMessage="Unknown" />
-                        ) : (
-                          <StyledLink as={LinkCollective} color="black.700" collective={activity.individual}>
-                            <Flex alignItems="center" gridGap="8px">
-                              <Avatar radius={24} collective={activity.individual} />
-                              {activity.individual.name}
-                            </Flex>
-                          </StyledLink>
-                        ),
-                      }}
-                    />
+                    {activity.isSystem ? (
+                      <Span>
+                        <FormattedMessage defaultMessage="System Activity" />
+                      </Span>
+                    ) : (
+                      <FormattedMessage
+                        id="ByUser"
+                        defaultMessage="By {userName}"
+                        values={{
+                          userName: !activity.individual ? (
+                            <Span>
+                              <FormattedMessage id="user.unknown" defaultMessage="Unknown" />
+                            </Span>
+                          ) : (
+                            <StyledLink as={LinkCollective} color="black.700" collective={activity.individual}>
+                              <Flex alignItems="center" gridGap="8px">
+                                <Avatar radius={24} collective={activity.individual} />
+                                {activity.individual.name}
+                              </Flex>
+                            </StyledLink>
+                          ),
+                        }}
+                      />
+                    )}
                     •
                     <DateTime value={activity.createdAt} dateStyle="medium" />
                   </MetadataContainer>
