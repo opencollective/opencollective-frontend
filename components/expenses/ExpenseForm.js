@@ -270,7 +270,7 @@ const ExpenseFormBody = ({
 
   // When user logs in we set its account as the default payout profile if not yet defined
   React.useEffect(() => {
-    if (values?.draft?.payee && !loggedInAccount) {
+    if (values?.draft?.payee && !loggedInAccount && !isRecurring) {
       formik.setFieldValue('payee', {
         ...values.draft.payee,
         isInvite: false,
@@ -753,7 +753,7 @@ const ExpenseForm = ({
     initialValues.attachedFiles = expense.draft.attachedFiles;
     initialValues.payoutMethod = expense.draft.payoutMethod;
     initialValues.payeeLocation = expense.draft.payeeLocation;
-    initialValues.payee = expense.draft.payee;
+    initialValues.payee = expense.recurringExpense ? expense.payee : expense.draft.payee;
   }
 
   return (
@@ -822,6 +822,7 @@ ExpenseForm.propTypes = {
     status: PropTypes.string,
     payee: PropTypes.object,
     draft: PropTypes.object,
+    recurringExpense: PropTypes.object,
     items: PropTypes.arrayOf(
       PropTypes.shape({
         url: PropTypes.string,
