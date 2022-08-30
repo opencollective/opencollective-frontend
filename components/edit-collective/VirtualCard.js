@@ -14,6 +14,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
 import Avatar from '../Avatar';
+import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
 import DismissIcon from '../icons/DismissIcon';
 import StyledCard from '../StyledCard';
@@ -130,6 +131,7 @@ const ActionsButton = props => {
   const wrapperRef = React.useRef();
   const arrowRef = React.useRef();
   const [displayActions, setDisplayActions] = React.useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = React.useState(false);
 
   useGlobalBlur(wrapperRef, outside => {
     if (outside) {
@@ -205,7 +207,12 @@ const ActionsButton = props => {
                 >
                   <Flex flexDirection="column" fontSize="13px" lineHeight="16px" fontWeight="500">
                     {props.provider === 'STRIPE' && (
-                      <Action onClick={handlePauseUnpause} disabled={isLoading}>
+                      <Action
+                        onClick={() =>
+                          props.confirmOnPauseCard ? setShowConfirmationModal(true) : handlePauseUnpause()
+                        }
+                        disabled={isLoading}
+                      >
                         {isActive ? (
                           <FormattedMessage id="VirtualCards.PauseCard" defaultMessage="Pause Card" />
                         ) : (
@@ -214,14 +221,22 @@ const ActionsButton = props => {
                         {isLoading && <StyledSpinner size="0.9em" mb="2px" />}
                       </Action>
                     )}
-                    <StyledHr borderColor="black.300" mt={2} mb={2} />
-                    <Action onClick={props.deleteHandler}>
-                      <FormattedMessage defaultMessage="Delete Card" />
-                    </Action>
-                    <StyledHr borderColor="black.300" mt={2} mb={2} />
-                    <Action onClick={props.editHandler}>
-                      <FormattedMessage defaultMessage="Edit Card Details" />
-                    </Action>
+                    {props.deleteHandler && (
+                      <React.Fragment>
+                        <StyledHr borderColor="black.300" mt={2} mb={2} />
+                        <Action onClick={props.deleteHandler}>
+                          <FormattedMessage defaultMessage="Delete Card" />
+                        </Action>
+                      </React.Fragment>
+                    )}
+                    {props.editHandler && (
+                      <React.Fragment>
+                        <StyledHr borderColor="black.300" mt={2} mb={2} />
+                        <Action onClick={props.editHandler}>
+                          <FormattedMessage defaultMessage="Edit Card Details" />
+                        </Action>
+                      </React.Fragment>
+                    )}
                   </Flex>
                   <Arrow ref={arrowRef} {...arrowProps} />
                 </StyledCard>
@@ -230,6 +245,23 @@ const ActionsButton = props => {
           </Popper>
         )}
       </Manager>
+      {showConfirmationModal && (
+        <ConfirmationModal
+          isDanger
+          type="confirm"
+          header={<FormattedMessage defaultMessage="Pause Virtual Card" />}
+          continueLabel={<FormattedMessage defaultMessage="Pause Card" />}
+          onClose={() => setShowConfirmationModal(false)}
+          continueHandler={async () => {
+            await handlePauseUnpause();
+            setShowConfirmationModal(false);
+          }}
+        >
+          <P>
+            <FormattedMessage defaultMessage="This will pause the virtual card. To unpause, you will need to contact the host." />
+          </P>
+        </ConfirmationModal>
+      )}
     </div>
   );
 };
@@ -242,6 +274,7 @@ ActionsButton.propTypes = {
   onError: PropTypes.func,
   editHandler: PropTypes.func,
   deleteHandler: PropTypes.func,
+  confirmOnPauseCard: PropTypes.bool,
 };
 
 const getLimitString = (spendingLimitAmount, spendingLimitInterval, currency, locale) => {
@@ -391,12 +424,14 @@ const VirtualCard = props => {
         {props.canEditVirtualCard && (
           <ActionsButton
             id={props.id}
+            account={props.account}
             data={props.data}
             provider={props.provider}
             onSuccess={props.onSuccess}
             onError={error => addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, error) })}
             editHandler={props.editHandler}
             deleteHandler={props.deleteHandler}
+            confirmOnPauseCard={props.confirmOnPauseCard}
           />
         )}
         <Action onClick={() => setDisplayDetails(!displayDetails)}>
@@ -437,6 +472,7 @@ VirtualCard.propTypes = {
   spendingLimitInterval: PropTypes.string,
   currency: PropTypes.string,
   createdAt: PropTypes.string,
+  confirmOnPauseCard: PropTypes.bool,
 };
 
 export default VirtualCard;
