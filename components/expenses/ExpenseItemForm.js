@@ -6,6 +6,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isURL } from 'validator';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
+import { getPrecisionForCurrency } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
 import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
@@ -232,7 +233,7 @@ const ExpenseItemForm = ({
                       {...inputProps}
                       currency={currency}
                       currencyDisplay="CODE"
-                      min={isOptional ? undefined : 1}
+                      min={isOptional ? undefined : getPrecisionForCurrency(currency) * 100}
                       maxWidth="100%"
                       placeholder="0.00"
                       onChange={(value, e) => setFieldValue(e.target.name, value)}
