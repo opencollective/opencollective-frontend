@@ -12,6 +12,7 @@ import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { i18nExpenseType } from '../lib/i18n/expense';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { parseToBoolean } from '../lib/utils';
 
@@ -25,13 +26,14 @@ import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/Exp
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseRecurringForm from '../components/expenses/ExpenseRecurringForm';
-import ExpenseSummary from '../components/expenses/ExpenseSummary';
+import ExpenseSummary, { SummaryHeader } from '../components/expenses/ExpenseSummary';
 import {
   expensePageExpenseFieldsFragment,
   loggedInAccountExpensePayoutFieldsFragment,
 } from '../components/expenses/graphql/fragments';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
 import { Box, Flex } from '../components/Grid';
+import LinkCollective from '../components/LinkCollective';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
@@ -39,7 +41,6 @@ import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree, { SignInOverlayBackground } from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import StyledCard from '../components/StyledCard';
-import { H1 } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
@@ -296,7 +297,7 @@ class CreateExpensePage extends React.Component {
   }
 
   render() {
-    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, router } = this.props;
+    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, router, intl } = this.props;
     const { step } = this.state;
 
     if (!data.loading) {
@@ -356,13 +357,26 @@ class CreateExpensePage extends React.Component {
               <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
                 <Flex justifyContent="space-between" flexDirection={['column', 'row']}>
                   <Box minWidth={300} maxWidth={['100%', null, null, 728]} mr={[0, 3, 5]} mb={5} flexGrow="1">
-                    <H1 fontSize="24px" lineHeight="32px" mb={24} py={2}>
+                    <SummaryHeader fontSize="24px" lineHeight="32px" mb={24} py={2}>
                       {step === STEPS.FORM ? (
                         <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
                       ) : (
-                        <FormattedMessage id="Summary" defaultMessage="Summary" />
+                        <FormattedMessage
+                          id="ExpenseSummaryTitle"
+                          defaultMessage="{type} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
+                          values={{
+                            type:
+                              this.state.expense?.type === expenseTypes.UNCLASSIFIED ? (
+                                <FormattedMessage id="Expense" defaultMessage="Expense" />
+                              ) : (
+                                i18nExpenseType(intl, this.state.expense?.type)
+                              ),
+                            collectiveName: collective?.name,
+                            LinkCollective: text => <LinkCollective collective={collective}>{text}</LinkCollective>,
+                          }}
+                        />
                       )}
-                    </H1>
+                    </SummaryHeader>
                     {data.loading || loadingLoggedInUser ? (
                       <LoadingPlaceholder width="100%" height={400} />
                     ) : (
