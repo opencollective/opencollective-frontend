@@ -471,7 +471,6 @@ const ExpenseFormPayeeStep = ({
                 mt={2}
                 whiteSpace="nowrap"
                 data-cy="expense-cancel"
-                disabled={!stepOneCompleted}
                 onClick={() => {
                   onCancel?.();
                 }}
