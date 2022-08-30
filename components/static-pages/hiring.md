@@ -8,10 +8,9 @@ Do you want to get paid to work on your passion for open source, mutual aid, and
 
 Open Collective is a tech platform that enabled a network of 600+ nonprofits, co-ops, and fiscal hosts to support 7000+ groups to raise and spend $25 million last year with full transparency—and we're growing fast! We love open source, mutual aid, climate justice, and decentralized collaborative groups.
 
-<!--
 <strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>
--->
 
+<!--
 **We're hiring Senior Software Engineers.**
 
 ## A little about us
@@ -70,3 +69,4 @@ Your message should be convincing enough for us to consider you and move to the 
 - Experience. What is your greatest achievment in software engineering? Can you tell us about a past project you're proud of (it doesn’t have to be an engineering one or even a technical one.)? What do you think you can bring to Open Collective?
 
 As part of our screening process, we'll also ask you to make a small contribution to [our codebase](https://github.com/opencollective). Have a look, do one now or be ready for it!
+-->
