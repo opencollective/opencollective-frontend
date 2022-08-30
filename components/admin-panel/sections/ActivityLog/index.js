@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { omit, omitBy } from 'lodash';
+import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -28,8 +28,9 @@ import StyledCard from '../../../StyledCard';
 import StyledLink from '../../../StyledLink';
 import { P } from '../../../Text';
 
+import { isSupportedAttributionFilter } from './ActivityAttributionFilter';
 import ActivityFilters from './ActivityFilters';
-import { getActivityTypeFilterValuesFromKey } from './ActivityTypeFilter';
+import { getActivityTypeFilterValuesFromKey, isSupportedActivityTypeFilter } from './ActivityTypeFilter';
 
 const activityLogQuery = gqlV2/* GraphQL */ `
   query AccountActivityLog(
@@ -86,6 +87,7 @@ const activityLogQuery = gqlV2/* GraphQL */ `
           account {
             id
             name
+            type
             slug
             ... on AccountWithParent {
               parent {
@@ -174,6 +176,21 @@ const getQueryVariables = (accountSlug, router) => {
   };
 };
 
+const getChangesThatRequireUpdate = (account, queryParams) => {
+  const changes = {};
+  if (!account) {
+    return changes;
+  }
+
+  if (!isSupportedActivityTypeFilter(account, queryParams.type)) {
+    changes.type = null;
+  }
+  if (!isSupportedAttributionFilter(account, queryParams.attribution)) {
+    changes.attribution = null;
+  }
+  return changes;
+};
+
 const ActivityLog = ({ accountSlug }) => {
   const intl = useIntl();
   const router = useRouter();
@@ -185,11 +202,20 @@ const ActivityLog = ({ accountSlug }) => {
   });
 
   const handleUpdateFilters = queryParams => {
+    const pathname = router.asPath.split('?')[0];
     return router.push({
-      pathname: `/${accountSlug}/admin/activity-log`,
+      pathname,
       query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
     });
   };
+
+  // Reset type/attribution if not supported by the account
+  React.useEffect(() => {
+    const changesThatRequireUpdate = getChangesThatRequireUpdate(data?.account, routerQuery);
+    if (!isEmpty(changesThatRequireUpdate)) {
+      handleUpdateFilters({ ...routerQuery, ...changesThatRequireUpdate });
+    }
+  }, [data?.account, routerQuery]);
 
   return (
     <Box mt={3}>
