@@ -193,6 +193,7 @@ const ExpenseFormPayeeStep = ({
   onCancel,
   onNext,
   onInvite,
+  onChange,
   isOnBehalf,
   loggedInAccount,
 }) => {
@@ -236,6 +237,7 @@ const ExpenseFormPayeeStep = ({
               formik.setFieldValue('payee', payee);
               formik.setFieldValue('payoutMethod', null);
               setLocationFromPayee(formik, payee);
+              onChange(payee);
             }
           }}
           styles={{
@@ -268,6 +270,7 @@ const ExpenseFormPayeeStep = ({
             formik.setFieldValue('payee', value);
             formik.setFieldValue('payoutMethod', null);
             setLocationFromPayee(formik, value);
+            onChange(value);
           }}
         />
       );
@@ -408,54 +411,56 @@ const ExpenseFormPayeeStep = ({
             </FastField>
           )}
         </Box>
-        <Box flexGrow="1" flexBasis="50%" display={values.payee ? 'block' : 'none'}>
-          <Field name="payoutMethod">
-            {({ field }) => (
-              <StyledInputField
-                name={field.name}
-                htmlFor="payout-method"
-                flex="1"
-                mt={3}
-                label={formatMessage(msg.payoutOptionLabel)}
-                labelFontSize="13px"
-                error={
-                  isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
-                    ? formatFormErrorMessage(intl, errors.payoutMethod)
-                    : null
-                }
-              >
-                {({ id, error }) => (
-                  <PayoutMethodSelect
-                    inputId={id}
-                    error={error}
-                    onChange={setPayoutMethod}
-                    onRemove={onPayoutMethodRemove}
-                    payoutMethod={values.payoutMethod}
-                    payoutMethods={allPayoutMethods}
-                    payee={values.payee}
-                    disabled={!values.payee}
-                    collective={collective}
-                  />
-                )}
-              </StyledInputField>
-            )}
-          </Field>
-
-          {values.payoutMethod && (
+        {!isOnBehalf && (
+          <Box flexGrow="1" flexBasis="50%" display={values.payee ? 'block' : 'none'}>
             <Field name="payoutMethod">
-              {({ field, meta }) => (
-                <Box mt={3} flex="1">
-                  <PayoutMethodForm
-                    fieldsPrefix="payoutMethod"
-                    payoutMethod={field.value}
-                    host={collective.host}
-                    errors={meta.error}
-                  />
-                </Box>
+              {({ field }) => (
+                <StyledInputField
+                  name={field.name}
+                  htmlFor="payout-method"
+                  flex="1"
+                  mt={3}
+                  label={formatMessage(msg.payoutOptionLabel)}
+                  labelFontSize="13px"
+                  error={
+                    isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
+                      ? formatFormErrorMessage(intl, errors.payoutMethod)
+                      : null
+                  }
+                >
+                  {({ id, error }) => (
+                    <PayoutMethodSelect
+                      inputId={id}
+                      error={error}
+                      onChange={setPayoutMethod}
+                      onRemove={onPayoutMethodRemove}
+                      payoutMethod={values.payoutMethod}
+                      payoutMethods={allPayoutMethods}
+                      payee={values.payee}
+                      disabled={!values.payee}
+                      collective={collective}
+                    />
+                  )}
+                </StyledInputField>
               )}
             </Field>
-          )}
-        </Box>
+
+            {values.payoutMethod && (
+              <Field name="payoutMethod">
+                {({ field, meta }) => (
+                  <Box mt={3} flex="1">
+                    <PayoutMethodForm
+                      fieldsPrefix="payoutMethod"
+                      payoutMethod={field.value}
+                      host={collective.host}
+                      errors={meta.error}
+                    />
+                  </Box>
+                )}
+              </Field>
+            )}
+          </Box>
+        )}
       </Flex>
 
       {values.payee && (
@@ -521,6 +526,7 @@ ExpenseFormPayeeStep.propTypes = {
   onCancel: PropTypes.func,
   onNext: PropTypes.func,
   onInvite: PropTypes.func,
+  onChange: PropTypes.func,
   isOnBehalf: PropTypes.bool,
   loggedInAccount: PropTypes.object,
   collective: PropTypes.shape({
