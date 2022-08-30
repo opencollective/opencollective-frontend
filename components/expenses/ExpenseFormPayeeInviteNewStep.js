@@ -373,6 +373,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onBack, onNext }) =
                         payoutMethod={field.value}
                         host={collective.host}
                         errors={meta.error}
+                        required={false}
                       />
                     </Box>
                   )}
