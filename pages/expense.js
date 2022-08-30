@@ -14,6 +14,7 @@ import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { i18nExpenseType } from '../lib/i18n/expense';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -31,7 +32,7 @@ import ExpenseInviteNotificationBanner from '../components/expenses/ExpenseInvit
 import ExpenseMissingReceiptNotificationBanner from '../components/expenses/ExpenseMissingReceiptNotificationBanner';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseRecurringBanner from '../components/expenses/ExpenseRecurringBanner';
-import ExpenseSummary from '../components/expenses/ExpenseSummary';
+import ExpenseSummary, { SummaryHeader } from '../components/expenses/ExpenseSummary';
 import {
   expensePageExpenseFieldsFragment,
   loggedInAccountExpensePayoutFieldsFragment,
@@ -43,13 +44,14 @@ import HTMLContent from '../components/HTMLContent';
 import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import CommentIcon from '../components/icons/CommentIcon';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
+import LinkCollective from '../components/LinkCollective';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
 import StyledCheckbox from '../components/StyledCheckbox';
 import StyledLink from '../components/StyledLink';
-import { H1, H5, Span } from '../components/Text';
+import { H5, Span } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
@@ -518,9 +520,22 @@ class ExpensePage extends React.Component {
             px={2}
             ref={this.expenseTopRef}
           >
-            <H1 fontSize="24px" lineHeight="32px" mb={24} py={2}>
-              <FormattedMessage id="Summary" defaultMessage="Summary" />
-            </H1>
+            <SummaryHeader fontSize="24px" lineHeight="32px" mb={24} py={2}>
+              <FormattedMessage
+                id="ExpenseSummaryTitle"
+                defaultMessage="{type} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
+                values={{
+                  type:
+                    expense?.type === expenseTypes.UNCLASSIFIED ? (
+                      <FormattedMessage id="Expense" defaultMessage="Expense" />
+                    ) : (
+                      i18nExpenseType(intl, expense?.type)
+                    ),
+                  collectiveName: collective?.name,
+                  LinkCollective: text => <LinkCollective collective={collective}>{text}</LinkCollective>,
+                }}
+              />
+            </SummaryHeader>
             {error && (
               <MessageBox type="error" withIcon mb={4}>
                 {formatErrorMessage(intl, error)}
