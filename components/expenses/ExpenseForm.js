@@ -6,10 +6,10 @@ import { first, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { accountSupportsGrants, accountSupportsInvoices, accountSupportsReceipts } from '../../lib/collective.lib';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { getSupportedExpenseTypes } from '../../lib/expenses';
 import { requireFields } from '../../lib/form-utils';
 import { flattenObjectDeep } from '../../lib/utils';
 import { checkRequiresAddress, validateExpenseTaxes } from './lib/utils';
@@ -244,6 +244,7 @@ const ExpenseFormBody = ({
   const isReceipt = values.type === expenseTypes.RECEIPT;
   const isGrant = values.type === expenseTypes.GRANT;
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
+  const supportedExpenseTypes = React.useMemo(() => getSupportedExpenseTypes(collective), [collective]);
   const isRecurring = expense && expense.recurringExpense !== null;
   const stepOneCompleted =
     values.payoutMethod &&
@@ -413,15 +414,9 @@ const ExpenseFormBody = ({
       {!isCreditCardCharge && (
         <ExpenseTypeRadioSelect
           name="type"
-          onChange={e => {
-            handleChange(e);
-          }}
+          onChange={handleChange}
           value={values.type}
-          options={{
-            hasGrant: accountSupportsGrants(collective, collective?.host),
-            hasReceipt: accountSupportsReceipts(collective, collective?.host),
-            hasInvoice: accountSupportsInvoices(collective, collective?.host),
-          }}
+          supportedExpenseTypes={supportedExpenseTypes}
         />
       )}
       {isRecurring && <ExpenseRecurringBanner expense={expense} />}
@@ -701,11 +696,10 @@ ExpenseFormBody.propTypes = {
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
       settings: PropTypes.shape({
-        disableGrantsByDefault: PropTypes.bool, // TODO
         expenseTypes: PropTypes.shape({
-          hasGrant: PropTypes.bool,
-          hasReceipt: PropTypes.bool,
-          hasInvoice: PropTypes.bool,
+          GRANT: PropTypes.bool,
+          RECEIPT: PropTypes.bool,
+          INVOICE: PropTypes.bool,
         }),
       }),
     }),

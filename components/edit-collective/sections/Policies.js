@@ -6,6 +6,7 @@ import { filter, get, isEmpty, omit, size } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
+import { DEFAULT_SUPPORTED_EXPENSE_TYPES } from '../../../lib/expenses';
 import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
 import { omitDeep, stripHTML } from '../../../lib/utils';
 
@@ -99,15 +100,15 @@ const messages = defineMessages({
     defaultMessage:
       'Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees)',
   },
-  'expensePolicy.hasReceipt': {
+  'expensePolicy.RECEIPT': {
     id: 'collective.expensePolicy.hasReceipt',
     defaultMessage: 'Allow receipts',
   },
-  'expensePolicy.hasGrant': {
+  'expensePolicy.GRANT': {
     id: 'collective.expensePolicy.hasGrant',
     defaultMessage: 'Allow grants',
   },
-  'expensePolicy.hasInvoice': {
+  'expensePolicy.INVOICE': {
     id: 'collective.expensePolicy.hasInvoice',
     defaultMessage: 'Allow invoices',
   },
@@ -144,9 +145,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
   const collectiveContributionPolicy = get(collective, 'contributionPolicy', null);
   const collectiveExpensePolicy = get(collective, 'expensePolicy', null);
   const collectiveDisableExpenseSubmission = get(collective, 'settings.disablePublicExpenseSubmission', false);
-  const collectiveHasReceipt = get(collective, 'settings.expenseTypes.hasReceipt', true);
-  const collectiveHasInvoice = get(collective, 'settings.expenseTypes.hasInvoice', true);
-  const collectiveHasGrant = get(collective, 'settings.expenseTypes.hasGrant', false);
+  const expenseTypes = get(collective, 'settings.expenseTypes') || DEFAULT_SUPPORTED_EXPENSE_TYPES;
   const numberOfAdmins = size(filter(collective.members, m => m.role === 'ADMIN'));
 
   const selectOptions = React.useMemo(() => {
@@ -164,21 +163,11 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
       contributionPolicy: collectiveContributionPolicy || '',
       expensePolicy: collectiveExpensePolicy || '',
       disablePublicExpenseSubmission: collectiveDisableExpenseSubmission || false,
-      hasReceipt: collectiveHasReceipt,
-      hasInvoice: collectiveHasInvoice,
-      hasGrant: collectiveHasGrant,
+      expenseTypes,
       policies: omitDeep(data?.account?.policies || {}, ['__typename']),
     },
     async onSubmit(values) {
-      const {
-        contributionPolicy,
-        expensePolicy,
-        disablePublicExpenseSubmission,
-        hasReceipt,
-        hasInvoice,
-        hasGrant,
-        policies,
-      } = values;
+      const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission, expenseTypes, policies } = values;
       await updateCollective({
         variables: {
           collective: {
@@ -188,11 +177,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             settings: {
               ...collective.settings,
               disablePublicExpenseSubmission,
-              expenseTypes: {
-                hasReceipt,
-                hasInvoice,
-                hasGrant,
-              },
+              expenseTypes,
             },
           },
         },
@@ -489,24 +474,21 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               defaultMessage="Specify the types of expenses allowed"
             />
           </P>
-          <StyledCheckbox
-            name="allow-receipt-submission"
-            label={formatMessage(messages['expensePolicy.hasReceipt'])}
-            onChange={() => formik.setFieldValue('hasReceipt', !formik.values.hasReceipt)}
-            defaultChecked={Boolean(formik.values.hasReceipt)}
-          />
-          <StyledCheckbox
-            name="allow-invoice-submission"
-            label={formatMessage(messages['expensePolicy.hasInvoice'])}
-            onChange={() => formik.setFieldValue('hasInvoice', !formik.values.hasInvoice)}
-            defaultChecked={Boolean(formik.values.hasInvoice)}
-          />
-          <StyledCheckbox
-            name="allow-grant-submission"
-            label={formatMessage(messages['expensePolicy.hasGrant'])}
-            onChange={() => formik.setFieldValue('hasGrant', !formik.values.hasGrant)}
-            defaultChecked={Boolean(formik.values.hasGrant)}
-          />
+
+          {['RECEIPT', 'INVOICE', 'GRANT'].map(type => (
+            <StyledCheckbox
+              key={type}
+              name={`allow-${type}-submission`}
+              label={formatMessage(messages[`expensePolicy.${type}`])}
+              checked={Boolean(formik.values.expenseTypes[type])}
+              onChange={() =>
+                formik.setFieldValue('expenseTypes', {
+                  ...formik.values.expenseTypes,
+                  [type]: !formik.values.expenseTypes[type],
+                })
+              }
+            />
+          ))}
         </Container>
         <Container>
           <SettingsSectionTitle mt={4}>

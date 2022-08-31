@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
-import { clamp, isNil, round } from 'lodash';
+import { clamp, isBoolean, isNil, round } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { accountSupportsGrants } from '../../lib/collective.lib';
+import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import { HOST_FEE_STRUCTURE } from '../../lib/constants/host-fee-structure';
 import { i18nGraphqlException } from '../../lib/errors';
+import { isSupportedExpenseType } from '../../lib/expenses';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { i18nExpenseType } from '../../lib/i18n/expense';
 
 import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
 import { Box, Flex } from '../Grid';
@@ -15,11 +17,11 @@ import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
-import StyledCheckbox from '../StyledCheckbox';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../StyledModal';
 import StyledRadioList from '../StyledRadioList';
-import { P } from '../Text';
+import StyledSelect from '../StyledSelect';
+import { Label, P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 const OPTION_LABELS = defineMessages({
@@ -73,6 +75,18 @@ const editAccountSettingsMutation = gqlV2/* GraphQL */ `
   }
 `;
 
+const DISPLAYED_EXPENSE_TYPES = [EXPENSE_TYPE.INVOICE, EXPENSE_TYPE.RECEIPT, EXPENSE_TYPE.GRANT];
+
+const EXPENSE_TYPE_OPTIONS = [
+  { value: null, label: <FormattedMessage defaultMessage="Use global host settings" /> },
+  { value: true, label: <FormattedMessage defaultMessage="Enabled" /> },
+  { value: false, label: <FormattedMessage defaultMessage="Disabled" /> },
+];
+
+const EXPENSE_TYPE_SELECT_STYLES = {
+  option: { fontSize: '12px' },
+};
+
 const CollectiveSettingsModal = ({ host, collective, ...props }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
@@ -80,7 +94,8 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
   const [selectedOption, setSelectedOption] = useState(
     hostFeePercent === host.hostFeePercent ? HOST_FEE_STRUCTURE.DEFAULT : HOST_FEE_STRUCTURE.CUSTOM_FEE,
   );
-  const [hasGrant, setHasGrant] = useState(() => accountSupportsGrants(collective, host));
+
+  const [expenseTypes, setExpenseTypes] = React.useState(() => collective.settings?.expenseTypes || {});
   const [submitEditSettings, { loading }] = useMutation(editAccountSettingsMutation, { context: API_V2_CONTEXT });
   const hasParent = Boolean(collective.parent);
 
@@ -91,21 +106,30 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
         <P fontSize="16px" lineHeight="24px" fontWeight="500" mb={2}>
           <FormattedMessage defaultMessage="Expense types" />
         </P>
-        <Flex mb="23px" mx="8px" justifyContent="space-between">
-          <StyledCheckbox
-            name="grant"
-            fontSize="12px"
-            defaultChecked={hasGrant}
-            label={
-              <P fontWeight="500">
-                <FormattedMessage defaultMessage="Enable grants" />
-              </P>
-            }
-            onChange={({ checked }) => {
-              setHasGrant(checked);
-            }}
-          />
-        </Flex>
+        <div>
+          {DISPLAYED_EXPENSE_TYPES.map(expenseType => (
+            <Flex key={expenseType} mb={3} alignItems="center">
+              <Box mr={2} flex="0 1 70px">
+                <Label htmlFor={`select-expense-type-${expenseType}`} fontWeight="normal">
+                  {i18nExpenseType(intl, expenseType)}
+                </Label>
+              </Box>
+              <StyledSelect
+                inputId={`select-expense-type-${expenseType}`}
+                fontSize="12px"
+                minWidth={195}
+                styles={EXPENSE_TYPE_SELECT_STYLES}
+                options={EXPENSE_TYPE_OPTIONS}
+                onChange={({ value }) => setExpenseTypes({ ...expenseTypes, [expenseType]: value })}
+                value={
+                  isBoolean(expenseTypes[expenseType])
+                    ? EXPENSE_TYPE_OPTIONS.find(({ value }) => value === expenseTypes[expenseType])
+                    : EXPENSE_TYPE_OPTIONS[0]
+                }
+              />
+            </Flex>
+          ))}
+        </div>
 
         <P fontSize="16px" lineHeight="24px" fontWeight="500" mb={2}>
           <FormattedMessage id="CollectiveFeesForm.Title" defaultMessage="Set fee structure" />
@@ -191,7 +215,7 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
                     hostFeePercent: isCustomFee ? hostFeePercent : host.hostFeePercent,
                     isCustomFee,
                     key: 'expenseTypes',
-                    value: { hasGrant },
+                    value: expenseTypes,
                   },
                 });
 
@@ -224,9 +248,6 @@ CollectiveSettingsModal.propTypes = {
   host: PropTypes.shape({
     slug: PropTypes.string,
     hostFeePercent: PropTypes.number,
-    settings: PropTypes.shape({
-      disableGrantsByDefault: PropTypes.bool,
-    }),
   }).isRequired,
 };
 
