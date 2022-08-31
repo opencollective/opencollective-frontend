@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { ActivityAttribution } from '../../../../lib/constants/activities';
 import { parseDateInterval } from '../../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 import { ActivityDescriptionI18n } from '../../../../lib/i18n/activities';
@@ -28,7 +27,6 @@ import StyledCard from '../../../StyledCard';
 import StyledLink from '../../../StyledLink';
 import { P, Span } from '../../../Text';
 
-import { isSupportedAttributionFilter } from './ActivityAttributionFilter';
 import ActivityFilters from './ActivityFilters';
 import { getActivityTypeFilterValuesFromKey, isSupportedActivityTypeFilter } from './ActivityTypeFilter';
 
@@ -40,21 +38,47 @@ const activityLogQuery = gqlV2/* GraphQL */ `
     $dateFrom: DateTime
     $dateTo: DateTime
     $type: [ActivityAndClassesType!]
-    $attribution: ActivityAttribution
+    $filteredAccount: [AccountReferenceInput!]
   ) {
     account(slug: $accountSlug) {
       id
       isHost
       type
+      ... on Collective {
+        childrenAccounts {
+          nodes {
+            id
+            legacyId
+            name
+            slug
+            imageUrl
+            legacyId
+          }
+        }
+      }
+      ... on Organization {
+        memberOf(role: HOST) {
+          nodes {
+            id
+            account {
+              id
+              legacyId
+              name
+              slug
+              imageUrl
+              legacyId
+            }
+          }
+        }
+      }
     }
     activities(
-      account: { slug: $accountSlug }
+      account: $filteredAccount
       limit: $limit
       offset: $offset
       dateFrom: $dateFrom
       dateTo: $dateTo
       type: $type
-      attribution: $attribution
     ) {
       offset
       limit
@@ -160,11 +184,16 @@ const ACTIVITY_LIMIT = 10;
 const getQueryVariables = (accountSlug, router) => {
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
-  const { period, type } = routerQuery;
+  const { period, type, account } = routerQuery;
+
+  let filteredAccount;
+  if (!account) {
+    filteredAccount = { slug: accountSlug };
+  } else {
+    filteredAccount = account.split(',').map(accountId => ({ legacyId: parseInt(accountId) }));
+  }
+
   const { from: dateFrom, to: dateTo } = parseDateInterval(period);
-  const attribution = Object.values(ActivityAttribution).includes(routerQuery.attribution)
-    ? routerQuery.attribution
-    : null;
 
   return {
     accountSlug,
@@ -173,7 +202,7 @@ const getQueryVariables = (accountSlug, router) => {
     limit: ACTIVITY_LIMIT,
     offset,
     type: getActivityTypeFilterValuesFromKey(type),
-    attribution,
+    filteredAccount,
   };
 };
 
@@ -185,9 +214,6 @@ const getChangesThatRequireUpdate = (account, queryParams) => {
 
   if (!isSupportedActivityTypeFilter(account, queryParams.type)) {
     changes.type = null;
-  }
-  if (!isSupportedAttributionFilter(account, queryParams.attribution)) {
-    changes.attribution = null;
   }
   return changes;
 };
@@ -210,7 +236,7 @@ const ActivityLog = ({ accountSlug }) => {
     });
   };
 
-  // Reset type/attribution if not supported by the account
+  // Reset type if not supported by the account
   React.useEffect(() => {
     const changesThatRequireUpdate = getChangesThatRequireUpdate(data?.account, routerQuery);
     if (!isEmpty(changesThatRequireUpdate)) {
