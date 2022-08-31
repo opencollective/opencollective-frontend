@@ -14,6 +14,7 @@ import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import { adminPanelQuery } from '../../../pages/admin-panel';
 import SettingsForm from '../../edit-collective/Form';
+import { EDIT_COLLECTIVE_SECTIONS } from '../../edit-collective/Menu';
 import Loading from '../../Loading';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
@@ -47,7 +48,8 @@ const AccountSettings = ({ account, section }) => {
     };
 
     delete collective.tos;
-    const CollectiveInputType = pick(collective, [
+
+    const collectiveFields = [
       'id',
       'type',
       'slug',
@@ -72,10 +74,15 @@ const AccountSettings = ({ account, section }) => {
       'HostCollectiveId',
       'image',
       'backgroundImage',
-      'settings',
       'hostFeePercent',
       'isActive',
-    ]);
+    ];
+
+    if (![EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section)) {
+      collectiveFields.push('settings');
+    }
+
+    const CollectiveInputType = pick(collective, collectiveFields);
     if (isArray(collective.tiers)) {
       CollectiveInputType.tiers = collective.tiers.map(tier =>
         pick(tier, [
@@ -97,7 +104,11 @@ const AccountSettings = ({ account, section }) => {
         ]),
       );
     }
-    CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long', 'country']);
+    if (collective.location === null) {
+      CollectiveInputType.location = null;
+    } else {
+      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long', 'country']);
+    }
     setState({ ...state, status: 'loading' });
     try {
       const response = await editCollective({

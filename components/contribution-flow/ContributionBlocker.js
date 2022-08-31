@@ -9,9 +9,11 @@ import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import Container from '../Container';
 import { Flex } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
+import { P } from '../Text';
 
 export const CONTRIBUTION_BLOCKER = {
   DISABLED: 'DISABLED',
@@ -90,14 +92,14 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
       reason: CONTRIBUTION_BLOCKER.NO_PAYMENT_PROVIDER,
       type: 'warning',
       showOtherWaysToContribute: true,
-      content: paymentMethodUnavailableWarning(loggedInUser, account),
+      content: paymentMethodUnavailableWarning(loggedInUser, account, tier),
     };
   } else {
     return null;
   }
 };
 
-const paymentMethodUnavailableWarning = (loggedInUser, account) => {
+const paymentMethodUnavailableWarning = (loggedInUser, account, tier) => {
   return (
     <React.Fragment>
       <strong>
@@ -108,12 +110,30 @@ const paymentMethodUnavailableWarning = (loggedInUser, account) => {
       </strong>
       <br />
       {loggedInUser?.isHostAdmin(account) && (
-        <Container textAlign="center">
-          <Link href={`/${account.slug}/accept-financial-contributions/organization`}>
-            <StyledButton buttonStyle="primary" mt={3}>
-              <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
-            </StyledButton>
-          </Link>
+        <Container maxWidth="400px" mt={3}>
+          {account.host.supportedPaymentMethods?.length &&
+          tierHasFixedInterval(tier) &&
+          !canContributeRecurring(account, loggedInUser) ? (
+            <P lineHeight="18px">
+              <FormattedMessage
+                defaultMessage="None of the payment providers currently active on your account supports recurring contributions. You can enable them by connecting Stripe or PayPal. Alternatively, you can remove the ability to contribute recurringly from the <TiersLink>tiers settings</TiersLink>."
+                values={{
+                  TiersLink: getI18nLink({
+                    as: Link,
+                    href: `${getCollectivePageRoute(account)}/admin/tiers`,
+                  }),
+                }}
+              />
+            </P>
+          ) : (
+            <Container textAlign="center">
+              <Link href={`/${account.slug}/accept-financial-contributions/organization`}>
+                <StyledButton buttonStyle="primary" mt={3}>
+                  <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
+                </StyledButton>
+              </Link>
+            </Container>
+          )}
         </Container>
       )}
     </React.Fragment>

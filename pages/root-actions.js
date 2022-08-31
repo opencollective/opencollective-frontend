@@ -13,7 +13,9 @@ import ClearCacheForAccountForm from '../components/root-actions/ClearCacheForAc
 import ConnectAccountsForm from '../components/root-actions/ConnectAccountsForm';
 import MergeAccountsForm from '../components/root-actions/MergeAccountsForm';
 import MoveAuthoredContributions from '../components/root-actions/MoveAuthoredContributions';
+import MoveExpenses from '../components/root-actions/MoveExpenses';
 import MoveReceivedContributions from '../components/root-actions/MoveReceivedContributions';
+import RootActivityLog from '../components/root-actions/RootActivityLog';
 import UnhostAccountForm from '../components/root-actions/UnhostAccountForm';
 import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
@@ -35,8 +37,9 @@ const MENU = [
     description: `Before merging user accounts, you must always make sure that the person who requested it own both emails. Merging means payment methods are merged too, so if we just merge 2 accounts because someones ask for it without verifying we could end up in a very bad situation.\nA simple way to do that is to send a unique random code to the other account they want to claim and ask them to share this code.`,
   },
   { id: 'Unhost account', Component: UnhostAccountForm },
+  { id: 'Activity Log', Component: RootActivityLog, useCard: false },
   {
-    id: 'Contributions',
+    id: 'Contributions & Expenses',
     type: 'category',
   },
   {
@@ -51,6 +54,11 @@ const MENU = [
     Component: MoveReceivedContributions,
     description: `This tool is meant to edit the account that received a contribution.
     Use it to move contributions to different tiers, sub-projects, events, etc.`,
+  },
+  {
+    id: 'Move expenses',
+    Component: MoveExpenses,
+    description: `This tool is meant to move expenses to another account.`,
   },
   {
     id: 'Moderation',
@@ -150,9 +158,13 @@ const RootActionsPage = () => {
                 {selectedMenuEntry.description}
               </MessageBox>
             )}
-            <StyledCard p={4} my={4} width="100%">
+            {selectedMenuEntry.useCard === false ? (
               <selectedMenuEntry.Component />
-            </StyledCard>
+            ) : (
+              <StyledCard p={4} my={4} width="100%">
+                <selectedMenuEntry.Component />
+              </StyledCard>
+            )}
           </Box>
         </div>
       </Grid>

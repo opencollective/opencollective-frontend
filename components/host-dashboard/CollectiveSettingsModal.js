@@ -7,7 +7,6 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import { HOST_FEE_STRUCTURE } from '../../lib/constants/host-fee-structure';
 import { i18nGraphqlException } from '../../lib/errors';
-import { isSupportedExpenseType } from '../../lib/expenses';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { i18nExpenseType } from '../../lib/i18n/expense';
 

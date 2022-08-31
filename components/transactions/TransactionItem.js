@@ -309,7 +309,10 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
         </Flex>
         {hasOrder && [CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP].includes(transaction.kind) && (
           <Container borderTop={['1px solid #E8E9EB', 'none']} mt={3} pt={[2, 0]}>
-            <KindTag>{i18nTransactionKind(intl, transaction.kind)}</KindTag>
+            <KindTag>
+              {i18nTransactionKind(intl, transaction.kind)}
+              {Boolean(order?.legacyId) && ` #${order.legacyId}`}
+            </KindTag>
             {transactionDetailsLink()}
           </Container>
         )}
@@ -370,6 +373,7 @@ TransactionItem.propTypes = {
     }),
     order: PropTypes.shape({
       id: PropTypes.string,
+      legacyId: PropTypes.number,
       status: PropTypes.string,
     }),
     expense: PropTypes.shape({

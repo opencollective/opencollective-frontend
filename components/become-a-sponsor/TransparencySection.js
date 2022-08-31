@@ -4,7 +4,8 @@ import styled from 'styled-components';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex } from '../Grid';
-import { H2, H3, P } from '../Text';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
+import { H3, P } from '../Text';
 
 const TransactionShadow = styled(Box)`
   width: 497px;
@@ -38,22 +39,16 @@ const JarIllustrationWrapper = styled(Flex)`
 
 const Transparency = () => (
   <Flex flexDirection="column" px={3} alignItems="center" mt="58px">
-    <Box textAlign="center" mb={3} width={['304px', '656px', '956px', null, '600px']}>
-      <H2
-        fontSize={['24px', '32px', '40px']}
-        lineHeight={['32px', '40px', '48px']}
-        letterSpacing="-1.6px"
-        mb={3}
-        color="black.800"
-      >
+    <Box textAlign="center" mb={3} width={['304px', '656px', '768px', null, '600px']}>
+      <SectionTitle mb={3}>
         <FormattedMessage id="becomeASponsor.transparency" defaultMessage="Transparency" />
-      </H2>
-      <P fontSize={['14px', '18px', '20px']} lineHeight={['24px', '28px']} letterSpacing="-0.6px" color="black.600">
+      </SectionTitle>
+      <SectionDescription>
         <FormattedMessage
           id="becomeASponsor.transparency.description"
           defaultMessage="You can directly see the impact of your contributions, in real time, because Collective budgets are transparent"
         />
-      </P>
+      </SectionDescription>
     </Box>
     <Box width={['304px', '552px']} height={[null, '341px']} maxHeight={['187px', '341px']}>
       <NextIllustration
@@ -104,7 +99,7 @@ const Transparency = () => (
             fontSize={['20px', null, null, null, '24px']}
             lineHeight={['28px', null, '32px', null, '40px']}
             letterSpacing={['-0.008em', null, '-0.6px']}
-            color="black.800"
+            color="primary.900"
             mb={2}
           >
             <FormattedMessage id="becomeASponsor.invoiceReceipts" defaultMessage="Invoices & Receipts" />
@@ -140,7 +135,7 @@ const Transparency = () => (
             fontSize={['20px', null, null, null, '24px']}
             lineHeight={['28px', null, '32px', null, '40px']}
             letterSpacing={['-0.008em', null, '-0.6px']}
-            color="black.800"
+            color="primary.900"
             mb={2}
           >
             <FormattedMessage id="becomeASponsor.paperWork" defaultMessage="We’ll take care of the paperwork" />
@@ -176,7 +171,7 @@ const Transparency = () => (
             fontSize={['20px', null, null, null, '24px']}
             lineHeight={['28px', null, '32px', null, '40px']}
             letterSpacing={['-0.008em', null, '-0.6px']}
-            color="black.800"
+            color="primary.900"
             mb={2}
           >
             <FormattedMessage id="becomeASponsor.reporting" defaultMessage="Reporting" />

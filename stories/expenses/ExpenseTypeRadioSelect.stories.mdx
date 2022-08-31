@@ -10,7 +10,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
       defaultValue: [expenseTypes.RECEIPT, expenseTypes.INVOICE, expenseTypes.GRANT],
     },
     value: {
-      supportedExpenseTypes: Object.values(expenseTypes),
+      options: Object.values(expenseTypes),
       control: { type: 'radio' },
     },
   }}

@@ -299,7 +299,6 @@ class ExpensePage extends React.Component {
                         limit={data.variables.limit}
                         offset={data.variables.offset}
                         ignoredQueryParams={['collectiveSlug', 'parentCollectiveSlug']}
-                        scrollToTopOnChange
                       />
                     </Flex>
                   </React.Fragment>

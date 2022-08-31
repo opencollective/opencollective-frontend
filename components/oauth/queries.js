@@ -9,6 +9,7 @@ export const authorizedAppsQuery = gqlV2/* GraphQL */ `
         nodes {
           id
           createdAt
+          lastUsedAt
           account {
             id
             name

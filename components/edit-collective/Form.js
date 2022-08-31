@@ -15,6 +15,7 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
 
+import ActivityLog from '../admin-panel/sections/ActivityLog';
 import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
 import ForDevelopers from '../admin-panel/sections/ForDevelopers';
 import CodeRepositoryIcon from '../CodeRepositoryIcon';
@@ -497,6 +498,9 @@ class EditCollectiveForm extends React.Component {
 
       case EDIT_COLLECTIVE_SECTIONS.FOR_DEVELOPERS:
         return <ForDevelopers accountSlug={collective.slug} />;
+
+      case EDIT_COLLECTIVE_SECTIONS.ACTIVITY_LOG:
+        return <ActivityLog accountSlug={collective.slug} />;
 
       case EDIT_COLLECTIVE_SECTIONS.ADVANCED:
         return (

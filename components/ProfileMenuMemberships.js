@@ -54,7 +54,7 @@ const MembershipLine = ({ user, membership }) => {
       {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
         <StyledLink
           as={Link}
-          href={getSettingsRoute(membership.collective, null, user)}
+          href={getSettingsRoute(membership.collective)}
           ml={1}
           color="black.500"
           title={intl.formatMessage({ id: 'AdminPanel.button', defaultMessage: 'Admin' })}

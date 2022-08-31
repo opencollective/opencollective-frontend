@@ -1,7 +1,7 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
-import Banner from '../components/collectives/Banner';
+// import Banner from '../components/collectives/Banner';
 import JoinUsSection from '../components/collectives/sections/JoinUs';
 import CollaborateWithMoney from '../components/home/CollaborateWithMoneySection';
 import DedicatedTeam from '../components/home/DedicatedTeamSection';
@@ -29,7 +29,9 @@ const HomePage = () => {
       title={formatMessage(messages.defaultTitle)}
       description={formatMessage(messages.defaultDescription)}
     >
+      {/*
       <Banner />
+      */}
       <TheFutureIsCollective />
       <RaiseMoney />
       <OpenCollectiveIs />

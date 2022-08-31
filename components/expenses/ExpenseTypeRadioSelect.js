@@ -151,7 +151,6 @@ const BASE_EXPENSE_TYPES = [expenseTypes.INVOICE, expenseTypes.RECEIPT, expenseT
  * layout. See https://github.com/w3c/csswg-drafts/issues/321
  */
 const ExpenseTypeRadioSelect = ({ name, onChange, value, supportedExpenseTypes }) => {
-  // TODO: What if all expense types are disabled?
   return (
     <StyledCard>
       <Fieldset onChange={onChange}>

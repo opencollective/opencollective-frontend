@@ -5,8 +5,9 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import Illustration from '../collectives/HomeIllustration';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
 import StyledCarousel from '../StyledCarousel';
-import { H2, H3, P } from '../Text';
+import { H3, P } from '../Text';
 
 import { HOST_CONSIDERATIONS } from './constants';
 
@@ -111,34 +112,21 @@ const FindTheRightFiscalHost = () => {
       justifyContent="center"
     >
       <Container display="flex" flexDirection="column" alignItems="center" mx={3}>
-        <Box mb={[2, 3]} width={['288px', 1]}>
-          <H2
-            fontSize={['28px', '32px', null, null, '40px']}
-            lineHeight={['36px', '40px', null, null, '48px']}
-            letterSpacing={['-0.008em', null, null, '-0.04em']}
-            color={['black.900', null, null, null, 'black.800']}
-            textAlign="center"
-          >
+        <Box mb={2} width={['288px', 1]}>
+          <SectionTitle textAlign="center">
             <FormattedMessage
               id="fiscalHosting.findingRightFiscalHost"
               defaultMessage="Finding the right fiscal host for you"
             />
-          </H2>
+          </SectionTitle>
         </Box>
         <Box width={['288px', '548px', null, null, '755px']}>
-          <P
-            fontSize={['16px', '20px', null, null, '24px']}
-            lineHeight={['24px', '28px', null, null, '32px']}
-            letterSpacing="-0.008em"
-            textAlign="center"
-            color="black.700"
-            fontWeight="500"
-          >
+          <SectionDescription textAlign="center">
             <FormattedMessage
               id="fiscalHosting.findingRightFiscalHost.description"
               defaultMessage="Some key things to consider when looking for the right fit"
             />
-          </P>
+          </SectionDescription>
         </Box>
       </Container>
       <Container width={1} display={['display', 'none']} justifyContent="center" alignItems="center" mt="56px">

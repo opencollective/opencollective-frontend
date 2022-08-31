@@ -148,7 +148,7 @@ export const updatesQuery = gqlV2/* GraphQL */ `
     $limit: Int
     $offset: Int
     $searchTerm: String
-    $orderBy: ChronologicalOrderInput
+    $orderBy: UpdateChronologicalOrderInput
   ) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
@@ -205,7 +205,7 @@ export const getUpdatesVariables = (slug, orderBy = null, searchTerm = null) => 
     collectiveSlug: slug,
     offset: 0,
     limit: UPDATES_PER_PAGE * 2,
-    orderBy: { field: 'CREATED_AT', direction: orderBy === 'oldest' ? 'ASC' : 'DESC' },
+    orderBy: { field: 'PUBLISHED_AT', direction: orderBy === 'oldest' ? 'ASC' : 'DESC' },
     searchTerm: searchTerm,
   };
 };

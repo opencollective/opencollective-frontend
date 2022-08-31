@@ -9,6 +9,7 @@ import { FileText as InvitedIcon } from '@styled-icons/feather/FileText';
 import { Plus as PlusIcon } from '@styled-icons/feather/Plus';
 import { UserCheck as ApprovedIcon } from '@styled-icons/feather/UserCheck';
 import { UserMinus as UnapprovedIcon } from '@styled-icons/feather/UserMinus';
+import { SyncAlt as MoveIcon } from '@styled-icons/material/SyncAlt';
 import { Update as UpdateIcon } from '@styled-icons/material/Update';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled, { useTheme } from 'styled-components';
@@ -39,6 +40,13 @@ const ACTIVITIES_INFO = {
     message: defineMessage({
       id: 'Expense.Activity.Approved',
       defaultMessage: 'Expense approved',
+    }),
+  },
+  COLLECTIVE_EXPENSE_MOVED: {
+    type: 'info',
+    icon: MoveIcon,
+    message: defineMessage({
+      defaultMessage: 'Expense moved from {movedFromCollective}',
     }),
   },
   COLLECTIVE_EXPENSE_UNAPPROVED: {
@@ -198,7 +206,9 @@ const ThreadActivity = ({ activity }) => {
       )}
       {message && (
         <ActivityParagraph activityColor={activityColor} mt={1} fontSize="12px" whiteSpace="pre-line">
-          <ActivityMessage color={activityColor}>{formatMessage(message)}</ActivityMessage>
+          <ActivityMessage color={activityColor}>
+            {formatMessage(message, { movedFromCollective: activity.data?.movedFromCollective?.name || 'collective' })}
+          </ActivityMessage>
           {details && (
             <Fragment>
               <br />
@@ -221,6 +231,7 @@ ThreadActivity.propTypes = {
         message: PropTypes.string,
       }),
       message: PropTypes.string,
+      movedFromCollective: PropTypes.object,
     }),
     individual: PropTypes.shape({
       id: PropTypes.string.isRequired,

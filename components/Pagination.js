@@ -105,7 +105,7 @@ Pagination.propTypes = {
 };
 
 Pagination.defaultProps = {
-  scrollToTopOnChange: false,
+  scrollToTopOnChange: true,
 };
 
 export default Pagination;

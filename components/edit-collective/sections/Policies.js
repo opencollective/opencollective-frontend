@@ -406,7 +406,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             {formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.applies === 'ALL_COLLECTIVES' &&
               formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze && (
                 <MessageBox type="warning" mt={2} fontSize="13px">
-                  <FormattedMessage defaultMessage="Some collectives hosted by you may not fulfil the minimum admin requirements. If you choose to apply the setting to all collectives, the collectives that don't comply will be frozen till they meet the minimum requirements for admins." />
+                  <FormattedMessage defaultMessage="Some collectives hosted by you may not fulfill the minimum admin requirements. If you choose to apply the setting to all Collectives, the ones that don't comply will be frozen until they meet the minimum requirements for admins." />
                 </MessageBox>
               )}
           </Container>

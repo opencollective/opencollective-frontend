@@ -5,7 +5,8 @@ import styled from 'styled-components';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex } from '../Grid';
-import { H2, H3, P, Span } from '../Text';
+import { SectionDescription, SectionTitle } from '../marketing/Text';
+import { H3, P, Span } from '../Text';
 
 const SectionWrapper = styled(Flex)`
   padding: 0 16px;
@@ -18,27 +19,15 @@ const SectionWrapper = styled(Flex)`
 const MoreFeatures = () => (
   <SectionWrapper flexDirection="column" alignItems="center" px={['16px']} mb="47px" mt="64px">
     <Box textAlign="center">
-      <H2
-        fontSize={['24px', '32px', null, null, '40px']}
-        lineHeight={['32px', '40px', null, null, '48px']}
-        letterSpacing={['-0.8px', '-0.008em', null, null, '-1.6px']}
-        color="black.900"
-        mb={[2, 3]}
-      >
+      <SectionTitle mb={[2, 3]}>
         <FormattedMessage id="becomeASponsor.moreFeatures.title" defaultMessage="More features" />
-      </H2>
-      <P
-        fontSize={['16px', '20px']}
-        lineHeight={['24px', '28px']}
-        fontWeight="500"
-        letterSpacing={[null, '-0.008em', null, null, '-0.6px']}
-        color="black.600"
-      >
+      </SectionTitle>
+      <SectionDescription color="black.600">
         <FormattedMessage
           id="becomeASponsor.moreFeatures.description"
           defaultMessage="Discover the possibilities of our features."
         />
-      </P>
+      </SectionDescription>
     </Box>
     <Flex
       flexDirection={['column', 'row']}
@@ -63,7 +52,7 @@ const MoreFeatures = () => (
             height={160}
           />
         </Box>
-        <H3 fontSize="24px" lineHeight="32px" color="black.800" mb="12px">
+        <H3 fontSize="24px" lineHeight="32px" color="primary.900" mb="12px">
           <FormattedMessage id="becomeASponsor.bulkPayments" defaultMessage="Bulk Payments" />
         </H3>
         <Box width={[null, '290px', '401px']}>
@@ -84,7 +73,7 @@ const MoreFeatures = () => (
             height={160}
           />
         </Box>
-        <H3 fontSize="24px" lineHeight="32px" color="black.800" mb="12px">
+        <H3 fontSize="24px" lineHeight="32px" color="primary.900" mb="12px">
           BackYourStack
         </H3>
         <Box width={[null, '290px', '312px']}>
@@ -108,23 +97,10 @@ const MoreFeatures = () => (
     </Flex>
     <Flex flexDirection={['column', 'row']} alignItems="center">
       <Box mb={['14px', 0]} width={[null, '305px', '341px', null, '536px']}>
-        <H2
-          fontSize={['32px', '40px', null, null, '30px']}
-          lineHeight={['40px', '48px']}
-          color={['black.800', null, null, null, 'black.900']}
-          letterSpacing={['-0.008em', '-1.6px']}
-          mb={['24px', 4, '48px', null, 3]}
-          textAlign={['center', 'left']}
-        >
+        <SectionTitle mb={['24px', 4, '48px', null, 3]} textAlign={['center', 'left']}>
           <FormattedMessage id="becomeASponsor.sustainersKit" defaultMessage="Sustainers kit:" />
-        </H2>
-        <P
-          fontSize={['18px']}
-          lineHeight="32px"
-          fontWeight="400"
-          letterSpacing="-0.16px"
-          color={['black.600', null, null, null, 'black.800']}
-        >
+        </SectionTitle>
+        <SectionDescription>
           <FormattedMessage
             id="becomeASponsor.sustainersKit.description"
             defaultMessage="We know making the case up the chain is not always easy. For all you heroes inside companies, we put together {resourcesLink}"
@@ -136,7 +112,7 @@ const MoreFeatures = () => (
               ),
             }}
           />
-        </P>
+        </SectionDescription>
       </Box>
       <Box
         ml={[null, '35px', '111px']}

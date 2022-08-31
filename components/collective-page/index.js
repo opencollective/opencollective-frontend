@@ -19,6 +19,7 @@ import SectionContributors from './sections/Contributors';
 import SectionConversations from './sections/Conversations';
 import SectionEmpty from './sections/Empty';
 import SectionEvents from './sections/Events';
+import SectionFinancialOverview from './sections/FinancialOverview';
 import SectionGoals from './sections/Goals';
 import SectionLocation from './sections/Location';
 import SectionOurTeam from './sections/OurTeam';
@@ -133,7 +134,7 @@ class CollectivePage extends Component {
     window.scrollTo(0, 0);
   };
 
-  renderSection(section) {
+  renderSection(section, version) {
     switch (section) {
       case Sections.UPDATES:
         return (
@@ -182,7 +183,9 @@ class CollectivePage extends Component {
           />
         );
       case Sections.BUDGET:
-        return (
+        return version === 2 ? (
+          <SectionFinancialOverview collective={this.props.collective} />
+        ) : (
           <SectionBudget
             collective={this.props.collective}
             transactions={this.props.transactions}
@@ -296,7 +299,7 @@ class CollectivePage extends Component {
                         !sectionsWithoutPaddingBottom[section.name]
                       }
                     >
-                      {this.renderSection(section.name)}
+                      {this.renderSection(section.name, section.version)}
                     </SectionContainer>
                   ))}
                 </Fragment>

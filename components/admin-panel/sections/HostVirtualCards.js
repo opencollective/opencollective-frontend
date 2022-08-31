@@ -99,6 +99,13 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
           name
           legacyId
           imageUrl(height: 64)
+          parentAccount {
+            id
+            slug
+            name
+            legacyId
+            imageUrl(height: 64)
+          }
         }
       }
     }
