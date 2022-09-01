@@ -7,11 +7,11 @@ import { FormattedMessage } from 'react-intl';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import ContributeCardsContainer from '../collective-page/ContributeCardsContainer';
-import StyledModal from '../StyledModal';
 
 import ContributeCardContainer from './ContributeCardContainer';
 import CreateNew from './CreateNew';
 import DraggableContributeCardWrapper from './DraggableContributeCardWrapper';
+import EditTierModal from './EditTierModal';
 
 /**
  * Display a list of contribution cards wrapped in a DragAndDrop provider
@@ -24,6 +24,7 @@ const AdminContributeCardsContainer = ({
   onMount,
   CardsContainer,
   useTierModals,
+  enableReordering,
 }) => {
   const [showCreateModal, setShowCreateModal] = React.useState(false);
   const isEvent = collective.type === CollectiveType.EVENT;
@@ -42,7 +43,7 @@ const AdminContributeCardsContainer = ({
       <CardsContainer>
         {cards.map(({ key, Component, componentProps }, index) => (
           <ContributeCardContainer key={key}>
-            {cards.length === 1 ? (
+            {cards.length === 1 || !enableReordering ? (
               // TODO Add edit button here
               <Component {...componentProps} />
             ) : (
@@ -52,7 +53,6 @@ const AdminContributeCardsContainer = ({
                 index={index}
                 onMove={onContributionCardMove}
                 onDrop={onContributionCardDrop}
-                hasEditModal={useTierModals}
               />
             )}
           </ContributeCardContainer>
@@ -68,7 +68,9 @@ const AdminContributeCardsContainer = ({
             </CreateNew>
           )}
         </ContributeCardContainer>
-        {showCreateModal && <StyledModal onClose={() => setShowCreateModal(false)}></StyledModal>}
+        {showCreateModal && (
+          <EditTierModal collective={collective} onClose={() => setShowCreateModal(false)}></EditTierModal>
+        )}
       </CardsContainer>
     </DndProvider>
   );
@@ -88,14 +90,16 @@ AdminContributeCardsContainer.propTypes = {
     }),
   }).isRequired,
   /** Whether to use the new modals to edit/create tiers */ useTierModals: PropTypes.bool,
-  onContributionCardMove: PropTypes.func.isRequired,
-  onContributionCardDrop: PropTypes.func.isRequired,
+  onContributionCardMove: PropTypes.func,
+  onContributionCardDrop: PropTypes.func,
   onMount: PropTypes.func,
   CardsContainer: PropTypes.node,
+  enableReordering: PropTypes.bool,
 };
 
 AdminContributeCardsContainer.defaultProps = {
   CardsContainer: ContributeCardsContainer,
+  enableReordering: true,
 };
 
 export default AdminContributeCardsContainer;

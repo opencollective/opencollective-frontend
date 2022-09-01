@@ -88,7 +88,7 @@ TierTitle.propTypes = {
   }),
 };
 
-const ContributeTier = ({ intl, collective, tier, ...props }) => {
+const ContributeTier = ({ intl, collective, tier, enableEditing, ...props }) => {
   const { stats } = tier;
   const currency = tier.currency || collective.currency;
   const isFlexibleAmount = tier.amountType === 'FLEXIBLE';
@@ -121,6 +121,9 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
       stats={stats?.contributors}
       data-cy="contribute-card-tier"
       disableCTA={isDisabled}
+      enableEditing={enableEditing}
+      tier={tier}
+      collective={collective}
       {...props}
     >
       <Flex flexDirection="column" justifyContent="space-between" height="100%">
@@ -244,6 +247,11 @@ ContributeTier.propTypes = {
   }),
   /** @ignore */
   intl: PropTypes.object.isRequired,
+  enableEditing: PropTypes.bool,
+};
+
+ContributeTier.defaultProps = {
+  enableEditing: false,
 };
 
 export default injectIntl(ContributeTier);

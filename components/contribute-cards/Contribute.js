@@ -14,6 +14,8 @@ import StyledHr from '../StyledHr';
 import StyledTag from '../StyledTag';
 import { P } from '../Text';
 
+import EditTierModal from './EditTierModal';
+
 /** Max number of contributors on each tier card */
 export const MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD = 4;
 export const CONTRIBUTE_CARD_WIDTH = 280;
@@ -196,8 +198,13 @@ const ContributeCard = ({
   image,
   disableCTA,
   hideCTA,
+  enableEditing,
+  tier,
+  collective,
   ...props
 }) => {
+  const [isEditTierModalOpen, setIsEditTierModalOpen] = React.useState(false);
+
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
 
   return (
@@ -273,6 +280,23 @@ const ContributeCard = ({
               )}
             </Box>
           )}
+          {enableEditing && (
+            <Box>
+              <StyledButton
+                buttonStyle="secondary"
+                width={1}
+                mb={2}
+                mt={3}
+                data-cy="edit-btn"
+                onClick={() => setIsEditTierModalOpen(true)}
+              >
+                Edit tier
+              </StyledButton>
+            </Box>
+          )}
+          {isEditTierModalOpen && (
+            <EditTierModal tier={tier} collective={collective} onClose={() => setIsEditTierModalOpen(false)} />
+          )}
         </Box>
       </Flex>
     </StyledContributeCard>
@@ -315,6 +339,13 @@ ContributeCard.propTypes = {
   /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
   router: PropTypes.object,
+  enableEditing: PropTypes.object,
+  tier: PropTypes.object,
+  collective: PropTypes.object,
+};
+
+ContributeCard.defaultProps = {
+  enableEditing: false,
 };
 
 export default injectIntl(ContributeCard);

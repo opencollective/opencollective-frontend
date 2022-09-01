@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { Mutation } from '@apollo/client/react/components';
 import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -19,6 +20,9 @@ import StyledCheckbox from '../../StyledCheckbox';
 import StyledHr from '../../StyledHr';
 import StyledLink from '../../StyledLink';
 import { P, Span, Strong } from '../../Text';
+import { editAccountSettingsMutation } from '../mutations';
+
+import { collectiveSettingsV1Query } from './EditCollectivePage';
 
 // TODO Make this a common function with the contribute section
 const getFinancialContributions = (collective, sortedTiers) => {
@@ -61,6 +65,7 @@ const getFinancialContributions = (collective, sortedTiers) => {
           tier,
           hideContributors: true,
           hideCTA: true,
+          enableEditing: true,
         },
       });
     }
@@ -87,17 +92,19 @@ const CardsContainer = styled(Grid).attrs({
 
 // TODO: Make sure this query works with organizations
 const tiersQuery = gqlV2/* GraphQL */ `
-  query UpdateOrderPopUpTiers($accountSlug: String!) {
+  query AccountTiers($accountSlug: String!) {
     account(slug: $accountSlug) {
       id
       ... on AccountWithContributions {
         tiers {
           nodes {
             id
+            legacyId
             name
             slug
             description
             interval
+            frequency
             amount {
               valueInCents
               currency
@@ -106,10 +113,17 @@ const tiersQuery = gqlV2/* GraphQL */ `
               valueInCents
               currency
             }
+            goal {
+              valueInCents
+              currency
+            }
             amountType
             endsAt
             type
             maxQuantity
+            presets
+            button
+            useStandalonePage
           }
         }
       }
@@ -126,6 +140,7 @@ const TiersRevamp = ({ collective }) => {
   const { data, loading, error } = useQuery(tiersQuery, { variables, context: API_V2_CONTEXT });
   const tiers = get(data, 'account.tiers.nodes', []);
   const intl = useIntl();
+
   return (
     <div>
       <Grid gridTemplateColumns={['1fr', '172px 1fr']} gridGap={62} mt={34}>
@@ -166,33 +181,41 @@ const TiersRevamp = ({ collective }) => {
               <P fontSize="14px" lineHeight="20x" mb={3}>
                 <FormattedMessage defaultMessage="The custom contribution adds a default tier on your collective that doesn't enforce any minimum amount or interval. This is the easiest way for people to contribute to your Collective, but it cannot be customized." />
               </P>
-              <StyledCheckbox
-                name="custom-contributions"
-                label={intl.formatMessage({
-                  id: 'tier.customContributions.label',
-                  defaultMessage: 'Enable flexible contributions',
-                })}
-                defaultChecked={!get(collective, 'settings.disableCustomContributions', false)}
-                width="auto"
-                isLoading={loading}
-                onChange={({ target }) => {
-                  // TODO
-                  // editSetting({
-                  //   variables: {
-                  //     id: this.props.collective.id,
-                  //     settings: set(updatedCollective.settings, 'disableCustomContributions', !target.value),
-                  //   },
-                  // });
-                }}
-              />
+              <Mutation
+                mutation={editAccountSettingsMutation}
+                refetchQueries={[{ query: collectiveSettingsV1Query, variables: { slug: collective.slug } }]}
+                awaitRefetchQueries
+              >
+                {(editSettings, { loading }) => (
+                  <StyledCheckbox
+                    name="custom-contributions"
+                    label={intl.formatMessage({
+                      id: 'tier.customContributions.label',
+                      defaultMessage: 'Enable flexible contributions',
+                    })}
+                    defaultChecked={!get(collective, 'settings.disableCustomContributions', false)}
+                    width="auto"
+                    isLoading={loading}
+                    onChange={({ target }) => {
+                      editSettings({
+                        variables: {
+                          account: { legacyId: collective.id },
+                          key: 'disableCustomContributions',
+                          value: !target.value,
+                        },
+                        context: API_V2_CONTEXT,
+                      });
+                    }}
+                  />
+                )}
+              </Mutation>
             </Box>
             <AdminContributeCardsContainer
               collective={collective}
               cards={getFinancialContributions(collective, tiers)}
               CardsContainer={CardsContainer}
-              onContributionCardMove={console.log} // TODO
-              onContributionCardDrop={console.log} // TODO
               useTierModals
+              enableReordering={false}
             />
           </div>
         )}
@@ -204,6 +227,7 @@ const TiersRevamp = ({ collective }) => {
 TiersRevamp.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
   }).isRequired,
 };
 
