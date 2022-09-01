@@ -12,7 +12,6 @@ import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { i18nExpenseType } from '../lib/i18n/expense';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { parseToBoolean } from '../lib/utils';
 
@@ -298,7 +297,7 @@ class CreateExpensePage extends React.Component {
   }
 
   render() {
-    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, router, intl } = this.props;
+    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, router } = this.props;
     const { step } = this.state;
 
     if (!data.loading) {
@@ -367,14 +366,9 @@ class CreateExpensePage extends React.Component {
                       ) : (
                         <FormattedMessage
                           id="ExpenseSummaryTitle"
-                          defaultMessage="{type} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
+                          defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
                           values={{
-                            type:
-                              this.state.expense?.type === expenseTypes.UNCLASSIFIED ? (
-                                <FormattedMessage id="Expense" defaultMessage="Expense" />
-                              ) : (
-                                i18nExpenseType(intl, this.state.expense?.type)
-                              ),
+                            type: this.state.expense?.type,
                             collectiveName: collective?.name,
                             LinkCollective: text => <LinkCollective collective={collective}>{text}</LinkCollective>,
                           }}

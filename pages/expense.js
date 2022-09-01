@@ -14,7 +14,6 @@ import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
-import { i18nExpenseType } from '../lib/i18n/expense';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -523,14 +522,9 @@ class ExpensePage extends React.Component {
             <SummaryHeader fontSize="24px" lineHeight="32px" mb={24} py={2}>
               <FormattedMessage
                 id="ExpenseSummaryTitle"
-                defaultMessage="{type} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
+                defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
                 values={{
-                  type:
-                    expense?.type === expenseTypes.UNCLASSIFIED ? (
-                      <FormattedMessage id="Expense" defaultMessage="Expense" />
-                    ) : (
-                      i18nExpenseType(intl, expense?.type)
-                    ),
+                  type: expense?.type,
                   collectiveName: collective?.name,
                   LinkCollective: text => <LinkCollective collective={collective}>{text}</LinkCollective>,
                 }}
