@@ -141,6 +141,8 @@ const Fieldset = styled.fieldset`
   margin: 0;
 `;
 
+const BASE_EXPENSE_TYPES = [expenseTypes.INVOICE, expenseTypes.RECEIPT, expenseTypes.GRANT];
+
 /**
  * To select expense's type.
  *
@@ -148,31 +150,14 @@ const Fieldset = styled.fieldset`
  * IE & Chrome don't support using `flex` on fieldset yet, so we have to create a custom
  * layout. See https://github.com/w3c/csswg-drafts/issues/321
  */
-const ExpenseTypeRadioSelect = ({ name, onChange, value, options = {} }) => {
+const ExpenseTypeRadioSelect = ({ name, onChange, value, supportedExpenseTypes }) => {
   return (
     <StyledCard>
       <Fieldset onChange={onChange}>
         <Flex flexDirection={['column', 'row']} overflow="hidden">
-          <ExpenseTypeOption
-            name={name}
-            type={expenseTypes.RECEIPT}
-            isChecked={value === expenseTypes.RECEIPT}
-            onChange={onChange}
-          />
-          <ExpenseTypeOption
-            name={name}
-            type={expenseTypes.INVOICE}
-            isChecked={value === expenseTypes.INVOICE}
-            onChange={onChange}
-          />
-          {options.hasGrant && (
-            <ExpenseTypeOption
-              name={name}
-              type={expenseTypes.GRANT}
-              isChecked={value === expenseTypes.GRANT}
-              onChange={onChange}
-            />
-          )}
+          {BASE_EXPENSE_TYPES.filter(type => supportedExpenseTypes.includes(type)).map(type => (
+            <ExpenseTypeOption key={type} name={name} type={type} isChecked={value === type} onChange={onChange} />
+          ))}
         </Flex>
       </Fieldset>
     </StyledCard>
@@ -186,8 +171,8 @@ ExpenseTypeRadioSelect.propTypes = {
   value: PropTypes.oneOf(Object.values(expenseTypes)),
   /** A function called with the new value when it changes */
   onChange: PropTypes.func,
-  /** Extra options */
-  options: PropTypes.object,
+  /** Supported expense types */
+  supportedExpenseTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 ExpenseTypeRadioSelect.defaultProps = {

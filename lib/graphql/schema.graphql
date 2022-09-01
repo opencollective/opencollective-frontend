@@ -170,6 +170,11 @@ interface CollectiveInterface {
   stats: CollectiveStatsType
   transactions(type: String, limit: Int, offset: Int, includeExpenseTransactions: Boolean): [Transaction]
   expenses(type: String, limit: Int, offset: Int, status: String, includeHostedCollectives: Boolean): [ExpenseType]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [String!]!
   role: String
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
@@ -1508,6 +1513,11 @@ type Collective implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [String!]!
   role: String
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
@@ -1750,6 +1760,11 @@ type Event implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [String!]!
   role: String
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
@@ -1992,6 +2007,11 @@ type Fund implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [String!]!
   role: String
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
@@ -2234,6 +2254,11 @@ type Organization implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [String!]!
   role: String
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
@@ -2477,6 +2502,11 @@ type Project implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [String!]!
   role: String
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
@@ -2961,6 +2991,11 @@ type User implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [String!]!
   role: String
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
@@ -3205,6 +3240,11 @@ type Vendor implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [String!]!
   role: String
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")

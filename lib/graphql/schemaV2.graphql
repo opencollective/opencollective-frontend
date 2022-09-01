@@ -497,6 +497,11 @@ interface Account {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -596,7 +601,6 @@ interface Account {
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
-    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -914,6 +918,7 @@ interface Transaction {
   isRefunded: Boolean
   isRefund: Boolean
   paymentMethod: PaymentMethod
+  payoutMethod: PayoutMethod
   permissions: TransactionPermissions
   isOrderRejected: Boolean!
   refundTransaction: Transaction
@@ -2286,8 +2291,14 @@ enum ActivityType {
   COLLECTIVE_APPROVED
   COLLECTIVE_REJECTED
   COLLECTIVE_CREATED
+  ORGANIZATION_COLLECTIVE_CREATED
+  COLLECTIVE_FROZEN
+  COLLECTIVE_UNFROZEN
   COLLECTIVE_COMMENT_CREATED
   COLLECTIVE_CONVERSATION_CREATED
+  UPDATE_COMMENT_CREATED
+  EXPENSE_COMMENT_CREATED
+  CONVERSATION_COMMENT_CREATED
   COLLECTIVE_EXPENSE_CREATED
   COLLECTIVE_EXPENSE_DELETED
   COLLECTIVE_EXPENSE_UPDATED
@@ -2305,10 +2316,13 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_INVITE_DRAFTED
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  TAXFORM_REQUEST
+  COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
-  COLLECTIVE_FROZEN
-  COLLECTIVE_UNFROZEN
+  VIRTUAL_CARD_REQUESTED
+  VIRTUAL_CARD_CHARGE_DECLINED
+  VIRTUAL_CARD_PURCHASE
   COLLECTIVE_MEMBER_INVITED
   COLLECTIVE_MEMBER_CREATED
   COLLECTIVE_MONTHLY_REPORT
@@ -2321,24 +2335,13 @@ enum ActivityType {
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
-  COLLECTIVE_VIRTUAL_CARD_ADDED
+  HOST_APPLICATION_CONTACT
   CONTRIBUTION_REJECTED
-  ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
   SUBSCRIPTION_CANCELED
   TICKET_CONFIRMED
-  USER_CREATED
-  USER_NEW_TOKEN
-  USER_CHANGE_EMAIL
-  USER_PAYMENT_METHOD_CREATED
-  USER_CARD_CLAIMED
-  USER_CARD_INVITED
-  WEBHOOK_STRIPE_RECEIVED
-  WEBHOOK_PAYPAL_RECEIVED
-  COLLECTIVE_MONTHLY
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
-  OAUTH_APPLICATION_AUTHORIZED
   ORDER_PROCESSING
   ORDER_PROCESSING_CRYPTO
   ORDER_PENDING_CONTRIBUTION_NEW
@@ -2346,19 +2349,22 @@ enum ActivityType {
   ORDER_THANKYOU
   ORDERS_SUSPICIOUS
   BACKYOURSTACK_DISPATCH_CONFIRMED
-  ACTIVATED_COLLECTIVE_AS_HOST
-  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
-  DEACTIVATED_COLLECTIVE_AS_HOST
-  VIRTUAL_CARD_REQUESTED
-  VIRTUAL_CARD_CHARGE_DECLINED
   PAYMENT_FAILED
   PAYMENT_CREDITCARD_CONFIRMATION
   PAYMENT_CREDITCARD_EXPIRING
-  TAXFORM_REQUEST
-  CONVERSATION_COMMENT_CREATED
-  UPDATE_COMMENT_CREATED
-  EXPENSE_COMMENT_CREATED
-  HOST_APPLICATION_CONTACT
+  USER_CREATED
+  USER_NEW_TOKEN
+  OAUTH_APPLICATION_AUTHORIZED
+  USER_CHANGE_EMAIL
+  USER_PAYMENT_METHOD_CREATED
+  USER_CARD_CLAIMED
+  USER_CARD_INVITED
+  WEBHOOK_STRIPE_RECEIVED
+  WEBHOOK_PAYPAL_RECEIVED
+  COLLECTIVE_MONTHLY
+  ACTIVATED_COLLECTIVE_AS_HOST
+  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
+  DEACTIVATED_COLLECTIVE_AS_HOST
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -2736,6 +2742,11 @@ type Host implements Account & AccountWithContributions {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -2820,7 +2831,6 @@ type Host implements Account & AccountWithContributions {
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
-    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -5080,6 +5090,11 @@ type Bot implements Account {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -5164,7 +5179,6 @@ type Bot implements Account {
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
-    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -5582,6 +5596,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -5666,7 +5685,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
-    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -5915,6 +5933,7 @@ type Credit implements Transaction {
   isRefunded: Boolean
   isRefund: Boolean
   paymentMethod: PaymentMethod
+  payoutMethod: PayoutMethod
 
   """
   The permissions given to current logged in user for this transaction
@@ -6020,6 +6039,7 @@ type Debit implements Transaction {
   isRefunded: Boolean
   isRefund: Boolean
   paymentMethod: PaymentMethod
+  payoutMethod: PayoutMethod
 
   """
   The permissions given to current logged in user for this transaction
@@ -6412,6 +6432,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -6496,7 +6521,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
-    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -7027,6 +7051,11 @@ type Individual implements Account {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -7109,7 +7138,6 @@ type Individual implements Account {
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
-    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -7619,6 +7647,11 @@ type Organization implements Account & AccountWithContributions {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -7701,7 +7734,6 @@ type Organization implements Account & AccountWithContributions {
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
-    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -8241,6 +8273,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -8325,7 +8362,6 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
-    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -10446,8 +10482,14 @@ enum ActivityAndClassesType {
   COLLECTIVE_APPROVED
   COLLECTIVE_REJECTED
   COLLECTIVE_CREATED
+  ORGANIZATION_COLLECTIVE_CREATED
+  COLLECTIVE_FROZEN
+  COLLECTIVE_UNFROZEN
   COLLECTIVE_COMMENT_CREATED
   COLLECTIVE_CONVERSATION_CREATED
+  UPDATE_COMMENT_CREATED
+  EXPENSE_COMMENT_CREATED
+  CONVERSATION_COMMENT_CREATED
   COLLECTIVE_EXPENSE_CREATED
   COLLECTIVE_EXPENSE_DELETED
   COLLECTIVE_EXPENSE_UPDATED
@@ -10465,10 +10507,13 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_INVITE_DRAFTED
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  TAXFORM_REQUEST
+  COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
-  COLLECTIVE_FROZEN
-  COLLECTIVE_UNFROZEN
+  VIRTUAL_CARD_REQUESTED
+  VIRTUAL_CARD_CHARGE_DECLINED
+  VIRTUAL_CARD_PURCHASE
   COLLECTIVE_MEMBER_INVITED
   COLLECTIVE_MEMBER_CREATED
   COLLECTIVE_MONTHLY_REPORT
@@ -10481,24 +10526,13 @@ enum ActivityAndClassesType {
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
-  COLLECTIVE_VIRTUAL_CARD_ADDED
+  HOST_APPLICATION_CONTACT
   CONTRIBUTION_REJECTED
-  ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
   SUBSCRIPTION_CANCELED
   TICKET_CONFIRMED
-  USER_CREATED
-  USER_NEW_TOKEN
-  USER_CHANGE_EMAIL
-  USER_PAYMENT_METHOD_CREATED
-  USER_CARD_CLAIMED
-  USER_CARD_INVITED
-  WEBHOOK_STRIPE_RECEIVED
-  WEBHOOK_PAYPAL_RECEIVED
-  COLLECTIVE_MONTHLY
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
-  OAUTH_APPLICATION_AUTHORIZED
   ORDER_PROCESSING
   ORDER_PROCESSING_CRYPTO
   ORDER_PENDING_CONTRIBUTION_NEW
@@ -10506,19 +10540,22 @@ enum ActivityAndClassesType {
   ORDER_THANKYOU
   ORDERS_SUSPICIOUS
   BACKYOURSTACK_DISPATCH_CONFIRMED
-  ACTIVATED_COLLECTIVE_AS_HOST
-  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
-  DEACTIVATED_COLLECTIVE_AS_HOST
-  VIRTUAL_CARD_REQUESTED
-  VIRTUAL_CARD_CHARGE_DECLINED
   PAYMENT_FAILED
   PAYMENT_CREDITCARD_CONFIRMATION
   PAYMENT_CREDITCARD_EXPIRING
-  TAXFORM_REQUEST
-  CONVERSATION_COMMENT_CREATED
-  UPDATE_COMMENT_CREATED
-  EXPENSE_COMMENT_CREATED
-  HOST_APPLICATION_CONTACT
+  USER_CREATED
+  USER_NEW_TOKEN
+  OAUTH_APPLICATION_AUTHORIZED
+  USER_CHANGE_EMAIL
+  USER_PAYMENT_METHOD_CREATED
+  USER_CARD_CLAIMED
+  USER_CARD_INVITED
+  WEBHOOK_STRIPE_RECEIVED
+  WEBHOOK_PAYPAL_RECEIVED
+  COLLECTIVE_MONTHLY
+  ACTIVATED_COLLECTIVE_AS_HOST
+  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
+  DEACTIVATED_COLLECTIVE_AS_HOST
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -10948,6 +10985,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -11032,7 +11074,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
-    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -11550,6 +11591,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -11634,7 +11680,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     offset: Int! = 0
     state: String = null
     merchantAccount: AccountReferenceInput = null
-    assignee: AccountReferenceInput = null
 
     """
     Only return expenses that were created after this date
@@ -13181,6 +13226,9 @@ input CommentUpdateInput {
   html: String
 }
 
+"""
+Input to create a comment. You can only specify one entity type: expense, conversation or update
+"""
 input CommentCreateInput {
   html: String
 
@@ -13188,8 +13236,17 @@ input CommentCreateInput {
   If your comment is linked to an expense, set it here
   """
   expense: ExpenseReferenceInput
-  ConversationId: String
+  ConversationId: String @deprecated(reason: "2022-08-26: Please use \"conversation\"")
+  conversation: ConversationReferenceInput
   update: UpdateReferenceInput
+}
+
+input ConversationReferenceInput {
+  """
+  The public id identifying the conversation
+  """
+  id: String
+  legacyId: Int
 }
 
 input UpdateReferenceInput {

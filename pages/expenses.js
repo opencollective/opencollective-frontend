@@ -376,6 +376,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       isActive
       settings
       createdAt
+      supportedExpenseTypes
       expensesTags {
         id
         tag
