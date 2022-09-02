@@ -3,7 +3,7 @@
   "env": { "jest": true },
   "parser": "@typescript-eslint/parser",
   "plugins": [
-    "@typescript-eslint",
+    "@typescript-eslint/eslint-plugin",
     "graphql",
     "react-hooks",
     "simple-import-sort",
