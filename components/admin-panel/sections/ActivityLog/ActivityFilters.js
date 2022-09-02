@@ -36,6 +36,7 @@ const ActivityFilters = ({ filters, onChange, account }) => {
       },
     };
   };
+  const childAccounts = account?.isHost ? null : account?.childrenAccounts?.nodes;
 
   return (
     <Container>
@@ -52,12 +53,14 @@ const ActivityFilters = ({ filters, onChange, account }) => {
           </FilterLabel>
           <ActivityTypeFilter account={account} {...getFilterProps('type')} />
         </FilterContainer>
-        <FilterContainer width={[1, 1 / 3, 1 / 3]} pl={[0, '19px']}>
-          <FilterLabel htmlFor="activity-filter-account">
-            <FormattedMessage defaultMessage="Account" />
-          </FilterLabel>
-          <ActivityAccountFilter account={account} {...getFilterProps('account')} />
-        </FilterContainer>
+        {(account?.isHost || childAccounts?.length > 0) && (
+          <FilterContainer width={[1, 1 / 3, 1 / 3]} pl={[0, '19px']}>
+            <FilterLabel htmlFor="activity-filter-account">
+              <FormattedMessage defaultMessage="Account" />
+            </FilterLabel>
+            <ActivityAccountFilter account={account} childAccounts={childAccounts} {...getFilterProps('account')} />
+          </FilterContainer>
+        )}
       </Flex>
     </Container>
   );
@@ -68,6 +71,7 @@ ActivityFilters.propTypes = {
   filters: PropTypes.object,
   account: PropTypes.shape({
     isHost: PropTypes.bool,
+    childrenAccounts: PropTypes.object,
   }),
 };
 

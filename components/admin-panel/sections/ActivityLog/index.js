@@ -38,10 +38,11 @@ const activityLogQuery = gqlV2/* GraphQL */ `
     $dateFrom: DateTime
     $dateTo: DateTime
     $type: [ActivityAndClassesType!]
-    $filteredAccount: [AccountReferenceInput!]
+    $filteredAccount: [AccountReferenceInput!]!
   ) {
     account(slug: $accountSlug) {
       id
+      legacyId
       isHost
       type
       ... on Collective {
@@ -53,21 +54,6 @@ const activityLogQuery = gqlV2/* GraphQL */ `
             slug
             imageUrl
             legacyId
-          }
-        }
-      }
-      ... on Organization {
-        memberOf(role: HOST) {
-          nodes {
-            id
-            account {
-              id
-              legacyId
-              name
-              slug
-              imageUrl
-              legacyId
-            }
           }
         }
       }

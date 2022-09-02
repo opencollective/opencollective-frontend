@@ -5,34 +5,32 @@ import { CollectiveType } from '../../../../lib/constants/collectives';
 
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
 
-const ActivityAccountFilter = ({ account, onChange }) => {
-  const childAccounts = account?.isHost
-    ? account?.memberOf?.nodes.map(node => node.account)
-    : account?.childrenAccounts?.nodes;
-
+const ActivityAccountFilter = ({ account, onChange, childAccounts }) => {
   return (
     <CollectivePickerAsync
       inputId="activity-filter-account"
       isMulti
       useCompactMode
       types={[CollectiveType.COLLECTIVE, CollectiveType.EVENT, CollectiveType.PROJECT, CollectiveType.FUND]}
+      hostCollectiveIds={account?.isHost ? [account?.legacyId] : null}
       filterResults={collectives =>
-        collectives.filter(collective => childAccounts.some(childAccount => childAccount.legacyId === collective.id))
+        account?.isHost
+          ? null
+          : collectives.filter(collective =>
+              childAccounts.some(childAccount => childAccount.legacyId === collective.id),
+            )
       }
-      onChange={filterAccounts =>
-        onChange(filterAccounts.map(filterAccount => filterAccount.legacyId || filterAccount.value.id).toString())
-      }
+      onChange={filterAccounts => onChange(filterAccounts.map(filterAccount => filterAccount.value.id).toString())}
     />
   );
 };
 
 ActivityAccountFilter.propTypes = {
   account: PropTypes.shape({
+    legacyId: PropTypes.number,
     isHost: PropTypes.bool,
-    memberOf: PropTypes.object,
-    childrenAccounts: PropTypes.object,
   }),
-  value: PropTypes.number,
+  childAccounts: PropTypes.object,
   onChange: PropTypes.func.isRequired,
 };
 
