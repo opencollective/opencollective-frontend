@@ -38,7 +38,7 @@ const ActivitySwitch = ({ account, activityType }) => {
   const isIndeterminate =
     activityType === 'ACTIVITY_ALL' &&
     account.activitySubscriptions?.some(notification => notification.type !== ActivityTypes.ACTIVITY_ALL);
-  const subscribed = existingSetting ? existingSetting.active : true;
+  const [isSubscribed, setSubscribed] = React.useState(existingSetting ? existingSetting.active : true);
   const isOverridedByAll = activityType !== 'ACTIVITY_ALL' && existingSetting?.type === ActivityTypes.ACTIVITY_ALL;
 
   const [setEmailNotification] = useMutation(setEmailNotificationMutation, {
@@ -48,6 +48,7 @@ const ActivitySwitch = ({ account, activityType }) => {
 
   const handleToggle = async variables => {
     try {
+      setSubscribed(variables.active);
       await setEmailNotification({ variables });
     } catch (e) {
       addToast({
@@ -69,7 +70,7 @@ const ActivitySwitch = ({ account, activityType }) => {
   return (
     <InputSwitch
       name={`${activityType}-switch`}
-      checked={subscribed}
+      checked={isSubscribed}
       disabled={isIndeterminate || isOverridedByAll}
       onChange={event =>
         handleToggle({ type: activityType, account: { id: account.id }, active: event.target.checked })
