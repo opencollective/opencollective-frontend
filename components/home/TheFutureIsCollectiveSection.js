@@ -72,38 +72,34 @@ const TheFutureIsCollective = () => {
               </Span>
             </StyledButton>
           </Box>
-          <Box display={[null, 'none']}>
-            <NextIllustration
-              width={320}
-              height={589}
-              alt="The future is collective."
-              src="/static/images/new-home/budget-illustration-xs.png"
-            />
-          </Box>
-          <Box display={['none', 'block', 'none']}>
-            <NextIllustration
-              width={768}
-              height={431}
-              alt="The future is collective."
-              src="/static/images/new-home/budget-illustration-sm.png"
-            />
-          </Box>
-          <Box display={['none', null, 'block', null, 'none']}>
-            <NextIllustration
-              width={978}
-              height={610}
-              alt="The future is collective."
-              src="/static/images/new-home/budget-illustration-md.png"
-            />
-          </Box>
-          <Box display={['none', null, null, null, 'block']}>
-            <NextIllustration
-              width={1014}
-              height={619}
-              alt="The future is collective."
-              src="/static/images/new-home/budget-illustration-lg.png"
-            />
-          </Box>
+          <NextIllustration
+            display={[null, 'none']}
+            width={320}
+            height={589}
+            alt="The future is collective."
+            src="/static/images/new-home/budget-illustration-mobile.png"
+          />
+          <NextIllustration
+            display={['none', 'block', 'none']}
+            width={768}
+            height={431}
+            alt="The future is collective."
+            src="/static/images/new-home/budget-illustration.png"
+          />
+          <NextIllustration
+            display={['none', null, 'block', null, 'none']}
+            width={978}
+            height={610}
+            alt="The future is collective."
+            src="/static/images/new-home/budget-illustration.png"
+          />
+          <NextIllustration
+            display={['none', null, null, null, 'block']}
+            width={1014}
+            height={619}
+            alt="The future is collective."
+            src="/static/images/new-home/budget-illustration.png"
+          />
         </Flex>
       </Flex>
       {showModal && (
