@@ -1913,6 +1913,7 @@
   "NotificationsSettings.NecessaryNotifications.ToSUpdates": "Aktualizácie našich podmienok poskytovania služieb",
   "NotificationsSettings.Title": "Nastavenia upozornení",
   "NotificationsSettings.ToggleError": "Chyba pri aktualizácii aktivity {activity}: {error}",
+  "NotificationsSettings.ToggleResetSettings": "By toggling this setting, you're also reseting previously set options for: {activities}",
   "NotificationsSettings.Updates.CollectivesSupported": "Kolektívy, ktoré podporujete",
   "NotificationsSettings.Updates.Description": "Upozornenia o nás, novinky, o ktoré sa s vami chceme podeliť v súvislosti s našimi aktivitami a vývojom platformy.",
   "NotificationsSettings.Updates.Newsletter": "Dostávajte newsletter Open Collective (mesačne)",
