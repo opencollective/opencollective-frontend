@@ -1913,6 +1913,7 @@
   "NotificationsSettings.NecessaryNotifications.ToSUpdates": "Actualizaciones en nuestros términos del servicio",
   "NotificationsSettings.Title": "Notifications Settings",
   "NotificationsSettings.ToggleError": "Error al actualizar la actividad {activity}: {error}",
+  "NotificationsSettings.ToggleResetSettings": "By toggling this setting, you're also reseting previously set options for: {activities}",
   "NotificationsSettings.Updates.CollectivesSupported": "Colectivos que apoyas",
   "NotificationsSettings.Updates.Description": "Notificaciones sobre nosotros, noticias que queremos compartir contigo relacionadas con nuestras actividades y el desarrollo de la plataforma.",
   "NotificationsSettings.Updates.Newsletter": "Recibir el boletín de Open Collective (mensual)",
