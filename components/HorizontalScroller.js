@@ -82,7 +82,7 @@ class HorizontalScroller extends React.PureComponent {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps() {
     this.setState({
       canGoNext: false,
     });
