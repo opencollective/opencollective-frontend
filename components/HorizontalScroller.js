@@ -82,6 +82,12 @@ class HorizontalScroller extends React.PureComponent {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      canGoNext: false,
+    });
+  }
+
   componentDidUpdate(oldProps) {
     if (oldProps.width !== this.props.width) {
       this.updateScrollInfo();
