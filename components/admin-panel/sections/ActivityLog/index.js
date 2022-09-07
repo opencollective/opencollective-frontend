@@ -47,14 +47,7 @@ const activityLogQuery = gqlV2/* GraphQL */ `
       type
       ... on Collective {
         childrenAccounts {
-          nodes {
-            id
-            legacyId
-            name
-            slug
-            imageUrl
-            legacyId
-          }
+          totalCount
         }
       }
     }

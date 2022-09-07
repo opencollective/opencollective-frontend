@@ -36,7 +36,6 @@ const ActivityFilters = ({ filters, onChange, account }) => {
       },
     };
   };
-  const childAccounts = account?.isHost ? null : account?.childrenAccounts?.nodes;
 
   return (
     <Container>
@@ -53,12 +52,12 @@ const ActivityFilters = ({ filters, onChange, account }) => {
           </FilterLabel>
           <ActivityTypeFilter account={account} {...getFilterProps('type')} />
         </FilterContainer>
-        {(account?.isHost || childAccounts?.length > 0) && (
+        {(account?.isHost || account?.childrenAccounts?.totalCount > 0) && (
           <FilterContainer width={[1, 1 / 3, 1 / 3]} pl={[0, '19px']}>
             <FilterLabel htmlFor="activity-filter-account">
               <FormattedMessage defaultMessage="Account" />
             </FilterLabel>
-            <ActivityAccountFilter account={account} childAccounts={childAccounts} {...getFilterProps('account')} />
+            <ActivityAccountFilter account={account} {...getFilterProps('account')} />
           </FilterContainer>
         )}
       </Flex>
