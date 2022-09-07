@@ -40,7 +40,7 @@ const StyledDescription = styled(P)`
 const RaiseMoney = () => {
   return (
     <Flex flexDirection="column" justifyContent="center" alignItems="center" mt="72px">
-      <Flex flexDirection="column" alignItems="center">
+      <Flex flexDirection="column" alignItems="center" maxWidth="100%">
         <Box mb="50px" px="16px">
           <SectionTitle textAlign="center" mb={3}>
             <FormattedMessage id="home.raiseMoney" defaultMessage={'Raise money with full transparency'} />
@@ -54,7 +54,7 @@ const RaiseMoney = () => {
           </SectionDescription>
         </Box>
 
-        <Flex justifyContent="center" width="100vw" overflow="hidden">
+        <Flex justifyContent="center" width="100vw" maxWidth="100%" overflow="hidden">
           <Container
             width={['100vw', '768px', '1024px', null, '1280px']}
             height={['495px', '256px', '347px']}

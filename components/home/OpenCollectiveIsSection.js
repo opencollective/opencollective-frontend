@@ -88,7 +88,7 @@ const OpenCollectiveIs = () => {
           </Box>
         </Container>
 
-        <Container position="relative" top="-40px">
+        <Container position="relative" maxWidth="100%" top="-40px">
           <NetworkOfCollectives />
         </Container>
 

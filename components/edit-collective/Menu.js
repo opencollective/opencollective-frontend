@@ -35,6 +35,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   WEBHOOKS: 'webhooks',
   PENDING_ORDERS: 'pending-orders',
   TWO_FACTOR_AUTH: 'two-factor-auth',
+  ACTIVITY_LOG: 'activity-log', // Last on purpose
   ADVANCED: 'advanced', // Last on purpose
   VIRTUAL_CARDS: 'virtual-cards',
   // Host Specific

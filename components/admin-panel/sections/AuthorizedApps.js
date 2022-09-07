@@ -5,9 +5,12 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
+import { getSettingsRoute } from '../../../lib/url-helpers';
 
+import { EDIT_COLLECTIVE_SECTIONS } from '../../edit-collective/Menu';
 import { Box, Flex } from '../../Grid';
-import { I18nSupportLink } from '../../I18nFormatters';
+import { getI18nLink } from '../../I18nFormatters';
+import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
@@ -48,8 +51,13 @@ const AuthorizedAppsSection = () => {
       ) : (
         <MessageBox type="info" withIcon mt={3}>
           <FormattedMessage
-            defaultMessage="We're beta-testing OAuth integrations for Open Collective. <SupportLink>Contact us</SupportLink> if you're interested to try it out early!"
-            values={{ SupportLink: I18nSupportLink }}
+            defaultMessage="No Authorized App yet. You can create your own OAuth application from the <ForDevelopersLink>For Developers</ForDevelopersLink> section."
+            values={{
+              ForDevelopersLink: getI18nLink({
+                as: Link,
+                href: getSettingsRoute(LoggedInUser.collective, EDIT_COLLECTIVE_SECTIONS.FOR_DEVELOPERS),
+              }),
+            }}
           />
         </MessageBox>
       )}
@@ -69,7 +77,6 @@ const AuthorizedAppsSection = () => {
             limit={variables.limit}
             offset={variables.offset}
             ignoredQueryParams={['slug', 'section']}
-            scrollToTopOnChange
           />
         </Flex>
       )}

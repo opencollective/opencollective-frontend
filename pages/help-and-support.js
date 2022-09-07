@@ -46,7 +46,7 @@ const renderFormContent = formConfirmation => {
         actions={
           <Flex flexDirection={['column', 'row']}>
             <Link href="/help">
-              <StyledButton minWidth={208} buttonStyle="standard" whiteSpace="nowrap">
+              <StyledButton minWidth={208} buttonStyle="marketingSecondary" whiteSpace="nowrap">
                 <FormattedMessage id="helpAndSupport.visitHelp" defaultMessage="Visit Help & Support" />
               </StyledButton>
             </Link>
@@ -54,7 +54,7 @@ const renderFormContent = formConfirmation => {
               href="https://docs.opencollective.com/"
               buttonSize="medium"
               minWidth={208}
-              buttonStyle="dark"
+              buttonStyle="marketing"
               mt={['16px', 0]}
               ml={[0, '16px']}
               openInNewTab

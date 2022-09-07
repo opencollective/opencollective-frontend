@@ -286,20 +286,11 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
 
         <Box width="32px" flex="1" />
 
-        <StyledCard
-          display="flex"
-          flex={[null, null, '1 1 300px']}
-          width="100%"
-          flexDirection={['column', 'row', 'column']}
-          mb={2}
-          mx={[null, null, 3]}
-        >
-          {isLoading ? (
-            <LoadingPlaceholder height={300} />
-          ) : (
-            <BudgetStats collective={collective} stats={data?.account?.stats} />
-          )}
-        </StyledCard>
+        {isLoading ? (
+          <LoadingPlaceholder height={300} />
+        ) : (
+          <BudgetStats collective={collective} stats={data?.account?.stats} />
+        )}
       </Flex>
     </ContainerSectionContent>
   );

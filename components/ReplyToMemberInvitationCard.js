@@ -93,7 +93,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
       <LinkCollective collective={invitation.account}>
         <Flex flexDirection="column" alignItems="center">
           <Avatar collective={invitation.account} />
-          <H3>{invitation.account.name}</H3>
+          <H3 textAlign="center">{invitation.account.name}</H3>
         </Flex>
       </LinkCollective>
       <br />

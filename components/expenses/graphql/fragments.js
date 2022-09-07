@@ -253,6 +253,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       twitterHandle
       currency
       expensePolicy
+      supportedExpenseTypes
       features {
         id
         ...NavbarFields

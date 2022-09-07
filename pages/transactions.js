@@ -416,7 +416,6 @@ class TransactionsPage extends React.Component {
                     limit={variables.limit}
                     offset={variables.offset}
                     ignoredQueryParams={['collectiveSlug']}
-                    scrollToTopOnChange
                   />
                 </Flex>
               </React.Fragment>

@@ -34,15 +34,15 @@ const ModalFooterWrapper = styled(ModalFooter)`
 `;
 
 const newsAndUpdatesQuery = gqlV2/* GraphQL */ `
-  query ChangelogUpdates(
-    $collectiveSlug: String
-    $onlyChangelogUpdates: Boolean
-    $onlyPublishedUpdates: Boolean
-    $limit: Int
-  ) {
-    account(slug: $collectiveSlug) {
+  query ChangelogUpdates($limit: Int) {
+    account(slug: "opencollective") {
       id
-      updates(onlyChangelogUpdates: $onlyChangelogUpdates, onlyPublishedUpdates: $onlyPublishedUpdates, limit: $limit) {
+      updates(
+        orderBy: { field: PUBLISHED_AT, direction: DESC }
+        onlyChangelogUpdates: true
+        onlyPublishedUpdates: true
+        limit: $limit
+      ) {
         nodes {
           id
           slug
@@ -154,16 +154,7 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
       </ModalHeaderWrapper>
       <hr />
       <ModalBody>
-        <Query
-          query={newsAndUpdatesQuery}
-          variables={{
-            collectiveSlug: 'opencollective',
-            onlyChangelogUpdates: true,
-            onlyPublishedUpdates: true,
-            limit: 5,
-          }}
-          context={API_V2_CONTEXT}
-        >
+        <Query query={newsAndUpdatesQuery} variables={{ limit: 5 }} context={API_V2_CONTEXT}>
           {({ data, loading, error }) => renderStyledCarousel(data, loading, error, onClose)}
         </Query>
       </ModalBody>

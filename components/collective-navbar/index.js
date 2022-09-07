@@ -7,7 +7,6 @@ import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
 import { Close } from '@styled-icons/material/Close';
-import { Dashboard } from '@styled-icons/material/Dashboard';
 import { Settings } from '@styled-icons/material/Settings';
 import { Stack } from '@styled-icons/remix-line/Stack';
 import { themeGet } from '@styled-system/theme-get';
@@ -16,15 +15,15 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { display } from 'styled-system';
 
-import { accountSupportsGrants, expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
+import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
 import { getFilteredSectionsForCollective, isSectionEnabled } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
+import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import roles from '../../lib/constants/roles';
-import { getEnvVar } from '../../lib/env-utils';
+import { isSupportedExpenseType } from '../../lib/expenses';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute, getSettingsRoute } from '../../lib/url-helpers';
-import { parseToBoolean } from '../../lib/utils';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -262,7 +261,8 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isAccountant, i
       isFeatureAvailable(collective, 'RECEIVE_EXPENSES') && expenseSubmissionAllowed(collective, LoggedInUser),
     hasManageSubscriptions: isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE',
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
-    hasRequestGrant: accountSupportsGrants(collective, host) && expenseSubmissionAllowed(collective, LoggedInUser),
+    hasRequestGrant:
+      isSupportedExpenseType(collective, EXPENSE_TYPE.GRANT) && expenseSubmissionAllowed(collective, LoggedInUser),
     addFunds: isHostAdmin,
     createVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
     assignVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
@@ -279,36 +279,20 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return null;
   }
 
-  const hasNewAdminPanel = parseToBoolean(getEnvVar('NEW_ADMIN_DASHBOARD'));
-
   // Order of the condition defines main call to action: first match gets displayed
   if (callsToAction.includes(NAVBAR_ACTION_TYPE.SETTINGS)) {
     return {
       type: NAVBAR_ACTION_TYPE.SETTINGS,
       component: (
-        <Link href={getSettingsRoute(collective, null, LoggedInUser)} data-cy="edit-collective-btn">
+        <Link href={getSettingsRoute(collective)} data-cy="edit-collective-btn">
           <ActionButton tabIndex="-1">
             <Settings size="1em" />
             <Span ml={2}>
-              {collective.isHost && hasNewAdminPanel ? (
+              {collective.isHost ? (
                 <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
               ) : (
                 <FormattedMessage id="Settings" defaultMessage="Settings" />
               )}
-            </Span>
-          </ActionButton>
-        </Link>
-      ),
-    };
-  } else if (callsToAction.includes('hasDashboard') && !hasNewAdminPanel) {
-    return {
-      type: NAVBAR_ACTION_TYPE.DASHBOARD,
-      component: (
-        <Link href={`/${collective.slug}/dashboard`}>
-          <ActionButton tabIndex="-1">
-            <Dashboard size="1em" />
-            <Span ml={2}>
-              <FormattedMessage id="host.dashboard" defaultMessage="Dashboard" />
             </Span>
           </ActionButton>
         </Link>

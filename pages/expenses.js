@@ -299,7 +299,6 @@ class ExpensePage extends React.Component {
                         limit={data.variables.limit}
                         offset={data.variables.offset}
                         ignoredQueryParams={['collectiveSlug', 'parentCollectiveSlug']}
-                        scrollToTopOnChange
                       />
                     </Flex>
                   </React.Fragment>
@@ -377,6 +376,7 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       isActive
       settings
       createdAt
+      supportedExpenseTypes
       expensesTags {
         id
         tag

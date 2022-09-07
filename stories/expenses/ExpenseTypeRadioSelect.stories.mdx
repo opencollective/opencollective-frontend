@@ -6,8 +6,8 @@ import expenseTypes from '../../lib/constants/expenseTypes';
   title="Expenses/ExpenseTypeRadioSelect"
   component={ExpenseTypeRadioSelect}
   argTypes={{
-    options: {
-      defaultValue: { hasGrant: true },
+    supportedExpenseTypes: {
+      defaultValue: [expenseTypes.RECEIPT, expenseTypes.INVOICE, expenseTypes.GRANT],
     },
     value: {
       options: Object.values(expenseTypes),

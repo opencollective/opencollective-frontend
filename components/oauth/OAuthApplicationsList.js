@@ -142,7 +142,6 @@ const OAuthApplicationsList = ({ accountSlug, onApplicationCreated, offset = 0 }
             limit={variables.limit}
             offset={variables.offset}
             ignoredQueryParams={['slug', 'section']}
-            scrollToTopOnChange
           />
         </Flex>
       )}

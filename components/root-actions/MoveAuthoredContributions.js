@@ -250,6 +250,7 @@ const MoveAuthoredContributions = () => {
             onChange={option => setNewFromAccount(option?.value || null)}
             disabled={!fromAccount}
             customOptions={toAccountCustomOptions}
+            skipGuests={false}
           />
         )}
       </StyledInputField>

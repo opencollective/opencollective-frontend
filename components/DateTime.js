@@ -10,7 +10,7 @@ const TITLE_MESSAGE = defineMessage({
   defaultMessage: 'Local time: {localTime}{newLine}UTC time: {utcTime}',
 });
 
-const generateTitle = (intl, date) => {
+export const generateDateTitle = (intl, date) => {
   return intl.formatMessage(TITLE_MESSAGE, {
     localTime: capitalize(intl.formatDate(date, { dateStyle: 'full', timeStyle: 'long' })),
     utcTime: capitalize(intl.formatDate(date, { dateStyle: 'full', timeStyle: 'long', timeZone: 'UTC' })),
@@ -31,7 +31,7 @@ const DateTime = ({ value, dateStyle, timeStyle, ...props }) => {
       {...props}
       title={title}
       dateTime={date.toISOString()}
-      onMouseEnter={() => setTitle(generateTitle(intl, date))}
+      onMouseEnter={() => setTitle(generateDateTitle(intl, date))}
     >
       <FormattedDate dateStyle={dateStyle} timeStyle={timeStyle} value={date} />
     </time>

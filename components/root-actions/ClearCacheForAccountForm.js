@@ -36,7 +36,9 @@ const ClearCacheForAccountForm = () => {
   return (
     <div>
       <StyledInputField htmlFor="clear-cache-account" label="Account" flex="1 1">
-        {({ id }) => <CollectivePickerAsync inputId={id} onChange={({ value }) => setAccount(value)} />}
+        {({ id }) => (
+          <CollectivePickerAsync inputId={id} onChange={({ value }) => setAccount(value)} skipGuests={false} />
+        )}
       </StyledInputField>
 
       <P fontWeight="normal" fontSize="14px" color="black.800" mt={3} mb={2}>
