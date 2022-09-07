@@ -24,7 +24,7 @@ const GroupView = ({ accounts, title, advancedSettings, roleLabel }) => {
     <Box>
       <P color="blue.800" fontSize="13px" fontWeight="500" lineHeight="16px" mb={4}>
         <StyledLink textDecoration="underline" color="inherit" onClick={handleBack}>
-          <FormattedMessage id="NotificationsSettings.Title" defaultMessage="Notifications settings" />
+          <FormattedMessage id="NotificationsSettings.Title" defaultMessage="Notifications Settings" />
         </StyledLink>{' '}
         &gt; {title}
       </P>
@@ -34,7 +34,7 @@ const GroupView = ({ accounts, title, advancedSettings, roleLabel }) => {
       <P lineHeight="20px" letterSpacing="0px">
         <FormattedMessage
           id="NotificationsSettings.Descripion"
-          defaultMessage="We will always let you know about important changes, but you can choose what else you hear about here. Manage email notifications for your individual profile as well as the collectives and organizations you are part of."
+          defaultMessage="We will always let you know about important changes, but you can customize other settings here. Manage email notifications for your individual profile as well as the collectives and organizations you are part of."
         />
       </P>
       <Flex mt={4} flexDirection="column">

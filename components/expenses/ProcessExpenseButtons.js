@@ -41,7 +41,7 @@ const processExpenseMutation = gqlV2/* GraphQL */ `
   ${expensePageExpenseFieldsFragment}
 `;
 
-const ButtonLabel = styled.span({ marginLeft: 6 });
+export const ButtonLabel = styled.span({ marginLeft: 6 });
 
 /**
  * A small helper to know if expense process buttons should be displayed

@@ -81,6 +81,7 @@ const CTAContainer = styled(Container)`
       h3,
       span {
         color: ${themeGet('colors.primary.800')};
+        word-break: break-word;
       }
     `}
 

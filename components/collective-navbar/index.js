@@ -15,10 +15,12 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { display } from 'styled-system';
 
-import { accountSupportsGrants, expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
+import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
 import { getFilteredSectionsForCollective, isSectionEnabled } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
+import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import roles from '../../lib/constants/roles';
+import { isSupportedExpenseType } from '../../lib/expenses';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute, getSettingsRoute } from '../../lib/url-helpers';
@@ -147,13 +149,6 @@ const CollectiveName = styled(LinkCollective).attrs({
   }
 `;
 
-const RightContainer = styled(Container)`
-  flex-shrink: 0;
-  @media screen and (min-width: 64em) {
-    width: 100%;
-  }
-`;
-
 const CategoriesContainer = styled(Container)`
   background-color: #ffffff;
   max-height: calc(100vh - 70px);
@@ -266,7 +261,8 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isAccountant, i
       isFeatureAvailable(collective, 'RECEIVE_EXPENSES') && expenseSubmissionAllowed(collective, LoggedInUser),
     hasManageSubscriptions: isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE',
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
-    hasRequestGrant: accountSupportsGrants(collective, host) && expenseSubmissionAllowed(collective, LoggedInUser),
+    hasRequestGrant:
+      isSupportedExpenseType(collective, EXPENSE_TYPE.GRANT) && expenseSubmissionAllowed(collective, LoggedInUser),
     addFunds: isHostAdmin,
     createVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
     assignVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
@@ -460,7 +456,7 @@ const CollectiveNavbar = ({
         minHeight={NAVBAR_HEIGHT}
       >
         {/** Collective info */}
-        <InfosContainer px={[3, 0]} py={[2, 1]} flexGrow="1">
+        <InfosContainer px={[3, 0]} py={[2, 1]}>
           <Flex alignItems="center" maxWidth={['90%', '100%']} flex="1 1">
             <BackButtonAndAvatar data-hide-on-desktop={isInHero}>
               {showBackButton && (
@@ -524,9 +520,10 @@ const CollectiveNavbar = ({
         {/** Main navbar items */}
 
         {!onlyInfos && (
-          <RightContainer
+          <Container
             overflowY="auto"
             display={['block', 'flex']}
+            width="100%"
             justifyContent="space-between"
             flexDirection={['column', 'row']}
           >
@@ -560,8 +557,8 @@ const CollectiveNavbar = ({
               display={isExpanded ? 'flex' : ['none', 'flex']}
               flexDirection={['column', 'row']}
               flexBasis="fit-content"
+              marginLeft={[0, 'auto']}
               backgroundColor="#fff"
-              flexShrink="0"
               zIndex={1}
             >
               {mainAction && (
@@ -593,7 +590,7 @@ const CollectiveNavbar = ({
                 </Container>
               )}
             </Container>
-          </RightContainer>
+          </Container>
         )}
       </NavbarContentContainer>
     </NavBarContainer>

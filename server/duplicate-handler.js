@@ -47,14 +47,16 @@ function duplicateHandler({ keyGenerator, skip, timeout } = {}) {
             originResMethods[method].apply(origin.res, arguments);
 
             // Apply on duplicates method
-            for (const duplicate of requests[id].duplicates) {
-              // Copy properties because we don't listen when their set
-              if (method === 'send') {
-                duplicate.res.statusCode = origin.res.statusCode;
-                duplicate.res.statusMessage = origin.res.statusMessage;
-              }
+            if (requests[id]) {
+              for (const duplicate of requests[id].duplicates) {
+                // Copy properties because we don't listen when their set
+                if (method === 'send') {
+                  duplicate.res.statusCode = origin.res.statusCode;
+                  duplicate.res.statusMessage = origin.res.statusMessage;
+                }
 
-              duplicate.res[method].apply(duplicate.res, arguments);
+                duplicate.res[method].apply(duplicate.res, arguments);
+              }
             }
           };
         }

@@ -39,6 +39,7 @@ export const collectivePageQuery = gql`
       imageUrl(height: 256)
       canApply
       canContact
+      supportedExpenseTypes
       features {
         id
         ...NavbarFields

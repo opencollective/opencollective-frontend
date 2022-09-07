@@ -52,7 +52,7 @@ const StyledInputFormikField = ({ name, validate, children, isFastField, flex, w
 
 StyledInputFormikField.propTypes = {
   name: PropTypes.string.isRequired,
-  validate: PropTypes.bool,
+  validate: PropTypes.func,
   isFastField: PropTypes.func,
   children: PropTypes.func,
   /** the label's 'for' attribute to be used as the 'name' and 'id' for the input */

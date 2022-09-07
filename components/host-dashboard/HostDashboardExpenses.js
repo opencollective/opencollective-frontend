@@ -303,7 +303,6 @@ const HostDashboardExpenses = ({ hostSlug, isNewAdmin }) => {
               limit={paginatedExpenses.limit}
               offset={paginatedExpenses.offset}
               ignoredQueryParams={ROUTE_PARAMS}
-              scrollToTopOnChange
             />
           </Flex>
         </React.Fragment>

@@ -58,6 +58,11 @@ type OAuthAuthorization {
   expiresAt: DateTime!
 
   """
+  The last time of token was used
+  """
+  lastUsedAt: DateTime
+
+  """
   The attached scopes.
   """
   scope: [OAuthScope]
@@ -301,6 +306,11 @@ interface Account {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -487,6 +497,11 @@ interface Account {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -569,7 +584,7 @@ interface Account {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -613,7 +628,7 @@ interface Account {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
 }
 
 """
@@ -726,7 +741,7 @@ type Tier {
   amountType: TierAmountType!
   minimumAmount: Amount!
   endsAt: DateTime
-  invoiceTemplate: String!
+  invoiceTemplate: String
 }
 
 """
@@ -903,6 +918,7 @@ interface Transaction {
   isRefunded: Boolean
   isRefund: Boolean
   paymentMethod: PaymentMethod
+  payoutMethod: PayoutMethod
   permissions: TransactionPermissions
   isOrderRejected: Boolean!
   refundTransaction: Transaction
@@ -922,6 +938,7 @@ interface Transaction {
   The balance after the Transaction has run. Only for financially active accounts.
   """
   balanceInHostCurrency: Amount
+  invoiceTemplate: String
 }
 
 """
@@ -1956,12 +1973,12 @@ input ChronologicalOrderInput {
   """
   Field to chronologically order by.
   """
-  field: DateTimeField = CREATED_AT
+  field: DateTimeField! = CREATED_AT
 
   """
   Ordering direction.
   """
-  direction: OrderDirection = DESC
+  direction: OrderDirection! = DESC
 }
 
 """
@@ -2231,9 +2248,19 @@ type Activity {
   createdAt: DateTime!
 
   """
-  The account concerned by this activity, if any
+  The account that authored by this activity, if any
+  """
+  fromAccount: Account
+
+  """
+  The account targeted by this activity, if any
   """
   account: Account
+
+  """
+  The host under which this activity happened, if any
+  """
+  host: Host
 
   """
   The person who triggered the action, if any
@@ -2241,9 +2268,24 @@ type Activity {
   individual: Individual
 
   """
+  The expense related to this activity, if any
+  """
+  expense: Expense
+
+  """
+  The order related to this activity, if any
+  """
+  order: Order
+
+  """
   Data attached to this activity (if any)
   """
   data: JSON!
+
+  """
+  Specifies whether this is a system generated activity
+  """
+  isSystem: Boolean!
 }
 
 enum ActivityType {
@@ -2254,14 +2296,21 @@ enum ActivityType {
   COLLECTIVE_APPROVED
   COLLECTIVE_REJECTED
   COLLECTIVE_CREATED
+  ORGANIZATION_COLLECTIVE_CREATED
+  COLLECTIVE_FROZEN
+  COLLECTIVE_UNFROZEN
   COLLECTIVE_COMMENT_CREATED
   COLLECTIVE_CONVERSATION_CREATED
+  UPDATE_COMMENT_CREATED
+  EXPENSE_COMMENT_CREATED
+  CONVERSATION_COMMENT_CREATED
   COLLECTIVE_EXPENSE_CREATED
   COLLECTIVE_EXPENSE_DELETED
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
   COLLECTIVE_EXPENSE_UNAPPROVED
+  COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM
@@ -2272,13 +2321,15 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_INVITE_DRAFTED
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  TAXFORM_REQUEST
+  COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
-  COLLECTIVE_FROZEN
-  COLLECTIVE_UNFROZEN
+  VIRTUAL_CARD_REQUESTED
+  VIRTUAL_CARD_CHARGE_DECLINED
+  VIRTUAL_CARD_PURCHASE
   COLLECTIVE_MEMBER_INVITED
   COLLECTIVE_MEMBER_CREATED
-  COLLECTIVE_MONTHLY_REPORT
   COLLECTIVE_CORE_MEMBER_ADDED
   COLLECTIVE_CORE_MEMBER_INVITED
   COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED
@@ -2288,22 +2339,12 @@ enum ActivityType {
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
-  COLLECTIVE_VIRTUAL_CARD_ADDED
+  HOST_APPLICATION_CONTACT
   CONTRIBUTION_REJECTED
-  ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
   SUBSCRIPTION_CANCELED
   TICKET_CONFIRMED
-  USER_CREATED
-  USER_NEW_TOKEN
-  USER_CHANGE_EMAIL
-  USER_PAYMENT_METHOD_CREATED
-  USER_CARD_CLAIMED
-  USER_CARD_INVITED
-  WEBHOOK_STRIPE_RECEIVED
-  WEBHOOK_PAYPAL_RECEIVED
-  COLLECTIVE_MONTHLY
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
   ORDER_PROCESSING
   ORDER_PROCESSING_CRYPTO
@@ -2312,173 +2353,27 @@ enum ActivityType {
   ORDER_THANKYOU
   ORDERS_SUSPICIOUS
   BACKYOURSTACK_DISPATCH_CONFIRMED
-  ACTIVATED_COLLECTIVE_AS_HOST
-  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
-  DEACTIVATED_COLLECTIVE_AS_HOST
-  VIRTUAL_CARD_REQUESTED
-  VIRTUAL_CARD_CHARGE_DECLINED
   PAYMENT_FAILED
   PAYMENT_CREDITCARD_CONFIRMATION
   PAYMENT_CREDITCARD_EXPIRING
-  TAXFORM_REQUEST
-  CONVERSATION_COMMENT_CREATED
-  UPDATE_COMMENT_CREATED
-  EXPENSE_COMMENT_CREATED
-  HOST_APPLICATION_CONTACT
+  USER_CREATED
+  USER_NEW_TOKEN
+  OAUTH_APPLICATION_AUTHORIZED
+  USER_CHANGE_EMAIL
+  USER_PAYMENT_METHOD_CREATED
+  USER_CARD_CLAIMED
+  USER_CARD_INVITED
+  WEBHOOK_STRIPE_RECEIVED
+  WEBHOOK_PAYPAL_RECEIVED
+  COLLECTIVE_MONTHLY_REPORT
+  ACTIVATED_COLLECTIVE_AS_HOST
+  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
+  DEACTIVATED_COLLECTIVE_AS_HOST
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
   COLLECTIVE_VIRTUAL_CARD_ASSIGNED
   COLLECTIVE_VIRTUAL_CARD_CREATED
-}
-
-"""
-Type for a required legal document
-"""
-enum LegalDocumentType {
-  """
-  US tax form (W9)
-  """
-  US_TAX_FORM
-}
-
-"""
-Fields for an expense quote
-"""
-type ExpenseQuote {
-  """
-  Amount of this item
-  """
-  totalAmount: Amount!
-
-  """
-  Amount of payment processor fee
-  """
-  paymentProcessorFeeAmount: Amount!
-
-  """
-  The date on which the item was created
-  """
-  estimatedDeliveryAt: DateTime!
-}
-
-"""
-A recurring expense object
-"""
-type RecurringExpense {
-  """
-  Unique identifier for this recurring expense
-  """
-  id: String!
-
-  """
-  The interval in which this recurring expense is created
-  """
-  interval: RecurringExpenseInterval!
-  account: Account!
-  fromAccount: Account!
-
-  """
-  The last time this recurring expense was paid for
-  """
-  lastDraftedAt: DateTime!
-
-  """
-  The time this expense will cease to be recurring
-  """
-  endsAt: DateTime
-
-  """
-  The last expense created by this recurring expense record paid for
-  """
-  lastExpenseCreated: Expense
-}
-
-"""
-All supported intervals for recurring expenses
-"""
-enum RecurringExpenseInterval {
-  day
-  week
-  month
-  quarter
-  year
-}
-
-"""
-PaymentMethod model
-"""
-type PaymentMethod {
-  id: String
-  legacyId: Int
-  name: String
-  service: PaymentMethodService
-  type: PaymentMethodType
-
-  """
-  Defines the type of the payment method. Meant to be moved to "type" in the future.
-  """
-  providerType: PaymentMethodLegacyType @deprecated(reason: "2021-03-02: Please use service + type")
-
-  """
-  Returns the balance amount and the currency of this paymentMethod
-  """
-  balance: Amount!
-  account: Account
-
-  """
-  For gift cards, this field will return to the source payment method
-  """
-  sourcePaymentMethod: PaymentMethod
-  data: JSON
-  limitedToHosts: [Host]
-  expiryDate: DateTime
-  createdAt: DateTime
-}
-
-enum PaymentMethodService {
-  PAYPAL
-  STRIPE
-  OPENCOLLECTIVE
-  PREPAID
-  THEGIVINGBLOCK
-}
-
-enum PaymentMethodType {
-  alipay @deprecated(reason: "Please use uppercase values")
-  creditcard @deprecated(reason: "Please use uppercase values")
-  prepaid @deprecated(reason: "Please use uppercase values")
-  payment @deprecated(reason: "Please use uppercase values")
-  subscription @deprecated(reason: "Please use uppercase values")
-  collective @deprecated(reason: "Please use uppercase values")
-  host @deprecated(reason: "Please use uppercase values")
-  adaptive @deprecated(reason: "Please use uppercase values")
-  giftcard @deprecated(reason: "Please use uppercase values")
-  manual @deprecated(reason: "Please use uppercase values")
-  crypto @deprecated(reason: "Please use uppercase values")
-  ALIPAY
-  CREDITCARD
-  PREPAID
-  PAYMENT
-  SUBSCRIPTION
-  COLLECTIVE
-  HOST
-  ADAPTIVE
-  GIFTCARD
-  MANUAL
-  CRYPTO
-}
-
-enum PaymentMethodLegacyType {
-  ALIPAY
-  CREDIT_CARD
-  GIFT_CARD
-  PREPAID_BUDGET
-  ACCOUNT_BALANCE
-  PAYPAL
-  BANK_TRANSFER
-  ADDED_FUNDS
-  CRYPTO
 }
 
 """
@@ -2658,6 +2553,11 @@ type Host implements Account & AccountWithContributions {
     The transaction type (DEBIT or CREDIT)
     """
     type: TransactionType
+
+    """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -2846,6 +2746,11 @@ type Host implements Account & AccountWithContributions {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -2913,7 +2818,7 @@ type Host implements Account & AccountWithContributions {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -2957,7 +2862,7 @@ type Host implements Account & AccountWithContributions {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -3452,6 +3357,36 @@ type TransactionCollection implements Collection {
   totalCount: Int
   nodes: [Transaction]
   kinds: [TransactionKind]
+
+  """
+  The types of payment methods used in this collection, regardless of the pagination
+  """
+  paymentMethodTypes: [PaymentMethodType]!
+}
+
+enum PaymentMethodType {
+  alipay @deprecated(reason: "Please use uppercase values")
+  creditcard @deprecated(reason: "Please use uppercase values")
+  prepaid @deprecated(reason: "Please use uppercase values")
+  payment @deprecated(reason: "Please use uppercase values")
+  subscription @deprecated(reason: "Please use uppercase values")
+  collective @deprecated(reason: "Please use uppercase values")
+  host @deprecated(reason: "Please use uppercase values")
+  adaptive @deprecated(reason: "Please use uppercase values")
+  giftcard @deprecated(reason: "Please use uppercase values")
+  manual @deprecated(reason: "Please use uppercase values")
+  crypto @deprecated(reason: "Please use uppercase values")
+  ALIPAY
+  CREDITCARD
+  PREPAID
+  PAYMENT
+  SUBSCRIPTION
+  COLLECTIVE
+  HOST
+  ADAPTIVE
+  GIFTCARD
+  MANUAL
+  CRYPTO
 }
 
 """
@@ -3536,6 +3471,62 @@ type TagStat {
   Number of entries for this tag
   """
   count: Int!
+
+  """
+  Total amount for this tag
+  """
+  amount: Amount!
+}
+
+"""
+PaymentMethod model
+"""
+type PaymentMethod {
+  id: String
+  legacyId: Int
+  name: String
+  service: PaymentMethodService
+  type: PaymentMethodType
+
+  """
+  Defines the type of the payment method. Meant to be moved to "type" in the future.
+  """
+  providerType: PaymentMethodLegacyType @deprecated(reason: "2021-03-02: Please use service + type")
+
+  """
+  Returns the balance amount and the currency of this paymentMethod
+  """
+  balance: Amount!
+  account: Account
+
+  """
+  For gift cards, this field will return to the source payment method
+  """
+  sourcePaymentMethod: PaymentMethod
+  data: JSON
+  limitedToHosts: [Host]
+  expiryDate: DateTime
+  createdAt: DateTime
+}
+
+enum PaymentMethodService {
+  PAYPAL
+  STRIPE
+  OPENCOLLECTIVE
+  PREPAID
+  THEGIVINGBLOCK
+}
+
+enum PaymentMethodLegacyType {
+  ALIPAY
+  CREDIT_CARD
+  GIFT_CARD
+  PREPAID_BUDGET
+  ACCOUNT_BALANCE
+  PAYPAL
+  BANK_TRANSFER
+  ADDED_FUNDS
+  CRYPTO
 }
 
 """
@@ -3692,6 +3683,176 @@ type AccountStats {
   """
   totalNetAmountReceived: Amount!
   activeRecurringContributions: JSON
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(
+    limit: Int! = 30
+
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    Include contributions to children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): [AmountStats]
+
+  """
+  History of the expense tags used by this collective.
+  """
+  expensesTagsTimeSeries(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+
+    """
+    Include expense to children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): TimeSeriesAmount!
+
+  """
+  Return amount stats for contributions (default, and only for now: one-time vs recurring)
+  """
+  contributionsAmount(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    Include contributions to children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): [AmountStats]
+
+  """
+  Return amount time series for contributions (default, and only for now: one-time vs recurring)
+  """
+  contributionsAmountTimeSeries(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+
+    """
+    Include contributions to children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): TimeSeriesAmount!
+}
+
+"""
+Statistics aith amounts
+"""
+type AmountStats {
+  """
+  Name/Label for the amount
+  """
+  label: String!
+
+  """
+  Total amount for this label
+  """
+  amount: Amount!
+
+  """
+  Number of entries for this label
+  """
+  count: Int
+}
+
+"""
+Amount time series
+"""
+type TimeSeriesAmount implements TimeSeries {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime!
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime!
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+
+  """
+  Time series data points
+  """
+  nodes: [TimeSeriesAmountNode!]!
+}
+
+interface TimeSeries {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime!
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime!
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+}
+
+enum TimeUnit {
+  SECOND
+  MINUTE
+  HOUR
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+type TimeSeriesAmountNode {
+  date: DateTime!
+  amount: Amount!
+  label: String
 }
 
 """
@@ -3801,6 +3962,36 @@ type UpdateAudienceStats {
   The total number of emails to send
   """
   total: Int!
+}
+
+"""
+Input to order updates chronologically
+"""
+input UpdateChronologicalOrderInput {
+  """
+  Field to chronologically order by.
+  """
+  field: UpdateDateTimeField! = CREATED_AT
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection! = DESC
+}
+
+"""
+All possible DateTime fields for an update
+"""
+enum UpdateDateTimeField {
+  """
+  The creation time
+  """
+  CREATED_AT
+
+  """
+  The creation time
+  """
+  PUBLISHED_AT
 }
 
 """
@@ -4160,63 +4351,6 @@ type HostMetricsTimeSeries {
   totalSpent: TimeSeriesAmountWithKind!
 }
 
-enum TimeUnit {
-  SECOND
-  MINUTE
-  HOUR
-  DAY
-  WEEK
-  MONTH
-  YEAR
-}
-
-"""
-Amount time series
-"""
-type TimeSeriesAmount implements TimeSeries {
-  """
-  The start date of the time series
-  """
-  dateFrom: DateTime!
-
-  """
-  The end date of the time series
-  """
-  dateTo: DateTime!
-
-  """
-  The interval between two data points
-  """
-  timeUnit: TimeUnit!
-
-  """
-  Time series data points
-  """
-  nodes: [TimeSeriesAmountNode!]!
-}
-
-interface TimeSeries {
-  """
-  The start date of the time series
-  """
-  dateFrom: DateTime!
-
-  """
-  The end date of the time series
-  """
-  dateTo: DateTime!
-
-  """
-  The interval between two data points
-  """
-  timeUnit: TimeUnit!
-}
-
-type TimeSeriesAmountNode {
-  date: DateTime!
-  amount: Amount!
-}
-
 """
 Amounts with settlements time series
 """
@@ -4383,6 +4517,79 @@ type ExpenseStats {
   Number of grants
   """
   grantsCount: Int!
+}
+
+"""
+Type for a required legal document
+"""
+enum LegalDocumentType {
+  """
+  US tax form (W9)
+  """
+  US_TAX_FORM
+}
+
+"""
+Fields for an expense quote
+"""
+type ExpenseQuote {
+  """
+  Amount of this item
+  """
+  totalAmount: Amount!
+
+  """
+  Amount of payment processor fee
+  """
+  paymentProcessorFeeAmount: Amount!
+
+  """
+  The date on which the item was created
+  """
+  estimatedDeliveryAt: DateTime
+}
+
+"""
+A recurring expense object
+"""
+type RecurringExpense {
+  """
+  Unique identifier for this recurring expense
+  """
+  id: String!
+
+  """
+  The interval in which this recurring expense is created
+  """
+  interval: RecurringExpenseInterval!
+  account: Account!
+  fromAccount: Account!
+
+  """
+  The last time this recurring expense was paid for
+  """
+  lastDraftedAt: DateTime!
+
+  """
+  The time this expense will cease to be recurring
+  """
+  endsAt: DateTime
+
+  """
+  The last expense created by this recurring expense record paid for
+  """
+  lastExpenseCreated: Expense
+}
+
+"""
+All supported intervals for recurring expenses
+"""
+enum RecurringExpenseInterval {
+  day
+  week
+  month
+  quarter
+  year
 }
 
 """
@@ -4696,6 +4903,11 @@ type Bot implements Account {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -4882,6 +5094,11 @@ type Bot implements Account {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -4949,7 +5166,7 @@ type Bot implements Account {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -4993,7 +5210,7 @@ type Bot implements Account {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -5192,6 +5409,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -5378,6 +5600,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -5445,7 +5672,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -5489,7 +5716,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -5710,6 +5937,7 @@ type Credit implements Transaction {
   isRefunded: Boolean
   isRefund: Boolean
   paymentMethod: PaymentMethod
+  payoutMethod: PayoutMethod
 
   """
   The permissions given to current logged in user for this transaction
@@ -5729,7 +5957,7 @@ type Credit implements Transaction {
   """
   merchantId: String
   balanceInHostCurrency: Amount
-  invoiceTemplate: String!
+  invoiceTemplate: String
 }
 
 """
@@ -5815,6 +6043,7 @@ type Debit implements Transaction {
   isRefunded: Boolean
   isRefund: Boolean
   paymentMethod: PaymentMethod
+  payoutMethod: PayoutMethod
 
   """
   The permissions given to current logged in user for this transaction
@@ -5834,7 +6063,7 @@ type Debit implements Transaction {
   """
   merchantId: String
   balanceInHostCurrency: Amount
-  invoiceTemplate: String!
+  invoiceTemplate: String
 }
 
 """
@@ -6014,6 +6243,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     The transaction type (DEBIT or CREDIT)
     """
     type: TransactionType
+
+    """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -6202,6 +6436,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -6269,7 +6508,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -6313,7 +6552,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6625,6 +6864,11 @@ type Individual implements Account {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -6811,6 +7055,11 @@ type Individual implements Account {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -6876,7 +7125,7 @@ type Individual implements Account {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -6920,7 +7169,7 @@ type Individual implements Account {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7211,6 +7460,11 @@ type Organization implements Account & AccountWithContributions {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -7397,6 +7651,11 @@ type Organization implements Account & AccountWithContributions {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -7462,7 +7721,7 @@ type Organization implements Account & AccountWithContributions {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -7506,7 +7765,7 @@ type Organization implements Account & AccountWithContributions {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7827,6 +8086,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -8013,6 +8277,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -8080,7 +8349,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -8124,7 +8393,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8331,6 +8600,42 @@ type Query {
     """
     orderBy: OrderByInput
   ): AccountCollection!
+  activities(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    The account associated with the Activity
+    """
+    account: AccountReferenceInput!
+
+    """
+    How activities are related to the account
+    """
+    attribution: ActivityAttribution
+
+    """
+    Only return activities that were created after this date
+    """
+    dateFrom: DateTime = null
+
+    """
+    Only return activities that were created before this date
+    """
+    dateTo: DateTime = null
+
+    """
+    Only return activities that are of this class/type
+    """
+    type: [ActivityAndClassesType!] = null
+  ): ActivityCollection!
   application(
     """
     The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -8765,6 +9070,11 @@ type Query {
     The transaction type (DEBIT or CREDIT)
     """
     type: TransactionType
+
+    """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -10133,6 +10443,136 @@ enum CountryISO {
   EH
 }
 
+"""
+A collection of "Activities"
+"""
+type ActivityCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Activity!]
+}
+
+"""
+How an activity is related to an account
+"""
+enum ActivityAttribution {
+  """
+  Activities initiated by this account
+  """
+  AUTHORED
+
+  """
+  Activities that targeted this account
+  """
+  RECEIVED
+
+  """
+  Activities where author and target both points to this account (e.g. settings update)
+  """
+  SELF
+
+  """
+  Activities that happened on accounts hosted by this account
+  """
+  HOSTED_ACCOUNTS
+}
+
+enum ActivityAndClassesType {
+  ACTIVITY_ALL
+  CONNECTED_ACCOUNT_CREATED
+  COLLECTIVE_CREATED_GITHUB
+  COLLECTIVE_APPLY
+  COLLECTIVE_APPROVED
+  COLLECTIVE_REJECTED
+  COLLECTIVE_CREATED
+  ORGANIZATION_COLLECTIVE_CREATED
+  COLLECTIVE_FROZEN
+  COLLECTIVE_UNFROZEN
+  COLLECTIVE_COMMENT_CREATED
+  COLLECTIVE_CONVERSATION_CREATED
+  UPDATE_COMMENT_CREATED
+  EXPENSE_COMMENT_CREATED
+  CONVERSATION_COMMENT_CREATED
+  COLLECTIVE_EXPENSE_CREATED
+  COLLECTIVE_EXPENSE_DELETED
+  COLLECTIVE_EXPENSE_UPDATED
+  COLLECTIVE_EXPENSE_REJECTED
+  COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_UNAPPROVED
+  COLLECTIVE_EXPENSE_MOVED
+  COLLECTIVE_EXPENSE_PAID
+  COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
+  COLLECTIVE_EXPENSE_MARKED_AS_SPAM
+  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
+  COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
+  COLLECTIVE_EXPENSE_ERROR
+  COLLECTIVE_EXPENSE_INVITE_DRAFTED
+  COLLECTIVE_EXPENSE_RECURRING_DRAFTED
+  COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  TAXFORM_REQUEST
+  COLLECTIVE_VIRTUAL_CARD_ADDED
+  COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
+  COLLECTIVE_VIRTUAL_CARD_SUSPENDED
+  VIRTUAL_CARD_REQUESTED
+  VIRTUAL_CARD_CHARGE_DECLINED
+  VIRTUAL_CARD_PURCHASE
+  COLLECTIVE_MEMBER_INVITED
+  COLLECTIVE_MEMBER_CREATED
+  COLLECTIVE_CORE_MEMBER_ADDED
+  COLLECTIVE_CORE_MEMBER_INVITED
+  COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED
+  COLLECTIVE_CORE_MEMBER_REMOVED
+  COLLECTIVE_CORE_MEMBER_EDITED
+  COLLECTIVE_TRANSACTION_CREATED
+  COLLECTIVE_UPDATE_CREATED
+  COLLECTIVE_UPDATE_PUBLISHED
+  COLLECTIVE_CONTACT
+  HOST_APPLICATION_CONTACT
+  CONTRIBUTION_REJECTED
+  SUBSCRIPTION_ACTIVATED
+  SUBSCRIPTION_CONFIRMED
+  SUBSCRIPTION_CANCELED
+  TICKET_CONFIRMED
+  ORDER_CANCELED_ARCHIVED_COLLECTIVE
+  ORDER_PROCESSING
+  ORDER_PROCESSING_CRYPTO
+  ORDER_PENDING_CONTRIBUTION_NEW
+  ORDER_PENDING_CONTRIBUTION_REMINDER
+  ORDER_THANKYOU
+  ORDERS_SUSPICIOUS
+  BACKYOURSTACK_DISPATCH_CONFIRMED
+  PAYMENT_FAILED
+  PAYMENT_CREDITCARD_CONFIRMATION
+  PAYMENT_CREDITCARD_EXPIRING
+  USER_CREATED
+  USER_NEW_TOKEN
+  OAUTH_APPLICATION_AUTHORIZED
+  USER_CHANGE_EMAIL
+  USER_PAYMENT_METHOD_CREATED
+  USER_CARD_CLAIMED
+  USER_CARD_INVITED
+  WEBHOOK_STRIPE_RECEIVED
+  WEBHOOK_PAYPAL_RECEIVED
+  COLLECTIVE_MONTHLY_REPORT
+  ACTIVATED_COLLECTIVE_AS_HOST
+  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
+  DEACTIVATED_COLLECTIVE_AS_HOST
+  ADDED_FUND_TO_ORG
+  COLLECTIVE_TRANSACTION_PAID
+  COLLECTIVE_USER_ADDED
+  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
+  COLLECTIVE_VIRTUAL_CARD_CREATED
+  COLLECTIVE
+  EXPENSES
+  CONTRIBUTIONS
+  ACTIVITIES_UPDATES
+  VIRTUAL_CARDS
+  FUND_EVENTS
+  REPORTS
+}
+
 input ExpenseReferenceInput {
   """
   The public id identifying the expense (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -10357,6 +10797,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -10543,6 +10988,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -10610,7 +11060,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -10654,7 +11104,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10953,6 +11403,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -11139,6 +11594,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -11206,7 +11666,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -11250,7 +11710,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   List of activities that the logged-in user is subscribed for this collective
   """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]!
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11412,7 +11872,7 @@ This is the root mutation
 """
 type Mutation {
   """
-  Add funds to the given account. Scope: "account".
+  Add funds to the given account. Scope: "host".
   """
   addFunds(
     fromAccount: AccountReferenceInput!
@@ -12769,6 +13229,9 @@ input CommentUpdateInput {
   html: String
 }
 
+"""
+Input to create a comment. You can only specify one entity type: expense, conversation or update
+"""
 input CommentCreateInput {
   html: String
 
@@ -12776,8 +13239,17 @@ input CommentCreateInput {
   If your comment is linked to an expense, set it here
   """
   expense: ExpenseReferenceInput
-  ConversationId: String
+  ConversationId: String @deprecated(reason: "2022-08-26: Please use \"conversation\"")
+  conversation: ConversationReferenceInput
   update: UpdateReferenceInput
+}
+
+input ConversationReferenceInput {
+  """
+  The public id identifying the conversation
+  """
+  id: String
+  legacyId: Int
 }
 
 input UpdateReferenceInput {
@@ -13870,97 +14342,4 @@ input WebhookReferenceInput {
   The legacy public id identifying the webhook (ie: 4242)
   """
   legacyId: Int
-}
-
-enum ActivityAndClassesType {
-  ACTIVITY_ALL
-  CONNECTED_ACCOUNT_CREATED
-  COLLECTIVE_CREATED_GITHUB
-  COLLECTIVE_APPLY
-  COLLECTIVE_APPROVED
-  COLLECTIVE_REJECTED
-  COLLECTIVE_CREATED
-  COLLECTIVE_COMMENT_CREATED
-  COLLECTIVE_CONVERSATION_CREATED
-  COLLECTIVE_EXPENSE_CREATED
-  COLLECTIVE_EXPENSE_DELETED
-  COLLECTIVE_EXPENSE_UPDATED
-  COLLECTIVE_EXPENSE_REJECTED
-  COLLECTIVE_EXPENSE_APPROVED
-  COLLECTIVE_EXPENSE_UNAPPROVED
-  COLLECTIVE_EXPENSE_PAID
-  COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
-  COLLECTIVE_EXPENSE_MARKED_AS_SPAM
-  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
-  COLLECTIVE_EXPENSE_PROCESSING
-  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
-  COLLECTIVE_EXPENSE_ERROR
-  COLLECTIVE_EXPENSE_INVITE_DRAFTED
-  COLLECTIVE_EXPENSE_RECURRING_DRAFTED
-  COLLECTIVE_EXPENSE_MISSING_RECEIPT
-  COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
-  COLLECTIVE_VIRTUAL_CARD_SUSPENDED
-  COLLECTIVE_FROZEN
-  COLLECTIVE_UNFROZEN
-  COLLECTIVE_MEMBER_INVITED
-  COLLECTIVE_MEMBER_CREATED
-  COLLECTIVE_MONTHLY_REPORT
-  COLLECTIVE_CORE_MEMBER_ADDED
-  COLLECTIVE_CORE_MEMBER_INVITED
-  COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED
-  COLLECTIVE_CORE_MEMBER_REMOVED
-  COLLECTIVE_CORE_MEMBER_EDITED
-  COLLECTIVE_TRANSACTION_CREATED
-  COLLECTIVE_UPDATE_CREATED
-  COLLECTIVE_UPDATE_PUBLISHED
-  COLLECTIVE_CONTACT
-  COLLECTIVE_VIRTUAL_CARD_ADDED
-  CONTRIBUTION_REJECTED
-  ORGANIZATION_COLLECTIVE_CREATED
-  SUBSCRIPTION_ACTIVATED
-  SUBSCRIPTION_CONFIRMED
-  SUBSCRIPTION_CANCELED
-  TICKET_CONFIRMED
-  USER_CREATED
-  USER_NEW_TOKEN
-  USER_CHANGE_EMAIL
-  USER_PAYMENT_METHOD_CREATED
-  USER_CARD_CLAIMED
-  USER_CARD_INVITED
-  WEBHOOK_STRIPE_RECEIVED
-  WEBHOOK_PAYPAL_RECEIVED
-  COLLECTIVE_MONTHLY
-  ORDER_CANCELED_ARCHIVED_COLLECTIVE
-  ORDER_PROCESSING
-  ORDER_PROCESSING_CRYPTO
-  ORDER_PENDING_CONTRIBUTION_NEW
-  ORDER_PENDING_CONTRIBUTION_REMINDER
-  ORDER_THANKYOU
-  ORDERS_SUSPICIOUS
-  BACKYOURSTACK_DISPATCH_CONFIRMED
-  ACTIVATED_COLLECTIVE_AS_HOST
-  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
-  DEACTIVATED_COLLECTIVE_AS_HOST
-  VIRTUAL_CARD_REQUESTED
-  VIRTUAL_CARD_CHARGE_DECLINED
-  PAYMENT_FAILED
-  PAYMENT_CREDITCARD_CONFIRMATION
-  PAYMENT_CREDITCARD_EXPIRING
-  TAXFORM_REQUEST
-  CONVERSATION_COMMENT_CREATED
-  UPDATE_COMMENT_CREATED
-  EXPENSE_COMMENT_CREATED
-  HOST_APPLICATION_CONTACT
-  ADDED_FUND_TO_ORG
-  COLLECTIVE_TRANSACTION_PAID
-  COLLECTIVE_USER_ADDED
-  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
-  COLLECTIVE_VIRTUAL_CARD_CREATED
-  COLLECTIVE
-  EXPENSES
-  CONTRIBUTIONS
-  ACTIVITIES_UPDATES
-  VIRTUAL_CARDS
-  FUND_EVENTS
-  REPORTS
 }

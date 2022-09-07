@@ -229,24 +229,25 @@ const ForFiscalHosts = () => {
             </Flex>
           </Box>
           <P fontSize="12px" lineHeight="18px" color="black.700">
+            (1){' '}
             <FormattedMessage
-              id="pricing.paymentProcessor"
-              defaultMessage="(1) Payment processor fees apply when using <stripeLink></stripeLink>, <paypalLink></paypalLink>, or <transferwiseLink></transferwiseLink>."
+              id="pricing.notes.paymentProcessor"
+              defaultMessage="Payment processor fees apply when using <stripeLink></stripeLink>, <paypalLink></paypalLink>, or <transferwiseLink></transferwiseLink>."
               values={{
                 stripeLink: getI18nLink({
                   href: 'https://stripe.com/pricing',
                   openInNewTab: true,
-                  text: 'Stripe',
+                  children: 'Stripe',
                 }),
                 paypalLink: getI18nLink({
                   href: 'https://paypal.com/pricing',
                   openInNewTab: true,
-                  text: 'PayPal',
+                  children: 'PayPal',
                 }),
                 transferwiseLink: getI18nLink({
                   href: 'https://wise.com/pricing',
                   openInNewTab: true,
-                  text: 'Wise',
+                  children: 'Wise',
                 }),
               }}
             />

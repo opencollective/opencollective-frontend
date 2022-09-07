@@ -198,7 +198,6 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
               limit={variables.limit}
               offset={variables.offset}
               ignoredQueryParams={ROUTE_PARAMS}
-              scrollToTopOnChange
             />
           </Flex>
         </React.Fragment>

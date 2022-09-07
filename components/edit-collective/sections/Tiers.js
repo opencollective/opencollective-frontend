@@ -298,7 +298,7 @@ class Tiers extends React.Component {
         name: 'button',
         type: 'text',
         label: intl.formatMessage(this.messages['button.label']),
-        when: (tier, collective) => ![FUND, PROJECT].includes(collective.type),
+        when: (tier, collective) => ![FUND].includes(collective.type),
       },
       {
         name: 'goal',
