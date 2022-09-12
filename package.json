@@ -195,7 +195,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-simple-import-sort": "^8.0.0",
     "eslint-plugin-styled-components-a11y": "1.0.0",
     "file-loader": "^6.2.0",
     "html-loader": "^3.0.0",
