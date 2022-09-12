@@ -18,9 +18,20 @@ const ActivityAccountFilter = ({ account, onChange }) => {
 
   useEffect(() => {
     if (router?.query?.account) {
-      router.push(`${account.slug}/admin/activity-log/`);
+      router.push(`${account.slug}/admin/activity-log`);
     }
   }, []);
+
+  const getCustomOptions = () => {
+    const customOptions = [{ value: { id: 'parentedAccounts' }, label: 'All children accounts' }];
+    if (account?.isHost) {
+      customOptions.push({
+        value: { id: 'hostedAccounts' },
+        label: 'All hosted accounts',
+      });
+    }
+    return customOptions;
+  };
 
   return (
     <CollectivePickerAsync
@@ -38,7 +49,7 @@ const ActivityAccountFilter = ({ account, onChange }) => {
         setSelectedValue(filterAccounts);
         onChange(filterAccounts.map(filterAccount => filterAccount.value.id).toString());
       }}
-      customOptions={[defaultValue]}
+      customOptions={[defaultValue, ...getCustomOptions()]}
       customOptionsPosition={CUSTOM_OPTIONS_POSITION.TOP}
       value={selectedValue}
     />
