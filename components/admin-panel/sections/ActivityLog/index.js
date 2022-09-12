@@ -42,6 +42,8 @@ const activityLogQuery = gqlV2/* GraphQL */ `
   ) {
     account(slug: $accountSlug) {
       id
+      name
+      slug
       legacyId
       isHost
       type
