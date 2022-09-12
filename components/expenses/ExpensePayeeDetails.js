@@ -187,7 +187,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
           </Box>
           <div data-cy="expense-summary-payout-method-data">
             <PayoutMethodData
-              payoutMethod={expense.draft ? expense.draft?.payoutMethod : expense.payoutMethod}
+              payoutMethod={expense.draft?.payoutMethod ?? expense.payoutMethod}
               isLoading={isLoadingLoggedInUser}
             />
           </div>
