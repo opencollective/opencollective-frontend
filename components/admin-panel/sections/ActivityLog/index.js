@@ -205,6 +205,7 @@ const ActivityLog = ({ accountSlug }) => {
   const { data, loading, error } = useQuery(activityLogQuery, {
     variables: getQueryVariables(accountSlug, router),
     context: API_V2_CONTEXT,
+    fetchPolicy: 'network-only',
   });
 
   const handleUpdateFilters = queryParams => {
