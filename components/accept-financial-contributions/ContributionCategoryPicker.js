@@ -8,48 +8,20 @@ import CollectiveNavbar from '../collective-navbar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
+import Image from '../Image';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import { H1, P } from '../Text';
 
-import acceptHostHoverIllustration from '../../public/static/images/create-collective/acceptContributionsHostHoverIllustration.png';
-import acceptHostIllustration from '../../public/static/images/create-collective/acceptContributionsHostIllustration.png';
-import acceptMyselfHoverIllustration from '../../public/static/images/create-collective/acceptContributionsMyselfHoverIllustration.png';
-import acceptMyselfIllustration from '../../public/static/images/create-collective/acceptContributionsMyselfIllustration.png';
-
-const Image = styled.img`
+const Illustration = styled(Container)`
   position: absolute;
-  @media screen and (min-width: 52em) {
-    height: 256px;
-    width: 256px;
-  }
-  @media screen and (max-width: 40em) {
-    height: 192px;
-    width: 192px;
-  }
-  @media screen and (min-width: 40em) and (max-width: 52em) {
-    height: 208px;
-    width: 208px;
-  }
 `;
 
-const HoverImage = styled.img`
+const HoverIllustration = styled(Container)`
   position: absolute;
   opacity: 0;
   &:hover {
     opacity: 1;
-  }
-  @media screen and (min-width: 52em) {
-    height: 256px;
-    width: 256px;
-  }
-  @media screen and (max-width: 40em) {
-    height: 192px;
-    width: 192px;
-  }
-  @media screen and (min-width: 40em) and (max-width: 52em) {
-    height: 208px;
-    width: 208px;
   }
 `;
 
@@ -109,8 +81,22 @@ class ContributionCategoryPicker extends React.Component {
               <Container alignItems="center" width={[null, 280, 312]} mb={[2, 0]}>
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Box size={[192, 208, 256]}>
-                    <Image src={acceptMyselfIllustration} alt={intl.formatMessage(this.messages.ourselves)} />
-                    <HoverImage src={acceptMyselfHoverIllustration} alt={intl.formatMessage(this.messages.ourselves)} />
+                    <Illustration>
+                      <Image
+                        width={256}
+                        height={256}
+                        src="/static/images/create-collective/acceptContributionsMyselfIllustration.png"
+                        alt={intl.formatMessage(this.messages.ourselves)}
+                      />
+                    </Illustration>
+                    <HoverIllustration>
+                      <Image
+                        width={256}
+                        height={256}
+                        src="/static/images/create-collective/acceptContributionsMyselfHoverIllustration.png"
+                        alt={intl.formatMessage(this.messages.ourselves)}
+                      />
+                    </HoverIllustration>
                   </Box>
                   <Link href={`/${router.query.slug}/accept-financial-contributions/ourselves`}>
                     <StyledButton
@@ -150,8 +136,22 @@ class ContributionCategoryPicker extends React.Component {
               >
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Box size={[192, 208, 256]}>
-                    <Image src={acceptHostIllustration} alt={intl.formatMessage(this.messages.host)} />
-                    <HoverImage src={acceptHostHoverIllustration} alt={intl.formatMessage(this.messages.host)} />
+                    <Illustration>
+                      <Image
+                        width={256}
+                        height={256}
+                        src="/static/images/create-collective/acceptContributionsHostIllustration.png"
+                        alt={intl.formatMessage(this.messages.host)}
+                      />
+                    </Illustration>
+                    <HoverIllustration>
+                      <Image
+                        width={256}
+                        height={256}
+                        src="/static/images/create-collective/acceptContributionsHostHoverIllustration.png"
+                        alt={intl.formatMessage(this.messages.host)}
+                      />
+                    </HoverIllustration>
                   </Box>
                   <Link href={`/${router.query.slug}/accept-financial-contributions/host`}>
                     <StyledButton

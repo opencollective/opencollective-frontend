@@ -11,6 +11,7 @@ import { i18nGraphqlException } from '../../../lib/errors';
 import Container from '../../Container';
 import HostPayouts2FARollingLimitFAQ from '../../faqs/HostPayouts2FARollingLimitFAQ';
 import { Flex } from '../../Grid';
+import Image from '../../Image';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
@@ -19,9 +20,6 @@ import StyledInputField from '../../StyledInputField';
 import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import { editCollectiveSettingsMutation } from '../mutations';
-
-import imgPreviewModal from '../../../public/static/images/host-two-factor-authentication/host-two-factor-authentication-payout-modal.png';
-import imgPreviewPrompt from '../../../public/static/images/host-two-factor-authentication/host-two-factor-authentication-payout-modal-prompt.png';
 
 const messages = defineMessages({
   'rollingLimit.label': {
@@ -166,10 +164,20 @@ const HostTwoFactorAuth = ({ collective }) => {
           )}
           <Flex flexWrap="wrap" justifyContent="space-between" width="100%">
             <ScreenshotPreview>
-              <img src={imgPreviewModal} alt="Preview host payouts rolling limit" />
+              <Image
+                height={222}
+                width={395}
+                src="/static/images/host-two-factor-authentication/host-two-factor-authentication-payout-modal.png"
+                alt="Preview host payouts rolling limit"
+              />
             </ScreenshotPreview>
             <ScreenshotPreview>
-              <img src={imgPreviewPrompt} alt="Preview host payouts rolling limit" />
+              <Image
+                height={222}
+                width={395}
+                src="/static/images/host-two-factor-authentication/host-two-factor-authentication-payout-modal-prompt.png"
+                alt="Preview host payouts rolling limit"
+              />
             </ScreenshotPreview>
             <hr />
           </Flex>

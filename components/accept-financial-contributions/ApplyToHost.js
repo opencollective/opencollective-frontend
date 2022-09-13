@@ -15,9 +15,6 @@ import { H1, H2, H3, P } from '../Text';
 
 import HostsContainer from './HostsContainer';
 
-import umbrellaIllustration from '../../public/static/images/create-collective/acceptContributionsHostHoverIllustration.png';
-import becomeFiscalHostIllustration from '../../public/static/images/create-collective/becomeFiscalHostIllustration.png';
-
 const FISCAL_HOST_LINK = 'https://docs.opencollective.com/help/fiscal-hosts/become-a-fiscal-host';
 
 const FilterTag = styled(StyledTag)`
@@ -126,7 +123,12 @@ class ApplyToHost extends React.Component {
             px={[3, 5]}
             my={3}
           >
-            <Image alt="" src={umbrellaIllustration} width={160} height={160} />
+            <Image
+              alt=""
+              src="/static/images/create-collective/acceptContributionsHostHoverIllustration.png"
+              width={160}
+              height={160}
+            />
             <Box maxWidth={'480px'} minWidth={'240px'} ml={[0, 4]}>
               <H2 fontSize="20px" color="black.900" textAlign={['center', 'left']} my={[3, 0]}>
                 {intl.formatMessage(this.messages.applyToHost)}
@@ -191,7 +193,12 @@ class ApplyToHost extends React.Component {
                 </StyledLink>
               </Box>
               <Box order={[1, 3, 2]}>
-                <Image alt="" src={becomeFiscalHostIllustration} width={192} height={192} />
+                <Image
+                  alt=""
+                  src="/static/images/create-collective/becomeFiscalHostIllustration.png"
+                  width={192}
+                  height={192}
+                />
               </Box>
             </InterestedContainer>
           </Container>

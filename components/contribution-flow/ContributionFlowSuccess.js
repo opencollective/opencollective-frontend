@@ -17,21 +17,21 @@ import { formatManualInstructions } from '../../lib/payment-method-utils';
 import { facebookShareURL, getCollectivePageRoute, tweetURL } from '../../lib/url-helpers';
 
 import Container from '../../components/Container';
-import { formatAccountDetails } from '../../components/edit-collective/utils';
-import { Box, Flex } from '../../components/Grid';
 import I18nFormatters, { getI18nLink, I18nBold } from '../../components/I18nFormatters';
 import Loading from '../../components/Loading';
 import MessageBox from '../../components/MessageBox';
 import StyledLink from '../../components/StyledLink';
-import { H3, P } from '../../components/Text';
-import { withUser } from '../../components/UserProvider';
 
+import { formatAccountDetails } from '../edit-collective/utils';
+import { Box, Flex } from '../Grid';
+import Image from '../Image';
 import Link from '../Link';
+import { H3, P } from '../Text';
+import { withUser } from '../UserProvider';
 
 import { orderSuccessFragment } from './graphql/fragments';
 import PublicMessageForm from './ContributionFlowPublicMessage';
 import ContributorCardWithTier from './ContributorCardWithTier';
-import successIllustrationUrl from './success-illustration.jpg';
 import SuccessCTA, { SUCCESS_CTA_TYPE } from './SuccessCTA';
 
 // Styled components
@@ -76,9 +76,8 @@ const BankTransferInfoContainer = styled(Container)`
   background-color: white;
 `;
 
-const SuccessIllustration = styled.img.attrs({ src: successIllustrationUrl })`
+const SuccessIllustration = styled(Container)`
   max-width: 100%;
-  width: 216px;
   margin: 0 auto;
   margin-bottom: 16px;
 `;
@@ -134,7 +133,11 @@ class ContributionFlowSuccess extends React.Component {
 
     return (
       <Flex flexDirection="column" justifyContent="center" p={2}>
-        {callsToAction.length <= 2 && <SuccessIllustration alt="" />}
+        {callsToAction.length >= 2 && (
+          <SuccessIllustration>
+            <Image width={216} height={152} src="/static/images/success-illustration.jpg" />
+          </SuccessIllustration>
+        )}
         {callsToAction.map((type, idx) => (
           <SuccessCTA
             key={type}

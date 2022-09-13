@@ -22,6 +22,7 @@ import CreateCollectiveMiniForm from '../CreateCollectiveMiniForm';
 import PayoutBankInformationForm from '../expenses/PayoutBankInformationForm';
 import FinancialContributionsFAQ from '../faqs/FinancialContributionsFAQ';
 import { Box, Flex } from '../Grid';
+import Image from '../Image';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
@@ -29,8 +30,6 @@ import { H1, H2, P } from '../Text';
 import { withUser } from '../UserProvider';
 
 import StripeOrBankAccountPicker from './StripeOrBankAccountPicker';
-
-import acceptOrganizationIllustration from '../../public/static/images/create-collective/acceptContributionsOrganizationHoverIllustration.png';
 
 const { ORGANIZATION } = CollectiveType;
 
@@ -46,21 +45,6 @@ const OrgCard = styled(Flex)`
   border-radius: 10px;
   &:hover {
     background: rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const Image = styled.img`
-  @media screen and (min-width: 52em) {
-    height: 256px;
-    width: 256px;
-  }
-  @media screen and (max-width: 40em) {
-    height: 192px;
-    width: 192px;
-  }
-  @media screen and (min-width: 40em) and (max-width: 52em) {
-    height: 208px;
-    width: 208px;
   }
 `;
 
@@ -231,7 +215,11 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
           <Flex flexDirection="column" alignItems="center" maxWidth={'575px'} my={2} mx={[3, 0]}>
             {noOrganizationPicked ? (
               <Fragment>
-                <Image src={acceptOrganizationIllustration} alt="" />
+                <Image
+                  src="/static/images/create-collective/acceptContributionsOrganizationHoverIllustration.png"
+                  width={256}
+                  height={256}
+                />
                 <H2 fontSize="20px" fontWeight="bold" color="black.900" textAlign="center">
                   <FormattedMessage
                     id="acceptContributions.organization.subtitle"

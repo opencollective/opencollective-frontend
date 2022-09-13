@@ -20,6 +20,7 @@ import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Flex } from '../Grid';
+import Image from '../Image';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
@@ -35,13 +36,6 @@ import StyledSelect from '../StyledSelect';
 import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
-
-import illustration from '../contribution-flow/fees-on-top-illustration.png';
-
-const Illustration = styled.img.attrs({ src: illustration })`
-  width: 40px;
-  height: 40px;
-`;
 
 const PlatformTipContainer = styled(StyledModal)`
   ${props =>
@@ -698,7 +692,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                         </P>
                         <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>
                           <Flex alignItems="center">
-                            <Illustration alt="" />
+                            <Image alt="" width={100} height={100} src="/static/images/fees-on-top-illustration.png" />
                             <P fontWeight={500} fontSize="12px" lineHeight="18px" color="black.900" mx={10}>
                               <FormattedMessage
                                 id="AddFundsModal.thankYou"

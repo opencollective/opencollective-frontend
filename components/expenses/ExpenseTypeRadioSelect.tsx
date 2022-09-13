@@ -5,16 +5,11 @@ import styled from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 
+import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Image from '../Image';
 import StyledCard from '../StyledCard';
 import { P } from '../Text';
-
-import grantIllustration from '../../public/static/images/grant.gif';
-import grantAnimation from '../../public/static/images/grant-animation.gif';
-import invoiceIllustration from '../../public/static/images/invoice-animation.gif';
-import invoiceIllustrationStatic from '../../public/static/images/invoice-animation-static.jpg';
-import receiptIllustration from '../../public/static/images/receipt-animation.gif';
-import receiptIllustrationStatic from '../../public/static/images/receipt-animation-static.jpg';
 
 const ExpenseTypeLabels = defineMessages({
   [expenseTypes.INVOICE]: {
@@ -46,12 +41,7 @@ const ExpenseTypeDescription = defineMessages({
   },
 });
 
-const TypeIllustration = styled.img.attrs({ alt: '' })`
-  width: 48px;
-  height: 48px;
-`;
-
-const StaticTypeIllustration = styled(TypeIllustration)`
+const StaticTypeIllustration = styled(Container)`
   position: absolute;
   background: white;
 `;
@@ -86,29 +76,31 @@ const ExpenseTypeOptionContainer = styled.label`
 `;
 
 const illustrations = {
-  [expenseTypes.INVOICE]: invoiceIllustration,
-  [expenseTypes.RECEIPT]: receiptIllustration,
-  [expenseTypes.GRANT]: grantAnimation,
+  [expenseTypes.INVOICE]: '/static/images/invoice-animation.gif',
+  [expenseTypes.RECEIPT]: '/static/images/receipt-animation.gif',
+  [expenseTypes.GRANT]: '/static/images/grant-animation.gif',
 };
 
 const staticIllustrations = {
-  [expenseTypes.INVOICE]: invoiceIllustrationStatic,
-  [expenseTypes.RECEIPT]: receiptIllustrationStatic,
-  [expenseTypes.GRANT]: grantIllustration,
+  [expenseTypes.INVOICE]: '/static/images/invoice-animation-static.jpg',
+  [expenseTypes.RECEIPT]: '/static/images/receipt-animation-static.jpg',
+  [expenseTypes.GRANT]: '/static/images/grant.gif',
 };
 
 const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
   const { formatMessage } = useIntl();
-  const illustrationSrc = illustrations[type] || receiptIllustration;
-  const staticIllustrationSrc = staticIllustrations[type] || receiptIllustrationStatic;
+  const illustrationSrc = illustrations[type] || '/static/images/receipt-animation.gif';
+  const staticIllustrationSrc = staticIllustrations[type] || '/static/images/receipt-animation-static.jpg';
   return (
     <ExpenseTypeOptionContainer data-cy={`radio-expense-type-${type}`}>
       <Box alignSelf={['center', 'baseline', null, 'center']}>
         <input type="radio" name={name} value={type} checked={isChecked} onChange={onChange} />
       </Box>
       <Box mx={2} size={48} alignSelf="center" display={['block', 'none', null, 'block']}>
-        <StaticTypeIllustration src={staticIllustrationSrc} />
-        <TypeIllustration src={illustrationSrc} />
+        <StaticTypeIllustration>
+          <Image src={staticIllustrationSrc} height={48} width={48} />
+        </StaticTypeIllustration>
+        <Image src={illustrationSrc} height={48} width={48} />
       </Box>
       <Box>
         <P fontSize="16px" fontWeight="bold" mb={2}>
@@ -116,8 +108,10 @@ const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
         </P>
         <Flex alignItems="center">
           <Box mr={1} size={48} alignSelf="center" display={['none', 'block', null, 'none']}>
-            <StaticTypeIllustration src={staticIllustrationSrc} />
-            <TypeIllustration src={illustrationSrc} />
+            <StaticTypeIllustration>
+              <Image src={staticIllustrationSrc} height={48} width={48} />
+            </StaticTypeIllustration>
+            <Image src={illustrationSrc} height={48} width={48} />
           </Box>
           <P fontSize="12px" color="black.600" fontWeight="normal">
             {formatMessage(ExpenseTypeDescription[type])}

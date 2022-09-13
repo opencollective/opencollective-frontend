@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 import { checkUserExistence, signin } from '../../lib/api';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -16,7 +15,7 @@ import StyledCard from '../../components/StyledCard';
 import StyledLink from '../../components/StyledLink';
 import { H4, P } from '../../components/Text';
 
-import pidgeon from '../../public/static/images/pidgeon.png';
+import Image from '../Image';
 
 const resendDraftExpenseInviteMutation = gql`
   mutation ResendDraftExpenseInvite($expense: ExpenseReferenceInput!) {
@@ -24,11 +23,6 @@ const resendDraftExpenseInviteMutation = gql`
       id
     }
   }
-`;
-
-const PidgeonIllustration = styled.img.attrs({ src: pidgeon })`
-  width: 132px;
-  height: 132px;
 `;
 
 const ResendDraftInviteButton = ({ expense }) => {
@@ -100,7 +94,7 @@ const ExpenseInviteNotificationBanner = props => {
   return (
     <StyledCard py={3} px="26px" mb={4} borderStyle={'solid'} data-cy="expense-draft-banner">
       <Flex>
-        <PidgeonIllustration alt="" />
+        <Image alt="" src="/static/images/pidgeon.png" width={132} height={132} />
         <Flex ml={[0, 2]} maxWidth="448px" flexDirection="column">
           <H4 mb="10px" fontWeight="500">
             {props.createdUser ? (
