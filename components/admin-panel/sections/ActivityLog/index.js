@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { isEmpty, omit, omitBy, remove } from 'lodash';
+import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -38,7 +38,7 @@ const activityLogQuery = gqlV2/* GraphQL */ `
     $dateFrom: DateTime
     $dateTo: DateTime
     $type: [ActivityAndClassesType!]
-    $filteredAccount: [AccountReferenceInput!]!
+    $account: [AccountReferenceInput!]!
     $includeHostedAccounts: Boolean
     $includeChildrenAccounts: Boolean
   ) {
@@ -56,7 +56,7 @@ const activityLogQuery = gqlV2/* GraphQL */ `
       }
     }
     activities(
-      account: $filteredAccount
+      account: $account
       limit: $limit
       offset: $offset
       dateFrom: $dateFrom
@@ -170,33 +170,19 @@ const getQueryVariables = (accountSlug, router) => {
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
   const { period, type, account } = routerQuery;
-
-  let filteredAccount = account?.split(',');
-  let includeChildrenAccounts, includeHostedAccounts;
-
-  if (account?.includes('parentedAccounts')) {
-    includeChildrenAccounts = true;
-  }
-
-  if (account?.includes('hostedAccounts')) {
-    includeHostedAccounts = true;
-  }
-
-  remove(filteredAccount, value => value === 'parentedAccounts' || value === 'hostedAccounts');
-
-  if (!filteredAccount || filteredAccount.length === 0) {
-    filteredAccount = { slug: accountSlug };
-  } else {
-    filteredAccount = filteredAccount
-      .map(filter => {
-        if (filter !== 'parentedAccounts' && filter !== 'hostedAccounts') {
-          return { legacyId: parseInt(filter) };
-        }
-      })
-      .filter(item => item);
-  }
-
   const { from: dateFrom, to: dateTo } = parseDateInterval(period);
+
+  // Account filters
+  let filteredAccounts = { slug: accountSlug };
+  let includeChildrenAccounts, includeHostedAccounts;
+  if (account === '__CHILDREN_ACCOUNTS__') {
+    includeChildrenAccounts = true;
+  } else if (account === '__HOSTED_ACCOUNTS__') {
+    includeHostedAccounts = true;
+  } else if (account) {
+    filteredAccounts = account.split(',').map(slug => ({ slug }));
+    includeChildrenAccounts = true; // By default, we include children of selected accounts
+  }
 
   return {
     accountSlug,
@@ -205,7 +191,7 @@ const getQueryVariables = (accountSlug, router) => {
     limit: ACTIVITY_LIMIT,
     offset,
     type: getActivityTypeFilterValuesFromKey(type),
-    filteredAccount,
+    account: filteredAccounts,
     includeChildrenAccounts,
     includeHostedAccounts,
   };

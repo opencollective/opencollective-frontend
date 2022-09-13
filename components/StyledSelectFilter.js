@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import StyledSelect from './StyledSelect';
 
-const getSelectStyles = stylesFromProps => ({
+export const getSelectFilterStyles = stylesFromProps => ({
   ...(stylesFromProps || null),
   control: (baseStyles, state) => {
     const styles = {
@@ -33,7 +33,7 @@ const getSelectStyles = stylesFromProps => ({
  * filters for lists.
  */
 export const StyledSelectFilter = props => {
-  const styles = React.useMemo(() => getSelectStyles(props.styles), [props.styles]);
+  const styles = React.useMemo(() => getSelectFilterStyles(props.styles), [props.styles]);
   return (
     <StyledSelect minWidth={80} fontSize="12px" lineHeight="14px" isSearchable={false} {...props} styles={styles} />
   );
