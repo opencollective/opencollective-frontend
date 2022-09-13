@@ -41,6 +41,7 @@ const activityLogQuery = gqlV2/* GraphQL */ `
     $account: [AccountReferenceInput!]!
     $includeHostedAccounts: Boolean
     $includeChildrenAccounts: Boolean
+    $excludeParentAccount: Boolean
   ) {
     account(slug: $accountSlug) {
       id
@@ -64,6 +65,7 @@ const activityLogQuery = gqlV2/* GraphQL */ `
       type: $type
       includeHostedAccounts: $includeHostedAccounts
       includeChildrenAccounts: $includeChildrenAccounts
+      excludeParentAccount: $excludeParentAccount
     ) {
       offset
       limit
@@ -174,9 +176,10 @@ const getQueryVariables = (accountSlug, router) => {
 
   // Account filters
   let filteredAccounts = { slug: accountSlug };
-  let includeChildrenAccounts, includeHostedAccounts;
+  let includeChildrenAccounts, includeHostedAccounts, excludeParentAccount;
   if (account === '__CHILDREN_ACCOUNTS__') {
     includeChildrenAccounts = true;
+    excludeParentAccount = true;
   } else if (account === '__HOSTED_ACCOUNTS__') {
     includeHostedAccounts = true;
   } else if (account) {
@@ -193,6 +196,7 @@ const getQueryVariables = (accountSlug, router) => {
     type: getActivityTypeFilterValuesFromKey(type),
     account: filteredAccounts,
     includeChildrenAccounts,
+    excludeParentAccount,
     includeHostedAccounts,
   };
 };

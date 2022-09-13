@@ -8619,12 +8619,17 @@ type Query {
     """
     If account is a parent, also include child accounts
     """
-    includeChildrenAccounts: Boolean = false
+    includeChildrenAccounts: Boolean! = false
+
+    """
+    If account is a parent, use this option to exclude it from the results. Use in combination with includeChildrenAccounts.
+    """
+    excludeParentAccount: Boolean! = false
 
     """
     If account is a host, also include hosted accounts
     """
-    includeHostedAccounts: Boolean = false
+    includeHostedAccounts: Boolean! = false
 
     """
     Only return activities that were created after this date
