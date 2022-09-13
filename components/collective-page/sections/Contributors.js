@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import Container from '../../Container';
 import * as ContributorsFilter from '../../ContributorsFilter';
-import ContributorsGrid, { COLLECTIVE_CARD_MARGIN_X } from '../../ContributorsGrid';
+import ContributorsGrid from '../../ContributorsGrid';
 import { H3, P, Span } from '../../Text';
 // Local imports
 import { Dimensions } from '../_constants';
@@ -147,25 +147,7 @@ export default class SectionContributors extends React.PureComponent {
           contributors={contributors}
           collectiveId={collective.id}
           currency={collective.currency}
-          getPaddingLeft={({ width, rowWidth, nbRows }) => {
-            if (width < Dimensions.MAX_SECTION_WIDTH) {
-              // No need for padding on screens small enough so they don't have padding
-              return 0;
-            } else if (nbRows > 1) {
-              if (rowWidth <= width) {
-                // If multiline and possible center contributors cards
-                const cardsLeftOffset = COLLECTIVE_CARD_MARGIN_X / 2;
-                return (width - rowWidth) / 2 - cardsLeftOffset;
-              } else {
-                // Otherwise if multiline and the grid is full, just use the full screen
-                return 0;
-              }
-            } else {
-              // Otherwise add a normal section padding on the left
-              const cardsLeftOffset = COLLECTIVE_CARD_MARGIN_X / 2;
-              return (width - Math.max(Dimensions.MAX_SECTION_WIDTH, rowWidth)) / 2 - cardsLeftOffset;
-            }
-          }}
+          maxWidthWhenNotFull={Dimensions.MAX_SECTION_WIDTH}
         />
       </MainContainer>
     );
