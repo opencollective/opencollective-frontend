@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import { TierTypes } from '../lib/constants/tiers-types';
 import { sortEvents } from '../lib/events';
 import { sortTiersForCollective } from '../lib/tier-utils';
+import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -295,7 +296,7 @@ class TiersPage extends React.Component {
                       </P>
                     )}
                     {waysToContribute.length > 0 && (
-                      <Link href={`/${slug}`}>
+                      <Link href={getCollectivePageRoute(collective)}>
                         <StyledButton buttonSize="small" mt={3}>
                           ←&nbsp;
                           <FormattedMessage
