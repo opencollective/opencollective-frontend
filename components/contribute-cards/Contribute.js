@@ -339,7 +339,7 @@ ContributeCard.propTypes = {
   /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
   router: PropTypes.object,
-  enableEditing: PropTypes.object,
+  enableEditing: PropTypes.bool,
   tier: PropTypes.object,
   collective: PropTypes.object,
 };
