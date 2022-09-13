@@ -44,6 +44,11 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
       {!isAccountantOnly && (
         <React.Fragment>
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} />
+          <MenuLink
+            collective={collective}
+            section={COLLECTIVE_SECTIONS.TIERS_REVAMP}
+            if={['development', 'staging'].includes(process.env.OC_ENV)}
+          />
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
           <MenuLink collective={collective} section={ALL_SECTIONS.WEBHOOKS} />
           <MenuLink
