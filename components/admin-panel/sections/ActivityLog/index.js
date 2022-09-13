@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { ActivityAttribution } from '../../../../lib/constants/activities';
 import { parseDateInterval } from '../../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 import { ActivityDescriptionI18n } from '../../../../lib/i18n/activities';
@@ -28,7 +27,6 @@ import StyledCard from '../../../StyledCard';
 import StyledLink from '../../../StyledLink';
 import { P, Span } from '../../../Text';
 
-import { isSupportedAttributionFilter } from './ActivityAttributionFilter';
 import ActivityFilters from './ActivityFilters';
 import { getActivityTypeFilterValuesFromKey, isSupportedActivityTypeFilter } from './ActivityTypeFilter';
 
@@ -40,21 +38,34 @@ const activityLogQuery = gqlV2/* GraphQL */ `
     $dateFrom: DateTime
     $dateTo: DateTime
     $type: [ActivityAndClassesType!]
-    $attribution: ActivityAttribution
+    $account: [AccountReferenceInput!]!
+    $includeHostedAccounts: Boolean
+    $includeChildrenAccounts: Boolean
+    $excludeParentAccount: Boolean
   ) {
     account(slug: $accountSlug) {
       id
+      name
+      slug
+      legacyId
       isHost
       type
+      ... on Collective {
+        childrenAccounts {
+          totalCount
+        }
+      }
     }
     activities(
-      account: { slug: $accountSlug }
+      account: $account
       limit: $limit
       offset: $offset
       dateFrom: $dateFrom
       dateTo: $dateTo
       type: $type
-      attribution: $attribution
+      includeHostedAccounts: $includeHostedAccounts
+      includeChildrenAccounts: $includeChildrenAccounts
+      excludeParentAccount: $excludeParentAccount
     ) {
       offset
       limit
@@ -160,11 +171,21 @@ const ACTIVITY_LIMIT = 10;
 const getQueryVariables = (accountSlug, router) => {
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
-  const { period, type } = routerQuery;
+  const { period, type, account } = routerQuery;
   const { from: dateFrom, to: dateTo } = parseDateInterval(period);
-  const attribution = Object.values(ActivityAttribution).includes(routerQuery.attribution)
-    ? routerQuery.attribution
-    : null;
+
+  // Account filters
+  let filteredAccounts = { slug: accountSlug };
+  let includeChildrenAccounts, includeHostedAccounts, excludeParentAccount;
+  if (account === '__CHILDREN_ACCOUNTS__') {
+    includeChildrenAccounts = true;
+    excludeParentAccount = true;
+  } else if (account === '__HOSTED_ACCOUNTS__') {
+    includeHostedAccounts = true;
+  } else if (account) {
+    filteredAccounts = account.split(',').map(slug => ({ slug }));
+    includeChildrenAccounts = true; // By default, we include children of selected accounts
+  }
 
   return {
     accountSlug,
@@ -173,7 +194,10 @@ const getQueryVariables = (accountSlug, router) => {
     limit: ACTIVITY_LIMIT,
     offset,
     type: getActivityTypeFilterValuesFromKey(type),
-    attribution,
+    account: filteredAccounts,
+    includeChildrenAccounts,
+    excludeParentAccount,
+    includeHostedAccounts,
   };
 };
 
@@ -186,9 +210,6 @@ const getChangesThatRequireUpdate = (account, queryParams) => {
   if (!isSupportedActivityTypeFilter(account, queryParams.type)) {
     changes.type = null;
   }
-  if (!isSupportedAttributionFilter(account, queryParams.attribution)) {
-    changes.attribution = null;
-  }
   return changes;
 };
 
@@ -200,6 +221,7 @@ const ActivityLog = ({ accountSlug }) => {
   const { data, loading, error } = useQuery(activityLogQuery, {
     variables: getQueryVariables(accountSlug, router),
     context: API_V2_CONTEXT,
+    fetchPolicy: 'network-only',
   });
 
   const handleUpdateFilters = queryParams => {
@@ -210,7 +232,7 @@ const ActivityLog = ({ accountSlug }) => {
     });
   };
 
-  // Reset type/attribution if not supported by the account
+  // Reset type if not supported by the account
   React.useEffect(() => {
     const changesThatRequireUpdate = getChangesThatRequireUpdate(data?.account, routerQuery);
     if (!isEmpty(changesThatRequireUpdate)) {

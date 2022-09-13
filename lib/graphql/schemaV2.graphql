@@ -8663,14 +8663,24 @@ type Query {
     offset: Int! = 0
 
     """
-    The account associated with the Activity
+    The accounts associated with the Activity
     """
-    account: AccountReferenceInput!
+    account: [AccountReferenceInput!]!
 
     """
-    How activities are related to the account
+    If account is a parent, also include child accounts
     """
-    attribution: ActivityAttribution
+    includeChildrenAccounts: Boolean! = false
+
+    """
+    If account is a parent, use this option to exclude it from the results. Use in combination with includeChildrenAccounts.
+    """
+    excludeParentAccount: Boolean! = false
+
+    """
+    If account is a host, also include hosted accounts
+    """
+    includeHostedAccounts: Boolean! = false
 
     """
     Only return activities that were created after this date
@@ -10502,31 +10512,6 @@ type ActivityCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Activity!]
-}
-
-"""
-How an activity is related to an account
-"""
-enum ActivityAttribution {
-  """
-  Activities initiated by this account
-  """
-  AUTHORED
-
-  """
-  Activities that targeted this account
-  """
-  RECEIVED
-
-  """
-  Activities where author and target both points to this account (e.g. settings update)
-  """
-  SELF
-
-  """
-  Activities that happened on accounts hosted by this account
-  """
-  HOSTED_ACCOUNTS
 }
 
 enum ActivityAndClassesType {
