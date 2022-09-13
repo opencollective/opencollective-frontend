@@ -6,7 +6,7 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronRight } from '@styled-icons/boxicons-regular/ChevronRight';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
@@ -17,6 +17,7 @@ import Avatar from './Avatar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
+import { HideGlobalScroll } from './HideGlobalScroll';
 import Link from './Link';
 import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
@@ -32,14 +33,6 @@ const memberInvitationsCountQuery = gqlV2`
   query MemberInvitationsCount($memberAccount: AccountReferenceInput!) {
     memberInvitations(memberAccount: $memberAccount) {
       id
-    }
-  }
-`;
-
-const HideGlobalScroll = createGlobalStyle`
-  @media(max-width: 40em) {
-    body {
-      overflow: hidden;
     }
   }
 `;
