@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown, ChevronUp } from '@styled-icons/boxicons-regular';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
+import { debounce } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -70,8 +71,11 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
 
+  // We debounce this function to avoid conflicts between the menu button and TopBarMobileMenu useGlobalBlur hook.
+  const debouncedSetShowMobileMenu = debounce(setShowMobileMenu);
+
   const toggleMobileMenu = () => {
-    setShowMobileMenu(!showMobileMenu);
+    debouncedSetShowMobileMenu(state => !state);
   };
 
   return (
@@ -245,12 +249,12 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
         </React.Fragment>
       )}
       <Hide md lg>
-        <TopBarMobileMenu showMobileMenu={showMobileMenu} closeMenu={toggleMobileMenu} />
         <Box mx={3} onClick={toggleMobileMenu}>
           <Flex as="a">
             <MenuIcon color="#aaaaaa" size={24} />
           </Flex>
         </Box>
+        {showMobileMenu && <TopBarMobileMenu closeMenu={toggleMobileMenu} />}
       </Hide>
     </Flex>
   );
