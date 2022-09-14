@@ -181,7 +181,6 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       type
       isAdmin
       ... on Account {
-        id
         emails
       }
       location {

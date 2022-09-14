@@ -195,8 +195,6 @@ class ExpensePage extends React.Component {
     super(props);
     this.expenseTopRef = React.createRef();
     const isDraft = this.props.data.expense?.status === expenseStatus.DRAFT;
-    const expensePayeeEmail = get(props.data, 'expense.payee.emails[0]');
-    const createdUser = !isDraft && expensePayeeEmail ? { email: expensePayeeEmail } : null;
     this.state = {
       isRefetchingDataForUser: false,
       error: null,
@@ -206,7 +204,7 @@ class ExpensePage extends React.Component {
       isPoolingEnabled: true,
       tos: false,
       newsletterOptIn: false,
-      createdUser,
+      createdUser: null,
     };
 
     this.pollingInterval = 60;
@@ -239,6 +237,14 @@ class ExpensePage extends React.Component {
     ) {
       this.handleExpenseVerification();
     }
+
+    let isDraft, expensePayeeEmail;
+    this.props.data.refetch().then(value => {
+      isDraft = value.data.expense?.status === expenseStatus.DRAFT;
+      expensePayeeEmail = get(value.data, 'expense.payee.emails[0]');
+      const createdUser = !isDraft && expensePayeeEmail ? { email: expensePayeeEmail } : null;
+      this.setState({ createdUser });
+    });
 
     this.handlePolling();
     document.addEventListener('mousemove', this.handlePolling);
