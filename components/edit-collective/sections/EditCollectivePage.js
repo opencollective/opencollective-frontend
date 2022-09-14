@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
-import { CaretUp } from '@styled-icons/fa-solid/CaretUp';
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { cloneDeep, flatten, get, isEqual, set } from 'lodash';
@@ -71,7 +69,7 @@ const SectionEntryContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 16px;
+  padding: 4px 16px;
 
   ${props =>
     props.isDragging &&
@@ -179,19 +177,11 @@ const CollectiveSectionEntry = ({
   return (
     <SectionEntryContainer ref={preview} isDragging={isDragging}>
       {showDragIcon && (
-        <Container display="inline-block" mr={1} pb="2px" cursor="move" ref={ref}>
-          <DragIndicator size={22} />
+        <Container mr={3} cursor="move" ref={ref}>
+          <DragIndicator size={14} />
         </Container>
       )}
-      <Flex flexDirection="column" alignItems="flex-start" justifyContent="space-between" mr={2}>
-        <StyledButton borderRadius={2} lineHeight="8px" buttonSize="tiny" p="3px" mb="2px">
-          <CaretUp size={10} />
-        </StyledButton>
-        <StyledButton borderRadius={2} lineHeight="8px" buttonSize="tiny" p="3px">
-          <CaretDown size={10} />
-        </StyledButton>
-      </Flex>
-      <P fontSize="14px" lineHeight="21px" fontWeight={fontWeight || '500'} css={{ flex: '1' }}>
+      <P fontSize="14px" fontWeight={fontWeight || '500'} css={{ flex: '1' }}>
         {i18nCollectivePageSection(intl, section)}
       </P>
 
@@ -296,20 +286,10 @@ const MenuCategory = ({ item, index, collective, onMove, onDrop, onSectionToggle
         boxShadow="0 3px 4px 0px #6b6b6b38"
         alignItems="center"
       >
-        <Container display="inline-block" mr={1} pb="2px" cursor="move" ref={ref}>
-          <DragIndicator size={22} />
+        <Container display="inline-block" mr={3} cursor="move" ref={ref}>
+          <DragIndicator size={14} />
         </Container>
-        <Flex flexDirection="column" alignItems="flex-start" justifyContent="space-between" mr={2}>
-          <StyledButton borderRadius={2} lineHeight="8px" buttonSize="tiny" p="3px" mb="2px">
-            <CaretUp size={10} />
-          </StyledButton>
-          <StyledButton borderRadius={2} lineHeight="8px" buttonSize="tiny" p="3px">
-            <CaretDown size={10} />
-          </StyledButton>
-        </Flex>
-        <P ontSize="14px" lineHeight="21px" css={{ flex: '1' }}>
-          {i18nNavbarCategory(intl, item.name)}
-        </P>
+        <Container>{i18nNavbarCategory(intl, item.name)}</Container>
       </Container>
       <Container>
         {item.sections?.map((section, index) => (
