@@ -194,19 +194,19 @@ class ExpensePage extends React.Component {
   constructor(props) {
     super(props);
     this.expenseTopRef = React.createRef();
+    const isDraft = this.props.data.expense?.status === expenseStatus.DRAFT;
+    const expensePayeeEmail = get(props.data, 'expense.payee.emails[0]');
+    const createdUser = !isDraft && expensePayeeEmail ? { email: expensePayeeEmail } : null;
     this.state = {
       isRefetchingDataForUser: false,
       error: null,
-      status:
-        this.props.draftKey && this.props.data.expense?.status === expenseStatus.DRAFT
-          ? PAGE_STATUS.EDIT
-          : PAGE_STATUS.VIEW,
+      status: this.props.draftKey && isDraft ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
       editedExpense: null,
       isSubmitting: false,
       isPoolingEnabled: true,
       tos: false,
       newsletterOptIn: false,
-      createdUser: null,
+      createdUser,
     };
 
     this.pollingInterval = 60;

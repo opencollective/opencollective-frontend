@@ -145,7 +145,9 @@ const ExpenseInviteNotificationBanner = props => {
 };
 
 ExpenseInviteNotificationBanner.propTypes = {
-  createdUser: PropTypes.object,
+  createdUser: PropTypes.shape({
+    email: PropTypes.string,
+  }),
   expense: PropTypes.object.isRequired,
 };
 

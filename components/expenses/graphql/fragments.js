@@ -180,6 +180,10 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       legalName
       type
       isAdmin
+      ... on Account {
+        id
+        emails
+      }
       location {
         id
         address
