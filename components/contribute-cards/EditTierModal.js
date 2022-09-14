@@ -403,6 +403,46 @@ export function ContributeCardPreview({ tier, collective }) {
   );
 }
 
+const listTierQuery = gqlV2/* GraphQL */ `
+  query AccountTiers($accountSlug: String!) {
+    account(slug: $accountSlug) {
+      id
+      ... on AccountWithContributions {
+        tiers {
+          nodes {
+            id
+            legacyId
+            name
+            slug
+            description
+            interval
+            frequency
+            amount {
+              valueInCents
+              currency
+            }
+            minimumAmount {
+              valueInCents
+              currency
+            }
+            goal {
+              valueInCents
+              currency
+            }
+            amountType
+            endsAt
+            type
+            maxQuantity
+            presets
+            button
+            useStandalonePage
+          }
+        }
+      }
+    }
+  }
+`;
+
 const editTierMutation = gqlV2/* GraphQL */ `
   mutation EditTier($tier: TierUpdateInput!) {
     editTier(tier: $tier) {
@@ -480,6 +520,14 @@ const createTierMutation = gqlV2/* GraphQL */ `
   }
 `;
 
+const deleteTierMutation = gqlV2/* GraphQL */ `
+  mutation DeleteTier($tier: TierReferenceInput!) {
+    deleteTier(tier: $tier) {
+      id
+    }
+  }
+`;
+
 export function EditTierForm({ tier, collective, onClose }) {
   const isEditing = React.useMemo(() => !!tier?.id);
   const initialValues = React.useMemo(() => {
@@ -514,7 +562,41 @@ export function EditTierForm({ tier, collective, onClose }) {
         legacyId: collective.id,
       },
     },
+    refetchQueries: [
+      {
+        query: listTierQuery,
+        context: API_V2_CONTEXT,
+        variables: {
+          accountSlug: collective.slug,
+        },
+      },
+    ],
+    awaitRefetchQueries: true,
   });
+
+  const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation, {
+    context: API_V2_CONTEXT,
+    variables: {
+      tier: {
+        id: tier?.id,
+      },
+    },
+    refetchQueries: [
+      {
+        query: listTierQuery,
+        context: API_V2_CONTEXT,
+        variables: {
+          accountSlug: collective.slug,
+        },
+      },
+    ],
+    awaitRefetchQueries: true,
+  });
+
+  const onDeleteTierClick = React.useCallback(async () => {
+    await deleteTier();
+    onClose();
+  }, [deleteTier]);
 
   return (
     <React.Fragment>
@@ -526,6 +608,9 @@ export function EditTierForm({ tier, collective, onClose }) {
             ...omit(values, 'interval'),
             frequency: getGQLV2FrequencyFromInterval(values.interval),
             maxQuantity: parseInt(values.maxQuantity),
+            goal: values?.goal?.valueInCents ? values.goal : null,
+            amount: values?.amount?.valueInCents ? values.amount : null,
+            minimumAmount: values?.minimumAmount?.valueInCents ? values.minimumAmount : null,
           };
 
           await submitFormMutation({
@@ -559,12 +644,28 @@ export function EditTierForm({ tier, collective, onClose }) {
               </ModalBody>
               <ModalFooter isFullWidth dividerMargin="1rem 0">
                 <Flex justifyContent="right" flexWrap="wrap">
+                  {isEditing && (
+                    <StyledButton
+                      type="button"
+                      data-cy="delete-btn"
+                      buttonStyle="dangerSecondary"
+                      mx={2}
+                      minWidth={120}
+                      onClick={onDeleteTierClick}
+                      loading={isDeleting}
+                      disabled={isSubmitting}
+                      marginRight="auto"
+                    >
+                      <FormattedMessage id="actions.delete" defaultMessage="Delete" />
+                    </StyledButton>
+                  )}
                   <StyledButton
                     type="submit"
                     data-cy="confirm-btn"
                     buttonStyle="primary"
                     mx={2}
                     minWidth={120}
+                    disabled={isDeleting}
                     loading={isSubmitting}
                   >
                     {isEditing ? (
@@ -576,7 +677,7 @@ export function EditTierForm({ tier, collective, onClose }) {
                   <StyledButton
                     type="button"
                     data-cy="cancel-btn"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isDeleting}
                     mx={2}
                     minWidth={100}
                     onClick={onClose}
