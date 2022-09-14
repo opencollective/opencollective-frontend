@@ -219,7 +219,7 @@ class ConversationPage extends React.Component {
     this.updateLoggedInUserFollowing(true);
 
     // Add user to the conversation subscribers
-    this.onFollowChange(true, comment.fromCollective);
+    this.onFollowChange(true, comment.fromAccount);
   };
 
   updateLoggedInUserFollowing = isFollowing => {

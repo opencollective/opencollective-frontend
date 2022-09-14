@@ -73,7 +73,7 @@ const hostDashboardExpensesQuery = gql`
       limit: $limit
       offset: $offset
       type: $type
-      tags: $tags
+      tag: $tags
       status: $status
       minAmount: $minAmount
       maxAmount: $maxAmount

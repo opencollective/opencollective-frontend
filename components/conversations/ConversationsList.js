@@ -23,14 +23,14 @@ const messages = defineMessages({
 
 const ConversationListItem = ({ conversation, collectiveSlug }) => {
   const { formatMessage } = useIntl();
-  const { id, slug, title, summary, createdAt, fromCollective, followers, stats } = conversation;
+  const { id, slug, title, summary, createdAt, fromAccount, followers, stats } = conversation;
   const hasFollowers = followers && size(followers.nodes) > 0;
   const hasComments = stats && stats.commentsCount > 0;
   return (
     <Flex>
       <Box mr={3}>
-        <LinkCollective collective={fromCollective}>
-          <Avatar collective={fromCollective} radius={40} />
+        <LinkCollective collective={fromAccount}>
+          <Avatar collective={fromAccount} radius={40} />
         </LinkCollective>
       </Box>
       <div>
@@ -45,7 +45,7 @@ const ConversationListItem = ({ conversation, collectiveSlug }) => {
             defaultMessage="Published on {date} by {author}"
             values={{
               date: <FormattedDate value={createdAt} day="numeric" month="long" year="numeric" />,
-              author: <LinkCollective collective={fromCollective} />,
+              author: <LinkCollective collective={fromAccount} />,
             }}
           />
         </P>
@@ -98,7 +98,7 @@ ConversationListItem.propTypes = {
     summary: PropTypes.string.isRequired,
     createdAt: PropTypes.string.isRequired,
     tags: PropTypes.arrayOf(PropTypes.string),
-    fromCollective: PropTypes.shape({
+    fromAccount: PropTypes.shape({
       type: PropTypes.string,
       slug: PropTypes.string.isRequired,
     }).isRequired,

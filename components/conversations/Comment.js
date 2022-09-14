@@ -56,14 +56,14 @@ const Comment = ({
       <Flex mb={3} justifyContent="space-between">
         <Flex>
           <Box mr={3}>
-            <LinkCollective collective={comment.fromCollective}>
-              <Avatar collective={comment.fromCollective} radius={40} />
+            <LinkCollective collective={comment.fromAccount}>
+              <Avatar collective={comment.fromAccount} radius={40} />
             </LinkCollective>
           </Box>
           <Flex flexDirection="column">
-            <LinkCollective collective={comment.fromCollective}>
+            <LinkCollective collective={comment.fromAccount}>
               <P color="black.800" fontWeight="500" truncateOverflow>
-                {comment.fromCollective.name}
+                {comment.fromAccount.name}
               </P>
             </LinkCollective>
             <P fontSize="12px" color="black.600" truncateOverflow title={comment.createdAt}>
@@ -132,7 +132,7 @@ Comment.propTypes = {
     id: PropTypes.string.isRequired,
     html: PropTypes.string,
     createdAt: PropTypes.string,
-    fromCollective: PropTypes.shape({
+    fromAccount: PropTypes.shape({
       id: PropTypes.string,
       name: PropTypes.string,
     }),

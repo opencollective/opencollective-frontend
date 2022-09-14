@@ -223,10 +223,6 @@ CommentActions.propTypes = {
     id: PropTypes.string.isRequired,
     html: PropTypes.string,
     createdAt: PropTypes.string,
-    fromCollective: PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-    }),
   }).isRequired,
   /** Can current user edit this comment? */
   canEdit: PropTypes.bool,

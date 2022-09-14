@@ -8622,6 +8622,11 @@ type Query {
     tag: [String]
 
     """
+    Host hosting the account
+    """
+    host: [AccountReferenceInput]
+
+    """
     Only return accounts that match these account types (COLLECTIVE, FUND, EVENT, PROJECT, ORGANIZATION or INDIVIDUAL)
     """
     type: [AccountType]

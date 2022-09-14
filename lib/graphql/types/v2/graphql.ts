@@ -3297,12 +3297,16 @@ export type ExpenseAttachedFile = {
   __typename?: 'ExpenseAttachedFile';
   /** Unique identifier for this file */
   id: Scalars['String'];
+  /** The original filename */
+  name?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['URL']>;
 };
 
 export type ExpenseAttachedFileInput = {
   /** ID of the file */
   id?: InputMaybe<Scalars['String']>;
+  /** Original filename */
+  name?: InputMaybe<Scalars['String']>;
   /** URL of the file */
   url: Scalars['URL'];
 };
@@ -7060,6 +7064,7 @@ export type QueryAccountArgs = {
 export type QueryAccountsArgs = {
   country?: InputMaybe<Array<InputMaybe<CountryIso>>>;
   hasCustomContributionsEnabled?: InputMaybe<Scalars['Boolean']>;
+  host?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeArchived?: InputMaybe<Scalars['Boolean']>;
   isActive?: InputMaybe<Scalars['Boolean']>;
   isHost?: InputMaybe<Scalars['Boolean']>;
