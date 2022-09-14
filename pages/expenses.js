@@ -319,11 +319,12 @@ class ExpensePage extends React.Component {
                       <ExpenseTags
                         isLoading={data.loading}
                         expense={{
-                          tags: data.account?.expensesTags.map(({ tag }) => tag).concat('untagged'),
+                          tags: data.account?.expensesTags.map(({ tag }) => tag),
                         }}
                         limit={30}
                         getTagProps={this.getTagProps}
                         data-cy="expense-tags-title"
+                        showUntagged
                       >
                         {({ key, tag, renderedTag, props }) => (
                           <Link

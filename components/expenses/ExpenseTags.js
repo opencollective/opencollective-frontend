@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
@@ -60,7 +60,20 @@ const ExpenseTag = styled(StyledTag).attrs({
   variant: 'rounded-right',
 })``;
 
-const ExpenseTags = ({ expense, isLoading, limit, getTagProps, children, canEdit, suggestedTags }) => {
+const ExpenseTags = ({ expense, isLoading, limit, getTagProps, children, canEdit, suggestedTags, showUntagged }) => {
+  const intl = useIntl();
+
+  const renderTag = ({ tag, label }) => {
+    const extraTagProps = getTagProps?.(tag) || {};
+
+    const renderedTag = (
+      <ExpenseTag key={tag} data-cy="expense-tag" {...extraTagProps}>
+        {label ?? tag}
+      </ExpenseTag>
+    );
+
+    return children ? children({ key: tag, tag, renderedTag, props: extraTagProps }) : renderedTag;
+  };
   return (
     <Flex flexWrap="wrap" alignItems="flex-start">
       {expense?.type && <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} isLoading={isLoading} />}
@@ -70,17 +83,13 @@ const ExpenseTags = ({ expense, isLoading, limit, getTagProps, children, canEdit
       ) : (
         expense?.tags && (
           <React.Fragment>
-            {expense.tags.slice(0, limit).map((tag, idx) => {
-              const extraTagProps = getTagProps?.(tag) || {};
-              const key = `${tag}-${idx}`;
-              const renderedTag = (
-                <ExpenseTag key={key} data-cy="expense-tag" {...extraTagProps}>
-                  {tag}
-                </ExpenseTag>
-              );
+            {expense.tags.slice(0, limit).map(tag => renderTag({ tag }))}
+            {showUntagged &&
+              renderTag({
+                tag: 'untagged',
+                label: intl.formatMessage(defineMessage({ defaultMessage: 'Untagged' })),
+              })}
 
-              return children ? children({ key, tag, renderedTag, props: extraTagProps }) : renderedTag;
-            })}
             {expense.tags.length > limit && (
               <ExpenseTag color="black.600" title={expense.tags.slice(limit).join(', ')}>
                 <FormattedMessage
@@ -115,6 +124,8 @@ ExpenseTags.propTypes = {
     legacyId: PropTypes.number,
     type: PropTypes.string,
   }),
+  /** Whether to show an "Untagged" tag (when used for filtering) */
+  showUntagged: PropTypes.bool,
 };
 
 ExpenseTags.defaultProps = {
