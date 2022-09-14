@@ -313,7 +313,7 @@ class ConversationPage extends React.Component {
     const followers = get(conversation, 'followers');
     const hasFollowers = followers && followers.nodes && followers.nodes.length > 0;
     const canEdit = LoggedInUser && body && LoggedInUser.canEditComment(body);
-    const canDelete = canEdit || (LoggedInUser && LoggedInUser.canEditCollective(collective));
+    const canDelete = canEdit || (LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(collective));
     return (
       <Page collective={collective} {...this.getPageMetaData(collective, conversation)}>
         {data.loading ? (

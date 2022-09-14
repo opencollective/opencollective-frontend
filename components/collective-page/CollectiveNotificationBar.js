@@ -137,7 +137,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
       status: 'collectivePending',
     };
   } else if (get(collective, 'type') === CollectiveType.EVENT && moneyCanMoveFromEvent(collective)) {
-    if (!LoggedInUser || !LoggedInUser.canEditCollective(collective)) {
+    if (!LoggedInUser || !LoggedInUser.isAdminOfCollectiveOrHost(collective)) {
       return;
     }
     return {

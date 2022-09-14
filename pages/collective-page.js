@@ -228,8 +228,8 @@ class CollectivePage extends React.Component {
                   updates={collective.updates}
                   conversations={collective.conversations}
                   LoggedInUser={LoggedInUser}
-                  isAdmin={Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective))}
-                  isHostAdmin={Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective.host))}
+                  isAdmin={Boolean(LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(collective))}
+                  isHostAdmin={Boolean(LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(collective.host))}
                   isRoot={Boolean(LoggedInUser && LoggedInUser.isRoot())}
                   onPrimaryColorChange={onPrimaryColorChange}
                   step={step}
@@ -238,7 +238,7 @@ class CollectivePage extends React.Component {
                 />
               )}
             </CollectiveThemeProvider>
-            {mode === 'onboarding' && LoggedInUser?.canEditCollective(collective) && (
+            {mode === 'onboarding' && LoggedInUser?.isAdminOfCollectiveOrHost(collective) && (
               <OnboardingModal
                 showOnboardingModal={showOnboardingModal}
                 setShowOnboardingModal={this.setShowOnboardingModal}
