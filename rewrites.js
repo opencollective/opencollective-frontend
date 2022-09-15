@@ -176,6 +176,11 @@ exports.REWRITES = [
     source: '/:collectiveSlug/:verb(tiers|contribute|events|projects|connected-collectives)',
     destination: '/contribute',
   },
+  {
+    source:
+      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(tiers|contribute|connected-collectives)',
+    destination: '/contribute',
+  },
   // Embed
   {
     source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:paymentFlow(crypto)?/:step(${contributionFlowSteps})?`,
