@@ -9,8 +9,11 @@ import { Mail } from '@styled-icons/material/Mail';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import useGlobalBlur from '../lib/hooks/useGlobalBlur';
+
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import { HideGlobalScroll } from './HideGlobalScroll';
 import Link from './Link';
 import StyledLink from './StyledLink';
 import StyledRoundButton from './StyledRoundButton';
@@ -34,21 +37,26 @@ const SubListItem = styled(ListItem)`
   padding-bottom: 10px;
 `;
 
-class TopBarMobileMenu extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { viewSolutionsMenu: false, viewProductsMenu: false, viewCompanyMenu: false };
-  }
+const TopBarMobileMenu = props => {
+  const [state, setState] = React.useState({
+    viewSolutionsMenu: false,
+    viewProductsMenu: false,
+    viewCompanyMenu: false,
+  });
+  const { closeMenu } = props;
+  const innerRef = React.useRef();
 
-  render() {
-    const { showMobileMenu, closeMenu } = this.props;
-
-    if (!showMobileMenu) {
-      return null;
+  useGlobalBlur(innerRef, isOutside => {
+    if (isOutside) {
+      closeMenu();
     }
+  });
 
-    return (
+  return (
+    <React.Fragment>
+      <HideGlobalScroll />
       <Container
+        ref={innerRef}
         bg="white.full"
         width="100%"
         position="absolute"
@@ -64,12 +72,12 @@ class TopBarMobileMenu extends React.Component {
           <ListItem>
             <Flex
               justifyContent="space-between"
-              onClick={() => this.setState(({ viewSolutionsMenu }) => ({ viewSolutionsMenu: !viewSolutionsMenu }))}
+              onClick={() => setState({ ...state, viewSolutionsMenu: !state.viewSolutionsMenu })}
             >
               <FormattedMessage defaultMessage="Solutions" />
               <ChevronDown size={20} />
             </Flex>
-            {this.state.viewSolutionsMenu && (
+            {state.viewSolutionsMenu && (
               <Box as="ul" my={2} pl="12px">
                 {/* TODO: Add this part back when the /collectives page is designed*/}
                 {/* <ListItem>*/}
@@ -94,12 +102,12 @@ class TopBarMobileMenu extends React.Component {
           <ListItem>
             <Flex
               justifyContent="space-between"
-              onClick={() => this.setState(({ viewProductsMenu }) => ({ viewProductsMenu: !viewProductsMenu }))}
+              onClick={() => setState({ ...state, viewProductsMenu: !state.viewProductsMenu })}
             >
               <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
               <ChevronDown size={20} />
             </Flex>
-            {this.state.viewProductsMenu && (
+            {state.viewProductsMenu && (
               <Box as="ul" my={2} pl="12px">
                 <SubListItem>
                   <Link href="/pricing" onClick={closeMenu}>
@@ -123,12 +131,12 @@ class TopBarMobileMenu extends React.Component {
           <ListItem>
             <Flex
               justifyContent="space-between"
-              onClick={() => this.setState(({ viewCompanyMenu }) => ({ viewCompanyMenu: !viewCompanyMenu }))}
+              onClick={() => setState({ ...state, viewCompanyMenu: !state.viewCompanyMenu })}
             >
               <FormattedMessage id="company" defaultMessage="Company" />
               <ChevronDown size={20} />
             </Flex>
-            {this.state.viewCompanyMenu && (
+            {state.viewCompanyMenu && (
               <Box as="ul" my={2} pl="12px">
                 <SubListItem>
                   <a href="https://blog.opencollective.com/" onClick={closeMenu}>
@@ -187,9 +195,9 @@ class TopBarMobileMenu extends React.Component {
           </StyledLink>
         </Container>
       </Container>
-    );
-  }
-}
+    </React.Fragment>
+  );
+};
 
 TopBarMobileMenu.propTypes = {
   showMobileMenu: PropTypes.bool,
