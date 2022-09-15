@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
@@ -11,6 +11,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import ContainerOverlay from '../ContainerOverlay';
+import { Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
@@ -163,17 +164,23 @@ const CommentForm = ({
             {formatErrorMessage(intl, getErrorFromGraphqlException(error))}
           </MessageBox>
         )}
-        <StyledButton
-          type="submit"
-          mt={3}
-          minWidth={150}
-          buttonStyle="primary"
-          disabled={isDisabled || !LoggedInUser || uploading}
-          loading={loading}
-          data-cy="submit-comment-btn"
-        >
-          {formatMessage(messages.postReply)}
-        </StyledButton>
+        <Flex mt={3} alignItems="center" gap={12}>
+          <StyledButton
+            type="submit"
+            minWidth={150}
+            buttonStyle="primary"
+            disabled={isDisabled || !LoggedInUser || uploading}
+            loading={loading}
+            data-cy="submit-comment-btn"
+          >
+            {formatMessage(messages.postReply)}
+          </StyledButton>
+          {uploading && (
+            <P color="black.500" fontStyle="italic">
+              <FormattedMessage defaultMessage="Uploading image..." />
+            </P>
+          )}
+        </Flex>
       </form>
     </Container>
   );
