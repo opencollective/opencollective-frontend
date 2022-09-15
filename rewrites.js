@@ -178,7 +178,7 @@ exports.REWRITES = [
   },
   {
     source:
-      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(tiers|contribute|events|projects|connected-collectives)',
+      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(tiers|contribute|connected-collectives)',
     destination: '/contribute',
   },
   // Embed
