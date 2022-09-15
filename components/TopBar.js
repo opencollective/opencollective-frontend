@@ -210,6 +210,11 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
                       <FormattedMessage id="OC.e2c" defaultMessage="Exit to Community" />
                     </NavItem>
                   </Link>
+                  <a href="https://opencollective.com/opencollective#category-ABOUT">
+                    <NavItem as={Container} mb={16}>
+                      <FormattedMessage id="company.about" defaultMessage="About" />
+                    </NavItem>
+                  </a>
                 </NavLinkContainer>
               </PopupMenu>
             )}
