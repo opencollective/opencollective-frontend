@@ -177,7 +177,8 @@ exports.REWRITES = [
     destination: '/contribute',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contribute',
+    source:
+      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(tiers|contribute|events|projects|connected-collectives)',
     destination: '/contribute',
   },
   // Embed
