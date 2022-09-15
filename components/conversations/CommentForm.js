@@ -100,6 +100,7 @@ const CommentForm = ({
   const [html, setHtml] = useState('');
   const [resetValue, setResetValue] = useState();
   const [validationError, setValidationError] = useState();
+  const [uploading, setUploading] = useState(false);
   const { formatMessage } = intl;
 
   const submitForm = async event => {
@@ -149,6 +150,7 @@ const CommentForm = ({
               setHtml(e.target.value);
               setValidationError(null);
             }}
+            setUploading={setUploading}
           />
         )}
         {validationError && (
@@ -166,7 +168,7 @@ const CommentForm = ({
           mt={3}
           minWidth={150}
           buttonStyle="primary"
-          disabled={isDisabled || !LoggedInUser}
+          disabled={isDisabled || !LoggedInUser || uploading}
           loading={loading}
           data-cy="submit-comment-btn"
         >
