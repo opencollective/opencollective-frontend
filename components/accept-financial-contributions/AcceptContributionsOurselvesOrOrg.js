@@ -48,6 +48,21 @@ const OrgCard = styled(Flex)`
   }
 `;
 
+const ImageSizingContainer = styled(Container)`
+  @media screen and (min-width: 52em) {
+    height: 256px;
+    width: 256px;
+  }
+  @media screen and (max-width: 40em) {
+    height: 192px;
+    width: 192px;
+  }
+  @media screen and (min-width: 40em) and (max-width: 52em) {
+    height: 208px;
+    width: 208px;
+  }
+`;
+
 class AcceptContributionsOurselvesOrOrg extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
@@ -215,11 +230,13 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
           <Flex flexDirection="column" alignItems="center" maxWidth={'575px'} my={2} mx={[3, 0]}>
             {noOrganizationPicked ? (
               <Fragment>
-                <Image
-                  src="/static/images/create-collective/acceptContributionsOrganizationHoverIllustration.png"
-                  width={256}
-                  height={256}
-                />
+                <ImageSizingContainer>
+                  <Image
+                    src="/static/images/create-collective/acceptContributionsOrganizationHoverIllustration.png"
+                    width={256}
+                    height={256}
+                  />
+                </ImageSizingContainer>
                 <H2 fontSize="20px" fontWeight="bold" color="black.900" textAlign="center">
                   <FormattedMessage
                     id="acceptContributions.organization.subtitle"

@@ -20,6 +20,21 @@ import Loading from '../Loading';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
 
+const ImageSizingContainer = styled(Container)`
+  @media screen and (min-width: 52em) {
+    height: 256px;
+    width: 256px;
+  }
+  @media screen and (max-width: 40em) {
+    height: 192px;
+    width: 192px;
+  }
+  @media screen and (min-width: 40em) and (max-width: 52em) {
+    height: 208px;
+    width: 208px;
+  }
+`;
+
 const ConnectedAccountCard = styled(Flex)`
   box-shadow: 0 1px 3px 2px rgba(46, 77, 97, 0.1);
   border-radius: 16px;
@@ -92,12 +107,14 @@ class StripeOrBankAccountPicker extends React.Component {
           <Flex justifyContent="center" alignItems="center" flexDirection={['column', 'row']}>
             <Container alignItems="center" width={[null, 280, 312]} mb={[2, 0]}>
               <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                <Image
-                  width={256}
-                  height={256}
-                  src="/static/images/create-collective/stripeIllustration.png"
-                  alt={intl.formatMessage(this.messages.connectService, { service: 'Stripe' })}
-                />
+                <ImageSizingContainer>
+                  <Image
+                    width={256}
+                    height={256}
+                    src="/static/images/create-collective/stripeIllustration.png"
+                    alt={intl.formatMessage(this.messages.connectService, { service: 'Stripe' })}
+                  />
+                </ImageSizingContainer>
                 {stripeAccount ? (
                   <ConnectedAccountCard
                     width={2 / 3}
@@ -149,12 +166,14 @@ class StripeOrBankAccountPicker extends React.Component {
               pt={[3, 0]}
             >
               <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                <Image
-                  width={256}
-                  height={256}
-                  src="/static/images/create-collective/bankAccountIllustration.png"
-                  alt={intl.formatMessage(this.messages.addBankAccount)}
-                />
+                <ImageSizingContainer>
+                  <Image
+                    width={256}
+                    height={256}
+                    src="/static/images/create-collective/bankAccountIllustration.png"
+                    alt={intl.formatMessage(this.messages.addBankAccount)}
+                  />
+                </ImageSizingContainer>
                 {isBankAccountAlreadyThere ? (
                   <ConnectedAccountCard
                     width={2 / 3}

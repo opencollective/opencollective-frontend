@@ -13,12 +13,23 @@ import Link from '../Link';
 import StyledButton from '../StyledButton';
 import { H1, P } from '../Text';
 
-const Illustration = styled(Container)`
+const ImageSizingContainer = styled(Container)`
   position: absolute;
+  @media screen and (min-width: 52em) {
+    height: 256px;
+    width: 256px;
+  }
+  @media screen and (max-width: 40em) {
+    height: 192px;
+    width: 192px;
+  }
+  @media screen and (min-width: 40em) and (max-width: 52em) {
+    height: 208px;
+    width: 208px;
+  }
 `;
 
-const HoverIllustration = styled(Container)`
-  position: absolute;
+const HoverImageSizingContainer = styled(ImageSizingContainer)`
   opacity: 0;
   &:hover {
     opacity: 1;
@@ -81,22 +92,22 @@ class ContributionCategoryPicker extends React.Component {
               <Container alignItems="center" width={[null, 280, 312]} mb={[2, 0]}>
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Box size={[192, 208, 256]}>
-                    <Illustration>
+                    <ImageSizingContainer>
                       <Image
                         width={256}
                         height={256}
                         src="/static/images/create-collective/acceptContributionsMyselfIllustration.png"
                         alt={intl.formatMessage(this.messages.ourselves)}
                       />
-                    </Illustration>
-                    <HoverIllustration>
+                    </ImageSizingContainer>
+                    <HoverImageSizingContainer>
                       <Image
                         width={256}
                         height={256}
                         src="/static/images/create-collective/acceptContributionsMyselfHoverIllustration.png"
                         alt={intl.formatMessage(this.messages.ourselves)}
                       />
-                    </HoverIllustration>
+                    </HoverImageSizingContainer>
                   </Box>
                   <Link href={`/${router.query.slug}/accept-financial-contributions/ourselves`}>
                     <StyledButton
@@ -136,22 +147,22 @@ class ContributionCategoryPicker extends React.Component {
               >
                 <Flex flexDirection="column" justifyContent="center" alignItems="center">
                   <Box size={[192, 208, 256]}>
-                    <Illustration>
+                    <ImageSizingContainer>
                       <Image
                         width={256}
                         height={256}
                         src="/static/images/create-collective/acceptContributionsHostIllustration.png"
                         alt={intl.formatMessage(this.messages.host)}
                       />
-                    </Illustration>
-                    <HoverIllustration>
+                    </ImageSizingContainer>
+                    <HoverImageSizingContainer>
                       <Image
                         width={256}
                         height={256}
                         src="/static/images/create-collective/acceptContributionsHostHoverIllustration.png"
                         alt={intl.formatMessage(this.messages.host)}
                       />
-                    </HoverIllustration>
+                    </HoverImageSizingContainer>
                   </Box>
                   <Link href={`/${router.query.slug}/accept-financial-contributions/host`}>
                     <StyledButton
