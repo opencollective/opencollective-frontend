@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { omit, omitBy } from 'lodash';
+import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { ActivityAttribution } from '../../../../lib/constants/activities';
 import { parseDateInterval } from '../../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 import { ActivityDescriptionI18n } from '../../../../lib/i18n/activities';
@@ -26,10 +25,10 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
 import StyledCard from '../../../StyledCard';
 import StyledLink from '../../../StyledLink';
-import { P } from '../../../Text';
+import { P, Span } from '../../../Text';
 
 import ActivityFilters from './ActivityFilters';
-import { getActivityTypeFilterValuesFromKey } from './ActivityTypeFilter';
+import { getActivityTypeFilterValuesFromKey, isSupportedActivityTypeFilter } from './ActivityTypeFilter';
 
 const activityLogQuery = gqlV2/* GraphQL */ `
   query AccountActivityLog(
@@ -39,21 +38,34 @@ const activityLogQuery = gqlV2/* GraphQL */ `
     $dateFrom: DateTime
     $dateTo: DateTime
     $type: [ActivityAndClassesType!]
-    $attribution: ActivityAttribution
+    $account: [AccountReferenceInput!]!
+    $includeHostedAccounts: Boolean
+    $includeChildrenAccounts: Boolean
+    $excludeParentAccount: Boolean
   ) {
     account(slug: $accountSlug) {
       id
+      name
+      slug
+      legacyId
       isHost
       type
+      ... on Collective {
+        childrenAccounts {
+          totalCount
+        }
+      }
     }
     activities(
-      account: { slug: $accountSlug }
+      account: $account
       limit: $limit
       offset: $offset
       dateFrom: $dateFrom
       dateTo: $dateTo
       type: $type
-      attribution: $attribution
+      includeHostedAccounts: $includeHostedAccounts
+      includeChildrenAccounts: $includeChildrenAccounts
+      excludeParentAccount: $excludeParentAccount
     ) {
       offset
       limit
@@ -63,6 +75,7 @@ const activityLogQuery = gqlV2/* GraphQL */ `
         createdAt
         type
         data
+        isSystem
         fromAccount {
           id
           name
@@ -86,6 +99,7 @@ const activityLogQuery = gqlV2/* GraphQL */ `
           account {
             id
             name
+            type
             slug
             ... on AccountWithParent {
               parent {
@@ -157,11 +171,21 @@ const ACTIVITY_LIMIT = 10;
 const getQueryVariables = (accountSlug, router) => {
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
-  const { period, type } = routerQuery;
+  const { period, type, account } = routerQuery;
   const { from: dateFrom, to: dateTo } = parseDateInterval(period);
-  const attribution = Object.values(ActivityAttribution).includes(routerQuery.attribution)
-    ? routerQuery.attribution
-    : null;
+
+  // Account filters
+  let filteredAccounts = { slug: accountSlug };
+  let includeChildrenAccounts, includeHostedAccounts, excludeParentAccount;
+  if (account === '__CHILDREN_ACCOUNTS__') {
+    includeChildrenAccounts = true;
+    excludeParentAccount = true;
+  } else if (account === '__HOSTED_ACCOUNTS__') {
+    includeHostedAccounts = true;
+  } else if (account) {
+    filteredAccounts = account.split(',').map(slug => ({ slug }));
+    includeChildrenAccounts = true; // By default, we include children of selected accounts
+  }
 
   return {
     accountSlug,
@@ -170,8 +194,23 @@ const getQueryVariables = (accountSlug, router) => {
     limit: ACTIVITY_LIMIT,
     offset,
     type: getActivityTypeFilterValuesFromKey(type),
-    attribution,
+    account: filteredAccounts,
+    includeChildrenAccounts,
+    excludeParentAccount,
+    includeHostedAccounts,
   };
+};
+
+const getChangesThatRequireUpdate = (account, queryParams) => {
+  const changes = {};
+  if (!account) {
+    return changes;
+  }
+
+  if (!isSupportedActivityTypeFilter(account, queryParams.type)) {
+    changes.type = null;
+  }
+  return changes;
 };
 
 const ActivityLog = ({ accountSlug }) => {
@@ -182,14 +221,24 @@ const ActivityLog = ({ accountSlug }) => {
   const { data, loading, error } = useQuery(activityLogQuery, {
     variables: getQueryVariables(accountSlug, router),
     context: API_V2_CONTEXT,
+    fetchPolicy: 'network-only',
   });
 
   const handleUpdateFilters = queryParams => {
+    const pathname = router.asPath.split('?')[0];
     return router.push({
-      pathname: `/${accountSlug}/admin/activity-log`,
+      pathname,
       query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
     });
   };
+
+  // Reset type if not supported by the account
+  React.useEffect(() => {
+    const changesThatRequireUpdate = getChangesThatRequireUpdate(data?.account, routerQuery);
+    if (!isEmpty(changesThatRequireUpdate)) {
+      handleUpdateFilters({ ...routerQuery, ...changesThatRequireUpdate });
+    }
+  }, [data?.account, routerQuery]);
 
   return (
     <Box mt={3}>
@@ -258,22 +307,30 @@ const ActivityLog = ({ accountSlug }) => {
                       : activity.type}
                   </P>
                   <MetadataContainer>
-                    <FormattedMessage
-                      id="ByUser"
-                      defaultMessage="By {userName}"
-                      values={{
-                        userName: !activity.individual ? (
-                          <FormattedMessage id="user.unknown" defaultMessage="Unknown" />
-                        ) : (
-                          <StyledLink as={LinkCollective} color="black.700" collective={activity.individual}>
-                            <Flex alignItems="center" gridGap="8px">
-                              <Avatar radius={24} collective={activity.individual} />
-                              {activity.individual.name}
-                            </Flex>
-                          </StyledLink>
-                        ),
-                      }}
-                    />
+                    {activity.isSystem ? (
+                      <Span>
+                        <FormattedMessage defaultMessage="System Activity" />
+                      </Span>
+                    ) : (
+                      <FormattedMessage
+                        id="ByUser"
+                        defaultMessage="By {userName}"
+                        values={{
+                          userName: !activity.individual ? (
+                            <Span>
+                              <FormattedMessage id="user.unknown" defaultMessage="Unknown" />
+                            </Span>
+                          ) : (
+                            <StyledLink as={LinkCollective} color="black.700" collective={activity.individual}>
+                              <Flex alignItems="center" gridGap="8px">
+                                <Avatar radius={24} collective={activity.individual} />
+                                {activity.individual.name}
+                              </Flex>
+                            </StyledLink>
+                          ),
+                        }}
+                      />
+                    )}
                     •
                     <DateTime value={activity.createdAt} dateStyle="medium" />
                   </MetadataContainer>

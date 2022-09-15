@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import AddressFormatter from '@shopify/address';
 import { Field } from 'formik';
-import { cloneDeep, get, isEmpty, isNil, isUndefined, orderBy, pick, set, truncate } from 'lodash';
+import { cloneDeep, get, isEmpty, isNil, orderBy, pick, set, truncate } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import LoadingPlaceholder from './LoadingPlaceholder';
@@ -291,7 +291,7 @@ const I18nAddressFields = ({
           label={fieldLabel}
           info={fieldInfo}
           value={value?.[fieldName]}
-          required={!isUndefined(required) ? !Object.keys(data?.optionalLabels).includes(fieldName) : required}
+          required={required === false ? false : !Object.keys(data?.optionalLabels).includes(fieldName)}
           fieldProps={fieldProps}
           onChange={({ target: { name, value: fieldValue } }) =>
             onCountryChange(set(cloneDeep(value || {}), name, fieldValue))

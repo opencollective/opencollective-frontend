@@ -58,6 +58,10 @@ export const getActivityTypeFilterValuesFromKey = key => {
   return USER_OPTIONS.find(option => option.value === key)?.type || null;
 };
 
+export const isSupportedActivityTypeFilter = (account, value) => {
+  return !value || getOptionsForAccount(account).some(option => option.value === value);
+};
+
 const getOptionsForAccount = account => {
   if (!account || !isIndividualAccount(account)) {
     return COMMON_OPTIONS;

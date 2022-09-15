@@ -6,6 +6,7 @@ import { get, includes } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { getAmountInCents } from '../../lib/currency-utils';
 
 import TransferwiseIcon from '../icons/TransferwiseIcon';
 import StyledButton from '../StyledButton';
@@ -16,6 +17,7 @@ import PayExpenseModal from './PayExpenseModal';
 
 const getDisabledMessage = (expense, collective, host, payoutMethod) => {
   // Collective / Balance can be v1 or v2 there ...
+  const expenseAmountInAccountCurrency = getAmountInCents(expense.amountInAccountCurrency);
   const balance = get(
     collective,
     'stats.balanceWithBlockedFunds.valueInCents',
@@ -25,7 +27,7 @@ const getDisabledMessage = (expense, collective, host, payoutMethod) => {
     return (
       <FormattedMessage id="expense.pay.error.noHost" defaultMessage="Expenses cannot be paid without a Fiscal Host" />
     );
-  } else if (balance < expense.amount) {
+  } else if (balance < expenseAmountInAccountCurrency) {
     return <FormattedMessage id="expense.pay.error.insufficientBalance" defaultMessage="Insufficient balance" />;
   } else if (includes(expense.requiredLegalDocuments, 'US_TAX_FORM')) {
     return (

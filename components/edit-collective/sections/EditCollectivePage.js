@@ -283,8 +283,8 @@ const MenuCategory = ({ item, index, collective, onMove, onDrop, onSectionToggle
         py="10px"
         fontSize="14px"
         fontWeight="bold"
-        alignItems="middle"
         boxShadow="0 3px 4px 0px #6b6b6b38"
+        alignItems="center"
       >
         <Container display="inline-block" mr={3} cursor="move" ref={ref}>
           <DragIndicator size={14} />
@@ -356,9 +356,12 @@ const EditCollectivePage = ({ collective }) => {
   };
 
   const onDrop = () => {
-    setSections(tmpSections);
-    setTmpSections(null);
-    setDirty(true);
+    // Ignore if the drop happened outside of a valid dropzone (tmpSections=null)
+    if (tmpSections) {
+      setSections(tmpSections);
+      setTmpSections(null);
+      setDirty(true);
+    }
   };
 
   const onSectionToggle = (selectedSection, { isEnabled, restrictedTo, version }) => {

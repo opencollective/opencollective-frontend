@@ -5,6 +5,7 @@ import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
+import { CollectiveType } from '../../../../lib/constants/collectives';
 import { parseDateInterval } from '../../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 
@@ -63,6 +64,7 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
           name
           last4
           data
+          provider
           privateData
           createdAt
           spendingLimitAmount
@@ -169,8 +171,13 @@ const VirtualCards = props => {
         </Flex>
       </Box>
       <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
-        {data.account.virtualCards.nodes.map(vc => (
-          <VirtualCard key={vc.id} {...vc} />
+        {data.account.virtualCards.nodes.map(virtualCard => (
+          <VirtualCard
+            canEditVirtualCard={virtualCard.data.status === 'active'}
+            confirmOnPauseCard={props.collective.type === CollectiveType.COLLECTIVE}
+            key={virtualCard.id}
+            {...virtualCard}
+          />
         ))}
       </Grid>
       <Flex mt={5} justifyContent="center">
@@ -189,6 +196,7 @@ const VirtualCards = props => {
 VirtualCards.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string,
+    type: PropTypes.string,
     virtualCards: PropTypes.object,
     virtualCardMerchants: PropTypes.array,
     host: PropTypes.object,

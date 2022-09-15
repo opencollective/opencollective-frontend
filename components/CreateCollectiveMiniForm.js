@@ -113,7 +113,7 @@ const prepareMutationVariables = collective => {
   const locationFields = includeLocation ? ['location.address', 'location.country'] : [];
 
   if (collective.type === CollectiveType.USER) {
-    return { user: pick(collective, ['name', 'email', ...locationFields]) };
+    return { user: pick(collective, ['name', 'legalName', 'email', ...locationFields]) };
   } else if (collective.type === CollectiveType.ORGANIZATION) {
     collective.members.forEach(member => (member.role = roles.ADMIN));
     return { collective: pick(collective, ['name', 'legalName', 'type', 'website', 'members', ...locationFields]) };
@@ -280,7 +280,7 @@ const CreateCollectiveMiniForm = ({
                       {...inputProps}
                       type="email"
                       width="100%"
-                      placeholder="e.g., jane-smith@youremail.com"
+                      placeholder="e.g., jane-doe@youremail.com"
                       data-cy="mini-form-email-field"
                     />
                   )}
@@ -326,7 +326,7 @@ const CreateCollectiveMiniForm = ({
                   />
                 )}
               </StyledInputField>
-              {isOrganization && (
+              {(isUser || isOrganization) && (
                 <StyledInputField
                   name="legalName"
                   htmlFor="legalName"
@@ -334,7 +334,7 @@ const CreateCollectiveMiniForm = ({
                   label={formatMessage(msg.legalName)}
                   mt={3}
                   value={values.legalName}
-                  isPrivate
+                  isPrivate={isUser}
                   hint={
                     <FormattedMessage
                       id="editCollective.legalName.description"
@@ -346,7 +346,9 @@ const CreateCollectiveMiniForm = ({
                     <Field
                       as={StyledInput}
                       {...inputProps}
-                      placeholder={intl.formatMessage(msg.examples, { examples: 'Open Collective Inc.' })}
+                      placeholder={intl.formatMessage(msg.examples, {
+                        examples: isUser ? 'Jane Mary Doe, Frank Vincent Zappa' : 'Open Collective Inc.',
+                      })}
                       width="100%"
                       data-cy="mini-form-legalName-field"
                     />

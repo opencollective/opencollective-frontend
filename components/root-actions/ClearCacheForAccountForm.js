@@ -17,8 +17,8 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 const CACHE_TYPES = ['CONTRIBUTORS', 'GRAPHQL_QUERIES', 'CLOUDFLARE'];
 
 const clearCacheMutation = gqlV2/* GraphQL */ `
-  mutation ClearCache($account: AccountReferenceInput!) {
-    clearCacheForAccount(account: $account) {
+  mutation ClearCache($account: AccountReferenceInput!, $cacheTypes: [AccountCacheType!]) {
+    clearCacheForAccount(account: $account, type: $cacheTypes) {
       id
       slug
       name
@@ -82,7 +82,7 @@ const ClearCacheForAccountForm = () => {
         loading={loading}
         onClick={async () => {
           try {
-            const result = await clearCache({ variables: { account: { legacyId: account.id } } });
+            const result = await clearCache({ variables: { account: { legacyId: account.id }, cacheTypes } });
             const resultAccount = result.data.clearCacheForAccount;
             addToast({
               type: TOAST_TYPE.SUCCESS,

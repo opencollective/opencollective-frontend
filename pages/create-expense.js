@@ -25,13 +25,14 @@ import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/Exp
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseRecurringForm from '../components/expenses/ExpenseRecurringForm';
-import ExpenseSummary from '../components/expenses/ExpenseSummary';
+import ExpenseSummary, { SummaryHeader } from '../components/expenses/ExpenseSummary';
 import {
   expensePageExpenseFieldsFragment,
   loggedInAccountExpensePayoutFieldsFragment,
 } from '../components/expenses/graphql/fragments';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
 import { Box, Flex } from '../components/Grid';
+import LinkCollective from '../components/LinkCollective';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
@@ -39,7 +40,6 @@ import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree, { SignInOverlayBackground } from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import StyledCard from '../components/StyledCard';
-import { H1 } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
@@ -84,6 +84,7 @@ class CreateExpensePage extends React.Component {
         twitterHandle: PropTypes.string,
         imageUrl: PropTypes.string,
         isArchived: PropTypes.bool,
+        supportedExpenseTypes: PropTypes.array,
         expensesTags: PropTypes.arrayOf(
           PropTypes.shape({
             id: PropTypes.string.isRequired,
@@ -304,7 +305,10 @@ class CreateExpensePage extends React.Component {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
-      } else if (!hasFeature(data.account, FEATURES.RECEIVE_EXPENSES)) {
+      } else if (
+        !hasFeature(data.account, FEATURES.RECEIVE_EXPENSES) ||
+        data.account.supportedExpenseTypes.length === 0
+      ) {
         return <PageFeatureNotSupported />;
       } else if (data.account.isArchived) {
         return <PageFeatureNotSupported showContactSupportLink={false} />;
@@ -356,13 +360,21 @@ class CreateExpensePage extends React.Component {
               <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
                 <Flex justifyContent="space-between" flexDirection={['column', 'row']}>
                   <Box minWidth={300} maxWidth={['100%', null, null, 728]} mr={[0, 3, 5]} mb={5} flexGrow="1">
-                    <H1 fontSize="24px" lineHeight="32px" mb={24} py={2}>
+                    <SummaryHeader fontSize="24px" lineHeight="32px" mb={24} py={2}>
                       {step === STEPS.FORM ? (
                         <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
                       ) : (
-                        <FormattedMessage id="Summary" defaultMessage="Summary" />
+                        <FormattedMessage
+                          id="ExpenseSummaryTitle"
+                          defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
+                          values={{
+                            type: this.state.expense?.type,
+                            collectiveName: collective?.name,
+                            LinkCollective: text => <LinkCollective collective={collective}>{text}</LinkCollective>,
+                          }}
+                        />
                       )}
-                    </H1>
+                    </SummaryHeader>
                     {data.loading || loadingLoggedInUser ? (
                       <LoadingPlaceholder width="100%" height={400} />
                     ) : (
@@ -500,6 +512,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
       isArchived
       isActive
       expensePolicy
+      supportedExpenseTypes
       features {
         id
         ...NavbarFields
