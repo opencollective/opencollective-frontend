@@ -293,6 +293,7 @@ export default class RichTextEditor extends React.Component {
   };
 
   /** ---- Trix handlers ---- */
+
   replaceEmbeddedIFrames = value => {
     const iframeRegex = new RegExp(`<iframe.+?iframe>`, 'ig');
     let match;
@@ -444,6 +445,7 @@ export default class RichTextEditor extends React.Component {
   handleUpload = e => {
     const { attachment } = e;
     if (!attachment.file) {
+      attachment.remove(); // Remove unknown stuff, for example when copy-pasting HTML
       return;
     }
 
