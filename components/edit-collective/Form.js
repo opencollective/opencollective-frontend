@@ -84,14 +84,6 @@ class EditCollectiveForm extends React.Component {
 
     const { collective } = this.state;
 
-    this.showEditTiers = [COLLECTIVE, EVENT].includes(collective.type);
-    this.showExpenses = collective.type === COLLECTIVE || collective.isHost;
-    this.showEditGoals = collective.type === COLLECTIVE;
-    this.showHost = collective.type === COLLECTIVE;
-    this.defaultTierType = collective.type === EVENT ? 'TICKET' : 'TIER';
-    this.showEditMembers = [COLLECTIVE, ORGANIZATION].includes(collective.type);
-    this.showPaymentMethods = [USER, ORGANIZATION].includes(collective.type);
-
     this.messages = defineMessages({
       loading: { id: 'loading', defaultMessage: 'loading' },
       save: { id: 'save', defaultMessage: 'Save' },
@@ -750,7 +742,6 @@ class EditCollectiveForm extends React.Component {
           description: intl.formatMessage(this.messages.privateInstructionsDescription),
           type: 'textarea',
           maxLength: 10000,
-          defaultValue: collective.privateInstructions,
           when: () => collective.type === EVENT,
         },
         {
