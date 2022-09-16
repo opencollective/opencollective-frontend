@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import { TierTypes } from '../lib/constants/tiers-types';
 import { sortEvents } from '../lib/events';
 import { sortTiersForCollective } from '../lib/tier-utils';
+import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -274,14 +275,14 @@ class TiersPage extends React.Component {
                       <H2 fontWeight="normal" mb={2}>
                         {title}
                       </H2>
-                      {LoggedInUser?.canEditCollective(collective) && verb === 'events' && (
+                      {LoggedInUser?.isAdminOfCollectiveOrHost(collective) && verb === 'events' && (
                         <Link href={`/${collective.slug}/events/new`}>
                           <StyledButton buttonStyle="primary">
                             <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
                           </StyledButton>
                         </Link>
                       )}
-                      {LoggedInUser?.canEditCollective(collective) && verb === 'projects' && (
+                      {LoggedInUser?.isAdminOfCollectiveOrHost(collective) && verb === 'projects' && (
                         <Link href={`/${collective.slug}/projects/new`}>
                           <StyledButton buttonStyle="primary">
                             <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
@@ -295,7 +296,7 @@ class TiersPage extends React.Component {
                       </P>
                     )}
                     {waysToContribute.length > 0 && (
-                      <Link href={`/${slug}`}>
+                      <Link href={getCollectivePageRoute(collective)}>
                         <StyledButton buttonSize="small" mt={3}>
                           ←&nbsp;
                           <FormattedMessage

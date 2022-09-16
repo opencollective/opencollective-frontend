@@ -419,7 +419,7 @@ const CollectiveNavbar = ({
   const [isExpanded, setExpanded] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
   const isAccountant = LoggedInUser?.hasRole(roles.ACCOUNTANT, collective);
-  isAdmin = isAdmin || LoggedInUser?.canEditCollective(collective);
+  isAdmin = isAdmin || LoggedInUser?.isAdminOfCollectiveOrHost(collective);
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
   const sections = React.useMemo(() => {
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
