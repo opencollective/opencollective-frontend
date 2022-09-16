@@ -42,7 +42,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
 
   async onClick() {
     const { currency, amount, fromCollective, toCollective, description, data, LoggedInUser } = this.props;
-    if (!LoggedInUser || !LoggedInUser.canEditCollective(fromCollective) || !get(data, 'account')) {
+    if (!LoggedInUser || !LoggedInUser.isAdminOfCollectiveOrHost(fromCollective) || !get(data, 'account')) {
       return;
     }
     const paymentMethods = get(data, 'account.paymentMethods');

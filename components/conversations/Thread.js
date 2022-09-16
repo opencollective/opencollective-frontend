@@ -39,7 +39,7 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
     return null;
   }
 
-  const isAdmin = LoggedInUser && LoggedInUser.canEditCollective(collective);
+  const isAdmin = LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(collective);
 
   const handleLoadMore = async () => {
     setLoading(true);

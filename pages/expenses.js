@@ -146,7 +146,7 @@ class ExpensePage extends React.Component {
   componentDidUpdate(oldProps) {
     const { LoggedInUser, data } = this.props;
     if (!oldProps.LoggedInUser && LoggedInUser) {
-      if (LoggedInUser.canEditCollective(data.account) || LoggedInUser.isHostAdmin(data.account)) {
+      if (LoggedInUser.isAdminOfCollectiveOrHost(data.account) || LoggedInUser.isHostAdmin(data.account)) {
         data.refetch();
       }
     }
