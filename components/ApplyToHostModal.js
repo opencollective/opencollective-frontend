@@ -299,7 +299,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
           }}
           onSubmit={async values => {
             if (isOCFHost) {
-              await router.push(`/foundation/apply/form?collectiveSlug=${values.collective.slug}`);
+              await router.push(`/foundation/apply/intro?collectiveSlug=${values.collective.slug}`);
               window.scrollTo(0, 0);
               return;
             }
