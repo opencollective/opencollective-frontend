@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 
 import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
