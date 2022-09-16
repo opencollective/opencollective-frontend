@@ -982,6 +982,8 @@
   "editTeam.member.remove.success": "Member removed successfully.",
   "editTeam.memberInvitation.edit.error": "Failed to update member invitation.",
   "editTeam.memberInvitation.edit.success": "Member invitation updated successfully.",
+  "editTeam.memberInvitation.remove.error": "Failed to remove member invitation.",
+  "editTeam.memberInvitation.remove.success": "Member invitation removed successfully.",
   "EditUserEmailForm.reSend": "Re-send confirmation",
   "EditUserEmailForm.submit": "Potvrdit nový email",
   "EditUserEmailForm.success": "An email with a confirmation link has been sent to {email}. Please click the link to validate your email address.",
