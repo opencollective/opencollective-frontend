@@ -95,7 +95,7 @@ class InlineEditField extends Component {
     topEdit: -5,
   };
 
-  state = { isEditing: false, draft: '' };
+  state = { isEditing: false, draft: '', uploading: false };
 
   componentDidUpdate(oldProps) {
     if (oldProps.isEditing !== this.props.isEditing) {
@@ -196,6 +196,7 @@ class InlineEditField extends Component {
                     setValue: this.setDraft,
                     enableEditor: this.enableEditor,
                     disableEditor: this.disableEditor,
+                    setUploading: uploading => this.setState({ uploading }),
                   })
                 ) : (
                   <StyledTextarea
@@ -234,7 +235,7 @@ class InlineEditField extends Component {
                     <FormButton
                       buttonStyle="primary"
                       loading={loading}
-                      disabled={!isValid}
+                      disabled={!isValid || this.state.uploading}
                       data-cy="InlineEditField-Btn-Save"
                       minWidth={buttonsMinWidth}
                       onClick={() => {
@@ -249,7 +250,11 @@ class InlineEditField extends Component {
                         updateField({ variables }).then(() => this.disableEditor(true));
                       }}
                     >
-                      <FormattedMessage id="save" defaultMessage="Save" />
+                      {this.state.uploading ? (
+                        <FormattedMessage id="uploadImage.isUploading" defaultMessage="Uploading image..." />
+                      ) : (
+                        <FormattedMessage id="save" defaultMessage="Save" />
+                      )}
                     </FormButton>
                   </Flex>
                 </Box>

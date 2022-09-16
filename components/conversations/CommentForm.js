@@ -45,6 +45,10 @@ const messages = defineMessages({
     id: 'CommentForm.SignIn',
     defaultMessage: 'Please sign in to comment:',
   },
+  uploadingImage: {
+    id: 'uploadImage.isUploading',
+    defaultMessage: 'Uploading image...',
+  },
 });
 
 const getRedirectUrl = (router, id) => {
@@ -173,13 +177,8 @@ const CommentForm = ({
             loading={loading}
             data-cy="submit-comment-btn"
           >
-            {formatMessage(messages.postReply)}
+            {formatMessage(uploading ? messages.uploadingImage : messages.postReply)}
           </StyledButton>
-          {uploading && (
-            <P color="black.500" fontStyle="italic">
-              <FormattedMessage defaultMessage="Uploading image..." />
-            </P>
-          )}
         </Flex>
       </form>
     </Container>

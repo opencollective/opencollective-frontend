@@ -75,6 +75,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
   const { formatMessage } = useIntl();
   const [createConversation, { error: submitError }] = useMutation(createConversationMutation, mutationOptions);
   const [formPersister] = React.useState(new FormPersister());
+  const [uploading, setUploading] = React.useState(false);
 
   const { values, errors, getFieldProps, handleSubmit, setFieldValue, setValues, isSubmitting, touched } = useFormik({
     initialValues: {
@@ -152,6 +153,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
                 fontSize="13px"
                 error={touched.html && errors.html}
                 defaultValue={values.html}
+                setUploading={setUploading}
               />
             )}
           </Box>
@@ -203,12 +205,16 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
         type="submit"
         buttonStyle="primary"
         data-cy="submit-new-conversation-btn"
-        disabled={disabled || loading}
+        disabled={disabled || loading || uploading}
         loading={isSubmitting}
         minWidth={200}
         mt={3}
       >
-        <FormattedMessage id="CreateConversationForm.Submit" defaultMessage="Create Conversation" />
+        {uploading ? (
+          <FormattedMessage id="uploadImage.isUploading" defaultMessage="Uploading image..." />
+        ) : (
+          <FormattedMessage id="CreateConversationForm.Submit" defaultMessage="Create Conversation" />
+        )}
       </StyledButton>
     </form>
   );

@@ -47,6 +47,7 @@ class EditUpdateForm extends React.Component {
       update: props.update ? pick(props.update, 'title', 'html', 'isPrivate', 'makePublicOn') : {},
       loading: false,
       error: '',
+      uploading: false,
     };
 
     this.storageKey = `EditUpdateForm#${get(this.props, 'update.id') || get(this.props, 'collective.slug')}`;
@@ -141,6 +142,7 @@ class EditUpdateForm extends React.Component {
               withBorders
               data-cy="update-content-editor"
               videoEmbedEnabled
+              setUploading={uploading => this.setState({ uploading })}
             />
           </Container>
           {(!collective.isHost || update.isPrivate) && !this.props.isChangelog && (
@@ -206,15 +208,19 @@ class EditUpdateForm extends React.Component {
               buttonSize="large"
               buttonStyle="primary"
               type="submit"
-              disabled={this.state.loading || !this.state.update.title || !this.state.update.html}
+              disabled={
+                this.state.loading || this.state.uploading || !this.state.update.title || !this.state.update.html
+              }
             >
-              {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
-              {!this.state.loading &&
-                (this.props.update?.publishedAt ? (
-                  <FormattedMessage id="save" defaultMessage="Save" />
-                ) : (
-                  <FormattedMessage id="update.new.preview" defaultMessage="Preview Update" />
-                ))}
+              {this.state.loading ? (
+                <FormattedMessage id="form.processing" defaultMessage="processing" />
+              ) : this.state.uploading ? (
+                <FormattedMessage id="uploadImage.isUploading" defaultMessage="Uploading image..." />
+              ) : this.props.update?.publishedAt ? (
+                <FormattedMessage id="save" defaultMessage="Save" />
+              ) : (
+                <FormattedMessage id="update.new.preview" defaultMessage="Preview Update" />
+              )}
             </StyledButton>
           </ActionButtonWrapper>
 
