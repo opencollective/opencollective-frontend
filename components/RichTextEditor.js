@@ -449,15 +449,15 @@ export default class RichTextEditor extends React.Component {
       return;
     }
 
-    this.props.setUploading(true);
+    this.props.setUploading?.(true);
 
     const onProgress = progress => attachment.setUploadProgress(progress);
     const onSuccess = fileURL => {
-      this.props.setUploading(false);
+      this.props.setUploading?.(false);
       attachment.setAttributes({ url: fileURL, href: fileURL });
     };
     const onFailure = () => {
-      this.props.setUploading(false);
+      this.props.setUploading?.(false);
       this.setState({ error: 'File upload failed' });
     };
     uploadImageWithXHR(attachment.file, { onProgress, onSuccess, onFailure });
