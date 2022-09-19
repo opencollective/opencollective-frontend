@@ -912,7 +912,7 @@
   "editCollective.expenseApprovalsPolicy.authorCannotApprove.hostDescription": "Esta política sólo se aplica a su anfitrión fiscal y no afecta a los Colectivos que usted auspicia.",
   "editCollective.expenseApprovalsPolicy.authorCannotApprove.minAdminRequired": "Necesita tener al menos dos administradores para activar esta política.",
   "editCollective.expenseApprovalsPolicy.header": "Aprobación de gastos",
-  "editCollective.expenseTypes.description": "Specify the types of expenses allowed",
+  "editCollective.expenseTypes.description": "Specify the types of expenses allowed for all the collectives you're hosting. If you wish to customize these options for specific collectives, head to the <HostedCollectivesLink>Hosted Collectives</HostedCollectivesLink> section.",
   "editCollective.expenseTypesPolicy.header": "Expense types",
   "editCollective.fiscalHosting": "Anfitrión Fiscal",
   "EditCollective.GSTNumber": "Número GST",

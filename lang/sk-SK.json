@@ -912,7 +912,7 @@
   "editCollective.expenseApprovalsPolicy.authorCannotApprove.hostDescription": "Táto politika sa uplatňuje len na vašom fiškálnom hostiteľovi a nemá vplyv na vami hostené kolektívy.",
   "editCollective.expenseApprovalsPolicy.authorCannotApprove.minAdminRequired": "Ak chcete túto pravidlo povoliť, musíte mať aspoň dvoch správcov.",
   "editCollective.expenseApprovalsPolicy.header": "Schvaľovanie výdavkov",
-  "editCollective.expenseTypes.description": "Specify the types of expenses allowed",
+  "editCollective.expenseTypes.description": "Specify the types of expenses allowed for all the collectives you're hosting. If you wish to customize these options for specific collectives, head to the <HostedCollectivesLink>Hosted Collectives</HostedCollectivesLink> section.",
   "editCollective.expenseTypesPolicy.header": "Expense types",
   "editCollective.fiscalHosting": "Fiškálny hosting",
   "EditCollective.GSTNumber": "Číslo GST",

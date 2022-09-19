@@ -912,7 +912,7 @@
   "editCollective.expenseApprovalsPolicy.authorCannotApprove.hostDescription": "This policy is only enforced on your fiscal host and does not affect collectives hosted by you.",
   "editCollective.expenseApprovalsPolicy.authorCannotApprove.minAdminRequired": "You need to have at least two admins to enable this policy.",
   "editCollective.expenseApprovalsPolicy.header": "Expense approvals",
-  "editCollective.expenseTypes.description": "Specify the types of expenses allowed",
+  "editCollective.expenseTypes.description": "Specify the types of expenses allowed for all the collectives you're hosting. If you wish to customize these options for specific collectives, head to the <HostedCollectivesLink>Hosted Collectives</HostedCollectivesLink> section.",
   "editCollective.expenseTypesPolicy.header": "Expense types",
   "editCollective.fiscalHosting": "Hébergement Fiscal",
   "EditCollective.GSTNumber": "Numéro GST",
