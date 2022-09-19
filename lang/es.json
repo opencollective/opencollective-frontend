@@ -2645,6 +2645,7 @@
   "UploadDocumentationDescription": "Si quieres incluir documentación, puedes hacerlo aquí.",
   "uploadImage.isDragActive": "Suéltala como si quemara 🔥",
   "uploadImage.isDragReject": "🚫 Este tipo de archivo no es aceptado",
+  "uploadImage.isUploading": "Uploading image...",
   "uploadImage.sizeRejected": "La resolución de la imagen debe estar entre {minResolution} y {maxResolution}. El tamaño del archivo debe ser inferior a {maxFileSize}.",
   "UploadInvoice": "Subir una factura",
   "UploadInvoiceDescription": "Si ya tienes un documento de factura, puedes subirlo aquí.",

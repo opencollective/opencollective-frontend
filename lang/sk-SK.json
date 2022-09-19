@@ -2645,6 +2645,7 @@
   "UploadDocumentationDescription": "If you want to include any documentation, you can upload it here.",
   "uploadImage.isDragActive": "Pustite to ako niečo horúce 🔥",
   "uploadImage.isDragReject": "🚫 Tento typ súboru nie je povolený",
+  "uploadImage.isUploading": "Uploading image...",
   "uploadImage.sizeRejected": "Rozlíšenie obrázka musí byť medzi {minResolution} a {maxResolution}. Veľkosť súboru musí byť menšia ako {maxFileSize}.",
   "UploadInvoice": "Upload invoice",
   "UploadInvoiceDescription": "If you already have an invoice document, you can upload it here.",

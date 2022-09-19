@@ -204,6 +204,8 @@ export default class RichTextEditor extends React.Component {
     error: PropTypes.any,
     'data-cy': PropTypes.string,
     videoEmbedEnabled: PropTypes.bool,
+    /** Called when an image is being uploaded to set a boolean */
+    setUploading: PropTypes.func,
   };
 
   static defaultProps = {
@@ -449,9 +451,17 @@ export default class RichTextEditor extends React.Component {
       return;
     }
 
+    this.props.setUploading?.(true);
+
     const onProgress = progress => attachment.setUploadProgress(progress);
-    const onSuccess = fileURL => attachment.setAttributes({ url: fileURL, href: fileURL });
-    const onFailure = () => this.setState({ error: 'File upload failed' });
+    const onSuccess = fileURL => {
+      this.props.setUploading?.(false);
+      attachment.setAttributes({ url: fileURL, href: fileURL });
+    };
+    const onFailure = () => {
+      this.props.setUploading?.(false);
+      this.setState({ error: 'File upload failed' });
+    };
     uploadImageWithXHR(attachment.file, { onProgress, onSuccess, onFailure });
     return e;
   };

@@ -2645,6 +2645,7 @@
   "UploadDocumentationDescription": "If you want to include any documentation, you can upload it here.",
   "uploadImage.isDragActive": "Drop it like it's hot 🔥",
   "uploadImage.isDragReject": "🚫 This file type is not accepted",
+  "uploadImage.isUploading": "Uploading image...",
   "uploadImage.sizeRejected": "Image resolution needs to be between {minResolution} and {maxResolution}. File size must be below {maxFileSize}.",
   "UploadInvoice": "청구서 업로드",
   "UploadInvoiceDescription": "If you already have an invoice document, you can upload it here.",

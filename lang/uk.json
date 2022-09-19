@@ -2645,6 +2645,7 @@
   "UploadDocumentationDescription": "Якщо ви хочете включити будь-яку документацію, ви можете завантажити її звідси.",
   "uploadImage.isDragActive": "Киньте його наче гаряче 🔥",
   "uploadImage.isDragReject": "🚫 Неприйнятний тип файлу",
+  "uploadImage.isUploading": "Uploading image...",
   "uploadImage.sizeRejected": "Image resolution needs to be between {minResolution} and {maxResolution}. File size must be below {maxFileSize}.",
   "UploadInvoice": "Вивантажити рахунок",
   "UploadInvoiceDescription": "Якщо у вас уже є рахунок-фактура, його можна завантажити тут.",

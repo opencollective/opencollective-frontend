@@ -2645,6 +2645,7 @@
   "UploadDocumentationDescription": "Se você deseja incluir qualquer documentação, você pode enviá-la aqui.",
   "uploadImage.isDragActive": "Solte como se estivesse quente! 🔥",
   "uploadImage.isDragReject": "Este tipo de arquivo não é aceito",
+  "uploadImage.isUploading": "Uploading image...",
   "uploadImage.sizeRejected": "Image resolution needs to be between {minResolution} and {maxResolution}. File size must be below {maxFileSize}.",
   "UploadInvoice": "Carregar fatura",
   "UploadInvoiceDescription": "Se você já tem um documento de fatura, você pode enviá-lo aqui.",
