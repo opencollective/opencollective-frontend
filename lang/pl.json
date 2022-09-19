@@ -879,6 +879,7 @@
   "Downloads": "Pobrań",
   "DragAndDropOrClickToUpload": "Przeciągnij i upuść lub <i18n-link>kliknij, aby przesłać</i18n-link>",
   "DropZone.UploadBox": "Przeciągnij i upuść jeden lub wiele plików lub <i18n-link>kliknij tutaj, aby zaznaczyć</i18n-link>.",
+  "DsfNxu": "Keep this field empty to use the default title: {receiptTitlePlaceholder}.",
   "dT6mUk": "Acquired on: {date}",
   "Du12dj": "Błąd przy tworzeniu karty wirtualnej: {error}",
   "DVdz90": "Error updating custom email message: {error}",
