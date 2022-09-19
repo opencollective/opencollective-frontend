@@ -982,6 +982,8 @@
   "editTeam.member.remove.success": "移除成员成功。",
   "editTeam.memberInvitation.edit.error": "更新成员邀请失败。",
   "editTeam.memberInvitation.edit.success": "更新成员邀请成功。",
+  "editTeam.memberInvitation.remove.error": "Failed to remove member invitation.",
+  "editTeam.memberInvitation.remove.success": "Member invitation removed successfully.",
   "EditUserEmailForm.reSend": "重新发送确认",
   "EditUserEmailForm.submit": "确认新电子邮件",
   "EditUserEmailForm.success": "一封含有确认链接的电子邮件已发送至 {email}。请点击链接来验证您的电子邮件地址。",

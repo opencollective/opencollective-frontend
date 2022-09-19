@@ -982,6 +982,8 @@
   "editTeam.member.remove.success": "Miembro eliminado con éxito.",
   "editTeam.memberInvitation.edit.error": "Error al actualizar la invitación del miembro.",
   "editTeam.memberInvitation.edit.success": "Invitación de miembros actualizada con éxito.",
+  "editTeam.memberInvitation.remove.error": "Failed to remove member invitation.",
+  "editTeam.memberInvitation.remove.success": "Member invitation removed successfully.",
   "EditUserEmailForm.reSend": "Reenviar confirmación",
   "EditUserEmailForm.submit": "Confirme el nuevo email",
   "EditUserEmailForm.success": "Se ha enviado un correo electrónico con un enlace de confirmación a {email}. Por favor, haz clic en el enlace para verificar tu dirección de correo electrónico.",

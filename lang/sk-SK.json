@@ -982,6 +982,8 @@
   "editTeam.member.remove.success": "Člen bol úspešne odstránený.",
   "editTeam.memberInvitation.edit.error": "Nepodarilo sa aktualizovať pozvánku člena.",
   "editTeam.memberInvitation.edit.success": "Pozvánka člena bola úspešne aktualizovaná.",
+  "editTeam.memberInvitation.remove.error": "Failed to remove member invitation.",
+  "editTeam.memberInvitation.remove.success": "Member invitation removed successfully.",
   "EditUserEmailForm.reSend": "Opätovne zaslať potvrdenie",
   "EditUserEmailForm.submit": "Potvrdiť nový e-mail",
   "EditUserEmailForm.success": "E-mail s potvrdzovacím odkazom bol odoslaný na adresu {email}. Kliknutím na odkaz potvrďte svoju e-mailovú adresu.",

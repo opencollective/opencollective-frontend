@@ -228,7 +228,12 @@ const EditMemberModal = props => {
 
         addToast({
           type: TOAST_TYPE.SUCCESS,
-          message: (
+          message: isInvitation ? (
+            <FormattedMessage
+              id="editTeam.memberInvitation.remove.success"
+              defaultMessage="Member invitation removed successfully."
+            />
+          ) : (
             <FormattedMessage id="editTeam.member.remove.success" defaultMessage="Member removed successfully." />
           ),
         });
@@ -242,7 +247,14 @@ const EditMemberModal = props => {
       } catch (error) {
         addToast({
           type: TOAST_TYPE.ERROR,
-          title: <FormattedMessage id="editTeam.member.remove.error" defaultMessage="Failed to remove member." />,
+          title: isInvitation ? (
+            <FormattedMessage id="editTeam.member.remove.error" defaultMessage="Failed to remove member." />
+          ) : (
+            <FormattedMessage
+              id="editTeam.memberInvitation.remove.error"
+              defaultMessage="Failed to remove member invitation."
+            />
+          ),
           message: i18nGraphqlException(intl, error),
         });
       }
