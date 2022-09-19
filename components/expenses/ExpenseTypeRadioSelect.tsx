@@ -41,10 +41,14 @@ const ExpenseTypeDescription = defineMessages({
   },
 });
 
-const StaticTypeIllustration = styled(Container)`
+const TypeIllustration = styled(Container)`
   position: absolute;
   background: white;
 `;
+
+const StaticTypeIllustration = styled(TypeIllustration)``;
+
+const AnimatedTypeIllustration = styled(TypeIllustration)``;
 
 const ExpenseTypeOptionContainer = styled.label`
   display: flex;
@@ -67,10 +71,15 @@ const ExpenseTypeOptionContainer = styled.label`
     margin-right: 4px;
   }
 
-  // Animate gif on hover by hidding the static illustration
+  // Animate gif on hover by hiding the static illustration
   &:hover {
     ${StaticTypeIllustration} {
-      opacity: 0;
+      display: none;
+    }
+  }
+  &:not(:hover) {
+    ${AnimatedTypeIllustration} {
+      display: none;
     }
   }
 `;
@@ -100,7 +109,9 @@ const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
         <StaticTypeIllustration>
           <Image src={staticIllustrationSrc} height={48} width={48} />
         </StaticTypeIllustration>
-        <Image src={illustrationSrc} height={48} width={48} />
+        <AnimatedTypeIllustration>
+          <Image src={illustrationSrc} height={48} width={48} />
+        </AnimatedTypeIllustration>
       </Box>
       <Box>
         <P fontSize="16px" fontWeight="bold" mb={2}>
@@ -111,7 +122,9 @@ const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
             <StaticTypeIllustration>
               <Image src={staticIllustrationSrc} height={48} width={48} />
             </StaticTypeIllustration>
-            <Image src={illustrationSrc} height={48} width={48} />
+            <AnimatedTypeIllustration>
+              <Image src={illustrationSrc} height={48} width={48} />
+            </AnimatedTypeIllustration>
           </Box>
           <P fontSize="12px" color="black.600" fontWeight="normal">
             {formatMessage(ExpenseTypeDescription[type])}

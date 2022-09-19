@@ -135,7 +135,7 @@ class ContributionFlowSuccess extends React.Component {
       <Flex flexDirection="column" justifyContent="center" p={2}>
         {callsToAction.length >= 2 && (
           <SuccessIllustration>
-            <Image width={216} height={152} src="/static/images/success-illustration.jpg" />
+            <Image alt="" width={216} height={152} src="/static/images/success-illustration.jpg" />
           </SuccessIllustration>
         )}
         {callsToAction.map((type, idx) => (

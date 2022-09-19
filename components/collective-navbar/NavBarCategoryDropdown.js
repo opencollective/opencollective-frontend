@@ -138,7 +138,7 @@ export const NavBarCategory = ({ category, collective }) => {
   return (
     <Flex>
       <Flex alignItems="center" mr={2}>
-        <Image width={32} height={32} src={categoryDetails.img || SECTIONS_CATEGORY_ICON.CONTRIBUTE} />
+        <Image width={32} height={32} alt="" src={categoryDetails.img || SECTIONS_CATEGORY_ICON.CONTRIBUTE} />
       </Flex>
       <Flex alignItems="center">
         <Span textTransform="uppercase" fontSize="14px" fontWeight="500" color="black.800" letterSpacing="0.02em">
