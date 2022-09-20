@@ -879,6 +879,7 @@
   "Downloads": "ダウンロード",
   "DragAndDropOrClickToUpload": "ドラッグ アンド ドロップするか<i18n-link>click to upload</i18n-link>",
   "DropZone.UploadBox": "Drag and drop one or multiple files or <i18n-link>click here to select</i18n-link>.",
+  "DsfNxu": "Keep this field empty to use the default title: {receiptTitlePlaceholder}.",
   "dT6mUk": "Acquired on: {date}",
   "Du12dj": "Error creating virtual card: {error}",
   "DVdz90": "Error updating custom email message: {error}",
