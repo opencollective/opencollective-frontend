@@ -879,6 +879,7 @@
   "Downloads": "Завантаження",
   "DragAndDropOrClickToUpload": "Перетягніть або <i18n-link>клацніть, щоб відвантажити</i18n-link>",
   "DropZone.UploadBox": "Перетягніть один або кілька файлів або ж <i18n-link>клацніть тут, щоб вибрати</i18n-link>.",
+  "DsfNxu": "Keep this field empty to use the default title: {receiptTitlePlaceholder}.",
   "dT6mUk": "Acquired on: {date}",
   "Du12dj": "Помилка створення віртуальної картки: {error}",
   "DVdz90": "Error updating custom email message: {error}",
