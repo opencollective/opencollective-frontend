@@ -14,11 +14,11 @@ import MessageBox from '../MessageBox';
 import SignInOrJoinFree from '../SignInOrJoinFree';
 import { H1, P } from '../Text';
 import { withUser } from '../UserProvider';
+import ConnectGithub from '../osc-host-application/ConnectGithub';
+import CreateOpenSourceCollective from '../osc-host-application/CreateOpenSourceCollective';
 
 import CollectiveCategoryPicker from './CollectiveCategoryPicker';
-import ConnectGithub from './ConnectGithub';
 import CreateCollectiveForm from './CreateCollectiveForm';
-import CreateOpenSourceCollective from './CreateOpenSourceCollective';
 
 class CreateCollective extends Component {
   static propTypes = {
