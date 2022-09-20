@@ -879,6 +879,7 @@
   "Downloads": "Téléchargements",
   "DragAndDropOrClickToUpload": "Glisser-déposer ou <i18n-link>cliquez pour téléverser</i18n-link>",
   "DropZone.UploadBox": "Glissez et déposez un ou plusieurs fichiers ou <i18n-link>cliquez ici pour sélectionner</i18n-link>.",
+  "DsfNxu": "Keep this field empty to use the default title: {receiptTitlePlaceholder}.",
   "dT6mUk": "Acquired on: {date}",
   "Du12dj": "Erreur lors de la création de la carte virtuelle : {error}",
   "DVdz90": "Error updating custom email message: {error}",
