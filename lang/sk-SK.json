@@ -879,6 +879,7 @@
   "Downloads": "Stiahnuté súbory",
   "DragAndDropOrClickToUpload": "Potiahnuť a pustiť alebo <i18n-link>kliknúť a nahrať</i18n-link>",
   "DropZone.UploadBox": "Potiahnite a pustite jeden alebo viacero súborov alebo <i18n-link>kliknutím sem vyberte</i18n-link>.",
+  "DsfNxu": "Keep this field empty to use the default title: {receiptTitlePlaceholder}.",
   "dT6mUk": "Získané dňa: {date}",
   "Du12dj": "Chyba pri vytváraní virtuálnej karty: {error}",
   "DVdz90": "Chyba pri aktualizácii vlastnej e-mailovej správy: {error}",
