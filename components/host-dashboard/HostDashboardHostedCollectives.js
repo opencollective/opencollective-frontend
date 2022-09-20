@@ -79,6 +79,7 @@ const hostedCollectivesQuery = gqlV2/* GraphQL */ `
               id
               balance {
                 valueInCents
+                currency
               }
             }
             ... on AccountWithHost {
