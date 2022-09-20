@@ -154,12 +154,12 @@ const StyledCollectiveCard = ({
         width="95%"
         right="0"
         pt="41.25%"
-        style={{ background: getBackground(collective) }}
+        style={{ background: getBackground(collective), filter: collective.isFrozen ? 'grayscale(1)' : undefined }}
       >
         <StyledBackgroundMask />
       </Container>
       <Container position="relative">
-        <Container height={74} px={3} pt={26}>
+        <Container height={74} px={3} pt={26} style={{ filter: collective.isFrozen ? 'grayscale(1)' : undefined }}>
           <Container borderRadius={borderRadius} background="white" width={48} border="3px solid white">
             <CollectiveContainer useLink={useLink} collective={collective}>
               <Avatar data-cy="collective-avatar" collective={collective} radius={48} />
@@ -223,6 +223,7 @@ StyledCollectiveCard.propTypes = {
     parent: PropTypes.shape({
       backgroundImageUrl: PropTypes.string,
     }),
+    isFrozen: PropTypes.bool,
   }).isRequired,
   borderRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   showWebsite: PropTypes.bool,
