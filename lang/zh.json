@@ -879,6 +879,7 @@
   "Downloads": "下载",
   "DragAndDropOrClickToUpload": "拖放或 <i18n-link>点击上传</i18n-link>",
   "DropZone.UploadBox": "拖放一个或多个文件或 <i18n-link>点击这里选择</i18n-link>。",
+  "DsfNxu": "Keep this field empty to use the default title: {receiptTitlePlaceholder}.",
   "dT6mUk": "Acquired on: {date}",
   "Du12dj": "Error creating virtual card: {error}",
   "DVdz90": "Error updating custom email message: {error}",
