@@ -727,6 +727,8 @@ type Tier {
   """
   orders(limit: Int! = 100, offset: Int! = 0, status: [OrderStatus]): OrderCollection!
   amount: Amount!
+  button: String
+  goal: Amount!
   type: TierType!
   interval: TierInterval @deprecated(reason: "2020-08-24: Please use \"frequency\"")
   frequency: TierFrequency!
@@ -742,6 +744,7 @@ type Tier {
   minimumAmount: Amount!
   endsAt: DateTime
   invoiceTemplate: String
+  useStandalonePage: Boolean
 }
 
 """
@@ -2296,6 +2299,8 @@ enum ActivityType {
   COLLECTIVE_APPROVED
   COLLECTIVE_REJECTED
   COLLECTIVE_CREATED
+  COLLECTIVE_EDITED
+  COLLECTIVE_DELETED
   ORGANIZATION_COLLECTIVE_CREATED
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
@@ -2359,6 +2364,8 @@ enum ActivityType {
   USER_CREATED
   USER_NEW_TOKEN
   OAUTH_APPLICATION_AUTHORIZED
+  TWO_FACTOR_CODE_ADDED
+  TWO_FACTOR_CODE_DELETED
   USER_CHANGE_EMAIL
   USER_PAYMENT_METHOD_CREATED
   USER_CARD_CLAIMED
@@ -3476,57 +3483,6 @@ type TagStat {
   Total amount for this tag
   """
   amount: Amount!
-}
-
-"""
-PaymentMethod model
-"""
-type PaymentMethod {
-  id: String
-  legacyId: Int
-  name: String
-  service: PaymentMethodService
-  type: PaymentMethodType
-
-  """
-  Defines the type of the payment method. Meant to be moved to "type" in the future.
-  """
-  providerType: PaymentMethodLegacyType @deprecated(reason: "2021-03-02: Please use service + type")
-
-  """
-  Returns the balance amount and the currency of this paymentMethod
-  """
-  balance: Amount!
-  account: Account
-
-  """
-  For gift cards, this field will return to the source payment method
-  """
-  sourcePaymentMethod: PaymentMethod
-  data: JSON
-  limitedToHosts: [Host]
-  expiryDate: DateTime
-  createdAt: DateTime
-}
-
-enum PaymentMethodService {
-  PAYPAL
-  STRIPE
-  OPENCOLLECTIVE
-  PREPAID
-  THEGIVINGBLOCK
-}
-
-enum PaymentMethodLegacyType {
-  ALIPAY
-  CREDIT_CARD
-  GIFT_CARD
-  PREPAID_BUDGET
-  ACCOUNT_BALANCE
-  PAYPAL
-  BANK_TRANSFER
-  ADDED_FUNDS
-  CRYPTO
 }
 
 """
@@ -10522,6 +10478,8 @@ enum ActivityAndClassesType {
   COLLECTIVE_APPROVED
   COLLECTIVE_REJECTED
   COLLECTIVE_CREATED
+  COLLECTIVE_EDITED
+  COLLECTIVE_DELETED
   ORGANIZATION_COLLECTIVE_CREATED
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
@@ -10585,6 +10543,8 @@ enum ActivityAndClassesType {
   USER_CREATED
   USER_NEW_TOKEN
   OAUTH_APPLICATION_AUTHORIZED
+  TWO_FACTOR_CODE_ADDED
+  TWO_FACTOR_CODE_DELETED
   USER_CHANGE_EMAIL
   USER_PAYMENT_METHOD_CREATED
   USER_CARD_CLAIMED
@@ -13089,6 +13049,28 @@ type Mutation {
     account: AccountReferenceInput
     active: Boolean!
   ): ActivitySubscription
+
+  """
+  Edit a tier.
+  """
+  editTier(tier: TierUpdateInput!): Tier!
+
+  """
+  Create a tier.
+  """
+  createTier(
+    tier: TierCreateInput!
+
+    """
+    Account to create tier in
+    """
+    account: AccountReferenceInput!
+  ): Tier!
+
+  """
+  Delete a tier.
+  """
+  deleteTier(tier: TierReferenceInput!): Tier!
 }
 
 input CollectiveCreateInput {
@@ -14379,4 +14361,43 @@ input WebhookReferenceInput {
   The legacy public id identifying the webhook (ie: 4242)
   """
   legacyId: Int
+}
+
+input TierUpdateInput {
+  """
+  The public id identifying the tier (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String!
+  amount: AmountInput!
+  name: NonEmptyString
+  description: String
+  button: String
+  goal: AmountInput
+  type: TierType!
+  amountType: TierAmountType!
+  frequency: TierFrequency!
+  presets: [Int!]
+  maxQuantity: Int
+  minimumAmount: AmountInput
+  useStandalonePage: Boolean
+}
+
+"""
+A string that cannot be passed as an empty value
+"""
+scalar NonEmptyString
+
+input TierCreateInput {
+  amount: AmountInput!
+  name: NonEmptyString
+  description: String
+  button: String
+  goal: AmountInput
+  type: TierType!
+  amountType: TierAmountType!
+  frequency: TierFrequency!
+  presets: [Int!]
+  maxQuantity: Int
+  minimumAmount: AmountInput
+  useStandalonePage: Boolean
 }

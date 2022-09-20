@@ -198,6 +198,33 @@ const accountPermissionsQuery = gqlV2/* GraphQL */ `
           }
         }
       }
+      ... on Event {
+        permissions {
+          id
+          addFunds {
+            allowed
+            reason
+          }
+        }
+      }
+      ... on Project {
+        permissions {
+          id
+          addFunds {
+            allowed
+            reason
+          }
+        }
+      }
+      ... on Fund {
+        permissions {
+          id
+          addFunds {
+            allowed
+            reason
+          }
+        }
+      }
     }
   }
 `;
