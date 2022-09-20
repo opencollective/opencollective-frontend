@@ -100,185 +100,247 @@ function FormFields({ collective, types, values }) {
 
   const receiptTemplateOptions = getReceiptTemplates(collective.host);
 
-  const fieldDefinitions = [
-    {
-      name: 'type',
-      type: 'select',
-      options: tierTypeOptions,
-      label: intl.formatMessage({ id: 'tier.type.label', defaultMessage: 'Type' }),
-      when: ![FUND].includes(collective.type) || types?.length === 1,
-    },
-    {
-      name: 'name',
-      label: intl.formatMessage({ id: 'Fields.name', defaultMessage: 'Name' }),
-      placeholder: 'E.g. Donation',
-    },
-    {
-      name: 'description',
-      type: 'textarea',
-      label: intl.formatMessage({
-        id: 'Fields.description',
-        defaultMessage: 'Description',
-      }),
-    },
-    {
-      name: 'interval',
-      type: 'select',
-      options: intervalOptions,
-      label: intl.formatMessage({
-        id: 'tier.interval.label',
-        defaultMessage: 'interval',
-      }),
-      when: [DONATION, MEMBERSHIP, TIER, SERVICE].includes(values.type),
-    },
-    {
-      name: 'amountType',
-      type: 'select',
-      options: amountTypeOptions,
-      label: intl.formatMessage({
-        id: 'tier.amountType.label',
-        defaultMessage: 'Amount type',
-      }),
-      when: values.interval !== FLEXIBLE,
-    },
-    {
-      name: 'amount',
-      type: 'currency',
-      label: intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
-      when: values.amountType === FIXED,
-    },
-    {
-      name: 'presets',
-      type: 'suggested-amounts',
-      label: intl.formatMessage({
-        id: 'tier.presets.label',
-        defaultMessage: 'suggested amounts',
-      }),
-      when: values.amountType === FLEXIBLE,
-    },
-    {
-      name: 'amount',
-      type: 'currency',
-      label: intl.formatMessage({
-        id: 'tier.defaultAmount.label',
-        defaultMessage: 'default amount',
-      }),
-      when: values.amountType === FLEXIBLE,
-    },
-    {
-      name: 'minimumAmount',
-      type: 'currency',
-      label: intl.formatMessage({ id: 'tier.minimumAmount.label', defaultMessage: 'minimum amount' }),
-      when: values.amountType === FLEXIBLE,
-    },
-    {
-      name: 'maxQuantity',
-      type: 'number',
-      label: intl.formatMessage({
-        id: 'tier.maxQuantity.label',
-        defaultMessage: 'Available quantity',
-      }),
-      description: intl.formatMessage({
-        id: 'tier.maxQuantity.description',
-        defaultMessage: 'Leave empty for unlimited',
-      }),
-      when:
-        [TICKET, PRODUCT].includes(values.type) || (values.type === TIER && ![FUND, PROJECT].includes(collective.type)),
-    },
-    {
-      name: 'button',
-      type: 'text',
-      label: intl.formatMessage({
-        id: 'tier.button.label',
-        defaultMessage: 'Button text',
-      }),
-      when: ![FUND].includes(collective.type),
-    },
-    {
-      name: 'goal',
-      type: 'currency',
-      label: intl.formatMessage({
-        id: 'ContributionType.Goal',
-        defaultMessage: 'Goal',
-      }),
-      description: intl.formatMessage({
-        id: 'tier.goal.description',
-        defaultMessage: 'Amount you aim to raise',
-      }),
-    },
-    {
-      name: 'useStandalonePage',
-      type: 'checkbox',
-      label: intl.formatMessage({
-        id: 'tier.standalonePage',
-        defaultMessage: 'Standalone page',
-      }),
-      when: ![FUND, PROJECT].includes(collective.type),
-      description: intl.formatMessage(
-        {
-          id: 'tier.standalonePageDescription',
-          defaultMessage:
-            "Create a <link>standalone</link> page for this tier? It's like a mini-crowdfunding campaign page that you can add a detailed description and video to, and link to directly",
-        },
-        {
-          link: function StandaloneTierPageLink(...msg) {
-            if (!values.id) {
-              return <span>{msg}</span>;
-            } else {
-              return (
-                <StyledLink
-                  as={Link}
-                  openInNewTab
-                  href={{ pathname: `${getCollectivePageRoute(collective)}/contribute/${values.slug}-${values.id}` }}
-                >
-                  <span>{msg}</span>
-                </StyledLink>
-              );
-            }
-          },
-        },
-      ),
-    },
-    {
-      name: 'invoiceTemplate',
-      type: 'select',
-      label: intl.formatMessage({
-        defaultMessage: 'Choose receipt',
-      }),
-      description: intl.formatMessage({
-        defaultMessage: 'Choose between the receipts templates available.',
-      }),
-      options: receiptTemplateOptions,
-      when: receiptTemplateOptions.length > 1,
-    },
-  ];
-
-  const visibleFields = fieldDefinitions.filter(fieldDef => {
-    if (fieldDef.when === undefined) {
-      return true;
-    }
-
-    return !!fieldDef.when;
-  });
-
-  function getFieldFor({ type, placeholder, options }) {
-    switch (type) {
-      case 'select': {
-        return ({ field, form, loading }) => (
-          <StyledSelect
-            inputId={field.name}
-            data-cy={field.name}
-            error={field.error}
-            onBlur={() => form.setFieldTouched(field.name, true)}
-            onChange={({ value }) => form.setFieldValue(field.name, value)}
-            isLoading={loading}
-            options={options}
-            value={options.find(option => option.value === field.value)}
-          />
-        );
-      }
-      case 'currency': {
-        return ({ field, form }) => (
+  return (
+    <React.Fragment>
+      {(![FUND].includes(collective.type) || types?.length === 1) && (
+        <StyledInputFormikField
+          name="type"
+          label={intl.formatMessage({ id: 'tier.type.label', defaultMessage: 'Type' })}
+          labelFontWeight="bold"
+          mt="3"
+        >
+          {({ field, form, loading }) => (
+            <StyledSelect
+              inputId={field.name}
+              data-cy={field.name}
+              error={field.error}
+              onBlur={() => form.setFieldTouched(field.name, true)}
+              onChange={({ value }) => form.setFieldValue(field.name, value)}
+              isLoading={loading}
+              options={tierTypeOptions}
+              value={tierTypeOptions.find(option => option.value === field.value)}
+            />
+          )}
+        </StyledInputFormikField>
+      )}
+      <StyledInputFormikField
+        name="name"
+        label={intl.formatMessage({ id: 'Fields.name', defaultMessage: 'Name' })}
+        labelFontWeight="bold"
+        mt="3"
+      >
+        {({ field }) => <StyledInput data-cy={field.name} placeholder="E.g. Donation" {...field} />}
+      </StyledInputFormikField>
+      <StyledInputFormikField
+        name="description"
+        label={intl.formatMessage({
+          id: 'Fields.description',
+          defaultMessage: 'Description',
+        })}
+        labelFontWeight="bold"
+        mt="3"
+      >
+        {({ field }) => <StyledTextarea data-cy={field.name} {...field} />}
+      </StyledInputFormikField>
+      {[DONATION, MEMBERSHIP, TIER, SERVICE].includes(values.type) && (
+        <StyledInputFormikField
+          name="interval"
+          label={intl.formatMessage({
+            id: 'tier.interval.label',
+            defaultMessage: 'interval',
+          })}
+          labelFontWeight="bold"
+          mt="3"
+        >
+          {({ field, form, loading }) => (
+            <StyledSelect
+              inputId={field.name}
+              data-cy={field.name}
+              error={field.error}
+              onBlur={() => form.setFieldTouched(field.name, true)}
+              onChange={({ value }) => form.setFieldValue(field.name, value)}
+              isLoading={loading}
+              options={intervalOptions}
+              value={intervalOptions.find(option => option.value === field.value)}
+            />
+          )}
+        </StyledInputFormikField>
+      )}
+      {values.interval !== FLEXIBLE && (
+        <StyledInputFormikField
+          name="amountType"
+          label={intl.formatMessage({
+            id: 'tier.amountType.label',
+            defaultMessage: 'Amount type',
+          })}
+          labelFontWeight="bold"
+          mt="3"
+        >
+          {({ field, form, loading }) => (
+            <StyledSelect
+              inputId={field.name}
+              data-cy={field.name}
+              error={field.error}
+              onBlur={() => form.setFieldTouched(field.name, true)}
+              onChange={({ value }) => form.setFieldValue(field.name, value)}
+              isLoading={loading}
+              options={amountTypeOptions}
+              value={amountTypeOptions.find(option => option.value === field.value)}
+            />
+          )}
+        </StyledInputFormikField>
+      )}
+      {values.amountType === FIXED && (
+        <StyledInputFormikField
+          name="amount"
+          label={intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' })}
+          labelFontWeight="bold"
+          mt="3"
+        >
+          {({ field, form }) => (
+            <StyledInputAmount
+              id={field.id}
+              data-cy={field.name}
+              currency={field.value?.currency ?? collective.currency}
+              currencyDisplay="CODE"
+              placeholder="0.00"
+              error={field.error}
+              value={field.value?.valueInCents}
+              maxWidth="100%"
+              onChange={value =>
+                form.setFieldValue(
+                  field.name,
+                  value ? { currency: field.value?.currency ?? collective.currency, valueInCents: value } : null,
+                )
+              }
+              onBlur={() => form.setFieldTouched(field.name, true)}
+            />
+          )}
+        </StyledInputFormikField>
+      )}
+      {values.amountType === FLEXIBLE && (
+        <StyledInputFormikField
+          name="presets"
+          label={intl.formatMessage({
+            id: 'tier.presets.label',
+            defaultMessage: 'suggested amounts',
+          })}
+          labelFontWeight="bold"
+          mt="3"
+        >
+          {({ field, form }) => (
+            <InputFieldPresets
+              {...field}
+              defaultValue={field.value}
+              onChange={value => form.setFieldValue(field.name, value)}
+            />
+          )}
+        </StyledInputFormikField>
+      )}
+      {values.amountType === FLEXIBLE && (
+        <StyledInputFormikField
+          name="amount"
+          label={intl.formatMessage({
+            id: 'tier.defaultAmount.label',
+            defaultMessage: 'default amount',
+          })}
+          labelFontWeight="bold"
+          mt="3"
+        >
+          {({ field, form }) => (
+            <StyledInputAmount
+              id={field.id}
+              data-cy={field.name}
+              currency={field.value?.currency ?? collective.currency}
+              currencyDisplay="CODE"
+              placeholder="0.00"
+              error={field.error}
+              value={field.value?.valueInCents}
+              maxWidth="100%"
+              onChange={value =>
+                form.setFieldValue(
+                  field.name,
+                  value ? { currency: field.value?.currency ?? collective.currency, valueInCents: value } : null,
+                )
+              }
+              onBlur={() => form.setFieldTouched(field.name, true)}
+            />
+          )}
+        </StyledInputFormikField>
+      )}
+      {values.amountType === FLEXIBLE && (
+        <StyledInputFormikField
+          name="minimumAmount"
+          label={intl.formatMessage({ id: 'tier.minimumAmount.label', defaultMessage: 'minimum amount' })}
+          labelFontWeight="bold"
+          mt="3"
+        >
+          {({ field, form }) => (
+            <StyledInputAmount
+              id={field.id}
+              data-cy={field.name}
+              currency={field.value?.currency ?? collective.currency}
+              currencyDisplay="CODE"
+              placeholder="0.00"
+              error={field.error}
+              value={field.value?.valueInCents}
+              maxWidth="100%"
+              onChange={value =>
+                form.setFieldValue(
+                  field.name,
+                  value ? { currency: field.value?.currency ?? collective.currency, valueInCents: value } : null,
+                )
+              }
+              onBlur={() => form.setFieldTouched(field.name, true)}
+            />
+          )}
+        </StyledInputFormikField>
+      )}
+      {([TICKET, PRODUCT].includes(values.type) ||
+        (values.type === TIER && ![FUND, PROJECT].includes(collective.type))) && (
+        <React.Fragment>
+          <StyledInputFormikField
+            name="maxQuantity"
+            label={intl.formatMessage({
+              id: 'tier.maxQuantity.label',
+              defaultMessage: 'Available quantity',
+            })}
+            labelFontWeight="bold"
+            mt="3"
+          >
+            {({ field }) => <StyledInput data-cy={field.name} {...field} />}
+          </StyledInputFormikField>
+          <FieldDescription>
+            {intl.formatMessage({
+              id: 'tier.maxQuantity.description',
+              defaultMessage: 'Leave empty for unlimited',
+            })}
+          </FieldDescription>
+        </React.Fragment>
+      )}
+      {![FUND].includes(collective.type) && (
+        <StyledInputFormikField
+          name="button"
+          label={intl.formatMessage({
+            id: 'tier.button.label',
+            defaultMessage: 'Button text',
+          })}
+          labelFontWeight="bold"
+          mt="3"
+        >
+          {({ field }) => <StyledInput data-cy={field.name} {...field} />}
+        </StyledInputFormikField>
+      )}
+      <StyledInputFormikField
+        name="goal"
+        label={intl.formatMessage({
+          id: 'ContributionType.Goal',
+          defaultMessage: 'Goal',
+        })}
+        labelFontWeight="bold"
+        mt="3"
+      >
+        {({ field, form }) => (
           <StyledInputAmount
             id={field.id}
             data-cy={field.name}
@@ -296,54 +358,96 @@ function FormFields({ collective, types, values }) {
             }
             onBlur={() => form.setFieldTouched(field.name, true)}
           />
-        );
-      }
-      case 'suggested-amounts': {
-        return ({ field, form }) => (
-          <InputFieldPresets
-            {...field}
-            defaultValue={field.value}
-            onChange={value => form.setFieldValue(field.name, value)}
-          />
-        );
-      }
-      case 'checkbox': {
-        return ({ field, form }) => (
-          <InputSwitch
-            name={field.name}
-            value={field.value}
-            onChange={event => form.setFieldValue(field.name, event.target.checked)}
-          />
-        );
-      }
-      case 'textarea': {
-        return ({ field }) => <StyledTextarea data-cy={field.name} placeholder={placeholder} {...field} />;
-      }
-      default: {
-        return ({ field }) => <StyledInput data-cy={field.name} placeholder={placeholder} {...field} />;
-      }
-    }
-  }
-
-  return (
-    <React.Fragment>
-      {visibleFields.map(fieldDef => (
-        <React.Fragment key={fieldDef.name}>
+        )}
+      </StyledInputFormikField>
+      <FieldDescription>
+        {intl.formatMessage({
+          id: 'tier.goal.description',
+          defaultMessage: 'Amount you aim to raise',
+        })}
+      </FieldDescription>
+      {![FUND, PROJECT].includes(collective.type) && (
+        <React.Fragment>
           <StyledInputFormikField
-            key={fieldDef.name}
-            name={fieldDef.name}
-            label={fieldDef.label}
+            name="useStandalonePage"
+            label={intl.formatMessage({
+              id: 'tier.standalonePage',
+              defaultMessage: 'Standalone page',
+            })}
             labelFontWeight="bold"
-            mt={3}
-            flexDirection={fieldDef.type === 'checkbox' ? 'row' : undefined}
-            justifyContent={fieldDef.type === 'checkbox' ? 'space-between' : undefined}
-            alignItems={fieldDef.type === 'checkbox' ? 'center' : undefined}
+            mt="3"
+            flexDirection={'row'}
+            justifyContent={'space-between'}
+            alignItems={'center'}
           >
-            {getFieldFor(fieldDef)}
+            {({ field, form }) => (
+              <InputSwitch
+                name={field.name}
+                value={field.value}
+                onChange={event => form.setFieldValue(field.name, event.target.checked)}
+              />
+            )}
           </StyledInputFormikField>
-          {fieldDef.description && <FieldDescription>{fieldDef.description}</FieldDescription>}
+          <FieldDescription>
+            {intl.formatMessage(
+              {
+                id: 'tier.standalonePageDescription',
+                defaultMessage:
+                  "Create a <link>standalone</link> page for this tier? It's like a mini-crowdfunding campaign page that you can add a detailed description and video to, and link to directly",
+              },
+              {
+                link: function StandaloneTierPageLink(...msg) {
+                  if (!values.id) {
+                    return <span>{msg}</span>;
+                  } else {
+                    return (
+                      <StyledLink
+                        as={Link}
+                        openInNewTab
+                        href={{
+                          pathname: `${getCollectivePageRoute(collective)}/contribute/${values.slug}-${values.id}`,
+                        }}
+                      >
+                        <span>{msg}</span>
+                      </StyledLink>
+                    );
+                  }
+                },
+              },
+            )}
+          </FieldDescription>
         </React.Fragment>
-      ))}
+      )}
+      {receiptTemplateOptions.length > 1 && (
+        <React.Fragment>
+          <StyledInputFormikField
+            name="invoiceTemplate"
+            label={intl.formatMessage({
+              defaultMessage: 'Choose receipt',
+            })}
+            labelFontWeight="bold"
+            mt="3"
+          >
+            {({ field, form, loading }) => (
+              <StyledSelect
+                inputId={field.name}
+                data-cy={field.name}
+                error={field.error}
+                onBlur={() => form.setFieldTouched(field.name, true)}
+                onChange={({ value }) => form.setFieldValue(field.name, value)}
+                isLoading={loading}
+                options={receiptTemplateOptions}
+                value={receiptTemplateOptions.find(option => option.value === field.value)}
+              />
+            )}
+          </StyledInputFormikField>
+          <FieldDescription>
+            {intl.formatMessage({
+              defaultMessage: 'Choose between the receipts templates available.',
+            })}
+          </FieldDescription>
+        </React.Fragment>
+      )}
     </React.Fragment>
   );
 }
