@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { injectIntl } from 'react-intl';
+import { injectIntl, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../lib/collective.lib';
@@ -147,6 +147,7 @@ const StyledCollectiveCard = ({
   useLink,
   ...props
 }) => {
+  const intl = useIntl();
   return (
     <StyledCard {...props} position="relative" borderRadius={borderRadius}>
       <Container
@@ -180,7 +181,11 @@ const StyledCollectiveCard = ({
                 </StyledLink>
               </P>
             )}
-            {tag === undefined ? (
+            {collective.isFrozen ? (
+              <StyledTag display="inline-block" variant="rounded-right" my={2}>
+                <I18nCollectiveTags tags={intl.formatMessage({ defaultMessage: 'This Collective is frozen' })} />
+              </StyledTag>
+            ) : tag === undefined ? (
               <StyledTag display="inline-block" variant="rounded-right" my={2}>
                 <I18nCollectiveTags
                   tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
