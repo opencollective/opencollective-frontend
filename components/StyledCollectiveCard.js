@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { injectIntl } from 'react-intl';
+import { injectIntl, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../lib/collective.lib';
@@ -147,6 +147,7 @@ const StyledCollectiveCard = ({
   useLink,
   ...props
 }) => {
+  const intl = useIntl();
   return (
     <StyledCard {...props} position="relative" borderRadius={borderRadius}>
       <Container
@@ -154,12 +155,12 @@ const StyledCollectiveCard = ({
         width="95%"
         right="0"
         pt="41.25%"
-        style={{ background: getBackground(collective) }}
+        style={{ background: getBackground(collective), filter: collective.isFrozen ? 'grayscale(1)' : undefined }}
       >
         <StyledBackgroundMask />
       </Container>
       <Container position="relative">
-        <Container height={74} px={3} pt={26}>
+        <Container height={74} px={3} pt={26} style={{ filter: collective.isFrozen ? 'grayscale(1)' : undefined }}>
           <Container borderRadius={borderRadius} background="white" width={48} border="3px solid white">
             <CollectiveContainer useLink={useLink} collective={collective}>
               <Avatar data-cy="collective-avatar" collective={collective} radius={48} />
@@ -180,7 +181,11 @@ const StyledCollectiveCard = ({
                 </StyledLink>
               </P>
             )}
-            {tag === undefined ? (
+            {collective.isFrozen ? (
+              <StyledTag display="inline-block" variant="rounded-right" my={2}>
+                <I18nCollectiveTags tags={intl.formatMessage({ defaultMessage: 'This Collective is frozen' })} />
+              </StyledTag>
+            ) : tag === undefined ? (
               <StyledTag display="inline-block" variant="rounded-right" my={2}>
                 <I18nCollectiveTags
                   tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
@@ -223,6 +228,7 @@ StyledCollectiveCard.propTypes = {
     parent: PropTypes.shape({
       backgroundImageUrl: PropTypes.string,
     }),
+    isFrozen: PropTypes.bool,
   }).isRequired,
   borderRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   showWebsite: PropTypes.bool,

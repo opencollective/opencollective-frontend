@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
-import { Check } from '@styled-icons/feather/Check';
 import { Pause } from '@styled-icons/feather/Pause';
+import { Play } from '@styled-icons/feather/Play';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Flex } from '../Grid';
@@ -21,7 +21,7 @@ const FreezeAccountButton = ({ collective, onClick }) => {
       onClick={onClick}
       borderRadius={0}
     >
-      {collective.isFrozen ? <Check size={18} color="#75777A" /> : <Pause size={16} />}
+      {collective.isFrozen ? <Play size={18} color="#75777A" /> : <Pause size={16} />}
       <Span ml={3} fontSize="14px" lineHeight="20px" css={{ verticalAlign: 'middle' }}>
         {collective.isFrozen ? (
           <FormattedMessage defaultMessage="Unfreeze Collective" />
