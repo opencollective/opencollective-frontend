@@ -36,6 +36,75 @@ describe('host dashboard', () => {
     });
   });
 
+  describe('unhost collectives', () => {
+    it('unhost collective with zero balance', () => {
+      cy.signup({ redirect: '/brusselstogetherasbl' });
+      const collectiveSlug = randomSlug();
+      cy.get('[data-cy="host-apply-btn"]:visible').click();
+      cy.getByDataCy('host-apply-modal-next').click();
+      cy.getByDataCy('host-apply-collective-picker').click();
+      cy.getByDataCy('host-apply-new-collective-link').click();
+      cy.get(`input[name="name"]`).type('Cavies United');
+      cy.get(`input[name="slug"]`).type(`{selectall}${collectiveSlug}`);
+      cy.get(`input[name="description"]`).type('We will rule the world with our cute squeaks');
+      cy.getByDataCy('checkbox-tos').click();
+      cy.get('button[type="submit"]').click();
+      cy.contains('Cavies United has been created!');
+      cy.login({ redirect: '/brusselstogetherasbl/admin' });
+      cy.get('[data-cy="menu-item-pending-applications"]').click();
+      cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
+      cy.contains(`[data-cy="host-application"]`, 'Approved');
+      cy.getByDataCy('menu-item-hosted-collectives').click();
+      cy.getByDataCy(`${collectiveSlug}-collective-card`).within(() => {
+        cy.get('button[title="More options"]').click();
+        cy.contains('button', 'Un-host').click();
+      });
+      cy.get('textarea#unhost-account-message').type('Un-hosting this collective');
+      cy.contains('button', 'Un-host Collective').click();
+      cy.getByDataCy(`${collectiveSlug}-collective-card`).should('not.exist');
+    });
+
+    it('cannot unhost collective with balance', () => {
+      cy.signup({ redirect: '/brusselstogetherasbl' });
+      const collectiveSlug = randomSlug();
+      cy.get('[data-cy="host-apply-btn"]:visible').click();
+      cy.getByDataCy('host-apply-modal-next').click();
+      cy.getByDataCy('host-apply-collective-picker').click();
+      cy.getByDataCy('host-apply-new-collective-link').click();
+      cy.get(`input[name="name"]`).type('Cavies United');
+      cy.get(`input[name="slug"]`).type(`{selectall}${collectiveSlug}`);
+      cy.get(`input[name="description"]`).type('We will rule the world with our cute squeaks');
+      cy.getByDataCy('checkbox-tos').click();
+      cy.get('button[type="submit"]').click();
+      cy.contains('Cavies United has been created!');
+      cy.login({ redirect: '/brusselstogetherasbl/admin' });
+      cy.get('[data-cy="menu-item-pending-applications"]').click();
+      cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
+      cy.contains(`[data-cy="host-application"]`, 'Approved');
+      cy.getByDataCy('menu-item-hosted-collectives').click();
+      cy.getByDataCy(`${collectiveSlug}-collective-card`).within(() => {
+        cy.get('[data-cy="hosted-collective-add-funds-btn"]').click();
+      });
+
+      cy.get('[data-cy="add-funds-amount"]').type('20');
+      cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
+      cy.get('[data-cy="add-funds-source"]').type(collectiveSlug);
+      cy.contains(`@${collectiveSlug}`).click();
+      cy.get('[data-cy="add-funds-submit-btn"]').click();
+      cy.contains('button', 'Finish').click();
+      cy.contains('button', 'Finish').should('not.exist');
+
+      cy.getByDataCy(`${collectiveSlug}-collective-card`).within(() => {
+        cy.get('button[title="More options"]').click();
+        cy.contains('button', 'Un-host').click();
+      });
+
+      cy.contains("The Collective's balance must be zero to un-host").should('exist');
+      cy.contains('button', 'Un-host Collective').should('be.disabled');
+      cy.contains('button', 'Cancel').click();
+    });
+  });
+
   describe('Orders', () => {
     it('edit order and mark as paid', () => {
       cy.login({ redirect: '/brusselstogetherasbl/admin/orders' });
