@@ -10,6 +10,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
 import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../StyledModal';
 import StyledTextarea from '../StyledTextarea';
 import { Label, P } from '../Text';
@@ -66,12 +67,22 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
           {collective.stats.balance.valueInCents > 0 && (
             <MessageBox type="warning" mb={2}>
               <FormattedMessage
-                defaultMessage="The Collective's balance must be zero to un-host, including its Events or Projects. There is a remaining balance of {collectiveBalanceAmount}. You can pay out these funds by processing expenses."
+                defaultMessage="The Collective's balance must be zero to un-host, including its Events or Projects. There is a remaining balance of {collectiveBalanceAmount}. You can pay out these funds by <Link>processing expenses.</Link>"
                 values={{
                   collectiveBalanceAmount: formatCurrency(
                     collective.stats.balance.valueInCents,
                     collective.stats.balance.currency,
                     { locale: intl.locale },
+                  ),
+                  Link: value => (
+                    <StyledLink
+                      color="black.800"
+                      href="https://docs.opencollective.com/help/collectives/collective-settings/zero-collective-balance"
+                      textDecoration="underline"
+                      openInNewTab
+                    >
+                      {value}
+                    </StyledLink>
                   ),
                 }}
               />

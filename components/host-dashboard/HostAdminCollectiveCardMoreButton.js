@@ -26,9 +26,9 @@ const FreezeAccountButton = ({ collective, onClick }) => {
       {collective.isFrozen ? <Play size={18} color="#75777A" /> : <Pause size={16} />}
       <Span ml={3} fontSize="14px" lineHeight="20px" css={{ verticalAlign: 'middle' }}>
         {collective.isFrozen ? (
-          <FormattedMessage defaultMessage="Unfreeze Collective" />
+          <FormattedMessage defaultMessage="Unfreeze" />
         ) : (
-          <FormattedMessage defaultMessage="Freeze Collective" />
+          <FormattedMessage defaultMessage="Freeze" />
         )}
       </Span>
     </StyledButton>
@@ -52,7 +52,7 @@ const UnhostAccountButton = ({ onClick }) => {
     >
       <Unlink size={18} />
       <Span ml={3} fontSize="14px" lineHeight="20px" css={{ verticalAlign: 'middle' }}>
-        <FormattedMessage defaultMessage="Unhost Collective" />
+        <FormattedMessage defaultMessage="Un-host" />
       </Span>
     </StyledButton>
   );
