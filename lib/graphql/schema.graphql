@@ -1402,6 +1402,11 @@ type Collective implements CollectiveInterface {
   isHost: Boolean
 
   """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
+
+  """
   Returns whether this host accepts applications for new collectives
   """
   canApply: Boolean
@@ -1430,6 +1435,16 @@ type Collective implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether this account is deleted
+  """
+  isDeleted: Boolean
+
+  """
+  Returns whether this account is banned
+  """
+  isBanned: Boolean
 
   """
   Returns whether this collective is approved
@@ -1649,6 +1664,11 @@ type Event implements CollectiveInterface {
   isHost: Boolean
 
   """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
+
+  """
   Returns whether this host accepts applications for new collectives
   """
   canApply: Boolean
@@ -1677,6 +1697,16 @@ type Event implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether this account is deleted
+  """
+  isDeleted: Boolean
+
+  """
+  Returns whether this account is banned
+  """
+  isBanned: Boolean
 
   """
   Returns whether this collective is approved
@@ -1896,6 +1926,11 @@ type Fund implements CollectiveInterface {
   isHost: Boolean
 
   """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
+
+  """
   Returns whether this host accepts applications for new collectives
   """
   canApply: Boolean
@@ -1924,6 +1959,16 @@ type Fund implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether this account is deleted
+  """
+  isDeleted: Boolean
+
+  """
+  Returns whether this account is banned
+  """
+  isBanned: Boolean
 
   """
   Returns whether this collective is approved
@@ -2143,6 +2188,11 @@ type Organization implements CollectiveInterface {
   isHost: Boolean
 
   """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
+
+  """
   Returns whether this host accepts applications for new collectives
   """
   canApply: Boolean
@@ -2171,6 +2221,16 @@ type Organization implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether this account is deleted
+  """
+  isDeleted: Boolean
+
+  """
+  Returns whether this account is banned
+  """
+  isBanned: Boolean
 
   """
   Returns whether this collective is approved
@@ -2391,6 +2451,11 @@ type Project implements CollectiveInterface {
   isHost: Boolean
 
   """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
+
+  """
   Returns whether this host accepts applications for new collectives
   """
   canApply: Boolean
@@ -2419,6 +2484,16 @@ type Project implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether this account is deleted
+  """
+  isDeleted: Boolean
+
+  """
+  Returns whether this account is banned
+  """
+  isBanned: Boolean
 
   """
   Returns whether this collective is approved
@@ -2880,6 +2955,11 @@ type User implements CollectiveInterface {
   isHost: Boolean
 
   """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
+
+  """
   Returns whether this host accepts applications for new collectives
   """
   canApply: Boolean
@@ -2908,6 +2988,16 @@ type User implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether this account is deleted
+  """
+  isDeleted: Boolean
+
+  """
+  Returns whether this account is banned
+  """
+  isBanned: Boolean
 
   """
   Returns whether this collective is approved
@@ -3129,6 +3219,11 @@ type Vendor implements CollectiveInterface {
   isHost: Boolean
 
   """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
+
+  """
   Returns whether this host accepts applications for new collectives
   """
   canApply: Boolean
@@ -3157,6 +3252,16 @@ type Vendor implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
+
+  """
+  Returns whether this account is deleted
+  """
+  isDeleted: Boolean
+
+  """
+  Returns whether this account is banned
+  """
+  isBanned: Boolean
 
   """
   Returns whether this collective is approved
@@ -3514,6 +3619,16 @@ type Query {
     Filter on whether account is a host
     """
     isHost: Boolean
+
+    """
+    Included collectives which are soft deleted
+    """
+    includeDeleted: Boolean
+
+    """
+    Included collectives which are soft archived
+    """
+    includeArchived: Boolean
 
     """
     Whether to return only active accounts

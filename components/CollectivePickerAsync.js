@@ -17,6 +17,8 @@ const collectivePickerSearchQuery = gql`
     $hostCollectiveIds: [Int]
     $parentCollectiveIds: [Int]
     $skipGuests: Boolean
+    $includeDeleted: Boolean
+    $includeArchived: Boolean
   ) {
     search(
       term: $term
@@ -25,6 +27,8 @@ const collectivePickerSearchQuery = gql`
       hostCollectiveIds: $hostCollectiveIds
       parentCollectiveIds: $parentCollectiveIds
       skipGuests: $skipGuests
+      includeDeleted: $includeDeleted
+      includeArchived: $includeArchived
     ) {
       id
       collectives {
@@ -41,6 +45,11 @@ const collectivePickerSearchQuery = gql`
         imageUrl(height: 64)
         hostFeePercent
         isActive
+        isDeleted
+        isBanned
+        isArchived
+        isHost
+        isTrustedHost
       }
     }
   }
@@ -118,6 +127,8 @@ const CollectivePickerAsync = ({
   noCache,
   isLoading,
   skipGuests,
+  includeDeleted,
+  includeArchived,
   ...props
 }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
@@ -138,6 +149,8 @@ const CollectivePickerAsync = ({
         hostCollectiveIds,
         parentCollectiveIds,
         skipGuests,
+        includeDeleted,
+        includeArchived,
       });
     }
   }, [types, limit, hostCollectiveIds, parentCollectiveIds, term]);
@@ -195,12 +208,18 @@ CollectivePickerAsync.propTypes = {
   invitable: PropTypes.bool,
   skipGuests: PropTypes.bool,
   onInvite: PropTypes.func,
+  /** Include deleted collectives **/
+  includeDeleted: PropTypes.bool,
+  /** Include archived collectives **/
+  includeArchived: PropTypes.bool,
 };
 
 CollectivePickerAsync.defaultProps = {
   preload: false,
   skipGuests: true,
   limit: 20,
+  includeArchived: false,
+  includeDeleted: false,
   searchQuery: collectivePickerSearchQuery,
 };
 
