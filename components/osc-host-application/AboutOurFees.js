@@ -12,8 +12,6 @@ import Link from '../Link';
 import StyledButton from '../StyledButton';
 import { H1, P } from '../Text';
 
-import OCFPrimaryButton from './OCFPrimaryButton';
-
 const AboutOurFees = () => {
   const { query } = useRouter();
   const backLinkPath = query.collectiveSlug
@@ -142,11 +140,11 @@ const AboutOurFees = () => {
           </StyledButton>
         </Link>
         <Link href={nextLinkPath}>
-          <OCFPrimaryButton width={['286px', '100px']}>
+          <StyledButton buttonStyle="purple" width={['286px', '100px']}>
             <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
             &nbsp;
             <ArrowRight2 size="14px" />
-          </OCFPrimaryButton>
+          </StyledButton>
         </Link>
       </Flex>
     </Flex>

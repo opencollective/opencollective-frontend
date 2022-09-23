@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Star } from '@styled-icons/fa-solid/Star';
+//import { Star } from '@styled-icons/boxicons-regular/Star';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -14,14 +15,9 @@ const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
 
   return (
     <Fragment>
-      <Container
-        display="flex"
-        justifyContent="space-between"
-        alignItems="flex-start"
-        flexDirection={['column', 'row']}
-      >
-        <Flex>
-          <Span mr={3}>{radio}</Span>
+      <Container display="flex" justifyContent="space-between" alignItems="start" flexDirection={['column', 'row']}>
+        <Flex alignItems="center">
+          <Span mr={4}>{radio}</Span>
           <Span mr={3} color="black.300">
             <Github size={40} />
           </Span>
@@ -30,7 +26,14 @@ const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
               {value.full_name}
             </P>
             <Flex>
-              <P textTransform="uppercase" color="black.400" fontSize="1rem">
+              <P
+                textTransform="uppercase"
+                fontWeight={600}
+                color="black.500"
+                fontSize="1rem"
+                mt={2}
+                letterSpacing="0.4px"
+              >
                 {repositoryTypeName}
               </P>
               <Box display={['block', null, 'none']} ml={3}>
@@ -42,52 +45,52 @@ const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
           </Flex>
         </Flex>
         <Box display={['none', null, 'block']}>
-          <P fontWeight={300} fontSize="1.2rem">
-            {value.stargazers_count} <Star size={12} />
-          </P>
+          <Flex gap={4} color="black.600" mt={1}>
+            <P fontWeight={600} fontSize="1.2rem" lineHeight="1.4rem">
+              {value.stargazers_count}
+            </P>
+            <Star size={12} />
+          </Flex>
         </Box>
       </Container>
-      <Container width={1} mx={3} my={2} px={2}>
-        {value.description && (
-          <P color="black.600" fontSize="1.2rem" fontWeight="400">
-            {value.description}
-          </P>
-        )}
-        {checked && (
-          <Container my={3}>
-            {type === 'Organization' && (
-              <StyledRadioList
-                id="useType"
-                name="useType"
-                options={['repository', 'organization']}
-                onChange={({ key }) => {
-                  changeRepoInfo(key, value);
-                }}
-                data-cy="use-type-radio"
-              >
-                {props => {
-                  return (
-                    <Container cursor="pointer">
-                      {props.value === 'repository' && (
-                        <Container fontWeight="400" fontSize="1.2rem" mb={2}>
-                          <Span mr={3}>{props.radio}</Span>
-                          Create a collective for the repository ({value.name})
-                        </Container>
-                      )}
-                      {props.value === 'organization' && (
-                        <Container fontWeight="400" fontSize="1.2rem" mb={4}>
-                          <Span mr={3}>{props.radio}</Span>
-                          Create a collective for the organization ({login})
-                        </Container>
-                      )}
+      {value.description && (
+        <P color="black.700" fontSize="1.2rem" lineHeight="1.8rem" fontWeight="400" width={1} ml={4} mt={3} px={2}>
+          {value.description}
+        </P>
+      )}
+      {/* <Container width={1} mx={4} mt={3} mb={1} px={2}> */}
+      {checked && type === 'Organization' && (
+        <Container width={1} mx={4} mt={3} mb={1} px={2}>
+          <StyledRadioList
+            id="useType"
+            name="useType"
+            options={['repository', 'organization']}
+            onChange={({ key }) => {
+              changeRepoInfo(key, value);
+            }}
+            data-cy="use-type-radio"
+          >
+            {props => {
+              return (
+                <Container cursor="pointer">
+                  {props.value === 'repository' && (
+                    <Container fontWeight="400" fontSize="1.2rem" mb={2}>
+                      <Span mr={3}>{props.radio}</Span>
+                      Create a collective for the repository ({value.name})
                     </Container>
-                  );
-                }}
-              </StyledRadioList>
-            )}
-          </Container>
-        )}
-      </Container>
+                  )}
+                  {props.value === 'organization' && (
+                    <Container fontWeight="400" fontSize="1.2rem">
+                      <Span mr={3}>{props.radio}</Span>
+                      Create a collective for the organization ({login})
+                    </Container>
+                  )}
+                </Container>
+              );
+            }}
+          </StyledRadioList>
+        </Container>
+      )}
     </Fragment>
   );
 };

@@ -8,7 +8,8 @@ import styled from 'styled-components';
 import { getGithubRepos } from '../../lib/api';
 
 import GithubRepositoriesFAQ from '../faqs/GithubRepositoriesFAQ';
-import { Box, Flex } from '../Grid';
+import NextIllustration from '../collectives/HomeNextIllustration';
+import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import Loading from '../Loading';
@@ -28,7 +29,7 @@ const BackButton = styled(StyledButton)`
 class ConnectGithub extends React.Component {
   static propTypes = {
     router: PropTypes.object.isRequired,
-    updateGithubInfo: PropTypes.func.isRequired,
+    setGithubInfo: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -38,6 +39,7 @@ class ConnectGithub extends React.Component {
       loadingRepos: false,
       repositories: [],
       error: null,
+      disabledContinue: true,
     };
   }
 
@@ -62,11 +64,16 @@ class ConnectGithub extends React.Component {
     }
   }
 
-  changeRoute = async ({ category, step }) => {
-    const { hostCollectiveSlug, verb } = this.props.router.query;
-    const route = [hostCollectiveSlug, verb || 'create', category, step].filter(Boolean).join('/');
+  changeRoute = async ({ step }) => {
+    const route = ['opensource', 'apply', step].filter(Boolean).join('/');
     await this.props.router.push(`/${route}`);
     window.scrollTo(0, 0);
+  };
+
+  setDisabled = disabled => {
+    this.setState({
+      disabledContinue: disabled,
+    });
   };
 
   render() {
@@ -75,54 +82,56 @@ class ConnectGithub extends React.Component {
     return (
       <Flex flexDirection="column" m={[3, 0]} mb={4}>
         <Flex flexDirection="column" my={[2, 4]}>
-          <Box textAlign="left" minHeight="32px" marginLeft={['none', '224px']}>
-            <BackButton asLink onClick={() => window && window.history.back()}>
-              ←&nbsp;
-              <FormattedMessage id="Back" defaultMessage="Back" />
-            </BackButton>
-          </Box>
-          <Box mb={[2, 3]}>
-            <H1
-              fontSize={['20px', '32px']}
-              lineHeight={['24px', '36px']}
-              fontWeight="bold"
-              textAlign="center"
-              color="black.900"
-              data-cy="connect-github-header"
-            >
-              <FormattedMessage id="openSourceApply.GithubRepositories.title" defaultMessage="Pick a repository" />
-            </H1>
-          </Box>
-          <Box textAlign="center" minHeight="24px">
-            <P fontSize="16px" color="black.600" mb={2}>
-              <FormattedMessage
-                id="collective.subtitle.seeRepo"
-                defaultMessage="Don't see the repository you're looking for? {helplink}."
-                values={{
-                  helplink: (
-                    <StyledLink href="https://docs.opencollective.com/help/collectives/osc-verification" openInNewTab>
-                      <FormattedMessage id="getHelp" defaultMessage="Get help" />
-                    </StyledLink>
-                  ),
-                }}
+          <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center">
+            <Box width={'160px'} height={'160px'} mb="24px">
+              <NextIllustration
+                alt="Open Source Collective logotype"
+                src="/static/images/new-home/osc-logo.png"
+                width={160}
+                height={160}
               />
-            </P>
-            <P fontSize="16px" color="black.600" mb={2}>
-              <FormattedMessage
-                defaultMessage="Want to apply using an <AltVerificationLink>alternative verification criteria</AltVerificationLink>? <ApplyLink>Click here</ApplyLink>."
-                values={{
-                  ApplyLink: getI18nLink({
-                    as: Link,
-                    href: { pathname: `/opensource/create/form`, query: { hostTos: true } },
-                  }),
-                  AltVerificationLink: getI18nLink({
-                    openInNewTab: true,
-                    href: 'https://www.oscollective.org/#criteria',
-                  }),
-                }}
-              />
-            </P>
-          </Box>
+            </Box>
+            <Box textAlign={['center', 'left']} width={['288px', '404px']} mb={4} ml={[null, '24px']}>
+              <H1
+                fontSize="32px"
+                lineHeight="40px"
+                letterSpacing="-0.008em"
+                color="black.900"
+                textAlign={['center', 'left']}
+                mb="14px"
+              >
+                <FormattedMessage id="openSourceApply.GithubRepositories.title" defaultMessage="Pick a repository" />
+              </H1>
+              <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
+                <FormattedMessage
+                  id="collective.subtitle.seeRepo"
+                  defaultMessage="Don't see the repository you're looking for? {helplink}."
+                  values={{
+                    helplink: (
+                      <StyledLink href="https://docs.opencollective.com/help/collectives/osc-verification" openInNewTab>
+                        <FormattedMessage id="getHelp" defaultMessage="Get help" />
+                      </StyledLink>
+                    ),
+                  }}
+                />
+              </P>
+              <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
+                <FormattedMessage
+                  defaultMessage="Want to apply using an <AltVerificationLink>alternative verification criteria</AltVerificationLink>? <ApplyLink>Click here</ApplyLink>."
+                  values={{
+                    ApplyLink: getI18nLink({
+                      as: Link,
+                      href: { pathname: `/opensource/create/form`, query: { hostTos: true } },
+                    }),
+                    AltVerificationLink: getI18nLink({
+                      openInNewTab: true,
+                      href: 'https://www.oscollective.org/#criteria',
+                    }),
+                  }}
+                />
+              </P>
+            </Box>
+          </Flex>
         </Flex>
         {error && (
           <Flex alignItems="center" justifyContent="center">
@@ -136,6 +145,7 @@ class ConnectGithub extends React.Component {
             <Loading />
           </Box>
         )}
+
         {repositories.length !== 0 && (
           <Flex justifyContent="center" width={1} mb={4} flexDirection={['column', 'row']}>
             <Box width={1 / 5} display={['none', null, 'block']} />
@@ -145,14 +155,38 @@ class ConnectGithub extends React.Component {
                   <GithubRepositories
                     {...fieldProps}
                     repositories={repositories}
-                    submitGithubInfo={githubInfo => {
-                      this.props.updateGithubInfo(githubInfo);
-                      this.changeRoute({ category: 'opensource', step: 'form' });
-                    }}
+                    setGithubInfo={githubInfo => this.props.setGithubInfo(githubInfo)}
+                    disabled={this.state.disabledContinue}
+                    setDisabled={this.setDisabled}
                   />
                 )}
               </StyledInputField>
+
+              <Grid gridTemplateColumns={['1fr', '1fr 1fr']} gridGap={'32px'} my={4}>
+                <StyledButton
+                  buttonStyle="purpleSecondary"
+                  buttonSize="large"
+                  textAlign="center"
+                  onClick={() => window && window.history.back()}
+                >
+                  ←&nbsp;
+                  <FormattedMessage id="Back" defaultMessage="Back" />
+                </StyledButton>
+                <StyledButton
+                  textAlign="center"
+                  buttonSize="large"
+                  buttonStyle="purple"
+                  disabled={this.state.disabledContinue}
+                  onClick={() => {
+                    this.changeRoute({ verb: 'apply', step: 'form' });
+                  }}
+                  data-cy="connect-github-continue"
+                >
+                  <FormattedMessage id="Pagination.Next" defaultMessage="Next" /> &nbsp;→
+                </StyledButton>
+              </Grid>
             </Box>
+
             <GithubRepositoriesFAQ
               mt={4}
               ml={[0, 4]}

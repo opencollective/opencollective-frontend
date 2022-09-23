@@ -1,37 +1,65 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
-import { Box, Flex } from '../Grid';
+import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledCheckbox from '../StyledCheckbox';
 import { H1, P } from '../Text';
+import StyledButton from '../StyledButton';
+import MessageBox from '../MessageBox';
 
 import ApplicationDescription from './ApplicationDescription';
-import OCFPrimaryButton from './OCFPrimaryButton';
+
+const messages = defineMessages({
+  acceptTermsOfFiscalSponsorship: {
+    id: 'createCollective.acceptTermsOfFiscalSponsorship',
+    defaultMessage: 'Please accept the terms of fiscal sponsorship',
+  },
+});
+
+const FISCAL_SPONSOR_TERMS =
+  'https://docs.google.com/document/u/1/d/e/2PACX-1vQbiyK2Fe0jLdh4vb9BfHY4bJ1LCo4Qvy0jg9P29ZkiC8y_vKJ_1fNgIbV0p6UdvbcT8Ql1gVto8bf9/pub';
+
+const getGithubConnectUrl = () => {
+  const urlParams = new URLSearchParams({ context: 'createCollective' });
+
+  const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+  if (accessToken) {
+    urlParams.set('access_token', accessToken);
+  }
+
+  return `/api/connected-accounts/github?${urlParams.toString()}`;
+};
 
 const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
+  const { formatMessage } = useIntl();
+
   const { query } = useRouter();
   const nextLinkPath = query.collectiveSlug
-    ? `/foundation/apply/fees?collectiveSlug=${query.collectiveSlug}`
-    : '/foundation/apply/fees';
+    ? `/opensource/apply/fees?collectiveSlug=${query.collectiveSlug}`
+    : '/opensource/apply/fees';
+  const [error, setError] = useState();
+
   return (
     <Flex flexDirection="column" alignItems="center" justifyContent="center" mt={['24px', '48px']}>
       <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center">
         <Box width={'160px'} height={'160px'} mb="24px">
           <NextIllustration
-            alt="OCF sponsorship illustration"
-            src="/static/images/ocf-host-application/ofc-sponsorship-illustration.png"
+            alt="Open Source Collective logotype"
+            src="/static/images/new-home/osc-logo.png"
             width={160}
             height={160}
           />
         </Box>
-        <Box textAlign={['center', 'left']} width={['288px', '404px']} mb={4} ml={[null, '24px']}>
+        <Box textAlign={['center', 'left']} width={['288px', '488px']} mb={4} ml={[null, '24px']}>
           <H1
             fontSize="32px"
             lineHeight="40px"
@@ -40,24 +68,22 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
             textAlign={['center', 'left']}
             mb="14px"
           >
-            <FormattedMessage id="OCFHostApplication.title" defaultMessage="Apply with your initiative" />
+            <FormattedMessage id="OSCHostApplication.title" defaultMessage="Apply with your Collective" />
           </H1>
           <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
             <FormattedMessage
-              id="OCFHostApplication.description"
-              defaultMessage="Get your non-profit initiative up and running fast."
+              id="collective.subtitle.opensource"
+              defaultMessage="Open source projects are invited to join the Open Source Collective Fiscal Host."
             />
           </P>
         </Box>
       </Flex>
-      <Box width={['288px', '588px']}>
+      <Box width={['288px', '672px']}>
         <ApplicationDescription />
-        <Container display="flex" alignSelf="flex-start" alignItems="center" mb={4} mt={2}>
+        <Container display="flex" alignSelf="flex-start" alignItems="center" mb={4} mt={4}>
           <Box mr={3}>
             <StyledCheckbox
               name="TOSAgreement"
-              background="#396C6F"
-              size="16px"
               checked={checked}
               onChange={({ checked }) => onChecked(checked)}
               label={
@@ -67,9 +93,10 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
                     defaultMessage="I agree with the <TOSLink>terms of fiscal sponsorship</TOSLink>."
                     values={{
                       TOSLink: getI18nLink({
-                        href: 'https://docs.opencollective.foundation/getting-started/terms',
+                        href: FISCAL_SPONSOR_TERMS,
                         openInNewTabNoFollow: true,
                         onClick: e => e.stopPropagation(), // don't check the checkbox when clicking on the link
+                        color: 'purple.500',
                       }),
                     }}
                   />
@@ -79,13 +106,47 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
           </Box>
         </Container>
       </Box>
-      <Link href={nextLinkPath}>
-        <OCFPrimaryButton mb="40px" width={['286px', '100px']} disabled={!checked}>
-          <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
-          &nbsp;
-          <ArrowRight2 size="14px" />
-        </OCFPrimaryButton>
-      </Link>
+      <Box width={['288px', '672px']} mb="100px">
+        <Grid gridTemplateColumns={['1fr', '1fr 1fr']} gridGap={'32px'} mb={4}>
+          <StyledButton
+            textAlign="center"
+            buttonSize="large"
+            buttonStyle="purple"
+            onClick={() => {
+              if (!checked) {
+                setError(formatMessage(messages.acceptTermsOfFiscalSponsorship));
+              } else {
+                window.location.href = getGithubConnectUrl();
+              }
+            }}
+          >
+            <FormattedMessage id="createcollective.opensource.VerifyGitHub" defaultMessage="Verify using GitHub" />
+          </StyledButton>
+          <Link
+            href={{ pathname: `/opensource/create/form`, query: { hostTos: true } }}
+            onClick={e => {
+              if (!checked) {
+                e.preventDefault();
+                setError(formatMessage(messages.acceptTermsOfFiscalSponsorship));
+              }
+            }}
+          >
+            <StyledButton textAlign="center" buttonSize="large" buttonStyle="purpleSecondary">
+              <FormattedMessage
+                id="createcollective.opensource.ManualVerification"
+                defaultMessage="Request manual verification"
+              />
+            </StyledButton>
+          </Link>
+        </Grid>
+        {error && (
+          <Flex alignItems="center" justifyContent="center">
+            <MessageBox type="error" withIcon mb={[1, 3]}>
+              {error}
+            </MessageBox>
+          </Flex>
+        )}
+      </Box>
     </Flex>
   );
 };

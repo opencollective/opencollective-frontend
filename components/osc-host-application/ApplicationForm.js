@@ -6,29 +6,30 @@ import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Question } from '@styled-icons/remix-line/Question';
 import { Form, Formik } from 'formik';
-import { isNil } from 'lodash';
+import { get, isNil } from 'lodash';
 import { withRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { suggestSlug } from '../../lib/collective.lib';
-import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../lib/constants/collectives';
+import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyChecked, verifyEmailPattern, verifyFieldLength } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { i18nOCFApplicationFormLabel } from '../../lib/i18n/ocf-form';
+import { i18nOSCApplicationFormLabel } from '../../lib/i18n/osc-form';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import OCFHostApplicationFAQ from '../faqs/OCFHostApplicationFAQ';
-import { Box, Flex } from '../Grid';
+import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import OnboardingProfileCard from '../onboarding-modal/OnboardingProfileCard';
 import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
@@ -37,9 +38,7 @@ import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledTextarea from '../StyledTextarea';
 import StyledTooltip from '../StyledTooltip';
-import { H1, H4, P } from '../Text';
-
-import OCFPrimaryButton from './OCFPrimaryButton';
+import { H1, H4, H5, P } from '../Text';
 
 const createCollectiveMutation = gqlV2/* GraphQL */ `
   mutation CreateCollective(
@@ -49,6 +48,7 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
     $message: String
     $applicationData: JSON
     $inviteMembers: [InviteMemberInput]
+    $automateApprovalWithGithub: Boolean
   ) {
     createCollective(
       collective: $collective
@@ -57,6 +57,7 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
       message: $message
       applicationData: $applicationData
       inviteMembers: $inviteMembers
+      automateApprovalWithGithub: $automateApprovalWithGithub
     ) {
       id
       slug
@@ -75,6 +76,7 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
     $message: String
     $applicationData: JSON
     $inviteMembers: [InviteMemberInput]
+    $automateApprovalWithGithub: Boolean
   ) {
     applyToHost(
       collective: $collective
@@ -82,6 +84,7 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
       message: $message
       applicationData: $applicationData
       inviteMembers: $inviteMembers
+      automateApprovalWithGithub: $automateApprovalWithGithub
     ) {
       id
       slug
@@ -96,6 +99,47 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
 `;
 
 export const APPLICATION_DATA_AMOUNT_FIELDS = ['totalAmountRaised', 'totalAmountToBeRaised'];
+const LABEL_STYLES = { fontWeight: 500, fontSize: '14px', lineHeight: '17px' };
+
+const messages = defineMessages({
+  nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: 'Collective Name' },
+  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
+  suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
+  descriptionLabel: {
+    id: 'createCollective.form.descriptionLabel',
+    defaultMessage: 'What does your Collective do?',
+  },
+  tagsLabel: { id: 'Tags', defaultMessage: 'Tags' },
+  descriptionHint: {
+    id: 'createCollective.form.descriptionHint',
+    defaultMessage: 'Write a short description (150 characters max)',
+  },
+  descriptionPlaceholder: {
+    id: 'create.collective.placeholder',
+    defaultMessage: 'Making the world a better place',
+  },
+  errorSlugHyphen: {
+    id: 'createCollective.form.error.slug.hyphen',
+    defaultMessage: 'Collective slug URL cannot start or end with a hyphen',
+  },
+  name: {
+    id: 'OCFHostApplication.name.label',
+    defaultMessage: 'Your Name',
+  },
+  email: {
+    id: 'Form.yourEmail',
+    defaultMessage: 'Your email address',
+  },
+
+  slug: {
+    id: 'createCollective.form.slugLabel',
+    defaultMessage: 'Set your URL',
+  },
+  collectiveDescription: {
+    // id: 'OCFHostApplication.initiativeDescription.label',
+    defaultMessage: 'What does your Collective do?',
+  },
+});
 
 const useApplicationMutation = canApplyWithCollective =>
   useMutation(canApplyWithCollective ? applyToHostMutation : createCollectiveMutation, {
@@ -123,6 +167,7 @@ const ApplicationForm = ({
   router,
   collective: collectiveWithSlug,
   host,
+  githubInfo,
 }) => {
   const intl = useIntl();
   const [submitApplication, { loading: submitting, error }] = useApplicationMutation(canApplyWithCollective);
@@ -134,39 +179,36 @@ const ApplicationForm = ({
       'collective.name',
       'collective.slug',
       'collective.description',
-      'applicationData.location',
-      'applicationData.initiativeDuration',
-      'applicationData.expectedFundingPartner',
-      'applicationData.missionImpactExplanation',
-      'applicationData.websiteAndSocialLinks',
     ]);
 
     verifyEmailPattern(errors, values, 'user.email');
-
-    // verifyFieldLength(intl, errors, values, 'collective.name', 1, 50);
-    // verifyFieldLength(intl, errors, values, 'collective.slug', 1, 30);
     verifyFieldLength(intl, errors, values, 'collective.description', 1, 250);
-    verifyFieldLength(intl, errors, values, 'applicationData.missionImpactExplanation', 1, 250);
 
     verifyChecked(errors, values, 'termsOfServiceOC');
+
     return errors;
   };
-  const submit = async ({ user, collective, applicationData, inviteMembers }) => {
+  const submit = async ({ user, collective, applicationData, inviteMembers, message }) => {
     const variables = {
-      collective,
-      host: { legacyId: OPENCOLLECTIVE_FOUNDATION_ID },
+      collective: {
+        ...collective,
+        ...(canApplyWithCollective && { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug }),
+        ...(githubInfo && { githubHandle: githubInfo.handle }),
+      },
+      host: { legacyId: OPENSOURCE_COLLECTIVE_ID },
       user,
       applicationData: prepareApplicationData(applicationData),
       inviteMembers: inviteMembers.map(invite => ({
         ...invite,
         memberAccount: { legacyId: invite.memberAccount.id },
       })),
-      ...(canApplyWithCollective && { collective: { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug } }),
+      message,
+      automateApprovalWithGithub: githubInfo ? true : false,
     };
 
     const response = await submitApplication({ variables });
     if (response.data.createCollective || response.data.applyToHost) {
-      await router.push('/foundation/apply/success');
+      await router.push('/opensource/apply/success');
       window.scrollTo(0, 0);
     }
   };
@@ -179,16 +221,16 @@ const ApplicationForm = ({
   return (
     <React.Fragment>
       <Flex flexDirection="column" alignItems="center" justifyContent="center" mt={['24px', '48px']}>
-        <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center" mb={[null, 3]}>
+        <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center">
           <Box width={'160px'} height={'160px'} mb="24px">
             <NextIllustration
-              alt="OCF Application form illustration"
-              src="/static/images/ocf-host-application/ocf-applicationForm-illustration.png"
+              alt="Open Source Collective logotype"
+              src="/static/images/new-home/osc-logo.png"
               width={160}
               height={160}
             />
           </Box>
-          <Box textAlign={['center', 'left']} width={['256px', '404px']} mb={4} ml={[null, '24px']}>
+          <Box textAlign={['center', 'left']} width={['288px', '488px']} mb={4} ml={[null, '24px']}>
             <H1
               fontSize="32px"
               lineHeight="40px"
@@ -197,12 +239,19 @@ const ApplicationForm = ({
               textAlign={['center', 'left']}
               mb="14px"
             >
-              <FormattedMessage id="OCFHostApplication.title" defaultMessage="Apply with your initiative" />
+              <FormattedMessage id="OSCHostApplication.title" defaultMessage="Apply with your Collective" />
             </H1>
             <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
               <FormattedMessage
-                id="OCFHostApplication.applicationForm.description"
-                defaultMessage="Grantees and project participants will love the simplicity and accessibility, and you’ll love how much your overhead is reduced."
+                //id="createcollective.opensource.p2"
+                defaultMessage="Introduce your Collective, please incude as much context as possible so we can give you the best service we can! Have doubts? {faqLink}"
+                values={{
+                  faqLink: (
+                    <StyledLink href="https://docs.oscollective.org/faq/general" openInNewTab color="purple.500">
+                      <FormattedMessage defaultMessage="Read our FAQs" />
+                    </StyledLink>
+                  ),
+                }}
               />
             </P>
           </Box>
@@ -266,60 +315,32 @@ const ApplicationForm = ({
                       padding="32px 16px"
                       display="flex"
                       borderRadius="8px"
-                      mr={[null, '36px', null, null, '102px']}
                     >
                       <Box width={['256px', '484px', '664px']}>
-                        <Container display="flex" alignItems="center" justifyContent="space-between">
-                          <H4 fontSize="16px" lineHeight="24px" color="black.900" mb={2}>
+                        <Flex alignItems="center" justifyContent="stretch" gap={6}>
+                          <H4 fontSize="18px" lineHeight="24px" color="black.900" mb={2}>
                             <FormattedMessage
-                              id="OCFHostApplication.applicationForm.title"
-                              defaultMessage="About you and your initiative {padlock} {questionMark}"
+                              //id="OCFHostApplication.applicationForm.title"
+                              defaultMessage="Main info {padlock}"
                               values={{
                                 padlock: <Lock size="12px" color="#9D9FA3" />,
-                                questionMark: (
-                                  <StyledTooltip
-                                    content={
-                                      <FormattedMessage
-                                        defaultMessage={
-                                          'Tell us more about your collective. This information is private and only used for internal purposes.'
-                                        }
-                                      />
-                                    }
-                                  >
-                                    <Question size="13px" color="#DADADA" />
-                                  </StyledTooltip>
-                                ),
                               }}
                             />
                           </H4>
-                          <StyledHr display={['none', 'flex']} width={[null, '219px', '383px']} />
-                        </Container>
+                          <StyledHr flex="1" />
+                        </Flex>
                         <P fontSize="12px" lineHeight="16px" color="black.600">
                           <FormattedMessage
-                            id="OCFHostApplication.applicationForm.instruction"
-                            defaultMessage="All fields are mandatory."
+                            //id="OCFHostApplication.applicationForm.instruction"
+                            defaultMessage="This information is private. We only use it to check your eligibility and legitimacy."
                           />
                         </P>
-                      </Box>
-                      <Box width={['256px', '234px', '324px']}>
-                        <StyledInputFormikField
-                          label={i18nOCFApplicationFormLabel(intl, 'location')}
-                          labelFontSize="13px"
-                          labelColor="#4E5052"
-                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          required
-                          htmlFor="location"
-                          name="applicationData.location"
-                          my={3}
-                        >
-                          {({ field }) => <StyledInput {...field} type="text" placeholder="Walnut, CA" px="7px" />}
-                        </StyledInputFormikField>
                       </Box>
                       {!LoggedInUser && (
                         <Flex flexDirection={['column', 'row']}>
                           <Box mr={[null, 3]}>
                             <StyledInputFormikField
-                              label={i18nOCFApplicationFormLabel(intl, 'name')}
+                              label={intl.formatMessage(messages.name)}
                               labelFontSize="13px"
                               labelColor="#4E5052"
                               labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -337,7 +358,7 @@ const ApplicationForm = ({
                           </Box>
                           <Box my={2}>
                             <StyledInputFormikField
-                              label={i18nOCFApplicationFormLabel(intl, 'email')}
+                              label={intl.formatMessage(messages.email)}
                               labelFontSize="13px"
                               labelColor="#4E5052"
                               labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -365,7 +386,7 @@ const ApplicationForm = ({
                         <Flex flexDirection={['column', 'row']}>
                           <Box my={2} mr={[null, 3]}>
                             <StyledInputFormikField
-                              label={i18nOCFApplicationFormLabel(intl, 'initiativeName')}
+                              label={intl.formatMessage(messages.nameLabel)}
                               labelFontSize="13px"
                               labelColor="#4E5052"
                               labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -382,7 +403,7 @@ const ApplicationForm = ({
                           </Box>
                           <Box width={['256px', '234px', '324px']} my={2}>
                             <StyledInputFormikField
-                              label={i18nOCFApplicationFormLabel(intl, 'slug')}
+                              label={i18nOSCApplicationFormLabel(intl, 'slug')}
                               helpText={<FormattedMessage defaultMessage="This can be edited later" />}
                               labelFontSize="13px"
                               labelColor="#4E5052"
@@ -409,105 +430,9 @@ const ApplicationForm = ({
                           </Box>
                         </Flex>
                       )}
-                      <Flex flexDirection={['column', 'row']}>
-                        <Box mr={[null, 3]}>
-                          <StyledInputFormikField
-                            label={i18nOCFApplicationFormLabel(intl, 'initiativeDuration')}
-                            labelFontSize="13px"
-                            labelColor="#4E5052"
-                            labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                            name="applicationData.initiativeDuration"
-                            htmlFor="initiativeDuration"
-                            required
-                            width={['256px', '234px', '324px']}
-                            my={2}
-                          >
-                            {({ field }) => (
-                              <StyledInput type="text" placeholder="New initiatives are welcome!" {...field} px="7px" />
-                            )}
-                          </StyledInputFormikField>
-                        </Box>
-                        <Box width={['256px', '234px', '324px']} my={2}>
-                          <StyledInputFormikField
-                            label={i18nOCFApplicationFormLabel(intl, 'totalAmountRaised')}
-                            labelFontSize="13px"
-                            labelColor="#4E5052"
-                            labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                            name="applicationData.totalAmountRaised"
-                            htmlFor="totalAmountRaised"
-                          >
-                            {({ form, field }) => (
-                              <StyledInputAmount
-                                id={field.id}
-                                currency="USD"
-                                px="7px"
-                                placeholder="It's fine if you're just starting out."
-                                error={field.error}
-                                value={field.value}
-                                maxWidth="100%"
-                                onChange={value => form.setFieldValue(field.name, value)}
-                                onBlur={() => form.setFieldTouched(field.name, true)}
-                              />
-                            )}
-                          </StyledInputFormikField>
-                          <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                            <FormattedMessage
-                              id="OCFHostApplication.applicationForm.totalAmountRaisedInstruction"
-                              defaultMessage="If you haven't please type 0."
-                            />
-                          </P>
-                        </Box>
-                      </Flex>
-                      <Flex flexDirection={['column', 'row']}>
-                        <Box width={['256px', '234px', '324px']} my={2} mr={[null, 3]}>
-                          <StyledInputFormikField
-                            label={i18nOCFApplicationFormLabel(intl, 'totalAmountToBeRaised')}
-                            labelFontSize="13px"
-                            labelColor="#4E5052"
-                            labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                            name="applicationData.totalAmountToBeRaised"
-                            htmlFor="totalAmountToBeRaised"
-                            required
-                          >
-                            {({ field, form }) => (
-                              <StyledInputAmount
-                                id={field.id}
-                                placeholder="Be as ambitious as you want."
-                                currency="USD"
-                                px="7px"
-                                error={field.error}
-                                value={field.value}
-                                maxWidth="100%"
-                                onChange={value => form.setFieldValue(field.name, value)}
-                                onBlur={() => form.setFieldTouched(field.name, true)}
-                              />
-                            )}
-                          </StyledInputFormikField>
-                        </Box>
-                        <Box width={['256px', '234px', '324px']} my={2}>
-                          <StyledInputFormikField
-                            label={i18nOCFApplicationFormLabel(intl, 'expectedFundingPartner')}
-                            labelFontSize="13px"
-                            labelColor="#4E5052"
-                            labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                            name="applicationData.expectedFundingPartner"
-                            htmlFor="expectedFundingPartner"
-                            required
-                          >
-                            {({ field }) => (
-                              <StyledInput
-                                type="text"
-                                placeholder="An idea of your ideal partners."
-                                {...field}
-                                px="7px"
-                              />
-                            )}
-                          </StyledInputFormikField>
-                        </Box>
-                      </Flex>
                       <Box width={['256px', '484px', '663px']} my={2}>
                         <StyledInputFormikField
-                          label={i18nOCFApplicationFormLabel(intl, 'initiativeDescription')}
+                          label={intl.formatMessage(messages.descriptionLabel)}
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -517,60 +442,53 @@ const ApplicationForm = ({
                         >
                           {({ field }) => (
                             <StyledTextarea
-                              placeholder="We make sandwiches and give them to our neighbors in an outdoor community fridge. We collaborate with other organizations to figure out what the best flavor sandwich is."
+                              placeholder={intl.formatMessage(messages.descriptionPlaceholder)}
                               {...field}
                               px="7px"
                             />
                           )}
                         </StyledInputFormikField>
                         <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                          <FormattedMessage
-                            id="OCFHostApplication.applicationForm.whatDoesInitiativeDoInstruction"
-                            defaultMessage="Write a short description of your initiative (250 characters max)"
-                          />
+                          {intl.formatMessage(messages.descriptionHint)}
                         </P>
                       </Box>
-                      <Box width={['256px', '484px', '663px']} my={2}>
-                        <StyledInputFormikField
-                          label={i18nOCFApplicationFormLabel(intl, 'missionImpactExplanation')}
-                          labelFontSize="13px"
-                          labelColor="#4E5052"
-                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="applicationData.missionImpactExplanation"
-                          htmlFor="missionImpactExplanation"
-                          required
-                        >
-                          {({ field }) => (
-                            <StyledTextarea
-                              placeholder="We create a positive social impact and combat community deterioration by providing access to the best sandwiches to our neighbors and building a strong community around our love of sandwiches."
-                              {...field}
-                              px="7px"
+
+                      <Box width={['256px', '484px', '664px']} mt={20}>
+                        <Flex alignItems="center" justifyContent="stretch" gap={6}>
+                          <H4 fontSize="18px" lineHeight="24px" color="black.900" mb={2}>
+                            <FormattedMessage
+                              //id="OCFHostApplication.applicationForm.title"
+                              defaultMessage="Your team {padlock}"
+                              values={{
+                                padlock: <Lock size="12px" color="#9D9FA3" />,
+                              }}
                             />
-                          )}
-                        </StyledInputFormikField>
-                        <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
+                          </H4>
+                          <StyledHr flex="1" />
+                        </Flex>
+                        <P fontSize="12px" lineHeight="16px" color="black.600">
                           <FormattedMessage
-                            id="OCFHostApplication.applicationForm.missionInstruction"
-                            defaultMessage="Check the sidebar for more info (250 characters max)"
+                            //id="OCFHostApplication.applicationForm.instruction"
+                            defaultMessage="This information is private. We only use it to check your eligibility and legitimacy."
                           />
                         </P>
                       </Box>
+
                       <Box width={['256px', '484px', '663px']} my={2}>
-                        <P fontSize="13px" lineHeight="16px" color="#4E5052">
-                          <FormattedMessage id="onboarding.admins.header" defaultMessage="Add administrators" />
-                        </P>
-                        <Flex mt={1} width="100%">
-                          <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
-                            <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
-                            {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
-                              ` (${1 + values.inviteMembers?.length}/${
+                        <H4 fontSize="16px" lineHeight="24px" color="black.800" mb={0}>
+                          <FormattedMessage id="AddedAdministrators" defaultMessage="Added administrators" />
+                        </H4>
+
+                        {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                          <Flex mt={1} width="100%">
+                            <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
+                              {` (${1 + values.inviteMembers?.length}/${
                                 host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins
                               })`}
-                          </P>
-                          <Flex flexGrow={1} alignItems="center">
-                            <StyledHr width="100%" ml={2} />
+                            </P>
                           </Flex>
-                        </Flex>
+                        )}
+
                         <Flex width="100%" flexWrap="wrap" data-cy="profile-card">
                           {LoggedInUser ? (
                             <OnboardingProfileCard
@@ -593,15 +511,11 @@ const ApplicationForm = ({
                             />
                           ))}
                         </Flex>
-                        <Flex mt={1} width="100%">
-                          <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
-                            <FormattedMessage id="InviteAdministrators" defaultMessage="Invite Administrators" />
-                          </P>
-                          <Flex flexGrow={1} alignItems="center">
-                            <StyledHr width="100%" ml={2} />
-                          </Flex>
-                        </Flex>
+
                         <Box>
+                          <H4 mt={2} fontSize="16px" color="black.800">
+                            <FormattedMessage id="InviteAdministrators" defaultMessage="Invite administrators" />
+                          </H4>
                           <CollectivePickerAsync
                             inputId="onboarding-admin-picker"
                             creatable
@@ -633,23 +547,24 @@ const ApplicationForm = ({
                       </Box>
                       <Box width={['256px', '484px', '663px']} my={2}>
                         <StyledInputFormikField
-                          label={i18nOCFApplicationFormLabel(intl, 'websiteAndSocialLinks')}
-                          labelFontSize="13px"
-                          labelColor="#4E5052"
-                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="applicationData.websiteAndSocialLinks"
-                          htmlFor="websiteAndSocialLinks"
-                          required
+                          name="message"
+                          htmlFor="apply-create-message"
+                          labelProps={LABEL_STYLES}
+                          required={false}
+                          mt={24}
+                          label={
+                            <FormattedMessage
+                              id="ApplyToHost.WriteMessage"
+                              defaultMessage="Message to the Fiscal Host"
+                            />
+                          }
                         >
-                          {({ field }) => <StyledTextarea type="text" {...field} px="7px" />}
+                          {({ field }) => (
+                            <StyledTextarea {...field} width="100%" minHeight={76} maxLength={3000} showCount />
+                          )}
                         </StyledInputFormikField>
-                        <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                          <FormattedMessage
-                            id="OCFHostApplication.applicationForm.websiteInstruction"
-                            defaultMessage="If you have something to send us, please upload it to a storage service (Dropbox, Drive) and paste the sharing link here."
-                          />
-                        </P>
                       </Box>
+
                       <Box width={['256px', '484px', '663px']} mb={2} mt="20px">
                         <StyledHr />
                       </Box>
@@ -692,47 +607,39 @@ const ApplicationForm = ({
                         </Box>
                       </Container>
                     </Container>
-                    <Flex
-                      flexDirection={['column', 'row']}
-                      alignItems="center"
-                      alignSelf={[null, 'flex-start']}
-                      justifyContent="center"
-                      mb="40px"
-                      mt={[null, 3]}
-                    >
-                      <Link href="/foundation/apply/fees">
-                        <StyledButton
-                          type="button"
-                          mb={[3, 0]}
-                          width={['286px', '120px']}
-                          mr={[null, 3]}
-                          onClick={() => setInitialValues({ ...initialValues, ...values })}
-                        >
-                          <ArrowLeft2 size="14px" />
-                          &nbsp;
-                          <FormattedMessage id="Back" defaultMessage="Back" />
-                        </StyledButton>
-                      </Link>
-                      <OCFPrimaryButton
-                        width={['286px', '120px']}
+
+                    <Grid gridTemplateColumns={['1fr', '1fr 1fr']} gridGap={'32px'} my={4}>
+                      <StyledButton
+                        buttonStyle="purpleSecondary"
+                        buttonSize="large"
+                        textAlign="center"
+                        onClick={() => {
+                          setInitialValues({ ...initialValues, ...values });
+                          window && window.history.back();
+                        }}
+                      >
+                        <ArrowLeft2 size="14px" />
+                        &nbsp;
+                        <FormattedMessage id="Back" defaultMessage="Back" />
+                      </StyledButton>
+                      <StyledButton
                         type="submit"
+                        textAlign="center"
+                        buttonSize="large"
+                        buttonStyle="purple"
                         onSubmit={handleSubmit}
                         loading={submitting}
                       >
-                        <FormattedMessage id="Apply" defaultMessage="Apply" />
+                        <FormattedMessage defaultMessage="Submit application" />
                         &nbsp;
                         <ArrowRight2 size="14px" />
-                      </OCFPrimaryButton>
-                    </Flex>
+                      </StyledButton>
+                    </Grid>
                   </Form>
                 );
               }}
             </Formik>
           )}
-        </Flex>
-        <Flex flexDirection="column" alignItems="center" justifyContent="center">
-          <StyledHr width="1px" solid />
-          <OCFHostApplicationFAQ width={['256px', '148px', '194px', null, '239px']} />
         </Flex>
       </Flex>
     </React.Fragment>
@@ -760,6 +667,7 @@ ApplicationForm.propTypes = {
   loadingCollective: PropTypes.bool,
   canApplyWithCollective: PropTypes.bool,
   router: PropTypes.object,
+  githubInfo: PropTypes.object,
 };
 
 export default withRouter(ApplicationForm);

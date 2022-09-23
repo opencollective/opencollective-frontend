@@ -47,10 +47,10 @@ const YourInitiativeIsNearlyThere = () => (
         mb="24px"
       >
         <NextIllustration
-          alt="Your initiative is nearly there illustration"
-          src="/static/images/ocf-host-application/ocf-initiativeIsAlmostThere-illustration.png"
-          width={360}
-          height={160}
+          alt="Open Source Collective logotype"
+          src="/static/images/new-home/osc-logo.png"
+          width={240}
+          height={240}
         />
       </Container>
       <Box textAlign="center" width={['288px', '404px']} mb="14px" ml={[null, '24px']}>
@@ -60,17 +60,17 @@ const YourInitiativeIsNearlyThere = () => (
             defaultMessage="Your initiative is nearly there!"
           />
         </H1>
-        <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.600">
+        <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.800">
           <FormattedMessage
-            id="OCFHostApplication.yourInitiativeIsNearlyThere.description"
-            defaultMessage="We need to undertake our internal process to get everything ready. {lineBreak}{lineBreak} In the meantime, check out these useful links."
+            //id="OCFHostApplication.yourInitiativeIsNearlyThere.description"
+            defaultMessage="We will review it and let you know by mail if we need you for anything during the process. {lineBreak}{lineBreak} In the meantime, you can use these useful links."
             values={{
               lineBreak: <br />,
             }}
           />
         </P>
       </Box>
-      <Container display="flex" justifyContent="center" alignItems="baseline">
+      {/* <Container display="flex" justifyContent="center" alignItems="baseline">
         <Link href="/">
           <FormattedMessage id="home" defaultMessage="Home" />
         </Link>
@@ -81,7 +81,7 @@ const YourInitiativeIsNearlyThere = () => (
         <Link href="https://blog.opencollective.com/">
           <FormattedMessage id="company.blog" defaultMessage="Blog" />
         </Link>
-      </Container>
+      </Container> */}
     </Flex>
     <Flex my="48px" flexDirection="column" alignItems="center" justifyContent="center">
       <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.800">
@@ -176,18 +176,17 @@ const YourInitiativeIsNearlyThere = () => (
             <H3 fontSize="20px" color="black.900" lineHeight="28px" my={2}>
               #Walkthevote Project
             </H3>
-            <P fontSize="14px" color="black.800" lineHeight="20px" fontWeight="500">
+            <P fontSize="16px" color="black.800" lineHeight="20px" fontWeight="500">
               <FormattedMessage id="OCFHostApplication.weAreAFund" defaultMessage="We are a fund" />
             </P>
           </Box>
         </Container>
       </Container>
-      <VisitDocumentationLink
+      <StyledLink
         my="40px"
-        href="https://docs.opencollective.foundation/"
-        width={['286px', '215px']}
+        href="https://docs.oscollective.org/"
+        //width={['286px', '215px']}
         buttonStyle="primary"
-        borderColor="transparent"
         buttonSize="medium"
         openInNewTab
       >
@@ -198,7 +197,7 @@ const YourInitiativeIsNearlyThere = () => (
             arrowRight: <ArrowRight2 size="14px" />,
           }}
         />
-      </VisitDocumentationLink>
+      </StyledLink>
     </Flex>
   </Flex>
 );

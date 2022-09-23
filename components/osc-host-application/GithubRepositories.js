@@ -35,11 +35,9 @@ const messages = defineMessages({
 /**
  * Component for displaying list of public repositories
  */
-const GithubRepositories = ({ repositories, submitGithubInfo, ...fieldProps }) => {
+const GithubRepositories = ({ repositories, setGithubInfo, disabled, setDisabled, ...fieldProps }) => {
   const { formatMessage } = useIntl();
   const [search, setSearch] = useState();
-  const [disabled, setDisabled] = useState(true);
-  const [githubInfo, setGithubInfo] = useState();
 
   if (search) {
     const test = new RegExp(escapeInput(search), 'i');
@@ -93,13 +91,16 @@ const GithubRepositories = ({ repositories, submitGithubInfo, ...fieldProps }) =
                 handle: `${value.owner.login}/${value.name}`,
                 repo: value.name,
               });
+            } else {
+              setDisabled(true);
+              setGithubInfo(null);
             }
           }}
           keyGetter="name"
         >
           {({ value, radio, checked }) => {
             return (
-              <RepositoryEntryContainer px={[2, 4]} py={3}>
+              <RepositoryEntryContainer px={[2, 4]} py={3} borderBottom="1px solid #E6E8EB">
                 <GithubRepositoryEntry
                   radio={radio}
                   value={value}
@@ -125,23 +126,6 @@ const GithubRepositories = ({ repositories, submitGithubInfo, ...fieldProps }) =
           }}
         </StyledRadioList>
       </StyledCard>
-      <Flex justifyContent="center">
-        <StyledButton
-          textAlign="center"
-          buttonSize="small"
-          minHeight="36px"
-          maxWidth="97px"
-          buttonStyle="primary"
-          disabled={disabled}
-          onClick={() => submitGithubInfo(githubInfo)}
-          m={2}
-          mt={4}
-          px={[2, 3]}
-          data-cy="connect-github-continue"
-        >
-          <FormattedMessage id="actions.continue" defaultMessage="Continue" />
-        </StyledButton>
-      </Flex>
     </Fragment>
   );
 };
