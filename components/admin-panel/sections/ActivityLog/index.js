@@ -18,11 +18,13 @@ import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
+import StyledButton from '../../../StyledButton';
 import StyledCard from '../../../StyledCard';
 import StyledLink from '../../../StyledLink';
 import { P, Span } from '../../../Text';
 
 import ActivityDescription from './ActivityDescription';
+import { DETAILED_ACTIVITY_TYPES } from './ActivityDetails';
 import ActivityFilters from './ActivityFilters';
 import { getActivityTypeFilterValuesFromKey, isSupportedActivityTypeFilter } from './ActivityTypeFilter';
 
@@ -293,6 +295,11 @@ const ActivityLog = ({ accountSlug }) => {
                     )}
                     •
                     <DateTime value={activity.createdAt} dateStyle="medium" />
+                    {DETAILED_ACTIVITY_TYPES.includes(activity.type) && (
+                      <StyledButton>
+                        <FormattedMessage id="viewDetails" defaultMessage="View Details" />
+                      </StyledButton>
+                    )}
                   </MetadataContainer>
                 </Box>
               ))}
