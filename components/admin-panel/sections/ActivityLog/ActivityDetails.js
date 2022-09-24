@@ -1,20 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ActivityTypes } from '../../../../lib/constants/activities';
+import { CollectiveEditedDetails } from './CollectiveEditedDetails';
 
-export const DETAILED_ACTIVITY_TYPES = [ActivityTypes.COLLECTIVE_EDITED];
+const ActivityDetailComponents = {
+  COLLECTIVE_EDITED: CollectiveEditedDetails,
+};
+
+export const DETAILED_ACTIVITY_TYPES = Object.keys(ActivityDetailComponents);
 
 const ActivityDetails = ({ activity }) => {
-  if (!DETAILED_ACTIVITY_TYPES.includes(activity.type)) {
-    return null;
-  }
-
-  return <div>ActivityDetails</div>;
+  const ActivityDetailsComponent = ActivityDetailComponents[activity.type];
+  return ActivityDetailsComponent ? <ActivityDetailsComponent activity={activity} /> : null;
 };
 
 ActivityDetails.propTypes = {
-  activity: PropTypes.shape({ type: PropTypes.string.isRequired }).isRequired,
+  activity: PropTypes.shape({ type: PropTypes.string.isRequired, data: PropTypes.object }).isRequired,
 };
 
 export default ActivityDetails;

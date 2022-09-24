@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import themeGet from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -12,7 +13,7 @@ import StyledLink from '../../../StyledLink';
 import { P, Span } from '../../../Text';
 
 import ActivityDescription from './ActivityDescription';
-import { DETAILED_ACTIVITY_TYPES } from './ActivityDetails';
+import ActivityDetails, { DETAILED_ACTIVITY_TYPES } from './ActivityDetails';
 
 const MetadataContainer = styled.div`
   display: flex;
@@ -29,7 +30,19 @@ const MetadataContainer = styled.div`
   }
 `;
 
+const DetailsContainer = styled.div`
+  width: 100%;
+  padding: 16px;
+  background: ${themeGet('colors.black.800')};
+  box-shadow: 0px 0px 6px 4px #1e1e1e inset;
+  color: white;
+  margin-top: 16px;
+  font-size: 12px;
+  border-radius: 4px;
+`;
+
 const ActivityListItem = ({ activity }) => {
+  const [showDetails, setShowDetails] = React.useState(false);
   return (
     <Box px="16px" py="14px">
       <P color="black.900" fontWeight="500" fontSize="14px">
@@ -63,11 +76,20 @@ const ActivityListItem = ({ activity }) => {
         •
         <DateTime value={activity.createdAt} dateStyle="medium" />
         {DETAILED_ACTIVITY_TYPES.includes(activity.type) && (
-          <StyledButton>
-            <FormattedMessage id="viewDetails" defaultMessage="View Details" />
+          <StyledButton ml={12} buttonSize="tiny" onClick={() => setShowDetails(!showDetails)}>
+            {!showDetails ? (
+              <FormattedMessage id="viewDetails" defaultMessage="View Details" />
+            ) : (
+              <FormattedMessage defaultMessage="Hide Details" />
+            )}
           </StyledButton>
         )}
       </MetadataContainer>
+      {showDetails && (
+        <DetailsContainer>
+          <ActivityDetails activity={activity} />
+        </DetailsContainer>
+      )}
     </Box>
   );
 };
