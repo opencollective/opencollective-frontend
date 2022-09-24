@@ -11,6 +11,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { getSupportedExpenseTypes } from '../../lib/expenses';
 import { requireFields } from '../../lib/form-utils';
+import { usePrevious } from '../../lib/hooks/usePrevious';
 import { flattenObjectDeep } from '../../lib/utils';
 import { checkRequiresAddress, validateExpenseTaxes } from './lib/utils';
 
@@ -208,7 +209,7 @@ const HiddenFragment = styled.div`
   display: ${({ show }) => (show ? 'block' : 'none')};
 `;
 
-const STEPS = {
+export const EXPENSE_FORM_STEPS = {
   PAYEE: 'PAYEE',
   EXPENSE: 'EXPENSE',
 };
@@ -218,6 +219,16 @@ const checkAddressValuesAreCompleted = values => {
     return values.payeeLocation?.country && values.payeeLocation?.address;
   }
   return true;
+};
+
+const getDefaultStep = (defaultStep, stepOneCompleted, isCreditCardCharge) => {
+  if (!stepOneCompleted) {
+    return EXPENSE_FORM_STEPS.PAYEE;
+  } else if (isCreditCardCharge) {
+    return EXPENSE_FORM_STEPS.EXPENSE;
+  } else {
+    return defaultStep || EXPENSE_FORM_STEPS.PAYEE;
+  }
 };
 
 const ExpenseFormBody = ({
@@ -233,6 +244,7 @@ const ExpenseFormBody = ({
   expensesTags,
   shouldLoadValuesFromPersister,
   isDraft,
+  defaultStep,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -254,7 +266,8 @@ const ExpenseFormBody = ({
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
 
-  const [step, setStep] = React.useState(stepOneCompleted || isCreditCardCharge ? STEPS.EXPENSE : STEPS.PAYEE);
+  const [step, setStep] = React.useState(() => getDefaultStep(defaultStep, stepOneCompleted, isCreditCardCharge));
+
   // Only true when logged in and drafting the expense
   const [isOnBehalf, setOnBehalf] = React.useState(false);
   const [showResetModal, setShowResetModal] = React.useState(false);
@@ -298,9 +311,10 @@ const ExpenseFormBody = ({
   }, [values.payee]);
 
   // Return to Payee step if type is changed and reset some values
+  const previousType = usePrevious(values.type);
   React.useEffect(() => {
-    if (!isCreditCardCharge) {
-      setStep(STEPS.PAYEE);
+    if (!isCreditCardCharge && previousType && values.type !== previousType) {
+      setStep(EXPENSE_FORM_STEPS.PAYEE);
       setOnBehalf(false);
 
       if (!isDraft && values.payee?.isInvite) {
@@ -356,7 +370,7 @@ const ExpenseFormBody = ({
         collective={collective}
         formik={formik}
         onCancel={onCancel}
-        onNext={() => setStep(STEPS.EXPENSE)}
+        onNext={() => setStep(EXPENSE_FORM_STEPS.EXPENSE)}
       />
     );
   } else if (isOnBehalf === true && isNewUser) {
@@ -365,7 +379,7 @@ const ExpenseFormBody = ({
         collective={collective}
         formik={formik}
         onBack={() => {
-          setStep(STEPS.PAYEE);
+          setStep(EXPENSE_FORM_STEPS.PAYEE);
           setOnBehalf(false);
           formik.setFieldValue('payee', null);
           formik.setFieldValue('payoutMethod', null);
@@ -377,7 +391,7 @@ const ExpenseFormBody = ({
           if (!isEmpty(errors)) {
             formik.setErrors(errors);
           } else {
-            setStep(STEPS.EXPENSE);
+            setStep(EXPENSE_FORM_STEPS.EXPENSE);
           }
         }}
         payoutProfiles={payoutProfiles}
@@ -399,7 +413,7 @@ const ExpenseFormBody = ({
           const shouldSkipValidation = isOnBehalf && isEmpty(values.payoutMethod);
           const validation = !shouldSkipValidation && validatePayoutMethod(values.payoutMethod);
           if (isEmpty(validation)) {
-            setStep(STEPS.EXPENSE);
+            setStep(EXPENSE_FORM_STEPS.EXPENSE);
           } else {
             setErrors({ payoutMethod: validation });
           }
@@ -427,7 +441,7 @@ const ExpenseFormBody = ({
       {isRecurring && <ExpenseRecurringBanner expense={expense} />}
       {values.type && (
         <StyledCard mt={4} p={[16, 16, 32]} overflow="initial">
-          {step === STEPS.PAYEE ? (
+          {step === EXPENSE_FORM_STEPS.PAYEE ? (
             <div>
               <Flex alignItems="center" mb={16}>
                 <Span color="black.900" fontSize="18px" lineHeight="26px" fontWeight="bold">
@@ -440,7 +454,7 @@ const ExpenseFormBody = ({
               </Flex>
               {payeeForm}
             </div>
-          ) : step === STEPS.EXPENSE ? (
+          ) : step === EXPENSE_FORM_STEPS.EXPENSE ? (
             <div>
               <Flex alignItems="center" mb={10}>
                 <P
@@ -592,7 +606,7 @@ const ExpenseFormBody = ({
                       if (isCreditCardCharge) {
                         onCancel();
                       } else {
-                        setStep(STEPS.PAYEE);
+                        setStep(EXPENSE_FORM_STEPS.PAYEE);
                       }
                     }}
                   >
@@ -641,7 +655,7 @@ const ExpenseFormBody = ({
                         if (editingExpense) {
                           onCancel();
                         } else {
-                          setStep(STEPS.PAYEE);
+                          setStep(EXPENSE_FORM_STEPS.PAYEE);
                           resetForm({ values: getDefaultExpense(collective) });
                           if (formPersister) {
                             formPersister.clearValues();
@@ -677,7 +691,7 @@ const ExpenseFormBody = ({
           ) : null}
         </StyledCard>
       )}
-      {step === STEPS.EXPENSE && (
+      {step === EXPENSE_FORM_STEPS.EXPENSE && (
         <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
           <ExpensePayeeDetails expense={formik.values} host={collective.host} borderless collective={collective} />
         </StyledCard>
@@ -693,6 +707,8 @@ ExpenseFormBody.propTypes = {
   shouldLoadValuesFromPersister: PropTypes.bool,
   onCancel: PropTypes.func,
   formPersister: PropTypes.object,
+  /** Defines the default selected step, if accessible (previous steps need to be completed) */
+  defaultStep: PropTypes.oneOf(Object.values(EXPENSE_FORM_STEPS)),
   loggedInAccount: PropTypes.object,
   loading: PropTypes.bool,
   isDraft: PropTypes.bool,
@@ -751,6 +767,7 @@ const ExpenseForm = ({
   loading,
   expensesTags,
   shouldLoadValuesFromPersister,
+  defaultStep,
 }) => {
   const isDraft = expense?.status === expenseStatus.DRAFT;
   const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
@@ -796,6 +813,7 @@ const ExpenseForm = ({
           loading={loading}
           shouldLoadValuesFromPersister={shouldLoadValuesFromPersister}
           isDraft={isDraft}
+          defaultStep={defaultStep}
         />
       )}
     </Formik>
@@ -813,6 +831,8 @@ ExpenseForm.propTypes = {
   loggedInAccount: PropTypes.object,
   loading: PropTypes.bool,
   expensesTags: PropTypes.arrayOf(PropTypes.string),
+  /** Defines the default selected step, if accessible (previous steps need to be completed) */
+  defaultStep: PropTypes.oneOf(Object.values(EXPENSE_FORM_STEPS)),
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
