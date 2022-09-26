@@ -4,27 +4,21 @@ import { useMutation } from '@apollo/client';
 import { Lock } from '@styled-icons/boxicons-solid/Lock';
 import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
-import { Question } from '@styled-icons/remix-line/Question';
 import { Form, Formik } from 'formik';
-import { get, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { suggestSlug } from '../../lib/collective.lib';
 import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
-import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyChecked, verifyEmailPattern, verifyFieldLength } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
-import { i18nOSCApplicationFormLabel } from '../../lib/i18n/osc-form';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
-import OCFHostApplicationFAQ from '../faqs/OCFHostApplicationFAQ';
 import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
-import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import OnboardingProfileCard from '../onboarding-modal/OnboardingProfileCard';
@@ -33,12 +27,10 @@ import StyledLink from '../StyledLink';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
-import StyledInputAmount from '../StyledInputAmount';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledTextarea from '../StyledTextarea';
-import StyledTooltip from '../StyledTooltip';
-import { H1, H4, H5, P } from '../Text';
+import { H1, H4, P } from '../Text';
 
 const createCollectiveMutation = gqlV2/* GraphQL */ `
   mutation CreateCollective(
@@ -101,7 +93,6 @@ const LABEL_STYLES = { fontWeight: 500, fontSize: '14px', lineHeight: '17px' };
 
 const messages = defineMessages({
   nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: 'Collective Name' },
-  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
   suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
   descriptionLabel: {
     id: 'createCollective.form.descriptionLabel',
@@ -128,13 +119,12 @@ const messages = defineMessages({
     id: 'Form.yourEmail',
     defaultMessage: 'Your email address',
   },
-
   slug: {
     id: 'createCollective.form.slugLabel',
     defaultMessage: 'Set your URL',
   },
   collectiveDescription: {
-    // id: 'OCFHostApplication.initiativeDescription.label',
+    id: 'createCollective.form.descriptionLabel',
     defaultMessage: 'What does your Collective do?',
   },
 });
@@ -143,17 +133,6 @@ const useApplicationMutation = canApplyWithCollective =>
   useMutation(canApplyWithCollective ? applyToHostMutation : createCollectiveMutation, {
     context: API_V2_CONTEXT,
   });
-
-const prepareApplicationData = applicationData => {
-  const formattedApplicationData = { ...applicationData, githubHandle: 'hay/hellu' };
-  APPLICATION_DATA_AMOUNT_FIELDS.forEach(key => {
-    if (!isNil(applicationData[key])) {
-      formattedApplicationData[key] = formatCurrency(applicationData[key], 'USD');
-    }
-  });
-
-  return formattedApplicationData;
-};
 
 const ApplicationForm = ({
   LoggedInUser,
@@ -193,7 +172,7 @@ const ApplicationForm = ({
       },
       host: { legacyId: OPENSOURCE_COLLECTIVE_ID },
       user,
-      applicationData: prepareApplicationData(applicationData),
+      applicationData: { ...applicationData, githubHandle: githubInfo.handle },
       inviteMembers: inviteMembers.map(invite => ({
         ...invite,
         memberAccount: { legacyId: invite.memberAccount.id },
@@ -399,7 +378,7 @@ const ApplicationForm = ({
                           </Box>
                           <Box width={['256px', '234px', '324px']} my={2}>
                             <StyledInputFormikField
-                              label={i18nOSCApplicationFormLabel(intl, 'slug')}
+                              label={intl.formatMessage(messages.slug)}
                               helpText={<FormattedMessage defaultMessage="This can be edited later" />}
                               labelFontSize="13px"
                               labelColor="#4E5052"
