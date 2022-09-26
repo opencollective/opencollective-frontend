@@ -67,7 +67,7 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
             textAlign={['center', 'left']}
             mb="14px"
           >
-            <FormattedMessage id="OSCHostApplication.title" defaultMessage="Apply with your Collective" />
+            <FormattedMessage id="OSCHostApplication.header" defaultMessage="Apply with your Collective" />
           </H1>
           <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
             <FormattedMessage

@@ -92,7 +92,7 @@ export const APPLICATION_DATA_AMOUNT_FIELDS = ['totalAmountRaised', 'totalAmount
 const LABEL_STYLES = { fontWeight: 500, fontSize: '14px', lineHeight: '17px' };
 
 const messages = defineMessages({
-  nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: 'Collective Name' },
+  nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: 'Collective name' },
   suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
   descriptionLabel: {
     id: 'createCollective.form.descriptionLabel',
@@ -214,11 +214,11 @@ const ApplicationForm = ({
               textAlign={['center', 'left']}
               mb="14px"
             >
-              <FormattedMessage id="OSCHostApplication.title" defaultMessage="Apply with your Collective" />
+              <FormattedMessage id="OSCHostApplication.header" defaultMessage="Apply with your Collective" />
             </H1>
             <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
               <FormattedMessage
-                // id="createcollective.opensource.p2"
+                id="OSCHostApplication.form.subheader"
                 defaultMessage="Introduce your Collective, please incude as much context as possible so we can give you the best service we can! Have doubts? {faqLink}"
                 values={{
                   faqLink: (
