@@ -23,6 +23,7 @@ class ConnectGithub extends React.Component {
   static propTypes = {
     router: PropTypes.object.isRequired,
     setGithubInfo: PropTypes.func.isRequired,
+    githubInfo: PropTypes.object,
   };
 
   constructor(props) {
@@ -165,7 +166,7 @@ class ConnectGithub extends React.Component {
                   textAlign="center"
                   buttonSize="large"
                   buttonStyle="purple"
-                  disabled={!this.state.githubInfo}
+                  disabled={!this.props.githubInfo}
                   onClick={() => {
                     this.props.router.push(nextLinkPath);
                   }}
