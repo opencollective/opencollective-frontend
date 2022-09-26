@@ -279,7 +279,7 @@ const ApplicationForm = ({
                 }
 
                 return (
-                  <Form>
+                  <Form data-cy="ccf-form">
                     <Container
                       justifyContent="center"
                       flexDirection="column"
@@ -414,6 +414,7 @@ const ApplicationForm = ({
                           name="collective.description"
                           htmlFor="initiativeDescription"
                           required
+                          data-cy="ccf-form-description"
                         >
                           {({ field }) => (
                             <StyledTextarea
@@ -561,6 +562,7 @@ const ApplicationForm = ({
                                 checked={field.value}
                                 onChange={({ checked }) => setFieldValue(field.name, checked)}
                                 error={field.error}
+                                data-cy="checkbox-tos"
                                 label={
                                   <P ml={1} fontSize="12px" lineHeight="16px" fontWeight="400" color="black.800">
                                     <FormattedMessage
@@ -604,6 +606,7 @@ const ApplicationForm = ({
                         buttonStyle="purple"
                         onSubmit={handleSubmit}
                         loading={submitting}
+                        data-cy="ccf-form-submit"
                       >
                         <FormattedMessage id="actions.submitApplication" defaultMessage="Submit application" />
                         &nbsp;
