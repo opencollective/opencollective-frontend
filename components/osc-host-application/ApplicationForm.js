@@ -76,7 +76,6 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
     $message: String
     $applicationData: JSON
     $inviteMembers: [InviteMemberInput]
-    $automateApprovalWithGithub: Boolean
   ) {
     applyToHost(
       collective: $collective
@@ -84,7 +83,6 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
       message: $message
       applicationData: $applicationData
       inviteMembers: $inviteMembers
-      automateApprovalWithGithub: $automateApprovalWithGithub
     ) {
       id
       slug
@@ -147,7 +145,7 @@ const useApplicationMutation = canApplyWithCollective =>
   });
 
 const prepareApplicationData = applicationData => {
-  const formattedApplicationData = { ...applicationData };
+  const formattedApplicationData = { ...applicationData, githubHandle: 'hay/hellu' };
   APPLICATION_DATA_AMOUNT_FIELDS.forEach(key => {
     if (!isNil(applicationData[key])) {
       formattedApplicationData[key] = formatCurrency(applicationData[key], 'USD');
@@ -191,9 +189,7 @@ const ApplicationForm = ({
   const submit = async ({ user, collective, applicationData, inviteMembers, message }) => {
     const variables = {
       collective: {
-        ...collective,
-        ...(canApplyWithCollective && { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug }),
-        ...(githubInfo && { githubHandle: githubInfo.handle }),
+        ...(canApplyWithCollective ? { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug } : collective),
       },
       host: { legacyId: OPENSOURCE_COLLECTIVE_ID },
       user,
@@ -203,7 +199,7 @@ const ApplicationForm = ({
         memberAccount: { legacyId: invite.memberAccount.id },
       })),
       message,
-      automateApprovalWithGithub: githubInfo ? true : false,
+      ...(!canApplyWithCollective && { automateApprovalWithGithub: githubInfo ? true : false }),
     };
 
     const response = await submitApplication({ variables });
