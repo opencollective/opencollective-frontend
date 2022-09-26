@@ -29,6 +29,7 @@ export const editAccountFlagsMutation = gqlV2/* GraphQL */ `
       isTrustedHost: $isTrustedHost
     ) {
       id
+      slug
     }
   }
 `;
@@ -59,6 +60,8 @@ const AccountSettings = () => {
             onChange={setSelectedAccountOption}
             includeDeleted={true}
             includeArchived={true}
+            value={selectedAccountOption}
+            noCache
           />
         )}
       </StyledInputField>
@@ -119,7 +122,7 @@ const AccountSettings = () => {
         loading={loading}
         onClick={async () => {
           try {
-            await editAccountFlags({
+            const result = await editAccountFlags({
               variables: {
                 account: { slug: selectedAccountOption?.value?.slug },
                 isBanned: bannedFlag,
@@ -128,11 +131,26 @@ const AccountSettings = () => {
                 isTrustedHost: trustedHostFlag,
               },
             });
-            addToast({
-              type: TOAST_TYPE.SUCCESS,
-              title: 'Success',
-              message: <FormattedMessage defaultMessage="Account settings saved" />,
-            });
+            const newSlug = result?.data?.editAccountFlags?.slug;
+            if (newSlug !== selectedAccountOption?.value?.slug) {
+              addToast({
+                type: TOAST_TYPE.SUCCESS,
+                title: 'Success',
+                message: (
+                  <FormattedMessage
+                    defaultMessage="Account has been {deletedFlag, select, true {deleted} other {restored}}. Slug renamed to {newSlug}"
+                    values={{ newSlug, deletedFlag }}
+                  />
+                ),
+              });
+              setSelectedAccountOption([]);
+            } else {
+              addToast({
+                type: TOAST_TYPE.SUCCESS,
+                title: 'Success',
+                message: <FormattedMessage defaultMessage="Account flags saved" />,
+              });
+            }
           } catch (e) {
             addToast({
               type: TOAST_TYPE.ERROR,
