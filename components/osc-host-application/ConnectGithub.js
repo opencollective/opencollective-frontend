@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { themeGet } from '@styled-system/theme-get';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 import { getGithubRepos } from '../../lib/api';
 
