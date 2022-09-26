@@ -33,7 +33,7 @@ const messages = defineMessages({
 /**
  * Component for displaying list of public repositories
  */
-const GithubRepositories = ({ repositories, setGithubInfo, disabled, setDisabled, ...fieldProps }) => {
+const GithubRepositories = ({ repositories, setGithubInfo, ...fieldProps }) => {
   const { formatMessage } = useIntl();
   const [search, setSearch] = useState();
 
@@ -84,13 +84,11 @@ const GithubRepositories = ({ repositories, setGithubInfo, disabled, setDisabled
           options={repositories}
           onChange={({ value }) => {
             if (value.owner.type === 'User') {
-              setDisabled(false);
               setGithubInfo({
                 handle: `${value.owner.login}/${value.name}`,
                 repo: value.name,
               });
             } else {
-              setDisabled(true);
               setGithubInfo(null);
             }
           }}
@@ -105,13 +103,11 @@ const GithubRepositories = ({ repositories, setGithubInfo, disabled, setDisabled
                   checked={checked}
                   changeRepoInfo={(type, value) => {
                     if (type === 'repository') {
-                      setDisabled(false);
                       setGithubInfo({
                         handle: `${value.owner.login}/${value.name}`,
                         repo: value.name,
                       });
                     } else {
-                      setDisabled(false);
                       setGithubInfo({
                         handle: value.owner.login,
                         repo: value.name,

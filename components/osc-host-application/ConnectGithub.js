@@ -7,8 +7,8 @@ import styled from 'styled-components';
 
 import { getGithubRepos } from '../../lib/api';
 
-import GithubRepositoriesFAQ from '../faqs/GithubRepositoriesFAQ';
 import NextIllustration from '../collectives/HomeNextIllustration';
+import GithubRepositoriesFAQ from '../faqs/GithubRepositoriesFAQ';
 import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
@@ -20,11 +20,6 @@ import StyledLink from '../StyledLink';
 import { H1, P } from '../Text';
 
 import GithubRepositories from './GithubRepositories';
-
-const BackButton = styled(StyledButton)`
-  color: ${themeGet('colors.black.600')};
-  font-size: 14px;
-`;
 
 class ConnectGithub extends React.Component {
   static propTypes = {
@@ -39,7 +34,6 @@ class ConnectGithub extends React.Component {
       loadingRepos: false,
       repositories: [],
       error: null,
-      disabledContinue: true,
     };
   }
 
@@ -63,12 +57,6 @@ class ConnectGithub extends React.Component {
       });
     }
   }
-
-  setDisabled = disabled => {
-    this.setState({
-      disabledContinue: disabled,
-    });
-  };
 
   render() {
     const { repositories, loadingRepos, error } = this.state;
@@ -160,8 +148,6 @@ class ConnectGithub extends React.Component {
                     {...fieldProps}
                     repositories={repositories}
                     setGithubInfo={githubInfo => this.props.setGithubInfo(githubInfo)}
-                    disabled={this.state.disabledContinue}
-                    setDisabled={this.setDisabled}
                   />
                 )}
               </StyledInputField>
@@ -180,7 +166,7 @@ class ConnectGithub extends React.Component {
                   textAlign="center"
                   buttonSize="large"
                   buttonStyle="purple"
-                  disabled={this.state.disabledContinue}
+                  disabled={!this.state.githubInfo}
                   onClick={() => {
                     this.props.router.push(nextLinkPath);
                   }}
