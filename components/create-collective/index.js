@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
@@ -14,8 +13,6 @@ import MessageBox from '../MessageBox';
 import SignInOrJoinFree from '../SignInOrJoinFree';
 import { H1, P } from '../Text';
 import { withUser } from '../UserProvider';
-import ConnectGithub from '../osc-host-application/ConnectGithub';
-import CreateOpenSourceCollective from '../osc-host-application/CreateOpenSourceCollective';
 
 import CollectiveCategoryPicker from './CollectiveCategoryPicker';
 import CreateCollectiveForm from './CreateCollectiveForm';
@@ -149,14 +146,6 @@ class CreateCollective extends Component {
 
     if (!host && !category) {
       return <CollectiveCategoryPicker />;
-    }
-
-    if ((category === 'opensource' || get(host, 'slug') === 'opensource') && step !== 'form') {
-      if (token) {
-        return <ConnectGithub updateGithubInfo={githubInfo => this.setState({ githubInfo })} />;
-      } else {
-        return <CreateOpenSourceCollective />;
-      }
     }
 
     return (

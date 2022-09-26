@@ -8,7 +8,6 @@ import { CollectiveType } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
-import AboutOurFees from '../components/osc-host-application/AboutOurFees';
 import ApplicationForm from '../components/osc-host-application/ApplicationForm';
 import TermsOfFiscalSponsorship from '../components/osc-host-application/TermsOfFiscalSponsorship';
 import ConnectGithub from '../components/osc-host-application/ConnectGithub';
@@ -140,7 +139,6 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
       {step === 'pick-repo' && (
         <ConnectGithub setGithubInfo={info => setGithubInfo(info)} router={router} githubInfo={githubInfo} />
       )}
-      {/* {step === 'fees' && <AboutOurFees />} */}
       {step === 'form' && (
         <ApplicationForm
           initialValues={initialValues}
