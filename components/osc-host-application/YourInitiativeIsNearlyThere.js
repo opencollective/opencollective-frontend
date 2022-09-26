@@ -44,7 +44,7 @@ const YourInitiativeIsNearlyThere = () => (
         </H1>
         <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.800">
           <FormattedMessage
-            id="OCFHostApplication.yourInitiativeIsNearlyThere.description"
+            id="HostApplication.yourInitiativeIsNearlyThere.description"
             defaultMessage="We will review it and let you know by mail if we need you for anything during the process. {lineBreak}{lineBreak} In the meantime, you can use these useful links."
             values={{
               lineBreak: <br />,

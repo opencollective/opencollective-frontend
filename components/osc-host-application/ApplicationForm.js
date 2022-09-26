@@ -214,16 +214,16 @@ const ApplicationForm = ({
               textAlign={['center', 'left']}
               mb="14px"
             >
-              <FormattedMessage id="OSCHostApplication.header" defaultMessage="Apply with your Collective" />
+              <FormattedMessage id="HostApplication.header" defaultMessage="Apply with your Collective" />
             </H1>
             <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
               <FormattedMessage
-                id="OSCHostApplication.form.subheader"
+                id="HostApplication.applicationForm.subheading"
                 defaultMessage="Introduce your Collective, please incude as much context as possible so we can give you the best service we can! Have doubts? {faqLink}"
                 values={{
                   faqLink: (
                     <StyledLink href="https://docs.oscollective.org/faq/general" openInNewTab color="purple.500">
-                      <FormattedMessage defaultMessage="Read our FAQs" />
+                      <FormattedMessage id="HostApplication.applicationForm.readFaqs" defaultMessage="Read our FAQs" />
                     </StyledLink>
                   ),
                 }}
@@ -295,7 +295,7 @@ const ApplicationForm = ({
                         <Flex alignItems="center" justifyContent="stretch" gap={6}>
                           <H4 fontSize="18px" lineHeight="24px" color="black.900" mb={2}>
                             <FormattedMessage
-                              // id="OCFHostApplication.applicationForm.title"
+                              id="HostApplication.applicationForm.mainInfo"
                               defaultMessage="Main info {padlock}"
                               values={{
                                 padlock: <Lock size="12px" color="#9D9FA3" />,
@@ -306,7 +306,7 @@ const ApplicationForm = ({
                         </Flex>
                         <P fontSize="12px" lineHeight="16px" color="black.600">
                           <FormattedMessage
-                            // id="OCFHostApplication.applicationForm.instruction"
+                            id="HostApplication.applicationForm.privateInformation"
                             defaultMessage="This information is private. We only use it to check your eligibility and legitimacy."
                           />
                         </P>
@@ -432,7 +432,7 @@ const ApplicationForm = ({
                         <Flex alignItems="center" justifyContent="stretch" gap={6}>
                           <H4 fontSize="18px" lineHeight="24px" color="black.900" mb={2}>
                             <FormattedMessage
-                              // id="OCFHostApplication.applicationForm.title"
+                              id="HostApplication.applicationForm.team"
                               defaultMessage="Your team {padlock}"
                               values={{
                                 padlock: <Lock size="12px" color="#9D9FA3" />,
@@ -443,7 +443,7 @@ const ApplicationForm = ({
                         </Flex>
                         <P fontSize="12px" lineHeight="16px" color="black.600">
                           <FormattedMessage
-                            // id="OCFHostApplication.applicationForm.instruction"
+                            id="HostApplication.applicationForm.privateInformation"
                             defaultMessage="This information is private. We only use it to check your eligibility and legitimacy."
                           />
                         </P>
@@ -451,7 +451,7 @@ const ApplicationForm = ({
 
                       <Box width={['256px', '484px', '663px']} my={2}>
                         <H4 fontSize="16px" lineHeight="24px" color="black.800" mb={0}>
-                          <FormattedMessage id="AddedAdministrators" defaultMessage="Added administrators" />
+                          <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
                         </H4>
 
                         {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
@@ -489,7 +489,7 @@ const ApplicationForm = ({
 
                         <Box>
                           <H4 mt={2} fontSize="16px" color="black.800">
-                            <FormattedMessage id="InviteAdministrators" defaultMessage="Invite administrators" />
+                            <FormattedMessage id="InviteAdministrators" defaultMessage="Invite Administrators" />
                           </H4>
                           <CollectivePickerAsync
                             inputId="onboarding-admin-picker"
@@ -605,7 +605,7 @@ const ApplicationForm = ({
                         onSubmit={handleSubmit}
                         loading={submitting}
                       >
-                        <FormattedMessage defaultMessage="Submit application" />
+                        <FormattedMessage id="actions.submitApplication" defaultMessage="Submit application" />
                         &nbsp;
                         <ArrowRight2 size="14px" />
                       </StyledButton>
