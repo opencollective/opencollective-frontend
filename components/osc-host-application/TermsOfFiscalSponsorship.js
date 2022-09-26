@@ -53,7 +53,7 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
         <Box width={'160px'} height={'160px'} mb="24px">
           <NextIllustration
             alt="Open Source Collective logotype"
-            src="/static/images/new-home/osc-logo.png"
+            src="/static/images/osc-logo.png"
             width={160}
             height={160}
           />

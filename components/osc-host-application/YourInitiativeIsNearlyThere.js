@@ -30,7 +30,7 @@ const YourInitiativeIsNearlyThere = () => (
       >
         <NextIllustration
           alt="Open Source Collective logotype"
-          src="/static/images/new-home/osc-logo.png"
+          src="/static/images/osc-logo.png"
           width={240}
           height={240}
         />
