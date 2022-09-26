@@ -561,7 +561,7 @@ const ApplicationForm = ({
                         </P>
                         <Flex mt={1} width="100%">
                           <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
-                            <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
+                            <FormattedMessage id="AddedAdministrators" defaultMessage="Added administrators" />
                             {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
                               ` (${1 + values.inviteMembers?.length}/${
                                 host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins
