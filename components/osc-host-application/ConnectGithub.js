@@ -83,6 +83,7 @@ class ConnectGithub extends React.Component {
                 color="black.900"
                 textAlign={['center', 'left']}
                 mb="14px"
+                data-cy="connect-github-header"
               >
                 <FormattedMessage id="openSourceApply.GithubRepositories.title" defaultMessage="Pick a repository" />
               </H1>
