@@ -28,8 +28,11 @@ const messages = defineMessages({
 const FISCAL_SPONSOR_TERMS =
   'https://docs.google.com/document/u/1/d/e/2PACX-1vQbiyK2Fe0jLdh4vb9BfHY4bJ1LCo4Qvy0jg9P29ZkiC8y_vKJ_1fNgIbV0p6UdvbcT8Ql1gVto8bf9/pub';
 
-const getGithubConnectUrl = () => {
-  const urlParams = new URLSearchParams({ context: 'createCollective' });
+const getGithubConnectUrl = collectiveSlug => {
+  const urlParams = new URLSearchParams({
+    context: 'createCollective',
+    ...(collectiveSlug ? { CollectiveId: collectiveSlug } : null),
+  });
 
   const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
   if (accessToken) {
@@ -42,10 +45,7 @@ const getGithubConnectUrl = () => {
 const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
   const { formatMessage } = useIntl();
 
-  const { query } = useRouter();
-  const nextLinkPath = query.collectiveSlug
-    ? `/opensource/apply/fees?collectiveSlug=${query.collectiveSlug}`
-    : '/opensource/apply/fees';
+  const router = useRouter();
   const [error, setError] = useState();
 
   return (
@@ -116,7 +116,7 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
               if (!checked) {
                 setError(formatMessage(messages.acceptTermsOfFiscalSponsorship));
               } else {
-                window.location.href = getGithubConnectUrl();
+                window.location.href = getGithubConnectUrl(router.query.collectiveSlug);
               }
             }}
           >

@@ -64,12 +64,6 @@ class ConnectGithub extends React.Component {
     }
   }
 
-  changeRoute = async ({ step }) => {
-    const route = ['opensource', 'apply', step].filter(Boolean).join('/');
-    await this.props.router.push(`/${route}`);
-    window.scrollTo(0, 0);
-  };
-
   setDisabled = disabled => {
     this.setState({
       disabledContinue: disabled,
@@ -78,6 +72,10 @@ class ConnectGithub extends React.Component {
 
   render() {
     const { repositories, loadingRepos, error } = this.state;
+    const { query } = this.props.router;
+    const nextLinkPath = query.collectiveSlug
+      ? `/opensource/apply/form?collectiveSlug=${query.collectiveSlug}`
+      : '/opensource/apply/form';
 
     return (
       <Flex flexDirection="column" m={[3, 0]} mb={4}>
@@ -108,7 +106,11 @@ class ConnectGithub extends React.Component {
                   defaultMessage="Don't see the repository you're looking for? {helplink}."
                   values={{
                     helplink: (
-                      <StyledLink href="https://docs.opencollective.com/help/collectives/osc-verification" openInNewTab>
+                      <StyledLink
+                        href="https://docs.opencollective.com/help/collectives/osc-verification"
+                        openInNewTab
+                        color="purple.500"
+                      >
                         <FormattedMessage id="getHelp" defaultMessage="Get help" />
                       </StyledLink>
                     ),
@@ -122,10 +124,12 @@ class ConnectGithub extends React.Component {
                     ApplyLink: getI18nLink({
                       as: Link,
                       href: { pathname: `/opensource/create/form`, query: { hostTos: true } },
+                      color: 'purple.500',
                     }),
                     AltVerificationLink: getI18nLink({
                       openInNewTab: true,
                       href: 'https://www.oscollective.org/#criteria',
+                      color: 'purple.500',
                     }),
                   }}
                 />
@@ -178,7 +182,7 @@ class ConnectGithub extends React.Component {
                   buttonStyle="purple"
                   disabled={this.state.disabledContinue}
                   onClick={() => {
-                    this.changeRoute({ verb: 'apply', step: 'form' });
+                    this.props.router.push(nextLinkPath);
                   }}
                   data-cy="connect-github-continue"
                 >

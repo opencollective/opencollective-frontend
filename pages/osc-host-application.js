@@ -88,7 +88,7 @@ const formValues = {
   inviteMembers: [],
 };
 
-const OCFHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
+const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
   const [checkedTermsOfFiscalSponsorship, setCheckedTermsOfFiscalSponsorship] = useState(false);
   const [githubInfo, setGithubInfo] = useState(null);
   const [initialValues, setInitialValues] = useState(formValues);
@@ -165,9 +165,9 @@ const OCFHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
   );
 };
 
-OCFHostApplication.propTypes = {
+OSCHostApplication.propTypes = {
   loadingLoggedInUser: PropTypes.bool,
   LoggedInUser: PropTypes.object,
 };
 
-export default withUser(OCFHostApplication);
+export default withUser(OSCHostApplication);
