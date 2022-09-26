@@ -256,6 +256,7 @@ ConfirmButtons.propTypes = {
   canSubmit: PropTypes.bool,
   canCancel: PropTypes.bool,
   isOCFHost: PropTypes.bool,
+  isOSCHost: PropTypes.bool,
 };
 
 /**
@@ -482,7 +483,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                           </StyledInputFormikField>
                         </Box>
                         {!isOSCHost && (
-                          <>
+                          <React.Fragment>
                             <StyledHr my="18px" width="100%" borderColor="black.300" />
                             <Box>
                               <P fontSize="13px" lineHeight="16px" fontWeight="600" color="black.700">
@@ -634,7 +635,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                 )}
                               </StyledInputFormikField>
                             )}
-                          </>
+                          </React.Fragment>
                         )}
 
                         {error && (

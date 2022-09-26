@@ -23,12 +23,12 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import OnboardingProfileCard from '../onboarding-modal/OnboardingProfileCard';
 import StyledButton from '../StyledButton';
-import StyledLink from '../StyledLink';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
+import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { H1, H4, P } from '../Text';
 
@@ -218,7 +218,7 @@ const ApplicationForm = ({
             </H1>
             <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
               <FormattedMessage
-                //id="createcollective.opensource.p2"
+                // id="createcollective.opensource.p2"
                 defaultMessage="Introduce your Collective, please incude as much context as possible so we can give you the best service we can! Have doubts? {faqLink}"
                 values={{
                   faqLink: (
@@ -295,7 +295,7 @@ const ApplicationForm = ({
                         <Flex alignItems="center" justifyContent="stretch" gap={6}>
                           <H4 fontSize="18px" lineHeight="24px" color="black.900" mb={2}>
                             <FormattedMessage
-                              //id="OCFHostApplication.applicationForm.title"
+                              // id="OCFHostApplication.applicationForm.title"
                               defaultMessage="Main info {padlock}"
                               values={{
                                 padlock: <Lock size="12px" color="#9D9FA3" />,
@@ -306,7 +306,7 @@ const ApplicationForm = ({
                         </Flex>
                         <P fontSize="12px" lineHeight="16px" color="black.600">
                           <FormattedMessage
-                            //id="OCFHostApplication.applicationForm.instruction"
+                            // id="OCFHostApplication.applicationForm.instruction"
                             defaultMessage="This information is private. We only use it to check your eligibility and legitimacy."
                           />
                         </P>
@@ -432,7 +432,7 @@ const ApplicationForm = ({
                         <Flex alignItems="center" justifyContent="stretch" gap={6}>
                           <H4 fontSize="18px" lineHeight="24px" color="black.900" mb={2}>
                             <FormattedMessage
-                              //id="OCFHostApplication.applicationForm.title"
+                              // id="OCFHostApplication.applicationForm.title"
                               defaultMessage="Your team {padlock}"
                               values={{
                                 padlock: <Lock size="12px" color="#9D9FA3" />,
@@ -443,7 +443,7 @@ const ApplicationForm = ({
                         </Flex>
                         <P fontSize="12px" lineHeight="16px" color="black.600">
                           <FormattedMessage
-                            //id="OCFHostApplication.applicationForm.instruction"
+                            // id="OCFHostApplication.applicationForm.instruction"
                             defaultMessage="This information is private. We only use it to check your eligibility and legitimacy."
                           />
                         </P>

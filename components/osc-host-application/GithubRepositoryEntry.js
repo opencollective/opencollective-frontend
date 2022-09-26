@@ -2,7 +2,6 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Star } from '@styled-icons/fa-solid/Star';
-//import { Star } from '@styled-icons/boxicons-regular/Star';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';

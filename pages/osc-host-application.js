@@ -9,8 +9,8 @@ import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 
 import ApplicationForm from '../components/osc-host-application/ApplicationForm';
-import TermsOfFiscalSponsorship from '../components/osc-host-application/TermsOfFiscalSponsorship';
 import ConnectGithub from '../components/osc-host-application/ConnectGithub';
+import TermsOfFiscalSponsorship from '../components/osc-host-application/TermsOfFiscalSponsorship';
 import YourInitiativeIsNearlyThere from '../components/osc-host-application/YourInitiativeIsNearlyThere';
 import Page from '../components/Page';
 import { TOAST_TYPE, useToasts } from '../components/ToastProvider';

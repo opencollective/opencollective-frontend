@@ -17,24 +17,6 @@ const Link = styled(StyledLink)`
   font-weight: 400;
 `;
 
-const VisitDocumentationLink = styled(StyledLink)`
-  background: linear-gradient(180deg, #4f7d7f 0%, #396c6f 100%);
-  border-color: transparent;
-  white-space: nowrap;
-  color: #ffffff;
-  &:focus {
-    border: solid 2px #90f0bd;
-    background: linear-gradient(to bottom, #7a9899, #527d80 99%);
-  }
-  &:active {
-    background: linear-gradient(to bottom, #7a9899, #527d80 99%);
-  }
-  &:hover {
-    border-color: transparent;
-    background: linear-gradient(to bottom, #7a9899, #527d80 99%);
-  }
-`;
-
 const YourInitiativeIsNearlyThere = () => (
   <Flex flexDirection="column" alignItems="center" justifyContent="center" mt={['24px', '48px']}>
     <Flex flexDirection={'column'} alignItems="center" justifyContent="center" mb={[null, 3]}>
@@ -62,7 +44,7 @@ const YourInitiativeIsNearlyThere = () => (
         </H1>
         <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.800">
           <FormattedMessage
-            //id="OCFHostApplication.yourInitiativeIsNearlyThere.description"
+            id="OCFHostApplication.yourInitiativeIsNearlyThere.description"
             defaultMessage="We will review it and let you know by mail if we need you for anything during the process. {lineBreak}{lineBreak} In the meantime, you can use these useful links."
             values={{
               lineBreak: <br />,
@@ -70,7 +52,7 @@ const YourInitiativeIsNearlyThere = () => (
           />
         </P>
       </Box>
-      {/* <Container display="flex" justifyContent="center" alignItems="baseline">
+      <Container display="flex" justifyContent="center" alignItems="baseline">
         <Link href="/">
           <FormattedMessage id="home" defaultMessage="Home" />
         </Link>
@@ -81,7 +63,7 @@ const YourInitiativeIsNearlyThere = () => (
         <Link href="https://blog.opencollective.com/">
           <FormattedMessage id="company.blog" defaultMessage="Blog" />
         </Link>
-      </Container> */}
+      </Container>
     </Flex>
     <Flex my="48px" flexDirection="column" alignItems="center" justifyContent="center">
       <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.800">
@@ -185,7 +167,7 @@ const YourInitiativeIsNearlyThere = () => (
       <StyledLink
         my="40px"
         href="https://docs.oscollective.org/"
-        //width={['286px', '215px']}
+        // width={['286px', '215px']}
         buttonStyle="primary"
         buttonSize="medium"
         openInNewTab

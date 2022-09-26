@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -11,10 +10,10 @@ import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
+import MessageBox from '../MessageBox';
+import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import { H1, P } from '../Text';
-import StyledButton from '../StyledButton';
-import MessageBox from '../MessageBox';
 
 import ApplicationDescription from './ApplicationDescription';
 

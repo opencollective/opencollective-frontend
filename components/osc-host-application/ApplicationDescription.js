@@ -1,9 +1,8 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { getI18nLink } from '../I18nFormatters';
-import { H5, P } from '../Text';
 import StyledLink from '../StyledLink';
+import { P } from '../Text';
 
 const ApplicationDescription = () => (
   <React.Fragment>
