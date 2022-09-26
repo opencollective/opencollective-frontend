@@ -139,6 +139,7 @@ function FormFields({ collective, types, values }) {
         })}
         labelFontWeight="bold"
         mt="3"
+        required={false}
       >
         {({ field }) => <StyledTextarea data-cy={field.name} {...field} />}
       </StyledInputFormikField>
@@ -151,6 +152,7 @@ function FormFields({ collective, types, values }) {
           })}
           labelFontWeight="bold"
           mt="3"
+          required={false}
         >
           {({ field, form, loading }) => (
             <StyledSelect
@@ -274,6 +276,7 @@ function FormFields({ collective, types, values }) {
           label={intl.formatMessage({ id: 'tier.minimumAmount.label', defaultMessage: 'minimum amount' })}
           labelFontWeight="bold"
           mt="3"
+          required={false}
         >
           {({ field, form }) => (
             <StyledInputAmount
@@ -307,6 +310,7 @@ function FormFields({ collective, types, values }) {
             })}
             labelFontWeight="bold"
             mt="3"
+            required={false}
           >
             {({ field }) => <StyledInput data-cy={field.name} {...field} />}
           </StyledInputFormikField>
@@ -327,6 +331,7 @@ function FormFields({ collective, types, values }) {
           })}
           labelFontWeight="bold"
           mt="3"
+          required={false}
         >
           {({ field }) => <StyledInput data-cy={field.name} {...field} />}
         </StyledInputFormikField>
@@ -339,6 +344,7 @@ function FormFields({ collective, types, values }) {
         })}
         labelFontWeight="bold"
         mt="3"
+        required={false}
       >
         {({ field, form }) => (
           <StyledInputAmount
@@ -427,6 +433,7 @@ function FormFields({ collective, types, values }) {
             })}
             labelFontWeight="bold"
             mt="3"
+            required={false}
           >
             {({ field, form, loading }) => (
               <StyledSelect
