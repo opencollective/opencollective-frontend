@@ -15,17 +15,17 @@ const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
 
   return (
     <Fragment>
-      <Container display="flex" justifyContent="space-between" alignItems="start" flexDirection={['column', 'row']}>
-        <Flex alignItems="center">
+      <Container display="flex" justifyContent="space-between" alignItems="start">
+        <Flex alignItems="center" flexGrow="1">
           <Span mr={4}>{radio}</Span>
           <Span mr={3} color="black.300">
             <Github size={40} />
           </Span>
-          <Flex flexDirection="column">
+          <Flex flexDirection="column" flex="1">
             <P fontWeight={500} fontSize="1.4rem">
               {value.full_name}
             </P>
-            <Flex>
+            <Flex justifyContent="space-between" flexGrow="1">
               <P
                 textTransform="uppercase"
                 fontWeight={600}
@@ -36,10 +36,13 @@ const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
               >
                 {repositoryTypeName}
               </P>
-              <Box display={['block', null, 'none']} ml={3}>
-                <P fontWeight={300} fontSize="1.2rem">
-                  {value.stargazers_count} <Star size={12} />
-                </P>
+              <Box display={['block', null, 'none']} ml={3} mr={1}>
+                <Flex gap={4} color="black.600" mt={1} alignItems="center">
+                  <P fontWeight={600} fontSize="1.2rem" lineHeight="1.4rem">
+                    {value.stargazers_count}
+                  </P>
+                  <Star size={12} />
+                </Flex>
               </Box>
             </Flex>
           </Flex>
