@@ -73,7 +73,7 @@ const MENU = [
     description: 'Use this action to ban an account or a network of accounts.',
   },
   {
-    id: 'Search & destroy',
+    id: 'Search & ban',
     Component: BanAccountsWithSearch,
     isDangerous: true,
   },
