@@ -21,7 +21,7 @@ import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
 import ErrorPage from '../components/ErrorPage';
 import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
-import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
+import ExpenseForm, { EXPENSE_FORM_STEPS, prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseRecurringForm from '../components/expenses/ExpenseRecurringForm';
@@ -43,7 +43,7 @@ import StyledCard from '../components/StyledCard';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
-const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
+const STEPS = { ...EXPENSE_FORM_STEPS, SUMMARY: 'summary' };
 
 class CreateExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, parentCollectiveSlug } }) {
@@ -117,7 +117,7 @@ class CreateExpensePage extends React.Component {
     super(props);
     this.formTopRef = React.createRef();
     this.state = {
-      step: STEPS.FORM,
+      step: STEPS.PAYEE,
       expense: null,
       isSubmitting: false,
       formPersister: null,
@@ -361,7 +361,7 @@ class CreateExpensePage extends React.Component {
                 <Flex justifyContent="space-between" flexDirection={['column', 'row']}>
                   <Box minWidth={300} maxWidth={['100%', null, null, 728]} mr={[0, 3, 5]} mb={5} flexGrow="1">
                     <SummaryHeader fontSize="24px" lineHeight="32px" mb={24} py={2}>
-                      {step === STEPS.FORM ? (
+                      {step !== STEPS.SUMMARY ? (
                         <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
                       ) : (
                         <FormattedMessage
@@ -380,7 +380,7 @@ class CreateExpensePage extends React.Component {
                     ) : (
                       <Box>
                         <CreateExpenseDismissibleIntro collectiveName={collective.name} />
-                        {step === STEPS.FORM && (
+                        {step !== STEPS.SUMMARY ? (
                           <ExpenseForm
                             collective={collective}
                             loading={loadingLoggedInUser}
@@ -391,10 +391,10 @@ class CreateExpensePage extends React.Component {
                             payoutProfiles={payoutProfiles}
                             formPersister={this.state.formPersister}
                             shouldLoadValuesFromPersister={this.state.isInitialForm}
+                            defaultStep={step}
                             autoFocusTitle
                           />
-                        )}
-                        {step === STEPS.SUMMARY && (
+                        ) : (
                           <div>
                             <StyledCard p={[16, 24, 32]} mb={0}>
                               <ExpenseSummary
@@ -426,7 +426,7 @@ class CreateExpensePage extends React.Component {
                                   mr={[null, 3]}
                                   whiteSpace="nowrap"
                                   data-cy="edit-expense-btn"
-                                  onClick={() => this.setState({ step: STEPS.FORM })}
+                                  onClick={() => this.setState({ step: STEPS.EXPENSE })}
                                   disabled={this.state.isSubmitting}
                                 >
                                   ← <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
