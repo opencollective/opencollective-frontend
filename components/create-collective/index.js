@@ -12,7 +12,7 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import SignInOrJoinFree from '../SignInOrJoinFree';
-import { H1, P } from '../Text';
+import { H1 } from '../Text';
 import { withUser } from '../UserProvider';
 
 import CollectiveCategoryPicker from './CollectiveCategoryPicker';
@@ -126,22 +126,10 @@ class CreateCollective extends Component {
 
     if (!LoggedInUser) {
       return (
-        <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
-          <Flex flexDirection="column" p={4} mt={2}>
-            <Box mb={3}>
-              <H1 fontSize="32px" lineHeight="36px" fontWeight="bold" textAlign="center">
-                <FormattedMessage id="collective.create.join" defaultMessage="Join Open Collective" />
-              </H1>
-            </Box>
-            <Box textAlign="center">
-              <P fontSize="14px" color="black.600" mb={1}>
-                <FormattedMessage
-                  id="collective.create.createOrSignIn"
-                  defaultMessage="Create an account (or sign in) to start a collective."
-                />
-              </P>
-            </Box>
-          </Flex>
+        <Flex flexDirection="column" alignItems="center" mt={5} mb={5}>
+          <MessageBox m={4} type="warning" withIcon>
+            <FormattedMessage id="mustBeLoggedIn" defaultMessage="You must be logged in to see this page" />
+          </MessageBox>
           <SignInOrJoinFree createProfileTabs={['personal']} />
         </Flex>
       );
