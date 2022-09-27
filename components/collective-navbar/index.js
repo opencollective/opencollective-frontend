@@ -189,40 +189,11 @@ const accountPermissionsQuery = gqlV2/* GraphQL */ `
   query AccountPermissions($slug: String!) {
     account(slug: $slug) {
       id
-      ... on Collective {
-        permissions {
-          id
-          addFunds {
-            allowed
-            reason
-          }
-        }
-      }
-      ... on Event {
-        permissions {
-          id
-          addFunds {
-            allowed
-            reason
-          }
-        }
-      }
-      ... on Project {
-        permissions {
-          id
-          addFunds {
-            allowed
-            reason
-          }
-        }
-      }
-      ... on Fund {
-        permissions {
-          id
-          addFunds {
-            allowed
-            reason
-          }
+      permissions {
+        id
+        addFunds {
+          allowed
+          reason
         }
       }
     }
@@ -478,6 +449,7 @@ const CollectiveNavbar = ({
   const { data, dataLoading } = useQuery(accountPermissionsQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: collective?.slug },
+    skip: !collective?.slug,
   });
 
   const loading = isLoading || dataLoading;

@@ -629,6 +629,11 @@ interface Account {
   List of activities that the logged-in user is subscribed for this collective
   """
   activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
 }
 
 """
@@ -2301,6 +2306,7 @@ enum ActivityType {
   COLLECTIVE_CREATED
   COLLECTIVE_EDITED
   COLLECTIVE_DELETED
+  COLLECTIVE_UNHOSTED
   ORGANIZATION_COLLECTIVE_CREATED
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
@@ -2870,6 +2876,11 @@ type Host implements Account & AccountWithContributions {
   List of activities that the logged-in user is subscribed for this collective
   """
   activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -2882,11 +2893,6 @@ type Host implements Account & AccountWithContributions {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Number of unique financial contributors.
@@ -4141,6 +4147,18 @@ enum ActivityChannel {
 }
 
 """
+Fields for the user permissions on an account
+"""
+type AccountPermissions {
+  id: String!
+
+  """
+  Whether the current user can mark this order as expired
+  """
+  addFunds: Permission!
+}
+
+"""
 A collection of webhooks
 """
 type WebhookCollection implements Collection {
@@ -4159,18 +4177,6 @@ type Webhook {
   activityType: ActivityType
   webhookUrl: URL
   account: Account!
-}
-
-"""
-Fields for the user permissions on an account
-"""
-type AccountPermissions {
-  id: String!
-
-  """
-  Whether the current user can mark this order as expired
-  """
-  addFunds: Permission!
 }
 
 """
@@ -4676,7 +4682,7 @@ A financial amount.
 type Amount {
   value: Float
   currency: Currency
-  valueInCents: Int
+  valueInCents: Float
 
   """
   If the amount was generated from a currency conversion, this field contains details about the conversion
@@ -5218,6 +5224,11 @@ type Bot implements Account {
   List of activities that the logged-in user is subscribed for this collective
   """
   activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -5230,11 +5241,6 @@ type Bot implements Account {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 }
 
 """
@@ -5724,6 +5730,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   List of activities that the logged-in user is subscribed for this collective
   """
   activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -5736,11 +5747,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Returns the Fiscal Host
@@ -6560,6 +6566,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   List of activities that the logged-in user is subscribed for this collective
   """
   activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6572,11 +6583,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Returns the Fiscal Host
@@ -7177,6 +7183,11 @@ type Individual implements Account {
   List of activities that the logged-in user is subscribed for this collective
   """
   activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7189,11 +7200,6 @@ type Individual implements Account {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Email for the account. For authenticated user: scope: "email".
@@ -7773,6 +7779,11 @@ type Organization implements Account & AccountWithContributions {
   List of activities that the logged-in user is subscribed for this collective
   """
   activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7785,11 +7796,6 @@ type Organization implements Account & AccountWithContributions {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Number of unique financial contributors.
@@ -8401,6 +8407,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   List of activities that the logged-in user is subscribed for this collective
   """
   activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8413,11 +8424,6 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Returns the Fiscal Host
@@ -10480,6 +10486,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_CREATED
   COLLECTIVE_EDITED
   COLLECTIVE_DELETED
+  COLLECTIVE_UNHOSTED
   ORGANIZATION_COLLECTIVE_CREATED
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
@@ -11101,6 +11108,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   List of activities that the logged-in user is subscribed for this collective
   """
   activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11113,11 +11125,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Returns the Fiscal Host
@@ -11707,6 +11714,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   List of activities that the logged-in user is subscribed for this collective
   """
   activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11719,11 +11731,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Returns the Fiscal Host
