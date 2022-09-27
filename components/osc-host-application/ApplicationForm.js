@@ -168,7 +168,9 @@ const ApplicationForm = ({
   const submit = async ({ user, collective, applicationData, inviteMembers, message }) => {
     const variables = {
       collective: {
-        ...(canApplyWithCollective ? { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug } : collective),
+        ...(canApplyWithCollective
+          ? { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug }
+          : { ...collective, githubHandle: githubInfo.handle }),
       },
       host: { legacyId: OPENSOURCE_COLLECTIVE_ID },
       user,
@@ -562,7 +564,6 @@ const ApplicationForm = ({
                                 checked={field.value}
                                 onChange={({ checked }) => setFieldValue(field.name, checked)}
                                 error={field.error}
-                                data-cy="checkbox-tos"
                                 label={
                                   <P ml={1} fontSize="12px" lineHeight="16px" fontWeight="400" color="black.800">
                                     <FormattedMessage

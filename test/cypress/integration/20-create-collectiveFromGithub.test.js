@@ -9,8 +9,8 @@ describe('Create collective from Github', () => {
     cy.get('[data-cy=ccf-form-description]').type('Blocks some ads');
     cy.get('[data-cy=ccf-form-submit]').click();
     cy.contains('[data-cy=ccf-form]', 'This must be checked');
-    cy.get('[data-cy=checkbox-tos]').click();
+    cy.get('[data-cy=checkbox-termsOfServiceOC]').find('[data-cy=custom-checkbox]').click();
     cy.get('[data-cy=ccf-form-submit]').click();
-    cy.url().should('include', '/adblockpluschrome/onboarding');
+    cy.url().should('include', '/opensource/apply/success');
   });
 });
