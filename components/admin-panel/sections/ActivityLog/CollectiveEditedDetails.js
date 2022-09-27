@@ -97,7 +97,7 @@ export const CollectiveEditedDetails = ({ activity }) => {
               )}
               {/* Separate array values (e.g. for tags) with commas */}
               {changes.type === 'array' && index < changes.diff.length - 1 && ', '}
-              {/* For for numbers & unknown types, show as "Previous value → New value" */}
+              {/* For numbers & unknown types, show as "Previous value → New value" */}
               {changes.type === 'default' && index < changes.diff.length - 1 && ' → '}
             </React.Fragment>
           ))}
