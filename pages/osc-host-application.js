@@ -92,17 +92,6 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
 
   const [initialValues, setInitialValues] = useState(formValues);
 
-  const updateGithubInfo = github => {
-    setInitialValues({
-      ...initialValues,
-      collective: {
-        ...initialValues.collective,
-        ...(github && { name: formatGithubRepoName(github.repo), slug: github.repo }),
-      },
-    });
-    setGithubInfo(github);
-  };
-
   const intl = useIntl();
   const router = useRouter();
   const { addToast } = useToasts();
@@ -155,7 +144,20 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
         />
       )}
       {step === 'pick-repo' && (
-        <ConnectGithub setGithubInfo={info => updateGithubInfo(info)} router={router} githubInfo={githubInfo} />
+        <ConnectGithub
+          setGithubInfo={github => {
+            setInitialValues({
+              ...initialValues,
+              collective: {
+                ...initialValues.collective,
+                ...(github && { name: formatGithubRepoName(github.repo), slug: github.repo }),
+              },
+            });
+            setGithubInfo(github);
+          }}
+          router={router}
+          githubInfo={githubInfo}
+        />
       )}
       {step === 'form' && (
         <ApplicationForm
