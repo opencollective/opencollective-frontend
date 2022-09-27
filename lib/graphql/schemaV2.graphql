@@ -12480,13 +12480,14 @@ type Mutation {
   ): ProcessHostApplicationResponse!
 
   """
-  [Root only] Removes the host for an account
+  Removes the host for an account
   """
   removeHost(
     """
     The account to unhost
     """
     account: AccountReferenceInput!
+    message: String
   ): Account!
 
   """
