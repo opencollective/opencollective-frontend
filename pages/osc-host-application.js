@@ -81,10 +81,28 @@ const formValues = {
   inviteMembers: [],
 };
 
+const formatGithubRepoName = repoName => {
+  // replaces dash and underscore with space, then capitalises the words
+  return repoName.replace(/[-_]/g, ' ').replace(/(?:^|\s)\S/g, words => words.toUpperCase());
+};
+
 const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
   const [checkedTermsOfFiscalSponsorship, setCheckedTermsOfFiscalSponsorship] = useState(false);
   const [githubInfo, setGithubInfo] = useState(null);
+
   const [initialValues, setInitialValues] = useState(formValues);
+
+  const updateGithubInfo = github => {
+    setInitialValues({
+      ...initialValues,
+      collective: {
+        ...initialValues.collective,
+        ...(github && { name: formatGithubRepoName(github.repo), slug: github.repo }),
+      },
+    });
+    setGithubInfo(github);
+  };
+
   const intl = useIntl();
   const router = useRouter();
   const { addToast } = useToasts();
@@ -137,7 +155,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
         />
       )}
       {step === 'pick-repo' && (
-        <ConnectGithub setGithubInfo={info => setGithubInfo(info)} router={router} githubInfo={githubInfo} />
+        <ConnectGithub setGithubInfo={info => updateGithubInfo(info)} router={router} githubInfo={githubInfo} />
       )}
       {step === 'form' && (
         <ApplicationForm
