@@ -125,7 +125,7 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
             </StyledRoundButton>
           </Flex>
           {[CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(collective.type) && (
-            <HostAdminCollectiveCardMoreButton collective={collective} />
+            <HostAdminCollectiveCardMoreButton collective={collective} host={host} />
           )}
         </Container>
       </Box>

@@ -222,10 +222,11 @@ const checkAddressValuesAreCompleted = values => {
 };
 
 const getDefaultStep = (defaultStep, stepOneCompleted, isCreditCardCharge) => {
-  if (!stepOneCompleted) {
-    return EXPENSE_FORM_STEPS.PAYEE;
-  } else if (isCreditCardCharge) {
+  // Card Charges take priority here because they are technically incomplete.
+  if (isCreditCardCharge) {
     return EXPENSE_FORM_STEPS.EXPENSE;
+  } else if (!stepOneCompleted) {
+    return EXPENSE_FORM_STEPS.PAYEE;
   } else {
     return defaultStep || EXPENSE_FORM_STEPS.PAYEE;
   }

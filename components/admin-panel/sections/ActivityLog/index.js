@@ -9,21 +9,16 @@ import styled from 'styled-components';
 import { parseDateInterval } from '../../../../lib/date-utils';
 import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
 
-import Avatar from '../../../Avatar';
 import Container from '../../../Container';
-import DateTime from '../../../DateTime';
-import { Box, Flex } from '../../../Grid';
-import LinkCollective from '../../../LinkCollective';
+import { Box } from '../../../Grid';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
 import StyledCard from '../../../StyledCard';
-import StyledLink from '../../../StyledLink';
-import { P, Span } from '../../../Text';
 
-import ActivityDescription from './ActivityDescription';
 import ActivityFilters from './ActivityFilters';
+import ActivityListItem from './ActivityListItem';
 import { getActivityTypeFilterValuesFromKey, isSupportedActivityTypeFilter } from './ActivityTypeFilter';
 
 const activityLogQuery = gqlV2/* GraphQL */ `
@@ -147,21 +142,6 @@ const ActivityLogContainer = styled(StyledCard)`
   }
 `;
 
-const MetadataContainer = styled.div`
-  display: flex;
-  align-items: center;
-  grid-gap: 8px;
-  color: #4d4f51;
-  margin-top: 10px;
-  a {
-    color: #4d4f51;
-    text-decoration: none;
-    &:hover {
-      color: #4e5052;
-    }
-  }
-`;
-
 const ACTIVITY_LIMIT = 10;
 
 const getQueryVariables = (accountSlug, router) => {
@@ -262,39 +242,7 @@ const ActivityLog = ({ accountSlug }) => {
           ) : (
             <ActivityLogContainer>
               {data.activities.nodes.map(activity => (
-                <Box key={activity.id} px="16px" py="14px">
-                  <P color="black.900" fontWeight="500" fontSize="14px">
-                    <ActivityDescription activity={activity} />
-                  </P>
-                  <MetadataContainer>
-                    {activity.isSystem ? (
-                      <Span>
-                        <FormattedMessage defaultMessage="System Activity" />
-                      </Span>
-                    ) : (
-                      <FormattedMessage
-                        id="ByUser"
-                        defaultMessage="By {userName}"
-                        values={{
-                          userName: !activity.individual ? (
-                            <Span>
-                              <FormattedMessage id="user.unknown" defaultMessage="Unknown" />
-                            </Span>
-                          ) : (
-                            <StyledLink as={LinkCollective} color="black.700" collective={activity.individual}>
-                              <Flex alignItems="center" gridGap="8px">
-                                <Avatar radius={24} collective={activity.individual} />
-                                {activity.individual.name}
-                              </Flex>
-                            </StyledLink>
-                          ),
-                        }}
-                      />
-                    )}
-                    •
-                    <DateTime value={activity.createdAt} dateStyle="medium" />
-                  </MetadataContainer>
-                </Box>
+                <ActivityListItem key={activity.id} activity={activity} />
               ))}
             </ActivityLogContainer>
           )}

@@ -149,7 +149,12 @@ const StyledCollectiveCard = ({
 }) => {
   const intl = useIntl();
   return (
-    <StyledCard {...props} position="relative" borderRadius={borderRadius}>
+    <StyledCard
+      data-cy={`${collective.slug}-collective-card`}
+      {...props}
+      position="relative"
+      borderRadius={borderRadius}
+    >
       <Container
         position="absolute"
         width="95%"
