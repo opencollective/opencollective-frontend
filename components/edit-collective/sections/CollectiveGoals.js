@@ -63,7 +63,7 @@ class CollectiveGoals extends React.Component {
       title: { id: 'goal.title.label', defaultMessage: 'Title' },
       description: { id: 'Fields.description', defaultMessage: 'Description' },
       amount: { id: 'Fields.amount', defaultMessage: 'Amount' },
-      showToggle: { id: 'goal.show', defaultMessage: 'Show goals on my Collective page' },
+      showToggle: { id: 'goal.show', defaultMessage: 'Show goals on my Profile page' },
     });
 
     const getOptions = arr => {

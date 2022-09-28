@@ -140,7 +140,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.COLLECTIVE_GOALS}
-            if={isType(collective, COLLECTIVE)}
+            if={isOneOfTypes(collective, [COLLECTIVE, PROJECT])}
           />
           <MenuLink
             collective={collective}
