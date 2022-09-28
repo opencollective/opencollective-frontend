@@ -202,7 +202,7 @@ const nextConfig = {
       },
       // Redirect legacy /create/opensource to new OSC apply flow
       {
-        source: '/create/opensource',
+        source: '/create/opensource/:step*',
         destination: '/opensource/apply/intro',
         permanent: true,
       },
