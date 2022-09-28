@@ -22,13 +22,12 @@ import CollectivePicker, {
 } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
-import I18nAddressFields from '../I18nAddressFields';
-import InputTypeCountry from '../InputTypeCountry';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
+import StyledInputLocation from '../StyledInputLocation';
 import StyledTextarea from '../StyledTextarea';
 import StyledTooltip from '../StyledTooltip';
 
@@ -333,59 +332,15 @@ const ExpenseFormPayeeStep = ({
             </Field>
           )}
           {requiresAddress && (
-            <Fragment>
-              <FastField name="payeeLocation.country">
-                {({ field }) => (
-                  <StyledInputField
-                    name={field.name}
-                    label={formatMessage(msg.country)}
-                    labelFontSize="13px"
-                    error={formatFormErrorMessage(intl, errors.payeeLocation?.country)}
-                    required
-                    mt={3}
-                  >
-                    {({ id, error }) => (
-                      <InputTypeCountry
-                        data-cy="payee-country"
-                        inputId={id}
-                        onChange={value => {
-                          formik.setFieldValue(field.name, value);
-                        }}
-                        value={field.value}
-                        error={error}
-                      />
-                    )}
-                  </StyledInputField>
-                )}
-              </FastField>
-              {values.payeeLocation?.structured || !values.payeeLocation?.address ? (
-                <I18nAddressFields
-                  prefix="payeeLocation.structured"
-                  selectedCountry={values.payeeLocation?.country}
-                  onCountryChange={addressObject => {
-                    if (addressObject) {
-                      formik.setFieldValue('payeeLocation.structured', addressObject);
-                    }
-                  }}
-                />
-              ) : (
-                <FastField name="payeeLocation.address">
-                  {({ field }) => (
-                    <StyledInputField name={field.name} label="Address" labelFontSize="13px" required mt={3}>
-                      {inputProps => (
-                        <StyledTextarea
-                          {...inputProps}
-                          {...field}
-                          data-cy="payee-address"
-                          minHeight={100}
-                          placeholder="P. Sherman 42&#10;Wallaby Way&#10;Sydney"
-                        />
-                      )}
-                    </StyledInputField>
-                  )}
-                </FastField>
-              )}
-            </Fragment>
+            <Box mt={3}>
+              <StyledInputLocation
+                onChange={values => {
+                  formik.setFieldValue('payeeLocation', values);
+                }}
+                location={values.payeeLocation}
+                errors={errors.payeeLocation}
+              />
+            </Box>
           )}
           {values.type === expenseTypes.INVOICE && (
             <FastField name="invoiceInfo">

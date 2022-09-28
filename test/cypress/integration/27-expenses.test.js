@@ -188,10 +188,10 @@ describe('New expense flow', () => {
       cy.getByDataCy('radio-expense-type-INVOICE').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
-      cy.getByDataCy('payee-country').click();
+      cy.getByDataCy('country-select').click();
       cy.contains('[data-cy="select-option"]', 'Angola').click();
-      cy.get('input[data-cy="payee-address-address1"]').type('Street Name, 123');
-      cy.get('input[data-cy="payee-address-city"]').type('Citycitycity');
+      cy.get('input[data-cy="address-address1"]').type('Street Name, 123');
+      cy.get('input[data-cy="address-city"]').type('Citycitycity');
       cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
       cy.getByDataCy('expense-next').click();
       // Fill the form with valid data
@@ -267,10 +267,10 @@ describe('New expense flow', () => {
         cy.logout();
         cy.reload();
 
-        cy.getByDataCy('payee-country').click();
+        cy.getByDataCy('country-select').click();
         cy.contains('[data-cy="select-option"]', 'Angola').click();
-        cy.get('[data-cy="payee-address-address1"]').type('Street Name, 123');
-        cy.get('[data-cy="payee-address-city"]').type('City');
+        cy.get('[data-cy="address-address1"]').type('Street Name, 123');
+        cy.get('[data-cy="address-city"]').type('City');
 
         cy.getByDataCy('payout-method-select').click();
         cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
@@ -335,10 +335,10 @@ describe('New expense flow', () => {
         cy.reload();
         cy.visit(`/${collective}/expenses/${expenseId}?key=draft-key`);
 
-        cy.getByDataCy('payee-country').click();
+        cy.getByDataCy('country-select').click();
         cy.contains('[data-cy="select-option"]', 'Angola').click();
-        cy.get('[data-cy="payee-address-address1"]').type('Street Name, 123');
-        cy.get('[data-cy="payee-address-city"]').type('City');
+        cy.get('[data-cy="address-address1"]').type('Street Name, 123');
+        cy.get('[data-cy="address-city"]').type('City');
 
         cy.getByDataCy('payout-method-select').click();
         cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
@@ -388,10 +388,10 @@ describe('New expense flow', () => {
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New PayPal account').click();
       cy.get('input[name="payoutMethod.data.email"]').type('paypal-test@opencollective.com');
-      cy.getByDataCy('payee-country').click();
+      cy.getByDataCy('country-select').click();
       cy.contains('[data-cy="select-option"]', 'Angola').click();
-      cy.get('input[data-cy="payee-address-address1"]').type('Street Name, 123');
-      cy.get('input[data-cy="payee-address-city"]').type('Citycitycity');
+      cy.get('input[data-cy="address-address1"]').type('Street Name, 123');
+      cy.get('input[data-cy="address-city"]').type('Citycitycity');
       cy.getByDataCy('expense-next').click();
 
       // Fill details
