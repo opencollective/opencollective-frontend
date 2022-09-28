@@ -46,6 +46,9 @@ const StyledInputField = ({
   useRequiredLabel,
   isPrivate,
   helpText,
+  flexDirection,
+  justifyContent,
+  alignItems,
   ...props
 }) => {
   const isCheckbox = inputType === 'checkbox';
@@ -60,9 +63,12 @@ const StyledInputField = ({
     </Span>
   );
 
+  const containerFlexDirection = flexDirection ?? (isCheckbox ? 'row-reverse' : 'column');
+  const containerJustifyContent = justifyContent ?? 'flex-end';
+
   return (
     <Box {...props}>
-      <Flex flexDirection={isCheckbox ? 'row-reverse' : 'column'} justifyContent="flex-end">
+      <Flex alignItems={alignItems} flexDirection={containerFlexDirection} justifyContent={containerJustifyContent}>
         {label && (
           <P
             as="label"

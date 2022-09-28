@@ -54,7 +54,7 @@ export const getSettingsQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const collectiveSettingsV1Query = gql`
+export const collectiveSettingsV1Query = gql`
   query EditCollectivePage($slug: String) {
     Collective(slug: $slug) {
       id

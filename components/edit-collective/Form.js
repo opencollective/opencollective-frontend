@@ -52,6 +52,7 @@ import ReceivingMoney from './sections/ReceivingMoney';
 import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
+import TiersRevamp from './sections/TiersRevamp';
 import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
 import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
@@ -429,6 +430,9 @@ class EditCollectiveForm extends React.Component {
             defaultType="TIER"
           />
         );
+
+      case EDIT_COLLECTIVE_SECTIONS.TIERS_REVAMP:
+        return <TiersRevamp collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
 
       case EDIT_COLLECTIVE_SECTIONS.TICKETS:
         return (
