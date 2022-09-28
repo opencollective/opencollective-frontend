@@ -170,11 +170,11 @@ const ApplicationForm = ({
       collective: {
         ...(canApplyWithCollective
           ? { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug }
-          : { ...collective, githubHandle: githubInfo.handle }),
+          : { ...collective, githubHandle: githubInfo?.handle }),
       },
       host: { legacyId: OPENSOURCE_COLLECTIVE_ID },
       user,
-      applicationData: { ...applicationData, githubHandle: githubInfo.handle },
+      applicationData: { ...applicationData, githubHandle: githubInfo?.handle },
       inviteMembers: inviteMembers.map(invite => ({
         ...invite,
         memberAccount: { legacyId: invite.memberAccount.id },

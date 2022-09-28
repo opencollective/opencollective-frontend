@@ -60,7 +60,6 @@ const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
           {value.description}
         </P>
       )}
-      {/* <Container width={1} mx={4} mt={3} mb={1} px={2}> */}
       {checked && type === 'Organization' && (
         <Container width={1} mx={4} mt={3} mb={1} px={2}>
           <StyledRadioList

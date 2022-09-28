@@ -47,6 +47,8 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
   const router = useRouter();
   const [error, setError] = useState();
 
+  const { collectiveSlug } = router.query;
+
   return (
     <Flex flexDirection="column" alignItems="center" justifyContent="center" mt={['24px', '48px']}>
       <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center">
@@ -115,14 +117,17 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
               if (!checked) {
                 setError(formatMessage(messages.acceptTermsOfFiscalSponsorship));
               } else {
-                window.location.href = getGithubConnectUrl(router.query.collectiveSlug);
+                window.location.href = getGithubConnectUrl(collectiveSlug);
               }
             }}
           >
             <FormattedMessage id="createcollective.opensource.VerifyStars" defaultMessage="Verify using GitHub stars" />
           </StyledButton>
           <Link
-            href={{ pathname: `/opensource/create/form`, query: { hostTos: true } }}
+            href={{
+              pathname: `/opensource/apply/form`,
+              query: { ...(collectiveSlug && { collectiveSlug }) },
+            }}
             onClick={e => {
               if (!checked) {
                 e.preventDefault();
