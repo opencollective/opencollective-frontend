@@ -152,6 +152,7 @@ export const updatesQuery = gqlV2/* GraphQL */ `
   ) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
+      legacyId
       name
       slug
       type

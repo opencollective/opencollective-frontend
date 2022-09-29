@@ -42,6 +42,7 @@ const conversationPageQuery = gqlV2/* GraphQL */ `
   query ConversationPage($collectiveSlug: String!, $id: String!, $offset: Int) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
+      legacyId
       slug
       name
       type
