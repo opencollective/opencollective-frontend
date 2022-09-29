@@ -340,8 +340,6 @@ class TiersPage extends React.Component {
   }
 }
 
-// We have to disable the linter because it's not able to detect that `nbContributorsPerContributeCard` is used in fragments
-/* eslint-disable graphql/template-strings */
 const contributePageQuery = gql`
   query ContributePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug) {
