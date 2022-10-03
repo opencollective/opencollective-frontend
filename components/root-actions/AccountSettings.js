@@ -28,6 +28,7 @@ const AccountSettings = () => {
   const [selectedAccountOption, setSelectedAccountOption] = React.useState([]);
   const [archivedFlag, setArchivedFlag] = React.useState();
   const [trustedHostFlag, setTrustedHostFlag] = React.useState();
+  const [enableSave, setEnableSave] = React.useState(false);
   const [editAccountFlags, { loading }] = useMutation(editAccountFlagsMutation, { context: API_V2_CONTEXT });
 
   useEffect(() => {
@@ -50,64 +51,72 @@ const AccountSettings = () => {
         )}
       </StyledInputField>
 
-      <Container px={1} pt={3} pb={3}>
-        <Box pb={2}>
-          <FormattedMessage defaultMessage="Flags" />
-        </Box>
-        <Flex flexWrap="wrap" px={1} mt={2}>
-          <Box pr={4}>
-            <StyledCheckbox
-              name="Archived"
-              label="Archived"
-              checked={archivedFlag}
-              onChange={({ checked }) => {
-                setArchivedFlag(checked);
-              }}
-            />
-          </Box>
-          {selectedAccountOption?.value?.isHost && (
-            <Box>
-              <StyledCheckbox
-                name="Trusted Host"
-                label="Trusted Host"
-                checked={trustedHostFlag}
-                onChange={({ checked }) => {
-                  setTrustedHostFlag(checked);
-                }}
-              />
+      {selectedAccountOption.length !== 0 && (
+        <React.Fragment>
+          <Container px={1} pt={3} pb={3}>
+            <Box pb={2}>
+              <FormattedMessage defaultMessage="Flags" />
             </Box>
-          )}
-        </Flex>
-      </Container>
-      <StyledButton
-        mt={4}
-        width="100%"
-        buttonStyle="primary"
-        loading={loading}
-        onClick={async () => {
-          try {
-            await editAccountFlags({
-              variables: {
-                account: { slug: selectedAccountOption?.value?.slug },
-                isArchived: archivedFlag,
-                isTrustedHost: trustedHostFlag,
-              },
-            });
-            addToast({
-              type: TOAST_TYPE.SUCCESS,
-              title: 'Success',
-              message: <FormattedMessage defaultMessage="Account flags saved" />,
-            });
-          } catch (e) {
-            addToast({
-              type: TOAST_TYPE.ERROR,
-              message: i18nGraphqlException(intl, e),
-            });
-          }
-        }}
-      >
-        Save
-      </StyledButton>
+            <Flex flexWrap="wrap" px={1} mt={2}>
+              <Box pr={4}>
+                <StyledCheckbox
+                  name="Archived"
+                  label="Archived"
+                  checked={archivedFlag}
+                  onChange={({ checked }) => {
+                    setEnableSave(true);
+                    setArchivedFlag(checked);
+                  }}
+                />
+              </Box>
+              {selectedAccountOption?.value?.isHost && (
+                <Box>
+                  <StyledCheckbox
+                    name="Trusted Host"
+                    label="Trusted Host"
+                    checked={trustedHostFlag}
+                    onChange={({ checked }) => {
+                      setEnableSave(true);
+                      setTrustedHostFlag(checked);
+                    }}
+                  />
+                </Box>
+              )}
+            </Flex>
+          </Container>
+          <StyledButton
+            mt={4}
+            width="100%"
+            buttonStyle="primary"
+            loading={loading}
+            disabled={!enableSave}
+            onClick={async () => {
+              try {
+                await editAccountFlags({
+                  variables: {
+                    account: { slug: selectedAccountOption?.value?.slug },
+                    isArchived: archivedFlag,
+                    isTrustedHost: trustedHostFlag,
+                  },
+                });
+                addToast({
+                  type: TOAST_TYPE.SUCCESS,
+                  title: 'Success',
+                  message: <FormattedMessage defaultMessage="Account flags saved" />,
+                });
+                setEnableSave(false);
+              } catch (e) {
+                addToast({
+                  type: TOAST_TYPE.ERROR,
+                  message: i18nGraphqlException(intl, e),
+                });
+              }
+            }}
+          >
+            Save
+          </StyledButton>
+        </React.Fragment>
+      )}
     </React.Fragment>
   );
 };
