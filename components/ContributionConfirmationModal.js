@@ -257,12 +257,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
             onClick={() => triggerAction()}
             data-cy="order-confirmation-modal-submit"
           >
-            <FormattedMessage
-              defaultMessage="Confirm contribution of {amount}"
-              values={{
-                amount: <FormattedMoneyAmount amount={amount} currency={currency} precision={2} amountStyles={null} />,
-              }}
-            />
+            <FormattedMessage defaultMessage="Confirm contribution" />
           </StyledButton>
         </Container>
       </ModalFooter>
