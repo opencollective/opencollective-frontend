@@ -1437,16 +1437,6 @@ type Collective implements CollectiveInterface {
   isArchived: Boolean
 
   """
-  Returns whether this account is deleted
-  """
-  isDeleted: Boolean
-
-  """
-  Returns whether this account is banned
-  """
-  isBanned: Boolean
-
-  """
   Returns whether this collective is approved
   """
   isApproved: Boolean
@@ -1697,16 +1687,6 @@ type Event implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
-
-  """
-  Returns whether this account is deleted
-  """
-  isDeleted: Boolean
-
-  """
-  Returns whether this account is banned
-  """
-  isBanned: Boolean
 
   """
   Returns whether this collective is approved
@@ -1961,16 +1941,6 @@ type Fund implements CollectiveInterface {
   isArchived: Boolean
 
   """
-  Returns whether this account is deleted
-  """
-  isDeleted: Boolean
-
-  """
-  Returns whether this account is banned
-  """
-  isBanned: Boolean
-
-  """
   Returns whether this collective is approved
   """
   isApproved: Boolean
@@ -2221,16 +2191,6 @@ type Organization implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
-
-  """
-  Returns whether this account is deleted
-  """
-  isDeleted: Boolean
-
-  """
-  Returns whether this account is banned
-  """
-  isBanned: Boolean
 
   """
   Returns whether this collective is approved
@@ -2484,16 +2444,6 @@ type Project implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
-
-  """
-  Returns whether this account is deleted
-  """
-  isDeleted: Boolean
-
-  """
-  Returns whether this account is banned
-  """
-  isBanned: Boolean
 
   """
   Returns whether this collective is approved
@@ -2990,16 +2940,6 @@ type User implements CollectiveInterface {
   isArchived: Boolean
 
   """
-  Returns whether this account is deleted
-  """
-  isDeleted: Boolean
-
-  """
-  Returns whether this account is banned
-  """
-  isBanned: Boolean
-
-  """
   Returns whether this collective is approved
   """
   isApproved: Boolean
@@ -3252,16 +3192,6 @@ type Vendor implements CollectiveInterface {
   Returns whether this collective is archived
   """
   isArchived: Boolean
-
-  """
-  Returns whether this account is deleted
-  """
-  isDeleted: Boolean
-
-  """
-  Returns whether this account is banned
-  """
-  isBanned: Boolean
 
   """
   Returns whether this collective is approved
@@ -3621,12 +3551,7 @@ type Query {
     isHost: Boolean
 
     """
-    Included collectives which are soft deleted
-    """
-    includeDeleted: Boolean
-
-    """
-    Included collectives which are soft archived
+    Included collectives which are archived
     """
     includeArchived: Boolean
 

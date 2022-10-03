@@ -14,20 +14,8 @@ import StyledInputField from '../StyledInputField';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 export const editAccountFlagsMutation = gqlV2/* GraphQL */ `
-  mutation EditAccountFlags(
-    $account: AccountReferenceInput!
-    $isDeleted: Boolean
-    $isArchived: Boolean
-    $isBanned: Boolean
-    $isTrustedHost: Boolean
-  ) {
-    editAccountFlags(
-      account: $account
-      isDeleted: $isDeleted
-      isArchived: $isArchived
-      isBanned: $isBanned
-      isTrustedHost: $isTrustedHost
-    ) {
+  mutation EditAccountFlags($account: AccountReferenceInput!, $isArchived: Boolean, $isTrustedHost: Boolean) {
+    editAccountFlags(account: $account, isArchived: $isArchived, isTrustedHost: $isTrustedHost) {
       id
       slug
     }
@@ -38,15 +26,11 @@ const AccountSettings = () => {
   const { addToast } = useToasts();
   const intl = useIntl();
   const [selectedAccountOption, setSelectedAccountOption] = React.useState([]);
-  const [deletedFlag, setDeletedFlag] = React.useState();
-  const [bannedFlag, setBannedFlag] = React.useState();
   const [archivedFlag, setArchivedFlag] = React.useState();
   const [trustedHostFlag, setTrustedHostFlag] = React.useState();
   const [editAccountFlags, { loading }] = useMutation(editAccountFlagsMutation, { context: API_V2_CONTEXT });
 
   useEffect(() => {
-    setDeletedFlag(selectedAccountOption?.value?.isDeleted);
-    setBannedFlag(selectedAccountOption?.value?.isBanned);
     setArchivedFlag(selectedAccountOption?.value?.isArchived);
     setTrustedHostFlag(selectedAccountOption?.value?.isTrustedHost);
   }, [selectedAccountOption]);
@@ -71,26 +55,6 @@ const AccountSettings = () => {
           <FormattedMessage defaultMessage="Flags" />
         </Box>
         <Flex flexWrap="wrap" px={1} mt={2}>
-          <Box pr={4}>
-            <StyledCheckbox
-              name="Deleted"
-              label="Deleted"
-              checked={deletedFlag}
-              onChange={({ checked }) => {
-                setDeletedFlag(checked);
-              }}
-            />
-          </Box>
-          <Box pr={4}>
-            <StyledCheckbox
-              name="Banned"
-              label="Banned"
-              checked={bannedFlag}
-              onChange={({ checked }) => {
-                setBannedFlag(checked);
-              }}
-            />
-          </Box>
           <Box pr={4}>
             <StyledCheckbox
               name="Archived"
@@ -122,35 +86,18 @@ const AccountSettings = () => {
         loading={loading}
         onClick={async () => {
           try {
-            const result = await editAccountFlags({
+            await editAccountFlags({
               variables: {
                 account: { slug: selectedAccountOption?.value?.slug },
-                isBanned: bannedFlag,
-                isDeleted: deletedFlag,
                 isArchived: archivedFlag,
                 isTrustedHost: trustedHostFlag,
               },
             });
-            const newSlug = result?.data?.editAccountFlags?.slug;
-            if (newSlug !== selectedAccountOption?.value?.slug) {
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
-                title: 'Success',
-                message: (
-                  <FormattedMessage
-                    defaultMessage="Account has been {deletedFlag, select, true {deleted} other {restored}}. Slug renamed to {newSlug}"
-                    values={{ newSlug, deletedFlag }}
-                  />
-                ),
-              });
-              setSelectedAccountOption([]);
-            } else {
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
-                title: 'Success',
-                message: <FormattedMessage defaultMessage="Account flags saved" />,
-              });
-            }
+            addToast({
+              type: TOAST_TYPE.SUCCESS,
+              title: 'Success',
+              message: <FormattedMessage defaultMessage="Account flags saved" />,
+            });
           } catch (e) {
             addToast({
               type: TOAST_TYPE.ERROR,
