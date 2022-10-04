@@ -8,7 +8,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
-import { getSuggestedTags, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
+import { getCollectivePageMetadata, getSuggestedTags, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
@@ -153,10 +153,14 @@ class ExpensePage extends React.Component {
   }
 
   getPageMetaData(collective) {
+    const baseMetadata = getCollectivePageMetadata(collective);
     if (collective) {
-      return { title: this.props.intl.formatMessage(messages.title, { collectiveName: collective.name }) };
+      return {
+        ...baseMetadata,
+        title: this.props.intl.formatMessage(messages.title, { collectiveName: collective.name }),
+      };
     } else {
-      return { title: `Expenses` };
+      return { ...baseMetadata, title: `Expenses` };
     }
   }
 
@@ -373,6 +377,8 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       slug
       type
       imageUrl
+      backgroundImageUrl
+      twitterHandle
       name
       currency
       isArchived
@@ -402,6 +408,16 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
         host {
           id
           ...ExpenseHostFields
+        }
+      }
+
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+          imageUrl
+          backgroundImageUrl
+          twitterHandle
         }
       }
 

@@ -35,6 +35,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
     twitterHandle
     description
     imageUrl(height: 192)
+    backgroundImageUrl
     isHost
     isActive
     settings
@@ -80,6 +81,8 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
         id
         slug
         settings
+        imageUrl
+        backgroundImageUrl
         location {
           id
           country

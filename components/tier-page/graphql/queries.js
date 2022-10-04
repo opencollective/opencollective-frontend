@@ -36,6 +36,9 @@ export const tierPageQuery = gql`
         type
         name
         backgroundImage
+        backgroundImageUrl
+        imageUrl
+        isHost
         settings
         currency
         isArchived
@@ -72,6 +75,8 @@ export const tierPageQuery = gql`
           slug
           twitterHandle
           image
+          backgroundImageUrl
+          imageUrl
         }
       }
 
