@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from '@styled-system/css';
+import { get } from 'lodash';
 import styled from 'styled-components';
 import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
@@ -159,6 +160,8 @@ const TrixEditorContainer = styled.div`
       },
     })}
 `;
+
+const SUPPORTED_SERVICE_URLS = { youTube: 'https://www.youtube-nocookie.com/embed/', anchorFm: 'https://anchor.fm/' };
 
 /**
  * A React wrapper around the Trix library to edit rich text.
@@ -358,11 +361,11 @@ export default class RichTextEditor extends React.Component {
 
   constructVideoEmbedURL = (service, id) => {
     if (service === 'youtube') {
-      return `https://www.youtube-nocookie.com/embed/${id}`;
+      return `${SUPPORTED_SERVICE_URLS.youTube}${id}`;
     } /* else if (service === 'vimeo') {
       return `https://player.vimeo.com/video/${id}`;
     } */ else if (service === 'anchorFm') {
-      return `https://anchor.fm/${id}`;
+      return `${SUPPORTED_SERVICE_URLS.anchorFm}${id}`;
     } else {
       return null;
     }
@@ -446,7 +449,13 @@ export default class RichTextEditor extends React.Component {
 
   handleUpload = e => {
     const { attachment } = e;
-    if (!attachment.file) {
+    const attachmentContent = get(attachment, 'attachment.attributes.values.content');
+    const isVideoAttachment =
+      attachmentContent?.includes(`<iframe src="${SUPPORTED_SERVICE_URLS.youTube}`) ||
+      attachmentContent?.includes(`<iframe src="${SUPPORTED_SERVICE_URLS.anchorFm}`);
+    if (isVideoAttachment) {
+      return;
+    } else if (!attachment.file) {
       attachment.remove(); // Remove unknown stuff, for example when copy-pasting HTML
       return;
     }
