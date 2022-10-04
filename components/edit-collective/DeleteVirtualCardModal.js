@@ -18,11 +18,19 @@ const deleteVirtualCardMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps }) => {
+const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefetchQuery, ...modalProps }) => {
   const { addToast } = useToasts();
+
+  const refetchOptions = onDeleteRefetchQuery
+    ? {
+        refetchQueries: [onDeleteRefetchQuery],
+        awaitRefetchQueries: true,
+      }
+    : {};
 
   const [deleteVirtualCard, { loading: isBusy }] = useMutation(deleteVirtualCardMutation, {
     context: API_V2_CONTEXT,
+    ...refetchOptions,
   });
 
   const formik = useFormik({
@@ -91,6 +99,7 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps
 DeleteVirtualCardModal.propTypes = {
   onClose: PropTypes.func,
   onSuccess: PropTypes.func,
+  onDeleteRefetchQuery: PropTypes.string,
   virtualCard: PropTypes.shape({
     id: PropTypes.string,
     name: PropTypes.string,
