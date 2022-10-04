@@ -129,9 +129,7 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
           )}
         </Container>
       </Box>
-      {currentModal === 'addFunds' && (
-        <AddFundsModal collective={collective} host={host} onClose={() => setCurrentModal(null)} />
-      )}
+      {currentModal === 'addFunds' && <AddFundsModal collective={collective} onClose={() => setCurrentModal(null)} />}
       {currentModal === 'accountSettings' && (
         <CollectiveSettingsModal collective={collective} host={host} onClose={() => setCurrentModal(null)} />
       )}
