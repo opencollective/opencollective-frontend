@@ -303,7 +303,6 @@ const ApplicationForm = ({
                     <Container
                       justifyContent="center"
                       flexDirection="column"
-                      alignItems={['center', 'flex-start']}
                       mb={4}
                       mt={[3, 0]}
                       border="1px solid #DCDEE0"
@@ -469,57 +468,59 @@ const ApplicationForm = ({
                         </P>
                       </Box>
 
-                      <Box width={['256px', '234px', '324px']} my={2}>
-                        <StyledInputFormikField
-                          label={intl.formatMessage(messages.repositoryUrl)}
-                          labelFontSize="13px"
-                          labelColor="#4E5052"
-                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="applicationData.repositoryUrl"
-                          htmlFor="repositoryUrl"
-                        >
-                          {({ field }) => (
-                            <StyledInputGroup
-                              type="url"
-                              placeholder="github.com"
-                              {...field}
-                              onChange={e => setFieldValue('applicationData.repositoryUrl', e.target.value)}
-                              px="7px"
-                            />
-                          )}
-                        </StyledInputFormikField>
-                        <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                          <FormattedMessage
-                            id="HostApplication.repositoryUrlHint"
-                            defaultMessage="You can link your github/gitlab etc."
-                          />
-                        </P>
-                      </Box>
-
-                      <Box width={['256px', '234px', '324px']} my={2}>
-                        <StyledInputFormikField
-                          label={intl.formatMessage(messages.repositoryLicense)}
-                          labelFontSize="13px"
-                          labelColor="#4E5052"
-                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="applicationData.licenseSpdxId"
-                          htmlFor="licenseSpdxId"
-                        >
-                          {({ field }) => {
-                            return (
-                              <StyledSelect
-                                inputId={field.id}
-                                options={spdxLicenseList}
+                      <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} py={2}>
+                        <Box>
+                          <StyledInputFormikField
+                            label={intl.formatMessage(messages.repositoryUrl)}
+                            labelFontSize="13px"
+                            labelColor="#4E5052"
+                            labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                            name="applicationData.repositoryUrl"
+                            htmlFor="repositoryUrl"
+                          >
+                            {({ field }) => (
+                              <StyledInputGroup
+                                type="url"
+                                placeholder="github.com"
                                 {...field}
-                                value={spdxLicenseList.find(option => option.value === field.value)}
-                                onChange={({ value }) => {
-                                  setFieldValue('applicationData.licenseSpdxId', value);
-                                }}
+                                onChange={e => setFieldValue('applicationData.repositoryUrl', e.target.value)}
+                                px="7px"
                               />
-                            );
-                          }}
-                        </StyledInputFormikField>
-                      </Box>
+                            )}
+                          </StyledInputFormikField>
+                          <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
+                            <FormattedMessage
+                              id="HostApplication.repositoryUrlHint"
+                              defaultMessage="You can link your github/gitlab etc."
+                            />
+                          </P>
+                        </Box>
+
+                        <Box>
+                          <StyledInputFormikField
+                            label={intl.formatMessage(messages.repositoryLicense)}
+                            labelFontSize="13px"
+                            labelColor="#4E5052"
+                            labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                            name="applicationData.licenseSpdxId"
+                            htmlFor="licenseSpdxId"
+                          >
+                            {({ field }) => {
+                              return (
+                                <StyledSelect
+                                  inputId={field.id}
+                                  options={spdxLicenseList}
+                                  {...field}
+                                  value={spdxLicenseList.find(option => option.value === field.value)}
+                                  onChange={({ value }) => {
+                                    setFieldValue('applicationData.licenseSpdxId', value);
+                                  }}
+                                />
+                              );
+                            }}
+                          </StyledInputFormikField>
+                        </Box>
+                      </Grid>
 
                       <Box width={['256px', '484px', '664px']} mt={20}>
                         <Flex alignItems="center" justifyContent="stretch" gap={6}>
