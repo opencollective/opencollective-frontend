@@ -277,7 +277,6 @@ const AddFundsModal = ({ collective, ...props }) => {
   const { data, loading } = useQuery(addFundsAccountQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: collective.slug },
-    skip: !collective,
   });
   const account = data?.account;
   const currency = account?.currency;
@@ -293,7 +292,7 @@ const AddFundsModal = ({ collective, ...props }) => {
       {
         context: API_V2_CONTEXT,
         query: getBudgetSectionQuery(true),
-        variables: getBudgetSectionQueryVariables(collective.slug, account?.host?.slug),
+        variables: getBudgetSectionQueryVariables(collective.slug, collective.host?.slug),
       },
       { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
     ],
@@ -318,11 +317,11 @@ const AddFundsModal = ({ collective, ...props }) => {
 
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
-  const canAddHostFee = account?.host?.plan?.hostFees && collective.id !== account?.host?.id;
+  const canAddHostFee = collective.host?.plan?.hostFees && collective.id !== account?.host?.id;
   const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
-  const canAddPlatformTip = account?.host?.isTrustedHost;
-  const receiptTemplates = account?.host?.settings?.invoice?.templates;
+  const canAddPlatformTip = collective.host?.isTrustedHost;
+  const receiptTemplates = collective.host?.settings?.invoice?.templates;
 
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
@@ -421,10 +420,10 @@ const AddFundsModal = ({ collective, ...props }) => {
 
           const defaultSources = [];
           defaultSources.push({
-            value: account?.host,
-            label: <DefaultCollectiveLabel value={account?.host} />,
+            value: collective.host,
+            label: <DefaultCollectiveLabel value={collective.host} />,
           });
-          if (account?.host?.id !== collective.id) {
+          if (collective.host?.id !== collective.id) {
             defaultSources.push({ value: collective, label: <DefaultCollectiveLabel value={collective} /> });
           }
 
@@ -758,6 +757,7 @@ AddFundsModal.propTypes = {
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     hostFeePercent: PropTypes.number,
     slug: PropTypes.string,
+    host: PropTypes.object.isRequired,
   }).isRequired,
   onClose: PropTypes.func,
 };
