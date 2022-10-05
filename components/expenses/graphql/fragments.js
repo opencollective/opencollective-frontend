@@ -243,6 +243,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
     }
     account {
       id
+      legacyId
       slug
       name
       type

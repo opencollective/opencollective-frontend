@@ -6,6 +6,7 @@ export const recurringContributionsQuery = gqlV2/* GraphQL */ `
   query RecurringContributions($slug: String!) {
     account(slug: $slug) {
       id
+      legacyId
       slug
       name
       type

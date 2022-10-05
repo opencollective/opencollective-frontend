@@ -136,6 +136,7 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
     account(slug: $slug) {
       id
       type
+      currency
       settings
       ... on Organization {
         tiers {
@@ -149,6 +150,12 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
         addedFundsHostFeePercent: hostFeePercent(paymentMethodType: HOST)
         host {
           id
+          slug
+          name
+          plan {
+            id
+            hostFees
+          }
           isTrustedHost
         }
       }
@@ -249,15 +256,11 @@ const getTiersOptions = (intl, tiers) => {
   ];
 };
 
-const AddFundsModal = ({ host, collective, ...props }) => {
+const AddFundsModal = ({ collective, ...props }) => {
   const { LoggedInUser } = useLoggedInUser();
   const [fundDetails, setFundDetails] = useState({});
   const { addToast } = useToasts();
   const intl = useIntl();
-  const options = React.useMemo(
-    () => getOptions(fundDetails.fundAmount, collective.currency, intl),
-    [fundDetails.fundAmount, collective.currency],
-  );
   const formatOptionLabel = option => {
     if (option.currency) {
       return (
@@ -270,19 +273,27 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       return option.label;
     }
   };
-  const [selectedOption, setSelectedOption] = useState(options[3]);
   const [customAmount, setCustomAmount] = useState(0);
   const { data, loading } = useQuery(addFundsAccountQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: collective.slug },
+    skip: !collective,
   });
+  const account = data?.account;
+  const currency = account?.currency;
+
+  const options = React.useMemo(
+    () => getOptions(fundDetails.fundAmount, currency, intl),
+    [fundDetails.fundAmount, currency],
+  );
+  const [selectedOption, setSelectedOption] = useState(options[3]);
   const [submitAddFunds, { data: addFundsResponse, error: fundError }] = useMutation(addFundsMutation, {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
         context: API_V2_CONTEXT,
         query: getBudgetSectionQuery(true),
-        variables: getBudgetSectionQueryVariables(collective.slug, host.slug),
+        variables: getBudgetSectionQueryVariables(collective.slug, account?.host?.slug),
       },
       { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
     ],
@@ -307,11 +318,11 @@ const AddFundsModal = ({ host, collective, ...props }) => {
 
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
-  const canAddHostFee = host.plan?.hostFees && collective.id !== host.id;
-  const hostFeePercent = data?.account.addedFundsHostFeePercent || collective.hostFeePercent;
+  const canAddHostFee = account?.host?.plan?.hostFees && collective.id !== account?.host?.id;
+  const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
-  const canAddPlatformTip = data?.account?.host?.isTrustedHost;
-  const receiptTemplates = collective.host?.settings?.invoice?.templates;
+  const canAddPlatformTip = account?.host?.isTrustedHost;
+  const receiptTemplates = account?.host?.settings?.invoice?.templates;
 
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
@@ -330,6 +341,10 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     setCustomAmount(0);
     props.onClose();
   };
+
+  if (!currency) {
+    return null;
+  }
 
   return (
     <PlatformTipContainer
@@ -405,8 +420,11 @@ const AddFundsModal = ({ host, collective, ...props }) => {
           const hostFee = Math.round(values.amount * (hostFeePercent / 100));
 
           const defaultSources = [];
-          defaultSources.push({ value: host, label: <DefaultCollectiveLabel value={host} /> });
-          if (host.id !== collective.id) {
+          defaultSources.push({
+            value: account?.host,
+            label: <DefaultCollectiveLabel value={account?.host} />,
+          });
+          if (account?.host?.id !== collective.id) {
             defaultSources.push({ value: collective, label: <DefaultCollectiveLabel value={collective} /> });
           }
 
@@ -479,7 +497,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                         <StyledInputAmount
                           id={field.id}
                           data-cy="add-funds-amount"
-                          currency={collective.currency}
+                          currency={currency}
                           placeholder="0.00"
                           error={field.error}
                           value={field.value}
@@ -549,13 +567,13 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                   <StyledHr my={2} borderColor="black.300" />
                   <AmountDetailsLine
                     value={values.amount || 0}
-                    currency={collective.currency}
+                    currency={currency}
                     label={<FormattedMessage id="AddFundsModal.fundingAmount" defaultMessage="Funding amount" />}
                   />
                   {canAddHostFee && (
                     <AmountDetailsLine
                       value={hostFee}
-                      currency={collective.currency}
+                      currency={currency}
                       label={
                         <FormattedMessage
                           id="AddFundsModal.hostFees"
@@ -568,7 +586,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                   <StyledHr my={2} borderColor="black.300" />
                   <AmountDetailsLine
                     value={values.amount - hostFee}
-                    currency={collective.currency}
+                    currency={currency}
                     label={
                       <FormattedMessage
                         id="AddFundsModal.netAmount"
@@ -581,7 +599,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     <FormattedMessage
                       id="AddFundsModal.disclaimer"
                       defaultMessage="By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective."
-                      values={{ amount: formatCurrency(values.amount, collective.currency, { locale: intl.locale }) }}
+                      values={{ amount: formatCurrency(values.amount, currency, { locale: intl.locale }) }}
                     />
                   </P>
                   {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
@@ -618,7 +636,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       <FormattedMessage id="AddFundsModal.YouAdded" defaultMessage="You added:" />
                       <ul>
                         <li>
-                          <strong>{`${fundDetails.fundAmount / 100} ${collective.currency}`}</strong>
+                          <strong>{`${fundDetails.fundAmount / 100} ${currency}`}</strong>
                         </li>
                         <li>
                           <FormattedMessage id="AddFundsModal.FromTheSource" defaultMessage="From the source" />{' '}
@@ -691,7 +709,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                           <Flex justifyContent="flex-end" mt={2}>
                             <StyledInputAmount
                               id="platformTip"
-                              currency={collective.currency}
+                              currency={currency}
                               onChange={amount => setCustomAmount(amount)}
                               defaultValue={options[1].value}
                             />
@@ -736,27 +754,10 @@ const AddFundsModal = ({ host, collective, ...props }) => {
 };
 
 AddFundsModal.propTypes = {
-  host: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string,
-    plan: PropTypes.shape({
-      hostFees: PropTypes.bool,
-      hostFeeSharePercent: PropTypes.number,
-    }),
-  }).isRequired,
   collective: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    currency: PropTypes.string,
     hostFeePercent: PropTypes.number,
     slug: PropTypes.string,
-    host: PropTypes.shape({
-      settings: PropTypes.shape({
-        invoice: PropTypes.shape({
-          templates: PropTypes.object,
-        }),
-      }),
-    }),
   }).isRequired,
   onClose: PropTypes.func,
 };

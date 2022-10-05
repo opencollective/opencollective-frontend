@@ -501,6 +501,7 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
   query CreateExpensePage($collectiveSlug: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
+      legacyId
       slug
       name
       type

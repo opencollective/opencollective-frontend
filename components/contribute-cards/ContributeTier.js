@@ -233,9 +233,9 @@ ContributeTier.propTypes = {
     amountType: PropTypes.string,
     endsAt: PropTypes.string,
     button: PropTypes.string,
-    goal: PropTypes.oneOfType(PropTypes.number, PropTypes.object),
-    minimumAmount: PropTypes.oneOfType(PropTypes.number, PropTypes.object),
-    amount: PropTypes.oneOfType(PropTypes.number, PropTypes.object),
+    goal: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
+    minimumAmount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
+    amount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
     maxQuantity: PropTypes.number,
     stats: PropTypes.shape({
       totalRecurringDonations: PropTypes.number,
