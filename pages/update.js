@@ -186,6 +186,7 @@ const updateQuery = gqlV2/* GraphQL */ `
   query Update($collectiveSlug: String, $updateSlug: String!, $offset: Int) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
+      legacyId
       slug
       name
       type

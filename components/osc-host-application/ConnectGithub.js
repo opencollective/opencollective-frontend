@@ -23,7 +23,6 @@ class ConnectGithub extends React.Component {
   static propTypes = {
     router: PropTypes.object.isRequired,
     setGithubInfo: PropTypes.func.isRequired,
-    githubInfo: PropTypes.object,
     nextDisabled: PropTypes.bool,
   };
 
