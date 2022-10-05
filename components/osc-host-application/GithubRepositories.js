@@ -86,10 +86,10 @@ const GithubRepositories = ({ repositories, setGithubInfo, ...fieldProps }) => {
             if (value.owner.type === 'User') {
               setGithubInfo({
                 handle: `${value.owner.login}/${value.name}`,
-                repo: value.name,
+                licenseSpdxId: value.license?.spdx_id,
               });
             } else {
-              setGithubInfo(null);
+              setGithubInfo({});
             }
           }}
           keyGetter="name"
@@ -105,12 +105,11 @@ const GithubRepositories = ({ repositories, setGithubInfo, ...fieldProps }) => {
                     if (type === 'repository') {
                       setGithubInfo({
                         handle: `${value.owner.login}/${value.name}`,
-                        repo: value.name,
+                        licenseSpdxId: value.license?.spdx_id,
                       });
                     } else {
                       setGithubInfo({
                         handle: value.owner.login,
-                        repo: value.name,
                       });
                     }
                   }}

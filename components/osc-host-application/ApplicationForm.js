@@ -7,6 +7,7 @@ import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Form, Formik } from 'formik';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import spdxLicenses from 'spdx-license-list';
 
 import { suggestSlug } from '../../lib/collective.lib';
 import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
@@ -31,6 +32,7 @@ import StyledInputGroup from '../StyledInputGroup';
 import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { H1, H4, P } from '../Text';
+import StyledSelect from '../StyledSelect';
 
 const createCollectiveMutation = gqlV2/* GraphQL */ `
   mutation CreateCollective(
@@ -127,6 +129,18 @@ const messages = defineMessages({
     id: 'createCollective.form.descriptionLabel',
     defaultMessage: 'What does your Collective do?',
   },
+  repositoryUrl: {
+    id: 'HostApplicationForm.RepositoryUrlLabel',
+    defaultMessage: 'Link your Repository or Organisation',
+  },
+  repositoryUrlHint: {
+    id: 'HostApplicationForm.RepositoryUrlHint',
+    defaultMessage: 'You can link your github/gitlab etc.',
+  },
+  repositoryLicense: {
+    id: 'HostApplication.form.license',
+    defaultMessage: 'License',
+  },
 });
 
 const useApplicationMutation = canApplyWithCollective =>
@@ -144,7 +158,6 @@ const ApplicationForm = ({
   router,
   collective: collectiveWithSlug,
   host,
-  githubInfo,
 }) => {
   const intl = useIntl();
   const [submitApplication, { loading: submitting, error }] = useApplicationMutation(canApplyWithCollective);
@@ -168,19 +181,17 @@ const ApplicationForm = ({
   const submit = async ({ user, collective, applicationData, inviteMembers, message }) => {
     const variables = {
       collective: {
-        ...(canApplyWithCollective
-          ? { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug }
-          : { ...collective, githubHandle: githubInfo?.handle }),
+        ...(canApplyWithCollective ? { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug } : collective),
       },
       host: { legacyId: OPENSOURCE_COLLECTIVE_ID },
       user,
-      applicationData: { ...applicationData, githubHandle: githubInfo?.handle },
+      applicationData,
       inviteMembers: inviteMembers.map(invite => ({
         ...invite,
         memberAccount: { legacyId: invite.memberAccount.id },
       })),
       message,
-      ...(!canApplyWithCollective && { automateApprovalWithGithub: githubInfo ? true : false }),
+      ...(!canApplyWithCollective && { automateApprovalWithGithub: applicationData.repositoryUrl ? true : false }),
     };
 
     const response = await submitApplication({ variables });
@@ -194,6 +205,13 @@ const ApplicationForm = ({
     // Scroll the user to the top in order to see the error message
     window.scrollTo(0, 0);
   }
+
+  // turn licenses object into array
+  const spdxLicenseList = Object.keys(spdxLicenses).map(key => ({
+    label: spdxLicenses[key].name,
+    value: key,
+    key,
+  }));
 
   return (
     <React.Fragment>
@@ -429,6 +447,78 @@ const ApplicationForm = ({
                         <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
                           {intl.formatMessage(messages.descriptionHint)}
                         </P>
+                      </Box>
+                      <Box width={['256px', '484px', '664px']} mt={20}>
+                        <Flex alignItems="center" justifyContent="stretch" gap={6}>
+                          <H4 fontSize="18px" lineHeight="24px" color="black.900" mb={2}>
+                            <FormattedMessage
+                              id="HostApplication.applicationForm.code"
+                              defaultMessage="About your Code {padlock}"
+                              values={{
+                                padlock: <Lock size="12px" color="#9D9FA3" />,
+                              }}
+                            />
+                          </H4>
+                          <StyledHr flex="1" />
+                        </Flex>
+                        <P fontSize="12px" lineHeight="16px" color="black.600">
+                          <FormattedMessage
+                            id="HostApplication.applicationForm.privateInformation"
+                            defaultMessage="This information is private. We only use it to check your eligibility and legitimacy."
+                          />
+                        </P>
+                      </Box>
+
+                      <Box width={['256px', '234px', '324px']} my={2}>
+                        <StyledInputFormikField
+                          label={intl.formatMessage(messages.repositoryUrl)}
+                          labelFontSize="13px"
+                          labelColor="#4E5052"
+                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                          name="applicationData.repositoryUrl"
+                          htmlFor="repositoryUrl"
+                        >
+                          {({ field }) => (
+                            <StyledInputGroup
+                              type="url"
+                              placeholder="github.com"
+                              {...field}
+                              onChange={e => setFieldValue('applicationData.repositoryUrl', e.target.value)}
+                              px="7px"
+                            />
+                          )}
+                        </StyledInputFormikField>
+                        <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
+                          <FormattedMessage
+                            id="HostApplication.repositoryUrlHint"
+                            defaultMessage="You can link your github/gitlab etc."
+                          />
+                        </P>
+                      </Box>
+
+                      <Box width={['256px', '234px', '324px']} my={2}>
+                        <StyledInputFormikField
+                          label={intl.formatMessage(messages.repositoryLicense)}
+                          labelFontSize="13px"
+                          labelColor="#4E5052"
+                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                          name="applicationData.licenseSpdxId"
+                          htmlFor="licenseSpdxId"
+                        >
+                          {({ field }) => {
+                            return (
+                              <StyledSelect
+                                inputId={field.id}
+                                options={spdxLicenseList}
+                                {...field}
+                                value={spdxLicenseList.find(option => option.value === field.value)}
+                                onChange={({ value }) => {
+                                  setFieldValue('applicationData.licenseSpdxId', value);
+                                }}
+                              />
+                            );
+                          }}
+                        </StyledInputFormikField>
                       </Box>
 
                       <Box width={['256px', '484px', '664px']} mt={20}>
