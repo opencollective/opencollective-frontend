@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
@@ -16,9 +15,7 @@ import { H1 } from '../Text';
 import { withUser } from '../UserProvider';
 
 import CollectiveCategoryPicker from './CollectiveCategoryPicker';
-import ConnectGithub from './ConnectGithub';
 import CreateCollectiveForm from './CreateCollectiveForm';
-import CreateOpenSourceCollective from './CreateOpenSourceCollective';
 
 class CreateCollective extends Component {
   static propTypes = {
@@ -98,7 +95,7 @@ class CreateCollective extends Component {
   render() {
     const { LoggedInUser, host, router, data } = this.props;
     const { error } = this.state;
-    const { category, step, token } = router.query;
+    const { category } = router.query;
     const tags = data?.tagStats?.nodes?.filter(node => !IGNORED_TAGS.includes(node.tag));
     const popularTags = tags?.map(value => value.tag);
 
@@ -137,14 +134,6 @@ class CreateCollective extends Component {
 
     if (!host && !category) {
       return <CollectiveCategoryPicker />;
-    }
-
-    if ((category === 'opensource' || get(host, 'slug') === 'opensource') && step !== 'form') {
-      if (token) {
-        return <ConnectGithub updateGithubInfo={githubInfo => this.setState({ githubInfo })} />;
-      } else {
-        return <CreateOpenSourceCollective />;
-      }
     }
 
     return (
