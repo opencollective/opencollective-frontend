@@ -75,7 +75,7 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
   if (message) {
     if (message.startsWith('Insufficient Paypal balance')) {
       return {
-        title: 'Insufficient Paypal balance',
+        title: intl.formatMessage({ defaultMessage: 'Insufficient Paypal balance' }),
         message: (
           <React.Fragment>
             <Link href={`/${host.slug}/admin`}>
@@ -89,7 +89,7 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
       };
     } else if (message.startsWith('Host has two-factor authentication enabled for large payouts')) {
       return {
-        title: 'Host has two-factor authentication enabled for large payouts',
+        title: intl.formatMessage({ defaultMessage: 'Host has two-factor authentication enabled for payouts' }),
         message: (
           <FormattedMessage
             id="PayExpenseModal.HostTwoFactorAuthEnabled"

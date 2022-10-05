@@ -1,11 +1,13 @@
 import React from 'react';
 import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
 import { useRouter } from 'next/router';
+import slugify from 'slugify';
 import styled, { css } from 'styled-components';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
 import { Box, Grid } from '../components/Grid';
+import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import BanAccounts from '../components/root-actions/BanAccounts';
 import BanAccountsWithSearch from '../components/root-actions/BanAccountsWithSearch';
@@ -71,13 +73,17 @@ const MENU = [
     description: 'Use this action to ban an account or a network of accounts.',
   },
   {
-    id: 'Search & destroy',
+    id: 'Search & ban',
     Component: BanAccountsWithSearch,
     isDangerous: true,
   },
 ];
 
-const MenuEntry = styled.button`
+// Add slug for menu sections
+MENU.forEach(menu => (menu.slug = slugify(menu.id, { lower: true })));
+
+const MenuEntry = styled.div`
+  display: block;
   background: white;
   padding: 16px;
   cursor: pointer;
@@ -90,7 +96,7 @@ const MenuEntry = styled.button`
   text-align: left;
 
   ${props =>
-    props.isActive &&
+    props.$isActive &&
     css`
       font-weight: 800;
       background: #f5faff;
@@ -111,8 +117,8 @@ const MenuEntry = styled.button`
 `;
 
 const RootActionsPage = () => {
-  const [selectedMenuEntry, setSelectedMenuEntry] = React.useState(MENU[1]);
   const router = useRouter();
+  const selectedMenuEntry = MENU.find(m => m.slug === router.query.section) || MENU[1];
   const showHiddenActions = Boolean(router.query.showHiddenActions);
   return (
     <AuthenticatedPage disableSignup rootOnly>
@@ -123,17 +129,25 @@ const RootActionsPage = () => {
       </Container>
       <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" mb={5}>
         <Container borderRight="1px solid #e5e5e5">
-          {MENU.filter(e => showHiddenActions || !e.isHidden).map(menuEntry => (
-            <MenuEntry
-              key={menuEntry.id}
-              title={menuEntry.title || menuEntry.id}
-              isActive={selectedMenuEntry.id === menuEntry.id}
-              onClick={() => (menuEntry.type === 'category' ? null : setSelectedMenuEntry(menuEntry))}
-              $type={menuEntry.type}
-            >
-              {menuEntry.id}
-            </MenuEntry>
-          ))}
+          {MENU.filter(e => showHiddenActions || !e.isHidden).map(menuEntry =>
+            menuEntry.type === 'category' ? (
+              <MenuEntry key={menuEntry.id} title={menuEntry.title || menuEntry.id} $type="category">
+                {menuEntry.id}
+              </MenuEntry>
+            ) : (
+              <MenuEntry
+                key={menuEntry.id}
+                as={Link}
+                href={`/opencollective/root-actions/${menuEntry.slug}`}
+                shallow
+                title={menuEntry.title || menuEntry.id}
+                $isActive={selectedMenuEntry.id === menuEntry.id}
+                $type={menuEntry.type}
+              >
+                {menuEntry.id}
+              </MenuEntry>
+            ),
+          )}
         </Container>
         <div>
           <H3 lineHeight="30px" fontSize="24px" backgroundColor="black.50" color="black.800" p={3}>

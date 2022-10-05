@@ -15,9 +15,17 @@ const collectivePickerSearchQuery = gql`
     $types: [TypeOfCollective]
     $limit: Int
     $hostCollectiveIds: [Int]
+    $parentCollectiveIds: [Int]
     $skipGuests: Boolean
   ) {
-    search(term: $term, types: $types, limit: $limit, hostCollectiveIds: $hostCollectiveIds, skipGuests: $skipGuests) {
+    search(
+      term: $term
+      types: $types
+      limit: $limit
+      hostCollectiveIds: $hostCollectiveIds
+      parentCollectiveIds: $parentCollectiveIds
+      skipGuests: $skipGuests
+    ) {
       id
       collectives {
         id
@@ -101,6 +109,7 @@ const CollectivePickerAsync = ({
   types,
   limit,
   hostCollectiveIds,
+  parentCollectiveIds,
   preload,
   filterResults,
   searchQuery,
@@ -122,9 +131,16 @@ const CollectivePickerAsync = ({
   // If preload is true, trigger a first query on mount or when one of the query param changes
   React.useEffect(() => {
     if (term || preload) {
-      throttledSearch(searchCollectives, { term: term || '', types, limit, hostCollectiveIds, skipGuests });
+      throttledSearch(searchCollectives, {
+        term: term || '',
+        types,
+        limit,
+        hostCollectiveIds,
+        parentCollectiveIds,
+        skipGuests,
+      });
     }
-  }, [types, limit, hostCollectiveIds, term]);
+  }, [types, limit, hostCollectiveIds, parentCollectiveIds, term]);
 
   return (
     <CollectivePicker
@@ -161,6 +177,8 @@ CollectivePickerAsync.propTypes = {
   limit: PropTypes.number,
   /** If set, only the collectives under this host will be retrieved */
   hostCollectiveIds: PropTypes.arrayOf(PropTypes.number),
+  /** If set, only the collectives under this parent collective will be retrieved */
+  parentCollectiveIds: PropTypes.arrayOf(PropTypes.number),
   /** If true, a query will be triggered even if search is empty */
   preload: PropTypes.bool,
   /** If true, results won't be cached (Apollo "network-only" mode) */

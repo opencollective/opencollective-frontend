@@ -105,7 +105,7 @@ class HostDashboardPage extends React.Component {
           <FormattedMessage id="notFound" defaultMessage="Not found" />
         </MessageBox>
       );
-    } else if (!LoggedInUser.canEditCollective(data.account)) {
+    } else if (!LoggedInUser.isAdminOfCollectiveOrHost(data.account)) {
       return (
         <MessageBox m={5} type="error" withIcon>
           <FormattedMessage
@@ -143,7 +143,7 @@ class HostDashboardPage extends React.Component {
     const { LoggedInUser, loadingLoggedInUser, data, view, slug } = this.props;
     const host = data.account || {};
 
-    const canEdit = LoggedInUser && host && LoggedInUser.canEditCollective(host);
+    const canEdit = LoggedInUser && host && LoggedInUser.isAdminOfCollectiveOrHost(host);
 
     const newAdminUrl = host.id && getSettingsRoute(host, view);
     return (

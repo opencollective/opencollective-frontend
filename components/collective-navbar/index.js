@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { PropTypes } from 'prop-types';
+import { useQuery } from '@apollo/client';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
@@ -21,6 +22,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import roles from '../../lib/constants/roles';
 import { isSupportedExpenseType } from '../../lib/expenses';
+import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute, getSettingsRoute } from '../../lib/url-helpers';
@@ -183,6 +185,21 @@ const CategoriesContainer = styled(Container)`
   }
 `;
 
+const accountPermissionsQuery = gqlV2/* GraphQL */ `
+  query AccountPermissions($slug: String!) {
+    account(slug: $slug) {
+      id
+      permissions {
+        id
+        addFunds {
+          allowed
+          reason
+        }
+      }
+    }
+  }
+`;
+
 const MobileCategoryContainer = styled(Container).attrs({ display: ['block', null, null, 'none'] })`
   animation: ${fadeIn} 0.2s;
   margin-left: 8px;
@@ -247,7 +264,15 @@ const getHasContribute = (collective, sections, isAdmin) => {
   );
 };
 
-const getDefaultCallsToActions = (collective, sections, isAdmin, isAccountant, isHostAdmin, LoggedInUser) => {
+const getDefaultCallsToActions = (
+  collective,
+  sections,
+  isAdmin,
+  isAccountant,
+  isHostAdmin,
+  LoggedInUser,
+  isAllowedAddFunds,
+) => {
   if (!collective) {
     return {};
   }
@@ -263,7 +288,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, isAccountant, i
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     hasRequestGrant:
       isSupportedExpenseType(collective, EXPENSE_TYPE.GRANT) && expenseSubmissionAllowed(collective, LoggedInUser),
-    addFunds: isHostAdmin,
+    addFunds: isAllowedAddFunds,
     createVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
     assignVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
     requestVirtualCard: isAdmin && isFeatureAvailable(collective, 'REQUEST_VIRTUAL_CARDS'),
@@ -419,13 +444,30 @@ const CollectiveNavbar = ({
   const [isExpanded, setExpanded] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
   const isAccountant = LoggedInUser?.hasRole(roles.ACCOUNTANT, collective);
-  isAdmin = isAdmin || LoggedInUser?.canEditCollective(collective);
+  isAdmin = isAdmin || LoggedInUser?.isAdminOfCollectiveOrHost(collective);
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
+  const { data, dataLoading } = useQuery(accountPermissionsQuery, {
+    context: API_V2_CONTEXT,
+    variables: { slug: collective?.slug },
+    skip: !collective?.slug,
+  });
+
+  const loading = isLoading || dataLoading;
+
+  const isAllowedAddFunds = data?.account?.permissions?.addFunds?.allowed;
   const sections = React.useMemo(() => {
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
   callsToAction = {
-    ...getDefaultCallsToActions(collective, sections, isAdmin, isAccountant, isHostAdmin, LoggedInUser),
+    ...getDefaultCallsToActions(
+      collective,
+      sections,
+      isAdmin,
+      isAccountant,
+      isHostAdmin,
+      LoggedInUser,
+      isAllowedAddFunds,
+    ),
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
@@ -480,7 +522,7 @@ const CollectiveNavbar = ({
             </BackButtonAndAvatar>
 
             <Container display={onlyInfos ? 'flex' : ['flex', null, null, 'none']} minWidth={0}>
-              {isLoading ? (
+              {loading ? (
                 <LoadingPlaceholder height={14} minWidth={100} />
               ) : isInHero ? (
                 <React.Fragment>
@@ -536,7 +578,7 @@ const CollectiveNavbar = ({
               order={[0, 3, 0]}
               isExpanded={isExpanded}
             >
-              {isLoading ? (
+              {loading ? (
                 <LoadingPlaceholder height={34} minWidth={100} maxWidth={200} my={15} />
               ) : (
                 getNavBarMenu(intl, collective, sections).map(({ category, links }) => (
@@ -567,7 +609,7 @@ const CollectiveNavbar = ({
                   {secondAction?.component ? <Container ml={2}>{secondAction?.component}</Container> : null}
                 </Container>
               )}
-              {!isLoading && (
+              {!loading && (
                 <CollectiveNavbarActionsMenu
                   collective={collective}
                   callsToAction={callsToAction}

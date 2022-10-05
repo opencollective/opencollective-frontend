@@ -8,6 +8,7 @@ import { TransactionKind, TransactionTypes } from '../../lib/constants/transacti
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { renderDetailsString, saveInvoice } from '../../lib/transactions';
 
+import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
@@ -98,6 +99,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
     hostFee,
     paymentMethod,
     paymentProcessorFee,
+    payoutMethod,
     amount,
     netAmount,
     permissions,
@@ -193,6 +195,22 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               )}
             </React.Fragment>
           )}
+          {payoutMethod && (
+            <Box>
+              <DetailTitle>
+                <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
+              </DetailTitle>
+              <DetailDescription>
+                <PayoutMethodTypeWithIcon
+                  type={payoutMethod.type}
+                  color={'inherit'}
+                  fontWeight={'inherit'}
+                  fontSize={'inherit'}
+                  iconSize={16}
+                />
+              </DetailDescription>
+            </Box>
+          )}
         </Box>
       </Flex>
       {displayActions && ( // Let us overide so we can hide buttons in the collective page
@@ -281,6 +299,9 @@ TransactionDetails.propTypes = {
     taxAmount: PropTypes.object,
     taxInfo: PropTypes.object,
     paymentMethod: PropTypes.shape({
+      type: PropTypes.string,
+    }),
+    payoutMethod: PropTypes.shape({
       type: PropTypes.string,
     }),
     amount: PropTypes.shape({

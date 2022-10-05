@@ -1,0 +1,25 @@
+import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
+import StyledCollectiveCard from '../../components/StyledCollectiveCard';
+import { webpackCollective } from '../mocks/collectives';
+
+<Meta title="Design system/StyledCollectiveCard" component={StyledCollectiveCard} argTypes={{}} />
+
+# StyledCollectiveCard
+
+## Default
+
+export const DefaultStory = props => <StyledCollectiveCard {...props} />;
+
+<Canvas>
+  <Story name="Default">
+    <StyledCollectiveCard collective={webpackCollective} />
+  </Story>
+</Canvas>
+
+## Frozen Collective
+
+<Canvas>
+  <Story name="Frozen Collective">
+    <StyledCollectiveCard collective={{ ...webpackCollective, isFrozen: true }} />
+  </Story>
+</Canvas>

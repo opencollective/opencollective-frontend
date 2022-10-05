@@ -101,7 +101,7 @@ const Comment = ({
           warnIfUnsavedChanges
           required
         >
-          {({ isEditing, setValue }) =>
+          {({ isEditing, setValue, setUploading }) =>
             !isEditing ? (
               <HTMLContent content={comment.html} fontSize="13px" data-cy="comment-body" />
             ) : (
@@ -110,6 +110,7 @@ const Comment = ({
                 onChange={e => setValue(e.target.value)}
                 fontSize="13px"
                 autoFocus
+                setUploading={setUploading}
               />
             )
           }

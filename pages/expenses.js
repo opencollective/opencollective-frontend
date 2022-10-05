@@ -146,7 +146,7 @@ class ExpensePage extends React.Component {
   componentDidUpdate(oldProps) {
     const { LoggedInUser, data } = this.props;
     if (!oldProps.LoggedInUser && LoggedInUser) {
-      if (LoggedInUser.canEditCollective(data.account) || LoggedInUser.isHostAdmin(data.account)) {
+      if (LoggedInUser.isAdminOfCollectiveOrHost(data.account) || LoggedInUser.isHostAdmin(data.account)) {
         data.refetch();
       }
     }
@@ -318,10 +318,13 @@ class ExpensePage extends React.Component {
                       </H5>
                       <ExpenseTags
                         isLoading={data.loading}
-                        expense={{ tags: data.account?.expensesTags.map(({ tag }) => tag) }}
+                        expense={{
+                          tags: data.account?.expensesTags.map(({ tag }) => tag),
+                        }}
                         limit={30}
                         getTagProps={this.getTagProps}
                         data-cy="expense-tags-title"
+                        showUntagged
                       >
                         {({ key, tag, renderedTag, props }) => (
                           <Link
@@ -478,7 +481,7 @@ const addExpensesPageData = graphql(expensesPageQuery, {
         limit: props.query.limit || EXPENSES_PER_PAGE,
         type: props.query.type,
         status: props.query.status,
-        tags: props.query.tag ? [props.query.tag] : undefined,
+        tags: props.query.tag ? (props.query.tag === 'untagged' ? null : [props.query.tag]) : undefined,
         minAmount: amountRange[0] && amountRange[0] * 100,
         maxAmount: amountRange[1] && amountRange[1] * 100,
         payoutMethodType: props.query.payout,

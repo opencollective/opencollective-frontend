@@ -24,7 +24,7 @@ describe('create a collective', () => {
     cy.get('[data-cy="custom-checkbox"').click();
     cy.get('[data-cy=ccf-form-submit]').click();
     cy.get('[data-cy=ccf-error-message]').contains(
-      'The slug bees-are-neat is already taken. Please use another slug for your collective.',
+      'An account already exists for this URL, please choose another one.',
     );
   });
 

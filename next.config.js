@@ -200,6 +200,12 @@ const nextConfig = {
         destination: '/search',
         permanent: true,
       },
+      // Redirect legacy /create/opensource to new OSC apply flow
+      {
+        source: '/create/opensource/:step*',
+        destination: '/opensource/apply/intro',
+        permanent: true,
+      },
     ];
   },
 };

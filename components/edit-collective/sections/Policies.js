@@ -12,6 +12,8 @@ import { omitDeep, stripHTML } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
+import { getI18nLink } from '../../I18nFormatters';
+import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import RichTextEditor from '../../RichTextEditor';
@@ -471,7 +473,10 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
           <P mb={2}>
             <FormattedMessage
               id="editCollective.expenseTypes.description"
-              defaultMessage="Specify the types of expenses allowed"
+              defaultMessage="Specify the types of expenses allowed for all the collectives you're hosting. If you wish to customize these options for specific collectives, head to the <HostedCollectivesLink>Hosted Collectives</HostedCollectivesLink> section."
+              values={{
+                HostedCollectivesLink: getI18nLink({ as: Link, href: `/${collective.slug}/admin/hosted-collectives` }),
+              }}
             />
           </P>
 

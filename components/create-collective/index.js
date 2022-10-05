@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
@@ -12,13 +11,11 @@ import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import SignInOrJoinFree from '../SignInOrJoinFree';
-import { H1, P } from '../Text';
+import { H1 } from '../Text';
 import { withUser } from '../UserProvider';
 
 import CollectiveCategoryPicker from './CollectiveCategoryPicker';
-import ConnectGithub from './ConnectGithub';
 import CreateCollectiveForm from './CreateCollectiveForm';
-import CreateOpenSourceCollective from './CreateOpenSourceCollective';
 
 class CreateCollective extends Component {
   static propTypes = {
@@ -98,7 +95,7 @@ class CreateCollective extends Component {
   render() {
     const { LoggedInUser, host, router, data } = this.props;
     const { error } = this.state;
-    const { category, step, token } = router.query;
+    const { category } = router.query;
     const tags = data?.tagStats?.nodes?.filter(node => !IGNORED_TAGS.includes(node.tag));
     const popularTags = tags?.map(value => value.tag);
 
@@ -126,22 +123,10 @@ class CreateCollective extends Component {
 
     if (!LoggedInUser) {
       return (
-        <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
-          <Flex flexDirection="column" p={4} mt={2}>
-            <Box mb={3}>
-              <H1 fontSize="32px" lineHeight="36px" fontWeight="bold" textAlign="center">
-                <FormattedMessage id="collective.create.join" defaultMessage="Join Open Collective" />
-              </H1>
-            </Box>
-            <Box textAlign="center">
-              <P fontSize="14px" color="black.600" mb={1}>
-                <FormattedMessage
-                  id="collective.create.createOrSignIn"
-                  defaultMessage="Create an account (or sign in) to start a collective."
-                />
-              </P>
-            </Box>
-          </Flex>
+        <Flex flexDirection="column" alignItems="center" mt={5} mb={5}>
+          <MessageBox m={4} type="warning" withIcon>
+            <FormattedMessage id="mustBeLoggedIn" defaultMessage="You must be logged in to see this page" />
+          </MessageBox>
           <SignInOrJoinFree createProfileTabs={['personal']} />
         </Flex>
       );
@@ -149,14 +134,6 @@ class CreateCollective extends Component {
 
     if (!host && !category) {
       return <CollectiveCategoryPicker />;
-    }
-
-    if ((category === 'opensource' || get(host, 'slug') === 'opensource') && step !== 'form') {
-      if (token) {
-        return <ConnectGithub updateGithubInfo={githubInfo => this.setState({ githubInfo })} />;
-      } else {
-        return <CreateOpenSourceCollective />;
-      }
     }
 
     return (

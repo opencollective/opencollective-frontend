@@ -65,6 +65,7 @@ const BanAccount = () => {
 
       <Flex flexWrap="wrap" px={1} mt={2}>
         <StyledCheckbox
+          name="associated-accounts"
           label="Include all associated accounts"
           checked={includeAssociatedAccounts}
           onChange={({ checked }) => {
@@ -98,7 +99,7 @@ const BanAccount = () => {
           isDanger
           continueLabel="Ban accounts"
           header="Ban accounts"
-          cancelHandler={() => setDryRunData(null)}
+          onClose={() => setDryRunData(null)}
           disableSubmit={!dryRunData.isAllowed}
           continueHandler={async () => {
             try {

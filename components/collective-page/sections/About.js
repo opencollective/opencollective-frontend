@@ -55,7 +55,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
             longDescription: isEmptyValue(longDescription) ? null : longDescription,
           })}
         >
-          {({ isEditing, value, setValue, enableEditor }) => {
+          {({ isEditing, value, setValue, enableEditor, setUploading }) => {
             if (isEditing) {
               return (
                 <RichTextEditor
@@ -67,6 +67,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
                   withStickyToolbar
                   videoEmbedEnabled
                   autoFocus
+                  setUploading={setUploading}
                 />
               );
             } else if (isEmptyDescription) {

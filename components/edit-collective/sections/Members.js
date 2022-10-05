@@ -191,7 +191,7 @@ class Members extends React.Component {
               isLastAdmin={isLastAdmin}
               LoggedInUser={LoggedInUser}
               refetchLoggedInUser={refetchLoggedInUser}
-              canRemove={!(isInvitation || isLastAdmin)}
+              canRemove={!isLastAdmin}
             />
           ) : (
             <StyledRoundButton

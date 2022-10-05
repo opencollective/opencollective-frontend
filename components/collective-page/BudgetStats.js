@@ -16,7 +16,7 @@ import DefinedTerm, { Terms } from '../DefinedTerm';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box } from '../Grid';
 import StyledCard from '../StyledCard';
-import { P } from '../Text';
+import { P, Span } from '../Text';
 
 const StatTitle = styled(Container)`
   font-size: 12px;
@@ -81,26 +81,32 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
           <Container display="inline-block" fontSize="11px" mr="5px" fontWeight="500" width="12px" textAlign="center">
             {getCurrencySymbol(collective.currency)}
           </Container>
-          <DefinedTerm
-            term={Terms.BALANCE}
-            textTransform="uppercase"
-            color="black.700"
-            extraTooltipContent={
-              <Fragment>
-                <Box mt={2}>
-                  <FormattedMessage
-                    id="budgetSection-balance-consolidated"
-                    defaultMessage="Total consolidated including Projects and Events: {amount}"
-                    values={{
-                      amount: formatCurrency(stats?.consolidatedBalance.valueInCents || 0, collective.currency, {
-                        locale,
-                      }),
-                    }}
-                  />
-                </Box>
-              </Fragment>
-            }
-          />
+          {![CollectiveType.PROJECT, CollectiveType.EVENT].includes(collective.type) ? (
+            <DefinedTerm
+              term={Terms.BALANCE}
+              textTransform="uppercase"
+              color="black.700"
+              extraTooltipContent={
+                <Fragment>
+                  <Box mt={2}>
+                    <FormattedMessage
+                      id="budgetSection-balance-consolidated"
+                      defaultMessage="Total consolidated including Projects and Events: {amount}"
+                      values={{
+                        amount: formatCurrency(stats?.consolidatedBalance.valueInCents || 0, collective.currency, {
+                          locale,
+                        }),
+                      }}
+                    />
+                  </Box>
+                </Fragment>
+              }
+            />
+          ) : (
+            <Span textTransform="uppercase" color="black.700">
+              <FormattedMessage id="CollectivePage.SectionBudget.Balance" defaultMessage="Today’s balance" />
+            </Span>
+          )}
         </StatTitle>
         <StatAmount amount={stats.balance.valueInCents} currency={collective.currency} />
       </StatContainer>

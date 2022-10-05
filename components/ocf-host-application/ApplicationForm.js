@@ -6,7 +6,7 @@ import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Question } from '@styled-icons/remix-line/Question';
 import { Form, Formik } from 'formik';
-import { isNil } from 'lodash';
+import { get, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -126,6 +126,7 @@ const ApplicationForm = ({
 }) => {
   const intl = useIntl();
   const [submitApplication, { loading: submitting, error }] = useApplicationMutation(canApplyWithCollective);
+  const slugAlreadyExists = get(error, 'graphQLErrors.0.extensions.extraInfo.slugExists');
 
   const validate = values => {
     const errors = requireFields(values, [
@@ -210,7 +211,7 @@ const ApplicationForm = ({
       </Flex>
       <Flex flexDirection={['column', 'row']} alignItems={['center', 'flex-start']} justifyContent="center">
         <Flex flexDirection="column" alignItems="center" justifyContent="center">
-          {error && (
+          {error && !slugAlreadyExists && (
             <Flex alignItems="center" justifyContent="center">
               <MessageBox type="error" withIcon mb={[1, 3]}>
                 {i18nGraphqlException(intl, error)}
@@ -403,9 +404,18 @@ const ApplicationForm = ({
                                 />
                               )}
                             </StyledInputFormikField>
-                            <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                              <FormattedMessage id="createCollective.form.suggestedLabel" defaultMessage="Suggested" />
-                            </P>
+                            {slugAlreadyExists ? (
+                              <P fontSize="10px" color="red.600" mt="6px">
+                                {i18nGraphqlException(intl, error)}
+                              </P>
+                            ) : (
+                              <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
+                                <FormattedMessage
+                                  id="createCollective.form.suggestedLabel"
+                                  defaultMessage="Suggested"
+                                />
+                              </P>
+                            )}
                           </Box>
                         </Flex>
                       )}

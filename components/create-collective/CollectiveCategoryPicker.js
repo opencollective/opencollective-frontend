@@ -73,7 +73,7 @@ const CollectiveCategoryPicker = () => {
               src="/static/images/create-collective/openSourceIllustration.png"
               alt={formatMessage(messages.opensource)}
             />
-            <Link href={`${baseRoute}/opensource`}>
+            <Link href={`/opensource/apply/intro`}>
               <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
                 {formatMessage(messages.opensource)}
               </StyledButton>
