@@ -168,7 +168,7 @@ const YourInitiativeIsNearlyThere = () => (
         my="40px"
         href="https://docs.oscollective.org/"
         // width={['286px', '215px']}
-        buttonStyle="primary"
+        buttonStyle="purple"
         buttonSize="medium"
         openInNewTab
       >
