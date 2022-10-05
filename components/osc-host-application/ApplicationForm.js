@@ -79,8 +79,8 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
     ) {
       id
       slug
-      isApproved
       ... on AccountWithHost {
+        isApproved
         host {
           id
           slug
