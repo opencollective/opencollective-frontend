@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -18,7 +18,7 @@ import { H2, P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const sendMessageMutation = gql`
-  mutation SendMessage($account: AccountReferenceInput!, $message: String!, $subject: String) {
+  mutation SendMessage($account: AccountReferenceInput!, $message: NonEmptyString!, $subject: String) {
     sendMessage(account: $account, message: $message, subject: $subject) {
       success
     }
