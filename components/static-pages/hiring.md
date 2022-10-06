@@ -10,17 +10,17 @@ Open Collective is a financial and legal toolbox for grassroots groups. We suppo
 
 Right now, [Open Collective](https://opencollective.com) is hiring for a Senior UX Designer, and [Open Collective Foundation](https://opencollective.foundation) is hiring for two roles, a Non-profit Ops & Finance Leader and an Ops Support team member.
 
-# Senior UX Designer
+## Senior UX Designer
 
 Pay $48K-$60K/year, open to applicants worldwide, role with Open Collective Inc.
 
 We are looking for a Senior UX designer who is passionate about: the future of money, collective work, transparent budgets, open source, mutual aid, and distributed leadership. If this describes you, and you are happy with remote and asynchronous work (except for mandatory stand-up calls at 9am ET / 3pm CET weekdays), read more.
 
-#### About
+### About
 
 **The design team at [Open Collective](https://opencollective.com)** is currently based in Mexico, India, Brazil, and the United States. It is responsible for planning, designing, and delivering the features that will make this goal possible in a way that embraces the contributions of multiple designers and creatives worldwide. So far, we have not had a UX-focused designer and we are thrilled to add this skillset to the team.
 
-#### As a senior UX designer, you will:
+### As a senior UX designer, you will:
 
 - Build on and incrementally improve our current user-experience approach across the platform and within our design practice.
 - Lead the process of user-experience support and development for features, components, and interface design complex solutions.
@@ -32,7 +32,7 @@ We are looking for a Senior UX designer who is passionate about: the future of m
 - Establish and maintain user research tools and practices: discovery calls, prototype testing, surveying, interpreting production data, and building context for other team members to do their best work.
 - Work on different projects at a time, producing multiple concepts and workflows.
 
-#### What is expected from you
+### What is expected from you
 
 - You know how to work with different teams, and you can comfortably reach out to people, make proposals, lead workshops, and explain concepts.
 - You are proficient in reviewing and producing interface design and graphic design; while this won't be the majority of your work, you are capable of performing senior QA on any design project related to the platform.
@@ -42,18 +42,18 @@ We are looking for a Senior UX designer who is passionate about: the future of m
 - You are comfortable building on top of already existing ideas and letting others build on your ideas.
 - You are autonomous by taking full ownership of your work. You’ll be responsible for every detail, every step of the way, from drafting and sketching to high-fidelity design solutions.
 
-#### Pay
+### Pay
 
 Open Collective exists to sustain contributors to the commons, including our team. Our budgets and salaries are transparent and based on where you live. We estimate that this role will require $48K - $60K for you to show up joyfully to work (We will propose you something based on your skills and situation). Our aim is that you can earn a good livelihood, have a great work-life balance, and join a team that truly practices what it preaches - no bullshit.
 
-#### Perks
+### Perks
 
 Additional to the monetary compensation, we offer a couple of extra perks:
 
 - $1K per year for improving your workspace, buying tools, and other office expenses that help you perform better.
 - An opportunity to travel when we have retreats (Weeks of face-to-face work every ~8 months) with transportation, allocation, and meals covered during our time together. The last one was in September 2022 in Marseille, France.
 
-#### Values
+### Values
 
 We are a group of optimistic, driven, nerdy, and open people. Open Collective stands for Transparency (“open”) and Group Work (“collective”).
 
@@ -61,7 +61,7 @@ We are a group of optimistic, driven, nerdy, and open people. Open Collective st
 
 **COLLECTIVE**: The happiest people here tend to be rigorous, generous people who love group feedback on slack and want to lead a project and take responsibility for it at a high level. We were founded in 2015 and are on a path to [co-governance of the platform with the community](http://opencollective.com/e2c).
 
-#### Tools
+### Tools
 
 Our main tools are Google Docs for file sharing and copyediting, Figma for design, GitHub for product development, Slack for daily communication, Loom for asynchronous recordings, Loomio for decision making, CoBudget for money decisions, and Around for video-conferencing. It is OK if you don’t know how to use some of these - you can learn on the job.
 
@@ -69,17 +69,17 @@ Our main tools are Google Docs for file sharing and copyediting, Figma for desig
 
 Please fill out [this form](https://x7rwr9qad3h.typeform.com/to/lySp1Tfn) to apply.
 
-# Two Roles Open with Open Collective Foundation
+## Two Roles Open with Open Collective Foundation
 
 [Open Collective Foundation](https://opencollective.foundation) (OCF) is a nonprofit fiscal sponsor with an open source tech platform, that is enabling 400 groups to access 501(c)(3) status and fundraise in full transparency. [Our Collectives](https://opencollective.com/foundation#category-CONTRIBUTIONS) include mutual aid groups, public interest open source tech, social justice movements, humanitarian aid, climate action, and many kinds of communities with missions focused on education, civic engagement, and positive social impact. [Solidarity is our guiding principle](https://blog.opencollective.com/solidarity-as-our-guiding-principle). Our Collectives are on track to raise close to $30m in 2022, and we may hit 100x growth since 2019 by the end of this year. We are scaling quickly, and growing our team to meet increasing demand.
 
-#### What Makes Us Different
+### What Makes Us Different
 
 OCF is a tech-first nonprofit. We are one node in a growing international network of 30+ fiscal sponsor organizations who use Open Collective, an open source software platform for transparent fundraising and money management, to create efficiencies with money and amplify impact in communities. Globally, the network supports 15,000 groups to raise and spend $35M a year. Our tech platform and mission are all about transparency, collective collaboration, and practicality—and we apply the same principles to how we run OCF as an organization.
 
 **Learn more about OCF**: [website](https://opencollective.foundation), [2-minute explainer video](https://youtu.be/269SyUQmL_U), [values & mission](https://docs.opencollective.foundation/about/mission-and-values), [blog](https://blog.opencollective.com/tag/ocf/), [team](https://docs.opencollective.foundation/about/team), [documentation](https://docs.opencollective.foundation).
 
-## Nonprofit Ops & Finance Leader role
+### Nonprofit Ops & Finance Leader role
 
 $80-$100k for 40 hrs/wk (or 30 hrs/wk pro rata) plus benefits. Must live in the US. Applications open until October 23rd.
 
@@ -120,11 +120,11 @@ _(We don’t expect you to have all of these - any of them would be a bonus)_
 - The pay will be between $80k-$100K, plus benefits (including health insurance)
 - We are seeking someone to commit 30-40 hours per week (pro rata pay for less than 40 hours)
 
-### To apply for the Nonprofit Ops & Finance Leader role
+#### To apply for the Nonprofit Ops & Finance Leader role
 
 Fill out [this form](https://docs.google.com/forms/d/e/1FAIpQLSctqGUohrudHGV-sp9N-tlF4cCV1HVPIW4dXf0lv-6u7vHN1Q/viewform).
 
-## Ops & Admin Support role
+### Ops & Admin Support role
 
 $60k for 40 hrs/wk (or 30 hrs/wk pro rata) plus benefits. Must live in the US. Applications open until October 23rd.
 
@@ -160,7 +160,7 @@ _(We don’t expect you to have all of these - any of them would be a bonus)_
 - The pay will be $60k plus benefits (including health insurance)
 - We are seeking someone to commit 30-40 hours per week (pro rata pay for less than 40 hours)
 
-### To apply for the Ops & Admin Support role
+#### To apply for the Ops & Admin Support role
 
 Fill out [this form](https://docs.google.com/forms/d/e/1FAIpQLSd3BzRzcHYDnwwXH4gKHburN00EwumJ2n4NfVLp-Jb-h1-amA/viewform).
 
