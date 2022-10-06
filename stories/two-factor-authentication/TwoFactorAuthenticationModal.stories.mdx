@@ -1,0 +1,50 @@
+import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
+import TwoFactorAuthenticationModal from '../../components/two-factor-authentication/TwoFactorAuthenticationModal';
+import TwoFactorAuthenticationPromptButton from './TwoFactorAuthenticationPromptButton';
+import TwoFactorAuthProvider, {
+  TwoFactorAuthContext,
+} from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+import { UserContext } from '../../components/UserProvider';
+import { loggedInUser } from '../mocks/loggedInUser';
+
+<Meta
+  title="Two Factor Authentication/TwoFactorAuthenticationModal"
+  component={TwoFactorAuthenticationModal}
+  argTypes={{}}
+/>
+
+# TwoFactorAuthenticationModal
+
+## Default
+
+export const DefaultStory = props => <TwoFactorAuthenticationModal {...props} />;
+
+<Canvas>
+  <Story name="Prompt">
+    <TwoFactorAuthProvider>
+      <TwoFactorAuthenticationPromptButton />
+    </TwoFactorAuthProvider>
+  </Story>
+</Canvas>
+
+## Modal
+
+<Canvas>
+  <Story name="Modal">
+    <TwoFactorAuthContext.Provider value={{ prompt: { isOpen: true, supportedMethods: ['totp'] } }}>
+      <TwoFactorAuthenticationModal />
+    </TwoFactorAuthContext.Provider>
+  </Story>
+</Canvas>
+
+## No 2FA configured
+
+<Canvas>
+  <Story name="No 2FA configured">
+    <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+      <TwoFactorAuthContext.Provider value={{ prompt: { isOpen: true, supportedMethods: [] } }}>
+        <TwoFactorAuthenticationModal />
+      </TwoFactorAuthContext.Provider>
+    </UserContext.Provider>
+  </Story>
+</Canvas>
