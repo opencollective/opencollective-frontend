@@ -171,7 +171,7 @@ const messages = defineMessages({
   },
   linksToLicenses: {
     id: 'HostApplication.form.linksToLicenses',
-    defaultMessage: 'Links your license(s)',
+    defaultMessage: 'Link your license(s)',
   },
   linksToLicensesPlaceholder: {
     id: 'HostApplication.form.linksToLicensesPlaceholder',
@@ -562,7 +562,7 @@ const ApplicationForm = ({
                         </P>
                       </Box>
 
-                      <Flex mt={24} gridGap="12px" alignItems="center" mb={3}>
+                      <Flex mt={32} gridGap="12px" alignItems="center" mb={3}>
                         <NextIllustration src="/static/images/community.png" width={48} height={48} />
                         <Box flex="1">
                           <Flex alignItems="center" justifyContent="stretch" gap={6} mb={3}>
@@ -632,7 +632,7 @@ const ApplicationForm = ({
                         </P>
                       </Box>
 
-                      <Box mt={24} mb={3}>
+                      <Box mt={32} mb={3}>
                         <Flex alignItems="center" justifyContent="stretch" gap={6} mb={3}>
                           <H4 fontSize="18px" lineHeight="24px" color="black.900">
                             <FormattedMessage
