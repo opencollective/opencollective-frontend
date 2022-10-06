@@ -136,6 +136,9 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
     account(slug: $slug) {
       id
       type
+      isHost
+      name
+      slug
       currency
       settings
       ... on Organization {
@@ -146,12 +149,24 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
           }
         }
       }
+      ... on Host {
+        id
+        slug
+        name
+        settings
+        plan {
+          id
+          hostFees
+        }
+        isTrustedHost
+      }
       ... on AccountWithHost {
         addedFundsHostFeePercent: hostFeePercent(paymentMethodType: HOST)
         host {
           id
           slug
           name
+          settings
           plan {
             id
             hostFees
@@ -280,6 +295,13 @@ const AddFundsModal = ({ collective, ...props }) => {
   });
   const account = data?.account;
   const currency = account?.currency;
+  let host;
+
+  if (account?.isHost) {
+    host = account;
+  } else {
+    host = account?.host;
+  }
 
   const options = React.useMemo(
     () => getOptions(fundDetails.fundAmount, currency, intl),
@@ -292,7 +314,7 @@ const AddFundsModal = ({ collective, ...props }) => {
       {
         context: API_V2_CONTEXT,
         query: getBudgetSectionQuery(true),
-        variables: getBudgetSectionQueryVariables(collective.slug, collective.host?.slug),
+        variables: getBudgetSectionQueryVariables(collective.slug, host?.slug),
       },
       { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
     ],
@@ -317,11 +339,11 @@ const AddFundsModal = ({ collective, ...props }) => {
 
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
-  const canAddHostFee = collective.host?.plan?.hostFees && collective.id !== account?.host?.id;
+  const canAddHostFee = host?.plan?.hostFees && collective.id !== host?.id;
   const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
-  const canAddPlatformTip = collective.host?.isTrustedHost;
-  const receiptTemplates = collective.host?.settings?.invoice?.templates;
+  const canAddPlatformTip = host?.isTrustedHost;
+  const receiptTemplates = host?.settings?.invoice?.templates;
 
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
@@ -420,11 +442,11 @@ const AddFundsModal = ({ collective, ...props }) => {
 
           const defaultSources = [];
           defaultSources.push({
-            value: collective.host,
-            label: <DefaultCollectiveLabel value={collective.host} />,
+            value: host,
+            label: <DefaultCollectiveLabel value={host} />,
           });
-          if (collective.host?.id !== collective.id) {
-            defaultSources.push({ value: collective, label: <DefaultCollectiveLabel value={collective} /> });
+          if (host?.id !== account.id) {
+            defaultSources.push({ value: account, label: <DefaultCollectiveLabel value={account} /> });
           }
 
           if (!fundDetails.showPlatformTipModal) {
@@ -757,7 +779,6 @@ AddFundsModal.propTypes = {
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     hostFeePercent: PropTypes.number,
     slug: PropTypes.string,
-    host: PropTypes.object.isRequired,
   }).isRequired,
   onClose: PropTypes.func,
 };
