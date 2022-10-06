@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { DotsHorizontalRounded } from '@styled-icons/boxicons-regular/DotsHorizontalRounded';
 import { X } from '@styled-icons/feather/X';
 import { Edit } from '@styled-icons/material/Edit';
@@ -9,7 +9,7 @@ import { usePopper } from 'react-popper';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -96,7 +96,7 @@ AdminActionButtons.propTypes = {
   canDelete: PropTypes.bool,
 };
 
-const deleteCommentMutation = gqlV2/* GraphQL */ `
+const deleteCommentMutation = gql`
   mutation DeleteComment($id: String!) {
     deleteComment(id: $id) {
       id

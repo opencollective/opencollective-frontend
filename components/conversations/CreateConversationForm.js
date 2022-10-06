@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import FormPersister from '../../lib/form-persister';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
 import { Box, Flex } from '../Grid';
@@ -19,7 +19,7 @@ import StyledInput from '../StyledInput';
 import StyledInputTags from '../StyledInputTags';
 import { H4, P } from '../Text';
 
-const createConversationMutation = gqlV2/* GraphQL */ `
+const createConversationMutation = gql`
   mutation CreateConversation($title: String!, $html: String!, $CollectiveId: String!, $tags: [String]) {
     createConversation(title: $title, html: $html, CollectiveId: $CollectiveId, tags: $tags) {
       id

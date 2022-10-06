@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { CardElement } from '@stripe/react-stripe-js';
@@ -18,7 +19,7 @@ import { TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { isPastEvent } from '../../lib/events';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
@@ -971,7 +972,7 @@ class ContributionFlow extends React.Component {
 }
 
 const addCreateOrderMutation = graphql(
-  gqlV2/* GraphQL */ `
+  gql`
     mutation CreateOrder($order: OrderCreateInput!) {
       createOrder(order: $order) {
         ...OrderResponseFragment
@@ -986,7 +987,7 @@ const addCreateOrderMutation = graphql(
 );
 
 const addConfirmOrderMutation = graphql(
-  gqlV2/* GraphQL */ `
+  gql`
     mutation ConfirmOrder($order: OrderReferenceInput!, $guestToken: String) {
       confirmOrder(order: $order, guestToken: $guestToken) {
         ...OrderResponseFragment

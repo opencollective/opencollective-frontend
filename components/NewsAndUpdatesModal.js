@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import { Flex } from './Grid';
@@ -33,7 +34,7 @@ const ModalFooterWrapper = styled(ModalFooter)`
   height: 65px;
 `;
 
-const newsAndUpdatesQuery = gqlV2/* GraphQL */ `
+const newsAndUpdatesQuery = gql`
   query ChangelogUpdates($limit: Int) {
     account(slug: "opencollective") {
       id

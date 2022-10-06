@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
@@ -9,6 +8,7 @@ import styled from 'styled-components';
 import { fontSize, maxWidth } from 'styled-system';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
+import { gqlV1 } from '../lib/graphql/helpers';
 import { compose, isValidEmail } from '../lib/utils';
 
 import Body from '../components/Body';
@@ -261,7 +261,7 @@ class RedeemPage extends React.Component {
   }
 }
 
-const redeemPageQuery = gql`
+const redeemPageQuery = gqlV1/* GraphQL */ `
   query RedeemPage($collectiveSlug: String!) {
     Collective(slug: $collectiveSlug) {
       id
@@ -280,7 +280,7 @@ const addRedeemPageData = graphql(redeemPageQuery, {
   skip: props => !props.collectiveSlug,
 });
 
-const redeemPaymentMethodMutation = gql`
+const redeemPaymentMethodMutation = gqlV1/* GraphQL */ `
   mutation RedeemPaymentMethod($code: String!, $user: UserInputType) {
     claimPaymentMethod(code: $code, user: $user) {
       id

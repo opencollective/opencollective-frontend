@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Facebook } from '@styled-icons/fa-brands/Facebook';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
@@ -11,7 +12,7 @@ import styled from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
 import { facebookShareURL, getCollectivePageRoute, tweetURL } from '../../lib/url-helpers';
 
@@ -329,7 +330,7 @@ class ContributionFlowSuccess extends React.Component {
 }
 
 // GraphQL
-const orderSuccessQuery = gqlV2/* GraphQL */ `
+const orderSuccessQuery = gql`
   query NewContributionFlowOrderSuccess($order: OrderReferenceInput!) {
     order(order: $order) {
       id

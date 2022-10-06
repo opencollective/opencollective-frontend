@@ -3,14 +3,14 @@ import { gql, useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const collectivePickerSearchQuery = gql`
+const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
   query UnhostAccountSearchQuery($term: String!, $types: [TypeOfCollective], $limit: Int, $hostCollectiveIds: [Int]) {
     search(term: $term, types: $types, limit: $limit, hostCollectiveIds: $hostCollectiveIds) {
       id
@@ -31,7 +31,7 @@ const collectivePickerSearchQuery = gql`
   }
 `;
 
-const unhostAccountMutation = gqlV2/* GraphQL */ `
+const unhostAccountMutation = gql`
   mutation UnhostAccount($account: AccountReferenceInput!) {
     removeHost(account: $account) {
       id

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { CardElement } from '@stripe/react-stripe-js';
 import { Add } from '@styled-icons/material/Add';
@@ -9,7 +8,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { PAYMENT_METHOD_TYPE } from '../../../lib/constants/payment-methods';
 import { getErrorFromGraphqlException, isErrorType } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import { paymentMethodLabel } from '../../../lib/payment_method_label';
 import { getStripe, stripeTokenToPaymentMethod } from '../../../lib/stripe';
 import { compose } from '../../../lib/utils';
@@ -322,7 +321,7 @@ class EditPaymentMethods extends React.Component {
   }
 }
 
-const paymentMethodsQuery = gql`
+const paymentMethodsQuery = gqlV1/* GraphQL */ `
   query EditCollectivePaymentMethods($collectiveSlug: String) {
     Collective(slug: $collectiveSlug) {
       id
@@ -369,7 +368,7 @@ const addConfirmCreditCardMutation = graphql(confirmCreditCardMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
-const removePaymentMethodMutation = gql`
+const removePaymentMethodMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveremovePaymentMethod($id: Int!) {
     removePaymentMethod(id: $id) {
       id
@@ -381,7 +380,7 @@ const addRemovePaymentMethodMutation = graphql(removePaymentMethodMutation, {
   name: 'removePaymentMethod',
 });
 
-const updatePaymentMethodMutation = gql`
+const updatePaymentMethodMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveUpdatePaymentMethod($id: Int!, $monthlyLimitPerMember: Int) {
     updatePaymentMethod(id: $id, monthlyLimitPerMember: $monthlyLimitPerMember) {
       id

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import { Flex } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -14,7 +14,7 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import ContributionsBudget from './Budget/ContributionsBudget';
 import ExpenseBudget from './Budget/ExpenseBudget';
 
-export const budgetSectionQuery = gqlV2/* GraphQL */ `
+export const budgetSectionQuery = gql`
   query BudgetSection($slug: String!) {
     account(slug: $slug) {
       id

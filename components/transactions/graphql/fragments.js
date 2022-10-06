@@ -1,6 +1,6 @@
-import { gqlV2 } from '../../../lib/graphql/helpers';
+import { gql } from '@apollo/client';
 
-export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
+export const transactionsQueryCollectionFragment = gql`
   fragment TransactionsQueryCollectionFragment on TransactionCollection {
     totalCount
     offset

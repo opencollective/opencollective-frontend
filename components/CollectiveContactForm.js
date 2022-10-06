@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+
+import { gqlV1 } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import { Box } from './Grid';
@@ -15,7 +17,7 @@ import StyledTextarea from './StyledTextarea';
 import { H2, P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
-const sendMessageMutation = gql`
+const sendMessageMutation = gqlV1/* GraphQL */ `
   mutation SendMessage($collectiveId: Int!, $message: String!, $subject: String) {
     sendMessageToCollective(collectiveId: $collectiveId, message: $message, subject: $subject) {
       success

@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { get, isEmpty } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -33,7 +33,7 @@ const PaymentMethodBox = styled.div`
     `}
 `;
 
-const paymentMethodsQuery = gqlV2/* GraphQL */ `
+const paymentMethodsQuery = gql`
   query ContributionFlowPaymentMethods($slug: String) {
     account(slug: $slug) {
       id

@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Email } from '@styled-icons/material/Email';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+
+import { gqlV1 } from '../lib/graphql/helpers';
 
 import Container from '../components/Container';
 import { Box } from '../components/Grid';
@@ -112,7 +113,7 @@ class ConfirmEmailPage extends React.Component {
   }
 }
 
-const confirmUserEmailMutation = gql`
+const confirmUserEmailMutation = gqlV1/* GraphQL */ `
   mutation ConfirmUserEmail($token: String!) {
     confirmUserEmail(token: $token) {
       id

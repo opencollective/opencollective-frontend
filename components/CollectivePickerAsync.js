@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { debounce } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import { gqlV1 } from '../lib/graphql/helpers';
 import formatCollectiveType from '../lib/i18n/collective-type';
 
 import CollectivePicker from './CollectivePicker';
 
-const collectivePickerSearchQuery = gql`
+const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
   query CollectivePickerSearchQuery(
     $term: String!
     $types: [TypeOfCollective]

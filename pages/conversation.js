@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, isEmpty, uniqBy, update } from 'lodash';
 import { withRouter } from 'next/router';
@@ -7,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { stripHTML } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -38,7 +39,7 @@ import StyledTag from '../components/StyledTag';
 import { H2, H4 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-const conversationPageQuery = gqlV2/* GraphQL */ `
+const conversationPageQuery = gql`
   query ConversationPage($collectiveSlug: String!, $id: String!, $offset: Int) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
@@ -97,7 +98,7 @@ const conversationPageQuery = gqlV2/* GraphQL */ `
   ${collectiveNavbarFieldsFragment}
 `;
 
-const editConversationMutation = gqlV2/* GraphQL */ `
+const editConversationMutation = gql`
   mutation EditConversation($id: String!, $title: String!, $tags: [String]) {
     editConversation(id: $id, title: $title, tags: $tags) {
       id

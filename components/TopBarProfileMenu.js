@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { Exit } from '@styled-icons/boxicons-regular';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
@@ -8,7 +9,7 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { getSettingsRoute } from '../lib/url-helpers';
 
@@ -29,7 +30,7 @@ import StyledLink from './StyledLink';
 import { P, Span } from './Text';
 import { withUser } from './UserProvider';
 
-const memberInvitationsCountQuery = gqlV2`
+const memberInvitationsCountQuery = gql`
   query MemberInvitationsCount($memberAccount: AccountReferenceInput!) {
     memberInvitations(memberAccount: $memberAccount) {
       id

@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { get, orderBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { EMPTY_ARRAY } from '../../../lib/constants/utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import { DebitItem } from '../../budget/DebitCreditList';
@@ -27,7 +27,7 @@ import { withUser } from '../../UserProvider';
 import BudgetStats from '../BudgetStats';
 import ContainerSectionContent from '../ContainerSectionContent';
 
-const budgetSectionAccountFieldsFragment = gqlV2/* GraphQL */ `
+const budgetSectionAccountFieldsFragment = gql`
   fragment BudgetSectionAccountFields on Account {
     id
     stats {
@@ -61,7 +61,7 @@ const budgetSectionAccountFieldsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-export const budgetSectionQuery = gqlV2/* GraphQL */ `
+export const budgetSectionQuery = gql`
   query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
     transactions(
       account: { slug: $slug }
@@ -90,7 +90,7 @@ export const budgetSectionQuery = gqlV2/* GraphQL */ `
   ${budgetSectionAccountFieldsFragment}
 `;
 
-export const budgetSectionWithHostQuery = gqlV2/* GraphQL */ `
+export const budgetSectionWithHostQuery = gql`
   query BudgetSectionWithHost($slug: String!, $hostSlug: String!, $limit: Int!, $kind: [TransactionKind]) {
     host(slug: $hostSlug) {
       id

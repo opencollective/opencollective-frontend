@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getGQLV2FrequencyFromInterval } from '../lib/constants/intervals';
 import { getEnvVar } from '../lib/env-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getPaypal } from '../lib/paypal';
 
 import LoadingPlaceholder from './LoadingPlaceholder';
@@ -202,7 +203,7 @@ class PayWithPaypalButton extends Component {
   }
 }
 
-const paypalPlanQuery = gqlV2/* GraphQL */ `
+const paypalPlanQuery = gql`
   query PaypalPlanQuery(
     $account: AccountReferenceInput!
     $tier: TierReferenceInput

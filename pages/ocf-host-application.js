@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import AboutOurFees from '../components/ocf-host-application/AboutOurFees';
 import ApplicationForm from '../components/ocf-host-application/ApplicationForm';
@@ -16,7 +16,7 @@ import Page from '../components/Page';
 import { TOAST_TYPE, useToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
-const ocfCollectiveApplicationQuery = gqlV2/* GraphQL */ `
+const ocfCollectiveApplicationQuery = gql`
   query OcfCollectiveApplicationPage($slug: String) {
     account(slug: $slug) {
       id
@@ -35,7 +35,7 @@ const ocfCollectiveApplicationQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const ocfHostApplicationPageQuery = gqlV2/* GraphQL */ `
+const ocfHostApplicationPageQuery = gql`
   query OcfHostApplicationPage {
     account(slug: "foundation") {
       id

@@ -1,14 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+
+import { gqlV1 } from '../../../lib/graphql/helpers';
 
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import { Box } from '../../Grid';
 import { P } from '../../Text';
 
-export const totalCollectiveContributionsQuery = gql`
+export const totalCollectiveContributionsQuery = gqlV1/* GraphQL */ `
   query HeroTotalCollectiveContributions($slug: String!) {
     Collective(slug: $slug) {
       id

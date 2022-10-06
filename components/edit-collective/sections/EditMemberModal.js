@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { Delete } from '@styled-icons/material/Delete';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
@@ -8,7 +8,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 
 import roles from '../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
@@ -20,7 +20,7 @@ import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import MemberForm from './MemberForm';
 import { coreContributorsQuery } from './Members';
 
-const editMemberMutation = gqlV2/* GraphQL */ `
+const editMemberMutation = gql`
   mutation EditMember(
     $memberAccount: AccountReferenceInput!
     $account: AccountReferenceInput!
@@ -43,7 +43,7 @@ const editMemberMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const editMemberInvitationMutation = gqlV2/* GraphQL */ `
+const editMemberInvitationMutation = gql`
   mutation EditMemberInvitation(
     $memberAccount: AccountReferenceInput!
     $account: AccountReferenceInput!
@@ -66,7 +66,7 @@ const editMemberInvitationMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const removeMemberMutation = gqlV2/* GraphQL */ `
+const removeMemberMutation = gql`
   mutation RemoveMember(
     $memberAccount: AccountReferenceInput!
     $account: AccountReferenceInput!

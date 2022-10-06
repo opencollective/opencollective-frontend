@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { Field, useFormikContext } from 'formik';
 import { get, kebabCase, partition, set } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import { I18nSupportLink } from '../I18nFormatters';
@@ -31,7 +31,7 @@ export const msg = defineMessages({
   },
 });
 
-const requiredFieldsQuery = gqlV2/* GraphQL */ `
+const requiredFieldsQuery = gql`
   query PayoutBankInformationRequiredFields($slug: String, $currency: String!, $accountDetails: JSON) {
     host(slug: $slug) {
       id
@@ -387,7 +387,7 @@ DetailsForm.propTypes = {
   getFieldName: PropTypes.func.isRequired,
 };
 
-const availableCurrenciesQuery = gqlV2/* GraphQL */ `
+const availableCurrenciesQuery = gql`
   query PayoutBankInformationAvailableCurrencies($slug: String, $ignoreBlockedCurrencies: Boolean) {
     host(slug: $slug) {
       id

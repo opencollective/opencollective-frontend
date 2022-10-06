@@ -1,8 +1,8 @@
-import { gqlV2 } from '../../../lib/graphql/helpers';
+import { gql } from '@apollo/client';
 
 import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
 
-export const recurringContributionsQuery = gqlV2/* GraphQL */ `
+export const recurringContributionsQuery = gql`
   query RecurringContributions($slug: String!) {
     account(slug: $slug) {
       id

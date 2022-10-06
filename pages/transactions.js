@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { get, isNil, omit, omitBy } from 'lodash';
@@ -12,7 +13,7 @@ import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { parseDateInterval } from '../lib/date-utils';
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import Body from '../components/Body';
@@ -43,7 +44,7 @@ import TransactionsFilters from '../components/transactions/TransactionsFilters'
 import TransactionsList from '../components/transactions/TransactionsList';
 import { withUser } from '../components/UserProvider';
 
-const transactionsPageQuery = gqlV2/* GraphQL */ `
+const transactionsPageQuery = gql`
   query TransactionsPage(
     $slug: String!
     $limit: Int!
