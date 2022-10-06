@@ -81,7 +81,7 @@ OCF is a tech-first nonprofit. We are one node in a growing international networ
 
 ## Nonprofit Ops & Finance Leader role
 
-$80-$100k for 40 hrs/wk (or 30 hrs/wk pro rata). Must live in the US. Applications open until October 23rd.
+$80-$100k for 40 hrs/wk (or 30 hrs/wk pro rata) plus benefits. Must live in the US. Applications open until October 23rd.
 
 #### Who we're looking for
 
@@ -124,7 +124,45 @@ _(We don’t expect you to have all of these - any of them would be a bonus)_
 
 Fill out [this form](https://docs.google.com/forms/d/e/1FAIpQLSctqGUohrudHGV-sp9N-tlF4cCV1HVPIW4dXf0lv-6u7vHN1Q/viewform).
 
-## Operations Support role
+## Ops & Admin Support role
+
+$60k for 40 hrs/wk (or 30 hrs/wk pro rata) plus benefits. Must live in the US. Applications open until October 23rd.
+
+#### Who we're looking for
+
+An operations and community oriented person who is:
+
+- Excited to be a driving force behind our operational functions and to support our Collectives to make the best use of our services
+- Self-motivated and autonomous, to thrive in our fully remote, high-trust, low-hierarchy environment
+- Comfortable with and excited about technology, able to learn new digital tools quickly, and eager to understand the ins and outs of the Open Collective software platform
+- Based in the United States
+
+#### Must-have skills
+
+- Financial administration skills (accounts receivable and payable—you will process incoming contributions and outgoing expenses, so you need a basic understanding of budgets and finance processes)
+- Helpdesk support and customer service - you'll support Collectives through the application process and with day-to-day questions
+- Detail-oriented, practical and organized, great at handling information overload and finding the path forward
+- Flexible and comfortable working in a fast-paced, ever-changing, quickly-scaling startup environment
+
+#### Additional desired experience
+
+_(We don’t expect you to have all of these - any of them would be a bonus)_
+
+- 501(c)(3) nonprofit and/or fiscal sponsorship
+- Fast-growth organizations and start-ups
+- Tech tools like Slack, Loom, Google Workspace, Trello, Loomio, GitHub (extra points if you’ve used Open Collective, of course!)
+
+#### Compensation & role details
+
+- This is a fully remote position (we don't have any physical offices and our team is distributed across time zones)
+- Highly flexible schedule (we have a few weekly meetings and the rest us up to you)
+- Open to applicants anywhere in the United States (sorry, we can't consider international candidates)
+- The pay will be $60k plus benefits (including health insurance)
+- We are seeking someone to commit 30-40 hours per week (pro rata pay for less than 40 hours)
+
+### To apply for the Ops & Admin Support role
+
+Fill out [this form](https://docs.google.com/forms/d/e/1FAIpQLSd3BzRzcHYDnwwXH4gKHburN00EwumJ2n4NfVLp-Jb-h1-amA/viewform).
 
 <!--
 **We're hiring Senior Software Engineers.**
