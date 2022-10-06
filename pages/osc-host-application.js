@@ -72,11 +72,13 @@ const formValues = {
   collective: {
     name: '',
     slug: '',
-    description: '',
   },
   applicationData: {
     repositoryUrl: '',
     licenseSpdxId: null,
+    linksToLicenses: '',
+    amountOfMembers: '',
+    linksToPreviousEvents: '',
   },
   termsOfServiceOC: false,
   inviteMembers: [],

@@ -31,7 +31,7 @@ import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
-import { H1, H4, P } from '../Text';
+import { H1, H4, P, Span } from '../Text';
 import StyledSelect from '../StyledSelect';
 
 const createCollectiveMutation = gqlV2/* GraphQL */ `
@@ -151,6 +151,35 @@ const messages = defineMessages({
   tellUsMoreHelpText: {
     id: 'HostApplication.form.tellUsMoreHelpText',
     defaultMessage: 'We want to know more about you and how we can help you.',
+  },
+  linksToPreviousEvents: {
+    id: 'HostApplication.form.linksToPreviousEvents',
+    defaultMessage: 'Links to previous events (if any)',
+  },
+  linksToPreviousEventsPlaceholder: {
+    id: 'HostApplication.form.linksToPreviousEventsPlaceholder',
+    defaultMessage: 'Enter URL of previous events.',
+  },
+  linksToPreviousEventsHelpText: {
+    id: 'HostApplication.form.linksToPreviousEventsHelpText',
+    defaultMessage:
+      'YouTube, Discord, Disqus, Meetup, Eventbrite events etc are all welcome. We just want to understand your community presence.',
+  },
+  amountOfMembers: {
+    id: 'HostApplication.form.amountOfMembers',
+    defaultMessage: 'How many members do you have?',
+  },
+  linksToLicenses: {
+    id: 'HostApplication.form.linksToLicenses',
+    defaultMessage: 'Links your license(s)',
+  },
+  linksToLicensesPlaceholder: {
+    id: 'HostApplication.form.linksToLicensesPlaceholder',
+    defaultMessage: 'You can add the links to your secondary or additional licenses here',
+  },
+  linksToLicensesHelpText: {
+    id: 'HostApplication.form.linksToLicensesHelpText',
+    defaultMessage: 'If you have more than one license, you can link them here',
   },
 });
 
@@ -433,16 +462,22 @@ const ApplicationForm = ({
                           </Grid>
                         </>
                       )}
-                      <Flex mt={20} gridGap="12px" alignItems="center" mb={3}>
-                        <NextIllustration src="/static/images/sky.png" width={48} height={48} />
+
+                      <Flex mt={24} gridGap="12px" alignItems="center" mb={3}>
+                        <NextIllustration src="/static/images/night-sky.png" width={48} height={48} />
                         <Box flex="1">
                           <Flex alignItems="center" justifyContent="stretch" gap={6} mb={3}>
                             <H4 fontSize="18px" lineHeight="24px" color="black.900">
                               <FormattedMessage
                                 id="HostApplication.applicationForm.code"
-                                defaultMessage="About your Code {padlock}"
+                                defaultMessage="About your Code {optional} {padlock}"
                                 values={{
                                   padlock: <Lock size="16px" color="#75777A" />,
+                                  optional: (
+                                    <Span fontWeight={400} color="black.700">
+                                      (<FormattedMessage id="forms.optional" defaultMessage="Optional" />)
+                                    </Span>
+                                  ),
                                 }}
                               />
                             </H4>
@@ -457,7 +492,7 @@ const ApplicationForm = ({
                         </Box>
                       </Flex>
 
-                      <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} py={2}>
+                      <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} pt={2}>
                         <Box>
                           <StyledInputFormikField
                             label={intl.formatMessage(messages.repositoryUrl)}
@@ -506,7 +541,98 @@ const ApplicationForm = ({
                         </StyledInputFormikField>
                       </Grid>
 
-                      <Box mt={20} mb={3}>
+                      <Box mt={20}>
+                        <StyledInputFormikField
+                          name="applicationData.linksToLicenses"
+                          htmlFor="linksToLicenses"
+                          labelFontSize="16px"
+                          labelProps={{ fontWeight: '600' }}
+                          label={intl.formatMessage(messages.linksToLicenses)}
+                        >
+                          {({ field }) => (
+                            <StyledTextarea
+                              {...field}
+                              rows={4}
+                              placeholder={intl.formatMessage(messages.linksToLicensesPlaceholder)}
+                            />
+                          )}
+                        </StyledInputFormikField>
+                        <P fontSize="13px" lineHeight="20px" color="black.700" mt={2}>
+                          <FormattedMessage {...messages.linksToLicensesHelpText} />
+                        </P>
+                      </Box>
+
+                      <Flex mt={24} gridGap="12px" alignItems="center" mb={3}>
+                        <NextIllustration src="/static/images/community.png" width={48} height={48} />
+                        <Box flex="1">
+                          <Flex alignItems="center" justifyContent="stretch" gap={6} mb={3}>
+                            <H4 fontSize="18px" lineHeight="24px" color="black.900">
+                              <FormattedMessage
+                                id="HostApplication.form.community"
+                                defaultMessage="About your community {optional} {padlock}"
+                                values={{
+                                  padlock: <Lock size="16px" color="#75777A" />,
+                                  optional: (
+                                    <Span fontWeight={400} color="black.700">
+                                      (<FormattedMessage id="forms.optional" defaultMessage="Optional" />)
+                                    </Span>
+                                  ),
+                                }}
+                              />
+                            </H4>
+                            <StyledHr flex="1" />
+                          </Flex>
+                          <P fontSize="14px" lineHeight="20px" color="black.700">
+                            <FormattedMessage
+                              id="HostApplication.applicationForm.publicInformation"
+                              defaultMessage="This information is public. Please do not add any personal information such as names or addresses in this field."
+                            />
+                          </P>
+                        </Box>
+                      </Flex>
+
+                      <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} pt={2}>
+                        <Box>
+                          <StyledInputFormikField
+                            label={intl.formatMessage(messages.amountOfMembers)}
+                            labelFontSize="16px"
+                            labelProps={{ fontWeight: '600' }}
+                            name="applicationData.amountOfMembers"
+                            htmlFor="amountOfMembers"
+                          >
+                            {({ field }) => (
+                              <StyledInputGroup
+                                placeholder="0-10"
+                                {...field}
+                                onChange={e => setFieldValue('applicationData.amountOfMembers', e.target.value)}
+                              />
+                            )}
+                          </StyledInputFormikField>
+                        </Box>
+                      </Grid>
+
+                      <Box mt={20}>
+                        <StyledInputFormikField
+                          name="applicationData.previousEvents"
+                          htmlFor="previousEvents"
+                          labelFontSize="16px"
+                          labelProps={{ fontWeight: '600' }}
+                          label={intl.formatMessage(messages.linksToPreviousEvents)}
+                        >
+                          {({ field }) => (
+                            <StyledTextarea
+                              {...field}
+                              rows={4}
+                              placeholder={intl.formatMessage(messages.linksToPreviousEventsPlaceholder)}
+                            />
+                          )}
+                        </StyledInputFormikField>
+                        <P fontSize="13px" lineHeight="20px" color="black.700" mt={2}>
+                          <FormattedMessage {...messages.linksToPreviousEventsHelpText} />
+                        </P>
+                      </Box>
+
+                      <Box mt={24} mb={3}>
                         <Flex alignItems="center" justifyContent="stretch" gap={6} mb={3}>
                           <H4 fontSize="18px" lineHeight="24px" color="black.900">
                             <FormattedMessage
