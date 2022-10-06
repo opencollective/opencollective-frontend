@@ -12,6 +12,7 @@ import theme from '../lib/theme';
 import withData from '../lib/withData';
 
 import StripeProviderSSR from '../components/StripeProvider';
+import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
 import UserProvider from '../components/UserProvider';
 
 import 'nprogress/nprogress.css';
@@ -132,6 +133,7 @@ class OpenCollectiveFrontendApp extends App {
                       <Component {...pageProps} />
                       <GlobalToasts />
                       <GlobalNewsAndUpdates />
+                      <TwoFactorAuthenticationModal />
                     </ToastProvider>
                   </NewsAndUpdatesProvider>
                 </UserProvider>
