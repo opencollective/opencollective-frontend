@@ -2336,6 +2336,7 @@ enum ActivityType {
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
+  COLLECTIVE_VIRTUAL_CARD_DELETED
   VIRTUAL_CARD_REQUESTED
   VIRTUAL_CARD_CHARGE_DECLINED
   VIRTUAL_CARD_PURCHASE
@@ -8581,6 +8582,11 @@ type Query {
     isHost: Boolean
 
     """
+    Included collectives which are archived
+    """
+    includeArchived: Boolean
+
+    """
     Only return "active" accounts with Financial Contributions enabled if true.
     """
     isActive: Boolean
@@ -10516,6 +10522,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
+  COLLECTIVE_VIRTUAL_CARD_DELETED
   VIRTUAL_CARD_REQUESTED
   VIRTUAL_CARD_CHARGE_DECLINED
   VIRTUAL_CARD_PURCHASE
@@ -12769,6 +12776,26 @@ type Mutation {
   removePayoutMethod(payoutMethodId: String!): PayoutMethod!
 
   """
+  [Root only] Edits account flags (deleted, banned, archived, trusted host)
+  """
+  editAccountFlags(
+    """
+    Account to change the flags for
+    """
+    account: AccountReferenceInput!
+
+    """
+    Specify whether the account is archived
+    """
+    isArchived: Boolean
+
+    """
+    Specify whether the account is a trusted host
+    """
+    isTrustedHost: Boolean
+  ): Account!
+
+  """
   [Root only] Clears the cache for a given account
   """
   clearCacheForAccount(
@@ -13077,7 +13104,7 @@ type Mutation {
   """
   Delete a tier.
   """
-  deleteTier(tier: TierReferenceInput!): Tier!
+  deleteTier(tier: TierReferenceInput!, stopRecurringContributions: Boolean! = false): Tier!
 }
 
 input CollectiveCreateInput {
