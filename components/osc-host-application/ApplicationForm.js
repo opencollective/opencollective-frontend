@@ -53,6 +53,7 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
     ) {
       id
       slug
+      isApproved
       host {
         id
         slug
@@ -79,6 +80,7 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
       id
       slug
       ... on AccountWithHost {
+        isApproved
         host {
           id
           slug
@@ -184,8 +186,14 @@ const ApplicationForm = ({
     };
 
     const response = await submitApplication({ variables });
-    if (response.data.createCollective || response.data.applyToHost) {
-      await router.push('/opensource/apply/success');
+    const resCollective = response.data.createCollective || response.data.applyToHost;
+
+    if (resCollective) {
+      if (resCollective.isApproved) {
+        await router.push(`/${resCollective.slug}/onboarding`);
+      } else {
+        await router.push('/opensource/apply/success');
+      }
       window.scrollTo(0, 0);
     }
   };
