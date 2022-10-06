@@ -14,7 +14,7 @@ const config: CodegenConfig = {
       schema: 'http://localhost:3060/graphql/v2',
       plugins: [],
       presetConfig: {
-        augmentedModuleName: './lib/graphql/types/v2',
+        augmentedModuleName: 'lib/graphql/helpers',
         gqlTagName: 'gqlV2',
       },
     },

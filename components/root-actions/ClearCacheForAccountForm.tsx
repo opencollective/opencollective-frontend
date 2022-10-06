@@ -1,10 +1,10 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { startCase, uniq } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
@@ -16,7 +16,7 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 const CACHE_TYPES = ['CONTRIBUTORS', 'GRAPHQL_QUERIES', 'CLOUDFLARE'];
 
-const clearCacheMutation = gqlV2/* GraphQL */ `
+const clearCacheMutation = gql`
   mutation ClearCache($account: AccountReferenceInput!, $cacheTypes: [AccountCacheType!]) {
     clearCacheForAccount(account: $account, type: $cacheTypes) {
       id
@@ -82,8 +82,8 @@ const ClearCacheForAccountForm = () => {
         loading={loading}
         onClick={async () => {
           try {
-            const result = await clearCache({ variables: { account: { legacyId: account.id }, cacheTypes } });
-            const resultAccount = result.data.clearCacheForAccount;
+            const result = await clearCache({ variables: { account: { zzz: account.id }, cacheTypes } });
+            const resultAccount = result.data.clearCacheFoxrAccount;
             addToast({
               type: TOAST_TYPE.SUCCESS,
               message: `Cache cleared for ${resultAccount.name} (@${resultAccount.slug})`,
