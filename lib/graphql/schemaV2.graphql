@@ -830,6 +830,7 @@ All order statuses
 enum OrderStatus {
   ACTIVE
   CANCELLED
+  DISPUTED
   ERROR
   EXPIRED
   NEW
@@ -920,6 +921,7 @@ interface Transaction {
   order: Order
   isRefunded: Boolean
   isRefund: Boolean
+  isDisputed: Boolean
   paymentMethod: PaymentMethod
   payoutMethod: PayoutMethod
   permissions: TransactionPermissions
@@ -961,6 +963,7 @@ enum TransactionKind {
   HOST_FEE_SHARE
   HOST_FEE_SHARE_DEBT
   PAYMENT_PROCESSOR_COVER
+  PAYMENT_PROCESSOR_DISPUTE_FEE
   PAYMENT_PROCESSOR_FEE
   PLATFORM_FEE
   PLATFORM_TIP
@@ -3081,6 +3084,11 @@ type Host implements Account & AccountWithContributions {
   Returns whether the host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether the host has any disputed orders
+  """
+  hasDisputedOrders: Boolean!
 }
 
 """
@@ -5913,6 +5921,7 @@ type Credit implements Transaction {
   order: Order
   isRefunded: Boolean
   isRefund: Boolean
+  isDisputed: Boolean
   paymentMethod: PaymentMethod
   payoutMethod: PayoutMethod
 
@@ -6019,6 +6028,7 @@ type Debit implements Transaction {
   order: Order
   isRefunded: Boolean
   isRefund: Boolean
+  isDisputed: Boolean
   paymentMethod: PaymentMethod
   payoutMethod: PayoutMethod
 

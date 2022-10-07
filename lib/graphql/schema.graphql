@@ -759,6 +759,7 @@ enum OrderStatus {
   EXPIRED
   PLEDGED
   REJECTED
+  DISPUTED
 }
 
 """
@@ -3542,6 +3543,14 @@ type Query {
 
     """
     Included collectives which are archived
+<<<<<<< HEAD
+=======
+    """
+    includeArchived: Boolean
+
+    """
+    Whether to return only active accounts
+>>>>>>> b01023275 (feat(stripe-dispute-orders): Add warning banner when fiscal host has disputed orders.)
     """
     includeArchived: Boolean
 

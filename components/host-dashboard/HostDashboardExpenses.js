@@ -213,6 +213,17 @@ const HostDashboardExpenses = ({ hostSlug, isNewAdmin }) => {
           )}
         </DismissibleMessage>
       )}
+      {!loading && data?.host.hasDisputedOrders && (
+        <Box mb={4}>
+          <MessageBox type="warning" withIcon>
+            <FormattedMessage
+              id="host.disputes.warning"
+              defaultMessage="Fraud Warning: There are disputed charges that need review."
+            />{' '}
+            <Link href={`/${hostSlug}/admin/orders?status=DISPUTED`}>Review Disputes</Link>
+          </MessageBox>
+        </Box>
+      )}
       <Box mb={4}>
         {loading ? (
           <LoadingPlaceholder height={150} />
