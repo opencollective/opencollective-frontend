@@ -16,6 +16,7 @@ const COMMON_DIRECTIVES = {
     'data:',
     '*.paypal.com',
     'opencollective.com', // for widgets on /admin/export
+    'blog.opencollective.com', // used to easily link images in static pages
     'blob:', // For upload images previews
   ].filter(Boolean),
   workerSrc: [
