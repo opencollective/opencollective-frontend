@@ -295,13 +295,7 @@ const AddFundsModal = ({ collective, ...props }) => {
   });
   const account = data?.account;
   const currency = account?.currency;
-  let host;
-
-  if (account?.isHost) {
-    host = account;
-  } else {
-    host = account?.host;
-  }
+  const host = account?.isHost ? account : account?.host;
 
   const options = React.useMemo(
     () => getOptions(fundDetails.fundAmount, currency, intl),
