@@ -165,7 +165,7 @@ const StyledInputAmount = ({
       error={props.error || getError(curValue, minAmount, props.required)}
       defaultValue={isUndefined(defaultValue) ? undefined : defaultValue / 100}
       value={curValue}
-      prependProps={!hasCurrencyPicker ? undefined : { p: 0 }}
+      prependProps={!hasCurrencyPicker ? { color: props.disabled ? 'black.400' : 'black.800' } : { p: 0 }}
       prepend={
         !hasCurrencyPicker ? (
           formatCurrencyName(currency, currencyDisplay)

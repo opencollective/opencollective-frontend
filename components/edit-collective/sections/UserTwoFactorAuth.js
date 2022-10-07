@@ -71,6 +71,8 @@ class UserTwoFactorAuth extends React.Component {
     /** From graphql query */
     addTwoFactorAuthTokenToIndividual: PropTypes.func.isRequired,
     removeTwoFactorAuthTokenFromIndividual: PropTypes.func.isRequired,
+    /** From withUser */
+    refetchLoggedInUser: PropTypes.func.isRequired,
     data: PropTypes.shape({
       individual: PropTypes.object,
       loading: PropTypes.bool,
@@ -147,6 +149,9 @@ class UserTwoFactorAuth extends React.Component {
           })
           .then(data => {
             this.setState({ recoveryCodes: get(data, 'data.addTwoFactorAuthTokenToIndividual.recoveryCodes') });
+          })
+          .then(() => {
+            this.props.refetchLoggedInUser(); // No need to await
           });
         this.setState({ error: null, enablingTwoFactorAuth: true });
       }
@@ -169,6 +174,7 @@ class UserTwoFactorAuth extends React.Component {
           code: twoFactorAuthenticatorCode,
         },
       });
+      this.props.refetchLoggedInUser(); // No need to await
       this.setState({ disablingTwoFactorAuth: false, error: null });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;

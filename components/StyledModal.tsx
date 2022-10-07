@@ -213,7 +213,15 @@ const DefaultTrapContainer = props => {
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
  * a styled `Container`.
  */
-const StyledModal = ({ children, onClose, usePortal, hasUnsavedChanges, trapFocus, ignoreEscapeKey, ...props }) => {
+const StyledModal = ({
+  children,
+  onClose,
+  usePortal = true,
+  hasUnsavedChanges = undefined,
+  trapFocus = false,
+  ignoreEscapeKey = false,
+  ...props
+}) => {
   const intl = useIntl();
   const TrapContainer = trapFocus ? DefaultTrapContainer : React.Fragment;
   const closeHandler = React.useCallback(() => {

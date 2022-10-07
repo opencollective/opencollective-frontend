@@ -6622,6 +6622,7 @@ export type Policies = {
   COLLECTIVE_MINIMUM_ADMINS?: Maybe<Collective_Minimum_Admins>;
   EXPENSE_AUTHOR_CANNOT_APPROVE?: Maybe<Scalars['Boolean']>;
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: Maybe<Maximum_Virtual_Card_Limit_Amount_For_Interval>;
+  REQUIRE_2FA_FOR_ADMINS?: Maybe<Scalars['Boolean']>;
 };
 
 export type PoliciesCollectiveMinimumAdminsInput = {
@@ -6633,6 +6634,7 @@ export type PoliciesCollectiveMinimumAdminsInput = {
 export type PoliciesInput = {
   COLLECTIVE_MINIMUM_ADMINS?: InputMaybe<PoliciesCollectiveMinimumAdminsInput>;
   EXPENSE_AUTHOR_CANNOT_APPROVE?: InputMaybe<Scalars['Boolean']>;
+  REQUIRE_2FA_FOR_ADMINS?: InputMaybe<Scalars['Boolean']>;
 };
 
 /** Defines how the policy is applied */
@@ -6643,7 +6645,7 @@ export enum PolicyApplication {
 
 /** Parameters for paying an expense */
 export type ProcessExpensePaymentParams = {
-  /** 2FA code for if the host account has 2FA for payouts turned on. */
+  /** Who is responsible for paying any due fees. */
   feesPayer?: InputMaybe<FeesPayer>;
   /** Bypass automatic integrations (ie. PayPal, Transferwise) to process the expense manually */
   forceManual?: InputMaybe<Scalars['Boolean']>;
@@ -6651,8 +6653,6 @@ export type ProcessExpensePaymentParams = {
   paymentProcessorFee?: InputMaybe<Scalars['Int']>;
   /** Whether the payment processor fees should be refunded when triggering MARK_AS_UNPAID */
   shouldRefundPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
-  /** 2FA code for if the host account has 2FA for payouts turned on. */
-  twoFactorAuthenticatorCode?: InputMaybe<Scalars['String']>;
 };
 
 /** Action taken for an account application to the host */
