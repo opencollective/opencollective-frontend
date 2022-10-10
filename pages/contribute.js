@@ -5,6 +5,7 @@ import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { TierTypes } from '../lib/constants/tiers-types';
 import { sortEvents } from '../lib/events';
 import { gqlV1 } from '../lib/graphql/helpers';
@@ -76,13 +77,16 @@ class TiersPage extends React.Component {
   });
 
   getPageMetadata(collective) {
+    const baseMetadata = getCollectivePageMetadata(collective);
     if (!collective) {
-      return { title: 'Contribute', description: 'All the ways to contribute' };
+      return { ...baseMetadata, title: 'Contribute', description: 'All the ways to contribute', noRobots: false };
     } else {
       return {
+        ...baseMetadata,
         title: `Contribute to ${collective.name}`,
         description: 'These are all the ways you can help make our community sustainable. ',
         canonicalURL: `${process.env.WEBSITE_URL}/${collective.slug}/contribute`,
+        noRobots: false,
       };
     }
   }
@@ -352,11 +356,14 @@ const contributePageQuery = gqlV1/* GraphQL */ `
       settings
       isActive
       isHost
+      backgroundImageUrl
       imageUrl
       parentCollective {
         id
         name
         slug
+        backgroundImageUrl
+        imageUrl
       }
       features {
         id

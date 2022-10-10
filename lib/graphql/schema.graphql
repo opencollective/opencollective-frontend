@@ -1402,6 +1402,11 @@ type Collective implements CollectiveInterface {
   isHost: Boolean
 
   """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
+
+  """
   Returns whether this host accepts applications for new collectives
   """
   canApply: Boolean
@@ -1647,6 +1652,11 @@ type Event implements CollectiveInterface {
   Returns whether this collective can host other collectives (ie. has a Stripe Account connected)
   """
   isHost: Boolean
+
+  """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
 
   """
   Returns whether this host accepts applications for new collectives
@@ -1896,6 +1906,11 @@ type Fund implements CollectiveInterface {
   isHost: Boolean
 
   """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
+
+  """
   Returns whether this host accepts applications for new collectives
   """
   canApply: Boolean
@@ -2141,6 +2156,11 @@ type Organization implements CollectiveInterface {
   Returns whether this collective can host other collectives (ie. has a Stripe Account connected)
   """
   isHost: Boolean
+
+  """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
 
   """
   Returns whether this host accepts applications for new collectives
@@ -2389,6 +2409,11 @@ type Project implements CollectiveInterface {
   Returns whether this collective can host other collectives (ie. has a Stripe Account connected)
   """
   isHost: Boolean
+
+  """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
 
   """
   Returns whether this host accepts applications for new collectives
@@ -2880,6 +2905,11 @@ type User implements CollectiveInterface {
   isHost: Boolean
 
   """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
+
+  """
   Returns whether this host accepts applications for new collectives
   """
   canApply: Boolean
@@ -3127,6 +3157,11 @@ type Vendor implements CollectiveInterface {
   Returns whether this collective can host other collectives (ie. has a Stripe Account connected)
   """
   isHost: Boolean
+
+  """
+  Returns whether this host is trusted or not
+  """
+  isTrustedHost: Boolean!
 
   """
   Returns whether this host accepts applications for new collectives
@@ -3514,6 +3549,11 @@ type Query {
     Filter on whether account is a host
     """
     isHost: Boolean
+
+    """
+    Included collectives which are archived
+    """
+    includeArchived: Boolean
 
     """
     Whether to return only active accounts

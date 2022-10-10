@@ -1,35 +1,44 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
-import { getDateFromValue } from '../lib/date-utils';
 import dayjs from '../lib/dayjs';
+
+import DateTime from './DateTime';
+
+const OneLineDate = styled(DateTime)`
+  white-space: nowrap;
+  display: inline-block;
+`;
 
 const getMessage = (from, to) => {
   if (!from && !to) {
     return <FormattedMessage id="DateRange.All" defaultMessage="All" />;
   } else if (from && to) {
     return (
-      <FormattedMessage
-        id="Date.DateRange"
-        defaultMessage="{dateFrom, date, short} to {dateTo, date, short}"
-        values={{ dateFrom: getDateFromValue(from), dateTo: getDateFromValue(to) }}
-      />
+      <div>
+        <FormattedMessage
+          defaultMessage="{dateFrom} to {dateTo}"
+          values={{
+            dateFrom: <OneLineDate value={from} dateStyle="medium" />,
+            dateTo: <OneLineDate value={to} dateStyle="medium" />,
+          }}
+        />
+      </div>
     );
   } else if (from) {
     return (
       <FormattedMessage
-        id="Date.SinceShort"
-        defaultMessage="Since {date, date, short}"
-        values={{ date: getDateFromValue(from) }}
+        defaultMessage="Since {date}"
+        values={{ date: <OneLineDate value={from} dateStyle="medium" /> }}
       />
     );
   } else {
     return (
       <FormattedMessage
-        id="Date.BeforeShort"
-        defaultMessage="Before {date, date, short}"
-        values={{ date: getDateFromValue(to) }}
+        defaultMessage="Before {date}"
+        values={{ date: <OneLineDate value={to} dateStyle="medium" /> }}
       />
     );
   }

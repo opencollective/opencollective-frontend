@@ -404,7 +404,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.ADD_FUNDS,
       component: (
-        <AddFundsBtn collective={collective} host={collective.host}>
+        <AddFundsBtn collective={collective}>
           {btnProps => (
             <ActionButton {...btnProps}>
               <AttachMoney size="1em" />

@@ -77,7 +77,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
                   Link: value => (
                     <StyledLink
                       color="black.800"
-                      href="https://docs.opencollective.com/help/collectives/collective-settings/zero-collective-balance"
+                      href="https://docs.opencollective.com/help/expenses-and-getting-paid/submitting-expenses"
                       textDecoration="underline"
                       openInNewTab
                     >

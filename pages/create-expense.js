@@ -7,7 +7,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { expenseSubmissionAllowed, getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { expenseSubmissionAllowed, getCollectivePageMetadata, getCollectiveTypeForUrl } from '../lib/collective.lib';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
@@ -167,11 +167,12 @@ class CreateExpensePage extends React.Component {
   }
 
   getPageMetaData(collective) {
+    const baseMetadata = getCollectivePageMetadata(collective);
     const canonicalURL = `${getCollectivePageCanonicalURL(collective)}/expenses/new`;
     if (collective) {
-      return { title: `${collective.name} - New expense`, canonicalURL };
+      return { ...baseMetadata, title: `${collective.name} - New expense`, canonicalURL };
     } else {
-      return { title: `New expense`, canonicalURL };
+      return { ...baseMetadata, title: `New expense`, canonicalURL };
     }
   }
 
@@ -508,8 +509,9 @@ const createExpensePageQuery = gql`
       type
       description
       settings
-      imageUrl
       twitterHandle
+      imageUrl
+      backgroundImageUrl
       currency
       isArchived
       isActive
@@ -558,6 +560,9 @@ const createExpensePageQuery = gql`
           id
           slug
           expensePolicy
+          imageUrl
+          backgroundImageUrl
+          twitterHandle
         }
       }
     }

@@ -6,6 +6,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
@@ -62,10 +63,11 @@ class CreateConversationPage extends React.Component {
   };
 
   getPageMetaData(collective) {
+    const baseMetadata = getCollectivePageMetadata(collective);
     if (collective) {
-      return { title: `${collective.name} - New conversation` };
+      return { ...baseMetadata, title: `${collective.name} - New conversation` };
     } else {
-      return { title: `New conversation` };
+      return { ...baseMetadata, title: `New conversation` };
     }
   }
 
@@ -155,6 +157,16 @@ const createConversationPageQuery = gql`
       settings
       imageUrl
       twitterHandle
+      imageUrl
+      backgroundImageUrl
+      ... on AccountWithParent {
+        parent {
+          id
+          imageUrl
+          backgroundImageUrl
+          twitterHandle
+        }
+      }
       conversationsTags {
         id
         tag

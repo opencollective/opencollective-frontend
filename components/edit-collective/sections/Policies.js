@@ -53,7 +53,7 @@ const editCollectiveMutation = gqlV1/* GraphQL */ `
 `;
 
 const setPoliciesMutation = gql`
-  mutation SetPolicies($account: AccountReferenceInput!, $policies: JSON!) {
+  mutation SetPolicies($account: AccountReferenceInput!, $policies: PoliciesInput!) {
     setPolicies(account: $account, policies: $policies) {
       id
       policies {
