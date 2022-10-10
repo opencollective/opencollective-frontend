@@ -30,3 +30,4 @@ storybook-static
 
 # Typescript
 tsconfig.tsbuildinfo
+next-env.d.ts

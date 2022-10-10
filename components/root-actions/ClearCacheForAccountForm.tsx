@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { AccountCacheType, ClearCacheMutation, ClearCacheMutationVariables } from '../../lib/graphql/types/v2/graphql';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
@@ -14,7 +15,7 @@ import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const CACHE_TYPES = ['CONTRIBUTORS', 'GRAPHQL_QUERIES', 'CLOUDFLARE'];
+const CACHE_TYPES = Object.values(AccountCacheType);
 
 const clearCacheMutation = gql`
   mutation ClearCache($account: AccountReferenceInput!, $cacheTypes: [AccountCacheType!]) {
@@ -28,8 +29,10 @@ const clearCacheMutation = gql`
 
 const ClearCacheForAccountForm = () => {
   const [account, setAccount] = React.useState(null);
-  const [cacheTypes, setCacheTypes] = React.useState(() => [...CACHE_TYPES]);
-  const [clearCache, { loading }] = useMutation(clearCacheMutation, { context: API_V2_CONTEXT });
+  const [cacheTypes, setCacheTypes] = React.useState<AccountCacheType[]>(() => [...CACHE_TYPES]);
+  const [clearCache, { loading }] = useMutation<ClearCacheMutation, ClearCacheMutationVariables>(clearCacheMutation, {
+    context: API_V2_CONTEXT,
+  });
   const { addToast } = useToasts();
   const isValid = account && cacheTypes.length > 0;
   const intl = useIntl();
@@ -82,8 +85,8 @@ const ClearCacheForAccountForm = () => {
         loading={loading}
         onClick={async () => {
           try {
-            const result = await clearCache({ variables: { account: { zzz: account.id }, cacheTypes } });
-            const resultAccount = result.data.clearCacheFoxrAccount;
+            const result = await clearCache({ variables: { account: { legacyId: account.id }, cacheTypes } });
+            const resultAccount = result.data.clearCacheForAccount;
             addToast({
               type: TOAST_TYPE.SUCCESS,
               message: `Cache cleared for ${resultAccount.name} (@${resultAccount.slug})`,

@@ -1,5 +1,6 @@
 {
   "extends": ["opencollective", "plugin:styled-components-a11y/recommended", "plugin:import/typescript"],
+  "ignorePatterns": ["./lib/graphql/types/*"],
   "env": { "jest": true },
   "parser": "@typescript-eslint/parser",
   "plugins": [

@@ -393,11 +393,6 @@ interface Account {
     """
     To filter by transaction kind
     """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
-
-    """
-    To filter by transaction kind
-    """
     kind: [TransactionKind]
 
     """
@@ -1139,7 +1134,6 @@ type Expense {
   (Optional) files attached to the expense
   """
   attachedFiles: [ExpenseAttachedFile!]
-  attachments: [ExpenseItem] @deprecated(reason: "2020-04-08: Field has been renamed to \"items\"")
   items: [ExpenseItem]
 
   """
@@ -2656,11 +2650,6 @@ type Host implements Account & AccountWithContributions {
     """
     To filter by transaction kind
     """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
-
-    """
-    To filter by transaction kind
-    """
     kind: [TransactionKind]
 
     """
@@ -2941,11 +2930,6 @@ type Host implements Account & AccountWithContributions {
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
   hostFeePercent: Float
   totalHostedCollectives: Int
@@ -2957,16 +2941,6 @@ type Host implements Account & AccountWithContributions {
     A collection of accounts for which the metrics should be returned.
     """
     account: [AccountReferenceInput!]
-
-    """
-    Inferior date limit in which we're calculating the metrics
-    """
-    from: String @deprecated(reason: "2020-09-20: Use dateFrom")
-
-    """
-    Superior date limit in which we're calculating the metrics
-    """
-    to: String @deprecated(reason: "2020-09-20: Use dateTo")
 
     """
     The start date of the time series
@@ -3159,11 +3133,6 @@ interface AccountWithContributions {
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
 }
 
@@ -3432,8 +3401,10 @@ type Conversation {
   updatedAt: DateTime!
   tags: [String]
   summary: String!
-  collective: Account
-  fromCollective: Account
+  collective: Account @deprecated(reason: "2022-09-14: Please use account")
+  account: Account
+  fromCollective: Account @deprecated(reason: "2022-09-14: Please use fromAccount")
+  fromAccount: Account
 
   """
   The root comment / starter for this conversation
@@ -4099,14 +4070,14 @@ type Policies {
 
 type COLLECTIVE_MINIMUM_ADMINS {
   numberOfAdmins: Int
-  applies: POLICY_APPLICATION
+  applies: PolicyApplication
   freeze: Boolean
 }
 
 """
 Defines how the policy is applied
 """
-enum POLICY_APPLICATION {
+enum PolicyApplication {
   ALL_COLLECTIVES
   NEW_COLLECTIVES
 }
@@ -4488,12 +4459,6 @@ type ContributionStats {
   The total number of contributions
   """
   contributionsCount: Int!
-
-  """
-  The contribution amounts over time
-  """
-  contributionAmountOverTime: TimeSeriesAmount
-    @deprecated(reason: "2022-04-21: Please use hostMetricsTimeSeries.totalReceived")
 
   """
   Number of one time contributions
@@ -5017,11 +4982,6 @@ type Bot implements Account {
     """
     To filter by transaction kind
     """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
-
-    """
-    To filter by transaction kind
-    """
     kind: [TransactionKind]
 
     """
@@ -5523,11 +5483,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     To filter by transaction kind
     """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
-
-    """
-    To filter by transaction kind
-    """
     kind: [TransactionKind]
 
     """
@@ -5833,11 +5788,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
 }
 
@@ -6359,11 +6309,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     To filter by transaction kind
     """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
-
-    """
-    To filter by transaction kind
-    """
     kind: [TransactionKind]
 
     """
@@ -6669,22 +6614,12 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
 
   """
   The Account parenting this account
   """
   parent: Account
-
-  """
-  The Collective hosting this Event
-  """
-  parentCollective: Collective @deprecated(reason: "2020/07/01 - Use parent instead.")
 
   """
   The Event start date and time
@@ -6974,11 +6909,6 @@ type Individual implements Account {
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
 
     """
     To filter by transaction kind
@@ -7574,11 +7504,6 @@ type Organization implements Account & AccountWithContributions {
     """
     To filter by transaction kind
     """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
-
-    """
-    To filter by transaction kind
-    """
     kind: [TransactionKind]
 
     """
@@ -7857,11 +7782,6 @@ type Organization implements Account & AccountWithContributions {
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the collective currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
@@ -8200,11 +8120,6 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     To filter by transaction kind
     """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
-
-    """
-    To filter by transaction kind
-    """
     kind: [TransactionKind]
 
     """
@@ -8510,11 +8425,6 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
 }
 
@@ -9197,11 +9107,6 @@ type Query {
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
 
     """
     To filter by transaction kind
@@ -10907,11 +10812,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     To filter by transaction kind
     """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
-
-    """
-    To filter by transaction kind
-    """
     kind: [TransactionKind]
 
     """
@@ -11217,11 +11117,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
 }
 
@@ -11513,11 +11408,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     To filter by transaction kind
     """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
-
-    """
-    To filter by transaction kind
-    """
     kind: [TransactionKind]
 
     """
@@ -11823,11 +11713,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
 
   """
@@ -12097,21 +11982,6 @@ type Mutation {
     """
     code: String!
   ): Individual!
-
-  """
-  Update the plan. Scope: "account".
-  """
-  editHostPlan(
-    """
-    Account where the host plan will be edited.
-    """
-    account: AccountReferenceInput!
-
-    """
-    The name of the plan to subscribe to.
-    """
-    plan: String!
-  ): Host! @deprecated(reason: "2022-07-06: Host Plans are deprecated.")
 
   """
   Edit key properties of an account. Scope: "account".
@@ -13242,7 +13112,7 @@ input PoliciesInput {
 
 input PoliciesCollectiveMinimumAdminsInput {
   numberOfAdmins: Int
-  applies: POLICY_APPLICATION
+  applies: PolicyApplication
   freeze: Boolean
 }
 
@@ -14090,11 +13960,6 @@ input GuestInfoInput {
   legalName: String
 
   """
-  The unique guest token
-  """
-  token: String @deprecated(reason: "2021-01-26: Guest tokens are not used anymore")
-
-  """
   Address of the user, mandatory when amount is above $5000.
   """
   location: LocationInput
@@ -14190,7 +14055,6 @@ input PaypalPaymentInput {
   data: JSON
   orderId: String
   subscriptionId: String
-  isNewApi: Boolean @deprecated(reason: "2021-07-30: Not used anymore")
 }
 
 """
