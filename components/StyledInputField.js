@@ -171,7 +171,7 @@ StyledInputField.propTypes = {
   /** Anything here will be passed down to label */
   labelProps: PropTypes.object,
   /** Help text that will appear next to the label (a small question mark with help text shown when hovered) */
-  helpText: PropTypes.string,
+  helpText: PropTypes.node,
   /** All props from `Box` */
   ...Box.propTypes,
 };
