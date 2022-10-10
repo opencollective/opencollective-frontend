@@ -1,12 +1,12 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal';
 import CreateVirtualCardModal from '../../edit-collective/CreateVirtualCardModal';
@@ -22,7 +22,7 @@ import StyledButton from '../../StyledButton';
 import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
-const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
+const hostVirtualCardsQuery = gql`
   query HostedVirtualCards(
     $slug: String
     $limit: Int!

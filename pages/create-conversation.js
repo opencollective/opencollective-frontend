@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -7,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
@@ -144,7 +145,7 @@ class CreateConversationPage extends React.Component {
   }
 }
 
-const createConversationPageQuery = gqlV2/* GraphQL */ `
+const createConversationPageQuery = gql`
   query CreateConversationPage($collectiveSlug: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id

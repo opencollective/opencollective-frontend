@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Lock } from '@styled-icons/fa-solid';
 import { get } from 'lodash';
@@ -9,7 +10,7 @@ import styled from 'styled-components';
 import { borders } from 'styled-system';
 
 import { FEATURES, isFeatureEnabled } from '../lib/allowed-features';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 import { compose, formatDate } from '../lib/utils';
 
@@ -370,7 +371,7 @@ class StyledUpdate extends Component {
   }
 }
 
-const editUpdateMutation = gqlV2/* GraphQL */ `
+const editUpdateMutation = gql`
   mutation EditUpdate($update: UpdateUpdateInput!) {
     editUpdate(update: $update) {
       id
@@ -385,7 +386,7 @@ const editUpdateMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const deleteUpdateMutation = gqlV2/* GraphQL */ `
+const deleteUpdateMutation = gql`
   mutation DeleteUpdate($id: String!) {
     deleteUpdate(id: $id) {
       id

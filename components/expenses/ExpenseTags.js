@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import StyledInputTags from '../StyledInputTags';
@@ -14,7 +14,7 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import ExpenseTypeTag from './ExpenseTypeTag';
 
-const editExpenseTagsMutation = gqlV2/* GraphQL */ `
+const editExpenseTagsMutation = gql`
   mutation EditExpenseTags($id: String!, $tags: [String!]!) {
     editExpense(expense: { id: $id, tags: $tags }) {
       id

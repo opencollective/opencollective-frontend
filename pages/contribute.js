@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
@@ -9,6 +8,7 @@ import styled from 'styled-components';
 import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { TierTypes } from '../lib/constants/tiers-types';
 import { sortEvents } from '../lib/events';
+import { gqlV1 } from '../lib/graphql/helpers';
 import { sortTiersForCollective } from '../lib/tier-utils';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 
@@ -344,7 +344,7 @@ class TiersPage extends React.Component {
   }
 }
 
-const contributePageQuery = gql`
+const contributePageQuery = gqlV1/* GraphQL */ `
   query ContributePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug) {
       id

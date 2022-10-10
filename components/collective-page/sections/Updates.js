@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Lock } from '@styled-icons/fa-solid';
 import { get, isEmpty } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { gqlV1 } from '../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import { formatDate } from '../../../lib/utils';
 
@@ -27,7 +27,7 @@ import { updatesFieldsFragment } from '../graphql/fragments';
 import SectionTitle from '../SectionTitle';
 
 /** Query to re-fetch updates */
-export const updatesSectionQuery = gql`
+export const updatesSectionQuery = gqlV1/* GraphQL */ `
   query UpdatesSection($slug: String!, $onlyPublishedUpdates: Boolean) {
     Collective(slug: $slug) {
       id

@@ -1,8 +1,6 @@
 import { gql } from '@apollo/client';
 
-const gqlV2 = gql;
-
-export const commentFieldsFragment = gqlV2/* GraphQL */ `
+export const commentFieldsFragment = gql`
   fragment CommentFields on Comment {
     id
     createdAt
@@ -19,7 +17,7 @@ export const commentFieldsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-export const conversationListFragment = gqlV2/* GraphQL */ `
+export const conversationListFragment = gql`
   fragment ConversationListFragment on ConversationCollection {
     totalCount
     offset
@@ -56,7 +54,7 @@ export const conversationListFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-export const isUserFollowingConversationQuery = gqlV2/* GraphQL */ `
+export const isUserFollowingConversationQuery = gql`
   query IsUserFollowingConversation($id: String!) {
     loggedInAccount {
       id
@@ -71,7 +69,7 @@ export const isUserFollowingConversationQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-export const updateListFragment = gqlV2/* GraphQL */ `
+export const updateListFragment = gql`
   fragment UpdateListFragment on UpdateCollection {
     totalCount
     offset

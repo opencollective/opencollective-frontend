@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { Email } from '@styled-icons/material/Email';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { useTheme } from 'styled-components';
 
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { removeGuestTokens } from '../lib/guest-accounts';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
@@ -25,7 +25,7 @@ const STATUS = {
   ERROR: 'ERROR',
 };
 
-const confirmGuestAccountMutation = gqlV2/* GraphQL */ `
+const confirmGuestAccountMutation = gql`
   mutation ConfirmGuestAccount($email: EmailAddress!, $token: String!) {
     confirmGuestAccount(email: $email, emailConfirmationToken: $token) {
       accessToken

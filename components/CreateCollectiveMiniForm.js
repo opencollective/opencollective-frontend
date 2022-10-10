@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
 import { assign, cloneDeep, get, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -8,6 +8,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
 import { i18nGraphqlException } from '../lib/errors';
+import { gqlV1 } from '../lib/graphql/helpers';
 import { isValidEmail } from '../lib/utils';
 
 import Container from './Container';
@@ -122,7 +123,7 @@ const prepareMutationVariables = collective => {
   }
 };
 
-const createCollectiveMutation = gql`
+const createCollectiveMutation = gqlV1/* GraphQL */ `
   mutation CreateCollective($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
       id
@@ -149,7 +150,7 @@ const createCollectiveMutation = gql`
   }
 `;
 
-const createUserMutation = gql`
+const createUserMutation = gqlV1/* GraphQL */ `
   mutation CreateUser($user: UserInputType!) {
     createUser(user: $user, throwIfExists: false, sendSignInLink: false) {
       user {

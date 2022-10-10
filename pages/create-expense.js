@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { compose, omit, pick } from 'lodash';
 import { withRouter } from 'next/router';
@@ -11,7 +12,7 @@ import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import FormPersister from '../lib/form-persister';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { parseToBoolean } from '../lib/utils';
 
@@ -470,7 +471,7 @@ class CreateExpensePage extends React.Component {
   }
 }
 
-const hostFieldsFragment = gqlV2/* GraphQL */ `
+const hostFieldsFragment = gql`
   fragment CreateExpenseHostFields on Host {
     id
     name
@@ -498,7 +499,7 @@ const hostFieldsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-const createExpensePageQuery = gqlV2/* GraphQL */ `
+const createExpensePageQuery = gql`
   query CreateExpensePage($collectiveSlug: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
@@ -583,7 +584,7 @@ const addCreateExpensePageData = graphql(createExpensePageQuery, {
   },
 });
 
-const createExpenseMutation = gqlV2/* GraphQL */ `
+const createExpenseMutation = gql`
   mutation CreateExpense(
     $expense: ExpenseCreateInput!
     $account: AccountReferenceInput!
@@ -602,7 +603,7 @@ const addCreateExpenseMutation = graphql(createExpenseMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
-const draftExpenseAndInviteUserMutation = gqlV2/* GraphQL */ `
+const draftExpenseAndInviteUserMutation = gql`
   mutation DraftExpenseAndInviteUser($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
     draftExpenseAndInviteUser(expense: $expense, account: $account) {
       id

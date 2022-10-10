@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
 import { ExternalLink } from '@styled-icons/feather/ExternalLink';
 import { Mail } from '@styled-icons/feather/Mail';
@@ -11,7 +11,7 @@ import { padding } from 'styled-system';
 
 import { getCollectiveMainTag } from '../../lib/collective.lib';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { i18nOCFApplicationFormLabel } from '../../lib/i18n/ocf-form';
 import { CustomScrollbarCSS } from '../../lib/styled-components-shared-styles';
 
@@ -63,7 +63,7 @@ const CollectiveCardBody = styled.div`
   }
 `;
 
-export const processApplicationAccountFields = gqlV2/* GraphQL */ `
+export const processApplicationAccountFields = gql`
   fragment ProcessHostApplicationFields on AccountWithHost {
     isActive
     approvedAt
@@ -74,7 +74,7 @@ export const processApplicationAccountFields = gqlV2/* GraphQL */ `
   }
 `;
 
-export const processApplicationMutation = gqlV2/* GraphQL */ `
+export const processApplicationMutation = gql`
   mutation ProcessHostApplication(
     $host: AccountReferenceInput!
     $account: AccountReferenceInput!

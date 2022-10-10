@@ -1,11 +1,11 @@
 import React from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { isIndividualAccount } from '../../lib/collective.lib';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
 import { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
@@ -25,7 +25,7 @@ import StyledTag from '../StyledTag';
 import { Label, P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const moveOrdersFieldsFragment = gqlV2/* GraphQL */ `
+const moveOrdersFieldsFragment = gql`
   fragment MoveOrdersFields on Order {
     id
     legacyId
@@ -50,7 +50,7 @@ const moveOrdersFieldsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-const ordersQuery = gqlV2/* GraphQL */ `
+const ordersQuery = gql`
   query AuthoredOrdersRoot($account: AccountReferenceInput!) {
     orders(account: $account, filter: OUTGOING, limit: 100, includeIncognito: true) {
       nodes {
@@ -62,7 +62,7 @@ const ordersQuery = gqlV2/* GraphQL */ `
   ${moveOrdersFieldsFragment}
 `;
 
-const moveOrdersMutation = gqlV2/* GraphQL */ `
+const moveOrdersMutation = gql`
   mutation MoveOrders($orders: [OrderReferenceInput!]!, $fromAccount: AccountReferenceInput!, $makeIncognito: Boolean) {
     moveOrders(orders: $orders, fromAccount: $fromAccount, makeIncognito: $makeIncognito) {
       id

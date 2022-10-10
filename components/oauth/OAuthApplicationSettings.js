@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { pick } from 'lodash';
 import { useRouter } from 'next/router';
@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import Link from '../Link';
@@ -28,7 +28,7 @@ import WarnIfUnsavedChanges from '../WarnIfUnsavedChanges';
 import DeleteOAuthApplicationModal from './DeleteOAuthApplicationModal';
 import { validateOauthApplicationValues } from './lib';
 
-const applicationSettingsFragment = gqlV2/* GraphQL */ `
+const applicationSettingsFragment = gql`
   fragment ApplicationSettings on Application {
     id
     name
@@ -39,7 +39,7 @@ const applicationSettingsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-const applicationQuery = gqlV2/* GraphQL */ `
+const applicationQuery = gql`
   query OAuthApplicationQuery($id: String!) {
     application(id: $id) {
       id
@@ -49,7 +49,7 @@ const applicationQuery = gqlV2/* GraphQL */ `
   ${applicationSettingsFragment}
 `;
 
-const updateApplicationMutation = gqlV2/* GraphQL */ `
+const updateApplicationMutation = gql`
   mutation UpdateOAuthApplication($application: ApplicationUpdateInput!) {
     updateApplication(application: $application) {
       id

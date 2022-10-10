@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { CardElement } from '@stripe/react-stripe-js';
 import { get } from 'lodash';
@@ -9,6 +8,7 @@ import styled from 'styled-components';
 import { maxWidth } from 'styled-system';
 
 import { formatCurrency } from '../lib/currency-utils';
+import { gqlV1 } from '../lib/graphql/helpers';
 import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
 import { compose } from '../lib/utils';
 
@@ -334,7 +334,7 @@ class UpdatePaymentPage extends React.Component {
   }
 }
 
-const replaceCreditCardMutation = gql`
+const replaceCreditCardMutation = gqlV1/* GraphQL */ `
   mutation ReplaceCreditCard(
     $id: Int!
     $CollectiveId: Int!
@@ -350,7 +350,7 @@ const replaceCreditCardMutation = gql`
   }
 `;
 
-const subscriptionsQuery = gql`
+const subscriptionsQuery = gqlV1/* GraphQL */ `
   query UpdateSubscriptionsForPaymentMethod($paymentMethodId: Int) {
     PaymentMethod(id: $paymentMethodId) {
       id

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import ApplicationForm from '../components/osc-host-application/ApplicationForm';
 import ConnectGithub from '../components/osc-host-application/ConnectGithub';
@@ -16,7 +16,7 @@ import Page from '../components/Page';
 import { TOAST_TYPE, useToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
-const oscCollectiveApplicationQuery = gqlV2/* GraphQL */ `
+const oscCollectiveApplicationQuery = gql`
   query OscCollectiveApplicationPage($slug: String) {
     account(slug: $slug) {
       id
@@ -35,7 +35,7 @@ const oscCollectiveApplicationQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const oscHostApplicationPageQuery = gqlV2/* GraphQL */ `
+const oscHostApplicationPageQuery = gql`
   query OscHostApplicationPage {
     account(slug: "opensource") {
       id

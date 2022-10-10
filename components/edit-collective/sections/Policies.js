@@ -7,7 +7,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
 import { DEFAULT_SUPPORTED_EXPENSE_TYPES } from '../../../lib/expenses';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import { omitDeep, stripHTML } from '../../../lib/utils';
 
 import Container from '../../Container';
@@ -30,7 +30,7 @@ import SettingsSectionTitle from './SettingsSectionTitle';
 const EXPENSE_POLICY_MAX_LENGTH = 16000; // max in database is ~15,500
 const CONTRIBUTION_POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average length word
 
-const updateFilterCategoriesMutation = gqlV2/* GraphQL */ `
+const updateFilterCategoriesMutation = gql`
   mutation UpdateFilterCategories($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
       id
@@ -41,7 +41,7 @@ const updateFilterCategoriesMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const editCollectiveMutation = gql/* GraphQL */ `
+const editCollectiveMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveMutation($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
       id
@@ -52,7 +52,7 @@ const editCollectiveMutation = gql/* GraphQL */ `
   }
 `;
 
-const setPoliciesMutation = gqlV2/* GraphQL */ `
+const setPoliciesMutation = gql`
   mutation SetPolicies($account: AccountReferenceInput!, $policies: PoliciesInput!) {
     setPolicies(account: $account, policies: $policies) {
       id

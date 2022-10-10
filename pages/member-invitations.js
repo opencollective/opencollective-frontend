@@ -1,9 +1,10 @@
 import React from 'react';
+import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
@@ -12,7 +13,7 @@ import MemberInvitationsList from '../components/MemberInvitationsList';
 import MessageBox from '../components/MessageBox';
 import { H1 } from '../components/Text';
 
-const memberInvitationsPageQuery = gqlV2/* GraphQL */ `
+const memberInvitationsPageQuery = gql`
   query MemberInvitationsPage($memberAccount: AccountReferenceInput!) {
     memberInvitations(memberAccount: $memberAccount) {
       id

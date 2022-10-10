@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { first, get, last, startCase } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -12,7 +12,7 @@ import { AmountTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { getIntervalFromContributionFrequency } from '../../lib/date-utils';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { DEFAULT_MINIMUM_AMOUNT, DEFAULT_PRESETS } from '../../lib/tier-utils';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -41,7 +41,7 @@ const messages = defineMessages({
   },
 });
 
-const updateOrderMutation = gqlV2/* GraphQL */ `
+const updateOrderMutation = gql`
   mutation UpdateOrder(
     $order: OrderReferenceInput!
     $amount: AmountInput
@@ -64,7 +64,7 @@ const updateOrderMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const tiersQuery = gqlV2/* GraphQL */ `
+const tiersQuery = gql`
   query UpdateOrderPopUpTiers($slug: String!) {
     account(slug: $slug) {
       id

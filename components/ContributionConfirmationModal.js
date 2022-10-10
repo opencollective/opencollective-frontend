@@ -1,10 +1,10 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
@@ -17,7 +17,7 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal'
 import { P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
-const confirmContributionMutation = gqlV2/* GraphQL */ `
+const confirmContributionMutation = gql`
   mutation ConfirmContribution($order: OrderUpdateInput!, $action: ProcessOrderAction!) {
     processPendingOrder(order: $order, action: $action) {
       id

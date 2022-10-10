@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ActivityClasses, ActivityTypes } from '../../../../lib/constants/activities';
-import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 
 import { Box, Flex } from '../../../Grid';
@@ -15,7 +15,7 @@ import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
 
 import { accountActivitySubscriptionsFragment } from './fragments';
 
-const refetchEmailNotificationQuery = gqlV2/* GraphQL */ `
+const refetchEmailNotificationQuery = gql`
   query NotificationsSettingsRefetchQuery($id: String!) {
     account(id: $id) {
       id
@@ -25,7 +25,7 @@ const refetchEmailNotificationQuery = gqlV2/* GraphQL */ `
   ${accountActivitySubscriptionsFragment}
 `;
 
-const setEmailNotificationMutation = gqlV2/* GraphQL */ `
+const setEmailNotificationMutation = gql`
   mutation SetEmailNotification($type: ActivityAndClassesType!, $account: AccountReferenceInput, $active: Boolean!) {
     setEmailNotification(type: $type, account: $account, active: $active) {
       id

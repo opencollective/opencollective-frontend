@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import { Box } from '../../Grid';
 import Link from '../../Link';
@@ -37,7 +37,7 @@ const I18nFilters = defineMessages({
   },
 });
 
-export const transactionsSectionQuery = gqlV2/* GraphQL */ `
+export const transactionsSectionQuery = gql`
   query TransactionsSection(
     $slug: String!
     $limit: Int!

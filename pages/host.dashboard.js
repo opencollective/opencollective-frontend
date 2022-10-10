@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { CheckDouble } from '@styled-icons/boxicons-regular/CheckDouble';
 import { Donate as DonateIcon } from '@styled-icons/fa-solid/Donate';
@@ -10,7 +11,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getSettingsRoute } from '../lib/url-helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -219,7 +220,7 @@ class HostDashboardPage extends React.Component {
   }
 }
 
-const hostDashboardPageQuery = gqlV2/* GraphQL */ `
+const hostDashboardPageQuery = gql`
   query HostDashboardPage($slug: String) {
     account(slug: $slug) {
       id

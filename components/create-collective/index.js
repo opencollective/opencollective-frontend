@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { IGNORED_TAGS } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
@@ -151,7 +152,7 @@ class CreateCollective extends Component {
   }
 }
 
-const createCollectiveMutation = gqlV2/* GraphQL */ `
+const createCollectiveMutation = gql`
   mutation CreateCollective(
     $collective: CollectiveCreateInput!
     $host: AccountReferenceInput
@@ -178,7 +179,7 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const tagStatsQuery = gqlV2/* GraphQL */ `
+const tagStatsQuery = gql`
   query CreateCollectivePageQuery {
     tagStats {
       nodes {

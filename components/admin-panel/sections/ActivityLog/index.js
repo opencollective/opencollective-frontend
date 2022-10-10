@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { parseDateInterval } from '../../../../lib/date-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
 import Container from '../../../Container';
 import { Box } from '../../../Grid';
@@ -21,7 +21,7 @@ import ActivityFilters from './ActivityFilters';
 import ActivityListItem from './ActivityListItem';
 import { getActivityTypeFilterValuesFromKey, isSupportedActivityTypeFilter } from './ActivityTypeFilter';
 
-const activityLogQuery = gqlV2/* GraphQL */ `
+const activityLogQuery = gql`
   query AccountActivityLog(
     $accountSlug: String!
     $limit: Int

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { Times } from '@styled-icons/fa-solid/Times';
 import { createPortal } from 'react-dom';
@@ -9,6 +8,7 @@ import { Popper } from 'react-popper';
 import styled from 'styled-components';
 
 import { formatErrorMessage, getErrorFromGraphqlException } from '../lib/errors';
+import { gqlV1 } from '../lib/graphql/helpers';
 import withViewport from '../lib/withViewport';
 
 import { collectivePageQuery } from '../components/collective-page/graphql/queries';
@@ -94,7 +94,7 @@ const Arrow = styled('div')`
   }
 `;
 
-const editPublicMessageMutation = gql`
+const editPublicMessageMutation = gqlV1/* GraphQL */ `
   mutation EditPublicMessage($FromCollectiveId: Int!, $CollectiveId: Int!, $message: String) {
     editPublicMessage(FromCollectiveId: $FromCollectiveId, CollectiveId: $CollectiveId, message: $message) {
       id

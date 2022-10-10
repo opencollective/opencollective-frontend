@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
 import { get } from 'lodash';
@@ -9,7 +9,7 @@ import styled, { css } from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -71,7 +71,7 @@ AmountDetailsLine.propTypes = {
   isLargeAmount: PropTypes.bool,
 };
 
-const addFundsMutation = gqlV2/* GraphQL */ `
+const addFundsMutation = gql`
   mutation AddFunds(
     $fromAccount: AccountReferenceInput!
     $account: AccountReferenceInput!
@@ -122,7 +122,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const addFundsTierFieldsFragment = gqlV2/* GraphQL */ `
+const addFundsTierFieldsFragment = gql`
   fragment AddFundsTierFields on Tier {
     id
     slug
@@ -131,7 +131,7 @@ const addFundsTierFieldsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-const addFundsAccountQuery = gqlV2/* GraphQL */ `
+const addFundsAccountQuery = gql`
   query AddFundsAccount($slug: String!) {
     account(slug: $slug) {
       id
@@ -187,7 +187,7 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
   ${addFundsTierFieldsFragment}
 `;
 
-const addPlatformTipMutation = gqlV2/* GraphQL */ `
+const addPlatformTipMutation = gql`
   mutation AddPlatformTip($amount: AmountInput!, $transaction: TransactionReferenceInput!) {
     addPlatformTipToTransaction(amount: $amount, transaction: $transaction) {
       id

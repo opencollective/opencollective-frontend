@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { Question } from '@styled-icons/remix-line/Question';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { simpleDateToISOString } from '../../lib/date-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import PeriodFilter from '../budget/filters/PeriodFilter';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -28,7 +28,7 @@ import PlatformTipsCollected from './reports-section/PlatformTipsCollected';
 import TotalMoneyManagedSection from './reports-section/TotalMoneyManagedSection';
 import TransactionsOverviewSection from './reports-section/TransactionsOverviewSection';
 
-const hostReportPageQuery = gqlV2/* GraphQL */ `
+const hostReportPageQuery = gql`
   query HostReportsPage(
     $hostSlug: String!
     $account: [AccountReferenceInput!]
