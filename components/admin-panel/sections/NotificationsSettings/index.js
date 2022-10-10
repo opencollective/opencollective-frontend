@@ -1,12 +1,12 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { compact, flatten } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
 import Avatar from '../../../Avatar';
 import { Box, Flex } from '../../../Grid';
@@ -37,7 +37,7 @@ const NecessaryNotificationsList = styled.ul`
   line-height: 20px;
 `;
 
-const userActivitySubscriptionsQuery = gqlV2/* GraphQL */ `
+const userActivitySubscriptionsQuery = gql`
   query ActivitySubscriptionsSettingsQuery($id: String!) {
     account(id: $id) {
       id
@@ -77,7 +77,7 @@ const userActivitySubscriptionsQuery = gqlV2/* GraphQL */ `
   ${accountActivitySubscriptionsFragment}
 `;
 
-const setNewsletterOptInMutation = gqlV2/* GraphQL */ `
+const setNewsletterOptInMutation = gql`
   mutation SetNewsletterOptIn($newsletterOptIn: Boolean!) {
     setNewsletterOptIn(newsletterOptIn: $newsletterOptIn) {
       id

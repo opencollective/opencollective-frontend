@@ -2,6 +2,7 @@ import React from 'react';
 import { find, get, isEmpty, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
+import { getCollectivePageMetadata } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import INTERVALS from '../../lib/constants/intervals';
 import {
@@ -271,15 +272,15 @@ const PAGE_META_MSGS = defineMessages({
 });
 
 export const getContributionFlowMetadata = (intl, account, tier) => {
+  const baseMetadata = getCollectivePageMetadata(account);
   if (!account) {
-    return { title: 'Contribute' };
+    return { ...baseMetadata, title: 'Contribute' };
   }
 
   return {
+    ...baseMetadata,
     canonicalURL: getCanonicalURL(account, tier),
-    description: account.description,
-    twitterHandle: account.twitterHandle,
-    image: account.imageUrl || account.backgroundImageUrl,
+    noRobots: false,
     title:
       account.type === CollectiveType.EVENT
         ? intl.formatMessage(PAGE_META_MSGS.eventTitle, { event: account.name })

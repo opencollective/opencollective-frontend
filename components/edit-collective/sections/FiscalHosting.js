@@ -1,10 +1,10 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import useKeyboardShortcut, { ENTER_KEY } from '../../../lib/hooks/useKeyboardKey';
 
 import { adminPanelQuery } from '../../../pages/admin-panel';
@@ -15,7 +15,7 @@ import { P } from '../../Text';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const activateCollectiveAsHostMutation = gql`
+const activateCollectiveAsHostMutation = gqlV1/* GraphQL */ `
   mutation ActivateCollectiveAsHost($id: Int!) {
     activateCollectiveAsHost(id: $id) {
       id
@@ -29,7 +29,7 @@ const activateCollectiveAsHostMutation = gql`
   }
 `;
 
-const deactivateCollectiveAsHostMutation = gql`
+const deactivateCollectiveAsHostMutation = gqlV1/* GraphQL */ `
   mutation DeactivateCollectiveAsHost($id: Int!) {
     deactivateCollectiveAsHost(id: $id) {
       id
@@ -43,7 +43,7 @@ const deactivateCollectiveAsHostMutation = gql`
   }
 `;
 
-const activateBudgetMutation = gql`
+const activateBudgetMutation = gqlV1/* GraphQL */ `
   mutation ActivateHostBudget($id: Int!) {
     activateBudget(id: $id) {
       id
@@ -52,7 +52,7 @@ const activateBudgetMutation = gql`
   }
 `;
 
-const deactivateBudgetMutation = gql`
+const deactivateBudgetMutation = gqlV1/* GraphQL */ `
   mutation DeactivateHostBudget($id: Int!) {
     deactivateBudget(id: $id) {
       id

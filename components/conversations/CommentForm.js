@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import ContainerOverlay from '../ContainerOverlay';
@@ -22,7 +22,7 @@ import { withUser } from '../UserProvider';
 
 import { commentFieldsFragment } from './graphql';
 
-const createCommentMutation = gqlV2/* GraphQL */ `
+const createCommentMutation = gql`
   mutation CreateComment($comment: CommentCreateInput!) {
     createComment(comment: $comment) {
       id

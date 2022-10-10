@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import Hide from '../Hide';
@@ -113,7 +114,7 @@ class HostsContainer extends React.Component {
   }
 }
 
-const hostsQuery = gqlV2/* GraphQL */ `
+const hostsQuery = gql`
   query AcceptFinancialContributionsHosts($tags: [String], $limit: Int) {
     hosts(tags: $tags, limit: $limit) {
       totalCount

@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled, { css } from 'styled-components';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
 import { Flex } from '../Grid';
@@ -13,7 +13,7 @@ import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledRoundButton from '../StyledRoundButton';
 
-const addReactionMutation = gqlV2/* GraphQL */ `
+const addReactionMutation = gql`
   mutation AddEmojiReaction($emoji: String!, $update: UpdateReferenceInput, $comment: CommentReferenceInput) {
     addEmojiReaction(emoji: $emoji, update: $update, comment: $comment) {
       update {
@@ -30,7 +30,7 @@ const addReactionMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const removeReactionMutation = gqlV2/* GraphQL */ `
+const removeReactionMutation = gql`
   mutation RemoveEmojiReaction($emoji: String!, $update: UpdateReferenceInput, $comment: CommentReferenceInput) {
     removeEmojiReaction(emoji: $emoji, update: $update, comment: $comment) {
       update {

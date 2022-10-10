@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { Copy } from '@styled-icons/feather/Copy';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
@@ -10,7 +10,7 @@ import { margin } from 'styled-system';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
 import Avatar from '../Avatar';
@@ -109,7 +109,7 @@ const StateLabel = styled(Box)`
   line-height: 12px;
 `;
 
-const pauseCardMutation = gqlV2/* GraphQL */ `
+const pauseCardMutation = gql`
   mutation PauseVirtualCard($virtualCard: VirtualCardReferenceInput!) {
     pauseVirtualCard(virtualCard: $virtualCard) {
       id
@@ -118,7 +118,7 @@ const pauseCardMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const resumeCardMutation = gqlV2/* GraphQL */ `
+const resumeCardMutation = gql`
   mutation ResumeVirtualCard($virtualCard: VirtualCardReferenceInput!) {
     resumeVirtualCard(virtualCard: $virtualCard) {
       id

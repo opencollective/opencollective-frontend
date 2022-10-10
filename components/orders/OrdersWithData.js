@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { parseDateInterval } from '../../lib/date-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 
@@ -25,7 +25,7 @@ import { H1 } from '../Text';
 import OrdersFilters from './OrdersFilters';
 import OrdersList from './OrdersList';
 
-const accountOrdersQuery = gqlV2/* GraphQL */ `
+const accountOrdersQuery = gql`
   query Orders(
     $accountSlug: String
     $limit: Int!

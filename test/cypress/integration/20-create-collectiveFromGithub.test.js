@@ -11,6 +11,6 @@ describe('Create collective from Github', () => {
     cy.contains('[data-cy=ccf-form]', 'This must be checked');
     cy.get('[data-cy=checkbox-termsOfServiceOC]').find('[data-cy=custom-checkbox]').click();
     cy.get('[data-cy=ccf-form-submit]').click();
-    cy.url().should('include', '/opensource/apply/success');
+    cy.url().should('include', '/adblockpluschrome/onboarding');
   });
 });

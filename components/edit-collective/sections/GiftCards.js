@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Add } from '@styled-icons/material/Add';
 import { get, last, omitBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+
+import { gqlV1 } from '../../../lib/graphql/helpers';
 
 import GiftCardDetails from '../../GiftCardDetails';
 import { Box, Flex } from '../../Grid';
@@ -206,7 +207,7 @@ const getIsConfirmedFromFilter = filter => {
 };
 
 /** A query to get the gift cards created by a collective. Must be authenticated. */
-const giftCardsQuery = gql`
+const giftCardsQuery = gqlV1/* GraphQL */ `
   query EditCollectiveGiftCards($CollectiveId: Int, $isConfirmed: Boolean, $limit: Int, $offset: Int, $batch: String) {
     Collective(id: $CollectiveId) {
       id

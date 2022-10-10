@@ -1,0 +1,35 @@
+name: Setup project
+description: Installs the right node version and dependencies
+inputs:
+  CACHE_VERSION:
+    description: The cache version, to manually invalidate the dependencies cache
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+
+    - name: Restore node_modules
+      uses: actions/cache@v3
+      id: node-modules
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}-${{ inputs.CACHE_VERSION }}
+
+    - name: Restore .npm cache
+      if: steps.node-modules.outputs.cache-hit != 'true'
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}-${{ inputs.CACHE_VERSION }}
+        restore-keys: |
+          ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}-${{ inputs.CACHE_VERSION }}
+          ${{ runner.os }}-npm-cache-
+
+    - name: Install dependencies
+      shell: bash
+      if: steps.node-modules.outputs.cache-hit != 'true'
+      run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit

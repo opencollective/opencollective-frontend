@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
-const hostTermsQuery = gqlV2/* GraphQL */ `
+const hostTermsQuery = gql`
   query HostTermsQuery($hostCollectiveSlug: String!) {
     host(slug: $hostCollectiveSlug) {
       id

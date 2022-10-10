@@ -52,13 +52,13 @@
     // https://github.com/apollographql/eslint-plugin-graphql#additional-schemas-or-tags
     "graphql/template-strings": [
       "error",
-      { "env": "apollo", "projectName": "opencollective" },
-      { "env": "apollo", "tagName": "gqlV2", "projectName": "opencollective_v2" }
+      { "env": "apollo", "tagName": "gqlV1", "projectName": "opencollective" },
+      { "env": "apollo", "projectName": "opencollective_v2" }
     ],
     "graphql/required-fields": [
       "error",
-      { "env": "apollo", "projectName": "opencollective", "requiredFields": ["id"] },
-      { "env": "apollo", "tagName": "gqlV2", "projectName": "opencollective_v2", "requiredFields": ["id"] }
+      { "env": "apollo", "tagName": "gqlV1", "projectName": "opencollective", "requiredFields": ["id"] },
+      { "env": "apollo", "projectName": "opencollective_v2", "requiredFields": ["id"] }
     ],
     "graphql/named-operations": ["error"],
     "graphql/capitalized-type-name": ["error"],

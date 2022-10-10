@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { Form, Formik } from 'formik';
 import { get, isNil, map, pick } from 'lodash';
@@ -10,7 +10,7 @@ import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-
 import { OPENCOLLECTIVE_FOUNDATION_ID, OPENSOURCE_COLLECTIVE_ID } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { requireFields } from '../lib/form-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import ApplicationDescription from './ocf-host-application/ApplicationDescription';
 import OCFPrimaryButton from './ocf-host-application/OCFPrimaryButton';
@@ -42,7 +42,7 @@ const messages = defineMessages({
   },
 });
 
-const hostFields = gqlV2/* GraphQL */ `
+const hostFields = gql`
   fragment ApplyToHostFields on Host {
     id
     legacyId
@@ -64,7 +64,7 @@ const hostFields = gqlV2/* GraphQL */ `
   }
 `;
 
-const accountFields = gqlV2/* GraphQL */ `
+const accountFields = gql`
   fragment ApplyToHostAccountFields on Account {
     id
     slug
@@ -98,7 +98,7 @@ const accountFields = gqlV2/* GraphQL */ `
   }
 `;
 
-const applyToHostQuery = gqlV2/* GraphQL */ `
+const applyToHostQuery = gql`
   query ApplyToHost($hostSlug: String!, $collectiveSlug: String!) {
     host(slug: $hostSlug) {
       id
@@ -116,7 +116,7 @@ const applyToHostQuery = gqlV2/* GraphQL */ `
 /**
  * A query similar to `applyToHostQuery`, except we also fetch user's administrated collectives for the picker
  */
-const applyToHostWithAccountsQuery = gqlV2/* GraphQL */ `
+const applyToHostWithAccountsQuery = gql`
   query ApplyToHostWithAccounts($hostSlug: String!) {
     host(slug: $hostSlug) {
       id
@@ -145,7 +145,7 @@ const applyToHostWithAccountsQuery = gqlV2/* GraphQL */ `
   ${accountFields}
 `;
 
-const applyToHostMutation = gqlV2/* GraphQL */ `
+const applyToHostMutation = gql`
   mutation ApplyToHost(
     $collective: AccountReferenceInput!
     $host: AccountReferenceInput!

@@ -1,8 +1,8 @@
-import { gql } from '@apollo/client';
+import { gqlV1 } from '../../../lib/graphql/helpers';
 
 import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
 
-export const tierPageQuery = gql`
+export const tierPageQuery = gqlV1/* GraphQL */ `
   query TierPage($tierId: Int!) {
     Tier(id: $tierId) {
       id
@@ -36,6 +36,9 @@ export const tierPageQuery = gql`
         type
         name
         backgroundImage
+        backgroundImageUrl
+        imageUrl
+        isHost
         settings
         currency
         isArchived
@@ -72,6 +75,8 @@ export const tierPageQuery = gql`
           slug
           twitterHandle
           image
+          backgroundImageUrl
+          imageUrl
         }
       }
 
