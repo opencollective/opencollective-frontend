@@ -4,6 +4,7 @@ import { Times } from '@styled-icons/fa-solid/Times';
 import { themeGet } from '@styled-system/theme-get';
 import FocusTrap from 'focus-trap-react';
 import { createPortal } from 'react-dom';
+import { useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { background, margin, overflow, space } from 'styled-system';
 
@@ -15,6 +16,7 @@ import { Flex } from './Grid';
 import { fadeIn } from './StyledKeyframes';
 import StyledLinkButton from './StyledLinkButton';
 import { P, Span } from './Text';
+import WarnIfUnsavedChanges from './WarnIfUnsavedChanges';
 
 const Wrapper = styled(Flex)`
   position: fixed;
@@ -122,7 +124,7 @@ export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }) => (
     {!hideCloseIcon && (
       <Span style={{ alignItems: 'center', display: 'flex' }} ml={2}>
         <StyledLinkButton type="button" onClick={onClose}>
-          <CloseIcon onClick={onClose} />
+          <CloseIcon />
         </StyledLinkButton>
       </Span>
     )}
@@ -186,13 +188,25 @@ const DefaultTrapContainer = props => {
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
  * a styled `Container`.
  */
-const StyledModal = ({ children, onClose, usePortal, trapFocus, ignoreEscapeKey, ...props }) => {
+const StyledModal = ({ children, onClose, usePortal, hasUnsavedChanges, trapFocus, ignoreEscapeKey, ...props }) => {
+  const intl = useIntl();
   const TrapContainer = trapFocus ? DefaultTrapContainer : React.Fragment;
+  const closeHandler = React.useCallback(() => {
+    if (
+      hasUnsavedChanges &&
+      !confirm(intl.formatMessage({ defaultMessage: 'You have unsaved changes. Are you sure you want to close this?' }))
+    ) {
+      return;
+    }
+
+    onClose();
+  }, [hasUnsavedChanges, onClose]);
+
   const onEscape = React.useCallback(() => {
     if (!ignoreEscapeKey) {
-      onClose();
+      closeHandler();
     }
-  }, []);
+  }, [closeHandler]);
 
   // Closes the modal upon the `ESC` key press.
   useKeyBoardShortcut({ callback: onEscape, keyMatch: ESCAPE_KEY });
@@ -201,12 +215,13 @@ const StyledModal = ({ children, onClose, usePortal, trapFocus, ignoreEscapeKey,
     return (
       <React.Fragment>
         <GlobalModalStyle />
+        {hasUnsavedChanges && <WarnIfUnsavedChanges hasUnsavedChanges />}
         <Wrapper>
           <TrapContainer>
             <Modal {...props}>
               {React.Children.map(children, child => {
                 if (child.type.displayName === 'Header') {
-                  return React.cloneElement(child, { onClose });
+                  return React.cloneElement(child, { onClose: closeHandler });
                 }
                 return child;
               })}
@@ -220,12 +235,13 @@ const StyledModal = ({ children, onClose, usePortal, trapFocus, ignoreEscapeKey,
     return createPortal(
       <React.Fragment>
         <GlobalModalStyle />
+        {hasUnsavedChanges && <WarnIfUnsavedChanges hasUnsavedChanges />}
         <Wrapper zindex={props.zindex}>
           <TrapContainer>
             <Modal {...props}>
               {React.Children.map(children, child => {
                 if (child.type?.displayName === 'Header') {
-                  return React.cloneElement(child, { onClose });
+                  return React.cloneElement(child, { onClose: closeHandler });
                 }
                 return child;
               })}
@@ -234,11 +250,11 @@ const StyledModal = ({ children, onClose, usePortal, trapFocus, ignoreEscapeKey,
           <ModalOverlay
             role="button"
             tabIndex={0}
-            onClick={onClose}
+            onClick={closeHandler}
             onKeyDown={event => {
               if (event.key === 'Escape') {
                 event.preventDefault();
-                onClose();
+                onEscape();
               }
             }}
           />
@@ -270,6 +286,8 @@ StyledModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   /** whether to render the modal at the root with a portal */
   usePortal: PropTypes.bool,
+  /** if true, a confirmation will be displayed if user tries to close the modal or leave the page */
+  hasUnsavedChanges: PropTypes.bool,
   /** set this to true if the modal contains a form or buttons */
   trapFocus: PropTypes.bool,
   /** whether to ignore the escape key */
@@ -281,6 +299,7 @@ StyledModal.propTypes = {
 StyledModal.defaultProps = {
   usePortal: true,
   trapFocus: false,
+  hasUnsavedChanges: false,
 };
 
 /** @component */
