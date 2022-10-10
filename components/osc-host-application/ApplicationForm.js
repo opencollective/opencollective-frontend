@@ -209,11 +209,11 @@ const ApplicationForm = ({
       'collective.name',
       'collective.slug',
       'message',
-      //      'collective.description',
+      'collective.description',
     ]);
 
     verifyEmailPattern(errors, values, 'user.email');
-    //  verifyFieldLength(intl, errors, values, 'collective.description', 1, 250);
+    verifyFieldLength(intl, errors, values, 'collective.description', 1, 150);
 
     verifyChecked(errors, values, 'termsOfServiceOC');
 
@@ -222,7 +222,9 @@ const ApplicationForm = ({
   const submit = async ({ user, collective, applicationData, inviteMembers, message }) => {
     const variables = {
       collective: {
-        ...(canApplyWithCollective ? { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug } : collective),
+        ...(canApplyWithCollective
+          ? { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug }
+          : { ...collective, repositoryUrl: applicationData.repositoryUrl }),
       },
       host: { legacyId: OPENSOURCE_COLLECTIVE_ID },
       user,
@@ -460,6 +462,30 @@ const ApplicationForm = ({
                               </P>
                             </Box>
                           </Grid>
+                          <Box>
+                            <StyledInputFormikField
+                              name="collective.description"
+                              htmlFor="description"
+                              labelFontSize="16px"
+                              labelProps={{ fontWeight: '600' }}
+                              label={intl.formatMessage(messages.descriptionLabel)}
+                              required
+                            >
+                              {({ field }) => (
+                                <StyledTextarea
+                                  {...field}
+                                  rows={3}
+                                  width="100%"
+                                  maxLength={150}
+                                  showCount
+                                  placeholder={intl.formatMessage(messages.descriptionPlaceholder)}
+                                />
+                              )}
+                            </StyledInputFormikField>
+                            <P fontSize="13px" lineHeight="20px" color="black.600" mt="6px">
+                              {intl.formatMessage(messages.descriptionHint)}
+                            </P>
+                          </Box>
                         </>
                       )}
 
