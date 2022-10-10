@@ -64,6 +64,7 @@ const virtualCardsQuery = gql`
           name
           last4
           data
+          currency
           provider
           privateData
           createdAt
@@ -71,6 +72,7 @@ const virtualCardsQuery = gql`
           spendingLimitInterval
           account {
             id
+            slug
             name
             imageUrl
           }
@@ -174,9 +176,12 @@ const VirtualCards = props => {
         {data.account.virtualCards.nodes.map(virtualCard => (
           <VirtualCard
             canEditVirtualCard={virtualCard.data.status === 'active'}
+            canPauseOrResumeVirtualCard
+            canDeleteVirtualCard
             confirmOnPauseCard={props.collective.type === CollectiveType.COLLECTIVE}
             key={virtualCard.id}
-            {...virtualCard}
+            virtualCard={virtualCard}
+            onDeleteRefetchQuery="AccountVirtualCards"
           />
         ))}
       </Grid>
