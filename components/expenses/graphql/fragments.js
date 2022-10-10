@@ -248,6 +248,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       name
       type
       imageUrl
+      backgroundImageUrl
       isActive
       description
       settings
@@ -275,6 +276,16 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         balanceWithBlockedFunds {
           valueInCents
           currency
+        }
+      }
+
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+          imageUrl
+          backgroundImageUrl
+          twitterHandle
         }
       }
 

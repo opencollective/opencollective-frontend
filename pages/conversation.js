@@ -6,6 +6,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
 import { stripHTML } from '../lib/utils';
@@ -50,6 +51,16 @@ const conversationPageQuery = gqlV2/* GraphQL */ `
       settings
       imageUrl
       twitterHandle
+      imageUrl
+      backgroundImageUrl
+      ... on AccountWithParent {
+        parent {
+          id
+          imageUrl
+          backgroundImageUrl
+          twitterHandle
+        }
+      }
       features {
         id
         ...NavbarFields
@@ -175,14 +186,16 @@ class ConversationPage extends React.Component {
   static MAX_NB_FOLLOWERS_AVATARS = 4;
 
   getPageMetaData(collective, conversation) {
+    const baseMetadata = getCollectivePageMetadata(collective);
     if (collective && conversation) {
       return {
+        ...baseMetadata,
         title: conversation.title,
         description: stripHTML(conversation.summary),
         metaTitle: `${conversation.title} - ${collective.name}`,
       };
     } else {
-      return { title: 'Conversations' };
+      return { ...baseMetadata, title: 'Conversations' };
     }
   }
 

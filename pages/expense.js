@@ -8,7 +8,7 @@ import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { getCollectiveTypeForUrl, getSuggestedTags } from '../lib/collective.lib';
+import { getCollectivePageMetadata, getCollectiveTypeForUrl, getSuggestedTags } from '../lib/collective.lib';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
@@ -381,8 +381,14 @@ class ExpensePage extends React.Component {
 
   getPageMetaData(expense) {
     const { intl, legacyExpenseId } = this.props;
+    const baseMetadata = getCollectivePageMetadata(expense?.account);
     if (expense?.description) {
-      return { title: intl.formatMessage(messages.title, { id: legacyExpenseId, title: expense.description }) };
+      return {
+        ...baseMetadata,
+        title: intl.formatMessage(messages.title, { id: legacyExpenseId, title: expense.description }),
+      };
+    } else {
+      return baseMetadata;
     }
   }
 
