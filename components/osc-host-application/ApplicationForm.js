@@ -12,7 +12,13 @@ import spdxLicenses from 'spdx-license-list';
 import { suggestSlug } from '../../lib/collective.lib';
 import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
-import { requireFields, verifyChecked, verifyEmailPattern, verifyFieldLength } from '../../lib/form-utils';
+import {
+  requireFields,
+  verifyChecked,
+  verifyEmailPattern,
+  verifyFieldLength,
+  verifyURLPattern,
+} from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -212,12 +218,19 @@ const ApplicationForm = ({
 
     verifyEmailPattern(errors, values, 'user.email');
     verifyFieldLength(intl, errors, values, 'collective.description', 1, 150);
-
+    verifyURLPattern(errors, values, 'applicationData.repositoryUrl');
     verifyChecked(errors, values, 'termsOfServiceOC');
 
     return errors;
   };
   const submit = async ({ user, collective, applicationData, inviteMembers, message }) => {
+    let automateApprovalWithGithub = false;
+
+    if (applicationData.repositoryUrl) {
+      const { hostname } = new URL(applicationData.repositoryUrl);
+      automateApprovalWithGithub = hostname === 'github.com';
+    }
+
     const variables = {
       collective: {
         ...(canApplyWithCollective
@@ -233,7 +246,7 @@ const ApplicationForm = ({
       })),
       message,
       ...(!canApplyWithCollective && {
-        automateApprovalWithGithub: applicationData.repositoryUrl?.includes('https://github.com/') ? true : false,
+        automateApprovalWithGithub,
       }),
     };
 
