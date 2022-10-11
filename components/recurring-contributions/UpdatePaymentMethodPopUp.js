@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { CardElement } from '@stripe/react-stripe-js';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
 import { themeGet } from '@styled-system/theme-get';
@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 import { PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import { getPaymentMethodIcon, getPaymentMethodMetadata } from '../../lib/payment-method-utils';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
@@ -43,7 +43,7 @@ const messages = defineMessages({
   },
 });
 
-const paymentMethodFragment = gqlV2/* GraphQL */ `
+const paymentMethodFragment = gql`
   fragment UpdatePaymentMethodFragment on PaymentMethod {
     id
     name
@@ -61,7 +61,7 @@ const paymentMethodFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-const paymentMethodsQuery = gqlV2/* GraphQL */ `
+const paymentMethodsQuery = gql`
   query UpdatePaymentMethodPopUpPaymentMethod($accountId: String!, $orderId: String!) {
     account(id: $accountId) {
       id
@@ -81,7 +81,7 @@ const paymentMethodsQuery = gqlV2/* GraphQL */ `
   ${paymentMethodFragment}
 `;
 
-const updatePaymentMethodMutation = gqlV2/* GraphQL */ `
+const updatePaymentMethodMutation = gql`
   mutation UpdatePaymentMethod(
     $order: OrderReferenceInput!
     $paymentMethod: PaymentMethodReferenceInput
@@ -107,7 +107,7 @@ const updatePaymentMethodMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const paymentMethodResponseFragment = gqlV2/* GraphQL */ `
+const paymentMethodResponseFragment = gql`
   fragment paymentMethodResponseFragment on CreditCardWithStripeError {
     paymentMethod {
       id
@@ -119,7 +119,7 @@ const paymentMethodResponseFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-export const addCreditCardMutation = gqlV2/* GraphQL */ `
+export const addCreditCardMutation = gql`
   mutation AddCreditCardRecurringContributions(
     $creditCardInfo: CreditCardCreateInput!
     $name: String!
@@ -132,7 +132,7 @@ export const addCreditCardMutation = gqlV2/* GraphQL */ `
   ${paymentMethodResponseFragment}
 `;
 
-export const confirmCreditCardMutation = gqlV2/* GraphQL */ `
+export const confirmCreditCardMutation = gql`
   mutation ConfirmCreditCardRecurringContributions($paymentMethod: PaymentMethodReferenceInput!) {
     confirmCreditCard(paymentMethod: $paymentMethod) {
       ...paymentMethodResponseFragment

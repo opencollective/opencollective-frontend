@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, uniqBy, update } from 'lodash';
 import { withRouter } from 'next/router';
 
 import { ERROR } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { stripHTML } from '../lib/utils';
 
@@ -182,7 +183,7 @@ class UpdatePage extends React.Component {
   }
 }
 
-const updateQuery = gqlV2/* GraphQL */ `
+const updateQuery = gql`
   query Update($collectiveSlug: String, $updateSlug: String!, $offset: Int) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id

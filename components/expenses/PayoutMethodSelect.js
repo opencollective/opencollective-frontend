@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Times as RemoveIcon } from '@styled-icons/fa-solid/Times';
 import { get, groupBy, isEmpty, truncate } from 'lodash';
@@ -9,7 +10,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { AccountTypesWithHost } from '../../lib/constants/collectives';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -335,7 +336,7 @@ class PayoutMethodSelect extends React.Component {
   }
 }
 
-const removePayoutMethodMutation = gqlV2/* GraphQL */ `
+const removePayoutMethodMutation = gql`
   mutation RemovePayoutMethod($id: String!) {
     removePayoutMethod(payoutMethodId: $id) {
       id

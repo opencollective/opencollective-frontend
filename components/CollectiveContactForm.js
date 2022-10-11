@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+
+import { gqlV1 } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import { Box } from './Grid';
@@ -15,7 +17,7 @@ import StyledTextarea from './StyledTextarea';
 import { H2, P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
-const sendMessageMutation = gql`
+const sendMessageMutation = gqlV1/* GraphQL */ `
   mutation SendMessage($collectiveId: Int!, $message: String!, $subject: String) {
     sendMessageToCollective(collectiveId: $collectiveId, message: $message, subject: $subject) {
       success
@@ -23,12 +25,19 @@ const sendMessageMutation = gql`
   }
 `;
 
-const CollectiveContactForm = ({ collective, isModal = false, onClose }) => {
+const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange }) => {
   const [subject, setSubject] = React.useState('');
   const [message, setMessage] = React.useState('');
   const [error, setError] = React.useState(null);
   const [submit, { data, loading }] = useMutation(sendMessageMutation);
   const { addToast } = useToasts();
+
+  // Dispatch changes to onChange if set
+  React.useEffect(() => {
+    if (onChange) {
+      onChange({ subject, message });
+    }
+  }, [subject, message]);
 
   if (get(data, 'sendMessageToCollective.success') && !isModal) {
     return (
@@ -59,13 +68,15 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose }) => {
 
   return (
     <Box flexDirection="column" alignItems={['center', 'flex-start']} maxWidth={1160} m="0 auto">
-      <H2 mb={2} fontSize={isModal ? '28px' : '40px'}>
-        <FormattedMessage
-          id="ContactCollective"
-          defaultMessage="Contact {collective}"
-          values={{ collective: collective.name }}
-        />
-      </H2>
+      {!isModal && (
+        <H2 mb={2} fontSize={'40px'}>
+          <FormattedMessage
+            id="ContactCollective"
+            defaultMessage="Contact {collective}"
+            values={{ collective: collective.name }}
+          />
+        </H2>
+      )}
       <P mb={4}>
         <FormattedMessage
           id="CollectiveContactForm.Disclaimer"
@@ -151,6 +162,7 @@ CollectiveContactForm.propTypes = {
   isModal: PropTypes.bool,
   /* Specifies close behaviour is this form is part of a modal */
   onClose: PropTypes.func,
+  onChange: PropTypes.func,
 };
 
 export default CollectiveContactForm;

@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { NetworkStatus, useQuery } from '@apollo/client';
+import { gql, NetworkStatus, useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { getOauthAppSettingsRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
@@ -21,7 +21,7 @@ import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
 import { H3, P } from '../Text';
 
-const applicationsQuery = gqlV2/* GraphQL */ `
+const applicationsQuery = gql`
   query ApplicationsQuery($slug: String!, $limit: Int, $offset: Int) {
     account(slug: $slug) {
       id

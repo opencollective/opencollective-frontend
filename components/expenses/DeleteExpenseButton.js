@@ -1,18 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
 import StyledButton from '../StyledButton';
 import { Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const deleteExpenseMutation = gqlV2/* GraphQL */ `
+const deleteExpenseMutation = gql`
   mutation DeleteExpense($id: String!) {
     deleteExpense(expense: { id: $id }) {
       id

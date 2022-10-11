@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import { PropTypes } from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Field, Form, Formik } from 'formik';
 import { get, pick } from 'lodash';
@@ -11,6 +10,7 @@ import { isEmail } from 'validator';
 
 import { signin } from '../lib/api';
 import { i18nGraphqlException } from '../lib/errors';
+import { gqlV1 } from '../lib/graphql/helpers';
 import { getWebsiteUrl } from '../lib/utils';
 
 import Container from './Container';
@@ -445,7 +445,7 @@ class SignInOrJoinFree extends React.Component {
   }
 }
 
-const signupMutation = gql`
+const signupMutation = gqlV1/* GraphQL */ `
   mutation Signup($user: UserInputType!, $organization: CollectiveInputType, $redirect: String, $websiteUrl: String) {
     createUser(user: $user, organization: $organization, redirect: $redirect, websiteUrl: $websiteUrl) {
       user {

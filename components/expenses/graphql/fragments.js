@@ -1,8 +1,8 @@
-import { gqlV2 } from '../../../lib/graphql/helpers';
+import { gql } from '@apollo/client';
 
 import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
 
-export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
+export const loggedInAccountExpensePayoutFieldsFragment = gql`
   fragment LoggedInAccountExpensePayoutFields on Individual {
     id
     slug
@@ -88,7 +88,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-export const expenseHostFields = gqlV2/* GraphQL */ `
+export const expenseHostFields = gql`
   fragment ExpenseHostFields on Host {
     id
     name
@@ -129,7 +129,7 @@ export const expenseHostFields = gqlV2/* GraphQL */ `
   }
 `;
 
-export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
+export const expensePageExpenseFieldsFragment = gql`
   fragment ExpensePageExpenseFields on Expense {
     id
     legacyId
@@ -248,6 +248,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
       name
       type
       imageUrl
+      backgroundImageUrl
       isActive
       description
       settings
@@ -275,6 +276,16 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
         balanceWithBlockedFunds {
           valueInCents
           currency
+        }
+      }
+
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+          imageUrl
+          backgroundImageUrl
+          twitterHandle
         }
       }
 
@@ -379,7 +390,7 @@ export const expensePageExpenseFieldsFragment = gqlV2/* GraphQL */ `
   ${collectiveNavbarFieldsFragment}
 `;
 
-export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
+export const expensesListFieldsFragment = gql`
   fragment ExpensesListFieldsFragment on Expense {
     id
     legacyId
@@ -479,7 +490,7 @@ export const expensesListFieldsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-export const expensesListAdminFieldsFragment = gqlV2/* GraphQL */ `
+export const expensesListAdminFieldsFragment = gql`
   fragment ExpensesListAdminFieldsFragment on Expense {
     id
     payoutMethod {

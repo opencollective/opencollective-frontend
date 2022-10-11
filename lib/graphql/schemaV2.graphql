@@ -2336,6 +2336,7 @@ enum ActivityType {
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
+  COLLECTIVE_VIRTUAL_CARD_DELETED
   VIRTUAL_CARD_REQUESTED
   VIRTUAL_CARD_CHARGE_DECLINED
   VIRTUAL_CARD_PURCHASE
@@ -3617,12 +3618,17 @@ type AccountStats {
     Calculate balance until this date.
     """
     dateTo: DateTime
+
+    """
+    Include balance from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
   ): Amount!
 
   """
   The consolidated amount of all the events and projects combined.
   """
-  consolidatedBalance: Amount!
+  consolidatedBalance: Amount! @deprecated(reason: "2022-09-02: Use balance + includeChildren instead")
 
   """
   Average amount spent per month based on the last 90 days
@@ -3662,10 +3668,15 @@ type AccountStats {
     Set this to true to use cached data
     """
     useCache: Boolean! = false
+
+    """
+    Include money received in children (Projects and Events)
+    """
+    includeChildren: Boolean = false
   ): Amount!
 
   """
-  Total of paid expenses, filter per expensetype
+  Total of paid expenses, filter per expense type
   """
   totalPaidExpenses(
     """
@@ -4088,11 +4099,14 @@ type Policies {
 
 type COLLECTIVE_MINIMUM_ADMINS {
   numberOfAdmins: Int
-  applies: COLLECTIVE_MINIMUM_ADMINS_APPLIES
+  applies: POLICY_APPLICATION
   freeze: Boolean
 }
 
-enum COLLECTIVE_MINIMUM_ADMINS_APPLIES {
+"""
+Defines how the policy is applied
+"""
+enum POLICY_APPLICATION {
   ALL_COLLECTIVES
   NEW_COLLECTIVES
 }
@@ -8581,6 +8595,11 @@ type Query {
     isHost: Boolean
 
     """
+    Included collectives which are archived
+    """
+    includeArchived: Boolean
+
+    """
     Only return "active" accounts with Financial Contributions enabled if true.
     """
     isActive: Boolean
@@ -10516,6 +10535,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
+  COLLECTIVE_VIRTUAL_CARD_DELETED
   VIRTUAL_CARD_REQUESTED
   VIRTUAL_CARD_CHARGE_DECLINED
   VIRTUAL_CARD_PURCHASE
@@ -12115,7 +12135,7 @@ type Mutation {
     """
     The policy to be added
     """
-    policies: JSON!
+    policies: PoliciesInput!
   ): Account!
 
   """
@@ -12769,6 +12789,26 @@ type Mutation {
   removePayoutMethod(payoutMethodId: String!): PayoutMethod!
 
   """
+  [Root only] Edits account flags (deleted, banned, archived, trusted host)
+  """
+  editAccountFlags(
+    """
+    Account to change the flags for
+    """
+    account: AccountReferenceInput!
+
+    """
+    Specify whether the account is archived
+    """
+    isArchived: Boolean
+
+    """
+    Specify whether the account is a trusted host
+    """
+    isTrustedHost: Boolean
+  ): Account!
+
+  """
   [Root only] Clears the cache for a given account
   """
   clearCacheForAccount(
@@ -13077,7 +13117,7 @@ type Mutation {
   """
   Delete a tier.
   """
-  deleteTier(tier: TierReferenceInput!): Tier!
+  deleteTier(tier: TierReferenceInput!, stopRecurringContributions: Boolean! = false): Tier!
 }
 
 input CollectiveCreateInput {
@@ -13193,6 +13233,17 @@ input AccountUpdateInput {
   """
   id: String!
   currency: Currency
+}
+
+input PoliciesInput {
+  EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
+  COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
+}
+
+input PoliciesCollectiveMinimumAdminsInput {
+  numberOfAdmins: Int
+  applies: POLICY_APPLICATION
+  freeze: Boolean
 }
 
 """

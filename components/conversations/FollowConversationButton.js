@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { Bell } from '@styled-icons/feather/Bell';
 import { BellOff } from '@styled-icons/feather/BellOff';
 import { get } from 'lodash';
@@ -8,7 +8,7 @@ import Router from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Link from '../Link';
 import StyledButton from '../StyledButton';
@@ -18,7 +18,7 @@ import { withUser } from '../UserProvider';
 
 import { isUserFollowingConversationQuery } from './graphql';
 
-const followConversationMutation = gqlV2/* GraphQL */ `
+const followConversationMutation = gql`
   mutation FollowConversation($id: String!, $isActive: Boolean) {
     followConversation(id: $id, isActive: $isActive)
   }

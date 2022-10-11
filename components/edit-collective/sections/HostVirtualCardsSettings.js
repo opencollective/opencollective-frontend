@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
@@ -20,7 +20,7 @@ import SettingsSectionTitle from './SettingsSectionTitle';
 
 const VIRTUAL_CARDS_POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average length word
 
-const updateAccountSettingsMutation = gqlV2/* GraphQL */ `
+const updateAccountSettingsMutation = gql`
   mutation UpdateAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
       id

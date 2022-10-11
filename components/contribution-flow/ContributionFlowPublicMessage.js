@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { Field, Form, Formik } from 'formik';
 import { truncate } from 'lodash';
@@ -8,7 +8,7 @@ import { defineMessages, FormattedMessage, injectIntl, useIntl } from 'react-int
 import styled from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Avatar from '../../components/Avatar';
 import Container from '../../components/Container';
@@ -30,7 +30,7 @@ const PublicMessageContainer = styled(Container)`
 `;
 
 // GraphQL
-const postContributionPublicMessageMutation = gqlV2/* GraphQL */ `
+const postContributionPublicMessageMutation = gql`
   mutation NewContributionFlowEditPublicMessage(
     $fromAccount: AccountReferenceInput!
     $toAccount: AccountReferenceInput!

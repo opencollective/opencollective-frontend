@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { Lock } from '@styled-icons/boxicons-solid/Lock';
 import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
@@ -13,7 +13,7 @@ import { suggestSlug } from '../../lib/collective.lib';
 import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyChecked, verifyEmailPattern, verifyFieldLength } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';
@@ -34,7 +34,7 @@ import StyledSelect from '../StyledSelect';
 import StyledTextarea from '../StyledTextarea';
 import { H1, H4, P, Span } from '../Text';
 
-const createCollectiveMutation = gqlV2/* GraphQL */ `
+const createCollectiveMutation = gql`
   mutation CreateCollective(
     $collective: CollectiveCreateInput!
     $host: AccountReferenceInput
@@ -55,6 +55,7 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
     ) {
       id
       slug
+      isApproved
       host {
         id
         slug
@@ -63,7 +64,7 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const applyToHostMutation = gqlV2/* GraphQL */ `
+const applyToHostMutation = gql`
   mutation ApplyToHost(
     $collective: AccountReferenceInput!
     $host: AccountReferenceInput!
@@ -81,6 +82,7 @@ const applyToHostMutation = gqlV2/* GraphQL */ `
       id
       slug
       ... on AccountWithHost {
+        isApproved
         host {
           id
           slug
@@ -240,8 +242,14 @@ const ApplicationForm = ({
     };
 
     const response = await submitApplication({ variables });
-    if (response.data.createCollective || response.data.applyToHost) {
-      await router.push('/opensource/apply/success');
+    const resCollective = response.data.createCollective || response.data.applyToHost;
+
+    if (resCollective) {
+      if (resCollective.isApproved) {
+        await router.push(`/${resCollective.slug}/onboarding`);
+      } else {
+        await router.push('/opensource/apply/success');
+      }
       window.scrollTo(0, 0);
     }
   };

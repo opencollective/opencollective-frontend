@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 
 import { adminPanelQuery } from '../../../pages/admin-panel';
 import Container from '../../Container';
@@ -16,7 +16,7 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledMo
 import { P } from '../../Text';
 import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
-const archiveCollectiveMutation = gql`
+const archiveCollectiveMutation = gqlV1/* GraphQL */ `
   mutation ArchiveCollective($id: Int!) {
     archiveCollective(id: $id) {
       id
@@ -25,7 +25,7 @@ const archiveCollectiveMutation = gql`
   }
 `;
 
-const unarchiveCollectiveMutation = gql`
+const unarchiveCollectiveMutation = gqlV1/* GraphQL */ `
   mutation UnarchiveCollective($id: Int!) {
     unarchiveCollective(id: $id) {
       id

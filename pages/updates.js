@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, omitBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 
 import Body from '../components/Body';
@@ -142,7 +143,7 @@ class UpdatesPage extends React.Component {
   }
 }
 
-export const updatesQuery = gqlV2/* GraphQL */ `
+export const updatesQuery = gql`
   query Updates(
     $collectiveSlug: String!
     $limit: Int

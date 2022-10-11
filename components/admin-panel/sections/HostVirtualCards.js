@@ -1,17 +1,15 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal';
 import CreateVirtualCardModal from '../../edit-collective/CreateVirtualCardModal';
-import DeleteVirtualCardModal from '../../edit-collective/DeleteVirtualCardModal';
-import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';
 import VirtualCardFilters from '../../edit-collective/sections/virtual-cards/VirtualCardFilters';
 import VirtualCard from '../../edit-collective/VirtualCard';
 import { Box, Flex, Grid } from '../../Grid';
@@ -22,7 +20,7 @@ import StyledButton from '../../StyledButton';
 import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
-const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
+const hostVirtualCardsQuery = gql`
   query HostedVirtualCards(
     $slug: String
     $limit: Int!
@@ -141,8 +139,6 @@ const HostVirtualCards = props => {
 
   const [displayAssignCardModal, setAssignCardModalDisplay] = React.useState(false);
   const [displayCreateVirtualCardModal, setCreateVirtualCardModalDisplay] = React.useState(false);
-  const [editingVirtualCard, setEditingVirtualCard] = React.useState(undefined);
-  const [deletingVirtualCard, setDeletingVirtualCard] = React.useState(undefined);
 
   const handleUpdateFilters = queryParams => {
     return router.push(
@@ -163,16 +159,6 @@ const HostVirtualCards = props => {
       ),
     });
     setAssignCardModalDisplay(false);
-    refetch();
-  };
-
-  const handleEditCardSuccess = message => {
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
-      message: message,
-    });
-    setEditingVirtualCard(undefined);
-    setDeletingVirtualCard(undefined);
     refetch();
   };
 
@@ -262,11 +248,11 @@ const HostVirtualCards = props => {
         {data.host.hostedVirtualCards.nodes.map(vc => (
           <VirtualCard
             key={vc.id}
-            {...vc}
-            onSuccess={refetch}
-            editHandler={() => setEditingVirtualCard(vc)}
-            deleteHandler={() => setDeletingVirtualCard(vc)}
+            virtualCard={vc}
             canEditVirtualCard
+            canPauseOrResumeVirtualCard
+            canDeleteVirtualCard
+            onDeleteRefetchQuery="HostedVirtualCards"
           />
         ))}
       </Grid>
@@ -289,26 +275,6 @@ const HostVirtualCards = props => {
           onClose={() => {
             setAssignCardModalDisplay(false);
           }}
-        />
-      )}
-      {editingVirtualCard && (
-        <EditVirtualCardModal
-          host={data.host}
-          onSuccess={handleEditCardSuccess}
-          onClose={() => {
-            setEditingVirtualCard(undefined);
-          }}
-          virtualCard={editingVirtualCard}
-        />
-      )}
-      {deletingVirtualCard && (
-        <DeleteVirtualCardModal
-          host={data.host}
-          onSuccess={handleEditCardSuccess}
-          onClose={() => {
-            setDeletingVirtualCard(undefined);
-          }}
-          virtualCard={deletingVirtualCard}
         />
       )}
       {displayCreateVirtualCardModal && (

@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
+
+import { gqlV1 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -165,7 +166,7 @@ class EditUserEmailForm extends React.Component {
   }
 }
 
-const loggedInUserEmailQuery = gql`
+const loggedInUserEmailQuery = gqlV1/* GraphQL */ `
   query LoggedInUserEmail {
     LoggedInUser {
       id
@@ -181,7 +182,7 @@ const addLoggedInUserEmailData = graphql(loggedInUserEmailQuery, {
   },
 });
 
-const updateUserEmailMutation = gql`
+const updateUserEmailMutation = gqlV1/* GraphQL */ `
   mutation UpdateUserEmail($email: String!) {
     updateUserEmail(email: $email) {
       id

@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { groupBy, uniq } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { gqlV1 } from '../../../lib/graphql/helpers';
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
 import { saveInvoice } from '../../../lib/transactions';
 
@@ -27,7 +28,7 @@ const HostName = styled(P)`
 
 dayjs.extend(utc);
 
-export const invoicesQuery = gql`
+export const invoicesQuery = gqlV1/* GraphQL */ `
   query TransactionsDownloadInvoices($fromCollectiveSlug: String!) {
     allInvoices(fromCollectiveSlug: $fromCollectiveSlug) {
       slug

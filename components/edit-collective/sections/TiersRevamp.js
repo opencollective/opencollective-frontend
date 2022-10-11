@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import AdminContributeCardsContainer from '../../contribute-cards/AdminContributeCardsContainer';
 import ContributeCrypto from '../../contribute-cards/ContributeCrypto';
@@ -91,7 +91,7 @@ const CardsContainer = styled(Grid).attrs({
 `;
 
 // TODO: Make sure this query works with organizations
-const tiersQuery = gqlV2/* GraphQL */ `
+const tiersQuery = gql`
   query AccountTiers($accountSlug: String!) {
     account(slug: $accountSlug) {
       id

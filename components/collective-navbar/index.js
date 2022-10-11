@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { PropTypes } from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
@@ -22,7 +22,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import roles from '../../lib/constants/roles';
 import { isSupportedExpenseType } from '../../lib/expenses';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute, getSettingsRoute } from '../../lib/url-helpers';
@@ -185,7 +185,7 @@ const CategoriesContainer = styled(Container)`
   }
 `;
 
-const accountPermissionsQuery = gqlV2/* GraphQL */ `
+const accountPermissionsQuery = gql`
   query AccountPermissions($slug: String!) {
     account(slug: $slug) {
       id
@@ -404,7 +404,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.ADD_FUNDS,
       component: (
-        <AddFundsBtn collective={collective} host={collective.host}>
+        <AddFundsBtn collective={collective}>
           {btnProps => (
             <ActionButton {...btnProps}>
               <AttachMoney size="1em" />

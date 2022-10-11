@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useLazyQuery } from '@apollo/client';
+import { gql, useLazyQuery } from '@apollo/client';
 import { debounce } from 'lodash';
 import { FormattedDate } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import Avatar from './Avatar';
 import { Flex } from './Grid';
@@ -12,7 +12,7 @@ import StyledSelect from './StyledSelect';
 import StyledTag from './StyledTag';
 import { Span } from './Text';
 
-const ordersSearchQuery = gqlV2/* GraphQL */ `
+const ordersSearchQuery = gql`
   query OrdersPickerSearchQuery(
     $account: AccountReferenceInput
     $includeIncognito: Boolean

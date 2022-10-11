@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
 import { get } from 'lodash';
@@ -9,7 +9,7 @@ import styled, { css } from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -71,7 +71,7 @@ AmountDetailsLine.propTypes = {
   isLargeAmount: PropTypes.bool,
 };
 
-const addFundsMutation = gqlV2/* GraphQL */ `
+const addFundsMutation = gql`
   mutation AddFunds(
     $fromAccount: AccountReferenceInput!
     $account: AccountReferenceInput!
@@ -122,7 +122,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const addFundsTierFieldsFragment = gqlV2/* GraphQL */ `
+const addFundsTierFieldsFragment = gql`
   fragment AddFundsTierFields on Tier {
     id
     slug
@@ -131,11 +131,14 @@ const addFundsTierFieldsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-const addFundsAccountQuery = gqlV2/* GraphQL */ `
+const addFundsAccountQuery = gql`
   query AddFundsAccount($slug: String!) {
     account(slug: $slug) {
       id
       type
+      isHost
+      name
+      slug
       currency
       settings
       ... on Organization {
@@ -146,12 +149,24 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
           }
         }
       }
+      ... on Host {
+        id
+        slug
+        name
+        settings
+        plan {
+          id
+          hostFees
+        }
+        isTrustedHost
+      }
       ... on AccountWithHost {
         addedFundsHostFeePercent: hostFeePercent(paymentMethodType: HOST)
         host {
           id
           slug
           name
+          settings
           plan {
             id
             hostFees
@@ -172,7 +187,7 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
   ${addFundsTierFieldsFragment}
 `;
 
-const addPlatformTipMutation = gqlV2/* GraphQL */ `
+const addPlatformTipMutation = gql`
   mutation AddPlatformTip($amount: AmountInput!, $transaction: TransactionReferenceInput!) {
     addPlatformTipToTransaction(amount: $amount, transaction: $transaction) {
       id
@@ -277,10 +292,10 @@ const AddFundsModal = ({ collective, ...props }) => {
   const { data, loading } = useQuery(addFundsAccountQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: collective.slug },
-    skip: !collective,
   });
   const account = data?.account;
   const currency = account?.currency;
+  const host = account?.isHost ? account : account?.host;
 
   const options = React.useMemo(
     () => getOptions(fundDetails.fundAmount, currency, intl),
@@ -293,7 +308,7 @@ const AddFundsModal = ({ collective, ...props }) => {
       {
         context: API_V2_CONTEXT,
         query: getBudgetSectionQuery(true),
-        variables: getBudgetSectionQueryVariables(collective.slug, account?.host?.slug),
+        variables: getBudgetSectionQueryVariables(collective.slug, host?.slug),
       },
       { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
     ],
@@ -318,11 +333,11 @@ const AddFundsModal = ({ collective, ...props }) => {
 
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
-  const canAddHostFee = account?.host?.plan?.hostFees && collective.id !== account?.host?.id;
+  const canAddHostFee = host?.plan?.hostFees && collective.id !== host?.id;
   const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
-  const canAddPlatformTip = account?.host?.isTrustedHost;
-  const receiptTemplates = account?.host?.settings?.invoice?.templates;
+  const canAddPlatformTip = host?.isTrustedHost;
+  const receiptTemplates = host?.settings?.invoice?.templates;
 
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
@@ -421,11 +436,11 @@ const AddFundsModal = ({ collective, ...props }) => {
 
           const defaultSources = [];
           defaultSources.push({
-            value: account?.host,
-            label: <DefaultCollectiveLabel value={account?.host} />,
+            value: host,
+            label: <DefaultCollectiveLabel value={host} />,
           });
-          if (account?.host?.id !== collective.id) {
-            defaultSources.push({ value: collective, label: <DefaultCollectiveLabel value={collective} /> });
+          if (host?.id !== account.id) {
+            defaultSources.push({ value: account, label: <DefaultCollectiveLabel value={account} /> });
           }
 
           if (!fundDetails.showPlatformTipModal) {

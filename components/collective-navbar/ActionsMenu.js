@@ -271,7 +271,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       </MenuItem>
                     )}
                     {callsToAction.addFunds && (
-                      <AddFundsBtn collective={collective} host={collective.host}>
+                      <AddFundsBtn collective={collective}>
                         {btnProps => (
                           <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ADD_FUNDS}>
                             <StyledButton

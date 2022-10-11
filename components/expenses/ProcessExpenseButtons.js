@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Ban as UnapproveIcon } from '@styled-icons/fa-solid/Ban';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
@@ -25,7 +25,7 @@ import DeleteExpenseButton from './DeleteExpenseButton';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
 
-const processExpenseMutation = gqlV2/* GraphQL */ `
+const processExpenseMutation = gql`
   mutation ProcessExpense(
     $id: String
     $legacyId: Int

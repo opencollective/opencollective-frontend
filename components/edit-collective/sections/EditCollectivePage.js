@@ -14,7 +14,7 @@ import { getCollectiveSections, getSectionPath } from '../../../lib/collective-s
 import { CollectiveType } from '../../../lib/constants/collectives';
 import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import i18nNavbarCategory from '../../../lib/i18n/navbar-categories';
 import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
 
@@ -34,7 +34,7 @@ import { P, Span } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
 import SettingsSubtitle from '../SettingsSubtitle';
 
-export const getSettingsQuery = gqlV2/* GraphQL */ `
+export const getSettingsQuery = gql`
   query GetSettingsForEditCollectivePage($slug: String!) {
     account(slug: $slug) {
       id
@@ -54,7 +54,7 @@ export const getSettingsQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-export const collectiveSettingsV1Query = gql`
+export const collectiveSettingsV1Query = gqlV1/* GraphQL */ `
   query EditCollectivePage($slug: String) {
     Collective(slug: $slug) {
       id

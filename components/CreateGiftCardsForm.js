@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { RadioButtonChecked } from '@styled-icons/material/RadioButtonChecked';
 import { RadioButtonUnchecked } from '@styled-icons/material/RadioButtonUnchecked';
@@ -12,6 +11,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { isPrepaid } from '../lib/constants/payment-methods';
+import { gqlV1 } from '../lib/graphql/helpers';
 import { compose, reportValidityHTML5 } from '../lib/utils';
 
 import CollectivePicker from './CollectivePicker';
@@ -651,7 +651,7 @@ class CreateGiftCardsForm extends Component {
  * gift cards, as a gift card cannot be used as a source payment method
  * for another payment method.
  */
-export const collectiveSourcePaymentMethodsQuery = gql`
+export const collectiveSourcePaymentMethodsQuery = gqlV1/* GraphQL */ `
   query CollectiveSourcePaymentMethods($id: Int) {
     Collective(id: $id) {
       id
@@ -694,7 +694,7 @@ const addCollectiveSourcePaymentMethodsQuery = graphql(collectiveSourcePaymentMe
   }),
 });
 
-const createGiftCardsMutation = gql`
+const createGiftCardsMutation = gqlV1/* GraphQL */ `
   mutation CreateGiftCards(
     $CollectiveId: Int!
     $numberOfGiftCards: Int
