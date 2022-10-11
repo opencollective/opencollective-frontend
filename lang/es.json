@@ -1345,6 +1345,7 @@
   "forms.optional": "Opcional",
   "FpmEYP": "¿Por qué necesitan mi nombre legal?",
   "fqHI7A": "New comment on update",
+  "FR8IoI": "If yes, you will still receive existing recurring contributions for this deleted tier.",
   "FRBgoF": "Account created",
   "Frequency": "Frecuencia",
   "Frequency.change": "¿Cambiar la frecuencia?",
@@ -1687,6 +1688,7 @@
   "hX1cHH": "<Expense>Expense</Expense> processing",
   "hx2hjA": "Dinero total gestionado por año",
   "HYFu3j": "Batch payment failed",
+  "iG8QUh": "Do you want to continue recurring contributions?",
   "IgOygF": "Ver documentación",
   "iHkkt+": "Administrar los Anfitriones Fiscales.",
   "iHRy9Z": "Rejected <Expense>expense</Expense> for <Account></Account>",
@@ -2796,6 +2798,7 @@
   "XoiuR5": "Crypto <Order>order</Order> from <FromAccount></FromAccount> to <Account></Account> set as processing",
   "XvKF/A": "Preview Notification",
   "XW00me": "Your host requires that Collectives have {numberOfAdmins, plural, one {# active administrator} other {# active administrators} }.",
+  "xxi1Y+": "The tier will be deleted forever and can't be retrieved.",
   "Y0G9KM": "Join as a Fiscal Host",
   "YdC/Ok": "Tarjeta correctamente creada",
   "year": "Anualmente",
@@ -2803,6 +2806,7 @@
   "YG0Ra/": "Marca esta opción para limitar el acceso al contenido de esta entrada sólo a colaboradores",
   "Yh1nOL": "Lo hemos enviado a {email}",
   "YhM3lt": "Presupuesto transparente",
+  "yHvRF3": "Don't Delete",
   "YjO/0+": "A Mí",
   "yKF8y5": "Learn more about creating a Collective",
   "yKslCj": "Virtual card charge declined on <Account></Account>",
@@ -2828,5 +2832,6 @@
   "zu5ckP": "Refund and reject recorded transactions.",
   "ZuoHDU": "Financial contributions",
   "ZvWD3X": "Apoya el evento o compra tickets para asistir.",
-  "zWgbGg": "Hoy"
+  "zWgbGg": "Hoy",
+  "zYN+lZ": "Delete Tier"
 }
