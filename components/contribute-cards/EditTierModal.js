@@ -2,6 +2,7 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
+import { Trash } from '@styled-icons/boxicons-regular/Trash';
 import { Form, Formik } from 'formik';
 import { omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -19,6 +20,7 @@ import InputFieldPresets from '../InputFieldPresets';
 import InputSwitch from '../InputSwitch';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
+import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputFormikField from '../StyledInputFormikField';
@@ -26,6 +28,8 @@ import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import StyledTextarea from '../StyledTextarea';
+import { P } from '../Text';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import ContributeTier from './ContributeTier';
 
@@ -389,7 +393,7 @@ function FormFields({ collective, types, values }) {
             {({ field, form }) => (
               <InputSwitch
                 name={field.name}
-                value={field.value}
+                checked={field.value}
                 onChange={event => form.setFieldValue(field.name, event.target.checked)}
               />
             )}
@@ -632,8 +636,8 @@ const createTierMutation = gql`
 `;
 
 const deleteTierMutation = gql`
-  mutation DeleteTier($tier: TierReferenceInput!) {
-    deleteTier(tier: $tier) {
+  mutation DeleteTier($tier: TierReferenceInput!, $stopRecurringContributions: Boolean! = false) {
+    deleteTier(tier: $tier, stopRecurringContributions: $stopRecurringContributions) {
       id
     }
   }
@@ -704,10 +708,30 @@ export function EditTierForm({ tier, collective, onClose }) {
     awaitRefetchQueries: true,
   });
 
+  const [isConfirmingDelete, setIsConfirmingDelete] = React.useState(false);
+  const { addToast } = useToasts();
+
   const onDeleteTierClick = React.useCallback(async () => {
-    await deleteTier();
-    onClose();
-  }, [deleteTier]);
+    setIsConfirmingDelete(true);
+  }, []);
+
+  const onConfirmDelete = React.useCallback(
+    async keepRecurringContributions => {
+      try {
+        await deleteTier({
+          variables: {
+            stopRecurringContributions: !keepRecurringContributions,
+          },
+        });
+        onClose();
+      } catch (e) {
+        addToast({ type: TOAST_TYPE.ERROR, message: e.message });
+      } finally {
+        setIsConfirmingDelete(false);
+      }
+    },
+    [deleteTier],
+  );
 
   return (
     <React.Fragment>
@@ -724,13 +748,16 @@ export function EditTierForm({ tier, collective, onClose }) {
             minimumAmount: values?.minimumAmount?.valueInCents ? values.minimumAmount : null,
           };
 
-          await submitFormMutation({
-            variables: {
-              tier,
-            },
-          });
-
-          onClose();
+          try {
+            await submitFormMutation({
+              variables: {
+                tier,
+              },
+            });
+            onClose();
+          } catch (e) {
+            addToast({ type: TOAST_TYPE.ERROR, message: e.message });
+          }
         }}
       >
         {({ values, isSubmitting }) => {
@@ -764,7 +791,7 @@ export function EditTierForm({ tier, collective, onClose }) {
                       minWidth={120}
                       onClick={onDeleteTierClick}
                       loading={isDeleting}
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isConfirmingDelete}
                       marginRight="auto"
                     >
                       <FormattedMessage id="actions.delete" defaultMessage="Delete" />
@@ -776,7 +803,7 @@ export function EditTierForm({ tier, collective, onClose }) {
                     buttonStyle="primary"
                     mx={2}
                     minWidth={120}
-                    disabled={isDeleting}
+                    disabled={isDeleting || isConfirmingDelete}
                     loading={isSubmitting}
                   >
                     {isEditing ? (
@@ -788,7 +815,7 @@ export function EditTierForm({ tier, collective, onClose }) {
                   <StyledButton
                     type="button"
                     data-cy="cancel-btn"
-                    disabled={isSubmitting || isDeleting}
+                    disabled={isSubmitting || isDeleting || isConfirmingDelete}
                     mx={2}
                     minWidth={100}
                     onClick={onClose}
@@ -801,6 +828,76 @@ export function EditTierForm({ tier, collective, onClose }) {
           );
         }}
       </Formik>
+      {isConfirmingDelete && (
+        <ConfirmTierDeleteModal
+          isDeleting={isDeleting}
+          onClose={() => setIsConfirmingDelete(false)}
+          onConfirmDelete={onConfirmDelete}
+        />
+      )}
     </React.Fragment>
+  );
+}
+
+function ConfirmTierDeleteModal({ isDeleting, onClose, onConfirmDelete }) {
+  const [keepRecurringContributions, setKeepRecurringContributions] = React.useState(true);
+
+  return (
+    <StyledModal>
+      <ModalHeader hideCloseIcon>
+        <FormattedMessage defaultMessage="Delete Tier" />
+      </ModalHeader>
+      <P mt="1.2em">
+        <FormattedMessage defaultMessage="The tier will be deleted forever and can't be retrieved." />
+      </P>
+      <StyledHr my="1.2em" />
+      <Flex gap="2em" mb="1.2em" alignItems="center" justifyContent="space-between">
+        <Flex flexDirection="column">
+          <P fontWeight="bold">
+            <FormattedMessage defaultMessage="Do you want to continue recurring contributions?" />
+          </P>
+          <P mt={1} color="black.500">
+            <FormattedMessage defaultMessage="If yes, you will still receive existing recurring contributions for this deleted tier." />
+          </P>
+        </Flex>
+        <InputSwitch
+          checked={keepRecurringContributions}
+          onChange={event => setKeepRecurringContributions(event.target.checked)}
+        />
+      </Flex>
+      <ModalFooter isFullWidth dividerMargin="1.2em 0">
+        <Flex justifyContent="space-between" flexWrap="wrap">
+          <StyledButton
+            flexGrow={1}
+            type="button"
+            data-cy="cancel-delete-btn"
+            disabled={isDeleting}
+            buttonStyle="secondary"
+            mx={2}
+            minWidth={100}
+            onClick={onClose}
+          >
+            <FormattedMessage defaultMessage="Don't Delete" />
+          </StyledButton>
+          <StyledButton
+            flexGrow={1}
+            type="button"
+            data-cy="confirm-delete-btn"
+            disabled={isDeleting}
+            mx={2}
+            buttonStyle="danger"
+            minWidth={100}
+            onClick={() => onConfirmDelete(keepRecurringContributions)}
+          >
+            <Flex alignItems="center" justifyContent="center">
+              <Flex alignItems="center" mr={1}>
+                <Trash size="1em" />
+              </Flex>
+              <FormattedMessage defaultMessage="Delete Tier" />
+            </Flex>
+          </StyledButton>
+        </Flex>
+      </ModalFooter>
+    </StyledModal>
   );
 }
