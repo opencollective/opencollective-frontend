@@ -1,8 +1,10 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
+import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 
 import Link from '../Link';
 import StyledLink from '../StyledLink';
+import { Box } from '../Grid';
 
 import FAQ, { Content, Entry, Title } from './FAQ';
 
@@ -36,35 +38,19 @@ const GithubRepositoriesFAQ = props => (
         />
       </Content>
     </Entry>
-    <Entry>
-      <Title>
-        <FormattedMessage
-          id="GithubRepositories.faq.repoStar.title"
-          defaultMessage="Why only repos with at least 100 stars?"
-        />
-      </Title>
-      <Content>
-        <FormattedMessage
-          id="GithubRepositories.faq.repoStar.content"
-          defaultMessage="We need to ensure that your project is legitimate and has a community around it. If you don't fit the 100 star requirement, we can consider your application using <criteria-link>alternative criteria.</criteria-link> - select the 'Request manual verification' option instead of verifying through Github."
-          values={{
-            'criteria-link': function CriteriaLink(msg) {
-              return (
-                <StyledLink href="https://www.oscollective.org#criteria" openInNewTab>
-                  {msg}
-                </StyledLink>
-              );
-            },
-            'for-any-community': function CommunityLink(msg) {
-              return <Link href="/create/community">{msg}</Link>;
-            },
-            'open-source': function OpenSourceLink(msg) {
-              return <Link href="/create/opensource">{msg}</Link>;
-            },
-          }}
-        />
-      </Content>
-    </Entry>
+    <Box mt={3}>
+      <StyledLink
+        href="https://docs.oscollective.org/faq"
+        background="#f3f1fe"
+        padding="8px 16px"
+        borderRadius="100px"
+        fontWeight="500"
+        openInNewTab
+        color="#6F5AFA"
+      >
+        <FormattedMessage id="moreInfo" defaultMessage="More info" /> <ArrowRight2 size="13px" />
+      </StyledLink>
+    </Box>
   </FAQ>
 );
 
