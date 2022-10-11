@@ -765,6 +765,7 @@ const ApplicationForm = ({
                           labelFontSize="16px"
                           labelProps={{ fontWeight: '600' }}
                           label={intl.formatMessage(messages.tellUsMoreLabel)}
+                          data-cy="ccf-form-message"
                         >
                           {({ field }) => (
                             <StyledTextarea
