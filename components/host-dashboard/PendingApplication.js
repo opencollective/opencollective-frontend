@@ -32,9 +32,9 @@ import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-import ValidatedRepositoryInfo from './ValidatedRepositoryInfo';
 import AcceptRejectButtons from './AcceptRejectButtons';
 import ApplicationMessageModal from './ApplicationMessageModal';
+import ValidatedRepositoryInfo from './ValidatedRepositoryInfo';
 
 const ApplicationBody = styled.div`
   height: 267px;

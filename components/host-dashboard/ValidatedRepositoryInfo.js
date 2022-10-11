@@ -1,13 +1,14 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { CheckShield } from '@styled-icons/boxicons-regular/CheckShield';
 import { Ban } from '@styled-icons/fa-solid/Ban';
 import { Check } from '@styled-icons/fa-solid/Check';
-import { CheckShield } from '@styled-icons/boxicons-regular/CheckShield';
-import Container from '../Container';
-import spdxLicenses from 'spdx-license-list';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import spdxLicenses from 'spdx-license-list';
 
+import Container from '../Container';
 import { Flex } from '../Grid';
 import StyledLink from '../StyledLink';
 import { P, Span } from '../Text';
@@ -23,6 +24,16 @@ const FieldWithValidationBadge = ({ field, children }) => {
       <P>{children({ field })}</P>
     </Flex>
   );
+};
+
+const ValidatedFieldPropType = PropTypes.shape({
+  isValid: PropTypes.bool,
+  value: PropTypes.string || PropTypes.number || PropTypes.bool,
+});
+
+FieldWithValidationBadge.propTypes = {
+  field: ValidatedFieldPropType.isRequired,
+  children: PropTypes.func.isRequired,
 };
 
 const msg = defineMessages({
@@ -72,7 +83,7 @@ const msg = defineMessages({
   },
 });
 
-export default function ValidatedRepositoryInfo({ customData }) {
+function ValidatedRepositoryInfo({ customData }) {
   const intl = useIntl();
   const { repositoryUrl, licenseSpdxId, validatedRepositoryInfo } = customData;
   return (
@@ -121,3 +132,23 @@ export default function ValidatedRepositoryInfo({ customData }) {
     </Container>
   );
 }
+
+ValidatedRepositoryInfo.propTypes = {
+  customData: PropTypes.shape({
+    repositoryUrl: PropTypes.string.isRequired,
+    licenseSpdxId: PropTypes.string,
+    validatedRepositoryInfo: PropTypes.shape({
+      fields: PropTypes.shape({
+        licenseSpdxId: ValidatedFieldPropType,
+        lastCommitDate: ValidatedFieldPropType,
+        isOwnedByOrg: ValidatedFieldPropType,
+        isFork: ValidatedFieldPropType,
+        collaboratorsCount: ValidatedFieldPropType,
+        starsCount: ValidatedFieldPropType,
+        isAdmin: ValidatedFieldPropType,
+      }).isRequired,
+    }).isRequired,
+  }),
+};
+
+export default ValidatedRepositoryInfo;

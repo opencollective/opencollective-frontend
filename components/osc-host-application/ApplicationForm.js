@@ -30,9 +30,9 @@ import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledLink from '../StyledLink';
+import StyledSelect from '../StyledSelect';
 import StyledTextarea from '../StyledTextarea';
 import { H1, H4, P, Span } from '../Text';
-import StyledSelect from '../StyledSelect';
 
 const createCollectiveMutation = gqlV2/* GraphQL */ `
   mutation CreateCollective(
@@ -416,7 +416,7 @@ const ApplicationForm = ({
                         </Grid>
                       )}
                       {!canApplyWithCollective && (
-                        <>
+                        <React.Fragment>
                           <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} py={2}>
                             <Box>
                               <StyledInputFormikField
@@ -486,7 +486,7 @@ const ApplicationForm = ({
                               {intl.formatMessage(messages.descriptionHint)}
                             </P>
                           </Box>
-                        </>
+                        </React.Fragment>
                       )}
 
                       <Flex mt={24} gridGap="12px" alignItems="center" mb={3}>

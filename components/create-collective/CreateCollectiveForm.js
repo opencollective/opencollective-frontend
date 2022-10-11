@@ -8,7 +8,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective.lib';
-import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
 
 import Avatar from '../Avatar';
