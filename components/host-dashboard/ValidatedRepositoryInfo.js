@@ -6,9 +6,9 @@ import Container from '../Container';
 import spdxLicenses from 'spdx-license-list';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { Box, Flex } from '../Grid';
+import { Flex } from '../Grid';
 import StyledLink from '../StyledLink';
 import { P, Span } from '../Text';
 
@@ -75,6 +75,8 @@ const msg = defineMessages({
 export default function ValidatedRepositoryInfo({
   customData: { repositoryUrl, validatedRepositoryInfo, licenseSpdxId },
 }) {
+  const intl = useIntl();
+
   return (
     <Container>
       <InfoSectionHeader icon={<CheckShield size={16} color="#75777A" />}>
