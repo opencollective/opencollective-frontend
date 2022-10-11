@@ -234,7 +234,9 @@ const ApplicationForm = ({
         memberAccount: { legacyId: invite.memberAccount.id },
       })),
       message,
-      ...(!canApplyWithCollective && { automateApprovalWithGithub: applicationData.repositoryUrl ? true : false }),
+      ...(!canApplyWithCollective && {
+        automateApprovalWithGithub: applicationData.repositoryUrl?.includes('github.com/') ? true : false,
+      }),
     };
 
     const response = await submitApplication({ variables });
