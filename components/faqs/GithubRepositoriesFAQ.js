@@ -1,10 +1,10 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
+import { FormattedMessage } from 'react-intl';
 
+import { Box } from '../Grid';
 import Link from '../Link';
 import StyledLink from '../StyledLink';
-import { Box } from '../Grid';
 
 import FAQ, { Content, Entry, Title } from './FAQ';
 

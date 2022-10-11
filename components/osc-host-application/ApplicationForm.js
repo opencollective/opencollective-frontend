@@ -235,7 +235,7 @@ const ApplicationForm = ({
       })),
       message,
       ...(!canApplyWithCollective && {
-        automateApprovalWithGithub: applicationData.repositoryUrl?.includes('github.com/') ? true : false,
+        automateApprovalWithGithub: applicationData.repositoryUrl?.includes('https://github.com/') ? true : false,
       }),
     };
 
