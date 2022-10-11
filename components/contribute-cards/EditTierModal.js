@@ -465,16 +465,66 @@ function FormFields({ collective, types, values }) {
 
 const EditSectionContainer = styled(Flex)`
   overflow: scroll;
-  max-height: 600px;
-  width: 400px;
+  flex-grow: 1;
   flex-direction: column;
   padding-right: 1rem;
+  min-width: 250px;
+
+  @media (min-width: 700px) {
+    max-height: 600px;
+  }
 `;
 
 const PreviewSectionContainer = styled(Flex)`
   overflow: hidden;
   max-height: 600px;
-  width: 300px;
+  flex-grow: 1;
+  min-width: 300px;
+  justify-content: center;
+  @media (max-width: 700px) {
+    margin: 0 -20px;
+  }
+`;
+
+const ModalSectionContainer = styled(Flex)`
+  @media (max-width: 700px) {
+    flex-wrap: wrap;
+    gap: 2em;
+    align-items: center;
+  }
+`;
+
+const EditModalActionsContainer = styled(Flex)`
+  justify-content: right;
+  flex-wrap: wrap;
+  gap: 1em;
+
+  @media (max-width: 700px) {
+    & > button {
+      width: 100%;
+    }
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+`;
+
+const ConfirmModalButton = styled(StyledButton)`
+  @media (max-width: 700px) {
+    order: 1;
+  }
+`;
+
+const DeleteModalButton = styled(StyledButton)`
+  @media (max-width: 700px) {
+    order: 2;
+  }
+`;
+
+const CancelModalButton = styled(StyledButton)`
+  @media (max-width: 700px) {
+    order: 3;
+  }
 `;
 
 const ModalContainer = styled(StyledModal)`
@@ -488,6 +538,9 @@ const FieldDescription = styled.div`
 
 const ContributeCardPreviewContainer = styled.div`
   padding: 2rem;
+  @media (max-width: 700px) {
+    padding: 0;
+  }
 `;
 
 export default function EditTierModal({ tier, collective, onClose }) {
@@ -771,23 +824,22 @@ export function EditTierForm({ tier, collective, onClose }) {
                 )}
               </ModalHeader>
               <ModalBody>
-                <Flex>
+                <ModalSectionContainer>
                   <EditSectionContainer>
                     <FormFields collective={collective} values={values} />
                   </EditSectionContainer>
                   <PreviewSectionContainer>
                     <ContributeCardPreview collective={collective} tier={values} />
                   </PreviewSectionContainer>
-                </Flex>
+                </ModalSectionContainer>
               </ModalBody>
               <ModalFooter isFullWidth dividerMargin="1rem 0">
-                <Flex justifyContent="right" flexWrap="wrap">
+                <EditModalActionsContainer>
                   {isEditing && (
-                    <StyledButton
+                    <DeleteModalButton
                       type="button"
                       data-cy="delete-btn"
                       buttonStyle="dangerSecondary"
-                      mx={2}
                       minWidth={120}
                       onClick={onDeleteTierClick}
                       loading={isDeleting}
@@ -795,13 +847,12 @@ export function EditTierForm({ tier, collective, onClose }) {
                       marginRight="auto"
                     >
                       <FormattedMessage id="actions.delete" defaultMessage="Delete" />
-                    </StyledButton>
+                    </DeleteModalButton>
                   )}
-                  <StyledButton
+                  <ConfirmModalButton
                     type="submit"
                     data-cy="confirm-btn"
                     buttonStyle="primary"
-                    mx={2}
                     minWidth={120}
                     disabled={isDeleting || isConfirmingDelete}
                     loading={isSubmitting}
@@ -811,18 +862,17 @@ export function EditTierForm({ tier, collective, onClose }) {
                     ) : (
                       <FormattedMessage id="create" defaultMessage="Create" />
                     )}
-                  </StyledButton>
-                  <StyledButton
+                  </ConfirmModalButton>
+                  <CancelModalButton
                     type="button"
                     data-cy="cancel-btn"
                     disabled={isSubmitting || isDeleting || isConfirmingDelete}
-                    mx={2}
                     minWidth={100}
                     onClick={onClose}
                   >
                     <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-                  </StyledButton>
-                </Flex>
+                  </CancelModalButton>
+                </EditModalActionsContainer>
               </ModalFooter>
             </Form>
           );
@@ -838,6 +888,26 @@ export function EditTierForm({ tier, collective, onClose }) {
     </React.Fragment>
   );
 }
+
+const CancelDeleteModalButton = styled(StyledButton)`
+  @media (max-width: 700px) {
+    order: 1;
+  }
+`;
+
+const ConfirmDeleteModalButton = styled(StyledButton)`
+  @media (max-width: 700px) {
+    order: 0;
+  }
+`;
+
+const DeleteModalActionsContainer = styled(Flex)`
+  justify-content: space-between;
+  flex-wrap: wrap;
+  @media (max-width: 700px) {
+    gap: 1em;
+  }
+`;
 
 function ConfirmTierDeleteModal({ isDeleting, onClose, onConfirmDelete }) {
   const [keepRecurringContributions, setKeepRecurringContributions] = React.useState(true);
@@ -866,8 +936,8 @@ function ConfirmTierDeleteModal({ isDeleting, onClose, onConfirmDelete }) {
         />
       </Flex>
       <ModalFooter isFullWidth dividerMargin="1.2em 0">
-        <Flex justifyContent="space-between" flexWrap="wrap">
-          <StyledButton
+        <DeleteModalActionsContainer>
+          <CancelDeleteModalButton
             flexGrow={1}
             type="button"
             data-cy="cancel-delete-btn"
@@ -878,8 +948,8 @@ function ConfirmTierDeleteModal({ isDeleting, onClose, onConfirmDelete }) {
             onClick={onClose}
           >
             <FormattedMessage defaultMessage="Don't Delete" />
-          </StyledButton>
-          <StyledButton
+          </CancelDeleteModalButton>
+          <ConfirmDeleteModalButton
             flexGrow={1}
             type="button"
             data-cy="confirm-delete-btn"
@@ -895,8 +965,8 @@ function ConfirmTierDeleteModal({ isDeleting, onClose, onConfirmDelete }) {
               </Flex>
               <FormattedMessage defaultMessage="Delete Tier" />
             </Flex>
-          </StyledButton>
-        </Flex>
+          </ConfirmDeleteModalButton>
+        </DeleteModalActionsContainer>
       </ModalFooter>
     </StyledModal>
   );
