@@ -32,7 +32,7 @@ const msg = defineMessages({
   },
   licenseManually: {
     id: 'PendingApplication.RepoInfo.LicenseManually',
-    defaultMessage: '(user specified {license} manually)',
+    defaultMessage: '(user specified "{license}" manually)',
   },
   lastCommitTimeAgo: {
     id: 'PendingApplication.RepoInfo.LastCommitTimeAgo',
@@ -72,13 +72,11 @@ const msg = defineMessages({
   },
 });
 
-export default function ValidatedRepositoryInfo({
-  customData: { repositoryUrl, validatedRepositoryInfo, licenseSpdxId },
-}) {
+export default function ValidatedRepositoryInfo({ customData }) {
   const intl = useIntl();
-
+  const { repositoryUrl, licenseSpdxId, validatedRepositoryInfo } = customData;
   return (
-    <Container>
+    <Container mb={3}>
       <InfoSectionHeader icon={<CheckShield size={16} color="#75777A" />}>
         <FormattedMessage id="PendingApplication.RepoInfo.Header" defaultMessage="Validated repository information" />
       </InfoSectionHeader>
@@ -93,7 +91,7 @@ export default function ValidatedRepositoryInfo({
                 license:
                   field.value === 'NOASSERTION' ? 'Not found' : `${field.value} (${spdxLicenses[field.value].name})`,
               })}{' '}
-              {licenseSpdxId !== field.value && (
+              {licenseSpdxId && licenseSpdxId !== field.value && (
                 <Span color="black.600">{intl.formatMessage(msg.licenseManually, { license: licenseSpdxId })}</Span>
               )}
             </React.Fragment>
@@ -101,7 +99,7 @@ export default function ValidatedRepositoryInfo({
         </FieldWithValidationBadge>
         <FieldWithValidationBadge field={validatedRepositoryInfo.fields.lastCommitDate}>
           {({ field }) =>
-            intl.formatMessage(msg.lastCommitTimeAgo, { timeAgo: field ? dayjs(field.value.fromNow()) : 'not found' })
+            intl.formatMessage(msg.lastCommitTimeAgo, { timeAgo: field ? dayjs(field.value).fromNow() : 'not found' })
           }
         </FieldWithValidationBadge>
         <FieldWithValidationBadge field={validatedRepositoryInfo.fields.isOwnedByOrg}>

@@ -374,7 +374,8 @@ const PendingApplication = ({ host, application, ...props }) => {
                 // Don't show repository info twice as it is displayed on top in a special component
                 if (
                   key === 'validatedRepositoryInfo' ||
-                  (key === 'repositoryUrl' && application.customData.validatedRepositoryInfo)
+                  (key === 'repositoryUrl' && application.customData.validatedRepositoryInfo) ||
+                  (key === 'licenseSpdxId' && application.customData.validatedRepositoryInfo)
                 ) {
                   return null;
                 }
