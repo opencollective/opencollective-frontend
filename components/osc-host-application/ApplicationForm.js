@@ -126,10 +126,6 @@ const messages = defineMessages({
     id: 'createCollective.form.slugLabel',
     defaultMessage: 'Set your URL',
   },
-  collectiveDescription: {
-    id: 'createCollective.form.descriptionLabel',
-    defaultMessage: 'What does your Collective do?',
-  },
   repositoryUrl: {
     id: 'HostApplication.form.RepositoryUrlLabel',
     defaultMessage: 'Link your Repository or Organisation',
@@ -480,6 +476,7 @@ const ApplicationForm = ({
                               labelProps={{ fontWeight: '600' }}
                               label={intl.formatMessage(messages.descriptionLabel)}
                               required
+                              data-cy="ccf-form-description"
                             >
                               {({ field }) => (
                                 <StyledTextarea
