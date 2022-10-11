@@ -43,7 +43,6 @@ class CreateCollective extends Component {
     this.state = {
       error: null,
       creating: false,
-      githubInfo: null,
     };
 
     this.createCollective = this.createCollective.bind(this);
@@ -58,17 +57,12 @@ class CreateCollective extends Component {
       ? [...collective.tags, this.props.router.query.category]
       : [this.props.router.query.category];
 
-    if (this.state.githubInfo) {
-      collective.githubHandle = this.state.githubInfo.handle;
-    }
-
     // try mutation
     try {
       const res = await this.props.createCollective({
         variables: {
           collective,
           host: this.props.host ? { slug: this.props.host.slug } : null,
-          automateApprovalWithGithub: this.state.githubInfo ? true : false,
           message,
           inviteMembers: inviteMembers.map(invite => ({
             ...invite,
@@ -139,7 +133,6 @@ class CreateCollective extends Component {
     return (
       <CreateCollectiveForm
         host={host}
-        github={this.state.githubInfo}
         onSubmit={this.createCollective}
         onChange={this.handleChange}
         loading={this.state.creating}
@@ -155,17 +148,10 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
   mutation CreateCollective(
     $collective: CollectiveCreateInput!
     $host: AccountReferenceInput
-    $automateApprovalWithGithub: Boolean
     $message: String
     $inviteMembers: [InviteMemberInput]
   ) {
-    createCollective(
-      collective: $collective
-      host: $host
-      automateApprovalWithGithub: $automateApprovalWithGithub
-      message: $message
-      inviteMembers: $inviteMembers
-    ) {
+    createCollective(collective: $collective, host: $host, message: $message, inviteMembers: $inviteMembers) {
       id
       name
       slug
