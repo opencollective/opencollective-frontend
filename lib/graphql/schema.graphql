@@ -91,7 +91,6 @@ interface CollectiveInterface {
   isArchived: Boolean
   isApproved: Boolean
   isDeletable: Boolean
-  hasVirtualCards: Boolean @deprecated(reason: "2021-10-12: Use features.VIRTUAL_CARDS === ACTIVE")
   host: CollectiveInterface
   hostCollective: CollectiveInterface
 
@@ -1596,7 +1595,6 @@ type Collective implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
-  hasVirtualCards: Boolean! @deprecated(reason: "2021-10-12: Use features.VIRTUAL_CARDS === ACTIVE")
 }
 
 """
@@ -1848,7 +1846,6 @@ type Event implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
-  hasVirtualCards: Boolean! @deprecated(reason: "2021-10-12: Use features.VIRTUAL_CARDS === ACTIVE")
 }
 
 """
@@ -2100,7 +2097,6 @@ type Fund implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
-  hasVirtualCards: Boolean! @deprecated(reason: "2021-10-12: Use features.VIRTUAL_CARDS === ACTIVE")
 }
 
 """
@@ -2352,7 +2348,6 @@ type Organization implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
-  hasVirtualCards: Boolean! @deprecated(reason: "2021-10-12: Use features.VIRTUAL_CARDS === ACTIVE")
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 }
 
@@ -2605,7 +2600,6 @@ type Project implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
-  hasVirtualCards: Boolean! @deprecated(reason: "2021-10-12: Use features.VIRTUAL_CARDS === ACTIVE")
 }
 
 """
@@ -3099,7 +3093,6 @@ type User implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
-  hasVirtualCards: Boolean! @deprecated(reason: "2021-10-12: Use features.VIRTUAL_CARDS === ACTIVE")
   email: String
   applications: [Application]
 }
@@ -3353,7 +3346,6 @@ type Vendor implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
-  hasVirtualCards: Boolean! @deprecated(reason: "2021-10-12: Use features.VIRTUAL_CARDS === ACTIVE")
 }
 
 """
@@ -3398,8 +3390,6 @@ type Query {
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction]
   Application(id: Int): Application
-  allUpdates(CollectiveId: Int!, includeHostedCollectives: Boolean, limit: Int, offset: Int): [UpdateType]
-    @deprecated(reason: "2022-01-26: This endpoint is deprecated and will be removed soon")
   Transaction(id: Int, uuid: String): Transaction
   allCollectives(
     """
@@ -3556,11 +3546,6 @@ type Query {
     includeArchived: Boolean
 
     """
-    Whether to return only active accounts
-    """
-    onlyActive: Boolean @deprecated(reason: "2021-01-20: Not supported anymore.")
-
-    """
     Whether to skip recent accounts (48h)
     """
     skipRecentAccounts: Boolean = false
@@ -3576,14 +3561,6 @@ type Query {
     limit: Int = 20
     offset: Int = 0
   ): CollectiveSearchResults
-  allTransactionsFromPaymentMethod(
-    uuid: String!
-    type: String
-    limit: Int
-    offset: Int
-    dateFrom: String
-    dateTo: String
-  ): [Transaction] @deprecated(reason: "2021-01-29: Not used anymore")
 }
 
 """
@@ -3687,6 +3664,7 @@ type Mutation {
   archiveCollective(id: Int!): CollectiveInterface
   unarchiveCollective(id: Int!): CollectiveInterface
   sendMessageToCollective(collectiveId: Int!, message: String!, subject: String): SendMessageToCollectiveResult
+    @deprecated(reason: "2022-08-01: Please use the sendMessage mutation from GraphQL v2 instead.")
 
   """
   Create a user with an optional organization.
