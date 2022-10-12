@@ -12,6 +12,7 @@ import StyledCard from '../StyledCard';
 import StyledInput from '../StyledInput';
 import StyledRadioList from '../StyledRadioList';
 import { H4 } from '../Text';
+import { Box } from '../Grid';
 
 import GithubRepositoryEntry from './GithubRepositoryEntry';
 
@@ -21,6 +22,7 @@ const SearchIcon = styled(Search)`
 
 const RepositoryEntryContainer = styled(Container)`
   cursor: pointer;
+  border-bottom: 1px solid ${themeGet('colors.black.200')};
   &:hover {
     background: ${themeGet('colors.black.50')};
   }
@@ -78,26 +80,27 @@ const GithubRepositories = ({ repositories, setGithubInfo, ...fieldProps }) => {
             </H4>
           </Container>
         )}
-
-        <StyledRadioList
-          {...fieldProps}
-          options={repositories}
-          onChange={({ value }) => {
-            setGithubInfo({
-              handle: `${value.owner.login}/${value.name}`,
-              licenseSpdxId: value.license?.spdx_id,
-            });
-          }}
-          keyGetter="name"
-        >
-          {({ value, radio, checked }) => {
-            return (
-              <RepositoryEntryContainer px={[2, 4]} py={3} borderBottom="1px solid #E6E8EB">
-                <GithubRepositoryEntry radio={radio} value={value} checked={checked} />
-              </RepositoryEntryContainer>
-            );
-          }}
-        </StyledRadioList>
+        <Box maxHeight="640px" overflow="auto">
+          <StyledRadioList
+            {...fieldProps}
+            options={repositories}
+            onChange={({ value }) => {
+              setGithubInfo({
+                handle: `${value.owner.login}/${value.name}`,
+                licenseSpdxId: value.license?.spdx_id,
+              });
+            }}
+            keyGetter="name"
+          >
+            {({ value, radio }) => {
+              return (
+                <RepositoryEntryContainer px={[2, 4]} py={3}>
+                  <GithubRepositoryEntry radio={radio} value={value} />
+                </RepositoryEntryContainer>
+              );
+            }}
+          </StyledRadioList>
+        </Box>
       </StyledCard>
     </Fragment>
   );

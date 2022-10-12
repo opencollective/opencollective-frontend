@@ -5,11 +5,10 @@ import { Star } from '@styled-icons/fa-solid/Star';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import StyledRadioList from '../StyledRadioList';
 import { P, Span } from '../Text';
 
-const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
-  const { type, login } = value.owner;
+const RepositoryEntry = ({ radio, value }) => {
+  const { type } = value.owner;
   const repositoryTypeName = type === 'User' ? 'Personal Repo' : 'Organization Repo';
 
   return (
