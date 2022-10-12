@@ -48,7 +48,6 @@ const createCollectiveMutation = gql`
     $message: String
     $applicationData: JSON
     $inviteMembers: [InviteMemberInput]
-    $automateApprovalWithGithub: Boolean
   ) {
     createCollective(
       collective: $collective
@@ -57,7 +56,6 @@ const createCollectiveMutation = gql`
       message: $message
       applicationData: $applicationData
       inviteMembers: $inviteMembers
-      automateApprovalWithGithub: $automateApprovalWithGithub
     ) {
       id
       slug
@@ -224,13 +222,6 @@ const ApplicationForm = ({
     return errors;
   };
   const submit = async ({ user, collective, applicationData, inviteMembers, message }) => {
-    let automateApprovalWithGithub = false;
-
-    if (applicationData.repositoryUrl) {
-      const { hostname } = new URL(applicationData.repositoryUrl);
-      automateApprovalWithGithub = hostname === 'github.com';
-    }
-
     const variables = {
       collective: {
         ...(canApplyWithCollective
@@ -245,9 +236,6 @@ const ApplicationForm = ({
         memberAccount: { legacyId: invite.memberAccount.id },
       })),
       message,
-      ...(!canApplyWithCollective && {
-        automateApprovalWithGithub,
-      }),
     };
 
     const response = await submitApplication({ variables });
