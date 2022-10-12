@@ -4,7 +4,6 @@ describe('Create collective from Github', () => {
     cy.login({ email: 'testuser@opencollective.com', redirect: '/opensource/apply/pick-repo?token=foofoo' });
     cy.contains('[data-cy=connect-github-header]', 'Pick a repository');
     cy.get('[data-cy=radio-select]').first().check();
-    cy.get('[data-cy=radio-select]').eq(1).check('repository');
     cy.get('[data-cy=connect-github-continue]').click();
     cy.get('[data-cy=ccf-form-description]').type('Blocks some ads');
     cy.get('[data-cy=ccf-form-message]').type('We need to gather some money');
