@@ -268,12 +268,14 @@ const ApplicationForm = ({
     window.scrollTo(0, 0);
   }
 
-  // turn licenses object into array
-  const spdxLicenseList = Object.keys(spdxLicenses).map(key => ({
-    label: spdxLicenses[key].name,
-    value: key,
-    key,
-  }));
+  // Turn licenses into an array and sort them on label/name
+  const spdxLicenseList = Object.keys(spdxLicenses)
+    .map(key => ({
+      label: spdxLicenses[key].name,
+      value: key,
+      key,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   return (
     <React.Fragment>
