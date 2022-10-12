@@ -1,6 +1,5 @@
-/* eslint-disable react/display-name */
-/* eslint-disable react/prop-types */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { Trash } from '@styled-icons/boxicons-regular/Trash';
 import { Form, Formik } from 'formik';
@@ -464,6 +463,22 @@ function FormFields({ collective, types, values }) {
   );
 }
 
+FormFields.propTypes = {
+  collective: PropTypes.shape({
+    host: PropTypes.object,
+    currency: PropTypes.string,
+    type: PropTypes.string,
+  }),
+  values: PropTypes.shape({
+    id: PropTypes.string,
+    slug: PropTypes.string,
+    type: PropTypes.string,
+    amountType: PropTypes.string,
+    interval: PropTypes.string,
+  }),
+  types: PropTypes.array,
+};
+
 const EditSectionContainer = styled(Flex)`
   overflow: scroll;
   flex-grow: 1;
@@ -552,6 +567,12 @@ export default function EditTierModal({ tier, collective, onClose }) {
   );
 }
 
+EditTierModal.propTypes = {
+  tier: PropTypes.object,
+  collective: PropTypes.object,
+  onClose: PropTypes.func,
+};
+
 export function ContributeCardPreview({ tier, collective }) {
   const intl = useIntl();
 
@@ -571,6 +592,14 @@ export function ContributeCardPreview({ tier, collective }) {
     </ContributeCardPreviewContainer>
   );
 }
+
+ContributeCardPreview.propTypes = {
+  tier: PropTypes.shape({
+    legacyId: PropTypes.number,
+    maxQuantity: PropTypes.number,
+  }),
+  collective: PropTypes.object,
+};
 
 const listTierQuery = gql`
   query AccountTiers($accountSlug: String!) {
@@ -891,6 +920,12 @@ export function EditTierForm({ tier, collective, onClose }) {
   );
 }
 
+EditTierForm.propTypes = {
+  collective: PropTypes.object,
+  tier: PropTypes.object,
+  onClose: PropTypes.func,
+};
+
 const CancelDeleteModalButton = styled(StyledButton)`
   @media (max-width: 700px) {
     order: 1;
@@ -973,3 +1008,9 @@ function ConfirmTierDeleteModal({ isDeleting, onClose, onConfirmDelete }) {
     </StyledModal>
   );
 }
+
+ConfirmTierDeleteModal.propTypes = {
+  isDeleting: PropTypes.bool,
+  onClose: PropTypes.func,
+  onConfirmDelete: PropTypes.func,
+};
