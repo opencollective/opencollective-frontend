@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
+import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -697,6 +698,7 @@ const deleteTierMutation = gql`
 `;
 
 export function EditTierForm({ tier, collective, onClose }) {
+  const intl = useIntl();
   const isEditing = React.useMemo(() => !!tier?.id);
   const initialValues = React.useMemo(() => {
     if (isEditing) {
@@ -778,7 +780,7 @@ export function EditTierForm({ tier, collective, onClose }) {
         });
         onClose();
       } catch (e) {
-        addToast({ type: TOAST_TYPE.ERROR, message: e.message });
+        addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e.message) });
       } finally {
         setIsConfirmingDelete(false);
       }
@@ -809,7 +811,7 @@ export function EditTierForm({ tier, collective, onClose }) {
             });
             onClose();
           } catch (e) {
-            addToast({ type: TOAST_TYPE.ERROR, message: e.message });
+            addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
           }
         }}
       >
