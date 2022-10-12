@@ -83,37 +83,17 @@ const GithubRepositories = ({ repositories, setGithubInfo, ...fieldProps }) => {
           {...fieldProps}
           options={repositories}
           onChange={({ value }) => {
-            if (value.owner.type === 'User') {
-              setGithubInfo({
-                handle: `${value.owner.login}/${value.name}`,
-                licenseSpdxId: value.license?.spdx_id,
-              });
-            } else {
-              setGithubInfo({});
-            }
+            setGithubInfo({
+              handle: `${value.owner.login}/${value.name}`,
+              licenseSpdxId: value.license?.spdx_id,
+            });
           }}
           keyGetter="name"
         >
           {({ value, radio, checked }) => {
             return (
               <RepositoryEntryContainer px={[2, 4]} py={3} borderBottom="1px solid #E6E8EB">
-                <GithubRepositoryEntry
-                  radio={radio}
-                  value={value}
-                  checked={checked}
-                  changeRepoInfo={(type, value) => {
-                    if (type === 'repository') {
-                      setGithubInfo({
-                        handle: `${value.owner.login}/${value.name}`,
-                        licenseSpdxId: value.license?.spdx_id,
-                      });
-                    } else {
-                      setGithubInfo({
-                        handle: value.owner.login,
-                      });
-                    }
-                  }}
-                />
+                <GithubRepositoryEntry radio={radio} value={value} checked={checked} />
               </RepositoryEntryContainer>
             );
           }}

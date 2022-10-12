@@ -60,38 +60,6 @@ const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
           {value.description}
         </P>
       )}
-      {checked && type === 'Organization' && (
-        <Container width={1} mx={4} mt={3} mb={1} px={2}>
-          <StyledRadioList
-            id="useType"
-            name="useType"
-            options={['repository', 'organization']}
-            onChange={({ key }) => {
-              changeRepoInfo(key, value);
-            }}
-            data-cy="use-type-radio"
-          >
-            {props => {
-              return (
-                <Container cursor="pointer">
-                  {props.value === 'repository' && (
-                    <Container fontWeight="400" fontSize="1.2rem" mb={2}>
-                      <Span mr={3}>{props.radio}</Span>
-                      Create a collective for the repository ({value.name})
-                    </Container>
-                  )}
-                  {props.value === 'organization' && (
-                    <Container fontWeight="400" fontSize="1.2rem">
-                      <Span mr={3}>{props.radio}</Span>
-                      Create a collective for the organization ({login})
-                    </Container>
-                  )}
-                </Container>
-              );
-            }}
-          </StyledRadioList>
-        </Container>
-      )}
     </Fragment>
   );
 };
@@ -106,7 +74,6 @@ RepositoryEntry.propTypes = {
     name: PropTypes.string,
   }),
   checked: PropTypes.bool,
-  changeRepoInfo: PropTypes.func.isRequired,
 };
 
 export default RepositoryEntry;
