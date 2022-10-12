@@ -305,12 +305,12 @@ const ApplicationForm = ({
             </H1>
             <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
               <FormattedMessage
-                id="HostApplication.applicationForm.subheading"
+                id="HostApplication.form.subheading"
                 defaultMessage="Introduce your Collective, please incude as much context as possible so we can give you the best service we can! Have doubts? {faqLink}"
                 values={{
                   faqLink: (
                     <StyledLink href="https://docs.oscollective.org/faq/general" openInNewTab color="purple.500">
-                      <FormattedMessage id="HostApplication.applicationForm.readFaqs" defaultMessage="Read our FAQs" />
+                      <FormattedMessage id="HostApplication.form.readFaqs" defaultMessage="Read our FAQs" />
                     </StyledLink>
                   ),
                 }}
@@ -381,7 +381,7 @@ const ApplicationForm = ({
                         <Flex alignItems="center" justifyContent="stretch" gap={6} mb={3}>
                           <H4 fontSize="18px" lineHeight="24px" color="black.900">
                             <FormattedMessage
-                              id="HostApplication.applicationForm.mainInfo"
+                              id="HostApplication.form.mainInfo"
                               defaultMessage="Main info {padlock}"
                               values={{
                                 padlock: <Lock size="16px" lineHeight="24px" color="#75777A" />,
@@ -392,7 +392,7 @@ const ApplicationForm = ({
                         </Flex>
                         <P fontSize="14px" lineHeight="20px" color="black.700">
                           <FormattedMessage
-                            id="HostApplication.applicationForm.publicInformation"
+                            id="HostApplication.form.publicInformation"
                             defaultMessage="This information is public. Please do not add any personal information such as names or addresses in this field."
                           />
                         </P>
@@ -655,7 +655,7 @@ const ApplicationForm = ({
                         <Flex alignItems="center" justifyContent="stretch" gap={6} mb={3}>
                           <H4 fontSize="18px" lineHeight="24px" color="black.900">
                             <FormattedMessage
-                              id="HostApplication.applicationForm.team"
+                              id="HostApplication.form.team"
                               defaultMessage="Your team {padlock}"
                               values={{
                                 padlock: <Lock size="16px" color="#75777A" />,
@@ -666,7 +666,7 @@ const ApplicationForm = ({
                         </Flex>
                         <P fontSize="14px" lineHeight="20px" color="black.700">
                           <FormattedMessage
-                            id="HostApplication.applicationForm.publicInformation"
+                            id="HostApplication.form.publicInformation"
                             defaultMessage="This information is public. Please do not add any personal information such as names or addresses in this field."
                           />
                         </P>
