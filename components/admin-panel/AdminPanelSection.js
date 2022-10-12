@@ -12,8 +12,6 @@ import HostDashboardReports from '../host-dashboard/HostDashboardReports';
 import PendingApplications from '../host-dashboard/PendingApplications';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
-import MessageBox from '../../components/MessageBox';
-import { FormattedMessage } from 'react-intl';
 
 import AccountSettings from './sections/AccountSettings';
 import FinancialContributions from './sections/FinancialContributions';
