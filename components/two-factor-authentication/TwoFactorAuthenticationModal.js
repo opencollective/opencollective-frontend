@@ -9,10 +9,11 @@ import { getSettingsRoute } from '../../lib/url-helpers';
 
 import { Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
+import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledModal, { ModalFooter, ModalHeader } from '../StyledModal';
-import { P } from '../Text';
+import { Label, P } from '../Text';
 
 export default function TwoFactorAuthenticationModal() {
   const { LoggedInUser } = useLoggedInUser();
@@ -49,29 +50,42 @@ export default function TwoFactorAuthenticationModal() {
     const has2FAConfigured = prompt.supportedMethods.length > 0;
 
     return (
-      <StyledModal onClose={cancel}>
+      <StyledModal onClose={cancel} trapFocus>
         <ModalHeader hideCloseIcon>
           {has2FAConfigured ? (
-            <FormattedMessage defaultMessage="Verify using the 2FA code:" />
+            <FormattedMessage defaultMessage="Verify using the Two-Factor Authentication (2FA) code:" />
           ) : (
-            <FormattedMessage defaultMessage="You must configure 2FA to access this feature." />
+            <FormattedMessage defaultMessage="You must configure Two-Factor Authentication (2FA) to access this feature." />
           )}
         </ModalHeader>
         {has2FAConfigured ? (
           <Flex mt={2} flexDirection="column">
-            <P fontWeight="normal" as="label" mb={2}>
+            <Label htmlFor="2fa-code-input" fontWeight="normal" as="label" mb={2}>
               <FormattedMessage defaultMessage="Please enter your 6-digit code without any dashes." />
-            </P>
-            <StyledInput type="text" value={twoFactorCode} onChange={e => setTwoFactorCode(e.target.value)} />
+            </Label>
+            <StyledInput
+              id="2fa-code-input"
+              name="2fa-code-input"
+              type="text"
+              minHeight={50}
+              fontSize="20px"
+              placeholder="123456"
+              pattern="[0-9]{6}"
+              inputMode="numeric"
+              value={twoFactorCode}
+              onChange={e => setTwoFactorCode(e.target.value)}
+              autoFocus
+            />
           </Flex>
         ) : (
           <Flex mt={2} flexDirection="column">
             <P fontWeight="normal" as="label" mb={4}>
               <FormattedMessage
-                defaultMessage="To enable 2FA, follow the steps <link>here</link>"
+                defaultMessage="To enable Two-Factor Authentication (2FA), follow the steps <link>here</link>"
                 values={{
                   link: getI18nLink({
                     href: getSettingsRoute(LoggedInUser.collective, 'two-factor-auth'),
+                    as: Link,
                   }),
                 }}
               />
