@@ -8,11 +8,11 @@ import styled from 'styled-components';
 import { escapeInput } from '../../lib/utils';
 
 import Container from '../Container';
+import { Box } from '../Grid';
 import StyledCard from '../StyledCard';
 import StyledInput from '../StyledInput';
 import StyledRadioList from '../StyledRadioList';
 import { H4 } from '../Text';
-import { Box } from '../Grid';
 
 import GithubRepositoryEntry from './GithubRepositoryEntry';
 
