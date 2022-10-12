@@ -7,14 +7,13 @@ import { ContributionTypes } from '../../lib/constants/contribution-types';
 
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
+import EditTierModal from '../edit-collective/tiers/EditTierModal';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledTag from '../StyledTag';
 import { P } from '../Text';
-
-import EditTierModal from './EditTierModal';
 
 /** Max number of contributors on each tier card */
 export const MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD = 4;
