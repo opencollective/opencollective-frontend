@@ -68,7 +68,7 @@ class ConnectGithub extends React.Component {
       <Flex flexDirection="column" m={[3, 0]} mb={4}>
         <Flex flexDirection="column" my={[2, 4]}>
           <Flex flexDirection={['column', 'row']} alignItems="center" justifyContent="center">
-            <Box width={'160px'} height={'160px'} mb="24px">
+            <Box width={'160px'} height={'160px'}>
               <NextIllustration
                 alt="Open Source Collective logotype"
                 src="/static/images/osc-logo.png"
@@ -76,7 +76,7 @@ class ConnectGithub extends React.Component {
                 height={160}
               />
             </Box>
-            <Box textAlign={['center', 'left']} width={['288px', '404px']} mb={4} ml={[null, '24px']}>
+            <Box textAlign={['center', 'left']} width={['288px', '404px']} ml={[null, '24px']}>
               <H1
                 fontSize="32px"
                 lineHeight="40px"
@@ -139,55 +139,58 @@ class ConnectGithub extends React.Component {
         )}
 
         {repositories.length !== 0 && (
-          <Flex justifyContent="center" width={1} mb={4} flexDirection={['column', 'row']}>
-            <Box width={1 / 5} display={['none', null, 'block']} />
-            <Box maxWidth={[400, 500]} minWidth={[300, 400]} alignSelf={['center', 'none']}>
-              <StyledInputField htmlFor="collective">
-                {fieldProps => (
-                  <GithubRepositories
-                    {...fieldProps}
-                    repositories={repositories}
-                    setGithubInfo={githubInfo => this.props.setGithubInfo(githubInfo)}
-                  />
-                )}
-              </StyledInputField>
-
-              <Grid gridTemplateColumns={['1fr', '1fr 1fr']} gridGap={'32px'} my={4}>
-                <StyledButton
-                  buttonStyle="purpleSecondary"
-                  buttonSize="large"
-                  textAlign="center"
-                  onClick={() => window && window.history.back()}
-                >
-                  ←&nbsp;
-                  <FormattedMessage id="Back" defaultMessage="Back" />
-                </StyledButton>
-                <StyledButton
-                  textAlign="center"
-                  buttonSize="large"
-                  buttonStyle="purple"
-                  disabled={this.props.nextDisabled}
-                  onClick={() => {
-                    this.props.router.push(nextLinkPath);
-                  }}
-                  data-cy="connect-github-continue"
-                >
-                  <FormattedMessage id="Pagination.Next" defaultMessage="Next" /> &nbsp;→
-                </StyledButton>
-              </Grid>
-            </Box>
-
-            <GithubRepositoriesFAQ
-              mt={4}
-              ml={[0, 4]}
-              display={['block', null, 'block']}
-              width={[1, 1 / 5]}
-              maxWidth={[250, null, 335]}
-              alignSelf={['center', 'flex-start']}
-              position="sticky"
-              top={0}
-              pt={[0, 3]}
-            />
+          <Flex justifyContent="center" px={[2, 4]} width={1}>
+            <Grid
+              gridTemplateColumns={['1fr', 'repeat(4, minmax(0, 1fr))']}
+              gridGap={'48px'}
+              maxWidth="1200px"
+              position="relative"
+              flexGrow={1}
+            >
+              <Box gridColumn={[null, '1/4', '1/4', '2/4']}>
+                <StyledInputField htmlFor="collective">
+                  {fieldProps => (
+                    <GithubRepositories
+                      {...fieldProps}
+                      repositories={repositories}
+                      setGithubInfo={githubInfo => this.props.setGithubInfo(githubInfo)}
+                    />
+                  )}
+                </StyledInputField>
+                <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={'32px'} my={4}>
+                  <StyledButton
+                    buttonStyle="purpleSecondary"
+                    buttonSize="large"
+                    textAlign="center"
+                    onClick={() => window && window.history.back()}
+                  >
+                    ←&nbsp;
+                    <FormattedMessage id="Back" defaultMessage="Back" />
+                  </StyledButton>
+                  <StyledButton
+                    textAlign="center"
+                    buttonSize="large"
+                    buttonStyle="purple"
+                    disabled={this.props.nextDisabled}
+                    onClick={() => {
+                      this.props.router.push(nextLinkPath);
+                    }}
+                    data-cy="connect-github-continue"
+                  >
+                    <FormattedMessage id="Pagination.Next" defaultMessage="Next" /> &nbsp;→
+                  </StyledButton>
+                </Grid>
+              </Box>
+              <GithubRepositoriesFAQ
+                display={['none', 'block']}
+                width={1}
+                flexGrow={1}
+                alignSelf="flex-start"
+                position="sticky"
+                top={0}
+                pt={3}
+              />
+            </Grid>
           </Flex>
         )}
       </Flex>

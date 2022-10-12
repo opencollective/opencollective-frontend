@@ -46,7 +46,7 @@ const GithubRepositories = ({ repositories, setGithubInfo, ...fieldProps }) => {
 
   return (
     <Fragment>
-      <StyledCard maxWidth={[300, 448, 500]}>
+      <StyledCard>
         {showSearch && (
           <Container
             display="flex"
