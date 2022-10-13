@@ -1618,7 +1618,7 @@
   "Host.VirtualCards.AutoPause.Description": "Automatically suspend cards with pending receipts after 31 days and resume after all receipts are submitted.",
   "Host.VirtualCards.AutoPause.Title": "Automatically suspend cards",
   "Host.VirtualCards.EditCard.Error": "Error editing card: {error}",
-  "Host.VirtualCards.List.Description": "Make payments easier by creating virtual cards on Privacy.com and linking them to Collectives. One Collective can have multiple virtual cards. <learnMoreLink>Learn more</learnMoreLink>",
+  "Host.VirtualCards.List.Description": "Make payments easier by creating virtual cards. One Collective can have multiple virtual cards. <learnMoreLink>Learn more</learnMoreLink>",
   "Host.VirtualCards.Policy.Placeholder": "E.g. deadlines to submit receipts, allowed charges, limits, or who to contact with questions.",
   "Host.VirtualCards.Policy.Save": "Save Policy",
   "Host.VirtualCards.Policy.Title": "Virtual Card Policy",

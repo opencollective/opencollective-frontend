@@ -1618,7 +1618,7 @@
   "Host.VirtualCards.AutoPause.Description": "Suspender automáticamente las tarjetas con recibos pendientes pasados los 31 días y reanudarlas cuando se presenten todos los recibos.",
   "Host.VirtualCards.AutoPause.Title": "Suspender automáticamente las tarjetas",
   "Host.VirtualCards.EditCard.Error": "Error editando la tarjeta: {error}",
-  "Host.VirtualCards.List.Description": "Facilita los pagos creando tarjetas virtuales en Privacy.com y vinculándolas a Colectivos. Un Colectivo puede tener múltiples tarjetas virtuales. <learnMoreLink>Más información</learnMoreLink>",
+  "Host.VirtualCards.List.Description": "Make payments easier by creating virtual cards. One Collective can have multiple virtual cards. <learnMoreLink>Learn more</learnMoreLink>",
   "Host.VirtualCards.Policy.Placeholder": "P. ej., plazos para presentar los recibos, gastos permitidos, límites o a quién dirigirse en caso de preguntas.",
   "Host.VirtualCards.Policy.Save": "Política de Ahorro",
   "Host.VirtualCards.Policy.Title": "Política de Tarjetas Virtuales",
