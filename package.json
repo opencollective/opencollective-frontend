@@ -98,6 +98,7 @@
     "redis": "3.1.2",
     "sanitize-html": "2.7.2",
     "slugify": "1.6.5",
+    "spdx-license-list": "^6.6.0",
     "speakeasy": "2.0.0",
     "styled-components": "5.3.6",
     "styled-system": "5.1.5",

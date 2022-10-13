@@ -11814,7 +11814,7 @@ type Mutation {
     """
     Whether to trigger the automated approval for Open Source collectives with GitHub.
     """
-    automateApprovalWithGithub: Boolean = false
+    automateApprovalWithGithub: Boolean = false @deprecated(reason: "2022-10-12: This is now automated")
 
     """
     A message to attach for the host to review the application

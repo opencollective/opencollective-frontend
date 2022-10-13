@@ -72,24 +72,25 @@ const formValues = {
   collective: {
     name: '',
     slug: '',
-    description: '',
   },
   applicationData: {
-    githubHandle: '',
+    repositoryUrl: '',
+    licenseSpdxId: null,
+    linksToLicenses: '',
+    amountOfMembers: '',
+    linksToPreviousEvents: '',
   },
   termsOfServiceOC: false,
   inviteMembers: [],
 };
 
-const formatGithubRepoName = repoName => {
+const formatNameFromSlug = repoName => {
   // replaces dash and underscore with space, then capitalises the words
   return repoName.replace(/[-_]/g, ' ').replace(/(?:^|\s)\S/g, words => words.toUpperCase());
 };
 
 const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
   const [checkedTermsOfFiscalSponsorship, setCheckedTermsOfFiscalSponsorship] = useState(false);
-  const [githubInfo, setGithubInfo] = useState(null);
-
   const [initialValues, setInitialValues] = useState(formValues);
 
   const intl = useIntl();
@@ -145,18 +146,25 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
       )}
       {step === 'pick-repo' && (
         <ConnectGithub
-          setGithubInfo={github => {
+          setGithubInfo={({ handle, licenseSpdxId } = {}) => {
+            const [owner, repo] = handle?.split('/') || [];
+
             setInitialValues({
               ...initialValues,
               collective: {
                 ...initialValues.collective,
-                ...(github && { name: formatGithubRepoName(github.repo), slug: github.repo }),
+                name: handle ? formatNameFromSlug(repo ?? owner) : '',
+                slug: handle ? repo ?? owner : '',
+              },
+              applicationData: {
+                ...initialValues.applicationData,
+                repositoryUrl: handle ? `https://github.com/${handle}` : '',
+                licenseSpdxId,
               },
             });
-            setGithubInfo(github);
           }}
           router={router}
-          githubInfo={githubInfo}
+          nextDisabled={!initialValues.applicationData.repositoryUrl}
         />
       )}
       {step === 'form' && (
@@ -169,7 +177,6 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
           host={hostData?.account}
           loadingCollective={loadingCollective}
           canApplyWithCollective={canApplyWithCollective && !hasHost}
-          githubInfo={githubInfo}
         />
       )}
       {step === 'success' && <YourInitiativeIsNearlyThere />}

@@ -8,7 +8,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective.lib';
-import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
 
 import Avatar from '../Avatar';
@@ -73,11 +72,6 @@ const messages = defineMessages({
   },
 });
 
-const formatGithubRepoName = repoName => {
-  // replaces dash and underscore with space, then capitalises the words
-  return repoName.replace(/[-_]/g, ' ').replace(/(?:^|\s)\S/g, words => words.toUpperCase());
-};
-
 const LABEL_STYLES = { fontWeight: 500, fontSize: '14px', lineHeight: '17px' };
 
 class CreateCollectiveForm extends React.Component {
@@ -88,7 +82,6 @@ class CreateCollectiveForm extends React.Component {
     onSubmit: PropTypes.func,
     intl: PropTypes.object.isRequired,
     onChange: PropTypes.func,
-    github: PropTypes.object,
     router: PropTypes.object.isRequired,
     popularTags: PropTypes.arrayOf(PropTypes.string),
     loggedInUser: PropTypes.object,
@@ -97,22 +90,19 @@ class CreateCollectiveForm extends React.Component {
   hasHostTerms() {
     if (!this.props.host) {
       return false;
-    } else if (this.props.host.legacyId === OPENSOURCE_COLLECTIVE_ID) {
-      // Already checked on previous step (Github flow)
-      return false;
     } else {
       return Boolean(this.props.host.termsUrl);
     }
   }
 
   render() {
-    const { intl, error, host, loading, github, popularTags, loggedInUser } = this.props;
+    const { intl, error, host, loading, popularTags, loggedInUser } = this.props;
     const hasHostTerms = this.hasHostTerms();
 
     const initialValues = {
-      name: github ? formatGithubRepoName(github.repo) : '',
+      name: '',
       description: '',
-      slug: github ? github.repo : '',
+      slug: '',
       message: '',
       tos: false,
       hostTos: false,

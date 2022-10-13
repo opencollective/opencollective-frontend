@@ -5,11 +5,10 @@ import { Star } from '@styled-icons/fa-solid/Star';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import StyledRadioList from '../StyledRadioList';
 import { P, Span } from '../Text';
 
-const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
-  const { type, login } = value.owner;
+const RepositoryEntry = ({ radio, value }) => {
+  const { type } = value.owner;
   const repositoryTypeName = type === 'User' ? 'Personal Repo' : 'Organization Repo';
 
   return (
@@ -60,38 +59,6 @@ const RepositoryEntry = ({ radio, value, checked, changeRepoInfo }) => {
           {value.description}
         </P>
       )}
-      {checked && type === 'Organization' && (
-        <Container width={1} mx={4} mt={3} mb={1} px={2}>
-          <StyledRadioList
-            id="useType"
-            name="useType"
-            options={['repository', 'organization']}
-            onChange={({ key }) => {
-              changeRepoInfo(key, value);
-            }}
-            data-cy="use-type-radio"
-          >
-            {props => {
-              return (
-                <Container cursor="pointer">
-                  {props.value === 'repository' && (
-                    <Container fontWeight="400" fontSize="1.2rem" mb={2}>
-                      <Span mr={3}>{props.radio}</Span>
-                      Create a collective for the repository ({value.name})
-                    </Container>
-                  )}
-                  {props.value === 'organization' && (
-                    <Container fontWeight="400" fontSize="1.2rem">
-                      <Span mr={3}>{props.radio}</Span>
-                      Create a collective for the organization ({login})
-                    </Container>
-                  )}
-                </Container>
-              );
-            }}
-          </StyledRadioList>
-        </Container>
-      )}
     </Fragment>
   );
 };
@@ -106,7 +73,6 @@ RepositoryEntry.propTypes = {
     name: PropTypes.string,
   }),
   checked: PropTypes.bool,
-  changeRepoInfo: PropTypes.func.isRequired,
 };
 
 export default RepositoryEntry;

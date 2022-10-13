@@ -7,11 +7,18 @@ import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Form, Formik } from 'formik';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import spdxLicenses from 'spdx-license-list';
 
 import { suggestSlug } from '../../lib/collective.lib';
 import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
-import { requireFields, verifyChecked, verifyEmailPattern, verifyFieldLength } from '../../lib/form-utils';
+import {
+  requireFields,
+  verifyChecked,
+  verifyEmailPattern,
+  verifyFieldLength,
+  verifyURLPattern,
+} from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -29,8 +36,11 @@ import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledLink from '../StyledLink';
+import StyledSelect from '../StyledSelect';
 import StyledTextarea from '../StyledTextarea';
-import { H1, H4, P } from '../Text';
+import { H1, H4, P, Span } from '../Text';
+
+import CollapseSection from './CollapseSection';
 
 const createCollectiveMutation = gql`
   mutation CreateCollective(
@@ -40,7 +50,6 @@ const createCollectiveMutation = gql`
     $message: String
     $applicationData: JSON
     $inviteMembers: [InviteMemberInput]
-    $automateApprovalWithGithub: Boolean
   ) {
     createCollective(
       collective: $collective
@@ -49,7 +58,6 @@ const createCollectiveMutation = gql`
       message: $message
       applicationData: $applicationData
       inviteMembers: $inviteMembers
-      automateApprovalWithGithub: $automateApprovalWithGithub
     ) {
       id
       slug
@@ -91,7 +99,6 @@ const applyToHostMutation = gql`
 `;
 
 export const APPLICATION_DATA_AMOUNT_FIELDS = ['totalAmountRaised', 'totalAmountToBeRaised'];
-const LABEL_STYLES = { fontWeight: 500, fontSize: '14px', lineHeight: '17px' };
 
 const messages = defineMessages({
   nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: 'Collective name' },
@@ -125,9 +132,71 @@ const messages = defineMessages({
     id: 'createCollective.form.slugLabel',
     defaultMessage: 'Set your URL',
   },
-  collectiveDescription: {
-    id: 'createCollective.form.descriptionLabel',
-    defaultMessage: 'What does your Collective do?',
+  repositoryUrl: {
+    id: 'HostApplication.form.RepositoryUrlLabel',
+    defaultMessage: 'Link your Repository or Organisation',
+  },
+  repositoryUrlHint: {
+    id: 'HostApplication.form.RepositoryUrlHint',
+    defaultMessage: 'You can link your github/gitlab etc.',
+  },
+  repositoryLicense: {
+    id: 'HostApplication.form.license',
+    defaultMessage: 'License',
+  },
+  tellUsMoreLabel: {
+    id: 'HostApplication.form.tellUsMoreLabel',
+    defaultMessage: "Tell us a little about your project, what you're working on and what you need from us.",
+  },
+  tellUsMorePlaceholder: {
+    id: 'HostApplication.form.tellUsMorePlaceHolder',
+    defaultMessage: 'Please include all the info you think is valuable of your Collective',
+  },
+  tellUsMoreHelpText: {
+    id: 'HostApplication.form.tellUsMoreHelpText',
+    defaultMessage: 'We want to know more about you and how we can help you.',
+  },
+  linksToPreviousEvents: {
+    id: 'HostApplication.form.linksToPreviousEvents',
+    defaultMessage: 'Links to previous events (if any)',
+  },
+  linksToPreviousEventsPlaceholder: {
+    id: 'HostApplication.form.linksToPreviousEventsPlaceholder',
+    defaultMessage: 'Enter URL of previous events.',
+  },
+  linksToPreviousEventsHelpText: {
+    id: 'HostApplication.form.linksToPreviousEventsHelpText',
+    defaultMessage:
+      'YouTube, Discord, Disqus, Meetup, Eventbrite events etc are all welcome. We just want to understand your community presence.',
+  },
+  amountOfMembers: {
+    id: 'HostApplication.form.amountOfMembers',
+    defaultMessage: 'How many members do you have?',
+  },
+  linksToLicenses: {
+    id: 'HostApplication.form.linksToLicenses',
+    defaultMessage: 'Link your license(s)',
+  },
+  linksToLicensesPlaceholder: {
+    id: 'HostApplication.form.linksToLicensesPlaceholder',
+    defaultMessage: 'You can add the links to your secondary or additional licenses here',
+  },
+  linksToLicensesHelpText: {
+    id: 'HostApplication.form.linksToLicensesHelpText',
+    defaultMessage: 'If you have more than one license, you can link them here',
+  },
+  publicInformation: {
+    id: 'HostApplication.form.publicInformation',
+    defaultMessage:
+      'This information is public. Please do not add any personal information such as names or addresses in this field.',
+  },
+  aboutYourCommunityTitle: {
+    id: 'HostApplication.form.aboutYourCommunity',
+    defaultMessage: 'About your community {optional} {padlock}',
+  },
+  aboutYourCodeTitle: {
+    id: 'HostApplication.form.code',
+    defaultMessage: 'About your Code {optional} {padlock}',
   },
 });
 
@@ -146,7 +215,6 @@ const ApplicationForm = ({
   router,
   collective: collectiveWithSlug,
   host,
-  githubInfo,
 }) => {
   const intl = useIntl();
   const [submitApplication, { loading: submitting, error }] = useApplicationMutation(canApplyWithCollective);
@@ -157,12 +225,13 @@ const ApplicationForm = ({
       'user.email',
       'collective.name',
       'collective.slug',
+      'message',
       'collective.description',
     ]);
 
     verifyEmailPattern(errors, values, 'user.email');
-    verifyFieldLength(intl, errors, values, 'collective.description', 1, 250);
-
+    verifyFieldLength(intl, errors, values, 'collective.description', 1, 150);
+    verifyURLPattern(errors, values, 'applicationData.repositoryUrl');
     verifyChecked(errors, values, 'termsOfServiceOC');
 
     return errors;
@@ -172,17 +241,16 @@ const ApplicationForm = ({
       collective: {
         ...(canApplyWithCollective
           ? { id: collectiveWithSlug.id, slug: collectiveWithSlug.slug }
-          : { ...collective, githubHandle: githubInfo?.handle }),
+          : { ...collective, repositoryUrl: applicationData.repositoryUrl }),
       },
       host: { legacyId: OPENSOURCE_COLLECTIVE_ID },
       user,
-      applicationData: { ...applicationData, githubHandle: githubInfo?.handle },
+      applicationData,
       inviteMembers: inviteMembers.map(invite => ({
         ...invite,
         memberAccount: { legacyId: invite.memberAccount.id },
       })),
       message,
-      ...(!canApplyWithCollective && { automateApprovalWithGithub: githubInfo ? true : false }),
     };
 
     const response = await submitApplication({ variables });
@@ -202,6 +270,15 @@ const ApplicationForm = ({
     // Scroll the user to the top in order to see the error message
     window.scrollTo(0, 0);
   }
+
+  // Turn licenses into an array and sort them on label/name
+  const spdxLicenseList = Object.keys(spdxLicenses)
+    .map(key => ({
+      label: spdxLicenses[key].name,
+      value: key,
+      key,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   return (
     <React.Fragment>
@@ -228,12 +305,12 @@ const ApplicationForm = ({
             </H1>
             <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
               <FormattedMessage
-                id="HostApplication.applicationForm.subheading"
+                id="HostApplication.form.subheading"
                 defaultMessage="Introduce your Collective, please incude as much context as possible so we can give you the best service we can! Have doubts? {faqLink}"
                 values={{
                   faqLink: (
                     <StyledLink href="https://docs.oscollective.org/faq/general" openInNewTab color="purple.500">
-                      <FormattedMessage id="HostApplication.applicationForm.readFaqs" defaultMessage="Read our FAQs" />
+                      <FormattedMessage id="HostApplication.form.readFaqs" defaultMessage="Read our FAQs" />
                     </StyledLink>
                   ),
                 }}
@@ -242,8 +319,8 @@ const ApplicationForm = ({
           </Box>
         </Flex>
       </Flex>
-      <Flex flexDirection={['column', 'row']} alignItems={['center', 'flex-start']} justifyContent="center">
-        <Flex flexDirection="column" alignItems="center" justifyContent="center">
+      <Flex justifyContent="center">
+        <Flex flexDirection="column" flex={'1'} maxWidth="993px">
           {error && (
             <Flex alignItems="center" justifyContent="center">
               <MessageBox type="error" withIcon mb={[1, 3]}>
@@ -293,46 +370,43 @@ const ApplicationForm = ({
                     <Container
                       justifyContent="center"
                       flexDirection="column"
-                      alignItems={['center', 'flex-start']}
                       mb={4}
                       mt={[3, 0]}
                       border="1px solid #DCDEE0"
-                      padding="32px 16px"
+                      padding={['16px', '32px']}
                       display="flex"
                       borderRadius="8px"
                     >
-                      <Box width={['256px', '484px', '664px']}>
-                        <Flex alignItems="center" justifyContent="stretch" gap={6}>
-                          <H4 fontSize="18px" lineHeight="24px" color="black.900" mb={2}>
+                      <Box mb={3}>
+                        <Flex alignItems="center" justifyContent="stretch" gap={6} mb={3}>
+                          <H4 fontSize="18px" lineHeight="24px" color="black.900">
                             <FormattedMessage
-                              id="HostApplication.applicationForm.mainInfo"
+                              id="HostApplication.form.mainInfo"
                               defaultMessage="Main info {padlock}"
                               values={{
-                                padlock: <Lock size="12px" color="#9D9FA3" />,
+                                padlock: <Lock size="16px" lineHeight="24px" color="#75777A" />,
                               }}
                             />
                           </H4>
                           <StyledHr flex="1" />
                         </Flex>
-                        <P fontSize="12px" lineHeight="16px" color="black.600">
+                        <P fontSize="14px" lineHeight="20px" color="black.700">
                           <FormattedMessage
-                            id="HostApplication.applicationForm.privateInformation"
-                            defaultMessage="This information is private. We only use it to check your eligibility and legitimacy."
+                            id="HostApplication.form.publicInformation"
+                            defaultMessage="This information is public. Please do not add any personal information such as names or addresses in this field."
                           />
                         </P>
                       </Box>
                       {!LoggedInUser && (
-                        <Flex flexDirection={['column', 'row']}>
-                          <Box mr={[null, 3]}>
+                        <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} py={2}>
+                          <Box>
                             <StyledInputFormikField
                               label={intl.formatMessage(messages.name)}
-                              labelFontSize="13px"
-                              labelColor="#4E5052"
-                              labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                              labelFontSize="16px"
+                              labelProps={{ fontWeight: '600' }}
                               disabled={!!LoggedInUser}
                               name="user.name"
                               htmlFor="name"
-                              width={['256px', '234px', '324px']}
                               my={2}
                               required
                             >
@@ -341,17 +415,15 @@ const ApplicationForm = ({
                               )}
                             </StyledInputFormikField>
                           </Box>
-                          <Box my={2}>
+                          <Box>
                             <StyledInputFormikField
                               label={intl.formatMessage(messages.email)}
-                              labelFontSize="13px"
-                              labelColor="#4E5052"
-                              labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                              labelFontSize="16px"
+                              labelProps={{ fontWeight: '600' }}
                               disabled={!!LoggedInUser}
                               name="user.email"
                               htmlFor="email"
                               type="email"
-                              width={['256px', '234px', '324px']}
                               required
                             >
                               {({ field }) => (
@@ -365,115 +437,252 @@ const ApplicationForm = ({
                               />
                             </P>
                           </Box>
-                        </Flex>
+                        </Grid>
                       )}
                       {!canApplyWithCollective && (
-                        <Flex flexDirection={['column', 'row']}>
-                          <Box my={2} mr={[null, 3]}>
+                        <React.Fragment>
+                          <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} py={2}>
+                            <Box>
+                              <StyledInputFormikField
+                                label={intl.formatMessage(messages.nameLabel)}
+                                labelFontSize="16px"
+                                labelProps={{ fontWeight: '600' }}
+                                name="collective.name"
+                                htmlFor="initiativeName"
+                                required
+                                onChange={handleSlugChange}
+                              >
+                                {({ field }) => (
+                                  <StyledInput type="text" placeholder="e.g Agora Collective" px="7px" {...field} />
+                                )}
+                              </StyledInputFormikField>
+                            </Box>
+                            <Box>
+                              <StyledInputFormikField
+                                label={intl.formatMessage(messages.slug)}
+                                helpText={<FormattedMessage defaultMessage="This can be edited later" />}
+                                labelFontSize="16px"
+                                labelProps={{ fontWeight: '600' }}
+                                name="collective.slug"
+                                htmlFor="slug"
+                                required
+                              >
+                                {({ field }) => (
+                                  <StyledInputGroup
+                                    prepend="opencollective.com/"
+                                    type="url"
+                                    placeholder="agora"
+                                    {...field}
+                                    onChange={e => setFieldValue('collective.slug', e.target.value)}
+                                    prependProps={{ color: '#9D9FA3' }}
+                                  />
+                                )}
+                              </StyledInputFormikField>
+                              <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
+                                <FormattedMessage
+                                  id="createCollective.form.suggestedLabel"
+                                  defaultMessage="Suggested"
+                                />
+                              </P>
+                            </Box>
+                          </Grid>
+                          <Box>
                             <StyledInputFormikField
-                              label={intl.formatMessage(messages.nameLabel)}
-                              labelFontSize="13px"
-                              labelColor="#4E5052"
-                              labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                              name="collective.name"
-                              htmlFor="initiativeName"
+                              name="collective.description"
+                              htmlFor="description"
+                              labelFontSize="16px"
+                              labelProps={{ fontWeight: '600' }}
+                              label={intl.formatMessage(messages.descriptionLabel)}
                               required
-                              onChange={handleSlugChange}
-                              width={['256px', '234px', '324px']}
+                              data-cy="ccf-form-description"
                             >
                               {({ field }) => (
-                                <StyledInput type="text" placeholder="Agora Collective" px="7px" {...field} />
-                              )}
-                            </StyledInputFormikField>
-                          </Box>
-                          <Box width={['256px', '234px', '324px']} my={2}>
-                            <StyledInputFormikField
-                              label={intl.formatMessage(messages.slug)}
-                              helpText={<FormattedMessage defaultMessage="This can be edited later" />}
-                              labelFontSize="13px"
-                              labelColor="#4E5052"
-                              labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                              name="collective.slug"
-                              htmlFor="slug"
-                              required
-                            >
-                              {({ field }) => (
-                                <StyledInputGroup
-                                  prepend="opencollective.com/"
-                                  type="url"
-                                  placeholder="agora"
+                                <StyledTextarea
                                   {...field}
-                                  onChange={e => setFieldValue('collective.slug', e.target.value)}
-                                  px="7px"
-                                  prependProps={{ color: '#9D9FA3', fontSize: '13px', lineHeight: '16px' }}
+                                  rows={3}
+                                  width="100%"
+                                  maxLength={150}
+                                  showCount
+                                  placeholder={intl.formatMessage(messages.descriptionPlaceholder)}
                                 />
                               )}
                             </StyledInputFormikField>
-                            <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                              <FormattedMessage id="createCollective.form.suggestedLabel" defaultMessage="Suggested" />
+                            <P fontSize="13px" lineHeight="20px" color="black.600" mt="6px">
+                              {intl.formatMessage(messages.descriptionHint)}
                             </P>
                           </Box>
-                        </Flex>
+                        </React.Fragment>
                       )}
-                      <Box width={['256px', '484px', '663px']} my={2}>
-                        <StyledInputFormikField
-                          label={intl.formatMessage(messages.descriptionLabel)}
-                          labelFontSize="13px"
-                          labelColor="#4E5052"
-                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          name="collective.description"
-                          htmlFor="initiativeDescription"
-                          required
-                          data-cy="ccf-form-description"
-                        >
-                          {({ field }) => (
-                            <StyledTextarea
-                              placeholder={intl.formatMessage(messages.descriptionPlaceholder)}
-                              {...field}
-                              px="7px"
-                            />
-                          )}
-                        </StyledInputFormikField>
-                        <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                          {intl.formatMessage(messages.descriptionHint)}
-                        </P>
-                      </Box>
 
-                      <Box width={['256px', '484px', '664px']} mt={20}>
-                        <Flex alignItems="center" justifyContent="stretch" gap={6}>
-                          <H4 fontSize="18px" lineHeight="24px" color="black.900" mb={2}>
+                      <CollapseSection
+                        title={intl.formatMessage(messages.aboutYourCodeTitle, {
+                          padlock: <Lock size="16px" color="#75777A" />,
+                          optional: (
+                            <Span fontWeight={400} color="black.700">
+                              (<FormattedMessage id="forms.optional" defaultMessage="Optional" />)
+                            </Span>
+                          ),
+                        })}
+                        imageSrc="/static/images/night-sky.png"
+                        subtitle={intl.formatMessage(messages.publicInformation)}
+                      >
+                        <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} pt={2}>
+                          <Box>
+                            <StyledInputFormikField
+                              label={intl.formatMessage(messages.repositoryUrl)}
+                              labelFontSize="16px"
+                              labelProps={{ fontWeight: '600' }}
+                              name="applicationData.repositoryUrl"
+                              htmlFor="repositoryUrl"
+                            >
+                              {({ field }) => (
+                                <StyledInputGroup
+                                  type="url"
+                                  placeholder="https://github.com"
+                                  {...field}
+                                  onChange={e => setFieldValue('applicationData.repositoryUrl', e.target.value)}
+                                />
+                              )}
+                            </StyledInputFormikField>
+                            <P fontSize="13px" lineHeight="20px" color="black.600" mt="6px">
+                              <FormattedMessage
+                                id="HostApplication.repositoryUrlHint"
+                                defaultMessage="You can link your github/gitlab etc."
+                              />
+                            </P>
+                          </Box>
+
+                          <StyledInputFormikField
+                            label={intl.formatMessage(messages.repositoryLicense)}
+                            labelFontSize="16px"
+                            labelProps={{ fontWeight: '600' }}
+                            name="applicationData.licenseSpdxId"
+                            htmlFor="licenseSpdxId"
+                          >
+                            {({ field }) => {
+                              return (
+                                <StyledSelect
+                                  inputId={field.id}
+                                  options={spdxLicenseList}
+                                  {...field}
+                                  value={spdxLicenseList.find(option => option.value === field.value)}
+                                  onChange={({ value }) => {
+                                    setFieldValue('applicationData.licenseSpdxId', value);
+                                  }}
+                                />
+                              );
+                            }}
+                          </StyledInputFormikField>
+                        </Grid>
+
+                        <Box mt={20}>
+                          <StyledInputFormikField
+                            name="applicationData.linksToLicenses"
+                            htmlFor="linksToLicenses"
+                            labelFontSize="16px"
+                            labelProps={{ fontWeight: '600' }}
+                            label={intl.formatMessage(messages.linksToLicenses)}
+                          >
+                            {({ field }) => (
+                              <StyledTextarea
+                                {...field}
+                                rows={4}
+                                placeholder={intl.formatMessage(messages.linksToLicensesPlaceholder)}
+                              />
+                            )}
+                          </StyledInputFormikField>
+                          <P fontSize="13px" lineHeight="20px" color="black.700" mt={2}>
+                            <FormattedMessage {...messages.linksToLicensesHelpText} />
+                          </P>
+                        </Box>
+                      </CollapseSection>
+
+                      <CollapseSection
+                        title={intl.formatMessage(messages.aboutYourCommunityTitle, {
+                          padlock: <Lock size="16px" color="#75777A" />,
+                          optional: (
+                            <Span fontWeight={400} color="black.700">
+                              (<FormattedMessage id="forms.optional" defaultMessage="Optional" />)
+                            </Span>
+                          ),
+                        })}
+                        imageSrc="/static/images/community.png"
+                        subtitle={intl.formatMessage(messages.publicInformation)}
+                      >
+                        <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} pt={2}>
+                          <Box>
+                            <StyledInputFormikField
+                              label={intl.formatMessage(messages.amountOfMembers)}
+                              labelFontSize="16px"
+                              labelProps={{ fontWeight: '600' }}
+                              name="applicationData.amountOfMembers"
+                              htmlFor="amountOfMembers"
+                            >
+                              {({ field }) => (
+                                <StyledInputGroup
+                                  placeholder="0-10"
+                                  {...field}
+                                  onChange={e => setFieldValue('applicationData.amountOfMembers', e.target.value)}
+                                />
+                              )}
+                            </StyledInputFormikField>
+                          </Box>
+                        </Grid>
+
+                        <Box mt={20}>
+                          <StyledInputFormikField
+                            name="applicationData.previousEvents"
+                            htmlFor="previousEvents"
+                            labelFontSize="16px"
+                            labelProps={{ fontWeight: '600' }}
+                            label={intl.formatMessage(messages.linksToPreviousEvents)}
+                          >
+                            {({ field }) => (
+                              <StyledTextarea
+                                {...field}
+                                rows={4}
+                                placeholder={intl.formatMessage(messages.linksToPreviousEventsPlaceholder)}
+                              />
+                            )}
+                          </StyledInputFormikField>
+                          <P fontSize="13px" lineHeight="20px" color="black.700" mt={2}>
+                            <FormattedMessage {...messages.linksToPreviousEventsHelpText} />
+                          </P>
+                        </Box>
+                      </CollapseSection>
+
+                      <Box mt={32} mb={3}>
+                        <Flex alignItems="center" justifyContent="stretch" gap={6} mb={3}>
+                          <H4 fontSize="18px" lineHeight="24px" color="black.900">
                             <FormattedMessage
-                              id="HostApplication.applicationForm.team"
+                              id="HostApplication.form.team"
                               defaultMessage="Your team {padlock}"
                               values={{
-                                padlock: <Lock size="12px" color="#9D9FA3" />,
+                                padlock: <Lock size="16px" color="#75777A" />,
                               }}
                             />
                           </H4>
                           <StyledHr flex="1" />
                         </Flex>
-                        <P fontSize="12px" lineHeight="16px" color="black.600">
+                        <P fontSize="14px" lineHeight="20px" color="black.700">
                           <FormattedMessage
-                            id="HostApplication.applicationForm.privateInformation"
-                            defaultMessage="This information is private. We only use it to check your eligibility and legitimacy."
+                            id="HostApplication.form.publicInformation"
+                            defaultMessage="This information is public. Please do not add any personal information such as names or addresses in this field."
                           />
                         </P>
                       </Box>
 
-                      <Box width={['256px', '484px', '663px']} my={2}>
+                      <Box my={2}>
                         <H4 fontSize="16px" lineHeight="24px" color="black.800" mb={0}>
                           <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
-                        </H4>
-
-                        {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
-                          <Flex mt={1} width="100%">
-                            <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
+                          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                            <Span fontWeight="300" fontSize="11px" color="black.700" letterSpacing="0.06em">
                               {` (${1 + values.inviteMembers?.length}/${
                                 host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins
                               })`}
-                            </P>
-                          </Flex>
-                        )}
+                            </Span>
+                          )}
+                        </H4>
 
                         <Flex width="100%" flexWrap="wrap" data-cy="profile-card">
                           {LoggedInUser ? (
@@ -531,41 +740,37 @@ const ApplicationForm = ({
                           </MessageBox>
                         )}
                       </Box>
-                      <Box width={['256px', '484px', '663px']} my={2}>
+                      <Box mt={24}>
                         <StyledInputFormikField
                           name="message"
                           htmlFor="apply-create-message"
-                          labelProps={LABEL_STYLES}
-                          required={false}
-                          mt={24}
-                          label={
-                            <FormattedMessage
-                              id="ApplyToHost.WriteMessage"
-                              defaultMessage="Message to the Fiscal Host"
-                            />
-                          }
+                          required={true}
+                          labelFontSize="16px"
+                          labelProps={{ fontWeight: '600' }}
+                          label={intl.formatMessage(messages.tellUsMoreLabel)}
+                          data-cy="ccf-form-message"
                         >
                           {({ field }) => (
-                            <StyledTextarea {...field} width="100%" minHeight={76} maxLength={3000} showCount />
+                            <StyledTextarea
+                              {...field}
+                              rows={6}
+                              placeholder={intl.formatMessage(messages.tellUsMorePlaceholder)}
+                            />
                           )}
                         </StyledInputFormikField>
+                        <P fontSize="13px" lineHeight="20px" color="black.700" mt={2}>
+                          <FormattedMessage {...messages.tellUsMoreHelpText} />
+                        </P>
                       </Box>
 
-                      <Box width={['256px', '484px', '663px']} mb={2} mt="20px">
+                      <Box mb={2} mt={40}>
                         <StyledHr />
                       </Box>
-                      <Container
-                        width={['256px', '484px', '663px']}
-                        display="flex"
-                        alignSelf="flex-start"
-                        alignItems="center"
-                        my={2}
-                      >
+                      <Container display="flex" alignSelf="flex-start" alignItems="center" my={2}>
                         <Box mr={3}>
                           <StyledInputFormikField name="termsOfServiceOC" required>
                             {({ field }) => (
                               <StyledCheckbox
-                                background="#396C6F"
                                 size="16px"
                                 name={field.name}
                                 required={field.required}
@@ -580,6 +785,7 @@ const ApplicationForm = ({
                                       values={{
                                         TOSLink: getI18nLink({
                                           href: '/tos',
+                                          color: '#6F5AFA',
                                           openInNewTab: true,
                                           onClick: e => e.stopPropagation(), // don't check the checkbox when clicking on the link
                                         }),
@@ -594,34 +800,36 @@ const ApplicationForm = ({
                       </Container>
                     </Container>
 
-                    <Grid gridTemplateColumns={['1fr', '1fr 1fr']} gridGap={'32px'} my={4}>
-                      <StyledButton
-                        buttonStyle="purpleSecondary"
-                        buttonSize="large"
-                        textAlign="center"
-                        onClick={() => {
-                          setInitialValues({ ...initialValues, ...values });
-                          window && window.history.back();
-                        }}
-                      >
-                        <ArrowLeft2 size="14px" />
-                        &nbsp;
-                        <FormattedMessage id="Back" defaultMessage="Back" />
-                      </StyledButton>
-                      <StyledButton
-                        type="submit"
-                        textAlign="center"
-                        buttonSize="large"
-                        buttonStyle="purple"
-                        onSubmit={handleSubmit}
-                        loading={submitting}
-                        data-cy="ccf-form-submit"
-                      >
-                        <FormattedMessage id="actions.submitApplication" defaultMessage="Submit application" />
-                        &nbsp;
-                        <ArrowRight2 size="14px" />
-                      </StyledButton>
-                    </Grid>
+                    <Flex justifyContent="center" mb={48}>
+                      <Grid gridTemplateColumns={['1fr', '1fr 1fr']} gridGap={'32px'} maxWidth={672} px={48} flex="1">
+                        <StyledButton
+                          buttonStyle="purpleSecondary"
+                          buttonSize="large"
+                          textAlign="center"
+                          onClick={() => {
+                            setInitialValues({ ...initialValues, ...values });
+                            window && window.history.back();
+                          }}
+                        >
+                          <ArrowLeft2 size="14px" />
+                          &nbsp;
+                          <FormattedMessage id="Back" defaultMessage="Back" />
+                        </StyledButton>
+                        <StyledButton
+                          type="submit"
+                          textAlign="center"
+                          buttonSize="large"
+                          buttonStyle="purple"
+                          onSubmit={handleSubmit}
+                          loading={submitting}
+                          data-cy="ccf-form-submit"
+                        >
+                          <FormattedMessage id="actions.submitApplication" defaultMessage="Submit application" />
+                          &nbsp;
+                          <ArrowRight2 size="14px" />
+                        </StyledButton>
+                      </Grid>
+                    </Flex>
                   </Form>
                 );
               }}
@@ -654,7 +862,6 @@ ApplicationForm.propTypes = {
   loadingCollective: PropTypes.bool,
   canApplyWithCollective: PropTypes.bool,
   router: PropTypes.object,
-  githubInfo: PropTypes.object,
 };
 
 export default withRouter(ApplicationForm);

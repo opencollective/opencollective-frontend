@@ -200,7 +200,7 @@ Cypress.Commands.add('createHostedCollectiveV2', ({ email = defaultTestUserEmail
       operationName: 'createCollective',
       query: `
           mutation createCollective($collective: CollectiveCreateInput!, $host: AccountReferenceInput!, $testPayload: JSON) {
-            createCollective(collective: $collective, host: $host, automateApprovalWithGithub: true, testPayload: $testPayload) {
+            createCollective(collective: $collective, host: $host, testPayload: $testPayload) {
               id
               slug
               name
@@ -211,13 +211,12 @@ Cypress.Commands.add('createHostedCollectiveV2', ({ email = defaultTestUserEmail
         `,
       variables: {
         host: { slug: 'opensourceorg' },
-        automateApprovalWithGithub: true,
         testPayload: testPayload || null,
         collective: {
           name: 'TestCollective',
           slug: randomSlug(),
           description: 'A test collective',
-          githubHandle: 'opencollective',
+          repositoryUrl: 'https://github.com/opencollective',
         },
       },
     }).then(({ body }) => {

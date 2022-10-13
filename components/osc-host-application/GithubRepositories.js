@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { escapeInput } from '../../lib/utils';
 
 import Container from '../Container';
+import { Box } from '../Grid';
 import StyledCard from '../StyledCard';
 import StyledInput from '../StyledInput';
 import StyledRadioList from '../StyledRadioList';
@@ -21,6 +22,7 @@ const SearchIcon = styled(Search)`
 
 const RepositoryEntryContainer = styled(Container)`
   cursor: pointer;
+  border-bottom: 1px solid ${themeGet('colors.black.200')};
   &:hover {
     background: ${themeGet('colors.black.50')};
   }
@@ -46,7 +48,7 @@ const GithubRepositories = ({ repositories, setGithubInfo, ...fieldProps }) => {
 
   return (
     <Fragment>
-      <StyledCard maxWidth={[300, 448, 500]}>
+      <StyledCard>
         {showSearch && (
           <Container
             display="flex"
@@ -78,47 +80,27 @@ const GithubRepositories = ({ repositories, setGithubInfo, ...fieldProps }) => {
             </H4>
           </Container>
         )}
-
-        <StyledRadioList
-          {...fieldProps}
-          options={repositories}
-          onChange={({ value }) => {
-            if (value.owner.type === 'User') {
+        <Box maxHeight="640px" overflow="auto">
+          <StyledRadioList
+            {...fieldProps}
+            options={repositories}
+            onChange={({ value }) => {
               setGithubInfo({
                 handle: `${value.owner.login}/${value.name}`,
-                repo: value.name,
+                licenseSpdxId: value.license?.spdx_id,
               });
-            } else {
-              setGithubInfo(null);
-            }
-          }}
-          keyGetter="name"
-        >
-          {({ value, radio, checked }) => {
-            return (
-              <RepositoryEntryContainer px={[2, 4]} py={3} borderBottom="1px solid #E6E8EB">
-                <GithubRepositoryEntry
-                  radio={radio}
-                  value={value}
-                  checked={checked}
-                  changeRepoInfo={(type, value) => {
-                    if (type === 'repository') {
-                      setGithubInfo({
-                        handle: `${value.owner.login}/${value.name}`,
-                        repo: value.name,
-                      });
-                    } else {
-                      setGithubInfo({
-                        handle: value.owner.login,
-                        repo: value.name,
-                      });
-                    }
-                  }}
-                />
-              </RepositoryEntryContainer>
-            );
-          }}
-        </StyledRadioList>
+            }}
+            keyGetter="name"
+          >
+            {({ value, radio }) => {
+              return (
+                <RepositoryEntryContainer px={[2, 4]} py={3}>
+                  <GithubRepositoryEntry radio={radio} value={value} />
+                </RepositoryEntryContainer>
+              );
+            }}
+          </StyledRadioList>
+        </Box>
       </StyledCard>
     </Fragment>
   );

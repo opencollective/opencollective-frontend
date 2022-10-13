@@ -121,7 +121,7 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
               }
             }}
           >
-            <FormattedMessage id="createcollective.opensource.VerifyStars" defaultMessage="Verify using GitHub stars" />
+            <FormattedMessage id="createcollective.opensource.VerifyGithub" defaultMessage="Verify using GitHub" />
           </StyledButton>
           <Link
             href={{

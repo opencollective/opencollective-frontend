@@ -34,6 +34,7 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import AcceptRejectButtons from './AcceptRejectButtons';
 import ApplicationMessageModal from './ApplicationMessageModal';
+import ValidatedRepositoryInfo from './ValidatedRepositoryInfo';
 
 const ApplicationBody = styled.div`
   height: 267px;
@@ -194,7 +195,7 @@ const getSuccessToast = (intl, action, collective, result) => {
   }
 };
 
-const InfoSectionHeader = ({ children, icon = null }) => (
+export const InfoSectionHeader = ({ children, icon = null }) => (
   <Flex alignItems="center" mb={3}>
     {icon && <Box mr={2}>{icon}</Box>}
     <Span fontSize="11px" fontWeight="500" color="black.500" textTransform="uppercase" mr={2}>
@@ -349,6 +350,10 @@ const PendingApplication = ({ host, application, ...props }) => {
       >
         <Container px="4px" position="relative">
           <ApplicationBody p={[12, 22]}>
+            {application.customData?.validatedRepositoryInfo && (
+              <ValidatedRepositoryInfo customData={application.customData} />
+            )}
+
             {(application.message || hasNothingToShow) && (
               <Box mb={3}>
                 <InfoSectionHeader icon={<CommentIcon size={16} />}>
@@ -365,17 +370,28 @@ const PendingApplication = ({ host, application, ...props }) => {
             )}
 
             {application.customData &&
-              Object.keys(application.customData).map(key => (
-                <Container mb={3} key={key}>
-                  <InfoSectionHeader>{i18nOCFApplicationFormLabel(intl, key)}</InfoSectionHeader>
-                  <UserInputContainer>
-                    {/** Amount was previously stored as a number in cents */}
-                    {APPLICATION_DATA_AMOUNT_FIELDS.includes(key) && typeof application.customData[key] === 'number'
-                      ? `${application.customData[key] / 100}$`
-                      : application.customData[key]}
-                  </UserInputContainer>
-                </Container>
-              ))}
+              Object.keys(application.customData).map(key => {
+                // Don't show repository info twice as it is displayed on top in a special component
+                if (
+                  key === 'validatedRepositoryInfo' ||
+                  (key === 'repositoryUrl' && application.customData.validatedRepositoryInfo) ||
+                  (key === 'licenseSpdxId' && application.customData.validatedRepositoryInfo)
+                ) {
+                  return null;
+                }
+
+                return (
+                  <Container mb={3} key={key}>
+                    <InfoSectionHeader>{i18nOCFApplicationFormLabel(intl, key)}</InfoSectionHeader>
+                    <UserInputContainer>
+                      {/** Amount was previously stored as a number in cents */}
+                      {APPLICATION_DATA_AMOUNT_FIELDS.includes(key) && typeof application.customData[key] === 'number'
+                        ? `${application.customData[key] / 100}$`
+                        : application.customData[key]}
+                    </UserInputContainer>
+                  </Container>
+                );
+              })}
           </ApplicationBody>
         </Container>
         {!isDone && (
