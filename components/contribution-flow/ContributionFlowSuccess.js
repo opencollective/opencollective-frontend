@@ -15,6 +15,7 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
 import { facebookShareURL, getCollectivePageRoute, tweetURL } from '../../lib/url-helpers';
+import { getWebsiteUrl } from '../../lib/utils';
 
 import Container from '../../components/Container';
 import { formatAccountDetails } from '../../components/edit-collective/utils';
@@ -220,7 +221,7 @@ class ContributionFlowSuccess extends React.Component {
   render() {
     const { LoggedInUser, collective, data, intl, isEmbed } = this.props;
     const { order } = data;
-    const shareURL = `${process.env.WEBSITE_URL}/${collective.slug}`;
+    const shareURL = `${getWebsiteUrl()}/${collective.slug}`;
 
     if (!data.loading && !order) {
       return (

@@ -7,6 +7,7 @@ import { withRouter } from 'next/router';
 import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
+import { getWebsiteUrl } from '../lib/utils';
 
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import ErrorPage from '../components/ErrorPage';
@@ -57,9 +58,7 @@ class TierPage extends React.Component {
     const baseMetadata = getCollectivePageMetadata(tier?.collective);
     if (tier && tier.collective) {
       const collective = tier.collective;
-      canonicalURL = `${process.env.WEBSITE_URL}/${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${
-        tier.id
-      }`;
+      canonicalURL = `${getWebsiteUrl()}/${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}`;
       return {
         ...baseMetadata,
         title: `${collective.name} - ${tier.name}`,
@@ -69,9 +68,13 @@ class TierPage extends React.Component {
       };
     } else {
       if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(this.props.collectiveType)) {
-        canonicalURL = `${process.env.WEBSITE_URL}/${this.props.parentCollectiveSlug}/${this.props.collectiveType}/${this.props.collectiveSlug}/contribute/${this.props.tierSlug}-${this.props.tierId}`;
+        canonicalURL = `${getWebsiteUrl()}/${this.props.parentCollectiveSlug}/${this.props.collectiveType}/${
+          this.props.collectiveSlug
+        }/contribute/${this.props.tierSlug}-${this.props.tierId}`;
       } else {
-        canonicalURL = `${process.env.WEBSITE_URL}/${this.props.collectiveSlug}/contribute/${this.props.tierSlug}-${this.props.tierId}`;
+        canonicalURL = `${getWebsiteUrl()}/${this.props.collectiveSlug}/contribute/${this.props.tierSlug}-${
+          this.props.tierId
+        }`;
       }
       return { ...baseMetadata, title: 'Tier', canonicalURL };
     }

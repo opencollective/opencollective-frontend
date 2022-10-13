@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { addAuthTokenToHeader } from '../../lib/api';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { getWebsiteUrl } from '../../lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
@@ -54,7 +55,7 @@ const ScheduledExpensesBanner = ({ host, onSubmit, secondButton, expenses }) => 
   const handlePayBatch = async () => {
     const expenseIds = scheduledExpenses.data.expenses.nodes.map(e => e.id);
     try {
-      await request(`${process.env.WEBSITE_URL}/api/services/transferwise/pay-batch`, {
+      await request(`${getWebsiteUrl()}/api/services/transferwise/pay-batch`, {
         method: 'POST',
         body: JSON.stringify({ expenseIds, hostId: host.id }),
         headers: addAuthTokenToHeader(),
