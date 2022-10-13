@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
+import { FormattedMessage } from 'react-intl';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
@@ -26,11 +27,11 @@ const CollapseSection = ({ title, subtitle, imageSrc, children }) => {
               <Flex alignItems="center" gridGap="8px">
                 {isOpen ? (
                   <React.Fragment>
-                    <ChevronUp size={16} /> Show Less
+                    <ChevronUp size={16} /> <FormattedMessage id="ShowLess" defaultMessage="Show Less" />
                   </React.Fragment>
                 ) : (
                   <React.Fragment>
-                    <ChevronDown size={16} /> Expand
+                    <ChevronDown size={16} /> <FormattedMessage id="Expand" defaultMessage="Expand" />
                   </React.Fragment>
                 )}
               </Flex>
