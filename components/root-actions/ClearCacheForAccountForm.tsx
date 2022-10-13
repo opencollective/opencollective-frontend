@@ -1,10 +1,11 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { startCase, uniq } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { AccountCacheType, ClearCacheMutation, ClearCacheMutationVariables } from '../../lib/graphql/types/v2/graphql';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
@@ -14,9 +15,9 @@ import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const CACHE_TYPES = ['CONTRIBUTORS', 'GRAPHQL_QUERIES', 'CLOUDFLARE'];
+const CACHE_TYPES = Object.values(AccountCacheType);
 
-const clearCacheMutation = gqlV2/* GraphQL */ `
+const clearCacheMutation = gql`
   mutation ClearCache($account: AccountReferenceInput!, $cacheTypes: [AccountCacheType!]) {
     clearCacheForAccount(account: $account, type: $cacheTypes) {
       id
@@ -28,8 +29,10 @@ const clearCacheMutation = gqlV2/* GraphQL */ `
 
 const ClearCacheForAccountForm = () => {
   const [account, setAccount] = React.useState(null);
-  const [cacheTypes, setCacheTypes] = React.useState(() => [...CACHE_TYPES]);
-  const [clearCache, { loading }] = useMutation(clearCacheMutation, { context: API_V2_CONTEXT });
+  const [cacheTypes, setCacheTypes] = React.useState<AccountCacheType[]>(() => [...CACHE_TYPES]);
+  const [clearCache, { loading }] = useMutation<ClearCacheMutation, ClearCacheMutationVariables>(clearCacheMutation, {
+    context: API_V2_CONTEXT,
+  });
   const { addToast } = useToasts();
   const isValid = account && cacheTypes.length > 0;
   const intl = useIntl();

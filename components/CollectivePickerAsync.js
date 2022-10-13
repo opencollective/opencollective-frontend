@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { debounce } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import { gqlV1 } from '../lib/graphql/helpers';
 import formatCollectiveType from '../lib/i18n/collective-type';
 
 import CollectivePicker from './CollectivePicker';
 
-const collectivePickerSearchQuery = gql`
+const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
   query CollectivePickerSearchQuery(
     $term: String!
     $types: [TypeOfCollective]
@@ -111,19 +112,19 @@ const getPlaceholder = (intl, types) => {
  */
 const CollectivePickerAsync = ({
   inputId,
-  types,
-  limit,
-  hostCollectiveIds,
-  parentCollectiveIds,
-  preload,
-  filterResults,
-  searchQuery,
-  invitable,
-  emptyCustomOptions,
-  noCache,
-  isLoading,
-  skipGuests,
-  includeArchived,
+  types = undefined,
+  limit = 20,
+  hostCollectiveIds = undefined,
+  parentCollectiveIds = undefined,
+  preload = false,
+  filterResults = undefined,
+  searchQuery = collectivePickerSearchQuery,
+  invitable = false,
+  emptyCustomOptions = [],
+  noCache = false,
+  isLoading = false,
+  skipGuests = true,
+  includeArchived = false,
   ...props
 }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
@@ -204,14 +205,6 @@ CollectivePickerAsync.propTypes = {
   onInvite: PropTypes.func,
   /** Include archived collectives **/
   includeArchived: PropTypes.bool,
-};
-
-CollectivePickerAsync.defaultProps = {
-  preload: false,
-  skipGuests: true,
-  limit: 20,
-  includeArchived: false,
-  searchQuery: collectivePickerSearchQuery,
 };
 
 export default CollectivePickerAsync;

@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getDateFromValue, toIsoDateStr } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { RecurringExpenseIntervals, RecurringIntervalOptions } from '../../lib/i18n/expense';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -28,7 +28,7 @@ const recurringExpensePropType = PropTypes.shape({
   endsAt: PropTypes.string,
 }).isRequired;
 
-const deleteExpenseMutation = gqlV2/* GraphQL */ `
+const deleteExpenseMutation = gql`
   mutation DeleteExpense($expense: ExpenseReferenceInput!) {
     deleteExpense(expense: $expense) {
       id

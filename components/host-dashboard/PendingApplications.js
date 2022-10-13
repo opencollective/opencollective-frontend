@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -21,7 +21,7 @@ import PendingApplication, { processApplicationAccountFields } from './PendingAp
 
 const COLLECTIVES_PER_PAGE = 20;
 
-const pendingApplicationsQuery = gqlV2/* GraphQL */ `
+const pendingApplicationsQuery = gql`
   query HostDashboardPendingApplications(
     $hostSlug: String!
     $limit: Int!

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import MessageBox from '../MessageBox';
@@ -16,7 +16,7 @@ import StyledTextarea from '../StyledTextarea';
 import { Label, P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const unhostAccountMutation = gqlV2/* GraphQL */ `
+const unhostAccountMutation = gql`
   mutation UnhostAccount($account: AccountReferenceInput!, $message: String) {
     removeHost(account: $account, message: $message) {
       id
@@ -77,7 +77,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
                   Link: value => (
                     <StyledLink
                       color="black.800"
-                      href="https://docs.opencollective.com/help/collectives/collective-settings/zero-collective-balance"
+                      href="https://docs.opencollective.com/help/expenses-and-getting-paid/submitting-expenses"
                       textDecoration="underline"
                       openInNewTab
                     >

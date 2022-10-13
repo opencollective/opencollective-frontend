@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { HELP_MESSAGE } from '../../lib/constants/dismissable-help-message';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import DismissibleMessage from '../DismissibleMessage';
@@ -106,7 +106,7 @@ ChangelogTrigger.propTypes = {
   showDropdown: PropTypes.bool,
 };
 
-const setChangelogViewDateMutation = gqlV2/* GraphQL */ `
+const setChangelogViewDateMutation = gql`
   mutation SetChangelogViewDateMutation($changelogViewDate: DateTime!) {
     setChangelogViewDate(changelogViewDate: $changelogViewDate) {
       id
@@ -115,7 +115,7 @@ const setChangelogViewDateMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const loggedInUserQuery = gql`
+const loggedInUserQuery = gqlV1/* GraphQL */ `
   query LoggedInUser {
     LoggedInUser {
       id

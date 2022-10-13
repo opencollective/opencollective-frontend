@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gqlV1 } from '../../../lib/graphql/helpers';
 
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/Contribute';
 
@@ -6,7 +6,7 @@ import * as fragments from './fragments';
 
 // We have to disable the linter because it's not able to detect that `nbContributorsPerContributeCard` is used in fragments
 /* eslint-disable graphql/template-strings */
-export const collectivePageQuery = gql`
+export const collectivePageQuery = gqlV1/* GraphQL */ `
   query CollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug, throwIfMissing: false) {
       id

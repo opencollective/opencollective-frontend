@@ -1,11 +1,11 @@
 import React from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { truncate, uniqBy } from 'lodash';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
@@ -22,7 +22,7 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { banAccountsMutation } from './BanAccounts';
 import BanAccountsSummary from './BanAccountsSummary';
 
-export const searchQuery = gqlV2/* GraphQL */ `
+export const searchQuery = gql`
   query SearchPage($term: String!, $offset: Int) {
     accounts(
       searchTerm: $term

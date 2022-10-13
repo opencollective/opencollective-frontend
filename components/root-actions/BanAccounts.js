@@ -1,9 +1,9 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
@@ -16,7 +16,7 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import BanAccountsSummary from './BanAccountsSummary';
 
-export const banAccountsMutation = gqlV2/* GraphQL */ `
+export const banAccountsMutation = gql`
   mutation BanAccounts($account: [AccountReferenceInput!]!, $dryRun: Boolean!, $includeAssociatedAccounts: Boolean!) {
     banAccount(account: $account, includeAssociatedAccounts: $includeAssociatedAccounts, dryRun: $dryRun) {
       isAllowed
@@ -124,7 +124,5 @@ const BanAccount = () => {
     </div>
   );
 };
-
-BanAccount.propTypes = {};
 
 export default BanAccount;

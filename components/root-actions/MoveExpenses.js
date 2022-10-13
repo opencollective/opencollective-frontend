@@ -1,11 +1,11 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { omit } from 'lodash';
 import { FormattedDate, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
@@ -21,7 +21,7 @@ import StyledTag from '../StyledTag';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const moveExpensesMutation = gqlV2/* GraphQL */ `
+const moveExpensesMutation = gql`
   mutation MoveExpensesMutation($destinationAccount: AccountReferenceInput!, $expenses: [ExpenseReferenceInput!]!) {
     moveExpenses(destinationAccount: $destinationAccount, expenses: $expenses) {
       id

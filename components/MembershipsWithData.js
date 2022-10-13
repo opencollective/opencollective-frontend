@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
+
+import { gqlV1 } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import Error from './Error';
@@ -110,7 +111,7 @@ class MembershipsWithData extends React.Component {
   }
 }
 
-const membershipsQuery = gql`
+const membershipsQuery = gqlV1/* GraphQL */ `
   query Memberships($memberCollectiveSlug: String, $role: String, $limit: Int, $offset: Int, $orderBy: String) {
     allMembers(
       memberCollectiveSlug: $memberCollectiveSlug

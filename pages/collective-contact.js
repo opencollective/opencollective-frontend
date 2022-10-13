@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
+import { gqlV1 } from '../lib/graphql/helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -49,18 +49,17 @@ class CollectiveContact extends React.Component {
   };
 
   getPageMetaData(collective) {
+    const baseMetadata = getCollectivePageMetadata(collective);
     if (collective) {
       return {
+        ...baseMetadata,
         title: `Contact ${collective.name}`,
-        description: collective.description,
-        twitterHandle: collective.twitterHandle || get(collective, 'parentCollective.twitterHandle'),
-        image: collective.image || get(collective, 'parentCollective.image'),
         noRobots: false,
       };
     } else {
       return {
+        ...baseMetadata,
         title: 'Contact collective',
-        image: '/static/images/defaultBackgroundImage.png',
         noRobots: false,
       };
     }
@@ -124,7 +123,7 @@ class CollectiveContact extends React.Component {
   }
 }
 
-const collectiveContactPageQuery = gql`
+const collectiveContactPageQuery = gqlV1/* GraphQL */ `
   query CollectiveContactPage($collectiveSlug: String!) {
     Collective(slug: $collectiveSlug, throwIfMissing: false) {
       id

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
 import { get, isNumber, round } from 'lodash';
@@ -11,7 +11,7 @@ import { border, color, space, typography } from 'styled-system';
 import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { AmountPropTypeShape } from '../../lib/prop-types';
@@ -37,7 +37,7 @@ import { withUser } from '../UserProvider';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 
-const quoteExpenseQuery = gqlV2/* GraphQL */ `
+const quoteExpenseQuery = gql`
   query QuoteExpenseQuery($id: String!) {
     expense(expense: { id: $id }) {
       id

@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { IGNORED_TAGS } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
@@ -16,9 +16,7 @@ import { H1 } from '../Text';
 import { withUser } from '../UserProvider';
 
 import CollectiveCategoryPicker from './CollectiveCategoryPicker';
-import ConnectGithub from './ConnectGithub';
 import CreateCollectiveForm from './CreateCollectiveForm';
-import CreateOpenSourceCollective from './CreateOpenSourceCollective';
 
 class CreateCollective extends Component {
   static propTypes = {
@@ -46,7 +44,6 @@ class CreateCollective extends Component {
     this.state = {
       error: null,
       creating: false,
-      githubInfo: null,
     };
 
     this.createCollective = this.createCollective.bind(this);
@@ -61,17 +58,12 @@ class CreateCollective extends Component {
       ? [...collective.tags, this.props.router.query.category]
       : [this.props.router.query.category];
 
-    if (this.state.githubInfo) {
-      collective.githubHandle = this.state.githubInfo.handle;
-    }
-
     // try mutation
     try {
       const res = await this.props.createCollective({
         variables: {
           collective,
           host: this.props.host ? { slug: this.props.host.slug } : null,
-          automateApprovalWithGithub: this.state.githubInfo ? true : false,
           message,
           inviteMembers: inviteMembers.map(invite => ({
             ...invite,
@@ -98,7 +90,7 @@ class CreateCollective extends Component {
   render() {
     const { LoggedInUser, host, router, data } = this.props;
     const { error } = this.state;
-    const { category, step, token } = router.query;
+    const { category } = router.query;
     const tags = data?.tagStats?.nodes?.filter(node => !IGNORED_TAGS.includes(node.tag));
     const popularTags = tags?.map(value => value.tag);
 
@@ -139,18 +131,9 @@ class CreateCollective extends Component {
       return <CollectiveCategoryPicker />;
     }
 
-    if ((category === 'opensource' || get(host, 'slug') === 'opensource') && step !== 'form') {
-      if (token) {
-        return <ConnectGithub updateGithubInfo={githubInfo => this.setState({ githubInfo })} />;
-      } else {
-        return <CreateOpenSourceCollective />;
-      }
-    }
-
     return (
       <CreateCollectiveForm
         host={host}
-        github={this.state.githubInfo}
         onSubmit={this.createCollective}
         onChange={this.handleChange}
         loading={this.state.creating}
@@ -162,21 +145,14 @@ class CreateCollective extends Component {
   }
 }
 
-const createCollectiveMutation = gqlV2/* GraphQL */ `
+const createCollectiveMutation = gql`
   mutation CreateCollective(
     $collective: CollectiveCreateInput!
     $host: AccountReferenceInput
-    $automateApprovalWithGithub: Boolean
     $message: String
     $inviteMembers: [InviteMemberInput]
   ) {
-    createCollective(
-      collective: $collective
-      host: $host
-      automateApprovalWithGithub: $automateApprovalWithGithub
-      message: $message
-      inviteMembers: $inviteMembers
-    ) {
+    createCollective(collective: $collective, host: $host, message: $message, inviteMembers: $inviteMembers) {
       id
       name
       slug
@@ -189,7 +165,7 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const tagStatsQuery = gqlV2/* GraphQL */ `
+const tagStatsQuery = gql`
   query CreateCollectivePageQuery {
     tagStats {
       nodes {

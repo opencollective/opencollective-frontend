@@ -1,7 +1,7 @@
 /* eslint-disable react/display-name */
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -11,7 +11,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { requireFields } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import { Flex } from '../Grid';
@@ -514,7 +514,7 @@ export function ContributeCardPreview({ tier, collective }) {
   );
 }
 
-const listTierQuery = gqlV2/* GraphQL */ `
+const listTierQuery = gql`
   query AccountTiers($accountSlug: String!) {
     account(slug: $accountSlug) {
       id
@@ -554,7 +554,7 @@ const listTierQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const editTierMutation = gqlV2/* GraphQL */ `
+const editTierMutation = gql`
   mutation EditTier($tier: TierUpdateInput!) {
     editTier(tier: $tier) {
       id
@@ -593,7 +593,7 @@ const editTierMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const createTierMutation = gqlV2/* GraphQL */ `
+const createTierMutation = gql`
   mutation CreateTier($tier: TierCreateInput!, $account: AccountReferenceInput!) {
     createTier(tier: $tier, account: $account) {
       id
@@ -631,7 +631,7 @@ const createTierMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const deleteTierMutation = gqlV2/* GraphQL */ `
+const deleteTierMutation = gql`
   mutation DeleteTier($tier: TierReferenceInput!) {
     deleteTier(tier: $tier) {
       id

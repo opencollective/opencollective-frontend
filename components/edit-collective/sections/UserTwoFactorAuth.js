@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Info } from '@styled-icons/feather/Info';
 import { Field, Form, Formik } from 'formik';
@@ -10,7 +11,7 @@ import speakeasy from 'speakeasy';
 import styled from 'styled-components';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { compose } from '../../../lib/utils';
 
 import ConfirmationModal from '../../ConfirmationModal';
@@ -538,7 +539,7 @@ class UserTwoFactorAuth extends React.Component {
   }
 }
 
-const addTwoFactorAuthToIndividualMutation = gqlV2/* GraphQL */ `
+const addTwoFactorAuthToIndividualMutation = gql`
   mutation AddTwoFactorAuthToIndividual($account: AccountReferenceInput!, $token: String!) {
     addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
       account {
@@ -552,7 +553,7 @@ const addTwoFactorAuthToIndividualMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const removeTwoFactorAuthFromIndividualMutation = gqlV2/* GraphQL */ `
+const removeTwoFactorAuthFromIndividualMutation = gql`
   mutation RemoveTwoFactorAuthFromIndividual($account: AccountReferenceInput!, $code: String!) {
     removeTwoFactorAuthTokenFromIndividual(account: $account, code: $code) {
       id
@@ -563,7 +564,7 @@ const removeTwoFactorAuthFromIndividualMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const accountHasTwoFactorAuthQuery = gqlV2/* GraphQL */ `
+const accountHasTwoFactorAuthQuery = gql`
   query AccountHasTwoFactorAuth($slug: String) {
     individual(slug: $slug) {
       id

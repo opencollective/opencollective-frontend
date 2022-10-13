@@ -78,14 +78,12 @@ const HostAdminCollectiveCardMoreButton = ({ collective, host }) => {
                 onClose();
               }}
             />
-            {['development', 'staging', 'e2e', 'ci'].includes(process.env.OC_ENV) && (
-              <UnhostAccountButton
-                onClick={() => {
-                  setHasUnhostModal(true);
-                  onClose();
-                }}
-              />
-            )}
+            <UnhostAccountButton
+              onClick={() => {
+                setHasUnhostModal(true);
+                onClose();
+              }}
+            />
           </Flex>
         )}
       >

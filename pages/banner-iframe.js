@@ -9,7 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 
 import TopContributors from '../components/collective-page/TopContributors';
 import { Box, Flex } from '../components/Grid';
@@ -19,7 +19,7 @@ import MessageBoxGraphqlError from '../components/MessageBoxGraphqlError';
 import StyledLink from '../components/StyledLink';
 import { H3 } from '../components/Text';
 
-const topContributorsQuery = gqlV2/* GraphQL */ `
+const topContributorsQuery = gql`
   query BannerTopContributors($collectiveSlug: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
@@ -420,7 +420,7 @@ class BannerIframe extends React.Component {
   }
 }
 
-const collectiveBannerIframeQuery = gql`
+const collectiveBannerIframeQuery = gqlV1/* GraphQL */ `
   query CollectiveBannerIframe($collectiveSlug: String) {
     Collective(slug: $collectiveSlug) {
       id

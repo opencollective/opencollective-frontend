@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { trim } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { editCollectivePageQuery } from '../../lib/graphql/queries';
 
 import StyledButton from '../StyledButton';
@@ -13,7 +13,7 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
 
-const createConnectedAccountMutation = gqlV2/* GraphQL */ `
+const createConnectedAccountMutation = gql`
   mutation createConnectedAccount($connectedAccount: ConnectedAccountCreateInput!, $account: AccountReferenceInput!) {
     createConnectedAccount(connectedAccount: $connectedAccount, account: $account) {
       id
@@ -25,7 +25,7 @@ const createConnectedAccountMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const deleteConnectedAccountMutation = gqlV2/* GraphQL */ `
+const deleteConnectedAccountMutation = gql`
   mutation deleteConnectedAccount($connectedAccount: ConnectedAccountReferenceInput!) {
     deleteConnectedAccount(connectedAccount: $connectedAccount) {
       id

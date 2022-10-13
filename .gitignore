@@ -27,3 +27,7 @@ storybook-static
 
 # Git time manager
 .gtm
+
+# Typescript
+tsconfig.tsbuildinfo
+next-env.d.ts

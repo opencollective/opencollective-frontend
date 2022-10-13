@@ -1,10 +1,10 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import { Box } from '../Grid';
@@ -28,7 +28,7 @@ const initialValues = {
   purpose: undefined,
 };
 
-const requestVirtualCardMutation = gqlV2/* GraphQL */ `
+const requestVirtualCardMutation = gql`
   mutation requestVirtualCard($notes: String, $purpose: String, $budget: Int, $account: AccountReferenceInput!) {
     requestVirtualCard(notes: $notes, purpose: $purpose, budget: $budget, account: $account)
   }

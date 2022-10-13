@@ -46,7 +46,7 @@ class OnboardingProfileCard extends React.Component {
     );
 
     return (
-      <Flex my={1} ml={2}>
+      <Flex my={1} mr={2}>
         {isPending ? (
           <StyledTooltip
             content={() => <FormattedMessage id="onboarding.admins.pending" defaultMessage="Pending approval" />}

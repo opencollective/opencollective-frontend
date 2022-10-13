@@ -1,10 +1,24 @@
 {
-  "extends": ["opencollective", "plugin:styled-components-a11y/recommended"],
+  "extends": ["opencollective", "plugin:styled-components-a11y/recommended", "plugin:import/typescript"],
+  "ignorePatterns": ["./lib/graphql/types/*"],
   "env": { "jest": true },
-  "plugins": ["graphql", "react-hooks", "simple-import-sort", "formatjs", "styled-components-a11y"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint/eslint-plugin",
+    "graphql",
+    "react-hooks",
+    "simple-import-sort",
+    "formatjs",
+    "styled-components-a11y"
+  ],
   "rules": {
     "no-console": "error",
     "require-atomic-updates": "off",
+    // Typescript
+    "node/no-missing-import": ["error", { "tryExtensions": [".js", ".ts", ".tsx"] }],
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["error"],
+    // -- End of typescript-specific config
     "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
     "no-restricted-imports": [
       "error",
@@ -39,13 +53,13 @@
     // https://github.com/apollographql/eslint-plugin-graphql#additional-schemas-or-tags
     "graphql/template-strings": [
       "error",
-      { "env": "apollo", "projectName": "opencollective" },
-      { "env": "apollo", "tagName": "gqlV2", "projectName": "opencollective_v2" }
+      { "env": "apollo", "tagName": "gqlV1", "projectName": "opencollective" },
+      { "env": "apollo", "projectName": "opencollective_v2" }
     ],
     "graphql/required-fields": [
       "error",
-      { "env": "apollo", "projectName": "opencollective", "requiredFields": ["id"] },
-      { "env": "apollo", "tagName": "gqlV2", "projectName": "opencollective_v2", "requiredFields": ["id"] }
+      { "env": "apollo", "tagName": "gqlV1", "projectName": "opencollective", "requiredFields": ["id"] },
+      { "env": "apollo", "projectName": "opencollective_v2", "requiredFields": ["id"] }
     ],
     "graphql/named-operations": ["error"],
     "graphql/capitalized-type-name": ["error"],

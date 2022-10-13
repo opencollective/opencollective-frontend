@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import { parseDateInterval } from '../../../../lib/date-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
 import Collapse from '../../../Collapse';
 import { Box, Flex, Grid } from '../../../Grid';
@@ -20,7 +20,7 @@ import VirtualCard from '../../VirtualCard';
 
 import VirtualCardFilters from './VirtualCardFilters';
 
-const virtualCardsQuery = gqlV2/* GraphQL */ `
+const virtualCardsQuery = gql`
   query AccountVirtualCards(
     $slug: String
     $limit: Int!
@@ -64,6 +64,7 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
           name
           last4
           data
+          currency
           provider
           privateData
           createdAt
@@ -71,6 +72,7 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
           spendingLimitInterval
           account {
             id
+            slug
             name
             imageUrl
           }
@@ -174,9 +176,12 @@ const VirtualCards = props => {
         {data.account.virtualCards.nodes.map(virtualCard => (
           <VirtualCard
             canEditVirtualCard={virtualCard.data.status === 'active'}
+            canPauseOrResumeVirtualCard
+            canDeleteVirtualCard
             confirmOnPauseCard={props.collective.type === CollectiveType.COLLECTIVE}
             key={virtualCard.id}
-            {...virtualCard}
+            virtualCard={virtualCard}
+            onDeleteRefetchQuery="AccountVirtualCards"
           />
         ))}
       </Grid>

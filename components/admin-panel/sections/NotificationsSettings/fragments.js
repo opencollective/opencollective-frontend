@@ -1,6 +1,6 @@
-import { gqlV2 } from '../../../../lib/graphql/helpers';
+import { gql } from '@apollo/client';
 
-export const accountActivitySubscriptionsFragment = gqlV2/* GraphQL */ `
+export const accountActivitySubscriptionsFragment = gql`
   fragment AccountActivitySubscriptionsFields on Account {
     id
     name

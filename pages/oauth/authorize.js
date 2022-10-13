@@ -1,10 +1,10 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { difference } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import EmbeddedPage from '../../components/EmbeddedPage';
@@ -15,7 +15,7 @@ import MessageBoxGraphqlError from '../../components/MessageBoxGraphqlError';
 import { ApplicationApproveScreen } from '../../components/oauth/ApplicationApproveScreen';
 import SignInOrJoinFree from '../../components/SignInOrJoinFree';
 
-const applicationQuery = gqlV2`
+const applicationQuery = gql`
   query OAuthAuthorization($clientId: String!) {
     application(clientId: $clientId) {
       id
