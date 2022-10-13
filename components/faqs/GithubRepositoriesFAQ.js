@@ -11,7 +11,7 @@ import FAQ, { Content, Entry, Title } from './FAQ';
  * FAQ associated to the `GithubRepositories` component.
  */
 const GithubRepositoriesFAQ = props => (
-  <FAQ {...props}>
+  <FAQ withBorderLeft withNewButtons {...props} titleProps={{ fontSize: '16px', mb: 2 }}>
     <Entry>
       <Title>
         <FormattedMessage
