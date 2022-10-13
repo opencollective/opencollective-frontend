@@ -1,13 +1,45 @@
 import styled, { css } from 'styled-components';
-import { color, display, space, typography } from 'styled-system';
+import {
+  color,
+  ColorProps,
+  display,
+  DisplayProps,
+  space,
+  SpaceProps,
+  typography,
+  TypographyProps,
+} from 'styled-system';
 
-import { cursor, overflowWrap, textTransform, whiteSpace, wordBreak } from '../lib/styled-system-custom-properties';
+import {
+  cursor,
+  CursorProps,
+  overflowWrap,
+  OverflowWrapProps,
+  textTransform,
+  TextTransformProps,
+  whiteSpace,
+  WhiteSpaceProps,
+  wordBreak,
+  WordBreakProps,
+} from '../lib/styled-system-custom-properties';
 
-export const P = styled.p.attrs(props => ({
+type TextProps = ColorProps &
+  DisplayProps &
+  SpaceProps &
+  TypographyProps &
+  TextTransformProps &
+  WhiteSpaceProps &
+  OverflowWrapProps &
+  WordBreakProps &
+  CursorProps & {
+    truncateOverflow?: boolean;
+  };
+
+export const P = styled.p.attrs<TextProps>(props => ({
   // Overrides default margin Y to avoid global styles
   mb: props.mb || props.my || props.m || 0,
   mt: props.mt || props.my || props.m || 0,
-}))`
+}))<TextProps>`
   ${color}
   ${display}
   ${space}

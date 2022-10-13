@@ -107,18 +107,18 @@ const getPlaceholder = (intl, types) => {
  */
 const CollectivePickerAsync = ({
   inputId,
-  types,
-  limit,
-  hostCollectiveIds,
-  parentCollectiveIds,
-  preload,
-  filterResults,
-  searchQuery,
-  invitable,
-  emptyCustomOptions,
-  noCache,
-  isLoading,
-  skipGuests,
+  types = undefined,
+  limit = 20,
+  hostCollectiveIds = undefined,
+  parentCollectiveIds = undefined,
+  preload = false,
+  filterResults = undefined,
+  searchQuery = collectivePickerSearchQuery,
+  invitable = false,
+  emptyCustomOptions = [],
+  noCache = false,
+  isLoading = false,
+  skipGuests = true,
   ...props
 }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
@@ -196,13 +196,6 @@ CollectivePickerAsync.propTypes = {
   invitable: PropTypes.bool,
   skipGuests: PropTypes.bool,
   onInvite: PropTypes.func,
-};
-
-CollectivePickerAsync.defaultProps = {
-  preload: false,
-  skipGuests: true,
-  limit: 20,
-  searchQuery: collectivePickerSearchQuery,
 };
 
 export default CollectivePickerAsync;

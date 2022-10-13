@@ -1,7 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import StyledSystemPropTypes from '@styled-system/prop-types';
 import styled, { css } from 'styled-components';
-import { background, border, color, flexbox, layout, space, typography } from 'styled-system';
+import {
+  background,
+  BackgroundProps,
+  border,
+  BorderProps,
+  color,
+  ColorProps,
+  flexbox,
+  FlexboxProps,
+  layout,
+  LayoutProps,
+  space,
+  SpaceProps,
+  typography,
+  TypographyProps,
+} from 'styled-system';
 
 import { textTransform, whiteSpace } from '../lib/styled-system-custom-properties';
 import theme from '../lib/theme';
@@ -9,12 +25,28 @@ import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
 
 import StyledSpinner from './StyledSpinner';
 
+type StyledButtonProps = BackgroundProps &
+  BorderProps &
+  ColorProps &
+  FlexboxProps &
+  LayoutProps &
+  SpaceProps &
+  TypographyProps &
+  React.HTMLProps<HTMLButtonElement> & {
+    buttonStyle?: string;
+    buttonSize?: string;
+    loading?: boolean;
+    asLink?: boolean;
+    isBorderless?: boolean;
+    type?: 'button' | 'submit' | 'reset';
+  };
+
 /**
  * styled-component button using styled-system
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
-const StyledButtonContent = styled.button`
+const StyledButtonContent = styled.button<StyledButtonProps>`
   appearance: none;
   border: none;
   cursor: pointer;
@@ -77,11 +109,12 @@ const StyledButtonContent = styled.button`
   }}
 `;
 
-const StyledButton = React.forwardRef(({ loading, ...props }, ref) =>
+const StyledButton = React.forwardRef<HTMLButtonElement, StyledButtonProps>(({ loading, as, ...props }, ref) =>
+  // TODO(Typescript): We have to hack the `as` prop because styled-components somehow types it as "never"
   !loading ? (
-    <StyledButtonContent {...props} ref={ref} />
+    <StyledButtonContent {...props} as={as as never} ref={ref} />
   ) : (
-    <StyledButtonContent {...props} onClick={undefined} ref={ref}>
+    <StyledButtonContent {...props} as={as as never} onClick={undefined} ref={ref}>
       <StyledSpinner size="0.9em" />
     </StyledButtonContent>
   ),
@@ -90,6 +123,13 @@ const StyledButton = React.forwardRef(({ loading, ...props }, ref) =>
 StyledButton.displayName = 'StyledButton';
 
 StyledButton.propTypes = {
+  ...StyledSystemPropTypes.background,
+  ...StyledSystemPropTypes.border,
+  ...StyledSystemPropTypes.color,
+  ...StyledSystemPropTypes.flexbox,
+  ...StyledSystemPropTypes.layout,
+  ...StyledSystemPropTypes.space,
+  ...StyledSystemPropTypes.typography,
   /**
    * Based on the design system theme
    */
@@ -98,35 +138,6 @@ StyledButton.propTypes = {
    * Based on the design system theme
    */
   buttonStyle: PropTypes.oneOf(Object.keys(theme.buttons)),
-  /**
-   * From styled-system: accepts any css 'display' value
-   */
-  display: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
-  /**
-   * From styled-system: accepts any css 'font-weight' value
-   */
-  fontWeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /**
-   * From styled-system: accepts any css 'min-width' value
-   */
-  minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /**
-   * From styled-system: accepts any css 'max-width' value
-   */
-  maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /**
-   * styled-system prop: adds margin & padding props
-   * see: https://github.com/jxnblk/styled-system/blob/master/docs/api.md#space
-   */
-  space: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /**
-   * From styled-system: accepts any css 'text-align' value
-   */
-  textAlign: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-  /**
-   * From styled-system: accepts any css 'width' value
-   */
-  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
   /**
    * Show a loading spinner on button
    */

@@ -5,10 +5,32 @@
 
 import propTypes from '@styled-system/prop-types';
 import styled from 'styled-components';
-import { color, compose, flexbox, grid, layout, space, typography } from 'styled-system';
+import {
+  color,
+  ColorProps,
+  compose,
+  flexbox,
+  FlexboxProps,
+  grid,
+  layout,
+  LayoutProps,
+  space,
+  SpaceProps,
+  typography,
+  TypographyProps,
+} from 'styled-system';
 
 const boxProps = compose(space, color, layout, typography, flexbox, grid);
-export const Box = styled('div')(
+
+type BoxProps = SpaceProps &
+  ColorProps &
+  LayoutProps &
+  TypographyProps &
+  FlexboxProps & {
+    gap?: string | number;
+  };
+
+export const Box = styled.div<BoxProps>(
   {
     boxSizing: 'border-box',
   },
@@ -35,7 +57,7 @@ export const Flex = styled(Box)(
 
 Flex.displayName = 'Flex';
 
-export const Grid = styled('div')(
+export const Grid = styled.div(
   {
     boxSizing: 'border-box',
     display: 'grid',

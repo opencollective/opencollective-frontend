@@ -1,26 +1,36 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { ReactNode, useCallback, useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { v4 as uuid } from 'uuid';
 
-export const ToastContext = React.createContext({
-  /**
-   * Params keys:
-   * - {TOAST_TYPE} type (default: INFO)
-   * - {string} title
-   * - {string} message (optional)
-   * - {light|dark} variant (default: dark)
-   * - {number} duration (default: 15000)
-   */
-  addToast: () => {},
-});
+export enum TOAST_TYPE {
+  ERROR = 'ERROR',
+  SUCCESS = 'SUCCESS',
+  INFO = 'INFO',
+}
 
-export const TOAST_TYPE = {
-  ERROR: 'ERROR',
-  SUCCESS: 'SUCCESS',
-  INFO: 'INFO',
+type Toast = {
+  id: string;
+  type: TOAST_TYPE;
+  variant: 'light' | 'dark';
+  message: ReactNode | null;
+  title: ReactNode | null;
+  duration: number;
 };
 
-const createToast = params => {
+type ToastInput = Partial<Toast>;
+
+type ToastFilterFunc = (toast: Toast) => boolean;
+
+interface ToastContextInterface {
+  toasts: Toast[];
+  addToast(toast: ToastInput): void;
+  addToasts(toasts: Array<ToastInput>): void;
+  removeToasts(filter: ToastFilterFunc): void;
+}
+
+export const ToastContext = React.createContext<ToastContextInterface>(null);
+
+const createToast = (params: ToastInput) => {
   return {
     ...params,
     id: uuid(),

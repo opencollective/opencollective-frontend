@@ -29,26 +29,26 @@ const QuestionMarkIconWithSpace = ({ helpText, labelFontSize, labelColor }) => (
  */
 const StyledInputField = ({
   children,
-  label,
+  label = undefined,
   htmlFor,
-  name,
-  error,
-  hint,
-  success,
-  disabled,
-  required,
-  inputType,
-  labelFontSize,
-  labelFontWeight,
-  labelColor,
-  labelProps,
-  hideOptionalLabel,
-  useRequiredLabel,
-  isPrivate,
-  helpText,
-  flexDirection,
-  justifyContent,
-  alignItems,
+  name = undefined,
+  error = undefined,
+  hint = undefined,
+  success = undefined,
+  disabled = undefined,
+  required = undefined,
+  inputType = undefined,
+  labelFontSize = undefined,
+  labelFontWeight = 'normal',
+  labelColor = 'black.800',
+  labelProps = undefined,
+  hideOptionalLabel = undefined,
+  useRequiredLabel = undefined,
+  isPrivate = undefined,
+  helpText = undefined,
+  flexDirection = undefined,
+  justifyContent = undefined,
+  alignItems = undefined,
   ...props
 }) => {
   const isCheckbox = inputType === 'checkbox';
@@ -174,11 +174,6 @@ StyledInputField.propTypes = {
   helpText: PropTypes.node,
   /** All props from `Box` */
   ...Box.propTypes,
-};
-
-StyledInputField.defaultProps = {
-  labelColor: 'black.800',
-  labelFontWeight: 'normal',
 };
 
 export default StyledInputField;

@@ -4,13 +4,13 @@ import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
-import { size, space } from 'styled-system';
+import { size, SizeProps, space, SpaceProps } from 'styled-system';
 
 import Container from './Container';
 
 export const Details = styled(Container).attrs({
   as: 'details',
-})`
+})<React.HTMLProps<HTMLDetailsElement>>`
   summary {
     list-style-type: none;
     > div {
@@ -65,7 +65,9 @@ export const Details = styled(Container).attrs({
   }
 `;
 
-const CollapseBtn = styled.div`
+type CollapseBtnProps = SizeProps & SpaceProps & React.HTMLProps<HTMLButtonElement>;
+
+const CollapseBtn = styled.div<CollapseBtnProps>`
   display: flex;
   justify-content: center;
   align-items: center;
