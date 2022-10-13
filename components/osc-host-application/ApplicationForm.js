@@ -675,17 +675,14 @@ const ApplicationForm = ({
                       <Box my={2}>
                         <H4 fontSize="16px" lineHeight="24px" color="black.800" mb={0}>
                           <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
-                        </H4>
-
-                        {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
-                          <Flex mt={1} width="100%">
-                            <P my={2} fontSize="9px" textTransform="uppercase" color="black.700" letterSpacing="0.06em">
+                          {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                            <Span fontWeight="300" fontSize="11px" color="black.700" letterSpacing="0.06em">
                               {` (${1 + values.inviteMembers?.length}/${
                                 host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins
                               })`}
-                            </P>
-                          </Flex>
-                        )}
+                            </Span>
+                          )}
+                        </H4>
 
                         <Flex width="100%" flexWrap="wrap" data-cy="profile-card">
                           {LoggedInUser ? (
