@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import { Box } from './Grid';
@@ -17,9 +17,9 @@ import StyledTextarea from './StyledTextarea';
 import { H2, P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
-const sendMessageMutation = gqlV1/* GraphQL */ `
-  mutation SendMessage($collectiveId: Int!, $message: String!, $subject: String) {
-    sendMessageToCollective(collectiveId: $collectiveId, message: $message, subject: $subject) {
+const sendMessageMutation = gql`
+  mutation SendMessage($account: AccountReferenceInput!, $message: NonEmptyString!, $subject: String) {
+    sendMessage(account: $account, message: $message, subject: $subject) {
       success
     }
   }
@@ -29,7 +29,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange 
   const [subject, setSubject] = React.useState('');
   const [message, setMessage] = React.useState('');
   const [error, setError] = React.useState(null);
-  const [submit, { data, loading }] = useMutation(sendMessageMutation);
+  const [submit, { data, loading }] = useMutation(sendMessageMutation, { context: API_V2_CONTEXT });
   const { addToast } = useToasts();
 
   // Dispatch changes to onChange if set
@@ -39,7 +39,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange 
     }
   }, [subject, message]);
 
-  if (get(data, 'sendMessageToCollective.success') && !isModal) {
+  if (get(data, 'sendMessage.success') && !isModal) {
     return (
       <MessageBox type="success" withIcon maxWidth={400} m="32px auto">
         <FormattedMessage id="MessageSent" defaultMessage="Message sent" />
@@ -128,7 +128,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange 
               setError(null);
               await submit({
                 variables: {
-                  collectiveId: typeof collective.id === 'string' ? collective.legacyId : collective.id,
+                  account: { slug: collective.slug },
                   subject,
                   message,
                 },
@@ -157,6 +157,7 @@ CollectiveContactForm.propTypes = {
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     legacyId: PropTypes.number,
     name: PropTypes.string.isRequired,
+    slug: PropTypes.string,
   }),
   /* Defines whether this form is displayed as a modal */
   isModal: PropTypes.bool,

@@ -3664,6 +3664,7 @@ type Mutation {
   archiveCollective(id: Int!): CollectiveInterface
   unarchiveCollective(id: Int!): CollectiveInterface
   sendMessageToCollective(collectiveId: Int!, message: String!, subject: String): SendMessageToCollectiveResult
+    @deprecated(reason: "2022-08-01: Please use the sendMessage mutation from GraphQL v2 instead.")
 
   """
   Create a user with an optional organization.

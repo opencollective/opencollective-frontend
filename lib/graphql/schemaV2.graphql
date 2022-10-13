@@ -12017,6 +12017,22 @@ type Mutation {
     """
     account: AccountReferenceInput!
   ): Account
+
+  """
+  Send a message to an account. Scope: "account"
+  """
+  sendMessage(
+    """
+    Reference to the Account to send message to.
+    """
+    account: AccountReferenceInput!
+
+    """
+    Message to send to the account.
+    """
+    message: NonEmptyString!
+    subject: String
+  ): SendMessageResult
   createApplication(application: ApplicationCreateInput!): Application
   updateApplication(application: ApplicationUpdateInput!): Application
   deleteApplication(application: ApplicationReferenceInput!): Application
@@ -13115,6 +13131,15 @@ input PoliciesCollectiveMinimumAdminsInput {
   applies: PolicyApplication
   freeze: Boolean
 }
+
+type SendMessageResult {
+  success: Boolean
+}
+
+"""
+A string that cannot be passed as an empty value
+"""
+scalar NonEmptyString
 
 """
 Input type for Application
@@ -14303,11 +14328,6 @@ input TierUpdateInput {
   minimumAmount: AmountInput
   useStandalonePage: Boolean
 }
-
-"""
-A string that cannot be passed as an empty value
-"""
-scalar NonEmptyString
 
 input TierCreateInput {
   amount: AmountInput!

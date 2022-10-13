@@ -23,6 +23,9 @@ import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
+import DeleteVirtualCardModal from './DeleteVirtualCardModal';
+import EditVirtualCardModal from './EditVirtualCardModal';
+
 const CardContainer = styled(Flex)`
   border: 1px solid #dcdee0;
   border-radius: 12px;
@@ -132,6 +135,22 @@ const ActionsButton = props => {
   const arrowRef = React.useRef();
   const [displayActions, setDisplayActions] = React.useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = React.useState(false);
+  const [isEditingVirtualCard, setIsEditingVirtualCard] = React.useState(false);
+  const [isDeletingVirtualCard, setIsDeletingVirtualCard] = React.useState(false);
+  const { addToast } = useToasts();
+  const { virtualCard, host, canEditVirtualCard, canDeleteVirtualCard, confirmOnPauseCard } = props;
+
+  const handleActionSuccess = React.useCallback(
+    message => {
+      setIsEditingVirtualCard(false);
+      setIsDeletingVirtualCard(false);
+      addToast({
+        type: TOAST_TYPE.SUCCESS,
+        message: message,
+      });
+    },
+    [addToast],
+  );
 
   useGlobalBlur(wrapperRef, outside => {
     if (outside) {
@@ -146,18 +165,16 @@ const ActionsButton = props => {
     context: API_V2_CONTEXT,
   });
 
-  const isActive = props.data.status === 'active' || props.data.state === 'OPEN';
+  const isActive = virtualCard.data.status === 'active' || virtualCard.data.state === 'OPEN';
 
   const handlePauseUnpause = async () => {
     try {
       if (isActive) {
-        await pauseCard({ variables: { virtualCard: { id: props.id } } });
+        await pauseCard({ variables: { virtualCard: { id: virtualCard.id } } });
       } else {
-        await resumeCard({ variables: { virtualCard: { id: props.id } } });
+        await resumeCard({ variables: { virtualCard: { id: virtualCard.id } } });
       }
-      if (props.onSuccess) {
-        await props.onSuccess();
-      }
+      handleActionSuccess();
     } catch (e) {
       props.onError(e);
     }
@@ -206,10 +223,10 @@ const ActionsButton = props => {
                   boxShadow="0px 8px 12px rgba(20, 20, 20, 0.16)"
                 >
                   <Flex flexDirection="column" fontSize="13px" lineHeight="16px" fontWeight="500">
-                    {props.provider === 'STRIPE' && (
+                    {virtualCard.provider === 'STRIPE' && (
                       <Action
                         onClick={() =>
-                          props.confirmOnPauseCard ? setShowConfirmationModal(true) : handlePauseUnpause()
+                          confirmOnPauseCard && isActive ? setShowConfirmationModal(true) : handlePauseUnpause()
                         }
                         disabled={isLoading}
                       >
@@ -221,18 +238,18 @@ const ActionsButton = props => {
                         {isLoading && <StyledSpinner size="0.9em" mb="2px" />}
                       </Action>
                     )}
-                    {props.deleteHandler && (
+                    {canDeleteVirtualCard && (
                       <React.Fragment>
                         <StyledHr borderColor="black.300" mt={2} mb={2} />
-                        <Action onClick={props.deleteHandler}>
+                        <Action onClick={() => setIsDeletingVirtualCard(true)}>
                           <FormattedMessage defaultMessage="Delete Card" />
                         </Action>
                       </React.Fragment>
                     )}
-                    {props.editHandler && (
+                    {canEditVirtualCard && (
                       <React.Fragment>
                         <StyledHr borderColor="black.300" mt={2} mb={2} />
-                        <Action onClick={props.editHandler}>
+                        <Action onClick={() => setIsEditingVirtualCard(true)}>
                           <FormattedMessage defaultMessage="Edit Card Details" />
                         </Action>
                       </React.Fragment>
@@ -262,19 +279,40 @@ const ActionsButton = props => {
           </P>
         </ConfirmationModal>
       )}
+      {isEditingVirtualCard && (
+        <EditVirtualCardModal
+          host={host}
+          onSuccess={handleActionSuccess}
+          onClose={() => setIsEditingVirtualCard(false)}
+          virtualCard={virtualCard}
+        />
+      )}
+      {isDeletingVirtualCard && (
+        <DeleteVirtualCardModal
+          host={host}
+          onSuccess={handleActionSuccess}
+          onDeleteRefetchQuery={props.onDeleteRefetchQuery}
+          onClose={() => setIsDeletingVirtualCard(false)}
+          virtualCard={virtualCard}
+        />
+      )}
     </div>
   );
 };
 
 ActionsButton.propTypes = {
-  id: PropTypes.string,
-  data: PropTypes.object,
-  provider: PropTypes.string,
+  virtualCard: PropTypes.shape({
+    id: PropTypes.string,
+    data: PropTypes.object,
+    provider: PropTypes.string,
+  }),
+  host: PropTypes.object,
   onSuccess: PropTypes.func,
   onError: PropTypes.func,
-  editHandler: PropTypes.func,
-  deleteHandler: PropTypes.func,
   confirmOnPauseCard: PropTypes.bool,
+  canEditVirtualCard: PropTypes.bool,
+  canDeleteVirtualCard: PropTypes.bool,
+  onDeleteRefetchQuery: PropTypes.string,
 };
 
 const getLimitString = (spendingLimitAmount, spendingLimitInterval, currency, locale) => {
@@ -318,11 +356,12 @@ const VirtualCard = props => {
   const [displayDetails, setDisplayDetails] = React.useState(false);
   const intl = useIntl();
   const { addToast } = useToasts();
+  const { virtualCard } = props;
 
-  const isActive = props.data.state === 'OPEN' || props.data.status === 'active';
+  const isActive = virtualCard.data.state === 'OPEN' || virtualCard.data.status === 'active';
 
-  const name = props.name || '';
-  const cardNumber = `****  ****  ****  ${props.last4}`;
+  const name = virtualCard.name || '';
+  const cardNumber = `****  ****  ****  ${virtualCard.last4}`;
   const handleCopy = value => () => {
     navigator.clipboard.writeText(value);
     addToast({
@@ -337,13 +376,15 @@ const VirtualCard = props => {
       <Box flexGrow={1} m="24px 24px 0 24px">
         <Flex fontSize="16px" lineHeight="24px" fontWeight="500" justifyContent="space-between">
           <Box>{name}</Box>
-          <StateLabel isActive={isActive}>{(props.data.state || props.data.status).toUpperCase()}</StateLabel>
+          <StateLabel isActive={isActive}>
+            {(virtualCard.data.state || virtualCard.data.status).toUpperCase()}
+          </StateLabel>
         </Flex>
         {displayDetails ? (
           <React.Fragment>
             <P mt="27px" fontSize="18px" fontWeight="700" lineHeight="26px">
-              {props.privateData.cardNumber.replace(/\d{4}(?=.)/g, '$& ')}{' '}
-              <Action color="black" ml={2} onClick={handleCopy(props.privateData.cardNumber)}>
+              {virtualCard.privateData.cardNumber.replace(/\d{4}(?=.)/g, '$& ')}{' '}
+              <Action color="black" ml={2} onClick={handleCopy(virtualCard.privateData.cardNumber)}>
                 <Copy size="18px" />
               </Action>
             </P>
@@ -355,7 +396,7 @@ const VirtualCard = props => {
                 <P fontSize="18px" fontWeight="700" lineHeight="26px">
                   {
                     // expireDate should be removed once https://github.com/opencollective/opencollective-api/pull/7307 is deployed to production
-                    props.privateData.expireDate || props.privateData.expiryDate
+                    virtualCard.privateData.expireDate || virtualCard.privateData.expiryDate
                   }
 
                   <Action
@@ -363,7 +404,7 @@ const VirtualCard = props => {
                     ml={2}
                     onClick={
                       // expireDate should be removed once https://github.com/opencollective/opencollective-api/pull/7307 is deployed to production
-                      handleCopy(props.privateData.expireDate || props.privateData.expiryDate)
+                      handleCopy(virtualCard.privateData.expireDate || virtualCard.privateData.expiryDate)
                     }
                   >
                     <Copy size="18px" />
@@ -375,9 +416,9 @@ const VirtualCard = props => {
               </Box>
               <Box mt="19px">
                 <P fontSize="18px" fontWeight="700" lineHeight="26px">
-                  {props.privateData.cvv}
+                  {virtualCard.privateData.cvv}
 
-                  <Action color="black" ml={2} onClick={handleCopy(props.privateData.cvv)}>
+                  <Action color="black" ml={2} onClick={handleCopy(virtualCard.privateData.cvv)}>
                     <Box position="relative" display="inline-block">
                       <Copy size="18px" />
                     </Box>
@@ -395,19 +436,30 @@ const VirtualCard = props => {
               {cardNumber}
             </P>
             <Box mt="8px" fontSize="13px" fontWeight="500" lineHeight="20px">
-              <Avatar collective={props.account} radius="20px" display="inline-block" mr={2} verticalAlign="middle" />{' '}
-              {props.account.name}
+              <Avatar
+                collective={virtualCard.account}
+                radius="20px"
+                display="inline-block"
+                mr={2}
+                verticalAlign="middle"
+              />{' '}
+              {virtualCard.account.name}
             </Box>
             <P mt="27px" fontSize="13px" fontWeight="400" lineHeight="20px">
               <FormattedMessage
                 id="VirtualCards.AssignedOn"
                 defaultMessage="Assigned on {createdAt, date, short}"
                 values={{
-                  createdAt: new Date(props.createdAt),
+                  createdAt: new Date(virtualCard.createdAt),
                 }}
               />
               &nbsp;&middot;&nbsp;
-              {getLimitString(props.spendingLimitAmount, props.spendingLimitInterval, props.currency, intl.locale)}
+              {getLimitString(
+                virtualCard.spendingLimitAmount,
+                virtualCard.spendingLimitInterval,
+                virtualCard.currency,
+                intl.locale,
+              )}
             </P>
           </React.Fragment>
         )}
@@ -421,17 +473,15 @@ const VirtualCard = props => {
         alignItems="center"
         shrink={0}
       >
-        {props.canEditVirtualCard && (
+        {(props.canEditVirtualCard || props.canPauseOrResumeVirtualCard || props.canDeleteVirtualCard) && (
           <ActionsButton
-            id={props.id}
-            account={props.account}
-            data={props.data}
-            provider={props.provider}
-            onSuccess={props.onSuccess}
+            virtualCard={virtualCard}
+            host={props.host}
             onError={error => addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, error) })}
-            editHandler={props.editHandler}
-            deleteHandler={props.deleteHandler}
+            onDeleteRefetchQuery={props.onDeleteRefetchQuery}
             confirmOnPauseCard={props.confirmOnPauseCard}
+            canEditVirtualCard={props.canEditVirtualCard}
+            canDeleteVirtualCard={props.canDeleteVirtualCard}
           />
         )}
         <Action onClick={() => setDisplayDetails(!displayDetails)}>
@@ -454,25 +504,28 @@ const VirtualCard = props => {
 
 VirtualCard.propTypes = {
   canEditVirtualCard: PropTypes.bool,
-  onSuccess: PropTypes.func,
-  editHandler: PropTypes.func,
-  deleteHandler: PropTypes.func,
-  account: PropTypes.shape({
+  canPauseOrResumeVirtualCard: PropTypes.bool,
+  canDeleteVirtualCard: PropTypes.bool,
+  host: PropTypes.object,
+  virtualCard: PropTypes.shape({
     id: PropTypes.string,
-    imageUrl: PropTypes.string,
+    last4: PropTypes.string,
     name: PropTypes.string,
+    data: PropTypes.object,
+    privateData: PropTypes.object,
+    provider: PropTypes.string,
+    spendingLimitAmount: PropTypes.number,
+    spendingLimitInterval: PropTypes.string,
+    currency: PropTypes.string,
+    createdAt: PropTypes.string,
+    account: PropTypes.shape({
+      id: PropTypes.string,
+      imageUrl: PropTypes.string,
+      name: PropTypes.string,
+    }),
   }),
-  id: PropTypes.string,
-  last4: PropTypes.string,
-  name: PropTypes.string,
-  data: PropTypes.object,
-  privateData: PropTypes.object,
-  provider: PropTypes.string,
-  spendingLimitAmount: PropTypes.number,
-  spendingLimitInterval: PropTypes.string,
-  currency: PropTypes.string,
-  createdAt: PropTypes.string,
   confirmOnPauseCard: PropTypes.bool,
+  onDeleteRefetchQuery: PropTypes.string,
 };
 
 export default VirtualCard;
