@@ -123,11 +123,6 @@ exports.REWRITES = [
     destination: '/collective-contact',
   },
   {
-    source:
-      '/:hostCollectiveSlug/legacy-dashboard/:view(expenses|pending-applications|hosted-collectives|donations|reports)?',
-    destination: '/host.dashboard',
-  },
-  {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions',
     destination: '/transactions',
   },
