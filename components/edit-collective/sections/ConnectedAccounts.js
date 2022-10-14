@@ -11,6 +11,7 @@ import SettingsSectionTitle from './SettingsSectionTitle';
 
 const TITLE_OVERRIDE = {
   transferwise: 'Wise',
+  paypal: 'PayPal',
 };
 
 const ConnectedAccounts = props => {

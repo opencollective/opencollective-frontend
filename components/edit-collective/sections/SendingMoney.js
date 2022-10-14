@@ -6,6 +6,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import { gqlV1 } from '../../../lib/graphql/helpers';
 
+import { I18nSupportLink } from '../../I18nFormatters';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { P } from '../../Text';
@@ -64,6 +65,9 @@ class SendingMoney extends React.Component {
       paypalConnectButton = <FormattedMessage id="collective.paypalDisable.button" defaultMessage="Disable PayPal" />;
     }
 
+    const connectedAccounts = this.props.collective?.connectedAccounts;
+    const isPaypalConnected = connectedAccounts?.some(ca => ca.service === 'paypal');
+
     return (
       <Fragment>
         <ConnectedAccounts
@@ -71,11 +75,8 @@ class SendingMoney extends React.Component {
           connectedAccounts={this.props.collective.connectedAccounts}
           services={services}
         />
-        {!services.includes('paypal') && (
+        {services.includes('paypal') && isPaypalConnected && (
           <Fragment>
-            <SettingsSectionTitle>
-              <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage={'PayPal'} />
-            </SettingsSectionTitle>
             {!this.props.collective.settings?.disablePaypalPayouts && (
               <P mb={3}>
                 <FormattedMessage
@@ -102,15 +103,31 @@ class SendingMoney extends React.Component {
               mt={2}
               type="submit"
               maxWidth={200}
+              mr={2}
             >
               {paypalConnectButton}
             </StyledButton>
-            {this.state.error && (
-              <MessageBox type="error" withIcon my={3}>
-                {this.state.error}
-              </MessageBox>
-            )}
           </Fragment>
+        )}
+        {!services.includes('paypal') && (
+          <Fragment>
+            <SettingsSectionTitle>
+              <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage="PayPal" />
+            </SettingsSectionTitle>
+            <MessageBox type="info" withIcon>
+              <FormattedMessage
+                defaultMessage="Please contact <SupportLink>support</SupportLink> if you like to activate PayPal Payouts for sending money."
+                values={{
+                  SupportLink: I18nSupportLink,
+                }}
+              />
+            </MessageBox>
+          </Fragment>
+        )}
+        {this.state.error && (
+          <MessageBox type="error" withIcon my={3}>
+            {this.state.error}
+          </MessageBox>
         )}
       </Fragment>
     );
