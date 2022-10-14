@@ -100,7 +100,7 @@ const getDefaultExpense = collective => ({
   privateMessage: '',
   invoiceInfo: '',
   currency: collective.currency,
-  taxes: [],
+  taxes: null,
   payeeLocation: {
     address: '',
     country: null,

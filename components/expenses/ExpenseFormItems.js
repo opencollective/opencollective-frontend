@@ -179,6 +179,21 @@ class ExpenseFormItems extends React.PureComponent {
     }
   }
 
+  hasTaxFields(taxType) {
+    if (!taxType) {
+      return false;
+    }
+
+    const { values } = this.props.form;
+    if (!values.taxes) {
+      // If tax is not initialized (create expense) we render the fields by default
+      return true;
+    } else {
+      // If tax is initialized (edit expense) we render the fields only if there are values
+      return values.taxes[0] && !values.taxes[0].isDisabled;
+    }
+  }
+
   render() {
     const { values, errors, setFieldValue } = this.props.form;
     const requireFile = attachmentRequiresFile(values.type);
@@ -214,7 +229,7 @@ class ExpenseFormItems extends React.PureComponent {
     const onRemove = requireFile || items.length > 1 ? this.remove : null;
     const availableCurrencies = this.getPossibleCurrencies();
     const taxType = this.getApplicableTaxType();
-    const hasTaxFields = taxType && !values.taxes?.[0]?.isDisabled; // True by default
+    const hasTaxFields = this.hasTaxFields(taxType);
     return (
       <Box>
         {this.renderErrors()}
