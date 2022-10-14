@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
@@ -13,7 +13,7 @@ import StyledCheckbox from '../StyledCheckbox';
 import StyledInputField from '../StyledInputField';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-export const editAccountFlagsMutation = gqlV2/* GraphQL */ `
+export const editAccountFlagsMutation = gql`
   mutation EditAccountFlags($account: AccountReferenceInput!, $isArchived: Boolean, $isTrustedHost: Boolean) {
     editAccountFlags(account: $account, isArchived: $isArchived, isTrustedHost: $isTrustedHost) {
       id
