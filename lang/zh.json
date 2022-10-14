@@ -1346,6 +1346,7 @@
   "forms.optional": "可选",
   "FpmEYP": "Why do you need my legal name?",
   "fqHI7A": "New comment on update",
+  "FR8IoI": "If yes, you will still receive existing recurring contributions for this deleted tier.",
   "FRBgoF": "帐号已创建",
   "Frequency": "频率",
   "Frequency.change": "修改频率？",
@@ -1702,6 +1703,7 @@
   "hX1cHH": "<Expense>Expense</Expense> processing",
   "hx2hjA": "Total money managed per year",
   "HYFu3j": "批量付款失败",
+  "iG8QUh": "Do you want to continue recurring contributions?",
   "IgOygF": "查看文档",
   "iHkkt+": "管理财务托管",
   "iHRy9Z": "Rejected <Expense>expense</Expense> for <Account></Account>",
@@ -2827,6 +2829,7 @@
   "XoiuR5": "Crypto <Order>order</Order> from <FromAccount></FromAccount> to <Account></Account> set as processing",
   "XvKF/A": "预览通知",
   "XW00me": "Your host requires that Collectives have {numberOfAdmins, plural, one {# active administrator} other {# active administrators} }.",
+  "xxi1Y+": "The tier will be deleted forever and can't be retrieved.",
   "Y0G9KM": "成为财务托管",
   "YdC/Ok": "卡片创建成功！",
   "year": "每年",
@@ -2834,6 +2837,7 @@
   "YG0Ra/": "Check this to limit access to the content of this update to contributors only",
   "Yh1nOL": "我们已发送至 {email}",
   "YhM3lt": "预算透明",
+  "yHvRF3": "Don't Delete",
   "YjO/0+": "自己",
   "yKF8y5": "了解更多关于创建集体的信息",
   "yKslCj": "Virtual card charge declined on <Account></Account>",
@@ -2859,5 +2863,6 @@
   "zu5ckP": "退款和拒绝记录的交易。",
   "ZuoHDU": "资金贡献",
   "ZvWD3X": "支持活动或购买门票。",
-  "zWgbGg": "今天"
+  "zWgbGg": "今天",
+  "zYN+lZ": "Delete Tier"
 }
