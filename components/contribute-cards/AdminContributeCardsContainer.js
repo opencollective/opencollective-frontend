@@ -7,11 +7,11 @@ import { FormattedMessage } from 'react-intl';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import ContributeCardsContainer from '../collective-page/ContributeCardsContainer';
+import EditTierModal from '../edit-collective/tiers/EditTierModal';
 
 import ContributeCardContainer from './ContributeCardContainer';
 import CreateNew from './CreateNew';
 import DraggableContributeCardWrapper from './DraggableContributeCardWrapper';
-import EditTierModal from './EditTierModal';
 
 /**
  * Display a list of contribution cards wrapped in a DragAndDrop provider

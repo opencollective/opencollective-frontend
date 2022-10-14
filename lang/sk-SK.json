@@ -908,7 +908,6 @@
   "E80WrK": "Informácie",
   "E8zg4M": "Aplikácia \"{name}\" vytvorená",
   "ecapW0": "New draft created for <Expense>recurring expense</Expense> on <Account></Account>",
-  "Ed112w": "Flags",
   "Edit": "Upraviť",
   "editCollective.admins.description": "Prosím, upresnite minimálny požadovaný počet správcov pre kolektív, aby ho váš fiškálny hostiteľ akceptoval a aby mohol prijímať príspevky.",
   "editCollective.admins.header": "Požadovaný počet správcov",
@@ -1347,6 +1346,7 @@
   "forms.optional": "Voliteľné",
   "FpmEYP": "Prečo potrebujete moje zákonné meno?",
   "fqHI7A": "New comment on update",
+  "FR8IoI": "If yes, you will still receive existing recurring contributions for this deleted tier.",
   "FRBgoF": "Account created",
   "Frequency": "Frekvencia",
   "Frequency.change": "Zmeniť frekvenciu?",
@@ -1703,6 +1703,7 @@
   "hX1cHH": "<Expense>Expense</Expense> processing",
   "hx2hjA": "Total money managed per year",
   "HYFu3j": "Batch payment failed",
+  "iG8QUh": "Do you want to continue recurring contributions?",
   "IgOygF": "View documentation",
   "iHkkt+": "Administrate fiscal hosts.",
   "iHRy9Z": "Rejected <Expense>expense</Expense> for <Account></Account>",
@@ -2828,7 +2829,7 @@
   "XoiuR5": "Crypto <Order>order</Order> from <FromAccount></FromAccount> to <Account></Account> set as processing",
   "XvKF/A": "Náhľad notifikácie",
   "XW00me": "Váš hostiteľ vyžaduje, aby kolektívy mali {numberOfAdmins, plural, one {# aktívneho správcu} other {# aktívnych správcov} }.",
-  "xZejyI": "Account flags saved",
+  "xxi1Y+": "The tier will be deleted forever and can't be retrieved.",
   "Y0G9KM": "Join as a Fiscal Host",
   "YdC/Ok": "Card successfully created",
   "year": "Ročne",
@@ -2836,6 +2837,7 @@
   "YG0Ra/": "Check this to limit access to the content of this update to contributors only",
   "Yh1nOL": "We've sent it to {email}",
   "YhM3lt": "Transparent budget",
+  "yHvRF3": "Don't Delete",
   "YjO/0+": "Ja",
   "yKF8y5": "Learn more about creating a Collective",
   "yKslCj": "Virtual card charge declined on <Account></Account>",
@@ -2861,5 +2863,6 @@
   "zu5ckP": "Refund and reject recorded transactions.",
   "ZuoHDU": "Financial contributions",
   "ZvWD3X": "Podporte podujatie alebo si zakúpte vstupenky, ak si želáte zúčastniť sa.",
-  "zWgbGg": "Dnes"
+  "zWgbGg": "Dnes",
+  "zYN+lZ": "Delete Tier"
 }

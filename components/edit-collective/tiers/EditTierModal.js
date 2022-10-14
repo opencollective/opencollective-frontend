@@ -1,33 +1,35 @@
-/* eslint-disable react/display-name */
-/* eslint-disable react/prop-types */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../../lib/constants/collectives';
-import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
-import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
-import { requireFields } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { CollectiveType } from '../../../lib/constants/collectives';
+import { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
+import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
+import { i18nGraphqlException } from '../../../lib/errors';
+import { requireFields } from '../../../lib/form-utils';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
-import { Flex } from '../Grid';
-import InputFieldPresets from '../InputFieldPresets';
-import InputSwitch from '../InputSwitch';
-import Link from '../Link';
-import StyledButton from '../StyledButton';
-import StyledInput from '../StyledInput';
-import StyledInputAmount from '../StyledInputAmount';
-import StyledInputFormikField from '../StyledInputFormikField';
-import StyledLink from '../StyledLink';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
-import StyledSelect from '../StyledSelect';
-import StyledTextarea from '../StyledTextarea';
+import ContributeTier from '../../contribute-cards/ContributeTier';
+import { Flex } from '../../Grid';
+import InputFieldPresets from '../../InputFieldPresets';
+import InputSwitch from '../../InputSwitch';
+import Link from '../../Link';
+import StyledButton from '../../StyledButton';
+import StyledInput from '../../StyledInput';
+import StyledInputAmount from '../../StyledInputAmount';
+import StyledInputFormikField from '../../StyledInputFormikField';
+import StyledLink from '../../StyledLink';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
+import StyledSelect from '../../StyledSelect';
+import StyledTextarea from '../../StyledTextarea';
+import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
-import ContributeTier from './ContributeTier';
+import ConfirmTierDeleteModal from './ConfirmTierDeleteModal';
 
 const { FUND, PROJECT } = CollectiveType;
 const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
@@ -389,7 +391,7 @@ function FormFields({ collective, types, values }) {
             {({ field, form }) => (
               <InputSwitch
                 name={field.name}
-                value={field.value}
+                checked={field.value}
                 onChange={event => form.setFieldValue(field.name, event.target.checked)}
               />
             )}
@@ -459,18 +461,84 @@ function FormFields({ collective, types, values }) {
   );
 }
 
+FormFields.propTypes = {
+  collective: PropTypes.shape({
+    host: PropTypes.object,
+    currency: PropTypes.string,
+    type: PropTypes.string,
+  }),
+  values: PropTypes.shape({
+    id: PropTypes.string,
+    slug: PropTypes.string,
+    type: PropTypes.string,
+    amountType: PropTypes.string,
+    interval: PropTypes.string,
+  }),
+  types: PropTypes.array,
+};
+
 const EditSectionContainer = styled(Flex)`
   overflow: scroll;
-  max-height: 600px;
-  width: 400px;
+  flex-grow: 1;
   flex-direction: column;
   padding-right: 1rem;
+  min-width: 250px;
+
+  @media (min-width: 700px) {
+    max-height: 600px;
+  }
 `;
 
 const PreviewSectionContainer = styled(Flex)`
   overflow: hidden;
   max-height: 600px;
-  width: 300px;
+  flex-grow: 1;
+  min-width: 300px;
+  justify-content: center;
+  @media (max-width: 700px) {
+    margin: 0 -20px;
+  }
+`;
+
+const ModalSectionContainer = styled(Flex)`
+  @media (max-width: 700px) {
+    flex-wrap: wrap;
+    gap: 2em;
+    align-items: center;
+  }
+`;
+
+const EditModalActionsContainer = styled(Flex)`
+  justify-content: right;
+  flex-wrap: wrap;
+  gap: 1em;
+
+  @media (max-width: 700px) {
+    & > button {
+      width: 100%;
+    }
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+`;
+
+const ConfirmModalButton = styled(StyledButton)`
+  @media (max-width: 700px) {
+    order: 1;
+  }
+`;
+
+const DeleteModalButton = styled(StyledButton)`
+  @media (max-width: 700px) {
+    order: 2;
+  }
+`;
+
+const CancelModalButton = styled(StyledButton)`
+  @media (max-width: 700px) {
+    order: 3;
+  }
 `;
 
 const ModalContainer = styled(StyledModal)`
@@ -484,6 +552,9 @@ const FieldDescription = styled.div`
 
 const ContributeCardPreviewContainer = styled.div`
   padding: 2rem;
+  @media (max-width: 700px) {
+    padding: 0;
+  }
 `;
 
 export default function EditTierModal({ tier, collective, onClose }) {
@@ -493,6 +564,12 @@ export default function EditTierModal({ tier, collective, onClose }) {
     </ModalContainer>
   );
 }
+
+EditTierModal.propTypes = {
+  tier: PropTypes.object,
+  collective: PropTypes.object,
+  onClose: PropTypes.func,
+};
 
 export function ContributeCardPreview({ tier, collective }) {
   const intl = useIntl();
@@ -513,6 +590,14 @@ export function ContributeCardPreview({ tier, collective }) {
     </ContributeCardPreviewContainer>
   );
 }
+
+ContributeCardPreview.propTypes = {
+  tier: PropTypes.shape({
+    legacyId: PropTypes.number,
+    maxQuantity: PropTypes.number,
+  }),
+  collective: PropTypes.object,
+};
 
 const listTierQuery = gql`
   query AccountTiers($accountSlug: String!) {
@@ -632,14 +717,15 @@ const createTierMutation = gql`
 `;
 
 const deleteTierMutation = gql`
-  mutation DeleteTier($tier: TierReferenceInput!) {
-    deleteTier(tier: $tier) {
+  mutation DeleteTier($tier: TierReferenceInput!, $stopRecurringContributions: Boolean! = false) {
+    deleteTier(tier: $tier, stopRecurringContributions: $stopRecurringContributions) {
       id
     }
   }
 `;
 
 export function EditTierForm({ tier, collective, onClose }) {
+  const intl = useIntl();
   const isEditing = React.useMemo(() => !!tier?.id);
   const initialValues = React.useMemo(() => {
     if (isEditing) {
@@ -704,10 +790,30 @@ export function EditTierForm({ tier, collective, onClose }) {
     awaitRefetchQueries: true,
   });
 
+  const [isConfirmingDelete, setIsConfirmingDelete] = React.useState(false);
+  const { addToast } = useToasts();
+
   const onDeleteTierClick = React.useCallback(async () => {
-    await deleteTier();
-    onClose();
-  }, [deleteTier]);
+    setIsConfirmingDelete(true);
+  }, []);
+
+  const onConfirmDelete = React.useCallback(
+    async keepRecurringContributions => {
+      try {
+        await deleteTier({
+          variables: {
+            stopRecurringContributions: !keepRecurringContributions,
+          },
+        });
+        onClose();
+      } catch (e) {
+        addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e.message) });
+      } finally {
+        setIsConfirmingDelete(false);
+      }
+    },
+    [deleteTier],
+  );
 
   return (
     <React.Fragment>
@@ -724,13 +830,16 @@ export function EditTierForm({ tier, collective, onClose }) {
             minimumAmount: values?.minimumAmount?.valueInCents ? values.minimumAmount : null,
           };
 
-          await submitFormMutation({
-            variables: {
-              tier,
-            },
-          });
-
-          onClose();
+          try {
+            await submitFormMutation({
+              variables: {
+                tier,
+              },
+            });
+            onClose();
+          } catch (e) {
+            addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+          }
         }}
       >
         {({ values, isSubmitting }) => {
@@ -744,39 +853,37 @@ export function EditTierForm({ tier, collective, onClose }) {
                 )}
               </ModalHeader>
               <ModalBody>
-                <Flex>
+                <ModalSectionContainer>
                   <EditSectionContainer>
                     <FormFields collective={collective} values={values} />
                   </EditSectionContainer>
                   <PreviewSectionContainer>
                     <ContributeCardPreview collective={collective} tier={values} />
                   </PreviewSectionContainer>
-                </Flex>
+                </ModalSectionContainer>
               </ModalBody>
               <ModalFooter isFullWidth dividerMargin="1rem 0">
-                <Flex justifyContent="right" flexWrap="wrap">
+                <EditModalActionsContainer>
                   {isEditing && (
-                    <StyledButton
+                    <DeleteModalButton
                       type="button"
                       data-cy="delete-btn"
                       buttonStyle="dangerSecondary"
-                      mx={2}
                       minWidth={120}
                       onClick={onDeleteTierClick}
                       loading={isDeleting}
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isConfirmingDelete}
                       marginRight="auto"
                     >
                       <FormattedMessage id="actions.delete" defaultMessage="Delete" />
-                    </StyledButton>
+                    </DeleteModalButton>
                   )}
-                  <StyledButton
+                  <ConfirmModalButton
                     type="submit"
                     data-cy="confirm-btn"
                     buttonStyle="primary"
-                    mx={2}
                     minWidth={120}
-                    disabled={isDeleting}
+                    disabled={isDeleting || isConfirmingDelete}
                     loading={isSubmitting}
                   >
                     {isEditing ? (
@@ -784,23 +891,35 @@ export function EditTierForm({ tier, collective, onClose }) {
                     ) : (
                       <FormattedMessage id="create" defaultMessage="Create" />
                     )}
-                  </StyledButton>
-                  <StyledButton
+                  </ConfirmModalButton>
+                  <CancelModalButton
                     type="button"
                     data-cy="cancel-btn"
-                    disabled={isSubmitting || isDeleting}
-                    mx={2}
+                    disabled={isSubmitting || isDeleting || isConfirmingDelete}
                     minWidth={100}
                     onClick={onClose}
                   >
                     <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-                  </StyledButton>
-                </Flex>
+                  </CancelModalButton>
+                </EditModalActionsContainer>
               </ModalFooter>
             </Form>
           );
         }}
       </Formik>
+      {isConfirmingDelete && (
+        <ConfirmTierDeleteModal
+          isDeleting={isDeleting}
+          onClose={() => setIsConfirmingDelete(false)}
+          onConfirmDelete={onConfirmDelete}
+        />
+      )}
     </React.Fragment>
   );
 }
+
+EditTierForm.propTypes = {
+  collective: PropTypes.object,
+  tier: PropTypes.object,
+  onClose: PropTypes.func,
+};
