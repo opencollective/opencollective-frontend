@@ -313,6 +313,12 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
             if (!values.collective && contentRef.current) {
               contentRef.current.scrollIntoView({ behavior: 'smooth' });
             }
+
+            // Since the OSC flow is using a standalone form, without any TOS checkbox in this modal, skip validation here
+            if (isOSCHost) {
+              return {};
+            }
+
             return requireFields(values, host.termsUrl ? ['areTosChecked', 'collective'] : ['collective']);
           }}
           onSubmit={async values => {
