@@ -107,6 +107,12 @@ class HorizontalScroller extends React.PureComponent {
     });
   });
 
+  UNSAFE_componentWillReceiveProps() {
+    this.setState({
+      canGoNext: false,
+    });
+  }
+
   // Manually move scroll. We don't need to check for limits here because browsers
   // already cap the value. See https://developer.mozilla.org/en/docs/Web/API/Element/scrollLeft:
   // > scrollLeft can be specified as any integer value. However:
