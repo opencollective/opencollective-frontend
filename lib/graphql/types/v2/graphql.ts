@@ -3264,6 +3264,7 @@ export type Expense = {
   requestedByAccount?: Maybe<Account>;
   /** Returns the list of legal documents required from the payee before the expense can be payed. Must be logged in. */
   requiredLegalDocuments?: Maybe<Array<Maybe<LegalDocumentType>>>;
+  securityChecks?: Maybe<Array<Maybe<SecurityCheck>>>;
   /** The state of the expense (pending, approved, paid, rejected...etc) */
   status: ExpenseStatus;
   tags: Array<Maybe<Scalars['String']>>;
@@ -7307,6 +7308,34 @@ export enum RecurringExpenseInterval {
   quarter = 'quarter',
   week = 'week',
   year = 'year'
+}
+
+export type SecurityCheck = {
+  __typename?: 'SecurityCheck';
+  /** SecurityCheck details */
+  details?: Maybe<Scalars['String']>;
+  /** The SecurityCheck level */
+  level: SecurityCheckLevel;
+  /** SecurityCheck description message */
+  message: Scalars['String'];
+  /** The SecurityCheck scope */
+  scope: SecurityCheckScope;
+};
+
+/** All supported SecurityCheck levels */
+export enum SecurityCheckLevel {
+  HIGH = 'HIGH',
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  PASS = 'PASS'
+}
+
+/** All supported SecurityCheck scopes */
+export enum SecurityCheckScope {
+  COLLECTIVE = 'COLLECTIVE',
+  PAYEE = 'PAYEE',
+  PAYOUT_METHOD = 'PAYOUT_METHOD',
+  USER = 'USER'
 }
 
 export type SendMessageResult = {
