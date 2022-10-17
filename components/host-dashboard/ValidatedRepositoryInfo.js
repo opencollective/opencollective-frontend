@@ -102,7 +102,7 @@ function ValidatedRepositoryInfo({ customData }) {
                 license:
                   !field?.value || field.value === 'NOASSERTION'
                     ? 'Not found'
-                    : `${field.value} (${spdxLicenses[field.value].name})`,
+                    : `${field.value} (${spdxLicenses[field.value]?.name || 'Unknown'})`,
               })}{' '}
               {licenseSpdxId && licenseSpdxId !== field?.value && (
                 <Span color="black.600">{intl.formatMessage(msg.licenseManually, { license: licenseSpdxId })}</Span>
