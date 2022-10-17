@@ -221,7 +221,7 @@ const StyledModal = ({ children, onClose, usePortal, hasUnsavedChanges, trapFocu
           <TrapContainer>
             <Modal {...props}>
               {React.Children.map(children, child => {
-                if (child.type.displayName === 'Header') {
+                if (child?.type?.displayName === 'Header') {
                   return React.cloneElement(child, { onClose: closeHandler });
                 }
                 return child;
@@ -241,7 +241,7 @@ const StyledModal = ({ children, onClose, usePortal, hasUnsavedChanges, trapFocu
           <TrapContainer>
             <Modal {...props}>
               {React.Children.map(children, child => {
-                if (child.type?.displayName === 'Header') {
+                if (child?.type?.displayName === 'Header') {
                   return React.cloneElement(child, { onClose: closeHandler });
                 }
                 return child;
