@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Shield } from '@styled-icons/boxicons-solid/Shield';
+import { ShieldFillCheck } from '@styled-icons/bootstrap/ShieldFillCheck';
+import { ShieldFillExclamation } from '@styled-icons/bootstrap/ShieldFillExclamation';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
@@ -214,6 +215,7 @@ export const SecurityChecksButton = ({ expense, ...buttonProps }) => {
   const [hasModal, setHasModal] = React.useState(false);
   const highRiskChecks = expense?.securityChecks?.filter(check => check.level === 'HIGH').length || 0;
   const higherRisk = first(compact(LEVEL_ORDER.map(level => find(expense?.securityChecks, { level }))));
+  const ShieldIcon = highRiskChecks ? ShieldFillExclamation : ShieldFillCheck;
 
   return (
     <React.Fragment>
@@ -223,7 +225,7 @@ export const SecurityChecksButton = ({ expense, ...buttonProps }) => {
         onClick={() => setHasModal(true)}
       >
         {highRiskChecks ? <Indicator>{highRiskChecks}</Indicator> : null}
-        <Shield size={20} />
+        <ShieldIcon size={18} />
       </RoundButton>
       {hasModal && <SecurityChecksModal expense={expense} onClose={() => setHasModal(false)} />}
     </React.Fragment>
