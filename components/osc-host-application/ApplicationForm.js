@@ -134,11 +134,7 @@ const messages = defineMessages({
   },
   repositoryUrl: {
     id: 'HostApplication.form.RepositoryUrlLabel',
-    defaultMessage: 'Link your Repository or Organisation',
-  },
-  repositoryUrlHint: {
-    id: 'HostApplication.form.RepositoryUrlHint',
-    defaultMessage: 'You can link your github/gitlab etc.',
+    defaultMessage: 'Your Repository or Organization',
   },
   repositoryLicense: {
     id: 'HostApplication.form.license',
@@ -175,15 +171,11 @@ const messages = defineMessages({
   },
   linksToLicenses: {
     id: 'HostApplication.form.linksToLicenses',
-    defaultMessage: 'Link your license(s)',
-  },
-  linksToLicensesPlaceholder: {
-    id: 'HostApplication.form.linksToLicensesPlaceholder',
-    defaultMessage: 'You can add the links to your secondary or additional licenses here',
+    defaultMessage: 'Extra information about your license(s)',
   },
   linksToLicensesHelpText: {
     id: 'HostApplication.form.linksToLicensesHelpText',
-    defaultMessage: 'If you have more than one license, you can link them here',
+    defaultMessage: 'If your license is unrecognized or have more than one license, add information here',
   },
   publicInformation: {
     id: 'HostApplication.form.publicInformation',
@@ -192,11 +184,21 @@ const messages = defineMessages({
   },
   aboutYourCommunityTitle: {
     id: 'HostApplication.form.aboutYourCommunity',
-    defaultMessage: 'About your community {optional} {padlock}',
+    defaultMessage: 'About your community {optional}',
+  },
+  aboutYourCommunitySubtitle: {
+    id: 'HostApplication.form.aboutYourCommunity.subtitle',
+    defaultMessage:
+      'If applicable, please share information about your community and your events so we can properly consider your application.',
   },
   aboutYourCodeTitle: {
     id: 'HostApplication.form.code',
-    defaultMessage: 'About your Code {optional} {padlock}',
+    defaultMessage: 'About your Code {optional}',
+  },
+  aboutYourCodeSubtitle: {
+    id: 'HostApplication.form.code.subtitle',
+    defaultMessage:
+      "If a codebase is central to your community's work please share information about your code and license so we can properly consider your application.",
   },
 });
 
@@ -380,22 +382,10 @@ const ApplicationForm = ({
                       <Box mb={3}>
                         <Flex alignItems="center" justifyContent="stretch" gap={6} mb={3}>
                           <H4 fontSize="18px" lineHeight="24px" color="black.900">
-                            <FormattedMessage
-                              id="HostApplication.form.mainInfo"
-                              defaultMessage="Main info {padlock}"
-                              values={{
-                                padlock: <Lock size="16px" lineHeight="24px" color="#75777A" />,
-                              }}
-                            />
+                            <FormattedMessage id="HostApplication.form.mainInfo" defaultMessage="Main info" />
                           </H4>
                           <StyledHr flex="1" />
                         </Flex>
-                        <P fontSize="14px" lineHeight="20px" color="black.700">
-                          <FormattedMessage
-                            id="HostApplication.form.publicInformation"
-                            defaultMessage="This information is public. Please do not add any personal information such as names or addresses in this field."
-                          />
-                        </P>
                       </Box>
                       {!LoggedInUser && (
                         <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} py={2}>
@@ -516,7 +506,6 @@ const ApplicationForm = ({
 
                       <CollapseSection
                         title={intl.formatMessage(messages.aboutYourCodeTitle, {
-                          padlock: <Lock size="16px" color="#75777A" />,
                           optional: (
                             <Span fontWeight={400} color="black.700">
                               (<FormattedMessage id="forms.optional" defaultMessage="Optional" />)
@@ -524,7 +513,7 @@ const ApplicationForm = ({
                           ),
                         })}
                         imageSrc="/static/images/night-sky.png"
-                        subtitle={intl.formatMessage(messages.publicInformation)}
+                        subtitle={intl.formatMessage(messages.aboutYourCodeSubtitle)}
                       >
                         <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} pt={2}>
                           <Box>
@@ -547,7 +536,7 @@ const ApplicationForm = ({
                             <P fontSize="13px" lineHeight="20px" color="black.600" mt="6px">
                               <FormattedMessage
                                 id="HostApplication.repositoryUrlHint"
-                                defaultMessage="You can link your github/gitlab etc."
+                                defaultMessage="Can be GitHub, GitLab or any URL"
                               />
                             </P>
                           </Box>
@@ -587,7 +576,7 @@ const ApplicationForm = ({
                               <StyledTextarea
                                 {...field}
                                 rows={4}
-                                placeholder={intl.formatMessage(messages.linksToLicensesPlaceholder)}
+                                placeholder={intl.formatMessage(messages.linksToLicensesHelpText)}
                               />
                             )}
                           </StyledInputFormikField>
@@ -599,7 +588,6 @@ const ApplicationForm = ({
 
                       <CollapseSection
                         title={intl.formatMessage(messages.aboutYourCommunityTitle, {
-                          padlock: <Lock size="16px" color="#75777A" />,
                           optional: (
                             <Span fontWeight={400} color="black.700">
                               (<FormattedMessage id="forms.optional" defaultMessage="Optional" />)
@@ -607,7 +595,7 @@ const ApplicationForm = ({
                           ),
                         })}
                         imageSrc="/static/images/community.png"
-                        subtitle={intl.formatMessage(messages.publicInformation)}
+                        subtitle={intl.formatMessage(messages.aboutYourCommunitySubtitle)}
                       >
                         <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} pt={2}>
                           <Box>
@@ -656,7 +644,7 @@ const ApplicationForm = ({
                           <H4 fontSize="18px" lineHeight="24px" color="black.900">
                             <FormattedMessage
                               id="HostApplication.form.team"
-                              defaultMessage="Your team {padlock}"
+                              defaultMessage="Your team"
                               values={{
                                 padlock: <Lock size="16px" color="#75777A" />,
                               }}
@@ -664,12 +652,6 @@ const ApplicationForm = ({
                           </H4>
                           <StyledHr flex="1" />
                         </Flex>
-                        <P fontSize="14px" lineHeight="20px" color="black.700">
-                          <FormattedMessage
-                            id="HostApplication.form.publicInformation"
-                            defaultMessage="This information is public. Please do not add any personal information such as names or addresses in this field."
-                          />
-                        </P>
                       </Box>
 
                       <Box my={2}>
