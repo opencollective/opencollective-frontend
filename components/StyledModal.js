@@ -79,6 +79,7 @@ const Header = styled(Container)`
   display: flex;
   text-shadow: none;
   justify-content: space-between;
+  align-items: flex-start;
 `;
 
 export const ModalBody = styled(Container)``;
