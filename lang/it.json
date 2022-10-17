@@ -1638,7 +1638,7 @@
   "HostApplication.form.aboutYourCommunity.subtitle": "If applicable, please share information about your community and your events so we can properly consider your application.",
   "HostApplication.form.amountOfMembers": "How many members do you have?",
   "HostApplication.form.code": "About your Code {optional}",
-  "HostApplication.form.code.subtitle": "If applicable, please share information about your code and your license so we can properly consider your application.",
+  "HostApplication.form.code.subtitle": "If a codebase is central to your community's work please share information about your code and license so we can properly consider your application.",
   "HostApplication.form.license": "License",
   "HostApplication.form.linksToLicenses": "Extra information about your license(s)",
   "HostApplication.form.linksToLicensesHelpText": "If your license is unrecognized or have more than one license, add information here",

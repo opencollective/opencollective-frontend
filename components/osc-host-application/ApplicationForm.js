@@ -198,7 +198,7 @@ const messages = defineMessages({
   aboutYourCodeSubtitle: {
     id: 'HostApplication.form.code.subtitle',
     defaultMessage:
-      'If a codebase is central to your community's work please share information about your code and license so we can properly consider your application.',
+      "If a codebase is central to your community's work please share information about your code and license so we can properly consider your application.",
   },
 });
 
