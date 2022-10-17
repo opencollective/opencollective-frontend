@@ -28,7 +28,7 @@ const FieldWithValidationBadge = ({ field, children }) => {
 
 const ValidatedFieldPropType = PropTypes.shape({
   isValid: PropTypes.bool,
-  value: PropTypes.string || PropTypes.number || PropTypes.bool,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool]),
 });
 
 FieldWithValidationBadge.propTypes = {
@@ -100,9 +100,11 @@ function ValidatedRepositoryInfo({ customData }) {
             <React.Fragment>
               {intl.formatMessage(msg.license, {
                 license:
-                  field.value === 'NOASSERTION' ? 'Not found' : `${field.value} (${spdxLicenses[field.value].name})`,
+                  !field?.value || field.value === 'NOASSERTION'
+                    ? 'Not found'
+                    : `${field.value} (${spdxLicenses[field.value]?.name || 'Unknown'})`,
               })}{' '}
-              {licenseSpdxId && licenseSpdxId !== field.value && (
+              {licenseSpdxId && licenseSpdxId !== field?.value && (
                 <Span color="black.600">{intl.formatMessage(msg.licenseManually, { license: licenseSpdxId })}</Span>
               )}
             </React.Fragment>
