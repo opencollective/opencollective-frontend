@@ -80,7 +80,7 @@ const GithubRepositories = ({ repositories, setGithubInfo, ...fieldProps }) => {
             </H4>
           </Container>
         )}
-        <Box maxHeight="640px" overflow="auto">
+        <Box maxHeight="420px" overflow="auto">
           <StyledRadioList
             {...fieldProps}
             options={repositories}
