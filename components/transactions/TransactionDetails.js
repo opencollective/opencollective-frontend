@@ -168,6 +168,14 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
             </React.Fragment>
           )}
         </DetailDescription>
+        {order.memo && (
+          <React.Fragment>
+            <DetailTitle>
+              <FormattedMessage defaultMessage="Memo" />
+            </DetailTitle>
+            <DetailDescription>{order.memo}</DetailDescription>
+          </React.Fragment>
+        )}
       </Flex>
       <Flex flexDirection="column" width={[1, 0.35]}>
         <Box>
@@ -288,6 +296,7 @@ TransactionDetails.propTypes = {
     order: PropTypes.shape({
       id: PropTypes.string,
       status: PropTypes.string,
+      memo: PropTypes.string,
     }),
     expense: PropTypes.object,
     id: PropTypes.string,
