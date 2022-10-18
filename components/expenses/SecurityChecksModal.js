@@ -119,7 +119,7 @@ const SecurityChecksModal = ({ expense, onClose, onConfirm, ...modalProps }) => 
   const [scope, setScope] = React.useState();
 
   return (
-    <StyledModal onClose={onClose} width="680px" {...modalProps}>
+    <StyledModal onClose={onClose} width="680px" data-cy="security-check-modal" {...modalProps}>
       <ModalHeader onClose={onClose}>
         <Box>
           <H1 color="black.900" fontSize="20px" lineHeight="28px">
@@ -159,7 +159,7 @@ const SecurityChecksModal = ({ expense, onClose, onConfirm, ...modalProps }) => 
             <StyledButton onClick={onClose}>
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </StyledButton>
-            <StyledButton buttonStyle="primary" onClick={onConfirm}>
+            <StyledButton buttonStyle="primary" onClick={onConfirm} data-cy="pay-button">
               <FormattedMessage id="SecurityChecksModal.confirm.button" defaultMessage="Yes, Continue to Payment" />
             </StyledButton>
           </Flex>
