@@ -537,7 +537,9 @@ const ApplicationForm = ({
                                 const { value } = e.target;
                                 if (value === 'COMMUNITY') {
                                   setCommunitySectionExpanded(true);
-                                  if (!values.applicationData.repositoryUrl) {setCodeSectionExpanded(false);}
+                                  if (!values.applicationData.repositoryUrl) {
+                                    setCodeSectionExpanded(false);
+                                  }
                                 } else if (value === 'CODE') {
                                   setCodeSectionExpanded(true);
                                   setCommunitySectionExpanded(false);
