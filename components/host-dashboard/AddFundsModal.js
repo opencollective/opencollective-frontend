@@ -508,7 +508,20 @@ const AddFundsModal = ({ collective, ...props }) => {
                   <StyledInputFormikField
                     name="memo"
                     htmlFor="addFunds-memo"
-                    label={<FormattedMessage defaultMessage="Memo (Optional)" />}
+                    label={
+                      <span>
+                        <FormattedMessage defaultMessage="Memo" />
+                        {` `}
+                        <StyledTooltip
+                          content={() => (
+                            <FormattedMessage defaultMessage="This is a private note that will only be visible to the host." />
+                          )}
+                        >
+                          <InfoCircle size={16} />
+                        </StyledTooltip>
+                      </span>
+                    }
+                    required={false}
                     mt={3}
                   >
                     {({ field }) => <StyledInput data-cy="add-funds-memo" {...field} />}
