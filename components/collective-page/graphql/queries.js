@@ -109,6 +109,12 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
           id
           VIRTUAL_CARDS
         }
+        policies {
+          COLLECTIVE_MINIMUM_ADMINS {
+            freeze
+            numberOfAdmins
+          }
+        }
       }
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {
         id
@@ -129,6 +135,9 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       projects {
         id
         ...ContributeCardProjectFields
+      }
+      admins: members(role: "ADMIN") {
+        id
       }
       connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
         id
