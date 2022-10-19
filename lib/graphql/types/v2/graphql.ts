@@ -5128,6 +5128,8 @@ export type Mutation = {
   revokeOAuthAuthorization: OAuthAuthorization;
   /** Sends an email for guest to confirm their emails and create their Open Collective account */
   sendGuestConfirmationEmail: Scalars['Boolean'];
+  /** Send a message to an account. Scope: "account" */
+  sendMessage?: Maybe<SendMessageResult>;
   /** Update the time which the user viewed the changelog updates. Scope: "account". */
   setChangelogViewDate: Individual;
   /** Set email notification subscription for requesting logged-in user */
@@ -5716,6 +5718,14 @@ export type MutationRevokeOAuthAuthorizationArgs = {
 /** This is the root mutation */
 export type MutationSendGuestConfirmationEmailArgs = {
   email: Scalars['EmailAddress'];
+};
+
+
+/** This is the root mutation */
+export type MutationSendMessageArgs = {
+  account: AccountReferenceInput;
+  message: Scalars['NonEmptyString'];
+  subject?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -7275,6 +7285,11 @@ export enum RecurringExpenseInterval {
   year = 'year'
 }
 
+export type SendMessageResult = {
+  __typename?: 'SendMessageResult';
+  success?: Maybe<Scalars['Boolean']>;
+};
+
 export type StripeError = {
   __typename?: 'StripeError';
   account?: Maybe<Scalars['String']>;
@@ -7421,9 +7436,10 @@ export type TierReferenceInput = {
 export enum TierType {
   DONATION = 'DONATION',
   MEMBERSHIP = 'MEMBERSHIP',
+  MULTIPLE_TICKET = 'MULTIPLE_TICKET',
   PRODUCT = 'PRODUCT',
   SERVICE = 'SERVICE',
-  TICKET = 'TICKET',
+  SINGLE_TICKET = 'SINGLE_TICKET',
   TIER = 'TIER'
 }
 

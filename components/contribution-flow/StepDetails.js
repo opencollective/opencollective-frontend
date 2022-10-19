@@ -43,7 +43,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
   const { LoggedInUser } = useLoggedInUser();
 
   const minAmount = getTierMinAmount(tier, currency);
-  const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;
+  const hasQuantity = tier?.type === TierTypes.MULTIPLE_TICKET || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
   const customFields = getCustomFields(collective, tier);
   const selectedInterval = data?.interval !== INTERVALS.flexible ? data?.interval : null;

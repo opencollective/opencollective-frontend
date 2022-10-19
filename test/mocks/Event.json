@@ -34,7 +34,7 @@
         {
           "id": 24,
           "slug": null,
-          "type": "TICKET",
+          "type": "MULTIPLE_TICKET",
           "name": "free ticket",
           "description": "For students and low income people only.",
           "amount": null,
@@ -45,7 +45,7 @@
         {
           "id": 22,
           "slug": null,
-          "type": "TICKET",
+          "type": "MULTIPLE_TICKET",
           "name": "regular ticket",
           "description": "Get your ticket for a great evening of inspiration and meeting great people. Includes a free drink and a free high five!",
           "amount": 1000,

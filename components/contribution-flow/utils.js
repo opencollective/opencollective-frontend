@@ -11,6 +11,7 @@ import {
   PAYMENT_METHOD_TYPE,
 } from '../../lib/constants/payment-methods';
 import roles from '../../lib/constants/roles';
+import { TierTypes } from '../../lib/constants/tiers-types';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
   getPaymentMethodIcon,
@@ -44,7 +45,10 @@ const memberCanBeUsedToContribute = (member, account, canUseIncognito) => {
  * Cannot use contributions for events and "Tickets" tiers, because we need the ticket holder's identity
  */
 export const canUseIncognitoForContribution = (collective, tier) => {
-  return collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET');
+  return (
+    collective.type !== CollectiveType.EVENT &&
+    (!tier || (tier.type !== TierTypes.SINGLE_TICKET && tier.type !== TierTypes.MULTIPLE_TICKET))
+  );
 };
 
 export const getContributeProfiles = (loggedInUser, collective, tier) => {

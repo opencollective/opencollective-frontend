@@ -38,7 +38,7 @@ const getContributionTypeFromTier = (tier, isPassed) => {
     return ContributionTypes.FINANCIAL_GOAL;
   } else if (tier.type === TierTypes.PRODUCT) {
     return ContributionTypes.PRODUCT;
-  } else if (tier.type === TierTypes.TICKET) {
+  } else if (tier.type === TierTypes.SINGLE_TICKET || tier.type === TierTypes.MULTIPLE_TICKET) {
     return ContributionTypes.TICKET;
   } else if (tier.type === TierTypes.MEMBERSHIP) {
     return ContributionTypes.MEMBERSHIP;

@@ -214,7 +214,7 @@ class SectionContribute extends React.PureComponent {
   });
 
   filterTickets = memoizeOne(tiers => {
-    return tiers.filter(tier => tier.type === TierTypes.TICKET);
+    return tiers.filter(tier => tier.type === TierTypes.SINGLE_TICKET || tier.type === TierTypes.MULTIPLE_TICKET);
   });
 
   render() {

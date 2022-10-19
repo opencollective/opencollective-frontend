@@ -33,7 +33,7 @@ import { editAccountSettingsMutation } from '../mutations';
 import SettingsSectionTitle from './SettingsSectionTitle';
 
 const { FUND, PROJECT } = CollectiveType;
-const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
+const { TIER, SINGLE_TICKET, MULTIPLE_TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
 const { FIXED, FLEXIBLE } = AmountTypes;
 
 const SIMPLIFIED_TIER_TYPES = [TIER, SERVICE, PRODUCT, DONATION];
@@ -93,15 +93,23 @@ class Tiers extends React.Component {
         defaultMessage: 'product (e.g., t-shirt)',
       },
       DONATION: { id: 'tier.type.donation', defaultMessage: 'donation (gift)' },
-      TICKET: {
-        id: 'tier.type.ticket',
-        defaultMessage: 'ticket (allow multiple tickets per order)',
+      SINGLE_TICKET: {
+        id: 'tier.type.ticket.single',
+        defaultMessage: 'Single Ticket (allow one ticket per order)',
+      },
+      MULTIPLE_TICKET: {
+        id: 'tier.type.ticket.multiple',
+        defaultMessage: 'Multiple Ticket (allow multiple tickets per order)',
       },
       'TIER.remove': {
         id: 'tier.type.tier.remove',
         defaultMessage: 'remove tier',
       },
-      'TICKET.remove': {
+      'SINGLE_TICKET.remove': {
+        id: 'tier.type.ticket.remove',
+        defaultMessage: 'remove ticket',
+      },
+      'MULTIPLE_TICKET.remove': {
         id: 'tier.type.ticket.remove',
         defaultMessage: 'remove ticket',
       },
@@ -117,7 +125,11 @@ class Tiers extends React.Component {
         id: 'tier.type.tier.add',
         defaultMessage: 'add another tier',
       },
-      'TICKET.add': {
+      'SINGLE_TICKET.add': {
+        id: 'tier.type.ticket.add',
+        defaultMessage: 'add another ticket',
+      },
+      'MULTIPLE_TICKET.add': {
         id: 'tier.type.ticket.add',
         defaultMessage: 'add another ticket',
       },
@@ -292,7 +304,8 @@ class Tiers extends React.Component {
         label: intl.formatMessage(this.messages['maxQuantity.label']),
         description: intl.formatMessage(this.messages['maxQuantity.description']),
         when: (tier, collective) =>
-          [TICKET, PRODUCT].includes(tier.type) || (tier.type === TIER && ![FUND, PROJECT].includes(collective.type)),
+          [SINGLE_TICKET, MULTIPLE_TICKET, PRODUCT].includes(tier.type) ||
+          (tier.type === TIER && ![FUND, PROJECT].includes(collective.type)),
       },
       {
         name: 'button',
@@ -476,11 +489,11 @@ class Tiers extends React.Component {
   }
 
   render() {
-    const { intl, collective, defaultType = TICKET } = this.props;
+    const { intl, collective, defaultType = MULTIPLE_TICKET } = this.props;
     const hasCustomContributionsDisabled = get(collective, 'settings.disableCustomContributions', false);
     const hasCryptoContributionsDisabled = get(collective, 'settings.disableCryptoContributions', true);
     const cryptoContributionsEnabledByHost = get(collective, 'host.settings.cryptoEnabled', false);
-    const displayContributionSettings = collective.id && defaultType !== TICKET;
+    const displayContributionSettings = collective.id && defaultType !== MULTIPLE_TICKET;
 
     return (
       <div className="EditTiers">

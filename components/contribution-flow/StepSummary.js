@@ -12,7 +12,7 @@ import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import tiersTypes from '../../lib/constants/tiers-types';
+import tiersTypes, { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { propTypeCountry } from '../../lib/custom-prop-types';
 import getPaymentMethodFees from '../../lib/fees';
@@ -352,7 +352,7 @@ const StepSummary = ({
           amount={amount}
         />
       )}
-      {quantity && (tierType === 'TICKET' || quantity > 1) && (
+      {quantity && (tierType === TierTypes.SINGLE_TICKET || tierType === TierTypes.MULTIPLE_TICKET || quantity > 1) && (
         <React.Fragment>
           <AmountLine my={3}>
             <Label fontWeight="bold">

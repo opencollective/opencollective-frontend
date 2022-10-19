@@ -141,7 +141,9 @@ class TiersPage extends React.Component {
       });
 
       // Tickets
-      const tickets = collective.tiers?.filter(t => t.type === TierTypes.TICKET);
+      const tickets = collective.tiers?.filter(
+        t => t.type === TierTypes.SINGLE_TICKET || t.type === TierTypes.MULTIPLE_TICKET,
+      );
       tickets?.forEach(ticket => {
         waysToContribute.push({
           ContributeCardComponent: ContributeTier,

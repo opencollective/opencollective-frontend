@@ -32,7 +32,7 @@ import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import ConfirmTierDeleteModal from './ConfirmTierDeleteModal';
 
 const { FUND, PROJECT } = CollectiveType;
-const { TIER, TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
+const { TIER, SINGLE_TICKET, MULTIPLE_TICKET, MEMBERSHIP, SERVICE, PRODUCT, DONATION } = TierTypes;
 const { FIXED, FLEXIBLE } = AmountTypes;
 
 function getTierTypeOptions(intl, collectiveType) {
@@ -301,7 +301,7 @@ function FormFields({ collective, types, values }) {
           )}
         </StyledInputFormikField>
       )}
-      {([TICKET, PRODUCT].includes(values.type) ||
+      {([SINGLE_TICKET, MULTIPLE_TICKET, PRODUCT].includes(values.type) ||
         (values.type === TIER && ![FUND, PROJECT].includes(collective.type))) && (
         <React.Fragment>
           <StyledInputFormikField

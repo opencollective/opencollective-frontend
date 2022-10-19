@@ -562,7 +562,7 @@ class ContributionFlow extends React.Component {
         return `/embed${getCollectivePageRoute(collective)}/donate/${step}`;
       }
     } else if (tier) {
-      if (tier.type === 'TICKET' && collective.parent) {
+      if ((tier.type === TierTypes.SINGLE_TICKET || tier.type === TierTypes.MULTIPLE_TICKET) && collective.parent) {
         return `${getCollectivePageRoute(collective)}/order/${tier.legacyId}/${step}`;
       } else {
         // Enforce "contribute" verb for ordering tiers
@@ -597,7 +597,7 @@ class ContributionFlow extends React.Component {
       return false;
     } else if (!tier) {
       return true;
-    } else if (tier.type === TierTypes.TICKET) {
+    } else if (tier.type === TierTypes.SINGLE_TICKET || tier.type === TierTypes.MULTIPLE_TICKET) {
       return false;
     } else if (tier.amountType === 'FIXED' && !tier.amount.valueInCents) {
       return false; // No platform tips for free tiers
