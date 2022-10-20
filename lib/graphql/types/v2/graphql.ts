@@ -5395,7 +5395,8 @@ export type MutationCreateUpdateArgs = {
 export type MutationCreateVirtualCardArgs = {
   account: AccountReferenceInput;
   assignee: AccountReferenceInput;
-  monthlyLimit: AmountInput;
+  limitAmount: AmountInput;
+  limitInterval: VirtualCardLimitInterval;
   name: Scalars['String'];
 };
 
@@ -5570,7 +5571,8 @@ export type MutationEditUpdateArgs = {
 /** This is the root mutation */
 export type MutationEditVirtualCardArgs = {
   assignee?: InputMaybe<AccountReferenceInput>;
-  monthlyLimit?: InputMaybe<AmountInput>;
+  limitAmount?: InputMaybe<AmountInput>;
+  limitInterval?: InputMaybe<VirtualCardLimitInterval>;
   name?: InputMaybe<Scalars['String']>;
   virtualCard: VirtualCardReferenceInput;
 };

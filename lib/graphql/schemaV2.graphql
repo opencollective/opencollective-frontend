@@ -12963,9 +12963,14 @@ type Mutation {
     name: String!
 
     """
-    Virtual card monthly limit
+    Virtual card limit amount
     """
-    monthlyLimit: AmountInput!
+    limitAmount: AmountInput!
+
+    """
+    Virtual card limit interval
+    """
+    limitInterval: VirtualCardLimitInterval!
 
     """
     Account where the virtual card will be associated
@@ -12998,9 +13003,14 @@ type Mutation {
     assignee: AccountReferenceInput
 
     """
-    Virtual card monthly limit
+    Virtual card limit amount
     """
-    monthlyLimit: AmountInput
+    limitAmount: AmountInput
+
+    """
+    Virtual card limit interval
+    """
+    limitInterval: VirtualCardLimitInterval
   ): VirtualCard!
 
   """
