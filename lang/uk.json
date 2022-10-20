@@ -2753,7 +2753,7 @@
   "VirtualCards.NoLimit": "Без обмеження",
   "VirtualCards.PauseCard": "Призупинити дію картки",
   "VirtualCards.Policy.Reminder": "Правила користування віртуальною карткою {hostName}",
-  "VirtualCards.Remaining": "remaining: {formattedAmount}",
+  "VirtualCards.Remaining": "{formattedAmount} remaining",
   "VirtualCards.RequestCardButton": "Надіслати запит на отримання картки",
   "VirtualCards.ResumeCard": "Відновити дію картки",
   "VirtualCards.Title": "Віртуальні картки",

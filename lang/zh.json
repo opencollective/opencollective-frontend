@@ -2753,7 +2753,7 @@
   "VirtualCards.NoLimit": "无限制",
   "VirtualCards.PauseCard": "暂停卡片",
   "VirtualCards.Policy.Reminder": "{hostName} Virtual Card use Policy",
-  "VirtualCards.Remaining": "remaining: {formattedAmount}",
+  "VirtualCards.Remaining": "{formattedAmount} remaining",
   "VirtualCards.RequestCardButton": "Request card",
   "VirtualCards.ResumeCard": "Resume Card",
   "VirtualCards.Title": "虚拟卡",
