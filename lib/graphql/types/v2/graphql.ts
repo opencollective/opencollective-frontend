@@ -8193,6 +8193,7 @@ export type VirtualCard = {
   name?: Maybe<Scalars['String']>;
   privateData?: Maybe<Scalars['JSONObject']>;
   provider?: Maybe<Scalars['String']>;
+  remainingLimit?: Maybe<Scalars['Int']>;
   spendingLimitAmount?: Maybe<Scalars['Int']>;
   spendingLimitInterval?: Maybe<Scalars['String']>;
   updatedAt?: Maybe<Scalars['DateTime']>;
