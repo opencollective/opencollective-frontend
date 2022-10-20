@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import { gql, useLazyQuery, useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { debounce } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
+import { VirtualCardMaximumLimitForInterval } from '../../lib/constants/virtual-cards';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 
 import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -17,6 +19,7 @@ import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
@@ -25,11 +28,18 @@ const MAXIMUM_MONTHLY_LIMIT = 2000;
 const createVirtualCardMutation = gql`
   mutation createVirtualCard(
     $name: String!
-    $monthlyLimit: AmountInput!
+    $limitAmount: AmountInput!
+    $limitInterval: VirtualCardLimitInterval!
     $account: AccountReferenceInput!
     $assignee: AccountReferenceInput!
   ) {
-    createVirtualCard(name: $name, monthlyLimit: $monthlyLimit, account: $account, assignee: $assignee) {
+    createVirtualCard(
+      name: $name
+      limitAmount: $limitAmount
+      limitInterval: $limitInterval
+      account: $account
+      assignee: $assignee
+    ) {
       id
       name
       last4
@@ -66,7 +76,8 @@ const initialValues = {
   collective: undefined,
   assignee: undefined,
   cardName: undefined,
-  monthlyLimit: undefined,
+  limitAmount: undefined,
+  limitInterval: undefined,
 };
 
 const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modalProps }) => {
@@ -85,7 +96,7 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
       collective,
     },
     async onSubmit(values) {
-      const { collective, assignee, cardName, monthlyLimit } = values;
+      const { collective, assignee, cardName, limitAmount, limitInterval } = values;
 
       try {
         await createVirtualCard({
@@ -93,7 +104,8 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
             assignee: { id: assignee.id },
             account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
             name: cardName,
-            monthlyLimit: { currency: host.currency, valueInCents: monthlyLimit },
+            limitAmount: { currency: host.currency, valueInCents: limitAmount },
+            limitInterval,
           },
         });
       } catch (e) {
@@ -124,17 +136,65 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
       if (!values.cardName) {
         errors.cardName = 'Required';
       }
-      if (!values.monthlyLimit) {
-        errors.monthlyLimit = 'Required';
+      if (!values.limitAmount) {
+        errors.limitAmount = 'Required';
       }
-      if (values.monthlyLimit > MAXIMUM_MONTHLY_LIMIT * 100) {
-        errors.monthlyLimit = `Monthly limit should not exceed ${MAXIMUM_MONTHLY_LIMIT} ${
+
+      if (values.limitInterval) {
+        const maximumLimitForInterval = VirtualCardMaximumLimitForInterval[values.limitInterval];
+        if (values.limitAmount > maximumLimitForInterval * 100) {
+          errors.limitAmount = `Limit for this interval should not exceed ${maximumLimitForInterval} ${
+            values.collective?.currency || 'USD'
+          }`;
+        }
+      }
+
+      if (
+        values.limitInterval === VirtualCardLimitInterval.MONTHLY &&
+        values.limitAmount > MAXIMUM_MONTHLY_LIMIT * 100
+      ) {
+        errors.limitAmount = `Monthly limit should not exceed ${MAXIMUM_MONTHLY_LIMIT} ${
           values.collective?.currency || 'USD'
         }`;
+      }
+      if (!values.limitInterval) {
+        errors.limitInterval = 'Required';
       }
       return errors;
     },
   });
+
+  const intl = useIntl();
+
+  const virtualCardLimitOptions = [
+    {
+      value: VirtualCardLimitInterval.ALL_TIME,
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.all_time', defaultMessage: 'all time' }),
+    },
+    {
+      value: VirtualCardLimitInterval.DAILY,
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.daily', defaultMessage: 'daily' }),
+    },
+    {
+      value: VirtualCardLimitInterval.MONTHLY,
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.monthly', defaultMessage: 'monthly' }),
+    },
+    {
+      value: VirtualCardLimitInterval.PER_AUTHORIZATION,
+      label: intl.formatMessage({
+        id: 'virtualCard.intervalLimit.per_authorization',
+        defaultMessage: 'per authorization',
+      }),
+    },
+    {
+      value: VirtualCardLimitInterval.WEEKLY,
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.weekly', defaultMessage: 'weekly' }),
+    },
+    {
+      value: VirtualCardLimitInterval.YEARLY,
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.yearly', defaultMessage: 'yearly' }),
+    },
+  ];
 
   useEffect(() => {
     if (formik.values.collective?.slug) {
@@ -239,19 +299,40 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Monthly limit" />}
-              htmlFor="monthlyLimit"
-              error={formik.touched.monthlyLimit && formik.errors.monthlyLimit}
+              label={<FormattedMessage defaultMessage="Limit" />}
+              htmlFor="limitAmount"
+              error={formik.touched.limitAmount && formik.errors.limitAmount}
             >
               {inputProps => (
                 <StyledInputAmount
                   {...inputProps}
-                  id="monthlyLimit"
+                  id="limitAmount"
                   currency={host.currency || 'USD'}
                   prepend={host.currency || 'USD'}
-                  onChange={value => formik.setFieldValue('monthlyLimit', value)}
-                  value={formik.values.monthlyLimit}
+                  onChange={value => formik.setFieldValue('limitAmount', value)}
+                  value={formik.values.limitAmount}
                   disabled={isBusy}
+                />
+              )}
+            </StyledInputField>
+            <StyledInputField
+              gridColumn="1/3"
+              labelFontSize="13px"
+              label={<FormattedMessage defaultMessage="Limit interval" />}
+              htmlFor="limitInterval"
+              error={formik.touched.limitInterval && formik.errors.limitInterval}
+            >
+              {inputProps => (
+                <StyledSelect
+                  {...inputProps}
+                  inputId="limitInterval"
+                  data-cy="limitInterval"
+                  error={formik.errors.limitInterval}
+                  onBlur={() => formik.setFieldTouched('limitInterval', true)}
+                  onChange={({ value }) => formik.setFieldValue('limitInterval', value)}
+                  isLoading={isBusy}
+                  options={virtualCardLimitOptions}
+                  value={virtualCardLimitOptions.find(option => option.value === formik.values.limitInterval)}
                 />
               )}
             </StyledInputField>
