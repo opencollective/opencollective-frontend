@@ -76,6 +76,12 @@ const virtualCardsQuery = gql`
             name
             imageUrl
           }
+          assignee {
+            id
+            name
+            slug
+            imageUrl
+          }
         }
       }
       virtualCardMerchants {
@@ -175,6 +181,7 @@ const VirtualCards = props => {
       <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
         {data.account.virtualCards.nodes.map(virtualCard => (
           <VirtualCard
+            host={data.account.host}
             canEditVirtualCard={virtualCard.data.status === 'active'}
             canPauseOrResumeVirtualCard
             canDeleteVirtualCard
