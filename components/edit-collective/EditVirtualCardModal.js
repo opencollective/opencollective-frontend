@@ -3,10 +3,12 @@ import PropTypes from 'prop-types';
 import { gql, useLazyQuery, useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { debounce } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../../lib/constants/roles';
+import { VirtualCardMaximumLimitForInterval } from '../../lib/constants/virtual-cards';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 
 import CollectivePicker from '../CollectivePicker';
 import Container from '../Container';
@@ -17,23 +19,30 @@ import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { useLoggedInUser } from '../UserProvider';
-
-const MAXIMUM_MONTHLY_LIMIT = 2000;
 
 const editVirtualCardMutation = gql`
   mutation editVirtualCard(
     $virtualCard: VirtualCardReferenceInput!
     $name: String!
-    $monthlyLimit: AmountInput
+    $limitAmount: AmountInput
+    $limitInterval: VirtualCardLimitInterval
     $assignee: AccountReferenceInput!
   ) {
-    editVirtualCard(virtualCard: $virtualCard, name: $name, monthlyLimit: $monthlyLimit, assignee: $assignee) {
+    editVirtualCard(
+      virtualCard: $virtualCard
+      name: $name
+      limitAmount: $limitAmount
+      limitInterval: $limitInterval
+      assignee: $assignee
+    ) {
       id
       name
       spendingLimitAmount
+      spendingLimitInterval
       assignee {
         id
         name
@@ -81,17 +90,17 @@ const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, host, ...modalP
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = LoggedInUser?.hasRole(roles.ADMIN, host);
 
-  const canEditMonthlyLimit =
-    isHostAdmin && virtualCard.spendingLimitInterval === 'MONTHLY' && virtualCard.provider === 'STRIPE';
+  const canEditLimit = isHostAdmin && virtualCard.provider === 'STRIPE';
 
   const formik = useFormik({
     initialValues: {
       cardName: virtualCard.name,
       assignee: virtualCard.assignee,
-      monthlyLimit: canEditMonthlyLimit ? virtualCard.spendingLimitAmount : undefined,
+      limitAmount: canEditLimit ? virtualCard.spendingLimitAmount : undefined,
+      limitInterval: canEditLimit ? virtualCard.spendingLimitInterval : undefined,
     },
     async onSubmit(values) {
-      const { assignee, cardName, monthlyLimit } = values;
+      const { assignee, cardName, limitAmount, limitInterval } = values;
 
       try {
         const variables = {
@@ -100,12 +109,14 @@ const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, host, ...modalP
           assignee: { id: assignee.id },
         };
 
-        if (canEditMonthlyLimit) {
-          variables.monthlyLimit = {
+        if (canEditLimit) {
+          variables.limitAmount = {
             currency: virtualCard.currency,
-            valueInCents: monthlyLimit,
-            value: monthlyLimit / 100,
+            valueInCents: limitAmount,
+            value: limitAmount / 100,
           };
+
+          variables.limitInterval = limitInterval;
         }
 
         await editVirtualCard({ variables });
@@ -136,11 +147,19 @@ const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, host, ...modalP
       if (!values.cardName) {
         errors.cardName = 'Required';
       }
-      if (canEditMonthlyLimit && !values.monthlyLimit) {
-        errors.monthlyLimit = 'Required';
+      if (canEditLimit && !values.limitAmount) {
+        errors.limitAmount = 'Required';
       }
-      if (canEditMonthlyLimit && values.monthlyLimit > MAXIMUM_MONTHLY_LIMIT * 100) {
-        errors.monthlyLimit = `Monthly limit should not exceed ${MAXIMUM_MONTHLY_LIMIT}`;
+      if (values.limitInterval) {
+        const maximumLimitForInterval = VirtualCardMaximumLimitForInterval[values.limitInterval];
+        if (values.limitAmount > maximumLimitForInterval * 100) {
+          errors.limitAmount = `Limit for this interval should not exceed ${maximumLimitForInterval} ${
+            values.collective?.currency || 'USD'
+          }`;
+        }
+      }
+      if (canEditLimit && !values.limitInterval) {
+        errors.limitInterval = 'Required';
       }
       return errors;
     },
@@ -150,9 +169,41 @@ const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, host, ...modalP
     throttledCall(getCollectiveUsers, { slug: virtualCard.account.slug });
   });
 
+  const intl = useIntl();
+
   const handleClose = () => {
     onClose?.();
   };
+
+  const virtualCardLimitOptions = [
+    {
+      value: VirtualCardLimitInterval.ALL_TIME,
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.all_time', defaultMessage: 'all time' }),
+    },
+    {
+      value: VirtualCardLimitInterval.DAILY,
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.daily', defaultMessage: 'daily' }),
+    },
+    {
+      value: VirtualCardLimitInterval.MONTHLY,
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.monthly', defaultMessage: 'monthly' }),
+    },
+    {
+      value: VirtualCardLimitInterval.PER_AUTHORIZATION,
+      label: intl.formatMessage({
+        id: 'virtualCard.intervalLimit.per_authorization',
+        defaultMessage: 'per authorization',
+      }),
+    },
+    {
+      value: VirtualCardLimitInterval.WEEKLY,
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.weekly', defaultMessage: 'weekly' }),
+    },
+    {
+      value: VirtualCardLimitInterval.YEARLY,
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.yearly', defaultMessage: 'yearly' }),
+    },
+  ];
 
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
@@ -209,23 +260,46 @@ const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, host, ...modalP
               )}
             </StyledInputField>
 
-            {canEditMonthlyLimit && (
+            {canEditLimit && (
               <StyledInputField
                 gridColumn="1/3"
                 labelFontSize="13px"
-                label={<FormattedMessage defaultMessage="Monthly limit" />}
-                htmlFor="monthlyLimit"
-                error={formik.touched.monthlyLimit && formik.errors.monthlyLimit}
+                label={<FormattedMessage defaultMessage="Limit" />}
+                htmlFor="limitAmount"
+                error={formik.touched.limitAmount && formik.errors.limitAmount}
               >
                 {inputProps => (
                   <StyledInputAmount
                     {...inputProps}
-                    id="monthlyLimit"
+                    id="limitAmount"
                     currency={virtualCard.currency}
                     prepend={virtualCard.currency}
-                    onChange={value => formik.setFieldValue('monthlyLimit', value)}
-                    value={formik.values.monthlyLimit}
+                    onChange={value => formik.setFieldValue('limitAmount', value)}
+                    value={formik.values.limitAmount}
                     disabled={isBusy}
+                  />
+                )}
+              </StyledInputField>
+            )}
+            {canEditLimit && (
+              <StyledInputField
+                gridColumn="1/3"
+                labelFontSize="13px"
+                label={<FormattedMessage defaultMessage="Limit interval" />}
+                htmlFor="limitInterval"
+                error={formik.touched.limitInterval && formik.errors.limitInterval}
+              >
+                {inputProps => (
+                  <StyledSelect
+                    {...inputProps}
+                    inputId="limitInterval"
+                    data-cy="limitInterval"
+                    error={formik.errors.limitInterval}
+                    onBlur={() => formik.setFieldTouched('limitInterval', true)}
+                    onChange={({ value }) => formik.setFieldValue('limitInterval', value)}
+                    isLoading={isBusy}
+                    options={virtualCardLimitOptions}
+                    value={virtualCardLimitOptions.find(option => option.value === formik.values.limitInterval)}
                   />
                 )}
               </StyledInputField>
