@@ -81,7 +81,7 @@ function getReceiptTemplates(host) {
   return receiptTemplateTitles;
 }
 
-function FormFields({ collective, types, values }) {
+function FormFields({ collective, tier, types, values }) {
   const intl = useIntl();
 
   const tierTypeOptions = getTierTypeOptions(intl, collective.type);
@@ -407,6 +407,30 @@ function FormFields({ collective, types, values }) {
           defaultMessage: 'Amount you aim to raise',
         })}
       </FieldDescription>
+      {tier?.type === TICKET && (
+        <React.Fragment>
+          <StyledInputFormikField
+            name="singleTicket"
+            label={<FormattedMessage defaultMessage="Single Ticket" />}
+            labelFontWeight="bold"
+            mt="3"
+            flexDirection={'row'}
+            justifyContent={'space-between'}
+            alignItems={'center'}
+          >
+            {({ field, form }) => (
+              <InputSwitch
+                name={field.name}
+                checked={field.value}
+                onChange={event => form.setFieldValue(field.name, event.target.checked)}
+              />
+            )}
+          </StyledInputFormikField>
+          <FieldDescription>
+            <FormattedMessage defaultMessage="Only allow people to buy a single ticket per order" />
+          </FieldDescription>
+        </React.Fragment>
+      )}
       {![FUND, PROJECT].includes(collective.type) && (
         <React.Fragment>
           <StyledInputFormikField
@@ -506,6 +530,10 @@ FormFields.propTypes = {
     type: PropTypes.string,
     amountType: PropTypes.string,
     interval: PropTypes.string,
+  }),
+  tier: PropTypes.shape({
+    type: PropTypes.string,
+    singleTicket: PropTypes.bool,
   }),
   types: PropTypes.array,
 };
@@ -871,6 +899,7 @@ export function EditTierForm({ tier, collective, onClose }) {
             goal: values?.goal?.valueInCents ? values.goal : null,
             amount: values?.amount?.valueInCents ? values.amount : null,
             minimumAmount: values?.minimumAmount?.valueInCents ? values.minimumAmount : null,
+            singleTicket: values?.singleTicket,
           };
 
           try {
@@ -902,7 +931,7 @@ export function EditTierForm({ tier, collective, onClose }) {
               <ModalBody>
                 <ModalSectionContainer>
                   <EditSectionContainer>
-                    <FormFields collective={collective} values={values} />
+                    <FormFields collective={collective} tier={tier} values={values} />
                   </EditSectionContainer>
                   <PreviewSectionContainer>
                     <ContributeCardPreview collective={collective} tier={values} />

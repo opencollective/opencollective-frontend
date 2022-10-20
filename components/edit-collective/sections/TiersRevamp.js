@@ -119,6 +119,7 @@ const tiersQuery = gql`
             presets
             button
             useStandalonePage
+            singleTicket
           }
         }
       }
