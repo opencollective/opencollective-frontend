@@ -445,7 +445,26 @@ const VirtualCard = props => {
               />{' '}
               {virtualCard.account.name}
             </Box>
-            <P mt="27px" fontSize="13px" fontWeight="400" lineHeight="20px">
+            <P mt="15px" fontSize="12px" fontWeight="400" lineHeight="20px">
+              {getLimitString(
+                virtualCard.spendingLimitAmount,
+                virtualCard.spendingLimitInterval,
+                virtualCard.currency,
+                intl.locale,
+              )}{' '}
+              (
+              <FormattedMessage
+                id="VirtualCards.Remaining"
+                defaultMessage="remaining: {formattedAmount}"
+                values={{
+                  formattedAmount: formatCurrency(virtualCard.remainingLimit, virtualCard.currency, {
+                    locale: intl.locale,
+                  }),
+                }}
+              />
+              )
+            </P>
+            <P fontSize="12px" fontWeight="400" lineHeight="20px">
               <FormattedMessage
                 id="VirtualCards.AssignedOn"
                 defaultMessage="Assigned on {createdAt, date, short}"
@@ -453,13 +472,6 @@ const VirtualCard = props => {
                   createdAt: new Date(virtualCard.createdAt),
                 }}
               />
-              &nbsp;&middot;&nbsp;
-              {getLimitString(
-                virtualCard.spendingLimitAmount,
-                virtualCard.spendingLimitInterval,
-                virtualCard.currency,
-                intl.locale,
-              )}
             </P>
           </React.Fragment>
         )}
@@ -516,6 +528,7 @@ VirtualCard.propTypes = {
     provider: PropTypes.string,
     spendingLimitAmount: PropTypes.number,
     spendingLimitInterval: PropTypes.string,
+    remainingLimit: PropTypes.number,
     currency: PropTypes.string,
     createdAt: PropTypes.string,
     account: PropTypes.shape({

@@ -56,6 +56,7 @@ const hostVirtualCardsQuery = gql`
           provider
           spendingLimitAmount
           spendingLimitInterval
+          remainingLimit
           currency
           createdAt
           account {

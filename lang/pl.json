@@ -2753,6 +2753,7 @@
   "VirtualCards.NoLimit": "Bez limitu",
   "VirtualCards.PauseCard": "Pause Card",
   "VirtualCards.Policy.Reminder": "Polityka korzystania z karty wirtualnej {hostName}",
+  "VirtualCards.Remaining": "remaining: {formattedAmount}",
   "VirtualCards.RequestCardButton": "Poproś o kartę",
   "VirtualCards.ResumeCard": "Resume Card",
   "VirtualCards.Title": "Wirtualne karty",
