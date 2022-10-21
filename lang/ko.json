@@ -492,6 +492,8 @@
   "collective.subtitle.opensource": "Open source projects are invited to join the Open Source Collective Fiscal Host.",
   "collective.subtitle.seeRepo": "찾고 계신 리포지터리가 없나요? {helplink}.",
   "collective.tags.edit.description": "Help people find you",
+  "collective.tooFewAdmins": "You need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.",
+  "collective.tooFewAdmins.description": "You will automatically be able to accept contributions when {missingAdminsCount, plural, one {an invited administrator} other {# invited administrators} } has joined.",
   "collective.tos.description": "Link to the terms under which this Host collects and holds funds.",
   "collective.type.label": "유형",
   "collective.types.collective": "{n, plural, one {Collective} other {Collectives}}",
