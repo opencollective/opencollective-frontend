@@ -3,6 +3,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { Copy } from '@styled-icons/feather/Copy';
+import { Question } from '@styled-icons/remix-line/Question';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
@@ -20,7 +21,8 @@ import DismissIcon from '../icons/DismissIcon';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledSpinner from '../StyledSpinner';
-import { P } from '../Text';
+import StyledTooltip from '../StyledTooltip';
+import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import DeleteVirtualCardModal from './DeleteVirtualCardModal';
@@ -324,29 +326,29 @@ const getLimitString = (spendingLimitAmount, spendingLimitInterval, currency, lo
     case 'DAILY':
       return (
         <Fragment>
-          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
-          &nbsp;
           {value}/<FormattedMessage defaultMessage="day" />
+        </Fragment>
+      );
+    case 'WEEKLY':
+      return (
+        <Fragment>
+          {value}/<FormattedMessage defaultMessage="week" />
         </Fragment>
       );
     case 'MONTHLY':
       return (
         <Fragment>
-          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
-          &nbsp;
           {value}/<FormattedMessage id="Frequency.Monthly.Short" defaultMessage="mo." />
         </Fragment>
       );
-    case 'ANNUALLY':
+    case 'YEARLY':
       return (
         <Fragment>
-          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
-          &nbsp;
           {value}/<FormattedMessage id="Frequency.Yearly.Short" defaultMessage="yr." />
         </Fragment>
       );
-    case 'TRANSACTION':
-    case 'FOREVER':
+    case 'PER_AUTHORIZATION':
+    case 'ALL_TIME':
     default:
       return value;
   }
@@ -445,7 +447,7 @@ const VirtualCard = props => {
               />{' '}
               {virtualCard.account.name}
             </Box>
-            <P mt="15px" fontSize="12px" fontWeight="400" lineHeight="20px">
+            <P mt="27px" fontSize="12px" fontWeight="400" lineHeight="20px">
               <FormattedMessage
                 id="VirtualCards.AssignedOn"
                 defaultMessage="Assigned on {createdAt, date, short}"
@@ -453,26 +455,34 @@ const VirtualCard = props => {
                   createdAt: new Date(virtualCard.createdAt),
                 }}
               />
-            </P>
-            <P fontSize="12px" fontWeight="400" lineHeight="20px">
+              &nbsp;&middot;&nbsp;
+              <Span fontWeight="700">
+                <FormattedMessage id="VirtualCards.Available" defaultMessage="Avl." />{' '}
+                {formatCurrency(virtualCard.remainingLimit, virtualCard.currency, {
+                  locale: intl.locale,
+                })}
+                {' / '}
+              </Span>
               {getLimitString(
                 virtualCard.spendingLimitAmount,
                 virtualCard.spendingLimitInterval,
                 virtualCard.currency,
                 intl.locale,
               )}{' '}
-              (
-              <FormattedMessage
-                id="VirtualCards.Remaining"
-                defaultMessage="{formattedAmount} remaining"
-                values={{
-                  formattedAmount: formatCurrency(virtualCard.remainingLimit, virtualCard.currency, {
-                    locale: intl.locale,
-                  }),
-                }}
-              />
-              )
+              <StyledTooltip
+                content={
+                  <FormattedMessage
+                    defaultMessage={'Spending limit renews on {renewsOnDate, date, long}'}
+                    values={{
+                      renewsOnDate: new Date(virtualCard.spendingLimitRenewsOn),
+                    }}
+                  />
+                }
+              >
+                <Question size="13px" color="#DADADA" />
+              </StyledTooltip>
             </P>
+            <P mt="4px" fontSize="13px" fontWeight="400" lineHeight="20px"></P>
           </React.Fragment>
         )}
       </Box>
@@ -528,6 +538,7 @@ VirtualCard.propTypes = {
     provider: PropTypes.string,
     spendingLimitAmount: PropTypes.number,
     spendingLimitInterval: PropTypes.string,
+    spendingLimitRenewsOn: PropTypes.string,
     remainingLimit: PropTypes.number,
     currency: PropTypes.string,
     createdAt: PropTypes.string,
