@@ -1,18 +1,22 @@
 import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
 import VirtualCard from '../../components/edit-collective/VirtualCard';
-import { webpackCollective } from '../mocks/collectives';
+import { webpackCollective, openSourceHost } from '../mocks/collectives';
+
+import ToastProvider, { ToastContext, TOAST_TYPE } from '../../components/ToastProvider';
+import { UserContext } from '../../components/UserProvider';
+import { loggedInUser } from '../mocks/loggedInUser';
 
 <Meta title="Virtual Cards/VirtualCard" component={VirtualCard} argTypes={{}} />
 
 # VirtualCard
 
-## Default
+## With Host Admin
 
 export const DefaultStory = props => <VirtualCard {...props} />;
 
 <Canvas>
   <Story
-    name="Default"
+    name="With Host Admin"
     parameters={{
       design: {
         type: 'figma',
@@ -20,21 +24,60 @@ export const DefaultStory = props => <VirtualCard {...props} />;
       },
     }}
   >
-    <VirtualCard
-      virtualCard={{
-        account: webpackCollective,
-        data: { status: 'active' },
-        last4: '9012',
-        privateData: { cvv: '321', expiryDate: '12/30', cardNumber: '5432123456789012' },
-        currency: 'USD',
-        provider: 'STRIPE',
-        spendingLimitAmount: 50000,
-        spendingLimitInterval: 'MONTHLY',
-        createdAt: '2022-09-29T05:00:00Z',
-      }}
-      canEditVirtualCard
-      canPauseOrResumeVirtualCard
-      canDeleteVirtualCard
-    />
+    <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+      <ToastProvider>
+        <VirtualCard
+          host={openSourceHost}
+          virtualCard={{
+            account: webpackCollective,
+            data: { status: 'active' },
+            last4: '9012',
+            privateData: { cvv: '321', expiryDate: '12/30', cardNumber: '5432123456789012' },
+            currency: 'USD',
+            provider: 'STRIPE',
+            spendingLimitAmount: 50000,
+            spendingLimitInterval: 'MONTHLY',
+            createdAt: '2022-09-29T05:00:00Z',
+          }}
+          canEditVirtualCard
+          canPauseOrResumeVirtualCard
+          canDeleteVirtualCard
+        />
+      </ToastProvider>
+    </UserContext.Provider>
+  </Story>
+</Canvas>
+
+## With Collective Admin
+
+<Canvas>
+  <Story
+    name="With Collective Admin"
+    parameters={{
+      design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/ZQBMWhnGGtRWeIZknFW1eP/%5BOC-Design%5D-Production-Ready-%E2%9C%85?node-id=18797%3A200561',
+      },
+    }}
+  >
+    <ToastProvider>
+      <VirtualCard
+        host={openSourceHost}
+        virtualCard={{
+          account: webpackCollective,
+          data: { status: 'active' },
+          last4: '9012',
+          privateData: { cvv: '321', expiryDate: '12/30', cardNumber: '5432123456789012' },
+          currency: 'USD',
+          provider: 'STRIPE',
+          spendingLimitAmount: 50000,
+          spendingLimitInterval: 'MONTHLY',
+          createdAt: '2022-09-29T05:00:00Z',
+        }}
+        canEditVirtualCard
+        canPauseOrResumeVirtualCard
+        canDeleteVirtualCard
+      />
+    </ToastProvider>
   </Story>
 </Canvas>

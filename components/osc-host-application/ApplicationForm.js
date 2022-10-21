@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
-import { Lock } from '@styled-icons/boxicons-solid/Lock';
 import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Form, Formik } from 'formik';
@@ -41,6 +40,7 @@ import StyledTextarea from '../StyledTextarea';
 import { H1, H4, P, Span } from '../Text';
 
 import CollapseSection from './CollapseSection';
+import ProjectTypeSelect from './ProjectTypeSelect';
 
 const createCollectiveMutation = gql`
   mutation CreateCollective(
@@ -97,8 +97,6 @@ const applyToHostMutation = gql`
     }
   }
 `;
-
-export const APPLICATION_DATA_AMOUNT_FIELDS = ['totalAmountRaised', 'totalAmountToBeRaised'];
 
 const messages = defineMessages({
   nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: 'Collective name' },
@@ -169,12 +167,12 @@ const messages = defineMessages({
     id: 'HostApplication.form.amountOfMembers',
     defaultMessage: 'How many members do you have?',
   },
-  linksToLicenses: {
-    id: 'HostApplication.form.linksToLicenses',
+  extraLicenseInfo: {
+    id: 'HostApplication.form.extraLicenseInfo',
     defaultMessage: 'Extra information about your license(s)',
   },
-  linksToLicensesHelpText: {
-    id: 'HostApplication.form.linksToLicensesHelpText',
+  extraLicenseInfoHelpText: {
+    id: 'HostApplication.form.extraLicenseInfoHelpText',
     defaultMessage: 'If your license is unrecognized or have more than one license, add information here',
   },
   publicInformation: {
@@ -184,7 +182,7 @@ const messages = defineMessages({
   },
   aboutYourCommunityTitle: {
     id: 'HostApplication.form.aboutYourCommunity',
-    defaultMessage: 'About your community {optional}',
+    defaultMessage: 'About your Community {optional}',
   },
   aboutYourCommunitySubtitle: {
     id: 'HostApplication.form.aboutYourCommunity.subtitle',
@@ -221,6 +219,14 @@ const ApplicationForm = ({
   const intl = useIntl();
   const [submitApplication, { loading: submitting, error }] = useApplicationMutation(canApplyWithCollective);
 
+  const [codeSectionExpanded, setCodeSectionExpanded] = useState(false);
+  const [communitySectionExpanded, setCommunitySectionExpanded] = useState(false);
+
+  useEffect(() => {
+    const { typeOfProject } = initialValues?.applicationData || {};
+    setCodeSectionExpanded(typeOfProject === 'CODE');
+  }, [initialValues?.applicationData?.typeOfProject]);
+
   const validate = values => {
     const errors = requireFields(values, [
       'user.name',
@@ -229,6 +235,7 @@ const ApplicationForm = ({
       'collective.slug',
       'message',
       'collective.description',
+      'applicationData.typeOfProject',
     ]);
 
     verifyEmailPattern(errors, values, 'user.email');
@@ -379,14 +386,12 @@ const ApplicationForm = ({
                       display="flex"
                       borderRadius="8px"
                     >
-                      <Box mb={3}>
-                        <Flex alignItems="center" justifyContent="stretch" gap={6} mb={3}>
-                          <H4 fontSize="18px" lineHeight="24px" color="black.900">
-                            <FormattedMessage id="HostApplication.form.mainInfo" defaultMessage="Main info" />
-                          </H4>
-                          <StyledHr flex="1" />
-                        </Flex>
-                      </Box>
+                      <Flex alignItems="center" justifyContent="stretch" gap={12} mb={3}>
+                        <H4 fontSize="18px" lineHeight="24px" color="black.900">
+                          <FormattedMessage id="HostApplication.form.mainInfo" defaultMessage="Main info" />
+                        </H4>
+                        <StyledHr flex="1" />
+                      </Flex>
                       {!LoggedInUser && (
                         <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} py={2}>
                           <Box>
@@ -431,7 +436,7 @@ const ApplicationForm = ({
                       )}
                       {!canApplyWithCollective && (
                         <React.Fragment>
-                          <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} py={2}>
+                          <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} mb={3}>
                             <Box>
                               <StyledInputFormikField
                                 label={intl.formatMessage(messages.nameLabel)}
@@ -504,14 +509,59 @@ const ApplicationForm = ({
                         </React.Fragment>
                       )}
 
+                      <Box mb={3} mt={'40px'}>
+                        <Flex alignItems="center" justifyContent="stretch" gap={12} mb={3}>
+                          <H4 fontSize="18px" lineHeight="24px" color="black.900">
+                            <FormattedMessage
+                              id="HostApplication.form.typeOfProject"
+                              defaultMessage="Type of Project"
+                            />
+                          </H4>
+                          <StyledHr flex="1" />
+                        </Flex>
+
+                        <P fontSize="14px" lineHeight="20px">
+                          <FormattedMessage
+                            id="HostApplication.form.typeOfProject.description"
+                            defaultMessage="Open Source Collective hosts open source software projects and adjacent communities (meetup groups, educational programs and mentorship schemes etc). What is the primary focus of your project?"
+                          />
+                        </P>
+                      </Box>
+
+                      <StyledInputFormikField name="applicationData.typeOfProject" htmlFor="typeOfProject" required>
+                        {({ field }) => {
+                          return (
+                            <ProjectTypeSelect
+                              {...field}
+                              onChange={e => {
+                                const { value } = e.target;
+                                if (value === 'COMMUNITY') {
+                                  setCommunitySectionExpanded(true);
+                                  if (!values.applicationData.repositoryUrl) {
+                                    setCodeSectionExpanded(false);
+                                  }
+                                } else if (value === 'CODE') {
+                                  setCodeSectionExpanded(true);
+                                  setCommunitySectionExpanded(false);
+                                }
+                                setFieldValue('applicationData.typeOfProject', value);
+                              }}
+                            />
+                          );
+                        }}
+                      </StyledInputFormikField>
+
                       <CollapseSection
                         title={intl.formatMessage(messages.aboutYourCodeTitle, {
-                          optional: (
-                            <Span fontWeight={400} color="black.700">
-                              (<FormattedMessage id="forms.optional" defaultMessage="Optional" />)
-                            </Span>
-                          ),
+                          optional:
+                            values.applicationData.typeOfProject === 'COMMUNITY' ? (
+                              <Span fontWeight={400} color="black.700">
+                                (<FormattedMessage id="forms.optional" defaultMessage="Optional" />)
+                              </Span>
+                            ) : null,
                         })}
+                        isExpanded={codeSectionExpanded}
+                        toggleExpanded={() => setCodeSectionExpanded(!codeSectionExpanded)}
                         imageSrc="/static/images/night-sky.png"
                         subtitle={intl.formatMessage(messages.aboutYourCodeSubtitle)}
                       >
@@ -523,6 +573,7 @@ const ApplicationForm = ({
                               labelProps={{ fontWeight: '600' }}
                               name="applicationData.repositoryUrl"
                               htmlFor="repositoryUrl"
+                              required={values.applicationData.typeOfProject === 'CODE' || undefined}
                             >
                               {({ field }) => (
                                 <StyledInputGroup
@@ -566,34 +617,37 @@ const ApplicationForm = ({
 
                         <Box mt={20}>
                           <StyledInputFormikField
-                            name="applicationData.linksToLicenses"
-                            htmlFor="linksToLicenses"
+                            name="applicationData.extraLicenseInfo"
+                            htmlFor="extraLicenseInformation"
                             labelFontSize="16px"
                             labelProps={{ fontWeight: '600' }}
-                            label={intl.formatMessage(messages.linksToLicenses)}
+                            label={intl.formatMessage(messages.extraLicenseInfo)}
                           >
                             {({ field }) => (
                               <StyledTextarea
                                 {...field}
                                 rows={4}
-                                placeholder={intl.formatMessage(messages.linksToLicensesHelpText)}
+                                placeholder={intl.formatMessage(messages.extraLicenseInfoHelpText)}
                               />
                             )}
                           </StyledInputFormikField>
                           <P fontSize="13px" lineHeight="20px" color="black.700" mt={2}>
-                            <FormattedMessage {...messages.linksToLicensesHelpText} />
+                            <FormattedMessage {...messages.extraLicenseInfoHelpText} />
                           </P>
                         </Box>
                       </CollapseSection>
 
                       <CollapseSection
                         title={intl.formatMessage(messages.aboutYourCommunityTitle, {
-                          optional: (
-                            <Span fontWeight={400} color="black.700">
-                              (<FormattedMessage id="forms.optional" defaultMessage="Optional" />)
-                            </Span>
-                          ),
+                          optional:
+                            values.applicationData.typeOfProject === 'CODE' ? (
+                              <Span fontWeight={400} color="black.700">
+                                (<FormattedMessage id="forms.optional" defaultMessage="Optional" />)
+                              </Span>
+                            ) : null,
                         })}
+                        isExpanded={communitySectionExpanded}
+                        toggleExpanded={() => setCommunitySectionExpanded(!communitySectionExpanded)}
                         imageSrc="/static/images/community.png"
                         subtitle={intl.formatMessage(messages.aboutYourCommunitySubtitle)}
                       >
@@ -605,6 +659,7 @@ const ApplicationForm = ({
                               labelProps={{ fontWeight: '600' }}
                               name="applicationData.amountOfMembers"
                               htmlFor="amountOfMembers"
+                              required={values.applicationData.typeOfProject === 'COMMUNITY' || undefined}
                             >
                               {({ field }) => (
                                 <StyledInputGroup
@@ -639,22 +694,14 @@ const ApplicationForm = ({
                         </Box>
                       </CollapseSection>
 
-                      <Box mt={32} mb={3}>
-                        <Flex alignItems="center" justifyContent="stretch" gap={6} mb={3}>
-                          <H4 fontSize="18px" lineHeight="24px" color="black.900">
-                            <FormattedMessage
-                              id="HostApplication.form.team"
-                              defaultMessage="Your team"
-                              values={{
-                                padlock: <Lock size="16px" color="#75777A" />,
-                              }}
-                            />
-                          </H4>
-                          <StyledHr flex="1" />
-                        </Flex>
-                      </Box>
+                      <Flex alignItems="center" justifyContent="stretch" gap={12} mt={32} mb={3}>
+                        <H4 fontSize="18px" lineHeight="24px" color="black.900">
+                          <FormattedMessage id="HostApplication.form.team" defaultMessage="Your team" />
+                        </H4>
+                        <StyledHr flex="1" />
+                      </Flex>
 
-                      <Box my={2}>
+                      <Box mb={2}>
                         <H4 fontSize="16px" lineHeight="24px" color="black.800" mb={0}>
                           <FormattedMessage id="AddedAdministrators" defaultMessage="Added Administrators" />
                           {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
