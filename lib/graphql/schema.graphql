@@ -254,6 +254,11 @@ interface CollectiveInterface {
   Categories set by Open Collective to help moderation.
   """
   categories: [String]!
+
+  """
+  Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
+  """
+  policies: Policies!
 }
 
 """
@@ -1158,6 +1163,25 @@ type PlanType {
   platformTips: Boolean
 }
 
+type Policies {
+  EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
+  COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
+}
+
+type COLLECTIVE_MINIMUM_ADMINS {
+  numberOfAdmins: Int
+  applies: PolicyApplication
+  freeze: Boolean
+}
+
+"""
+Defines how the policy is applied
+"""
+enum PolicyApplication {
+  ALL_COLLECTIVES
+  NEW_COLLECTIVES
+}
+
 """
 The results from searching for collectives with pagination info
 """
@@ -1595,6 +1619,7 @@ type Collective implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  policies: Policies!
 }
 
 """
@@ -1846,6 +1871,7 @@ type Event implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  policies: Policies!
 }
 
 """
@@ -2097,6 +2123,7 @@ type Fund implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  policies: Policies!
 }
 
 """
@@ -2348,6 +2375,7 @@ type Organization implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  policies: Policies!
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 }
 
@@ -2600,6 +2628,7 @@ type Project implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  policies: Policies!
 }
 
 """
@@ -3093,6 +3122,7 @@ type User implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  policies: Policies!
   email: String
   applications: [Application]
 }
@@ -3346,6 +3376,7 @@ type Vendor implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  policies: Policies!
 }
 
 """

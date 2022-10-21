@@ -3609,10 +3609,35 @@ type AccountStats {
   """
   Total amount spent
   """
-  totalAmountSpent: Amount!
+  totalAmountSpent(
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+
+    """
+    Calculate total amount spent before this date
+    """
+    dateTo: DateTime
+
+    """
+    Calculate total amount spent after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate total amount spent in the last x months. Cannot be used with startDate/endDate
+    """
+    periodInMonths: Int
+
+    """
+    Include money spent in children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): Amount!
 
   """
-  Net amount received
+  Total amount received
   """
   totalAmountReceived(
     """
@@ -3647,7 +3672,7 @@ type AccountStats {
   ): Amount!
 
   """
-  Total of paid expenses, filter per expense type
+  Total of paid expenses to the account, filter per expense type
   """
   totalPaidExpenses(
     """
@@ -8442,11 +8467,21 @@ type VirtualCard {
   privateData: JSONObject
   provider: String
   spendingLimitAmount: Int
-  spendingLimitInterval: String
+  spendingLimitInterval: VirtualCardLimitInterval
+  spendingLimitRenewsOn: DateTime
   remainingLimit: Int
   currency: Currency
   createdAt: DateTime
   updatedAt: DateTime
+}
+
+enum VirtualCardLimitInterval {
+  PER_AUTHORIZATION
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+  ALL_TIME
 }
 
 """

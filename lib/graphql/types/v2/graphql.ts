@@ -364,13 +364,13 @@ export type AccountStats = {
   id?: Maybe<Scalars['String']>;
   /** Average amount spent per month based on the last 90 days */
   monthlySpending: Amount;
-  /** Net amount received */
+  /** Total amount received */
   totalAmountReceived: Amount;
   /** Total amount spent */
   totalAmountSpent: Amount;
   /** Total net amount received */
   totalNetAmountReceived: Amount;
-  /** Total of paid expenses, filter per expense type */
+  /** Total of paid expenses to the account, filter per expense type */
   totalPaidExpenses: Amount;
   yearlyBudget: Amount;
   yearlyBudgetManaged: Amount;
@@ -428,6 +428,16 @@ export type AccountStatsTotalAmountReceivedArgs = {
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   periodInMonths?: InputMaybe<Scalars['Int']>;
   useCache?: Scalars['Boolean'];
+};
+
+
+/** Stats for the Account */
+export type AccountStatsTotalAmountSpentArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  dateTo?: InputMaybe<Scalars['DateTime']>;
+  includeChildren?: InputMaybe<Scalars['Boolean']>;
+  kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
+  periodInMonths?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -8195,7 +8205,8 @@ export type VirtualCard = {
   provider?: Maybe<Scalars['String']>;
   remainingLimit?: Maybe<Scalars['Int']>;
   spendingLimitAmount?: Maybe<Scalars['Int']>;
-  spendingLimitInterval?: Maybe<Scalars['String']>;
+  spendingLimitInterval?: Maybe<VirtualCardLimitInterval>;
+  spendingLimitRenewsOn?: Maybe<Scalars['DateTime']>;
   updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
@@ -8216,6 +8227,15 @@ export type VirtualCardInput = {
   privateData?: InputMaybe<Scalars['JSONObject']>;
   provider?: InputMaybe<VirtualCardProvider>;
 };
+
+export enum VirtualCardLimitInterval {
+  ALL_TIME = 'ALL_TIME',
+  DAILY = 'DAILY',
+  MONTHLY = 'MONTHLY',
+  PER_AUTHORIZATION = 'PER_AUTHORIZATION',
+  WEEKLY = 'WEEKLY',
+  YEARLY = 'YEARLY'
+}
 
 export enum VirtualCardProvider {
   PRIVACY = 'PRIVACY',
