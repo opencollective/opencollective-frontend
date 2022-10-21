@@ -57,25 +57,25 @@ export type Account = {
   /** @deprecated 2022-06-03: Please use repositoryUrl */
   githubHandle?: Maybe<Scalars['String']>;
   /** The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g) */
-  id?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
   imageUrl?: Maybe<Scalars['String']>;
   /** Returns whether the account accepts financial contributions. */
   isActive?: Maybe<Scalars['Boolean']>;
   /** Returns true if the remote user is an admin of this account */
   isAdmin: Scalars['Boolean'];
   /** Returns whether this account is archived */
-  isArchived?: Maybe<Scalars['Boolean']>;
+  isArchived: Scalars['Boolean'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean'];
   /** Returns whether the account is setup to Host collectives. */
-  isHost?: Maybe<Scalars['Boolean']>;
+  isHost: Scalars['Boolean'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean'];
   /**
    * The internal database identifier of the collective (ie: 580)
    * @deprecated 2020-01-01: should only be used during the transition to GraphQL API v2.
    */
-  legacyId?: Maybe<Scalars['Int']>;
+  legacyId: Scalars['Int'];
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
   legalName?: Maybe<Scalars['String']>;
   /** The address associated to this account. This field is always public for collectives and events. */
@@ -102,7 +102,7 @@ export type Account = {
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
-  slug?: Maybe<Scalars['String']>;
+  slug: Scalars['String'];
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -111,7 +111,7 @@ export type Account = {
   transferwise?: Maybe<TransferWise>;
   twitterHandle?: Maybe<Scalars['String']>;
   /** The type of the account (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL/VENDOR) */
-  type?: Maybe<AccountType>;
+  type: AccountType;
   /** The time of last update */
   updatedAt?: Maybe<Scalars['DateTime']>;
   /** Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates". */
@@ -343,7 +343,9 @@ export type AccountReferenceInput = {
 /** Stats for the Account */
 export type AccountStats = {
   __typename?: 'AccountStats';
+  /** @deprecated 2022-10-21: Use activeRecurringContributionsV2 while we migrate to better semantics. */
   activeRecurringContributions?: Maybe<Scalars['JSON']>;
+  activeRecurringContributionsV2?: Maybe<Amount>;
   /** Amount of money in cents in the currency of the collective */
   balance: Amount;
   /** Amount of money in cents in the currency of the collective currently available to spend */
@@ -364,16 +366,22 @@ export type AccountStats = {
   id?: Maybe<Scalars['String']>;
   /** Average amount spent per month based on the last 90 days */
   monthlySpending: Amount;
-  /** Net amount received */
+  /** Total amount received */
   totalAmountReceived: Amount;
   /** Total amount spent */
   totalAmountSpent: Amount;
   /** Total net amount received */
   totalNetAmountReceived: Amount;
-  /** Total of paid expenses, filter per expense type */
+  /** Total of paid expenses to the account, filter per expense type */
   totalPaidExpenses: Amount;
   yearlyBudget: Amount;
   yearlyBudgetManaged: Amount;
+};
+
+
+/** Stats for the Account */
+export type AccountStatsActiveRecurringContributionsV2Args = {
+  frequency?: ContributionFrequency;
 };
 
 
@@ -428,6 +436,16 @@ export type AccountStatsTotalAmountReceivedArgs = {
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   periodInMonths?: InputMaybe<Scalars['Int']>;
   useCache?: Scalars['Boolean'];
+};
+
+
+/** Stats for the Account */
+export type AccountStatsTotalAmountSpentArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  dateTo?: InputMaybe<Scalars['DateTime']>;
+  includeChildren?: InputMaybe<Scalars['Boolean']>;
+  kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
+  periodInMonths?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -914,21 +932,21 @@ export type Bot = Account & {
   features: CollectiveFeatures;
   /** @deprecated 2022-06-03: Please use repositoryUrl */
   githubHandle?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
   imageUrl?: Maybe<Scalars['String']>;
   /** Returns whether the account accepts financial contributions. */
   isActive?: Maybe<Scalars['Boolean']>;
   /** Returns true if the remote user is an admin of this account */
   isAdmin: Scalars['Boolean'];
   /** Returns whether this account is archived */
-  isArchived?: Maybe<Scalars['Boolean']>;
+  isArchived: Scalars['Boolean'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean'];
   /** Returns whether the account is setup to Host collectives. */
-  isHost?: Maybe<Scalars['Boolean']>;
+  isHost: Scalars['Boolean'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean'];
-  legacyId?: Maybe<Scalars['Int']>;
+  legacyId: Scalars['Int'];
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
   legalName?: Maybe<Scalars['String']>;
   /** The address associated to this account. This field is always public for collectives and events. */
@@ -956,7 +974,7 @@ export type Bot = Account & {
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
-  slug?: Maybe<Scalars['String']>;
+  slug: Scalars['String'];
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -964,7 +982,7 @@ export type Bot = Account & {
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
   twitterHandle?: Maybe<Scalars['String']>;
-  type?: Maybe<AccountType>;
+  type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
   /** Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates". */
   updates: UpdateCollection;
@@ -1235,7 +1253,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   hostFeePercent?: Maybe<Scalars['Float']>;
   /** Describe how the host charges the collective */
   hostFeesStructure?: Maybe<HostFeeStructure>;
-  id?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
   imageUrl?: Maybe<Scalars['String']>;
   /** Returns whether it's active: can accept financial contributions and pay expenses. */
   isActive: Scalars['Boolean'];
@@ -1244,14 +1262,14 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   /** Returns whether it's approved by the Fiscal Host */
   isApproved: Scalars['Boolean'];
   /** Returns whether this account is archived */
-  isArchived?: Maybe<Scalars['Boolean']>;
+  isArchived: Scalars['Boolean'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean'];
   /** Returns whether the account is setup to Host collectives. */
-  isHost?: Maybe<Scalars['Boolean']>;
+  isHost: Scalars['Boolean'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean'];
-  legacyId?: Maybe<Scalars['Int']>;
+  legacyId: Scalars['Int'];
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
   legalName?: Maybe<Scalars['String']>;
   /** The address associated to this account. This field is always public for collectives and events. */
@@ -1283,7 +1301,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
-  slug?: Maybe<Scalars['String']>;
+  slug: Scalars['String'];
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -1294,7 +1312,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
   twitterHandle?: Maybe<Scalars['String']>;
-  type?: Maybe<AccountType>;
+  type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
   /** Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates". */
   updates: UpdateCollection;
@@ -2364,6 +2382,7 @@ export type Credit = Transaction & {
   hostFee: Amount;
   id: Scalars['String'];
   invoiceTemplate?: Maybe<Scalars['String']>;
+  isDisputed?: Maybe<Scalars['Boolean']>;
   isOrderRejected: Scalars['Boolean'];
   isRefund?: Maybe<Scalars['Boolean']>;
   isRefunded?: Maybe<Scalars['Boolean']>;
@@ -2769,6 +2788,7 @@ export type Debit = Transaction & {
   hostFee: Amount;
   id: Scalars['String'];
   invoiceTemplate?: Maybe<Scalars['String']>;
+  isDisputed?: Maybe<Scalars['Boolean']>;
   isOrderRejected: Scalars['Boolean'];
   isRefund?: Maybe<Scalars['Boolean']>;
   isRefunded?: Maybe<Scalars['Boolean']>;
@@ -2878,7 +2898,7 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   hostFeePercent?: Maybe<Scalars['Float']>;
   /** Describe how the host charges the collective */
   hostFeesStructure?: Maybe<HostFeeStructure>;
-  id?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
   imageUrl?: Maybe<Scalars['String']>;
   /** Returns whether it's active: can accept financial contributions and pay expenses. */
   isActive: Scalars['Boolean'];
@@ -2887,14 +2907,14 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   /** Returns whether it's approved by the Fiscal Host */
   isApproved: Scalars['Boolean'];
   /** Returns whether this account is archived */
-  isArchived?: Maybe<Scalars['Boolean']>;
+  isArchived: Scalars['Boolean'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean'];
   /** Returns whether the account is setup to Host collectives. */
-  isHost?: Maybe<Scalars['Boolean']>;
+  isHost: Scalars['Boolean'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean'];
-  legacyId?: Maybe<Scalars['Int']>;
+  legacyId: Scalars['Int'];
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
   legalName?: Maybe<Scalars['String']>;
   /** The address associated to this account. This field is always public for collectives and events. */
@@ -2928,7 +2948,7 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
-  slug?: Maybe<Scalars['String']>;
+  slug: Scalars['String'];
   /** The Event start date and time */
   startsAt?: Maybe<Scalars['DateTime']>;
   stats?: Maybe<AccountStats>;
@@ -2943,7 +2963,7 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
   twitterHandle?: Maybe<Scalars['String']>;
-  type?: Maybe<AccountType>;
+  type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
   /** Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates". */
   updates: UpdateCollection;
@@ -3659,7 +3679,7 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   hostFeePercent?: Maybe<Scalars['Float']>;
   /** Describe how the host charges the collective */
   hostFeesStructure?: Maybe<HostFeeStructure>;
-  id?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
   imageUrl?: Maybe<Scalars['String']>;
   /** Returns whether it's active: can accept financial contributions and pay expenses. */
   isActive: Scalars['Boolean'];
@@ -3668,14 +3688,14 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   /** Returns whether it's approved by the Fiscal Host */
   isApproved: Scalars['Boolean'];
   /** Returns whether this account is archived */
-  isArchived?: Maybe<Scalars['Boolean']>;
+  isArchived: Scalars['Boolean'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean'];
   /** Returns whether the account is setup to Host collectives. */
-  isHost?: Maybe<Scalars['Boolean']>;
+  isHost: Scalars['Boolean'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean'];
-  legacyId?: Maybe<Scalars['Int']>;
+  legacyId: Scalars['Int'];
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
   legalName?: Maybe<Scalars['String']>;
   /** The address associated to this account. This field is always public for collectives and events. */
@@ -3707,7 +3727,7 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
-  slug?: Maybe<Scalars['String']>;
+  slug: Scalars['String'];
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -3718,7 +3738,7 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
   twitterHandle?: Maybe<Scalars['String']>;
-  type?: Maybe<AccountType>;
+  type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
   /** Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates". */
   updates: UpdateCollection;
@@ -3998,30 +4018,32 @@ export type Host = Account & AccountWithContributions & {
   features: CollectiveFeatures;
   /** @deprecated 2022-06-03: Please use repositoryUrl */
   githubHandle?: Maybe<Scalars['String']>;
+  /** Returns whether the host has any disputed orders */
+  hasDisputedOrders: Scalars['Boolean'];
   hostFeePercent?: Maybe<Scalars['Float']>;
   hostMetrics: HostMetrics;
   hostMetricsTimeSeries: HostMetricsTimeSeries;
   hostedVirtualCardCollectives: AccountCollection;
   hostedVirtualCardMerchants: AccountCollection;
   hostedVirtualCards: VirtualCardCollection;
-  id?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
   imageUrl?: Maybe<Scalars['String']>;
   /** Returns whether the account accepts financial contributions. */
   isActive?: Maybe<Scalars['Boolean']>;
   /** Returns true if the remote user is an admin of this account */
   isAdmin: Scalars['Boolean'];
   /** Returns whether this account is archived */
-  isArchived?: Maybe<Scalars['Boolean']>;
+  isArchived: Scalars['Boolean'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean'];
   /** Returns whether the account is setup to Host collectives. */
-  isHost?: Maybe<Scalars['Boolean']>;
+  isHost: Scalars['Boolean'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean'];
   isOpenToApplications?: Maybe<Scalars['Boolean']>;
   /** Returns whether the host is trusted or not */
   isTrustedHost: Scalars['Boolean'];
-  legacyId?: Maybe<Scalars['Int']>;
+  legacyId: Scalars['Int'];
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
   legalName?: Maybe<Scalars['String']>;
   /** The address associated to this account. This field is always public for collectives and events. */
@@ -4060,7 +4082,7 @@ export type Host = Account & AccountWithContributions & {
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
-  slug?: Maybe<Scalars['String']>;
+  slug: Scalars['String'];
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -4079,7 +4101,7 @@ export type Host = Account & AccountWithContributions & {
   /** Transferwise balances. Returns null if Transferwise account is not connected. */
   transferwiseBalances?: Maybe<Array<Maybe<Amount>>>;
   twitterHandle?: Maybe<Scalars['String']>;
-  type?: Maybe<AccountType>;
+  type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
   /** Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates". */
   updates: UpdateCollection;
@@ -4537,23 +4559,23 @@ export type Individual = Account & {
   hasTwoFactorAuth?: Maybe<Scalars['Boolean']>;
   /** If the individual is a host account, this will return the matching Host object */
   host?: Maybe<Host>;
-  id?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
   imageUrl?: Maybe<Scalars['String']>;
   /** Returns whether the account accepts financial contributions. */
   isActive?: Maybe<Scalars['Boolean']>;
   /** Returns true if the remote user is an admin of this account */
   isAdmin: Scalars['Boolean'];
   /** Returns whether this account is archived */
-  isArchived?: Maybe<Scalars['Boolean']>;
+  isArchived: Scalars['Boolean'];
   isFollowingConversation: Scalars['Boolean'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean'];
   isGuest: Scalars['Boolean'];
   /** Returns whether the account is setup to Host collectives. */
-  isHost?: Maybe<Scalars['Boolean']>;
+  isHost: Scalars['Boolean'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean'];
-  legacyId?: Maybe<Scalars['Int']>;
+  legacyId: Scalars['Int'];
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
   legalName?: Maybe<Scalars['String']>;
   /**
@@ -4589,7 +4611,7 @@ export type Individual = Account & {
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
-  slug?: Maybe<Scalars['String']>;
+  slug: Scalars['String'];
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -4597,7 +4619,7 @@ export type Individual = Account & {
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
   twitterHandle?: Maybe<Scalars['String']>;
-  type?: Maybe<AccountType>;
+  type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
   /** Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates". */
   updates: UpdateCollection;
@@ -5128,6 +5150,8 @@ export type Mutation = {
   revokeOAuthAuthorization: OAuthAuthorization;
   /** Sends an email for guest to confirm their emails and create their Open Collective account */
   sendGuestConfirmationEmail: Scalars['Boolean'];
+  /** Send a message to an account. Scope: "account" */
+  sendMessage?: Maybe<SendMessageResult>;
   /** Update the time which the user viewed the changelog updates. Scope: "account". */
   setChangelogViewDate: Individual;
   /** Set email notification subscription for requesting logged-in user */
@@ -5720,6 +5744,14 @@ export type MutationSendGuestConfirmationEmailArgs = {
 
 
 /** This is the root mutation */
+export type MutationSendMessageArgs = {
+  account: AccountReferenceInput;
+  message: Scalars['NonEmptyString'];
+  subject?: InputMaybe<Scalars['String']>;
+};
+
+
+/** This is the root mutation */
 export type MutationSetChangelogViewDateArgs = {
   changelogViewDate: Scalars['DateTime'];
 };
@@ -6019,6 +6051,7 @@ export type OrderReferenceInput = {
 export enum OrderStatus {
   ACTIVE = 'ACTIVE',
   CANCELLED = 'CANCELLED',
+  DISPUTED = 'DISPUTED',
   ERROR = 'ERROR',
   EXPIRED = 'EXPIRED',
   NEW = 'NEW',
@@ -6111,21 +6144,21 @@ export type Organization = Account & AccountWithContributions & {
   githubHandle?: Maybe<Scalars['String']>;
   /** If the organization if a host account, this will return the matching Host object */
   host?: Maybe<Host>;
-  id?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
   imageUrl?: Maybe<Scalars['String']>;
   /** Returns whether the account accepts financial contributions. */
   isActive?: Maybe<Scalars['Boolean']>;
   /** Returns true if the remote user is an admin of this account */
   isAdmin: Scalars['Boolean'];
   /** Returns whether this account is archived */
-  isArchived?: Maybe<Scalars['Boolean']>;
+  isArchived: Scalars['Boolean'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean'];
   /** Returns whether the account is setup to Host collectives. */
-  isHost?: Maybe<Scalars['Boolean']>;
+  isHost: Scalars['Boolean'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean'];
-  legacyId?: Maybe<Scalars['Int']>;
+  legacyId: Scalars['Int'];
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
   legalName?: Maybe<Scalars['String']>;
   /**
@@ -6163,7 +6196,7 @@ export type Organization = Account & AccountWithContributions & {
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
-  slug?: Maybe<Scalars['String']>;
+  slug: Scalars['String'];
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -6174,7 +6207,7 @@ export type Organization = Account & AccountWithContributions & {
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
   twitterHandle?: Maybe<Scalars['String']>;
-  type?: Maybe<AccountType>;
+  type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
   /** Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates". */
   updates: UpdateCollection;
@@ -6664,7 +6697,7 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   hostFeePercent?: Maybe<Scalars['Float']>;
   /** Describe how the host charges the collective */
   hostFeesStructure?: Maybe<HostFeeStructure>;
-  id?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
   imageUrl?: Maybe<Scalars['String']>;
   /** Returns whether it's active: can accept financial contributions and pay expenses. */
   isActive: Scalars['Boolean'];
@@ -6673,14 +6706,14 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   /** Returns whether it's approved by the Fiscal Host */
   isApproved: Scalars['Boolean'];
   /** Returns whether this account is archived */
-  isArchived?: Maybe<Scalars['Boolean']>;
+  isArchived: Scalars['Boolean'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean'];
   /** Returns whether the account is setup to Host collectives. */
-  isHost?: Maybe<Scalars['Boolean']>;
+  isHost: Scalars['Boolean'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean'];
-  legacyId?: Maybe<Scalars['Int']>;
+  legacyId: Scalars['Int'];
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
   legalName?: Maybe<Scalars['String']>;
   /** The address associated to this account. This field is always public for collectives and events. */
@@ -6714,7 +6747,7 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
-  slug?: Maybe<Scalars['String']>;
+  slug: Scalars['String'];
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -6725,7 +6758,7 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
   twitterHandle?: Maybe<Scalars['String']>;
-  type?: Maybe<AccountType>;
+  type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
   /** Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates". */
   updates: UpdateCollection;
@@ -7275,6 +7308,11 @@ export enum RecurringExpenseInterval {
   year = 'year'
 }
 
+export type SendMessageResult = {
+  __typename?: 'SendMessageResult';
+  success?: Maybe<Scalars['Boolean']>;
+};
+
 export type StripeError = {
   __typename?: 'StripeError';
   account?: Maybe<Scalars['String']>;
@@ -7543,6 +7581,7 @@ export type Transaction = {
   hostFee?: Maybe<Amount>;
   id: Scalars['String'];
   invoiceTemplate?: Maybe<Scalars['String']>;
+  isDisputed?: Maybe<Scalars['Boolean']>;
   isOrderRejected: Scalars['Boolean'];
   isRefund?: Maybe<Scalars['Boolean']>;
   isRefunded?: Maybe<Scalars['Boolean']>;
@@ -7624,6 +7663,7 @@ export enum TransactionKind {
   HOST_FEE_SHARE = 'HOST_FEE_SHARE',
   HOST_FEE_SHARE_DEBT = 'HOST_FEE_SHARE_DEBT',
   PAYMENT_PROCESSOR_COVER = 'PAYMENT_PROCESSOR_COVER',
+  PAYMENT_PROCESSOR_DISPUTE_FEE = 'PAYMENT_PROCESSOR_DISPUTE_FEE',
   PAYMENT_PROCESSOR_FEE = 'PAYMENT_PROCESSOR_FEE',
   PLATFORM_FEE = 'PLATFORM_FEE',
   PLATFORM_TIP = 'PLATFORM_TIP',
@@ -7879,7 +7919,7 @@ export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   hostFeePercent?: Maybe<Scalars['Float']>;
   /** Describe how the host charges the collective */
   hostFeesStructure?: Maybe<HostFeeStructure>;
-  id?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
   imageUrl?: Maybe<Scalars['String']>;
   /** Returns whether it's active: can accept financial contributions and pay expenses. */
   isActive: Scalars['Boolean'];
@@ -7888,14 +7928,14 @@ export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   /** Returns whether it's approved by the Fiscal Host */
   isApproved: Scalars['Boolean'];
   /** Returns whether this account is archived */
-  isArchived?: Maybe<Scalars['Boolean']>;
+  isArchived: Scalars['Boolean'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean'];
   /** Returns whether the account is setup to Host collectives. */
-  isHost?: Maybe<Scalars['Boolean']>;
+  isHost: Scalars['Boolean'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean'];
-  legacyId?: Maybe<Scalars['Int']>;
+  legacyId: Scalars['Int'];
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
   legalName?: Maybe<Scalars['String']>;
   /** The address associated to this account. This field is always public for collectives and events. */
@@ -7927,7 +7967,7 @@ export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
-  slug?: Maybe<Scalars['String']>;
+  slug: Scalars['String'];
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -7938,7 +7978,7 @@ export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
   twitterHandle?: Maybe<Scalars['String']>;
-  type?: Maybe<AccountType>;
+  type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
   /** Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates". */
   updates: UpdateCollection;
@@ -8179,7 +8219,7 @@ export type VirtualCard = {
   privateData?: Maybe<Scalars['JSONObject']>;
   provider?: Maybe<Scalars['String']>;
   spendingLimitAmount?: Maybe<Scalars['Int']>;
-  spendingLimitInterval?: Maybe<Scalars['String']>;
+  spendingLimitInterval?: Maybe<VirtualCardLimitInterval>;
   updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
@@ -8200,6 +8240,15 @@ export type VirtualCardInput = {
   privateData?: InputMaybe<Scalars['JSONObject']>;
   provider?: InputMaybe<VirtualCardProvider>;
 };
+
+export enum VirtualCardLimitInterval {
+  ALL_TIME = 'ALL_TIME',
+  DAILY = 'DAILY',
+  MONTHLY = 'MONTHLY',
+  PER_AUTHORIZATION = 'PER_AUTHORIZATION',
+  WEEKLY = 'WEEKLY',
+  YEARLY = 'YEARLY'
+}
 
 export enum VirtualCardProvider {
   PRIVACY = 'PRIVACY',
@@ -8260,7 +8309,7 @@ export type ClearCacheMutationVariables = Exact<{
 }>;
 
 
-export type ClearCacheMutation = { __typename?: 'Mutation', clearCacheForAccount: { __typename?: 'Bot', id?: string | null, slug?: string | null, name?: string | null } | { __typename?: 'Collective', id?: string | null, slug?: string | null, name?: string | null } | { __typename?: 'Event', id?: string | null, slug?: string | null, name?: string | null } | { __typename?: 'Fund', id?: string | null, slug?: string | null, name?: string | null } | { __typename?: 'Host', id?: string | null, slug?: string | null, name?: string | null } | { __typename?: 'Individual', id?: string | null, slug?: string | null, name?: string | null } | { __typename?: 'Organization', id?: string | null, slug?: string | null, name?: string | null } | { __typename?: 'Project', id?: string | null, slug?: string | null, name?: string | null } | { __typename?: 'Vendor', id?: string | null, slug?: string | null, name?: string | null } };
+export type ClearCacheMutation = { __typename?: 'Mutation', clearCacheForAccount: { __typename?: 'Bot', id: string, slug: string, name?: string | null } | { __typename?: 'Collective', id: string, slug: string, name?: string | null } | { __typename?: 'Event', id: string, slug: string, name?: string | null } | { __typename?: 'Fund', id: string, slug: string, name?: string | null } | { __typename?: 'Host', id: string, slug: string, name?: string | null } | { __typename?: 'Individual', id: string, slug: string, name?: string | null } | { __typename?: 'Organization', id: string, slug: string, name?: string | null } | { __typename?: 'Project', id: string, slug: string, name?: string | null } | { __typename?: 'Vendor', id: string, slug: string, name?: string | null } };
 
 
 export const ClearCacheDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ClearCache"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"account"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountReferenceInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"cacheTypes"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountCacheType"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"clearCacheForAccount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"account"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}},{"kind":"Argument","name":{"kind":"Name","value":"type"},"value":{"kind":"Variable","name":{"kind":"Name","value":"cacheTypes"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<ClearCacheMutation, ClearCacheMutationVariables>;
