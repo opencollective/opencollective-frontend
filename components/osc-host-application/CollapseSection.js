@@ -1,31 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
+import AnimateHeight from 'react-animate-height';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
-import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Image from '../Image';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { H4, P } from '../Text';
 
-const CollapseSection = ({ title, subtitle, imageSrc, children }) => {
-  const [isOpen, setIsOpen] = React.useState(true);
+const Content = styled.div`
+  opacity: ${props => (props.isExpanded ? '1' : '0')};
+  transition: opacity 0.5s;
+`;
+
+const CollapseSection = ({ title, isExpanded, toggleExpanded, subtitle, imageSrc, children }) => {
+  const [height, setHeight] = useState(isExpanded ? 'auto' : 0);
+
+  useEffect(() => {
+    setHeight(isExpanded ? 'auto' : 0);
+  }, [isExpanded]);
+
   return (
     <Container>
-      <Flex mt={32} gridGap="12px" alignItems="center" mb={3}>
-        <NextIllustration src={imageSrc} width={48} height={48} />
+      <Flex mt={32} gridGap="12px" alignItems="flex-start" mb={3}>
+        <Image src={imageSrc} width={48} height={48} />
         <Box flex="1">
           <Flex alignItems="center" justifyContent="stretch" gap={12} mb={3}>
             <H4 fontSize="18px" lineHeight="24px" color="black.900">
               {title}
             </H4>
             <StyledHr flex="1" />
-            <StyledButton buttonSize="tiny" type="button" onClick={() => setIsOpen(!isOpen)}>
+            <StyledButton buttonSize="tiny" type="button" onClick={toggleExpanded}>
               <Flex alignItems="center" gridGap="8px">
-                {isOpen ? (
+                {isExpanded ? (
                   <React.Fragment>
                     <ChevronUp size={16} /> <FormattedMessage id="ShowLess" defaultMessage="Show Less" />
                   </React.Fragment>
@@ -42,8 +54,13 @@ const CollapseSection = ({ title, subtitle, imageSrc, children }) => {
           </P>
         </Box>
       </Flex>
-
-      <Box display={isOpen ? 'block' : 'none'}>{children}</Box>
+      <AnimateHeight
+        id="example-panel"
+        duration={500}
+        height={height} // see props documentation below
+      >
+        <Content isExpanded={isExpanded}>{children}</Content>
+      </AnimateHeight>
     </Container>
   );
 };
@@ -53,6 +70,8 @@ CollapseSection.propTypes = {
   subtitle: PropTypes.node.isRequired,
   imageSrc: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
+  isExpanded: PropTypes.bool.isRequired,
+  toggleExpanded: PropTypes.func.isRequired,
 };
 
 export default CollapseSection;
