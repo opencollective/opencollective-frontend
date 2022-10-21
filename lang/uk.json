@@ -2088,6 +2088,7 @@
   "order.paid": "Сплачено",
   "order.pending": "В черзі",
   "order.pledged": "Зобов'язання",
+  "order.refunded": "Refunded",
   "order.rejected": "Відхилено",
   "order.require_client_confirmation": "Вимагається підтвердження клієнтом",
   "order.status": "Стан",

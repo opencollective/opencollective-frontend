@@ -2088,6 +2088,7 @@
   "order.paid": "Выплачено",
   "order.pending": "В ожидании",
   "order.pledged": "Залог",
+  "order.refunded": "Refunded",
   "order.rejected": "Отклонено",
   "order.require_client_confirmation": "Требовать подтверждение клиента",
   "order.status": "Состояние",

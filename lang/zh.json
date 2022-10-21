@@ -2088,6 +2088,7 @@
   "order.paid": "已支付",
   "order.pending": "等待中",
   "order.pledged": "已认捐",
+  "order.refunded": "Refunded",
   "order.rejected": "已拒绝",
   "order.require_client_confirmation": "需要客户确认",
   "order.status": "状态",

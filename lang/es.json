@@ -2088,6 +2088,7 @@
   "order.paid": "Pagado",
   "order.pending": "Pendiente",
   "order.pledged": "Compromiso",
+  "order.refunded": "Refunded",
   "order.rejected": "Rechazado",
   "order.require_client_confirmation": "Requerir confirmación del cliente",
   "order.status": "Estado",

@@ -2088,6 +2088,7 @@
   "order.paid": "지불됨",
   "order.pending": "대기 중",
   "order.pledged": "서약",
+  "order.refunded": "Refunded",
   "order.rejected": "거절됨",
   "order.require_client_confirmation": "Require client confirmation",
   "order.status": "상태",
