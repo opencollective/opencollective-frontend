@@ -1,3 +1,5 @@
+import speakeasy from 'speakeasy';
+
 describe('OAuth Applications', () => {
   let user, clientId, clientSecret;
 
@@ -60,6 +62,42 @@ describe('OAuth Applications', () => {
     cy.getByDataCy('unhidden-secret').should('exist'); // client secret is hidden
     cy.getByDataCy('oauth-app-client-id').then($elem => (clientId = $elem.text()));
     cy.getByDataCy('unhidden-secret').then($elem => (clientSecret = $elem.text()));
+  });
+
+  it('create application with 2fa enabled', () => {
+    cy.signup({ user: { name: 'OAuth tester', settings: { features: { adminPanel: true } } } }).then(user => {
+      cy.login({ email: user.email, redirect: `${user.collective.slug}/admin/for-developers` });
+
+      const secret = speakeasy.generateSecret({ length: 64 });
+      cy.enableTwoFactorAuth({
+        userEmail: user.email,
+        userSlug: user.collective.slug,
+        secret: secret.base32,
+      });
+
+      cy.getByDataCy('create-app-link').click();
+      cy.get('input[name=name]').type('My App created with 2FA enabled');
+      cy.get('textarea[name=description]').type('A very accurate description');
+      cy.get('input[name=redirectUri]').type('https://example.com/callback');
+      cy.get('[data-cy="create-oauth-app-modal"] button[type=submit]').click();
+
+      cy.complete2FAPrompt(
+        speakeasy.totp({
+          algorithm: 'SHA1',
+          encoding: 'base32',
+          secret: secret.base32,
+        }),
+      );
+
+      cy.contains('[data-cy=toast-notification]:last', 'Application "My App created with 2FA enabled" created');
+
+      cy.log('Lands on the app settings');
+      cy.contains('[data-cy="oauth-app-settings"] h3', 'My App created with 2FA enabled');
+
+      cy.log('Returns to the apps list to make sure it is there');
+      cy.getByDataCy('go-back-link').click();
+      cy.contains('[data-cy="oauth-apps-list"]', 'My App created with 2FA enabled');
+    });
   });
 
   // Warning: this test is dependant on the previous one. To make it independent, create the OAuth app with a direct GraphQL request
