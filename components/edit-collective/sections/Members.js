@@ -278,7 +278,6 @@ class Members extends React.Component {
             nbAdmins < host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins && (
               <MessageBox type="error" mt={4} fontSize="13px">
                 <FormattedMessage
-                  id="collective.tooFewAdmins.description"
                   defaultMessage="Your collective doesn’t meet the requirements of having a minimum of {numberOfAdmins, plural, one {# administrator} other {# administrators} }. Add more administrators to comply with your host’s policy."
                   values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                 />

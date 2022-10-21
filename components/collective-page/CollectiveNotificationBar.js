@@ -91,7 +91,7 @@ const messages = defineMessages({
   tooFewAdminsDescription: {
     id: 'collective.tooFewAdmins.description',
     defaultMessage:
-      'Your collective doesn’t meet the requirements of having a minimum of {numberOfAdmins, plural, one {# administrator} other {# administrators} }. Add more administrators to comply with your host’s policy.',
+      'You will automatically be able to accept contributions when {missingAdminsCount, plural, one {an invited administrator} other {# invited administrators} } has joined.',
   },
 });
 
@@ -157,7 +157,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
         missingAdminsCount: host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins - collective.admins.length,
       }),
       description: intl.formatMessage(messages.tooFewAdminsDescription, {
-        numberOfAdmins: host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins,
+        missingAdminsCount: host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins - collective.admins.length,
       }),
     };
   } else if (get(collective, 'type') === CollectiveType.EVENT && moneyCanMoveFromEvent(collective)) {
