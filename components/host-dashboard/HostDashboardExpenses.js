@@ -170,6 +170,17 @@ const HostDashboardExpenses = ({ hostSlug, isNewAdmin }) => {
 
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
+      {!loading && data?.host.hasDisputedOrders && (
+        <Box mb={4}>
+          <MessageBox type="warning" withIcon>
+            <FormattedMessage
+              id="host.disputes.warning"
+              defaultMessage="Fraud Warning: There are disputed charges that need review."
+            />{' '}
+            <Link href={`/${hostSlug}/admin/orders?status=DISPUTED`}>Review Disputes</Link>
+          </MessageBox>
+        </Box>
+      )}
       <Flex mb={24} alignItems="center" flexWrap="wrap">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
