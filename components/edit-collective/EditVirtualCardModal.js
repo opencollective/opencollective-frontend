@@ -5,6 +5,7 @@ import { useFormik } from 'formik';
 import { debounce } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import roles from '../../lib/constants/roles';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePicker from '../CollectivePicker';
@@ -18,6 +19,7 @@ import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useLoggedInUser } from '../UserProvider';
 
 const MAXIMUM_MONTHLY_LIMIT = 2000;
 
@@ -66,7 +68,7 @@ const throttledCall = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
 
-const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps }) => {
+const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, host, ...modalProps }) => {
   const { addToast } = useToasts();
 
   const [editVirtualCard, { loading: isBusy }] = useMutation(editVirtualCardMutation, {
@@ -76,7 +78,11 @@ const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps }
     context: API_V2_CONTEXT,
   });
 
-  const canEditMonthlyLimit = virtualCard.spendingLimitInterval === 'MONTHLY' && virtualCard.provider === 'STRIPE';
+  const { LoggedInUser } = useLoggedInUser();
+  const isHostAdmin = LoggedInUser?.hasRole(roles.ADMIN, host);
+
+  const canEditMonthlyLimit =
+    isHostAdmin && virtualCard.spendingLimitInterval === 'MONTHLY' && virtualCard.provider === 'STRIPE';
 
   const formik = useFormik({
     initialValues: {
@@ -266,6 +272,7 @@ EditVirtualCardModal.propTypes = {
     spendingLimitInterval: PropTypes.string,
     provider: PropTypes.string,
   }),
+  host: PropTypes.object,
 };
 
 /** @component */

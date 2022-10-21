@@ -74,9 +74,10 @@ const formValues = {
     slug: '',
   },
   applicationData: {
+    typeOfProject: null,
     repositoryUrl: '',
     licenseSpdxId: null,
-    linksToLicenses: '',
+    extraLicenseInfo: '',
     amountOfMembers: '',
     linksToPreviousEvents: '',
   },
@@ -158,6 +159,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
               },
               applicationData: {
                 ...initialValues.applicationData,
+                typeOfProject: handle ? 'CODE' : null,
                 repositoryUrl: handle ? `https://github.com/${handle}` : '',
                 licenseSpdxId,
               },

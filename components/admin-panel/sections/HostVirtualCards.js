@@ -249,6 +249,7 @@ const HostVirtualCards = props => {
         {data.host.hostedVirtualCards.nodes.map(vc => (
           <VirtualCard
             key={vc.id}
+            host={data.host}
             virtualCard={vc}
             canEditVirtualCard
             canPauseOrResumeVirtualCard
