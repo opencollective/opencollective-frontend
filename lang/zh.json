@@ -492,6 +492,8 @@
   "collective.subtitle.opensource": "我们欢迎开源项目加入 Open Source Collective Fiscal Host（开源集体财政托管）。",
   "collective.subtitle.seeRepo": "找不到你想要的仓库吗？ {helplink}。",
   "collective.tags.edit.description": "帮助人们找到你",
+  "collective.tooFewAdmins": "You need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.",
+  "collective.tooFewAdmins.description": "You will automatically be able to accept contributions when {missingAdminsCount, plural, one {an invited administrator} other {# invited administrators} } has joined.",
   "collective.tos.description": "Link to the terms under which this Host collects and holds funds.",
   "collective.type.label": "类型",
   "collective.types.collective": "{n, plural, one {Collective} other {Collectives}}",

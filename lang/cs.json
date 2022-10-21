@@ -492,6 +492,8 @@
   "collective.subtitle.opensource": "Open source projects are invited to join the Open Source Collective Fiscal Host.",
   "collective.subtitle.seeRepo": "Nevidíte repozitář, který hledáte? {helplink}.",
   "collective.tags.edit.description": "Pomozte lidem Vás najít",
+  "collective.tooFewAdmins": "You need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.",
+  "collective.tooFewAdmins.description": "You will automatically be able to accept contributions when {missingAdminsCount, plural, one {an invited administrator} other {# invited administrators} } has joined.",
   "collective.tos.description": "Link to the terms under which this Host collects and holds funds.",
   "collective.type.label": "Typ",
   "collective.types.collective": "{n, plural, one {Collective} other {Collectives}}",
