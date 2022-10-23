@@ -82,10 +82,8 @@ class HorizontalScroller extends React.PureComponent {
     }
   }
 
-  componentDidUpdate(oldProps) {
-    if (oldProps.width !== this.props.width) {
-      this.updateScrollInfo();
-    }
+  componentDidUpdate() {
+    this.updateScrollInfo();
   }
 
   componentWillUnmount() {
@@ -106,12 +104,6 @@ class HorizontalScroller extends React.PureComponent {
       canGoNext: scrollLeft + offsetWidth < scrollWidth,
     });
   });
-
-  UNSAFE_componentWillReceiveProps() {
-    this.setState({
-      canGoNext: false,
-    });
-  }
 
   // Manually move scroll. We don't need to check for limits here because browsers
   // already cap the value. See https://developer.mozilla.org/en/docs/Web/API/Element/scrollLeft:
