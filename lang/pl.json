@@ -492,7 +492,7 @@
   "collective.subtitle.opensource": "Projekty open source są zapraszane do dołączenia gospodarza podatkowy w Open Source Collective.",
   "collective.subtitle.seeRepo": "Nie widzisz repozytorium, którego szukasz? {helplink}.",
   "collective.tags.edit.description": "Pomóż innym Cię odnaleźć",
-  "collective.tooFewAdmins": "You need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.",
+  "collective.tooFewAdmins": "Your collective was approved but you need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.",
   "collective.tooFewAdmins.description": "You will automatically be able to accept contributions when {missingAdminsCount, plural, one {an invited administrator} other {# invited administrators} } has joined.",
   "collective.tos.description": "Link do warunków, zgodnie z którymi ten Gospodarz gromadzi i przechowuje fundusze.",
   "collective.type.label": "Typ",
