@@ -31,3 +31,7 @@ storybook-static
 # Typescript
 tsconfig.tsbuildinfo
 next-env.d.ts
+
+# Frontend components build files
+scripts/publish-components/.tmp
+.rollup.cache

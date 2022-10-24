@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ForwardRefExoticComponent } from 'react';
 import PropTypes from 'prop-types';
 import StyledSystemPropTypes from '@styled-system/prop-types';
 import styled, { css } from 'styled-components';
@@ -27,11 +27,11 @@ import StyledSpinner from './StyledSpinner';
 
 type StyledButtonProps = BackgroundProps &
   BorderProps &
-  ColorProps &
   FlexboxProps &
   LayoutProps &
   SpaceProps &
   TypographyProps &
+  ColorProps &
   React.HTMLProps<HTMLButtonElement> & {
     buttonStyle?: string;
     buttonSize?: string;
@@ -109,7 +109,10 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
   }}
 `;
 
-const StyledButton = React.forwardRef<HTMLButtonElement, StyledButtonProps>(({ loading, as, ...props }, ref) =>
+const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forwardRef<
+  HTMLButtonElement,
+  StyledButtonProps
+>(({ loading, as, ...props }, ref) =>
   // TODO(Typescript): We have to hack the `as` prop because styled-components somehow types it as "never"
   !loading ? (
     <StyledButtonContent {...props} as={as as never} ref={ref} />

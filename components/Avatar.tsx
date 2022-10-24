@@ -2,22 +2,31 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
-import { border, color, layout, space } from 'styled-system';
+import { border, BorderProps, color, layout, space } from 'styled-system';
 
 import { CollectiveType, defaultImage } from '../lib/constants/collectives';
 import { getAvatarBorderRadius, getCollectiveImage } from '../lib/image-utils';
 
-import { Flex } from './Grid';
+import { Flex, FlexProps } from './Grid';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
 
-const StyledAvatar = styled(Flex).attrs(props => ({
+type StyledAvatarProps = FlexProps &
+  BorderProps & {
+    src?: string;
+    type?: string;
+    size?: number;
+    title?: string;
+    backgroundSize?: string;
+  };
+
+const StyledAvatar = styled(Flex).attrs<StyledAvatarProps>(props => ({
   style: {
     backgroundImage: props.src ? `url(${props.src})` : null,
     backgroundSize: props.backgroundSize || 'cover',
     backgroundColor: props.backgroundColor,
   },
-}))`
+}))<StyledAvatarProps>`
   align-items: center;
   background-color: ${({ theme, type }) => (type === 'USER' ? themeGet('colors.black.100')({ theme }) : 'none')};
   color: ${themeGet('colors.black.400')};
@@ -36,7 +45,14 @@ const StyledAvatar = styled(Flex).attrs(props => ({
   ${layout}
 `;
 
-const Avatar = ({ collective, src, type = 'USER', radius, name, ...styleProps }) => {
+const Avatar = ({
+  collective = null,
+  src = undefined,
+  type = 'USER',
+  radius = 42,
+  name = undefined,
+  ...styleProps
+}) => {
   // Use collective object instead of props
   if (collective) {
     type = collective.type;
