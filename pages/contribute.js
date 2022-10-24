@@ -11,6 +11,7 @@ import { sortEvents } from '../lib/events';
 import { gqlV1 } from '../lib/graphql/helpers';
 import { sortTiersForCollective } from '../lib/tier-utils';
 import { getCollectivePageRoute } from '../lib/url-helpers';
+import { getWebsiteUrl } from '../lib/utils';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -85,7 +86,7 @@ class TiersPage extends React.Component {
         ...baseMetadata,
         title: `Contribute to ${collective.name}`,
         description: 'These are all the ways you can help make our community sustainable. ',
-        canonicalURL: `${process.env.WEBSITE_URL}/${collective.slug}/contribute`,
+        canonicalURL: `${getWebsiteUrl()}/${collective.slug}/contribute`,
         noRobots: false,
       };
     }

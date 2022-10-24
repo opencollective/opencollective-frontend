@@ -764,6 +764,8 @@ enum OrderStatus {
   EXPIRED
   PLEDGED
   REJECTED
+  DISPUTED
+  REFUNDED
 }
 
 """

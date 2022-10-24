@@ -123,6 +123,7 @@ export const expenseHostFields = gql`
     }
     supportedPayoutMethods
     isTrustedHost
+    hasDisputedOrders
     plan {
       id
     }

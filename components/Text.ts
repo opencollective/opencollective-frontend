@@ -74,7 +74,15 @@ Span.defaultProps = {
 
 export const Label = P.withComponent('label');
 
+Label.defaultProps = {
+  fontWeight: 'normal',
+};
+
 export const Strong = P.withComponent('strong');
+
+Strong.defaultProps = {
+  fontWeight: 'bold',
+};
 
 export const H1 = P.withComponent('h1');
 

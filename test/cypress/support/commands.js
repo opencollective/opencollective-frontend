@@ -544,6 +544,11 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
   });
 });
 
+Cypress.Commands.add('complete2FAPrompt', code => {
+  cy.get('#2fa-code-input').type(code);
+  cy.contains('button', 'Verify').click();
+});
+
 let localStorageSnapshot = {};
 
 Cypress.Commands.add('resetLocalStorage', () => {
