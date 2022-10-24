@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useLazyQuery, useMutation } from '@apollo/client';
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
 import { debounce } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { VirtualCardMaximumLimitForInterval } from '../../lib/constants/virtual-cards';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 
@@ -80,8 +79,36 @@ const initialValues = {
   limitInterval: undefined,
 };
 
+const VirtualCardPoliciesQuery = gql`
+  query VirtualCardPoliciesQuery($slug: String) {
+    account(slug: $slug) {
+      id
+      policies {
+        MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
+          ALL_TIME
+          DAILY
+          MONTHLY
+          PER_AUTHORIZATION
+          WEEKLY
+          YEARLY
+        }
+      }
+    }
+  }
+`;
+
 const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modalProps }) => {
   const { addToast } = useToasts();
+
+  const { data: policyData, loading: isLoadingPolicy } = useQuery(VirtualCardPoliciesQuery, {
+    context: API_V2_CONTEXT,
+    variables: {
+      slug: host.slug,
+    },
+  });
+
+  const MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL =
+    policyData?.account?.policies?.MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL;
 
   const [createVirtualCard, { loading: isBusy }] = useMutation(createVirtualCardMutation, {
     context: API_V2_CONTEXT,
@@ -141,7 +168,7 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
       }
 
       if (values.limitInterval) {
-        const maximumLimitForInterval = VirtualCardMaximumLimitForInterval[values.limitInterval];
+        const maximumLimitForInterval = MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL[values.limitInterval];
         if (values.limitAmount > maximumLimitForInterval * 100) {
           errors.limitAmount = `Limit for this interval should not exceed ${maximumLimitForInterval} ${
             values.collective?.currency || 'USD'
@@ -301,6 +328,7 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
               labelFontSize="13px"
               label={<FormattedMessage defaultMessage="Limit" />}
               htmlFor="limitAmount"
+              disabled={isLoadingPolicy}
               error={formik.touched.limitAmount && formik.errors.limitAmount}
             >
               {inputProps => (
@@ -320,6 +348,7 @@ const CreateVirtualCardModal = ({ host, collective, onSuccess, onClose, ...modal
               labelFontSize="13px"
               label={<FormattedMessage defaultMessage="Limit interval" />}
               htmlFor="limitInterval"
+              disabled={isLoadingPolicy}
               error={formik.touched.limitInterval && formik.errors.limitInterval}
             >
               {inputProps => (

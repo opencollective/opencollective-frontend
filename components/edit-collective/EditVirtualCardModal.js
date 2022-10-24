@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useLazyQuery, useMutation } from '@apollo/client';
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
 import { debounce } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../../lib/constants/roles';
-import { VirtualCardMaximumLimitForInterval } from '../../lib/constants/virtual-cards';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 
@@ -73,12 +72,40 @@ const collectiveMembersQuery = gql`
   }
 `;
 
+const VirtualCardPoliciesQuery = gql`
+  query VirtualCardPoliciesQuery($slug: String) {
+    account(slug: $slug) {
+      id
+      policies {
+        MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
+          ALL_TIME
+          DAILY
+          MONTHLY
+          PER_AUTHORIZATION
+          WEEKLY
+          YEARLY
+        }
+      }
+    }
+  }
+`;
+
 const throttledCall = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
 
 const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, host, ...modalProps }) => {
   const { addToast } = useToasts();
+
+  const { data: policyData, loading: isLoadingPolicy } = useQuery(VirtualCardPoliciesQuery, {
+    context: API_V2_CONTEXT,
+    variables: {
+      slug: host.slug,
+    },
+  });
+
+  const MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL =
+    policyData?.account?.policies?.MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL;
 
   const [editVirtualCard, { loading: isBusy }] = useMutation(editVirtualCardMutation, {
     context: API_V2_CONTEXT,
@@ -151,7 +178,7 @@ const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, host, ...modalP
         errors.limitAmount = 'Required';
       }
       if (values.limitInterval) {
-        const maximumLimitForInterval = VirtualCardMaximumLimitForInterval[values.limitInterval];
+        const maximumLimitForInterval = MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL[values.limitInterval];
         if (values.limitAmount > maximumLimitForInterval * 100) {
           errors.limitAmount = `Limit for this interval should not exceed ${maximumLimitForInterval} ${
             values.collective?.currency || 'USD'
@@ -314,6 +341,7 @@ const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, host, ...modalP
               buttonStyle="primary"
               data-cy="confirmation-modal-continue"
               loading={isBusy}
+              disabled={isLoadingPolicy}
               type="submit"
               textTransform="capitalize"
             >

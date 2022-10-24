@@ -4888,6 +4888,16 @@ export type LocationInput = {
   structured?: InputMaybe<Scalars['JSON']>;
 };
 
+export type Maximum_Virtual_Card_Limit_Amount_For_Interval = {
+  __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL';
+  ALL_TIME?: Maybe<Scalars['Int']>;
+  DAILY?: Maybe<Scalars['Int']>;
+  MONTHLY?: Maybe<Scalars['Int']>;
+  PER_AUTHORIZATION?: Maybe<Scalars['Int']>;
+  WEEKLY?: Maybe<Scalars['Int']>;
+  YEARLY?: Maybe<Scalars['Int']>;
+};
+
 /** This represents a Member relationship (ie: Organization backing a Collective) */
 export type Member = {
   __typename?: 'Member';
@@ -6606,6 +6616,7 @@ export type Policies = {
   __typename?: 'Policies';
   COLLECTIVE_MINIMUM_ADMINS?: Maybe<Collective_Minimum_Admins>;
   EXPENSE_AUTHOR_CANNOT_APPROVE?: Maybe<Scalars['Boolean']>;
+  MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: Maybe<Maximum_Virtual_Card_Limit_Amount_For_Interval>;
 };
 
 export type PoliciesCollectiveMinimumAdminsInput = {
