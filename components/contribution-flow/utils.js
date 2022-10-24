@@ -17,6 +17,7 @@ import {
   getPaymentMethodMetadata,
   isPaymentMethodDisabled,
 } from '../../lib/payment-method-utils';
+import { getWebsiteUrl } from '../../lib/utils';
 
 import CreditCardInactive from '../icons/CreditCardInactive';
 
@@ -251,12 +252,12 @@ export const getGQLV2AmountInput = (valueInCents, defaultValue) => {
 
 const getCanonicalURL = (collective, tier) => {
   if (!tier) {
-    return `${process.env.WEBSITE_URL}/${collective.slug}/donate`;
+    return `${getWebsiteUrl()}/${collective.slug}/donate`;
   } else if (collective.type === CollectiveType.EVENT) {
     const parentSlug = get(collective.parent, 'slug', collective.slug);
-    return `${process.env.WEBSITE_URL}/${parentSlug}/events/${collective.slug}/order/${tier.id}`;
+    return `${getWebsiteUrl()}/${parentSlug}/events/${collective.slug}/order/${tier.id}`;
   } else {
-    return `${process.env.WEBSITE_URL}/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
+    return `${getWebsiteUrl()}/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
   }
 };
 
