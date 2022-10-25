@@ -24,6 +24,7 @@ import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import DeleteExpenseButton from './DeleteExpenseButton';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
+import { SecurityChecksButton } from './SecurityChecksModal';
 
 const processExpenseMutation = gql`
   mutation ProcessExpense(
@@ -287,6 +288,7 @@ const ProcessExpenseButtons = ({
           onDelete={onDelete}
         />
       )}
+      {expense?.securityChecks?.length && <SecurityChecksButton {...buttonProps} minWidth={0} expense={expense} />}
     </React.Fragment>
   );
 };
@@ -311,6 +313,13 @@ ProcessExpenseButtons.propTypes = {
     id: PropTypes.string,
     legacyId: PropTypes.number,
     status: PropTypes.string,
+    securityChecks: PropTypes.arrayOf(
+      PropTypes.shape({
+        level: PropTypes.string,
+        scope: PropTypes.string,
+        message: PropTypes.string,
+      }),
+    ),
   }).isRequired,
   /** The account where the expense has been submitted */
   collective: PropTypes.object.isRequired,
