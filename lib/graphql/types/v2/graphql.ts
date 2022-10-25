@@ -7846,6 +7846,7 @@ export type Tier = {
   /** Get all orders */
   orders: OrderCollection;
   presets?: Maybe<Array<Maybe<Scalars['Int']>>>;
+  singleTicket?: Maybe<Scalars['Boolean']>;
   slug?: Maybe<Scalars['String']>;
   type: TierType;
   useStandalonePage?: Maybe<Scalars['Boolean']>;
@@ -7932,6 +7933,7 @@ export type TierUpdateInput = {
   minimumAmount?: InputMaybe<AmountInput>;
   name?: InputMaybe<Scalars['NonEmptyString']>;
   presets?: InputMaybe<Array<Scalars['Int']>>;
+  singleTicket?: InputMaybe<Scalars['Boolean']>;
   type: TierType;
   useStandalonePage?: InputMaybe<Scalars['Boolean']>;
 };

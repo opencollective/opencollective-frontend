@@ -81,7 +81,7 @@ function getReceiptTemplates(host) {
   return receiptTemplateTitles;
 }
 
-function FormFields({ collective, tier, types, values }) {
+function FormFields({ collective, types, values }) {
   const intl = useIntl();
 
   const tierTypeOptions = getTierTypeOptions(intl, collective.type);
@@ -407,7 +407,7 @@ function FormFields({ collective, tier, types, values }) {
           defaultMessage: 'Amount you aim to raise',
         })}
       </FieldDescription>
-      {tier?.type === TICKET && (
+      {values.type === TICKET && (
         <React.Fragment>
           <StyledInputFormikField
             name="singleTicket"
@@ -931,7 +931,7 @@ export function EditTierForm({ tier, collective, onClose }) {
               <ModalBody>
                 <ModalSectionContainer>
                   <EditSectionContainer>
-                    <FormFields collective={collective} tier={tier} values={values} />
+                    <FormFields collective={collective} values={values} />
                   </EditSectionContainer>
                   <PreviewSectionContainer>
                     <ContributeCardPreview collective={collective} tier={values} />

@@ -792,6 +792,7 @@ type Tier {
   endsAt: DateTime
   invoiceTemplate: String
   useStandalonePage: Boolean
+  singleTicket: Boolean
 }
 
 """
@@ -15192,6 +15193,7 @@ input TierUpdateInput {
   maxQuantity: Int
   minimumAmount: AmountInput
   useStandalonePage: Boolean
+  singleTicket: Boolean
 }
 
 input TierCreateInput {

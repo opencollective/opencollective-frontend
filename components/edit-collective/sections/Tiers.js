@@ -241,8 +241,9 @@ class Tiers extends React.Component {
         options: collective =>
           getOptions(props.types || (collective.type === PROJECT ? SIMPLIFIED_TIER_TYPES : DEFAULT_TIER_TYPES)),
         label: intl.formatMessage(this.messages['type.label']),
-        disabled: props.types?.length === 1,
-        when: (tier, collective) => ![FUND].includes(collective.type) || props.types?.length === 1,
+        when: (tier, collective) =>
+          ![FUND].includes(collective.type) &&
+          (props.types || (collective.type === PROJECT ? SIMPLIFIED_TIER_TYPES : DEFAULT_TIER_TYPES)).length > 1,
       },
       {
         name: 'name',
