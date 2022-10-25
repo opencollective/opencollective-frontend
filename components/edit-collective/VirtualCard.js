@@ -394,7 +394,7 @@ const getLimitString = ({
             <Fragment>
               &nbsp;&bull;&nbsp;
               <FormattedMessage
-                defaultMessage={'Renews on {renewsOnDate, date, short}'}
+                defaultMessage={'Renews on {renewsOnDate, date, medium}'}
                 values={{
                   renewsOnDate: new Date(spendingLimitRenewsOn),
                 }}
@@ -509,7 +509,7 @@ const VirtualCard = props => {
             <P mt="8px" fontSize="11px" fontWeight="400" lineHeight="16px" letterSpacing="0">
               <FormattedMessage
                 id="VirtualCards.AssignedOnDateTo"
-                defaultMessage="Assigned on {createdAt, date, short} to {assignedTo}"
+                defaultMessage="Assigned on {createdAt, date, medium} to {assignedTo}"
                 values={{
                   createdAt: new Date(virtualCard.createdAt),
                   assignedTo: (
