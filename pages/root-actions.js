@@ -9,6 +9,7 @@ import Container from '../components/Container';
 import { Box, Grid } from '../components/Grid';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
+import AccountSettings from '../components/root-actions/AccountSettings';
 import BanAccounts from '../components/root-actions/BanAccounts';
 import BanAccountsWithSearch from '../components/root-actions/BanAccountsWithSearch';
 import ClearCacheForAccountForm from '../components/root-actions/ClearCacheForAccountForm';
@@ -39,6 +40,7 @@ const MENU = [
     description: `Before merging user accounts, you must always make sure that the person who requested it own both emails. Merging means payment methods are merged too, so if we just merge 2 accounts because someones ask for it without verifying we could end up in a very bad situation.\nA simple way to do that is to send a unique random code to the other account they want to claim and ask them to share this code.`,
   },
   { id: 'Unhost account', Component: UnhostAccountForm },
+  { id: 'Account Settings', Component: AccountSettings },
   { id: 'Activity Log', Component: RootActivityLog, useCard: false },
   {
     id: 'Contributions & Expenses',
