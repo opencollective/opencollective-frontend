@@ -96,6 +96,7 @@ const main = async () => {
           outDir: tmpDir,
           sourceMap: false,
           allowJs: false,
+          jsx: 'react',
         },
       }),
       RollupPluginBabel({

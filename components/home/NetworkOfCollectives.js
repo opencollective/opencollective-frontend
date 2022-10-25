@@ -2,9 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 
 import Container from '../Container';
-import { Box } from '../Grid';
+import { Box, boxProps } from '../Grid';
 
-const StyledSvg = styled(Box)`
+const StyledSvg = styled(Box).withConfig({
+  shouldForwardProp: (prop, defaultFilter) => !boxProps.propNames.includes(prop) && defaultFilter(prop),
+})`
   #logoContainer {
     transform-origin: 50% 50%;
     transition: 0.3s;
