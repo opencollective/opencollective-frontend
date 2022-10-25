@@ -20,7 +20,7 @@ import {
   TypographyProps,
 } from 'styled-system';
 
-const boxProps = compose(space, color, layout, typography, flexbox, grid);
+export const boxProps = compose(space, color, layout, typography, flexbox, grid);
 
 type BoxProps = SpaceProps &
   ColorProps &
