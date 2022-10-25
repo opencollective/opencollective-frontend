@@ -71,6 +71,7 @@ const paymentMethodsQuery = gql`
           slug
           type
           name
+          imageUrl
         }
         limitedToHosts {
           id
