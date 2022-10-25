@@ -78,6 +78,7 @@ const addFundsMutation = gql`
     $tier: TierReferenceInput
     $amount: AmountInput!
     $description: String!
+    $memo: String
     $hostFeePercent: Float!
     $invoiceTemplate: String
   ) {
@@ -86,12 +87,14 @@ const addFundsMutation = gql`
       fromAccount: $fromAccount
       amount: $amount
       description: $description
+      memo: $memo
       hostFeePercent: $hostFeePercent
       tier: $tier
       invoiceTemplate: $invoiceTemplate
     ) {
       id
       description
+      memo
       transactions {
         id
         type
@@ -199,6 +202,7 @@ const getInitialValues = values => ({
   amount: null,
   hostFeePercent: null,
   description: '',
+  memo: null,
   fromAccount: null,
   tier: null,
   ...values,
@@ -395,6 +399,7 @@ const AddFundsModal = ({ collective, ...props }) => {
               showPlatformTipModal: true,
               fundAmount: values.amount,
               description: resultOrder.description,
+              memo: resultOrder.memo,
               source: resultOrder.fromAccount,
               tier: resultOrder.tier,
             });
@@ -499,6 +504,27 @@ const AddFundsModal = ({ collective, ...props }) => {
                     mt={3}
                   >
                     {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
+                  </StyledInputFormikField>
+                  <StyledInputFormikField
+                    name="memo"
+                    htmlFor="addFunds-memo"
+                    label={
+                      <span>
+                        <FormattedMessage defaultMessage="Memo" />
+                        {` `}
+                        <StyledTooltip
+                          content={() => (
+                            <FormattedMessage defaultMessage="This is a private note that will only be visible to the host." />
+                          )}
+                        >
+                          <InfoCircle size={16} />
+                        </StyledTooltip>
+                      </span>
+                    }
+                    required={false}
+                    mt={3}
+                  >
+                    {({ field }) => <StyledInput data-cy="add-funds-memo" {...field} />}
                   </StyledInputFormikField>
                   <Flex mt={3} flexWrap="wrap">
                     <StyledInputFormikField
@@ -662,6 +688,11 @@ const AddFundsModal = ({ collective, ...props }) => {
                         <li>
                           <FormattedMessage id="AddFundsModal.ForThePurpose" defaultMessage="For the purpose of" />{' '}
                           <strong>{fundDetails.description}</strong>
+                        </li>
+                        <li>
+                          <FormattedMessage defaultMessage="Memo" />
+                          {': '}
+                          <strong>{fundDetails.memo}</strong>
                         </li>
                         {fundDetails.tier && (
                           <li>
