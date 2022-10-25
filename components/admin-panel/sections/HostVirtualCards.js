@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal';
-import CreateVirtualCardModal from '../../edit-collective/CreateVirtualCardModal';
+import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';
 import VirtualCardFilters from '../../edit-collective/sections/virtual-cards/VirtualCardFilters';
 import VirtualCard from '../../edit-collective/VirtualCard';
 import { Box, Flex, Grid } from '../../Grid';
@@ -281,7 +281,7 @@ const HostVirtualCards = props => {
         />
       )}
       {displayCreateVirtualCardModal && (
-        <CreateVirtualCardModal
+        <EditVirtualCardModal
           host={data.host}
           onSuccess={handleCreateVirtualCardSuccess}
           onClose={() => {
