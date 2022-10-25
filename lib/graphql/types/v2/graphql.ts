@@ -5198,6 +5198,7 @@ export type MutationAddFundsArgs = {
   fromAccount: AccountReferenceInput;
   hostFeePercent?: InputMaybe<Scalars['Float']>;
   invoiceTemplate?: InputMaybe<Scalars['String']>;
+  memo?: InputMaybe<Scalars['String']>;
   tier?: InputMaybe<TierReferenceInput>;
 };
 
@@ -5928,6 +5929,8 @@ export type Order = {
   legacyId: Scalars['Int'];
   /** This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order. */
   membership?: Maybe<MemberOf>;
+  /** Memo field which adds additional details about the order. For example in added funds this can be a note to mark what method (cheque, money order) the funds were received. */
+  memo?: Maybe<Scalars['String']>;
   nextChargeDate?: Maybe<Scalars['DateTime']>;
   paymentMethod?: Maybe<PaymentMethod>;
   /** The permissions given to current logged in user for this order */
