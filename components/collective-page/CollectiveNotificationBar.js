@@ -86,7 +86,7 @@ const messages = defineMessages({
   tooFewAdmins: {
     id: 'collective.tooFewAdmins',
     defaultMessage:
-      'You need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.',
+      'Your collective was approved but you need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.',
   },
   tooFewAdminsDescription: {
     id: 'collective.tooFewAdmins.description',
@@ -148,6 +148,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
     };
   } else if (
     LoggedInUser?.isAdminOfCollectiveOrHost(collective) &&
+    collective.isApproved &&
     host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze &&
     host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > collective?.admins?.length &&
     collective?.features?.RECEIVE_FINANCIAL_CONTRIBUTIONS === 'DISABLED'

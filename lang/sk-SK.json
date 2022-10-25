@@ -492,7 +492,7 @@
   "collective.subtitle.opensource": "Projekty s otvoreným zdrojovým kódom sa môžu zapojiť do fiškálneho hostingu Open Source Collective.",
   "collective.subtitle.seeRepo": "Nevidíte úložisko, ktoré hľadáte? {helplink}.",
   "collective.tags.edit.description": "Pomôžte ľuďom, aby vás našli",
-  "collective.tooFewAdmins": "You need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.",
+  "collective.tooFewAdmins": "Your collective was approved but you need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.",
   "collective.tooFewAdmins.description": "You will automatically be able to accept contributions when {missingAdminsCount, plural, one {an invited administrator} other {# invited administrators} } has joined.",
   "collective.tos.description": "Odkaz na podmienky, podľa ktorých tento hostiteľ zhromažďuje a uchováva finančné prostriedky.",
   "collective.type.label": "Typ",

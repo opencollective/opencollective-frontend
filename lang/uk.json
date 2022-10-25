@@ -492,7 +492,7 @@
   "collective.subtitle.opensource": "Проєкти з відкритим джерельним кодом запрошено приєднатися до фіскального вузла Колективу.",
   "collective.subtitle.seeRepo": "Не знайшли репозиторій, який шукаєте? {helplink}.",
   "collective.tags.edit.description": "Допоможіть людям знайти вас",
-  "collective.tooFewAdmins": "You need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.",
+  "collective.tooFewAdmins": "Your collective was approved but you need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.",
   "collective.tooFewAdmins.description": "You will automatically be able to accept contributions when {missingAdminsCount, plural, one {an invited administrator} other {# invited administrators} } has joined.",
   "collective.tos.description": "Посилання на умови, за яких цей фіскальний вузол збирає та тримає кошти.",
   "collective.type.label": "Тип",

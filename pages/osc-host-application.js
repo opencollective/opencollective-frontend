@@ -90,7 +90,7 @@ const formatNameFromSlug = repoName => {
   return repoName.replace(/[-_]/g, ' ').replace(/(?:^|\s)\S/g, words => words.toUpperCase());
 };
 
-const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
+const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedInUser }) => {
   const [checkedTermsOfFiscalSponsorship, setCheckedTermsOfFiscalSponsorship] = useState(false);
   const [initialValues, setInitialValues] = useState(formValues);
 
@@ -179,6 +179,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
           host={hostData?.account}
           loadingCollective={loadingCollective}
           canApplyWithCollective={canApplyWithCollective && !hasHost}
+          refetchLoggedInUser={refetchLoggedInUser}
         />
       )}
       {step === 'success' && <YourInitiativeIsNearlyThere />}
@@ -189,6 +190,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
 OSCHostApplication.propTypes = {
   loadingLoggedInUser: PropTypes.bool,
   LoggedInUser: PropTypes.object,
+  refetchLoggedInUser: PropTypes.func,
 };
 
 export default withUser(OSCHostApplication);
