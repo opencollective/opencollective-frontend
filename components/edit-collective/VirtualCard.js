@@ -20,9 +20,9 @@ import { Box, Flex } from '../Grid';
 import DismissIcon from '../icons/DismissIcon';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
-import StyledSpinner from '../StyledSpinner';
 import StyledLink from '../StyledLink';
-import { P, Span } from '../Text';
+import StyledSpinner from '../StyledSpinner';
+import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import DeleteVirtualCardModal from './DeleteVirtualCardModal';
