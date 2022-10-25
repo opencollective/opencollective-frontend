@@ -6058,6 +6058,7 @@ export enum OrderStatus {
   PAID = 'PAID',
   PENDING = 'PENDING',
   PLEDGED = 'PLEDGED',
+  REFUNDED = 'REFUNDED',
   REJECTED = 'REJECTED',
   REQUIRE_CLIENT_CONFIRMATION = 'REQUIRE_CLIENT_CONFIRMATION'
 }
@@ -8218,8 +8219,10 @@ export type VirtualCard = {
   name?: Maybe<Scalars['String']>;
   privateData?: Maybe<Scalars['JSONObject']>;
   provider?: Maybe<Scalars['String']>;
+  remainingLimit?: Maybe<Scalars['Int']>;
   spendingLimitAmount?: Maybe<Scalars['Int']>;
   spendingLimitInterval?: Maybe<VirtualCardLimitInterval>;
+  spendingLimitRenewsOn?: Maybe<Scalars['DateTime']>;
   updatedAt?: Maybe<Scalars['DateTime']>;
 };
 

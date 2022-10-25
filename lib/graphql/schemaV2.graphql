@@ -837,6 +837,7 @@ enum OrderStatus {
   PAID
   PENDING
   PLEDGED
+  REFUNDED
   REJECTED
   REQUIRE_CLIENT_CONFIRMATION
 }
@@ -8485,6 +8486,8 @@ type VirtualCard {
   provider: String
   spendingLimitAmount: Int
   spendingLimitInterval: VirtualCardLimitInterval
+  spendingLimitRenewsOn: DateTime
+  remainingLimit: Int
   currency: Currency
   createdAt: DateTime
   updatedAt: DateTime
