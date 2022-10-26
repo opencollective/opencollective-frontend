@@ -95,7 +95,7 @@ export const generatePaymentMethodOptions = (
     key: `pm-${pm.id}`,
     title: getPaymentMethodName(pm),
     subtitle: getPaymentMethodMetadata(pm, totalAmount),
-    icon: getPaymentMethodIcon(pm),
+    icon: getPaymentMethodIcon(pm, pm.account),
     disabled: isPaymentMethodDisabled(pm, totalAmount),
     paymentMethod: pm,
   }));
@@ -179,10 +179,7 @@ export const generatePaymentMethodOptions = (
           service: PAYMENT_METHOD_SERVICE.PAYPAL,
           type: PAYMENT_METHOD_TYPE.PAYMENT,
         },
-        icon: getPaymentMethodIcon(
-          { service: PAYMENT_METHOD_SERVICE.PAYPAL, type: PAYMENT_METHOD_TYPE.PAYMENT },
-          collective,
-        ),
+        icon: getPaymentMethodIcon({ service: PAYMENT_METHOD_SERVICE.PAYPAL, type: PAYMENT_METHOD_TYPE.PAYMENT }),
       });
     }
 
@@ -199,10 +196,7 @@ export const generatePaymentMethodOptions = (
           type: PAYMENT_METHOD_TYPE.ALIPAY,
         },
         title: <FormattedMessage id="Alipay" defaultMessage="Alipay" />,
-        icon: getPaymentMethodIcon(
-          { service: PAYMENT_METHOD_SERVICE.STRIPE, type: PAYMENT_METHOD_TYPE.ALIPAY },
-          collective,
-        ),
+        icon: getPaymentMethodIcon({ service: PAYMENT_METHOD_SERVICE.STRIPE, type: PAYMENT_METHOD_TYPE.ALIPAY }),
       });
     }
 
@@ -215,10 +209,10 @@ export const generatePaymentMethodOptions = (
           service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
           type: PAYMENT_METHOD_TYPE.MANUAL,
         },
-        icon: getPaymentMethodIcon(
-          { service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE, type: PAYMENT_METHOD_TYPE.MANUAL },
-          collective,
-        ),
+        icon: getPaymentMethodIcon({
+          service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
+          type: PAYMENT_METHOD_TYPE.MANUAL,
+        }),
         instructions: (
           <FormattedMessage
             id="NewContributionFlow.bankInstructions"

@@ -79,6 +79,7 @@ const Header = styled(Container)`
   display: flex;
   text-shadow: none;
   justify-content: space-between;
+  align-items: flex-start;
 `;
 
 export const ModalBody = styled(Container)``;
@@ -220,7 +221,7 @@ const StyledModal = ({ children, onClose, usePortal, hasUnsavedChanges, trapFocu
           <TrapContainer>
             <Modal {...props}>
               {React.Children.map(children, child => {
-                if (child.type.displayName === 'Header') {
+                if (child?.type?.displayName === 'Header') {
                   return React.cloneElement(child, { onClose: closeHandler });
                 }
                 return child;
@@ -240,7 +241,7 @@ const StyledModal = ({ children, onClose, usePortal, hasUnsavedChanges, trapFocu
           <TrapContainer>
             <Modal {...props}>
               {React.Children.map(children, child => {
-                if (child.type?.displayName === 'Header') {
+                if (child?.type?.displayName === 'Header') {
                   return React.cloneElement(child, { onClose: closeHandler });
                 }
                 return child;

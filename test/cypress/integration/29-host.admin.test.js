@@ -146,8 +146,13 @@ describe('host dashboard', () => {
       cy.get('@currentExpense').find('[data-cy="approve-button"]').click();
       cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Approved');
 
-      // Pay
+      // Security Check
       cy.get('@currentExpense').find('[data-cy="pay-button"]').click();
+      cy.getByDataCy('security-check-modal').as('securityCheckModal');
+      cy.get('@securityCheckModal').find('h1').contains('Are you sure you want to pay?');
+      cy.get('@securityCheckModal').find('[data-cy="pay-button"]').click();
+
+      // Pay
       cy.getByDataCy('pay-expense-modal').as('payExpenseModal');
       cy.get('@payExpenseModal').find('[data-cy="pay-type-MANUAL"]').click();
       cy.get('@payExpenseModal').find('[data-cy="mark-as-paid-button"]').click();
