@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
@@ -26,6 +26,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
     sendMoneyToCollective: PropTypes.func,
     confirmTransfer: PropTypes.func,
     isTransferApproved: PropTypes.bool,
+    customButton: PropTypes.node,
   };
 
   constructor(props) {
@@ -82,24 +83,45 @@ class SendMoneyToCollectiveBtn extends React.Component {
   }
 
   render() {
-    const { amount, currency, toCollective, intl } = this.props;
+    const { amount, currency, toCollective, intl, customButton } = this.props;
     const { locale } = intl;
     return (
       <div className="SendMoneyToCollectiveBtn">
         <Flex justifyContent="center" mb={1}>
-          <StyledButton onClick={this.props.confirmTransfer || this.onClick}>
-            {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
-            {!this.state.loading && (
-              <FormattedMessage
-                id="SendMoneyToCollective.btn"
-                defaultMessage="Send {amount} to {collective}"
-                values={{
-                  amount: formatCurrency(amount, currency, locale),
-                  collective: toCollective.name,
-                }}
-              />
-            )}
-          </StyledButton>
+          {customButton ? (
+            customButton({
+              onClick: this.props.confirmTransfer || this.onClick,
+              children: (
+                <Fragment>
+                  {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
+                  {!this.state.loading && (
+                    <FormattedMessage
+                      id="SendMoneyToCollective.btn"
+                      defaultMessage="Send {amount} to {collective}"
+                      values={{
+                        amount: formatCurrency(amount, currency, locale),
+                        collective: toCollective.name,
+                      }}
+                    />
+                  )}
+                </Fragment>
+              ),
+            })
+          ) : (
+            <StyledButton onClick={this.props.confirmTransfer || this.onClick}>
+              {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
+              {!this.state.loading && (
+                <FormattedMessage
+                  id="SendMoneyToCollective.btn"
+                  defaultMessage="Send {amount} to {collective}"
+                  values={{
+                    amount: formatCurrency(amount, currency, locale),
+                    collective: toCollective.name,
+                  }}
+                />
+              )}
+            </StyledButton>
+          )}
         </Flex>
         {this.state.error && <Container fontSize="1.1rem">{this.state.error}</Container>}
       </div>

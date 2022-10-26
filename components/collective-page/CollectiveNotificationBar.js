@@ -1,13 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, injectIntl, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
+import { i18nGraphqlException } from '../../lib/errors';
 import { moneyCanMoveFromEvent } from '../../lib/events';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
-import NotificationBar from '../NotificationBar';
+import { Flex } from '../Grid';
+import AcceptRejectButtons from '../host-dashboard/AcceptRejectButtons';
+import { processApplicationMutation } from '../host-dashboard/PendingApplication';
+import NotificationBar, { NotificationBarButton, NotificationBarLink } from '../NotificationBar';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 const messages = defineMessages({
   // Collective Created
@@ -95,19 +102,21 @@ const messages = defineMessages({
   },
 });
 
-const getNotification = (intl, status, collective, host, LoggedInUser) => {
+const getNotification = (intl, status, collective, host, LoggedInUser, refetch) => {
   if (status === 'collectiveCreated') {
     switch (collective.type) {
       case CollectiveType.ORGANIZATION:
         return {
           title: intl.formatMessage(messages.organizationCreated),
           description: intl.formatMessage(messages.organizationCreateDescription),
+          type: 'success',
         };
       default:
         if (collective.isApproved) {
           return {
             title: intl.formatMessage(messages.collectiveCreated),
             description: intl.formatMessage(messages.collectiveApprovedDescription, { host: host.name }),
+            type: 'success',
           };
         }
         return {
@@ -120,6 +129,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
       return {
         title: intl.formatMessage(messages.fundCreated),
         description: intl.formatMessage(messages.fundCreatedApprovedDescription, { host: host.name }),
+        type: 'success',
       };
     }
     return {
@@ -129,22 +139,27 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
   } else if (status === 'eventCreated') {
     return {
       title: intl.formatMessage(messages.eventCreated),
+      type: 'success',
     };
-  } else if (status === 'projectCreated') {
+  } else if (true || status === 'projectCreated') {
     return {
       title: intl.formatMessage(messages.projectCreated),
+      type: 'success',
+      dismissable: 'asdasda',
     };
   } else if (status === 'collectiveArchived' || collective.isArchived) {
     return {
       title: intl.formatMessage(messages.collectiveArchived, { name: collective.name }),
       description: intl.formatMessage(messages.collectiveArchivedDescription, { name: collective.name }),
-      status: 'collectiveArchived',
     };
   } else if (!collective.isApproved && collective.host && collective.type === CollectiveType.COLLECTIVE) {
     return {
       title: intl.formatMessage(messages.approvalPending),
       description: intl.formatMessage(messages.approvalPendingDescription, { host: collective.host.name }),
-      status: 'collectivePending',
+      type: 'alert',
+      actions: LoggedInUser?.isHostAdmin(collective) && (
+        <PendingApplicationActions key="PendingApplications" collective={collective} refetch={refetch} />
+      ),
     };
   } else if (
     LoggedInUser?.isAdminOfCollectiveOrHost(collective) &&
@@ -159,6 +174,12 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
       description: intl.formatMessage(messages.tooFewAdminsDescription, {
         missingAdminsCount: host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins - collective.admins.length,
       }),
+      type: 'alert',
+      actions: (
+        <NotificationBarLink key="ManageTeamLink" href={`/${collective.slug}/admin/members`}>
+          Manage members
+        </NotificationBarLink>
+      ),
     };
   } else if (get(collective, 'type') === CollectiveType.EVENT && moneyCanMoveFromEvent(collective)) {
     if (!LoggedInUser || !LoggedInUser.isAdminOfCollectiveOrHost(collective)) {
@@ -169,7 +190,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
       description: intl.formatMessage(messages['event.over.sendMoneyToParent.description'], {
         collective: collective.parentCollective.name,
       }),
-      actions: [
+      actions: (
         <SendMoneyToCollectiveBtn
           key="SendMoneyToCollectiveBtn"
           fromCollective={collective}
@@ -177,29 +198,70 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
           LoggedInUser={LoggedInUser}
           amount={collective.stats.balance}
           currency={collective.currency}
-        />,
-      ],
+          customButton={props => <NotificationBarButton {...props} />}
+        />
+      ),
     };
   }
+};
+
+export const PendingApplicationActions = ({ collective, refetch }) => {
+  const intl = useIntl();
+  const { addToast } = useToasts();
+  const [callProcessApplication, { loading }] = useMutation(processApplicationMutation, {
+    context: API_V2_CONTEXT,
+  });
+
+  const processApplication = async (action, message) => {
+    try {
+      await callProcessApplication({
+        variables: {
+          host: { legacyId: collective.host.id },
+          account: { legacyId: collective.id },
+          action,
+          message,
+        },
+      });
+
+      if (refetch) {
+        await refetch();
+      }
+    } catch (e) {
+      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+    }
+  };
+
+  return (
+    <Flex flexWrap="wrap" alignItems="center" justifyContent="center">
+      <AcceptRejectButtons
+        collective={collective}
+        isLoading={loading}
+        onApprove={() => processApplication('APPROVE')}
+        onReject={message => processApplication('REJECT', message)}
+        customButton={props => <NotificationBarButton {...props} />}
+      />
+    </Flex>
+  );
+};
+
+PendingApplicationActions.propTypes = {
+  refetch: PropTypes.func,
+  collective: PropTypes.shape({
+    id: PropTypes.number,
+    slug: PropTypes.string,
+    host: PropTypes.shape({
+      id: PropTypes.number,
+    }),
+  }),
 };
 
 /**
  * Adds a notification bar for the collective.
  */
 const CollectiveNotificationBar = ({ intl, status, collective, host, LoggedInUser, refetch }) => {
-  const notification = getNotification(intl, status, collective, host, LoggedInUser);
+  const notification = getNotification(intl, status, collective, host, LoggedInUser, refetch);
 
-  return !notification ? null : (
-    <NotificationBar
-      status={status || notification.status}
-      collective={collective}
-      title={notification.title}
-      description={notification.description}
-      actions={notification.actions}
-      LoggedInUser={LoggedInUser}
-      refetch={refetch}
-    />
-  );
+  return !notification ? null : <NotificationBar {...notification} />;
 };
 
 CollectiveNotificationBar.propTypes = {

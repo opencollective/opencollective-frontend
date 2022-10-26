@@ -1,0 +1,170 @@
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import NotificationBar, { NotificationBarButton, NotificationBarLink } from '../../components/NotificationBar';
+import { Flex, Box } from '../../components/Grid';
+
+export const getActionsComponent = actions => {
+  if (actions === 'Example button') {
+    return <NotificationBarButton>Send $18.33 to Agora collective</NotificationBarButton>;
+  } else if (actions === 'Example link') {
+    return <NotificationBarLink href="#">Go back</NotificationBarLink>;
+  }
+  return null;
+};
+
+<Meta
+  title="Design system/NotificationBar"
+  component={NotificationBar}
+  argTypes={{
+    title: {
+      defaultValue: 'Hello kind stranger, thank you for joining!',
+      control: {
+        type: 'text',
+      },
+    },
+    description: {
+      defaultValue: 'Lets get back to where you left off.',
+      control: {
+        type: 'text',
+      },
+    },
+    dismissible: {
+      defaultValue: true,
+      control: {
+        type: 'boolean',
+      },
+    },
+    type: { options: ['info', 'success', 'alert', 'error'], control: { type: 'radio' }, defaultValue: 'info' },
+    inline: { control: { type: 'boolean' }, defaultValue: true },
+    actions: {
+      options: ['Nothing', 'Example link', 'Example button'],
+      defaultValue: 'Nothing',
+      control: {
+        type: 'select',
+      },
+    },
+  }}
+  parameters={{
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/N4Xbl652BhzOutXmzhcrLGch/%5BDS%5D-02-Atoms-%E2%9A%9B%EF%B8%8F?node-id=3480%3A0',
+    },
+  }}
+/>
+
+# NotificationBar
+
+## Default
+
+export const DefaultStory = ({ actions, dismissable, ...rest }) => (
+  <NotificationBar actions={getActionsComponent(actions)} {...rest} />
+);
+
+<Story name="Default">{DefaultStory.bind({})}</Story>
+
+<ArgsTable story="Default" />
+
+## Variants
+
+<Canvas>
+  <Story name="Variants" parameters={{ controls: { hideNoControlsWarning: true } }}>
+    <Flex flexDirection="column" gridGap="20px">
+      <NotificationBar
+        inline={true}
+        title="Hello kind stranger, thank you for joining!"
+        description="Lets get back to where you left off."
+      />
+      <NotificationBar
+        inline={true}
+        title="Hello kind stranger, thank you for joining!"
+        description="Lets get back to where you left off."
+        actions={<NotificationBarLink href="#">Go back</NotificationBarLink>}
+      />
+      <NotificationBar
+        title="Your Collective has been created with success!"
+        description="While you can start accepting financial contributions, you can customize your Collective and set some other things. Welcome!"
+      />
+      <NotificationBar
+        inline={true}
+        title="Your Collective has been created with success!"
+        description="While you can start accepting financial contributions, you can customize your Collective and set some other things. Welcome!"
+      />
+      <NotificationBar
+        title="This event has a positive balance."
+        description="Spending by submitting expenses, or transfer the remaining balance to the main collective budget."
+        actions={[<NotificationBarButton>Send $18.33 to Agora collective</NotificationBarButton>]}
+      />
+      <NotificationBar
+        inline={true}
+        type="success"
+        title="Hello kind stranger, thank you for joining!"
+        description="Lets get back to where you left off."
+      />
+      <NotificationBar
+        inline={true}
+        type="success"
+        title="Hello kind stranger, thank you for joining!"
+        description="Lets get back to where you left off."
+        actions={[<NotificationBarLink href="#">Go back</NotificationBarLink>]}
+      />
+      <NotificationBar
+        type="success"
+        title="Your Collective has been created with success!"
+        description="While you can start accepting financial contributions, you can customize your Collective and set some other things. Welcome!"
+      />
+      <NotificationBar
+        type="success"
+        title="This event has a positive balance."
+        description="Spending by submitting expenses, or transfer the remaining balance to the main collective budget."
+        actions={[<NotificationBarButton>Send $18.33 to Agora collective</NotificationBarButton>]}
+      />
+      <NotificationBar
+        inline={true}
+        type="error"
+        title="Hello kind stranger, thank you for joining!"
+        description="Lets get back to where you left off."
+      />
+      <NotificationBar
+        inline={true}
+        type="error"
+        title="Hello kind stranger, thank you for joining!"
+        description="Lets get back to where you left off."
+        actions={[<NotificationBarLink href="#">Go back</NotificationBarLink>]}
+      />
+      <NotificationBar
+        type="error"
+        title="Your Collective has been created with success!"
+        description="While you can start accepting financial contributions, you can customize your Collective and set some other things. Welcome!"
+      />
+      <NotificationBar
+        type="error"
+        title="This event has a positive balance."
+        description="Spending by submitting expenses, or transfer the remaining balance to the main collective budget."
+        actions={[<NotificationBarButton>Send $18.33 to Agora collective</NotificationBarButton>]}
+      />
+      <NotificationBar
+        inline={true}
+        type="alert"
+        title="Hello kind stranger, thank you for joining!"
+        description="Lets get back to where you left off."
+      />
+      <NotificationBar
+        inline={true}
+        type="alert"
+        title="Hello kind stranger, thank you for joining!"
+        description="Lets get back to where you left off."
+        actions={[<NotificationBarLink href="#">Go back</NotificationBarLink>]}
+      />
+      <NotificationBar
+        type="alert"
+        title="Your Collective has been created with success!"
+        description="While you can start accepting financial contributions, you can customize your Collective and set some other things. Welcome!"
+      />
+      <NotificationBar
+        type="alert"
+        title="This event has a positive balance."
+        description="Spending by submitting expenses, or transfer the remaining balance to the main collective budget."
+        actions={[<NotificationBarButton>Send $18.33 to Agora collective</NotificationBarButton>]}
+      />
+    </Flex>
+  </Story>
+</Canvas>
