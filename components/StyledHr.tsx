@@ -1,12 +1,27 @@
 import propTypes from '@styled-system/prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
-import { border, display, flex, layout, shadow, space } from 'styled-system';
+import {
+  border,
+  BorderProps,
+  display,
+  DisplayProps,
+  flex,
+  FlexProps,
+  layout,
+  LayoutProps,
+  shadow,
+  ShadowProps,
+  space,
+  SpaceProps,
+} from 'styled-system';
+
+type StyledSelectProps = SpaceProps & FlexProps & LayoutProps & ShadowProps & BorderProps & DisplayProps;
 
 /**
  * An horizontal line. Control the color and size using border properties.
  */
-const StyledHr = styled.hr`
+const StyledHr = styled.hr<StyledSelectProps>`
   border: 0;
   border-top: 1px solid ${themeGet('colors.black.400')};
   margin: 0;
@@ -21,10 +36,12 @@ const StyledHr = styled.hr`
 `;
 
 StyledHr.propTypes = {
-  ...propTypes.border,
+  ...propTypes.space,
+  ...propTypes.flex,
   ...propTypes.layout,
   ...propTypes.shadow,
-  ...propTypes.space,
+  ...propTypes.border,
+  ...propTypes.display,
 };
 
 /** @component */
