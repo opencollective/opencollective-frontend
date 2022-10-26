@@ -141,7 +141,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
       title: intl.formatMessage(messages.eventCreated),
       type: 'success',
     };
-  } else if (true || status === 'projectCreated') {
+  } else if (status === 'projectCreated') {
     return {
       title: intl.formatMessage(messages.projectCreated),
       type: 'success',
