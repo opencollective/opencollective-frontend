@@ -3,14 +3,32 @@ import { variant } from 'styled-system';
 
 import { getTopToBottomGradient } from '../helpers';
 
-// Button size
+// Types
+export type ButtonSize = 'tiny' | 'small' | 'medium' | 'large' | 'xLarge' | 'round';
+export type ButtonStyle =
+  | 'standard'
+  | 'primary'
+  | 'secondary'
+  | 'warning'
+  | 'warningSecondary'
+  | 'danger'
+  | 'dangerSecondary'
+  | 'success'
+  | 'successSecondary'
+  | 'borderless'
+  | 'purple'
+  | 'purpleSecondary'
+  | 'dark'
+  | 'marketing'
+  | 'marketingSecondary';
 
+// Button size
 export const buttonSize = variant({
   key: 'buttonSizes',
   prop: 'buttonSize',
 });
 
-export const getButtonSizes = () => {
+export const getButtonSizes = (): Record<ButtonSize, Record<string, any>> => {
   return {
     xLarge: {
       fontSize: 17,
@@ -86,11 +104,11 @@ const generateButtonVariant = ({
   hoverColor,
   hoverGradientColor = hoverColor,
   activeColor,
-  focusBorderColor,
+  focusBorderColor = undefined,
   disabledColor,
-  disabledTextColor,
+  disabledTextColor = baseTextColor,
 }) => {
-  return {
+  const variantStyles = {
     background: getTopToBottomGradient(baseColor, baseGradientColor),
     backgroundColor: baseColor, // Not all browsers support gradients, this is a fallback for them
     borderColor: baseColor,
@@ -120,6 +138,14 @@ const generateButtonVariant = ({
       color: disabledTextColor || baseTextColor,
     },
   };
+
+  if (focusBorderColor) {
+    variantStyles['&:focus'] = {
+      borderColor: focusBorderColor,
+    };
+  }
+
+  return variantStyles;
 };
 
 /**
@@ -128,11 +154,11 @@ const generateButtonVariant = ({
 const generateSecondaryButtonVariant = ({
   baseColor,
   baseTextColor,
-  activeTextColor,
+  activeTextColor = '#FFFFFF',
   hoverColor,
   activeColor,
-  activeBackgroundColor,
-  focusColor,
+  activeBackgroundColor = activeColor,
+  focusColor = '#FFFFFF',
   disabledColor,
   disabledBorderColor = disabledColor,
 }) => {
@@ -147,14 +173,14 @@ const generateSecondaryButtonVariant = ({
     },
 
     '&:focus': {
-      background: focusColor || '#FFFFFF',
+      background: focusColor,
     },
 
     '&:active': {
       background: activeBackgroundColor || activeColor,
       backgroundColor: activeBackgroundColor || activeColor,
       borderColor: activeColor,
-      color: activeTextColor || '#FFFFFF',
+      color: activeTextColor,
     },
 
     '&:disabled': {
@@ -167,7 +193,7 @@ const generateSecondaryButtonVariant = ({
 /**
  * Generate buttons styles based on the colors defined in https://www.figma.com/file/1jyGC3MjtqI7uUsGf1447P/%5BDS%5D-01-Colors?node-id=1354%3A2
  */
-export const getButtonStyles = ({ colors }) => {
+export const getButtonStyles = ({ colors }): Record<ButtonStyle, Record<string, any>> => {
   return {
     // Base
     standard: {
@@ -228,7 +254,6 @@ export const getButtonStyles = ({ colors }) => {
       baseColor: colors.yellow[600],
       baseTextColor: colors.black[800],
       activeTextColor: colors.black[800],
-      disabledTextColor: colors.black[400],
       hoverColor: colors.yellow[50],
       focusColor: colors.yellow[50],
       activeColor: colors.yellow[500],
