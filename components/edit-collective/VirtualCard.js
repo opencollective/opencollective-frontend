@@ -491,14 +491,16 @@ const VirtualCard = props => {
               {cardNumber}
             </P>
             <Box mt="8px" fontSize="13px" fontWeight="500" lineHeight="20px" letterSpacing="0">
-              <Avatar
-                collective={virtualCard.account}
-                radius="20px"
-                display="inline-block"
-                mr={2}
-                verticalAlign="middle"
-              />{' '}
-              {virtualCard.account.name}
+              <StyledLink href={`/${virtualCard.account.slug}`} color="white.full" hoverColor="white.transparent.72">
+                <Avatar
+                  collective={virtualCard.account}
+                  radius="20px"
+                  display="inline-block"
+                  mr={2}
+                  verticalAlign="middle"
+                />{' '}
+                {virtualCard.account.name}
+              </StyledLink>
             </Box>
             <P mt="16px" fontSize="11px" fontWeight="400" lineHeight="16px" letterSpacing="0">
               {getLimitString({
@@ -592,6 +594,7 @@ VirtualCard.propTypes = {
       id: PropTypes.string,
       imageUrl: PropTypes.string,
       name: PropTypes.string,
+      slug: PropTypes.string,
     }),
   }),
   confirmOnPauseCard: PropTypes.bool,
