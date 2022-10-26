@@ -3264,6 +3264,7 @@ export type Expense = {
   requestedByAccount?: Maybe<Account>;
   /** Returns the list of legal documents required from the payee before the expense can be payed. Must be logged in. */
   requiredLegalDocuments?: Maybe<Array<Maybe<LegalDocumentType>>>;
+  securityChecks?: Maybe<Array<Maybe<SecurityCheck>>>;
   /** The state of the expense (pending, approved, paid, rejected...etc) */
   status: ExpenseStatus;
   tags: Array<Maybe<Scalars['String']>>;
@@ -5197,6 +5198,7 @@ export type MutationAddFundsArgs = {
   fromAccount: AccountReferenceInput;
   hostFeePercent?: InputMaybe<Scalars['Float']>;
   invoiceTemplate?: InputMaybe<Scalars['String']>;
+  memo?: InputMaybe<Scalars['String']>;
   tier?: InputMaybe<TierReferenceInput>;
 };
 
@@ -5927,6 +5929,8 @@ export type Order = {
   legacyId: Scalars['Int'];
   /** This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order. */
   membership?: Maybe<MemberOf>;
+  /** Memo field which adds additional details about the order. For example in added funds this can be a note to mark what method (cheque, money order) the funds were received. */
+  memo?: Maybe<Scalars['String']>;
   nextChargeDate?: Maybe<Scalars['DateTime']>;
   paymentMethod?: Maybe<PaymentMethod>;
   /** The permissions given to current logged in user for this order */
@@ -7307,6 +7311,34 @@ export enum RecurringExpenseInterval {
   quarter = 'quarter',
   week = 'week',
   year = 'year'
+}
+
+export type SecurityCheck = {
+  __typename?: 'SecurityCheck';
+  /** SecurityCheck details */
+  details?: Maybe<Scalars['String']>;
+  /** The SecurityCheck level */
+  level: SecurityCheckLevel;
+  /** SecurityCheck description message */
+  message: Scalars['String'];
+  /** The SecurityCheck scope */
+  scope: SecurityCheckScope;
+};
+
+/** All supported SecurityCheck levels */
+export enum SecurityCheckLevel {
+  HIGH = 'HIGH',
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  PASS = 'PASS'
+}
+
+/** All supported SecurityCheck scopes */
+export enum SecurityCheckScope {
+  COLLECTIVE = 'COLLECTIVE',
+  PAYEE = 'PAYEE',
+  PAYOUT_METHOD = 'PAYOUT_METHOD',
+  USER = 'USER'
 }
 
 export type SendMessageResult = {
