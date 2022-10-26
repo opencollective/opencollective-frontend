@@ -168,7 +168,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
             </React.Fragment>
           )}
         </DetailDescription>
-        {order.memo && (
+        {order?.memo && (
           <React.Fragment>
             <DetailTitle>
               <FormattedMessage defaultMessage="Memo" />
