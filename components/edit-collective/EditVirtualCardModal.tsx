@@ -262,30 +262,30 @@ export default function EditVirtualCardModal({
   const virtualCardLimitOptions = [
     {
       value: VirtualCardLimitInterval.ALL_TIME,
-      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.all_time', defaultMessage: 'all time' }),
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.all_time', defaultMessage: 'All time' }),
     },
     {
       value: VirtualCardLimitInterval.DAILY,
-      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.daily', defaultMessage: 'daily' }),
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.daily', defaultMessage: 'Daily' }),
     },
     {
       value: VirtualCardLimitInterval.MONTHLY,
-      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.monthly', defaultMessage: 'monthly' }),
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.monthly', defaultMessage: 'Monthly' }),
     },
     {
       value: VirtualCardLimitInterval.PER_AUTHORIZATION,
       label: intl.formatMessage({
         id: 'virtualCard.intervalLimit.per_authorization',
-        defaultMessage: 'per authorization',
+        defaultMessage: 'Per authorization',
       }),
     },
     {
       value: VirtualCardLimitInterval.WEEKLY,
-      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.weekly', defaultMessage: 'weekly' }),
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.weekly', defaultMessage: 'Weekly' }),
     },
     {
       value: VirtualCardLimitInterval.YEARLY,
-      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.yearly', defaultMessage: 'yearly' }),
+      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.yearly', defaultMessage: 'Yearly' }),
     },
   ];
 
@@ -470,6 +470,7 @@ export default function EditVirtualCardModal({
                       <StyledInputAmount
                         {...inputProps}
                         id="limitAmount"
+                        placeholder="0.00"
                         error={formik.touched.limitAmount && Boolean(formik.errors.limitAmount)}
                         currency={currency}
                         prepend={currency}
