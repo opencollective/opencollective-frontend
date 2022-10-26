@@ -31,6 +31,7 @@ import sentryLib from '../server/sentry';
 import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
 import GlobalToasts from '../components/GlobalToasts';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
+import { OpenCollectiveConfigProvider } from '../components/OpenCollectiveConfig';
 import ToastProvider from '../components/ToastProvider';
 
 // Use JSDOM on server-side so that react-intl can render rich messages
@@ -123,24 +124,26 @@ class OpenCollectiveFrontendApp extends App {
 
     return (
       <Fragment>
-        <ApolloProvider client={client}>
-          <ThemeProvider theme={theme}>
-            <StripeProviderSSR>
-              <RawIntlProvider value={intl}>
-                <UserProvider>
-                  <NewsAndUpdatesProvider>
-                    <ToastProvider>
-                      <Component {...pageProps} />
-                      <GlobalToasts />
-                      <GlobalNewsAndUpdates />
-                      <TwoFactorAuthenticationModal />
-                    </ToastProvider>
-                  </NewsAndUpdatesProvider>
-                </UserProvider>
-              </RawIntlProvider>
-            </StripeProviderSSR>
-          </ThemeProvider>
-        </ApolloProvider>
+        <OpenCollectiveConfigProvider>
+          <ApolloProvider client={client}>
+            <ThemeProvider theme={theme}>
+              <StripeProviderSSR>
+                <RawIntlProvider value={intl}>
+                  <UserProvider>
+                    <NewsAndUpdatesProvider>
+                      <ToastProvider>
+                        <Component {...pageProps} />
+                        <GlobalToasts />
+                        <GlobalNewsAndUpdates />
+                        <TwoFactorAuthenticationModal />
+                      </ToastProvider>
+                    </NewsAndUpdatesProvider>
+                  </UserProvider>
+                </RawIntlProvider>
+              </StripeProviderSSR>
+            </ThemeProvider>
+          </ApolloProvider>
+        </OpenCollectiveConfigProvider>
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />
         ))}

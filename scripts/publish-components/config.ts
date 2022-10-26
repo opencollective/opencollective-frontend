@@ -1,6 +1,8 @@
 export default {
   /** A list of glob patterns to define the files to include in the package */
   includeFiles: [
+    // Config
+    'components/OpenCollectiveConfig.tsx',
     // Theme lib
     'lib/theme/**/*.(js|jsx|ts|tsx)',
     'lib/styled*',
