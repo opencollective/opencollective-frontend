@@ -6,11 +6,14 @@ export default {
     'lib/styled*',
     // Avatar
     'components/Avatar*',
-    // Text
+    // Typography
     'components/Text..*',
     // Toasts
     'components/Toast*',
+    // Layout
     'components/Grid..*',
+    'components/Container',
+    // Misc helpers
     'components/Currency.*',
     // Loading
     'components/Loading*',
