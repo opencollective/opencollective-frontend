@@ -766,6 +766,7 @@ enum OrderStatus {
   REJECTED
   DISPUTED
   REFUNDED
+  IN_REVIEW
 }
 
 """

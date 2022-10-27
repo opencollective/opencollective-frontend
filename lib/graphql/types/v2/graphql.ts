@@ -2383,6 +2383,7 @@ export type Credit = Transaction & {
   id: Scalars['String'];
   invoiceTemplate?: Maybe<Scalars['String']>;
   isDisputed?: Maybe<Scalars['Boolean']>;
+  isInReview?: Maybe<Scalars['Boolean']>;
   isOrderRejected: Scalars['Boolean'];
   isRefund?: Maybe<Scalars['Boolean']>;
   isRefunded?: Maybe<Scalars['Boolean']>;
@@ -2789,6 +2790,7 @@ export type Debit = Transaction & {
   id: Scalars['String'];
   invoiceTemplate?: Maybe<Scalars['String']>;
   isDisputed?: Maybe<Scalars['Boolean']>;
+  isInReview?: Maybe<Scalars['Boolean']>;
   isOrderRejected: Scalars['Boolean'];
   isRefund?: Maybe<Scalars['Boolean']>;
   isRefunded?: Maybe<Scalars['Boolean']>;
@@ -4019,8 +4021,10 @@ export type Host = Account & AccountWithContributions & {
   features: CollectiveFeatures;
   /** @deprecated 2022-06-03: Please use repositoryUrl */
   githubHandle?: Maybe<Scalars['String']>;
-  /** Returns whether the host has any disputed orders */
+  /** Returns whether the host has any Stripe disputed orders */
   hasDisputedOrders: Scalars['Boolean'];
+  /** Returns whether the host has any Stripe in review orders */
+  hasInReviewOrders: Scalars['Boolean'];
   hostFeePercent?: Maybe<Scalars['Float']>;
   hostMetrics: HostMetrics;
   hostMetricsTimeSeries: HostMetricsTimeSeries;
@@ -6058,6 +6062,7 @@ export enum OrderStatus {
   DISPUTED = 'DISPUTED',
   ERROR = 'ERROR',
   EXPIRED = 'EXPIRED',
+  IN_REVIEW = 'IN_REVIEW',
   NEW = 'NEW',
   PAID = 'PAID',
   PENDING = 'PENDING',
@@ -7615,6 +7620,7 @@ export type Transaction = {
   id: Scalars['String'];
   invoiceTemplate?: Maybe<Scalars['String']>;
   isDisputed?: Maybe<Scalars['Boolean']>;
+  isInReview?: Maybe<Scalars['Boolean']>;
   isOrderRejected: Scalars['Boolean'];
   isRefund?: Maybe<Scalars['Boolean']>;
   isRefunded?: Maybe<Scalars['Boolean']>;
