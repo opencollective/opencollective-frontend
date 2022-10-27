@@ -8,7 +8,7 @@ Do you want to get paid to work on your passion for open source, mutual aid, and
 
 Open Collective is a financial and legal toolbox for grassroots groups. We support 15,000 groups and 30+ nonprofits around the world with one shared backend solution for fundraising and money management. This year our Collectives are on track to raise and spend $35 million dollars in full transparency.
 
-Right now, [Open Collective](https://opencollective.com) is hiring for a Senior UX Designer, and [Open Collective Foundation](https://opencollective.foundation) is hiring for two roles, a Non-profit Ops & Finance Leader and an Ops Support team member.
+Right now, [Open Collective](https://opencollective.com) is hiring for a Senior UX Designer.
 
 ## Senior UX Designer
 
@@ -68,101 +68,6 @@ Our main tools are Google Docs for file sharing and copyediting, Figma for desig
 ### Apply for the Senior UX Designer Role
 
 Please fill out [this form](https://x7rwr9qad3h.typeform.com/to/lySp1Tfn) to apply.
-
-## Two Roles Open with Open Collective Foundation
-
-[Open Collective Foundation](https://opencollective.foundation) (OCF) is a nonprofit fiscal sponsor with an open source tech platform, that is enabling 400 groups to access 501(c)(3) status and fundraise in full transparency. [Our Collectives](https://opencollective.com/foundation#category-CONTRIBUTIONS) include mutual aid groups, public interest open source tech, social justice movements, humanitarian aid, climate action, and many kinds of communities with missions focused on education, civic engagement, and positive social impact. [Solidarity is our guiding principle](https://blog.opencollective.com/solidarity-as-our-guiding-principle). Our Collectives are on track to raise close to $30m in 2022, and we may hit 100x growth since 2019 by the end of this year. We are scaling quickly, and growing our team to meet increasing demand.
-
-### What Makes Us Different
-
-OCF is a tech-first nonprofit. We are one node in a growing international network of 30+ fiscal sponsor organizations who use Open Collective, an open source software platform for transparent fundraising and money management, to create efficiencies with money and amplify impact in communities. Globally, the network supports 15,000 groups to raise and spend $35M a year. Our tech platform and mission are all about transparency, collective collaboration, and practicality—and we apply the same principles to how we run OCF as an organization.
-
-**Learn more about OCF**: [website](https://opencollective.foundation), [2-minute explainer video](https://youtu.be/269SyUQmL_U), [values & mission](https://docs.opencollective.foundation/about/mission-and-values), [blog](https://blog.opencollective.com/tag/ocf/), [team](https://docs.opencollective.foundation/about/team), [documentation](https://docs.opencollective.foundation).
-
-### Nonprofit Ops & Finance Leader role
-
-$80-$100k for 40 hrs/wk (or 30 hrs/wk pro rata) plus benefits. Must live in the US. Applications open until October 23rd.
-
-#### Who we're looking for
-
-An operationally oriented, practical systems thinker with 501(c)(3) nonprofit experience, who is:
-
-- Experienced with purpose-driven collectives rooted in the principles of solidarity and equity
-- Self-motivated and autonomous, to thrive in our fully remote, high-trust, low-hierarchy environment
-- Comfortable with and excited about technology, able to learn new digital tools quickly, and eager to understand the ins and outs of the Open Collective software platform
-- Experienced with worker self-directed non-profits and/or distributed leadership (e.g. collectives, cooperatives, non-hierarchy, collaborative networked organizations)
-- Interested in potentially growing into a co-ED role in the future
-- Based in the United States
-
-#### Must-have skills
-
-- 501c3 nonprofit operations and compliance knowledge (policy development and implementation)
-- Finance (internal controls, forecasting, budget planning, investment strategies)
-- Interfacing effectively with governance boards, accountants, and lawyers
-- Non-hierarchical leadership and decentralized organizational development
-
-#### Additional desired skills
-
-_(We don’t expect you to have all of these - any of them would be a bonus)_
-
-- Human Resources/People Operations (e.g. knowledge of HR best practice, experience with policies and processes, managing benefits and payroll via a PEO)
-- Fiscal sponsorship knowledge and experience
-- Start-ups—we have a startup mentality, and closely collaborate with our tech startup sister company and a global network of similar startups
-- Growth and scaling—we are expanding quickly and would love to find someone who has been through it before
-- Tech skills with tools like Slack, Loom, Google Docs, Trello, Loomio, Github (extra points if you’ve used Open Collective, of course!)
-
-#### Compensation & role details
-
-- We are seeking someone to step into a senior leadership role in our collaborative team
-- This is a fully remote position (we don't have any physical offices and our team is distributed)
-- Highly flexible schedule (we have a few weekly meetings and the rest us up to you, unlimited paid vacation)
-- Open to applicants anywhere in the United States (sorry, we can't consider international candidates)
-- The pay will be between $80k-$100K, plus benefits (including health insurance)
-- We are seeking someone to commit 30-40 hours per week (pro rata pay for less than 40 hours)
-
-#### To apply for the Nonprofit Ops & Finance Leader role
-
-Fill out [this form](https://docs.google.com/forms/d/e/1FAIpQLSctqGUohrudHGV-sp9N-tlF4cCV1HVPIW4dXf0lv-6u7vHN1Q/viewform).
-
-### Ops & Admin Support role
-
-$60k for 40 hrs/wk (or 30 hrs/wk pro rata) plus benefits. Must live in the US. Applications open until October 23rd.
-
-#### Who we're looking for
-
-An operations and community oriented person who is:
-
-- Excited to be a driving force behind our operational functions and to support our Collectives to make the best use of our services
-- Self-motivated and autonomous, to thrive in our fully remote, high-trust, low-hierarchy environment
-- Comfortable with and excited about technology, able to learn new digital tools quickly, and eager to understand the ins and outs of the Open Collective software platform
-- Based in the United States
-
-#### Must-have skills
-
-- Financial administration skills (accounts receivable and payable—you will process incoming contributions and outgoing expenses, so you need a basic understanding of budgets and finance processes)
-- Helpdesk support and customer service - you'll support Collectives through the application process and with day-to-day questions
-- Detail-oriented, practical and organized, great at handling information overload and finding the path forward
-- Flexible and comfortable working in a fast-paced, ever-changing, quickly-scaling startup environment
-
-#### Additional desired experience
-
-_(We don’t expect you to have all of these - any of them would be a bonus)_
-
-- 501(c)(3) nonprofit and/or fiscal sponsorship
-- Fast-growth organizations and start-ups
-- Tech tools like Slack, Loom, Google Workspace, Trello, Loomio, GitHub (extra points if you’ve used Open Collective, of course!)
-
-#### Compensation & role details
-
-- This is a fully remote position (we don't have any physical offices and our team is distributed across time zones)
-- Highly flexible schedule (we have a few weekly meetings and the rest us up to you)
-- Open to applicants anywhere in the United States (sorry, we can't consider international candidates)
-- The pay will be $60k plus benefits (including health insurance)
-- We are seeking someone to commit 30-40 hours per week (pro rata pay for less than 40 hours)
-
-#### To apply for the Ops & Admin Support role
-
-Fill out [this form](https://docs.google.com/forms/d/e/1FAIpQLSd3BzRzcHYDnwwXH4gKHburN00EwumJ2n4NfVLp-Jb-h1-amA/viewform).
 
 <!--
 **We're hiring Senior Software Engineers.**
