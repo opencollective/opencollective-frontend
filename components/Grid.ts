@@ -49,10 +49,13 @@ Box.propTypes = {
 
 export type FlexProps = BoxProps;
 
-export const Flex = styled(Box)<FlexProps>(props => ({
-  display: 'flex',
-  gap: props.gap,
-}));
+export const Flex = styled(Box)<FlexProps>(
+  props => ({
+    display: 'flex',
+    gap: props.gap,
+  }),
+  compose(space, layout, flexbox),
+);
 
 Flex.displayName = 'Flex';
 
