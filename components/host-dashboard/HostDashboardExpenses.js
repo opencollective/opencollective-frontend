@@ -187,7 +187,7 @@ const HostDashboardExpenses = ({ hostSlug, isNewAdmin }) => {
                 <ListItem paddingTop={10} paddingBottom={10}>
                   <FormattedMessage
                     id="host.disputes.warning"
-                    defaultMessage="Fraud Warning: There are disputed charges that need review."
+                    defaultMessage="Fraud Protection Warning: There are disputed charges that need review."
                   />{' '}
                   <Link href={`/${hostSlug}/admin/orders?status=DISPUTED`}>Disputed Orders</Link>{' '}
                 </ListItem>
@@ -197,7 +197,7 @@ const HostDashboardExpenses = ({ hostSlug, isNewAdmin }) => {
                 <ListItem paddingTop={10} paddingBottom={10}>
                   <FormattedMessage
                     id="host.in_review.warning"
-                    defaultMessage="Fraud Warning: There are charges under review that need attention."
+                    defaultMessage="Fraud Protection Warning: There are charges under review that need attention."
                   />{' '}
                   <Link href={`/${hostSlug}/admin/orders?status=IN_REVIEW`}>In Review Orders</Link>{' '}
                 </ListItem>
