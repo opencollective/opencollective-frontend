@@ -216,8 +216,10 @@ const HostVirtualCards = props => {
         >
           <StyledButton
             my={1}
+            px={14}
+            py={10}
             buttonStyle="primary"
-            buttonSize="round"
+            buttonSize="medium"
             data-cy="confirmation-modal-continue"
             onClick={() => setCreateVirtualCardModalDisplay(true)}
           >
@@ -236,8 +238,10 @@ const HostVirtualCards = props => {
         >
           <StyledButton
             my={1}
+            px={14}
+            py={10}
             buttonStyle="primary"
-            buttonSize="round"
+            buttonSize="medium"
             data-cy="confirmation-modal-continue"
             onClick={() => setAssignCardModalDisplay(true)}
           >
