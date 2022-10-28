@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { InfoCircle } from '@styled-icons/boxicons-regular';
 import { ExclamationCircle } from '@styled-icons/fa-solid';
 import { useFormik } from 'formik';
 import { debounce } from 'lodash';
@@ -10,6 +9,10 @@ import roles from '../../lib/constants/roles';
 import { graphqlAmountValueInCents } from '../../lib/currency-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { Account, VirtualCard, VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
+import {
+  VirtualCardLimitIntervalDescriptionsI18n,
+  VirtualCardLimitIntervalI18n,
+} from '../../lib/virtual-cards/constants';
 
 import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -23,7 +26,6 @@ import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
-import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { useLoggedInUser } from '../UserProvider';
@@ -274,62 +276,10 @@ export default function EditVirtualCardModal({
     onClose?.();
   };
 
-  const virtualCardLimitOptions = [
-    {
-      value: VirtualCardLimitInterval.ALL_TIME,
-      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.all_time', defaultMessage: 'All time' }),
-    },
-    {
-      value: VirtualCardLimitInterval.DAILY,
-      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.daily', defaultMessage: 'Daily' }),
-    },
-    {
-      value: VirtualCardLimitInterval.MONTHLY,
-      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.monthly', defaultMessage: 'Monthly' }),
-    },
-    {
-      value: VirtualCardLimitInterval.PER_AUTHORIZATION,
-      label: intl.formatMessage({
-        id: 'virtualCard.intervalLimit.per_authorization',
-        defaultMessage: 'Per authorization',
-      }),
-    },
-    {
-      value: VirtualCardLimitInterval.WEEKLY,
-      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.weekly', defaultMessage: 'Weekly' }),
-    },
-    {
-      value: VirtualCardLimitInterval.YEARLY,
-      label: intl.formatMessage({ id: 'virtualCard.intervalLimit.yearly', defaultMessage: 'Yearly' }),
-    },
-  ];
-
-  const virtualCardLimitIntervalDescriptions = {
-    [VirtualCardLimitInterval.ALL_TIME]: {
-      id: 'virtualCard.intervalLimitDescription.all_time',
-      defaultMessage: 'Total amount that can be spent with this card.',
-    },
-    [VirtualCardLimitInterval.DAILY]: {
-      id: 'virtualCard.intervalLimitDescription.daily',
-      defaultMessage: 'Daily amount that can be spent with this card.',
-    },
-    [VirtualCardLimitInterval.MONTHLY]: {
-      id: 'virtualCard.intervalLimitDescription.monthly',
-      defaultMessage: 'Monthly amount that can be spent with this card.',
-    },
-    [VirtualCardLimitInterval.PER_AUTHORIZATION]: {
-      id: 'virtualCard.intervalLimitDescription.per_authorization',
-      defaultMessage: 'Amount that can be spent with this card per use.',
-    },
-    [VirtualCardLimitInterval.WEEKLY]: {
-      id: 'virtualCard.intervalLimitDescription.weekly',
-      defaultMessage: 'Weekly amount that can be spent with this card.',
-    },
-    [VirtualCardLimitInterval.YEARLY]: {
-      id: 'virtualCard.intervalLimitDescription.yearly',
-      defaultMessage: 'Yearly amount that can be spent with this card.',
-    },
-  };
+  const virtualCardLimitOptions = Object.keys(VirtualCardLimitInterval).map(interval => ({
+    value: interval,
+    label: intl.formatMessage(VirtualCardLimitIntervalI18n[interval]),
+  }));
 
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
@@ -390,16 +340,7 @@ export default function EditVirtualCardModal({
             <StyledInputField
               labelFontSize="13px"
               labelFontWeight="bold"
-              label={
-                <React.Fragment>
-                  <FormattedMessage defaultMessage="Who is this card assigned to?" />{' '}
-                  <StyledTooltip
-                    content={<FormattedMessage defaultMessage="The assignee is responsible for the card." />}
-                  >
-                    <InfoCircle size={16} />
-                  </StyledTooltip>
-                </React.Fragment>
-              }
+              label={<FormattedMessage defaultMessage="Who is this card assigned to?" />}
               htmlFor="assignee"
               error={formik.touched.assignee && formik.errors.assignee}
             >
@@ -498,7 +439,7 @@ export default function EditVirtualCardModal({
                 </Flex>
                 <Box pt={2}>
                   <Span ml={1}>
-                    {intl.formatMessage(virtualCardLimitIntervalDescriptions[formik.values.limitInterval])}
+                    {intl.formatMessage(VirtualCardLimitIntervalDescriptionsI18n[formik.values.limitInterval])}
                   </Span>
                 </Box>
                 {formik.touched.limitAmount && formik.errors.limitAmount && (
