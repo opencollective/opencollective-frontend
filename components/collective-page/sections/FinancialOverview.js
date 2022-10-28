@@ -45,6 +45,10 @@ export const budgetSectionQuery = gql`
           valueInCents
           currency
         }
+        totalAmountSpent {
+          valueInCents
+          currency
+        }
       }
     }
   }

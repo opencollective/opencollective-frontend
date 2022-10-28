@@ -143,10 +143,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
           <Expand size="12px" />
           <FormattedMessage id="budgetSection-disbursed" defaultMessage="Total disbursed" />
         </StatTitle>
-        <StatAmount
-          amount={stats.totalNetAmountRaised.valueInCents - stats.balance.valueInCents}
-          currency={collective.currency}
-        />
+        <StatAmount amount={Math.abs(stats.totalAmountSpent.valueInCents)} currency={collective.currency} />
       </StatContainer>
       {!isFund && !isProject && (
         <StatContainer data-cy="budgetSection-estimated-budget" borderTop={borderTop}>
@@ -209,6 +206,7 @@ BudgetStats.propTypes = {
     totalAmountReceived: AmountPropTypeShape,
     totalAmountRaised: AmountPropTypeShape,
     totalNetAmountRaised: AmountPropTypeShape,
+    totalAmountSpent: AmountPropTypeShape,
   }),
 
   horizontal: PropTypes.bool,
