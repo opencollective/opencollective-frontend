@@ -4,6 +4,7 @@ export default {
     // Theme lib
     'lib/theme/**/*.(js|jsx|ts|tsx)',
     'lib/styled*',
+    'lib/date-utils*',
     // Avatar
     'components/Avatar*',
     // Typography
