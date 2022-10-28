@@ -8,7 +8,7 @@ import {
   color,
   ColorProps,
   flexbox,
-  FlexProps,
+  FlexboxProps,
   layout,
   LayoutProps,
   position,
@@ -36,7 +36,7 @@ import {
   WhiteSpaceProps,
 } from '../lib/styled-system-custom-properties';
 
-type ContainerProps = FlexProps &
+type ContainerProps = FlexboxProps &
   BackgroundProps &
   BorderProps &
   ShadowProps &
