@@ -13,16 +13,32 @@ import { messageType } from '../lib/theme/variants/message';
 
 import StyledCard from './StyledCard';
 import StyledSpinner from './StyledSpinner';
-import { Span } from './Text';
+import { H4, Span } from './Text';
+import Image from './Image';
+import { Box } from './Grid';
 
 const Message = styled.div`
-  border: 1px solid;
+  border: 0.6px solid;
   border-radius: 12px;
-  padding: ${themeGet('space.3')}px;
+  padding: ${themeGet('space.3')}px 24px;
+  font-size: 13px;
+  line-height: 20px;
 
   a {
     text-decoration: underline !important;
+    color: ${themeGet('colors.black.800')};
   }
+
+  h4 {
+    font-size: 13px;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+  }
+
+  display: flex;
+  align-items: center;
+
+  box-shadow: 0px 1px 4px 1px #3132331a;
 
   ${borders}
   ${shadow}
@@ -42,30 +58,44 @@ const Message = styled.div`
 `;
 
 const icons = {
-  info: <InfoCircle data-type="message-icon" size="1em" color="#5CA3FF" />,
-  success: <CheckCircle data-type="message-icon" size="1em" color="#25B869" />,
-  warning: <ExclamationTriangle data-type="message-icon" size="1em" color="#CCCC18" />,
-  error: <ExclamationCircle data-type="message-icon" size="1em" color="#E03F6A" />,
+  info: <Image width="32" height="32" src="/static/images/lock.png" />,
+  success: <Image width="32" height="32" src="/static/images/lock.png" />,
+  warning: <Image width="32" height="32" src="/static/images/lock.png" />,
+  error: <Image width="32" height="32" src="/static/images/lock.png" />,
 };
+
+// const icons = {
+//   info: <InfoCircle data-type="message-icon" size="1em" color="#5CA3FF" />,
+//   success: <CheckCircle data-type="message-icon" size="1em" color="#25B869" />,
+//   warning: <ExclamationTriangle data-type="message-icon" size="1em" color="#CCCC18" />,
+//   error: <ExclamationCircle data-type="message-icon" size="1em" color="#E03F6A" />,
+// };
 
 /**
  * Display messages in a box contextualized for message type (error, success...etc)
  */
-const MessageBox = ({ withIcon, isLoading, children, ...props }) => {
+const MessageBox = ({ withIcon, isLoading, children, title, action, ...props }) => {
   const icon = withIcon && icons[props.type];
   return (
     <Message {...props}>
-      {isLoading && (
-        <Span mr={2} style={{ display: 'inline-block' }}>
+      {isLoading ? (
+        <Box flexShrink={0} mr={3} style={{ display: 'inline-block' }}>
           <StyledSpinner size="1.5em" />
-        </Span>
+        </Box>
+      ) : (
+        icon && (
+          <Box flexShrink={0} mr={3} style={{ display: 'inline-block', verticalAlign: 'text-bottom' }}>
+            {icon}
+          </Box>
+        )
       )}
-      {icon && !isLoading && (
-        <Span mr={2} style={{ display: 'inline-block', verticalAlign: 'text-bottom' }}>
-          {icon}
-        </Span>
-      )}
-      {children}
+      <div>
+        {title && <h4> {title}</h4>}
+
+        {children}
+
+        {action && <Box mt={2}>{action}</Box>}
+      </div>
     </Message>
   );
 };
