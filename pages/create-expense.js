@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { compose, omit, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { expenseSubmissionAllowed, getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { expenseSubmissionAllowed, getCollectivePageMetadata, getCollectiveTypeForUrl } from '../lib/collective.lib';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import FormPersister from '../lib/form-persister';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { parseToBoolean } from '../lib/utils';
 
@@ -21,7 +22,7 @@ import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
 import ErrorPage from '../components/ErrorPage';
 import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
-import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
+import ExpenseForm, { EXPENSE_FORM_STEPS, prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseRecurringForm from '../components/expenses/ExpenseRecurringForm';
@@ -43,7 +44,7 @@ import StyledCard from '../components/StyledCard';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
-const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
+const STEPS = { ...EXPENSE_FORM_STEPS, SUMMARY: 'summary' };
 
 class CreateExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, parentCollectiveSlug } }) {
@@ -117,7 +118,7 @@ class CreateExpensePage extends React.Component {
     super(props);
     this.formTopRef = React.createRef();
     this.state = {
-      step: STEPS.FORM,
+      step: STEPS.PAYEE,
       expense: null,
       isSubmitting: false,
       formPersister: null,
@@ -166,11 +167,12 @@ class CreateExpensePage extends React.Component {
   }
 
   getPageMetaData(collective) {
+    const baseMetadata = getCollectivePageMetadata(collective);
     const canonicalURL = `${getCollectivePageCanonicalURL(collective)}/expenses/new`;
     if (collective) {
-      return { title: `${collective.name} - New expense`, canonicalURL };
+      return { ...baseMetadata, title: `${collective.name} - New expense`, canonicalURL };
     } else {
-      return { title: `New expense`, canonicalURL };
+      return { ...baseMetadata, title: `New expense`, canonicalURL };
     }
   }
 
@@ -361,7 +363,7 @@ class CreateExpensePage extends React.Component {
                 <Flex justifyContent="space-between" flexDirection={['column', 'row']}>
                   <Box minWidth={300} maxWidth={['100%', null, null, 728]} mr={[0, 3, 5]} mb={5} flexGrow="1">
                     <SummaryHeader fontSize="24px" lineHeight="32px" mb={24} py={2}>
-                      {step === STEPS.FORM ? (
+                      {step !== STEPS.SUMMARY ? (
                         <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
                       ) : (
                         <FormattedMessage
@@ -380,7 +382,7 @@ class CreateExpensePage extends React.Component {
                     ) : (
                       <Box>
                         <CreateExpenseDismissibleIntro collectiveName={collective.name} />
-                        {step === STEPS.FORM && (
+                        {step !== STEPS.SUMMARY ? (
                           <ExpenseForm
                             collective={collective}
                             loading={loadingLoggedInUser}
@@ -391,10 +393,10 @@ class CreateExpensePage extends React.Component {
                             payoutProfiles={payoutProfiles}
                             formPersister={this.state.formPersister}
                             shouldLoadValuesFromPersister={this.state.isInitialForm}
+                            defaultStep={step}
                             autoFocusTitle
                           />
-                        )}
-                        {step === STEPS.SUMMARY && (
+                        ) : (
                           <div>
                             <StyledCard p={[16, 24, 32]} mb={0}>
                               <ExpenseSummary
@@ -426,7 +428,7 @@ class CreateExpensePage extends React.Component {
                                   mr={[null, 3]}
                                   whiteSpace="nowrap"
                                   data-cy="edit-expense-btn"
-                                  onClick={() => this.setState({ step: STEPS.FORM })}
+                                  onClick={() => this.setState({ step: STEPS.EXPENSE })}
                                   disabled={this.state.isSubmitting}
                                 >
                                   ← <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
@@ -469,7 +471,7 @@ class CreateExpensePage extends React.Component {
   }
 }
 
-const hostFieldsFragment = gqlV2/* GraphQL */ `
+const hostFieldsFragment = gql`
   fragment CreateExpenseHostFields on Host {
     id
     name
@@ -497,17 +499,19 @@ const hostFieldsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-const createExpensePageQuery = gqlV2/* GraphQL */ `
+const createExpensePageQuery = gql`
   query CreateExpensePage($collectiveSlug: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
+      legacyId
       slug
       name
       type
       description
       settings
-      imageUrl
       twitterHandle
+      imageUrl
+      backgroundImageUrl
       currency
       isArchived
       isActive
@@ -556,6 +560,9 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
           id
           slug
           expensePolicy
+          imageUrl
+          backgroundImageUrl
+          twitterHandle
         }
       }
     }
@@ -577,7 +584,7 @@ const addCreateExpensePageData = graphql(createExpensePageQuery, {
   },
 });
 
-const createExpenseMutation = gqlV2/* GraphQL */ `
+const createExpenseMutation = gql`
   mutation CreateExpense(
     $expense: ExpenseCreateInput!
     $account: AccountReferenceInput!
@@ -596,7 +603,7 @@ const addCreateExpenseMutation = graphql(createExpenseMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
-const draftExpenseAndInviteUserMutation = gqlV2/* GraphQL */ `
+const draftExpenseAndInviteUserMutation = gql`
   mutation DraftExpenseAndInviteUser($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
     draftExpenseAndInviteUser(expense: $expense, account: $account) {
       id

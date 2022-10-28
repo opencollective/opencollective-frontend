@@ -7,11 +7,13 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
 import { DEFAULT_SUPPORTED_EXPENSE_TYPES } from '../../../lib/expenses';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import { omitDeep, stripHTML } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
+import { getI18nLink } from '../../I18nFormatters';
+import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import RichTextEditor from '../../RichTextEditor';
@@ -28,7 +30,7 @@ import SettingsSectionTitle from './SettingsSectionTitle';
 const EXPENSE_POLICY_MAX_LENGTH = 16000; // max in database is ~15,500
 const CONTRIBUTION_POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average length word
 
-const updateFilterCategoriesMutation = gqlV2/* GraphQL */ `
+const updateFilterCategoriesMutation = gql`
   mutation UpdateFilterCategories($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
       id
@@ -39,7 +41,7 @@ const updateFilterCategoriesMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const editCollectiveMutation = gql/* GraphQL */ `
+const editCollectiveMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveMutation($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
       id
@@ -50,8 +52,8 @@ const editCollectiveMutation = gql/* GraphQL */ `
   }
 `;
 
-const setPoliciesMutation = gqlV2/* GraphQL */ `
-  mutation SetPolicies($account: AccountReferenceInput!, $policies: JSON!) {
+const setPoliciesMutation = gql`
+  mutation SetPolicies($account: AccountReferenceInput!, $policies: PoliciesInput!) {
     setPolicies(account: $account, policies: $policies) {
       id
       policies {
@@ -471,7 +473,10 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
           <P mb={2}>
             <FormattedMessage
               id="editCollective.expenseTypes.description"
-              defaultMessage="Specify the types of expenses allowed"
+              defaultMessage="Specify the types of expenses allowed for all the collectives you're hosting. If you wish to customize these options for specific collectives, head to the <HostedCollectivesLink>Hosted Collectives</HostedCollectivesLink> section."
+              values={{
+                HostedCollectivesLink: getI18nLink({ as: Link, href: `/${collective.slug}/admin/hosted-collectives` }),
+              }}
             />
           </P>
 

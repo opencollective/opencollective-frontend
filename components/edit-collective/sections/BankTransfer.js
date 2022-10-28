@@ -1,13 +1,13 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
 import { Formik } from 'formik';
 import { findLast, get, omit } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS, PayoutMethodType } from '../../../lib/constants/payout-method';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../../lib/payment-method-utils';
 
 import ConfirmationModal from '../../ConfirmationModal';
@@ -23,7 +23,7 @@ import { formatAccountDetails } from '../utils';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const hostQuery = gqlV2/* GraphQL */ `
+const hostQuery = gql`
   query EditCollectiveBankTransferHost($slug: String) {
     host(slug: $slug) {
       id
@@ -51,7 +51,7 @@ const hostQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const createPayoutMethodMutation = gqlV2/* GraphQL */ `
+const createPayoutMethodMutation = gql`
   mutation EditCollectiveBankTransferCreatePayoutMethod(
     $payoutMethod: PayoutMethodInput!
     $account: AccountReferenceInput!
@@ -65,7 +65,7 @@ const createPayoutMethodMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const removePayoutMethodMutation = gqlV2/* GraphQL */ `
+const removePayoutMethodMutation = gql`
   mutation EditCollectiveBankTransferRemovePayoutMethod($payoutMethodId: String!) {
     removePayoutMethod(payoutMethodId: $payoutMethodId) {
       id
@@ -73,7 +73,7 @@ const removePayoutMethodMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const editBankTransferMutation = gqlV2/* GraphQL */ `
+const editBankTransferMutation = gql`
   mutation EditCollectiveBankTransfer($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
       id

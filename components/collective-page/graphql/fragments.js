@@ -1,9 +1,9 @@
-import { gql } from '@apollo/client';
+import { gqlV1 } from '../../../lib/graphql/helpers';
 
 /**
  * Fields fetched for updates
  */
-export const updatesFieldsFragment = gql`
+export const updatesFieldsFragment = gqlV1/* GraphQL */ `
   fragment UpdatesFields on UpdateType {
     id
     slug
@@ -26,7 +26,7 @@ export const updatesFieldsFragment = gql`
 /**
  * Fields fetched for contributors
  */
-export const contributorsFieldsFragment = gql`
+export const contributorsFieldsFragment = gqlV1/* GraphQL */ `
   fragment ContributorsFields on Contributor {
     id
     name
@@ -51,7 +51,7 @@ export const contributorsFieldsFragment = gql`
 /**
  * Fields fetched for all possible collective page features
  */
-export const collectiveNavbarFieldsFragment = gql`
+export const collectiveNavbarFieldsFragment = gqlV1/* GraphQL */ `
   fragment NavbarFields on CollectiveFeatures {
     id
     ABOUT
@@ -76,7 +76,7 @@ export const collectiveNavbarFieldsFragment = gql`
   }
 `;
 
-const contributeCardContributorFieldsFragment = gql`
+const contributeCardContributorFieldsFragment = gqlV1/* GraphQL */ `
   fragment ContributeCardContributorFields on Contributor {
     id
     image(height: 64)
@@ -87,7 +87,7 @@ const contributeCardContributorFieldsFragment = gql`
   }
 `;
 
-export const contributeCardTierFieldsFragment = gql`
+export const contributeCardTierFieldsFragment = gqlV1/* GraphQL */ `
   fragment ContributeCardTierFields on Tier {
     id
     name
@@ -124,7 +124,7 @@ export const contributeCardTierFieldsFragment = gql`
   ${contributeCardContributorFieldsFragment}
 `;
 
-export const contributeCardEventFieldsFragment = gql`
+export const contributeCardEventFieldsFragment = gqlV1/* GraphQL */ `
   fragment ContributeCardEventFields on Event {
     id
     slug
@@ -156,7 +156,7 @@ export const contributeCardEventFieldsFragment = gql`
   ${contributeCardContributorFieldsFragment}
 `;
 
-export const contributeCardProjectFieldsFragment = gql`
+export const contributeCardProjectFieldsFragment = gqlV1/* GraphQL */ `
   fragment ContributeCardProjectFields on Project {
     id
     slug

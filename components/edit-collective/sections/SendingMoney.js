@@ -1,10 +1,10 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../../lib/allowed-features';
+import { gqlV1 } from '../../../lib/graphql/helpers';
 
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
@@ -117,7 +117,7 @@ class SendingMoney extends React.Component {
   }
 }
 
-const editCollectiveSettingsMutation = gql`
+const editCollectiveSettingsMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveSettings($id: Int!, $settings: JSON) {
     editCollective(collective: { id: $id, settings: $settings }) {
       id

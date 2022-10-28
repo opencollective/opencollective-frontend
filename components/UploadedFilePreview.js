@@ -130,14 +130,7 @@ const UploadedFilePreview = ({
   } else if (!url) {
     content = <FileText color="#dcdee0" size="60%" />;
   } else if (isText) {
-    const icon = <FileTextIcon color="#dcdee0" size="60%" />;
-    content = url ? (
-      <StyledLink href={url} key={url} textAlign="center" openInNewTab>
-        {icon}
-      </StyledLink>
-    ) : (
-      icon
-    );
+    content = <FileTextIcon color="#dcdee0" size="60%" />;
   } else {
     const resizeWidth = Array.isArray(size) ? max(size) : size;
     content = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt || fileName} />;

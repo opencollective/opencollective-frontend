@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Edit } from '@styled-icons/material/Edit';
 import { compose, get, omit, truncate } from 'lodash';
@@ -11,7 +12,7 @@ import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import roles from '../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import formatMemberRole from '../../../lib/i18n/member-role';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
@@ -191,7 +192,7 @@ class Members extends React.Component {
               isLastAdmin={isLastAdmin}
               LoggedInUser={LoggedInUser}
               refetchLoggedInUser={refetchLoggedInUser}
-              canRemove={!(isInvitation || isLastAdmin)}
+              canRemove={!isLastAdmin}
             />
           ) : (
             <StyledRoundButton
@@ -399,7 +400,7 @@ class Members extends React.Component {
   }
 }
 
-const memberFieldsFragment = gqlV2/* GraphQL */ `
+const memberFieldsFragment = gql`
   fragment MemberFields on Member {
     id
     role
@@ -419,7 +420,7 @@ const memberFieldsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-export const coreContributorsQuery = gqlV2/* GraphQL */ `
+export const coreContributorsQuery = gql`
   query CoreContributors($collectiveSlug: String!, $account: AccountReferenceInput!) {
     account(slug: $collectiveSlug) {
       id

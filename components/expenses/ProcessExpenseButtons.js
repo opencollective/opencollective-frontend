@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Ban as UnapproveIcon } from '@styled-icons/fa-solid/Ban';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
@@ -24,8 +24,9 @@ import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import DeleteExpenseButton from './DeleteExpenseButton';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
+import { SecurityChecksButton } from './SecurityChecksModal';
 
-const processExpenseMutation = gqlV2/* GraphQL */ `
+const processExpenseMutation = gql`
   mutation ProcessExpense(
     $id: String
     $legacyId: Int
@@ -75,7 +76,7 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
   if (message) {
     if (message.startsWith('Insufficient Paypal balance')) {
       return {
-        title: 'Insufficient Paypal balance',
+        title: intl.formatMessage({ defaultMessage: 'Insufficient Paypal balance' }),
         message: (
           <React.Fragment>
             <Link href={`/${host.slug}/admin`}>
@@ -89,7 +90,7 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
       };
     } else if (message.startsWith('Host has two-factor authentication enabled for large payouts')) {
       return {
-        title: 'Host has two-factor authentication enabled for large payouts',
+        title: intl.formatMessage({ defaultMessage: 'Host has two-factor authentication enabled for payouts' }),
         message: (
           <FormattedMessage
             id="PayExpenseModal.HostTwoFactorAuthEnabled"
@@ -287,6 +288,7 @@ const ProcessExpenseButtons = ({
           onDelete={onDelete}
         />
       )}
+      {expense?.securityChecks?.length && <SecurityChecksButton {...buttonProps} minWidth={0} expense={expense} />}
     </React.Fragment>
   );
 };
@@ -311,6 +313,13 @@ ProcessExpenseButtons.propTypes = {
     id: PropTypes.string,
     legacyId: PropTypes.number,
     status: PropTypes.string,
+    securityChecks: PropTypes.arrayOf(
+      PropTypes.shape({
+        level: PropTypes.string,
+        scope: PropTypes.string,
+        message: PropTypes.string,
+      }),
+    ),
   }).isRequired,
   /** The account where the expense has been submitted */
   collective: PropTypes.object.isRequired,

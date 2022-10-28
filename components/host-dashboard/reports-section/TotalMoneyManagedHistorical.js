@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import { ChartWrapper } from '../../ChartWrapper';
 import ContainerOverlay from '../../ContainerOverlay';
@@ -19,7 +19,7 @@ import { formatAmountForLegend, getActiveYearsOptions, getMinMaxDifference } fro
 // Dynamic imports
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const totalMoneyManagedQuery = gqlV2/* GraphQL */ `
+const totalMoneyManagedQuery = gql`
   query TotalMoneyManagedQuery(
     $hostSlug: String!
     $dateFrom: DateTime!

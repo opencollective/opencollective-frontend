@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
 import { Form, Formik } from 'formik';
@@ -11,7 +12,7 @@ import styled from 'styled-components';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../lib/constants/payout-method';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
 import CollectiveNavbar from '../collective-navbar';
@@ -411,7 +412,7 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
   }
 }
 
-const createPayoutMethodMutation = gqlV2/* GraphQL */ `
+const createPayoutMethodMutation = gql`
   mutation CreatePayoutMethod($payoutMethod: PayoutMethodInput!, $account: AccountReferenceInput!) {
     createPayoutMethod(payoutMethod: $payoutMethod, account: $account) {
       data
@@ -427,7 +428,7 @@ const addCreatePayoutMethodMutation = graphql(createPayoutMethodMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
-const editBankAccountMutation = gqlV2/* GraphQL */ `
+const editBankAccountMutation = gql`
   mutation EditBankAccount($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
       id
@@ -441,7 +442,7 @@ const addEditBankAccountMutation = graphql(editBankAccountMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
-const applyToHostMutation = gqlV2/* GraphQL */ `
+const applyToHostMutation = gql`
   mutation ApplyToHost($collective: AccountReferenceInput!, $host: AccountReferenceInput!) {
     applyToHost(collective: $collective, host: $host) {
       id

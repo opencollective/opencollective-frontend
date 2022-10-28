@@ -1,4 +1,5 @@
 import { ThemeProvider } from 'styled-components';
+import { RouterContext } from 'next/dist/shared/lib/router-context';
 import { IntlProvider } from 'react-intl';
 import theme from '../lib/theme';
 import { ApolloProvider } from '@apollo/client';
@@ -11,6 +12,7 @@ import { withDesign } from 'storybook-addon-designs';
 import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
+import { WithNextRouter } from 'storybook-addon-next-router/dist/decorators';
 
 Object.defineProperty(nextImage, 'default', {
   configurable: true,
@@ -19,6 +21,9 @@ Object.defineProperty(nextImage, 'default', {
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
+  nextRouter: {
+    Provider: RouterContext.Provider,
+  },
 };
 
 export const decorators = [
@@ -34,4 +39,5 @@ export const decorators = [
     </ApolloProvider>
   ),
   withDesign,
+  WithNextRouter,
 ];

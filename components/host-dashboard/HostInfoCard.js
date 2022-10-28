@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { gqlV2 } from '../../lib/graphql/helpers';
 import { hasPaypalPreApprovalExpired } from '../../lib/payment-method-utils';
 
 import Container from '../Container';
@@ -23,7 +23,7 @@ import ConnectTransferwiseButton from './ConnectTransferwiseButton';
 import PaypalPreApprovalDetailsIcon from './PaypalPreApprovalDetailsIcon';
 import TransferwiseDetailsIcon from './TransferwiseDetailsIcon';
 
-export const hostInfoCardFields = gqlV2/* GraphQL */ `
+export const hostInfoCardFields = gql`
   fragment HostInfoCardFields on Host {
     id
     legacyId

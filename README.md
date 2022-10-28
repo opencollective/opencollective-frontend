@@ -102,6 +102,16 @@ This project is currently deployed to staging and production with [Heroku](https
 
 More info: [docs/deployment.md](docs/deployment.md)
 
+## Publishing components
+
+To publish a frontend components update to [NPM](https://www.npmjs.com/package/@opencollective/frontend-components), you need to be a core member of the Open Collective team. Steps:
+
+1. Check the currently published version with `npm view @opencollective/frontend-components version`
+2. Trigger the publishing script by running `npm run publish-components {NEW_VERSION}`, where `{NEW_VERSION}` is the new version number (please follow [semver](https://semver.org/)).
+3. Review the changes, and confirm if everything makes sense.
+
+To add new files or dependencies to this exported package, have a look at [scripts/publish-components/config.ts](scripts/publish-components/config.ts).
+
 ## Discussion
 
 If you have any questions, ping us on Slack

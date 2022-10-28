@@ -9,12 +9,11 @@ import PeriodFilter from '../../../budget/filters/PeriodFilter';
 import Container from '../../../Container';
 import { Box, Flex } from '../../../Grid';
 
-import ActivityAttributionFilter from './ActivityAttributionFilter';
+import ActivityAccountFilter from './ActivityAccountFilter';
 import ActivityTypeFilter from './ActivityTypeFilter';
 
 const FilterContainer = styled(Box)`
   margin-bottom: 24px;
-  width: 210px;
 `;
 
 const FilterLabel = styled.label`
@@ -41,24 +40,26 @@ const ActivityFilters = ({ filters, onChange, account }) => {
   return (
     <Container>
       <Flex flexWrap="wrap">
-        <FilterContainer>
+        <FilterContainer width={[1, 1 / 3, 1 / 3]}>
           <FilterLabel htmlFor="activity-filter-period">
             <FormattedMessage id="Period" defaultMessage="Period" />
           </FilterLabel>
           <PeriodFilter {...getFilterProps('period', encodeDateInterval)} />
         </FilterContainer>
-        <FilterContainer ml={[0, '19px']}>
+        <FilterContainer width={[1, 1 / 3, 1 / 3]} pl={[0, '19px']}>
           <FilterLabel htmlFor="activity-filter-type">
             <FormattedMessage id="webhooks.types.label" defaultMessage="Activity" />
           </FilterLabel>
           <ActivityTypeFilter account={account} {...getFilterProps('type')} />
         </FilterContainer>
-        <FilterContainer ml={[0, '19px']}>
-          <FilterLabel htmlFor="activity-filter-attribution">
-            <FormattedMessage id="Activity.Attribution" defaultMessage="Attribution" />
-          </FilterLabel>
-          <ActivityAttributionFilter account={account} {...getFilterProps('attribution')} />
-        </FilterContainer>
+        {(account?.isHost || account?.childrenAccounts?.totalCount > 0) && (
+          <FilterContainer width={[1, 1 / 3, 1 / 3]} pl={[0, '19px']}>
+            <FilterLabel htmlFor="activity-filter-account">
+              <FormattedMessage defaultMessage="Account" />
+            </FilterLabel>
+            <ActivityAccountFilter account={account} {...getFilterProps('account')} />
+          </FilterContainer>
+        )}
       </Flex>
     </Container>
   );
@@ -69,6 +70,7 @@ ActivityFilters.propTypes = {
   filters: PropTypes.object,
   account: PropTypes.shape({
     isHost: PropTypes.bool,
+    childrenAccounts: PropTypes.object,
   }),
 };
 

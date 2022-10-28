@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
+
+import { gqlV1 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import InputField from '../InputField';
@@ -205,7 +206,7 @@ class EditTwitterAccount extends React.Component {
   }
 }
 
-const editConnectedAccountMutation = gql`
+const editConnectedAccountMutation = gqlV1/* GraphQL */ `
   mutation EditConnectedAccount($connectedAccount: ConnectedAccountInputType!) {
     editConnectedAccount(connectedAccount: $connectedAccount) {
       id

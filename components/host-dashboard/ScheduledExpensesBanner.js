@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { create, Mode } from '@transferwise/approve-api-action-helpers';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { addAuthTokenToHeader } from '../../lib/api';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { getWebsiteUrl } from '../../lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
@@ -15,7 +16,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const scheduledExpensesQuery = gqlV2/* GraphQL */ `
+const scheduledExpensesQuery = gql`
   query ScheduledExpensesBanner(
     $hostId: String!
     $limit: Int!
@@ -54,7 +55,7 @@ const ScheduledExpensesBanner = ({ host, onSubmit, secondButton, expenses }) => 
   const handlePayBatch = async () => {
     const expenseIds = scheduledExpenses.data.expenses.nodes.map(e => e.id);
     try {
-      await request(`${process.env.WEBSITE_URL}/api/services/transferwise/pay-batch`, {
+      await request(`${getWebsiteUrl()}/api/services/transferwise/pay-batch`, {
         method: 'POST',
         body: JSON.stringify({ expenseIds, hostId: host.id }),
         headers: addAuthTokenToHeader(),

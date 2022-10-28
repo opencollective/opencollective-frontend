@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useLazyQuery, useMutation } from '@apollo/client';
+import { gql, useLazyQuery, useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { debounce } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -22,7 +22,7 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 const MAXIMUM_MONTHLY_LIMIT = 2000;
 
-const createVirtualCardMutation = gqlV2/* GraphQL */ `
+const createVirtualCardMutation = gql`
   mutation createVirtualCard(
     $name: String!
     $monthlyLimit: AmountInput!
@@ -39,7 +39,7 @@ const createVirtualCardMutation = gqlV2/* GraphQL */ `
 `;
 
 // TODO : refactor this mutation
-const collectiveMembersQuery = gqlV2/* GraphQL */ `
+const collectiveMembersQuery = gql`
   query CollectiveMembers($slug: String!) {
     account(slug: $slug) {
       id

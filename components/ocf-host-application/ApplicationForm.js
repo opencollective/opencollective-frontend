@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { Lock } from '@styled-icons/boxicons-solid/Lock';
 import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Question } from '@styled-icons/remix-line/Question';
 import { Form, Formik } from 'formik';
-import { isNil } from 'lodash';
+import { get, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -15,7 +15,7 @@ import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../lib/constants/collectives';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyChecked, verifyEmailPattern, verifyFieldLength } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { i18nOCFApplicationFormLabel } from '../../lib/i18n/ocf-form';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -41,7 +41,7 @@ import { H1, H4, P } from '../Text';
 
 import OCFPrimaryButton from './OCFPrimaryButton';
 
-const createCollectiveMutation = gqlV2/* GraphQL */ `
+const createCollectiveMutation = gql`
   mutation CreateCollective(
     $collective: CollectiveCreateInput!
     $host: AccountReferenceInput
@@ -68,7 +68,7 @@ const createCollectiveMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const applyToHostMutation = gqlV2/* GraphQL */ `
+const applyToHostMutation = gql`
   mutation ApplyToHost(
     $collective: AccountReferenceInput!
     $host: AccountReferenceInput!
@@ -126,6 +126,7 @@ const ApplicationForm = ({
 }) => {
   const intl = useIntl();
   const [submitApplication, { loading: submitting, error }] = useApplicationMutation(canApplyWithCollective);
+  const slugAlreadyExists = get(error, 'graphQLErrors.0.extensions.extraInfo.slugExists');
 
   const validate = values => {
     const errors = requireFields(values, [
@@ -210,7 +211,7 @@ const ApplicationForm = ({
       </Flex>
       <Flex flexDirection={['column', 'row']} alignItems={['center', 'flex-start']} justifyContent="center">
         <Flex flexDirection="column" alignItems="center" justifyContent="center">
-          {error && (
+          {error && !slugAlreadyExists && (
             <Flex alignItems="center" justifyContent="center">
               <MessageBox type="error" withIcon mb={[1, 3]}>
                 {i18nGraphqlException(intl, error)}
@@ -403,9 +404,18 @@ const ApplicationForm = ({
                                 />
                               )}
                             </StyledInputFormikField>
-                            <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
-                              <FormattedMessage id="createCollective.form.suggestedLabel" defaultMessage="Suggested" />
-                            </P>
+                            {slugAlreadyExists ? (
+                              <P fontSize="10px" color="red.600" mt="6px">
+                                {i18nGraphqlException(intl, error)}
+                              </P>
+                            ) : (
+                              <P fontSize="11px" lineHeight="16px" color="black.600" mt="6px">
+                                <FormattedMessage
+                                  id="createCollective.form.suggestedLabel"
+                                  defaultMessage="Suggested"
+                                />
+                              </P>
+                            )}
                           </Box>
                         </Flex>
                       )}

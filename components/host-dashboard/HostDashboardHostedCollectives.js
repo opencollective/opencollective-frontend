@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { isEmpty, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Box, Flex, Grid } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -23,7 +23,7 @@ const COLLECTIVES_PER_PAGE = 20;
 
 // TODO: This query is using `legacyId` for host and member.account to interface with the
 // legacy `AddFundsForm`. Once the new add funds form will be implemented, we can remove these fields.
-const hostedCollectivesQuery = gqlV2/* GraphQL */ `
+const hostedCollectivesQuery = gql`
   query HostDashboardHostedCollectives(
     $hostSlug: String!
     $limit: Int!
@@ -79,6 +79,7 @@ const hostedCollectivesQuery = gqlV2/* GraphQL */ `
               id
               balance {
                 valueInCents
+                currency
               }
             }
             ... on AccountWithHost {

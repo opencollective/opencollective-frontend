@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { CheckboxChecked } from '@styled-icons/boxicons-regular/CheckboxChecked';
 import { themeGet } from '@styled-system/theme-get';
@@ -9,7 +10,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { connectAccount } from '../../lib/api';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -237,7 +238,7 @@ class StripeOrBankAccountPicker extends React.Component {
 }
 
 // We query on "account" and not "host" because the account is not necessarily an host yet
-const hostQuery = gqlV2/* GraphQL */ `
+const hostQuery = gql`
   query AcceptFinancialContributionsHost($slug: String!) {
     host: account(slug: $slug) {
       id

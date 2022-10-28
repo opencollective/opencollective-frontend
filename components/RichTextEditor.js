@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from '@styled-system/css';
+import { get } from 'lodash';
 import styled from 'styled-components';
 import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
@@ -160,6 +161,8 @@ const TrixEditorContainer = styled.div`
     })}
 `;
 
+const SUPPORTED_SERVICE_URLS = { youTube: 'https://www.youtube-nocookie.com/embed/', anchorFm: 'https://anchor.fm/' };
+
 /**
  * A React wrapper around the Trix library to edit rich text.
  * Produces HTML and clear text.
@@ -204,6 +207,8 @@ export default class RichTextEditor extends React.Component {
     error: PropTypes.any,
     'data-cy': PropTypes.string,
     videoEmbedEnabled: PropTypes.bool,
+    /** Called when an image is being uploaded to set a boolean */
+    setUploading: PropTypes.func,
   };
 
   static defaultProps = {
@@ -293,6 +298,7 @@ export default class RichTextEditor extends React.Component {
   };
 
   /** ---- Trix handlers ---- */
+
   replaceEmbeddedIFrames = value => {
     const iframeRegex = new RegExp(`<iframe.+?iframe>`, 'ig');
     let match;
@@ -355,11 +361,11 @@ export default class RichTextEditor extends React.Component {
 
   constructVideoEmbedURL = (service, id) => {
     if (service === 'youtube') {
-      return `https://www.youtube-nocookie.com/embed/${id}`;
+      return `${SUPPORTED_SERVICE_URLS.youTube}${id}`;
     } /* else if (service === 'vimeo') {
       return `https://player.vimeo.com/video/${id}`;
     } */ else if (service === 'anchorFm') {
-      return `https://anchor.fm/${id}`;
+      return `${SUPPORTED_SERVICE_URLS.anchorFm}${id}`;
     } else {
       return null;
     }
@@ -443,13 +449,28 @@ export default class RichTextEditor extends React.Component {
 
   handleUpload = e => {
     const { attachment } = e;
-    if (!attachment.file) {
+    const attachmentContent = get(attachment, 'attachment.attributes.values.content');
+    const isVideoAttachment =
+      attachmentContent?.includes(`<iframe src="${SUPPORTED_SERVICE_URLS.youTube}`) ||
+      attachmentContent?.includes(`<iframe src="${SUPPORTED_SERVICE_URLS.anchorFm}`);
+    if (isVideoAttachment) {
+      return;
+    } else if (!attachment.file) {
+      attachment.remove(); // Remove unknown stuff, for example when copy-pasting HTML
       return;
     }
 
+    this.props.setUploading?.(true);
+
     const onProgress = progress => attachment.setUploadProgress(progress);
-    const onSuccess = fileURL => attachment.setAttributes({ url: fileURL, href: fileURL });
-    const onFailure = () => this.setState({ error: 'File upload failed' });
+    const onSuccess = fileURL => {
+      this.props.setUploading?.(false);
+      attachment.setAttributes({ url: fileURL, href: fileURL });
+    };
+    const onFailure = () => {
+      this.props.setUploading?.(false);
+      this.setState({ error: 'File upload failed' });
+    };
     uploadImageWithXHR(attachment.file, { onProgress, onSuccess, onFailure });
     return e;
   };

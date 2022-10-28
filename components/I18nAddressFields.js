@@ -107,7 +107,7 @@ const ZoneSelect = ({ info, required, value, name, label, onChange, id, error, .
       options={zoneOptions}
       error={error}
       placeholder={`Please select your ${label}`} // TODO i18n
-      data-cy={`payee-address-${name}`} // TODO: Should not be locked on payee-address
+      data-cy={`address-${name}`} // TODO: Should not be locked on payee-address
       value={zoneOptions.find(option => option?.value === value) || null}
       onChange={v => {
         onChange({ target: { name: name, value: v.value } });
@@ -147,7 +147,7 @@ export const FormikLocationFieldRenderer = ({ name, label, required, prefix, inf
                   />
                 );
               default:
-                return <StyledInput {...inputProps} {...field} error={meta.error} data-cy={`payee-address-${name}`} />;
+                return <StyledInput {...inputProps} {...field} error={meta.error} data-cy={`address-${name}`} />;
             }
           }}
         </StyledInputField>
@@ -194,7 +194,15 @@ export const SimpleLocationFieldRenderer = ({ name, label, required, prefix, val
               />
             );
           default:
-            return <StyledInput {...inputProps} value={value} error={error} onChange={dispatchOnChange} />;
+            return (
+              <StyledInput
+                {...inputProps}
+                value={value}
+                error={error}
+                onChange={dispatchOnChange}
+                data-cy={`address-${name}`}
+              />
+            );
         }
       }}
     </StyledInputField>

@@ -13,8 +13,6 @@ import { formatFormErrorMessage, requireFields, verifyEmailPattern } from '../..
 import { reportValidityHTML5 } from '../../lib/utils';
 
 import { Box, Flex, Grid } from '../Grid';
-import I18nAddressFields from '../I18nAddressFields';
-import InputTypeCountry from '../InputTypeCountry';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
@@ -23,6 +21,7 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
+import StyledInputLocation from '../StyledInputLocation';
 import StyledLinkButton from '../StyledLinkButton';
 import StyledTextarea from '../StyledTextarea';
 import { P } from '../Text';
@@ -303,38 +302,14 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onBack, onNext }) =
           </Box>
         ) : (
           <Fragment>
-            <Box>
-              <FastField name="payeeLocation.country">
-                {({ field }) => (
-                  <StyledInputField
-                    name={field.name}
-                    label={formatMessage(msg.country)}
-                    labelFontSize="13px"
-                    error={formatFormErrorMessage(intl, errors.payeeLocation?.country)}
-                    required={false}
-                    mt={3}
-                  >
-                    {({ id, error }) => (
-                      <InputTypeCountry
-                        data-cy="payee-country"
-                        inputId={id}
-                        onChange={value => formik.setFieldValue(field.name, value)}
-                        value={field.value}
-                        error={error}
-                      />
-                    )}
-                  </StyledInputField>
-                )}
-              </FastField>
-              <I18nAddressFields
-                prefix="payeeLocation.structured"
-                required={false}
-                selectedCountry={values.payeeLocation?.country}
-                onCountryChange={addressObject => {
-                  if (addressObject) {
-                    formik.setFieldValue('payeeLocation.structured', addressObject);
-                  }
+            <Box mt={3}>
+              <StyledInputLocation
+                onChange={values => {
+                  formik.setFieldValue('payeeLocation', values);
                 }}
+                location={values.payeeLocation}
+                errors={errors.payeeLocation}
+                required={false}
               />
             </Box>
             <Box>

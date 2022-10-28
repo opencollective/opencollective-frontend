@@ -29,6 +29,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   PAYMENT_RECEIPTS: 'payment-receipts',
   TICKETS: 'tickets',
   TIERS: 'tiers',
+  TIERS_REVAMP: 'tiers-revamp',
   GIFT_CARDS: 'gift-cards',
   AUTHORIZED_APPS: 'authorized-apps',
   FOR_DEVELOPERS: 'for-developers',
@@ -186,7 +187,7 @@ const isCollective = c => c.type === COLLECTIVE;
 
 const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.INFO]: () => true,
-  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: c => isCollective(c),
+  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: c => isOneOfTypes(c, COLLECTIVE, PROJECT),
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: c => isHost(c) || isCollective(c),
   [EDIT_COLLECTIVE_SECTIONS.POLICIES]: c => isCollective(c) || isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: c => isCollective(c),

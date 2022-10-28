@@ -15,7 +15,7 @@ import StyledButton from '../StyledButton';
 const TierLongDescription = ({ tier, editMutation, canEdit }) => {
   return (
     <InlineEditField mutation={editMutation} values={tier} field="longDescription" canEdit={canEdit}>
-      {({ isEditing, value, setValue, enableEditor }) => {
+      {({ isEditing, value, setValue, enableEditor, setUploading }) => {
         if (isEditing) {
           return (
             <RichTextEditor
@@ -24,6 +24,7 @@ const TierLongDescription = ({ tier, editMutation, canEdit }) => {
               withStickyToolbar
               toolbarTop={NAVBAR_HEIGHT}
               toolbarOffsetY={-30}
+              setUploading={setUploading}
             />
           );
         } else if (isEmptyValue(tier.longDescription)) {

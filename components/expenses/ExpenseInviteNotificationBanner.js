@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { checkUserExistence, signin } from '../../lib/api';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { getWebsiteUrl } from '../../lib/utils';
 
@@ -18,7 +18,7 @@ import { H4, P } from '../../components/Text';
 
 import pidgeon from '../../public/static/images/pidgeon.png';
 
-const resendDraftExpenseInviteMutation = gqlV2/* GraphQL */ `
+const resendDraftExpenseInviteMutation = gql`
   mutation ResendDraftExpenseInvite($expense: ExpenseReferenceInput!) {
     resendDraftExpenseInvite(expense: $expense) {
       id

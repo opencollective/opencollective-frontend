@@ -1,11 +1,11 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { isHostAccount } from '../lib/collective.lib';
 import roles from '../lib/constants/roles';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
 import { AdminPanelContext } from '../components/admin-panel/AdminPanelContext';
@@ -20,7 +20,7 @@ import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 
-export const adminPanelQuery = gqlV2/* GraphQL */ `
+export const adminPanelQuery = gql`
   query AdminPanel($slug: String!) {
     account(slug: $slug) {
       id
@@ -96,7 +96,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return ALL_SECTIONS.INFO;
   }
 
-  const isAdmin = loggedInUser?.canEditCollective(account);
+  const isAdmin = loggedInUser?.isAdminOfCollectiveOrHost(account);
   const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
   const isAccountantOnly = !isAdmin && isAccountant;
   if (isHostAccount(account)) {
@@ -137,7 +137,7 @@ function getBlocker(LoggedInUser, account, section) {
   }
 
   // Check permissions
-  const isAdmin = LoggedInUser.canEditCollective(account);
+  const isAdmin = LoggedInUser.isAdminOfCollectiveOrHost(account);
   if (SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS.includes(section)) {
     if (!isAdmin && !LoggedInUser.hasRole(roles.ACCOUNTANT, account)) {
       return <FormattedMessage defaultMessage="You need to be logged in as an admin or accountant to view this page" />;
@@ -148,7 +148,9 @@ function getBlocker(LoggedInUser, account, section) {
 }
 
 const getIsAccountantOnly = (LoggedInUser, account) => {
-  return LoggedInUser && !LoggedInUser.canEditCollective(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account);
+  return (
+    LoggedInUser && !LoggedInUser.isAdminOfCollectiveOrHost(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account)
+  );
 };
 
 const AdminPanelPage = () => {

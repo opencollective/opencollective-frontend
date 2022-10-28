@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import EXPENSE_STATUS from '../../lib/constants/expense-status';
 import { parseDateInterval } from '../../lib/date-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { useLazyGraphQLPaginatedResults } from '../../lib/hooks/useLazyGraphQLPaginatedResults';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
@@ -34,7 +34,7 @@ import { H1 } from '../Text';
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
-const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
+const hostDashboardExpensesQuery = gql`
   query HostDashboardExpenses(
     $hostSlug: String!
     $limit: Int!
@@ -170,6 +170,17 @@ const HostDashboardExpenses = ({ hostSlug, isNewAdmin }) => {
 
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
+      {!loading && data?.host.hasDisputedOrders && (
+        <Box mb={4}>
+          <MessageBox type="warning" withIcon>
+            <FormattedMessage
+              id="host.disputes.warning"
+              defaultMessage="Fraud Warning: There are disputed charges that need review."
+            />{' '}
+            <Link href={`/${hostSlug}/admin/orders?status=DISPUTED`}>Review Disputes</Link>
+          </MessageBox>
+        </Box>
+      )}
       <Flex mb={24} alignItems="center" flexWrap="wrap">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />

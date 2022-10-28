@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { giftCardsDownloadUrl } from '../lib/url-helpers';
+import { getWebsiteUrl } from '../lib/utils';
 
 import FileDownloader from './FileDownloader';
 import { Box, Flex } from './Grid';
@@ -48,7 +49,7 @@ export default class CreateGiftCardsSuccess extends React.Component {
 
   getRedeemLinkFromVC = vc => {
     const code = vc.uuid.split('-')[0];
-    return `${process.env.WEBSITE_URL}/${this.props.collectiveSlug}/redeem/${code}`;
+    return `${getWebsiteUrl()}/${this.props.collectiveSlug}/redeem/${code}`;
   };
 
   copyLinksToClipboard = () => {

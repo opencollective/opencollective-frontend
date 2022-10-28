@@ -2,6 +2,7 @@ import React from 'react';
 import { find, get, isEmpty, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
+import { getCollectivePageMetadata } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import INTERVALS from '../../lib/constants/intervals';
 import {
@@ -16,6 +17,7 @@ import {
   getPaymentMethodMetadata,
   isPaymentMethodDisabled,
 } from '../../lib/payment-method-utils';
+import { getWebsiteUrl } from '../../lib/utils';
 
 import CreditCardInactive from '../icons/CreditCardInactive';
 
@@ -93,7 +95,7 @@ export const generatePaymentMethodOptions = (
     key: `pm-${pm.id}`,
     title: getPaymentMethodName(pm),
     subtitle: getPaymentMethodMetadata(pm, totalAmount),
-    icon: getPaymentMethodIcon(pm),
+    icon: getPaymentMethodIcon(pm, pm.account),
     disabled: isPaymentMethodDisabled(pm, totalAmount),
     paymentMethod: pm,
   }));
@@ -177,10 +179,7 @@ export const generatePaymentMethodOptions = (
           service: PAYMENT_METHOD_SERVICE.PAYPAL,
           type: PAYMENT_METHOD_TYPE.PAYMENT,
         },
-        icon: getPaymentMethodIcon(
-          { service: PAYMENT_METHOD_SERVICE.PAYPAL, type: PAYMENT_METHOD_TYPE.PAYMENT },
-          collective,
-        ),
+        icon: getPaymentMethodIcon({ service: PAYMENT_METHOD_SERVICE.PAYPAL, type: PAYMENT_METHOD_TYPE.PAYMENT }),
       });
     }
 
@@ -197,10 +196,7 @@ export const generatePaymentMethodOptions = (
           type: PAYMENT_METHOD_TYPE.ALIPAY,
         },
         title: <FormattedMessage id="Alipay" defaultMessage="Alipay" />,
-        icon: getPaymentMethodIcon(
-          { service: PAYMENT_METHOD_SERVICE.STRIPE, type: PAYMENT_METHOD_TYPE.ALIPAY },
-          collective,
-        ),
+        icon: getPaymentMethodIcon({ service: PAYMENT_METHOD_SERVICE.STRIPE, type: PAYMENT_METHOD_TYPE.ALIPAY }),
       });
     }
 
@@ -213,10 +209,10 @@ export const generatePaymentMethodOptions = (
           service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
           type: PAYMENT_METHOD_TYPE.MANUAL,
         },
-        icon: getPaymentMethodIcon(
-          { service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE, type: PAYMENT_METHOD_TYPE.MANUAL },
-          collective,
-        ),
+        icon: getPaymentMethodIcon({
+          service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
+          type: PAYMENT_METHOD_TYPE.MANUAL,
+        }),
         instructions: (
           <FormattedMessage
             id="NewContributionFlow.bankInstructions"
@@ -250,12 +246,12 @@ export const getGQLV2AmountInput = (valueInCents, defaultValue) => {
 
 const getCanonicalURL = (collective, tier) => {
   if (!tier) {
-    return `${process.env.WEBSITE_URL}/${collective.slug}/donate`;
+    return `${getWebsiteUrl()}/${collective.slug}/donate`;
   } else if (collective.type === CollectiveType.EVENT) {
     const parentSlug = get(collective.parent, 'slug', collective.slug);
-    return `${process.env.WEBSITE_URL}/${parentSlug}/events/${collective.slug}/order/${tier.id}`;
+    return `${getWebsiteUrl()}/${parentSlug}/events/${collective.slug}/order/${tier.id}`;
   } else {
-    return `${process.env.WEBSITE_URL}/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
+    return `${getWebsiteUrl()}/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
   }
 };
 
@@ -271,15 +267,15 @@ const PAGE_META_MSGS = defineMessages({
 });
 
 export const getContributionFlowMetadata = (intl, account, tier) => {
+  const baseMetadata = getCollectivePageMetadata(account);
   if (!account) {
-    return { title: 'Contribute' };
+    return { ...baseMetadata, title: 'Contribute' };
   }
 
   return {
+    ...baseMetadata,
     canonicalURL: getCanonicalURL(account, tier),
-    description: account.description,
-    twitterHandle: account.twitterHandle,
-    image: account.imageUrl || account.backgroundImageUrl,
+    noRobots: false,
     title:
       account.type === CollectiveType.EVENT
         ? intl.formatMessage(PAGE_META_MSGS.eventTitle, { event: account.name })

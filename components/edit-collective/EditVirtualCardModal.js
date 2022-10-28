@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useLazyQuery, useMutation } from '@apollo/client';
+import { gql, useLazyQuery, useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { debounce } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import roles from '../../lib/constants/roles';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePicker from '../CollectivePicker';
 import Container from '../Container';
@@ -18,10 +19,11 @@ import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useLoggedInUser } from '../UserProvider';
 
 const MAXIMUM_MONTHLY_LIMIT = 2000;
 
-const editVirtualCardMutation = gqlV2/* GraphQL */ `
+const editVirtualCardMutation = gql`
   mutation editVirtualCard(
     $virtualCard: VirtualCardReferenceInput!
     $name: String!
@@ -43,7 +45,7 @@ const editVirtualCardMutation = gqlV2/* GraphQL */ `
 `;
 
 // TODO : refactor this mutation
-const collectiveMembersQuery = gqlV2/* GraphQL */ `
+const collectiveMembersQuery = gql`
   query CollectiveMembers($slug: String!) {
     account(slug: $slug) {
       id
@@ -66,7 +68,7 @@ const throttledCall = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
 
-const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps }) => {
+const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, host, ...modalProps }) => {
   const { addToast } = useToasts();
 
   const [editVirtualCard, { loading: isBusy }] = useMutation(editVirtualCardMutation, {
@@ -76,7 +78,11 @@ const EditVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps }
     context: API_V2_CONTEXT,
   });
 
-  const canEditMonthlyLimit = virtualCard.spendingLimitInterval === 'MONTHLY' && virtualCard.provider === 'STRIPE';
+  const { LoggedInUser } = useLoggedInUser();
+  const isHostAdmin = LoggedInUser?.hasRole(roles.ADMIN, host);
+
+  const canEditMonthlyLimit =
+    isHostAdmin && virtualCard.spendingLimitInterval === 'MONTHLY' && virtualCard.provider === 'STRIPE';
 
   const formik = useFormik({
     initialValues: {
@@ -266,6 +272,7 @@ EditVirtualCardModal.propTypes = {
     spendingLimitInterval: PropTypes.string,
     provider: PropTypes.string,
   }),
+  host: PropTypes.object,
 };
 
 /** @component */

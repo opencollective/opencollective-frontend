@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import FormPersister from '../../lib/form-persister';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
 import { Box, Flex } from '../Grid';
@@ -19,7 +19,7 @@ import StyledInput from '../StyledInput';
 import StyledInputTags from '../StyledInputTags';
 import { H4, P } from '../Text';
 
-const createConversationMutation = gqlV2/* GraphQL */ `
+const createConversationMutation = gql`
   mutation CreateConversation($title: String!, $html: String!, $CollectiveId: String!, $tags: [String]) {
     createConversation(title: $title, html: $html, CollectiveId: $CollectiveId, tags: $tags) {
       id
@@ -75,6 +75,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
   const { formatMessage } = useIntl();
   const [createConversation, { error: submitError }] = useMutation(createConversationMutation, mutationOptions);
   const [formPersister] = React.useState(new FormPersister());
+  const [uploading, setUploading] = React.useState(false);
 
   const { values, errors, getFieldProps, handleSubmit, setFieldValue, setValues, isSubmitting, touched } = useFormik({
     initialValues: {
@@ -152,6 +153,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
                 fontSize="13px"
                 error={touched.html && errors.html}
                 defaultValue={values.html}
+                setUploading={setUploading}
               />
             )}
           </Box>
@@ -203,12 +205,16 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
         type="submit"
         buttonStyle="primary"
         data-cy="submit-new-conversation-btn"
-        disabled={disabled || loading}
+        disabled={disabled || loading || uploading}
         loading={isSubmitting}
         minWidth={200}
         mt={3}
       >
-        <FormattedMessage id="CreateConversationForm.Submit" defaultMessage="Create Conversation" />
+        {uploading ? (
+          <FormattedMessage id="uploadImage.isUploading" defaultMessage="Uploading image..." />
+        ) : (
+          <FormattedMessage id="CreateConversationForm.Submit" defaultMessage="Create Conversation" />
+        )}
       </StyledButton>
     </form>
   );

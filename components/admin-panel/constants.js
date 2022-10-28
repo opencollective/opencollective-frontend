@@ -64,6 +64,7 @@ export const COLLECTIVE_SECTIONS = {
   TEAM: 'members',
   TICKETS: 'tickets',
   TIERS: 'tiers',
+  TIERS_REVAMP: 'tiers-revamp',
   TWO_FACTOR_AUTH: 'two-factor-auth',
   VIRTUAL_CARDS: 'virtual-cards',
   WEBHOOKS: 'webhooks',
@@ -198,6 +199,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.TIERS]: {
     id: 'editCollective.menu.tiers',
     defaultMessage: 'Tiers',
+  },
+  [ALL_SECTIONS.TIERS_REVAMP]: {
+    defaultMessage: 'Tiers (New!)',
   },
   [ALL_SECTIONS.GIFT_CARDS]: {
     id: 'editCollective.menu.giftCards',

@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
-import { gqlV2 } from '../../../lib/graphql/helpers';
+import { gqlV1 } from '../../../lib/graphql/helpers';
 
-export const editCollectiveSettingsMutation = gql`
+export const editCollectiveSettingsMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveSettings($id: Int!, $settings: JSON) {
     editCollective(collective: { id: $id, settings: $settings }) {
       id
@@ -11,7 +11,7 @@ export const editCollectiveSettingsMutation = gql`
   }
 `;
 
-export const editAccountSettingMutation = gqlV2/* GraphQL */ `
+export const editAccountSettingMutation = gql`
   mutation EditAccountSetting($collectiveId: Int!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: { legacyId: $collectiveId }, key: $key, value: $value) {
       id
@@ -21,7 +21,7 @@ export const editAccountSettingMutation = gqlV2/* GraphQL */ `
 `;
 
 /** A mutation used by child components to update the collective */
-export const editCollectiveLongDescriptionMutation = gql`
+export const editCollectiveLongDescriptionMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveLongDescription($id: Int!, $longDescription: String) {
     editCollective(collective: { id: $id, longDescription: $longDescription }) {
       id
@@ -30,7 +30,7 @@ export const editCollectiveLongDescriptionMutation = gql`
   }
 `;
 
-export const editCollectiveAvatarMutation = gql`
+export const editCollectiveAvatarMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveAvatar($id: Int!, $image: String) {
     editCollective(collective: { id: $id, image: $image }) {
       id
@@ -40,7 +40,7 @@ export const editCollectiveAvatarMutation = gql`
   }
 `;
 
-export const editCollectiveBackgroundMutation = gql`
+export const editCollectiveBackgroundMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveBackground($id: Int!, $settings: JSON, $backgroundImage: String) {
     editCollective(collective: { id: $id, settings: $settings, backgroundImage: $backgroundImage }) {
       id

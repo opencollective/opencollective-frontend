@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { compose } from '../lib/utils';
 
 import { addEditCollectiveMembersMutation } from './onboarding-modal/OnboardingModal';
@@ -145,7 +146,7 @@ class CreateOrganization extends React.Component {
   }
 }
 
-const createOrganizationMutation = gqlV2/* GraphQL */ `
+const createOrganizationMutation = gql`
   mutation CreateOrganization($organization: OrganizationCreateInput!) {
     createOrganization(organization: $organization) {
       id

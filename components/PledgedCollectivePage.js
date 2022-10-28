@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { ExternalLinkAlt } from '@styled-icons/fa-solid/ExternalLinkAlt';
 import { FormattedMessage } from 'react-intl';
+
+import { gqlV1 } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import Currency from './Currency';
@@ -20,7 +22,7 @@ import { withUser } from './UserProvider';
 
 const defaultPledgedLogo = '/static/images/default-pledged-logo.svg';
 
-export const pledgedCollectivePageQuery = gql`
+export const pledgedCollectivePageQuery = gqlV1/* GraphQL */ `
   query PledgedCollectivePage($id: Int!) {
     Collective(id: $id) {
       id

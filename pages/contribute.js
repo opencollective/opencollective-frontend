@@ -1,14 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { TierTypes } from '../lib/constants/tiers-types';
 import { sortEvents } from '../lib/events';
+import { gqlV1 } from '../lib/graphql/helpers';
 import { sortTiersForCollective } from '../lib/tier-utils';
+import { getCollectivePageRoute } from '../lib/url-helpers';
+import { getWebsiteUrl } from '../lib/utils';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -75,13 +78,16 @@ class TiersPage extends React.Component {
   });
 
   getPageMetadata(collective) {
+    const baseMetadata = getCollectivePageMetadata(collective);
     if (!collective) {
-      return { title: 'Contribute', description: 'All the ways to contribute' };
+      return { ...baseMetadata, title: 'Contribute', description: 'All the ways to contribute', noRobots: false };
     } else {
       return {
+        ...baseMetadata,
         title: `Contribute to ${collective.name}`,
         description: 'These are all the ways you can help make our community sustainable. ',
-        canonicalURL: `${process.env.WEBSITE_URL}/${collective.slug}/contribute`,
+        canonicalURL: `${getWebsiteUrl()}/${collective.slug}/contribute`,
+        noRobots: false,
       };
     }
   }
@@ -274,14 +280,14 @@ class TiersPage extends React.Component {
                       <H2 fontWeight="normal" mb={2}>
                         {title}
                       </H2>
-                      {LoggedInUser?.canEditCollective(collective) && verb === 'events' && (
+                      {LoggedInUser?.isAdminOfCollectiveOrHost(collective) && verb === 'events' && (
                         <Link href={`/${collective.slug}/events/new`}>
                           <StyledButton buttonStyle="primary">
                             <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
                           </StyledButton>
                         </Link>
                       )}
-                      {LoggedInUser?.canEditCollective(collective) && verb === 'projects' && (
+                      {LoggedInUser?.isAdminOfCollectiveOrHost(collective) && verb === 'projects' && (
                         <Link href={`/${collective.slug}/projects/new`}>
                           <StyledButton buttonStyle="primary">
                             <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
@@ -295,7 +301,7 @@ class TiersPage extends React.Component {
                       </P>
                     )}
                     {waysToContribute.length > 0 && (
-                      <Link href={`/${slug}`}>
+                      <Link href={getCollectivePageRoute(collective)}>
                         <StyledButton buttonSize="small" mt={3}>
                           ←&nbsp;
                           <FormattedMessage
@@ -339,9 +345,7 @@ class TiersPage extends React.Component {
   }
 }
 
-// We have to disable the linter because it's not able to detect that `nbContributorsPerContributeCard` is used in fragments
-/* eslint-disable graphql/template-strings */
-const contributePageQuery = gql`
+const contributePageQuery = gqlV1/* GraphQL */ `
   query ContributePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug) {
       id
@@ -353,11 +357,14 @@ const contributePageQuery = gql`
       settings
       isActive
       isHost
+      backgroundImageUrl
       imageUrl
       parentCollective {
         id
         name
         slug
+        backgroundImageUrl
+        imageUrl
       }
       features {
         id

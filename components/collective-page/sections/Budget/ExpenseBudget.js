@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { BarChart, FormatListBulleted, PieChart, Timeline } from '@styled-icons/material';
 import { capitalize, sumBy } from 'lodash';
 import dynamic from 'next/dynamic';
@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { alignSeries, extractSeriesFromTimeSeries } from '../../../../lib/charts';
 import { formatCurrency } from '../../../../lib/currency-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
 import { Box, Flex } from '../../../Grid';
@@ -31,14 +31,14 @@ import {
   TagMarker,
 } from './common';
 
-const budgetSectionExpenseQuery = gqlV2/* GraphQL */ `
+const budgetSectionExpenseQuery = gql`
   query BudgetSectionExpenseQuery($slug: String!, $from: DateTime, $to: DateTime) {
     account(slug: $slug) {
       id
       currency
       stats {
         id
-        expensesTags(dateFrom: $from, dateTo: $to, includeChildren: true) {
+        expensesTags(dateFrom: $from, dateTo: $to, includeChildren: false) {
           label
           count
           amount {
@@ -47,7 +47,7 @@ const budgetSectionExpenseQuery = gqlV2/* GraphQL */ `
             currency
           }
         }
-        expensesTagsTimeSeries(dateFrom: $from, dateTo: $to, includeChildren: true) {
+        expensesTagsTimeSeries(dateFrom: $from, dateTo: $to, includeChildren: false) {
           timeUnit
           nodes {
             date

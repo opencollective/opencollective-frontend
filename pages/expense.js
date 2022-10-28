@@ -1,6 +1,7 @@
 /* eslint-disable graphql/template-strings */
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import dayjs from 'dayjs';
 import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
@@ -8,12 +9,12 @@ import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { getCollectiveTypeForUrl, getSuggestedTags } from '../lib/collective.lib';
+import { getCollectivePageMetadata, getCollectiveTypeForUrl, getSuggestedTags } from '../lib/collective.lib';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -70,7 +71,7 @@ const messages = defineMessages({
   },
 });
 
-const expensePageQuery = gqlV2/* GraphQL */ `
+const expensePageQuery = gql`
   query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalPaidExpensesDateFrom: DateTime) {
     expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
       id
@@ -118,7 +119,7 @@ const expensePageQuery = gqlV2/* GraphQL */ `
   ${commentFieldsFragment}
 `;
 
-const editExpenseMutation = gqlV2/* GraphQL */ `
+const editExpenseMutation = gql`
   mutation EditExpense($expense: ExpenseUpdateInput!, $draftKey: String) {
     editExpense(expense: $expense, draftKey: $draftKey) {
       id
@@ -129,7 +130,7 @@ const editExpenseMutation = gqlV2/* GraphQL */ `
   ${expensePageExpenseFieldsFragment}
 `;
 
-const verifyExpenseMutation = gqlV2/* GraphQL */ `
+const verifyExpenseMutation = gql`
   mutation VerifyExpense($expense: ExpenseReferenceInput!, $draftKey: String) {
     verifyExpense(expense: $expense, draftKey: $draftKey) {
       id
@@ -381,8 +382,14 @@ class ExpensePage extends React.Component {
 
   getPageMetaData(expense) {
     const { intl, legacyExpenseId } = this.props;
+    const baseMetadata = getCollectivePageMetadata(expense?.account);
     if (expense?.description) {
-      return { title: intl.formatMessage(messages.title, { id: legacyExpenseId, title: expense.description }) };
+      return {
+        ...baseMetadata,
+        title: intl.formatMessage(messages.title, { id: legacyExpenseId, title: expense.description }),
+      };
+    } else {
+      return baseMetadata;
     }
   }
 

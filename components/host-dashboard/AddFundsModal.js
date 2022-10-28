@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
 import { get } from 'lodash';
@@ -9,7 +9,7 @@ import styled, { css } from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -71,13 +71,14 @@ AmountDetailsLine.propTypes = {
   isLargeAmount: PropTypes.bool,
 };
 
-const addFundsMutation = gqlV2/* GraphQL */ `
+const addFundsMutation = gql`
   mutation AddFunds(
     $fromAccount: AccountReferenceInput!
     $account: AccountReferenceInput!
     $tier: TierReferenceInput
     $amount: AmountInput!
     $description: String!
+    $memo: String
     $hostFeePercent: Float!
     $invoiceTemplate: String
   ) {
@@ -86,12 +87,14 @@ const addFundsMutation = gqlV2/* GraphQL */ `
       fromAccount: $fromAccount
       amount: $amount
       description: $description
+      memo: $memo
       hostFeePercent: $hostFeePercent
       tier: $tier
       invoiceTemplate: $invoiceTemplate
     ) {
       id
       description
+      memo
       transactions {
         id
         type
@@ -122,7 +125,7 @@ const addFundsMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const addFundsTierFieldsFragment = gqlV2/* GraphQL */ `
+const addFundsTierFieldsFragment = gql`
   fragment AddFundsTierFields on Tier {
     id
     slug
@@ -131,11 +134,15 @@ const addFundsTierFieldsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-const addFundsAccountQuery = gqlV2/* GraphQL */ `
+const addFundsAccountQuery = gql`
   query AddFundsAccount($slug: String!) {
     account(slug: $slug) {
       id
       type
+      isHost
+      name
+      slug
+      currency
       settings
       ... on Organization {
         tiers {
@@ -145,10 +152,28 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
           }
         }
       }
+      ... on Host {
+        id
+        slug
+        name
+        settings
+        plan {
+          id
+          hostFees
+        }
+        isTrustedHost
+      }
       ... on AccountWithHost {
         addedFundsHostFeePercent: hostFeePercent(paymentMethodType: HOST)
         host {
           id
+          slug
+          name
+          settings
+          plan {
+            id
+            hostFees
+          }
           isTrustedHost
         }
       }
@@ -165,7 +190,7 @@ const addFundsAccountQuery = gqlV2/* GraphQL */ `
   ${addFundsTierFieldsFragment}
 `;
 
-const addPlatformTipMutation = gqlV2/* GraphQL */ `
+const addPlatformTipMutation = gql`
   mutation AddPlatformTip($amount: AmountInput!, $transaction: TransactionReferenceInput!) {
     addPlatformTipToTransaction(amount: $amount, transaction: $transaction) {
       id
@@ -177,6 +202,7 @@ const getInitialValues = values => ({
   amount: null,
   hostFeePercent: null,
   description: '',
+  memo: null,
   fromAccount: null,
   tier: null,
   ...values,
@@ -249,15 +275,11 @@ const getTiersOptions = (intl, tiers) => {
   ];
 };
 
-const AddFundsModal = ({ host, collective, ...props }) => {
+const AddFundsModal = ({ collective, ...props }) => {
   const { LoggedInUser } = useLoggedInUser();
   const [fundDetails, setFundDetails] = useState({});
   const { addToast } = useToasts();
   const intl = useIntl();
-  const options = React.useMemo(
-    () => getOptions(fundDetails.fundAmount, collective.currency, intl),
-    [fundDetails.fundAmount, collective.currency],
-  );
   const formatOptionLabel = option => {
     if (option.currency) {
       return (
@@ -270,19 +292,27 @@ const AddFundsModal = ({ host, collective, ...props }) => {
       return option.label;
     }
   };
-  const [selectedOption, setSelectedOption] = useState(options[3]);
   const [customAmount, setCustomAmount] = useState(0);
   const { data, loading } = useQuery(addFundsAccountQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: collective.slug },
   });
+  const account = data?.account;
+  const currency = account?.currency;
+  const host = account?.isHost ? account : account?.host;
+
+  const options = React.useMemo(
+    () => getOptions(fundDetails.fundAmount, currency, intl),
+    [fundDetails.fundAmount, currency],
+  );
+  const [selectedOption, setSelectedOption] = useState(options[3]);
   const [submitAddFunds, { data: addFundsResponse, error: fundError }] = useMutation(addFundsMutation, {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
         context: API_V2_CONTEXT,
         query: getBudgetSectionQuery(true),
-        variables: getBudgetSectionQueryVariables(collective.slug, host.slug),
+        variables: getBudgetSectionQueryVariables(collective.slug, host?.slug),
       },
       { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
     ],
@@ -307,11 +337,11 @@ const AddFundsModal = ({ host, collective, ...props }) => {
 
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
-  const canAddHostFee = host.plan?.hostFees && collective.id !== host.id;
-  const hostFeePercent = data?.account.addedFundsHostFeePercent || collective.hostFeePercent;
+  const canAddHostFee = host?.plan?.hostFees && collective.id !== host?.id;
+  const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
-  const canAddPlatformTip = data?.account?.host?.isTrustedHost;
-  const receiptTemplates = collective.host?.settings?.invoice?.templates;
+  const canAddPlatformTip = host?.isTrustedHost;
+  const receiptTemplates = host?.settings?.invoice?.templates;
 
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
@@ -330,6 +360,10 @@ const AddFundsModal = ({ host, collective, ...props }) => {
     setCustomAmount(0);
     props.onClose();
   };
+
+  if (!currency) {
+    return null;
+  }
 
   return (
     <PlatformTipContainer
@@ -365,6 +399,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
               showPlatformTipModal: true,
               fundAmount: values.amount,
               description: resultOrder.description,
+              memo: resultOrder.memo,
               source: resultOrder.fromAccount,
               tier: resultOrder.tier,
             });
@@ -405,9 +440,12 @@ const AddFundsModal = ({ host, collective, ...props }) => {
           const hostFee = Math.round(values.amount * (hostFeePercent / 100));
 
           const defaultSources = [];
-          defaultSources.push({ value: host, label: <DefaultCollectiveLabel value={host} /> });
-          if (host.id !== collective.id) {
-            defaultSources.push({ value: collective, label: <DefaultCollectiveLabel value={collective} /> });
+          defaultSources.push({
+            value: host,
+            label: <DefaultCollectiveLabel value={host} />,
+          });
+          if (host?.id !== account.id) {
+            defaultSources.push({ value: account, label: <DefaultCollectiveLabel value={account} /> });
           }
 
           if (!fundDetails.showPlatformTipModal) {
@@ -467,6 +505,27 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                   >
                     {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
                   </StyledInputFormikField>
+                  <StyledInputFormikField
+                    name="memo"
+                    htmlFor="addFunds-memo"
+                    label={
+                      <span>
+                        <FormattedMessage defaultMessage="Memo" />
+                        {` `}
+                        <StyledTooltip
+                          content={() => (
+                            <FormattedMessage defaultMessage="This is a private note that will only be visible to the host." />
+                          )}
+                        >
+                          <InfoCircle size={16} />
+                        </StyledTooltip>
+                      </span>
+                    }
+                    required={false}
+                    mt={3}
+                  >
+                    {({ field }) => <StyledInput data-cy="add-funds-memo" {...field} />}
+                  </StyledInputFormikField>
                   <Flex mt={3} flexWrap="wrap">
                     <StyledInputFormikField
                       name="amount"
@@ -479,7 +538,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                         <StyledInputAmount
                           id={field.id}
                           data-cy="add-funds-amount"
-                          currency={collective.currency}
+                          currency={currency}
                           placeholder="0.00"
                           error={field.error}
                           value={field.value}
@@ -549,13 +608,13 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                   <StyledHr my={2} borderColor="black.300" />
                   <AmountDetailsLine
                     value={values.amount || 0}
-                    currency={collective.currency}
+                    currency={currency}
                     label={<FormattedMessage id="AddFundsModal.fundingAmount" defaultMessage="Funding amount" />}
                   />
                   {canAddHostFee && (
                     <AmountDetailsLine
                       value={hostFee}
-                      currency={collective.currency}
+                      currency={currency}
                       label={
                         <FormattedMessage
                           id="AddFundsModal.hostFees"
@@ -568,7 +627,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                   <StyledHr my={2} borderColor="black.300" />
                   <AmountDetailsLine
                     value={values.amount - hostFee}
-                    currency={collective.currency}
+                    currency={currency}
                     label={
                       <FormattedMessage
                         id="AddFundsModal.netAmount"
@@ -581,7 +640,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                     <FormattedMessage
                       id="AddFundsModal.disclaimer"
                       defaultMessage="By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective."
-                      values={{ amount: formatCurrency(values.amount, collective.currency, { locale: intl.locale }) }}
+                      values={{ amount: formatCurrency(values.amount, currency, { locale: intl.locale }) }}
                     />
                   </P>
                   {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
@@ -618,7 +677,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                       <FormattedMessage id="AddFundsModal.YouAdded" defaultMessage="You added:" />
                       <ul>
                         <li>
-                          <strong>{`${fundDetails.fundAmount / 100} ${collective.currency}`}</strong>
+                          <strong>{`${fundDetails.fundAmount / 100} ${currency}`}</strong>
                         </li>
                         <li>
                           <FormattedMessage id="AddFundsModal.FromTheSource" defaultMessage="From the source" />{' '}
@@ -629,6 +688,11 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                         <li>
                           <FormattedMessage id="AddFundsModal.ForThePurpose" defaultMessage="For the purpose of" />{' '}
                           <strong>{fundDetails.description}</strong>
+                        </li>
+                        <li>
+                          <FormattedMessage defaultMessage="Memo" />
+                          {': '}
+                          <strong>{fundDetails.memo}</strong>
                         </li>
                         {fundDetails.tier && (
                           <li>
@@ -691,7 +755,7 @@ const AddFundsModal = ({ host, collective, ...props }) => {
                           <Flex justifyContent="flex-end" mt={2}>
                             <StyledInputAmount
                               id="platformTip"
-                              currency={collective.currency}
+                              currency={currency}
                               onChange={amount => setCustomAmount(amount)}
                               defaultValue={options[1].value}
                             />
@@ -736,27 +800,10 @@ const AddFundsModal = ({ host, collective, ...props }) => {
 };
 
 AddFundsModal.propTypes = {
-  host: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    slug: PropTypes.string.isRequired,
-    name: PropTypes.string,
-    plan: PropTypes.shape({
-      hostFees: PropTypes.bool,
-      hostFeeSharePercent: PropTypes.number,
-    }),
-  }).isRequired,
   collective: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    currency: PropTypes.string,
     hostFeePercent: PropTypes.number,
     slug: PropTypes.string,
-    host: PropTypes.shape({
-      settings: PropTypes.shape({
-        invoice: PropTypes.shape({
-          templates: PropTypes.object,
-        }),
-      }),
-    }),
   }).isRequired,
   onClose: PropTypes.func,
 };

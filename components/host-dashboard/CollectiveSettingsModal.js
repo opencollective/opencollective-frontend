@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { clamp, isBoolean, isNil, round } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import { HOST_FEE_STRUCTURE } from '../../lib/constants/host-fee-structure';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { i18nExpenseType } from '../../lib/i18n/expense';
 
 import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
@@ -42,7 +42,7 @@ const getDefaultFee = (collective, host) => {
   }
 };
 
-const editAccountSettingsMutation = gqlV2/* GraphQL */ `
+const editAccountSettingsMutation = gql`
   mutation EditAccountSettings(
     $account: AccountReferenceInput!
     $hostFeePercent: Float!

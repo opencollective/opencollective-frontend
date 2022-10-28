@@ -44,6 +44,11 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
       {!isAccountantOnly && (
         <React.Fragment>
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} />
+          <MenuLink
+            collective={collective}
+            section={COLLECTIVE_SECTIONS.TIERS_REVAMP}
+            if={['development', 'staging'].includes(process.env.OC_ENV)}
+          />
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
           <MenuLink collective={collective} section={ALL_SECTIONS.WEBHOOKS} />
           <MenuLink
@@ -140,7 +145,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.COLLECTIVE_GOALS}
-            if={isType(collective, COLLECTIVE)}
+            if={isOneOfTypes(collective, [COLLECTIVE, PROJECT])}
           />
           <MenuLink
             collective={collective}
@@ -202,6 +207,14 @@ const Menu = ({ collective, isAccountantOnly }) => {
             collective={collective}
             section={COLLECTIVE_SECTIONS.TIERS}
             if={isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT])}
+          />
+          <MenuLink
+            collective={collective}
+            section={COLLECTIVE_SECTIONS.TIERS_REVAMP}
+            if={
+              ['development', 'staging'].includes(process.env.OC_ENV) &&
+              isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT])
+            }
           />
           <MenuLink
             collective={collective}

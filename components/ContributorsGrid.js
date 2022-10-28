@@ -101,6 +101,29 @@ const getItemsRepartition = (nbItems, width, maxNbRows) => {
 };
 
 /**
+ * Compute the proper padding left to center the content according to max width
+ */
+const computePaddingLeft = (width, rowWidth, nbRows, maxWidthWhenNotFull) => {
+  if (width < maxWidthWhenNotFull) {
+    // No need for padding on screens small enough so they don't have padding
+    return 0;
+  } else if (nbRows > 1) {
+    if (rowWidth <= width) {
+      // If multiline and possible center contributors cards
+      const cardsLeftOffset = COLLECTIVE_CARD_MARGIN_X / 2;
+      return (width - rowWidth) / 2 - cardsLeftOffset;
+    } else {
+      // Otherwise if multiline and the grid is full, just use the full screen
+      return 0;
+    }
+  } else {
+    // Otherwise add a normal section padding on the left
+    const cardsLeftOffset = COLLECTIVE_CARD_MARGIN_X / 2;
+    return (width - Math.max(maxWidthWhenNotFull, rowWidth)) / 2 - cardsLeftOffset;
+  }
+};
+
+/**
  * A grid to show contributors, with horizontal scroll to search them.
  */
 const ContributorsGrid = ({
@@ -108,7 +131,7 @@ const ContributorsGrid = ({
   width,
   maxNbRowsForViewports,
   viewport,
-  getPaddingLeft,
+  maxWidthWhenNotFull,
   currency,
   LoggedInUser,
   collectiveId,
@@ -119,7 +142,7 @@ const ContributorsGrid = ({
   // Preload more items when viewport width is unknown to avoid displaying blank spaces on SSR
   const viewWidth = viewport === VIEWPORTS.UNKNOWN ? width * 3 : width;
   const rowWidth = nbCols * COLLECTIVE_CARD_FULL_WIDTH + COLLECTIVE_CARD_MARGIN_X;
-  const paddingLeft = getPaddingLeft ? getPaddingLeft({ width, rowWidth, nbRows }) : 0;
+  const paddingLeft = computePaddingLeft(width, rowWidth, nbRows, maxWidthWhenNotFull);
   const hasScroll = rowWidth + paddingLeft > width;
   const loggedUserCollectiveId = get(LoggedInUser, 'CollectiveId');
   return (
@@ -179,9 +202,6 @@ ContributorsGrid.propTypes = {
     [VIEWPORTS.LARGE]: PropTypes.number,
   }).isRequired,
 
-  /** A callback to calculate left padding */
-  getPaddingLeft: PropTypes.func,
-
   /** Currency used for contributions */
   currency: PropTypes.string,
 
@@ -190,6 +210,9 @@ ContributorsGrid.propTypes = {
 
   /** @ignore from withViewport */
   width: PropTypes.number.isRequired,
+
+  /** To center the content when the grid is not full */
+  maxWidthWhenNotFull: PropTypes.number,
 
   /** @ignore from withUser */
   LoggedInUser: PropTypes.shape({
