@@ -9,7 +9,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import { simpleDateToISOString } from '../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
-import PeriodFilter from '../budget/filters/PeriodFilter';
+import PeriodFilter from '../filters/PeriodFilter';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';

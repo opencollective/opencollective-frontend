@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { encodeDateInterval } from '../../lib/date-utils';
 
 import AmountFilter from '../budget/filters/AmountFilter';
-import PeriodFilter from '../budget/filters/PeriodFilter';
+import PeriodFilter from '../filters/PeriodFilter';
 import { Flex } from '../Grid';
 
 import OrderStatusFilter from './OrderStatusFilter';

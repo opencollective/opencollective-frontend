@@ -15,6 +15,8 @@ export default {
     'components/Container',
     // Misc helpers
     'components/Currency.*',
+    // Filters
+    'components/filters/*',
     // Loading
     'components/Loading*',
     // Styled components

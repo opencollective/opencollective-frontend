@@ -30,7 +30,7 @@ const QuestionMarkIconWithSpace = ({ helpText, labelFontSize, labelColor }) => (
 const StyledInputField = ({
   children,
   label = undefined,
-  htmlFor,
+  htmlFor = undefined,
   name = undefined,
   error = undefined,
   hint = undefined,

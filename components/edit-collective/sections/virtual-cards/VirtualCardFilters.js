@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import { encodeDateInterval } from '../../../../lib/date-utils';
 
-import PeriodFilter from '../../../budget/filters/PeriodFilter';
+import PeriodFilter from '../../../filters/PeriodFilter';
 import Container from '../../../Container';
 import { Box, Flex } from '../../../Grid';
 import RequestVirtualCardBtn from '../../../RequestVirtualCardBtn';
