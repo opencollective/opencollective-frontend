@@ -7,6 +7,7 @@ import { debounce } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../../lib/constants/roles';
+import { graphqlAmountValueInCents } from '../../lib/currency-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { Account, VirtualCard, VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 
@@ -105,12 +106,24 @@ const VirtualCardPoliciesQuery = gql`
       id
       policies {
         MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
-          ALL_TIME
-          DAILY
-          MONTHLY
-          PER_AUTHORIZATION
-          WEEKLY
-          YEARLY
+          ALL_TIME {
+            valueInCents
+          }
+          DAILY {
+            valueInCents
+          }
+          MONTHLY {
+            valueInCents
+          }
+          PER_AUTHORIZATION {
+            valueInCents
+          }
+          WEEKLY {
+            valueInCents
+          }
+          YEARLY {
+            valueInCents
+          }
         }
       }
     }
@@ -236,7 +249,9 @@ export default function EditVirtualCardModal({
         errors.limitAmount = 'Required';
       }
       if (values.limitInterval) {
-        const maximumLimitForInterval = MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL[values.limitInterval];
+        const maximumLimitForInterval = graphqlAmountValueInCents(
+          MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL[values.limitInterval],
+        );
         if (values.limitAmount > maximumLimitForInterval * 100) {
           errors.limitAmount = `Limit for this interval should not exceed ${maximumLimitForInterval} ${currency}`;
         }

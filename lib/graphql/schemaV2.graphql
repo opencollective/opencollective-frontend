@@ -4131,12 +4131,12 @@ enum PolicyApplication {
 }
 
 type MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
-  ALL_TIME: Int
-  DAILY: Int
-  MONTHLY: Int
-  PER_AUTHORIZATION: Int
-  WEEKLY: Int
-  YEARLY: Int
+  ALL_TIME: Amount
+  DAILY: Amount
+  MONTHLY: Amount
+  PER_AUTHORIZATION: Amount
+  WEEKLY: Amount
+  YEARLY: Amount
 }
 
 type ActivitySubscription {
