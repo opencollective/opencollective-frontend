@@ -158,6 +158,9 @@ const BankTransfer = props => {
           </Box>
           {existingManualPaymentMethod && (
             <Box pt={2}>
+              <Container fontSize="12px" mt={2} mb={2} color="black.600" textAlign="left">
+                <FormattedMessage defaultMessage="Preview of bank transfer instructions" />
+              </Container>
               <pre style={{ whiteSpace: 'pre-wrap' }}>
                 {renderBankInstructions(instructions, latestBankAccount?.data)}
               </pre>
