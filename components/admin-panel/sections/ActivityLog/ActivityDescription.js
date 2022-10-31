@@ -47,7 +47,15 @@ const ActivityDescription = ({ activity }) => {
         </Link>
       ),
     Host: () => <LinkCollective collective={activity.host} openInNewTab />,
-    MemberRole: () => (activity.data?.member?.role ? formatMemberRole(intl, activity.data.member.role) : 'member'),
+    MemberRole: () => {
+      if (activity.data?.member?.role) {
+        return formatMemberRole(intl, activity.data.member.role);
+      } else if (activity.data?.invitation?.role) {
+        return formatMemberRole(intl, activity.data.invitation.role);
+      } else {
+        return 'member';
+      }
+    },
   });
 };
 
