@@ -147,7 +147,7 @@ const ACTIVITY_LIMIT = 10;
 const getQueryVariables = (accountSlug, router) => {
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
-  const { period, type, account } = routerQuery;
+  const { period, type, account, limit } = routerQuery;
   const { from: dateFrom, to: dateTo } = parseDateInterval(period);
 
   // Account filters
@@ -167,7 +167,7 @@ const getQueryVariables = (accountSlug, router) => {
     accountSlug,
     dateFrom,
     dateTo,
-    limit: ACTIVITY_LIMIT,
+    limit: limit ? parseInt(limit) : ACTIVITY_LIMIT,
     offset,
     type: getActivityTypeFilterValuesFromKey(type),
     account: filteredAccounts,
