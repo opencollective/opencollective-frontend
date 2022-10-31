@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { capitalize } from 'lodash';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ActivityDescriptionI18n } from '../../../../lib/i18n/activities';
 import formatMemberRole from '../../../../lib/i18n/member-role';
@@ -47,6 +47,23 @@ const ActivityDescription = ({ activity }) => {
         </Link>
       ),
     Host: () => <LinkCollective collective={activity.host} openInNewTab />,
+    CommentEntity: () => {
+      if (activity.expense) {
+        return (
+          <LinkExpense
+            collective={activity.expense.account}
+            expense={activity.expense}
+            title={activity.expense.description}
+            openInNewTab
+          >
+            <FormattedMessage id="Transaction.kind.EXPENSE" defaultMessage="Expense" /> #{activity.expense.legacyId}
+          </LinkExpense>
+        );
+      } else {
+        // We're not yet linking conversations & updates to comments in the activity table
+        return <LinkCollective collective={activity.account} openInNewTab />;
+      }
+    },
     MemberRole: () => {
       if (activity.data?.member?.role) {
         return formatMemberRole(intl, activity.data.member.role);
