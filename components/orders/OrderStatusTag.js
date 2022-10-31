@@ -8,7 +8,16 @@ import i18nOrderStatus from '../../lib/i18n/order-status';
 import StyledTag from '../StyledTag';
 
 const getTagType = status => {
-  if ([ORDER_STATUS.ERROR, ORDER_STATUS.EXPIRED, ORDER_STATUS.CANCELLED, ORDER_STATUS.REJECTED].includes(status)) {
+  if (
+    [
+      ORDER_STATUS.ERROR,
+      ORDER_STATUS.EXPIRED,
+      ORDER_STATUS.CANCELLED,
+      ORDER_STATUS.REJECTED,
+      ORDER_STATUS.DISPUTED,
+      ORDER_STATUS.IN_REVIEW,
+    ].includes(status)
+  ) {
     return 'error';
   } else if ([ORDER_STATUS.ACTIVE, ORDER_STATUS.PAID].includes(status)) {
     return 'success';

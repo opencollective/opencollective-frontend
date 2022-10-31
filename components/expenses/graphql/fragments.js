@@ -124,6 +124,7 @@ export const expenseHostFields = gql`
     supportedPayoutMethods
     isTrustedHost
     hasDisputedOrders
+    hasInReviewOrders
     plan {
       id
     }
