@@ -27,14 +27,8 @@ export const getActionsComponent = actions => {
         type: 'text',
       },
     },
-    dismissible: {
-      defaultValue: true,
-      control: {
-        type: 'boolean',
-      },
-    },
-    type: { options: ['info', 'success', 'alert', 'error'], control: { type: 'radio' }, defaultValue: 'info' },
-    inline: { control: { type: 'boolean' }, defaultValue: true },
+    type: { options: ['info', 'success', 'warning', 'error'], control: { type: 'radio' }, defaultValue: 'info' },
+    inline: { control: { type: 'boolean' }, defaultValue: false },
     actions: {
       options: ['Nothing', 'Example link', 'Example button'],
       defaultValue: 'Nothing',
@@ -143,147 +137,24 @@ export const DefaultStory = ({ actions, dismissable, ...rest }) => (
       />
       <NotificationBar
         inline
-        type="alert"
+        type="warning"
         title="Hello kind stranger, thank you for joining!"
         description="Lets get back to where you left off."
       />
       <NotificationBar
         inline
-        type="alert"
-        title="Hello kind stranger, thank you for joining!"
-        description="Lets get back to where you left off."
-        actions={<NotificationBarLink href="#">Go back</NotificationBarLink>}
-      />
-      <NotificationBar
-        type="alert"
-        title="Your Collective has been created with success!"
-        description="While you can start accepting financial contributions, you can customize your Collective and set some other things. Welcome!"
-      />
-      <NotificationBar
-        type="alert"
-        title="This event has a positive balance."
-        description="Spending by submitting expenses, or transfer the remaining balance to the main collective budget."
-        actions={<NotificationBarButton>Send $18.33 to Agora collective</NotificationBarButton>}
-      />
-    </Flex>
-  </Story>
-</Canvas>
-
-## Dismissible
-
-<Canvas>
-  <Story name="Dismissble" parameters={{ controls: { hideNoControlsWarning: true } }}>
-    <Flex flexDirection="column" gridGap="20px">
-      <NotificationBar
-        inline
-        dismissible
-        title="Hello kind stranger, thank you for joining!"
-        description="Lets get back to where you left off."
-      />
-      <NotificationBar
-        inline
-        dismissible
+        type="warning"
         title="Hello kind stranger, thank you for joining!"
         description="Lets get back to where you left off."
         actions={<NotificationBarLink href="#">Go back</NotificationBarLink>}
       />
       <NotificationBar
-        dismissible
+        type="warning"
         title="Your Collective has been created with success!"
         description="While you can start accepting financial contributions, you can customize your Collective and set some other things. Welcome!"
       />
       <NotificationBar
-        inline
-        dismissible
-        title="Your Collective has been created with success!"
-        description="While you can start accepting financial contributions, you can customize your Collective and set some other things. Welcome!"
-      />
-      <NotificationBar
-        dismissible
-        title="This event has a positive balance."
-        description="Spending by submitting expenses, or transfer the remaining balance to the main collective budget."
-        actions={<NotificationBarButton>Send $18.33 to Agora collective</NotificationBarButton>}
-      />
-      <NotificationBar
-        inline
-        dismissible
-        type="success"
-        title="Hello kind stranger, thank you for joining!"
-        description="Lets get back to where you left off."
-      />
-      <NotificationBar
-        inline
-        dismissible
-        type="success"
-        title="Hello kind stranger, thank you for joining!"
-        description="Lets get back to where you left off."
-        actions={<NotificationBarLink href="#">Go back</NotificationBarLink>}
-      />
-      <NotificationBar
-        dismissible
-        type="success"
-        title="Your Collective has been created with success!"
-        description="While you can start accepting financial contributions, you can customize your Collective and set some other things. Welcome!"
-      />
-      <NotificationBar
-        dismissible
-        type="success"
-        title="This event has a positive balance."
-        description="Spending by submitting expenses, or transfer the remaining balance to the main collective budget."
-        actions={<NotificationBarButton>Send $18.33 to Agora collective</NotificationBarButton>}
-      />
-      <NotificationBar
-        inline
-        dismissible
-        type="error"
-        title="Hello kind stranger, thank you for joining!"
-        description="Lets get back to where you left off."
-      />
-      <NotificationBar
-        inline
-        dismissible
-        type="error"
-        title="Hello kind stranger, thank you for joining!"
-        description="Lets get back to where you left off."
-        actions={<NotificationBarLink href="#">Go back</NotificationBarLink>}
-      />
-      <NotificationBar
-        type="error"
-        dismissible
-        title="Your Collective has been created with success!"
-        description="While you can start accepting financial contributions, you can customize your Collective and set some other things. Welcome!"
-      />
-      <NotificationBar
-        type="error"
-        dismissible
-        title="This event has a positive balance."
-        description="Spending by submitting expenses, or transfer the remaining balance to the main collective budget."
-        actions={<NotificationBarButton>Send $18.33 to Agora collective</NotificationBarButton>}
-      />
-      <NotificationBar
-        inline
-        dismissible
-        type="alert"
-        title="Hello kind stranger, thank you for joining!"
-        description="Lets get back to where you left off."
-      />
-      <NotificationBar
-        inline
-        dismissible
-        type="alert"
-        title="Hello kind stranger, thank you for joining!"
-        description="Lets get back to where you left off."
-        actions={<NotificationBarLink href="#">Go back</NotificationBarLink>}
-      />
-      <NotificationBar
-        dismissible
-        type="alert"
-        title="Your Collective has been created with success!"
-        description="While you can start accepting financial contributions, you can customize your Collective and set some other things. Welcome!"
-      />
-      <NotificationBar
-        dismissible
-        type="alert"
+        type="warning"
         title="This event has a positive balance."
         description="Spending by submitting expenses, or transfer the remaining balance to the main collective budget."
         actions={<NotificationBarButton>Send $18.33 to Agora collective</NotificationBarButton>}
