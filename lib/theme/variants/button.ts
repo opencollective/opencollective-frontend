@@ -4,7 +4,7 @@ import { variant } from 'styled-system';
 import { getTopToBottomGradient } from '../helpers';
 
 // Types
-export type ButtonSize = 'tiny' | 'small' | 'medium' | 'large' | 'xLarge' | 'round';
+export type ButtonSize = 'tiny' | 'small' | 'medium' | 'large' | 'xLarge';
 export type ButtonStyle =
   | 'standard'
   | 'primary'
@@ -74,15 +74,6 @@ export const getButtonSizes = (): Record<ButtonSize, Record<string, any>> => {
       paddingLeft: 14,
       paddingRight: 14,
       paddingTop: 5,
-    },
-
-    round: {
-      fontSize: '14px',
-      lineHeight: '17px',
-      paddingBottom: 10,
-      paddingLeft: 14,
-      paddingRight: 14,
-      paddingTop: 10,
     },
   };
 };

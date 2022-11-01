@@ -16,12 +16,12 @@ import {
   SpaceProps,
 } from 'styled-system';
 
-type StyledSelectProps = SpaceProps & FlexProps & LayoutProps & ShadowProps & BorderProps & DisplayProps;
+type StyledHrProps = SpaceProps & FlexProps & LayoutProps & ShadowProps & BorderProps & DisplayProps;
 
 /**
  * An horizontal line. Control the color and size using border properties.
  */
-const StyledHr = styled.hr<StyledSelectProps>`
+const StyledHr = styled.hr<StyledHrProps>`
   border: 0;
   border-top: 1px solid ${themeGet('colors.black.400')};
   margin: 0;
