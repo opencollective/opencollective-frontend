@@ -21,7 +21,7 @@ import {
 
 import { textTransform, TextTransformProps, whiteSpace } from '../lib/styled-system-custom-properties';
 import theme from '../lib/theme';
-import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
+import { ButtonSize, buttonSize, ButtonStyle, buttonStyle } from '../lib/theme/variants/button';
 
 import StyledSpinner from './StyledSpinner';
 
@@ -34,8 +34,8 @@ type StyledButtonProps = BackgroundProps &
   ColorProps &
   TextTransformProps &
   React.HTMLProps<HTMLButtonElement> & {
-    buttonStyle?: string;
-    buttonSize?: string;
+    buttonStyle?: ButtonStyle;
+    buttonSize?: ButtonSize;
     loading?: boolean;
     asLink?: boolean;
     isBorderless?: boolean;

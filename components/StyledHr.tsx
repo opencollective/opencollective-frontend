@@ -7,7 +7,7 @@ import {
   display,
   DisplayProps,
   flex,
-  FlexboxProps,
+  FlexProps,
   layout,
   LayoutProps,
   shadow,
@@ -16,7 +16,7 @@ import {
   SpaceProps,
 } from 'styled-system';
 
-type StyledHrProps = SpaceProps & FlexboxProps & LayoutProps & ShadowProps & BorderProps & DisplayProps;
+type StyledHrProps = SpaceProps & FlexProps & LayoutProps & ShadowProps & BorderProps & DisplayProps;
 
 /**
  * An horizontal line. Control the color and size using border properties.
@@ -36,10 +36,12 @@ const StyledHr = styled.hr<StyledHrProps>`
 `;
 
 StyledHr.propTypes = {
-  ...propTypes.border,
+  ...propTypes.space,
+  ...propTypes.flex,
   ...propTypes.layout,
   ...propTypes.shadow,
-  ...propTypes.space,
+  ...propTypes.border,
+  ...propTypes.display,
 };
 
 /** @component */

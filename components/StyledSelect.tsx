@@ -2,10 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import propTypes from '@styled-system/prop-types';
 import { isNil, omitBy, truncate } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import Select, { components as ReactSelectComponents } from 'react-select';
+import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-intl';
+import Select, {
+  components as ReactSelectComponents,
+  ContainerProps,
+  GroupHeadingProps,
+  OptionProps,
+  ValueContainerProps,
+} from 'react-select';
 import styled from 'styled-components';
-import { layout, space, typography } from 'styled-system';
+import { layout, LayoutProps, space, SpaceProps, typography, TypographyProps } from 'styled-system';
 
 import Container from './Container';
 import { Flex } from './Grid';
@@ -29,29 +35,30 @@ const Messages = defineMessages({
   },
 });
 
-// eslint-disable-next-line react/prop-types
-const Option = ({ innerProps, ...props }) => (
+/* eslint-disable react/prop-types */
+const Option = ({ innerProps, ...props }: OptionProps & { 'data-cy': string }) => (
   <ReactSelectComponents.Option
     {...props}
-    // eslint-disable-next-line react/prop-types
-    innerProps={{ ...innerProps, 'data-cy': 'select-option', title: props.data.title }}
+    innerProps={
+      { ...innerProps, 'data-cy': 'select-option', title: props.data['title'] } as React.HTMLProps<HTMLDivElement>
+    }
   />
 );
 
-// eslint-disable-next-line react/prop-types
-const SelectContainer = ({ innerProps, ...props }) => (
+const SelectContainer = ({ innerProps, ...props }: ContainerProps) => (
   <ReactSelectComponents.SelectContainer
     {...props}
-    innerProps={{ ...innerProps, 'data-cy': props.selectProps['data-cy'] || 'select' }} // eslint-disable-line react/prop-types
+    innerProps={
+      { ...innerProps, 'data-cy': props.selectProps['data-cy'] || 'select' } as React.HTMLProps<HTMLDivElement>
+    }
   />
 );
 
-/* eslint-disable react/prop-types */
 const MultiValue = ({ children, removeProps, ...props }) => {
   let title;
   if (typeof children === 'string') {
     title = children;
-    children = truncate(children, { maxLength: 32 });
+    children = truncate(children, { length: 32 });
   }
 
   if (props.selectProps.useCompactMode) {
@@ -70,12 +77,10 @@ const MultiValue = ({ children, removeProps, ...props }) => {
     );
   }
 };
-/* eslint-enable react/prop-types */
 
-/* eslint-disable react/prop-types */
-const ValueContainer = ({ children, ...rest }) => {
+const ValueContainer = ({ children, ...rest }: ValueContainerProps) => {
   const selectedCount = rest.getValue().length;
-  const truncationThreshold = rest.selectProps.truncationThreshold || 3;
+  const truncationThreshold = rest.selectProps['truncationThreshold'] || 3;
   const isTruncate = selectedCount > truncationThreshold;
 
   let firstChild = [];
@@ -124,8 +129,7 @@ DropdownSearchIndicator.propTypes = {
   isDisabled: PropTypes.bool,
 };
 
-// eslint-disable-next-line react/prop-types
-const GroupHeading = ({ children, ...props }) => (
+const GroupHeading = ({ children, ...props }: GroupHeadingProps) => (
   <ReactSelectComponents.GroupHeading {...props}>
     <Flex justifyContent="space-between" alignItems="center" mr={2}>
       <P
@@ -197,7 +201,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
       theme: selectTheme,
       styles: {
         control: (baseStyles, state) => {
-          const customStyles = { borderColor: theme.colors.black[300] };
+          const customStyles: Record<string, unknown> = { borderColor: theme.colors.black[300] };
 
           if (error) {
             customStyles.borderColor = theme.colors.red[500];
@@ -224,7 +228,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
           }
         },
         option: (baseStyles, state) => {
-          const customStyles = { cursor: 'pointer' };
+          const customStyles: Record<string, unknown> = { cursor: 'pointer' };
 
           if (state.data.__background__) {
             // Ability to force background by setting a special option prop
@@ -289,9 +293,25 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
   ${space}
 `;
 
-const StyledSelect = makeStyledSelect(Select);
+type StyledSelectCustomComponent = Select &
+  React.ExoticComponent<
+    LayoutProps &
+      TypographyProps &
+      SpaceProps & {
+        intl: IntlShape;
+        /** Alias for isDisabled */
+        disabled?: boolean;
+        useSearchIcon?: boolean;
+        hideDropdownIndicator?: boolean;
+        hideMenu?: boolean;
+        error?: boolean;
+        style: Record<string, unknown>;
+      }
+  >;
 
-StyledSelect.propTypes = {
+const StyledSelect: StyledSelectCustomComponent = makeStyledSelect(Select);
+
+StyledSelect['propTypes'] = {
   // Styled-system
   ...propTypes.typography,
   ...propTypes.layout,
@@ -329,11 +349,10 @@ StyledSelect.propTypes = {
   useCompactMode: PropTypes.bool,
 };
 
-StyledSelect.defaultProps = {
+StyledSelect['defaultProps'] = {
   fontSize: '14px',
   styles: {},
   useCompactMode: false,
 };
 
-/** @component */
 export default injectIntl(StyledSelect);
