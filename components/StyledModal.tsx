@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Times } from '@styled-icons/fa-solid/Times';
+import propTypes from '@styled-system/prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import FocusTrap from 'focus-trap-react';
 import { createPortal } from 'react-dom';
 import { useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
-import { background, margin, overflow, space } from 'styled-system';
+import { background, BackgroundProps, LayoutProps, margin, overflow, space, SpaceProps } from 'styled-system';
 
 import useKeyBoardShortcut, { ESCAPE_KEY } from '../lib/hooks/useKeyboardKey';
 
@@ -18,7 +19,11 @@ import StyledLinkButton from './StyledLinkButton';
 import { P, Span } from './Text';
 import WarnIfUnsavedChanges from './WarnIfUnsavedChanges';
 
-const Wrapper = styled(Flex)`
+type WrapperProps = {
+  zindex?: number;
+};
+
+const Wrapper = styled(Flex)<WrapperProps>`
   position: fixed;
   top: 0;
   left: 0;
@@ -30,10 +35,12 @@ const Wrapper = styled(Flex)`
   align-items: center;
 `;
 
-const Modal = styled(Container).attrs(props => ({
+type ModalProps = SpaceProps & LayoutProps & BackgroundProps;
+
+const Modal = styled(Container).attrs((props: ModalProps) => ({
   maxWidth: props.maxWidth || '95%',
   maxHeight: props.maxHeight || '97%',
-}))`
+}))<ModalProps>`
   border: 1px solid rgba(9, 10, 10, 0.12);
   border-radius: 8px;
   overflow-y: auto;
@@ -82,7 +89,9 @@ const Header = styled(Container)`
   align-items: flex-start;
 `;
 
-export const ModalBody = styled(Container)``;
+type ModalBodyProps = LayoutProps & SpaceProps;
+
+export const ModalBody = styled(Container)<ModalBodyProps>``;
 
 ModalBody.defaultProps = {
   mt: '10px',
@@ -96,9 +105,12 @@ ModalBody.propTypes = {
   height: PropTypes.string,
   /** children */
   children: PropTypes.node,
+  ...propTypes.space,
 };
 
-const Divider = styled.div`
+type DividerProps = SpaceProps & { isFullWidth?: boolean };
+
+const Divider = styled.div<DividerProps>`
   ${margin}
   width: 100%;
   height: 1px;
@@ -119,7 +131,13 @@ export const CloseIcon = styled(Times)`
   cursor: pointer;
 `;
 
-export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }) => (
+type ModalHeaderProps = {
+  children?: React.ReactNode;
+  onClose?: () => void;
+  hideCloseIcon?: boolean;
+};
+
+export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }: ModalHeaderProps) => (
   <Header {...props}>
     {children || <div />}
     {!hideCloseIcon && (
@@ -164,7 +182,13 @@ CollectiveModalHeader.propTypes = {
 
 CollectiveModalHeader.displayName = 'Header';
 
-export const ModalFooter = ({ children, isFullWidth, dividerMargin, ...props }) => (
+type ModalFooterProps = {
+  children: React.ReactNode;
+  dividerMargin?: string;
+  isFullWidth?: boolean;
+};
+
+export const ModalFooter = ({ children, isFullWidth, dividerMargin, ...props }: ModalFooterProps) => (
   <Container {...props}>
     <Divider margin={dividerMargin} isFullWidth={isFullWidth} />
     {children}

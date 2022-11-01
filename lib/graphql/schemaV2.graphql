@@ -4120,6 +4120,7 @@ type VirtualCardCollection implements Collection {
 type Policies {
   EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
+  MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
 }
 
 type COLLECTIVE_MINIMUM_ADMINS {
@@ -4134,6 +4135,15 @@ Defines how the policy is applied
 enum PolicyApplication {
   ALL_COLLECTIVES
   NEW_COLLECTIVES
+}
+
+type MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
+  ALL_TIME: Amount
+  DAILY: Amount
+  MONTHLY: Amount
+  PER_AUTHORIZATION: Amount
+  WEEKLY: Amount
+  YEARLY: Amount
 }
 
 type ActivitySubscription {
@@ -12972,9 +12982,14 @@ type Mutation {
     name: String!
 
     """
-    Virtual card monthly limit
+    Virtual card limit amount
     """
-    monthlyLimit: AmountInput!
+    limitAmount: AmountInput!
+
+    """
+    Virtual card limit interval
+    """
+    limitInterval: VirtualCardLimitInterval!
 
     """
     Account where the virtual card will be associated
@@ -13007,9 +13022,14 @@ type Mutation {
     assignee: AccountReferenceInput
 
     """
-    Virtual card monthly limit
+    Virtual card limit amount
     """
-    monthlyLimit: AmountInput
+    limitAmount: AmountInput
+
+    """
+    Virtual card limit interval
+    """
+    limitInterval: VirtualCardLimitInterval
   ): VirtualCard!
 
   """
