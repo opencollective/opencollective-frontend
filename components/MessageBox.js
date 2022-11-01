@@ -6,7 +6,7 @@ import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle'
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
-import { borders, color, display, flexbox, layout, shadow, space, typography } from 'styled-system';
+import { borders, color, display, flexbox, layout, margin, shadow, space, typography } from 'styled-system';
 
 import { whiteSpace } from '../lib/styled-system-custom-properties';
 import { messageType } from '../lib/theme/variants/message';
@@ -22,23 +22,13 @@ const Message = styled.div`
   font-size: 13px;
   line-height: 20px;
 
-  a {
-    text-decoration: underline !important;
-    color: ${themeGet('colors.black.800')};
-  }
-
-  h4 {
-    font-size: 13px;
-    margin: 0 0 8px 0;
-    font-weight: 700;
-  }
-
   display: flex;
   align-items: center;
   gap: 16px;
 
   box-shadow: 0px 1px 4px 1px #3132331a;
 
+  ${margin}
   ${borders}
   ${shadow}
   ${display}
@@ -51,7 +41,16 @@ const Message = styled.div`
 
   ${messageType}
 
-  svg[data-type="message-icon"] {
+  a {
+    text-decoration: underline !important;
+    color: ${themeGet('colors.black.800')};
+  }
+  h4 {
+    font-size: 13px;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+  }
+  svg[data-type='message-icon'] {
     vertical-align: text-bottom;
   }
 `;

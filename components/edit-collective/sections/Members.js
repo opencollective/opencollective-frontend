@@ -272,11 +272,11 @@ class Members extends React.Component {
               </P>
             )}
 
-          <StyledHr mt={4} borderColor="black.200" flex="1 1" />
+          <StyledHr my={4} borderColor="black.200" flex="1 1" />
 
           {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
             nbAdmins < host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins && (
-              <MessageBox type="error" mt={4} fontSize="13px">
+              <MessageBox type="error" fontSize="13px">
                 <FormattedMessage
                   defaultMessage="Your collective doesn’t meet the requirements of having a minimum of {numberOfAdmins, plural, one {# administrator} other {# administrators} }. Add more administrators to comply with your host’s policy."
                   values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
