@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
-import { defineMessages, injectIntl, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
@@ -110,6 +110,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
           title: intl.formatMessage(messages.organizationCreated),
           description: intl.formatMessage(messages.organizationCreateDescription),
           type: 'success',
+          inline: false,
         };
       default:
         if (collective.isApproved) {
@@ -117,11 +118,14 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
             title: intl.formatMessage(messages.collectiveCreated),
             description: intl.formatMessage(messages.collectiveApprovedDescription, { host: host.name }),
             type: 'success',
+            inline: true,
           };
         }
         return {
           title: intl.formatMessage(messages.collectiveCreated),
           description: host ? intl.formatMessage(messages.collectiveCreatedDescription, { host: host.name }) : '',
+          type: 'info',
+          inline: true,
         };
     }
   } else if (status === 'fundCreated') {
@@ -130,35 +134,41 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
         title: intl.formatMessage(messages.fundCreated),
         description: intl.formatMessage(messages.fundCreatedApprovedDescription, { host: host.name }),
         type: 'success',
+        inline: true,
       };
     }
     return {
       title: intl.formatMessage(messages.fundCreated),
       description: host ? intl.formatMessage(messages.fundCreatedDescription, { host: host.name }) : '',
+      type: 'info',
+      inline: true,
     };
   } else if (status === 'eventCreated') {
     return {
       title: intl.formatMessage(messages.eventCreated),
       type: 'success',
+      inline: true,
     };
   } else if (status === 'projectCreated') {
     return {
       title: intl.formatMessage(messages.projectCreated),
       type: 'success',
-      dismissable: 'asdasda',
+      inline: true,
     };
   } else if (status === 'collectiveArchived' || collective.isArchived) {
     return {
       title: intl.formatMessage(messages.collectiveArchived, { name: collective.name }),
       description: intl.formatMessage(messages.collectiveArchivedDescription, { name: collective.name }),
+      type: 'warning',
+      inline: true,
     };
   } else if (!collective.isApproved && collective.host && collective.type === CollectiveType.COLLECTIVE) {
     return {
       title: intl.formatMessage(messages.approvalPending),
       description: intl.formatMessage(messages.approvalPendingDescription, { host: collective.host.name }),
-      type: 'alert',
+      type: 'warning',
       actions: LoggedInUser?.isHostAdmin(collective) && (
-        <PendingApplicationActions key="PendingApplications" collective={collective} refetch={refetch} />
+        <PendingApplicationActions collective={collective} refetch={refetch} />
       ),
     };
   } else if (
@@ -174,10 +184,10 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
       description: intl.formatMessage(messages.tooFewAdminsDescription, {
         missingAdminsCount: host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins - collective.admins.length,
       }),
-      type: 'alert',
+      type: 'warning',
       actions: (
-        <NotificationBarLink key="ManageTeamLink" href={`/${collective.slug}/admin/members`}>
-          Manage members
+        <NotificationBarLink href={`/${collective.slug}/admin/members`}>
+          <FormattedMessage defaultMessage="Manage members" />
         </NotificationBarLink>
       ),
     };
@@ -190,9 +200,9 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
       description: intl.formatMessage(messages['event.over.sendMoneyToParent.description'], {
         collective: collective.parentCollective.name,
       }),
+      type: 'info',
       actions: (
         <SendMoneyToCollectiveBtn
-          key="SendMoneyToCollectiveBtn"
           fromCollective={collective}
           toCollective={collective.parentCollective}
           LoggedInUser={LoggedInUser}

@@ -11,11 +11,14 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
 import Container from '../../../Container';
 import { Box } from '../../../Grid';
+import Image from '../../../Image';
+import Link from '../../../Link';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
 import StyledCard from '../../../StyledCard';
+import StyledLink from '../../../StyledLink';
 
 import ActivityFilters from './ActivityFilters';
 import ActivityListItem from './ActivityListItem';
@@ -227,7 +230,7 @@ const ActivityLog = ({ accountSlug }) => {
       ) : loading ? (
         <LoadingPlaceholder width="100%" height={163} />
       ) : !data?.activities?.nodes ? (
-        <MessageBox type="error" withIcon>
+        <MessageBox type="error" withIcon title="You must be admin">
           <FormattedMessage
             id="mustBeAdmin"
             defaultMessage="You must be an admin of this collective to see this page"
