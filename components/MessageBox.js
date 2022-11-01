@@ -11,11 +11,9 @@ import { borders, color, display, flexbox, layout, shadow, space, typography } f
 import { whiteSpace } from '../lib/styled-system-custom-properties';
 import { messageType } from '../lib/theme/variants/message';
 
+import { Box } from './Grid';
 import StyledCard from './StyledCard';
 import StyledSpinner from './StyledSpinner';
-import { H4, Span } from './Text';
-import Image from './Image';
-import { Box } from './Grid';
 
 const Message = styled.div`
   border: 0.6px solid;
@@ -37,6 +35,7 @@ const Message = styled.div`
 
   display: flex;
   align-items: center;
+  gap: 16px;
 
   box-shadow: 0px 1px 4px 1px #3132331a;
 
@@ -57,54 +56,52 @@ const Message = styled.div`
   }
 `;
 
-const icons = {
-  info: <Image width="32" height="32" src="/static/images/lock.png" />,
-  success: <Image width="32" height="32" src="/static/images/lock.png" />,
-  warning: <Image width="32" height="32" src="/static/images/lock.png" />,
-  error: <Image width="32" height="32" src="/static/images/lock.png" />,
+const iconColors = {
+  white: 'black.600',
+  info: 'blue.500',
+  success: 'green.500',
+  warning: 'yellow.600',
+  error: 'red.500',
 };
 
-// const icons = {
-//   info: <InfoCircle data-type="message-icon" size="1em" color="#5CA3FF" />,
-//   success: <CheckCircle data-type="message-icon" size="1em" color="#25B869" />,
-//   warning: <ExclamationTriangle data-type="message-icon" size="1em" color="#CCCC18" />,
-//   error: <ExclamationCircle data-type="message-icon" size="1em" color="#E03F6A" />,
-// };
+const icons = {
+  info: <InfoCircle data-type="message-icon" size="1.1em" color="inherit" />,
+  success: <CheckCircle data-type="message-icon" size="1.1em" />,
+  warning: <ExclamationTriangle data-type="message-icon" size="1.1em" />,
+  error: <ExclamationCircle data-type="message-icon" size="1.1em" />,
+};
 
 /**
  * Display messages in a box contextualized for message type (error, success...etc)
  */
-const MessageBox = ({ withIcon, isLoading, children, title, action, ...props }) => {
-  const icon = withIcon && icons[props.type];
+const MessageBox = ({ withIcon, customIcon, isLoading, children, title, action, type }) => {
+  const icon = customIcon ? customIcon : withIcon ? icons[type] : null;
   return (
-    <Message {...props}>
-      {isLoading ? (
-        <Box flexShrink={0} mr={3} style={{ display: 'inline-block' }}>
-          <StyledSpinner size="1.5em" />
+    <Message type={type}>
+      {(icon || isLoading) && (
+        <Box flexShrink={0} alignSelf={withIcon ? 'start' : 'center'} color={iconColors[type]}>
+          {isLoading ? <StyledSpinner size="1.2em" /> : icon}
         </Box>
-      ) : (
-        icon && (
-          <Box flexShrink={0} mr={3} style={{ display: 'inline-block', verticalAlign: 'text-bottom' }}>
-            {icon}
-          </Box>
-        )
       )}
-      <div>
+
+      <Box>
         {title && <h4> {title}</h4>}
 
         {children}
 
         {action && <Box mt={2}>{action}</Box>}
-      </div>
+      </Box>
     </Message>
   );
 };
 
 MessageBox.propTypes = {
   /** Type of the message */
-  type: PropTypes.oneOf(['white', 'dark', 'info', 'success', 'warning', 'error']),
+  type: PropTypes.oneOf(['white', 'info', 'success', 'warning', 'error']),
   /** Whether icon should be hidden. Icons are only set for info, success, warning and error messages. */
   withIcon: PropTypes.bool,
+  /** An image or icon. */
+  customIcon: PropTypes.node,
   /** If true, a `StyledSpinner` will be displayed instead of the normal icon */
   isLoading: PropTypes.bool,
   /** Message */
