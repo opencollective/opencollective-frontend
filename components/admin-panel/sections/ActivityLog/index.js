@@ -11,14 +11,11 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
 import Container from '../../../Container';
 import { Box } from '../../../Grid';
-import Image from '../../../Image';
-import Link from '../../../Link';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
 import StyledCard from '../../../StyledCard';
-import StyledLink from '../../../StyledLink';
 
 import ActivityFilters from './ActivityFilters';
 import ActivityListItem from './ActivityListItem';
