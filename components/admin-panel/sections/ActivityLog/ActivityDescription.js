@@ -4,6 +4,7 @@ import { capitalize } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ActivityDescriptionI18n } from '../../../../lib/i18n/activities';
+import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import formatMemberRole from '../../../../lib/i18n/member-role';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
@@ -19,8 +20,11 @@ const ActivityDescription = ({ activity }) => {
   }
 
   return intl.formatMessage(ActivityDescriptionI18n[activity.type], {
+    hasParent: Boolean(activity.account?.parent),
     FromAccount: () => <LinkCollective collective={activity.fromAccount} openInNewTab />,
     Account: () => <LinkCollective collective={activity.account} openInNewTab />,
+    AccountType: () => formatCollectiveType(intl, activity.account?.type || 'COLLECTIVE'),
+    AccountParent: () => <LinkCollective collective={activity.account?.parent} openInNewTab />,
     Expense: msg =>
       !activity.expense ? (
         msg

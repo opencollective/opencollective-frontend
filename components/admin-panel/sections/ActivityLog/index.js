@@ -71,15 +71,19 @@ const activityLogQuery = gql`
           id
           name
           slug
+          type
         }
         account {
           id
           name
           slug
+          type
           ... on AccountWithParent {
             parent {
               id
               slug
+              name
+              type
             }
           }
         }
