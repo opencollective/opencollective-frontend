@@ -18,18 +18,18 @@ const CloseButton = styled(StyledRoundButton).attrs({
 })``;
 
 const ToastTitle = styled.span`
-  font-size: 11px;
-  line-height: 12px;
+  font-size: 12px;
+  line-height: 16px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 `;
 
 const ToastMessage = styled.span`
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 13px;
+  line-height: 20px;
   font-weight: 500;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   margin-top: 8px;
   word-break: break-word;
 `;
@@ -67,12 +67,12 @@ const variantType = variant({
         [Separator]: { bg: 'blue.600' },
       },
       '&[data-type="ERROR"]': {
-        [IconContainer]: { bg: 'red.500' },
-        [Separator]: { bg: 'red.500' },
+        [IconContainer]: { bg: '#E03F6A' },
+        [Separator]: { bg: '#E03F6A' },
       },
       '&[data-type="SUCCESS"]': {
-        [IconContainer]: { bg: 'green.500' },
-        [Separator]: { bg: 'green.500' },
+        [IconContainer]: { bg: '#29CC75' },
+        [Separator]: { bg: '#29CC75' },
       },
     },
 
@@ -92,12 +92,12 @@ const variantType = variant({
         [Separator]: { bg: 'blue.500' },
       },
       '&[data-type="ERROR"]': {
-        [IconContainer]: { bg: 'red.500' },
-        [Separator]: { bg: 'red.500' },
+        [IconContainer]: { bg: 'red.400' },
+        [Separator]: { bg: 'red.400' },
       },
       '&[data-type="SUCCESS"]': {
-        [IconContainer]: { bg: 'green.500' },
-        [Separator]: { bg: 'green.500' },
+        [IconContainer]: { bg: '#29CC75' },
+        [Separator]: { bg: '#29CC75' },
       },
       a: {
         color: 'white.full',
