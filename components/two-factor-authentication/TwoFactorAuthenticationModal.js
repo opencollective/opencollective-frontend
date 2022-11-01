@@ -18,20 +18,24 @@ import { Label, P } from '../Text';
 export default function TwoFactorAuthenticationModal() {
   const { LoggedInUser } = useLoggedInUser();
   const [twoFactorCode, setTwoFactorCode] = React.useState('');
+  const [confirming, setConfirming] = React.useState(false);
   const prompt = useTwoFactorAuthenticationPrompt();
 
   const cancel = React.useCallback(() => {
     setTwoFactorCode('');
+    setConfirming(false);
     prompt.rejectAuth(createError(ERROR.TWO_FACTOR_AUTH_CANCELED));
   }, []);
 
   const confirm = React.useCallback(() => {
     const code = twoFactorCode;
+    setConfirming(true);
     setTwoFactorCode('');
     prompt.resolveAuth({
       type: 'totp',
       code,
     });
+    setConfirming(false);
   }, [twoFactorCode]);
 
   const router = useRouter();
@@ -74,6 +78,13 @@ export default function TwoFactorAuthenticationModal() {
               inputMode="numeric"
               value={twoFactorCode}
               onChange={e => setTwoFactorCode(e.target.value)}
+              disabled={confirming}
+              onKeyDown={event => {
+                if (event.key === 'Enter' && twoFactorCode?.length === 6) {
+                  event.preventDefault();
+                  confirm();
+                }
+              }}
               autoFocus
             />
           </Flex>
@@ -94,14 +105,15 @@ export default function TwoFactorAuthenticationModal() {
         )}
         <ModalFooter isFullWidth dividerMargin="1rem 0">
           <Flex justifyContent="right" flexWrap="wrap">
-            <StyledButton mr={2} minWidth={120} onClick={cancel}>
+            <StyledButton disabled={confirming} mr={2} minWidth={120} onClick={cancel}>
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </StyledButton>
             <StyledButton
               ml={2}
               minWidth={120}
               buttonStyle="primary"
-              disabled={twoFactorCode === '' || !has2FAConfigured}
+              loading={confirming}
+              disabled={!has2FAConfigured || twoFactorCode?.length !== 6}
               onClick={confirm}
             >
               <FormattedMessage id="actions.verify" defaultMessage="Verify" />

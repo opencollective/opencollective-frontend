@@ -70,6 +70,8 @@ const virtualCardsQuery = gql`
           createdAt
           spendingLimitAmount
           spendingLimitInterval
+          spendingLimitRenewsOn
+          remainingLimit
           account {
             id
             slug

@@ -124,6 +124,7 @@ export const expenseHostFields = gql`
     supportedPayoutMethods
     isTrustedHost
     hasDisputedOrders
+    hasInReviewOrders
     plan {
       id
     }
@@ -385,6 +386,12 @@ export const expensePageExpenseFieldsFragment = gql`
       interval
       endsAt
     }
+    securityChecks {
+      level
+      message
+      scope
+      details
+    }
   }
 
   ${expenseHostFields}
@@ -514,6 +521,12 @@ export const expensesListAdminFieldsFragment = gql`
     attachedFiles {
       id
       url
+    }
+    securityChecks {
+      level
+      message
+      scope
+      details
     }
   }
 `;

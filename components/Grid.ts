@@ -20,7 +20,7 @@ import {
   TypographyProps,
 } from 'styled-system';
 
-const boxProps = compose(space, color, layout, typography, flexbox, grid);
+export const boxProps = compose(space, color, layout, typography, flexbox, grid);
 
 type BoxProps = SpaceProps &
   ColorProps &
@@ -49,10 +49,13 @@ Box.propTypes = {
 
 export type FlexProps = BoxProps;
 
-export const Flex = styled(Box)<FlexProps>(props => ({
-  display: 'flex',
-  gap: props.gap,
-}));
+export const Flex = styled(Box)<FlexProps>(
+  props => ({
+    display: 'flex',
+    gap: props.gap,
+  }),
+  compose(space, layout, flexbox),
+);
 
 Flex.displayName = 'Flex';
 

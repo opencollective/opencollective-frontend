@@ -19,7 +19,7 @@ import {
   TypographyProps,
 } from 'styled-system';
 
-import { textTransform, whiteSpace } from '../lib/styled-system-custom-properties';
+import { textTransform, TextTransformProps, whiteSpace } from '../lib/styled-system-custom-properties';
 import theme from '../lib/theme';
 import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
 
@@ -32,6 +32,7 @@ type StyledButtonProps = BackgroundProps &
   SpaceProps &
   TypographyProps &
   ColorProps &
+  TextTransformProps &
   React.HTMLProps<HTMLButtonElement> & {
     buttonStyle?: string;
     buttonSize?: string;

@@ -215,6 +215,7 @@ const ApplicationForm = ({
   router,
   collective: collectiveWithSlug,
   host,
+  refetchLoggedInUser,
 }) => {
   const intl = useIntl();
   const [submitApplication, { loading: submitting, error }] = useApplicationMutation(canApplyWithCollective);
@@ -267,6 +268,8 @@ const ApplicationForm = ({
 
     if (resCollective) {
       if (resCollective.isApproved) {
+        await refetchLoggedInUser();
+
         await router.push(`/${resCollective.slug}/onboarding`);
       } else {
         await router.push('/opensource/apply/success');
@@ -873,6 +876,7 @@ const ApplicationForm = ({
 ApplicationForm.propTypes = {
   loadingLoggedInUser: PropTypes.bool,
   LoggedInUser: PropTypes.object,
+  refetchLoggedInUser: PropTypes.func,
   initialValues: PropTypes.object,
   setInitialValues: PropTypes.func,
   collective: PropTypes.shape({

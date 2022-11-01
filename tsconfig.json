@@ -14,7 +14,7 @@
     "isolatedModules": true,
     "moduleResolution": "node",
     "typeRoots": ["node_modules/@types", "lib/custom_typings"],
-    "jsx": "react",
+    "jsx": "preserve",
     "resolveJsonModule": true
   },
   "include": [

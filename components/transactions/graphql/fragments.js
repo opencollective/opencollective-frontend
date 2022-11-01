@@ -136,6 +136,7 @@ export const transactionsQueryCollectionFragment = gql`
         id
         legacyId
         status
+        memo
       }
       expense {
         id

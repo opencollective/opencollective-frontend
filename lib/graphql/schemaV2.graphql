@@ -822,6 +822,11 @@ type Order {
   Custom data related to the order, based on the fields described by tier.customFields. Must be authenticated as an admin of the fromAccount or toAccount (returns null otherwise)
   """
   customData: JSON
+
+  """
+  Memo field which adds additional details about the order. For example in added funds this can be a note to mark what method (cheque, money order) the funds were received.
+  """
+  memo: String
 }
 
 """
@@ -833,10 +838,12 @@ enum OrderStatus {
   DISPUTED
   ERROR
   EXPIRED
+  IN_REVIEW
   NEW
   PAID
   PENDING
   PLEDGED
+  REFUNDED
   REJECTED
   REQUIRE_CLIENT_CONFIRMATION
 }
@@ -922,6 +929,7 @@ interface Transaction {
   isRefunded: Boolean
   isRefund: Boolean
   isDisputed: Boolean
+  isInReview: Boolean
   paymentMethod: PaymentMethod
   payoutMethod: PayoutMethod
   permissions: TransactionPermissions
@@ -1181,6 +1189,7 @@ type Expense {
   requestedByAccount: Account
   quote: ExpenseQuote
   recurringExpense: RecurringExpense
+  securityChecks: [SecurityCheck]
 }
 
 """
@@ -3086,9 +3095,14 @@ type Host implements Account & AccountWithContributions {
   isTrustedHost: Boolean!
 
   """
-  Returns whether the host has any disputed orders
+  Returns whether the host has any Stripe disputed orders
   """
   hasDisputedOrders: Boolean!
+
+  """
+  Returns whether the host has any Stripe in review orders
+  """
+  hasInReviewOrders: Boolean!
 }
 
 """
@@ -4106,6 +4120,7 @@ type VirtualCardCollection implements Collection {
 type Policies {
   EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
+  MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
 }
 
 type COLLECTIVE_MINIMUM_ADMINS {
@@ -4120,6 +4135,15 @@ Defines how the policy is applied
 enum PolicyApplication {
   ALL_COLLECTIVES
   NEW_COLLECTIVES
+}
+
+type MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
+  ALL_TIME: Amount
+  DAILY: Amount
+  MONTHLY: Amount
+  PER_AUTHORIZATION: Amount
+  WEEKLY: Amount
+  YEARLY: Amount
 }
 
 type ActivitySubscription {
@@ -4622,6 +4646,48 @@ enum RecurringExpenseInterval {
   month
   quarter
   year
+}
+
+type SecurityCheck {
+  """
+  The SecurityCheck scope
+  """
+  scope: SecurityCheckScope!
+
+  """
+  The SecurityCheck level
+  """
+  level: SecurityCheckLevel!
+
+  """
+  SecurityCheck description message
+  """
+  message: String!
+
+  """
+  SecurityCheck details
+  """
+  details: String
+}
+
+"""
+All supported SecurityCheck scopes
+"""
+enum SecurityCheckScope {
+  USER
+  COLLECTIVE
+  PAYEE
+  PAYOUT_METHOD
+}
+
+"""
+All supported SecurityCheck levels
+"""
+enum SecurityCheckLevel {
+  PASS
+  LOW
+  MEDIUM
+  HIGH
 }
 
 """
@@ -5954,6 +6020,7 @@ type Credit implements Transaction {
   isRefunded: Boolean
   isRefund: Boolean
   isDisputed: Boolean
+  isInReview: Boolean
   paymentMethod: PaymentMethod
   payoutMethod: PayoutMethod
 
@@ -6061,6 +6128,7 @@ type Debit implements Transaction {
   isRefunded: Boolean
   isRefund: Boolean
   isDisputed: Boolean
+  isInReview: Boolean
   paymentMethod: PaymentMethod
   payoutMethod: PayoutMethod
 
@@ -8485,6 +8553,8 @@ type VirtualCard {
   provider: String
   spendingLimitAmount: Int
   spendingLimitInterval: VirtualCardLimitInterval
+  spendingLimitRenewsOn: DateTime
+  remainingLimit: Int
   currency: Currency
   createdAt: DateTime
   updatedAt: DateTime
@@ -11839,6 +11909,7 @@ type Mutation {
     tier: TierReferenceInput
     amount: AmountInput!
     description: String!
+    memo: String
     hostFeePercent: Float
     invoiceTemplate: String
   ): Order!
@@ -12911,9 +12982,14 @@ type Mutation {
     name: String!
 
     """
-    Virtual card monthly limit
+    Virtual card limit amount
     """
-    monthlyLimit: AmountInput!
+    limitAmount: AmountInput!
+
+    """
+    Virtual card limit interval
+    """
+    limitInterval: VirtualCardLimitInterval!
 
     """
     Account where the virtual card will be associated
@@ -12946,9 +13022,14 @@ type Mutation {
     assignee: AccountReferenceInput
 
     """
-    Virtual card monthly limit
+    Virtual card limit amount
     """
-    monthlyLimit: AmountInput
+    limitAmount: AmountInput
+
+    """
+    Virtual card limit interval
+    """
+    limitInterval: VirtualCardLimitInterval
   ): VirtualCard!
 
   """

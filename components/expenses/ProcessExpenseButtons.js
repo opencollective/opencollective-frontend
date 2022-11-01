@@ -11,10 +11,7 @@ import styled from 'styled-components';
 import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
-import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
-import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
@@ -24,6 +21,7 @@ import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import DeleteExpenseButton from './DeleteExpenseButton';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
+import { SecurityChecksButton } from './SecurityChecksModal';
 
 const processExpenseMutation = gql`
   mutation ProcessExpense(
@@ -69,7 +67,7 @@ const messages = defineMessages({
   },
 });
 
-const getErrorContent = (intl, error, host, LoggedInUser) => {
+const getErrorContent = (intl, error, host) => {
   // TODO: The proper way to check for error types is with error.type, not the message
   const message = error?.message;
   if (message) {
@@ -85,33 +83,6 @@ const getErrorContent = (intl, error, host, LoggedInUser) => {
               />
             </Link>
           </React.Fragment>
-        ),
-      };
-    } else if (message.startsWith('Host has two-factor authentication enabled for large payouts')) {
-      return {
-        title: intl.formatMessage({ defaultMessage: 'Host has two-factor authentication enabled for payouts' }),
-        message: (
-          <FormattedMessage
-            id="PayExpenseModal.HostTwoFactorAuthEnabled"
-            defaultMessage="Please go to your <SettingsLink>settings</SettingsLink> to enable two-factor authentication for your account."
-            values={{
-              SettingsLink: getI18nLink({
-                as: Link,
-                href: `${LoggedInUser.collective.slug}/admin/${EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH}`,
-                openInNewTab: true,
-              }),
-            }}
-          />
-        ),
-      };
-    } else if (message.startsWith('Two-factor authentication')) {
-      return {
-        type: TOAST_TYPE.INFO,
-        message: (
-          <FormattedMessage
-            id="2FA.PleaseEnterCode"
-            defaultMessage="Two-factor authentication enabled: please enter your code."
-          />
         ),
       };
     }
@@ -165,7 +136,6 @@ const ProcessExpenseButtons = ({
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
   const intl = useIntl();
   const { addToast } = useToasts();
-  const { LoggedInUser } = useLoggedInUser();
 
   const triggerAction = async (action, paymentParams) => {
     // Prevent submitting the action if another one is being submitted at the same time
@@ -181,7 +151,7 @@ const ProcessExpenseButtons = ({
       return true;
     } catch (e) {
       // Display a toast with light variant since we're in a modal
-      addToast({ type: TOAST_TYPE.ERROR, variant: 'light', ...getErrorContent(intl, e, host, LoggedInUser) });
+      addToast({ type: TOAST_TYPE.ERROR, variant: 'light', ...getErrorContent(intl, e, host) });
       return false;
     }
   };
@@ -287,6 +257,7 @@ const ProcessExpenseButtons = ({
           onDelete={onDelete}
         />
       )}
+      {expense?.securityChecks?.length && <SecurityChecksButton {...buttonProps} minWidth={0} expense={expense} />}
     </React.Fragment>
   );
 };
@@ -311,6 +282,13 @@ ProcessExpenseButtons.propTypes = {
     id: PropTypes.string,
     legacyId: PropTypes.number,
     status: PropTypes.string,
+    securityChecks: PropTypes.arrayOf(
+      PropTypes.shape({
+        level: PropTypes.string,
+        scope: PropTypes.string,
+        message: PropTypes.string,
+      }),
+    ),
   }).isRequired,
   /** The account where the expense has been submitted */
   collective: PropTypes.object.isRequired,

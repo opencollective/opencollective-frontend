@@ -11,6 +11,7 @@ import { margin } from 'styled-system';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
 import Avatar from '../Avatar';
@@ -19,6 +20,7 @@ import { Box, Flex } from '../Grid';
 import DismissIcon from '../icons/DismissIcon';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
+import StyledLink from '../StyledLink';
 import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
@@ -105,11 +107,13 @@ const StateLabel = styled(Box)`
   align-self: center;
   padding: 2px 6px;
   border-radius: 4px;
-  background: ${props => (props.isActive ? props.theme.colors.green[500] : props.theme.colors.black[500])};
-  color: #fff;
-  font-size: 11px;
+  background: ${props => (props.isActive ? props.theme.colors.green[100] : props.theme.colors.black[100])};
+  color: ${props => (props.isActive ? props.theme.colors.green[600] : props.theme.colors.black[500])};
+  font-size: 12px;
   font-weight: 700;
-  line-height: 12px;
+  line-height: 16px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 `;
 
 const pauseCardMutation = gql`
@@ -315,41 +319,92 @@ ActionsButton.propTypes = {
   onDeleteRefetchQuery: PropTypes.string,
 };
 
-const getLimitString = (spendingLimitAmount, spendingLimitInterval, currency, locale) => {
-  const value = formatCurrency(spendingLimitAmount, currency, { locale });
+const getLimitIntervalString = spendingLimitInterval => {
+  switch (spendingLimitInterval) {
+    case VirtualCardLimitInterval.DAILY:
+      return (
+        <Fragment>
+          /<FormattedMessage defaultMessage="day" />
+        </Fragment>
+      );
+    case VirtualCardLimitInterval.WEEKLY:
+      return (
+        <Fragment>
+          /<FormattedMessage defaultMessage="wk" />
+        </Fragment>
+      );
+    case VirtualCardLimitInterval.MONTHLY:
+      return (
+        <Fragment>
+          /<FormattedMessage id="Frequency.Monthly.Short" defaultMessage="mo" />
+        </Fragment>
+      );
+    case VirtualCardLimitInterval.YEARLY:
+      return (
+        <Fragment>
+          /<FormattedMessage id="Frequency.Yearly.Short" defaultMessage="yr" />
+        </Fragment>
+      );
+    default:
+      return null;
+  }
+};
+
+const getLimitString = ({
+  spendingLimitAmount,
+  spendingLimitInterval,
+  spendingLimitRenewsOn,
+  remainingLimit,
+  currency,
+  locale,
+}) => {
   if (!spendingLimitAmount) {
     return <FormattedMessage id="VirtualCards.NoLimit" defaultMessage="No Limit" />;
   }
-  switch (spendingLimitInterval) {
-    case 'DAILY':
-      return (
+  return (
+    <Fragment>
+      {spendingLimitInterval === VirtualCardLimitInterval.PER_AUTHORIZATION ? (
+        <FormattedMessage
+          id="VirtualCards.LimitedToPerAuthorization"
+          defaultMessage={'Limited to {limit} per authorization'}
+          values={{
+            limit: formatCurrency(spendingLimitAmount, currency, {
+              locale,
+            }),
+          }}
+        />
+      ) : (
         <Fragment>
-          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
-          &nbsp;
-          {value}/<FormattedMessage defaultMessage="day" />
+          <FormattedMessage
+            id="VirtualCards.AvailableOfLimit"
+            defaultMessage="Avl. {available} of {limit}{interval}"
+            values={{
+              available: formatCurrency(remainingLimit, currency, {
+                locale,
+              }),
+              limit: formatCurrency(spendingLimitAmount, currency, {
+                locale,
+              }),
+              interval: getLimitIntervalString(spendingLimitInterval),
+            }}
+          />
+          {spendingLimitInterval === VirtualCardLimitInterval.ALL_TIME ? (
+            <FormattedMessage id="VirtualCards.LimitDoesNotRenew" defaultMessage="Limit does not renew" />
+          ) : (
+            <Fragment>
+              &nbsp;&bull;&nbsp;
+              <FormattedMessage
+                defaultMessage={'Renews on {renewsOnDate, date, medium}'}
+                values={{
+                  renewsOnDate: new Date(spendingLimitRenewsOn),
+                }}
+              />
+            </Fragment>
+          )}
         </Fragment>
-      );
-    case 'MONTHLY':
-      return (
-        <Fragment>
-          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
-          &nbsp;
-          {value}/<FormattedMessage id="Frequency.Monthly.Short" defaultMessage="mo." />
-        </Fragment>
-      );
-    case 'ANNUALLY':
-      return (
-        <Fragment>
-          <FormattedMessage id="VirtualCards.LimitedTo" defaultMessage="Limited to" />
-          &nbsp;
-          {value}/<FormattedMessage id="Frequency.Yearly.Short" defaultMessage="yr." />
-        </Fragment>
-      );
-    case 'TRANSACTION':
-    case 'FOREVER':
-    default:
-      return value;
-  }
+      )}
+    </Fragment>
+  );
 };
 
 const VirtualCard = props => {
@@ -432,34 +487,45 @@ const VirtualCard = props => {
           </React.Fragment>
         ) : (
           <React.Fragment>
-            <P mt="27px" fontSize="18px" fontWeight="700" lineHeight="26px">
+            <P mt="18px" fontSize="18px" fontWeight="700" lineHeight="26px" letterSpacing="0">
               {cardNumber}
             </P>
-            <Box mt="8px" fontSize="13px" fontWeight="500" lineHeight="20px">
-              <Avatar
-                collective={virtualCard.account}
-                radius="20px"
-                display="inline-block"
-                mr={2}
-                verticalAlign="middle"
-              />{' '}
-              {virtualCard.account.name}
+            <Box mt="8px" fontSize="13px" fontWeight="500" lineHeight="20px" letterSpacing="0">
+              <StyledLink href={`/${virtualCard.account.slug}`} color="white.full" hoverColor="white.transparent.72">
+                <Avatar
+                  collective={virtualCard.account}
+                  radius="20px"
+                  display="inline-block"
+                  mr={2}
+                  verticalAlign="middle"
+                />{' '}
+                {virtualCard.account.name}
+              </StyledLink>
             </Box>
-            <P mt="27px" fontSize="13px" fontWeight="400" lineHeight="20px">
+            <P mt="16px" fontSize="11px" fontWeight="400" lineHeight="16px" letterSpacing="0">
+              {getLimitString({
+                ...virtualCard,
+                locale: intl.locale,
+              })}
+            </P>
+            <P mt="8px" fontSize="11px" fontWeight="400" lineHeight="16px" letterSpacing="0">
               <FormattedMessage
-                id="VirtualCards.AssignedOn"
-                defaultMessage="Assigned on {createdAt, date, short}"
+                id="VirtualCards.AssignedOnDateTo"
+                defaultMessage="Assigned on {createdAt, date, medium} to {assignedTo}"
                 values={{
                   createdAt: new Date(virtualCard.createdAt),
+                  assignedTo: (
+                    <StyledLink
+                      href={`/${virtualCard.assignee.slug}`}
+                      color="white.full"
+                      hoverColor="white.transparent.72"
+                      fontWeight="700"
+                    >
+                      {virtualCard.assignee.name}
+                    </StyledLink>
+                  ),
                 }}
               />
-              &nbsp;&middot;&nbsp;
-              {getLimitString(
-                virtualCard.spendingLimitAmount,
-                virtualCard.spendingLimitInterval,
-                virtualCard.currency,
-                intl.locale,
-              )}
             </P>
           </React.Fragment>
         )}
@@ -516,12 +582,19 @@ VirtualCard.propTypes = {
     provider: PropTypes.string,
     spendingLimitAmount: PropTypes.number,
     spendingLimitInterval: PropTypes.string,
+    spendingLimitRenewsOn: PropTypes.string,
+    remainingLimit: PropTypes.number,
     currency: PropTypes.string,
     createdAt: PropTypes.string,
+    assignee: PropTypes.shape({
+      name: PropTypes.string,
+      slug: PropTypes.string,
+    }),
     account: PropTypes.shape({
       id: PropTypes.string,
       imageUrl: PropTypes.string,
       name: PropTypes.string,
+      slug: PropTypes.string,
     }),
   }),
   confirmOnPauseCard: PropTypes.bool,
