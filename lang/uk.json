@@ -2723,7 +2723,7 @@
   "User.EmailAddress": "Адреса електронної пошти",
   "User.InviteNew": "Запросити нового користувача",
   "user.isArchived": "Обліковий запис архівовано.",
-  "user.isArchived.edit.description": "Цей обліковий запис більше не активний.",
+  "user.isArchived.edit.description": "This account has been archived and is no longer active.",
   "user.since.label": "З",
   "user.unknown": "Unknown",
   "UserCollective.incognito.description": "Цей користувач вирішив залишатися анонімним",

@@ -2723,7 +2723,7 @@
   "User.EmailAddress": "Endereço de e-mail",
   "User.InviteNew": "Convidar novo usuário",
   "user.isArchived": "A conta foi arquivada.",
-  "user.isArchived.edit.description": "Esta conta foi arquivada e não está mais ativa.",
+  "user.isArchived.edit.description": "This account has been archived and is no longer active.",
   "user.since.label": "Since",
   "user.unknown": "Unknown",
   "UserCollective.incognito.description": "Este usuário decidiu permanecer anônimo",
