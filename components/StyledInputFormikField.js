@@ -14,7 +14,16 @@ import { P } from './Text';
  * A special wrapper around `StyledInputField` + Formik's `Field` component.
  * Accept all props from `StyledInputField`.
  */
-const StyledInputFormikField = ({ name, validate, children, isFastField, flex, width, display, ...props }) => {
+const StyledInputFormikField = ({
+  name,
+  children,
+  validate = undefined,
+  isFastField = false,
+  flex = undefined,
+  width = undefined,
+  display = undefined,
+  ...props
+}) => {
   const intl = useIntl();
   const FieldComponent = isFastField ? FastField : Field;
   const htmlFor = props.htmlFor || `input-${name}`;

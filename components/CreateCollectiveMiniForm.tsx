@@ -209,7 +209,7 @@ const CreateCollectiveMiniForm = ({
   };
 
   const validate = values => {
-    const errors = {};
+    const errors: Record<string, unknown> = {};
 
     if (isOrganization && !excludeAdminFields) {
       if (!get(values, 'members[0].member.email') || !isValidEmail(get(values, 'members[0].member.email'))) {
@@ -256,7 +256,7 @@ const CreateCollectiveMiniForm = ({
   return (
     <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange={true}>
       {formik => {
-        const { values, handleSubmit, errors, touched, isSubmitting } = formik;
+        const { values, errors, touched, isSubmitting } = formik;
 
         return (
           <Form data-cy="create-collective-mini-form">
@@ -426,7 +426,6 @@ const CreateCollectiveMiniForm = ({
                 buttonStyle="primary"
                 minWidth={100}
                 loading={isSubmitting}
-                onSubmit={handleSubmit}
                 data-cy="mini-form-save-button"
               >
                 {isUser ? formatMessage(msg.saveUser) : formatMessage(msg.save)}

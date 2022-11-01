@@ -4,14 +4,20 @@ export default {
     // Theme lib
     'lib/theme/**/*.(js|jsx|ts|tsx)',
     'lib/styled*',
+    'lib/date-utils*',
     // Avatar
     'components/Avatar*',
-    // Text
+    // Typography
     'components/Text..*',
     // Toasts
     'components/Toast*',
+    // Layout
     'components/Grid..*',
+    'components/Container',
+    // Misc helpers
     'components/Currency.*',
+    // Filters
+    'components/filters/*',
     // Loading
     'components/Loading*',
     // Styled components

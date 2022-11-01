@@ -1,21 +1,52 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { CheckCircle } from '@styled-icons/fa-solid/CheckCircle';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
-import { borders, color, display, flexbox, layout, shadow, space, typography } from 'styled-system';
+import {
+  borders,
+  BordersProps,
+  color,
+  display,
+  DisplayProps,
+  flexbox,
+  FlexboxProps,
+  layout,
+  LayoutProps,
+  shadow,
+  ShadowProps,
+  space,
+  SpaceProps,
+  typography,
+  TypographyProps,
+} from 'styled-system';
 
-import { whiteSpace } from '../lib/styled-system-custom-properties';
-import { messageType } from '../lib/theme/variants/message';
+import { whiteSpace, WhiteSpaceProps } from '../lib/styled-system-custom-properties';
+import { MessageType, messageType } from '../lib/theme/variants/message';
 
-import StyledCard from './StyledCard';
 import StyledSpinner from './StyledSpinner';
 import { Span } from './Text';
 
-const Message = styled.div`
+type MessageProps = BordersProps &
+  ShadowProps &
+  DisplayProps &
+  LayoutProps &
+  SpaceProps &
+  TypographyProps &
+  FlexboxProps &
+  WhiteSpaceProps & {
+    type: MessageType;
+  };
+
+type MessageBoxProps = MessageProps & {
+  isLoading?: boolean;
+  withIcon?: boolean;
+  children: React.ReactNode;
+};
+
+const Message = styled.div<MessageProps>`
   border: 1px solid;
   border-radius: 12px;
   padding: ${themeGet('space.3')}px;
@@ -51,10 +82,10 @@ const icons = {
 /**
  * Display messages in a box contextualized for message type (error, success...etc)
  */
-const MessageBox = ({ withIcon, isLoading, children, ...props }) => {
-  const icon = withIcon && icons[props.type];
+const MessageBox = ({ type = 'white', withIcon = false, isLoading, children, ...props }: MessageBoxProps) => {
+  const icon = withIcon && icons[type];
   return (
-    <Message {...props}>
+    <Message type={type} {...props}>
       {isLoading && (
         <Span mr={2} style={{ display: 'inline-block' }}>
           <StyledSpinner size="1.5em" />
@@ -68,24 +99,6 @@ const MessageBox = ({ withIcon, isLoading, children, ...props }) => {
       {children}
     </Message>
   );
-};
-
-MessageBox.propTypes = {
-  /** Type of the message */
-  type: PropTypes.oneOf(['white', 'dark', 'info', 'success', 'warning', 'error']),
-  /** Whether icon should be hidden. Icons are only set for info, success, warning and error messages. */
-  withIcon: PropTypes.bool,
-  /** If true, a `StyledSpinner` will be displayed instead of the normal icon */
-  isLoading: PropTypes.bool,
-  /** Message */
-  children: PropTypes.node,
-  /** All props from `StyledCard` */
-  ...StyledCard.propTypes,
-};
-
-MessageBox.defaultProps = {
-  type: 'white',
-  withIcon: false,
 };
 
 export default MessageBox;
