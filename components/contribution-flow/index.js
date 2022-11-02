@@ -69,7 +69,7 @@ const STEP_LABELS = defineMessages({
     defaultMessage: 'Profile',
   },
   details: {
-    id: 'contribute.step.details',
+    id: 'Details',
     defaultMessage: 'Details',
   },
   payment: {

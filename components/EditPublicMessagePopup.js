@@ -220,7 +220,7 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                       onClose();
                     }}
                   >
-                    <FormattedMessage id="button.submit" defaultMessage="Submit" />
+                    <FormattedMessage id="submit" defaultMessage="Submit" />
                   </StyledButton>
                 </Box>
               </Flex>

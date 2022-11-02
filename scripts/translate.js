@@ -10,7 +10,6 @@ const LANG_DIR = './lang/';
 const DEFAULT_TRANSLATIONS_FILE = `${LANG_DIR}en.json`;
 const DUPLICATED_IGNORED_IDS = new Set([
   'section.team.title',
-  'contribute.step.details',
   'order.status',
   'expense.status',
   'expense.markAsPaid',
@@ -18,8 +17,20 @@ const DUPLICATED_IGNORED_IDS = new Set([
   'expense.rejected',
   'order.rejected',
   'AdminPanel.button',
+  'Order',
 ]);
-const DUPLICATED_IGNORED_MESSAGES = new Set(['all', 'type', 'paid', 'pending', 'other', 'expired']);
+
+// Use lowercase values
+const DUPLICATED_IGNORED_MESSAGES = new Set([
+  'all',
+  'type',
+  'paid',
+  'pending',
+  'other',
+  'expired',
+  'completed',
+  'refunded',
+]);
 
 /* eslint-disable no-console */
 

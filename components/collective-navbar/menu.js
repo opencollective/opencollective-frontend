@@ -45,7 +45,7 @@ const titles = defineMessages({
     defaultMessage: 'Events',
   },
   PROJECTS: {
-    id: 'CollectivePage.SectionProjects.Title',
+    id: 'Projects',
     defaultMessage: 'Projects',
   },
   CONNECTED_COLLECTIVES: {

@@ -271,7 +271,7 @@ const ActionsButton = props => {
           isDanger
           type="confirm"
           header={<FormattedMessage defaultMessage="Pause Virtual Card" />}
-          continueLabel={<FormattedMessage defaultMessage="Pause Card" />}
+          continueLabel={<FormattedMessage id="VirtualCards.PauseCard" defaultMessage="Pause Card" />}
           onClose={() => setShowConfirmationModal(false)}
           continueHandler={async () => {
             await handlePauseUnpause();

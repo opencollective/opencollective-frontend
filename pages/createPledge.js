@@ -112,7 +112,7 @@ const AmountField = () => {
           label={
             <P {...labelStyles}>
               <FormattedMessage
-                id="contribution.amount.currency.label"
+                id="Label.AmountWithCurrency"
                 defaultMessage="Amount ({currency})"
                 values={{ currency: 'USD' }}
               />
@@ -467,7 +467,7 @@ class CreatePledgePage extends React.Component {
 
                     <Flex flexDirection="column" mb={3} width={200}>
                       <P {...labelStyles} htmlFor="interval">
-                        <FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />
+                        <FormattedMessage id="Frequency" defaultMessage="Frequency" />
                       </P>
                       <select id="interval" name="interval" defaultValue="monthly">
                         <option key="monthly" value="month">

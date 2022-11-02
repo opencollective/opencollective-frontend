@@ -499,7 +499,7 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
               data-cy="recurring-contribution-update-pm-button"
               onClick={() => updatePaymentMethod(selectedPaymentMethod).then(onCloseEdit)}
             >
-              <FormattedMessage id="subscription.updateAmount.update.btn" defaultMessage="Update" />
+              <FormattedMessage id="actions.update" defaultMessage="Update" />
             </StyledButton>
           </Fragment>
         )}

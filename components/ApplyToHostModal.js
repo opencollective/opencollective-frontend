@@ -172,7 +172,7 @@ const GQL_CONTEXT = { context: API_V2_CONTEXT };
 const INITIAL_FORM_VALUES = { message: '', areTosChecked: false, collective: null, inviteMembers: [] };
 const STEPS = {
   INFORMATION: { name: 'Information', label: <FormattedMessage defaultMessage="Information" /> },
-  APPLY: { name: 'Apply', label: <FormattedMessage defaultMessage="Apply" /> },
+  APPLY: { name: 'Apply', label: <FormattedMessage id="Apply" defaultMessage="Apply" /> },
 };
 
 const getAccountInput = collective => {
@@ -192,7 +192,7 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, is
         px={3}
       >
         {onBack ? (
-          <FormattedMessage defaultMessage="Back" />
+          <FormattedMessage id="Back" defaultMessage="Back" />
         ) : (
           <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
         )}
@@ -662,7 +662,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                       buttonStyle="primary"
                       onClick={() => setStep(STEPS.APPLY)}
                     >
-                      <FormattedMessage defaultMessage="Next" />
+                      <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
                     </StyledButton>
                   </Flex>
                 )}
