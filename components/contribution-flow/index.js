@@ -4,6 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { CardElement } from '@stripe/react-stripe-js';
+import { Formik } from 'formik';
 import { find, get, intersection, isEmpty, isEqual, isNil, omitBy, pick, set } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
@@ -54,6 +55,7 @@ import {
 } from './query-parameters';
 import SafeTransactionMessage from './SafeTransactionMessage';
 import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
+import { queryParamsToFormikState } from './state';
 import { validateGuestProfile } from './StepProfileGuestForm';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
 import { getContributeProfiles, getGQLV2AmountInput, getTotalAmount, NEW_CREDIT_CARD_KEY } from './utils';
@@ -207,6 +209,22 @@ class ContributionFlow extends React.Component {
 
   getQueryParams = () => {
     return this._getQueryParams(this.props.router.query);
+  };
+
+  // TODO should simplify the abstraction & memoize
+  getFormikState = () => {
+    const { collective, tier, LoggedInUser, loadingLoggedInUser, paymentFlow } = this.props;
+    const isCryptoFlow = paymentFlow === PAYMENT_FLOW.CRYPTO;
+    const currency = isCryptoFlow ? CRYPTO_CURRENCIES[0] : tier?.amount?.currency || collective.currency;
+    return queryParamsToFormikState(
+      this.getQueryParams(),
+      LoggedInUser,
+      loadingLoggedInUser,
+      collective,
+      tier,
+      currency,
+      isCryptoFlow,
+    );
   };
 
   // ---- Order submission & error handling ----
@@ -833,174 +851,178 @@ class ContributionFlow extends React.Component {
     }
 
     return (
-      <Steps
-        steps={this.getSteps()}
-        currentStepName={currentStepName}
-        onStepChange={this.onStepChange}
-        onComplete={isCrypto && isSubmitted ? this.cryptoOrderCompleted : this.submitOrder}
-      >
-        {({
-          steps,
-          currentStep,
-          lastVisitedStep,
-          goNext,
-          goBack,
-          goToStep,
-          prevStep,
-          nextStep,
-          isValidating,
-          isValidStep,
-        }) => (
-          <Container
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            py={[3, 4, 5]}
-            mb={4}
-            data-cy="cf-content"
-            ref={this.mainContainerRef}
+      <Formik initialValues={this.getFormikState()} enableReinitialize>
+        {formik => (
+          <Steps
+            steps={this.getSteps()}
+            currentStepName={currentStepName}
+            onStepChange={this.onStepChange}
+            onComplete={isCrypto && isSubmitted ? this.cryptoOrderCompleted : this.submitOrder}
           >
-            {!this.getQueryParams().hideHeader && (
-              <Box px={[2, 3]} mb={4}>
-                <ContributionFlowHeader collective={collective} isEmbed={isEmbed} />
-              </Box>
-            )}
-            {!queryParams.hideSteps && (
-              <StepsProgressBox mb={3} width={[1.0, 0.8]}>
-                <ContributionFlowStepsProgress
-                  steps={steps}
-                  currentStep={currentStep}
-                  lastVisitedStep={lastVisitedStep}
-                  goToStep={goToStep}
-                  stepProfile={stepProfile}
-                  stepDetails={stepDetails}
-                  stepPayment={stepPayment}
-                  stepSummary={stepSummary}
-                  isCrypto={isCrypto}
-                  isSubmitted={this.state.isSubmitted}
-                  loading={isValidating || isLoading}
-                  currency={currency}
-                  isFreeTier={this.getTierMinAmount(tier, currency) === 0}
-                />
-              </StepsProgressBox>
-            )}
-            {/* main container */}
-            {(currentStep.name !== STEPS.DETAILS && loadingLoggedInUser) || !isValidStep ? (
-              <Box py={[4, 5]}>
-                <Loading />
-              </Box>
-            ) : currentStep.name === STEPS.PROFILE && !LoggedInUser && this.state.showSignIn ? (
-              <SignInToContributeAsAnOrganization
-                defaultEmail={stepProfile?.email}
-                redirect={this.getRedirectUrlForSignIn()}
-                onCancel={() => this.setState({ showSignIn: false })}
-              />
-            ) : (
-              <Grid
-                px={[2, 3]}
-                gridTemplateColumns={[
-                  'minmax(200px, 600px)',
-                  null,
-                  '0fr minmax(300px, 600px) 1fr',
-                  '1fr minmax(300px, 600px) 1fr',
-                ]}
+            {({
+              steps,
+              currentStep,
+              lastVisitedStep,
+              goNext,
+              goBack,
+              goToStep,
+              prevStep,
+              nextStep,
+              isValidating,
+              isValidStep,
+            }) => (
+              <Container
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                py={[3, 4, 5]}
+                mb={4}
+                data-cy="cf-content"
+                ref={this.mainContainerRef}
               >
-                <Box />
-                <Box as="form" ref={this.formRef} onSubmit={e => e.preventDefault()} maxWidth="100%">
-                  {(error || backendError) && (
-                    <MessageBox type="error" withIcon mb={3} data-cy="contribution-flow-error">
-                      {formatErrorMessage(this.props.intl, error) || backendError}
-                    </MessageBox>
-                  )}
-                  {pastEvent && (
-                    <MessageBox type="warning" withIcon mb={3} data-cy="contribution-flow-warning">
-                      {this.props.intl.formatMessage(OTHER_MESSAGES.pastEventWarning)}
-                    </MessageBox>
-                  )}
-                  <ContributionFlowStepContainer
-                    collective={collective}
-                    tier={tier}
-                    mainState={this.state}
-                    onChange={data => this.setState(data)}
-                    step={currentStep}
-                    isCrypto={isCrypto}
-                    showPlatformTip={this.canHavePlatformTips()}
-                    onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
-                    defaultEmail={queryParams.email}
-                    defaultName={queryParams.name}
-                    taxes={this.getApplicableTaxes(collective, host, tier?.type)}
-                    onSignInClick={() => this.setState({ showSignIn: true })}
-                    isEmbed={isEmbed}
-                    isSubmitting={isValidating || isLoading}
-                    order={this.state.createdOrder}
-                    disabledPaymentMethodTypes={queryParams.disabledPaymentMethodTypes}
-                    hideCreditCardPostalCode={queryParams.hideCreditCardPostalCode}
-                    contributeProfiles={this.getContributeProfiles(LoggedInUser, collective, tier)}
-                  />
-                  {!nextStep && shouldDisplayCaptcha && (
-                    <Flex mt={40} justifyContent="center">
-                      <Captcha
-                        ref={this.captchaRef}
-                        onVerify={result => this.setState({ stepProfile: set(stepProfile, 'captcha', result) })}
-                      />
-                    </Flex>
-                  )}
-                  <Box mt={40}>
-                    <ContributionFlowButtons
-                      goNext={goNext}
-                      // for crypto flow the user should not be able to go back after the order is created at checkout step
-                      // we also don't want to show the back button when linking directly to the payment step with `hideSteps=true`
-                      goBack={
-                        (isCrypto && currentStep.name === STEPS.CHECKOUT) ||
-                        (queryParams.hideSteps && currentStep.name === STEPS.PAYMENT)
-                          ? null
-                          : goBack
-                      }
-                      step={currentStep}
-                      prevStep={prevStep}
-                      nextStep={nextStep}
-                      isValidating={isValidating || isLoading}
-                      paypalButtonProps={!nextStep ? this.getPaypalButtonProps({ currency }) : null}
-                      totalAmount={getTotalAmount(stepDetails, stepSummary)}
-                      currency={currency}
-                      isCrypto={isCrypto}
-                    />
+                {!this.getQueryParams().hideHeader && (
+                  <Box px={[2, 3]} mb={4}>
+                    <ContributionFlowHeader collective={collective} isEmbed={isEmbed} />
                   </Box>
-                  {!isEmbed && (
-                    <Box textAlign="center" mt={5}>
-                      <CollectiveTitleContainer collective={collective} useLink>
-                        <FormattedMessage
-                          id="ContributionFlow.backToCollectivePage"
-                          defaultMessage="Back to Collective Page"
-                        />
-                      </CollectiveTitleContainer>
-                    </Box>
-                  )}
-                </Box>
-                {!queryParams.hideFAQ && (
-                  <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
-                    <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
-                      <SafeTransactionMessage />
-                      <Box mt={4}>
-                        <ContributionSummary
-                          collective={collective}
-                          stepDetails={stepDetails}
-                          stepSummary={stepSummary}
-                          stepPayment={stepPayment}
+                )}
+                {!queryParams.hideSteps && (
+                  <StepsProgressBox mb={3} width={[1.0, 0.8]}>
+                    <ContributionFlowStepsProgress
+                      steps={steps}
+                      currentStep={currentStep}
+                      lastVisitedStep={lastVisitedStep}
+                      goToStep={goToStep}
+                      stepProfile={stepProfile}
+                      stepDetails={stepDetails}
+                      stepPayment={stepPayment}
+                      stepSummary={stepSummary}
+                      isCrypto={isCrypto}
+                      isSubmitted={this.state.isSubmitted}
+                      loading={isValidating || isLoading}
+                      currency={currency}
+                      isFreeTier={this.getTierMinAmount(tier, currency) === 0}
+                    />
+                  </StepsProgressBox>
+                )}
+                {/* main container */}
+                {(currentStep.name !== STEPS.DETAILS && loadingLoggedInUser) || !isValidStep ? (
+                  <Box py={[4, 5]}>
+                    <Loading />
+                  </Box>
+                ) : currentStep.name === STEPS.PROFILE && !LoggedInUser && this.state.showSignIn ? (
+                  <SignInToContributeAsAnOrganization
+                    defaultEmail={stepProfile?.email}
+                    redirect={this.getRedirectUrlForSignIn()}
+                    onCancel={() => this.setState({ showSignIn: false })}
+                  />
+                ) : (
+                  <Grid
+                    px={[2, 3]}
+                    gridTemplateColumns={[
+                      'minmax(200px, 600px)',
+                      null,
+                      '0fr minmax(300px, 600px) 1fr',
+                      '1fr minmax(300px, 600px) 1fr',
+                    ]}
+                  >
+                    <Box />
+                    <Box as="form" ref={this.formRef} onSubmit={e => e.preventDefault()} maxWidth="100%">
+                      {(error || backendError) && (
+                        <MessageBox type="error" withIcon mb={3} data-cy="contribution-flow-error">
+                          {formatErrorMessage(this.props.intl, error) || backendError}
+                        </MessageBox>
+                      )}
+                      {pastEvent && (
+                        <MessageBox type="warning" withIcon mb={3} data-cy="contribution-flow-warning">
+                          {this.props.intl.formatMessage(OTHER_MESSAGES.pastEventWarning)}
+                        </MessageBox>
+                      )}
+                      <ContributionFlowStepContainer
+                        collective={collective}
+                        tier={tier}
+                        mainState={this.state}
+                        onChange={data => this.setState(data)}
+                        step={currentStep}
+                        isCrypto={isCrypto}
+                        showPlatformTip={this.canHavePlatformTips()}
+                        onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
+                        defaultEmail={queryParams.email}
+                        defaultName={queryParams.name}
+                        taxes={this.getApplicableTaxes(collective, host, tier?.type)}
+                        onSignInClick={() => this.setState({ showSignIn: true })}
+                        isEmbed={isEmbed}
+                        isSubmitting={isValidating || isLoading}
+                        order={this.state.createdOrder}
+                        disabledPaymentMethodTypes={queryParams.disabledPaymentMethodTypes}
+                        hideCreditCardPostalCode={queryParams.hideCreditCardPostalCode}
+                        contributeProfiles={this.getContributeProfiles(LoggedInUser, collective, tier)}
+                      />
+                      {!nextStep && shouldDisplayCaptcha && (
+                        <Flex mt={40} justifyContent="center">
+                          <Captcha
+                            ref={this.captchaRef}
+                            onVerify={result => this.setState({ stepProfile: set(stepProfile, 'captcha', result) })}
+                          />
+                        </Flex>
+                      )}
+                      <Box mt={40}>
+                        <ContributionFlowButtons
+                          goNext={goNext}
+                          // for crypto flow the user should not be able to go back after the order is created at checkout step
+                          // we also don't want to show the back button when linking directly to the payment step with `hideSteps=true`
+                          goBack={
+                            (isCrypto && currentStep.name === STEPS.CHECKOUT) ||
+                            (queryParams.hideSteps && currentStep.name === STEPS.PAYMENT)
+                              ? null
+                              : goBack
+                          }
+                          step={currentStep}
+                          prevStep={prevStep}
+                          nextStep={nextStep}
+                          isValidating={isValidating || isLoading}
+                          paypalButtonProps={!nextStep ? this.getPaypalButtonProps({ currency }) : null}
+                          totalAmount={getTotalAmount(stepDetails, stepSummary)}
                           currency={currency}
                           isCrypto={isCrypto}
                         />
                       </Box>
-                      <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} isCrypto={isCrypto} />
+                      {!isEmbed && (
+                        <Box textAlign="center" mt={5}>
+                          <CollectiveTitleContainer collective={collective} useLink>
+                            <FormattedMessage
+                              id="ContributionFlow.backToCollectivePage"
+                              defaultMessage="Back to Collective Page"
+                            />
+                          </CollectiveTitleContainer>
+                        </Box>
+                      )}
                     </Box>
-                  </Box>
+                    {!queryParams.hideFAQ && (
+                      <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
+                        <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
+                          <SafeTransactionMessage />
+                          <Box mt={4}>
+                            <ContributionSummary
+                              collective={collective}
+                              stepDetails={stepDetails}
+                              stepSummary={stepSummary}
+                              stepPayment={stepPayment}
+                              currency={currency}
+                              isCrypto={isCrypto}
+                            />
+                          </Box>
+                          <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} isCrypto={isCrypto} />
+                        </Box>
+                      </Box>
+                    )}
+                  </Grid>
                 )}
-              </Grid>
+              </Container>
             )}
-          </Container>
+          </Steps>
         )}
-      </Steps>
+      </Formik>
     );
   }
 }

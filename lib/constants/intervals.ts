@@ -1,9 +1,9 @@
-const INTERVALS = {
-  oneTime: 'oneTime',
-  month: 'month',
-  year: 'year',
-  flexible: 'flexible',
-};
+enum INTERVALS {
+  oneTime = 'oneTime',
+  month = 'month',
+  year = 'year',
+  flexible = 'flexible',
+}
 
 export const getGQLV2FrequencyFromInterval = interval => {
   switch (interval) {

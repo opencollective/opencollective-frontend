@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useFormikContext } from 'formik';
 import { set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
@@ -40,7 +41,10 @@ const getSignInLinkQueryParams = email => {
   return email ? { ...params, email } : params;
 };
 
-const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defaultName, isEmbed, onSignInClick }) => {
+const StepProfileGuestForm = ({ onChange, defaultEmail, defaultName, isEmbed, onSignInClick }) => {
+  const formik = useFormikContext();
+  const data = formik.values.stepProfile;
+  const stepDetails = formik.values.stepDetails;
   const totalAmount = getTotalAmount(stepDetails);
   const dispatchChange = (field, value) => onChange({ stepProfile: set({ ...data, isGuest: true }, field, value) });
   const dispatchGenericEvent = e => dispatchChange(e.target.name, e.target.value);

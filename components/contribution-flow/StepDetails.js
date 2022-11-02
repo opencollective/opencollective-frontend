@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useFormikContext } from 'formik';
 import { isEmpty, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -32,7 +33,9 @@ const getCustomFields = (collective, tier) => {
   return [...(tier?.customFields || []), ...(collective.host?.settings?.contributionFlow?.customFields || [])];
 };
 
-const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router, isEmbed }) => {
+const StepDetails = ({ onChange, collective, tier, showPlatformTip, router, isEmbed }) => {
+  const formik = useFormikContext();
+  const data = formik.values.stepDetails;
   const intl = useIntl();
   const amount = data?.amount;
   const currency = tier?.amount.currency || collective.currency;
@@ -256,13 +259,6 @@ StepDetails.propTypes = {
   showPlatformTip: PropTypes.bool,
   isEmbed: PropTypes.bool,
   LoggedInUser: PropTypes.object,
-  data: PropTypes.shape({
-    amount: PropTypes.number,
-    platformTip: PropTypes.number,
-    quantity: PropTypes.number,
-    interval: PropTypes.string,
-    customData: PropTypes.object,
-  }),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,

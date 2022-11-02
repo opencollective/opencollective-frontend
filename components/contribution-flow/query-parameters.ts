@@ -1,13 +1,13 @@
 import { assign, pick } from 'lodash';
 
-import UrlQueryHelper from '../../lib/UrlQueryHelper';
+import UrlQueryHelper, { FieldsConfig } from '../../lib/UrlQueryHelper';
 
 /**
  * These attributes are documented using JSDoc to automatically generate
  * documentation for the contribution flow. You can re-generate them by running:
  * `npm run docs:generate:contribution-flow`
  */
-const ContributionFlowUrlParametersConfig = {
+const ContributionFlowUrlParametersConfig: FieldsConfig = {
   // ---- Public fields ----
   // -- Contribution
   /**
@@ -95,7 +95,7 @@ const ContributionFlowUrlParametersConfig = {
   defaultName: { type: 'alias', on: 'name' },
 };
 
-const EmbedContributionFlowUrlParametersConfig = {
+const EmbedContributionFlowUrlParametersConfig: FieldsConfig = {
   ...ContributionFlowUrlParametersConfig,
   /**
    * Whether we need to hide the right-column FAQ
@@ -126,7 +126,7 @@ const EmbedContributionFlowUrlParametersConfig = {
  * Returns an un-sanitized version of the URL query parameters
  */
 export const stepsDataToUrlParamsData = (stepDetails, stepProfile) => {
-  const data = {};
+  const data: Record<string, unknown> = {};
 
   // Step details
   assign(data, pick(stepDetails, ['amount', 'interval', 'quantity', 'platformTip']));

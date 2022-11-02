@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { useFormikContext } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
 import { Box, Flex } from '../Grid';
@@ -34,7 +35,9 @@ const getProfileInfo = (stepProfile, profiles) => {
   }
 };
 
-const StepProfileLoggedInForm = ({ profiles, onChange, canUseIncognito, collective, data, stepDetails }) => {
+const StepProfileLoggedInForm = ({ profiles, onChange, canUseIncognito, collective, stepDetails }) => {
+  const formik = useFormikContext();
+  const data = formik.values.stepProfile;
   const profileInfo = getProfileInfo(data, profiles);
   const isContributingFromSameHost = data?.host?.id === collective.host.legacyId;
 
@@ -119,7 +122,6 @@ const StepProfileLoggedInForm = ({ profiles, onChange, canUseIncognito, collecti
 };
 
 StepProfileLoggedInForm.propTypes = {
-  data: PropTypes.object,
   stepDetails: PropTypes.object,
   onChange: PropTypes.func,
   profiles: PropTypes.arrayOf(PropTypes.object),
