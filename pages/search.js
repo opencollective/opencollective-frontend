@@ -390,7 +390,7 @@ class SearchPage extends React.Component {
             {showTagFilterSection && (
               <Container pl={[0, '23px']} pt={['20px', 0]}>
                 <FilterLabel htmlFor="tag-filter-type">
-                  <FormattedMessage defaultMessage="Tags" />
+                  <FormattedMessage id="Tags" defaultMessage="Tags" />
                 </FilterLabel>
                 <Flex flexWrap="wrap">
                   {uniqBy(

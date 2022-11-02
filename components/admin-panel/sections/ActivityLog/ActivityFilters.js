@@ -48,7 +48,7 @@ const ActivityFilters = ({ filters, onChange, account }) => {
         </FilterContainer>
         <FilterContainer width={[1, 1 / 3, 1 / 3]} pl={[0, '19px']}>
           <FilterLabel htmlFor="activity-filter-type">
-            <FormattedMessage id="webhooks.types.label" defaultMessage="Activity" />
+            <FormattedMessage defaultMessage="Activity" />
           </FilterLabel>
           <ActivityTypeFilter account={account} {...getFilterProps('type')} />
         </FilterContainer>

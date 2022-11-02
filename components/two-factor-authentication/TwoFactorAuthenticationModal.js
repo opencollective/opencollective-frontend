@@ -65,7 +65,10 @@ export default function TwoFactorAuthenticationModal() {
         {has2FAConfigured ? (
           <Flex mt={2} flexDirection="column">
             <Label htmlFor="2fa-code-input" fontWeight="normal" as="label" mb={2}>
-              <FormattedMessage defaultMessage="Please enter your 6-digit code without any dashes." />
+              <FormattedMessage
+                id="TwoFactorAuth.Setup.Form.InputLabel"
+                defaultMessage="Please enter your 6-digit code without any dashes."
+              />
             </Label>
             <StyledInput
               id="2fa-code-input"

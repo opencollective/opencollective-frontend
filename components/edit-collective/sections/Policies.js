@@ -468,7 +468,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
         </Container>
         <Container>
           <SettingsSectionTitle mt={4}>
-            <FormattedMessage id="editCollective.expenseTypesPolicy.header" defaultMessage="Expense types" />
+            <FormattedMessage defaultMessage="Expense types" />
           </SettingsSectionTitle>
           <P mb={2}>
             <FormattedMessage

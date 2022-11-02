@@ -363,7 +363,7 @@ class Host extends React.Component {
             </Box>
             <Box mb={4}>
               <OptionLabel htmlFor="host-radio-noHost">
-                <FormattedMessage id="collective.edit.host.noHost.title" defaultMessage="No one" />
+                <FormattedMessage defaultMessage="No one" />
               </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.noHost.description"

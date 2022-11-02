@@ -122,7 +122,7 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Payment Methods',
   },
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: {
-    id: 'editCollective.menu.tiers',
+    id: 'Tiers',
     defaultMessage: 'Tiers',
   },
   [EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS]: {

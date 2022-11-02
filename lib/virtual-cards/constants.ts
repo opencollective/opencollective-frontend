@@ -31,7 +31,6 @@ export const VirtualCardLimitIntervalDescriptionsI18n = defineMessages({
 
 export const VirtualCardLimitIntervalI18n = defineMessages({
   [VirtualCardLimitInterval.ALL_TIME]: {
-    id: 'virtualCard.intervalLimit.all_time',
     defaultMessage: 'All time',
   },
   [VirtualCardLimitInterval.DAILY]: {
@@ -39,7 +38,7 @@ export const VirtualCardLimitIntervalI18n = defineMessages({
     defaultMessage: 'Daily',
   },
   [VirtualCardLimitInterval.MONTHLY]: {
-    id: 'virtualCard.intervalLimit.monthly',
+    id: 'Frequency.Monthly',
     defaultMessage: 'Monthly',
   },
   [VirtualCardLimitInterval.PER_AUTHORIZATION]: {
@@ -47,11 +46,11 @@ export const VirtualCardLimitIntervalI18n = defineMessages({
     defaultMessage: 'Per authorization',
   },
   [VirtualCardLimitInterval.WEEKLY]: {
-    id: 'virtualCard.intervalLimit.weekly',
+    id: 'week',
     defaultMessage: 'Weekly',
   },
   [VirtualCardLimitInterval.YEARLY]: {
-    id: 'virtualCard.intervalLimit.yearly',
+    id: 'Frequency.Yearly',
     defaultMessage: 'Yearly',
   },
 });

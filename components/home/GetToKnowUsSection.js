@@ -242,6 +242,7 @@ const GetToKnowUs = () => {
             fontWeight="500"
           >
             <FormattedMessage
+              id="e2c.description"
               defaultMessage={
                 'Join us as we transition from a privately owned company to a structure that allows us to share power and revenue with you.'
               }

@@ -554,7 +554,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                         htmlFor="addFunds-hostFeePercent"
                         label={
                           <span>
-                            <FormattedMessage id="AddFundsModal.hostFee" defaultMessage="Host Fee" />
+                            <FormattedMessage defaultMessage="Host Fee" />
                             {` `}
                             <StyledTooltip
                               content={() => (

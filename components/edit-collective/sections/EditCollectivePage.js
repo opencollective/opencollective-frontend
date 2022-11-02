@@ -140,7 +140,7 @@ const CollectiveSectionEntry = ({
       value: 'ADMIN',
     },
     {
-      label: <FormattedMessage id="EditCollectivePage.ShowSection.Disabled" defaultMessage="Disabled" />,
+      label: <FormattedMessage defaultMessage="Disabled" />,
       value: 'DISABLED',
     },
   ];
