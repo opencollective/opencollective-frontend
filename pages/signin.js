@@ -217,6 +217,7 @@ class SigninV2Page extends React.Component {
   }
 
   render() {
+    console.log('signin render', 'token:', this.props.token);
     return (
       <Box flex={1} className="LoginPage">
         <Header
