@@ -25,7 +25,7 @@ class SigninV2Page extends React.Component {
     if (next && next.startsWith('%2F')) {
       next = decodeURIComponent(next);
     }
-
+    console.log('getInitialProps', { token });
     next = next && isValidRelativeUrl(next) ? next : null;
     email = email && decodeURIComponent(email);
     return {
@@ -59,8 +59,11 @@ class SigninV2Page extends React.Component {
 
   componentDidMount() {
     if (this.state.isRobot) {
+      console.log('isRobot');
       this.robotsDetector.startListening(() => this.setState({ isRobot: false }));
     } else {
+      console.log('initialize');
+
       this.initialize();
     }
   }
@@ -112,6 +115,7 @@ class SigninV2Page extends React.Component {
         this.setState({ error: err.message || err });
       }
     } else {
+      console.log('try login without token?');
       this.props.login();
     }
   }
