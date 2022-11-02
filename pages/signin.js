@@ -10,7 +10,7 @@ import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isValidRelativeUrl } from '../lib/utils';
 
 import Body from '../components/Body';
-import { Box,Flex } from '../components/Grid';
+import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import Loading from '../components/Loading';
 import LoadingGrid from '../components/LoadingGrid';
@@ -96,7 +96,7 @@ class SigninV2Page extends React.Component {
       let user;
       try {
         user = await this.props.login(this.props.token);
-
+        console.log({ user });
         // If given token is invalid, try to login with the old one
         if (!user) {
           user = await this.props.login();
@@ -107,6 +107,8 @@ class SigninV2Page extends React.Component {
           this.setState({ error: 'Token rejected' });
         }
       } catch (err) {
+        console.log({ err });
+
         this.setState({ error: err.message || err });
       }
     } else {
