@@ -1638,7 +1638,7 @@
   "HostApplication.header": "Apply with your Collective",
   "HostApplication.ProjectTypeSelect.code": "Code",
   "HostApplication.ProjectTypeSelect.codeDescription": "My project is primarily concerned with the development and maintenance of a specific codebase.",
-  "HostApplication.ProjectTypeSelect.communityDescription": "My project is not strongly associated with with a specific codebase.",
+  "HostApplication.ProjectTypeSelect.communityDescription": "My project is not strongly associated with a specific codebase.",
   "HostApplication.Rejected": "{name} foi rejeitado",
   "HostApplication.repositoryUrlHint": "Can be GitHub, GitLab or any URL",
   "HostApplication.yourInitiativeIsNearlyThere.description": "We will review it and let you know by mail if we need you for anything during the process. {lineBreak}{lineBreak} In the meantime, you can use these useful links.",

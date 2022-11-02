@@ -82,7 +82,7 @@ const msg = defineMessages({
   },
   communityDescription: {
     id: 'HostApplication.ProjectTypeSelect.communityDescription',
-    defaultMessage: 'My project is not strongly associated with with a specific codebase.',
+    defaultMessage: 'My project is not strongly associated with a specific codebase.',
   },
 });
 
