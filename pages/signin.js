@@ -10,7 +10,7 @@ import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isValidRelativeUrl } from '../lib/utils';
 
 import Body from '../components/Body';
-import { Flex, Box } from '../components/Grid';
+import { Box,Flex } from '../components/Grid';
 import Header from '../components/Header';
 import Loading from '../components/Loading';
 import LoadingGrid from '../components/LoadingGrid';

@@ -2,12 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Plus } from '@styled-icons/boxicons-regular';
 import { Settings } from '@styled-icons/feather/Settings';
+import { Check } from '@styled-icons/heroicons-outline/Check';
 import { themeGet } from '@styled-system/theme-get';
-
 import { groupBy, isEmpty, uniqBy } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { Check } from '@styled-icons/heroicons-outline/Check';
+
 import { CollectiveType } from '../lib/constants/collectives';
 import { isPastEvent } from '../lib/events';
 import { getSettingsRoute } from '../lib/url-helpers';
@@ -157,7 +157,7 @@ const MENU_SECTIONS = {
 };
 
 function figureOutRole(collective, role) {
-  if (role === 'Personal profile') return role;
+  if (role === 'Personal profile') {return role;}
   if (collective.type === 'ORGANIZATION') {
     if (collective.isHost) {
       return role === 'ADMIN' ? 'Fiscal host admin' : 'Member';

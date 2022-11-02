@@ -17,7 +17,7 @@ import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
 import Pagination from '../../Pagination';
 import StyledButton from '../../StyledButton';
-import { P, H1 } from '../../Text';
+import { H1,P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
 const hostVirtualCardsQuery = gql`

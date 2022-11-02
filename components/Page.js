@@ -1,26 +1,23 @@
 import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { themeGet } from '@styled-system/theme-get';
-import { BroadActivityFeed } from '@styled-icons/fluentui-system-regular/BroadActivityFeed';
-import { SettingsOutline } from '@styled-icons/evaicons-outline/SettingsOutline';
-import { Settings } from '@styled-icons/feather/settings';
-import { Grid } from '@styled-icons/feather/Grid';
-import { GridOutline } from '@styled-icons/evaicons-outline/GridOutline';
-import { ViewGrid } from '@styled-icons/heroicons-outline/ViewGrid';
-import { CreditCard } from '@styled-icons/heroicons-outline/CreditCard';
 import { Cog } from '@styled-icons/heroicons-outline/Cog';
+import { CreditCard } from '@styled-icons/heroicons-outline/CreditCard';
 import { Template } from '@styled-icons/heroicons-outline/Template';
+import { ViewGrid } from '@styled-icons/heroicons-outline/ViewGrid';
+import { themeGet } from '@styled-system/theme-get';
 import { useRouter } from 'next/router';
-import Image from '../components/Image';
+import styled from 'styled-components';
+
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
 import Body from '../components/Body';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
-import Header from '../components/Header';
 import { Flex } from '../components/Grid';
+import Header from '../components/Header';
+import Image from '../components/Image';
 import Link from '../components/Link';
+
 import SideBarProfileMenu from './SideBarProfileMenu';
 import { withUser } from './UserProvider';
 
@@ -158,7 +155,7 @@ export const Sidebar = () => {
       setActiveCollective({ ...LoggedInUser.collective, type: 'USER', role: 'Personal profile' });
     }
   }, [LoggedInUser]);
-  //if (!LoggedInUser || !activeCollective) return null;
+  // if (!LoggedInUser || !activeCollective) return null;
   // console.log({ activeCollective });
 
   const pages = activeCollective

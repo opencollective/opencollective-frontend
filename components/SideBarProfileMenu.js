@@ -4,10 +4,9 @@ import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { Exit } from '@styled-icons/boxicons-regular';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
+import { ChevronRight } from '@styled-icons/boxicons-regular/ChevronRight';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
-
-import { ChevronRight } from '@styled-icons/boxicons-regular/ChevronRight';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';

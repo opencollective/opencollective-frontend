@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { ChevronDown, ChevronUp } from '@styled-icons/boxicons-regular';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { debounce } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { useRouter } from 'next/router';
 
 import theme from '../lib/theme';
 

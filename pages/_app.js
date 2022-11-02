@@ -5,17 +5,17 @@ import App from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
-import { ThemeProvider } from 'styled-components';
-import { withUser } from '../components/UserProvider';
+import styled, { ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import theme from '../lib/theme';
 import withData from '../lib/withData';
-import styled from 'styled-components';
+
+import { Sidebar } from '../components/Page';
 import StripeProviderSSR from '../components/StripeProvider';
 import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
-import UserProvider from '../components/UserProvider';
-import { Sidebar } from '../components/Page';
+import UserProvider, { withUser } from '../components/UserProvider';
+
 import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
