@@ -228,12 +228,12 @@ class ExpensePage extends React.Component {
         canonicalURL={`${getCollectivePageCanonicalURL(data.account)}/expenses`}
         {...this.getPageMetaData(data.account)}
       >
-        <CollectiveNavbar
+        {/* <CollectiveNavbar
           collective={data.account}
           isLoading={!data.account}
           selected={Sections.BUDGET}
           selectedCategory={NAVBAR_CATEGORIES.BUDGET}
-        />
+        /> */}
         <Container position="relative" minHeight={[null, 800]}>
           <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
             <Flex justifyContent="space-between" flexWrap="wrap">

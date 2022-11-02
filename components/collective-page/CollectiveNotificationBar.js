@@ -146,13 +146,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
       description: intl.formatMessage(messages.approvalPendingDescription, { host: collective.host.name }),
       status: 'collectivePending',
     };
-  } else if (
-    LoggedInUser?.isAdminOfCollectiveOrHost(collective) &&
-    collective.isApproved &&
-    host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze &&
-    host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > collective?.admins?.length &&
-    collective?.features?.RECEIVE_FINANCIAL_CONTRIBUTIONS === 'DISABLED'
-  ) {
+  } else if (false) {
     return {
       title: intl.formatMessage(messages.tooFewAdmins, {
         missingAdminsCount: host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins - collective.admins.length,

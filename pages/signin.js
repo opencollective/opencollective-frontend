@@ -10,7 +10,7 @@ import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isValidRelativeUrl } from '../lib/utils';
 
 import Body from '../components/Body';
-import { Flex } from '../components/Grid';
+import { Flex, Box } from '../components/Grid';
 import Header from '../components/Header';
 import Loading from '../components/Loading';
 import LoadingGrid from '../components/LoadingGrid';
@@ -216,7 +216,7 @@ class SigninV2Page extends React.Component {
 
   render() {
     return (
-      <div className="LoginPage">
+      <Box flex={1} className="LoginPage">
         <Header
           title={this.props.form === 'signin' ? 'Sign In' : 'Create Account'}
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
@@ -229,7 +229,7 @@ class SigninV2Page extends React.Component {
             {this.renderContent()}
           </Flex>
         </Body>
-      </div>
+      </Box>
     );
   }
 }

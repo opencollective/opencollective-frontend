@@ -149,7 +149,6 @@ class recurringContributionsPage extends React.Component {
     const recurringContributions = collective && collective.orders;
     const groupedAdminOf = this.getAdministratedAccounts(LoggedInUser);
     const isAdminOfGroups = !isEmpty(groupedAdminOf);
-    const mainGridColumns = isAdminOfGroups ? ['1fr', '250px 1fr'] : ['1fr'];
     return (
       <AuthenticatedPage disableSignup>
         {loadingLoggedInUser || (data?.loading && !isAdminOfGroups) ? (
@@ -168,49 +167,12 @@ class recurringContributionsPage extends React.Component {
           </Container>
         ) : (
           <Container>
-            <CollectiveNavbar collective={collective} />
-            <MainContainer py={[3, 4]} px={[2, 3, 4]}>
-              <SectionTitle textAlign="left" mb={1}>
+            {/* <CollectiveNavbar collective={collective} /> */}
+            <MainContainer pb={[3, 4]} px={[2, 3, 4]} pt={2}>
+              <SectionTitle textAlign="left" mb={1} mt={4}>
                 <FormattedMessage id="Subscriptions.Title" defaultMessage="Recurring contributions" />
               </SectionTitle>
-              <Grid gridTemplateColumns={mainGridColumns} gridGap={32} mt={4}>
-                {isAdminOfGroups && (
-                  <div>
-                    <MenuEntry
-                      href="/recurring-contributions"
-                      $isActive={!slug || slug === LoggedInUser.collective.slug}
-                      onClick={() => {}}
-                    >
-                      <Avatar collective={LoggedInUser.collective} size={32} />
-                      <Span ml={3}>
-                        <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" />
-                      </Span>
-                    </MenuEntry>
-                    {Object.entries(groupedAdminOf).map(([collectiveType, members]) => (
-                      <div key={collectiveType}>
-                        <Flex alignItems="center" px={2} mt={3} mb={2}>
-                          <Span fontWeight="bold" color="black.700" fontSize="14px">
-                            {formatCollectiveType(intl, collectiveType, 2)}
-                          </Span>
-                          <StyledHr ml={2} width="100%" borderColor="black.300" />
-                        </Flex>
-                        {members.map(m => (
-                          <MenuEntry
-                            key={m.id}
-                            href={`/${m.collective.slug}/recurring-contributions`}
-                            title={m.collective.name}
-                            $isActive={slug === m.collective.slug}
-                          >
-                            <Avatar collective={m.collective} size={32} />
-                            <Span ml={3} truncateOverflow>
-                              {m.collective.name}
-                            </Span>
-                          </MenuEntry>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                )}
+              <Box mt={4}>
                 <Box>
                   <Box mx="auto">
                     <StyledFilters
@@ -232,7 +194,7 @@ class recurringContributionsPage extends React.Component {
                     />
                   )}
                 </Box>
-              </Grid>
+              </Box>
             </MainContainer>
           </Container>
         )}

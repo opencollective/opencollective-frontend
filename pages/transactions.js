@@ -275,21 +275,21 @@ class TransactionsPage extends React.Component {
     }
 
     return (
-      <TransactionPageWrapper>
-        <Header
+      <Page disableSignup>
+        {/* <Header
           collective={collective}
           LoggedInUser={LoggedInUser}
           canonicalURL={`${getCollectivePageCanonicalURL(collective)}/transactions`}
           noRobots={['USER', 'INDIVIDUAL'].includes(collective.type) && !collective.isHost}
-        />
+        /> */}
         <Body>
-          <CollectiveNavbar
+          {/* <CollectiveNavbar
             collective={collective}
             isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(collective)}
             selectedCategory={NAVBAR_CATEGORIES.BUDGET}
             selectedSection={collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
-          />
-          <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} py={[0, 5]} mt={3} data-cy="transactions-page-content">
+          /> */}
+          <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} pb={[0, 5]} mt={4} data-cy="transactions-page-content">
             <Flex justifyContent="space-between">
               <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal" display={['none', 'block']}>
                 <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
@@ -423,8 +423,7 @@ class TransactionsPage extends React.Component {
             )}
           </Box>
         </Body>
-        <Footer />
-      </TransactionPageWrapper>
+      </Page>
     );
   }
 }

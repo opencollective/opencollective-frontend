@@ -6,15 +6,16 @@ import Router from 'next/router';
 import NProgress from 'nprogress';
 import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
+import { withUser } from '../components/UserProvider';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import theme from '../lib/theme';
 import withData from '../lib/withData';
-
+import styled from 'styled-components';
 import StripeProviderSSR from '../components/StripeProvider';
 import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
 import UserProvider from '../components/UserProvider';
-
+import { Sidebar } from '../components/Page';
 import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
@@ -43,6 +44,14 @@ if (!process.browser) {
 // since it prevents memory leak
 const cache = createIntlCache();
 
+const Container = styled.div`
+  display: flex;
+  flex: 1;
+  justify-content: stretch;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+`;
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
     pageProps: PropTypes.object.isRequired,
@@ -130,7 +139,10 @@ class OpenCollectiveFrontendApp extends App {
                 <UserProvider>
                   <NewsAndUpdatesProvider>
                     <ToastProvider>
-                      <Component {...pageProps} />
+                      <Container>
+                        <Sidebar />
+                        <Component {...pageProps} />
+                      </Container>
                       <GlobalToasts />
                       <GlobalNewsAndUpdates />
                       <TwoFactorAuthenticationModal />
@@ -149,4 +161,4 @@ class OpenCollectiveFrontendApp extends App {
   }
 }
 
-export default withData(OpenCollectiveFrontendApp);
+export default withData(withUser(OpenCollectiveFrontendApp));

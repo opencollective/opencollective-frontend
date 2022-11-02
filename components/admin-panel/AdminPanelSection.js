@@ -51,10 +51,10 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
 
   if (isLoading) {
     return (
-      <div>
+      <Container width="100%" px={3}>
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
-      </div>
+      </Container>
     );
   }
 
@@ -81,7 +81,7 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
   // Form
   if (values(LEGACY_COLLECTIVE_SETTINGS_SECTIONS).includes(section)) {
     return (
-      <Container width="100%">
+      <Container width="100%" px={3}>
         {SECTION_LABELS[section] && (
           <Box mb={3}>
             <Title>{formatMessage(SECTION_LABELS[section])}</Title>

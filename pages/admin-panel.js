@@ -196,22 +196,14 @@ const AdminPanelPage = () => {
             {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
           </Flex>
         ) : (
-          <Grid
-            gridTemplateColumns={['1fr', null, '208px 1fr']}
-            maxWidth={1280}
-            minHeight={600}
-            gridGap={56}
-            m="0 auto"
-            px={3}
-            py={4}
-          >
-            <AdminPanelSideBar
+          <Grid gridTemplateColumns={'1fr'} maxWidth={1200} minHeight={600} gridGap={56} m="0 auto" px={3} py={4}>
+            {/* <AdminPanelSideBar
               isLoading={isLoading}
               collective={account}
               selectedSection={selectedSection}
               display={['none', null, 'block']}
               isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
-            />
+            /> */}
             <AdminPanelSection section={selectedSection} isLoading={isLoading} collective={account} subpath={subpath} />
           </Grid>
         )}

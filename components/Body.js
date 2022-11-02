@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const Main = styled.main`
-  border-top: 1px solid rgb(232, 233, 235);
+  min-height: 74vh;
 `;
 
 export default class Body extends React.Component {

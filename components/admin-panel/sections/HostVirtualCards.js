@@ -17,7 +17,7 @@ import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
 import Pagination from '../../Pagination';
 import StyledButton from '../../StyledButton';
-import { P } from '../../Text';
+import { P, H1 } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
 const hostVirtualCardsQuery = gql`
@@ -178,11 +178,11 @@ const HostVirtualCards = props => {
   }
 
   return (
-    <Fragment>
+    <Box maxWidth={1200} m="0 auto" px={3}>
       <Box>
-        <P fontSize="24px" fontWeight="700" lineHeight="32px" mb={3}>
+        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
-        </P>
+        </H1>
         <P>
           <FormattedMessage
             id="Host.VirtualCards.List.Description"
@@ -293,7 +293,7 @@ const HostVirtualCards = props => {
           }}
         />
       )}
-    </Fragment>
+    </Box>
   );
 };
 

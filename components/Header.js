@@ -97,7 +97,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const { css, canonicalURL, withTopBar } = this.props;
+    const { css, canonicalURL, withTopBar, LoggedInUser } = this.props;
     return (
       <header>
         <Head>
@@ -123,6 +123,7 @@ class Header extends React.Component {
             showSearch={this.props.showSearch}
             menuItems={this.props.menuItems}
             showProfileAndChangelogMenu={this.props.showProfileAndChangelogMenu}
+            LoggedInUser={LoggedInUser}
           />
         )}
         <GlobalWarnings collective={this.props.collective} />

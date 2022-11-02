@@ -15,6 +15,7 @@ import StyledButton from '../components/StyledButton';
 import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
 import StyledLink from '../components/StyledLink';
+import { H1 } from '../components/Text';
 
 const loggedInUserApplicationsQuery = gqlV1/* GraphQL */ `
   query LoggedInUserApplications {
@@ -77,10 +78,10 @@ class Apps extends React.Component {
               const apiKeys = applications.filter(app => app.type === 'API_KEY');
 
               return (
-                <Container maxWidth="80%" m="40px auto">
-                  <h3>
+                <Container maxWidth="1200" px={'32px'} m="32px auto">
+                  <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
                     <FormattedMessage id="applications.ApiKeys" defaultMessage="API Keys" />
-                  </h3>
+                  </H1>
 
                   <p>
                     <FormattedMessage

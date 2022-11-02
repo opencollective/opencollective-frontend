@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
@@ -178,31 +178,29 @@ const HostDashboardExpenses = ({ hostSlug, isNewAdmin }) => {
   };
 
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
+    <Box maxWidth={1200} m="0 auto" px={3}>
       {!loading && (data?.host.hasDisputedOrders || data?.host.hasInReviewOrders) && (
         <Box mb={4}>
           <MessageBox type="warning" withIcon>
-            <List>
-              {data?.host.hasDisputedOrders && (
-                <ListItem paddingTop={10} paddingBottom={10}>
-                  <FormattedMessage
-                    id="host.disputes.warning"
-                    defaultMessage="Fraud Protection Warning: There are disputed charges that need review."
-                  />{' '}
-                  <Link href={`/${hostSlug}/admin/orders?status=DISPUTED`}>Disputed Orders</Link>{' '}
-                </ListItem>
-              )}
+            {data?.host.hasDisputedOrders && (
+              <Fragment>
+                <FormattedMessage
+                  id="host.disputes.warning"
+                  defaultMessage="Fraud Protection Warning: There are disputed charges that need review."
+                />{' '}
+                <Link href={`/${hostSlug}/admin/orders?status=DISPUTED`}>Disputed Orders</Link>{' '}
+              </Fragment>
+            )}
 
-              {data?.host.hasInReviewOrders && (
-                <ListItem paddingTop={10} paddingBottom={10}>
-                  <FormattedMessage
-                    id="host.in_review.warning"
-                    defaultMessage="Fraud Protection Warning: There are charges under review that need attention."
-                  />{' '}
-                  <Link href={`/${hostSlug}/admin/orders?status=IN_REVIEW`}>In Review Orders</Link>{' '}
-                </ListItem>
-              )}
-            </List>
+            {data?.host.hasInReviewOrders && (
+              <Fragment paddingTop={10} paddingBottom={10}>
+                <FormattedMessage
+                  id="host.in_review.warning"
+                  defaultMessage="Fraud Protection Warning: There are charges under review that need attention."
+                />{' '}
+                <Link href={`/${hostSlug}/admin/orders?status=IN_REVIEW`}>In Review Orders</Link>{' '}
+              </Fragment>
+            )}
           </MessageBox>
         </Box>
       )}
