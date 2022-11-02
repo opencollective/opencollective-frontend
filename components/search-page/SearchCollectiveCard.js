@@ -102,7 +102,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                     </Span>
                     {` `}
                     <Span fontSize="12px" fontWeight={400} color="black.700">
-                      <FormattedMessage defaultMessage="Money Spent" />
+                      <FormattedMessage defaultMessage="Contributed" />
                     </Span>
                   </Box>
                 )}
