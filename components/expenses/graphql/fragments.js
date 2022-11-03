@@ -178,6 +178,7 @@ export const expensePageExpenseFieldsFragment = gql`
     attachedFiles {
       id
       url
+      name
     }
     payee {
       id
@@ -525,6 +526,7 @@ export const expensesListAdminFieldsFragment = gql`
     attachedFiles {
       id
       url
+      name
     }
     securityChecks {
       level

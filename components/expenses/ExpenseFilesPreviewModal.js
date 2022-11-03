@@ -21,9 +21,9 @@ import UploadedFilePreview from '../UploadedFilePreview';
 const FileInfo = ({ collective, expense, item, invoiceBlob }) => (
   <Flex justifyContent="space-between" px={25} mt={2}>
     <Box flex="1 1 65%">
-      {item.description && (
+      {(item.description || item.name) && (
         <P fontSize="14px" lineHeight="21px" color="black.900" mb={1}>
-          {item.description}
+          {item.description || item.name}
         </P>
       )}
       <P fontSize="11px" color="black.500">
@@ -132,7 +132,7 @@ const ExpenseFilesPreviewModal = ({ collective, expense, onClose }) => {
             <ExpenseInvoicePreview isLoading={!invoiceFile} fileURL={invoiceFile} />
           )
         ) : (
-          <UploadedFilePreview url={item.url} size={350} title={item.title} />
+          <UploadedFilePreview url={item.url} size={350} title={item.title} fileName={item.name} />
         )
       }
     />
