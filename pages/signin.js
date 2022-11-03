@@ -216,7 +216,7 @@ class SigninV2Page extends React.Component {
 
   render() {
     return (
-      <div className="LoginPage">
+      <div data-cy="LoginPage">
         <Header
           title={this.props.form === 'signin' ? 'Sign In' : 'Create Account'}
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."

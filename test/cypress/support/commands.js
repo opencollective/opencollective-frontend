@@ -49,8 +49,10 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams } = {})
     // opencollective-api/server/controllers/users.js for more info
     const token = getTokenFromRedirectUrl(redirect);
     if (token) {
-      return getLoggedInUserFromToken(token).then(user => {
-        return cy.visit(redirect, visitParams).then(() => user);
+      return getLoggedInUserFromToken(token).then(async user => {
+        await cy.visit(redirect, visitParams);
+        await cy.getByDataCy('LoginPage').should('not.exist'); // Wait for redirect to be over before passing on
+        return user;
       });
     } else {
       return cy.visit(redirect, visitParams).then(() => user);
