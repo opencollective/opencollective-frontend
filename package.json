@@ -98,7 +98,7 @@
     "react-text-mask": "^5.4.3",
     "react-window": "1.8.8",
     "redis": "3.1.2",
-    "sanitize-html": "2.7.2",
+    "sanitize-html": "2.7.3",
     "slugify": "1.6.5",
     "spdx-license-list": "^6.6.0",
     "speakeasy": "2.0.0",
