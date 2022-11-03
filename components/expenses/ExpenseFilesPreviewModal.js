@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Download as DownloadIcon } from '@styled-icons/feather/Download';
 import { saveAs } from 'file-saver';
 import { FormattedDate, FormattedMessage } from 'react-intl';
-import { v4 as uuid } from 'uuid';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 
@@ -61,16 +60,7 @@ const getFilesFromExpense = (collective, expense) => {
   }
 
   if (expense.type === expenseTypes.INVOICE) {
-    return [
-      {
-        id: uuid(),
-        amount: expense.amount,
-        description: <FormattedMessage id="Expense.Type.Invoice" defaultMessage="Invoice" />,
-        title: getExpenseInvoiceFilename(collective, expense),
-        type: 'EXPENSE_INVOICE',
-      },
-      ...expense.attachedFiles,
-    ];
+    return expense.attachedFiles || [];
   } else {
     const items = expense.items?.filter(({ url }) => Boolean(url)) || [];
     return [...items, ...expense.attachedFiles];
