@@ -2100,6 +2100,11 @@ type ExpenseAttachedFile {
   """
   id: String!
   url: URL
+
+  """
+  The original filename
+  """
+  name: String
 }
 
 """
@@ -13537,6 +13542,11 @@ input ExpenseAttachedFileInput {
   ID of the file
   """
   id: String
+
+  """
+  Original filename
+  """
+  name: String
 
   """
   URL of the file
