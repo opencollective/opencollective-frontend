@@ -56,6 +56,7 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
             section={COLLECTIVE_SECTIONS.ACTIVITY_LOG}
             if={hasActivityLog(collective)}
           />
+          <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SECURITY} />
           <MenuLink collective={collective} section={ALL_SECTIONS.ADVANCED} />
           {!isHostAccount(collective) && <MenuLink collective={collective} section={ALL_SECTIONS.FISCAL_HOSTING} />}
         </React.Fragment>
@@ -123,7 +124,6 @@ const Menu = ({ collective, isAccountantOnly }) => {
                 section={FISCAL_HOST_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS}
                 if={hasFeature(collective, FEATURES.VIRTUAL_CARDS)}
               />
-              <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.HOST_TWO_FACTOR_AUTH} />
               <MenuLink
                 collective={collective}
                 section={FISCAL_HOST_SECTIONS.POLICIES}
@@ -237,6 +237,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={COLLECTIVE_SECTIONS.ACTIVITY_LOG}
             if={hasActivityLog(collective)}
           />
+          <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SECURITY} if={!isType(collective, USER)} />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ADVANCED} />
         </MenuGroup>
         <MenuGroup if={isSelfHostedAccount(collective) && !isAccountantOnly} mt={24}>
@@ -248,7 +249,6 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
             if={isType(collective, COLLECTIVE)}
           />
-          <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.HOST_TWO_FACTOR_AUTH} />
         </MenuGroup>
       </React.Fragment>
     );

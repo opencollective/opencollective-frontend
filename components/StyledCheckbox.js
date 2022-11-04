@@ -100,12 +100,6 @@ const CheckboxContainer = styled.div`
     }
   }
 
-  /* Focused */
-  input:focus ~ ${CustomCheckbox} {
-    background: ${themeGet('colors.primary.400')};
-    border-color: ${themeGet('colors.primary.400')};
-  }
-
   /* Disabled */
   input:disabled {
     & ~ ${CustomCheckbox} {
@@ -167,7 +161,15 @@ class StyledCheckbox extends React.Component {
         data-cy={`checkbox-${name}`}
         {...props}
       >
-        <input id={inputId} name={name} type="checkbox" checked={realChecked} disabled={disabled} readOnly />
+        <input
+          id={inputId}
+          name={name}
+          type="checkbox"
+          checked={realChecked}
+          disabled={disabled}
+          readOnly
+          tabIndex="-1" // Prevents the checkbox from being focused, since we're using the container as the focusable element
+        />
         <CustomCheckbox data-cy="custom-checkbox">
           {isLoading ? <StyledSpinner size={size} /> : <IconCheckmark />}
         </CustomCheckbox>

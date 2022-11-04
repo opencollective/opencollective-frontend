@@ -4119,6 +4119,7 @@ type VirtualCardCollection implements Collection {
 
 type Policies {
   EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
+  REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
 }
@@ -13255,6 +13256,7 @@ input AccountUpdateInput {
 
 input PoliciesInput {
   EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
+  REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
 }
 
@@ -13825,12 +13827,7 @@ input ProcessExpensePaymentParams {
   forceManual: Boolean
 
   """
-  2FA code for if the host account has 2FA for payouts turned on.
-  """
-  twoFactorAuthenticatorCode: String
-
-  """
-  2FA code for if the host account has 2FA for payouts turned on.
+  Who is responsible for paying any due fees.
   """
   feesPayer: FeesPayer = COLLECTIVE
 }

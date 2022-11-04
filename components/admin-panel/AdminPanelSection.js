@@ -12,6 +12,7 @@ import HostDashboardReports from '../host-dashboard/HostDashboardReports';
 import PendingApplications from '../host-dashboard/PendingApplications';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
+import { H2 } from '../Text';
 
 import AccountSettings from './sections/AccountSettings';
 import FinancialContributions from './sections/FinancialContributions';
@@ -40,7 +41,7 @@ const FISCAL_HOST_SETTINGS_SECTIONS = {
   [FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
 };
 
-const Title = styled(Box)`
+const Title = styled(H2)`
   font-size: 24px;
   font-weight: 700;
   line-height: 32px;

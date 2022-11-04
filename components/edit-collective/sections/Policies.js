@@ -58,6 +58,7 @@ const setPoliciesMutation = gql`
       id
       policies {
         EXPENSE_AUTHOR_CANNOT_APPROVE
+        REQUIRE_2FA_FOR_ADMINS
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
           applies
