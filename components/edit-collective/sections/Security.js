@@ -217,7 +217,7 @@ const Security = ({ collective }) => {
           </P>
           <StyledHr borderColor="black.400" my={4} />
           <div>
-            <StyledButton buttonStyle="primary" minWidth={100} type="submit" isLoading={submitting} disabled={!dirty}>
+            <StyledButton buttonStyle="primary" minWidth={100} type="submit" loading={submitting} disabled={!dirty}>
               <FormattedMessage id="save" defaultMessage="Save" />
             </StyledButton>
           </div>
