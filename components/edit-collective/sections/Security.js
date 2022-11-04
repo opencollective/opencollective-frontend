@@ -174,7 +174,7 @@ const Security = ({ collective }) => {
                   </P>
                 </Box>
               </CheckboxContainer>
-              {get(data.account, 'settings.payoutsTwoFactorAuth.enabled', false) && (
+              {values.payoutsTwoFactorAuth.enabled && (
                 <StyledInputField name="rollingLimit" htmlFor="rollingLimit" disabled={loading} mr="24px">
                   {inputProps => (
                     <StyledInputAmount
