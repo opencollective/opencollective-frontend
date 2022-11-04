@@ -7,8 +7,10 @@ import { ViewGrid } from '@styled-icons/heroicons-outline/ViewGrid';
 import { themeGet } from '@styled-system/theme-get';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
+import { Plus } from '@styled-icons/heroicons-outline/Plus';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import StyledButton from './StyledButton';
 
 import Body from '../components/Body';
 import ErrorPage from '../components/ErrorPage';
@@ -22,7 +24,30 @@ import { Box } from '../components/Grid';
 
 import SideBarProfileMenu from './SideBarProfileMenu';
 import { withUser } from './UserProvider';
+// const CreateButton = styled(StyledButton)`
+//   //margin: 0 4px;
+//   background: transparent;
+//   padding: 12px 12px 12px 12px;
+//   border-radius: 8px;
+//   border-width: 1px;
+//   letter-spacing: 0;
+//   border-color: transparent;
+//   box-shadow: 0px 0px 0px 2px #e2e8f0;
 
+//   &:hover {
+//     border-color: transparent;
+//     background: #e8edf4;
+//     color: ${themeGet('colors.black.900')};
+//     box-shadow: 0px 0px 0px 2px #e8edf4;
+//   }
+//   display: flex;
+//   align-items: center;
+//   gap: 12px;
+//   //margin-right: 20px;
+//   font-size: 14px;
+//   font-weight: 500;
+//   color: ${themeGet('colors.black.700')};
+// `;
 const Slider = styled.div`
   background: #f8fafc;
   border-right: 1px solid ${themeGet('colors.black.200')};
@@ -339,9 +364,23 @@ export const Sidebar = () => {
     m => m.role === 'ADMIN' || m.role === 'MEMBER',
   );
   useEffect(() => {
+
+    if (!activeCollective) return;
+    const isUserSettings =
+      (activeCollective.type === 'USER' || activeCollective.type === 'COLLECTIVE') &&
+      router.asPath === `/${activeCollective.slug}/admin`;
+    if (router.asPath === `/${activeCollective.slug}/admin`) {
+      router.push(
+        activeCollective.type === 'ORGANIZATION'
+          ? `/${activeCollective.slug}/admin/expenses`
+          : `/${activeCollective.slug}/admin/info`,
+        null,
+        { shallow: true },
+      );
+    }
     const isPathInSettings = settings.some(s => router.asPath.includes(s.href));
 
-    if (isPathInSettings) {
+    if (isPathInSettings || isUserSettings) {
       setShowSettingsMenu(true);
     } else {
       setShowSettingsMenu(false);
@@ -350,19 +389,17 @@ export const Sidebar = () => {
     // if new path is part of a collective I am member of, then set active collective
     const possibleCollectiveSlug = router.asPath.split('/')[1];
 
-    if (possibleCollectiveSlug === LoggedInUser?.collective.slug) {
-      setActiveCollective({ ...LoggedInUser.collective, role: 'Personal profile' });
-    } else if (membershipsThatICanHaveAsContext) {
-      const membership = membershipsThatICanHaveAsContext.find(m => m.collective.slug === possibleCollectiveSlug);
-      if (membership) {
-        setActiveCollective({ ...membership.collective, role: membership.role });
+    if (possibleCollectiveSlug !== activeCollective.slug) {
+      if (possibleCollectiveSlug === LoggedInUser?.collective.slug) {
+        setActiveCollective({ ...LoggedInUser.collective, role: 'Personal profile' });
+      } else if (membershipsThatICanHaveAsContext) {
+        const membership = membershipsThatICanHaveAsContext.find(m => m.collective.slug === possibleCollectiveSlug);
+        if (membership) {
+          setActiveCollective({ ...membership.collective, role: membership.role });
+        }
       }
     }
   }, [router.asPath]);
-
-  useEffect(() => {
-    setShowSettingsMenu(false);
-  }, [activeCollective]);
 
   return (
     <Slider show={!!LoggedInUser}>

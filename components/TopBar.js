@@ -6,6 +6,7 @@ import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+import { Plus } from '@styled-icons/heroicons-outline/Plus';
 
 import theme from '../lib/theme';
 
@@ -24,6 +25,18 @@ import { Span } from './Text';
 import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
 
+const CreateButton = styled(StyledButton)`
+  // margin: 0 4px;
+  background: transparent;
+  padding: 10px 16px 10px 10px;
+  border-radius: 8px;
+  letter-spacing: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+`;
 const NavList = styled(Flex)`
   list-style: none;
   min-width: 20rem;
@@ -91,7 +104,6 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, LoggedInUs
     debouncedSetShowMobileMenu(state => !state);
   };
   const router = useRouter();
-  console.log(router);
 
   const inMarketingPage = marketingPaths.includes(router.pathname);
 
@@ -271,22 +283,19 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, LoggedInUs
 
       {showProfileAndChangelogMenu && (
         <React.Fragment>
-          <Flex alignItems="center" mr={3}>
-            {!inMarketingPage && LoggedInUser && (
-              <NavList as="ul" p={0} m={0} justifyContent="space-around">
-                {menuItems.docs && (
-                  <Link href="/help">
-                    <NavButton as={Container} whiteSpace="nowrap">
-                      <FormattedMessage defaultMessage="Help & Support" />
-                    </NavButton>
-                  </Link>
-                )}
-              </NavList>
+          <Flex alignItems="center" gridGap={3} mr={2}>
+            {!inMarketingPage && LoggedInUser && menuItems.docs && (
+              <Link href="/help">
+                <NavButton as={Container} whiteSpace="nowrap">
+                  <FormattedMessage defaultMessage="Help & Support" />
+                </NavButton>
+              </Link>
             )}
 
-            <Hide xs>
-              <ChangelogTrigger />
-            </Hide>
+            <CreateButton>
+              <Plus size="16" /> <span>Create</span>
+            </CreateButton>
+            <ChangelogTrigger />
           </Flex>
           {!LoggedInUser && <TopBarProfileMenu />}
         </React.Fragment>
