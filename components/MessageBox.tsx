@@ -44,6 +44,8 @@ type MessageBoxProps = MessageProps & {
   isLoading?: boolean;
   withIcon?: boolean;
   customIcon?: React.ReactNode;
+  title?: React.ReactNode;
+  action?: React.ReactNode;
   children: React.ReactNode;
 };
 
@@ -104,7 +106,15 @@ const icons = {
 /**
  * Display messages in a box contextualized for message type (error, success...etc)
  */
-const MessageBox = ({ type = 'white', customIcon, withIcon = false, isLoading, children }: MessageBoxProps) => {
+const MessageBox = ({
+  title,
+  type = 'white',
+  customIcon,
+  withIcon = false,
+  action,
+  isLoading,
+  children,
+}: MessageBoxProps) => {
   const icon = customIcon ? customIcon : withIcon ? icons[type] : null;
   return (
     <Message type={type}>
