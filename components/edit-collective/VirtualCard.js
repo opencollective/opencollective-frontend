@@ -389,7 +389,10 @@ const getLimitString = ({
             }}
           />
           {spendingLimitInterval === VirtualCardLimitInterval.ALL_TIME ? (
-            <FormattedMessage id="VirtualCards.LimitDoesNotRenew" defaultMessage="Limit does not renew" />
+            <Fragment>
+              &nbsp;&bull;&nbsp;
+              <FormattedMessage id="VirtualCards.LimitDoesNotRenew" defaultMessage="Limit does not renew" />
+            </Fragment>
           ) : (
             <Fragment>
               &nbsp;&bull;&nbsp;
