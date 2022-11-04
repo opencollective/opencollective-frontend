@@ -95,10 +95,12 @@ class SigninV2Page extends React.Component {
   }
 
   async initialize() {
-    if (this.props.token) {
+    const token = this.props.token || this.props.router.query.token;
+    console.log({ token, query: this.props.router.query });
+    if (token) {
       let user;
       try {
-        user = await this.props.login(this.props.token);
+        user = await this.props.login(token);
         console.log({ user });
         // If given token is invalid, try to login with the old one
         if (!user) {
