@@ -79,7 +79,6 @@ class UserProvider extends React.Component {
   login = async (token, options = {}) => {
     const { getLoggedInUser } = this.props;
     const { twoFactorAuthenticatorCode, recoveryCode } = options;
-    console.log('login', token);
     try {
       const LoggedInUser = token
         ? await getLoggedInUser({ token, twoFactorAuthenticatorCode, recoveryCode })
@@ -92,7 +91,6 @@ class UserProvider extends React.Component {
       });
       return LoggedInUser;
     } catch (error) {
-      console.log({ error });
       // If token from localStorage is invalid or expired, delete it
       if (!token && ['Invalid token', 'Expired token'].includes(error.message)) {
         this.logout();

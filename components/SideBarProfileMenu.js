@@ -358,8 +358,6 @@ class TopBarProfileMenu extends React.Component {
           </P>
         )}
 
-        {status === 'loggedout' && <LoginBtn />}
-
         {status === 'loggedin' && this.renderLoggedInUser()}
       </ProfileContainer>
     );
