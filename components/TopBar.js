@@ -291,10 +291,12 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, LoggedInUs
                 </NavButton>
               </Link>
             )}
+            {LoggedInUser && (
+              <CreateButton>
+                <Plus size="16" /> <span>Create</span>
+              </CreateButton>
+            )}
 
-            <CreateButton>
-              <Plus size="16" /> <span>Create</span>
-            </CreateButton>
             <ChangelogTrigger />
           </Flex>
           {!LoggedInUser && <TopBarProfileMenu />}
