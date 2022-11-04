@@ -102,11 +102,11 @@ const I18nScopes = defineMessages({
     defaultMessage: 'Payee',
   },
   [Scope.USER]: {
-    id: 'SecurityScope.User',
+    id: 'Tags.USER',
     defaultMessage: 'User',
   },
   [Scope.COLLECTIVE]: {
-    id: 'SecurityScope.Collective',
+    id: 'Collective',
     defaultMessage: 'Collective',
   },
   [Scope.PAYOUT_METHOD]: {

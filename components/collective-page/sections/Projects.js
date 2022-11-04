@@ -68,7 +68,7 @@ class SectionProjects extends React.PureComponent {
       <Box pt={[4, 5]} data-cy="Projects">
         <ContainerSectionContent>
           <SectionTitle>
-            <FormattedMessage id="CollectivePage.SectionProjects.Title" defaultMessage="Projects" />
+            <FormattedMessage id="Projects" defaultMessage="Projects" />
           </SectionTitle>
           <P color="black.700" mb={4}>
             {isAdmin ? (

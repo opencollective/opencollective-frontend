@@ -149,7 +149,7 @@ const InvoicesReceipts = ({ collective }) => {
         </StyledInputField>
       </Box>
       <SettingsSectionTitle>
-        <FormattedMessage defaultMessage="Financial contributions" />
+        <FormattedMessage id="financialContributions" defaultMessage="Financial contributions" />
       </SettingsSectionTitle>
       <P pb="26px">
         <FormattedMessage

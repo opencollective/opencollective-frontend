@@ -301,7 +301,7 @@ class SignInOrJoinFree extends React.Component {
                       {useRecoveryCodes ? (
                         <FormattedMessage id="login.twoFactorAuth.reset" defaultMessage="Reset 2FA" />
                       ) : (
-                        <FormattedMessage id="VerifyButton" defaultMessage="Verify" />
+                        <FormattedMessage id="actions.verify" defaultMessage="Verify" />
                       )}
                     </StyledButton>
                   </Flex>
@@ -432,7 +432,7 @@ class SignInOrJoinFree extends React.Component {
                   </Span>
                   <Span mt={['32px', 0]}>
                     <SignInFooterLink href="/contact">
-                      <FormattedMessage defaultMessage="Contact support" />
+                      <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
                     </SignInFooterLink>
                   </Span>
                 </Flex>

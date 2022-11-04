@@ -58,6 +58,7 @@ const setPoliciesMutation = gql`
       id
       policies {
         EXPENSE_AUTHOR_CANNOT_APPROVE
+        REQUIRE_2FA_FOR_ADMINS
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
           applies
@@ -468,7 +469,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
         </Container>
         <Container>
           <SettingsSectionTitle mt={4}>
-            <FormattedMessage id="editCollective.expenseTypesPolicy.header" defaultMessage="Expense types" />
+            <FormattedMessage defaultMessage="Expense types" />
           </SettingsSectionTitle>
           <P mb={2}>
             <FormattedMessage

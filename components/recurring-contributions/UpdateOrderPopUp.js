@@ -471,7 +471,7 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
             data-cy="recurring-contribution-update-order-button"
             onClick={() => updateOrder(selectedTier, selectedAmountOption, inputAmountValue)}
           >
-            <FormattedMessage id="subscription.updateAmount.update.btn" defaultMessage="Update" />
+            <FormattedMessage id="actions.update" defaultMessage="Update" />
           </StyledButton>
         )}
       </Flex>

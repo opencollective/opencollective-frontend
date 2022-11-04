@@ -37,7 +37,7 @@ export const ORG_BUDGET_SECTIONS = {
 
 export const FISCAL_HOST_SECTIONS = {
   FISCAL_HOSTING: 'fiscal-hosting',
-  HOST_TWO_FACTOR_AUTH: 'host-two-factor-auth',
+  SECURITY: 'security',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   HOST_VIRTUAL_CARDS_SETTINGS: 'host-virtual-cards-settings',
   INVOICES_RECEIPTS: 'invoices-receipts',
@@ -197,7 +197,7 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Payment Methods',
   },
   [ALL_SECTIONS.TIERS]: {
-    id: 'editCollective.menu.tiers',
+    id: 'Tiers',
     defaultMessage: 'Tiers',
   },
   [ALL_SECTIONS.TIERS_REVAMP]: {
@@ -229,9 +229,9 @@ export const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.paymentReceipts',
     defaultMessage: 'Payment Receipts',
   },
-  [ALL_SECTIONS.HOST_TWO_FACTOR_AUTH]: {
-    id: 'TwoFactorAuth',
-    defaultMessage: 'Two-factor authentication',
+  [ALL_SECTIONS.SECURITY]: {
+    id: 'Security',
+    defaultMessage: 'Security',
   },
   [ALL_SECTIONS.HOST_VIRTUAL_CARDS]: {
     id: 'VirtualCards.Title',

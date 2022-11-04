@@ -49,7 +49,7 @@ const ContactUsSuccess = () => (
     <Box my="18px" width={['288px', '404px']}>
       <P fontSize={['16px', '18px']} lineHeight={['24px', '26px']} color="black.800" textAlign="center">
         <FormattedMessage
-          id="helpAndSupport.messageConfirmation.description"
+          id="helpAndSupport.description"
           defaultMessage="Our support team is available from Monday to Friday. Please expect a response within 3 business days."
         />
       </P>

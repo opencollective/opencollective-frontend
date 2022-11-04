@@ -467,7 +467,7 @@ export default function EditVirtualCardModal({
               textTransform="capitalize"
             >
               {isEditing ? (
-                <FormattedMessage defaultMessage="Update" />
+                <FormattedMessage id="actions.update" defaultMessage="Update" />
               ) : (
                 <FormattedMessage defaultMessage="Create virtual card" />
               )}

@@ -271,7 +271,7 @@ const ActionsButton = props => {
           isDanger
           type="confirm"
           header={<FormattedMessage defaultMessage="Pause Virtual Card" />}
-          continueLabel={<FormattedMessage defaultMessage="Pause Card" />}
+          continueLabel={<FormattedMessage id="VirtualCards.PauseCard" defaultMessage="Pause Card" />}
           onClose={() => setShowConfirmationModal(false)}
           continueHandler={async () => {
             await handlePauseUnpause();
@@ -389,7 +389,10 @@ const getLimitString = ({
             }}
           />
           {spendingLimitInterval === VirtualCardLimitInterval.ALL_TIME ? (
-            <FormattedMessage id="VirtualCards.LimitDoesNotRenew" defaultMessage="Limit does not renew" />
+            <Fragment>
+              &nbsp;&bull;&nbsp;
+              <FormattedMessage id="VirtualCards.LimitDoesNotRenew" defaultMessage="Limit does not renew" />
+            </Fragment>
           ) : (
             <Fragment>
               &nbsp;&bull;&nbsp;

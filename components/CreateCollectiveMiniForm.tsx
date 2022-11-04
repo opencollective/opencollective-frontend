@@ -123,7 +123,7 @@ const prepareMutationVariables = collective => {
   }
 };
 
-const createCollectiveMutation = gqlV1/* GraphQL */ `
+const createCollectiveMutation = gqlV1`
   mutation CreateCollective($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
       id
@@ -150,7 +150,7 @@ const createCollectiveMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-const createUserMutation = gqlV1/* GraphQL */ `
+const createUserMutation = gqlV1`
   mutation CreateUser($user: UserInputType!) {
     createUser(user: $user, throwIfExists: false, sendSignInLink: false) {
       user {

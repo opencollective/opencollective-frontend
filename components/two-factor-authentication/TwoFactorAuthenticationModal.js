@@ -54,18 +54,21 @@ export default function TwoFactorAuthenticationModal() {
     const has2FAConfigured = prompt.supportedMethods.length > 0;
 
     return (
-      <StyledModal onClose={cancel} trapFocus>
+      <StyledModal onClose={cancel} trapFocus maxWidth={495}>
         <ModalHeader hideCloseIcon>
           {has2FAConfigured ? (
-            <FormattedMessage defaultMessage="Verify using the Two-Factor Authentication (2FA) code:" />
+            <FormattedMessage defaultMessage="Verify using the 2FA code" />
           ) : (
-            <FormattedMessage defaultMessage="You must configure Two-Factor Authentication (2FA) to access this feature." />
+            <FormattedMessage defaultMessage="You must configure 2FA to access this feature" />
           )}
         </ModalHeader>
         {has2FAConfigured ? (
           <Flex mt={2} flexDirection="column">
             <Label htmlFor="2fa-code-input" fontWeight="normal" as="label" mb={2}>
-              <FormattedMessage defaultMessage="Please enter your 6-digit code without any dashes." />
+              <FormattedMessage
+                id="TwoFactorAuth.Setup.Form.InputLabel"
+                defaultMessage="Please enter your 6-digit code without any dashes."
+              />
             </Label>
             <StyledInput
               id="2fa-code-input"
