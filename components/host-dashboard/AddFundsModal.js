@@ -84,6 +84,7 @@ const addFundsMutation = gql`
     $amount: AmountInput!
     $description: String!
     $memo: String
+    $fundReceivedDate: DateTime
     $hostFeePercent: Float!
     $invoiceTemplate: String
   ) {
@@ -93,6 +94,7 @@ const addFundsMutation = gql`
       amount: $amount
       description: $description
       memo: $memo
+      fundReceivedDate: $fundReceivedDate
       hostFeePercent: $hostFeePercent
       tier: $tier
       invoiceTemplate: $invoiceTemplate
@@ -100,6 +102,7 @@ const addFundsMutation = gql`
       id
       description
       memo
+      fundReceivedDate
       transactions {
         id
         type
@@ -214,6 +217,7 @@ const getInitialValues = values => ({
   hostFeePercent: null,
   description: '',
   memo: null,
+  fundReceivedDate: null,
   fromAccount: null,
   tier: null,
   ...values,
@@ -401,6 +405,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                   account: buildAccountReference(values.account),
                   tier: !values.tier ? null : { id: values.tier.id },
                   invoiceTemplate: values.invoiceTemplate?.value || defaultInvoiceTemplate,
+                  fundReceivedDate: values.fundReceivedDate ? new Date(values.fundReceivedDate) : null,
                 },
               });
 
@@ -410,6 +415,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                 fundAmount: values.amount,
                 description: resultOrder.description,
                 memo: resultOrder.memo,
+                fundReceivedDate: resultOrder.fundReceivedDate,
                 source: resultOrder.fromAccount,
                 tier: resultOrder.tier,
               });
@@ -516,6 +522,26 @@ const AddFundsModal = ({ collective, ...props }) => {
                       mt={3}
                     >
                       {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
+                    </StyledInputFormikField>
+                    <StyledInputFormikField
+                      name="fundReceivedDate"
+                      htmlFor="addFunds-fundReceivedDate"
+                      inputType="date"
+                      label={
+                        <span>
+                          <FormattedMessage defaultMessage="Date" />
+                          {` `}
+                          <StyledTooltip
+                            content={() => <FormattedMessage defaultMessage="Date the funds were received." />}
+                          >
+                            <InfoCircle size={16} />
+                          </StyledTooltip>
+                        </span>
+                      }
+                      required={false}
+                      mt={3}
+                    >
+                      {({ field }) => <StyledInput data-cy="add-funds-fundReceivedDate" {...field} />}
                     </StyledInputFormikField>
                     <StyledInputFormikField
                       name="memo"
@@ -701,11 +727,20 @@ const AddFundsModal = ({ collective, ...props }) => {
                             <FormattedMessage id="AddFundsModal.ForThePurpose" defaultMessage="For the purpose of" />{' '}
                             <strong>{fundDetails.description}</strong>
                           </li>
-                          <li>
-                            <FormattedMessage defaultMessage="Memo" />
-                            {': '}
-                            <strong>{fundDetails.memo}</strong>
-                          </li>
+                          {fundDetails.memo && (
+                            <li>
+                              <FormattedMessage defaultMessage="Memo" />
+                              {': '}
+                              <strong>{fundDetails.memo}</strong>
+                            </li>
+                          )}
+                          {fundDetails.fundReceivedDate && (
+                            <li>
+                              <FormattedMessage defaultMessage="Fund Received Date" />
+                              {': '}
+                              <strong>{intl.formatDate(fundDetails.fundReceivedDate)}</strong>
+                            </li>
+                          )}
                           {fundDetails.tier && (
                             <li>
                               <FormattedMessage defaultMessage="For the tier" />{' '}
