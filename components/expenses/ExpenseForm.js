@@ -410,6 +410,7 @@ const ExpenseFormBody = ({
         formik={formik}
         isOnBehalf={isOnBehalf}
         onCancel={onCancel}
+        handleClearPayeeStep={() => setShowResetModal(true)}
         payoutProfiles={payoutProfiles}
         loggedInAccount={loggedInAccount}
         onChange={payee => {
@@ -424,6 +425,10 @@ const ExpenseFormBody = ({
             setErrors({ payoutMethod: validation });
           }
         }}
+        editingExpense={editingExpense}
+        resetDefaultStep={() => setStep(EXPENSE_FORM_STEPS.PAYEE)}
+        formPersister={formPersister}
+        getDefaultExpense={getDefaultExpense}
         onInvite={isInvite => {
           setOnBehalf(isInvite);
           formik.setFieldValue('payeeLocation', {});
