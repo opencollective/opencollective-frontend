@@ -60,7 +60,7 @@ const Message = styled.div<MessageProps>`
   align-items: center;
   gap: 16px;
 
-  box-shadow: 0px 1px 4px 1px #3132331a;
+  box-shadow: 0px 1px 4px 1px rgba(49, 50, 51, 0.05);
 
   ${borders}
   ${shadow}
