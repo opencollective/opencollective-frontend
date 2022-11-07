@@ -237,7 +237,11 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={COLLECTIVE_SECTIONS.ACTIVITY_LOG}
             if={hasActivityLog(collective)}
           />
-          <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SECURITY} if={!isType(collective, USER)} />
+          <MenuLink
+            collective={collective}
+            section={FISCAL_HOST_SECTIONS.SECURITY}
+            if={isOneOfTypes(collective, [COLLECTIVE, FUND, ORGANIZATION])}
+          />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ADVANCED} />
         </MenuGroup>
         <MenuGroup if={isSelfHostedAccount(collective) && !isAccountantOnly} mt={24}>

@@ -142,7 +142,10 @@ const Security = ({ collective }) => {
               </Box>
               <Box flex="1 1">
                 <P fontSize="16px" lineHeight="24px" fontWeight="700">
-                  <FormattedMessage defaultMessage="All admins must have two-factor authentication" />
+                  <FormattedMessage
+                    defaultMessage="All {account} admins must have two-factor authentication"
+                    values={{ account: data.account.name }}
+                  />
                 </P>
                 <P mt="5px" color="black.700" fontSize="14px" lineHeight="20px">
                   <FormattedMessage defaultMessage="Checking this will require all admins of your team to activate a two-factor authentication to perform admin tasks like payouts." />
