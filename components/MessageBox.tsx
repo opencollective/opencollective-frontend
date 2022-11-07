@@ -43,9 +43,6 @@ type MessageProps = BordersProps &
 type MessageBoxProps = MessageProps & {
   isLoading?: boolean;
   withIcon?: boolean;
-  customIcon?: React.ReactNode;
-  title?: React.ReactNode;
-  action?: React.ReactNode;
   children: React.ReactNode;
 };
 
@@ -78,6 +75,9 @@ const Message = styled.div<MessageProps>`
     text-decoration: underline !important;
     color: ${themeGet('colors.black.800')};
   }
+  h1,
+  h2,
+  h3,
   h4 {
     font-size: 13px;
     margin: 0 0 8px 0;
@@ -106,32 +106,17 @@ const icons = {
 /**
  * Display messages in a box contextualized for message type (error, success...etc)
  */
-const MessageBox = ({
-  title,
-  type = 'white',
-  customIcon,
-  withIcon = false,
-  action,
-  isLoading,
-  children,
-  ...props
-}: MessageBoxProps) => {
-  const icon = customIcon ? customIcon : withIcon ? icons[type] : null;
+const MessageBox = ({ type = 'white', withIcon = false, isLoading, children, ...props }: MessageBoxProps) => {
+  const icon = withIcon ? icons[type] : null;
   return (
     <Message type={type} {...props}>
       {(icon || isLoading) && (
-        <Box flexShrink={0} alignSelf={withIcon ? 'start' : 'center'} color={iconColors[type]}>
+        <Box flexShrink={0} alignSelf={'start'} color={iconColors[type]}>
           {isLoading ? <StyledSpinner size="1.2em" /> : icon}
         </Box>
       )}
 
-      <Box>
-        {title && <h4>{title}</h4>}
-
-        {children}
-
-        {action && <Box mt={2}>{action}</Box>}
-      </Box>
+      <Box>{children}</Box>
     </Message>
   );
 };
