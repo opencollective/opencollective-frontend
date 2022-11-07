@@ -154,7 +154,7 @@ class ContributionFlow extends React.Component {
       stepDetails: {
         quantity: queryParams.quantity || 1,
         interval: queryParams.interval || getDefaultInterval(props.tier),
-        amount: isCryptoFlow ? '' : queryParams.amount || getDefaultTierAmount(tier, collective, currency),
+        amount: isCryptoFlow ? null : queryParams.amount || getDefaultTierAmount(tier, collective, currency),
         platformTip: queryParams.platformTip,
         currency,
       },
