@@ -126,7 +126,7 @@ const MessageBox = ({
       )}
 
       <Box>
-        {title && <h4> {title}</h4>}
+        {title && <h4>{title}</h4>}
 
         {children}
 

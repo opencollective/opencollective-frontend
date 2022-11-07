@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import { Close } from '@styled-icons/material/Close';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
 
@@ -75,10 +74,10 @@ const NotificationBar = ({ title, description, type, actions, inline }) => {
             <H1
               fontSize="1.4rem"
               lineHeight="2rem"
-              {...(description && { mb: '6px' })}
               mx="4px"
               textAlign="center"
               letterSpacing="0px"
+              {...(description && { mb: '6px' })}
               {...(inline && { display: 'inline' })}
             >
               {title}
@@ -123,8 +122,6 @@ NotificationBar.propTypes = {
   type: PropTypes.oneOf(['info', 'success', 'error', 'warning']),
   inline: PropTypes.bool,
   actions: PropTypes.oneOf([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]),
-  // dismissible: PropTypes.bool,
-  // dismiss: PropTypes.func,
 };
 
 export default NotificationBar;
