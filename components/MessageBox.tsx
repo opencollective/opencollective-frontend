@@ -114,10 +114,11 @@ const MessageBox = ({
   action,
   isLoading,
   children,
+  ...props
 }: MessageBoxProps) => {
   const icon = customIcon ? customIcon : withIcon ? icons[type] : null;
   return (
-    <Message type={type}>
+    <Message type={type} {...props}>
       {(icon || isLoading) && (
         <Box flexShrink={0} alignSelf={withIcon ? 'start' : 'center'} color={iconColors[type]}>
           {isLoading ? <StyledSpinner size="1.2em" /> : icon}
