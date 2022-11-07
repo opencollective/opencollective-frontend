@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { capitalize } from 'lodash';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ActivityDescriptionI18n } from '../../../../lib/i18n/activities';
+import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import formatMemberRole from '../../../../lib/i18n/member-role';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
@@ -19,8 +20,11 @@ const ActivityDescription = ({ activity }) => {
   }
 
   return intl.formatMessage(ActivityDescriptionI18n[activity.type], {
+    hasParent: Boolean(activity.account?.parent),
     FromAccount: () => <LinkCollective collective={activity.fromAccount} openInNewTab />,
     Account: () => <LinkCollective collective={activity.account} openInNewTab />,
+    AccountType: () => formatCollectiveType(intl, activity.account?.type || 'COLLECTIVE'),
+    AccountParent: () => <LinkCollective collective={activity.account?.parent} openInNewTab />,
     Expense: msg =>
       !activity.expense ? (
         msg
@@ -47,7 +51,32 @@ const ActivityDescription = ({ activity }) => {
         </Link>
       ),
     Host: () => <LinkCollective collective={activity.host} openInNewTab />,
-    MemberRole: () => (activity.data?.member?.role ? formatMemberRole(intl, activity.data.member.role) : 'member'),
+    CommentEntity: () => {
+      if (activity.expense) {
+        return (
+          <LinkExpense
+            collective={activity.expense.account}
+            expense={activity.expense}
+            title={activity.expense.description}
+            openInNewTab
+          >
+            <FormattedMessage id="Transaction.kind.EXPENSE" defaultMessage="Expense" /> #{activity.expense.legacyId}
+          </LinkExpense>
+        );
+      } else {
+        // We're not yet linking conversations & updates to comments in the activity table
+        return <LinkCollective collective={activity.account} openInNewTab />;
+      }
+    },
+    MemberRole: () => {
+      if (activity.data?.member?.role) {
+        return formatMemberRole(intl, activity.data.member.role);
+      } else if (activity.data?.invitation?.role) {
+        return formatMemberRole(intl, activity.data.invitation.role);
+      } else {
+        return 'member';
+      }
+    },
   });
 };
 
