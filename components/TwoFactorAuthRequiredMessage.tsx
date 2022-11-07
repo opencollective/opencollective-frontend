@@ -11,18 +11,28 @@ import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledHr from './StyledHr';
 import { P, Strong } from './Text';
+import { useLoggedInUser } from './UserProvider';
 
 type TwoFactorAuthRequiredMessageProps = {
   loggedInUser: LoggedInUser;
+  borderWidth?: string | number;
+  noTitle?: boolean;
 };
 
-export const TwoFactorAuthRequiredMessage = ({ loggedInUser }: TwoFactorAuthRequiredMessageProps) => {
+export const TwoFactorAuthRequiredMessage = ({
+  borderWidth = '1px',
+  noTitle = false,
+  ...flexProps
+}: TwoFactorAuthRequiredMessageProps) => {
+  const { LoggedInUser } = useLoggedInUser();
   return (
-    <Flex justifyContent="center" alignItems="flex-start" mt={[null, null, '64px']}>
-      <StyledCard width="100%" maxWidth={496} py="16px" textAlign="center">
-        <Strong fontSize="28px" lineHeight="36px">
-          <FormattedMessage defaultMessage="2FA Required" />
-        </Strong>
+    <Flex justifyContent="center" alignItems="flex-start" {...flexProps}>
+      <StyledCard width="100%" maxWidth={496} py="16px" textAlign="center" borderWidth={borderWidth}>
+        {!noTitle && (
+          <Strong fontSize="28px" lineHeight="36px">
+            <FormattedMessage defaultMessage="2FA Required" />
+          </Strong>
+        )}
         <StyledHr my="21px" borderColor="black.200" />
         <Flex my="41px" px="36px" alignItems="center">
           <Box flex="1 0 164px">
@@ -33,13 +43,15 @@ export const TwoFactorAuthRequiredMessage = ({ loggedInUser }: TwoFactorAuthRequ
           </P>
         </Flex>
         <StyledHr my="16px" borderColor="black.400" />
-        <Flex justifyContent="center">
-          <Link href={getSettingsRoute(loggedInUser.collective, 'two-factor-auth')}>
-            <StyledButton buttonStyle="primary">
-              <FormattedMessage defaultMessage="Activate 2FA" />
-            </StyledButton>
-          </Link>
-        </Flex>
+        {LoggedInUser && (
+          <Flex justifyContent="center">
+            <Link href={getSettingsRoute(LoggedInUser.collective, 'two-factor-auth')}>
+              <StyledButton buttonStyle="primary">
+                <FormattedMessage defaultMessage="Activate 2FA" />
+              </StyledButton>
+            </Link>
+          </Flex>
+        )}
       </StyledCard>
     </Flex>
   );

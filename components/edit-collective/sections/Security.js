@@ -142,7 +142,10 @@ const Security = ({ collective }) => {
               </Box>
               <Box flex="1 1">
                 <P fontSize="16px" lineHeight="24px" fontWeight="700">
-                  <FormattedMessage defaultMessage="All admins must have two-factor authentication" />
+                  <FormattedMessage
+                    defaultMessage="All {account} admins must have two-factor authentication"
+                    values={{ account: data.account.name }}
+                  />
                 </P>
                 <P mt="5px" color="black.700" fontSize="14px" lineHeight="20px">
                   <FormattedMessage defaultMessage="Checking this will require all admins of your team to activate a two-factor authentication to perform admin tasks like payouts." />
@@ -174,7 +177,7 @@ const Security = ({ collective }) => {
                   </P>
                 </Box>
               </CheckboxContainer>
-              {get(data.account, 'settings.payoutsTwoFactorAuth.enabled', false) && (
+              {values.payoutsTwoFactorAuth.enabled && (
                 <StyledInputField name="rollingLimit" htmlFor="rollingLimit" disabled={loading} mr="24px">
                   {inputProps => (
                     <StyledInputAmount
@@ -217,7 +220,7 @@ const Security = ({ collective }) => {
           </P>
           <StyledHr borderColor="black.400" my={4} />
           <div>
-            <StyledButton buttonStyle="primary" minWidth={100} type="submit" isLoading={submitting} disabled={!dirty}>
+            <StyledButton buttonStyle="primary" minWidth={100} type="submit" loading={submitting} disabled={!dirty}>
               <FormattedMessage id="save" defaultMessage="Save" />
             </StyledButton>
           </div>

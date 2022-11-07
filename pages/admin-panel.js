@@ -210,7 +210,7 @@ const AdminPanelPage = () => {
               isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
             />
             {account?.policies?.REQUIRE_2FA_FOR_ADMINS && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
-              <TwoFactorAuthRequiredMessage loggedInUser={LoggedInUser} />
+              <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
             ) : (
               <AdminPanelSection
                 section={selectedSection}
