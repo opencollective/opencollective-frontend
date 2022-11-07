@@ -65,8 +65,12 @@ const ContributeEvent = ({ collective, event, ...props }) => {
                 {!takesMultipleDays ? (
                   <React.Fragment>
                     <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" />
-                    {`-`}
-                    <FormattedDate value={endsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
+                    {endsAt && (
+                      <React.Fragment>
+                        {`-`}
+                        <FormattedDate value={endsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
+                      </React.Fragment>
+                    )}
                   </React.Fragment>
                 ) : (
                   <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
