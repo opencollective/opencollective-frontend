@@ -63,10 +63,10 @@ export const DefaultStory = props => (
   </Story>
 </Canvas>
 
-## With standard icons
+## With icons
 
 <Canvas>
-  <Story name="With standard icons" parameters={{ controls: { hideNoControlsWarning: true } }}>
+  <Story name="With icons" parameters={{ controls: { hideNoControlsWarning: true } }}>
     <Flex flexDirection="column" gridGap="20px" px={2} maxWidth="800px">
       <MessageBox type="white" withIcon>
         You must be signed in as an admin or the expense submitter to read them.
@@ -81,69 +81,6 @@ export const DefaultStory = props => (
         You must be signed in as an admin or the expense submitter to read them.
       </MessageBox>
       <MessageBox withIcon type="error" withIcon>
-        You must be signed in as an admin or the expense submitter to read them.
-      </MessageBox>
-    </Flex>
-  </Story>
-</Canvas>
-
-## With custom icon
-
-<Canvas>
-  <Story name="With custom icon" parameters={{ controls: { hideNoControlsWarning: true } }}>
-    <Flex flexDirection="column" gridGap="20px" px={2} maxWidth="800px">
-      <MessageBox type="info" customIcon={<Image width="32" height="32" src="/static/images/lock.png" />}>
-        You must be signed in as an admin or the expense submitter to read them.
-      </MessageBox>
-      <MessageBox type="success" customIcon={<Image width="32" height="32" src="/static/images/lock.png" />}>
-        You must be signed in as an admin or the expense submitter to read them.
-      </MessageBox>
-      <MessageBox type="warning" customIcon={<Image width="32" height="32" src="/static/images/lock.png" />}>
-        You must be signed in as an admin or the expense submitter to read them.
-      </MessageBox>
-      <MessageBox type="error" customIcon={<Image width="32" height="32" src="/static/images/lock.png" />}>
-        You must be signed in as an admin or the expense submitter to read them.
-      </MessageBox>
-    </Flex>
-  </Story>
-</Canvas>
-
-## With title
-
-<Canvas>
-  <Story name="With title" parameters={{ controls: { hideNoControlsWarning: true } }}>
-    <Flex flexDirection="column" gridGap="20px" px={2} maxWidth="800px">
-      <MessageBox withIcon type="info" title="These comments are private">
-        You must be signed in as an admin or the expense submitter to read them.
-      </MessageBox>
-      <MessageBox withIcon type="success" title="These comments are private">
-        You must be signed in as an admin or the expense submitter to read them.
-      </MessageBox>
-      <MessageBox withIcon type="warning" title="These comments are private">
-        You must be signed in as an admin or the expense submitter to read them.
-      </MessageBox>
-      <MessageBox withIcon type="error" title="These comments are private">
-        You must be signed in as an admin or the expense submitter to read them.
-      </MessageBox>
-    </Flex>
-  </Story>
-</Canvas>
-
-## With action
-
-<Canvas>
-  <Story name="With action" parameters={{ controls: { hideNoControlsWarning: true } }}>
-    <Flex flexDirection="column" gridGap="20px" px={2} maxWidth="800px">
-      <MessageBox withIcon type="info" title="These comments are private" action={<a href="#">Sign in</a>}>
-        You must be signed in as an admin or the expense submitter to read them.
-      </MessageBox>
-      <MessageBox withIcon type="success" title="These comments are private" action={<a href="#">Sign in</a>}>
-        You must be signed in as an admin or the expense submitter to read them.
-      </MessageBox>
-      <MessageBox withIcon type="warning" title="These comments are private" action={<a href="#">Sign in</a>}>
-        You must be signed in as an admin or the expense submitter to read them.
-      </MessageBox>
-      <MessageBox withIcon type="error" title="These comments are private" action={<a href="#">Sign in</a>}>
         You must be signed in as an admin or the expense submitter to read them.
       </MessageBox>
     </Flex>
