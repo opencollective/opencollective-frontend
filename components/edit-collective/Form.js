@@ -15,6 +15,7 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
 
+import ActivityLog from '../admin-panel/sections/ActivityLog';
 import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
 import ForDevelopers from '../admin-panel/sections/ForDevelopers';
 import CodeRepositoryIcon from '../CodeRepositoryIcon';
@@ -41,16 +42,17 @@ import Export from './sections/Export';
 import FiscalHosting from './sections/FiscalHosting';
 import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
-import HostTwoFactorAuth from './sections/HostTwoFactorAuth';
 import HostVirtualCardsSettings from './sections/HostVirtualCardsSettings';
 import Members from './sections/Members';
 import PaymentMethods from './sections/PaymentMethods';
 import PaymentReceipts from './sections/PaymentReceipts';
 import Policies from './sections/Policies';
 import ReceivingMoney from './sections/ReceivingMoney';
+import Security from './sections/Security';
 import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
+import TiersRevamp from './sections/TiersRevamp';
 import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
 import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
@@ -82,14 +84,6 @@ class EditCollectiveForm extends React.Component {
     this.handleChange = this.handleChange.bind(this);
 
     const { collective } = this.state;
-
-    this.showEditTiers = [COLLECTIVE, EVENT].includes(collective.type);
-    this.showExpenses = collective.type === COLLECTIVE || collective.isHost;
-    this.showEditGoals = collective.type === COLLECTIVE;
-    this.showHost = collective.type === COLLECTIVE;
-    this.defaultTierType = collective.type === EVENT ? 'TICKET' : 'TIER';
-    this.showEditMembers = [COLLECTIVE, ORGANIZATION].includes(collective.type);
-    this.showPaymentMethods = [USER, ORGANIZATION].includes(collective.type);
 
     this.messages = defineMessages({
       loading: { id: 'loading', defaultMessage: 'loading' },
@@ -437,6 +431,9 @@ class EditCollectiveForm extends React.Component {
           />
         );
 
+      case EDIT_COLLECTIVE_SECTIONS.TIERS_REVAMP:
+        return <TiersRevamp collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
+
       case EDIT_COLLECTIVE_SECTIONS.TICKETS:
         return (
           <Tickets
@@ -498,6 +495,9 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.FOR_DEVELOPERS:
         return <ForDevelopers accountSlug={collective.slug} />;
 
+      case EDIT_COLLECTIVE_SECTIONS.ACTIVITY_LOG:
+        return <ActivityLog accountSlug={collective.slug} />;
+
       case EDIT_COLLECTIVE_SECTIONS.ADVANCED:
         return (
           <Box>
@@ -531,8 +531,8 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
         return <SendingMoney collective={collective} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH:
-        return <HostTwoFactorAuth collective={collective} />;
+      case EDIT_COLLECTIVE_SECTIONS.SECURITY:
+        return <Security collective={collective} />;
 
       // 2FA
       case EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH:
@@ -746,7 +746,6 @@ class EditCollectiveForm extends React.Component {
           description: intl.formatMessage(this.messages.privateInstructionsDescription),
           type: 'textarea',
           maxLength: 10000,
-          defaultValue: collective.privateInstructions,
           when: () => collective.type === EVENT,
         },
         {

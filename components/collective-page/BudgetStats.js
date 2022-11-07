@@ -5,6 +5,7 @@ import { Expand } from '@styled-icons/ionicons-solid/Expand';
 import { ShowChart } from '@styled-icons/material/ShowChart';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
+import { border } from 'styled-system';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { formatCurrency, getCurrencySymbol } from '../../lib/currency-utils';
@@ -14,7 +15,8 @@ import Container from '../Container';
 import DefinedTerm, { Terms } from '../DefinedTerm';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box } from '../Grid';
-import { P } from '../Text';
+import StyledCard from '../StyledCard';
+import { P, Span } from '../Text';
 
 const StatTitle = styled(Container)`
   font-size: 12px;
@@ -54,51 +56,61 @@ const StatContainer = styled.div`
       background: #f7f8fa;
     `}
 
-  ${props =>
-    !props.$isFirst &&
-    css`
-      border-top: 1px solid #dcdee0;
-    `}
+  border-color: #dcdee0;
+  ${border}
 `;
 
-const BudgetStats = ({ collective, stats }) => {
+const BudgetStats = ({ collective, stats, horizontal }) => {
   const { locale } = useIntl();
   const monthlyRecurring =
     (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
   const isFund = collective.type === CollectiveType.FUND;
   const isProject = collective.type === CollectiveType.PROJECT;
+  const borderTop = ['1px solid #dcdee0', 'none', horizontal ? null : '1px solid #dcdee0'];
 
   return (
-    <Fragment>
-      <StatContainer data-cy="budgetSection-today-balance" $isFirst>
+    <StyledCard
+      display="flex"
+      flex={[null, null, '1 1 300px']}
+      width="100%"
+      flexDirection={['column', 'row', horizontal ? null : 'column']}
+      mb={2}
+    >
+      <StatContainer data-cy="budgetSection-today-balance" $isMain>
         <StatTitle>
           <Container display="inline-block" fontSize="11px" mr="5px" fontWeight="500" width="12px" textAlign="center">
             {getCurrencySymbol(collective.currency)}
           </Container>
-          <DefinedTerm
-            term={Terms.BALANCE}
-            textTransform="uppercase"
-            color="black.700"
-            extraTooltipContent={
-              <Fragment>
-                <Box mt={2}>
-                  <FormattedMessage
-                    id="budgetSection-balance-consolidated"
-                    defaultMessage="Total consolidated including Projects and Events: {amount}"
-                    values={{
-                      amount: formatCurrency(stats?.consolidatedBalance.valueInCents || 0, collective.currency, {
-                        locale,
-                      }),
-                    }}
-                  />
-                </Box>
-              </Fragment>
-            }
-          />
+          {![CollectiveType.PROJECT, CollectiveType.EVENT].includes(collective.type) ? (
+            <DefinedTerm
+              term={Terms.BALANCE}
+              textTransform="uppercase"
+              color="black.700"
+              extraTooltipContent={
+                <Fragment>
+                  <Box mt={2}>
+                    <FormattedMessage
+                      id="budgetSection-balance-consolidated"
+                      defaultMessage="Total consolidated including Projects and Events: {amount}"
+                      values={{
+                        amount: formatCurrency(stats?.consolidatedBalance.valueInCents || 0, collective.currency, {
+                          locale,
+                        }),
+                      }}
+                    />
+                  </Box>
+                </Fragment>
+              }
+            />
+          ) : (
+            <Span textTransform="uppercase" color="black.700">
+              <FormattedMessage id="CollectivePage.SectionBudget.Balance" defaultMessage="Today’s balance" />
+            </Span>
+          )}
         </StatTitle>
         <StatAmount amount={stats.balance.valueInCents} currency={collective.currency} />
       </StatContainer>
-      <StatContainer>
+      <StatContainer borderTop={borderTop}>
         <StatTitle>
           <ShowChart size="12px" />
           {collective.isHost ? (
@@ -126,7 +138,7 @@ const BudgetStats = ({ collective, stats }) => {
         </StatTitle>
         <StatAmount amount={stats.totalNetAmountRaised.valueInCents} currency={collective.currency} />
       </StatContainer>
-      <StatContainer>
+      <StatContainer borderTop={borderTop}>
         <StatTitle>
           <Expand size="12px" />
           <FormattedMessage id="budgetSection-disbursed" defaultMessage="Total disbursed" />
@@ -137,7 +149,7 @@ const BudgetStats = ({ collective, stats }) => {
         />
       </StatContainer>
       {!isFund && !isProject && (
-        <StatContainer data-cy="budgetSection-estimated-budget" $isMain>
+        <StatContainer data-cy="budgetSection-estimated-budget" borderTop={borderTop}>
           <StatTitle>
             <Calendar size="12px" />
             <DefinedTerm
@@ -171,7 +183,7 @@ const BudgetStats = ({ collective, stats }) => {
           <StatAmount amount={stats.yearlyBudget.valueInCents} currency={collective.currency} />
         </StatContainer>
       )}
-    </Fragment>
+    </StyledCard>
   );
 };
 
@@ -199,6 +211,7 @@ BudgetStats.propTypes = {
     totalNetAmountRaised: AmountPropTypeShape,
   }),
 
+  horizontal: PropTypes.bool,
   isLoading: PropTypes.bool,
 };
 

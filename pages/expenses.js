@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { has, omit, omitBy } from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -8,14 +9,14 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
-import { getSuggestedTags, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
+import { getCollectivePageMetadata, getSuggestedTags, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
@@ -146,17 +147,21 @@ class ExpensePage extends React.Component {
   componentDidUpdate(oldProps) {
     const { LoggedInUser, data } = this.props;
     if (!oldProps.LoggedInUser && LoggedInUser) {
-      if (LoggedInUser.canEditCollective(data.account) || LoggedInUser.isHostAdmin(data.account)) {
+      if (LoggedInUser.isAdminOfCollectiveOrHost(data.account) || LoggedInUser.isHostAdmin(data.account)) {
         data.refetch();
       }
     }
   }
 
   getPageMetaData(collective) {
+    const baseMetadata = getCollectivePageMetadata(collective);
     if (collective) {
-      return { title: this.props.intl.formatMessage(messages.title, { collectiveName: collective.name }) };
+      return {
+        ...baseMetadata,
+        title: this.props.intl.formatMessage(messages.title, { collectiveName: collective.name }),
+      };
     } else {
-      return { title: `Expenses` };
+      return { ...baseMetadata, title: `Expenses` };
     }
   }
 
@@ -299,7 +304,6 @@ class ExpensePage extends React.Component {
                         limit={data.variables.limit}
                         offset={data.variables.offset}
                         ignoredQueryParams={['collectiveSlug', 'parentCollectiveSlug']}
-                        scrollToTopOnChange
                       />
                     </Flex>
                   </React.Fragment>
@@ -319,10 +323,13 @@ class ExpensePage extends React.Component {
                       </H5>
                       <ExpenseTags
                         isLoading={data.loading}
-                        expense={{ tags: data.account?.expensesTags.map(({ tag }) => tag) }}
+                        expense={{
+                          tags: data.account?.expensesTags.map(({ tag }) => tag),
+                        }}
                         limit={30}
                         getTagProps={this.getTagProps}
                         data-cy="expense-tags-title"
+                        showUntagged
                       >
                         {({ key, tag, renderedTag, props }) => (
                           <Link
@@ -349,7 +356,7 @@ class ExpensePage extends React.Component {
   }
 }
 
-const expensesPageQuery = gqlV2/* GraphQL */ `
+const expensesPageQuery = gql`
   query ExpensesPage(
     $collectiveSlug: String!
     $limit: Int!
@@ -371,12 +378,15 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
       slug
       type
       imageUrl
+      backgroundImageUrl
+      twitterHandle
       name
       currency
       isArchived
       isActive
       settings
       createdAt
+      supportedExpenseTypes
       expensesTags {
         id
         tag
@@ -399,6 +409,16 @@ const expensesPageQuery = gqlV2/* GraphQL */ `
         host {
           id
           ...ExpenseHostFields
+        }
+      }
+
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+          imageUrl
+          backgroundImageUrl
+          twitterHandle
         }
       }
 
@@ -478,7 +498,7 @@ const addExpensesPageData = graphql(expensesPageQuery, {
         limit: props.query.limit || EXPENSES_PER_PAGE,
         type: props.query.type,
         status: props.query.status,
-        tags: props.query.tag ? [props.query.tag] : undefined,
+        tags: props.query.tag ? (props.query.tag === 'untagged' ? null : [props.query.tag]) : undefined,
         minAmount: amountRange[0] && amountRange[0] * 100,
         maxAmount: amountRange[1] && amountRange[1] * 100,
         payoutMethodType: props.query.payout,

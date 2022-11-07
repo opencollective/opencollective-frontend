@@ -1,7 +1,9 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { themeGet } from '@styled-system/theme-get';
 import { includes } from 'lodash';
 import { FormattedDate, FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -18,7 +20,7 @@ import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
-import { H4, P, Span } from '../Text';
+import { H1, H4, P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
@@ -27,6 +29,17 @@ import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseStatusTag from './ExpenseStatusTag';
 import ExpenseTags from './ExpenseTags';
 import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
+
+export const SummaryHeader = styled(H1)`
+  > a {
+    color: inherit;
+    text-decoration: underline;
+
+    :hover {
+      color: ${themeGet('colors.black.600')};
+    }
+  }
+`;
 
 const CreatedByUserLink = ({ account }) => {
   return (

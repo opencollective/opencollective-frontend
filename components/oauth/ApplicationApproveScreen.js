@@ -199,9 +199,11 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
                   </P>
                 </Flex>
               ))}
-              <MessageBox type="info" mt={40} fontSize="13px">
-                <FormattedMessage defaultMessage="These permissions are granted to all the accounts you're administrating, including your personal profile." />
-              </MessageBox>
+              {filteredScopes.length > 0 && (
+                <MessageBox type="info" mt={40} fontSize="13px">
+                  <FormattedMessage defaultMessage="These permissions are granted to all the accounts you're administrating, including your personal profile." />
+                </MessageBox>
+              )}
               {error && (
                 <MessageBox type="error" withIcon mt={3}>
                   {error.toString()}

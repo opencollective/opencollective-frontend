@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, isEmpty, uniqBy, update } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { stripHTML } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -38,10 +40,11 @@ import StyledTag from '../components/StyledTag';
 import { H2, H4 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-const conversationPageQuery = gqlV2/* GraphQL */ `
+const conversationPageQuery = gql`
   query ConversationPage($collectiveSlug: String!, $id: String!, $offset: Int) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
+      legacyId
       slug
       name
       type
@@ -49,6 +52,16 @@ const conversationPageQuery = gqlV2/* GraphQL */ `
       settings
       imageUrl
       twitterHandle
+      imageUrl
+      backgroundImageUrl
+      ... on AccountWithParent {
+        parent {
+          id
+          imageUrl
+          backgroundImageUrl
+          twitterHandle
+        }
+      }
       features {
         id
         ...NavbarFields
@@ -96,7 +109,7 @@ const conversationPageQuery = gqlV2/* GraphQL */ `
   ${collectiveNavbarFieldsFragment}
 `;
 
-const editConversationMutation = gqlV2/* GraphQL */ `
+const editConversationMutation = gql`
   mutation EditConversation($id: String!, $title: String!, $tags: [String]) {
     editConversation(id: $id, title: $title, tags: $tags) {
       id
@@ -174,14 +187,16 @@ class ConversationPage extends React.Component {
   static MAX_NB_FOLLOWERS_AVATARS = 4;
 
   getPageMetaData(collective, conversation) {
+    const baseMetadata = getCollectivePageMetadata(collective);
     if (collective && conversation) {
       return {
+        ...baseMetadata,
         title: conversation.title,
         description: stripHTML(conversation.summary),
         metaTitle: `${conversation.title} - ${collective.name}`,
       };
     } else {
-      return { title: 'Conversations' };
+      return { ...baseMetadata, title: 'Conversations' };
     }
   }
 
@@ -313,7 +328,7 @@ class ConversationPage extends React.Component {
     const followers = get(conversation, 'followers');
     const hasFollowers = followers && followers.nodes && followers.nodes.length > 0;
     const canEdit = LoggedInUser && body && LoggedInUser.canEditComment(body);
-    const canDelete = canEdit || (LoggedInUser && LoggedInUser.canEditCollective(collective));
+    const canDelete = canEdit || (LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(collective));
     return (
       <Page collective={collective} {...this.getPageMetaData(collective, conversation)}>
         {data.loading ? (

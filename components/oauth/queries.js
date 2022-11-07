@@ -1,6 +1,6 @@
-import { gqlV2 } from '../../lib/graphql/helpers';
+import { gql } from '@apollo/client';
 
-export const authorizedAppsQuery = gqlV2/* GraphQL */ `
+export const authorizedAppsQuery = gql`
   query AuthorizedApps($limit: Int, $offset: Int) {
     loggedInAccount {
       id
@@ -9,6 +9,7 @@ export const authorizedAppsQuery = gqlV2/* GraphQL */ `
         nodes {
           id
           createdAt
+          lastUsedAt
           account {
             id
             name

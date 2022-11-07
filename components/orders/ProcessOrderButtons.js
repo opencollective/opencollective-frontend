@@ -1,20 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
 import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
 import ContributionConfirmationModal from '../ContributionConfirmationModal';
 import StyledButton from '../StyledButton';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const processPendingOrderMutation = gqlV2/* GraphQL */ `
+const processPendingOrderMutation = gql`
   mutation ProcessPendingOrder($id: String!, $action: ProcessOrderAction!) {
     processPendingOrder(order: { id: $id }, action: $action) {
       id

@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { Mutation, Query } from '@apollo/client/react/components';
 import { cloneDeep, get, update } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+
+import { gqlV1 } from '../lib/graphql/helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
@@ -15,7 +16,7 @@ import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
 import StyledLink from '../components/StyledLink';
 
-const loggedInUserApplicationsQuery = gql`
+const loggedInUserApplicationsQuery = gqlV1/* GraphQL */ `
   query LoggedInUserApplications {
     LoggedInUser {
       id
@@ -34,7 +35,7 @@ const loggedInUserApplicationsQuery = gql`
   }
 `;
 
-const createApplicationMutation = gql`
+const createApplicationMutation = gqlV1/* GraphQL */ `
   mutation CreateApplication($application: ApplicationInput!) {
     createApplication(application: $application) {
       id
@@ -44,7 +45,7 @@ const createApplicationMutation = gql`
   }
 `;
 
-const deleteApplicationMutation = gql`
+const deleteApplicationMutation = gqlV1/* GraphQL */ `
   mutation DeleteApplication($id: Int!) {
     deleteApplication(id: $id) {
       id

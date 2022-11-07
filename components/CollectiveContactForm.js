@@ -4,6 +4,8 @@ import { gql, useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+
 import Container from './Container';
 import { Box } from './Grid';
 import MessageBox from './MessageBox';
@@ -16,21 +18,28 @@ import { H2, P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const sendMessageMutation = gql`
-  mutation SendMessage($collectiveId: Int!, $message: String!, $subject: String) {
-    sendMessageToCollective(collectiveId: $collectiveId, message: $message, subject: $subject) {
+  mutation SendMessage($account: AccountReferenceInput!, $message: NonEmptyString!, $subject: String) {
+    sendMessage(account: $account, message: $message, subject: $subject) {
       success
     }
   }
 `;
 
-const CollectiveContactForm = ({ collective, isModal = false, onClose }) => {
+const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange }) => {
   const [subject, setSubject] = React.useState('');
   const [message, setMessage] = React.useState('');
   const [error, setError] = React.useState(null);
-  const [submit, { data, loading }] = useMutation(sendMessageMutation);
+  const [submit, { data, loading }] = useMutation(sendMessageMutation, { context: API_V2_CONTEXT });
   const { addToast } = useToasts();
 
-  if (get(data, 'sendMessageToCollective.success') && !isModal) {
+  // Dispatch changes to onChange if set
+  React.useEffect(() => {
+    if (onChange) {
+      onChange({ subject, message });
+    }
+  }, [subject, message]);
+
+  if (get(data, 'sendMessage.success') && !isModal) {
     return (
       <MessageBox type="success" withIcon maxWidth={400} m="32px auto">
         <FormattedMessage id="MessageSent" defaultMessage="Message sent" />
@@ -59,13 +68,15 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose }) => {
 
   return (
     <Box flexDirection="column" alignItems={['center', 'flex-start']} maxWidth={1160} m="0 auto">
-      <H2 mb={2} fontSize={isModal ? '28px' : '40px'}>
-        <FormattedMessage
-          id="ContactCollective"
-          defaultMessage="Contact {collective}"
-          values={{ collective: collective.name }}
-        />
-      </H2>
+      {!isModal && (
+        <H2 mb={2} fontSize={'40px'}>
+          <FormattedMessage
+            id="ContactCollective"
+            defaultMessage="Contact {collective}"
+            values={{ collective: collective.name }}
+          />
+        </H2>
+      )}
       <P mb={4}>
         <FormattedMessage
           id="CollectiveContactForm.Disclaimer"
@@ -117,7 +128,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose }) => {
               setError(null);
               await submit({
                 variables: {
-                  collectiveId: typeof collective.id === 'string' ? collective.legacyId : collective.id,
+                  account: { slug: collective.slug },
                   subject,
                   message,
                 },
@@ -146,11 +157,13 @@ CollectiveContactForm.propTypes = {
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     legacyId: PropTypes.number,
     name: PropTypes.string.isRequired,
+    slug: PropTypes.string,
   }),
   /* Defines whether this form is displayed as a modal */
   isModal: PropTypes.bool,
   /* Specifies close behaviour is this form is part of a modal */
   onClose: PropTypes.func,
+  onChange: PropTypes.func,
 };
 
 export default CollectiveContactForm;

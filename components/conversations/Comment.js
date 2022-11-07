@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -18,7 +19,7 @@ import EmojiReactionPicker from './EmojiReactionPicker';
 import CommentReactions from './EmojiReactions';
 import { commentFieldsFragment } from './graphql';
 
-const editCommentMutation = gqlV2/* GraphQL */ `
+const editCommentMutation = gql`
   mutation EditComment($comment: CommentUpdateInput!) {
     editComment(comment: $comment) {
       id
@@ -101,7 +102,7 @@ const Comment = ({
           warnIfUnsavedChanges
           required
         >
-          {({ isEditing, setValue }) =>
+          {({ isEditing, setValue, setUploading }) =>
             !isEditing ? (
               <HTMLContent content={comment.html} fontSize="13px" data-cy="comment-body" />
             ) : (
@@ -110,6 +111,7 @@ const Comment = ({
                 onChange={e => setValue(e.target.value)}
                 fontSize="13px"
                 autoFocus
+                setUploading={setUploading}
               />
             )
           }

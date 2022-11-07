@@ -6,8 +6,14 @@ import { FormattedDate, FormattedMessage, FormattedTime } from 'react-intl';
 
 import dayjs from '../../../lib/dayjs';
 
+import Container from '../../Container';
+import DefinedTerm, { Terms } from '../../DefinedTerm';
+import { Flex } from '../../Grid';
 import Link from '../../Link';
+import LinkCollective from '../../LinkCollective';
+import StyledLink from '../../StyledLink';
 import StyledTooltip from '../../StyledTooltip';
+import TruncatedTextWithTooltip from '../../TruncatedTextWithTooltip';
 
 import HeroNote from './HeroNote';
 
@@ -55,12 +61,17 @@ Timerange.propTypes = {
 
 class HeroEventDetails extends React.Component {
   static propTypes = {
+    host: PropTypes.object,
+    displayedConnectedAccount: PropTypes.object,
     collective: PropTypes.shape({
+      id: PropTypes.number,
       startsAt: PropTypes.string,
       endsAt: PropTypes.string,
       timezone: PropTypes.string.isRequired,
       location: PropTypes.object,
       parentCollective: PropTypes.object,
+      isApproved: PropTypes.boolean,
+      isHost: PropTypes.boolean,
     }).isRequired,
   };
 
@@ -82,12 +93,9 @@ class HeroEventDetails extends React.Component {
   }
 
   render() {
-    const {
-      collective: { startsAt, endsAt, timezone, location, parentCollective },
-    } = this.props;
-
-    const locationRoute = '#section-location';
-
+    const { collective, host, displayedConnectedAccount } = this.props;
+    const { startsAt, endsAt, timezone, location, parentCollective } = collective;
+    const parentIsHost = host && collective.parentCollective?.id === host.id;
     return (
       <Fragment>
         {startsAt && (
@@ -135,13 +143,13 @@ class HeroEventDetails extends React.Component {
         {location.name && (
           <HeroNote>
             <MapPin size={16} />
-            <Link href={locationRoute}>
+            <Link href="#section-location">
               <span>{location.name}</span>
             </Link>
           </HeroNote>
         )}
 
-        {parentCollective && (
+        {Boolean(!parentIsHost && parentCollective) && (
           <HeroNote>
             <span>
               <FormattedMessage
@@ -154,6 +162,50 @@ class HeroEventDetails extends React.Component {
             </span>
           </HeroNote>
         )}
+        <Flex alignItemt>
+          {host && collective.isApproved && host.id !== collective.id && !collective.isHost && (
+            <Container mr={1} color="black.700" my={2}>
+              <FormattedMessage
+                id="Collective.Hero.Host"
+                defaultMessage="{FiscalHost}: {hostName}"
+                values={{
+                  FiscalHost: <DefinedTerm term={Terms.FISCAL_HOST} color="black.700" />,
+                  hostName: (
+                    <StyledLink
+                      as={LinkCollective}
+                      collective={host}
+                      data-cy="fiscalHostName"
+                      noTitle
+                      color="black.700"
+                    >
+                      <TruncatedTextWithTooltip value={host.name} cursor="pointer" />
+                    </StyledLink>
+                  ),
+                }}
+              />
+            </Container>
+          )}
+          {displayedConnectedAccount && (
+            <Container mx={1} color="black.700" my={2}>
+              <FormattedMessage
+                id="Collective.Hero.ParentCollective"
+                defaultMessage="Part of: {parentName}"
+                values={{
+                  parentName: (
+                    <StyledLink
+                      as={LinkCollective}
+                      collective={displayedConnectedAccount.collective}
+                      noTitle
+                      color="black.700"
+                    >
+                      <TruncatedTextWithTooltip value={displayedConnectedAccount.collective.name} cursor="pointer" />
+                    </StyledLink>
+                  ),
+                }}
+              />
+            </Container>
+          )}
+        </Flex>
       </Fragment>
     );
   }

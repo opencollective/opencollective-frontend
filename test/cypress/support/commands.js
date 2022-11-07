@@ -103,6 +103,20 @@ Cypress.Commands.add('openEmail', emailMatcher => {
 });
 
 /**
+ * Gets an email in maildev.
+ *
+ * API must be configured to use maildev
+ * - configured by default in development, e2e and ci environments
+ * - otherwise MAILDEV_CLIENT=true and MAILDEV_SERVER=true
+ *
+ * @param emailMatcher {func} - used to find the email. Gets passed an email. To see the
+ *  list of all fields, check https://github.com/djfarrelly/MailDev/blob/master/docs/rest.md
+ */
+Cypress.Commands.add('getEmail', emailMatcher => {
+  return getEmail(emailMatcher);
+});
+
+/**
  * Clear maildev inbox.
  */
 Cypress.Commands.add('clearInbox', () => {
@@ -186,7 +200,7 @@ Cypress.Commands.add('createHostedCollectiveV2', ({ email = defaultTestUserEmail
       operationName: 'createCollective',
       query: `
           mutation createCollective($collective: CollectiveCreateInput!, $host: AccountReferenceInput!, $testPayload: JSON) {
-            createCollective(collective: $collective, host: $host, automateApprovalWithGithub: true, testPayload: $testPayload) {
+            createCollective(collective: $collective, host: $host, testPayload: $testPayload) {
               id
               slug
               name
@@ -197,13 +211,12 @@ Cypress.Commands.add('createHostedCollectiveV2', ({ email = defaultTestUserEmail
         `,
       variables: {
         host: { slug: 'opensourceorg' },
-        automateApprovalWithGithub: true,
         testPayload: testPayload || null,
         collective: {
           name: 'TestCollective',
           slug: randomSlug(),
           description: 'A test collective',
-          githubHandle: 'opencollective',
+          repositoryUrl: 'https://github.com/opencollective',
         },
       },
     }).then(({ body }) => {
@@ -344,16 +357,36 @@ Cypress.Commands.add('fillStripeInput', fillStripeInput);
  */
 Cypress.Commands.add('complete3dSecure', (approve = true) => {
   const iframeSelector = 'iframe[name^="__privateStripeFrame"]';
+  const targetBtn = approve ? '#test-source-authorize-3ds' : '#test-source-fail-3ds';
 
-  return cy.waitUntil(() =>
-    cy.get(iframeSelector).then($3dSecureIframe => {
-      const $challengeIframe = $3dSecureIframe.contents().find('body iframe#challengeFrame');
-      const $acsIframe = $challengeIframe.contents().find('iframe[name="acsFrame"]');
-      const $finalContent = $acsIframe.contents().find('body');
-      const targetBtn = approve ? '#test-source-authorize-3ds' : '#test-source-fail-3ds';
-      $finalContent.find(targetBtn).click();
-    }),
-  );
+  cy.get(iframeSelector)
+    .should($stripeFrame => {
+      const frameContent = $stripeFrame.contents();
+      const challengeFrame = frameContent.find('body iframe#challengeFrame');
+      expect(challengeFrame).to.exist;
+
+      const acsFrame = challengeFrame.contents().find('iframe[name="acsFrame"]');
+      expect(acsFrame).to.exist;
+
+      const frameBody = acsFrame.contents().find('body');
+      expect(frameBody).to.exist;
+
+      expect(frameBody.find(targetBtn)).to.exist;
+    })
+    .then($iframe => {
+      const btn = cy.wrap(
+        $iframe
+          .contents()
+          .find('body iframe#challengeFrame')
+          .contents()
+          .find('iframe[name="acsFrame"]')
+          .contents()
+          .find('body')
+          .find(targetBtn),
+      );
+
+      btn.click();
+    });
 });
 
 Cypress.Commands.add('iframeLoaded', { prevSubject: 'element' }, $iframe => {
@@ -511,6 +544,11 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
   });
 });
 
+Cypress.Commands.add('complete2FAPrompt', code => {
+  cy.get('#2fa-code-input').type(code);
+  cy.contains('button', 'Verify').click();
+});
+
 let localStorageSnapshot = {};
 
 Cypress.Commands.add('resetLocalStorage', () => {
@@ -625,13 +663,22 @@ function fillStripeInput(params) {
 }
 
 function loopOpenEmail(emailMatcher, timeout = 8000) {
-  return cy.getInbox().then(body => {
-    const email = body.find(emailMatcher);
+  return getEmail(emailMatcher, timeout).then(email => {
+    return cy.openExternalLink(`${Cypress.env('MAILDEV_URL')}/email/${email.id}/html`);
+  });
+}
+
+function getEmail(emailMatcher, timeout = 8000) {
+  if (timeout < 0) {
+    return assert.fail('getEmail timed out');
+  }
+
+  return cy.getInbox().then(inbox => {
+    const email = inbox.find(emailMatcher);
     if (email) {
-      return cy.openExternalLink(`${Cypress.env('MAILDEV_URL')}/email/${email.id}/html`);
-    } else if (timeout > 0) {
-      cy.wait(100);
-      return loopOpenEmail(emailMatcher, timeout - 100);
+      return cy.wrap(email);
     }
+    cy.wait(100);
+    return getEmail(emailMatcher, timeout - 100);
   });
 }

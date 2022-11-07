@@ -1,23 +1,34 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { debounce } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
+import { gqlV1 } from '../lib/graphql/helpers';
 import formatCollectiveType from '../lib/i18n/collective-type';
 
 import CollectivePicker from './CollectivePicker';
 
-const collectivePickerSearchQuery = gql`
+const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
   query CollectivePickerSearchQuery(
     $term: String!
     $types: [TypeOfCollective]
     $limit: Int
     $hostCollectiveIds: [Int]
+    $parentCollectiveIds: [Int]
     $skipGuests: Boolean
+    $includeArchived: Boolean
   ) {
-    search(term: $term, types: $types, limit: $limit, hostCollectiveIds: $hostCollectiveIds, skipGuests: $skipGuests) {
+    search(
+      term: $term
+      types: $types
+      limit: $limit
+      hostCollectiveIds: $hostCollectiveIds
+      parentCollectiveIds: $parentCollectiveIds
+      skipGuests: $skipGuests
+      includeArchived: $includeArchived
+    ) {
       id
       collectives {
         id
@@ -33,6 +44,9 @@ const collectivePickerSearchQuery = gql`
         imageUrl(height: 64)
         hostFeePercent
         isActive
+        isArchived
+        isHost
+        isTrustedHost
       }
     }
   }
@@ -62,6 +76,9 @@ const Messages = defineMessages({
     id: 'Search',
     defaultMessage: 'Search',
   },
+  searchForUsers: {
+    defaultMessage: 'Search for Users by name or email',
+  },
 });
 
 /**
@@ -73,7 +90,11 @@ const getPlaceholder = (intl, types) => {
   if (nbTypes === 0 || nbTypes > 3) {
     return intl.formatMessage(Messages.search);
   } else if (nbTypes === 1) {
-    return intl.formatMessage(Messages.searchForType, { entity: formatCollectiveType(intl, types[0], 100) });
+    if (types[0] === CollectiveType.USER) {
+      return intl.formatMessage(Messages.searchForUsers);
+    } else {
+      return intl.formatMessage(Messages.searchForType, { entity: formatCollectiveType(intl, types[0], 100) });
+    }
   } else {
     // Format by passing a map of entities like { entity1: 'Collectives' }
     return intl.formatMessage(
@@ -91,17 +112,19 @@ const getPlaceholder = (intl, types) => {
  */
 const CollectivePickerAsync = ({
   inputId,
-  types,
-  limit,
-  hostCollectiveIds,
-  preload,
-  filterResults,
-  searchQuery,
-  invitable,
-  emptyCustomOptions,
-  noCache,
-  isLoading,
-  skipGuests,
+  types = undefined,
+  limit = 20,
+  hostCollectiveIds = undefined,
+  parentCollectiveIds = undefined,
+  preload = false,
+  filterResults = undefined,
+  searchQuery = collectivePickerSearchQuery,
+  invitable = false,
+  emptyCustomOptions = [],
+  noCache = false,
+  isLoading = false,
+  skipGuests = true,
+  includeArchived = false,
   ...props
 }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
@@ -115,9 +138,17 @@ const CollectivePickerAsync = ({
   // If preload is true, trigger a first query on mount or when one of the query param changes
   React.useEffect(() => {
     if (term || preload) {
-      throttledSearch(searchCollectives, { term: term || '', types, limit, hostCollectiveIds, skipGuests });
+      throttledSearch(searchCollectives, {
+        term: term || '',
+        types,
+        limit,
+        hostCollectiveIds,
+        parentCollectiveIds,
+        skipGuests,
+        includeArchived,
+      });
     }
-  }, [types, limit, hostCollectiveIds, term]);
+  }, [types, limit, hostCollectiveIds, parentCollectiveIds, term]);
 
   return (
     <CollectivePicker
@@ -154,6 +185,8 @@ CollectivePickerAsync.propTypes = {
   limit: PropTypes.number,
   /** If set, only the collectives under this host will be retrieved */
   hostCollectiveIds: PropTypes.arrayOf(PropTypes.number),
+  /** If set, only the collectives under this parent collective will be retrieved */
+  parentCollectiveIds: PropTypes.arrayOf(PropTypes.number),
   /** If true, a query will be triggered even if search is empty */
   preload: PropTypes.bool,
   /** If true, results won't be cached (Apollo "network-only" mode) */
@@ -170,13 +203,8 @@ CollectivePickerAsync.propTypes = {
   invitable: PropTypes.bool,
   skipGuests: PropTypes.bool,
   onInvite: PropTypes.func,
-};
-
-CollectivePickerAsync.defaultProps = {
-  preload: false,
-  skipGuests: true,
-  limit: 20,
-  searchQuery: collectivePickerSearchQuery,
+  /** Include archived collectives **/
+  includeArchived: PropTypes.bool,
 };
 
 export default CollectivePickerAsync;

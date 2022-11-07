@@ -1,17 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import CreateCollective from '../components/create-collective';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
-const createCollectiveHostQuery = gqlV2/* GraphQL */ `
+const createCollectiveHostQuery = gql`
   query CreateCollectiveHost($slug: String!) {
     host(slug: $slug) {
       id
@@ -50,7 +50,7 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
   }
 
   return (
-    <Page>
+    <Page showFooter={Boolean(LoggedInUser)}>
       <CreateCollective host={data && data.host} />
     </Page>
   );

@@ -216,8 +216,8 @@ class CollectivePicker extends React.PureComponent {
     return options;
   });
 
-  onChange = e => {
-    this.props.onChange(e);
+  onChange = (...args) => {
+    this.props.onChange(...args);
     if (this.state.showCreatedCollective) {
       this.setState({ showCreatedCollective: false });
     }

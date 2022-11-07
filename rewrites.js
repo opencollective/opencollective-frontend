@@ -23,6 +23,10 @@ exports.REWRITES = [
     destination: '/ocf-host-application',
   },
   {
+    source: '/opensource/apply/:step(intro|pick-repo|fees|form|success)',
+    destination: '/osc-host-application',
+  },
+  {
     source: '/signin/sent',
     destination: '/signinLinkSent',
   },
@@ -119,11 +123,6 @@ exports.REWRITES = [
     destination: '/collective-contact',
   },
   {
-    source:
-      '/:hostCollectiveSlug/legacy-dashboard/:view(expenses|pending-applications|hosted-collectives|donations|reports)?',
-    destination: '/host.dashboard',
-  },
-  {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions',
     destination: '/transactions',
   },
@@ -159,7 +158,7 @@ exports.REWRITES = [
 
   // New Create Collective Flow
   {
-    source: '/:hostCollectiveSlug?/:verb(create)/:version(v2)?/:category(opensource|community|climate)?/:step(form)?',
+    source: '/:hostCollectiveSlug?/:verb(create)/:version(v2)?/:category(community|climate)?/:step(form)?',
     destination: '/create-collective',
   },
   // Events and Projects using collective page
@@ -174,6 +173,11 @@ exports.REWRITES = [
   // "Ways to contribute" pages
   {
     source: '/:collectiveSlug/:verb(tiers|contribute|events|projects|connected-collectives)',
+    destination: '/contribute',
+  },
+  {
+    source:
+      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(tiers|contribute|connected-collectives)',
     destination: '/contribute',
   },
   // Embed

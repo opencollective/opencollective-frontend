@@ -30,6 +30,7 @@ Sentry.init({
     // Chrome extensions
     /extensions\//i,
     /^chrome:\/\//i,
+    /^chrome-extension:\/\//i,
   ],
 });
 

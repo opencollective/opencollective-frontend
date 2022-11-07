@@ -4,8 +4,10 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 
+import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
+import { getWebsiteUrl } from '../lib/utils';
 
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import ErrorPage from '../components/ErrorPage';
@@ -53,29 +55,28 @@ class TierPage extends React.Component {
 
   getPageMetaData(tier) {
     let canonicalURL;
+    const baseMetadata = getCollectivePageMetadata(tier?.collective);
     if (tier && tier.collective) {
       const collective = tier.collective;
-      canonicalURL = `${process.env.WEBSITE_URL}/${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${
-        tier.id
-      }`;
+      canonicalURL = `${getWebsiteUrl()}/${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}`;
       return {
+        ...baseMetadata,
         title: `${collective.name} - ${tier.name}`,
         description: tier.description || collective.description || collective.longDescription,
         twitterHandle: collective.twitterHandle || get(collective, 'parentCollective.twitterHandle'),
-        image: collective.image || get(collective, 'parentCollective.image'),
         canonicalURL,
       };
     } else {
       if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(this.props.collectiveType)) {
-        canonicalURL = `${process.env.WEBSITE_URL}/${this.props.parentCollectiveSlug}/${this.props.collectiveType}/${this.props.collectiveSlug}/contribute/${this.props.tierSlug}-${this.props.tierId}`;
+        canonicalURL = `${getWebsiteUrl()}/${this.props.parentCollectiveSlug}/${this.props.collectiveType}/${
+          this.props.collectiveSlug
+        }/contribute/${this.props.tierSlug}-${this.props.tierId}`;
       } else {
-        canonicalURL = `${process.env.WEBSITE_URL}/${this.props.collectiveSlug}/contribute/${this.props.tierSlug}-${this.props.tierId}`;
+        canonicalURL = `${getWebsiteUrl()}/${this.props.collectiveSlug}/contribute/${this.props.tierSlug}-${
+          this.props.tierId
+        }`;
       }
-      return {
-        title: 'Tier',
-        image: '/static/images/defaultBackgroundImage.png',
-        canonicalURL,
-      };
+      return { ...baseMetadata, title: 'Tier', canonicalURL };
     }
   }
 

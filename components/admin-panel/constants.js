@@ -37,7 +37,7 @@ export const ORG_BUDGET_SECTIONS = {
 
 export const FISCAL_HOST_SECTIONS = {
   FISCAL_HOSTING: 'fiscal-hosting',
-  HOST_TWO_FACTOR_AUTH: 'host-two-factor-auth',
+  SECURITY: 'security',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   HOST_VIRTUAL_CARDS_SETTINGS: 'host-virtual-cards-settings',
   INVOICES_RECEIPTS: 'invoices-receipts',
@@ -58,14 +58,17 @@ export const COLLECTIVE_SECTIONS = {
   INFO: 'info',
   PAYMENT_METHODS: 'payment-methods',
   PAYMENT_RECEIPTS: 'payment-receipts',
+  NOTIFICATIONS: 'notifications',
   POLICIES: 'policies',
   CUSTOM_EMAIL: 'custom-email',
   TEAM: 'members',
   TICKETS: 'tickets',
   TIERS: 'tiers',
+  TIERS_REVAMP: 'tiers-revamp',
   TWO_FACTOR_AUTH: 'two-factor-auth',
   VIRTUAL_CARDS: 'virtual-cards',
   WEBHOOKS: 'webhooks',
+  ACTIVITY_LOG: 'activity-log',
 };
 
 export const LEGACY_COLLECTIVE_SETTINGS_SECTIONS = {
@@ -95,6 +98,9 @@ export const PAGE_TITLES = defineMessages({
 });
 
 export const SECTION_LABELS = defineMessages({
+  [ALL_SECTIONS.ACTIVITY_LOG]: {
+    defaultMessage: 'Activity log',
+  },
   [ALL_SECTIONS.EXPENSES]: {
     id: 'Expenses',
     defaultMessage: 'Expenses',
@@ -191,8 +197,11 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Payment Methods',
   },
   [ALL_SECTIONS.TIERS]: {
-    id: 'editCollective.menu.tiers',
+    id: 'Tiers',
     defaultMessage: 'Tiers',
+  },
+  [ALL_SECTIONS.TIERS_REVAMP]: {
+    defaultMessage: 'Tiers (New!)',
   },
   [ALL_SECTIONS.GIFT_CARDS]: {
     id: 'editCollective.menu.giftCards',
@@ -220,9 +229,9 @@ export const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.paymentReceipts',
     defaultMessage: 'Payment Receipts',
   },
-  [ALL_SECTIONS.HOST_TWO_FACTOR_AUTH]: {
-    id: 'TwoFactorAuth',
-    defaultMessage: 'Two-factor authentication',
+  [ALL_SECTIONS.SECURITY]: {
+    id: 'Security',
+    defaultMessage: 'Security',
   },
   [ALL_SECTIONS.HOST_VIRTUAL_CARDS]: {
     id: 'VirtualCards.Title',
@@ -239,5 +248,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.HOSTED_COLLECTIVES]: {
     id: 'HostedCollectives',
     defaultMessage: 'Hosted Collectives',
+  },
+  [ALL_SECTIONS.NOTIFICATIONS]: {
+    id: 'NotificationsSettings.Title',
+    defaultMessage: 'Notifications Settings',
   },
 });

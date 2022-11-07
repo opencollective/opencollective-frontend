@@ -1,9 +1,9 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
@@ -16,7 +16,7 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import BanAccountsSummary from './BanAccountsSummary';
 
-export const banAccountsMutation = gqlV2/* GraphQL */ `
+export const banAccountsMutation = gql`
   mutation BanAccounts($account: [AccountReferenceInput!]!, $dryRun: Boolean!, $includeAssociatedAccounts: Boolean!) {
     banAccount(account: $account, includeAssociatedAccounts: $includeAssociatedAccounts, dryRun: $dryRun) {
       isAllowed
@@ -58,11 +58,14 @@ const BanAccount = () => {
   return (
     <div>
       <StyledInputField htmlFor="ban-accounts-picker" label="Account" flex="1 1">
-        {({ id }) => <CollectivePickerAsync inputId={id} onChange={setSelectedAccountsOptions} isMulti />}
+        {({ id }) => (
+          <CollectivePickerAsync inputId={id} onChange={setSelectedAccountsOptions} isMulti skipGuests={false} />
+        )}
       </StyledInputField>
 
       <Flex flexWrap="wrap" px={1} mt={2}>
         <StyledCheckbox
+          name="associated-accounts"
           label="Include all associated accounts"
           checked={includeAssociatedAccounts}
           onChange={({ checked }) => {
@@ -96,7 +99,7 @@ const BanAccount = () => {
           isDanger
           continueLabel="Ban accounts"
           header="Ban accounts"
-          cancelHandler={() => setDryRunData(null)}
+          onClose={() => setDryRunData(null)}
           disableSubmit={!dryRunData.isAllowed}
           continueHandler={async () => {
             try {
@@ -121,7 +124,5 @@ const BanAccount = () => {
     </div>
   );
 };
-
-BanAccount.propTypes = {};
 
 export default BanAccount;

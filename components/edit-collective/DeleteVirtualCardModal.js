@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import StyledButton from '../StyledButton';
@@ -12,17 +12,25 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const deleteVirtualCardMutation = gqlV2/* GraphQL */ `
+const deleteVirtualCardMutation = gql`
   mutation deleteVirtualCard($virtualCard: VirtualCardReferenceInput!) {
     deleteVirtualCard(virtualCard: $virtualCard)
   }
 `;
 
-const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps }) => {
+const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefetchQuery, ...modalProps }) => {
   const { addToast } = useToasts();
+
+  const refetchOptions = onDeleteRefetchQuery
+    ? {
+        refetchQueries: [onDeleteRefetchQuery],
+        awaitRefetchQueries: true,
+      }
+    : {};
 
   const [deleteVirtualCard, { loading: isBusy }] = useMutation(deleteVirtualCardMutation, {
     context: API_V2_CONTEXT,
+    ...refetchOptions,
   });
 
   const formik = useFormik({
@@ -79,7 +87,7 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps
               type="submit"
               textTransform="capitalize"
             >
-              <FormattedMessage defaultMessage="Delete" />
+              <FormattedMessage id="actions.delete" defaultMessage="Delete" />
             </StyledButton>
           </Container>
         </ModalFooter>
@@ -91,6 +99,7 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, ...modalProps
 DeleteVirtualCardModal.propTypes = {
   onClose: PropTypes.func,
   onSuccess: PropTypes.func,
+  onDeleteRefetchQuery: PropTypes.string,
   virtualCard: PropTypes.shape({
     id: PropTypes.string,
     name: PropTypes.string,

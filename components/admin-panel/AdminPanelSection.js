@@ -12,38 +12,42 @@ import HostDashboardReports from '../host-dashboard/HostDashboardReports';
 import PendingApplications from '../host-dashboard/PendingApplications';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
+import { H2 } from '../Text';
 
 import AccountSettings from './sections/AccountSettings';
 import FinancialContributions from './sections/FinancialContributions';
 import HostVirtualCards from './sections/HostVirtualCards';
 import InvoicesReceipts from './sections/InvoicesReceipts';
+import NotificationsSettings from './sections/NotificationsSettings';
 import {
+  COLLECTIVE_SECTIONS,
   FISCAL_HOST_SECTIONS,
   HOST_DASHBOARD_SECTIONS,
   LEGACY_COLLECTIVE_SETTINGS_SECTIONS,
   SECTION_LABELS,
 } from './constants';
 
-const HOST_ADMIN_SECTIONS = {
+const ADMIN_PANEL_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
   [HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS]: FinancialContributions,
   [HOST_DASHBOARD_SECTIONS.EXPENSES]: HostDashboardExpenses,
   [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: PendingApplications,
   [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
   [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
+  [COLLECTIVE_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
 };
 
 const FISCAL_HOST_SETTINGS_SECTIONS = {
   [FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
 };
 
-const Title = styled(Box)`
+const Title = styled(H2)`
   font-size: 24px;
   font-weight: 700;
   line-height: 32px;
 `;
 
-const AdminPanelSection = ({ collective, isLoading, section }) => {
+const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
   const { formatMessage } = useIntl();
 
   if (isLoading) {
@@ -56,11 +60,11 @@ const AdminPanelSection = ({ collective, isLoading, section }) => {
   }
 
   // Host Dashboard
-  const AdminSectionComponent = HOST_ADMIN_SECTIONS[section];
+  const AdminSectionComponent = ADMIN_PANEL_SECTIONS[section];
   if (AdminSectionComponent) {
     return (
       <Container width="100%">
-        <AdminSectionComponent hostSlug={collective.slug} isNewAdmin />
+        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} isNewAdmin />
       </Container>
     );
   }
@@ -99,6 +103,7 @@ const AdminPanelSection = ({ collective, isLoading, section }) => {
 AdminPanelSection.propTypes = {
   isLoading: PropTypes.bool,
   section: PropTypes.string,
+  subpath: PropTypes.arrayOf(PropTypes.string),
   /** The account. Can be null if isLoading is true */
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,

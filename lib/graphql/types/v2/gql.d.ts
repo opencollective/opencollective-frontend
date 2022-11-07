@@ -1,0 +1,14 @@
+/* eslint-disable */
+import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
+
+declare module "@apollo/client" {
+
+  export function gql(source: "\n  mutation editVirtualCard(\n    $virtualCard: VirtualCardReferenceInput!\n    $name: String!\n    $limitAmount: AmountInput\n    $limitInterval: VirtualCardLimitInterval\n    $assignee: AccountReferenceInput!\n  ) {\n    editVirtualCard(\n      virtualCard: $virtualCard\n      name: $name\n      limitAmount: $limitAmount\n      limitInterval: $limitInterval\n      assignee: $assignee\n    ) {\n      id\n      name\n      spendingLimitAmount\n      spendingLimitInterval\n      assignee {\n        id\n        name\n        slug\n        imageUrl\n      }\n    }\n  }\n"): typeof import('./graphql').EditVirtualCardDocument;
+  export function gql(source: "\n  mutation createVirtualCard(\n    $name: String!\n    $limitAmount: AmountInput!\n    $limitInterval: VirtualCardLimitInterval!\n    $account: AccountReferenceInput!\n    $assignee: AccountReferenceInput!\n  ) {\n    createVirtualCard(\n      name: $name\n      limitAmount: $limitAmount\n      limitInterval: $limitInterval\n      account: $account\n      assignee: $assignee\n    ) {\n      id\n      name\n      last4\n      data\n    }\n  }\n"): typeof import('./graphql').CreateVirtualCardDocument;
+  export function gql(source: "\n  query CollectiveMembers($slug: String!) {\n    account(slug: $slug) {\n      id\n      members(role: ADMIN) {\n        nodes {\n          id\n          account {\n            id\n            name\n            imageUrl\n            slug\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').CollectiveMembersDocument;
+  export function gql(source: "\n  query VirtualCardPoliciesQuery($slug: String) {\n    account(slug: $slug) {\n      id\n      policies {\n        MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {\n          ALL_TIME {\n            valueInCents\n          }\n          DAILY {\n            valueInCents\n          }\n          MONTHLY {\n            valueInCents\n          }\n          PER_AUTHORIZATION {\n            valueInCents\n          }\n          WEEKLY {\n            valueInCents\n          }\n          YEARLY {\n            valueInCents\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').VirtualCardPoliciesQueryDocument;
+  export function gql(source: "\n  mutation ClearCache($account: AccountReferenceInput!, $cacheTypes: [AccountCacheType!]) {\n    clearCacheForAccount(account: $account, type: $cacheTypes) {\n      id\n      slug\n      name\n    }\n  }\n"): typeof import('./graphql').ClearCacheDocument;
+  export function gql(source: string): unknown;
+
+    export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<    infer TType,    any  >    ? TType    : never;  
+}

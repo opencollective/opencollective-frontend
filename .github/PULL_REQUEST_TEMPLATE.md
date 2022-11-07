@@ -1,6 +1,5 @@
-<!-- If there's an issue associated with this pull request, add it here -->
-
-Resolve #.....
+Resolve ... <!-- If there's an issue associated with this pull request, add a link here -->
+Require ... <!-- If this PR depends on another PR (usually from the API), add a link here -->
 
 # Description
 

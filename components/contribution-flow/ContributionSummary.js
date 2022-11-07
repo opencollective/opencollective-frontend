@@ -52,7 +52,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
   const intl = useIntl();
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
   const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, currency);
-  const platformContribution = stepDetails.platformContribution || 0;
+  const platformTip = stepDetails.platformTip || 0;
 
   return (
     <Container fontSize="12px">
@@ -98,7 +98,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               </Amount>
             </AmountLine>
           )}
-          {Boolean(platformContribution) && (
+          {Boolean(platformTip) && (
             <AmountLine color="black.700" data-cy="ContributionSummary-Tip">
               <Label>
                 <FormattedMessage
@@ -109,7 +109,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               </Label>
               <Amount>
                 <FormattedMoneyAmount
-                  amount={platformContribution}
+                  amount={platformTip}
                   currency={currency}
                   amountStyles={{ color: 'black.700', fontWeight: 400 }}
                 />
@@ -187,7 +187,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
           </Label>
           <Amount>
             <FormattedMoneyAmount
-              amount={totalAmount - pmFeeInfo.fee - platformContribution}
+              amount={totalAmount - pmFeeInfo.fee - platformTip}
               currency={currency}
               amountStyles={null}
             />

@@ -20,7 +20,12 @@ const TheFutureIsCollective = () => {
       <Flex justifyContent="center" alignItems="center" px="16px" mt="40px">
         <Flex flexDirection="column" alignItems="center">
           <Box>
-            <MainTitle textAlign="center">
+            <MainTitle
+              fontSize={['52px', '64px', '72px']}
+              lineHeight={['56px', '80px', '88px']}
+              letterSpacing={['-0.04em', '0.012em', null]}
+              textAlign="center"
+            >
               <FormattedMessage id="home.futureIsCollective" defaultMessage={'The future is collective'} />
             </MainTitle>
           </Box>
@@ -40,7 +45,7 @@ const TheFutureIsCollective = () => {
           <Box mb="40px" display="flex" flexDirection={['column', 'row']} alignItems="center">
             <Link href="/create">
               <StyledButton
-                width={['288px', '125px']}
+                minWidth={['288px', '125px']}
                 my={['12px', null, 0]}
                 mr={[0, '24px']}
                 buttonStyle="marketing"
@@ -55,7 +60,7 @@ const TheFutureIsCollective = () => {
             <StyledButton
               onClick={() => setShowModal(true)}
               my={['12px', null, 0]}
-              width={['288px', '196px']}
+              minWidth={['288px', '196px']}
               fontSize="16px"
               lineHeight="20px"
             >
@@ -67,38 +72,34 @@ const TheFutureIsCollective = () => {
               </Span>
             </StyledButton>
           </Box>
-          <Box display={[null, 'none']}>
-            <NextIllustration
-              width={320}
-              height={589}
-              alt="The future is collective."
-              src="/static/images/new-home/budget-illustration-xs.png"
-            />
-          </Box>
-          <Box display={['none', 'block', 'none']}>
-            <NextIllustration
-              width={768}
-              height={431}
-              alt="The future is collective."
-              src="/static/images/new-home/budget-illustration-sm.png"
-            />
-          </Box>
-          <Box display={['none', null, 'block', null, 'none']}>
-            <NextIllustration
-              width={978}
-              height={610}
-              alt="The future is collective."
-              src="/static/images/new-home/budget-illustration-md.png"
-            />
-          </Box>
-          <Box display={['none', null, null, null, 'block']}>
-            <NextIllustration
-              width={1014}
-              height={619}
-              alt="The future is collective."
-              src="/static/images/new-home/budget-illustration-lg.png"
-            />
-          </Box>
+          <NextIllustration
+            display={[null, 'none']}
+            width={320}
+            height={589}
+            alt="The future is collective."
+            src="/static/images/new-home/budget-illustration-mobile.png"
+          />
+          <NextIllustration
+            display={['none', 'block', 'none']}
+            width={768}
+            height={431}
+            alt="The future is collective."
+            src="/static/images/new-home/budget-illustration.png"
+          />
+          <NextIllustration
+            display={['none', null, 'block', null, 'none']}
+            width={978}
+            height={610}
+            alt="The future is collective."
+            src="/static/images/new-home/budget-illustration.png"
+          />
+          <NextIllustration
+            display={['none', null, null, null, 'block']}
+            width={1014}
+            height={619}
+            alt="The future is collective."
+            src="/static/images/new-home/budget-illustration.png"
+          />
         </Flex>
       </Flex>
       {showModal && (

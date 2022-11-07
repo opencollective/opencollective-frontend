@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
 import { get, isNumber, round } from 'lodash';
@@ -11,7 +11,7 @@ import { border, color, space, typography } from 'styled-system';
 import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { createError, ERROR } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { AmountPropTypeShape } from '../../lib/prop-types';
@@ -26,7 +26,6 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledButtonSet from '../StyledButtonSet';
 import StyledCheckbox from '../StyledCheckbox';
-import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
@@ -37,7 +36,7 @@ import { withUser } from '../UserProvider';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 
-const quoteExpenseQuery = gqlV2/* GraphQL */ `
+const quoteExpenseQuery = gql`
   query QuoteExpenseQuery($id: String!) {
     expense(expense: { id: $id }) {
       id
@@ -87,7 +86,6 @@ const getPayoutOptionValue = (payoutMethodType, isAuto, host) => {
 
 const DEFAULT_VALUES = Object.freeze({
   paymentProcessorFee: null,
-  twoFactorAuthenticatorCode: null,
   feesPayer: 'COLLECTIVE',
 });
 
@@ -414,7 +412,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
                     showCurrencyCode={false}
                     amount={{
                       valueInCents: Math.round(totalAmount * expense.amountInAccountCurrency.exchangeRate.value),
-                      currency: expense.currency,
+                      currency: expense.amountInAccountCurrency.currency,
                       exchangeRate: expense.amountInAccountCurrency.exchangeRate,
                     }}
                   />
@@ -423,36 +421,6 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
             </AmountLine>
           )}
         </Box>
-        {Boolean(error?.message?.startsWith('Two-factor authentication')) && (
-          <StyledInputField
-            name="twoFactorAuthenticatorCode"
-            htmlFor="twoFactorAuthenticatorCode"
-            label={
-              <FormattedMessage
-                id="PayExpenseModal.TwoFactorAuthCode"
-                defaultMessage="Two-factor authentication code"
-              />
-            }
-            value={formik.values.twoFactorAuthenticatorCode}
-            mt={2}
-            mb={3}
-          >
-            {inputProps => (
-              <StyledInput
-                {...inputProps}
-                minHeight={50}
-                fontSize="20px"
-                placeholder="123456"
-                pattern="[0-9]{6}"
-                inputMode="numeric"
-                autoFocus
-                onChange={e => {
-                  formik.setFieldValue('twoFactorAuthenticatorCode', e.target.value);
-                }}
-              />
-            )}
-          </StyledInputField>
-        )}
         {!error && formik.values.forceManual && payoutMethodType !== PayoutMethodType.OTHER && (
           <MessageBox type="warning" withIcon my={3} fontSize="12px">
             <strong>

@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import { Flex } from './Grid';
@@ -33,16 +34,16 @@ const ModalFooterWrapper = styled(ModalFooter)`
   height: 65px;
 `;
 
-const newsAndUpdatesQuery = gqlV2/* GraphQL */ `
-  query ChangelogUpdates(
-    $collectiveSlug: String
-    $onlyChangelogUpdates: Boolean
-    $onlyPublishedUpdates: Boolean
-    $limit: Int
-  ) {
-    account(slug: $collectiveSlug) {
+const newsAndUpdatesQuery = gql`
+  query ChangelogUpdates($limit: Int) {
+    account(slug: "opencollective") {
       id
-      updates(onlyChangelogUpdates: $onlyChangelogUpdates, onlyPublishedUpdates: $onlyPublishedUpdates, limit: $limit) {
+      updates(
+        orderBy: { field: PUBLISHED_AT, direction: DESC }
+        onlyChangelogUpdates: true
+        onlyPublishedUpdates: true
+        limit: $limit
+      ) {
         nodes {
           id
           slug
@@ -154,16 +155,7 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
       </ModalHeaderWrapper>
       <hr />
       <ModalBody>
-        <Query
-          query={newsAndUpdatesQuery}
-          variables={{
-            collectiveSlug: 'opencollective',
-            onlyChangelogUpdates: true,
-            onlyPublishedUpdates: true,
-            limit: 5,
-          }}
-          context={API_V2_CONTEXT}
-        >
+        <Query query={newsAndUpdatesQuery} variables={{ limit: 5 }} context={API_V2_CONTEXT}>
           {({ data, loading, error }) => renderStyledCarousel(data, loading, error, onClose)}
         </Query>
       </ModalBody>

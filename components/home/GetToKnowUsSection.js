@@ -242,6 +242,7 @@ const GetToKnowUs = () => {
             fontWeight="500"
           >
             <FormattedMessage
+              id="e2c.description"
               defaultMessage={
                 'Join us as we transition from a privately owned company to a structure that allows us to share power and revenue with you.'
               }
@@ -250,7 +251,7 @@ const GetToKnowUs = () => {
           <Box display={['none', null, 'block']} mt="24px">
             <Link href="/e2c">
               <StyledButton
-                width="135px"
+                minWidth="135px"
                 my={['12px', null, 0]}
                 buttonStyle="marketing"
                 whiteSpace="nowrap"

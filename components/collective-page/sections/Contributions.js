@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import CollectiveRoles from '../../../lib/constants/roles';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
@@ -149,7 +149,7 @@ const MembershipCardContainer = styled.div`
   animation: ${fadeIn} 0.2s;
 `;
 
-const contributionsSectionStaticQuery = gqlV2/* GraphQL */ `
+const contributionsSectionStaticQuery = gql`
   query ContributionsSectionStatic($slug: String!) {
     account(slug: $slug) {
       id
@@ -194,7 +194,7 @@ const contributionsSectionStaticQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const contributionsSectionQuery = gqlV2/* GraphQL */ `
+const contributionsSectionQuery = gql`
   query ContributionsSection(
     $slug: String!
     $limit: Int!

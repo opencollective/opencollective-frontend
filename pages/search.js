@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular';
 import copy from 'copy-to-clipboard';
-import { differenceWith, isNil, pickBy, truncate } from 'lodash';
+import { differenceWith, isNil, pickBy, toLower, truncate, uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
 
@@ -389,21 +390,24 @@ class SearchPage extends React.Component {
             {showTagFilterSection && (
               <Container pl={[0, '23px']} pt={['20px', 0]}>
                 <FilterLabel htmlFor="tag-filter-type">
-                  <FormattedMessage defaultMessage="Tags" />
+                  <FormattedMessage id="Tags" defaultMessage="Tags" />
                 </FilterLabel>
                 <Flex flexWrap="wrap">
-                  {tagStats?.nodes
-                    ?.filter(node => !IGNORED_TAGS.includes(node.tag))
-                    .map(node => (
+                  {uniqBy(
+                    tagStats?.nodes.map(node => node.tag),
+                    toLower,
+                  )
+                    ?.filter(tag => !IGNORED_TAGS.includes(tag))
+                    .map(tag => (
                       <FilterButton
                         as={StyledTag}
-                        key={node.tag}
-                        title={node.tag}
+                        key={tag}
+                        title={tag}
                         variant="rounded-right"
-                        $isSelected={tags.includes(node.tag)}
-                        onClick={() => this.changeTags(node.tag)}
+                        $isSelected={tags.includes(tag)}
+                        onClick={() => this.changeTags(tag)}
                       >
-                        {truncate(node.tag, { length: 20 })}
+                        {truncate(tag, { length: 20 })}
                       </FilterButton>
                     ))}
                   {hiddenSelectedTags?.map(tag => (
@@ -536,7 +540,7 @@ class SearchPage extends React.Component {
 
 export { SearchPage as MockSearchPage };
 
-export const searchPageQuery = gqlV2/* GraphQL */ `
+export const searchPageQuery = gql`
   query SearchPage(
     $term: String!
     $type: [AccountType]

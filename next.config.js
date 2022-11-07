@@ -28,8 +28,6 @@ const nextConfig = {
         REST_URL: null,
         SENTRY_DSN: null,
         TW_API_COLLECTIVE_SLUG: null,
-        HOST_DASHBOARD_REPORTS: false,
-        NEW_ADMIN_DASHBOARD: false,
         WISE_ENVIRONMENT: 'sandbox',
         HCAPTCHA_SITEKEY: false,
         CAPTCHA_ENABLED: false,
@@ -200,6 +198,12 @@ const nextConfig = {
       {
         source: '/discover',
         destination: '/search',
+        permanent: true,
+      },
+      // Redirect legacy /create/opensource to new OSC apply flow
+      {
+        source: '/create/opensource/:step*',
+        destination: '/opensource/apply/intro',
         permanent: true,
       },
     ];

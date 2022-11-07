@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import classNames from 'classnames';
 import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+
+import { gqlV1 } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import Error from './Error';
@@ -136,7 +137,7 @@ class MembersWithData extends React.Component {
   }
 }
 
-const membersQuery = gql`
+const membersQuery = gqlV1/* GraphQL */ `
   query Members(
     $collectiveSlug: String!
     $TierId: Int

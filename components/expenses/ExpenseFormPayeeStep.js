@@ -22,15 +22,15 @@ import CollectivePicker, {
 } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
-import I18nAddressFields from '../I18nAddressFields';
-import InputTypeCountry from '../InputTypeCountry';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
+import StyledInputLocation from '../StyledInputLocation';
 import StyledTextarea from '../StyledTextarea';
 import StyledTooltip from '../StyledTooltip';
+import { TwoFactorAuthRequiredMessage } from '../TwoFactorAuthRequiredMessage';
 
 import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
@@ -173,8 +173,10 @@ const getPayeeOptions = (intl, payoutProfiles) => {
   return payeeOptions;
 };
 
-const checkStepOneCompleted = (values, isOnBehalf) => {
-  if (isOnBehalf) {
+const checkStepOneCompleted = (values, isOnBehalf, isMissing2FA) => {
+  if (isMissing2FA) {
+    return false;
+  } else if (isOnBehalf) {
     return Boolean(values.payee);
   } else if (!isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod)))) {
     return false; // There are some errors in the form
@@ -193,13 +195,15 @@ const ExpenseFormPayeeStep = ({
   onCancel,
   onNext,
   onInvite,
+  onChange,
   isOnBehalf,
   loggedInAccount,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, errors } = formik;
-  const stepOneCompleted = checkStepOneCompleted(values, isOnBehalf);
+  const isMissing2FA = Boolean(values.payee?.policies?.REQUIRE_2FA_FOR_ADMINS && !loggedInAccount?.hasTwoFactorAuth);
+  const stepOneCompleted = checkStepOneCompleted(values, isOnBehalf, isMissing2FA);
   const allPayoutMethods = React.useMemo(
     () => getPayoutMethodsFromPayee(values.payee),
     [values.payee, loggedInAccount],
@@ -236,6 +240,7 @@ const ExpenseFormPayeeStep = ({
               formik.setFieldValue('payee', payee);
               formik.setFieldValue('payoutMethod', null);
               setLocationFromPayee(formik, payee);
+              onChange(payee);
             }
           }}
           styles={{
@@ -268,6 +273,7 @@ const ExpenseFormPayeeStep = ({
             formik.setFieldValue('payee', value);
             formik.setFieldValue('payoutMethod', null);
             setLocationFromPayee(formik, value);
+            onChange(value);
           }}
         />
       );
@@ -289,176 +295,140 @@ const ExpenseFormPayeeStep = ({
               </StyledInputField>
             )}
           </Field>
-          {values.payee?.legalName && (
-            <Field name="legalName">
-              {({ field }) => (
-                <StyledInputField
-                  name={field.name}
-                  label={
-                    <React.Fragment>
-                      <FormattedMessage id="LegalName" defaultMessage="Legal Name" />
-                      &nbsp;
-                      <StyledTooltip
-                        content={() => (
-                          <FormattedMessage
-                            id="ExpenseForm.legalName.tooltip"
-                            defaultMessage="The legal name of the payee. This can be changed in your profile settings."
-                          />
-                        )}
-                      >
-                        <InfoCircle size={16} />
-                      </StyledTooltip>
-                    </React.Fragment>
-                  }
-                  labelFontSize="13px"
-                  flex="1"
-                  mt={3}
-                >
-                  <StyledInput value={values.payee.legalName} disabled />
-                  {values.payoutMethod?.data?.accountHolderName &&
-                    values.payee.legalName &&
-                    !compareNames(values.payoutMethod.data.accountHolderName, values.payee.legalName) && (
-                      <MessageBox mt={2} fontSize="12px" type="warning" withIcon>
-                        <FormattedMessage
-                          id="Warning.LegalNameNotMatchBankAccountName"
-                          defaultMessage="The legal name should match the bank account holder name in most cases. Otherwise payments may be delayed. If the payment is to an organization, please select or create that organization's profile instead of your individual profile as the payee."
-                        />
-                      </MessageBox>
-                    )}
-                </StyledInputField>
-              )}
-            </Field>
-          )}
-          {requiresAddress && (
-            <Fragment>
-              <FastField name="payeeLocation.country">
-                {({ field }) => (
-                  <StyledInputField
-                    name={field.name}
-                    label={formatMessage(msg.country)}
-                    labelFontSize="13px"
-                    error={formatFormErrorMessage(intl, errors.payeeLocation?.country)}
-                    required
-                    mt={3}
-                  >
-                    {({ id, error }) => (
-                      <InputTypeCountry
-                        data-cy="payee-country"
-                        inputId={id}
-                        onChange={value => {
-                          formik.setFieldValue(field.name, value);
-                        }}
-                        value={field.value}
-                        error={error}
-                      />
-                    )}
-                  </StyledInputField>
-                )}
-              </FastField>
-              {values.payeeLocation?.structured || !values.payeeLocation?.address ? (
-                <I18nAddressFields
-                  prefix="payeeLocation.structured"
-                  selectedCountry={values.payeeLocation?.country}
-                  onCountryChange={addressObject => {
-                    if (addressObject) {
-                      formik.setFieldValue('payeeLocation.structured', addressObject);
-                    }
-                  }}
-                />
-              ) : (
-                <FastField name="payeeLocation.address">
+          {!isMissing2FA && (
+            <React.Fragment>
+              {values.payee?.legalName && (
+                <Field name="legalName">
                   {({ field }) => (
-                    <StyledInputField name={field.name} label="Address" labelFontSize="13px" required mt={3}>
+                    <StyledInputField
+                      name={field.name}
+                      label={
+                        <React.Fragment>
+                          <FormattedMessage id="LegalName" defaultMessage="Legal Name" />
+                          &nbsp;
+                          <StyledTooltip
+                            content={() => (
+                              <FormattedMessage
+                                id="ExpenseForm.legalName.tooltip"
+                                defaultMessage="The legal name of the payee. This can be changed in your profile settings."
+                              />
+                            )}
+                          >
+                            <InfoCircle size={16} />
+                          </StyledTooltip>
+                        </React.Fragment>
+                      }
+                      labelFontSize="13px"
+                      flex="1"
+                      mt={3}
+                    >
+                      <StyledInput value={values.payee.legalName} disabled />
+                      {values.payoutMethod?.data?.accountHolderName &&
+                        values.payee.legalName &&
+                        !compareNames(values.payoutMethod.data.accountHolderName, values.payee.legalName) && (
+                          <MessageBox mt={2} fontSize="12px" type="warning" withIcon>
+                            <FormattedMessage
+                              id="Warning.LegalNameNotMatchBankAccountName"
+                              defaultMessage="The legal name should match the bank account holder name in most cases. Otherwise payments may be delayed. If the payment is to an organization, please select or create that organization's profile instead of your individual profile as the payee."
+                            />
+                          </MessageBox>
+                        )}
+                    </StyledInputField>
+                  )}
+                </Field>
+              )}
+              {requiresAddress && (
+                <Box mt={3}>
+                  <StyledInputLocation
+                    onChange={values => {
+                      formik.setFieldValue('payeeLocation', values);
+                    }}
+                    location={values.payeeLocation}
+                    errors={errors.payeeLocation}
+                  />
+                </Box>
+              )}
+              {values.type === expenseTypes.INVOICE && (
+                <FastField name="invoiceInfo">
+                  {({ field }) => (
+                    <StyledInputField
+                      name={field.name}
+                      label={formatMessage(msg.invoiceInfo)}
+                      labelFontSize="13px"
+                      required={false}
+                      mt={3}
+                    >
                       {inputProps => (
-                        <StyledTextarea
+                        <Field
+                          as={StyledTextarea}
                           {...inputProps}
                           {...field}
-                          data-cy="payee-address"
-                          minHeight={100}
-                          placeholder="P. Sherman 42&#10;Wallaby Way&#10;Sydney"
+                          minHeight={80}
+                          placeholder={formatMessage(msg.invoiceInfoPlaceholder)}
                         />
                       )}
                     </StyledInputField>
                   )}
                 </FastField>
               )}
-            </Fragment>
+            </React.Fragment>
           )}
-          {values.type === expenseTypes.INVOICE && (
-            <FastField name="invoiceInfo">
+        </Box>
+        {!isOnBehalf && (
+          <Box flexGrow="1" flexBasis="50%" display={values.payee ? 'block' : 'none'}>
+            <Field name="payoutMethod">
               {({ field }) => (
                 <StyledInputField
                   name={field.name}
-                  label={formatMessage(msg.invoiceInfo)}
-                  labelFontSize="13px"
-                  required={false}
+                  htmlFor="payout-method"
+                  flex="1"
                   mt={3}
+                  label={formatMessage(msg.payoutOptionLabel)}
+                  labelFontSize="13px"
+                  error={
+                    isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
+                      ? formatFormErrorMessage(intl, errors.payoutMethod)
+                      : null
+                  }
                 >
-                  {inputProps => (
-                    <Field
-                      as={StyledTextarea}
-                      {...inputProps}
-                      {...field}
-                      minHeight={80}
-                      placeholder={formatMessage(msg.invoiceInfoPlaceholder)}
+                  {({ id, error }) => (
+                    <PayoutMethodSelect
+                      inputId={id}
+                      error={error}
+                      onChange={setPayoutMethod}
+                      onRemove={onPayoutMethodRemove}
+                      payoutMethod={values.payoutMethod}
+                      payoutMethods={allPayoutMethods}
+                      payee={values.payee}
+                      disabled={!values.payee || isMissing2FA}
+                      collective={collective}
                     />
                   )}
                 </StyledInputField>
               )}
-            </FastField>
-          )}
-        </Box>
-        <Box flexGrow="1" flexBasis="50%" display={values.payee ? 'block' : 'none'}>
-          <Field name="payoutMethod">
-            {({ field }) => (
-              <StyledInputField
-                name={field.name}
-                htmlFor="payout-method"
-                flex="1"
-                mt={3}
-                label={formatMessage(msg.payoutOptionLabel)}
-                labelFontSize="13px"
-                error={
-                  isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
-                    ? formatFormErrorMessage(intl, errors.payoutMethod)
-                    : null
-                }
-              >
-                {({ id, error }) => (
-                  <PayoutMethodSelect
-                    inputId={id}
-                    error={error}
-                    onChange={setPayoutMethod}
-                    onRemove={onPayoutMethodRemove}
-                    payoutMethod={values.payoutMethod}
-                    payoutMethods={allPayoutMethods}
-                    payee={values.payee}
-                    disabled={!values.payee}
-                    collective={collective}
-                  />
-                )}
-              </StyledInputField>
-            )}
-          </Field>
-
-          {values.payoutMethod && (
-            <Field name="payoutMethod">
-              {({ field, meta }) => (
-                <Box mt={3} flex="1">
-                  <PayoutMethodForm
-                    fieldsPrefix="payoutMethod"
-                    payoutMethod={field.value}
-                    host={collective.host}
-                    errors={meta.error}
-                  />
-                </Box>
-              )}
             </Field>
-          )}
-        </Box>
+
+            {values.payoutMethod && (
+              <Field name="payoutMethod">
+                {({ field, meta }) => (
+                  <Box mt={3} flex="1">
+                    <PayoutMethodForm
+                      fieldsPrefix="payoutMethod"
+                      payoutMethod={field.value}
+                      host={collective.host}
+                      errors={meta.error}
+                    />
+                  </Box>
+                )}
+              </Field>
+            )}
+          </Box>
+        )}
       </Flex>
 
-      {values.payee && (
+      {isMissing2FA && <TwoFactorAuthRequiredMessage mt={4} />}
+
+      {values.payee && !isMissing2FA && (
         <Fragment>
           <StyledHr flex="1" mt={4} borderColor="black.300" />
           <Flex mt={3} flexWrap="wrap">
@@ -471,7 +441,6 @@ const ExpenseFormPayeeStep = ({
                 mt={2}
                 whiteSpace="nowrap"
                 data-cy="expense-cancel"
-                disabled={!stepOneCompleted}
                 onClick={() => {
                   onCancel?.();
                 }}
@@ -522,6 +491,7 @@ ExpenseFormPayeeStep.propTypes = {
   onCancel: PropTypes.func,
   onNext: PropTypes.func,
   onInvite: PropTypes.func,
+  onChange: PropTypes.func,
   isOnBehalf: PropTypes.bool,
   loggedInAccount: PropTypes.object,
   collective: PropTypes.shape({

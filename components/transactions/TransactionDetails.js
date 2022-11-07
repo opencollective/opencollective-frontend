@@ -8,6 +8,7 @@ import { TransactionKind, TransactionTypes } from '../../lib/constants/transacti
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { renderDetailsString, saveInvoice } from '../../lib/transactions';
 
+import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
@@ -98,6 +99,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
     hostFee,
     paymentMethod,
     paymentProcessorFee,
+    payoutMethod,
     amount,
     netAmount,
     permissions,
@@ -166,6 +168,14 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
             </React.Fragment>
           )}
         </DetailDescription>
+        {order?.memo && (
+          <React.Fragment>
+            <DetailTitle>
+              <FormattedMessage defaultMessage="Memo" />
+            </DetailTitle>
+            <DetailDescription>{order.memo}</DetailDescription>
+          </React.Fragment>
+        )}
       </Flex>
       <Flex flexDirection="column" width={[1, 0.35]}>
         <Box>
@@ -192,6 +202,22 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                 </Box>
               )}
             </React.Fragment>
+          )}
+          {payoutMethod && (
+            <Box>
+              <DetailTitle>
+                <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
+              </DetailTitle>
+              <DetailDescription>
+                <PayoutMethodTypeWithIcon
+                  type={payoutMethod.type}
+                  color={'inherit'}
+                  fontWeight={'inherit'}
+                  fontSize={'inherit'}
+                  iconSize={16}
+                />
+              </DetailDescription>
+            </Box>
           )}
         </Box>
       </Flex>
@@ -270,6 +296,7 @@ TransactionDetails.propTypes = {
     order: PropTypes.shape({
       id: PropTypes.string,
       status: PropTypes.string,
+      memo: PropTypes.string,
     }),
     expense: PropTypes.object,
     id: PropTypes.string,
@@ -281,6 +308,9 @@ TransactionDetails.propTypes = {
     taxAmount: PropTypes.object,
     taxInfo: PropTypes.object,
     paymentMethod: PropTypes.shape({
+      type: PropTypes.string,
+    }),
+    payoutMethod: PropTypes.shape({
       type: PropTypes.string,
     }),
     amount: PropTypes.shape({

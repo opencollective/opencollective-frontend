@@ -5,9 +5,9 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
-import SectionTitle from '../collectives/SectionTitle';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import { SectionTitle } from '../marketing/Text';
 import StyledCarousel from '../StyledCarousel';
 import { H4, P, Span } from '../Text';
 
@@ -251,7 +251,7 @@ const HowToUseOpenCollective = () => {
   const intl = useIntl();
 
   return (
-    <Flex mx={[3, 4]} flexDirection="column" textAlign="center" my={[4, null, 0]}>
+    <Flex mx={[3, 4]} flexDirection="column" textAlign="center" my={[4, null, 0, null, '112px']}>
       <SectionTitle mb="0">
         <FormattedMessage id="fiscalHosting.howCanAFiscalHostHelp" defaultMessage="How can a fiscal host help?" />
       </SectionTitle>

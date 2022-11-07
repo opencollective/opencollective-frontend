@@ -1,13 +1,14 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
 import { Formik } from 'formik';
-import { get, omit } from 'lodash';
+import { findLast, get, omit } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../../lib/constants/payout-method';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS, PayoutMethodType } from '../../../lib/constants/payout-method';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { formatManualInstructions } from '../../../lib/payment-method-utils';
 
 import ConfirmationModal from '../../ConfirmationModal';
 import Container from '../../Container';
@@ -18,10 +19,11 @@ import Loading from '../../Loading';
 import StyledButton from '../../StyledButton';
 import { P } from '../../Text';
 import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
+import { formatAccountDetails } from '../utils';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const hostQuery = gqlV2/* GraphQL */ `
+const hostQuery = gql`
   query EditCollectiveBankTransferHost($slug: String) {
     host(slug: $slug) {
       id
@@ -49,7 +51,7 @@ const hostQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const createPayoutMethodMutation = gqlV2/* GraphQL */ `
+const createPayoutMethodMutation = gql`
   mutation EditCollectiveBankTransferCreatePayoutMethod(
     $payoutMethod: PayoutMethodInput!
     $account: AccountReferenceInput!
@@ -63,7 +65,15 @@ const createPayoutMethodMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const editBankTransferMutation = gqlV2/* GraphQL */ `
+const removePayoutMethodMutation = gql`
+  mutation EditCollectiveBankTransferRemovePayoutMethod($payoutMethodId: String!) {
+    removePayoutMethod(payoutMethodId: $payoutMethodId) {
+      id
+    }
+  }
+`;
+
+const editBankTransferMutation = gql`
   mutation EditCollectiveBankTransfer($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
       id
@@ -72,12 +82,25 @@ const editBankTransferMutation = gqlV2/* GraphQL */ `
   }
 `;
 
+const renderBankInstructions = (instructions, bankAccountInfo) => {
+  const formatValues = {
+    account: bankAccountInfo ? formatAccountDetails(bankAccountInfo) : '',
+    reference: '76400',
+    OrderId: '76400',
+    amount: '$30',
+    collective: 'acme',
+  };
+
+  return formatManualInstructions(instructions, formatValues);
+};
+
 const BankTransfer = props => {
   const { loading, data } = useQuery(hostQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: props.collectiveSlug },
   });
   const [createPayoutMethod] = useMutation(createPayoutMethodMutation, { context: API_V2_CONTEXT });
+  const [removePayoutMethod] = useMutation(removePayoutMethodMutation, { context: API_V2_CONTEXT });
   const [editBankTransfer] = useMutation(editBankTransferMutation, { context: API_V2_CONTEXT });
   const [showForm, setShowForm] = React.useState(false);
   const [showRemoveBankConfirmationModal, setShowRemoveBankConfirmationModal] = React.useState(false);
@@ -105,6 +128,11 @@ const BankTransfer = props => {
     instructions,
   };
 
+  const latestBankAccount = findLast(
+    data?.host?.payoutMethods,
+    payoutMethod => payoutMethod.type === PayoutMethodType.BANK_ACCOUNT,
+  );
+
   return (
     <Flex className="EditPaymentMethods" flexDirection="column">
       {showEditManualPaymentMethod && (
@@ -128,6 +156,16 @@ const BankTransfer = props => {
               )}
             </Container>
           </Box>
+          {existingManualPaymentMethod && (
+            <Box pt={2}>
+              <Container fontSize="12px" mt={2} mb={2} color="black.600" textAlign="left">
+                <FormattedMessage defaultMessage="Preview of bank transfer instructions" />
+              </Container>
+              <pre style={{ whiteSpace: 'pre-wrap' }}>
+                {renderBankInstructions(instructions, latestBankAccount?.data)}
+              </pre>
+            </Box>
+          )}
           <Box alignItems="center" my={2}>
             <StyledButton
               buttonStyle="standard"
@@ -276,6 +314,13 @@ const BankTransfer = props => {
           continueHandler={async () => {
             const paymentMethods = get(data.host, 'settings.paymentMethods');
             const modifiedPaymentMethods = omit(paymentMethods, 'manual');
+            if (latestBankAccount) {
+              await removePayoutMethod({
+                variables: {
+                  payoutMethodId: latestBankAccount.id,
+                },
+              });
+            }
             await editBankTransfer({
               variables: {
                 key: 'paymentMethods',

@@ -83,6 +83,16 @@ const messages = defineMessages({
     id: 'event.over.sendMoneyToParent.description',
     defaultMessage: 'Spend it by submitting event expenses, or transfer the remaining balance to the main budget.',
   },
+  tooFewAdmins: {
+    id: 'collective.tooFewAdmins',
+    defaultMessage:
+      'Your collective was approved but you need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.',
+  },
+  tooFewAdminsDescription: {
+    id: 'collective.tooFewAdmins.description',
+    defaultMessage:
+      'You will automatically be able to accept contributions when {missingAdminsCount, plural, one {an invited administrator} other {# invited administrators} } has joined.',
+  },
 });
 
 const getNotification = (intl, status, collective, host, LoggedInUser) => {
@@ -136,8 +146,23 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
       description: intl.formatMessage(messages.approvalPendingDescription, { host: collective.host.name }),
       status: 'collectivePending',
     };
+  } else if (
+    LoggedInUser?.isAdminOfCollectiveOrHost(collective) &&
+    collective.isApproved &&
+    host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze &&
+    host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > collective?.admins?.length &&
+    collective?.features?.RECEIVE_FINANCIAL_CONTRIBUTIONS === 'DISABLED'
+  ) {
+    return {
+      title: intl.formatMessage(messages.tooFewAdmins, {
+        missingAdminsCount: host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins - collective.admins.length,
+      }),
+      description: intl.formatMessage(messages.tooFewAdminsDescription, {
+        missingAdminsCount: host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins - collective.admins.length,
+      }),
+    };
   } else if (get(collective, 'type') === CollectiveType.EVENT && moneyCanMoveFromEvent(collective)) {
-    if (!LoggedInUser || !LoggedInUser.canEditCollective(collective)) {
+    if (!LoggedInUser || !LoggedInUser.isAdminOfCollectiveOrHost(collective)) {
       return;
     }
     return {

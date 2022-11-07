@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
+
+import { gqlV1 } from '../lib/graphql/helpers';
 
 import CollectiveCard from './CollectiveCard';
 import Container from './Container';
@@ -98,7 +99,7 @@ class HostsWithData extends React.Component {
   }
 }
 
-const hostsQuery = gql`
+const hostsQuery = gqlV1/* GraphQL */ `
   query Hosts(
     $tags: [String]
     $currency: String

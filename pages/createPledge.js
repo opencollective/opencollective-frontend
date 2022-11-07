@@ -1,6 +1,5 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { themeGet } from '@styled-system/theme-get';
 import { get } from 'lodash';
@@ -11,6 +10,7 @@ import styled from 'styled-components';
 import { suggestSlug } from '../lib/collective.lib';
 import { defaultImage } from '../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../lib/errors';
+import { gqlV1 } from '../lib/graphql/helpers';
 import { legacyCollectiveQuery } from '../lib/graphql/queries';
 import { imagePreview } from '../lib/image-utils';
 import { compose } from '../lib/utils';
@@ -112,7 +112,7 @@ const AmountField = () => {
           label={
             <P {...labelStyles}>
               <FormattedMessage
-                id="contribution.amount.currency.label"
+                id="Label.AmountWithCurrency"
                 defaultMessage="Amount ({currency})"
                 values={{ currency: 'USD' }}
               />
@@ -467,7 +467,7 @@ class CreatePledgePage extends React.Component {
 
                     <Flex flexDirection="column" mb={3} width={200}>
                       <P {...labelStyles} htmlFor="interval">
-                        <FormattedMessage id="contribution.interval.label" defaultMessage="Frequency" />
+                        <FormattedMessage id="Frequency" defaultMessage="Frequency" />
                       </P>
                       <select id="interval" name="interval" defaultValue="monthly">
                         <option key="monthly" value="month">
@@ -662,7 +662,7 @@ class CreatePledgePage extends React.Component {
   }
 }
 
-const createPledgePageQuery = gql`
+const createPledgePageQuery = gqlV1/* GraphQL */ `
   query CreatePledgePage($slug: String!) {
     Collective(slug: $slug) {
       currency
@@ -689,7 +689,7 @@ const addCreatePledgePageData = graphql(createPledgePageQuery, {
   skip: props => !props.slug,
 });
 
-const createPledgeMutation = gql`
+const createPledgeMutation = gqlV1/* GraphQL */ `
   mutation CreatePledge($order: OrderInputType!) {
     createOrder(order: $order) {
       id

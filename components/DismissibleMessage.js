@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { get } from 'lodash';
 
 import { BANNER, DISMISSABLE_HELP_MESSAGE_KEY, HELP_MESSAGE } from '../lib/constants/dismissable-help-message';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getFromLocalStorage, setLocalStorage } from '../lib/local-storage';
 
 import { withUser } from './UserProvider';
 
-const accountSettingsQuery = gqlV2/* GraphQL */ `
+const accountSettingsQuery = gql`
   query AccountSettings {
     loggedInAccount {
       id
@@ -18,7 +18,7 @@ const accountSettingsQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const dismissMessageMutation = gqlV2/* GraphQL */ `
+const dismissMessageMutation = gql`
   mutation DismissMessage($account: AccountReferenceInput!, $key: AccountSettingsKey!) {
     editAccountSetting(account: $account, key: $key, value: true) {
       id

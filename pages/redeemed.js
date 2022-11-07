@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { fontSize, maxWidth } from 'styled-system';
 
+import { gqlV1 } from '../lib/graphql/helpers';
 import withData from '../lib/withData';
 
 import Body from '../components/Body';
@@ -24,7 +24,7 @@ import SearchForm from '../components/SearchForm';
 import { H1, H5, P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-const redeemedPaymentMethodQuery = gql`
+const redeemedPaymentMethodQuery = gqlV1/* GraphQL */ `
   query RedeemedPaymentMethod($code: String) {
     PaymentMethod(code: $code) {
       id
@@ -286,7 +286,7 @@ class RedeemedPage extends React.Component {
     );
   }
 }
-const redeemedPageQuery = gql`
+const redeemedPageQuery = gqlV1/* GraphQL */ `
   query RedeemedPage($collectiveSlug: String!) {
     Collective(slug: $collectiveSlug) {
       id

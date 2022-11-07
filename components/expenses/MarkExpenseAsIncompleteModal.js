@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
@@ -22,7 +22,7 @@ const messages = defineMessages({
   },
 });
 
-const processExpenseMutation = gqlV2/* GraphQL */ `
+const processExpenseMutation = gql`
   mutation ProcessExpense($id: String, $legacyId: Int, $action: ExpenseProcessAction!, $message: String) {
     processExpense(expense: { id: $id, legacyId: $legacyId }, action: $action, message: $message) {
       id
@@ -37,7 +37,7 @@ const MarkExpenseAsIncompleteModal = ({ expense, onClose }) => {
   const intl = useIntl();
   const [message, setMessage] = React.useState();
   const mutationOptions = { context: API_V2_CONTEXT };
-  const [processExpense] = useMutation(processExpenseMutation, mutationOptions);
+  const [processExpense, { loading }] = useMutation(processExpenseMutation, mutationOptions);
   const { addToast } = useToasts();
 
   const onConfirm = async () => {
@@ -83,7 +83,7 @@ const MarkExpenseAsIncompleteModal = ({ expense, onClose }) => {
       </ModalBody>
       <ModalFooter>
         <Flex gap="16px" justifyContent="flex-end">
-          <StyledButton buttonStyle="secondary" buttonSize="small" onClick={onConfirm}>
+          <StyledButton buttonStyle="secondary" buttonSize="small" onClick={onConfirm} minWidth={180} loading={loading}>
             <FormattedMessage defaultMessage="Confirm and mark as incomplete" />
           </StyledButton>
           <StyledButton buttonStyle="standard" buttonSize="small" onClick={onClose}>

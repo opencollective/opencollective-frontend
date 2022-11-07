@@ -58,6 +58,11 @@ type OAuthAuthorization {
   expiresAt: DateTime!
 
   """
+  The last time of token was used
+  """
+  lastUsedAt: DateTime
+
+  """
   The attached scopes.
   """
   scope: [OAuthScope]
@@ -150,22 +155,22 @@ interface Account {
   """
   The public id identifying the account (ie: 5v08jk63-w4g9nbpz-j7qmyder-p7ozax5g)
   """
-  id: String
+  id: String!
 
   """
   The internal database identifier of the collective (ie: 580)
   """
-  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
+  legacyId: Int! @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
 
   """
   The slug identifying the account (ie: babel)
   """
-  slug: String
+  slug: String!
 
   """
   The type of the account (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL/VENDOR)
   """
-  type: AccountType
+  type: AccountType!
 
   """
   Public name
@@ -206,7 +211,7 @@ interface Account {
   """
   Returns whether this account is archived
   """
-  isArchived: Boolean
+  isArchived: Boolean!
 
   """
   Whether this account is frozen
@@ -221,7 +226,7 @@ interface Account {
   """
   Returns whether the account is setup to Host collectives.
   """
-  isHost: Boolean
+  isHost: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -299,6 +304,11 @@ interface Account {
     The transaction type (DEBIT or CREDIT)
     """
     type: TransactionType
+
+    """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -379,11 +389,6 @@ interface Account {
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
 
     """
     To filter by transaction kind
@@ -487,6 +492,11 @@ interface Account {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -569,7 +579,7 @@ interface Account {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -609,6 +619,16 @@ interface Account {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
 }
 
 """
@@ -707,6 +727,8 @@ type Tier {
   """
   orders(limit: Int! = 100, offset: Int! = 0, status: [OrderStatus]): OrderCollection!
   amount: Amount!
+  button: String
+  goal: Amount!
   type: TierType!
   interval: TierInterval @deprecated(reason: "2020-08-24: Please use \"frequency\"")
   frequency: TierFrequency!
@@ -721,7 +743,8 @@ type Tier {
   amountType: TierAmountType!
   minimumAmount: Amount!
   endsAt: DateTime
-  invoiceTemplate: String!
+  invoiceTemplate: String
+  useStandalonePage: Boolean
 }
 
 """
@@ -799,6 +822,11 @@ type Order {
   Custom data related to the order, based on the fields described by tier.customFields. Must be authenticated as an admin of the fromAccount or toAccount (returns null otherwise)
   """
   customData: JSON
+
+  """
+  Memo field which adds additional details about the order. For example in added funds this can be a note to mark what method (cheque, money order) the funds were received.
+  """
+  memo: String
 }
 
 """
@@ -807,12 +835,15 @@ All order statuses
 enum OrderStatus {
   ACTIVE
   CANCELLED
+  DISPUTED
   ERROR
   EXPIRED
+  IN_REVIEW
   NEW
   PAID
   PENDING
   PLEDGED
+  REFUNDED
   REJECTED
   REQUIRE_CLIENT_CONFIRMATION
 }
@@ -897,7 +928,10 @@ interface Transaction {
   order: Order
   isRefunded: Boolean
   isRefund: Boolean
+  isDisputed: Boolean
+  isInReview: Boolean
   paymentMethod: PaymentMethod
+  payoutMethod: PayoutMethod
   permissions: TransactionPermissions
   isOrderRejected: Boolean!
   refundTransaction: Transaction
@@ -917,6 +951,7 @@ interface Transaction {
   The balance after the Transaction has run. Only for financially active accounts.
   """
   balanceInHostCurrency: Amount
+  invoiceTemplate: String
 }
 
 """
@@ -936,6 +971,7 @@ enum TransactionKind {
   HOST_FEE_SHARE
   HOST_FEE_SHARE_DEBT
   PAYMENT_PROCESSOR_COVER
+  PAYMENT_PROCESSOR_DISPUTE_FEE
   PAYMENT_PROCESSOR_FEE
   PLATFORM_FEE
   PLATFORM_TIP
@@ -1109,7 +1145,6 @@ type Expense {
   (Optional) files attached to the expense
   """
   attachedFiles: [ExpenseAttachedFile!]
-  attachments: [ExpenseItem] @deprecated(reason: "2020-04-08: Field has been renamed to \"items\"")
   items: [ExpenseItem]
 
   """
@@ -1154,6 +1189,7 @@ type Expense {
   requestedByAccount: Account
   quote: ExpenseQuote
   recurringExpense: RecurringExpense
+  securityChecks: [SecurityCheck]
 }
 
 """
@@ -1951,12 +1987,12 @@ input ChronologicalOrderInput {
   """
   Field to chronologically order by.
   """
-  field: DateTimeField = CREATED_AT
+  field: DateTimeField! = CREATED_AT
 
   """
   Ordering direction.
   """
-  direction: OrderDirection = DESC
+  direction: OrderDirection! = DESC
 }
 
 """
@@ -2226,9 +2262,19 @@ type Activity {
   createdAt: DateTime!
 
   """
-  The account concerned by this activity, if any
+  The account that authored by this activity, if any
+  """
+  fromAccount: Account
+
+  """
+  The account targeted by this activity, if any
   """
   account: Account
+
+  """
+  The host under which this activity happened, if any
+  """
+  host: Host
 
   """
   The person who triggered the action, if any
@@ -2236,9 +2282,24 @@ type Activity {
   individual: Individual
 
   """
+  The expense related to this activity, if any
+  """
+  expense: Expense
+
+  """
+  The order related to this activity, if any
+  """
+  order: Order
+
+  """
   Data attached to this activity (if any)
   """
   data: JSON!
+
+  """
+  Specifies whether this is a system generated activity
+  """
+  isSystem: Boolean!
 }
 
 enum ActivityType {
@@ -2249,14 +2310,24 @@ enum ActivityType {
   COLLECTIVE_APPROVED
   COLLECTIVE_REJECTED
   COLLECTIVE_CREATED
+  COLLECTIVE_EDITED
+  COLLECTIVE_DELETED
+  COLLECTIVE_UNHOSTED
+  ORGANIZATION_COLLECTIVE_CREATED
+  COLLECTIVE_FROZEN
+  COLLECTIVE_UNFROZEN
   COLLECTIVE_COMMENT_CREATED
   COLLECTIVE_CONVERSATION_CREATED
+  UPDATE_COMMENT_CREATED
+  EXPENSE_COMMENT_CREATED
+  CONVERSATION_COMMENT_CREATED
   COLLECTIVE_EXPENSE_CREATED
   COLLECTIVE_EXPENSE_DELETED
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
   COLLECTIVE_EXPENSE_UNAPPROVED
+  COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM
@@ -2267,13 +2338,16 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_INVITE_DRAFTED
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  TAXFORM_REQUEST
+  COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
-  COLLECTIVE_FROZEN
-  COLLECTIVE_UNFROZEN
+  COLLECTIVE_VIRTUAL_CARD_DELETED
+  VIRTUAL_CARD_REQUESTED
+  VIRTUAL_CARD_CHARGE_DECLINED
+  VIRTUAL_CARD_PURCHASE
   COLLECTIVE_MEMBER_INVITED
   COLLECTIVE_MEMBER_CREATED
-  COLLECTIVE_MONTHLY_REPORT
   COLLECTIVE_CORE_MEMBER_ADDED
   COLLECTIVE_CORE_MEMBER_INVITED
   COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED
@@ -2283,22 +2357,12 @@ enum ActivityType {
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
-  COLLECTIVE_VIRTUAL_CARD_ADDED
+  HOST_APPLICATION_CONTACT
   CONTRIBUTION_REJECTED
-  ORGANIZATION_COLLECTIVE_CREATED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CONFIRMED
   SUBSCRIPTION_CANCELED
   TICKET_CONFIRMED
-  USER_CREATED
-  USER_NEW_TOKEN
-  USER_CHANGE_EMAIL
-  USER_PAYMENT_METHOD_CREATED
-  USER_CARD_CLAIMED
-  USER_CARD_INVITED
-  WEBHOOK_STRIPE_RECEIVED
-  WEBHOOK_PAYPAL_RECEIVED
-  COLLECTIVE_MONTHLY
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
   ORDER_PROCESSING
   ORDER_PROCESSING_CRYPTO
@@ -2307,18 +2371,24 @@ enum ActivityType {
   ORDER_THANKYOU
   ORDERS_SUSPICIOUS
   BACKYOURSTACK_DISPATCH_CONFIRMED
-  ACTIVATED_COLLECTIVE_AS_HOST
-  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
-  DEACTIVATED_COLLECTIVE_AS_HOST
-  VIRTUAL_CARD_REQUESTED
-  VIRTUAL_CARD_CHARGE_DECLINED
   PAYMENT_FAILED
   PAYMENT_CREDITCARD_CONFIRMATION
   PAYMENT_CREDITCARD_EXPIRING
-  TAXFORM_REQUEST
-  CONVERSATION_COMMENT_CREATED
-  UPDATE_COMMENT_CREATED
-  EXPENSE_COMMENT_CREATED
+  USER_CREATED
+  USER_NEW_TOKEN
+  OAUTH_APPLICATION_AUTHORIZED
+  TWO_FACTOR_CODE_ADDED
+  TWO_FACTOR_CODE_DELETED
+  USER_CHANGE_EMAIL
+  USER_PAYMENT_METHOD_CREATED
+  USER_CARD_CLAIMED
+  USER_CARD_INVITED
+  WEBHOOK_STRIPE_RECEIVED
+  WEBHOOK_PAYPAL_RECEIVED
+  COLLECTIVE_MONTHLY_REPORT
+  ACTIVATED_COLLECTIVE_AS_HOST
+  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
+  DEACTIVATED_COLLECTIVE_AS_HOST
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -2327,166 +2397,17 @@ enum ActivityType {
 }
 
 """
-Type for a required legal document
-"""
-enum LegalDocumentType {
-  """
-  US tax form (W9)
-  """
-  US_TAX_FORM
-}
-
-"""
-Fields for an expense quote
-"""
-type ExpenseQuote {
-  """
-  Amount of this item
-  """
-  totalAmount: Amount!
-
-  """
-  Amount of payment processor fee
-  """
-  paymentProcessorFeeAmount: Amount!
-
-  """
-  The date on which the item was created
-  """
-  estimatedDeliveryAt: DateTime!
-}
-
-"""
-A recurring expense object
-"""
-type RecurringExpense {
-  """
-  Unique identifier for this recurring expense
-  """
-  id: String!
-
-  """
-  The interval in which this recurring expense is created
-  """
-  interval: RecurringExpenseInterval!
-  account: Account!
-  fromAccount: Account!
-
-  """
-  The last time this recurring expense was paid for
-  """
-  lastDraftedAt: DateTime!
-
-  """
-  The time this expense will cease to be recurring
-  """
-  endsAt: DateTime
-
-  """
-  The last expense created by this recurring expense record paid for
-  """
-  lastExpenseCreated: Expense
-}
-
-"""
-All supported intervals for recurring expenses
-"""
-enum RecurringExpenseInterval {
-  day
-  week
-  month
-  quarter
-  year
-}
-
-"""
-PaymentMethod model
-"""
-type PaymentMethod {
-  id: String
-  legacyId: Int
-  name: String
-  service: PaymentMethodService
-  type: PaymentMethodType
-
-  """
-  Defines the type of the payment method. Meant to be moved to "type" in the future.
-  """
-  providerType: PaymentMethodLegacyType @deprecated(reason: "2021-03-02: Please use service + type")
-
-  """
-  Returns the balance amount and the currency of this paymentMethod
-  """
-  balance: Amount!
-  account: Account
-
-  """
-  For gift cards, this field will return to the source payment method
-  """
-  sourcePaymentMethod: PaymentMethod
-  data: JSON
-  limitedToHosts: [Host]
-  expiryDate: DateTime
-  createdAt: DateTime
-}
-
-enum PaymentMethodService {
-  PAYPAL
-  STRIPE
-  OPENCOLLECTIVE
-  PREPAID
-  THEGIVINGBLOCK
-}
-
-enum PaymentMethodType {
-  alipay @deprecated(reason: "Please use uppercase values")
-  creditcard @deprecated(reason: "Please use uppercase values")
-  prepaid @deprecated(reason: "Please use uppercase values")
-  payment @deprecated(reason: "Please use uppercase values")
-  subscription @deprecated(reason: "Please use uppercase values")
-  collective @deprecated(reason: "Please use uppercase values")
-  host @deprecated(reason: "Please use uppercase values")
-  adaptive @deprecated(reason: "Please use uppercase values")
-  giftcard @deprecated(reason: "Please use uppercase values")
-  manual @deprecated(reason: "Please use uppercase values")
-  crypto @deprecated(reason: "Please use uppercase values")
-  ALIPAY
-  CREDITCARD
-  PREPAID
-  PAYMENT
-  SUBSCRIPTION
-  COLLECTIVE
-  HOST
-  ADAPTIVE
-  GIFTCARD
-  MANUAL
-  CRYPTO
-}
-
-enum PaymentMethodLegacyType {
-  ALIPAY
-  CREDIT_CARD
-  GIFT_CARD
-  PREPAID_BUDGET
-  ACCOUNT_BALANCE
-  PAYPAL
-  BANK_TRANSFER
-  ADDED_FUNDS
-  CRYPTO
-}
-
-"""
 This represents an Host account
 """
 type Host implements Account & AccountWithContributions {
-  id: String
-  legacyId: Int
+  id: String!
+  legacyId: Int!
 
   """
   The slug identifying the account (ie: babel)
   """
-  slug: String
-  type: AccountType
+  slug: String!
+  type: AccountType!
 
   """
   Public name
@@ -2523,7 +2444,7 @@ type Host implements Account & AccountWithContributions {
   """
   Returns whether this account is archived
   """
-  isArchived: Boolean
+  isArchived: Boolean!
 
   """
   Whether this account is frozen
@@ -2538,7 +2459,7 @@ type Host implements Account & AccountWithContributions {
   """
   Returns whether the account is setup to Host collectives.
   """
-  isHost: Boolean
+  isHost: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -2654,6 +2575,11 @@ type Host implements Account & AccountWithContributions {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -2732,11 +2658,6 @@ type Host implements Account & AccountWithContributions {
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
 
     """
     To filter by transaction kind
@@ -2840,6 +2761,11 @@ type Host implements Account & AccountWithContributions {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -2907,7 +2833,7 @@ type Host implements Account & AccountWithContributions {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -2947,6 +2873,16 @@ type Host implements Account & AccountWithContributions {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -2959,11 +2895,6 @@ type Host implements Account & AccountWithContributions {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Number of unique financial contributors.
@@ -3011,11 +2942,6 @@ type Host implements Account & AccountWithContributions {
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
   hostFeePercent: Float
   totalHostedCollectives: Int
@@ -3027,16 +2953,6 @@ type Host implements Account & AccountWithContributions {
     A collection of accounts for which the metrics should be returned.
     """
     account: [AccountReferenceInput!]
-
-    """
-    Inferior date limit in which we're calculating the metrics
-    """
-    from: String @deprecated(reason: "2020-09-20: Use dateFrom")
-
-    """
-    Superior date limit in which we're calculating the metrics
-    """
-    to: String @deprecated(reason: "2020-09-20: Use dateTo")
 
     """
     The start date of the time series
@@ -3177,6 +3093,16 @@ type Host implements Account & AccountWithContributions {
   Returns whether the host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether the host has any Stripe disputed orders
+  """
+  hasDisputedOrders: Boolean!
+
+  """
+  Returns whether the host has any Stripe in review orders
+  """
+  hasInReviewOrders: Boolean!
 }
 
 """
@@ -3229,11 +3155,6 @@ interface AccountWithContributions {
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
 }
 
@@ -3441,6 +3362,36 @@ type TransactionCollection implements Collection {
   totalCount: Int
   nodes: [Transaction]
   kinds: [TransactionKind]
+
+  """
+  The types of payment methods used in this collection, regardless of the pagination
+  """
+  paymentMethodTypes: [PaymentMethodType]!
+}
+
+enum PaymentMethodType {
+  alipay @deprecated(reason: "Please use uppercase values")
+  creditcard @deprecated(reason: "Please use uppercase values")
+  prepaid @deprecated(reason: "Please use uppercase values")
+  payment @deprecated(reason: "Please use uppercase values")
+  subscription @deprecated(reason: "Please use uppercase values")
+  collective @deprecated(reason: "Please use uppercase values")
+  host @deprecated(reason: "Please use uppercase values")
+  adaptive @deprecated(reason: "Please use uppercase values")
+  giftcard @deprecated(reason: "Please use uppercase values")
+  manual @deprecated(reason: "Please use uppercase values")
+  crypto @deprecated(reason: "Please use uppercase values")
+  ALIPAY
+  CREDITCARD
+  PREPAID
+  PAYMENT
+  SUBSCRIPTION
+  COLLECTIVE
+  HOST
+  ADAPTIVE
+  GIFTCARD
+  MANUAL
+  CRYPTO
 }
 
 """
@@ -3472,8 +3423,10 @@ type Conversation {
   updatedAt: DateTime!
   tags: [String]
   summary: String!
-  collective: Account
-  fromCollective: Account
+  collective: Account @deprecated(reason: "2022-09-14: Please use account")
+  account: Account
+  fromCollective: Account @deprecated(reason: "2022-09-14: Please use fromAccount")
+  fromAccount: Account
 
   """
   The root comment / starter for this conversation
@@ -3525,6 +3478,62 @@ type TagStat {
   Number of entries for this tag
   """
   count: Int!
+
+  """
+  Total amount for this tag
+  """
+  amount: Amount!
+}
+
+"""
+PaymentMethod model
+"""
+type PaymentMethod {
+  id: String
+  legacyId: Int
+  name: String
+  service: PaymentMethodService
+  type: PaymentMethodType
+
+  """
+  Defines the type of the payment method. Meant to be moved to "type" in the future.
+  """
+  providerType: PaymentMethodLegacyType @deprecated(reason: "2021-03-02: Please use service + type")
+
+  """
+  Returns the balance amount and the currency of this paymentMethod
+  """
+  balance: Amount!
+  account: Account
+
+  """
+  For gift cards, this field will return to the source payment method
+  """
+  sourcePaymentMethod: PaymentMethod
+  data: JSON
+  limitedToHosts: [Host]
+  expiryDate: DateTime
+  createdAt: DateTime
+}
+
+enum PaymentMethodService {
+  PAYPAL
+  STRIPE
+  OPENCOLLECTIVE
+  PREPAID
+  THEGIVINGBLOCK
+}
+
+enum PaymentMethodLegacyType {
+  ALIPAY
+  CREDIT_CARD
+  GIFT_CARD
+  PREPAID_BUDGET
+  ACCOUNT_BALANCE
+  PAYPAL
+  BANK_TRANSFER
+  ADDED_FUNDS
+  CRYPTO
 }
 
 """
@@ -3602,12 +3611,17 @@ type AccountStats {
     Calculate balance until this date.
     """
     dateTo: DateTime
+
+    """
+    Include balance from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
   ): Amount!
 
   """
   The consolidated amount of all the events and projects combined.
   """
-  consolidatedBalance: Amount!
+  consolidatedBalance: Amount! @deprecated(reason: "2022-09-02: Use balance + includeChildren instead")
 
   """
   Average amount spent per month based on the last 90 days
@@ -3617,10 +3631,35 @@ type AccountStats {
   """
   Total amount spent
   """
-  totalAmountSpent: Amount!
+  totalAmountSpent(
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+
+    """
+    Calculate total amount spent before this date
+    """
+    dateTo: DateTime
+
+    """
+    Calculate total amount spent after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate total amount spent in the last x months. Cannot be used with startDate/endDate
+    """
+    periodInMonths: Int
+
+    """
+    Include money spent in children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): Amount!
 
   """
-  Net amount received
+  Total amount received
   """
   totalAmountReceived(
     """
@@ -3647,10 +3686,15 @@ type AccountStats {
     Set this to true to use cached data
     """
     useCache: Boolean! = false
+
+    """
+    Include money received in children (Projects and Events)
+    """
+    includeChildren: Boolean = false
   ): Amount!
 
   """
-  Total of paid expenses, filter per expensetype
+  Total of paid expenses to the account, filter per expense type
   """
   totalPaidExpenses(
     """
@@ -3681,6 +3725,183 @@ type AccountStats {
   """
   totalNetAmountReceived: Amount!
   activeRecurringContributions: JSON
+    @deprecated(reason: "2022-10-21: Use activeRecurringContributionsV2 while we migrate to better semantics.")
+  activeRecurringContributionsV2(
+    """
+    The frequency of the recurring contribution (MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency! = MONTHLY
+  ): Amount
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(
+    limit: Int! = 30
+
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    Include contributions to children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): [AmountStats]
+
+  """
+  History of the expense tags used by this collective.
+  """
+  expensesTagsTimeSeries(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+
+    """
+    Include expense to children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): TimeSeriesAmount!
+
+  """
+  Return amount stats for contributions (default, and only for now: one-time vs recurring)
+  """
+  contributionsAmount(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    Include contributions to children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): [AmountStats]
+
+  """
+  Return amount time series for contributions (default, and only for now: one-time vs recurring)
+  """
+  contributionsAmountTimeSeries(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+
+    """
+    Include contributions to children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): TimeSeriesAmount!
+}
+
+"""
+Statistics aith amounts
+"""
+type AmountStats {
+  """
+  Name/Label for the amount
+  """
+  label: String!
+
+  """
+  Total amount for this label
+  """
+  amount: Amount!
+
+  """
+  Number of entries for this label
+  """
+  count: Int
+}
+
+"""
+Amount time series
+"""
+type TimeSeriesAmount implements TimeSeries {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime!
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime!
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+
+  """
+  Time series data points
+  """
+  nodes: [TimeSeriesAmountNode!]!
+}
+
+interface TimeSeries {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime!
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime!
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+}
+
+enum TimeUnit {
+  SECOND
+  MINUTE
+  HOUR
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+type TimeSeriesAmountNode {
+  date: DateTime!
+  amount: Amount!
+  label: String
 }
 
 """
@@ -3793,6 +4014,36 @@ type UpdateAudienceStats {
 }
 
 """
+Input to order updates chronologically
+"""
+input UpdateChronologicalOrderInput {
+  """
+  Field to chronologically order by.
+  """
+  field: UpdateDateTimeField! = CREATED_AT
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection! = DESC
+}
+
+"""
+All possible DateTime fields for an update
+"""
+enum UpdateDateTimeField {
+  """
+  The creation time
+  """
+  CREATED_AT
+
+  """
+  The creation time
+  """
+  PUBLISHED_AT
+}
+
+"""
 Describes the features enabled and available for this account
 """
 type CollectiveFeatures {
@@ -3829,6 +4080,7 @@ type CollectiveFeatures {
   ALIPAY: CollectiveFeatureStatus
   USE_PAYMENT_METHODS: CollectiveFeatureStatus
   EMIT_GIFT_CARDS: CollectiveFeatureStatus
+  EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
   VIRTUAL_CARDS: CollectiveFeatureStatus
   REQUEST_VIRTUAL_CARDS: CollectiveFeatureStatus
 }
@@ -3867,18 +4119,93 @@ type VirtualCardCollection implements Collection {
 
 type Policies {
   EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
+  REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
+  MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
 }
 
 type COLLECTIVE_MINIMUM_ADMINS {
   numberOfAdmins: Int
-  applies: COLLECTIVE_MINIMUM_ADMINS_APPLIES
+  applies: PolicyApplication
   freeze: Boolean
 }
 
-enum COLLECTIVE_MINIMUM_ADMINS_APPLIES {
+"""
+Defines how the policy is applied
+"""
+enum PolicyApplication {
   ALL_COLLECTIVES
   NEW_COLLECTIVES
+}
+
+type MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
+  ALL_TIME: Amount
+  DAILY: Amount
+  MONTHLY: Amount
+  PER_AUTHORIZATION: Amount
+  WEEKLY: Amount
+  YEARLY: Amount
+}
+
+type ActivitySubscription {
+  """
+  Unique identifier for this notification setting
+  """
+  id: String!
+
+  """
+  The channel this setting is notifying through
+  """
+  channel: ActivityChannel!
+
+  """
+  The type of Activity this setting is notifying about
+  """
+  type: String!
+
+  """
+  Wheter this notification setting is active or not
+  """
+  active: Boolean!
+  createdAt: DateTime!
+
+  """
+  If channel supports, this is the webhook URL we submit the notification to
+  """
+  webhookUrl: String
+
+  """
+  The account which this notification setting is applied to
+  """
+  account: Account
+
+  """
+  The user who defined the setting
+  """
+  individual: Individual!
+}
+
+"""
+All supported Activity channels we can broadcast to
+"""
+enum ActivityChannel {
+  gitter
+  slack
+  twitter
+  webhook
+  email
+}
+
+"""
+Fields for the user permissions on an account
+"""
+type AccountPermissions {
+  id: String!
+
+  """
+  Whether the current user can mark this order as expired
+  """
+  addFunds: Permission!
 }
 
 """
@@ -3900,18 +4227,6 @@ type Webhook {
   activityType: ActivityType
   webhookUrl: URL
   account: Account!
-}
-
-"""
-Fields for the user permissions on an account
-"""
-type AccountPermissions {
-  id: String!
-
-  """
-  Whether the current user can mark this order as expired
-  """
-  addFunds: Permission!
 }
 
 """
@@ -4099,63 +4414,6 @@ type HostMetricsTimeSeries {
   totalSpent: TimeSeriesAmountWithKind!
 }
 
-enum TimeUnit {
-  SECOND
-  MINUTE
-  HOUR
-  DAY
-  WEEK
-  MONTH
-  YEAR
-}
-
-"""
-Amount time series
-"""
-type TimeSeriesAmount implements TimeSeries {
-  """
-  The start date of the time series
-  """
-  dateFrom: DateTime!
-
-  """
-  The end date of the time series
-  """
-  dateTo: DateTime!
-
-  """
-  The interval between two data points
-  """
-  timeUnit: TimeUnit!
-
-  """
-  Time series data points
-  """
-  nodes: [TimeSeriesAmountNode!]!
-}
-
-interface TimeSeries {
-  """
-  The start date of the time series
-  """
-  dateFrom: DateTime!
-
-  """
-  The end date of the time series
-  """
-  dateTo: DateTime!
-
-  """
-  The interval between two data points
-  """
-  timeUnit: TimeUnit!
-}
-
-type TimeSeriesAmountNode {
-  date: DateTime!
-  amount: Amount!
-}
-
 """
 Amounts with settlements time series
 """
@@ -4268,12 +4526,6 @@ type ContributionStats {
   contributionsCount: Int!
 
   """
-  The contribution amounts over time
-  """
-  contributionAmountOverTime: TimeSeriesAmount
-    @deprecated(reason: "2022-04-21: Please use hostMetricsTimeSeries.totalReceived")
-
-  """
   Number of one time contributions
   """
   oneTimeContributionsCount: Int!
@@ -4322,6 +4574,121 @@ type ExpenseStats {
   Number of grants
   """
   grantsCount: Int!
+}
+
+"""
+Type for a required legal document
+"""
+enum LegalDocumentType {
+  """
+  US tax form (W9)
+  """
+  US_TAX_FORM
+}
+
+"""
+Fields for an expense quote
+"""
+type ExpenseQuote {
+  """
+  Amount of this item
+  """
+  totalAmount: Amount!
+
+  """
+  Amount of payment processor fee
+  """
+  paymentProcessorFeeAmount: Amount!
+
+  """
+  The date on which the item was created
+  """
+  estimatedDeliveryAt: DateTime
+}
+
+"""
+A recurring expense object
+"""
+type RecurringExpense {
+  """
+  Unique identifier for this recurring expense
+  """
+  id: String!
+
+  """
+  The interval in which this recurring expense is created
+  """
+  interval: RecurringExpenseInterval!
+  account: Account!
+  fromAccount: Account!
+
+  """
+  The last time this recurring expense was paid for
+  """
+  lastDraftedAt: DateTime!
+
+  """
+  The time this expense will cease to be recurring
+  """
+  endsAt: DateTime
+
+  """
+  The last expense created by this recurring expense record paid for
+  """
+  lastExpenseCreated: Expense
+}
+
+"""
+All supported intervals for recurring expenses
+"""
+enum RecurringExpenseInterval {
+  day
+  week
+  month
+  quarter
+  year
+}
+
+type SecurityCheck {
+  """
+  The SecurityCheck scope
+  """
+  scope: SecurityCheckScope!
+
+  """
+  The SecurityCheck level
+  """
+  level: SecurityCheckLevel!
+
+  """
+  SecurityCheck description message
+  """
+  message: String!
+
+  """
+  SecurityCheck details
+  """
+  details: String
+}
+
+"""
+All supported SecurityCheck scopes
+"""
+enum SecurityCheckScope {
+  USER
+  COLLECTIVE
+  PAYEE
+  PAYOUT_METHOD
+}
+
+"""
+All supported SecurityCheck levels
+"""
+enum SecurityCheckLevel {
+  PASS
+  LOW
+  MEDIUM
+  HIGH
 }
 
 """
@@ -4401,7 +4768,7 @@ A financial amount.
 type Amount {
   value: Float
   currency: Currency
-  valueInCents: Int
+  valueInCents: Float
 
   """
   If the amount was generated from a currency conversion, this field contains details about the conversion
@@ -4460,14 +4827,14 @@ enum CurrencyExchangeRateSourceType {
 This represents a Bot account
 """
 type Bot implements Account {
-  id: String
-  legacyId: Int
+  id: String!
+  legacyId: Int!
 
   """
   The slug identifying the account (ie: babel)
   """
-  slug: String
-  type: AccountType
+  slug: String!
+  type: AccountType!
 
   """
   Public name
@@ -4504,7 +4871,7 @@ type Bot implements Account {
   """
   Returns whether this account is archived
   """
-  isArchived: Boolean
+  isArchived: Boolean!
 
   """
   Whether this account is frozen
@@ -4519,7 +4886,7 @@ type Bot implements Account {
   """
   Returns whether the account is setup to Host collectives.
   """
-  isHost: Boolean
+  isHost: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -4635,6 +5002,11 @@ type Bot implements Account {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -4713,11 +5085,6 @@ type Bot implements Account {
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
 
     """
     To filter by transaction kind
@@ -4821,6 +5188,11 @@ type Bot implements Account {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -4888,7 +5260,7 @@ type Bot implements Account {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -4928,6 +5300,16 @@ type Bot implements Account {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -4940,25 +5322,20 @@ type Bot implements Account {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 }
 
 """
 This represents a Collective account
 """
 type Collective implements Account & AccountWithHost & AccountWithContributions {
-  id: String
-  legacyId: Int
+  id: String!
+  legacyId: Int!
 
   """
   The slug identifying the account (ie: babel)
   """
-  slug: String
-  type: AccountType
+  slug: String!
+  type: AccountType!
 
   """
   Public name
@@ -4995,7 +5372,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   Returns whether this account is archived
   """
-  isArchived: Boolean
+  isArchived: Boolean!
 
   """
   Whether this account is frozen
@@ -5010,7 +5387,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   Returns whether the account is setup to Host collectives.
   """
-  isHost: Boolean
+  isHost: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -5126,6 +5503,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -5204,11 +5586,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
 
     """
     To filter by transaction kind
@@ -5312,6 +5689,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -5379,7 +5761,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -5419,6 +5801,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -5431,11 +5823,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Returns the Fiscal Host
@@ -5508,11 +5895,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
 }
 
@@ -5638,7 +6020,10 @@ type Credit implements Transaction {
   order: Order
   isRefunded: Boolean
   isRefund: Boolean
+  isDisputed: Boolean
+  isInReview: Boolean
   paymentMethod: PaymentMethod
+  payoutMethod: PayoutMethod
 
   """
   The permissions given to current logged in user for this transaction
@@ -5658,7 +6043,7 @@ type Credit implements Transaction {
   """
   merchantId: String
   balanceInHostCurrency: Amount
-  invoiceTemplate: String!
+  invoiceTemplate: String
 }
 
 """
@@ -5743,7 +6128,10 @@ type Debit implements Transaction {
   order: Order
   isRefunded: Boolean
   isRefund: Boolean
+  isDisputed: Boolean
+  isInReview: Boolean
   paymentMethod: PaymentMethod
+  payoutMethod: PayoutMethod
 
   """
   The permissions given to current logged in user for this transaction
@@ -5763,21 +6151,21 @@ type Debit implements Transaction {
   """
   merchantId: String
   balanceInHostCurrency: Amount
-  invoiceTemplate: String!
+  invoiceTemplate: String
 }
 
 """
 This represents an Event account
 """
 type Event implements Account & AccountWithHost & AccountWithContributions & AccountWithParent {
-  id: String
-  legacyId: Int
+  id: String!
+  legacyId: Int!
 
   """
   The slug identifying the account (ie: babel)
   """
-  slug: String
-  type: AccountType
+  slug: String!
+  type: AccountType!
 
   """
   Public name
@@ -5814,7 +6202,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   Returns whether this account is archived
   """
-  isArchived: Boolean
+  isArchived: Boolean!
 
   """
   Whether this account is frozen
@@ -5829,7 +6217,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   Returns whether the account is setup to Host collectives.
   """
-  isHost: Boolean
+  isHost: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -5945,6 +6333,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -6023,11 +6416,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
 
     """
     To filter by transaction kind
@@ -6131,6 +6519,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -6198,7 +6591,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -6238,6 +6631,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6250,11 +6653,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Returns the Fiscal Host
@@ -6327,22 +6725,12 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
 
   """
   The Account parenting this account
   """
   parent: Account
-
-  """
-  The Collective hosting this Event
-  """
-  parentCollective: Collective @deprecated(reason: "2020/07/01 - Use parent instead.")
 
   """
   The Event start date and time
@@ -6374,14 +6762,14 @@ interface AccountWithParent {
 This represents an Individual account
 """
 type Individual implements Account {
-  id: String
-  legacyId: Int
+  id: String!
+  legacyId: Int!
 
   """
   The slug identifying the account (ie: babel)
   """
-  slug: String
-  type: AccountType
+  slug: String!
+  type: AccountType!
 
   """
   Public name
@@ -6418,7 +6806,7 @@ type Individual implements Account {
   """
   Returns whether this account is archived
   """
-  isArchived: Boolean
+  isArchived: Boolean!
 
   """
   Whether this account is frozen
@@ -6433,7 +6821,7 @@ type Individual implements Account {
   """
   Returns whether the account is setup to Host collectives.
   """
-  isHost: Boolean
+  isHost: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -6549,6 +6937,11 @@ type Individual implements Account {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -6627,11 +7020,6 @@ type Individual implements Account {
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
 
     """
     To filter by transaction kind
@@ -6735,6 +7123,11 @@ type Individual implements Account {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -6800,7 +7193,7 @@ type Individual implements Account {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -6840,6 +7233,16 @@ type Individual implements Account {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6854,17 +7257,13 @@ type Individual implements Account {
   ): WebhookCollection!
 
   """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
-
-  """
   Email for the account. For authenticated user: scope: "email".
   """
   email: String
   isGuest: Boolean!
   isFollowingConversation(id: String!): Boolean!
   hasTwoFactorAuth: Boolean
+  newsletterOptIn: Boolean
 
   """
   If the individual is a host account, this will return the matching Host object
@@ -6954,14 +7353,14 @@ type MemberOf {
 This represents an Organization account
 """
 type Organization implements Account & AccountWithContributions {
-  id: String
-  legacyId: Int
+  id: String!
+  legacyId: Int!
 
   """
   The slug identifying the account (ie: babel)
   """
-  slug: String
-  type: AccountType
+  slug: String!
+  type: AccountType!
 
   """
   Public name
@@ -6998,7 +7397,7 @@ type Organization implements Account & AccountWithContributions {
   """
   Returns whether this account is archived
   """
-  isArchived: Boolean
+  isArchived: Boolean!
 
   """
   Whether this account is frozen
@@ -7013,7 +7412,7 @@ type Organization implements Account & AccountWithContributions {
   """
   Returns whether the account is setup to Host collectives.
   """
-  isHost: Boolean
+  isHost: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -7129,6 +7528,11 @@ type Organization implements Account & AccountWithContributions {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -7207,11 +7611,6 @@ type Organization implements Account & AccountWithContributions {
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
 
     """
     To filter by transaction kind
@@ -7315,6 +7714,11 @@ type Organization implements Account & AccountWithContributions {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -7380,7 +7784,7 @@ type Organization implements Account & AccountWithContributions {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -7420,6 +7824,16 @@ type Organization implements Account & AccountWithContributions {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7432,11 +7846,6 @@ type Organization implements Account & AccountWithContributions {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Number of unique financial contributors.
@@ -7484,13 +7893,8 @@ type Organization implements Account & AccountWithContributions {
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the collective currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
-  email: String
+  email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
   """
   If the organization if a host account, this will return the matching Host object
@@ -7565,14 +7969,14 @@ scalar JSONObject
 This represents a Vendor account
 """
 type Vendor implements Account & AccountWithHost & AccountWithContributions {
-  id: String
-  legacyId: Int
+  id: String!
+  legacyId: Int!
 
   """
   The slug identifying the account (ie: babel)
   """
-  slug: String
-  type: AccountType
+  slug: String!
+  type: AccountType!
 
   """
   Public name
@@ -7609,7 +8013,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   Returns whether this account is archived
   """
-  isArchived: Boolean
+  isArchived: Boolean!
 
   """
   Whether this account is frozen
@@ -7624,7 +8028,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   Returns whether the account is setup to Host collectives.
   """
-  isHost: Boolean
+  isHost: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -7740,6 +8144,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -7818,11 +8227,6 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
 
     """
     To filter by transaction kind
@@ -7926,6 +8330,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -7993,7 +8402,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -8033,6 +8442,16 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8045,11 +8464,6 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Returns the Fiscal Host
@@ -8122,11 +8536,6 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
 }
 
@@ -8144,10 +8553,21 @@ type VirtualCard {
   privateData: JSONObject
   provider: String
   spendingLimitAmount: Int
-  spendingLimitInterval: String
+  spendingLimitInterval: VirtualCardLimitInterval
+  spendingLimitRenewsOn: DateTime
+  remainingLimit: Int
   currency: Currency
   createdAt: DateTime
   updatedAt: DateTime
+}
+
+enum VirtualCardLimitInterval {
+  PER_AUTHORIZATION
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+  ALL_TIME
 }
 
 """
@@ -8207,6 +8627,11 @@ type Query {
     isHost: Boolean
 
     """
+    Included collectives which are archived
+    """
+    includeArchived: Boolean
+
+    """
     Only return "active" accounts with Financial Contributions enabled if true.
     """
     isActive: Boolean
@@ -8239,6 +8664,52 @@ type Query {
     """
     orderBy: OrderByInput
   ): AccountCollection!
+  activities(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    The accounts associated with the Activity
+    """
+    account: [AccountReferenceInput!]!
+
+    """
+    If account is a parent, also include child accounts
+    """
+    includeChildrenAccounts: Boolean! = false
+
+    """
+    If account is a parent, use this option to exclude it from the results. Use in combination with includeChildrenAccounts.
+    """
+    excludeParentAccount: Boolean! = false
+
+    """
+    If account is a host, also include hosted accounts
+    """
+    includeHostedAccounts: Boolean! = false
+
+    """
+    Only return activities that were created after this date
+    """
+    dateFrom: DateTime = null
+
+    """
+    Only return activities that were created before this date
+    """
+    dateTo: DateTime = null
+
+    """
+    Only return activities that are of this class/type
+    """
+    type: [ActivityAndClassesType!] = null
+  ): ActivityCollection!
   application(
     """
     The public id identifying the application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -8675,6 +9146,11 @@ type Query {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -8753,11 +9229,6 @@ type Query {
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
 
     """
     To filter by transaction kind
@@ -10041,6 +10512,117 @@ enum CountryISO {
   EH
 }
 
+"""
+A collection of "Activities"
+"""
+type ActivityCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Activity!]
+}
+
+enum ActivityAndClassesType {
+  ACTIVITY_ALL
+  CONNECTED_ACCOUNT_CREATED
+  COLLECTIVE_CREATED_GITHUB
+  COLLECTIVE_APPLY
+  COLLECTIVE_APPROVED
+  COLLECTIVE_REJECTED
+  COLLECTIVE_CREATED
+  COLLECTIVE_EDITED
+  COLLECTIVE_DELETED
+  COLLECTIVE_UNHOSTED
+  ORGANIZATION_COLLECTIVE_CREATED
+  COLLECTIVE_FROZEN
+  COLLECTIVE_UNFROZEN
+  COLLECTIVE_COMMENT_CREATED
+  COLLECTIVE_CONVERSATION_CREATED
+  UPDATE_COMMENT_CREATED
+  EXPENSE_COMMENT_CREATED
+  CONVERSATION_COMMENT_CREATED
+  COLLECTIVE_EXPENSE_CREATED
+  COLLECTIVE_EXPENSE_DELETED
+  COLLECTIVE_EXPENSE_UPDATED
+  COLLECTIVE_EXPENSE_REJECTED
+  COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_UNAPPROVED
+  COLLECTIVE_EXPENSE_MOVED
+  COLLECTIVE_EXPENSE_PAID
+  COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
+  COLLECTIVE_EXPENSE_MARKED_AS_SPAM
+  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
+  COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
+  COLLECTIVE_EXPENSE_ERROR
+  COLLECTIVE_EXPENSE_INVITE_DRAFTED
+  COLLECTIVE_EXPENSE_RECURRING_DRAFTED
+  COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  TAXFORM_REQUEST
+  COLLECTIVE_VIRTUAL_CARD_ADDED
+  COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
+  COLLECTIVE_VIRTUAL_CARD_SUSPENDED
+  COLLECTIVE_VIRTUAL_CARD_DELETED
+  VIRTUAL_CARD_REQUESTED
+  VIRTUAL_CARD_CHARGE_DECLINED
+  VIRTUAL_CARD_PURCHASE
+  COLLECTIVE_MEMBER_INVITED
+  COLLECTIVE_MEMBER_CREATED
+  COLLECTIVE_CORE_MEMBER_ADDED
+  COLLECTIVE_CORE_MEMBER_INVITED
+  COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED
+  COLLECTIVE_CORE_MEMBER_REMOVED
+  COLLECTIVE_CORE_MEMBER_EDITED
+  COLLECTIVE_TRANSACTION_CREATED
+  COLLECTIVE_UPDATE_CREATED
+  COLLECTIVE_UPDATE_PUBLISHED
+  COLLECTIVE_CONTACT
+  HOST_APPLICATION_CONTACT
+  CONTRIBUTION_REJECTED
+  SUBSCRIPTION_ACTIVATED
+  SUBSCRIPTION_CONFIRMED
+  SUBSCRIPTION_CANCELED
+  TICKET_CONFIRMED
+  ORDER_CANCELED_ARCHIVED_COLLECTIVE
+  ORDER_PROCESSING
+  ORDER_PROCESSING_CRYPTO
+  ORDER_PENDING_CONTRIBUTION_NEW
+  ORDER_PENDING_CONTRIBUTION_REMINDER
+  ORDER_THANKYOU
+  ORDERS_SUSPICIOUS
+  BACKYOURSTACK_DISPATCH_CONFIRMED
+  PAYMENT_FAILED
+  PAYMENT_CREDITCARD_CONFIRMATION
+  PAYMENT_CREDITCARD_EXPIRING
+  USER_CREATED
+  USER_NEW_TOKEN
+  OAUTH_APPLICATION_AUTHORIZED
+  TWO_FACTOR_CODE_ADDED
+  TWO_FACTOR_CODE_DELETED
+  USER_CHANGE_EMAIL
+  USER_PAYMENT_METHOD_CREATED
+  USER_CARD_CLAIMED
+  USER_CARD_INVITED
+  WEBHOOK_STRIPE_RECEIVED
+  WEBHOOK_PAYPAL_RECEIVED
+  COLLECTIVE_MONTHLY_REPORT
+  ACTIVATED_COLLECTIVE_AS_HOST
+  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
+  DEACTIVATED_COLLECTIVE_AS_HOST
+  ADDED_FUND_TO_ORG
+  COLLECTIVE_TRANSACTION_PAID
+  COLLECTIVE_USER_ADDED
+  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
+  COLLECTIVE_VIRTUAL_CARD_CREATED
+  COLLECTIVE
+  EXPENSES
+  CONTRIBUTIONS
+  ACTIVITIES_UPDATES
+  VIRTUAL_CARDS
+  FUND_EVENTS
+  REPORTS
+}
+
 input ExpenseReferenceInput {
   """
   The public id identifying the expense (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -10090,14 +10672,14 @@ enum ExpenseStatusFilter {
 This represents an Project account
 """
 type Fund implements Account & AccountWithHost & AccountWithContributions {
-  id: String
-  legacyId: Int
+  id: String!
+  legacyId: Int!
 
   """
   The slug identifying the account (ie: babel)
   """
-  slug: String
-  type: AccountType
+  slug: String!
+  type: AccountType!
 
   """
   Public name
@@ -10134,7 +10716,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   Returns whether this account is archived
   """
-  isArchived: Boolean
+  isArchived: Boolean!
 
   """
   Whether this account is frozen
@@ -10149,7 +10731,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   Returns whether the account is setup to Host collectives.
   """
-  isHost: Boolean
+  isHost: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -10265,6 +10847,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -10343,11 +10930,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
 
     """
     To filter by transaction kind
@@ -10451,6 +11033,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -10518,7 +11105,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -10558,6 +11145,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10570,11 +11167,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Returns the Fiscal Host
@@ -10647,11 +11239,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
 }
 
@@ -10681,14 +11268,14 @@ input OrderReferenceInput {
 This represents an Project account
 """
 type Project implements Account & AccountWithHost & AccountWithContributions & AccountWithParent {
-  id: String
-  legacyId: Int
+  id: String!
+  legacyId: Int!
 
   """
   The slug identifying the account (ie: babel)
   """
-  slug: String
-  type: AccountType
+  slug: String!
+  type: AccountType!
 
   """
   Public name
@@ -10725,7 +11312,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   Returns whether this account is archived
   """
-  isArchived: Boolean
+  isArchived: Boolean!
 
   """
   Whether this account is frozen
@@ -10740,7 +11327,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   Returns whether the account is setup to Host collectives.
   """
-  isHost: Boolean
+  isHost: Boolean!
 
   """
   Returns true if the remote user is an admin of this account
@@ -10856,6 +11443,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     type: TransactionType
 
     """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -10934,11 +11526,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Whether to include debt transactions
     """
     includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kinds: [TransactionKind] @deprecated(reason: "2020-06-30: Please use kind (singular)")
 
     """
     To filter by transaction kind
@@ -11042,6 +11629,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
   transferwise: TransferWise
 
   """
@@ -11109,7 +11701,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     onlyPublishedUpdates: Boolean = false
     onlyChangelogUpdates: Boolean
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
   ): UpdateCollection!
 
@@ -11149,6 +11741,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11161,11 +11763,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     offset: Int! = 0
     account: AccountReferenceInput!
   ): WebhookCollection!
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
 
   """
   Returns the Fiscal Host
@@ -11238,11 +11835,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
-
-  """
-  Amount of money in cents in the currency of the account currently available to spend
-  """
-  balance: Int @deprecated(reason: "2020/04/09 - Should not have been introduced. Use stats.balance.value")
   contributionPolicy: String
 
   """
@@ -11310,7 +11902,7 @@ This is the root mutation
 """
 type Mutation {
   """
-  Add funds to the given account. Scope: "account".
+  Add funds to the given account. Scope: "host".
   """
   addFunds(
     fromAccount: AccountReferenceInput!
@@ -11318,6 +11910,7 @@ type Mutation {
     tier: TierReferenceInput
     amount: AmountInput!
     description: String!
+    memo: String
     hostFeePercent: Float
     invoiceTemplate: String
   ): Order!
@@ -11344,7 +11937,7 @@ type Mutation {
     """
     Whether to trigger the automated approval for Open Source collectives with GitHub.
     """
-    automateApprovalWithGithub: Boolean = false
+    automateApprovalWithGithub: Boolean = false @deprecated(reason: "2022-10-12: This is now automated")
 
     """
     A message to attach for the host to review the application
@@ -11514,21 +12107,6 @@ type Mutation {
   ): Individual!
 
   """
-  Update the plan. Scope: "account".
-  """
-  editHostPlan(
-    """
-    Account where the host plan will be edited.
-    """
-    account: AccountReferenceInput!
-
-    """
-    The name of the plan to subscribe to.
-    """
-    plan: String!
-  ): Host! @deprecated(reason: "2022-07-06: Host Plans are deprecated.")
-
-  """
   Edit key properties of an account. Scope: "account".
   """
   editAccount(
@@ -11550,7 +12128,7 @@ type Mutation {
     """
     The policy to be added
     """
-    policies: JSON!
+    policies: PoliciesInput!
   ): Account!
 
   """
@@ -11562,6 +12140,22 @@ type Mutation {
     """
     account: AccountReferenceInput!
   ): Account
+
+  """
+  Send a message to an account. Scope: "account"
+  """
+  sendMessage(
+    """
+    Reference to the Account to send message to.
+    """
+    account: AccountReferenceInput!
+
+    """
+    Message to send to the account.
+    """
+    message: NonEmptyString!
+    subject: String
+  ): SendMessageResult
   createApplication(application: ApplicationCreateInput!): Application
   updateApplication(application: ApplicationUpdateInput!): Application
   deleteApplication(application: ApplicationReferenceInput!): Application
@@ -11882,19 +12476,25 @@ type Mutation {
   ): ProcessHostApplicationResponse!
 
   """
-  [Root only] Removes the host for an account
+  Removes the host for an account
   """
   removeHost(
     """
     The account to unhost
     """
     account: AccountReferenceInput!
+    message: String
   ): Account!
 
   """
   Update the time which the user viewed the changelog updates. Scope: "account".
   """
   setChangelogViewDate(changelogViewDate: DateTime!): Individual!
+
+  """
+  Update newsletter opt-in preference. Scope: "account".
+  """
+  setNewsletterOptIn(newsletterOptIn: Boolean!): Individual!
 
   """
   Invite a new member to the Collective. Scope: "account".
@@ -12198,6 +12798,26 @@ type Mutation {
   removePayoutMethod(payoutMethodId: String!): PayoutMethod!
 
   """
+  [Root only] Edits account flags (deleted, banned, archived, trusted host)
+  """
+  editAccountFlags(
+    """
+    Account to change the flags for
+    """
+    account: AccountReferenceInput!
+
+    """
+    Specify whether the account is archived
+    """
+    isArchived: Boolean
+
+    """
+    Specify whether the account is a trusted host
+    """
+    isTrustedHost: Boolean
+  ): Account!
+
+  """
   [Root only] Clears the cache for a given account
   """
   clearCacheForAccount(
@@ -12251,6 +12871,21 @@ type Mutation {
     """
     dryRun: Boolean!
   ): BanAccountResponse!
+
+  """
+  [Root only] A mutation to move expenses from one account to another
+  """
+  moveExpenses(
+    """
+    The orders to move
+    """
+    expenses: [ExpenseReferenceInput!]!
+
+    """
+    The account to move the expenses to. This must be a non USER account.
+    """
+    destinationAccount: AccountReferenceInput!
+  ): [Expense]!
 
   """
   Add platform tips to a transaction. Scope: "transactions".
@@ -12348,9 +12983,14 @@ type Mutation {
     name: String!
 
     """
-    Virtual card monthly limit
+    Virtual card limit amount
     """
-    monthlyLimit: AmountInput!
+    limitAmount: AmountInput!
+
+    """
+    Virtual card limit interval
+    """
+    limitInterval: VirtualCardLimitInterval!
 
     """
     Account where the virtual card will be associated
@@ -12383,9 +13023,14 @@ type Mutation {
     assignee: AccountReferenceInput
 
     """
-    Virtual card monthly limit
+    Virtual card limit amount
     """
-    monthlyLimit: AmountInput
+    limitAmount: AmountInput
+
+    """
+    Virtual card limit interval
+    """
+    limitInterval: VirtualCardLimitInterval
   ): VirtualCard!
 
   """
@@ -12457,6 +13102,41 @@ type Mutation {
   Delete webhook. Scope: "webhooks".
   """
   deleteWebhook(webhook: WebhookReferenceInput!): Webhook
+
+  """
+  Set email notification subscription for requesting logged-in user
+  """
+  setEmailNotification(
+    type: ActivityAndClassesType!
+
+    """
+    Scope account which this notification preference is applied to
+    """
+    account: AccountReferenceInput
+    active: Boolean!
+  ): ActivitySubscription
+
+  """
+  Edit a tier.
+  """
+  editTier(tier: TierUpdateInput!): Tier!
+
+  """
+  Create a tier.
+  """
+  createTier(
+    tier: TierCreateInput!
+
+    """
+    Account to create tier in
+    """
+    account: AccountReferenceInput!
+  ): Tier!
+
+  """
+  Delete a tier.
+  """
+  deleteTier(tier: TierReferenceInput!, stopRecurringContributions: Boolean! = false): Tier!
 }
 
 input CollectiveCreateInput {
@@ -12574,6 +13254,27 @@ input AccountUpdateInput {
   currency: Currency
 }
 
+input PoliciesInput {
+  EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
+  REQUIRE_2FA_FOR_ADMINS: Boolean
+  COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
+}
+
+input PoliciesCollectiveMinimumAdminsInput {
+  numberOfAdmins: Int
+  applies: PolicyApplication
+  freeze: Boolean
+}
+
+type SendMessageResult {
+  success: Boolean
+}
+
+"""
+A string that cannot be passed as an empty value
+"""
+scalar NonEmptyString
+
 """
 Input type for Application
 """
@@ -12634,6 +13335,9 @@ input CommentUpdateInput {
   html: String
 }
 
+"""
+Input to create a comment. You can only specify one entity type: expense, conversation or update
+"""
 input CommentCreateInput {
   html: String
 
@@ -12641,8 +13345,17 @@ input CommentCreateInput {
   If your comment is linked to an expense, set it here
   """
   expense: ExpenseReferenceInput
-  ConversationId: String
+  ConversationId: String @deprecated(reason: "2022-08-26: Please use \"conversation\"")
+  conversation: ConversationReferenceInput
   update: UpdateReferenceInput
+}
+
+input ConversationReferenceInput {
+  """
+  The public id identifying the conversation
+  """
+  id: String
+  legacyId: Int
 }
 
 input UpdateReferenceInput {
@@ -13114,12 +13827,7 @@ input ProcessExpensePaymentParams {
   forceManual: Boolean
 
   """
-  2FA code for if the host account has 2FA for payouts turned on.
-  """
-  twoFactorAuthenticatorCode: String
-
-  """
-  2FA code for if the host account has 2FA for payouts turned on.
+  Who is responsible for paying any due fees.
   """
   feesPayer: FeesPayer = COLLECTIVE
 }
@@ -13406,11 +14114,6 @@ input GuestInfoInput {
   legalName: String
 
   """
-  The unique guest token
-  """
-  token: String @deprecated(reason: "2021-01-26: Guest tokens are not used anymore")
-
-  """
   Address of the user, mandatory when amount is above $5000.
   """
   location: LocationInput
@@ -13506,7 +14209,6 @@ input PaypalPaymentInput {
   data: JSON
   orderId: String
   subscriptionId: String
-  isNewApi: Boolean @deprecated(reason: "2021-07-30: Not used anymore")
 }
 
 """
@@ -13735,4 +14437,38 @@ input WebhookReferenceInput {
   The legacy public id identifying the webhook (ie: 4242)
   """
   legacyId: Int
+}
+
+input TierUpdateInput {
+  """
+  The public id identifying the tier (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String!
+  amount: AmountInput!
+  name: NonEmptyString
+  description: String
+  button: String
+  goal: AmountInput
+  type: TierType!
+  amountType: TierAmountType!
+  frequency: TierFrequency!
+  presets: [Int!]
+  maxQuantity: Int
+  minimumAmount: AmountInput
+  useStandalonePage: Boolean
+}
+
+input TierCreateInput {
+  amount: AmountInput!
+  name: NonEmptyString
+  description: String
+  button: String
+  goal: AmountInput
+  type: TierType!
+  amountType: TierAmountType!
+  frequency: TierFrequency!
+  presets: [Int!]
+  maxQuantity: Int
+  minimumAmount: AmountInput
+  useStandalonePage: Boolean
 }

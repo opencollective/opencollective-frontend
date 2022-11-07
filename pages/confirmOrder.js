@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { gqlV1 } from '../lib/graphql/helpers';
 import { getStripe } from '../lib/stripe';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
@@ -136,7 +136,7 @@ class ConfirmOrderPage extends React.Component {
   }
 }
 
-const confirmOrderMutation = gql`
+const confirmOrderMutation = gqlV1/* GraphQL */ `
   mutation ConfirmOrder($order: ConfirmOrderInputType!) {
     confirmOrder(order: $order) {
       id

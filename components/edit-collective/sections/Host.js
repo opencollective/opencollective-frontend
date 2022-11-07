@@ -6,7 +6,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
-import { formatDate } from '../../../lib/utils';
+import { formatDate, getWebsiteUrl } from '../../../lib/utils';
 
 import CollectiveCard from '../../CollectiveCard';
 import Container from '../../Container';
@@ -363,7 +363,7 @@ class Host extends React.Component {
             </Box>
             <Box mb={4}>
               <OptionLabel htmlFor="host-radio-noHost">
-                <FormattedMessage id="collective.edit.host.noHost.title" defaultMessage="No one" />
+                <FormattedMessage defaultMessage="No one" />
               </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.noHost.description"
@@ -424,7 +424,7 @@ class Host extends React.Component {
                         collective={collective}
                         service="stripe"
                         options={{
-                          redirect: `${process.env.WEBSITE_URL}/${collective.slug}/admin/host?selectedOption=selfHost`,
+                          redirect: `${getWebsiteUrl()}/${collective.slug}/admin/host?selectedOption=selfHost`,
                         }}
                       />
                     </Box>

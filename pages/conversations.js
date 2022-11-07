@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
@@ -68,10 +70,11 @@ class ConversationsPage extends React.Component {
   };
 
   getPageMetaData(collective) {
+    const baseMetadata = getCollectivePageMetadata(collective);
     if (collective) {
-      return { title: `${collective.name}'s conversations` };
+      return { ...baseMetadata, title: `${collective.name}'s conversations` };
     } else {
-      return { title: 'Conversations' };
+      return { ...baseMetadata, title: 'Conversations' };
     }
   }
 
@@ -206,7 +209,7 @@ class ConversationsPage extends React.Component {
   }
 }
 
-const conversationsPageQuery = gqlV2/* GraphQL */ `
+const conversationsPageQuery = gql`
   query ConversationsPage($collectiveSlug: String!, $tag: String) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
@@ -216,8 +219,17 @@ const conversationsPageQuery = gqlV2/* GraphQL */ `
       type
       description
       settings
-      imageUrl
       twitterHandle
+      imageUrl
+      backgroundImageUrl
+      ... on AccountWithParent {
+        parent {
+          id
+          imageUrl
+          backgroundImageUrl
+          twitterHandle
+        }
+      }
       conversations(tag: $tag) {
         ...ConversationListFragment
       }

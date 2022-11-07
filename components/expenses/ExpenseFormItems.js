@@ -5,7 +5,7 @@ import { isEmpty, uniq } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import hasFeature, { FEATURES } from '../../lib/allowed-features';
+import { FEATURES, isFeatureEnabled } from '../../lib/allowed-features';
 import { Currency, PayPalSupportedCurrencies } from '../../lib/constants/currency';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -132,11 +132,10 @@ class ExpenseFormItems extends React.PureComponent {
     const { collective, form } = this.props;
 
     if (
-      (!hasFeature(collective, FEATURES.MULTI_CURRENCY_EXPENSES) &&
-        !hasFeature(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES)) ||
+      !isFeatureEnabled(collective, FEATURES.MULTI_CURRENCY_EXPENSES) ||
       payoutMethod?.type === PayoutMethodType.ACCOUNT_BALANCE
     ) {
-      return [collective.currency];
+      return [collective?.currency];
     }
 
     const { payoutMethod, currency } = form.values;
@@ -149,8 +148,8 @@ class ExpenseFormItems extends React.PureComponent {
       return uniq(
         [
           currency,
-          collective.currency,
-          collective.host?.currency,
+          collective?.currency,
+          collective?.host?.currency,
           payoutMethod?.currency,
           payoutMethod?.data?.currency,
         ].filter(Boolean),
@@ -177,6 +176,21 @@ class ExpenseFormItems extends React.PureComponent {
         return <ExpenseGSTFormikFields formik={this.props.form} isOptional={isOptional} />;
       default:
         return `Tax not supported: ${taxType}`;
+    }
+  }
+
+  hasTaxFields(taxType) {
+    if (!taxType) {
+      return false;
+    }
+
+    const { values } = this.props.form;
+    if (!values.taxes) {
+      // If tax is not initialized (create expense) we render the fields by default
+      return true;
+    } else {
+      // If tax is initialized (edit expense) we render the fields only if there are values
+      return values.taxes[0] && !values.taxes[0].isDisabled;
     }
   }
 
@@ -215,7 +229,7 @@ class ExpenseFormItems extends React.PureComponent {
     const onRemove = requireFile || items.length > 1 ? this.remove : null;
     const availableCurrencies = this.getPossibleCurrencies();
     const taxType = this.getApplicableTaxType();
-    const hasTaxFields = taxType && !values.taxes?.[0]?.isDisabled; // True by default
+    const hasTaxFields = this.hasTaxFields(taxType);
     return (
       <Box>
         {this.renderErrors()}

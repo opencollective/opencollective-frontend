@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import hasFeature, { FEATURES } from '../../lib/allowed-features';
+import hasFeature, { FEATURES, isFeatureEnabled } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective.lib';
 import { getCollectiveTypeKey, isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -22,6 +22,12 @@ import { MenuGroup, MenuLink, MenuSectionHeader, useSubmenu } from './MenuCompon
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
+const hasActivityLog = collective => {
+  return Boolean(
+    ['development', 'staging'].includes(process.env.OC_ENV) || collective.settings?.earlyAccess?.activityLog,
+  );
+};
+
 const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
   return (
     <React.Fragment>
@@ -38,8 +44,19 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
       {!isAccountantOnly && (
         <React.Fragment>
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} />
+          <MenuLink
+            collective={collective}
+            section={COLLECTIVE_SECTIONS.TIERS_REVAMP}
+            if={['development', 'staging'].includes(process.env.OC_ENV)}
+          />
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
           <MenuLink collective={collective} section={ALL_SECTIONS.WEBHOOKS} />
+          <MenuLink
+            collective={collective}
+            section={COLLECTIVE_SECTIONS.ACTIVITY_LOG}
+            if={hasActivityLog(collective)}
+          />
+          <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SECURITY} />
           <MenuLink collective={collective} section={ALL_SECTIONS.ADVANCED} />
           {!isHostAccount(collective) && <MenuLink collective={collective} section={ALL_SECTIONS.FISCAL_HOSTING} />}
         </React.Fragment>
@@ -107,7 +124,6 @@ const Menu = ({ collective, isAccountantOnly }) => {
                 section={FISCAL_HOST_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS}
                 if={hasFeature(collective, FEATURES.VIRTUAL_CARDS)}
               />
-              <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.HOST_TWO_FACTOR_AUTH} />
               <MenuLink
                 collective={collective}
                 section={FISCAL_HOST_SECTIONS.POLICIES}
@@ -129,7 +145,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.COLLECTIVE_GOALS}
-            if={isType(collective, COLLECTIVE)}
+            if={isOneOfTypes(collective, [COLLECTIVE, PROJECT])}
           />
           <MenuLink
             collective={collective}
@@ -169,6 +185,11 @@ const Menu = ({ collective, isAccountantOnly }) => {
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS} if={isIndividual} />
           <MenuLink
             collective={collective}
+            section={COLLECTIVE_SECTIONS.NOTIFICATIONS}
+            if={isIndividual && isFeatureEnabled(collective, FEATURES.EMAIL_NOTIFICATIONS_PANEL)}
+          />
+          <MenuLink
+            collective={collective}
             section={ORG_BUDGET_SECTIONS.GIFT_CARDS}
             if={['ACTIVE', 'AVAILABLE'].includes(collective.features.EMIT_GIFT_CARDS)}
           />
@@ -189,6 +210,14 @@ const Menu = ({ collective, isAccountantOnly }) => {
           />
           <MenuLink
             collective={collective}
+            section={COLLECTIVE_SECTIONS.TIERS_REVAMP}
+            if={
+              ['development', 'staging'].includes(process.env.OC_ENV) &&
+              isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT])
+            }
+          />
+          <MenuLink
+            collective={collective}
             section={COLLECTIVE_SECTIONS.WEBHOOKS}
             if={isOneOfTypes(collective, [COLLECTIVE, USER, EVENT])}
           />
@@ -203,6 +232,16 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS}
             if={isOneOfTypes(collective, [COLLECTIVE, ORGANIZATION, USER])}
           />
+          <MenuLink
+            collective={collective}
+            section={COLLECTIVE_SECTIONS.ACTIVITY_LOG}
+            if={hasActivityLog(collective)}
+          />
+          <MenuLink
+            collective={collective}
+            section={FISCAL_HOST_SECTIONS.SECURITY}
+            if={isOneOfTypes(collective, [COLLECTIVE, FUND, ORGANIZATION])}
+          />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ADVANCED} />
         </MenuGroup>
         <MenuGroup if={isSelfHostedAccount(collective) && !isAccountantOnly} mt={24}>
@@ -214,7 +253,6 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
             if={isType(collective, COLLECTIVE)}
           />
-          <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.HOST_TWO_FACTOR_AUTH} />
         </MenuGroup>
       </React.Fragment>
     );
@@ -229,6 +267,7 @@ Menu.propTypes = {
     type: PropTypes.string,
     isHost: PropTypes.bool,
     host: PropTypes.object,
+    settings: PropTypes.object,
     features: PropTypes.shape({
       USE_PAYMENT_METHODS: PropTypes.string,
       EMIT_GIFT_CARDS: PropTypes.string,

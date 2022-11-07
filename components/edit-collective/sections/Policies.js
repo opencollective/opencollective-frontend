@@ -6,11 +6,14 @@ import { filter, get, isEmpty, omit, size } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { DEFAULT_SUPPORTED_EXPENSE_TYPES } from '../../../lib/expenses';
+import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import { omitDeep, stripHTML } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
+import { getI18nLink } from '../../I18nFormatters';
+import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import RichTextEditor from '../../RichTextEditor';
@@ -27,7 +30,7 @@ import SettingsSectionTitle from './SettingsSectionTitle';
 const EXPENSE_POLICY_MAX_LENGTH = 16000; // max in database is ~15,500
 const CONTRIBUTION_POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average length word
 
-const updateFilterCategoriesMutation = gqlV2/* GraphQL */ `
+const updateFilterCategoriesMutation = gql`
   mutation UpdateFilterCategories($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
       id
@@ -38,7 +41,7 @@ const updateFilterCategoriesMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const editCollectiveMutation = gql/* GraphQL */ `
+const editCollectiveMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveMutation($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
       id
@@ -49,12 +52,13 @@ const editCollectiveMutation = gql/* GraphQL */ `
   }
 `;
 
-const setPoliciesMutation = gqlV2/* GraphQL */ `
-  mutation SetPolicies($account: AccountReferenceInput!, $policies: JSON!) {
+const setPoliciesMutation = gql`
+  mutation SetPolicies($account: AccountReferenceInput!, $policies: PoliciesInput!) {
     setPolicies(account: $account, policies: $policies) {
       id
       policies {
         EXPENSE_AUTHOR_CANNOT_APPROVE
+        REQUIRE_2FA_FOR_ADMINS
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
           applies
@@ -99,6 +103,18 @@ const messages = defineMessages({
     defaultMessage:
       'Only allow expenses to be created by Team Members and Financial Contributors (they may invite expenses from other payees)',
   },
+  'expensePolicy.RECEIPT': {
+    id: 'collective.expensePolicy.hasReceipt',
+    defaultMessage: 'Allow receipts',
+  },
+  'expensePolicy.GRANT': {
+    id: 'collective.expensePolicy.hasGrant',
+    defaultMessage: 'Allow grants',
+  },
+  'expensePolicy.INVOICE': {
+    id: 'collective.expensePolicy.hasInvoice',
+    defaultMessage: 'Allow invoices',
+  },
   'requiredAdmins.numberOfAdmins': {
     defaultMessage: '{admins, plural, =0 {Do not enforce minimum number of admins} one {# Admin} other {# Admins} }',
   },
@@ -132,6 +148,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
   const collectiveContributionPolicy = get(collective, 'contributionPolicy', null);
   const collectiveExpensePolicy = get(collective, 'expensePolicy', null);
   const collectiveDisableExpenseSubmission = get(collective, 'settings.disablePublicExpenseSubmission', false);
+  const expenseTypes = get(collective, 'settings.expenseTypes') || DEFAULT_SUPPORTED_EXPENSE_TYPES;
   const numberOfAdmins = size(filter(collective.members, m => m.role === 'ADMIN'));
 
   const selectOptions = React.useMemo(() => {
@@ -149,17 +166,22 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
       contributionPolicy: collectiveContributionPolicy || '',
       expensePolicy: collectiveExpensePolicy || '',
       disablePublicExpenseSubmission: collectiveDisableExpenseSubmission || false,
+      expenseTypes,
       policies: omitDeep(data?.account?.policies || {}, ['__typename']),
     },
     async onSubmit(values) {
-      const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission, policies } = values;
+      const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission, expenseTypes, policies } = values;
       await updateCollective({
         variables: {
           collective: {
             id: collective.id,
             contributionPolicy,
             expensePolicy,
-            settings: { ...collective.settings, disablePublicExpenseSubmission },
+            settings: {
+              ...collective.settings,
+              disablePublicExpenseSubmission,
+              expenseTypes,
+            },
           },
         },
       });
@@ -444,6 +466,35 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             }
             defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
           />
+        </Container>
+        <Container>
+          <SettingsSectionTitle mt={4}>
+            <FormattedMessage defaultMessage="Expense types" />
+          </SettingsSectionTitle>
+          <P mb={2}>
+            <FormattedMessage
+              id="editCollective.expenseTypes.description"
+              defaultMessage="Specify the types of expenses allowed for all the collectives you're hosting. If you wish to customize these options for specific collectives, head to the <HostedCollectivesLink>Hosted Collectives</HostedCollectivesLink> section."
+              values={{
+                HostedCollectivesLink: getI18nLink({ as: Link, href: `/${collective.slug}/admin/hosted-collectives` }),
+              }}
+            />
+          </P>
+
+          {['RECEIPT', 'INVOICE', 'GRANT'].map(type => (
+            <StyledCheckbox
+              key={type}
+              name={`allow-${type}-submission`}
+              label={formatMessage(messages[`expensePolicy.${type}`])}
+              checked={Boolean(formik.values.expenseTypes[type])}
+              onChange={() =>
+                formik.setFieldValue('expenseTypes', {
+                  ...formik.values.expenseTypes,
+                  [type]: !formik.values.expenseTypes[type],
+                })
+              }
+            />
+          ))}
         </Container>
         <Container>
           <SettingsSectionTitle mt={4}>

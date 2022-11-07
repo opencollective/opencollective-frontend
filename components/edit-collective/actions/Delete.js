@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { gqlV1 } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { getI18nLink } from '../../I18nFormatters';
@@ -15,7 +16,7 @@ import { P } from '../../Text';
 import { withUser } from '../../UserProvider';
 import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
-const deleteCollectiveMutation = gql`
+const deleteCollectiveMutation = gqlV1/* GraphQL */ `
   mutation DeleteCollective($id: Int!) {
     deleteCollective(id: $id) {
       id
@@ -23,7 +24,7 @@ const deleteCollectiveMutation = gql`
   }
 `;
 
-const deleteUserCollectiveMutation = gql`
+const deleteUserCollectiveMutation = gqlV1/* GraphQL */ `
   mutation DeleteUserCollective($id: Int!) {
     deleteUserCollective(id: $id) {
       id

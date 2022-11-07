@@ -177,7 +177,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             <PayoutMethodTypeWithIcon
               type={
                 !expense.payoutMethod?.type && (expense.draft || expense.payee.isInvite)
-                  ? expense.draft?.payoutMethod || INVITE
+                  ? expense.draft?.payoutMethod?.type || INVITE
                   : isCharge
                   ? VIRTUAL_CARD
                   : expense.payoutMethod?.type
@@ -186,7 +186,10 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
             />
           </Box>
           <div data-cy="expense-summary-payout-method-data">
-            <PayoutMethodData payoutMethod={expense.payoutMethod} isLoading={isLoadingLoggedInUser} />
+            <PayoutMethodData
+              payoutMethod={expense.draft?.payoutMethod ?? expense.payoutMethod}
+              isLoading={isLoadingLoggedInUser}
+            />
           </div>
           {expense.invoiceInfo && (
             <Box mt={3} data-cy="expense-summary-invoice-info">

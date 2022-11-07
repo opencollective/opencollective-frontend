@@ -1,16 +1,14 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal';
-import CreateVirtualCardModal from '../../edit-collective/CreateVirtualCardModal';
-import DeleteVirtualCardModal from '../../edit-collective/DeleteVirtualCardModal';
 import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';
 import VirtualCardFilters from '../../edit-collective/sections/virtual-cards/VirtualCardFilters';
 import VirtualCard from '../../edit-collective/VirtualCard';
@@ -22,7 +20,7 @@ import StyledButton from '../../StyledButton';
 import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
-const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
+const hostVirtualCardsQuery = gql`
   query HostedVirtualCards(
     $slug: String
     $limit: Int!
@@ -58,6 +56,8 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
           provider
           spendingLimitAmount
           spendingLimitInterval
+          spendingLimitRenewsOn
+          remainingLimit
           currency
           createdAt
           account {
@@ -99,6 +99,13 @@ const hostVirtualCardsQuery = gqlV2/* GraphQL */ `
           name
           legacyId
           imageUrl(height: 64)
+          parentAccount {
+            id
+            slug
+            name
+            legacyId
+            imageUrl(height: 64)
+          }
         }
       }
     }
@@ -134,8 +141,6 @@ const HostVirtualCards = props => {
 
   const [displayAssignCardModal, setAssignCardModalDisplay] = React.useState(false);
   const [displayCreateVirtualCardModal, setCreateVirtualCardModalDisplay] = React.useState(false);
-  const [editingVirtualCard, setEditingVirtualCard] = React.useState(undefined);
-  const [deletingVirtualCard, setDeletingVirtualCard] = React.useState(undefined);
 
   const handleUpdateFilters = queryParams => {
     return router.push(
@@ -156,16 +161,6 @@ const HostVirtualCards = props => {
       ),
     });
     setAssignCardModalDisplay(false);
-    refetch();
-  };
-
-  const handleEditCardSuccess = message => {
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
-      message: message,
-    });
-    setEditingVirtualCard(undefined);
-    setDeletingVirtualCard(undefined);
     refetch();
   };
 
@@ -191,7 +186,7 @@ const HostVirtualCards = props => {
         <P>
           <FormattedMessage
             id="Host.VirtualCards.List.Description"
-            defaultMessage="Make payments easier by creating virtual cards on Privacy.com and linking them to Collectives. One Collective can have multiple virtual cards. <learnMoreLink>Learn more</learnMoreLink>"
+            defaultMessage="Make payments easier by creating virtual cards. One Collective can have multiple virtual cards. <learnMoreLink>Learn more</learnMoreLink>"
             values={{
               learnMoreLink: getI18nLink({
                 href: 'https://docs.opencollective.com/help/fiscal-hosts/virtual-cards',
@@ -221,8 +216,10 @@ const HostVirtualCards = props => {
         >
           <StyledButton
             my={1}
+            px={14}
+            py={10}
             buttonStyle="primary"
-            buttonSize="round"
+            buttonSize="medium"
             data-cy="confirmation-modal-continue"
             onClick={() => setCreateVirtualCardModalDisplay(true)}
           >
@@ -241,8 +238,10 @@ const HostVirtualCards = props => {
         >
           <StyledButton
             my={1}
+            px={14}
+            py={10}
             buttonStyle="primary"
-            buttonSize="round"
+            buttonSize="medium"
             data-cy="confirmation-modal-continue"
             onClick={() => setAssignCardModalDisplay(true)}
           >
@@ -255,11 +254,12 @@ const HostVirtualCards = props => {
         {data.host.hostedVirtualCards.nodes.map(vc => (
           <VirtualCard
             key={vc.id}
-            {...vc}
-            onSuccess={refetch}
-            editHandler={() => setEditingVirtualCard(vc)}
-            deleteHandler={() => setDeletingVirtualCard(vc)}
+            host={data.host}
+            virtualCard={vc}
             canEditVirtualCard
+            canPauseOrResumeVirtualCard
+            canDeleteVirtualCard
+            onDeleteRefetchQuery="HostedVirtualCards"
           />
         ))}
       </Grid>
@@ -284,28 +284,8 @@ const HostVirtualCards = props => {
           }}
         />
       )}
-      {editingVirtualCard && (
-        <EditVirtualCardModal
-          host={data.host}
-          onSuccess={handleEditCardSuccess}
-          onClose={() => {
-            setEditingVirtualCard(undefined);
-          }}
-          virtualCard={editingVirtualCard}
-        />
-      )}
-      {deletingVirtualCard && (
-        <DeleteVirtualCardModal
-          host={data.host}
-          onSuccess={handleEditCardSuccess}
-          onClose={() => {
-            setDeletingVirtualCard(undefined);
-          }}
-          virtualCard={deletingVirtualCard}
-        />
-      )}
       {displayCreateVirtualCardModal && (
-        <CreateVirtualCardModal
+        <EditVirtualCardModal
           host={data.host}
           onSuccess={handleCreateVirtualCardSuccess}
           onClose={() => {

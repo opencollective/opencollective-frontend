@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, get } from 'lodash';
 
 import { getErrorFromGraphqlException } from '../../lib/errors';
+import { gqlV1 } from '../../lib/graphql/helpers';
 import { compose } from '../../lib/utils';
 
 import { Flex } from '../Grid';
@@ -69,7 +69,7 @@ class CreateHostFormWithData extends React.Component {
   }
 }
 
-const editCollectiveConnectedAccountsQuery = gql`
+const editCollectiveConnectedAccountsQuery = gqlV1/* GraphQL */ `
   query EditCollectiveConnectedAccounts($slug: String!) {
     Collective(slug: $slug) {
       id
@@ -110,7 +110,7 @@ export const addEditCollectiveConnectedAccountsData = graphql(editCollectiveConn
   }),
 });
 
-const editCollectiveCreateHostMutation = gql`
+const editCollectiveCreateHostMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveCreateHost($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
       id

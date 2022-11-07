@@ -7,6 +7,7 @@ import { ContributionTypes } from '../../lib/constants/contribution-types';
 
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
+import EditTierModal from '../edit-collective/tiers/EditTierModal';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
@@ -195,8 +196,14 @@ const ContributeCard = ({
   hideContributors,
   image,
   disableCTA,
+  hideCTA,
+  enableEditing,
+  tier,
+  collective,
   ...props
 }) => {
+  const [isEditTierModalOpen, setIsEditTierModalOpen] = React.useState(false);
+
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
 
   return (
@@ -224,7 +231,7 @@ const ContributeCard = ({
           <Description data-cy="contribute-description">{children}</Description>
         </Flex>
         <Box>
-          {!disableCTA && (
+          {!disableCTA && !hideCTA && (
             <Link href={route}>
               <StyledButton buttonStyle={getCTAButtonStyle(type)} width={1} mb={2} mt={3} data-cy="contribute-btn">
                 {buttonText || getContributeCTA(type)}
@@ -272,6 +279,23 @@ const ContributeCard = ({
               )}
             </Box>
           )}
+          {enableEditing && (
+            <Box>
+              <StyledButton
+                buttonStyle="secondary"
+                width={1}
+                mb={2}
+                mt={3}
+                data-cy="edit-btn"
+                onClick={() => setIsEditTierModalOpen(true)}
+              >
+                Edit tier
+              </StyledButton>
+            </Box>
+          )}
+          {isEditTierModalOpen && (
+            <EditTierModal tier={tier} collective={collective} onClose={() => setIsEditTierModalOpen(false)} />
+          )}
         </Box>
       </Flex>
     </StyledContributeCard>
@@ -293,6 +317,7 @@ ContributeCard.propTypes = {
   children: PropTypes.node,
   /** If true, the call to action will not be displayed */
   disableCTA: PropTypes.bool,
+  hideCTA: PropTypes.bool,
   /** Contributors */
   contributors: PropTypes.arrayOf(
     PropTypes.shape({
@@ -313,6 +338,13 @@ ContributeCard.propTypes = {
   /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
   router: PropTypes.object,
+  enableEditing: PropTypes.bool,
+  tier: PropTypes.object,
+  collective: PropTypes.object,
+};
+
+ContributeCard.defaultProps = {
+  enableEditing: false,
 };
 
 export default injectIntl(ContributeCard);

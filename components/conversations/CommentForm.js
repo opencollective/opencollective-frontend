@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import ContainerOverlay from '../ContainerOverlay';
+import { Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
@@ -21,7 +22,7 @@ import { withUser } from '../UserProvider';
 
 import { commentFieldsFragment } from './graphql';
 
-const createCommentMutation = gqlV2/* GraphQL */ `
+const createCommentMutation = gql`
   mutation CreateComment($comment: CommentCreateInput!) {
     createComment(comment: $comment) {
       id
@@ -43,6 +44,10 @@ const messages = defineMessages({
   signInLabel: {
     id: 'CommentForm.SignIn',
     defaultMessage: 'Please sign in to comment:',
+  },
+  uploadingImage: {
+    id: 'uploadImage.isUploading',
+    defaultMessage: 'Uploading image...',
   },
 });
 
@@ -100,6 +105,7 @@ const CommentForm = ({
   const [html, setHtml] = useState('');
   const [resetValue, setResetValue] = useState();
   const [validationError, setValidationError] = useState();
+  const [uploading, setUploading] = useState(false);
   const { formatMessage } = intl;
 
   const submitForm = async event => {
@@ -149,6 +155,7 @@ const CommentForm = ({
               setHtml(e.target.value);
               setValidationError(null);
             }}
+            setUploading={setUploading}
           />
         )}
         {validationError && (
@@ -161,17 +168,18 @@ const CommentForm = ({
             {formatErrorMessage(intl, getErrorFromGraphqlException(error))}
           </MessageBox>
         )}
-        <StyledButton
-          type="submit"
-          mt={3}
-          minWidth={150}
-          buttonStyle="primary"
-          disabled={isDisabled || !LoggedInUser}
-          loading={loading}
-          data-cy="submit-comment-btn"
-        >
-          {formatMessage(messages.postReply)}
-        </StyledButton>
+        <Flex mt={3} alignItems="center" gap={12}>
+          <StyledButton
+            type="submit"
+            minWidth={150}
+            buttonStyle="primary"
+            disabled={isDisabled || !LoggedInUser || uploading}
+            loading={loading}
+            data-cy="submit-comment-btn"
+          >
+            {formatMessage(uploading ? messages.uploadingImage : messages.postReply)}
+          </StyledButton>
+        </Flex>
       </form>
     </Container>
   );

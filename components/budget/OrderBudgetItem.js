@@ -137,7 +137,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
                     />
                   </Span>
                 </Flex>
-                {showPlatformTip && order.platformTipAmount?.valueInCents && (
+                {Boolean(showPlatformTip && order.platformTipAmount?.valueInCents) && (
                   <Container fontSize="10px" color="black.500">
                     <FormattedMessage
                       id="OrderBudgetItem.Tip"

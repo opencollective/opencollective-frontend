@@ -2,20 +2,23 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import ReactDOM from 'react-dom';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
 
+import expenseStatus from '../../lib/constants/expense-status';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useKeyboardKey, { ESCAPE_KEY } from '../../lib/hooks/useKeyboardKey';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
 
 import { Box, Flex } from '../Grid';
+import StyledButton from '../StyledButton';
 import StyledSpinner from '../StyledSpinner';
 import StyledTag from '../StyledTag';
 
 import { getExpenseStatusMsgType } from './ExpenseStatusTag';
-import ProcessExpenseButtons from './ProcessExpenseButtons';
+import MarkExpenseAsIncompleteModal from './MarkExpenseAsIncompleteModal';
+import ProcessExpenseButtons, { ButtonLabel } from './ProcessExpenseButtons';
 
 const ExpenseStatusTag = styled(StyledTag)`
   cursor: pointer;
@@ -77,6 +80,9 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
   const wrapperRef = React.useRef();
   const [showPopup, setShowPopup] = React.useState(false);
   const [isClosable, setClosable] = React.useState(true);
+  const [showMarkAsIncompleteModal, setMarkAsIncompleteModal] = React.useState(false);
+  const hideProcessExpenseButtons = expense?.status === expenseStatus.APPROVED;
+  const buttonProps = { px: 2, py: 2, isBorderless: true, width: '100%', textAlign: 'left' };
 
   const onClick = () => {
     setShowPopup(true);
@@ -125,14 +131,29 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
               {({ ref, style, arrowProps }) => (
                 <PopupContainer ref={ref} style={style} onMouseEnter={onClick}>
                   <Flex alignItems="center" ref={wrapperRef} flexDirection="column" p={2}>
-                    <ProcessExpenseButtons
-                      host={host}
-                      buttonProps={{ px: 2, py: 2, isBorderless: true, width: '100%', textAlign: 'left' }}
-                      collective={collective}
-                      expense={expense}
-                      permissions={expense.permissions}
-                      onModalToggle={isOpen => setClosable(!isOpen)}
-                    />
+                    {!hideProcessExpenseButtons && (
+                      <ProcessExpenseButtons
+                        host={host}
+                        buttonProps={buttonProps}
+                        collective={collective}
+                        expense={expense}
+                        permissions={expense.permissions}
+                        onModalToggle={isOpen => setClosable(!isOpen)}
+                        onSuccess={() => setShowPopup(false)}
+                      />
+                    )}
+                    {expense?.permissions?.canMarkAsIncomplete && (
+                      <StyledButton
+                        {...buttonProps}
+                        onClick={() => {
+                          setMarkAsIncompleteModal(true);
+                        }}
+                      >
+                        <ButtonLabel>
+                          <FormattedMessage id="actions.markAsIncomplete" defaultMessage="Mark as Incomplete" />
+                        </ButtonLabel>
+                      </StyledButton>
+                    )}
                   </Flex>
                   <Arrow ref={arrowProps.ref} style={arrowProps.style} />
                 </PopupContainer>
@@ -141,6 +162,9 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
             document.body,
           )}
       </Manager>
+      {showMarkAsIncompleteModal && (
+        <MarkExpenseAsIncompleteModal expense={expense} onClose={() => setMarkAsIncompleteModal(false)} />
+      )}
     </React.Fragment>
   );
 };

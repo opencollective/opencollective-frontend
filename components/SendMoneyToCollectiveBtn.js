@@ -6,7 +6,7 @@ import { get, pick } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { formatCurrency } from '../lib/currency-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { compose } from '../lib/utils';
 
 import Container from './Container';
@@ -42,7 +42,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
 
   async onClick() {
     const { currency, amount, fromCollective, toCollective, description, data, LoggedInUser } = this.props;
-    if (!LoggedInUser || !LoggedInUser.canEditCollective(fromCollective) || !get(data, 'account')) {
+    if (!LoggedInUser || !LoggedInUser.isAdminOfCollectiveOrHost(fromCollective) || !get(data, 'account')) {
       return;
     }
     const paymentMethods = get(data, 'account.paymentMethods');
@@ -107,7 +107,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
   }
 }
 
-const paymentMethodsQuery = gqlV2/* GraphQL */ `
+const paymentMethodsQuery = gql`
   query SendMoneyToCollectivePaymentMethods($slug: String) {
     account(slug: $slug) {
       id
@@ -132,14 +132,14 @@ const addPaymentMethodsData = graphql(paymentMethodsQuery, {
   },
 });
 
-const collectiveBalanceFragment = gql`
+const collectiveBalanceFragment = gqlV1/* GraphQL */ `
   fragment StatFieldsFragment on CollectiveStatsType {
     id
     balance
   }
 `;
 
-const sendMoneyToCollectiveMutation = gqlV2/* GraphQL */ `
+const sendMoneyToCollectiveMutation = gql`
   mutation SendMoneyToCollective($order: OrderCreateInput!) {
     createOrder(order: $order) {
       order {

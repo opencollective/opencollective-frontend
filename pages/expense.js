@@ -1,6 +1,7 @@
 /* eslint-disable graphql/template-strings */
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import dayjs from 'dayjs';
 import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
@@ -8,12 +9,12 @@ import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { getCollectiveTypeForUrl, getSuggestedTags } from '../lib/collective.lib';
+import { getCollectivePageMetadata, getCollectiveTypeForUrl, getSuggestedTags } from '../lib/collective.lib';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { formatErrorMessage, generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -31,7 +32,7 @@ import ExpenseInviteNotificationBanner from '../components/expenses/ExpenseInvit
 import ExpenseMissingReceiptNotificationBanner from '../components/expenses/ExpenseMissingReceiptNotificationBanner';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseRecurringBanner from '../components/expenses/ExpenseRecurringBanner';
-import ExpenseSummary from '../components/expenses/ExpenseSummary';
+import ExpenseSummary, { SummaryHeader } from '../components/expenses/ExpenseSummary';
 import {
   expensePageExpenseFieldsFragment,
   loggedInAccountExpensePayoutFieldsFragment,
@@ -43,13 +44,14 @@ import HTMLContent from '../components/HTMLContent';
 import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
 import CommentIcon from '../components/icons/CommentIcon';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
+import LinkCollective from '../components/LinkCollective';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
 import StyledCheckbox from '../components/StyledCheckbox';
 import StyledLink from '../components/StyledLink';
-import { H1, H5, Span } from '../components/Text';
+import { H5, Span } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
@@ -69,7 +71,7 @@ const messages = defineMessages({
   },
 });
 
-const expensePageQuery = gqlV2/* GraphQL */ `
+const expensePageQuery = gql`
   query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalPaidExpensesDateFrom: DateTime) {
     expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
       id
@@ -117,7 +119,7 @@ const expensePageQuery = gqlV2/* GraphQL */ `
   ${commentFieldsFragment}
 `;
 
-const editExpenseMutation = gqlV2/* GraphQL */ `
+const editExpenseMutation = gql`
   mutation EditExpense($expense: ExpenseUpdateInput!, $draftKey: String) {
     editExpense(expense: $expense, draftKey: $draftKey) {
       id
@@ -128,7 +130,7 @@ const editExpenseMutation = gqlV2/* GraphQL */ `
   ${expensePageExpenseFieldsFragment}
 `;
 
-const verifyExpenseMutation = gqlV2/* GraphQL */ `
+const verifyExpenseMutation = gql`
   mutation VerifyExpense($expense: ExpenseReferenceInput!, $draftKey: String) {
     verifyExpense(expense: $expense, draftKey: $draftKey) {
       id
@@ -380,8 +382,14 @@ class ExpensePage extends React.Component {
 
   getPageMetaData(expense) {
     const { intl, legacyExpenseId } = this.props;
+    const baseMetadata = getCollectivePageMetadata(expense?.account);
     if (expense?.description) {
-      return { title: intl.formatMessage(messages.title, { id: legacyExpenseId, title: expense.description }) };
+      return {
+        ...baseMetadata,
+        title: intl.formatMessage(messages.title, { id: legacyExpenseId, title: expense.description }),
+      };
+    } else {
+      return baseMetadata;
     }
   }
 
@@ -518,9 +526,17 @@ class ExpensePage extends React.Component {
             px={2}
             ref={this.expenseTopRef}
           >
-            <H1 fontSize="24px" lineHeight="32px" mb={24} py={2}>
-              <FormattedMessage id="Summary" defaultMessage="Summary" />
-            </H1>
+            <SummaryHeader fontSize="24px" lineHeight="32px" mb={24} py={2}>
+              <FormattedMessage
+                id="ExpenseSummaryTitle"
+                defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
+                values={{
+                  type: expense?.type,
+                  collectiveName: collective?.name,
+                  LinkCollective: text => <LinkCollective collective={collective}>{text}</LinkCollective>,
+                }}
+              />
+            </SummaryHeader>
             {error && (
               <MessageBox type="error" withIcon mb={4}>
                 {formatErrorMessage(intl, error)}
