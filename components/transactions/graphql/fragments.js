@@ -6,6 +6,7 @@ export const transactionsQueryCollectionFragment = gql`
     offset
     limit
     kinds
+    paymentMethodTypes
     nodes {
       id
       uuid
