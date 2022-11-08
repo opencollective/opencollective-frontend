@@ -1254,7 +1254,7 @@
   "fiscalHosting.distributeCollaboration": "A distributed collaboration",
   "fiscalHosting.distributeCollaboration.description": "Like an open source software project, which isn’t owned by anyone and wants resources held in common.",
   "fiscalHosting.feature.acceptAndSpendFunds": "Accept and spend funds immediately",
-  "fiscalHosting.feature.acceptAndSpendFunds.description": "財務ホスティングの申請は多くの場合、極めて迅速に（場合によっては即座に）承認され、資金の出し入れの準備が整い、運用を開始することができます。従来の財務支援サービスを使用したり、独自の法人の設立したりするのに比べて、財務ホストのもとで活動を開始するのは非常にスムーズです。",
+  "fiscalHosting.feature.acceptAndSpendFunds.description": "財務ホスティングの申請は多くの場合、極めて迅速に（場合によっては即座に）承認され、資金の出し入れの準備が整い、運用を開始することができます。従来の財務支援サービスを使用したり、独自の法人を設立したりするのに比べて、財務ホストのもとで活動を開始するのは非常にスムーズです。",
   "fiscalHosting.feature.acceptAndSpendFunds.tabName": "Accept and spend funds",
   "fiscalHosting.feature.automaticReporting": "Automatic reporting & transparency",
   "fiscalHosting.feature.automaticReporting.description": "No need to spend hours creating reports for funders. The Open Collective platform has automated quantitative reporting built in. Just sent the funder a link to your page! There are great tools for qualitative reporting too, like posting blogs and newsletters, which also serve to keep your wider community engaged and up to date.",
