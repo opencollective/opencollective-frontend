@@ -25,6 +25,10 @@ storybook-static
 .vscode/*
 .history
 
+# JetBrains
+.idea/
+*.iml
+
 # Git time manager
 .gtm
 
