@@ -292,7 +292,8 @@ class Tiers extends React.Component {
         label: intl.formatMessage(this.messages['maxQuantity.label']),
         description: intl.formatMessage(this.messages['maxQuantity.description']),
         when: (tier, collective) =>
-          [TICKET, PRODUCT].includes(tier.type) || (tier.type === TIER && ![FUND, PROJECT].includes(collective.type)),
+          [TICKET, PRODUCT, MEMBERSHIP].includes(tier.type) ||
+          (tier.type === TIER && ![FUND, PROJECT].includes(collective.type)),
       },
       {
         name: 'button',
@@ -358,6 +359,10 @@ class Tiers extends React.Component {
       if (value === TierTypes.PRODUCT) {
         tiers[index].interval = null;
         tiers[index].amountType = FIXED;
+      }
+
+      if (![TICKET, PRODUCT, MEMBERSHIP].includes(value)) {
+        tiers[index].maxQuantity = null;
       }
     }
 
