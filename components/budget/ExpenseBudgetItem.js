@@ -79,7 +79,7 @@ const getNbAttachedFiles = expense => {
   if (!expense) {
     return 0;
   } else if (expense.type === expenseTypes.INVOICE) {
-    return 1 + size(expense.attachedFiles);
+    return size(expense.attachedFiles);
   } else {
     return size(expense.attachedFiles) + size(expense.items.filter(({ url }) => Boolean(url)));
   }
