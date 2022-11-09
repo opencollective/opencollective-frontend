@@ -38,6 +38,7 @@ const { FIXED, FLEXIBLE } = AmountTypes;
 
 const SIMPLIFIED_TIER_TYPES = [TIER, SERVICE, PRODUCT, DONATION];
 const DEFAULT_TIER_TYPES = [...SIMPLIFIED_TIER_TYPES, MEMBERSHIP];
+const TIER_TYPES_WITH_QUANTITY = [TICKET, PRODUCT, MEMBERSHIP];
 
 const getReceiptTemplates = host => {
   const receiptTemplates = host?.settings?.invoice?.templates;
@@ -292,7 +293,7 @@ class Tiers extends React.Component {
         label: intl.formatMessage(this.messages['maxQuantity.label']),
         description: intl.formatMessage(this.messages['maxQuantity.description']),
         when: (tier, collective) =>
-          [TICKET, PRODUCT, MEMBERSHIP].includes(tier.type) ||
+          TIER_TYPES_WITH_QUANTITY.includes(tier.type) ||
           (tier.type === TIER && ![FUND, PROJECT].includes(collective.type)),
       },
       {
@@ -361,7 +362,7 @@ class Tiers extends React.Component {
         tiers[index].amountType = FIXED;
       }
 
-      if (![TICKET, PRODUCT, MEMBERSHIP].includes(value)) {
+      if (!TIER_TYPES_WITH_QUANTITY.includes(value)) {
         tiers[index].maxQuantity = null;
       }
     }
