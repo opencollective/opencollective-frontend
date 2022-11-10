@@ -186,17 +186,17 @@ export const generatePaymentMethodOptions = (
     if (
       !interval &&
       !isEmbed &&
-      supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.ALIPAY) &&
-      !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.ALIPAY)
+      supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.STRIPE_CHECKOUT)
     ) {
       uniquePMs.push({
-        key: 'alipay',
+        key: 'checkout',
         paymentMethod: {
           service: PAYMENT_METHOD_SERVICE.STRIPE,
-          type: PAYMENT_METHOD_TYPE.ALIPAY,
+          type: PAYMENT_METHOD_TYPE.CHECKOUT,
         },
-        title: <FormattedMessage id="Alipay" defaultMessage="Alipay" />,
-        icon: getPaymentMethodIcon({ service: PAYMENT_METHOD_SERVICE.STRIPE, type: PAYMENT_METHOD_TYPE.ALIPAY }),
+        title: <FormattedMessage defaultMessage="Other..." />,
+        subtitle: <FormattedMessage defaultMessage="ACH, SEPA, ApplePay, GooglePay" />,
+        icon: getPaymentMethodIcon({ service: PAYMENT_METHOD_SERVICE.STRIPE, type: PAYMENT_METHOD_TYPE.CHECKOUT }),
       });
     }
 
