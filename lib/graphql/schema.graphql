@@ -287,6 +287,7 @@ type UserDetails {
   """
   isLimited: Boolean
   hasSeenLatestChangelogEntry: Boolean!
+  hasTwoFactorAuth: Boolean
 }
 
 """
@@ -766,6 +767,7 @@ enum OrderStatus {
   REJECTED
   DISPUTED
   REFUNDED
+  IN_REVIEW
 }
 
 """
@@ -1167,7 +1169,9 @@ type PlanType {
 
 type Policies {
   EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
+  REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
+  MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
 }
 
 type COLLECTIVE_MINIMUM_ADMINS {
@@ -1183,6 +1187,756 @@ enum PolicyApplication {
   ALL_COLLECTIVES
   NEW_COLLECTIVES
 }
+
+type MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
+  ALL_TIME: Amount
+  DAILY: Amount
+  MONTHLY: Amount
+  PER_AUTHORIZATION: Amount
+  WEEKLY: Amount
+  YEARLY: Amount
+}
+
+"""
+A financial amount.
+"""
+type Amount {
+  value: Float
+  currency: Currency
+  valueInCents: Float
+
+  """
+  If the amount was generated from a currency conversion, this field contains details about the conversion
+  """
+  exchangeRate: CurrencyExchangeRate
+}
+
+"""
+All supported currencies
+"""
+enum Currency {
+  """
+  US Dollar
+  """
+  USD
+
+  """
+  UAE Dirham
+  """
+  AED
+
+  """
+  Afghani
+  """
+  AFN
+
+  """
+  Lek
+  """
+  ALL
+
+  """
+  Armenian Dram
+  """
+  AMD
+
+  """
+  Netherlands Antillean Guilder
+  """
+  ANG
+
+  """
+  Kwanza
+  """
+  AOA
+
+  """
+  Argentine Peso
+  """
+  ARS
+
+  """
+  Australian Dollar
+  """
+  AUD
+
+  """
+  Aruban Florin
+  """
+  AWG
+
+  """
+  Azerbaijanian Manat
+  """
+  AZN
+
+  """
+  Convertible Mark
+  """
+  BAM
+
+  """
+  Barbados Dollar
+  """
+  BBD
+
+  """
+  Taka
+  """
+  BDT
+
+  """
+  Bulgarian Lev
+  """
+  BGN
+
+  """
+  Burundi Franc
+  """
+  BIF
+
+  """
+  Bermudian Dollar
+  """
+  BMD
+
+  """
+  Brunei Dollar
+  """
+  BND
+
+  """
+  Boliviano
+  """
+  BOB
+
+  """
+  Brazilian Real
+  """
+  BRL
+
+  """
+  Bahamian Dollar
+  """
+  BSD
+
+  """
+  Pula
+  """
+  BWP
+
+  """
+  Belarussian Ruble
+  """
+  BYN
+
+  """
+  Belize Dollar
+  """
+  BZD
+
+  """
+  Canadian Dollar
+  """
+  CAD
+
+  """
+  Congolese Franc
+  """
+  CDF
+
+  """
+  Swiss Franc
+  """
+  CHF
+
+  """
+  Chilean Peso
+  """
+  CLP
+
+  """
+  Yuan Renminbi
+  """
+  CNY
+
+  """
+  Colombian Peso
+  """
+  COP
+
+  """
+  Costa Rican Colon
+  """
+  CRC
+
+  """
+  Cabo Verde Escudo
+  """
+  CVE
+
+  """
+  Czech Koruna
+  """
+  CZK
+
+  """
+  Djibouti Franc
+  """
+  DJF
+
+  """
+  Danish Krone
+  """
+  DKK
+
+  """
+  Dominican Peso
+  """
+  DOP
+
+  """
+  Algerian Dinar
+  """
+  DZD
+
+  """
+  Egyptian Pound
+  """
+  EGP
+
+  """
+  Ethiopian Birr
+  """
+  ETB
+
+  """
+  Euro
+  """
+  EUR
+
+  """
+  Fiji Dollar
+  """
+  FJD
+
+  """
+  Falkland Islands Pound
+  """
+  FKP
+
+  """
+  Pound Sterling
+  """
+  GBP
+
+  """
+  Lari
+  """
+  GEL
+
+  """
+  Gibraltar Pound
+  """
+  GIP
+
+  """
+  Dalasi
+  """
+  GMD
+
+  """
+  Guinea Franc
+  """
+  GNF
+
+  """
+  Quetzal
+  """
+  GTQ
+
+  """
+  Guyana Dollar
+  """
+  GYD
+
+  """
+  Hong Kong Dollar
+  """
+  HKD
+
+  """
+  Lempira
+  """
+  HNL
+
+  """
+  Kuna
+  """
+  HRK
+
+  """
+  Gourde
+  """
+  HTG
+
+  """
+  Forint
+  """
+  HUF
+
+  """
+  Rupiah
+  """
+  IDR
+
+  """
+  New Israeli Sheqel
+  """
+  ILS
+
+  """
+  Indian Rupee
+  """
+  INR
+
+  """
+  Iceland Krona
+  """
+  ISK
+
+  """
+  Jamaican Dollar
+  """
+  JMD
+
+  """
+  Yen
+  """
+  JPY
+
+  """
+  Kenyan Shilling
+  """
+  KES
+
+  """
+  Som
+  """
+  KGS
+
+  """
+  Riel
+  """
+  KHR
+
+  """
+  Comoro Franc
+  """
+  KMF
+
+  """
+  Won
+  """
+  KRW
+
+  """
+  Cayman Islands Dollar
+  """
+  KYD
+
+  """
+  Tenge
+  """
+  KZT
+
+  """
+  Kip
+  """
+  LAK
+
+  """
+  Lebanese Pound
+  """
+  LBP
+
+  """
+  Sri Lanka Rupee
+  """
+  LKR
+
+  """
+  Liberian Dollar
+  """
+  LRD
+
+  """
+  Loti
+  """
+  LSL
+
+  """
+  Moroccan Dirham
+  """
+  MAD
+
+  """
+  Moldovan Leu
+  """
+  MDL
+
+  """
+  Malagasy Ariary
+  """
+  MGA
+
+  """
+  Denar
+  """
+  MKD
+
+  """
+  Kyat
+  """
+  MMK
+
+  """
+  Tugrik
+  """
+  MNT
+
+  """
+  Pataca
+  """
+  MOP
+
+  """
+  Mauritius Rupee
+  """
+  MUR
+
+  """
+  Rufiyaa
+  """
+  MVR
+
+  """
+  Kwacha
+  """
+  MWK
+
+  """
+  Mexican Peso
+  """
+  MXN
+
+  """
+  Malaysian Ringgit
+  """
+  MYR
+
+  """
+  Mozambique Metical
+  """
+  MZN
+
+  """
+  Namibia Dollar
+  """
+  NAD
+
+  """
+  Naira
+  """
+  NGN
+
+  """
+  Cordoba Oro
+  """
+  NIO
+
+  """
+  Norwegian Krone
+  """
+  NOK
+
+  """
+  Nepalese Rupee
+  """
+  NPR
+
+  """
+  New Zealand Dollar
+  """
+  NZD
+
+  """
+  Balboa
+  """
+  PAB
+
+  """
+  Nuevo Sol
+  """
+  PEN
+
+  """
+  Kina
+  """
+  PGK
+
+  """
+  Philippine Peso
+  """
+  PHP
+
+  """
+  Pakistan Rupee
+  """
+  PKR
+
+  """
+  Zloty
+  """
+  PLN
+
+  """
+  Guarani
+  """
+  PYG
+
+  """
+  Qatari Rial
+  """
+  QAR
+
+  """
+  Romanian Leu
+  """
+  RON
+
+  """
+  Serbian Dinar
+  """
+  RSD
+
+  """
+  Russian Ruble
+  """
+  RUB
+
+  """
+  Rwanda Franc
+  """
+  RWF
+
+  """
+  Saudi Riyal
+  """
+  SAR
+
+  """
+  Solomon Islands Dollar
+  """
+  SBD
+
+  """
+  Seychelles Rupee
+  """
+  SCR
+
+  """
+  Swedish Krona
+  """
+  SEK
+
+  """
+  Singapore Dollar
+  """
+  SGD
+
+  """
+  Saint Helena Pound
+  """
+  SHP
+
+  """
+  Leone
+  """
+  SLL
+
+  """
+  Somali Shilling
+  """
+  SOS
+
+  """
+  Surinam Dollar
+  """
+  SRD
+
+  """
+  Lilangeni
+  """
+  SZL
+
+  """
+  Baht
+  """
+  THB
+
+  """
+  Somoni
+  """
+  TJS
+
+  """
+  Pa’anga
+  """
+  TOP
+
+  """
+  Turkish Lira
+  """
+  TRY
+
+  """
+  Trinidad and Tobago Dollar
+  """
+  TTD
+
+  """
+  New Taiwan Dollar
+  """
+  TWD
+
+  """
+  Tanzanian Shilling
+  """
+  TZS
+
+  """
+  Hryvnia
+  """
+  UAH
+
+  """
+  Uganda Shilling
+  """
+  UGX
+
+  """
+  Peso Uruguayo
+  """
+  UYU
+
+  """
+  Uzbekistan Sum
+  """
+  UZS
+
+  """
+  Dong
+  """
+  VND
+
+  """
+  Vatu
+  """
+  VUV
+
+  """
+  Tala
+  """
+  WST
+
+  """
+  CFA Franc BEAC
+  """
+  XAF
+
+  """
+  East Caribbean Dollar
+  """
+  XCD
+
+  """
+  CFA Franc BCEAO
+  """
+  XOF
+
+  """
+  CFP Franc
+  """
+  XPF
+
+  """
+  Yemeni Rial
+  """
+  YER
+
+  """
+  Rand
+  """
+  ZAR
+
+  """
+  Zambian Kwacha
+  """
+  ZMW
+}
+
+"""
+Fields for a currency fx rate
+"""
+type CurrencyExchangeRate {
+  """
+  Exchange rate value as a scalar (e.g 1.15 or 0.86)
+  """
+  value: Float!
+
+  """
+  Where does the FX rate comes from
+  """
+  source: CurrencyExchangeRateSourceType!
+  fromCurrency: Currency!
+  toCurrency: Currency!
+
+  """
+  Date of the FX rate
+  """
+  date: DateTime!
+
+  """
+  Is the FX rate approximate or a fixed value?
+  """
+  isApproximate: Boolean!
+}
+
+"""
+Where does the FX rate come from
+"""
+enum CurrencyExchangeRateSourceType {
+  """
+  Open Collective internal system, relying on caching and 3rd party APIs
+  """
+  OPENCOLLECTIVE
+
+  """
+  PayPal API
+  """
+  PAYPAL
+
+  """
+  Wise API
+  """
+  WISE
+}
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
 
 """
 The results from searching for collectives with pagination info

@@ -26,7 +26,6 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledButtonSet from '../StyledButtonSet';
 import StyledCheckbox from '../StyledCheckbox';
-import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
@@ -87,7 +86,6 @@ const getPayoutOptionValue = (payoutMethodType, isAuto, host) => {
 
 const DEFAULT_VALUES = Object.freeze({
   paymentProcessorFee: null,
-  twoFactorAuthenticatorCode: null,
   feesPayer: 'COLLECTIVE',
 });
 
@@ -423,36 +421,6 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
             </AmountLine>
           )}
         </Box>
-        {Boolean(error?.message?.startsWith('Two-factor authentication')) && (
-          <StyledInputField
-            name="twoFactorAuthenticatorCode"
-            htmlFor="twoFactorAuthenticatorCode"
-            label={
-              <FormattedMessage
-                id="PayExpenseModal.TwoFactorAuthCode"
-                defaultMessage="Two-factor authentication code"
-              />
-            }
-            value={formik.values.twoFactorAuthenticatorCode}
-            mt={2}
-            mb={3}
-          >
-            {inputProps => (
-              <StyledInput
-                {...inputProps}
-                minHeight={50}
-                fontSize="20px"
-                placeholder="123456"
-                pattern="[0-9]{6}"
-                inputMode="numeric"
-                autoFocus
-                onChange={e => {
-                  formik.setFieldValue('twoFactorAuthenticatorCode', e.target.value);
-                }}
-              />
-            )}
-          </StyledInputField>
-        )}
         {!error && formik.values.forceManual && payoutMethodType !== PayoutMethodType.OTHER && (
           <MessageBox type="warning" withIcon my={3} fontSize="12px">
             <strong>

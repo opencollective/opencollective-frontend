@@ -151,7 +151,7 @@ const JoinUs = ({ page }) => (
           link={page === 'becomeAHost' ? '/organizations/new' : '/create'}
           title={
             page === 'becomeAHost' ? (
-              <FormattedMessage id="becomeAHost.create" defaultMessage="Join as a Fiscal Host" />
+              <FormattedMessage defaultMessage="Join as a Fiscal Host" />
             ) : (
               <FormattedMessage defaultMessage="Get started now free!" />
             )

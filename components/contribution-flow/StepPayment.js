@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -16,6 +17,7 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import NewCreditCardForm from '../NewCreditCardForm';
 import StyledRadioList from '../StyledRadioList';
 import { P } from '../Text';
+import { TwoFactorAuthRequiredMessage } from '../TwoFactorAuthRequiredMessage';
 
 import BlockedContributorMessage from './BlockedContributorMessage';
 import { generatePaymentMethodOptions, NEW_CREDIT_CARD_KEY } from './utils';
@@ -96,6 +98,8 @@ const StepPayment = ({
   onNewCardFormReady,
   disabledPaymentMethodTypes,
 }) => {
+  const { LoggedInUser } = useLoggedInUser();
+
   // GraphQL mutations and queries
   const { loading, data, error } = useQuery(paymentMethodsQuery, {
     variables: { slug: stepProfile.slug },
@@ -131,6 +135,10 @@ const StepPayment = ({
       }
     }
   }, [paymentOptions, stepPayment, loading]);
+
+  if (stepProfile.policies?.REQUIRE_2FA_FOR_ADMINS && !LoggedInUser?.hasTwoFactorAuth) {
+    return <TwoFactorAuthRequiredMessage borderWidth={0} noTitle />;
+  }
 
   return (
     <Container width={1} border={['1px solid #DCDEE0', 'none']} borderRadius={15}>

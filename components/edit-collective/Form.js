@@ -42,13 +42,13 @@ import Export from './sections/Export';
 import FiscalHosting from './sections/FiscalHosting';
 import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
-import HostTwoFactorAuth from './sections/HostTwoFactorAuth';
 import HostVirtualCardsSettings from './sections/HostVirtualCardsSettings';
 import Members from './sections/Members';
 import PaymentMethods from './sections/PaymentMethods';
 import PaymentReceipts from './sections/PaymentReceipts';
 import Policies from './sections/Policies';
 import ReceivingMoney from './sections/ReceivingMoney';
+import Security from './sections/Security';
 import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
@@ -531,8 +531,8 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
         return <SendingMoney collective={collective} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH:
-        return <HostTwoFactorAuth collective={collective} />;
+      case EDIT_COLLECTIVE_SECTIONS.SECURITY:
+        return <Security collective={collective} />;
 
       // 2FA
       case EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH:

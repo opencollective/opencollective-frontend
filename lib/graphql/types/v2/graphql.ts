@@ -2383,6 +2383,7 @@ export type Credit = Transaction & {
   id: Scalars['String'];
   invoiceTemplate?: Maybe<Scalars['String']>;
   isDisputed?: Maybe<Scalars['Boolean']>;
+  isInReview?: Maybe<Scalars['Boolean']>;
   isOrderRejected: Scalars['Boolean'];
   isRefund?: Maybe<Scalars['Boolean']>;
   isRefunded?: Maybe<Scalars['Boolean']>;
@@ -2789,6 +2790,7 @@ export type Debit = Transaction & {
   id: Scalars['String'];
   invoiceTemplate?: Maybe<Scalars['String']>;
   isDisputed?: Maybe<Scalars['Boolean']>;
+  isInReview?: Maybe<Scalars['Boolean']>;
   isOrderRejected: Scalars['Boolean'];
   isRefund?: Maybe<Scalars['Boolean']>;
   isRefunded?: Maybe<Scalars['Boolean']>;
@@ -3295,12 +3297,16 @@ export type ExpenseAttachedFile = {
   __typename?: 'ExpenseAttachedFile';
   /** Unique identifier for this file */
   id: Scalars['String'];
+  /** The original filename */
+  name?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['URL']>;
 };
 
 export type ExpenseAttachedFileInput = {
   /** ID of the file */
   id?: InputMaybe<Scalars['String']>;
+  /** Original filename */
+  name?: InputMaybe<Scalars['String']>;
   /** URL of the file */
   url: Scalars['URL'];
 };
@@ -4019,8 +4025,10 @@ export type Host = Account & AccountWithContributions & {
   features: CollectiveFeatures;
   /** @deprecated 2022-06-03: Please use repositoryUrl */
   githubHandle?: Maybe<Scalars['String']>;
-  /** Returns whether the host has any disputed orders */
+  /** Returns whether the host has any Stripe disputed orders */
   hasDisputedOrders: Scalars['Boolean'];
+  /** Returns whether the host has any Stripe in review orders */
+  hasInReviewOrders: Scalars['Boolean'];
   hostFeePercent?: Maybe<Scalars['Float']>;
   hostMetrics: HostMetrics;
   hostMetricsTimeSeries: HostMetricsTimeSeries;
@@ -4888,6 +4896,16 @@ export type LocationInput = {
   structured?: InputMaybe<Scalars['JSON']>;
 };
 
+export type Maximum_Virtual_Card_Limit_Amount_For_Interval = {
+  __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL';
+  ALL_TIME?: Maybe<Amount>;
+  DAILY?: Maybe<Amount>;
+  MONTHLY?: Maybe<Amount>;
+  PER_AUTHORIZATION?: Maybe<Amount>;
+  WEEKLY?: Maybe<Amount>;
+  YEARLY?: Maybe<Amount>;
+};
+
 /** This represents a Member relationship (ie: Organization backing a Collective) */
 export type Member = {
   __typename?: 'Member';
@@ -5395,7 +5413,8 @@ export type MutationCreateUpdateArgs = {
 export type MutationCreateVirtualCardArgs = {
   account: AccountReferenceInput;
   assignee: AccountReferenceInput;
-  monthlyLimit: AmountInput;
+  limitAmount: AmountInput;
+  limitInterval: VirtualCardLimitInterval;
   name: Scalars['String'];
 };
 
@@ -5570,7 +5589,8 @@ export type MutationEditUpdateArgs = {
 /** This is the root mutation */
 export type MutationEditVirtualCardArgs = {
   assignee?: InputMaybe<AccountReferenceInput>;
-  monthlyLimit?: InputMaybe<AmountInput>;
+  limitAmount?: InputMaybe<AmountInput>;
+  limitInterval?: InputMaybe<VirtualCardLimitInterval>;
   name?: InputMaybe<Scalars['String']>;
   virtualCard: VirtualCardReferenceInput;
 };
@@ -6058,6 +6078,7 @@ export enum OrderStatus {
   DISPUTED = 'DISPUTED',
   ERROR = 'ERROR',
   EXPIRED = 'EXPIRED',
+  IN_REVIEW = 'IN_REVIEW',
   NEW = 'NEW',
   PAID = 'PAID',
   PENDING = 'PENDING',
@@ -6604,6 +6625,8 @@ export type Policies = {
   __typename?: 'Policies';
   COLLECTIVE_MINIMUM_ADMINS?: Maybe<Collective_Minimum_Admins>;
   EXPENSE_AUTHOR_CANNOT_APPROVE?: Maybe<Scalars['Boolean']>;
+  MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: Maybe<Maximum_Virtual_Card_Limit_Amount_For_Interval>;
+  REQUIRE_2FA_FOR_ADMINS?: Maybe<Scalars['Boolean']>;
 };
 
 export type PoliciesCollectiveMinimumAdminsInput = {
@@ -6615,6 +6638,7 @@ export type PoliciesCollectiveMinimumAdminsInput = {
 export type PoliciesInput = {
   COLLECTIVE_MINIMUM_ADMINS?: InputMaybe<PoliciesCollectiveMinimumAdminsInput>;
   EXPENSE_AUTHOR_CANNOT_APPROVE?: InputMaybe<Scalars['Boolean']>;
+  REQUIRE_2FA_FOR_ADMINS?: InputMaybe<Scalars['Boolean']>;
 };
 
 /** Defines how the policy is applied */
@@ -6625,7 +6649,7 @@ export enum PolicyApplication {
 
 /** Parameters for paying an expense */
 export type ProcessExpensePaymentParams = {
-  /** 2FA code for if the host account has 2FA for payouts turned on. */
+  /** Who is responsible for paying any due fees. */
   feesPayer?: InputMaybe<FeesPayer>;
   /** Bypass automatic integrations (ie. PayPal, Transferwise) to process the expense manually */
   forceManual?: InputMaybe<Scalars['Boolean']>;
@@ -6633,8 +6657,6 @@ export type ProcessExpensePaymentParams = {
   paymentProcessorFee?: InputMaybe<Scalars['Int']>;
   /** Whether the payment processor fees should be refunded when triggering MARK_AS_UNPAID */
   shouldRefundPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
-  /** 2FA code for if the host account has 2FA for payouts turned on. */
-  twoFactorAuthenticatorCode?: InputMaybe<Scalars['String']>;
 };
 
 /** Action taken for an account application to the host */
@@ -7042,6 +7064,7 @@ export type QueryAccountArgs = {
 export type QueryAccountsArgs = {
   country?: InputMaybe<Array<InputMaybe<CountryIso>>>;
   hasCustomContributionsEnabled?: InputMaybe<Scalars['Boolean']>;
+  host?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeArchived?: InputMaybe<Scalars['Boolean']>;
   isActive?: InputMaybe<Scalars['Boolean']>;
   isHost?: InputMaybe<Scalars['Boolean']>;
@@ -7615,6 +7638,7 @@ export type Transaction = {
   id: Scalars['String'];
   invoiceTemplate?: Maybe<Scalars['String']>;
   isDisputed?: Maybe<Scalars['Boolean']>;
+  isInReview?: Maybe<Scalars['Boolean']>;
   isOrderRejected: Scalars['Boolean'];
   isRefund?: Maybe<Scalars['Boolean']>;
   isRefunded?: Maybe<Scalars['Boolean']>;
@@ -8338,6 +8362,42 @@ export type WebhookUpdateInput = {
   webhookUrl: Scalars['URL'];
 };
 
+export type EditVirtualCardMutationVariables = Exact<{
+  virtualCard: VirtualCardReferenceInput;
+  name: Scalars['String'];
+  limitAmount?: InputMaybe<AmountInput>;
+  limitInterval?: InputMaybe<VirtualCardLimitInterval>;
+  assignee: AccountReferenceInput;
+}>;
+
+
+export type EditVirtualCardMutation = { __typename?: 'Mutation', editVirtualCard: { __typename?: 'VirtualCard', id?: string | null, name?: string | null, spendingLimitAmount?: number | null, spendingLimitInterval?: VirtualCardLimitInterval | null, assignee?: { __typename?: 'Individual', id: string, name?: string | null, slug: string, imageUrl?: string | null } | null } };
+
+export type CreateVirtualCardMutationVariables = Exact<{
+  name: Scalars['String'];
+  limitAmount: AmountInput;
+  limitInterval: VirtualCardLimitInterval;
+  account: AccountReferenceInput;
+  assignee: AccountReferenceInput;
+}>;
+
+
+export type CreateVirtualCardMutation = { __typename?: 'Mutation', createVirtualCard: { __typename?: 'VirtualCard', id?: string | null, name?: string | null, last4?: string | null, data?: any | null } };
+
+export type CollectiveMembersQueryVariables = Exact<{
+  slug: Scalars['String'];
+}>;
+
+
+export type CollectiveMembersQuery = { __typename?: 'Query', account?: { __typename?: 'Bot', id: string, members: { __typename?: 'MemberCollection', nodes?: Array<{ __typename?: 'Member', id?: string | null, account?: { __typename?: 'Bot', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Collective', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Event', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Fund', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Host', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Individual', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Organization', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Project', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Vendor', id: string, name?: string | null, imageUrl?: string | null, slug: string } | null } | null> | null } } | { __typename?: 'Collective', id: string, members: { __typename?: 'MemberCollection', nodes?: Array<{ __typename?: 'Member', id?: string | null, account?: { __typename?: 'Bot', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Collective', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Event', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Fund', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Host', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Individual', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Organization', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Project', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Vendor', id: string, name?: string | null, imageUrl?: string | null, slug: string } | null } | null> | null } } | { __typename?: 'Event', id: string, members: { __typename?: 'MemberCollection', nodes?: Array<{ __typename?: 'Member', id?: string | null, account?: { __typename?: 'Bot', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Collective', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Event', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Fund', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Host', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Individual', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Organization', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Project', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Vendor', id: string, name?: string | null, imageUrl?: string | null, slug: string } | null } | null> | null } } | { __typename?: 'Fund', id: string, members: { __typename?: 'MemberCollection', nodes?: Array<{ __typename?: 'Member', id?: string | null, account?: { __typename?: 'Bot', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Collective', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Event', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Fund', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Host', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Individual', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Organization', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Project', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Vendor', id: string, name?: string | null, imageUrl?: string | null, slug: string } | null } | null> | null } } | { __typename?: 'Host', id: string, members: { __typename?: 'MemberCollection', nodes?: Array<{ __typename?: 'Member', id?: string | null, account?: { __typename?: 'Bot', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Collective', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Event', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Fund', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Host', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Individual', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Organization', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Project', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Vendor', id: string, name?: string | null, imageUrl?: string | null, slug: string } | null } | null> | null } } | { __typename?: 'Individual', id: string, members: { __typename?: 'MemberCollection', nodes?: Array<{ __typename?: 'Member', id?: string | null, account?: { __typename?: 'Bot', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Collective', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Event', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Fund', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Host', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Individual', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Organization', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Project', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Vendor', id: string, name?: string | null, imageUrl?: string | null, slug: string } | null } | null> | null } } | { __typename?: 'Organization', id: string, members: { __typename?: 'MemberCollection', nodes?: Array<{ __typename?: 'Member', id?: string | null, account?: { __typename?: 'Bot', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Collective', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Event', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Fund', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Host', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Individual', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Organization', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Project', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Vendor', id: string, name?: string | null, imageUrl?: string | null, slug: string } | null } | null> | null } } | { __typename?: 'Project', id: string, members: { __typename?: 'MemberCollection', nodes?: Array<{ __typename?: 'Member', id?: string | null, account?: { __typename?: 'Bot', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Collective', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Event', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Fund', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Host', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Individual', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Organization', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Project', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Vendor', id: string, name?: string | null, imageUrl?: string | null, slug: string } | null } | null> | null } } | { __typename?: 'Vendor', id: string, members: { __typename?: 'MemberCollection', nodes?: Array<{ __typename?: 'Member', id?: string | null, account?: { __typename?: 'Bot', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Collective', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Event', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Fund', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Host', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Individual', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Organization', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Project', id: string, name?: string | null, imageUrl?: string | null, slug: string } | { __typename?: 'Vendor', id: string, name?: string | null, imageUrl?: string | null, slug: string } | null } | null> | null } } | null };
+
+export type VirtualCardPoliciesQueryQueryVariables = Exact<{
+  slug?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type VirtualCardPoliciesQueryQuery = { __typename?: 'Query', account?: { __typename?: 'Bot', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Collective', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Event', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Fund', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Host', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Individual', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Organization', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Project', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Vendor', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | null };
+
 export type ClearCacheMutationVariables = Exact<{
   account: AccountReferenceInput;
   cacheTypes?: InputMaybe<Array<AccountCacheType> | AccountCacheType>;
@@ -8347,4 +8407,8 @@ export type ClearCacheMutationVariables = Exact<{
 export type ClearCacheMutation = { __typename?: 'Mutation', clearCacheForAccount: { __typename?: 'Bot', id: string, slug: string, name?: string | null } | { __typename?: 'Collective', id: string, slug: string, name?: string | null } | { __typename?: 'Event', id: string, slug: string, name?: string | null } | { __typename?: 'Fund', id: string, slug: string, name?: string | null } | { __typename?: 'Host', id: string, slug: string, name?: string | null } | { __typename?: 'Individual', id: string, slug: string, name?: string | null } | { __typename?: 'Organization', id: string, slug: string, name?: string | null } | { __typename?: 'Project', id: string, slug: string, name?: string | null } | { __typename?: 'Vendor', id: string, slug: string, name?: string | null } };
 
 
+export const EditVirtualCardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"editVirtualCard"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"virtualCard"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"VirtualCardReferenceInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limitAmount"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"AmountInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limitInterval"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"VirtualCardLimitInterval"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"assignee"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountReferenceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"editVirtualCard"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"virtualCard"},"value":{"kind":"Variable","name":{"kind":"Name","value":"virtualCard"}}},{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}},{"kind":"Argument","name":{"kind":"Name","value":"limitAmount"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limitAmount"}}},{"kind":"Argument","name":{"kind":"Name","value":"limitInterval"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limitInterval"}}},{"kind":"Argument","name":{"kind":"Name","value":"assignee"},"value":{"kind":"Variable","name":{"kind":"Name","value":"assignee"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"spendingLimitAmount"}},{"kind":"Field","name":{"kind":"Name","value":"spendingLimitInterval"}},{"kind":"Field","name":{"kind":"Name","value":"assignee"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}}]}}]}}]}}]} as unknown as DocumentNode<EditVirtualCardMutation, EditVirtualCardMutationVariables>;
+export const CreateVirtualCardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createVirtualCard"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limitAmount"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AmountInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limitInterval"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"VirtualCardLimitInterval"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"account"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountReferenceInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"assignee"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountReferenceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createVirtualCard"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}},{"kind":"Argument","name":{"kind":"Name","value":"limitAmount"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limitAmount"}}},{"kind":"Argument","name":{"kind":"Name","value":"limitInterval"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limitInterval"}}},{"kind":"Argument","name":{"kind":"Name","value":"account"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}},{"kind":"Argument","name":{"kind":"Name","value":"assignee"},"value":{"kind":"Variable","name":{"kind":"Name","value":"assignee"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"last4"}},{"kind":"Field","name":{"kind":"Name","value":"data"}}]}}]}}]} as unknown as DocumentNode<CreateVirtualCardMutation, CreateVirtualCardMutationVariables>;
+export const CollectiveMembersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CollectiveMembers"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"slug"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"account"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"slug"},"value":{"kind":"Variable","name":{"kind":"Name","value":"slug"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"members"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"role"},"value":{"kind":"EnumValue","value":"ADMIN"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"account"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<CollectiveMembersQuery, CollectiveMembersQueryVariables>;
+export const VirtualCardPoliciesQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"VirtualCardPoliciesQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"slug"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"account"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"slug"},"value":{"kind":"Variable","name":{"kind":"Name","value":"slug"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"policies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ALL_TIME"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}}]}},{"kind":"Field","name":{"kind":"Name","value":"DAILY"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}}]}},{"kind":"Field","name":{"kind":"Name","value":"MONTHLY"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}}]}},{"kind":"Field","name":{"kind":"Name","value":"PER_AUTHORIZATION"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}}]}},{"kind":"Field","name":{"kind":"Name","value":"WEEKLY"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}}]}},{"kind":"Field","name":{"kind":"Name","value":"YEARLY"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<VirtualCardPoliciesQueryQuery, VirtualCardPoliciesQueryQueryVariables>;
 export const ClearCacheDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ClearCache"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"account"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountReferenceInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"cacheTypes"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountCacheType"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"clearCacheForAccount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"account"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}},{"kind":"Argument","name":{"kind":"Name","value":"type"},"value":{"kind":"Variable","name":{"kind":"Name","value":"cacheTypes"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<ClearCacheMutation, ClearCacheMutationVariables>;

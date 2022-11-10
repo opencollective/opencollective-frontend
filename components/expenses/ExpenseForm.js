@@ -139,7 +139,7 @@ export const prepareExpenseForSubmit = expenseData => {
     payee,
     payeeLocation,
     payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
-    attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])) : [],
+    attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => {
       return pick(item, [
@@ -298,9 +298,14 @@ const ExpenseFormBody = ({
         (values.payee && payoutProfiles.find(p => p.slug === values.payee.slug)) || first(payoutProfiles);
       formik.setFieldValue('payee', defaultProfile);
     }
-    // If recurring expense with selected Payout Method
-    if (isDraft && loggedInAccount && !values.payoutMethod && expense.payoutMethod) {
-      formik.setFieldValue('payoutMethod', expense.payoutMethod);
+    // Update the form state with private fields that were refeched after the user was authenticated
+    if (isDraft && loggedInAccount) {
+      const privateFields = ['payoutMethod', 'invoiceInfo'];
+      for (const field of privateFields) {
+        if (!values[field] && expense[field]) {
+          formik.setFieldValue(field, expense[field]);
+        }
+      }
     }
   }, [payoutProfiles, loggedInAccount]);
 

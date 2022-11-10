@@ -6,19 +6,19 @@ import { has } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { isValidDate, parseDateInterval, stripTime } from '../../../lib/date-utils';
-import dayjs from '../../../lib/dayjs';
+import { isValidDate, parseDateInterval, stripTime } from '../../lib/date-utils';
+import dayjs from '../../lib/dayjs';
 
-import { DateRange } from '../../DateRange';
-import { Box, Flex } from '../../Grid';
-import PeriodFilterPresetsSelect from '../../PeriodFilterPresetsSelect';
-import PopupMenu from '../../PopupMenu';
-import StyledButton from '../../StyledButton';
-import StyledButtonSet from '../../StyledButtonSet';
-import StyledInput from '../../StyledInput';
-import StyledInputField from '../../StyledInputField';
-import StyledTooltip from '../../StyledTooltip';
-import { Span } from '../../Text';
+import { DateRange } from '../DateRange';
+import { Box, Flex } from '../Grid';
+import PeriodFilterPresetsSelect from '../PeriodFilterPresetsSelect';
+import PopupMenu from '../PopupMenu';
+import StyledButton from '../StyledButton';
+import StyledButtonSet from '../StyledButtonSet';
+import StyledInput from '../StyledInput';
+import StyledInputField from '../StyledInputField';
+import StyledTooltip from '../StyledTooltip';
+import { Span } from '../Text';
 
 const DEFAULT_INTERVAL = { from: '', to: '', timezoneType: 'local' };
 
@@ -119,7 +119,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
   const formattedMin = stripTime(minDate);
 
   const setDate = (changeField, date) => {
-    const newInterval = getNewInterval(tmpDateInterval, changeField, date, setIsValidDateInterval);
+    const newInterval = getNewInterval(tmpDateInterval, changeField, date);
     setTmpDateInterval(newInterval);
 
     // Add warning in case fromDate is after toDate

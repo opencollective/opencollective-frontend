@@ -838,6 +838,7 @@ enum OrderStatus {
   DISPUTED
   ERROR
   EXPIRED
+  IN_REVIEW
   NEW
   PAID
   PENDING
@@ -928,6 +929,7 @@ interface Transaction {
   isRefunded: Boolean
   isRefund: Boolean
   isDisputed: Boolean
+  isInReview: Boolean
   paymentMethod: PaymentMethod
   payoutMethod: PayoutMethod
   permissions: TransactionPermissions
@@ -2098,6 +2100,11 @@ type ExpenseAttachedFile {
   """
   id: String!
   url: URL
+
+  """
+  The original filename
+  """
+  name: String
 }
 
 """
@@ -3093,9 +3100,14 @@ type Host implements Account & AccountWithContributions {
   isTrustedHost: Boolean!
 
   """
-  Returns whether the host has any disputed orders
+  Returns whether the host has any Stripe disputed orders
   """
   hasDisputedOrders: Boolean!
+
+  """
+  Returns whether the host has any Stripe in review orders
+  """
+  hasInReviewOrders: Boolean!
 }
 
 """
@@ -4112,7 +4124,9 @@ type VirtualCardCollection implements Collection {
 
 type Policies {
   EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
+  REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
+  MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
 }
 
 type COLLECTIVE_MINIMUM_ADMINS {
@@ -4127,6 +4141,15 @@ Defines how the policy is applied
 enum PolicyApplication {
   ALL_COLLECTIVES
   NEW_COLLECTIVES
+}
+
+type MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
+  ALL_TIME: Amount
+  DAILY: Amount
+  MONTHLY: Amount
+  PER_AUTHORIZATION: Amount
+  WEEKLY: Amount
+  YEARLY: Amount
 }
 
 type ActivitySubscription {
@@ -6003,6 +6026,7 @@ type Credit implements Transaction {
   isRefunded: Boolean
   isRefund: Boolean
   isDisputed: Boolean
+  isInReview: Boolean
   paymentMethod: PaymentMethod
   payoutMethod: PayoutMethod
 
@@ -6110,6 +6134,7 @@ type Debit implements Transaction {
   isRefunded: Boolean
   isRefund: Boolean
   isDisputed: Boolean
+  isInReview: Boolean
   paymentMethod: PaymentMethod
   payoutMethod: PayoutMethod
 
@@ -8595,6 +8620,11 @@ type Query {
     Only accounts that match these tags
     """
     tag: [String]
+
+    """
+    Host hosting the account
+    """
+    host: [AccountReferenceInput]
 
     """
     Only return accounts that match these account types (COLLECTIVE, FUND, EVENT, PROJECT, ORGANIZATION or INDIVIDUAL)
@@ -12963,9 +12993,14 @@ type Mutation {
     name: String!
 
     """
-    Virtual card monthly limit
+    Virtual card limit amount
     """
-    monthlyLimit: AmountInput!
+    limitAmount: AmountInput!
+
+    """
+    Virtual card limit interval
+    """
+    limitInterval: VirtualCardLimitInterval!
 
     """
     Account where the virtual card will be associated
@@ -12998,9 +13033,14 @@ type Mutation {
     assignee: AccountReferenceInput
 
     """
-    Virtual card monthly limit
+    Virtual card limit amount
     """
-    monthlyLimit: AmountInput
+    limitAmount: AmountInput
+
+    """
+    Virtual card limit interval
+    """
+    limitInterval: VirtualCardLimitInterval
   ): VirtualCard!
 
   """
@@ -13226,6 +13266,7 @@ input AccountUpdateInput {
 
 input PoliciesInput {
   EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
+  REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
 }
 
@@ -13506,6 +13547,11 @@ input ExpenseAttachedFileInput {
   ID of the file
   """
   id: String
+
+  """
+  Original filename
+  """
+  name: String
 
   """
   URL of the file
@@ -13796,12 +13842,7 @@ input ProcessExpensePaymentParams {
   forceManual: Boolean
 
   """
-  2FA code for if the host account has 2FA for payouts turned on.
-  """
-  twoFactorAuthenticatorCode: String
-
-  """
-  2FA code for if the host account has 2FA for payouts turned on.
+  Who is responsible for paying any due fees.
   """
   feesPayer: FeesPayer = COLLECTIVE
 }

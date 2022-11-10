@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Download as DownloadIcon } from '@styled-icons/feather/Download';
 import { saveAs } from 'file-saver';
 import { FormattedDate, FormattedMessage } from 'react-intl';
-import { v4 as uuid } from 'uuid';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 
@@ -22,9 +21,9 @@ import UploadedFilePreview from '../UploadedFilePreview';
 const FileInfo = ({ collective, expense, item, invoiceBlob }) => (
   <Flex justifyContent="space-between" px={25} mt={2}>
     <Box flex="1 1 65%">
-      {item.description && (
+      {(item.description || item.name) && (
         <P fontSize="14px" lineHeight="21px" color="black.900" mb={1}>
-          {item.description}
+          {item.description || item.name}
         </P>
       )}
       <P fontSize="11px" color="black.500">
@@ -61,16 +60,7 @@ const getFilesFromExpense = (collective, expense) => {
   }
 
   if (expense.type === expenseTypes.INVOICE) {
-    return [
-      {
-        id: uuid(),
-        amount: expense.amount,
-        description: <FormattedMessage id="Expense.Type.Invoice" defaultMessage="Invoice" />,
-        title: getExpenseInvoiceFilename(collective, expense),
-        type: 'EXPENSE_INVOICE',
-      },
-      ...expense.attachedFiles,
-    ];
+    return expense.attachedFiles || [];
   } else {
     const items = expense.items?.filter(({ url }) => Boolean(url)) || [];
     return [...items, ...expense.attachedFiles];
@@ -142,7 +132,7 @@ const ExpenseFilesPreviewModal = ({ collective, expense, onClose }) => {
             <ExpenseInvoicePreview isLoading={!invoiceFile} fileURL={invoiceFile} />
           )
         ) : (
-          <UploadedFilePreview url={item.url} size={350} title={item.title} />
+          <UploadedFilePreview url={item.url} size={350} title={item.title} fileName={item.name} />
         )
       }
     />

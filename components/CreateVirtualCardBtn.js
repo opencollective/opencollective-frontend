@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import CreateVirtualCardModal from './edit-collective/CreateVirtualCardModal';
+import EditVirtualCardModal from './edit-collective/EditVirtualCardModal';
 import StyledButton from './StyledButton';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
@@ -22,7 +22,7 @@ const CreateVirtualCardBtn = ({ children, host, collective }) => {
     <Fragment>
       {children({ onClick: () => setShowModal(true) })}
       {showModal && (
-        <CreateVirtualCardModal
+        <EditVirtualCardModal
           host={host}
           collective={collective}
           onClose={() => setShowModal(false)}

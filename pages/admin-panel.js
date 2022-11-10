@@ -19,6 +19,7 @@ import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 
 export const adminPanelQuery = gql`
   query AdminPanel($slug: String!) {
@@ -40,6 +41,9 @@ export const adminPanelQuery = gql`
         USE_PAYMENT_METHODS
         EMIT_GIFT_CARDS
         EMAIL_NOTIFICATIONS_PANEL
+      }
+      policies {
+        REQUIRE_2FA_FOR_ADMINS
       }
       ... on AccountWithParent {
         parent {
@@ -212,7 +216,16 @@ const AdminPanelPage = () => {
               display={['none', null, 'block']}
               isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
             />
-            <AdminPanelSection section={selectedSection} isLoading={isLoading} collective={account} subpath={subpath} />
+            {account?.policies?.REQUIRE_2FA_FOR_ADMINS && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
+              <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
+            ) : (
+              <AdminPanelSection
+                section={selectedSection}
+                isLoading={isLoading}
+                collective={account}
+                subpath={subpath}
+              />
+            )}
           </Grid>
         )}
       </Page>

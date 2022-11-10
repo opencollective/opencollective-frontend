@@ -173,14 +173,14 @@ StepDetailsCrypto.propTypes = {
    */
   data: PropTypes.shape({
     amount: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    currency: PropTypes.object,
+    currency: PropTypes.string,
     convertedAmount: PropTypes.shape({
       amount: PropTypes.number,
       currency: PropTypes.string,
     }),
   }),
   collective: PropTypes.shape({
-    currency: PropTypes.object,
+    currency: PropTypes.string,
   }),
 };
 

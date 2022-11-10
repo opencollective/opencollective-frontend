@@ -77,16 +77,13 @@ describe('Contribution Flow: Donate', () => {
       // ---- Let's go back ---
       cy.go('back');
 
-      // Steps should be reset
-      cy.checkStepsProgress({ enabled: ['details', 'profile'], disabled: 'payment' });
-
+      // We're back on the payment step
       // Previous credit card should be added to the account
-      cy.get('button[data-cy="cf-next-step"]').click();
       cy.contains('#PaymentMethod label:first', 'VISA ****');
       cy.get('#PaymentMethod label:first input[type=radio]').should('be.checked');
 
       // Submit a new order with existing card
-      cy.contains('button', 'Contribute $20').click();
+      cy.contains('button', 'Contribute $1,337').click();
       cy.getByDataCy('order-success', { timeout: 20000 }).contains('Thank you!');
     });
   });
