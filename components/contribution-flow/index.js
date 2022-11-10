@@ -273,7 +273,7 @@ class ContributionFlow extends React.Component {
     }
   };
 
-  handleOrderResponse = async ({ order, stripeError, guestToken }, email) => {
+  handleOrderResponse = async ({ order, stripeError, guestToken, redirectUrl }, email) => {
     if (guestToken && order) {
       setGuestToken(email, order.id, guestToken);
     }
@@ -282,6 +282,8 @@ class ContributionFlow extends React.Component {
       return this.handleStripeError(order, stripeError, email, guestToken);
     } else if (this.props.paymentFlow === PAYMENT_FLOW.CRYPTO) {
       this.setState({ isSubmitted: true, isSubmitting: false, createdOrder: order });
+    } else if (redirectUrl) {
+      window.location.href = redirectUrl;
     } else {
       return this.handleSuccess(order);
     }

@@ -203,6 +203,7 @@ export const orderResponseFragment = gql`
       id
       ...OrderSuccessFragment
     }
+    redirectUrl
     stripeError {
       message
       account
