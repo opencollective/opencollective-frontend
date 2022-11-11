@@ -188,6 +188,12 @@ export const generatePaymentMethodOptions = (
       !isEmbed &&
       supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.STRIPE_CHECKOUT)
     ) {
+      let subtitle;
+      if (stepDetails.currency === 'USD') {
+        subtitle = 'ACH';
+      } else if (stepDetails.currency === 'EUR') {
+        subtitle = 'SEPA, giropay, iDEAL';
+      }
       uniquePMs.push({
         key: 'checkout',
         paymentMethod: {
@@ -195,7 +201,7 @@ export const generatePaymentMethodOptions = (
           type: PAYMENT_METHOD_TYPE.CHECKOUT,
         },
         title: <FormattedMessage defaultMessage="Other..." />,
-        subtitle: <FormattedMessage defaultMessage="ACH, SEPA, ApplePay, GooglePay" />,
+        subtitle,
         icon: getPaymentMethodIcon({ service: PAYMENT_METHOD_SERVICE.STRIPE, type: PAYMENT_METHOD_TYPE.CHECKOUT }),
       });
     }
