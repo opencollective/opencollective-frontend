@@ -125,8 +125,8 @@ const EmbedContributionFlowUrlParametersConfig = {
 /**
  * Returns an un-sanitized version of the URL query parameters
  */
-export const stepsDataToUrlParamsData = (stepDetails, stepProfile) => {
-  const data = {};
+export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepProfile) => {
+  const data = pick(previousUrlParams, ['redirect']);
 
   // Step details
   assign(data, pick(stepDetails, ['amount', 'interval', 'quantity', 'platformTip']));
