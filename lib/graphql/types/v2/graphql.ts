@@ -7147,6 +7147,7 @@ export type QueryExpensesArgs = {
   offset?: Scalars['Int'];
   orderBy?: ChronologicalOrderInput;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
+  returnSubmittedIfIndividual?: InputMaybe<Scalars['Boolean']>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<ExpenseStatusFilter>;
   tag?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;

@@ -514,7 +514,7 @@ class ExpensePage extends React.Component {
           selectedCategory={NAVBAR_CATEGORIES.BUDGET}
           callsToAction={{ hasSubmitExpense: status === PAGE_STATUS.VIEW }}
         />
-        <Flex flexDirection={['column', 'row']} my={[4, 5]} data-cy="expense-page-content">
+        <Flex flexDirection={['column', 'row']} px={[2, 3, 4]} py={[0, 5]} mt={3} data-cy="expense-page-content">
           <Box width={SIDE_MARGIN_WIDTH}></Box>
           <Box
             flex="1 1 650px"

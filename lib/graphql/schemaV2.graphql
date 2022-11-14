@@ -8822,6 +8822,11 @@ type Query {
     account: AccountReferenceInput
 
     """
+    If `account` is an individual and this param is true, the query will return submitted expenses
+    """
+    returnSubmittedIfIndividual: Boolean
+
+    """
     Return expenses only for this host
     """
     host: AccountReferenceInput

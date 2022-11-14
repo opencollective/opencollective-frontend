@@ -8,8 +8,12 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
-import { getCollectivePageMetadata, getSuggestedTags, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
+import {
+  getCollectivePageMetadata,
+  getSuggestedTags,
+  isIndividualAccount,
+  loggedInUserCanAccessFinancialData,
+} from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
 import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
@@ -22,6 +26,7 @@ import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePa
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
+import { Dimensions } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
@@ -53,7 +58,7 @@ const messages = defineMessages({
 
 const SearchFormContainer = styled(Box)`
   width: 100%;
-  max-width: 350px;
+  max-width: 278px;
   min-width: 10rem;
 `;
 
@@ -111,10 +116,12 @@ class ExpensePage extends React.Component {
       variables: PropTypes.shape({
         offset: PropTypes.number.isRequired,
         limit: PropTypes.number.isRequired,
+        account: PropTypes.object,
       }),
       account: PropTypes.shape({
         id: PropTypes.string.isRequired,
         currency: PropTypes.string.isRequired,
+        name: PropTypes.string,
         isArchived: PropTypes.bool,
         isHost: PropTypes.bool,
         host: PropTypes.object,
@@ -143,7 +150,7 @@ class ExpensePage extends React.Component {
     addParentToURLIfMissing(router, account, `/expenses`, queryParameters);
   }
 
-  componentDidUpdate(oldProps) {
+  async componentDidUpdate(oldProps) {
     const { LoggedInUser, data } = this.props;
     if (!oldProps.LoggedInUser && LoggedInUser) {
       if (LoggedInUser.isAdminOfCollectiveOrHost(data.account) || LoggedInUser.isHostAdmin(data.account)) {
@@ -207,15 +214,16 @@ class ExpensePage extends React.Component {
     const { collectiveSlug, data, query, LoggedInUser } = this.props;
     const hasFilters = this.hasFilter(query);
     const isSelfHosted = data.account?.id === data.account?.host?.id;
+    const isUserAccount = data.account?.type === 'INDIVIDUAL';
 
     if (!data.loading) {
       if (data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account || !data.expenses?.nodes) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
-      } else if (!isFeatureSupported(data.account, FEATURES.RECEIVE_EXPENSES)) {
+      } /* TODO else if (!isFeatureSupported(data.account, FEATURES.RECEIVE_EXPENSES)) {
         return <PageFeatureNotSupported />;
-      } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, data.account)) {
+      }*/ else if (!loggedInUserCanAccessFinancialData(LoggedInUser, data.account)) {
         // Hack for funds that want to keep their budget "private"
         return <PageFeatureNotSupported showContactSupportLink={false} />;
       }
@@ -233,12 +241,22 @@ class ExpensePage extends React.Component {
           selectedCategory={NAVBAR_CATEGORIES.BUDGET}
         />
         <Container position="relative" minHeight={[null, 800]}>
-          <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
+          <Box maxWidth={Dimensions.MAX_SECTION_WIDTH} m="0 auto" px={[2, 3, 4]} py={[0, 5]} mt={3}>
             <Flex justifyContent="space-between" flexWrap="wrap">
-              <Box flex="1 1 500px" minWidth={300} maxWidth={792} mr={[0, 3, 5]} mb={5}>
+              <Box
+                flex="1 1 500px"
+                minWidth={300}
+                maxWidth={isUserAccount ? '100%' : 792}
+                mr={isUserAccount ? 0 : [0, 3, 5]}
+                mb={5}
+              >
                 <Flex>
-                  <H1 fontSize="32px" lineHeight="40px" mb={24} py={2} fontWeight="normal">
-                    <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+                  <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
+                    {data.account && isIndividualAccount(data.account) ? (
+                      <FormattedMessage defaultMessage="Submitted Expenses" />
+                    ) : (
+                      <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+                    )}
                   </H1>
                   <Box mx="auto" />
                   <SearchFormContainer p={2}>
@@ -248,11 +266,11 @@ class ExpensePage extends React.Component {
                     />
                   </SearchFormContainer>
                 </Flex>
-                <StyledHr mb={26} borderWidth="0.5px" />
+                <StyledHr my={24} mx="8px" borderWidth="0.5px" />
                 {isSelfHosted && LoggedInUser?.isHostAdmin(data.account) && data.scheduledExpenses?.totalCount > 0 && (
                   <ScheduledExpensesBanner host={data.account} />
                 )}
-                <Box mb={34}>
+                <Box mx="8px">
                   {data.account ? (
                     <ExpensesFilters
                       collective={data.account}
@@ -264,88 +282,94 @@ class ExpensePage extends React.Component {
                     <LoadingPlaceholder height={70} />
                   )}
                 </Box>
-                {!data.loading && !data.expenses?.nodes.length ? (
-                  <MessageBox type="info" withIcon data-cy="zero-expense-message">
-                    {hasFilters ? (
-                      <FormattedMessage
-                        id="ExpensesList.Empty"
-                        defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
-                        values={{
-                          ResetLink: text => (
-                            <Link
-                              data-cy="reset-expenses-filters"
-                              href={`${getCollectivePageRoute(data.account)}/expenses`}
-                            >
-                              <span>{text}</span>
-                            </Link>
-                          ),
-                        }}
-                      />
-                    ) : (
-                      <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
-                    )}
-                  </MessageBox>
-                ) : (
-                  <React.Fragment>
-                    <ExpensesList
-                      isLoading={data.loading}
-                      collective={data.account}
-                      host={data.account?.isHost ? data.account : data.account?.host}
-                      expenses={data.expenses?.nodes}
-                      nbPlaceholders={data.variables.limit}
-                      suggestedTags={this.getSuggestedTags(data.account)}
-                    />
-                    <Flex mt={5} justifyContent="center">
-                      <Pagination
-                        route={`${getCollectivePageRoute(data.account)}/expenses`}
-                        total={data.expenses?.totalCount}
-                        limit={data.variables.limit}
-                        offset={data.variables.offset}
-                        ignoredQueryParams={['collectiveSlug', 'parentCollectiveSlug']}
-                      />
-                    </Flex>
-                  </React.Fragment>
-                )}
-              </Box>
-              <Box minWidth={270} width={['100%', null, null, 275]} mt={[0, 70]}>
-                <ExpenseInfoSidebar
-                  isLoading={data.loading}
-                  collective={data.account}
-                  host={data.account?.host}
-                  showExpenseTypeFilters
-                >
-                  {data.account?.expensesTags.length > 0 && (
+                <Box mt={['16px', '46px']}>
+                  {!data?.loading && !data.expenses?.nodes.length ? (
+                    <MessageBox type="info" withIcon data-cy="zero-expense-message">
+                      {hasFilters ? (
+                        <FormattedMessage
+                          id="ExpensesList.Empty"
+                          defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
+                          values={{
+                            ResetLink: text => (
+                              <Link
+                                data-cy="reset-expenses-filters"
+                                href={`${getCollectivePageRoute(data.account)}/expenses`}
+                              >
+                                <span>{text}</span>
+                              </Link>
+                            ),
+                          }}
+                        />
+                      ) : (
+                        <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
+                      )}
+                    </MessageBox>
+                  ) : (
                     <React.Fragment>
-                      <H5 mb={3}>
-                        <FormattedMessage id="Tags" defaultMessage="Tags" />
-                      </H5>
-                      <ExpenseTags
-                        isLoading={data.loading}
-                        expense={{
-                          tags: data.account?.expensesTags.map(({ tag }) => tag),
-                        }}
-                        limit={30}
-                        getTagProps={this.getTagProps}
-                        data-cy="expense-tags-title"
-                        showUntagged
-                      >
-                        {({ key, tag, renderedTag, props }) => (
-                          <Link
-                            key={key}
-                            href={{
-                              pathname: `${getCollectivePageRoute(data.account)}/expenses`,
-                              query: this.buildFilterLinkParams({ tag: props.closeButtonProps ? null : tag }),
-                            }}
-                            data-cy="expense-tags-link"
-                          >
-                            {renderedTag}
-                          </Link>
-                        )}
-                      </ExpenseTags>
+                      <ExpensesList
+                        isLoading={Boolean(data?.loading)}
+                        collective={data.account}
+                        host={data.account?.isHost ? data.account : data.account?.host}
+                        expenses={data.expenses?.nodes}
+                        nbPlaceholders={data.variables.limit}
+                        suggestedTags={this.getSuggestedTags(data.account)}
+                        isInverted={isUserAccount}
+                        view={isUserAccount ? 'submitter' : 'public'}
+                      />
+                      <Flex mt={5} justifyContent="center">
+                        <Pagination
+                          route={`${getCollectivePageRoute(data.account)}/expenses`}
+                          total={data.expenses?.totalCount}
+                          limit={data.variables.limit}
+                          offset={data.variables.offset}
+                          ignoredQueryParams={['collectiveSlug', 'parentCollectiveSlug']}
+                        />
+                      </Flex>
                     </React.Fragment>
                   )}
-                </ExpenseInfoSidebar>
+                </Box>
               </Box>
+              {!isUserAccount && (
+                <Box minWidth={270} width={['100%', null, null, 275]} mt={[0, 70]}>
+                  <ExpenseInfoSidebar
+                    isLoading={data.loading}
+                    collective={data.account}
+                    host={data.account?.host}
+                    showExpenseTypeFilters
+                  >
+                    {data.account?.expensesTags.length > 0 && (
+                      <React.Fragment>
+                        <H5 mb={3}>
+                          <FormattedMessage id="Tags" defaultMessage="Tags" />
+                        </H5>
+                        <ExpenseTags
+                          isLoading={data.loading}
+                          expense={{
+                            tags: data.account?.expensesTags.map(({ tag }) => tag),
+                          }}
+                          limit={30}
+                          getTagProps={this.getTagProps}
+                          data-cy="expense-tags-title"
+                          showUntagged
+                        >
+                          {({ key, tag, renderedTag, props }) => (
+                            <Link
+                              key={key}
+                              href={{
+                                pathname: `${getCollectivePageRoute(data.account)}/expenses`,
+                                query: this.buildFilterLinkParams({ tag: props.closeButtonProps ? null : tag }),
+                              }}
+                              data-cy="expense-tags-link"
+                            >
+                              {renderedTag}
+                            </Link>
+                          )}
+                        </ExpenseTags>
+                      </React.Fragment>
+                    )}
+                  </ExpenseInfoSidebar>
+                </Box>
+              )}
             </Flex>
           </Box>
         </Container>
@@ -458,6 +482,7 @@ const expensesPageQuery = gql`
       dateTo: $dateTo
       searchTerm: $searchTerm
       orderBy: $orderBy
+      returnSubmittedIfIndividual: true
     ) {
       totalCount
       offset
@@ -468,6 +493,7 @@ const expensesPageQuery = gql`
       }
     }
     # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
+    # TODO: We don't need to try and fetch this field on non-host accounts
     scheduledExpenses: expenses(
       host: { slug: $collectiveSlug }
       status: SCHEDULED_FOR_PAYMENT

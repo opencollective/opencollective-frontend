@@ -122,12 +122,10 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
       title: intl.formatMessage(titles.TRANSACTIONS),
     });
 
-    if (hasFeature(collective, FEATURES.RECEIVE_EXPENSES)) {
-      links.push({
-        route: `${collectivePageRoute}/expenses`,
-        title: intl.formatMessage(titles.EXPENSES),
-      });
-    }
+    links.push({
+      route: `${collectivePageRoute}/expenses`,
+      title: intl.formatMessage(titles.EXPENSES),
+    });
   } else if (category === NAVBAR_CATEGORIES.CONNECT) {
     // Connect
     if (hasFeature(collective, FEATURES.UPDATES) && hasSection(sections, Sections.UPDATES)) {
