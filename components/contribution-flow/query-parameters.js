@@ -72,7 +72,7 @@ const ContributionFlowUrlParametersConfig = {
   redirect: { type: 'string' },
   // -- Misc metadata
   /** @private */
-  data: { type: 'json' },
+  customData: { type: 'json' },
   /**
    * Some tags to attach to the contribution
    * @example tag1,tag2
@@ -129,7 +129,7 @@ export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepPro
   const data = pick(previousUrlParams, ['redirect']);
 
   // Step details
-  assign(data, pick(stepDetails, ['amount', 'interval', 'quantity', 'platformTip']));
+  assign(data, pick(stepDetails, ['amount', 'interval', 'quantity', 'platformTip', 'customData']));
 
   // Step profile
   if (stepProfile.slug) {
