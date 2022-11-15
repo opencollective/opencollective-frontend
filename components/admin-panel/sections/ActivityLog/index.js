@@ -73,6 +73,12 @@ const activityLogQuery = gql`
           slug
           type
         }
+        host {
+          id
+          name
+          slug
+          type
+        }
         account {
           id
           name
