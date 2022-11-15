@@ -6,18 +6,18 @@ export const ActivityClasses = {
   VIRTUAL_CARDS: 'virtualCards',
   FUND_EVENTS: 'fundsEvents',
   REPORTS: 'reports',
-};
+} as const;
 
 export const ActivityTypes = {
   ACTIVITY_ALL: 'all',
   CONNECTED_ACCOUNT_CREATED: 'connected_account.created',
+  COLLECTIVE_CREATED: 'collective.created',
+  ORGANIZATION_COLLECTIVE_CREATED: 'organization.collective.created',
   COLLECTIVE_CREATED_GITHUB: 'collective.created.github',
   COLLECTIVE_APPLY: 'collective.apply',
   COLLECTIVE_APPROVED: 'collective.approved',
   COLLECTIVE_REJECTED: 'collective.rejected',
-  COLLECTIVE_CREATED: 'collective.created',
   COLLECTIVE_EDITED: 'collective.edited',
-  COLLECTIVE_COMMENT_CREATED: 'collective.comment.created',
   COLLECTIVE_CONVERSATION_CREATED: 'collective.conversation.created',
   COLLECTIVE_EXPENSE_CREATED: 'collective.expense.created',
   COLLECTIVE_EXPENSE_DELETED: 'collective.expense.deleted',
@@ -35,13 +35,12 @@ export const ActivityTypes = {
   COLLECTIVE_EXPENSE_INVITE_DRAFTED: 'collective.expense.invite.drafted',
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED: 'collective.expense.recurring.drafted',
   COLLECTIVE_EXPENSE_MISSING_RECEIPT: 'collective.expense.missing.receipt',
-  COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS: 'collective.virtualcard.missing.receipts',
-  COLLECTIVE_VIRTUAL_CARD_SUSPENDED: 'collective.virtualcard.suspended',
+  COLLECTIVE_EXPENSE_MOVED: 'collective.expense.moved',
   COLLECTIVE_FROZEN: 'collective.frozen',
   COLLECTIVE_UNFROZEN: 'collective.unfrozen',
+  COLLECTIVE_MONTHLY_REPORT: 'collective.monthlyreport',
   COLLECTIVE_MEMBER_INVITED: 'collective.member.invited',
   COLLECTIVE_MEMBER_CREATED: 'collective.member.created',
-  COLLECTIVE_MONTHLY_REPORT: 'collective.monthlyreport',
   COLLECTIVE_CORE_MEMBER_ADDED: 'collective.core.member.added',
   COLLECTIVE_CORE_MEMBER_INVITED: 'collective.core.member.invited',
   COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED: 'collective.core.member.invitation.declined',
@@ -51,9 +50,12 @@ export const ActivityTypes = {
   COLLECTIVE_UPDATE_CREATED: 'collective.update.created',
   COLLECTIVE_UPDATE_PUBLISHED: 'collective.update.published',
   COLLECTIVE_CONTACT: 'collective.contact',
+  COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS: 'collective.virtualcard.missing.receipts',
+  COLLECTIVE_VIRTUAL_CARD_SUSPENDED: 'collective.virtualcard.suspended',
   COLLECTIVE_VIRTUAL_CARD_ADDED: 'collective.virtualcard.added',
+  VIRTUAL_CARD_REQUESTED: 'virtual_card.requested',
+  VIRTUAL_CARD_CHARGE_DECLINED: 'virtualcard.charge.declined',
   CONTRIBUTION_REJECTED: 'contribution.rejected',
-  ORGANIZATION_COLLECTIVE_CREATED: 'organization.collective.created',
   SUBSCRIPTION_ACTIVATED: 'subscription.activated',
   SUBSCRIPTION_CONFIRMED: 'subscription.confirmed',
   SUBSCRIPTION_CANCELED: 'subscription.canceled',
@@ -77,16 +79,15 @@ export const ActivityTypes = {
   ACTIVATED_COLLECTIVE_AS_HOST: 'activated.collective.as.host',
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT: 'activated.collective.as.independent',
   DEACTIVATED_COLLECTIVE_AS_HOST: 'deactivated.collective.as.host',
-  VIRTUAL_CARD_REQUESTED: 'virtual_card.requested',
-  VIRTUAL_CARD_CHARGE_DECLINED: 'virtualcard.charge.declined',
   PAYMENT_FAILED: 'payment.failed',
   PAYMENT_CREDITCARD_CONFIRMATION: 'payment.creditcard.confirmation',
   PAYMENT_CREDITCARD_EXPIRING: 'payment.creditcard.expiring',
   TAXFORM_REQUEST: 'taxform.request',
+  COLLECTIVE_COMMENT_CREATED: 'collective.comment.created',
   CONVERSATION_COMMENT_CREATED: 'conversation.comment.created',
   UPDATE_COMMENT_CREATED: 'update.comment.created',
   EXPENSE_COMMENT_CREATED: 'expense.comment.created',
-};
+} as const;
 
 export const ActivityAttribution = {
   // Activities initiated by this account
@@ -97,4 +98,4 @@ export const ActivityAttribution = {
   SELF: 'SELF',
   // Activities that happened on accounts hosted by this account
   HOSTED_ACCOUNTS: 'HOSTED_ACCOUNTS',
-};
+} as const;
