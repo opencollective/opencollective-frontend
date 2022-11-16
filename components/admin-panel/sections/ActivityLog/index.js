@@ -19,7 +19,7 @@ import StyledCard from '../../../StyledCard';
 
 import ActivityFilters from './ActivityFilters';
 import ActivityListItem from './ActivityListItem';
-import { getActivityTypeFilterValuesFromKey, isSupportedActivityTypeFilter } from './ActivityTypeFilter';
+import { isSupportedActivityTypeFilter } from './ActivityTypeFilter';
 
 const activityLogQuery = gql`
   query AccountActivityLog(
@@ -179,7 +179,7 @@ const getQueryVariables = (accountSlug, router) => {
     dateTo,
     limit: limit ? parseInt(limit) : ACTIVITY_LIMIT,
     offset,
-    type: getActivityTypeFilterValuesFromKey(type),
+    type: type,
     account: filteredAccounts,
     includeChildrenAccounts,
     excludeParentAccount,
