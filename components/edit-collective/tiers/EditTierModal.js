@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { omit } from 'lodash';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -86,17 +86,17 @@ function FormFields({ collective, types, values }) {
 
   const tierTypeOptions = getTierTypeOptions(intl, collective.type);
   const intervalOptions = [
-    { value: 'onetime', label: intl.formatMessage({ id: 'tier.interval.onetime', defaultMessage: 'one time' }) },
-    { value: 'month', label: intl.formatMessage({ id: 'tier.interval.month', defaultMessage: 'monthly' }) },
-    { value: 'year', label: intl.formatMessage({ id: 'tier.interval.year', defaultMessage: 'yearly' }) },
-    { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'flexible' }) },
+    { value: 'onetime', label: intl.formatMessage({ id: 'tier.interval.onetime', defaultMessage: 'One time' }) },
+    { value: 'month', label: intl.formatMessage({ id: 'tier.interval.month', defaultMessage: 'Monthly' }) },
+    { value: 'year', label: intl.formatMessage({ id: 'tier.interval.year', defaultMessage: 'Yearly' }) },
+    { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
   ];
 
   const amountTypeOptions = [
-    { value: FIXED, label: intl.formatMessage({ id: 'tier.amountType.fixed', defaultMessage: 'fixed amount' }) },
+    { value: FIXED, label: intl.formatMessage({ id: 'tier.amountType.fixed', defaultMessage: 'Fixed amount' }) },
     {
       value: FLEXIBLE,
-      label: intl.formatMessage({ id: 'tier.amountType.flexible', defaultMessage: 'flexible amount' }),
+      label: intl.formatMessage({ id: 'tier.amountType.flexible', defaultMessage: 'Flexible amount' }),
     },
   ];
 
@@ -150,7 +150,7 @@ function FormFields({ collective, types, values }) {
           name="interval"
           label={intl.formatMessage({
             id: 'tier.interval.label',
-            defaultMessage: 'interval',
+            defaultMessage: 'Interval',
           })}
           labelFontWeight="bold"
           mt="3"
@@ -227,7 +227,7 @@ function FormFields({ collective, types, values }) {
           name="presets"
           label={intl.formatMessage({
             id: 'tier.presets.label',
-            defaultMessage: 'suggested amounts',
+            defaultMessage: 'Suggested amounts',
           })}
           labelFontWeight="bold"
           mt="3"
@@ -246,7 +246,7 @@ function FormFields({ collective, types, values }) {
           name="amount"
           label={intl.formatMessage({
             id: 'tier.defaultAmount.label',
-            defaultMessage: 'default amount',
+            defaultMessage: 'Default amount',
           })}
           labelFontWeight="bold"
           mt="3"
@@ -275,7 +275,7 @@ function FormFields({ collective, types, values }) {
       {values.amountType === FLEXIBLE && (
         <StyledInputFormikField
           name="minimumAmount"
-          label={intl.formatMessage({ id: 'tier.minimumAmount.label', defaultMessage: 'minimum amount' })}
+          label={intl.formatMessage({ id: 'tier.minimumAmount.label', defaultMessage: 'Minimum amount' })}
           labelFontWeight="bold"
           mt="3"
           required={false}
@@ -478,7 +478,7 @@ FormFields.propTypes = {
 };
 
 const EditSectionContainer = styled(Flex)`
-  overflow: scroll;
+  overflow-y: scroll;
   flex-grow: 1;
   flex-direction: column;
   padding-right: 1rem;
@@ -586,7 +586,7 @@ export function ContributeCardPreview({ tier, collective }) {
 
   return (
     <ContributeCardPreviewContainer>
-      <ContributeTier intl={intl} tier={previewTier} collective={collective} hideContributors />
+      <ContributeTier isPreview intl={intl} tier={previewTier} collective={collective} hideContributors />
     </ContributeCardPreviewContainer>
   );
 }
@@ -724,6 +724,12 @@ const deleteTierMutation = gql`
   }
 `;
 
+const i18nMessages = defineMessages({
+  EDIT_SUCCESS: { id: 'EditTier.Edit.Success', defaultMessage: 'Tier updated.' },
+  CREATE_SUCCESS: { id: 'EditTier.Create.Success', defaultMessage: 'Tier created.' },
+  DELETE_SUCCESS: { id: 'EditTier.Delete.Success', defaultMessage: 'Tier deleted.' },
+});
+
 export function EditTierForm({ tier, collective, onClose }) {
   const intl = useIntl();
   const isEditing = React.useMemo(() => !!tier?.id);
@@ -806,6 +812,10 @@ export function EditTierForm({ tier, collective, onClose }) {
           },
         });
         onClose();
+        addToast({
+          type: TOAST_TYPE.SUCCESS,
+          message: intl.formatMessage(i18nMessages['DELETE_SUCCESS']),
+        });
       } catch (e) {
         addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e.message) });
       } finally {
@@ -835,6 +845,10 @@ export function EditTierForm({ tier, collective, onClose }) {
               variables: {
                 tier,
               },
+            });
+            addToast({
+              type: TOAST_TYPE.SUCCESS,
+              message: intl.formatMessage(i18nMessages[isEditing ? 'EDIT_SUCCESS' : 'CREATE_SUCCESS']),
             });
             onClose();
           } catch (e) {
