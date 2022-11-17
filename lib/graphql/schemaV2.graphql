@@ -1210,6 +1210,11 @@ enum ExpenseCurrencySource {
   The expense currency expressed as the expense currency
   """
   EXPENSE
+
+  """
+  The expense currency expressed as the expense currency
+  """
+  CREATED_BY_ACCOUNT
 }
 
 """
@@ -8822,14 +8827,14 @@ type Query {
     account: AccountReferenceInput
 
     """
-    If `account` is an individual and this param is true, the query will return submitted expenses
-    """
-    returnSubmittedIfIndividual: Boolean
-
-    """
     Return expenses only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return expenses only created by this INDIVIDUAL account
+    """
+    createdByAccount: AccountReferenceInput
 
     """
     Use this field to filter expenses on their statuses

@@ -32,4 +32,4 @@ export default {
   SPAM: 'SPAM',
   UNVERIFIED: 'UNVERIFIED',
   INCOMPLETE: 'INCOMPLETE',
-};
+} as const;

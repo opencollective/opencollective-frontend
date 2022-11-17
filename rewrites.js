@@ -139,6 +139,10 @@ exports.REWRITES = [
     destination: '/expenses',
   },
   {
+    source: '/:collectiveSlug/submitted-expenses',
+    destination: '/submitted-expenses',
+  },
+  {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders',
     destination: '/orders',
   },
