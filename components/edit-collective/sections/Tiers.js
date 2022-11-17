@@ -138,10 +138,10 @@ class Tiers extends React.Component {
         defaultMessage: 'Amount type',
       },
       'amount.label': { id: 'Fields.amount', defaultMessage: 'Amount' },
-      'minimumAmount.label': { id: 'tier.minimumAmount.label', defaultMessage: 'minimum amount' },
+      'minimumAmount.label': { id: 'tier.minimumAmount.label', defaultMessage: 'Minimum amount' },
       'defaultAmount.label': {
         id: 'tier.defaultAmount.label',
-        defaultMessage: 'default amount',
+        defaultMessage: 'Default amount',
       },
       'goal.label': {
         id: 'ContributionType.Goal',
@@ -157,20 +157,20 @@ class Tiers extends React.Component {
       },
       'interval.label': {
         id: 'tier.interval.label',
-        defaultMessage: 'interval',
+        defaultMessage: 'Interval',
       },
-      FIXED: { id: 'tier.amountType.fixed', defaultMessage: 'fixed amount' },
+      FIXED: { id: 'tier.amountType.fixed', defaultMessage: 'Fixed amount' },
       FLEXIBLE: {
         id: 'tier.amountType.flexible',
-        defaultMessage: 'flexible amount',
+        defaultMessage: 'Flexible amount',
       },
-      onetime: { id: 'tier.interval.onetime', defaultMessage: 'one time' },
-      month: { id: 'tier.interval.month', defaultMessage: 'monthly' },
-      year: { id: 'tier.interval.year', defaultMessage: 'yearly' },
-      flexible: { id: 'tier.interval.flexible', defaultMessage: 'flexible' },
+      onetime: { id: 'Frequency.OneTime', defaultMessage: 'One time' },
+      month: { id: 'Frequency.Monthly', defaultMessage: 'Monthly' },
+      year: { id: 'Frequency.Yearly', defaultMessage: 'Yearly' },
+      flexible: { id: 'tier.interval.flexible', defaultMessage: 'Flexible' },
       'presets.label': {
         id: 'tier.presets.label',
-        defaultMessage: 'suggested amounts',
+        defaultMessage: 'Suggested amounts',
       },
       'description.label': {
         id: 'Fields.description',

@@ -10,7 +10,7 @@ describe('Recurring contributions', () => {
         cy.getByDataCy('add-tier-button').click();
         cy.get('[data-cy="tier-input-field-name"] input').last().type('Recurring Fixed Donation Tier');
         cy.get('[data-cy="tier-input-field-interval"] [data-cy="interval"]').last().click();
-        cy.contains('[data-cy="select-option"]', 'monthly').click();
+        cy.contains('[data-cy="select-option"]', 'Monthly').click();
         cy.get('[data-cy="tier-input-field-amount"] input').last().type('10');
         cy.getByDataCy('collective-save').click();
         cy.wait(2000);

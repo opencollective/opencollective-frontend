@@ -86,9 +86,9 @@ function FormFields({ collective, types, values }) {
 
   const tierTypeOptions = getTierTypeOptions(intl, collective.type);
   const intervalOptions = [
-    { value: 'onetime', label: intl.formatMessage({ id: 'tier.interval.onetime', defaultMessage: 'One time' }) },
-    { value: 'month', label: intl.formatMessage({ id: 'tier.interval.month', defaultMessage: 'Monthly' }) },
-    { value: 'year', label: intl.formatMessage({ id: 'tier.interval.year', defaultMessage: 'Yearly' }) },
+    { value: 'onetime', label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) },
+    { value: 'month', label: intl.formatMessage({ id: 'Frequency.Monthly', defaultMessage: 'Monthly' }) },
+    { value: 'year', label: intl.formatMessage({ id: 'Frequency.Yearly', defaultMessage: 'Yearly' }) },
     { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
   ];
 
