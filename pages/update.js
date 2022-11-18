@@ -12,7 +12,6 @@ import { stripHTML } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import CommentForm from '../components/conversations/CommentForm';
@@ -137,7 +136,6 @@ class UpdatePage extends React.Component {
         <CollectiveNavbar
           collective={account}
           isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(account)}
-          selected={Sections.UPDATES}
           selectedCategory={NAVBAR_CATEGORIES.CONNECT}
         />
 

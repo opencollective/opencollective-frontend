@@ -16,7 +16,6 @@ import { getWebsiteUrl } from '../lib/utils';
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { Sections } from '../components/collective-page/_constants';
 import * as fragments from '../components/collective-page/graphql/fragments';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
@@ -269,11 +268,7 @@ class TiersPage extends React.Component {
           ) : (
             <CollectiveThemeProvider collective={data.Collective}>
               <Container pb={3}>
-                <CollectiveNavbar
-                  collective={collective}
-                  selected={Sections.CONTRIBUTE}
-                  selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE}
-                />
+                <CollectiveNavbar collective={collective} selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE} />
                 <Container maxWidth={1260} my={5} px={[15, 30]} mx="auto">
                   <Box my={5}>
                     <Flex flexWrap="wrap" justifyContent="space-between">

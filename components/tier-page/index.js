@@ -14,7 +14,6 @@ import { getWebsiteUrl } from '../../lib/utils';
 
 import CollectiveNavbar from '../collective-navbar';
 import { NAVBAR_CATEGORIES } from '../collective-navbar/constants';
-import { Sections } from '../collective-page/_constants';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -178,12 +177,7 @@ class TierPage extends Component {
       <Container>
         {/** ---- Hero / Banner ---- */}
         <Container position="sticky" top={0} zIndex={999}>
-          <CollectiveNavbar
-            collective={collective}
-            selected={Sections.CONTRIBUTE}
-            selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE}
-            isAdmin={canEdit}
-          />
+          <CollectiveNavbar collective={collective} selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE} isAdmin={canEdit} />
         </Container>
         <Container position="relative">
           <Container position="absolute" width={1} zIndex={-1} overflow="hidden">
