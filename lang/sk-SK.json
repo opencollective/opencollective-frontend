@@ -1060,6 +1060,7 @@
   "Expense.Attachments": "Prílohy",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "Týmto sa natrvalo odstránia výdavky a všetky prílohy a komentáre.",
+  "expense.draft": "Draft",
   "Expense.edit": "Upraviť výdavok",
   "Expense.EnterExpenseTitle": "Názov výdavku <small>(Verejné)</small>",
   "Expense.EnterRequestSubject": "Zadajte predmet grantu <small>(Public)</small>",

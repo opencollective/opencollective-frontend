@@ -1060,6 +1060,7 @@
   "Expense.Attachments": "Anexos",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "Isto excluirá permanentemente esta despesa, anexos e comentários.",
+  "expense.draft": "Draft",
   "Expense.edit": "Editar despesa",
   "Expense.EnterExpenseTitle": "Expense title <small>(Public)</small>",
   "Expense.EnterRequestSubject": "Digite conceder assunto <small>(Public)</small>",

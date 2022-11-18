@@ -1060,6 +1060,7 @@
   "Expense.Attachments": "Anhänge",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "This will permanently delete the expense and all attachments and comments.",
+  "expense.draft": "Draft",
   "Expense.edit": "Ausgabe bearbeiten",
   "Expense.EnterExpenseTitle": "Expense title <small>(Public)</small>",
   "Expense.EnterRequestSubject": "Enter grant subject <small>(Public)</small>",

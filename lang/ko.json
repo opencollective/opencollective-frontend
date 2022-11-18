@@ -1060,6 +1060,7 @@
   "Expense.Attachments": "첨부 파일",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "This will permanently delete the expense and all attachments and comments.",
+  "expense.draft": "Draft",
   "Expense.edit": "경비 수정",
   "Expense.EnterExpenseTitle": "Expense title <small>(Public)</small>",
   "Expense.EnterRequestSubject": "Enter grant subject <small>(Public)</small>",

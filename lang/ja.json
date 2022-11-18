@@ -1060,6 +1060,7 @@
   "Expense.Attachments": "添付ファイル",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "This will permanently delete the expense and all attachments and comments.",
+  "expense.draft": "Draft",
   "Expense.edit": "経費を編集",
   "Expense.EnterExpenseTitle": "経費名 <small>(公開)</small>",
   "Expense.EnterRequestSubject": "Enter grant subject <small>(Public)</small>",

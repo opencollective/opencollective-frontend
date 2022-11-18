@@ -1060,6 +1060,7 @@
   "Expense.Attachments": "Załączniki",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "Spowoduje to trwałe usunięcie wydatku oraz wszystkich załączników i komentarzy.",
+  "expense.draft": "Draft",
   "Expense.edit": "Edytuj wydatek",
   "Expense.EnterExpenseTitle": "Tytuł wydatku <small>(Publiczny)</small>",
   "Expense.EnterRequestSubject": "Wpisz temat dotacji <small>(Publiczny)</small>",

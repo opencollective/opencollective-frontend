@@ -1060,6 +1060,7 @@
   "Expense.Attachments": "Adjuntos",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "Esta acción eliminará el gasto de manera permanente y todos los archivos adjuntos y los comentarios.",
+  "expense.draft": "Draft",
   "Expense.edit": "Editar gasto",
   "Expense.EnterExpenseTitle": "Título del gasto <small>(Público)</small>",
   "Expense.EnterRequestSubject": "Escriba el tema de la subvención <small>(Público)</small>",

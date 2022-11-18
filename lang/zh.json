@@ -1060,6 +1060,7 @@
   "Expense.Attachments": "附件",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "This will permanently delete the expense and all attachments and comments.",
+  "expense.draft": "Draft",
   "Expense.edit": "编辑支出",
   "Expense.EnterExpenseTitle": "Expense title <small>(Public)</small>",
   "Expense.EnterRequestSubject": "Enter grant subject <small>(Public)</small>",

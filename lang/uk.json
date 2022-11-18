@@ -1060,6 +1060,7 @@
   "Expense.Attachments": "Вкладення",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "Це остаточно видалить витрати, вкладення та коментарі.",
+  "expense.draft": "Draft",
   "Expense.edit": "Редагувати витрату",
   "Expense.EnterExpenseTitle": "Expense title <small>(Public)</small>",
   "Expense.EnterRequestSubject": "Enter grant subject <small>(Public)</small>",

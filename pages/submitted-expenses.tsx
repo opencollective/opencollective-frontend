@@ -176,11 +176,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
               <Box flex="1 1 500px" minWidth={300} maxWidth={'100%'} mr={0} mb={5}>
                 <Flex>
                   <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
-                    {data.account && isIndividualAccount(data.account) ? (
-                      <FormattedMessage defaultMessage="Submitted Expenses" />
-                    ) : (
-                      <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-                    )}
+                    <FormattedMessage defaultMessage="Submitted Expenses" />
                   </H1>
                   <Box mx="auto" />
                   <SearchFormContainer p={2}>
@@ -197,6 +193,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
                       collective={data.account}
                       filters={this.props.query}
                       onChange={queryParams => this.updateFilters(queryParams, data.account)}
+                      ignoredExpenseStatus={null} // We want to show all expense types for users, including drafts and unverified
                       wrap={false}
                     />
                   ) : (
