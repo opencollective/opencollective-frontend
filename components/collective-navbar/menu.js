@@ -1,6 +1,7 @@
 import { defineMessages } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
+import { isIndividualAccount } from '../../lib/collective.lib';
 import { hasSection } from '../../lib/collective-sections';
 import i18nCollectivePageSection from '../../lib/i18n-collective-page-section';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -35,6 +36,9 @@ const titles = defineMessages({
   EXPENSES: {
     id: 'Expenses',
     defaultMessage: 'Expenses',
+  },
+  SUBMITTED_EXPENSES: {
+    defaultMessage: 'Submitted Expenses',
   },
   UPDATES: {
     id: 'updates',
@@ -122,7 +126,12 @@ const getCategoryMenuLinks = (intl, collective, sections, category) => {
       title: intl.formatMessage(titles.TRANSACTIONS),
     });
 
-    if (hasFeature(collective, FEATURES.RECEIVE_EXPENSES)) {
+    if (isIndividualAccount(collective) && !collective.isHost) {
+      links.push({
+        route: `${collectivePageRoute}/submitted-expenses`,
+        title: intl.formatMessage(titles.SUBMITTED_EXPENSES),
+      });
+    } else {
       links.push({
         route: `${collectivePageRoute}/expenses`,
         title: intl.formatMessage(titles.EXPENSES),
