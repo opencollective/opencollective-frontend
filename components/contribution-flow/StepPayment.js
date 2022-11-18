@@ -20,7 +20,8 @@ import { P } from '../Text';
 import { TwoFactorAuthRequiredMessage } from '../TwoFactorAuthRequiredMessage';
 
 import BlockedContributorMessage from './BlockedContributorMessage';
-import { generatePaymentMethodOptions, NEW_CREDIT_CARD_KEY } from './utils';
+import PayWithStripe from './PayWithStripe';
+import { generatePaymentMethodOptions, NEW_CREDIT_CARD_KEY, STRIPE_PAYMENT_ELEMENT_KEY } from './utils';
 
 const PaymentMethodBox = styled.div`
   display: flex;
@@ -203,6 +204,16 @@ const StepPayment = ({
               {value.key === 'manual' && checked && value.instructions && (
                 <Box my={3} color="black.600" fontSize="14px">
                   {value.instructions}
+                </Box>
+              )}
+              {value.key === STRIPE_PAYMENT_ELEMENT_KEY && checked && (
+                <Box my={3}>
+                  <PayWithStripe
+                    collective={collective}
+                    stepDetails={stepDetails}
+                    stepProfile={stepProfile}
+                    onChange={onChange}
+                  />
                 </Box>
               )}
             </PaymentMethodBox>

@@ -56,7 +56,13 @@ import SafeTransactionMessage from './SafeTransactionMessage';
 import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
 import { validateGuestProfile } from './StepProfileGuestForm';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
-import { getContributeProfiles, getGQLV2AmountInput, getTotalAmount, NEW_CREDIT_CARD_KEY } from './utils';
+import {
+  getContributeProfiles,
+  getGQLV2AmountInput,
+  getTotalAmount,
+  NEW_CREDIT_CARD_KEY,
+  STRIPE_PAYMENT_ELEMENT_KEY,
+} from './utils';
 
 const StepsProgressBox = styled(Box)`
   min-height: 120px;
@@ -274,11 +280,30 @@ class ContributionFlow extends React.Component {
   };
 
   handleOrderResponse = async ({ order, stripeError, guestToken }, email) => {
+    const { stepPayment } = this.state;
+
     if (guestToken && order) {
       setGuestToken(email, order.id, guestToken);
     }
 
-    if (stripeError) {
+    if (stepPayment?.key === STRIPE_PAYMENT_ELEMENT_KEY) {
+      const { stripeData } = stepPayment;
+
+      const returnUrl = `${window.location.origin}/${this.props.collective.slug}/donate/success?OrderId=${order.id}`;
+
+      try {
+        await stripeData.stripe.confirmPayment({
+          elements: stripeData.elements,
+          confirmParams: {
+            // eslint-disable-next-line camelcase
+            return_url: returnUrl,
+          },
+        });
+        this.setState({ isSubmitted: true, isSubmitting: false });
+      } catch (e) {
+        this.setState({ isSubmitting: false, error: e.message });
+      }
+    } else if (stripeError) {
       return this.handleStripeError(order, stripeError, email, guestToken);
     } else if (this.props.paymentFlow === PAYMENT_FLOW.CRYPTO) {
       this.setState({ isSubmitted: true, isSubmitting: false, createdOrder: order });
@@ -304,6 +329,7 @@ class ContributionFlow extends React.Component {
       const stripe = await getStripe(null, account);
       const result = isAlipay
         ? await stripe.confirmAlipayPayment(response.paymentIntent.client_secret, {
+            // eslint-disable-next-line camelcase
             return_url: `${window.location.origin}/api/services/stripe/alipay/callback?OrderId=${order.id}`,
           })
         : await stripe.handleCardAction(response.paymentIntent.client_secret);
@@ -411,6 +437,7 @@ class ContributionFlow extends React.Component {
       legacyType: stepPayment.paymentMethod.providerType,
       service: stepPayment.paymentMethod.service,
       newType: stepPayment.paymentMethod.type,
+      paymentIntentId: stepPayment.paymentMethod.paymentIntentId,
 
       // Migration Step 3
       // service: stepPayment.paymentMethod.service,
@@ -716,10 +743,12 @@ class ContributionFlow extends React.Component {
       steps.push({
         name: 'payment',
         label: intl.formatMessage(STEP_LABELS.payment),
-        isCompleted: !stepProfile?.contributorRejectedCategories,
+        isCompleted: !stepProfile?.contributorRejectedCategories && stepPayment?.isCompleted,
         validate: action => {
           if (action === 'prev') {
             return true;
+          } else if (stepPayment?.key === STRIPE_PAYMENT_ELEMENT_KEY) {
+            return stepPayment.isCompleted;
           } else {
             const isCompleted = Boolean(noPaymentRequired || stepPayment);
             if (
