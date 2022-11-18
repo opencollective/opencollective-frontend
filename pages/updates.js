@@ -12,7 +12,6 @@ import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePa
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
@@ -88,7 +87,6 @@ class UpdatesPage extends React.Component {
           <CollectiveNavbar
             collective={collective}
             isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(collective)}
-            selected={Sections.UPDATES}
             selectedCategory={NAVBAR_CATEGORIES.CONNECT}
           />
 
