@@ -125,11 +125,15 @@ const EmbedContributionFlowUrlParametersConfig = {
 /**
  * Returns an un-sanitized version of the URL query parameters
  */
-export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepProfile) => {
+export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepProfile, isCrypto) => {
   const data = pick(previousUrlParams, ['redirect']);
 
   // Step details
-  assign(data, pick(stepDetails, ['amount', 'interval', 'quantity', 'platformTip', 'customData']));
+  assign(data, pick(stepDetails, ['interval', 'quantity', 'platformTip', 'customData']));
+
+  if (!isCrypto) {
+    data.amount = stepDetails.amount;
+  }
 
   // Step profile
   if (stepProfile.slug) {
