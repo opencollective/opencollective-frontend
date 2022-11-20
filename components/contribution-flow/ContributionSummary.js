@@ -50,6 +50,7 @@ const Amount = styled(Span)`
 
 const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment, currency, isCrypto }) => {
   const intl = useIntl();
+  const amount = isCrypto ? stepDetails.cryptoAmount : stepDetails.amount;
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
   const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, currency);
   const platformTip = stepDetails.platformTip || 0;
@@ -79,7 +80,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
             </Label>
             <Amount>
               <FormattedMoneyAmount
-                amount={stepDetails.amount || 0}
+                amount={amount || 0}
                 currency={currency}
                 amountStyles={{ color: 'black.700', fontWeight: 400 }}
                 isCrypto={isCrypto}

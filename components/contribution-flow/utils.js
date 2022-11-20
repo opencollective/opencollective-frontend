@@ -265,7 +265,7 @@ export const generatePaymentMethodOptions = (
 
 export const getTotalAmount = (stepDetails, stepSummary = null) => {
   const quantity = get(stepDetails, 'quantity') || 1;
-  const amount = get(stepDetails, 'amount') || 0;
+  const amount = get(stepDetails, 'cryptoAmount') || get(stepDetails, 'amount') || 0;
   const taxAmount = get(stepSummary, 'amount') || 0;
   const platformFeeAmount = get(stepDetails, 'platformTip') || 0;
   return quantity * amount + platformFeeAmount + taxAmount;

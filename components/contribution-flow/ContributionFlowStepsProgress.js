@@ -28,8 +28,9 @@ const StepLabel = styled(Span)`
 `;
 
 const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, isCrypto }) => {
-  if (stepDetails.amount) {
-    const totalAmount = stepDetails.amount + (stepDetails.platformTip || 0);
+  if (stepDetails.amount || stepDetails.cryptoAmount) {
+    const amount = isCrypto ? stepDetails.cryptoAmount : stepDetails.amount;
+    const totalAmount = amount + (stepDetails.platformTip || 0);
     return (
       <FormattedMoneyAmount
         interval={stepDetails.interval !== INTERVALS.flexible ? stepDetails.interval : null}
@@ -52,6 +53,7 @@ PrettyAmountFromStepDetails.propTypes = {
   stepDetails: PropTypes.shape({
     interval: PropTypes.string,
     amount: PropTypes.number,
+    cryptoAmount: PropTypes.number,
     platformTip: PropTypes.number,
   }),
   isFreeTier: PropTypes.bool,

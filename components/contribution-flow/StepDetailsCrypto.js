@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { find } from 'lodash';
+import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -71,8 +73,10 @@ const validateCryptoCurrencyAmount = (touched, amount, minimumAmount, cryptoCurr
 
 const StepDetailsCrypto = ({ onChange, data, collective }) => {
   const intl = useIntl();
-  const [selectedCryptoCurrency, setSelectedCryptoCurrency] = useState(data.currency);
-  const [amount, setAmount] = useState(data.amount);
+  const { query } = useRouter();
+  const cryptoCurrency = find(CRYPTO_CURRENCIES, field => field.value === query.cryptoCurrency) || CRYPTO_CURRENCIES[0];
+  const [selectedCryptoCurrency, setSelectedCryptoCurrency] = useState(cryptoCurrency);
+  const [amount, setAmount] = useState(query.cryptoAmount);
   const [convertedAmount, setConvertedAmount] = useState(null);
   const [cryptoExchangeRate, setCryptoExchangeRate] = useState(null);
   const [touched, setTouched] = useState(false);
@@ -123,12 +127,12 @@ const StepDetailsCrypto = ({ onChange, data, collective }) => {
         inputMode="decimal"
         defaultValue={amount}
         onChange={({ target }) => {
-          const amount = parseFloat(target.value);
+          const amount = parseFloat(target.value).toFixed(2);
           setAmount(amount);
           if (amount >= selectedCryptoCurrency.minDonation) {
-            dispatchChange('amount', amount);
+            dispatchChange('cryptoAmount', amount);
           } else {
-            dispatchChange('amount', null);
+            dispatchChange('cryptoAmount', null);
           }
         }}
         onBlur={() => setTouched(true)}
