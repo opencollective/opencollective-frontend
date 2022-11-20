@@ -187,7 +187,12 @@ class ContributionFlow extends React.Component {
     if (currentStepName !== STEPS.SUCCESS) {
       const { stepDetails, stepProfile } = this.state;
       const currentUrlState = this.getQueryParams();
-      const expectedUrlState = stepsDataToUrlParamsData(currentUrlState, stepDetails, stepProfile);
+      const expectedUrlState = stepsDataToUrlParamsData(
+        currentUrlState,
+        stepDetails,
+        stepProfile,
+        this.props.paymentFlow === PAYMENT_FLOW.CRYPTO,
+      );
       if (!isEqual(currentUrlState, omitBy(expectedUrlState, isNil))) {
         const route = this.getRoute(currentStepName);
         const queryHelper = this.getQueryHelper();
