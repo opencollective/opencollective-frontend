@@ -8,6 +8,7 @@ import styled, { css } from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { require2FAForAdmins } from '../../lib/policies';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -137,7 +138,7 @@ const StepPayment = ({
     }
   }, [paymentOptions, stepPayment, loading]);
 
-  if (stepProfile.policies?.REQUIRE_2FA_FOR_ADMINS && !LoggedInUser?.hasTwoFactorAuth) {
+  if (require2FAForAdmins(stepProfile) && !LoggedInUser?.hasTwoFactorAuth) {
     return <TwoFactorAuthRequiredMessage borderWidth={0} noTitle />;
   }
 

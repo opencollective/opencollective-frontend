@@ -12,6 +12,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
+import { require2FAForAdmins } from '../../lib/policies';
 import { flattenObjectDeep } from '../../lib/utils';
 import { checkRequiresAddress } from './lib/utils';
 
@@ -202,7 +203,7 @@ const ExpenseFormPayeeStep = ({
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, errors } = formik;
-  const isMissing2FA = Boolean(values.payee?.policies?.REQUIRE_2FA_FOR_ADMINS && !loggedInAccount?.hasTwoFactorAuth);
+  const isMissing2FA = require2FAForAdmins(values.payee) && !loggedInAccount?.hasTwoFactorAuth;
   const stepOneCompleted = checkStepOneCompleted(values, isOnBehalf, isMissing2FA);
   const allPayoutMethods = React.useMemo(
     () => getPayoutMethodsFromPayee(values.payee),
