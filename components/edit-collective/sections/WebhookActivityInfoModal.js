@@ -84,6 +84,7 @@ const getFakeExpenseEventActivity = type => {
       formattedAmountWithInterval: '$55.00',
     },
     fromCollective: getFakeIndividual(),
+    collective: getFakeCollective(),
   });
 };
 
