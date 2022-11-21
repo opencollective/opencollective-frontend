@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Facebook } from '@styled-icons/fa-brands/Facebook';
+import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { themeGet } from '@styled-system/theme-get';
 import { get } from 'lodash';
@@ -14,7 +15,7 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
-import { facebookShareURL, getCollectivePageRoute, tweetURL } from '../../lib/url-helpers';
+import { facebookShareURL, getCollectivePageRoute, mastodonShareURL, tweetURL } from '../../lib/url-helpers';
 import { getWebsiteUrl } from '../../lib/utils';
 
 import Container from '../../components/Container';
@@ -233,6 +234,8 @@ class ContributionFlowSuccess extends React.Component {
       );
     }
 
+    const isFediverse = order?.toAccount?.tags?.includes('mastodon') || order?.toAccount?.tags?.includes('fediverse');
+
     return (
       <Flex
         width={1}
@@ -308,10 +311,30 @@ class ContributionFlowSuccess extends React.Component {
                     <Twitter size="1.2em" color="#4E5052" />
                     <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
                   </ShareLink>
-                  <ShareLink href={facebookShareURL({ u: shareURL })}>
-                    <Facebook size="1.2em" color="#4E5052" />
-                    <FormattedMessage id="shareIt" defaultMessage="Share it" />
-                  </ShareLink>
+                  {!isFediverse && (
+                    <ShareLink href={facebookShareURL({ u: shareURL })}>
+                      <Facebook size="1.2em" color="#4E5052" />
+                      <FormattedMessage id="shareIt" defaultMessage="Share it" />
+                    </ShareLink>
+                  )}
+                  {isFediverse && (
+                    <ShareLink
+                      href={mastodonShareURL({
+                        text:
+                          // eslint-disable-next-line prefer-template
+                          intl.formatMessage(
+                            order.toAccount.type === 'EVENT' ? successMsgs.event : successMsgs.default,
+                            {
+                              collective: order.toAccount.name,
+                              event: order.toAccount.name,
+                            },
+                          ) + ` ${shareURL}`,
+                      })}
+                    >
+                      <Mastodon size="1.2em" color="#4E5052" />
+                      <FormattedMessage id="shareOnMastodon" defaultMessage="Share on Mastodon" />
+                    </ShareLink>
+                  )}
                 </Flex>
                 {LoggedInUser && (
                   <Box px={1}>
