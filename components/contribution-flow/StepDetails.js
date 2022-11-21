@@ -190,9 +190,12 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
                   max={tier.availableQuantity}
                   value={data?.quantity}
                   maxWidth={80}
-                  onChange={e => dispatchChange('quantity', parseInt(e.target.value))}
                   fontSize="15px"
                   minWidth={100}
+                  onChange={e => {
+                    const newValue = parseInt(e.target.value);
+                    dispatchChange('quantity', isNaN(newValue) ? null : newValue);
+                  }}
                 />
               </div>
             )}
