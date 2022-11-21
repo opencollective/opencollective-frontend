@@ -414,7 +414,7 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
     defaultMessage: 'Virtual card charge declined',
   },
   CONTRIBUTION_REJECTED: {
-    defaultMessage: 'Virtual card charge declined',
+    defaultMessage: 'Contribution rejected',
   },
   COLLECTIVE_TRANSACTION_CREATED: {
     id: 'WebhookEvents.COLLECTIVE_TRANSACTION_CREATED',
