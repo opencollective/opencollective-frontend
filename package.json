@@ -137,7 +137,7 @@
     "langs:build": "formatjs extract \"{components,lib,pages}/**/*.{js,ts,tsx}\" --ignore='**/*.d.ts' --out-file \"dist/messages/messages.json\" --throws",
     "langs:check": "cross-env scripts/check_translations.sh",
     "langs:translate": "babel-node scripts/translate.js",
-    "langs:update": "npm-run-all build:clean langs:build langs:translate",
+    "langs:update": "npm-run-all langs:build langs:translate",
     "lint": "eslint . --ignore-path .gitignore --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "npm run lint -- --fix",
     "lint:quiet": "npm run lint -- --quiet",
