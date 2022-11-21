@@ -216,11 +216,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
               isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT])
             }
           />
-          <MenuLink
-            collective={collective}
-            section={COLLECTIVE_SECTIONS.WEBHOOKS}
-            if={isOneOfTypes(collective, [COLLECTIVE, USER, EVENT])}
-          />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.WEBHOOKS} />
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.AUTHORIZED_APPS}

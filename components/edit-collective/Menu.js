@@ -203,7 +203,6 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: c =>
     isOneOfTypes(c, COLLECTIVE, FUND, EVENT, PROJECT) || (c.type === ORGANIZATION && c.isActive),
   [EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS]: c => isType(c, ORGANIZATION) || c.createdGiftCards.total > 0,
-  [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: c => isOneOfTypes(c, COLLECTIVE, ORGANIZATION, USER, EVENT, PROJECT),
   [EDIT_COLLECTIVE_SECTIONS.ADVANCED]: () => true,
   [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: c => isType(c, USER),
   // Fiscal Host
