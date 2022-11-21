@@ -7,6 +7,7 @@ import { isHostAccount } from '../lib/collective.lib';
 import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { require2FAForAdmins } from '../lib/policies';
 
 import { AdminPanelContext } from '../components/admin-panel/AdminPanelContext';
 import AdminPanelSection from '../components/admin-panel/AdminPanelSection';
@@ -49,6 +50,9 @@ export const adminPanelQuery = gql`
         parent {
           id
           slug
+          policies {
+            REQUIRE_2FA_FOR_ADMINS
+          }
         }
       }
       ... on AccountWithHost {
@@ -216,7 +220,7 @@ const AdminPanelPage = () => {
               display={['none', null, 'block']}
               isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
             />
-            {account?.policies?.REQUIRE_2FA_FOR_ADMINS && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
+            {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
             ) : (
               <AdminPanelSection
