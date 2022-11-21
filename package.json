@@ -141,7 +141,6 @@
     "lint": "eslint . --ignore-path .gitignore --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "npm run lint -- --fix",
     "lint:quiet": "npm run lint -- --quiet",
-    "optimize-png": "npm install --no-save imagemin imagemin-optipng imagemin-pngquant && babel-node ./scripts/optimize-png",
     "prettier": "prettier \"*.@(js|ts|tsx|json|md)\" \"@(components|lib|pages|scripts|server|test|stories)/**/*.@(js|ts|tsx|json|md|mdx)\"",
     "prettier:check": "npm run prettier -- --check",
     "prettier:write": "npm run prettier -- --write",
@@ -278,9 +277,6 @@
       "@graphql-codegen/gql-tag-operations-preset",
       "cheerio",
       "eslint-config-next",
-      "imagemin",
-      "imagemin-optipng",
-      "imagemin-pngquant",
       "@storybook/*",
       "@shopify/address",
       "storybook-addon-designs"
