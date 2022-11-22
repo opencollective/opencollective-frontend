@@ -5,6 +5,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getStripe } from '../lib/stripe';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
@@ -157,6 +158,7 @@ const confirmOrderMutation = gql`
 
 const addConfirmOrderMutation = graphql(confirmOrderMutation, {
   name: 'confirmOrder',
+  options: { context: API_V2_CONTEXT },
 });
 
 export default withUser(addConfirmOrderMutation(ConfirmOrderPage));
