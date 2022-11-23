@@ -137,11 +137,17 @@ StyledButton.propTypes = {
   /**
    * Based on the design system theme
    */
-  buttonSize: PropTypes.oneOf(Object.keys(theme.buttonSizes)),
+  buttonSize: PropTypes.oneOfType([
+    PropTypes.oneOf(Object.keys(theme.buttonSizes)),
+    PropTypes.arrayOf(PropTypes.oneOf(Object.keys(theme.buttonSizes))),
+  ]),
   /**
    * Based on the design system theme
    */
-  buttonStyle: PropTypes.oneOf(Object.keys(theme.buttons)),
+  buttonStyle: PropTypes.oneOfType([
+    PropTypes.oneOf(Object.keys(theme.buttons)),
+    PropTypes.arrayOf(PropTypes.oneOf(Object.keys(theme.buttons))),
+  ]),
   /**
    * Show a loading spinner on button
    */

@@ -117,7 +117,7 @@ class TierPage extends Component {
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
-      interval: PropTypes.string.isRequired,
+      interval: PropTypes.string,
       currency: PropTypes.string,
       endsAt: PropTypes.string,
       button: PropTypes.string,
