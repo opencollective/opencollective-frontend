@@ -172,6 +172,15 @@ const ExpenseBudgetItem = ({
                       toAccount: <LinkCollective collective={expense.account} />,
                     }}
                   />
+                ) : isInverted ? (
+                  <FormattedMessage
+                    id="CreatedBy"
+                    defaultMessage="by {name} for {accountName}" // TODO: Only (1) on SUBMITTED expenses page (2) when submitter !== payee
+                    values={{
+                      name: <StyledLink as={LinkCollective} collective={expense.createdByAccount} />,
+                      accountName: <StyledLink as={LinkCollective} collective={expense.account} />,
+                    }}
+                  />
                 ) : (
                   <FormattedMessage
                     id="CreatedBy"
