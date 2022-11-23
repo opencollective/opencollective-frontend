@@ -1035,8 +1035,6 @@
   "event.sponsors.title": "赞助者",
   "event.type.label": "类型",
   "EventCover.LocalTime": "你的活动",
-  "EventDetails.showLess": "显示更少",
-  "EventDetails.showMore": "显示更多",
   "Events": "活动",
   "events": "我的活动",
   "events.create.login": "You need to be logged as a team member of this Collective to create an event.",

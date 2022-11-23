@@ -1035,8 +1035,6 @@
   "event.sponsors.title": "スポンサー",
   "event.type.label": "タイプ",
   "EventCover.LocalTime": "Your Time",
-  "EventDetails.showLess": "少なく表示",
-  "EventDetails.showMore": "もっと見る",
   "Events": "イベント",
   "events": "My Events",
   "events.create.login": "You need to be logged as a team member of this Collective to create an event.",
