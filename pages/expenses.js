@@ -75,6 +75,7 @@ class ExpensePage extends React.Component {
       period,
       searchTerm,
       orderBy,
+      direction,
     } = query;
     return {
       parentCollectiveSlug,
@@ -85,6 +86,7 @@ class ExpensePage extends React.Component {
         type: has(expenseTypes, type) ? type : undefined,
         status: has(expenseStatus, status) || status === 'READY_TO_PAY' ? status : undefined,
         payout: has(PayoutMethodType, payout) ? payout : undefined,
+        direction,
         period,
         amount,
         tag,
@@ -102,6 +104,7 @@ class ExpensePage extends React.Component {
       type: PropTypes.string,
       tag: PropTypes.string,
       searchTerm: PropTypes.string,
+      direction: PropTypes.string,
     }),
     /** from injectIntl */
     intl: PropTypes.object,
@@ -262,6 +265,7 @@ class ExpensePage extends React.Component {
                       filters={this.props.query}
                       onChange={queryParams => this.updateFilters(queryParams, data.account)}
                       wrap={false}
+                      showDirectionFilter
                     />
                   ) : (
                     <LoadingPlaceholder height={70} />
@@ -298,6 +302,7 @@ class ExpensePage extends React.Component {
                         expenses={data.expenses?.nodes}
                         nbPlaceholders={data.variables.limit}
                         suggestedTags={this.getSuggestedTags(data.account)}
+                        isInverted={query.direction === 'SUBMITTED'}
                       />
                       <Flex mt={5} justifyContent="center">
                         <Pagination
@@ -362,6 +367,8 @@ class ExpensePage extends React.Component {
 const expensesPageQuery = gql`
   query ExpensesPage(
     $collectiveSlug: String!
+    $account: AccountReferenceInput
+    $fromAccount: AccountReferenceInput
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
@@ -450,7 +457,8 @@ const expensesPageQuery = gql`
       }
     }
     expenses(
-      account: { slug: $collectiveSlug }
+      account: $account
+      fromAccount: $fromAccount
       limit: $limit
       offset: $offset
       type: $type
@@ -494,10 +502,14 @@ const addExpensesPageData = graphql(expensesPageQuery, {
     const amountRange = parseAmountRange(props.query.amount);
     const { from: dateFrom, to: dateTo } = parseDateInterval(props.query.period);
     const orderBy = props.query.orderBy && parseChronologicalOrderInput(props.query.orderBy);
+    const fromAccount = props.query.direction === 'SUBMITTED' ? { slug: props.collectiveSlug } : null;
+    const account = props.query.direction !== 'SUBMITTED' ? { slug: props.collectiveSlug } : null;
     return {
       context: API_V2_CONTEXT,
       variables: {
         collectiveSlug: props.collectiveSlug,
+        fromAccount,
+        account,
         offset: props.query.offset || 0,
         limit: props.query.limit || EXPENSES_PER_PAGE,
         type: props.query.type,

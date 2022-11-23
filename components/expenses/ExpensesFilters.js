@@ -8,8 +8,10 @@ import { encodeDateInterval } from '../../lib/date-utils';
 
 import AmountFilter from '../budget/filters/AmountFilter';
 import PeriodFilter from '../filters/PeriodFilter';
-import { Flex } from '../Grid';
+import { Box, Flex } from '../Grid';
+import StyledFilters from '../StyledFilters';
 
+import { ExpensesDirection } from './filters/ExpensesDirection';
 import ExpensesOrder from './filters/ExpensesOrder';
 import ExpensesPayoutTypeFilter from './filters/ExpensesPayoutTypeFilter';
 import ExpensesStatusFilter from './filters/ExpensesStatusFilter';
@@ -29,7 +31,9 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const ExpensesFilters = ({ collective, filters, onChange, ignoredExpenseStatus, wrap = true }) => {
+const MVP_TYPE = 2;
+
+const ExpensesFilters = ({ collective, filters, onChange, ignoredExpenseStatus, showDirectionFilter, wrap = true }) => {
   const getFilterProps = (name, valueModifier) => ({
     inputId: `expenses-filter-${name}`,
     value: filters?.[name],
@@ -40,50 +44,79 @@ const ExpensesFilters = ({ collective, filters, onChange, ignoredExpenseStatus, 
   });
 
   return (
-    <Flex flexWrap={['wrap', null, wrap ? 'wrap' : 'nowrap']} gap="18px">
-      <FilterContainer>
-        <FilterLabel htmlFor="expenses-filter-type">
-          <FormattedMessage id="expense.type" defaultMessage="Type" />
-        </FilterLabel>
-        <ExpensesTypeFilter {...getFilterProps('type')} />
-      </FilterContainer>
-      <FilterContainer>
-        <FilterLabel htmlFor="expenses-filter-payout">
-          <FormattedMessage id="Payout" defaultMessage="Payout" />
-        </FilterLabel>
-        <ExpensesPayoutTypeFilter {...getFilterProps('payout')} />
-      </FilterContainer>
-      <FilterContainer>
-        <FilterLabel htmlFor="expenses-filter-period">
-          <FormattedMessage id="Period" defaultMessage="Period" />
-        </FilterLabel>
-        <PeriodFilter {...getFilterProps('period', encodeDateInterval)} minDate={collective.createdAt} />
-      </FilterContainer>
-      <FilterContainer>
-        <FilterLabel htmlFor="expenses-filter-amount">
-          <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
-        </FilterLabel>
-        <AmountFilter currency={collective.currency} {...getFilterProps('amount')} />
-      </FilterContainer>
-      <FilterContainer>
-        <FilterLabel htmlFor="expenses-filter-status">
-          <FormattedMessage id="expense.status" defaultMessage="Status" />
-        </FilterLabel>
-        <ExpensesStatusFilter {...getFilterProps('status')} ignoredExpenseStatus={ignoredExpenseStatus} />
-      </FilterContainer>
-      <FilterContainer>
-        <FilterLabel htmlFor="expenses-order">
-          <FormattedMessage id="expense.order" defaultMessage="Order" />
-        </FilterLabel>
-        <ExpensesOrder {...getFilterProps('orderBy')} />
-      </FilterContainer>
-    </Flex>
+    <div>
+      {showDirectionFilter && MVP_TYPE === 1 && (
+        <Box mb={3}>
+          <FilterContainer>
+            <StyledFilters
+              filters={['RECEIVED', 'SUBMITTED']}
+              selected={filters?.direction}
+              onChange={direction => onChange({ ...filters, direction })}
+              getLabel={value => {
+                return value === 'RECEIVED' ? (
+                  <FormattedMessage id="ExpensesFilter.Received" defaultMessage="Received" />
+                ) : (
+                  <FormattedMessage id="ExpensesFilter.Submitted" defaultMessage="Submitted" />
+                );
+              }}
+            />
+          </FilterContainer>
+        </Box>
+      )}
+      <Flex flexWrap={['wrap', null, wrap ? 'wrap' : 'nowrap']} gap="18px">
+        <FilterContainer>
+          <FilterLabel htmlFor="expenses-filter-type">
+            <FormattedMessage id="expense.type" defaultMessage="Type" />
+          </FilterLabel>
+          <ExpensesTypeFilter {...getFilterProps('type')} />
+        </FilterContainer>
+        <FilterContainer>
+          <FilterLabel htmlFor="expenses-filter-payout">
+            <FormattedMessage id="Payout" defaultMessage="Payout" />
+          </FilterLabel>
+          <ExpensesPayoutTypeFilter {...getFilterProps('payout')} />
+        </FilterContainer>
+        <FilterContainer>
+          <FilterLabel htmlFor="expenses-filter-period">
+            <FormattedMessage id="Period" defaultMessage="Period" />
+          </FilterLabel>
+          <PeriodFilter {...getFilterProps('period', encodeDateInterval)} minDate={collective.createdAt} />
+        </FilterContainer>
+        <FilterContainer>
+          <FilterLabel htmlFor="expenses-filter-amount">
+            <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
+          </FilterLabel>
+          <AmountFilter currency={collective.currency} {...getFilterProps('amount')} />
+        </FilterContainer>
+        <FilterContainer>
+          <FilterLabel htmlFor="expenses-filter-status">
+            <FormattedMessage id="expense.status" defaultMessage="Status" />
+          </FilterLabel>
+          <ExpensesStatusFilter {...getFilterProps('status')} ignoredExpenseStatus={ignoredExpenseStatus} />
+        </FilterContainer>
+        <FilterContainer>
+          <FilterLabel htmlFor="expenses-order">
+            <FormattedMessage id="expense.order" defaultMessage="Order" />
+          </FilterLabel>
+          <ExpensesOrder {...getFilterProps('orderBy')} />
+        </FilterContainer>
+        {showDirectionFilter && MVP_TYPE === 2 && (
+          <FilterContainer>
+            <FilterLabel htmlFor="expenses-filter-direction">
+              <FormattedMessage defaultMessage="Direction" />
+            </FilterLabel>
+            <ExpensesDirection {...getFilterProps('direction')} />
+          </FilterContainer>
+        )}
+      </Flex>
+    </div>
   );
 };
 
 ExpensesFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
+  showDirectionFilter: PropTypes.bool,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     createdAt: PropTypes.string,
