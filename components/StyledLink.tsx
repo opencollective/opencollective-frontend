@@ -123,8 +123,8 @@ const StyledLink = styled.a.attrs<StyledLinkProps>(props => {
 `;
 
 StyledLink.defaultProps = {
-  color: 'colors.primary.500',
-  hoverColor: 'colors.primary.400',
+  color: 'primary.500',
+  hoverColor: 'primary.400',
 };
 
 export default StyledLink;
