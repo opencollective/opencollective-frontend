@@ -66,7 +66,7 @@ describe('Contribution Flow: Donate', () => {
       // Ensure we display errors
       cy.fillStripeInput({ card: { creditCardNumber: 123 } });
       cy.contains('button', 'Contribute $1,337').click();
-      cy.contains('Your card number is incomplete.');
+      cy.contains('Credit card ZIP code and CVC are required');
 
       // Submit with valid credit card
       cy.fillStripeInput();
@@ -126,7 +126,7 @@ describe('Contribution Flow: Donate', () => {
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.checkStepsProgress({ enabled: ['details', 'profile'] });
       cy.get('button[data-cy="cf-next-step"]').click();
-      cy.wait(1000); // Wait for stripe to be loaded
+      cy.wait(2000); // Wait for stripe to be loaded
       cy.fillStripeInput();
 
       // Should display the contribution details

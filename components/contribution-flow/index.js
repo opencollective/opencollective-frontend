@@ -23,6 +23,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
+import { confirmPayment } from '../../lib/stripe/confirm-payment';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { getCollectivePageRoute, isTrustedRedirectHost, objectToQueryString } from '../../lib/url-helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
@@ -291,20 +292,24 @@ class ContributionFlow extends React.Component {
       setGuestToken(email, order.id, guestToken);
     }
 
-    if (stepPayment?.key === STRIPE_PAYMENT_ELEMENT_KEY) {
+    if (
+      stepPayment?.paymentMethod?.service === PAYMENT_METHOD_SERVICE.STRIPE &&
+      (stepPayment?.key === STRIPE_PAYMENT_ELEMENT_KEY ||
+        stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.US_BANK_ACCOUNT ||
+        stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.SEPA_DEBIT)
+    ) {
       const { stripeData } = stepPayment;
-
       const returnUrl = `${window.location.origin}/${this.props.collective.slug}/donate/success?OrderId=${order.id}`;
 
       try {
-        await stripeData.stripe.confirmPayment({
-          elements: stripeData.elements,
-          confirmParams: {
-            // eslint-disable-next-line camelcase
-            return_url: returnUrl,
-          },
+        await confirmPayment(stripeData?.stripe, stripeData?.paymentIntentClientSecret, {
+          returnUrl,
+          elements: stripeData?.elements,
+          type: stepPayment?.paymentMethod?.type,
+          paymentMethodId: stepPayment?.paymentMethod?.data?.paymentMethodId,
         });
         this.setState({ isSubmitted: true, isSubmitting: false });
+        return this.handleSuccess(order);
       } catch (e) {
         this.setState({ isSubmitting: false, error: e.message });
       }
@@ -442,7 +447,6 @@ class ContributionFlow extends React.Component {
       legacyType: stepPayment.paymentMethod.providerType,
       service: stepPayment.paymentMethod.service,
       newType: stepPayment.paymentMethod.type,
-      paymentIntentId: stepPayment.paymentMethod.paymentIntentId,
 
       // Migration Step 3
       // service: stepPayment.paymentMethod.service,
@@ -471,6 +475,13 @@ class ContributionFlow extends React.Component {
       if (paymentMethod.paypalInfo.subscriptionId) {
         paymentMethod.type === PAYMENT_METHOD_TYPE.SUBSCRIPTION;
       }
+    }
+
+    if (
+      stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.US_BANK_ACCOUNT ||
+      stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.SEPA_DEBIT
+    ) {
+      paymentMethod.paymentIntentId = stepPayment.paymentMethod.paymentIntentId;
     }
 
     return paymentMethod;
