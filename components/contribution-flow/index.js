@@ -306,7 +306,7 @@ class ContributionFlow extends React.Component {
           returnUrl,
           elements: stripeData?.elements,
           type: stepPayment?.paymentMethod?.type,
-          paymentMethodId: stepPayment?.paymentMethod?.data?.paymentMethodId,
+          paymentMethodId: stepPayment?.paymentMethod?.data?.stripePaymentMethodId,
         });
         this.setState({ isSubmitted: true, isSubmitting: false });
         return this.handleSuccess(order);
