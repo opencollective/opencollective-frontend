@@ -8,6 +8,7 @@ import styled, { css } from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { Account, Host, Individual, PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getStripe } from '../../lib/stripe';
 
 import { Box, Flex } from '../Grid';
@@ -114,6 +115,8 @@ type PaymentMethodListProps = {
 };
 
 export default function PaymentMethodList(props: PaymentMethodListProps) {
+  const { LoggedInUser } = useLoggedInUser();
+
   const {
     loading: loadingPaymentMethods,
     data: paymentMethodsData,
@@ -293,6 +296,10 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
           {value.key === STRIPE_PAYMENT_ELEMENT_KEY && checked && (
             <Box my={3}>
               <PayWithStripeForm
+                bilingDetails={{
+                  name: LoggedInUser?.collective?.name,
+                  email: LoggedInUser?.email,
+                }}
                 paymentIntentId={paymentIntentId}
                 paymentIntentClientSecret={paymentIntentClientSecret}
                 onChange={props.onChange}

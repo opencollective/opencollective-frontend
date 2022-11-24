@@ -6,7 +6,7 @@ import { PAYMENT_METHOD_SERVICE, PAYMENT_METHOD_TYPE } from '../../lib/constants
 
 import { STRIPE_PAYMENT_ELEMENT_KEY } from './utils';
 
-export function PayWithStripeForm({ paymentIntentId, paymentIntentClientSecret, onChange }) {
+export function PayWithStripeForm({ bilingDetails, paymentIntentId, paymentIntentClientSecret, onChange }) {
   const elements = useElements();
   const stripe = useStripe();
 
@@ -33,11 +33,27 @@ export function PayWithStripeForm({ paymentIntentId, paymentIntentClientSecret, 
     [onChange],
   );
 
-  return <PaymentElement onChange={onElementChange} />;
+  return (
+    <PaymentElement
+      options={{
+        defaultValues: {
+          billingDetails: {
+            name: bilingDetails?.name,
+            email: bilingDetails?.email,
+          },
+        },
+      }}
+      onChange={onElementChange}
+    />
+  );
 }
 
 PayWithStripeForm.propTypes = {
   paymentIntentId: PropTypes.string.isRequired,
   paymentIntentClientSecret: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
+  bilingDetails: PropTypes.shape({
+    name: PropTypes.string,
+    email: PropTypes.string,
+  }),
 };
