@@ -65,7 +65,6 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
   const monthlyRecurring =
     (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
   const isFund = collective.type === CollectiveType.FUND;
-  const isProject = collective.type === CollectiveType.PROJECT;
   const borderTop = ['1px solid #dcdee0', 'none', horizontal ? null : '1px solid #dcdee0'];
 
   return (
@@ -148,7 +147,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
           currency={collective.currency}
         />
       </StatContainer>
-      {!isFund && !isProject && (
+      {!isFund && (
         <StatContainer data-cy="budgetSection-estimated-budget" borderTop={borderTop}>
           <StatTitle>
             <Calendar size="12px" />
