@@ -118,6 +118,12 @@ export const generatePaymentMethodOptions = (
     }
   });
 
+  uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
+    return (
+      !interval || ![PAYMENT_METHOD_TYPE.US_BANK_ACCOUNT, PAYMENT_METHOD_TYPE.SEPA_DEBIT].includes(paymentMethod.type)
+    );
+  });
+
   // prepaid budget: limited to a specific host
   const matchesHostCollectiveIdPrepaid = prepaid => {
     const hostCollectiveLegacyId = get(collective, 'host.legacyId');
