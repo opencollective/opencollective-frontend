@@ -128,8 +128,6 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     fetchPolicy: 'no-cache',
   });
 
-  const anyPaymentMethodAvailable = true;
-
   const [createPaymentIntent, { data: paymentIntentData, loading: loadingPaymentIntent, error: paymentIntentError }] =
     useMutation(createPaymentIntentMutation, {
       context: API_V2_CONTEXT,
@@ -229,7 +227,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     return <MessageBoxGraphqlError error={error} />;
   }
 
-  if (!anyPaymentMethodAvailable) {
+  if (isEmpty(paymentMethodOptions)) {
     return (
       <MessageBox type="warning" withIcon>
         <FormattedMessage id="NewContribute.noPaymentMethodsAvailable" defaultMessage="No payment methods available." />
@@ -297,7 +295,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
             <Box my={3}>
               <PayWithStripeForm
                 bilingDetails={{
-                  name: LoggedInUser?.collective?.name,
+                  name: props.fromAccount?.name,
                   email: LoggedInUser?.email,
                 }}
                 paymentIntentId={paymentIntentId}
