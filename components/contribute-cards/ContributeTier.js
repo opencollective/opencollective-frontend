@@ -88,7 +88,7 @@ TierTitle.propTypes = {
   }),
 };
 
-const ContributeTier = ({ intl, collective, tier, enableEditing, ...props }) => {
+const ContributeTier = ({ intl, collective, tier, enableEditing, isPreview, ...props }) => {
   const { stats } = tier;
   const currency = tier.currency || collective.currency;
   const isFlexibleAmount = tier.amountType === 'FLEXIBLE';
@@ -120,7 +120,8 @@ const ContributeTier = ({ intl, collective, tier, enableEditing, ...props }) => 
       contributors={tier.contributors}
       stats={stats?.contributors}
       data-cy="contribute-card-tier"
-      disableCTA={isDisabled}
+      isPreview={isPreview}
+      disableCTA={!isPreview && isDisabled}
       enableEditing={enableEditing}
       tier={tier}
       collective={collective}
@@ -147,7 +148,7 @@ const ContributeTier = ({ intl, collective, tier, enableEditing, ...props }) => 
                 <StyledLink
                   as={Link}
                   whiteSpace="nowrap"
-                  href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}`}
+                  href={isPreview ? '#' : `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}`}
                 >
                   <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
                 </StyledLink>
@@ -248,6 +249,7 @@ ContributeTier.propTypes = {
   /** @ignore */
   intl: PropTypes.object.isRequired,
   enableEditing: PropTypes.bool,
+  isPreview: PropTypes.bool,
 };
 
 ContributeTier.defaultProps = {

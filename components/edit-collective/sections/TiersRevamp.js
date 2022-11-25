@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
-import { get } from 'lodash';
+import { get, sortBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -138,7 +138,7 @@ const tiersQuery = gql`
 const TiersRevamp = ({ collective }) => {
   const variables = { accountSlug: collective.slug };
   const { data, loading, error } = useQuery(tiersQuery, { variables, context: API_V2_CONTEXT });
-  const tiers = get(data, 'account.tiers.nodes', []);
+  const tiers = sortBy(get(data, 'account.tiers.nodes', []), 'legacyId');
   const intl = useIntl();
 
   return (
