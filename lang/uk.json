@@ -1969,7 +1969,7 @@
   "NotificationsSettings.NecessaryNotifications.Receipts": "Receipts of your contributions",
   "NotificationsSettings.NecessaryNotifications.Title": "Необхідні сповіщення",
   "NotificationsSettings.NecessaryNotifications.ToSUpdates": "Оновлення наших умов надання послуг",
-  "NotificationsSettings.Title": "Налаштування сповіщень",
+  "NotificationsSettings.Title": "Notification Settings",
   "NotificationsSettings.ToggleError": "Помилка оновлення діяльності {activity}: {error}",
   "NotificationsSettings.ToggleResetSettings": "By toggling this setting, you're also reseting previously set options for: {activities}",
   "NotificationsSettings.Updates.CollectivesSupported": "Підтримувані вами колективи",

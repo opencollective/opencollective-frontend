@@ -244,7 +244,7 @@ const NotificationsSettings = ({ account, subpath }) => {
   return (
     <Box>
       <P fontSize="24px" fontWeight="700" lineHeight="32px" mb={3}>
-        <FormattedMessage id="NotificationsSettings.Title" defaultMessage="Notifications Settings" />
+        <FormattedMessage id="NotificationsSettings.Title" defaultMessage="Notification Settings" />
       </P>
       <P lineHeight="20px" letterSpacing="0px">
         <FormattedMessage
