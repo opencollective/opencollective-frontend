@@ -1966,7 +1966,7 @@
   "NotificationsSettings.NecessaryNotifications.Receipts": "Doklady o vašich príspevkoch",
   "NotificationsSettings.NecessaryNotifications.Title": "Potrebné upozornenia",
   "NotificationsSettings.NecessaryNotifications.ToSUpdates": "Aktualizácie našich podmienok poskytovania služieb",
-  "NotificationsSettings.Title": "Nastavenia upozornení",
+  "NotificationsSettings.Title": "Notification Settings",
   "NotificationsSettings.ToggleError": "Chyba pri aktualizácii aktivity {activity}: {error}",
   "NotificationsSettings.ToggleResetSettings": "By toggling this setting, you're also reseting previously set options for: {activities}",
   "NotificationsSettings.Updates.CollectivesSupported": "Kolektívy, ktoré podporujete",

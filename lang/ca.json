@@ -1966,7 +1966,7 @@
   "NotificationsSettings.NecessaryNotifications.Receipts": "Receipts of your contributions",
   "NotificationsSettings.NecessaryNotifications.Title": "Necessary notifications",
   "NotificationsSettings.NecessaryNotifications.ToSUpdates": "Updates on our terms of service",
-  "NotificationsSettings.Title": "Notifications Settings",
+  "NotificationsSettings.Title": "Notification Settings",
   "NotificationsSettings.ToggleError": "Error updating activity {activity}: {error}",
   "NotificationsSettings.ToggleResetSettings": "By toggling this setting, you're also reseting previously set options for: {activities}",
   "NotificationsSettings.Updates.CollectivesSupported": "Collectives you support",
