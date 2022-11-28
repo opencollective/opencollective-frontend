@@ -143,7 +143,7 @@ function FormFields({ collective, types, values }) {
         mt="3"
         required={false}
       >
-        {({ field }) => <StyledTextarea data-cy={field.name} {...field} />}
+        {({ field }) => <StyledTextarea data-cy={field.name} maxLength={510} showCount {...field} />}
       </StyledInputFormikField>
       {[DONATION, MEMBERSHIP, TIER, SERVICE].includes(values.type) && (
         <StyledInputFormikField

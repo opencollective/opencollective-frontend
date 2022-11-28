@@ -243,6 +243,7 @@ class Tiers extends React.Component {
         name: 'description',
         type: 'textarea',
         label: intl.formatMessage(this.messages['description.label']),
+        maxLength: 510,
       },
       {
         name: 'interval',
@@ -450,6 +451,7 @@ class Tiers extends React.Component {
                     defaultValue={defaultValues[field.name]}
                     options={typeof field.options === 'function' ? field.options(collective) : field.options}
                     pre={field.pre}
+                    maxLength={field.maxLength}
                     placeholder={field.placeholder}
                     onChange={value => this.editTier(index, field.name, value)}
                     description={
