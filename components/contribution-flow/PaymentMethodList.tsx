@@ -301,6 +301,8 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
                 paymentIntentId={paymentIntentId}
                 paymentIntentClientSecret={paymentIntentClientSecret}
                 onChange={props.onChange}
+                defaultIsSaved={!props.fromAccount?.isGuest}
+                hasSaveCheckBox={!props.fromAccount?.isGuest}
               />
             </Box>
           )}

@@ -483,6 +483,7 @@ class ContributionFlow extends React.Component {
       stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.PAYMENT_INTENT
     ) {
       paymentMethod.paymentIntentId = stepPayment.paymentMethod.paymentIntentId;
+      paymentMethod.isSavedForLater = stepPayment.paymentMethod.isSavedForLater;
     }
 
     return paymentMethod;
