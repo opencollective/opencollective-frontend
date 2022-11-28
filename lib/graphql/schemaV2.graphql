@@ -3395,6 +3395,8 @@ enum PaymentMethodType {
   manual @deprecated(reason: "Please use uppercase values")
   crypto @deprecated(reason: "Please use uppercase values")
   paymentintent @deprecated(reason: "Please use uppercase values")
+  us_bank_account @deprecated(reason: "Please use uppercase values")
+  sepa_debit @deprecated(reason: "Please use uppercase values")
   ALIPAY
   CREDITCARD
   PREPAID
@@ -3407,6 +3409,8 @@ enum PaymentMethodType {
   MANUAL
   CRYPTO
   PAYMENT_INTENT
+  US_BANK_ACCOUNT
+  SEPA_DEBIT
 }
 
 """
@@ -3649,6 +3653,8 @@ enum PaymentMethodLegacyType {
   ADDED_FUNDS
   CRYPTO
   PAYMENT_INTENT
+  US_BANK_ACCOUNT
+  SEPA_DEBIT
 }
 
 """

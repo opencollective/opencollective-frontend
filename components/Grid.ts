@@ -28,6 +28,7 @@ type BoxProps = SpaceProps &
   TypographyProps &
   FlexboxProps & {
     gap?: string | number;
+    css?: string | object;
   };
 
 export const Box = styled.div<BoxProps>(

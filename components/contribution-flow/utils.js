@@ -84,6 +84,7 @@ export const generatePaymentMethodOptions = (
   collective,
   isEmbed,
   disabledPaymentMethodTypes,
+  stripeAccount,
 ) => {
   const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
@@ -108,6 +109,20 @@ export const generatePaymentMethodOptions = (
     ({ paymentMethod }) =>
       paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE || collective.host.legacyId === stepProfile.host?.id,
   );
+
+  uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
+    if (paymentMethod?.data?.stripeAccount) {
+      return paymentMethod?.data?.stripeAccount === stripeAccount;
+    } else {
+      return true;
+    }
+  });
+
+  uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
+    return (
+      !interval || ![PAYMENT_METHOD_TYPE.US_BANK_ACCOUNT, PAYMENT_METHOD_TYPE.SEPA_DEBIT].includes(paymentMethod.type)
+    );
+  });
 
   // prepaid budget: limited to a specific host
   const matchesHostCollectiveIdPrepaid = prepaid => {
