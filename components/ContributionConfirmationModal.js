@@ -49,7 +49,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
   const [platformTip, setPlatformTip] = useState(platformTipAmount);
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
   const [hostFeePercent, setHostFeePercent] = useState(defaultHostFeePercent);
-  const [fundReceivedDate, setFundReceivedDate] = useState();
+  const [processedAt, setProcessedAt] = useState();
   const intl = useIntl();
   const { addToast } = useToasts();
   const [confirmOrder, { loading }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
@@ -84,8 +84,8 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
       orderUpdate.hostFeePercent = hostFeePercent;
     }
 
-    if (fundReceivedDate) {
-      orderUpdate.fundReceivedDate = new Date(fundReceivedDate);
+    if (processedAt) {
+      orderUpdate.processedAt = new Date(processedAt);
     }
 
     try {
@@ -197,13 +197,13 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
         <Container>
           <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
             <Span fontSize="14px" lineHeight="20px" fontWeight="400">
-              <FormattedMessage id="fundReceivedDate" defaultMessage="Fund received date" />
+              <FormattedMessage id="processedAt" defaultMessage="Fund received date" />
             </Span>
             <StyledInput
-              name="fundReceivedDate"
+              name="processedAt"
               type="date"
-              data-cy="fundReceivedDate"
-              onChange={e => setFundReceivedDate(e.target.value)}
+              data-cy="processedAt"
+              onChange={e => setProcessedAt(e.target.value)}
             />
           </Flex>
         </Container>

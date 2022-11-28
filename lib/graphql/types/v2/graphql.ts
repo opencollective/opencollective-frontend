@@ -5319,10 +5319,10 @@ export type MutationAddFundsArgs = {
   amount: AmountInput;
   description: Scalars['String'];
   fromAccount: AccountReferenceInput;
-  fundReceivedDate?: InputMaybe<Scalars['DateTime']>;
   hostFeePercent?: InputMaybe<Scalars['Float']>;
   invoiceTemplate?: InputMaybe<Scalars['String']>;
   memo?: InputMaybe<Scalars['String']>;
+  processedAt?: InputMaybe<Scalars['DateTime']>;
   tier?: InputMaybe<TierReferenceInput>;
 };
 
@@ -6057,8 +6057,6 @@ export type Order = {
   description?: Maybe<Scalars['String']>;
   frequency?: Maybe<ContributionFrequency>;
   fromAccount?: Maybe<Account>;
-  /** Date the funds were received. */
-  fundReceivedDate?: Maybe<Scalars['DateTime']>;
   id: Scalars['String'];
   legacyId: Scalars['Int'];
   /** This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order. */
@@ -6072,6 +6070,8 @@ export type Order = {
   /** Platform Tip attached to the Order. */
   platformTipAmount?: Maybe<Amount>;
   platformTipEligible?: Maybe<Scalars['Boolean']>;
+  /** Date the funds were received. */
+  processedAt?: Maybe<Scalars['DateTime']>;
   quantity?: Maybe<Scalars['Int']>;
   status?: Maybe<OrderStatus>;
   tags: Array<Maybe<Scalars['String']>>;
@@ -6230,8 +6230,6 @@ export enum OrderTaxType {
 export type OrderUpdateInput = {
   /** Amount received by collective, excluding any tips or fees */
   amount?: InputMaybe<AmountInput>;
-  /** Date the funds were received */
-  fundReceivedDate?: InputMaybe<Scalars['DateTime']>;
   /** Host fee percent to be applied to the order */
   hostFeePercent?: InputMaybe<Scalars['Float']>;
   /** The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
@@ -6242,6 +6240,8 @@ export type OrderUpdateInput = {
   paymentProcessorFee?: InputMaybe<AmountInput>;
   /** Amount intended as tip for the platform */
   platformTip?: InputMaybe<AmountInput>;
+  /** Date the funds were received */
+  processedAt?: InputMaybe<Scalars['DateTime']>;
 };
 
 export type OrderWithPayment = {

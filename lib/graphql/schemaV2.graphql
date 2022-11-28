@@ -831,7 +831,7 @@ type Order {
   """
   Date the funds were received.
   """
-  fundReceivedDate: DateTime
+  processedAt: DateTime
 }
 
 """
@@ -12179,7 +12179,7 @@ type Mutation {
     amount: AmountInput!
     description: String!
     memo: String
-    fundReceivedDate: DateTime
+    processedAt: DateTime
     hostFeePercent: Float
     invoiceTemplate: String
   ): Order!
@@ -14571,7 +14571,7 @@ input OrderUpdateInput {
   """
   Date the funds were received
   """
-  fundReceivedDate: DateTime
+  processedAt: DateTime
 }
 
 """

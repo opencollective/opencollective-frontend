@@ -179,12 +179,12 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               <DetailDescription>{order.memo}</DetailDescription>
             </React.Fragment>
           )}
-          {order?.fundReceivedDate && (
+          {order?.processedAt && (
             <React.Fragment>
               <DetailTitle>
                 <FormattedMessage defaultMessage="Fund Received Date" />
               </DetailTitle>
-              <DetailDescription>{intl.formatDate(order.fundReceivedDate)}</DetailDescription>
+              <DetailDescription>{intl.formatDate(order.processedAt)}</DetailDescription>
             </React.Fragment>
           )}
         </Flex>
@@ -309,7 +309,7 @@ TransactionDetails.propTypes = {
       id: PropTypes.string,
       status: PropTypes.string,
       memo: PropTypes.string,
-      fundReceivedDate: PropTypes.string,
+      processedAt: PropTypes.string,
     }),
     expense: PropTypes.object,
     id: PropTypes.string,
