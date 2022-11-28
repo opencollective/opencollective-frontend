@@ -242,6 +242,7 @@ export const generatePaymentMethodOptions = (
     if (
       supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYMENT_INTENT) &&
       !interval &&
+      get(collective, 'settings.features.stripePaymentIntent', false) &&
       ['USD', 'EUR'].includes(stepDetails.currency)
     ) {
       let subtitle;
