@@ -131,7 +131,6 @@ class EmbedContributionFlowPage extends React.Component {
             host={account.host}
             tier={tier}
             verb={this.props.verb}
-            queryParams={this.props.queryParams}
             error={this.props.error}
           />
         </Box>

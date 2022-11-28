@@ -212,7 +212,7 @@ class ContributionFlow extends React.Component {
   }
 
   _getQueryParams = memoizeOne(query => {
-    return ContributionFlowUrlQueryHelper.decode(query);
+    return this.getQueryHelper().decode(query);
   });
 
   getQueryParams = () => {
