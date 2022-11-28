@@ -70,8 +70,8 @@ class HeroEventDetails extends React.Component {
       timezone: PropTypes.string.isRequired,
       location: PropTypes.object,
       parentCollective: PropTypes.object,
-      isApproved: PropTypes.boolean,
-      isHost: PropTypes.boolean,
+      isApproved: PropTypes.bool,
+      isHost: PropTypes.bool,
     }).isRequired,
   };
 

@@ -4,7 +4,7 @@ import { isEmpty, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { canContributeRecurring, hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
+import { canContributeRecurring, hostIsTaxDeductibleInTheUs } from '../../lib/collective.lib';
 import INTERVALS from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
@@ -202,7 +202,7 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
           </StyledInputField>
         </Box>
       )}
-      {hostIsTaxDeductibeInTheUs(collective.host) && (
+      {hostIsTaxDeductibleInTheUs(collective.host) && (
         <React.Fragment>
           <StyledHr borderColor="black.300" mb={16} mt={32} />
           <P fontSize="14px" lineHeight="20px" fontStyle="italic" color="black.500" letterSpacing="0em">
