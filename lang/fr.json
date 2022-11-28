@@ -1131,7 +1131,6 @@
   "Expense.Type.Debit": "Débit",
   "Expense.Type.FundingRequest": "Autoriser",
   "Expense.Type.Invoice": "Facture",
-  "Expense.Type.Receipt": "Reçu",
   "Expense.Type.Settlement": "Réglement",
   "expense.type.tooltip": "Sélectionnez «reçu» pour être remboursé pour un achat déjà effectué. Sélectionnez \"facture\" si vous facturez votre temps, êtes payé à l'avance ou si vous n'avez pas de reçu.",
   "Expense.Type.Unclassified": "Non classé",

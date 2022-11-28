@@ -1131,7 +1131,6 @@
   "Expense.Type.Debit": "Debet",
   "Expense.Type.FundingRequest": "Grant",
   "Expense.Type.Invoice": "Faktúra",
-  "Expense.Type.Receipt": "Príjmový doklad",
   "Expense.Type.Settlement": "Vysporiadanie",
   "expense.type.tooltip": "Ak si želáte dostať späť peniaze za už uskutočnený nákup, zvoľte možnosť \"príjmový doklad\". Ak účtujete za svoj čas, dostávate platbu vopred alebo nemáte účtenku, zvoľte možnosť \"faktúra\".",
   "Expense.Type.Unclassified": "Nezaradené",
