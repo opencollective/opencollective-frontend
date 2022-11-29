@@ -151,7 +151,7 @@ exports.REWRITES = [
     destination: '/order',
   },
   {
-    source: '/orders/:id([0-9]+)/confirm',
+    source: '/:collectiveSlug?/orders/:id([0-9]+)/confirm',
     destination: '/confirmOrder',
   },
   {

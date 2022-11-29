@@ -28,6 +28,7 @@ const FilterButton = styled(StyledButton).attrs({
       &:focus {
         background-color: ${props => props.theme.colors.primary[100]};
         border: 1px solid ${props => props.theme.colors.primary[700]};
+        color: ${props => props.theme.colors.primary[900]};
         box-shadow: none;
       }
     `}
@@ -41,10 +42,20 @@ const FilterButton = styled(StyledButton).attrs({
   }
 `;
 
+const defaultGetLabel = filter => filter;
+
 /**
  * A controlled component to display a list of filters.
  */
-const StyledFilters = ({ filters, disabled, getLabel, onChange, selected, minButtonWidth, ...flexProps }) => {
+const StyledFilters = ({
+  filters,
+  onChange,
+  disabled = false,
+  getLabel = defaultGetLabel,
+  selected = undefined,
+  minButtonWidth = undefined,
+  ...flexProps
+}) => {
   return (
     <Flex data-cy="filters" px={1} py={1} css={{ overflowX: 'auto' }} {...flexProps}>
       {filters.map((filter, idx) => {
@@ -77,11 +88,6 @@ StyledFilters.propTypes = {
   disabled: PropTypes.bool,
   minButtonWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   selectedButtonStyle: PropTypes.oneOf(['primary', 'secondary', 'dark']),
-};
-
-StyledFilters.defaultProps = {
-  getLabel: filter => filter,
-  selectedButtonStyle: 'primary',
 };
 
 export default StyledFilters;

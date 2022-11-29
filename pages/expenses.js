@@ -6,7 +6,6 @@ import { has, omit, omitBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
 import { getCollectivePageMetadata, getSuggestedTags, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
@@ -30,7 +29,8 @@ import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
 import ExpensesList from '../components/expenses/ExpensesList';
 import ExpenseTags from '../components/expenses/ExpenseTags';
-import { parseChronologicalOrderInput } from '../components/expenses/filters/ExpensesOrder';
+import { ExpensesDirection } from '../components/expenses/filters/ExpensesDirection';
+import ExpensesOrder, { parseChronologicalOrderInput } from '../components/expenses/filters/ExpensesOrder';
 import { expenseHostFields, expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box, Flex } from '../components/Grid';
 import ScheduledExpensesBanner from '../components/host-dashboard/ScheduledExpensesBanner';
@@ -41,7 +41,6 @@ import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import Pagination from '../components/Pagination';
 import SearchBar from '../components/SearchBar';
-import StyledHr from '../components/StyledHr';
 import { H1, H5 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
@@ -52,13 +51,8 @@ const messages = defineMessages({
   },
 });
 
-const SearchFormContainer = styled(Box)`
-  width: 100%;
-  max-width: 278px;
-  min-width: 10rem;
-`;
-
 const EXPENSES_PER_PAGE = 10;
+const ORDER_SELECT_STYLE = { control: { background: 'white' } };
 
 class ExpensePage extends React.Component {
   static getInitialProps({ query }) {
@@ -105,6 +99,7 @@ class ExpensePage extends React.Component {
       tag: PropTypes.string,
       searchTerm: PropTypes.string,
       direction: PropTypes.string,
+      orderBy: PropTypes.string,
     }),
     /** from injectIntl */
     intl: PropTypes.object,
@@ -240,84 +235,92 @@ class ExpensePage extends React.Component {
         />
         <Container position="relative" minHeight={[null, 800]}>
           <Box maxWidth={Dimensions.MAX_SECTION_WIDTH} m="0 auto" px={[2, 3, 4]} py={[0, 5]} mt={3}>
-            <Flex justifyContent="space-between" flexWrap="wrap">
-              <Box flex="1 1 500px" minWidth={300} maxWidth={792} mr={[0, 3, 5]} mb={5}>
-                <Flex>
-                  <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
-                    <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-                  </H1>
-                  <Box mx="auto" />
-                  <SearchFormContainer p={2}>
-                    <SearchBar
-                      defaultValue={query.searchTerm}
-                      onSubmit={searchTerm => this.handleSearch(searchTerm, data.account)}
-                    />
-                  </SearchFormContainer>
-                </Flex>
-                <StyledHr my={24} mx="8px" borderWidth="0.5px" />
-                {isSelfHosted && LoggedInUser?.isHostAdmin(data.account) && data.scheduledExpenses?.totalCount > 0 && (
-                  <ScheduledExpensesBanner host={data.account} />
-                )}
-                <Box mx="8px">
-                  {data.account ? (
-                    <ExpensesFilters
-                      collective={data.account}
-                      filters={this.props.query}
-                      onChange={queryParams => this.updateFilters(queryParams, data.account)}
-                      wrap={false}
-                      showDirectionFilter
-                    />
-                  ) : (
-                    <LoadingPlaceholder height={70} />
-                  )}
-                </Box>
-                <Box mt={['16px', '46px']}>
-                  {!data?.loading && !data.expenses?.nodes.length ? (
-                    <MessageBox type="info" withIcon data-cy="zero-expense-message">
-                      {hasFilters ? (
-                        <FormattedMessage
-                          id="ExpensesList.Empty"
-                          defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
-                          values={{
-                            ResetLink: text => (
-                              <Link
-                                data-cy="reset-expenses-filters"
-                                href={`${getCollectivePageRoute(data.account)}/expenses`}
-                              >
-                                <span>{text}</span>
-                              </Link>
-                            ),
-                          }}
-                        />
-                      ) : (
-                        <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
-                      )}
-                    </MessageBox>
-                  ) : (
-                    <React.Fragment>
-                      <ExpensesList
-                        isLoading={Boolean(data?.loading)}
-                        collective={data.account}
-                        host={data.account?.isHost ? data.account : data.account?.host}
-                        expenses={data.expenses?.nodes}
-                        nbPlaceholders={data.variables.limit}
-                        suggestedTags={this.getSuggestedTags(data.account)}
-                        isInverted={query.direction === 'SUBMITTED'}
-                      />
-                      <Flex mt={5} justifyContent="center">
-                        <Pagination
-                          route={`${getCollectivePageRoute(data.account)}/expenses`}
-                          total={data.expenses?.totalCount}
-                          limit={data.variables.limit}
-                          offset={data.variables.offset}
-                          ignoredQueryParams={['collectiveSlug', 'parentCollectiveSlug']}
-                        />
-                      </Flex>
-                    </React.Fragment>
-                  )}
-                </Box>
+            <H1 fontSize="32px" lineHeight="40px" mb="32px" fontWeight="normal">
+              <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+            </H1>
+            <Flex alignItems="center" mb="32px">
+              <ExpensesDirection
+                value={query.direction}
+                onChange={direction => this.updateFilters({ ...query, direction }, data.account)}
+              />
+              <Box flex="1 1" mr="16px">
+                <SearchBar
+                  defaultValue={query.searchTerm}
+                  onSubmit={searchTerm => this.handleSearch(searchTerm, data.account)}
+                  height="40px"
+                />
               </Box>
-              <Box minWidth={270} width={['100%', null, null, 275]} mt={[0, 70]}>
+              <Box flex="0 1 150px">
+                <ExpensesOrder
+                  value={query.orderBy}
+                  onChange={orderBy => this.updateFilters({ ...query, orderBy }, data.account)}
+                  styles={ORDER_SELECT_STYLE}
+                />
+              </Box>
+            </Flex>
+            <Box mx="8px">
+              {data.account ? (
+                <ExpensesFilters
+                  collective={data.account}
+                  filters={query}
+                  onChange={queryParams => this.updateFilters(queryParams, data.account)}
+                  wrap={false}
+                  showOrderFilter={false} // On this page, the order filter is displayed at the top
+                />
+              ) : (
+                <LoadingPlaceholder height={70} />
+              )}
+            </Box>
+            {isSelfHosted && LoggedInUser?.isHostAdmin(data.account) && data.scheduledExpenses?.totalCount > 0 && (
+              <ScheduledExpensesBanner host={data.account} />
+            )}
+            <Flex justifyContent="space-between" flexWrap="wrap">
+              <Box flex="1 1 500px" minWidth={300} mr={[0, 3, 5]} mb={5} mt={['16px', '46px']}>
+                {!data?.loading && !data.expenses?.nodes.length ? (
+                  <MessageBox type="info" withIcon data-cy="zero-expense-message">
+                    {hasFilters ? (
+                      <FormattedMessage
+                        id="ExpensesList.Empty"
+                        defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
+                        values={{
+                          ResetLink: text => (
+                            <Link
+                              data-cy="reset-expenses-filters"
+                              href={`${getCollectivePageRoute(data.account)}/expenses`}
+                            >
+                              <span>{text}</span>
+                            </Link>
+                          ),
+                        }}
+                      />
+                    ) : (
+                      <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
+                    )}
+                  </MessageBox>
+                ) : (
+                  <React.Fragment>
+                    <ExpensesList
+                      isLoading={Boolean(data?.loading)}
+                      collective={data.account}
+                      host={data.account?.isHost ? data.account : data.account?.host}
+                      expenses={data.expenses?.nodes}
+                      nbPlaceholders={data.variables.limit}
+                      suggestedTags={this.getSuggestedTags(data.account)}
+                      isInverted={query.direction === 'SUBMITTED'}
+                    />
+                    <Flex mt={5} justifyContent="center">
+                      <Pagination
+                        route={`${getCollectivePageRoute(data.account)}/expenses`}
+                        total={data.expenses?.totalCount}
+                        limit={data.variables.limit}
+                        offset={data.variables.offset}
+                        ignoredQueryParams={['collectiveSlug', 'parentCollectiveSlug']}
+                      />
+                    </Flex>
+                  </React.Fragment>
+                )}
+              </Box>
+              <Box minWidth={270} width={['100%', null, null, 275]} mt={[0, 48]}>
                 <ExpenseInfoSidebar
                   isLoading={data.loading}
                   collective={data.account}
