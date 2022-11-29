@@ -21,9 +21,10 @@ export const ExpensesDirection = ({ onChange, value }: ExpensesDirectionProps) =
     <StyledFilters
       filters={DIRECTIONS}
       selected={value || DIRECTIONS[0]}
-      minButtonWidth={165}
+      minButtonWidth="100%"
       onChange={onChange}
       getLabel={value => intl.formatMessage(I18NLabels[value])}
+      buttonGrow={1}
     />
   );
 };

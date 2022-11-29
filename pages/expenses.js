@@ -238,19 +238,21 @@ class ExpensePage extends React.Component {
             <H1 fontSize="32px" lineHeight="40px" mb="32px" fontWeight="normal">
               <FormattedMessage id="Expenses" defaultMessage="Expenses" />
             </H1>
-            <Flex alignItems="center" mb="32px">
-              <ExpensesDirection
-                value={query.direction}
-                onChange={direction => this.updateFilters({ ...query, direction }, data.account)}
-              />
-              <Box flex="1 1" mr="16px">
+            <Flex alignItems={[null, null, 'center']} mb="26px" flexWrap="wrap" gap="16px" mr={2}>
+              <Box flex="0 1" flexBasis={['100%', null, '380px']}>
+                <ExpensesDirection
+                  value={query.direction}
+                  onChange={direction => this.updateFilters({ ...query, direction }, data.account)}
+                />
+              </Box>
+              <Box flex="12 1 150px">
                 <SearchBar
                   defaultValue={query.searchTerm}
                   onSubmit={searchTerm => this.handleSearch(searchTerm, data.account)}
                   height="40px"
                 />
               </Box>
-              <Box flex="0 1 150px">
+              <Box flex="1 1 150px">
                 <ExpensesOrder
                   value={query.orderBy}
                   onChange={orderBy => this.updateFilters({ ...query, orderBy }, data.account)}
