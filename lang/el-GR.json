@@ -1132,7 +1132,6 @@
   "Expense.Type.Debit": "Χρέωση",
   "Expense.Type.FundingRequest": "Παραχώρηση",
   "Expense.Type.Invoice": "Εξόφληση Τιμολογίου",
-  "Expense.Type.Receipt": "Απόδειξη",
   "Expense.Type.Settlement": "Διακανονισμός",
   "expense.type.tooltip": "Select 'receipt' to get paid back for a purchase already made. Select 'invoice' if you are charging for your time, getting paid in advance, or do not have a receipt.",
   "Expense.Type.Unclassified": "Μη ταξινομημένο",
