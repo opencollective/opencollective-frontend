@@ -1132,7 +1132,6 @@
   "Expense.Type.Debit": "Débito",
   "Expense.Type.FundingRequest": "Grant",
   "Expense.Type.Invoice": "Fatura",
-  "Expense.Type.Receipt": "Recibo",
   "Expense.Type.Settlement": "Settlement",
   "expense.type.tooltip": "Selecione 'recibo' para receber o reembolso de uma compra já feita. Selecione 'fatura' se estiver cobrando pelo seu tempo, sendo pago antecipadamente ou se não tiver um recibo.",
   "Expense.Type.Unclassified": "Não classificado",

@@ -1132,7 +1132,6 @@
   "Expense.Type.Debit": "Debit",
   "Expense.Type.FundingRequest": "Grant",
   "Expense.Type.Invoice": "Fattura",
-  "Expense.Type.Receipt": "Ricevuta",
   "Expense.Type.Settlement": "Settlement",
   "expense.type.tooltip": "Seleziona 'ricevuta' per essere rimborsato per un acquisto già effettuato. Seleziona \"fattura\" se stai addebitato per il tuo tempo, se ricevi pagamenti anticipati o se non hai una ricevuta.",
   "Expense.Type.Unclassified": "Non classificato",

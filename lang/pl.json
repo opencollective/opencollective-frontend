@@ -1132,7 +1132,6 @@
   "Expense.Type.Debit": "Obciążenie",
   "Expense.Type.FundingRequest": "Dotacja",
   "Expense.Type.Invoice": "Faktura",
-  "Expense.Type.Receipt": "Pokwitowanie",
   "Expense.Type.Settlement": "Rozliczenie",
   "expense.type.tooltip": "Wybierz 'paragon', aby otrzymać zwrot pieniędzy za dokonany zakup. Wybierz 'faktura', jeśli płacisz za swój czas, otrzymujesz płatność z góry lub nie masz paragonu.",
   "Expense.Type.Unclassified": "Niesklasyfikowane",
