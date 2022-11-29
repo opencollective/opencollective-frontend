@@ -165,7 +165,7 @@ class TierPage extends Component {
 
   render() {
     const { collective, tier, contributors, contributorsStats, redirect, LoggedInUser } = this.props;
-    const canEdit = LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(collective);
+    const canEdit = LoggedInUser && LoggedInUser.isAdminOfCollective(collective);
     const isFlexibleInterval = tier.interval === INTERVALS.flexible;
     const amountRaisedKey = tier.interval && !isFlexibleInterval ? 'totalRecurringDonations' : 'totalDonated';
     const amountRaised = tier.stats?.[amountRaisedKey] || 0;

@@ -104,7 +104,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return ALL_SECTIONS.INFO;
   }
 
-  const isAdmin = loggedInUser?.isAdminOfCollectiveOrHost(account);
+  const isAdmin = loggedInUser?.isAdminOfCollective(account);
   const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
   const isAccountantOnly = !isAdmin && isAccountant;
   if (isHostAccount(account)) {
@@ -145,7 +145,7 @@ function getBlocker(LoggedInUser, account, section) {
   }
 
   // Check permissions
-  const isAdmin = LoggedInUser.isAdminOfCollectiveOrHost(account);
+  const isAdmin = LoggedInUser.isAdminOfCollective(account);
   if (SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS.includes(section)) {
     if (!isAdmin && !LoggedInUser.hasRole(roles.ACCOUNTANT, account)) {
       return <FormattedMessage defaultMessage="You need to be logged in as an admin or accountant to view this page" />;
@@ -156,9 +156,7 @@ function getBlocker(LoggedInUser, account, section) {
 }
 
 const getIsAccountantOnly = (LoggedInUser, account) => {
-  return (
-    LoggedInUser && !LoggedInUser.isAdminOfCollectiveOrHost(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account)
-  );
+  return LoggedInUser && !LoggedInUser.isAdminOfCollective(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account);
 };
 
 const AdminPanelPage = () => {

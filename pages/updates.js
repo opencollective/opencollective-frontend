@@ -54,7 +54,7 @@ class UpdatesPage extends React.Component {
   componentDidUpdate(prevProps) {
     const { data, LoggedInUser } = this.props;
     const collective = data.account;
-    if (!prevProps.LoggedInUser && LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(collective)) {
+    if (!prevProps.LoggedInUser && LoggedInUser && LoggedInUser.isAdminOfCollective(collective)) {
       // We refetch the data to get the updates that are not published yet
       data.refetch({ options: { fetchPolicy: 'network-only' } });
     }
@@ -86,7 +86,7 @@ class UpdatesPage extends React.Component {
         <Body>
           <CollectiveNavbar
             collective={collective}
-            isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(collective)}
+            isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollective(collective)}
             selectedCategory={NAVBAR_CATEGORIES.CONNECT}
           />
 
@@ -103,7 +103,7 @@ class UpdatesPage extends React.Component {
                   />
                 </P>
               </Container>
-              {LoggedInUser?.isAdminOfCollectiveOrHost(collective) && (
+              {LoggedInUser?.isAdminOfCollective(collective) && (
                 <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
                   <StyledButton buttonStyle="primary" m={2}>
                     <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />

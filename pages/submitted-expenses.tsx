@@ -87,7 +87,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
   async componentDidUpdate(oldProps) {
     const { LoggedInUser, data } = this.props;
     if (!oldProps.LoggedInUser && LoggedInUser) {
-      if (LoggedInUser.isAdminOfCollectiveOrHost(data.account) || LoggedInUser.isHostAdmin(data.account)) {
+      if (LoggedInUser.isAdminOfCollectiveOrHost(data.account)) {
         data.refetch();
       }
     }

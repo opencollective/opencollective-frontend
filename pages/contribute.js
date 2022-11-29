@@ -275,14 +275,14 @@ class TiersPage extends React.Component {
                       <H2 fontWeight="normal" mb={2}>
                         {title}
                       </H2>
-                      {LoggedInUser?.isAdminOfCollectiveOrHost(collective) && verb === 'events' && (
+                      {LoggedInUser?.isAdminOfCollective(collective) && verb === 'events' && (
                         <Link href={`/${collective.slug}/events/new`}>
                           <StyledButton buttonStyle="primary">
                             <FormattedMessage id="event.create.btn" defaultMessage="Create Event" />
                           </StyledButton>
                         </Link>
                       )}
-                      {LoggedInUser?.isAdminOfCollectiveOrHost(collective) && verb === 'projects' && (
+                      {LoggedInUser?.isAdminOfCollective(collective) && verb === 'projects' && (
                         <Link href={`/${collective.slug}/projects/new`}>
                           <StyledButton buttonStyle="primary">
                             <FormattedMessage id="SectionProjects.CreateProject" defaultMessage="Create Project" />
