@@ -1132,7 +1132,6 @@
   "Expense.Type.Debit": "חיוב",
   "Expense.Type.FundingRequest": "מענק",
   "Expense.Type.Invoice": "חשבונית",
-  "Expense.Type.Receipt": "קבלה",
   "Expense.Type.Settlement": "הסדר",
   "expense.type.tooltip": "בחירת \"קבלה\" כדי לקבל החזר עבור הוצאה ששילמת מכיסך. בחירת \"דרישת תשלום\" אם ברצונך לקבל תשלום על עבודה, שירות, טובין וכו'.",
   "Expense.Type.Unclassified": "לא מוגדר",
