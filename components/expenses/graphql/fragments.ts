@@ -213,6 +213,14 @@ export const expensePageExpenseFieldsFragment = gql`
         isApproved
         host {
           id
+          # For Expenses across hosts
+          payoutMethods {
+            id
+            type
+            name
+            data
+            isSaved
+          }
         }
       }
 
