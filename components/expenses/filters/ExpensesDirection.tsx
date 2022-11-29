@@ -1,24 +1,29 @@
 import React from 'react';
-import { useIntl } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 
-import { StyledSelectFilter } from '../../StyledSelectFilter';
+import StyledFilters from '../../StyledFilters';
 
-export const ExpensesDirection = ({ onChange, value, ...props }) => {
+const I18NLabels = defineMessages({
+  RECEIVED: { id: 'Expense.Direction.Received', defaultMessage: 'Received' },
+  SUBMITTED: { id: 'Expense.Direction.Submitted', defaultMessage: 'Submitted' },
+});
+
+const DIRECTIONS = Object.keys(I18NLabels);
+
+type ExpensesDirectionProps = {
+  value: 'RECEIVED' | 'SUBMITTED' | null | undefined;
+  onChange: (direction: 'RECEIVED' | 'SUBMITTED') => void;
+};
+
+export const ExpensesDirection = ({ onChange, value }: ExpensesDirectionProps) => {
   const intl = useIntl();
-  const options = React.useMemo(
-    () => [
-      { value: 'RECEIVED', label: intl.formatMessage({ defaultMessage: 'Received' }) },
-      { value: 'SUBMITTED', label: intl.formatMessage({ defaultMessage: 'Submitted' }) },
-    ],
-    [],
-  );
-
   return (
-    <StyledSelectFilter
-      inputId="expenses-direction-filter"
-      options={options}
-      onChange={({ value }) => onChange(value)}
-      value={options.find(option => option.value === value) || options[0]}
+    <StyledFilters
+      filters={DIRECTIONS}
+      selected={value || DIRECTIONS[0]}
+      minButtonWidth={165}
+      onChange={onChange}
+      getLabel={value => intl.formatMessage(I18NLabels[value])}
     />
   );
 };
