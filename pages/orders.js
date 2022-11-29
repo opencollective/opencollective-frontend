@@ -36,7 +36,7 @@ class OrdersPage extends React.Component {
             <CollectiveNavbar
               isLoading={data.loading}
               collective={data.account}
-              isAdmin={LoggedInUser?.isAdminOfCollectiveOrHost(collective)}
+              isAdmin={LoggedInUser?.isAdminOfCollective(collective)}
             />
           </Container>
         )}

@@ -135,7 +135,7 @@ class UpdatePage extends React.Component {
       >
         <CollectiveNavbar
           collective={account}
-          isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(account)}
+          isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollective(account)}
           selectedCategory={NAVBAR_CATEGORIES.CONNECT}
         />
 
@@ -144,7 +144,7 @@ class UpdatePage extends React.Component {
             key={update.id}
             collective={account}
             update={update}
-            editable={Boolean(LoggedInUser?.isAdminOfCollectiveOrHost(account))}
+            editable={Boolean(LoggedInUser?.isAdminOfCollective(account))}
             LoggedInUser={LoggedInUser}
             compact={false}
             reactions={update.reactions}

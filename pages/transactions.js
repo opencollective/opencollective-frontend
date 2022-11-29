@@ -233,7 +233,6 @@ class TransactionsPage extends React.Component {
       return false;
     } else {
       return (
-        LoggedInUser.isHostAdmin(collective) ||
         LoggedInUser.isAdminOfCollectiveOrHost(collective) ||
         LoggedInUser.hasRole(roles.ACCOUNTANT, collective) ||
         LoggedInUser.hasRole(roles.ACCOUNTANT, collective.host)
@@ -289,7 +288,7 @@ class TransactionsPage extends React.Component {
         <Body>
           <CollectiveNavbar
             collective={collective}
-            isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(collective)}
+            isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollective(collective)}
             selectedCategory={NAVBAR_CATEGORIES.BUDGET}
             selectedSection={collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
           />
