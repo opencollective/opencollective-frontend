@@ -162,7 +162,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
 
   const hostSupportedPaymentMethods = props.host?.supportedPaymentMethods ?? [];
   const hostHasStripe = hostSupportedPaymentMethods.includes(PaymentMethodLegacyType.CREDIT_CARD);
-  const collectiveHasStripePaymentIntent = get(props.toAccount, 'settings.features.stripePaymentIntent', false)
+  const collectiveHasStripePaymentIntent = get(props.toAccount, 'settings.features.stripePaymentIntent', false);
 
   React.useEffect(() => {
     if (hostHasStripe && collectiveHasStripePaymentIntent) {
