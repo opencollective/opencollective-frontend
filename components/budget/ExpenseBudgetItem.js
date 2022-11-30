@@ -14,7 +14,7 @@ import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
-import Avatar from '../Avatar';
+import { AvatarWithLink } from '../AvatarWithLink';
 import Container from '../Container';
 import DateTime from '../DateTime';
 import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
@@ -118,9 +118,11 @@ const ExpenseBudgetItem = ({
             {isLoading ? (
               <LoadingPlaceholder width={40} height={40} />
             ) : (
-              <StyledLink as={LinkCollective} collective={featuredProfile}>
-                <Avatar collective={featuredProfile} radius={40} />
-              </StyledLink>
+              <AvatarWithLink
+                radius={40}
+                account={featuredProfile}
+                secondaryAccount={featuredProfile.id === expense.createdByAccount.id ? null : expense.createdByAccount}
+              />
             )}
           </Box>
           {isLoading ? (
@@ -163,29 +165,14 @@ const ExpenseBudgetItem = ({
 
               <P mt="5px" fontSize="12px" color="black.700">
                 {isAdminView ? (
-                  <StyledLink as={LinkCollective} collective={expense.account} />
-                ) : isSubmitterView ? (
-                  <FormattedMessage
-                    defaultMessage="from {fromAccount} to {toAccount}"
-                    values={{
-                      fromAccount: <LinkCollective collective={expense.payee} />,
-                      toAccount: <LinkCollective collective={expense.account} />,
-                    }}
-                  />
-                ) : isInverted ? (
-                  <FormattedMessage
-                    id="CreatedBy"
-                    defaultMessage="by {name} for {accountName}" // TODO: Only (1) on SUBMITTED expenses page (2) when submitter !== payee
-                    values={{
-                      name: <StyledLink as={LinkCollective} collective={expense.createdByAccount} />,
-                      accountName: <StyledLink as={LinkCollective} collective={expense.account} />,
-                    }}
-                  />
+                  <LinkCollective collective={expense.account} />
                 ) : (
                   <FormattedMessage
-                    id="CreatedBy"
-                    defaultMessage="by {name}"
-                    values={{ name: <StyledLink as={LinkCollective} collective={expense.createdByAccount} /> }}
+                    defaultMessage="from {payee} to {account}"
+                    values={{
+                      payee: <LinkCollective collective={expense.payee} />,
+                      account: <LinkCollective collective={expense.account} />,
+                    }}
                   />
                 )}
                 {' • '}
@@ -397,6 +384,7 @@ ExpenseBudgetItem.propTypes = {
       type: PropTypes.string,
     }),
     createdByAccount: PropTypes.shape({
+      id: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
