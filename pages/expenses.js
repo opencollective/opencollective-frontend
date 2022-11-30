@@ -507,8 +507,9 @@ const addExpensesPageData = graphql(expensesPageQuery, {
     const amountRange = parseAmountRange(props.query.amount);
     const { from: dateFrom, to: dateTo } = parseDateInterval(props.query.period);
     const orderBy = props.query.orderBy && parseChronologicalOrderInput(props.query.orderBy);
-    const fromAccount = props.query.direction === 'SUBMITTED' ? { slug: props.collectiveSlug } : null;
-    const account = props.query.direction !== 'SUBMITTED' ? { slug: props.collectiveSlug } : null;
+    const showSubmitted = props.query.direction === 'SUBMITTED';
+    const fromAccount = showSubmitted ? { slug: props.collectiveSlug } : null;
+    const account = !showSubmitted ? { slug: props.collectiveSlug } : null;
     return {
       context: API_V2_CONTEXT,
       variables: {
