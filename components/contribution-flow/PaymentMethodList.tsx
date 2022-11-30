@@ -142,6 +142,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
           toAccount: pick(props.toAccount, 'id'),
         },
       },
+      errorPolicy: 'all',
     });
 
   const {
@@ -190,7 +191,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
   ]);
 
   const loading = loadingPaymentMethods || (hostHasStripe && loadingPaymentIntent);
-  const error = paymentMethodsError || (hostHasStripe && paymentIntentError);
+  const error = paymentMethodsError;
 
   const setNewPaymentMethod = React.useCallback(
     (key, paymentMethod) => {
@@ -315,7 +316,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     clientSecret: paymentIntentClientSecret,
   };
 
-  if (hostHasStripe) {
+  if (hostHasStripe && !paymentIntentError) {
     return (
       <Elements options={options} stripe={stripe}>
         {list}
