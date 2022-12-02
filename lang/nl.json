@@ -229,6 +229,7 @@
   "AQNF/n": "Je moet ingelogd zijn als administrator",
   "archive.account.confirmation": "Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "Archive {name}",
+  "Archived": "Archived",
   "asqGnV": "Solutions",
   "Attachment.Private": "Deze bijlage is privé",
   "AttachReceipt": "Submit receipt",

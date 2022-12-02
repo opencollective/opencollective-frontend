@@ -11,6 +11,7 @@ import { isPastEvent } from '../lib/events';
 import { getSettingsRoute } from '../lib/url-helpers';
 
 import Avatar from './Avatar';
+import Collapse from './Collapse';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Link from './Link';
@@ -81,9 +82,25 @@ const sortMemberships = memberships => {
   }
 };
 
+const filterArchivedMemberships = memberships => {
+  const archivedMemberships = memberships.filter(m => {
+    if (
+      m.role !== 'BACKER' &&
+      m.collective.isArchived &&
+      !(m.collective.type === 'EVENT' && isPastEvent(m.collective))
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+
+  return uniqBy(archivedMemberships, m => m.collective.id);
+};
+
 const filterMemberships = memberships => {
   const filteredMemberships = memberships.filter(m => {
-    if (m.role === 'BACKER') {
+    if (m.role === 'BACKER' || m.collective.isArchived) {
       return false;
     } else if (m.collective.type === 'EVENT' && isPastEvent(m.collective)) {
       return false;
@@ -150,6 +167,9 @@ const MENU_SECTIONS = {
       href: '/organizations/new',
     },
   },
+  ARCHIVED: {
+    title: defineMessage({ id: 'Archived', defaultMessage: 'Archived' }),
+  },
 };
 
 const MenuSectionHeader = ({ section, hidePlusIcon }) => {
@@ -188,7 +208,9 @@ MenuSectionHeader.propTypes = {
 const ProfileMenuMemberships = ({ user }) => {
   const intl = useIntl();
   const memberships = filterMemberships(user.memberOf);
+  const archivedMemberships = filterArchivedMemberships(user.memberOf);
   const groupedMemberships = groupBy(memberships, m => m.collective.type);
+  groupedMemberships.ARCHIVED = archivedMemberships;
   const hasNoMemberships = isEmpty(memberships);
   const shouldDisplaySection = section => {
     return MENU_SECTIONS[section].emptyMessage || !isEmpty(groupedMemberships[section]);
@@ -209,36 +231,40 @@ const ProfileMenuMemberships = ({ user }) => {
           const sectionData = MENU_SECTIONS[accountType];
           return (
             <Box key={accountType} mb={3}>
-              <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} />
-              {sectionIsEmpty ? (
-                <Box my={2}>
-                  <P fontSize="12px" lineHeight="18px" color="black.700">
-                    {intl.formatMessage(sectionData.emptyMessage)}
-                  </P>
-                  {Boolean(sectionData.plusButton) && (
-                    <Link href={sectionData.plusButton.href}>
-                      <StyledButton mt="12px" mb="16px" borderRadius="8px" width="100%" fontSize="12px">
-                        <Flex alignItems="center" justifyContent="center">
-                          <Container
-                            display="flex"
-                            justifyContent="center"
-                            alignItems="center"
-                            borderRadius="100%"
-                            border="1px solid #C4C7CC"
-                            mr="16px"
-                            size="24px"
-                          >
-                            <Plus size={12} />
-                          </Container>
-                          <span>{intl.formatMessage(sectionData.plusButton.text)}</span>
-                        </Flex>
-                      </StyledButton>
-                    </Link>
-                  )}
-                </Box>
-              ) : (
-                <MembershipsList memberships={memberships} user={user} />
-              )}
+              <Collapse
+                defaultIsOpen={accountType !== 'ARCHIVED'}
+                title={<MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} />}
+              >
+                {sectionIsEmpty ? (
+                  <Box my={2}>
+                    <P fontSize="12px" lineHeight="18px" color="black.700">
+                      {intl.formatMessage(sectionData.emptyMessage)}
+                    </P>
+                    {Boolean(sectionData.plusButton) && (
+                      <Link href={sectionData.plusButton.href}>
+                        <StyledButton mt="12px" mb="16px" borderRadius="8px" width="100%" fontSize="12px">
+                          <Flex alignItems="center" justifyContent="center">
+                            <Container
+                              display="flex"
+                              justifyContent="center"
+                              alignItems="center"
+                              borderRadius="100%"
+                              border="1px solid #C4C7CC"
+                              mr="16px"
+                              size="24px"
+                            >
+                              <Plus size={12} />
+                            </Container>
+                            <span>{intl.formatMessage(sectionData.plusButton.text)}</span>
+                          </Flex>
+                        </StyledButton>
+                      </Link>
+                    )}
+                  </Box>
+                ) : (
+                  <MembershipsList memberships={memberships} user={user} />
+                )}
+              </Collapse>
             </Box>
           );
         })}

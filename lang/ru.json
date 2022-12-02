@@ -229,6 +229,7 @@
   "AQNF/n": "Вам нужно войти как администратор",
   "archive.account.confirmation": "Вы действительно хотите заархивировать {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "Архивировать {name}",
+  "Archived": "Archived",
   "asqGnV": "Решения",
   "Attachment.Private": "Это вложение приватное",
   "AttachReceipt": "Отправить расходы",

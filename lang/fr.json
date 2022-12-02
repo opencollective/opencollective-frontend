@@ -229,6 +229,7 @@
   "AQNF/n": "Vous devez être connecté en tant qu'administrateur",
   "archive.account.confirmation": "Êtes-vous sûr de vouloir archiver {type, select, EVENT {cet Événement} PROJECT {ce Projet} FUND {ce Fonds} COLLECTIVE {ce Collectif} ORGANIZATION {cette Organization} other {ce compte}} ?",
   "archive.modal.header": "Archiver {name}",
+  "Archived": "Archived",
   "asqGnV": "Solutions",
   "Attachment.Private": "Cette pièce jointe est privée",
   "AttachReceipt": "Soumettre un reçu",

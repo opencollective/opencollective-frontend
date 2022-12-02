@@ -229,6 +229,7 @@
   "AQNF/n": "You need to be logged in as an admin",
   "archive.account.confirmation": "Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "Arxiva {name}",
+  "Archived": "Archived",
   "asqGnV": "Solutions",
   "Attachment.Private": "This attachment is private",
   "AttachReceipt": "Submit receipt",

@@ -229,6 +229,7 @@
   "AQNF/n": "您需要以管理员身份登录",
   "archive.account.confirmation": "是否要删除{type, select, EVENT {this Event} PROJECT { this Project}FUND {this Fund} COLLECTIVE {this Collective}ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "归档 {name}",
+  "Archived": "Archived",
   "asqGnV": "解决方案",
   "Attachment.Private": "此附件是私密的",
   "AttachReceipt": "呈交收据",

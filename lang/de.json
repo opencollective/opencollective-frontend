@@ -229,6 +229,7 @@
   "AQNF/n": "Sie müssen als Administrator angemeldet sein",
   "archive.account.confirmation": "Bist du sicher, dass du {type, select, EVENT {diese Veranstaltung} PROJECT {dieses Projekt} FUND {diesen Fonds} COLLECTIVE {dieses Kollektiv} ORGANIZATION {diese Organisation} other {dieses Konto}} archivieren möchtest?",
   "archive.modal.header": "Archiviere {name}",
+  "Archived": "Archived",
   "asqGnV": "Lösungen",
   "Attachment.Private": "Dieser Anhang ist privat",
   "AttachReceipt": "Quittung einreichen",
