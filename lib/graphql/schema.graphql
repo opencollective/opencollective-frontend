@@ -759,6 +759,7 @@ enum OrderStatus {
   REQUIRE_CLIENT_CONFIRMATION
   PAID
   ERROR
+  PROCESSING
   ACTIVE
   CANCELLED
   PENDING
@@ -1117,6 +1118,7 @@ type CollectiveFeatures {
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
   ALIPAY: CollectiveFeatureStatus
+  STRIPE_PAYMENT_INTENT: CollectiveFeatureStatus
   USE_PAYMENT_METHODS: CollectiveFeatureStatus
   EMIT_GIFT_CARDS: CollectiveFeatureStatus
   EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus

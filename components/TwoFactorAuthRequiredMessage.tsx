@@ -2,6 +2,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import type { LoggedInUser } from '../lib/custom_typings/LoggedInUser';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { getSettingsRoute } from '../lib/url-helpers';
 
 import { Box, Flex } from './Grid';
@@ -11,7 +12,6 @@ import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledHr from './StyledHr';
 import { P, Strong } from './Text';
-import { useLoggedInUser } from './UserProvider';
 
 type TwoFactorAuthRequiredMessageProps = {
   loggedInUser: LoggedInUser;

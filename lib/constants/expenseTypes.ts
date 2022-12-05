@@ -5,4 +5,4 @@ export default {
   GRANT: 'GRANT',
   SETTLEMENT: 'SETTLEMENT',
   UNCLASSIFIED: 'UNCLASSIFIED',
-};
+} as const;

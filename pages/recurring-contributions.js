@@ -145,7 +145,7 @@ class recurringContributionsPage extends React.Component {
     }
 
     const collective = data && data.account;
-    const canEditCollective = Boolean(LoggedInUser?.isAdminOfCollectiveOrHost(collective));
+    const canEditCollective = Boolean(LoggedInUser?.isAdminOfCollective(collective));
     const recurringContributions = collective && collective.orders;
     const groupedAdminOf = this.getAdministratedAccounts(LoggedInUser);
     const isAdminOfGroups = !isEmpty(groupedAdminOf);

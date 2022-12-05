@@ -233,7 +233,6 @@ class TransactionsPage extends React.Component {
       return false;
     } else {
       return (
-        LoggedInUser.isHostAdmin(collective) ||
         LoggedInUser.isAdminOfCollectiveOrHost(collective) ||
         LoggedInUser.hasRole(roles.ACCOUNTANT, collective) ||
         LoggedInUser.hasRole(roles.ACCOUNTANT, collective.host)
@@ -289,7 +288,7 @@ class TransactionsPage extends React.Component {
         <Body>
           <CollectiveNavbar
             collective={collective}
-            isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(collective)}
+            isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollective(collective)}
             selectedCategory={NAVBAR_CATEGORIES.BUDGET}
             selectedSection={collective.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
           />
@@ -337,7 +336,6 @@ class TransactionsPage extends React.Component {
             </Flex>
 
             <Flex
-              mb={['8px', '23px']}
               mx="8px"
               justifyContent="space-between"
               flexDirection={['column', 'row']}
@@ -381,51 +379,53 @@ class TransactionsPage extends React.Component {
               )}
             </Flex>
 
-            {error ? (
-              <MessageBox type="error" withIcon>
-                {getErrorFromGraphqlException(error).message}
-              </MessageBox>
-            ) : !loading && !transactions?.nodes?.length ? (
-              <MessageBox type="info" withIcon data-cy="zero-transactions-message">
-                {hasFilters ? (
-                  <FormattedMessage
-                    id="TransactionsList.Empty"
-                    defaultMessage="No transactions found. <ResetLink>Reset filters</ResetLink> to see all transactions."
-                    values={{
-                      ResetLink(text) {
-                        return (
-                          <Link data-cy="reset-transactions-filters" href={`/${collective.slug}/transactions`}>
-                            <span>{text}</span>
-                          </Link>
-                        );
-                      },
-                    }}
+            <Box mt={['8px', '23px']}>
+              {error ? (
+                <MessageBox type="error" withIcon>
+                  {getErrorFromGraphqlException(error).message}
+                </MessageBox>
+              ) : !loading && !transactions?.nodes?.length ? (
+                <MessageBox type="info" withIcon data-cy="zero-transactions-message">
+                  {hasFilters ? (
+                    <FormattedMessage
+                      id="TransactionsList.Empty"
+                      defaultMessage="No transactions found. <ResetLink>Reset filters</ResetLink> to see all transactions."
+                      values={{
+                        ResetLink(text) {
+                          return (
+                            <Link data-cy="reset-transactions-filters" href={`/${collective.slug}/transactions`}>
+                              <span>{text}</span>
+                            </Link>
+                          );
+                        },
+                      }}
+                    />
+                  ) : (
+                    <FormattedMessage id="transactions.empty" defaultMessage="No transactions" />
+                  )}
+                </MessageBox>
+              ) : (
+                <React.Fragment>
+                  <TransactionsList
+                    isLoading={loading}
+                    collective={collective}
+                    nbPlaceholders={variables.limit}
+                    transactions={transactions?.nodes}
+                    displayActions
+                    onMutationSuccess={() => refetch()}
                   />
-                ) : (
-                  <FormattedMessage id="transactions.empty" defaultMessage="No transactions" />
-                )}
-              </MessageBox>
-            ) : (
-              <React.Fragment>
-                <TransactionsList
-                  isLoading={loading}
-                  collective={collective}
-                  nbPlaceholders={variables.limit}
-                  transactions={transactions?.nodes}
-                  displayActions
-                  onMutationSuccess={() => refetch()}
-                />
-                <Flex mt={5} justifyContent="center">
-                  <Pagination
-                    route={`/${slug}/transactions`}
-                    total={transactions?.totalCount}
-                    limit={variables.limit}
-                    offset={variables.offset}
-                    ignoredQueryParams={['collectiveSlug']}
-                  />
-                </Flex>
-              </React.Fragment>
-            )}
+                  <Flex mt={5} justifyContent="center">
+                    <Pagination
+                      route={`/${slug}/transactions`}
+                      total={transactions?.totalCount}
+                      limit={variables.limit}
+                      offset={variables.offset}
+                      ignoredQueryParams={['collectiveSlug']}
+                    />
+                  </Flex>
+                </React.Fragment>
+              )}
+            </Box>
           </Box>
         </Body>
         <Footer />

@@ -204,8 +204,6 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
 
 OrderBudgetItem.propTypes = {
   isLoading: PropTypes.bool,
-  /** Set this to true to invert who's displayed (payee or collective) */
-  isInverted: PropTypes.bool,
   showAmountSign: PropTypes.bool,
   onDelete: PropTypes.func,
   onProcess: PropTypes.func,

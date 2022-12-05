@@ -11,6 +11,7 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { require2FAForAdmins } from '../../lib/policies';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../collective-page/graphql/queries';
@@ -381,7 +382,7 @@ const AddFundsModal = ({ collective, ...props }) => {
       <CollectiveModalHeader collective={collective} onClick={handleClose} />
       {loading ? (
         <LoadingPlaceholder mt={2} height={200} />
-      ) : host?.policies?.REQUIRE_2FA_FOR_ADMINS && !LoggedInUser.hasTwoFactorAuth ? (
+      ) : require2FAForAdmins(host) && !LoggedInUser.hasTwoFactorAuth ? (
         <TwoFactorAuthRequiredMessage borderWidth={0} noTitle />
       ) : (
         <Formik

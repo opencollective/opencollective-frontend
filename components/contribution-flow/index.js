@@ -23,6 +23,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
+import { confirmPayment } from '../../lib/stripe/confirm-payment';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { getCollectivePageRoute, isTrustedRedirectHost, objectToQueryString } from '../../lib/url-helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
@@ -56,7 +57,13 @@ import SafeTransactionMessage from './SafeTransactionMessage';
 import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganization';
 import { validateGuestProfile } from './StepProfileGuestForm';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
-import { getContributeProfiles, getGQLV2AmountInput, getTotalAmount, NEW_CREDIT_CARD_KEY } from './utils';
+import {
+  getContributeProfiles,
+  getGQLV2AmountInput,
+  getTotalAmount,
+  NEW_CREDIT_CARD_KEY,
+  STRIPE_PAYMENT_ELEMENT_KEY,
+} from './utils';
 
 const StepsProgressBox = styled(Box)`
   min-height: 120px;
@@ -154,7 +161,7 @@ class ContributionFlow extends React.Component {
       stepDetails: {
         quantity: queryParams.quantity || 1,
         interval: queryParams.interval || getDefaultInterval(props.tier),
-        amount: isCryptoFlow ? '' : queryParams.amount || getDefaultTierAmount(tier, collective, currency),
+        amount: isCryptoFlow ? null : queryParams.amount || getDefaultTierAmount(tier, collective, currency),
         platformTip: queryParams.platformTip,
         currency,
       },
@@ -187,7 +194,12 @@ class ContributionFlow extends React.Component {
     if (currentStepName !== STEPS.SUCCESS) {
       const { stepDetails, stepProfile } = this.state;
       const currentUrlState = this.getQueryParams();
-      const expectedUrlState = stepsDataToUrlParamsData(stepDetails, stepProfile);
+      const expectedUrlState = stepsDataToUrlParamsData(
+        currentUrlState,
+        stepDetails,
+        stepProfile,
+        this.props.paymentFlow === PAYMENT_FLOW.CRYPTO,
+      );
       if (!isEqual(currentUrlState, omitBy(expectedUrlState, isNil))) {
         const route = this.getRoute(currentStepName);
         const queryHelper = this.getQueryHelper();
@@ -201,7 +213,7 @@ class ContributionFlow extends React.Component {
   }
 
   _getQueryParams = memoizeOne(query => {
-    return ContributionFlowUrlQueryHelper.decode(query);
+    return this.getQueryHelper().decode(query);
   });
 
   getQueryParams = () => {
@@ -274,11 +286,34 @@ class ContributionFlow extends React.Component {
   };
 
   handleOrderResponse = async ({ order, stripeError, guestToken }, email) => {
+    const { stepPayment } = this.state;
+
     if (guestToken && order) {
       setGuestToken(email, order.id, guestToken);
     }
 
-    if (stripeError) {
+    if (
+      stepPayment?.paymentMethod?.service === PAYMENT_METHOD_SERVICE.STRIPE &&
+      (stepPayment?.key === STRIPE_PAYMENT_ELEMENT_KEY ||
+        stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.US_BANK_ACCOUNT ||
+        stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.SEPA_DEBIT)
+    ) {
+      const { stripeData } = stepPayment;
+      const returnUrl = `${window.location.origin}/${this.props.collective.slug}/donate/success?OrderId=${order.id}`;
+
+      try {
+        await confirmPayment(stripeData?.stripe, stripeData?.paymentIntentClientSecret, {
+          returnUrl,
+          elements: stripeData?.elements,
+          type: stepPayment?.paymentMethod?.type,
+          paymentMethodId: stepPayment?.paymentMethod?.data?.stripePaymentMethodId,
+        });
+        this.setState({ isSubmitted: true, isSubmitting: false });
+        return this.handleSuccess(order);
+      } catch (e) {
+        this.setState({ isSubmitting: false, error: e.message });
+      }
+    } else if (stripeError) {
       return this.handleStripeError(order, stripeError, email, guestToken);
     } else if (this.props.paymentFlow === PAYMENT_FLOW.CRYPTO) {
       this.setState({ isSubmitted: true, isSubmitting: false, createdOrder: order });
@@ -304,6 +339,7 @@ class ContributionFlow extends React.Component {
       const stripe = await getStripe(null, account);
       const result = isAlipay
         ? await stripe.confirmAlipayPayment(response.paymentIntent.client_secret, {
+            // eslint-disable-next-line camelcase
             return_url: `${window.location.origin}/api/services/stripe/alipay/callback?OrderId=${order.id}`,
           })
         : await stripe.handleCardAction(response.paymentIntent.client_secret);
@@ -439,6 +475,15 @@ class ContributionFlow extends React.Component {
       if (paymentMethod.paypalInfo.subscriptionId) {
         paymentMethod.type === PAYMENT_METHOD_TYPE.SUBSCRIPTION;
       }
+    }
+
+    if (
+      stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.US_BANK_ACCOUNT ||
+      stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.SEPA_DEBIT ||
+      stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.PAYMENT_INTENT
+    ) {
+      paymentMethod.paymentIntentId = stepPayment.paymentMethod.paymentIntentId;
+      paymentMethod.isSavedForLater = stepPayment.paymentMethod.isSavedForLater;
     }
 
     return paymentMethod;
@@ -716,10 +761,12 @@ class ContributionFlow extends React.Component {
       steps.push({
         name: 'payment',
         label: intl.formatMessage(STEP_LABELS.payment),
-        isCompleted: !stepProfile?.contributorRejectedCategories,
+        isCompleted: !stepProfile?.contributorRejectedCategories && stepPayment?.isCompleted,
         validate: action => {
           if (action === 'prev') {
             return true;
+          } else if (stepPayment?.key === STRIPE_PAYMENT_ELEMENT_KEY) {
+            return stepPayment.isCompleted;
           } else {
             const isCompleted = Boolean(noPaymentRequired || stepPayment);
             if (

@@ -22,12 +22,6 @@ import { MenuGroup, MenuLink, MenuSectionHeader, useSubmenu } from './MenuCompon
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
-const hasActivityLog = collective => {
-  return Boolean(
-    ['development', 'staging'].includes(process.env.OC_ENV) || collective.settings?.earlyAccess?.activityLog,
-  );
-};
-
 const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
   return (
     <React.Fragment>
@@ -51,11 +45,7 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
           />
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
           <MenuLink collective={collective} section={ALL_SECTIONS.WEBHOOKS} />
-          <MenuLink
-            collective={collective}
-            section={COLLECTIVE_SECTIONS.ACTIVITY_LOG}
-            if={hasActivityLog(collective)}
-          />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
           <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SECURITY} />
           <MenuLink collective={collective} section={ALL_SECTIONS.ADVANCED} />
           {!isHostAccount(collective) && <MenuLink collective={collective} section={ALL_SECTIONS.FISCAL_HOSTING} />}
@@ -216,11 +206,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
               isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT])
             }
           />
-          <MenuLink
-            collective={collective}
-            section={COLLECTIVE_SECTIONS.WEBHOOKS}
-            if={isOneOfTypes(collective, [COLLECTIVE, USER, EVENT])}
-          />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.WEBHOOKS} />
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.AUTHORIZED_APPS}
@@ -232,11 +218,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS}
             if={isOneOfTypes(collective, [COLLECTIVE, ORGANIZATION, USER])}
           />
-          <MenuLink
-            collective={collective}
-            section={COLLECTIVE_SECTIONS.ACTIVITY_LOG}
-            if={hasActivityLog(collective)}
-          />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
           <MenuLink
             collective={collective}
             section={FISCAL_HOST_SECTIONS.SECURITY}

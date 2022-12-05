@@ -585,6 +585,10 @@ export const searchPageQuery = gql`
             currency
             valueInCents
           }
+          totalAmountSpent {
+            currency
+            valueInCents
+          }
         }
         ... on Organization {
           host {

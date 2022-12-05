@@ -125,6 +125,11 @@ export const prepareExpenseForSubmit = expenseData => {
     ? pick(expenseData.payeeLocation, ['address', 'country', 'structured'])
     : null;
 
+  const payoutMethod = pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']);
+  if (payoutMethod.id === 'new') {
+    payoutMethod.id = null;
+  }
+
   return {
     ...pick(expenseData, [
       'id',
@@ -138,8 +143,8 @@ export const prepareExpenseForSubmit = expenseData => {
     ]),
     payee,
     payeeLocation,
-    payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
-    attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])) : [],
+    payoutMethod,
+    attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => {
       return pick(item, [

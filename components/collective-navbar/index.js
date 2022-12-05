@@ -444,7 +444,7 @@ const CollectiveNavbar = ({
   const [isExpanded, setExpanded] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
   const isAccountant = LoggedInUser?.hasRole(roles.ACCOUNTANT, collective);
-  isAdmin = isAdmin || LoggedInUser?.isAdminOfCollectiveOrHost(collective);
+  isAdmin = isAdmin || LoggedInUser?.isAdminOfCollective(collective);
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
   const { data, dataLoading } = useQuery(accountPermissionsQuery, {
     context: API_V2_CONTEXT,

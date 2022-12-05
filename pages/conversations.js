@@ -13,7 +13,6 @@ import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
@@ -136,11 +135,7 @@ class ConversationsPage extends React.Component {
         ) : (
           <CollectiveThemeProvider collective={collective}>
             <Container data-cy="page-conversations">
-              <CollectiveNavbar
-                collective={collective}
-                selected={Sections.CONVERSATIONS}
-                selectedCategory={NAVBAR_CATEGORIES.CONNECT}
-              />
+              <CollectiveNavbar collective={collective} selectedCategory={NAVBAR_CATEGORIES.CONNECT} />
               <Container py={[4, 5]} px={[2, 3, 4]}>
                 <Container maxWidth={1200} m="0 auto">
                   <H1 fontSize="40px" fontWeight="normal" textAlign="left" mb={2}>
