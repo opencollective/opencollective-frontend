@@ -1035,8 +1035,6 @@
   "event.sponsors.title": "Patrocinadores",
   "event.type.label": "Tipo",
   "EventCover.LocalTime": "Tu Hora",
-  "EventDetails.showLess": "Mostrar menos",
-  "EventDetails.showMore": "Mostrar más",
   "Events": "Eventos",
   "events": "Mis eventos",
   "events.create.login": "Necesitas estar registrado como un miembro del equipo de este Colectivo para crear un evento.",

@@ -1035,8 +1035,6 @@
   "event.sponsors.title": "Sponsoren",
   "event.type.label": "Typ",
   "EventCover.LocalTime": "Deine Zeit",
-  "EventDetails.showLess": "Weniger anzeigen",
-  "EventDetails.showMore": "Mehr anzeigen",
   "Events": "Ereignisse",
   "events": "Meine Veranstaltungen",
   "events.create.login": "You need to be logged as a team member of this Collective to create an event.",

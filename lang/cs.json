@@ -1035,8 +1035,6 @@
   "event.sponsors.title": "Sponzoři",
   "event.type.label": "Typ",
   "EventCover.LocalTime": "Váš čas",
-  "EventDetails.showLess": "Zobrazit méně",
-  "EventDetails.showMore": "Zobrazit více",
   "Events": "Události",
   "events": "Moje události",
   "events.create.login": "You need to be logged as a team member of this Collective to create an event.",

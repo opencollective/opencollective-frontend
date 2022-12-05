@@ -1035,8 +1035,6 @@
   "event.sponsors.title": "Спонсоры",
   "event.type.label": "Тип",
   "EventCover.LocalTime": "Ваше Время",
-  "EventDetails.showLess": "Показать меньше",
-  "EventDetails.showMore": "Показать больше",
   "Events": "Мероприятия",
   "events": "Мои события",
   "events.create.login": "You need to be logged as a team member of this Collective to create an event.",

@@ -1035,8 +1035,6 @@
   "event.sponsors.title": "Patrocinadors",
   "event.type.label": "Tipus",
   "EventCover.LocalTime": "Your Time",
-  "EventDetails.showLess": "Show less",
-  "EventDetails.showMore": "Show more",
   "Events": "Esdeveniments",
   "events": "My Events",
   "events.create.login": "You need to be logged as a team member of this Collective to create an event.",
