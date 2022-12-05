@@ -26,7 +26,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
     sendMoneyToCollective: PropTypes.func,
     confirmTransfer: PropTypes.func,
     isTransferApproved: PropTypes.bool,
-    customButton: PropTypes.node,
+    customButton: PropTypes.function,
   };
 
   constructor(props) {
