@@ -28,7 +28,8 @@ const StyledAvatar = styled(Flex).attrs<StyledAvatarProps>(props => ({
   },
 }))<StyledAvatarProps>`
   align-items: center;
-  background-color: ${({ theme, type }) => (type === 'USER' ? themeGet('colors.black.100')({ theme }) : 'none')};
+  background-color: ${({ theme, type }) =>
+    type === 'USER' || type === 'INDIVIDUAL' ? themeGet('colors.black.100')({ theme }) : 'none'};
   color: ${themeGet('colors.black.400')};
   background-position: center center;
   background-repeat: no-repeat;
@@ -69,7 +70,7 @@ const Avatar = ({
   }
   return (
     <StyledAvatar size={radius} type={type} src={src} title={name} {...styleProps}>
-      {!src && type === 'USER' && name && <span>{getInitials(name)}</span>}
+      {!src && (type === 'USER' || type === 'INDIVIDUAL') && name && <span>{getInitials(name)}</span>}
     </StyledAvatar>
   );
 };

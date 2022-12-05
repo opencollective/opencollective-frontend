@@ -29,7 +29,14 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const ExpensesFilters = ({ collective, filters, onChange, ignoredExpenseStatus, wrap = true }) => {
+const ExpensesFilters = ({
+  collective,
+  filters,
+  onChange,
+  ignoredExpenseStatus,
+  showOrderFilter = true,
+  wrap = true,
+}) => {
   const getFilterProps = (name, valueModifier) => ({
     inputId: `expenses-filter-${name}`,
     value: filters?.[name],
@@ -71,12 +78,14 @@ const ExpensesFilters = ({ collective, filters, onChange, ignoredExpenseStatus, 
         </FilterLabel>
         <ExpensesStatusFilter {...getFilterProps('status')} ignoredExpenseStatus={ignoredExpenseStatus} />
       </FilterContainer>
-      <FilterContainer>
-        <FilterLabel htmlFor="expenses-order">
-          <FormattedMessage id="expense.order" defaultMessage="Order" />
-        </FilterLabel>
-        <ExpensesOrder {...getFilterProps('orderBy')} />
-      </FilterContainer>
+      {showOrderFilter && (
+        <FilterContainer>
+          <FilterLabel htmlFor="expenses-order">
+            <FormattedMessage id="expense.order" defaultMessage="Order" />
+          </FilterLabel>
+          <ExpensesOrder {...getFilterProps('orderBy')} />
+        </FilterContainer>
+      )}
     </Flex>
   );
 };
@@ -84,6 +93,7 @@ const ExpensesFilters = ({ collective, filters, onChange, ignoredExpenseStatus, 
 ExpensesFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
+  showOrderFilter: PropTypes.bool,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     createdAt: PropTypes.string,

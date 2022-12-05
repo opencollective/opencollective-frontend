@@ -10,7 +10,14 @@ import Link from './Link';
  * Create a `Link` to the collective based on collective type.
  * It properly deals with type `EVENT` and `isIncognito`
  */
-const LinkCollective = ({ target, title, noTitle, collective, children, ...props }) => {
+const LinkCollective = ({
+  collective,
+  target = undefined,
+  title = undefined,
+  noTitle = false,
+  children = undefined,
+  ...props
+}) => {
   if (!collective || collective.isIncognito) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   } else if (collective.isGuest) {
