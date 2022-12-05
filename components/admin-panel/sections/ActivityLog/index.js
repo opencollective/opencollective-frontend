@@ -237,7 +237,7 @@ const ActivityLog = ({ accountSlug }) => {
       ) : loading ? (
         <LoadingPlaceholder width="100%" height={163} />
       ) : !data?.activities?.nodes ? (
-        <MessageBox type="error" withIcon title="You must be admin">
+        <MessageBox type="error" withIcon>
           <FormattedMessage
             id="mustBeAdmin"
             defaultMessage="You must be an admin of this collective to see this page"
