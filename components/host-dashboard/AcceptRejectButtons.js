@@ -108,7 +108,7 @@ AcceptRejectButtons.propTypes = {
   disabledMessage: PropTypes.string,
   onApprove: PropTypes.func,
   onReject: PropTypes.func,
-  customButton: PropTypes.node,
+  customButton: PropTypes.func,
 };
 
 export default AcceptRejectButtons;
