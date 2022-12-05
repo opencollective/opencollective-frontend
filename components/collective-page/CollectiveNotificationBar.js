@@ -1,20 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
-import { i18nGraphqlException } from '../../lib/errors';
 import { moneyCanMoveFromEvent } from '../../lib/events';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
-import { Flex } from '../Grid';
-import AcceptRejectButtons from '../host-dashboard/AcceptRejectButtons';
-import { processApplicationMutation } from '../host-dashboard/PendingApplication';
 import NotificationBar, { NotificationBarButton, NotificationBarLink } from '../NotificationBar';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+
+import PendingApplicationActions from './PendingApplicationActions';
 
 const messages = defineMessages({
   // Collective Created
@@ -214,56 +209,6 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
       ),
     };
   }
-};
-
-export const PendingApplicationActions = ({ collective, refetch }) => {
-  const intl = useIntl();
-  const { addToast } = useToasts();
-  const [callProcessApplication, { loading }] = useMutation(processApplicationMutation, {
-    context: API_V2_CONTEXT,
-  });
-
-  const processApplication = async (action, message) => {
-    try {
-      await callProcessApplication({
-        variables: {
-          host: { legacyId: collective.host.id },
-          account: { legacyId: collective.id },
-          action,
-          message,
-        },
-      });
-
-      if (refetch) {
-        await refetch();
-      }
-    } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
-    }
-  };
-
-  return (
-    <Flex flexWrap="wrap" alignItems="center" justifyContent="center">
-      <AcceptRejectButtons
-        collective={collective}
-        isLoading={loading}
-        onApprove={() => processApplication('APPROVE')}
-        onReject={message => processApplication('REJECT', message)}
-        customButton={props => <NotificationBarButton {...props} />}
-      />
-    </Flex>
-  );
-};
-
-PendingApplicationActions.propTypes = {
-  refetch: PropTypes.func,
-  collective: PropTypes.shape({
-    id: PropTypes.number,
-    slug: PropTypes.string,
-    host: PropTypes.shape({
-      id: PropTypes.number,
-    }),
-  }),
 };
 
 /**
