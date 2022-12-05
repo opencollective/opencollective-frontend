@@ -94,7 +94,6 @@ StyledFilters.propTypes = {
   disabled: PropTypes.bool,
   buttonGrow: PropTypes.any,
   minButtonWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  selectedButtonStyle: PropTypes.oneOf(['primary', 'secondary', 'dark']),
 };
 
 export default StyledFilters;
