@@ -119,7 +119,7 @@ const ExpenseBudgetItem = ({
               <LoadingPlaceholder width={40} height={40} />
             ) : (
               <AvatarWithLink
-                radius={40}
+                size={40}
                 account={featuredProfile}
                 secondaryAccount={featuredProfile.id === expense.createdByAccount.id ? null : expense.createdByAccount}
               />
