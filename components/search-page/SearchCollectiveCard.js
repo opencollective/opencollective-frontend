@@ -65,7 +65,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                     {` `}
                     <Span fontSize="12px" fontWeight={400} color="black.700">
                       <FormattedMessage
-                        defaultMessage="{ count, plural, one {Contributor} other {Contributors}}"
+                        defaultMessage="Financial {count, plural, one {Contributor} other {Contributors}}"
                         values={{ count: collective.backers.totalCount }}
                       />
                     </Span>
