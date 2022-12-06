@@ -9,7 +9,7 @@ import Container from '../../Container';
 import { Box } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
-import { recurringContributionsQuery } from '../../recurring-contributions/graphql/queries';
+import { manageContributionsQuery } from '../../recurring-contributions/graphql/queries';
 import RecurringContributionsContainer from '../../recurring-contributions/RecurringContributionsContainer';
 import StyledFilters from '../../StyledFilters';
 import { Dimensions } from '../_constants';
@@ -118,7 +118,7 @@ class SectionRecurringContributions extends React.Component {
   }
 }
 
-const getData = graphql(recurringContributionsQuery, {
+const getData = graphql(manageContributionsQuery, {
   options: props => ({
     context: API_V2_CONTEXT,
     variables: getRecurringContributionsSectionQueryVariables(props.slug),

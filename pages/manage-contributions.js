@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { css } from '@styled-system/css';
-import { groupBy, isEmpty, mapValues, orderBy, uniqBy } from 'lodash';
+import { groupBy, isEmpty, mapValues, orderBy, toUpper, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import formatCollectiveType from '../lib/i18n/collective-type';
+import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Avatar from '../components/Avatar';
@@ -22,8 +23,8 @@ import ErrorPage from '../components/ErrorPage';
 import { Box, Flex, Grid } from '../components/Grid';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
-import LoadingPlaceholder from '../components/LoadingPlaceholder';
-import { recurringContributionsQuery } from '../components/recurring-contributions/graphql/queries';
+import { manageContributionsQuery } from '../components/recurring-contributions/graphql/queries';
+import ProcessingContributions from '../components/recurring-contributions/ProcessingContributionsContainer';
 import RecurringContributionsContainer from '../components/recurring-contributions/RecurringContributionsContainer';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import StyledFilters from '../components/StyledFilters';
@@ -36,29 +37,20 @@ const MainContainer = styled(Container)`
   margin: 0 auto;
 `;
 
-const FILTERS = {
-  ACTIVE: 'ACTIVE',
-  MONTHLY: 'MONTHLY',
-  YEARLY: 'YEARLY',
-  CANCELLED: 'CANCELLED',
+const TABS = {
+  RECURRING: 'RECURRING',
+  PROCESSING: 'PROCESSING',
 };
 
-const I18nFilters = defineMessages({
-  [FILTERS.ACTIVE]: {
-    id: 'Subscriptions.Active',
-    defaultMessage: 'Active',
+// create defineMessages for TABS
+const I18nTabs = defineMessages({
+  [TABS.RECURRING]: {
+    id: 'Subscriptions.Recurring',
+    defaultMessage: 'Recurring Contributions',
   },
-  [FILTERS.MONTHLY]: {
-    id: 'Frequency.Monthly',
-    defaultMessage: 'Monthly',
-  },
-  [FILTERS.YEARLY]: {
-    id: 'Frequency.Yearly',
-    defaultMessage: 'Yearly',
-  },
-  [FILTERS.CANCELLED]: {
-    id: 'Subscriptions.Cancelled',
-    defaultMessage: 'Cancelled',
+  [TABS.PROCESSING]: {
+    id: 'Subscriptions.Processing',
+    defaultMessage: 'Processing Contributions',
   },
 });
 
@@ -90,13 +82,14 @@ const MenuEntry = styled(Link)`
   }
 `;
 
-class recurringContributionsPage extends React.Component {
-  static getInitialProps({ query: { slug } }) {
-    return { slug };
+class ManageContributionsPage extends React.Component {
+  static getInitialProps({ query: { slug, tab } }) {
+    return { slug, tab: TABS[toUpper(tab)] || TABS.RECURRING };
   }
 
   static propTypes = {
     slug: PropTypes.string,
+    tab: PropTypes.string,
     loadingLoggedInUser: PropTypes.bool,
     LoggedInUser: PropTypes.object,
     data: PropTypes.shape({
@@ -110,7 +103,6 @@ class recurringContributionsPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { filter: 'ACTIVE' };
   }
 
   componentDidUpdate() {
@@ -119,7 +111,7 @@ class recurringContributionsPage extends React.Component {
       // We used to send links like `/guest-12345/recurring-contributions` by email, which caused troubles when updating the slug.
       // This redirect ensures compatibility with old links byt redirecting them to the unified page.
       // See https://github.com/opencollective/opencollective/issues/4876
-      router.replace('/recurring-contributions');
+      router.replace('/manage-contributions');
     }
   }
 
@@ -131,10 +123,21 @@ class recurringContributionsPage extends React.Component {
     return mapValues(groupedMemberships, memberships => orderBy(memberships, 'collective.name'));
   });
 
+  changeTab(tab) {
+    const pathname = `${getCollectivePageCanonicalURL(
+      this.props.slug
+        ? {
+            slug: this.props.slug || this.props.LoggedInUser?.collective?.slug,
+          }
+        : undefined,
+    )}/manage-contributions/${tab.toLowerCase()}`;
+    this.props.router.push({
+      pathname,
+    });
+  }
+
   render() {
     const { slug, data, intl, loadingLoggedInUser, LoggedInUser } = this.props;
-
-    const filters = ['ACTIVE', 'MONTHLY', 'YEARLY', 'CANCELLED'];
 
     if (!data?.loading && !loadingLoggedInUser && LoggedInUser) {
       if (!data || data.error) {
@@ -171,13 +174,13 @@ class recurringContributionsPage extends React.Component {
             <CollectiveNavbar collective={collective} />
             <MainContainer py={[3, 4]} px={[2, 3, 4]}>
               <SectionTitle textAlign="left" mb={1}>
-                <FormattedMessage id="Subscriptions.Title" defaultMessage="Recurring contributions" />
+                <FormattedMessage id="ManageContributions.Title" defaultMessage="Manage contributions" />
               </SectionTitle>
               <Grid gridTemplateColumns={mainGridColumns} gridGap={32} mt={4}>
                 {isAdminOfGroups && (
                   <div>
                     <MenuEntry
-                      href="/recurring-contributions"
+                      href="/manage-contributions"
                       $isActive={!slug || slug === LoggedInUser.collective.slug}
                       onClick={() => {}}
                     >
@@ -197,7 +200,7 @@ class recurringContributionsPage extends React.Component {
                         {members.map(m => (
                           <MenuEntry
                             key={m.id}
-                            href={`/${m.collective.slug}/recurring-contributions`}
+                            href={`/${m.collective.slug}/manage-contributions`}
                             title={m.collective.name}
                             $isActive={slug === m.collective.slug}
                           >
@@ -212,24 +215,29 @@ class recurringContributionsPage extends React.Component {
                   </div>
                 )}
                 <Box>
-                  <Box mx="auto">
+                  <Box>
                     <StyledFilters
-                      filters={filters}
-                      getLabel={key => intl.formatMessage(I18nFilters[key])}
-                      selected={this.state.filter}
+                      filters={Object.values(TABS)}
+                      getLabel={key => intl.formatMessage(I18nTabs[key])}
+                      selected={this.props.tab}
                       justifyContent="left"
                       minButtonWidth={175}
-                      onChange={filter => this.setState({ filter: filter })}
+                      onChange={tab => this.changeTab(tab)}
+                      buttonHeight="40px"
+                      buttonPadding="10px 36px"
+                      disabled={data.loading}
                     />
                   </Box>
-                  {data.loading ? (
-                    <LoadingPlaceholder maxHeight="400px" mt={3} />
-                  ) : (
+                  {this.props.tab === TABS.RECURRING && (
                     <RecurringContributionsContainer
                       recurringContributions={recurringContributions}
                       account={collective}
-                      filter={this.state.filter}
+                      isLoading={data.loading}
+                      displayFilters
                     />
+                  )}
+                  {this.props.tab === TABS.PROCESSING && (
+                    <ProcessingContributions isLoading={data.loading} orders={collective?.processingOrders?.nodes} />
                   )}
                 </Box>
               </Grid>
@@ -241,16 +249,16 @@ class recurringContributionsPage extends React.Component {
   }
 }
 
-const addRecurringContributionsPageData = graphql(recurringContributionsQuery, {
+const addManageContributionsPageData = graphql(manageContributionsQuery, {
   skip: props => !props.LoggedInUser,
   options: props => ({
     context: API_V2_CONTEXT,
     variables: {
-      // If slug is passed in the URL (e.g. /facebook/recurring-contributions), use it.
+      // If slug is passed in the URL (e.g. /facebook/manage-contributions), use it.
       // Otherwise, use the slug of the LoggedInUser.
       slug: props.slug || props.LoggedInUser?.collective?.slug,
     },
   }),
 });
 
-export default withRouter(withUser(injectIntl(addRecurringContributionsPageData(recurringContributionsPage))));
+export default withRouter(withUser(injectIntl(addManageContributionsPageData(ManageContributionsPage))));
