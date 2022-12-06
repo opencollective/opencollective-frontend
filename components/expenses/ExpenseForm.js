@@ -77,15 +77,19 @@ const msg = defineMessages({
     defaultMessage: 'Payee information',
   },
   cancelEditExpense: {
+    id: 'ExpenseForm.CancelEditExpense',
     defaultMessage: 'Cancel Edit',
   },
   confirmCancelEditExpense: {
+    id: 'ExpenseForm.ConfirmCancelEditExpense',
     defaultMessage: 'Are you sure you want to cancel the edits?',
   },
   clearExpenseForm: {
+    id: 'ExpenseForm.ClearExpenseForm',
     defaultMessage: 'Clear Form',
   },
   confirmClearExpenseForm: {
+    id: 'ExpenseForm.ConfirmClearExpenseForm',
     defaultMessage: 'Are you sure you want to clear the expense form?',
   },
 });
