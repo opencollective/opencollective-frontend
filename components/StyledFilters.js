@@ -12,9 +12,8 @@ const FilterButton = styled(StyledButton).attrs({
 })`
   font-size: 14px;
   font-weight: 400;
-  height: 34px;
-  padding-top: 4px;
-  padding-bottom: 4px;
+  height: ${props => props.heignt};
+  padding: ${props => props.padding};
   background: #f9fafb;
   border-color: white;
   color: ${props => props.theme.colors.black[800]};
@@ -61,6 +60,8 @@ const StyledFilters = ({
   getLabel = defaultGetLabel,
   selected = undefined,
   minButtonWidth = undefined,
+  buttonHeight = '34px',
+  buttonPadding = '4px 14px',
   buttonGrow = undefined,
   ...flexProps
 }) => {
@@ -76,6 +77,8 @@ const StyledFilters = ({
               $isSelected={isSelected}
               minWidth={minButtonWidth}
               disabled={disabled}
+              height={buttonHeight}
+              padding={buttonPadding}
             >
               <Span whiteSpace="nowrap">{getLabel(filter)}</Span>
             </FilterButton>
@@ -94,6 +97,8 @@ StyledFilters.propTypes = {
   disabled: PropTypes.bool,
   buttonGrow: PropTypes.any,
   minButtonWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  buttonHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  buttonPadding: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default StyledFilters;

@@ -59,7 +59,7 @@ const OrderContainer = styled.div`
   }
 `;
 
-const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
+const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) => {
   const intl = useIntl();
   return (
     <OrderContainer>
@@ -124,8 +124,8 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
             ) : (
               <Flex flexDirection="column" alignItems={['flex-start', 'flex-end']}>
                 <Flex alignItems="center">
-                  <TransactionSign isCredit />
-                  <Span color="black.500" fontSize="15px">
+                  {showAmountSign && <TransactionSign isCredit />}
+                  <Span color="black.500" fontSize="16px">
                     <FormattedMoneyAmount
                       currency={order.amount.currency}
                       precision={2}
@@ -161,7 +161,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip }) => {
           {isLoading ? (
             <LoadingPlaceholder height={20} width={140} mt={2} />
           ) : (
-            <Flex mt={2}>
+            <Flex>
               <StyledTag variant="rounded-left" fontSize="10px" fontWeight="500" mr={1}>
                 <FormattedMessage id="Order" defaultMessage="Order" /> #{order.legacyId}
               </StyledTag>
@@ -236,6 +236,7 @@ OrderBudgetItem.propTypes = {
     }),
     paymentMethod: PropTypes.shape({
       providerType: PropTypes.string,
+      type: PropTypes.string,
     }),
     /** If available, this `account` will be used in place of the `collective` */
     toAccount: PropTypes.shape({
@@ -246,6 +247,10 @@ OrderBudgetItem.propTypes = {
     }),
   }),
   showPlatformTip: PropTypes.bool,
+};
+
+OrderBudgetItem.defaultProps = {
+  showAmountSign: true,
 };
 
 export default OrderBudgetItem;
