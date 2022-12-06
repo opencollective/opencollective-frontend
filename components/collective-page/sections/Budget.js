@@ -5,6 +5,7 @@ import { get, orderBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { isIndividualAccount } from '../../../lib/collective.lib';
 import { EMPTY_ARRAY } from '../../../lib/constants/utils';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
@@ -288,6 +289,8 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
 
         {isLoading ? (
           <LoadingPlaceholder height={300} />
+        ) : isIndividualAccount(collective) ? (
+          <div />
         ) : (
           <BudgetStats collective={collective} stats={data?.account?.stats} />
         )}
