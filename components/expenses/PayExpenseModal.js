@@ -255,7 +255,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
                 ...formik.values,
                 ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
                 paymentProcessorFee: null,
-                feesPayer: !getCanCustomizeFeesPayer(expense, collective, hasManualPayment, null, LoggedInUser.isRoot())
+                feesPayer: !getCanCustomizeFeesPayer(expense, collective, hasManualPayment, null, LoggedInUser.isRoot)
                   ? DEFAULT_VALUES.feesPayer // Reset fees payer if can't customize
                   : formik.values.feesPayer,
               });
@@ -299,7 +299,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
           collective,
           hasManualPayment,
           formik.values.paymentProcessorFee,
-          LoggedInUser.isRoot(),
+          LoggedInUser.isRoot,
         ) && (
           <Flex mt={16}>
             <StyledTooltip
