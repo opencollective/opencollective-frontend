@@ -19,6 +19,7 @@ export default class FilesPreviewModal extends React.Component {
     files: PropTypes.arrayOf(
       PropTypes.shape({
         url: PropTypes.string,
+        name: PropTypes.string,
         /** An alternative to `url` */
         onClick: PropTypes.func,
       }),

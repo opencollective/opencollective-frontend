@@ -4,7 +4,7 @@ import { isEmpty, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { canContributeRecurring, hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
+import { canContributeRecurring, hostIsTaxDeductibleInTheUs } from '../../lib/collective.lib';
 import INTERVALS from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
@@ -16,6 +16,8 @@ import StyledButtonSet from '../../components/StyledButtonSet';
 import StyledInputAmount from '../../components/StyledInputAmount';
 import StyledInputField from '../../components/StyledInputField';
 
+import { AutoCollapse } from '../AutoCollapse';
+import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import StyledAmountPicker, { OTHER_AMOUNT_KEY } from '../StyledAmountPicker';
@@ -64,6 +66,12 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
 
   return (
     <Box width={1}>
+      {tier?.type === 'TICKET' && tier.description && (
+        <Container mb={4} whiteSpace="pre-line">
+          <AutoCollapse maxCollapsedHeight={125}>{tier.description}</AutoCollapse>
+        </Container>
+      )}
+
       {!isFixedInterval && supportsRecurring && (
         <StyledButtonSet
           id="interval"
@@ -190,16 +198,19 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
                   max={tier.availableQuantity}
                   value={data?.quantity}
                   maxWidth={80}
-                  onChange={e => dispatchChange('quantity', parseInt(e.target.value))}
                   fontSize="15px"
                   minWidth={100}
+                  onChange={e => {
+                    const newValue = parseInt(e.target.value);
+                    dispatchChange('quantity', isNaN(newValue) ? null : newValue);
+                  }}
                 />
               </div>
             )}
           </StyledInputField>
         </Box>
       )}
-      {hostIsTaxDeductibeInTheUs(collective.host) && (
+      {hostIsTaxDeductibleInTheUs(collective.host) && (
         <React.Fragment>
           <StyledHr borderColor="black.300" mb={16} mt={32} />
           <P fontSize="14px" lineHeight="20px" fontStyle="italic" color="black.500" letterSpacing="0em">
@@ -272,6 +283,7 @@ StepDetails.propTypes = {
   tier: PropTypes.shape({
     amountType: PropTypes.string,
     interval: PropTypes.string,
+    description: PropTypes.string,
     name: PropTypes.string,
     maxQuantity: PropTypes.number,
     availableQuantity: PropTypes.number,

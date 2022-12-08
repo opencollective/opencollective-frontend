@@ -842,6 +842,7 @@ enum OrderStatus {
   NEW
   PAID
   PENDING
+  PROCESSING
   PLEDGED
   REFUNDED
   REJECTED
@@ -1210,6 +1211,11 @@ enum ExpenseCurrencySource {
   The expense currency expressed as the expense currency
   """
   EXPENSE
+
+  """
+  The expense currency expressed as the expense currency
+  """
+  CREATED_BY_ACCOUNT
 }
 
 """
@@ -2100,6 +2106,11 @@ type ExpenseAttachedFile {
   """
   id: String!
   url: URL
+
+  """
+  The original filename
+  """
+  name: String
 }
 
 """
@@ -2316,7 +2327,6 @@ enum ActivityType {
   ORGANIZATION_COLLECTIVE_CREATED
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
-  COLLECTIVE_COMMENT_CREATED
   COLLECTIVE_CONVERSATION_CREATED
   UPDATE_COMMENT_CREATED
   EXPENSE_COMMENT_CREATED
@@ -2360,14 +2370,15 @@ enum ActivityType {
   HOST_APPLICATION_CONTACT
   CONTRIBUTION_REJECTED
   SUBSCRIPTION_ACTIVATED
-  SUBSCRIPTION_CONFIRMED
   SUBSCRIPTION_CANCELED
   TICKET_CONFIRMED
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
-  ORDER_PROCESSING
-  ORDER_PROCESSING_CRYPTO
+  ORDER_PENDING
+  ORDER_PENDING_CRYPTO
   ORDER_PENDING_CONTRIBUTION_NEW
   ORDER_PENDING_CONTRIBUTION_REMINDER
+  ORDER_PROCESSING
+  ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
   ORDERS_SUSPICIOUS
   BACKYOURSTACK_DISPATCH_CONFIRMED
@@ -2394,6 +2405,8 @@ enum ActivityType {
   COLLECTIVE_USER_ADDED
   COLLECTIVE_VIRTUAL_CARD_ASSIGNED
   COLLECTIVE_VIRTUAL_CARD_CREATED
+  SUBSCRIPTION_CONFIRMED
+  COLLECTIVE_COMMENT_CREATED
 }
 
 """
@@ -3381,6 +3394,9 @@ enum PaymentMethodType {
   giftcard @deprecated(reason: "Please use uppercase values")
   manual @deprecated(reason: "Please use uppercase values")
   crypto @deprecated(reason: "Please use uppercase values")
+  paymentintent @deprecated(reason: "Please use uppercase values")
+  us_bank_account @deprecated(reason: "Please use uppercase values")
+  sepa_debit @deprecated(reason: "Please use uppercase values")
   ALIPAY
   CREDITCARD
   PREPAID
@@ -3392,6 +3408,9 @@ enum PaymentMethodType {
   GIFTCARD
   MANUAL
   CRYPTO
+  PAYMENT_INTENT
+  US_BANK_ACCOUNT
+  SEPA_DEBIT
 }
 
 """
@@ -3449,6 +3468,105 @@ type AccountCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Account]
+
+  """
+  Stats for the returned results (i.e. accounts within the limit)
+  """
+  stats: AccountCollectionStats!
+}
+
+"""
+Account collection stats
+"""
+type AccountCollectionStats {
+  """
+  Time series of the transaction count and sum of amount for these accounts
+  """
+  transactionsTimeSeries(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+    includeChildren: Boolean = false
+  ): TimeSeriesAmountWithCount!
+}
+
+"""
+Amounts with count time series
+"""
+type TimeSeriesAmountWithCount implements TimeSeries {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime!
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime!
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+
+  """
+  Time series data points
+  """
+  nodes: [TimeSeriesAmountWithCountNode!]!
+}
+
+interface TimeSeries {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime!
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime!
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+}
+
+enum TimeUnit {
+  SECOND
+  MINUTE
+  HOUR
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+type TimeSeriesAmountWithCountNode {
+  date: DateTime!
+  amount: Amount!
+  count: Int!
 }
 
 type ConversationStats {
@@ -3482,7 +3600,7 @@ type TagStat {
   """
   Total amount for this tag
   """
-  amount: Amount!
+  amount: Amount
 }
 
 """
@@ -3534,6 +3652,9 @@ enum PaymentMethodLegacyType {
   BANK_TRANSFER
   ADDED_FUNDS
   CRYPTO
+  PAYMENT_INTENT
+  US_BANK_ACCOUNT
+  SEPA_DEBIT
 }
 
 """
@@ -3871,33 +3992,6 @@ type TimeSeriesAmount implements TimeSeries {
   nodes: [TimeSeriesAmountNode!]!
 }
 
-interface TimeSeries {
-  """
-  The start date of the time series
-  """
-  dateFrom: DateTime!
-
-  """
-  The end date of the time series
-  """
-  dateTo: DateTime!
-
-  """
-  The interval between two data points
-  """
-  timeUnit: TimeUnit!
-}
-
-enum TimeUnit {
-  SECOND
-  MINUTE
-  HOUR
-  DAY
-  WEEK
-  MONTH
-  YEAR
-}
-
 type TimeSeriesAmountNode {
   date: DateTime!
   amount: Amount!
@@ -4078,6 +4172,7 @@ type CollectiveFeatures {
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
   ALIPAY: CollectiveFeatureStatus
+  STRIPE_PAYMENT_INTENT: CollectiveFeatureStatus
   USE_PAYMENT_METHODS: CollectiveFeatureStatus
   EMIT_GIFT_CARDS: CollectiveFeatureStatus
   EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
@@ -8617,6 +8712,11 @@ type Query {
     tag: [String]
 
     """
+    Host hosting the account
+    """
+    host: [AccountReferenceInput]
+
+    """
     Only return accounts that match these account types (COLLECTIVE, FUND, EVENT, PROJECT, ORGANIZATION or INDIVIDUAL)
     """
     type: [AccountType]
@@ -8815,6 +8915,11 @@ type Query {
     Return expenses only for this host
     """
     host: AccountReferenceInput
+
+    """
+    Return expenses only created by this INDIVIDUAL account
+    """
+    createdByAccount: AccountReferenceInput
 
     """
     Use this field to filter expenses on their statuses
@@ -10536,7 +10641,6 @@ enum ActivityAndClassesType {
   ORGANIZATION_COLLECTIVE_CREATED
   COLLECTIVE_FROZEN
   COLLECTIVE_UNFROZEN
-  COLLECTIVE_COMMENT_CREATED
   COLLECTIVE_CONVERSATION_CREATED
   UPDATE_COMMENT_CREATED
   EXPENSE_COMMENT_CREATED
@@ -10580,14 +10684,15 @@ enum ActivityAndClassesType {
   HOST_APPLICATION_CONTACT
   CONTRIBUTION_REJECTED
   SUBSCRIPTION_ACTIVATED
-  SUBSCRIPTION_CONFIRMED
   SUBSCRIPTION_CANCELED
   TICKET_CONFIRMED
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
-  ORDER_PROCESSING
-  ORDER_PROCESSING_CRYPTO
+  ORDER_PENDING
+  ORDER_PENDING_CRYPTO
   ORDER_PENDING_CONTRIBUTION_NEW
   ORDER_PENDING_CONTRIBUTION_REMINDER
+  ORDER_PROCESSING
+  ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
   ORDERS_SUSPICIOUS
   BACKYOURSTACK_DISPATCH_CONFIRMED
@@ -10614,6 +10719,8 @@ enum ActivityAndClassesType {
   COLLECTIVE_USER_ADDED
   COLLECTIVE_VIRTUAL_CARD_ASSIGNED
   COLLECTIVE_VIRTUAL_CARD_CREATED
+  SUBSCRIPTION_CONFIRMED
+  COLLECTIVE_COMMENT_CREATED
   COLLECTIVE
   EXPENSES
   CONTRIBUTIONS
@@ -12748,6 +12855,11 @@ type Mutation {
   ): [Order]!
 
   """
+  Creates a Stripe payment intent
+  """
+  createPaymentIntent(paymentIntent: PaymentIntentInput!): PaymentIntent!
+
+  """
   Add a new payment method to be used with an Order. Scope: "orders".
   """
   addCreditCard(
@@ -13539,6 +13651,11 @@ input ExpenseAttachedFileInput {
   id: String
 
   """
+  Original filename
+  """
+  name: String
+
+  """
   URL of the file
   """
   url: URL!
@@ -14191,6 +14308,11 @@ input PaymentMethodInput {
   To pass when type is PAYPAL
   """
   paypalInfo: PaypalPaymentInput
+
+  """
+  The Payment Intent ID used in this checkout
+  """
+  paymentIntentId: String
 }
 
 input CreditCardCreateInput {
@@ -14291,6 +14413,25 @@ enum ProcessOrderAction {
   To mark the order as paid
   """
   MARK_AS_PAID
+}
+
+"""
+A Stripe payment intent
+"""
+type PaymentIntent {
+  id: String!
+  paymentIntentClientSecret: String!
+  stripeAccount: String!
+  stripeAccountPublishableSecret: String!
+}
+
+"""
+Input to create a Stripe payment intent
+"""
+input PaymentIntentInput {
+  amount: AmountInput!
+  fromAccount: AccountReferenceInput
+  toAccount: AccountReferenceInput!
 }
 
 type CreditCardWithStripeError {

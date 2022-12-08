@@ -87,7 +87,7 @@ describe('event.createOrder page', () => {
     cy.get('.addTier').click();
     cy.get('.EditTiers input[name="name"]').type('Flexible Paying Ticket');
     cy.get('[data-cy="amountType"]').click();
-    cy.contains('[data-cy="select-option"]', 'flexible amount').click();
+    cy.contains('[data-cy="select-option"]', 'Flexible amount').click();
     cy.get('.EditTiers input[name="amount"]').type('10');
     cy.contains('button', 'Save').click();
     cy.contains('a', 'view event page').click();

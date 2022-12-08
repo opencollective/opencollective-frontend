@@ -288,6 +288,7 @@ type UserDetails {
   isLimited: Boolean
   hasSeenLatestChangelogEntry: Boolean!
   hasTwoFactorAuth: Boolean
+  isRoot: Boolean!
 }
 
 """
@@ -759,6 +760,7 @@ enum OrderStatus {
   REQUIRE_CLIENT_CONFIRMATION
   PAID
   ERROR
+  PROCESSING
   ACTIVE
   CANCELLED
   PENDING
@@ -1117,6 +1119,7 @@ type CollectiveFeatures {
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
   ALIPAY: CollectiveFeatureStatus
+  STRIPE_PAYMENT_INTENT: CollectiveFeatureStatus
   USE_PAYMENT_METHODS: CollectiveFeatureStatus
   EMIT_GIFT_CARDS: CollectiveFeatureStatus
   EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
@@ -4534,6 +4537,7 @@ type Mutation {
   createOrder(order: OrderInputType!): OrderType
     @deprecated(reason: "2020-10-13: This endpoint has been moved to GQLV2")
   confirmOrder(order: ConfirmOrderInputType!): OrderType
+    @deprecated(reason: "2022-11-18: This mutation has been moved to GQLV2")
   refundTransaction(id: Int!): Transaction @deprecated(reason: "2022-01-27: Please use refundTransaction from GQLV2")
   createApplication(application: ApplicationInput!): Application
   deleteApplication(id: Int!): Application

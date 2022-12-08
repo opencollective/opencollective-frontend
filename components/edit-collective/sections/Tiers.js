@@ -38,6 +38,7 @@ const { FIXED, FLEXIBLE } = AmountTypes;
 
 const SIMPLIFIED_TIER_TYPES = [TIER, SERVICE, PRODUCT, DONATION];
 const DEFAULT_TIER_TYPES = [...SIMPLIFIED_TIER_TYPES, MEMBERSHIP];
+const TIER_TYPES_WITH_QUANTITY = [TICKET, PRODUCT, MEMBERSHIP];
 
 const getReceiptTemplates = host => {
   const receiptTemplates = host?.settings?.invoice?.templates;
@@ -137,10 +138,10 @@ class Tiers extends React.Component {
         defaultMessage: 'Amount type',
       },
       'amount.label': { id: 'Fields.amount', defaultMessage: 'Amount' },
-      'minimumAmount.label': { id: 'tier.minimumAmount.label', defaultMessage: 'minimum amount' },
+      'minimumAmount.label': { id: 'tier.minimumAmount.label', defaultMessage: 'Minimum amount' },
       'defaultAmount.label': {
         id: 'tier.defaultAmount.label',
-        defaultMessage: 'default amount',
+        defaultMessage: 'Default amount',
       },
       'goal.label': {
         id: 'ContributionType.Goal',
@@ -156,20 +157,20 @@ class Tiers extends React.Component {
       },
       'interval.label': {
         id: 'tier.interval.label',
-        defaultMessage: 'interval',
+        defaultMessage: 'Interval',
       },
-      FIXED: { id: 'tier.amountType.fixed', defaultMessage: 'fixed amount' },
+      FIXED: { id: 'tier.amountType.fixed', defaultMessage: 'Fixed amount' },
       FLEXIBLE: {
         id: 'tier.amountType.flexible',
-        defaultMessage: 'flexible amount',
+        defaultMessage: 'Flexible amount',
       },
-      onetime: { id: 'tier.interval.onetime', defaultMessage: 'one time' },
-      month: { id: 'tier.interval.month', defaultMessage: 'monthly' },
-      year: { id: 'tier.interval.year', defaultMessage: 'yearly' },
-      flexible: { id: 'tier.interval.flexible', defaultMessage: 'flexible' },
+      onetime: { id: 'Frequency.OneTime', defaultMessage: 'One time' },
+      month: { id: 'Frequency.Monthly', defaultMessage: 'Monthly' },
+      year: { id: 'Frequency.Yearly', defaultMessage: 'Yearly' },
+      flexible: { id: 'tier.interval.flexible', defaultMessage: 'Flexible' },
       'presets.label': {
         id: 'tier.presets.label',
-        defaultMessage: 'suggested amounts',
+        defaultMessage: 'Suggested amounts',
       },
       'description.label': {
         id: 'Fields.description',
@@ -242,6 +243,7 @@ class Tiers extends React.Component {
         name: 'description',
         type: 'textarea',
         label: intl.formatMessage(this.messages['description.label']),
+        maxLength: 510,
       },
       {
         name: 'interval',
@@ -292,7 +294,8 @@ class Tiers extends React.Component {
         label: intl.formatMessage(this.messages['maxQuantity.label']),
         description: intl.formatMessage(this.messages['maxQuantity.description']),
         when: (tier, collective) =>
-          [TICKET, PRODUCT].includes(tier.type) || (tier.type === TIER && ![FUND, PROJECT].includes(collective.type)),
+          TIER_TYPES_WITH_QUANTITY.includes(tier.type) ||
+          (tier.type === TIER && ![FUND, PROJECT].includes(collective.type)),
       },
       {
         name: 'button',
@@ -358,6 +361,10 @@ class Tiers extends React.Component {
       if (value === TierTypes.PRODUCT) {
         tiers[index].interval = null;
         tiers[index].amountType = FIXED;
+      }
+
+      if (!TIER_TYPES_WITH_QUANTITY.includes(value)) {
+        tiers[index].maxQuantity = null;
       }
     }
 
@@ -444,6 +451,7 @@ class Tiers extends React.Component {
                     defaultValue={defaultValues[field.name]}
                     options={typeof field.options === 'function' ? field.options(collective) : field.options}
                     pre={field.pre}
+                    maxLength={field.maxLength}
                     placeholder={field.placeholder}
                     onChange={value => this.editTier(index, field.name, value)}
                     description={

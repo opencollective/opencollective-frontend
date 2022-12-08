@@ -63,7 +63,7 @@ class AuthenticatedPage extends React.Component {
           )}
         </Container>
       );
-    } else if (this.props.rootOnly && !LoggedInUser.isRoot()) {
+    } else if (this.props.rootOnly && !LoggedInUser.isRoot) {
       return (
         <Flex flexDirection="column" alignItems="center">
           <MessageBox type="warning" my={[5, 6, 7]} maxWidth={400} withIcon>

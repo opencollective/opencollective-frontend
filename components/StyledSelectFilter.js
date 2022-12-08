@@ -8,12 +8,12 @@ export const getSelectFilterStyles = stylesFromProps => ({
   control: (baseStyles, state) => {
     const styles = {
       ...baseStyles,
-      ...(stylesFromProps?.control || null),
-      borderRadius: 100,
       background: '#F7F8FA',
+      borderRadius: 100,
       padding: '0 8px',
       fontWeight: 500,
       borderColor: '#E8E9EB',
+      ...(stylesFromProps?.control || null),
       '&:hover': {
         borderColor: '#C4C7CC',
       },

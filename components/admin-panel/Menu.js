@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import hasFeature, { FEATURES, isFeatureEnabled } from '../../lib/allowed-features';
+import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective.lib';
 import { getCollectiveTypeKey, isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -21,12 +21,6 @@ import {
 import { MenuGroup, MenuLink, MenuSectionHeader, useSubmenu } from './MenuComponents';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
-
-const hasActivityLog = collective => {
-  return Boolean(
-    ['development', 'staging'].includes(process.env.OC_ENV) || collective.settings?.earlyAccess?.activityLog,
-  );
-};
 
 const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
   return (
@@ -51,11 +45,7 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
           />
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
           <MenuLink collective={collective} section={ALL_SECTIONS.WEBHOOKS} />
-          <MenuLink
-            collective={collective}
-            section={COLLECTIVE_SECTIONS.ACTIVITY_LOG}
-            if={hasActivityLog(collective)}
-          />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
           <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SECURITY} />
           <MenuLink collective={collective} section={ALL_SECTIONS.ADVANCED} />
           {!isHostAccount(collective) && <MenuLink collective={collective} section={ALL_SECTIONS.FISCAL_HOSTING} />}
@@ -183,11 +173,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             if={['ACTIVE', 'AVAILABLE'].includes(collective.features.USE_PAYMENT_METHODS)}
           />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS} if={isIndividual} />
-          <MenuLink
-            collective={collective}
-            section={COLLECTIVE_SECTIONS.NOTIFICATIONS}
-            if={isIndividual && isFeatureEnabled(collective, FEATURES.EMAIL_NOTIFICATIONS_PANEL)}
-          />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.NOTIFICATIONS} if={isIndividual} />
           <MenuLink
             collective={collective}
             section={ORG_BUDGET_SECTIONS.GIFT_CARDS}
@@ -216,11 +202,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
               isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT])
             }
           />
-          <MenuLink
-            collective={collective}
-            section={COLLECTIVE_SECTIONS.WEBHOOKS}
-            if={isOneOfTypes(collective, [COLLECTIVE, USER, EVENT])}
-          />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.WEBHOOKS} />
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.AUTHORIZED_APPS}
@@ -232,11 +214,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS}
             if={isOneOfTypes(collective, [COLLECTIVE, ORGANIZATION, USER])}
           />
-          <MenuLink
-            collective={collective}
-            section={COLLECTIVE_SECTIONS.ACTIVITY_LOG}
-            if={hasActivityLog(collective)}
-          />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
           <MenuLink
             collective={collective}
             section={FISCAL_HOST_SECTIONS.SECURITY}

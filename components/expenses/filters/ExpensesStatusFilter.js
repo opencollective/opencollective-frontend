@@ -9,16 +9,19 @@ import { StyledSelectFilter } from '../../StyledSelectFilter';
 
 const IGNORED_EXPENSE_STATUS = [expenseStatus.DRAFT, expenseStatus.UNVERIFIED];
 
-const ExpenseStatusFilter = ({ value, onChange, ...props }) => {
+const getOption = (intl, value) => ({ label: i18nExpenseStatus(intl, value), value });
+
+const getOptions = (intl, ignoredExpenseStatus) => {
+  const filteredStatuses = ignoredExpenseStatus
+    ? Object.values(expenseStatus).filter(s => !ignoredExpenseStatus.includes(s))
+    : Object.values(expenseStatus);
+
+  return ['ALL', ...filteredStatuses, 'READY_TO_PAY'].map(status => getOption(intl, status));
+};
+
+const ExpenseStatusFilter = ({ value, onChange, ignoredExpenseStatus = IGNORED_EXPENSE_STATUS, ...props }) => {
   const intl = useIntl();
-  const getOption = value => ({ label: i18nExpenseStatus(intl, value), value });
-  const options = [
-    getOption('ALL'),
-    ...Object.values(expenseStatus)
-      .filter(status => !IGNORED_EXPENSE_STATUS.includes(status))
-      .map(getOption),
-    getOption('READY_TO_PAY'),
-  ];
+  const options = React.useMemo(() => getOptions(intl, ignoredExpenseStatus), [ignoredExpenseStatus]);
 
   return (
     <StyledSelectFilter
@@ -26,7 +29,7 @@ const ExpenseStatusFilter = ({ value, onChange, ...props }) => {
       data-cy="expenses-filter-status"
       options={options}
       onChange={({ value }) => onChange(value)}
-      value={getOption(value || 'ALL')}
+      value={getOption(intl, value || 'ALL')}
       {...props}
     />
   );
@@ -35,6 +38,7 @@ const ExpenseStatusFilter = ({ value, onChange, ...props }) => {
 ExpenseStatusFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.oneOf([...Object.values(expenseStatus), 'READY_TO_PAY']),
+  ignoredExpenseStatus: PropTypes.arrayOf(PropTypes.oneOf(Object.values(expenseStatus))),
 };
 
 export default ExpenseStatusFilter;

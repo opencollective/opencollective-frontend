@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getStripe } from '../lib/stripe';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
@@ -53,7 +54,7 @@ class ConfirmOrderPage extends React.Component {
   async triggerRequest() {
     try {
       this.setState({ isRequestSent: true });
-      const res = await this.props.confirmOrder({ variables: { order: { id: this.props.id } } });
+      const res = await this.props.confirmOrder({ variables: { order: { legacyId: this.props.id } } });
       const orderConfirmed = res.data.confirmOrder;
       if (orderConfirmed.stripeError) {
         this.handleStripeError(orderConfirmed);
@@ -136,18 +137,20 @@ class ConfirmOrderPage extends React.Component {
   }
 }
 
-const confirmOrderMutation = gqlV1/* GraphQL */ `
-  mutation ConfirmOrder($order: ConfirmOrderInputType!) {
+const confirmOrderMutation = gql`
+  mutation ConfirmOrder($order: OrderReferenceInput!) {
     confirmOrder(order: $order) {
-      id
-      status
+      order {
+        id
+        status
+        transactions {
+          id
+        }
+      }
       stripeError {
         message
         account
         response
-      }
-      transactions {
-        id
       }
     }
   }
@@ -155,6 +158,7 @@ const confirmOrderMutation = gqlV1/* GraphQL */ `
 
 const addConfirmOrderMutation = graphql(confirmOrderMutation, {
   name: 'confirmOrder',
+  options: { context: API_V2_CONTEXT },
 });
 
 export default withUser(addConfirmOrderMutation(ConfirmOrderPage));

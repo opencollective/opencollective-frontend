@@ -7,6 +7,7 @@ import { isHostAccount } from '../lib/collective.lib';
 import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { require2FAForAdmins } from '../lib/policies';
 
 import { AdminPanelContext } from '../components/admin-panel/AdminPanelContext';
 import AdminPanelSection from '../components/admin-panel/AdminPanelSection';
@@ -40,7 +41,6 @@ export const adminPanelQuery = gql`
         VIRTUAL_CARDS
         USE_PAYMENT_METHODS
         EMIT_GIFT_CARDS
-        EMAIL_NOTIFICATIONS_PANEL
       }
       policies {
         REQUIRE_2FA_FOR_ADMINS
@@ -49,6 +49,9 @@ export const adminPanelQuery = gql`
         parent {
           id
           slug
+          policies {
+            REQUIRE_2FA_FOR_ADMINS
+          }
         }
       }
       ... on AccountWithHost {
@@ -100,7 +103,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return ALL_SECTIONS.INFO;
   }
 
-  const isAdmin = loggedInUser?.isAdminOfCollectiveOrHost(account);
+  const isAdmin = loggedInUser?.isAdminOfCollective(account);
   const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
   const isAccountantOnly = !isAdmin && isAccountant;
   if (isHostAccount(account)) {
@@ -141,7 +144,7 @@ function getBlocker(LoggedInUser, account, section) {
   }
 
   // Check permissions
-  const isAdmin = LoggedInUser.isAdminOfCollectiveOrHost(account);
+  const isAdmin = LoggedInUser.isAdminOfCollective(account);
   if (SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS.includes(section)) {
     if (!isAdmin && !LoggedInUser.hasRole(roles.ACCOUNTANT, account)) {
       return <FormattedMessage defaultMessage="You need to be logged in as an admin or accountant to view this page" />;
@@ -152,9 +155,7 @@ function getBlocker(LoggedInUser, account, section) {
 }
 
 const getIsAccountantOnly = (LoggedInUser, account) => {
-  return (
-    LoggedInUser && !LoggedInUser.isAdminOfCollectiveOrHost(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account)
-  );
+  return LoggedInUser && !LoggedInUser.isAdminOfCollective(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account);
 };
 
 const AdminPanelPage = () => {
@@ -216,7 +217,7 @@ const AdminPanelPage = () => {
               display={['none', null, 'block']}
               isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
             />
-            {account?.policies?.REQUIRE_2FA_FOR_ADMINS && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
+            {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
             ) : (
               <AdminPanelSection

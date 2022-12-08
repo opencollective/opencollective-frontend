@@ -123,7 +123,12 @@ const SectionTransactions = props => {
           {loading ? (
             <LoadingPlaceholder height={600} borderRadius={8} />
           ) : (
-            <TransactionsList collective={collective} transactions={data?.transactions?.nodes} displayActions />
+            <TransactionsList
+              collective={collective}
+              transactions={data?.transactions?.nodes}
+              displayActions
+              onMutationSuccess={() => refetch()}
+            />
           )}
           {data?.transactions.totalCount === 0 && (
             <MessageBox type="info">

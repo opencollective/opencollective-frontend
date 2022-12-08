@@ -77,15 +77,19 @@ const msg = defineMessages({
     defaultMessage: 'Payee information',
   },
   cancelEditExpense: {
+    id: 'ExpenseForm.CancelEditExpense',
     defaultMessage: 'Cancel Edit',
   },
   confirmCancelEditExpense: {
+    id: 'ExpenseForm.ConfirmCancelEditExpense',
     defaultMessage: 'Are you sure you want to cancel the edits?',
   },
   clearExpenseForm: {
+    id: 'ExpenseForm.ClearExpenseForm',
     defaultMessage: 'Clear Form',
   },
   confirmClearExpenseForm: {
+    id: 'ExpenseForm.ConfirmClearExpenseForm',
     defaultMessage: 'Are you sure you want to clear the expense form?',
   },
 });
@@ -125,6 +129,11 @@ export const prepareExpenseForSubmit = expenseData => {
     ? pick(expenseData.payeeLocation, ['address', 'country', 'structured'])
     : null;
 
+  const payoutMethod = pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']);
+  if (payoutMethod.id === 'new') {
+    payoutMethod.id = null;
+  }
+
   return {
     ...pick(expenseData, [
       'id',
@@ -138,8 +147,8 @@ export const prepareExpenseForSubmit = expenseData => {
     ]),
     payee,
     payeeLocation,
-    payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
-    attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])) : [],
+    payoutMethod,
+    attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => {
       return pick(item, [
@@ -410,6 +419,7 @@ const ExpenseFormBody = ({
         formik={formik}
         isOnBehalf={isOnBehalf}
         onCancel={onCancel}
+        handleClearPayeeStep={() => setShowResetModal(true)}
         payoutProfiles={payoutProfiles}
         loggedInAccount={loggedInAccount}
         onChange={payee => {
@@ -424,6 +434,10 @@ const ExpenseFormBody = ({
             setErrors({ payoutMethod: validation });
           }
         }}
+        editingExpense={editingExpense}
+        resetDefaultStep={() => setStep(EXPENSE_FORM_STEPS.PAYEE)}
+        formPersister={formPersister}
+        getDefaultExpense={getDefaultExpense}
         onInvite={isInvite => {
           setOnBehalf(isInvite);
           formik.setFieldValue('payeeLocation', {});

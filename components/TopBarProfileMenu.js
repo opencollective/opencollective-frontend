@@ -97,6 +97,9 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
       >
         <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
       </UserMenuLinkEntry>
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/submitted-expenses`}>
+        <FormattedMessage id="home.feature.manageExpenses" defaultMessage="Manage Expenses" />
+      </UserMenuLinkEntry>
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/transactions`}>
         <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
       </UserMenuLinkEntry>
@@ -106,7 +109,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} as="a" href="/help">
         <FormattedMessage id="menu.help" defaultMessage="Help" />
       </UserMenuLinkEntry>
-      {LoggedInUser.isRoot() && (
+      {LoggedInUser.isRoot && (
         <UserMenuLinkEntry isMobileMenuLink={isMobileView} href="/opencollective/root-actions">
           {/** Not i18n on purpose, this is for platform admins only */}
           Root Actions

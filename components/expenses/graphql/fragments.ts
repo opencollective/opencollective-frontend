@@ -39,6 +39,14 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
           policies {
             REQUIRE_2FA_FOR_ADMINS
           }
+          ... on AccountWithParent {
+            parent {
+              id
+              policies {
+                REQUIRE_2FA_FOR_ADMINS
+              }
+            }
+          }
           ... on AccountWithHost {
             host {
               id
@@ -178,6 +186,7 @@ export const expensePageExpenseFieldsFragment = gql`
     attachedFiles {
       id
       url
+      name
     }
     payee {
       id
@@ -204,6 +213,14 @@ export const expensePageExpenseFieldsFragment = gql`
         isApproved
         host {
           id
+          # For Expenses across hosts
+          payoutMethods {
+            id
+            type
+            name
+            data
+            isSaved
+          }
         }
       }
 
@@ -525,6 +542,7 @@ export const expensesListAdminFieldsFragment = gql`
     attachedFiles {
       id
       url
+      name
     }
     securityChecks {
       level

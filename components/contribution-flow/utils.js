@@ -1,4 +1,5 @@
 import React from 'react';
+import { Bank } from '@styled-icons/boxicons-solid';
 import { find, get, isEmpty, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
@@ -22,6 +23,7 @@ import { getWebsiteUrl } from '../../lib/utils';
 import CreditCardInactive from '../icons/CreditCardInactive';
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
+export const STRIPE_PAYMENT_ELEMENT_KEY = 'stripe-payment-element';
 const PAYPAL_MAX_AMOUNT = 999999999; // See MAX_VALUE_EXCEEDED https://developer.paypal.com/api/rest/reference/orders/v2/errors/#link-createorder
 
 const memberCanBeUsedToContribute = (member, account, canUseIncognito) => {
@@ -82,6 +84,7 @@ export const generatePaymentMethodOptions = (
   collective,
   isEmbed,
   disabledPaymentMethodTypes,
+  stripeAccount,
 ) => {
   const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
@@ -106,6 +109,20 @@ export const generatePaymentMethodOptions = (
     ({ paymentMethod }) =>
       paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE || collective.host.legacyId === stepProfile.host?.id,
   );
+
+  uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
+    if (paymentMethod?.data?.stripeAccount) {
+      return paymentMethod?.data?.stripeAccount === stripeAccount;
+    } else {
+      return true;
+    }
+  });
+
+  uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
+    return (
+      !interval || ![PAYMENT_METHOD_TYPE.US_BANK_ACCOUNT, PAYMENT_METHOD_TYPE.SEPA_DEBIT].includes(paymentMethod.type)
+    );
+  });
 
   // prepaid budget: limited to a specific host
   const matchesHostCollectiveIdPrepaid = prepaid => {
@@ -219,6 +236,32 @@ export const generatePaymentMethodOptions = (
             defaultMessage="Instructions to make a transfer will be given on the next page."
           />
         ),
+      });
+    }
+
+    if (
+      supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYMENT_INTENT) &&
+      !interval &&
+      get(collective, 'settings.features.stripePaymentIntent', false) &&
+      ['USD', 'EUR'].includes(stepDetails.currency) &&
+      stripeAccount
+    ) {
+      let subtitle;
+      if (stepDetails.currency === 'USD') {
+        subtitle = 'ACH';
+      } else if (stepDetails.currency === 'EUR') {
+        subtitle = 'SEPA';
+      }
+
+      uniquePMs.push({
+        key: STRIPE_PAYMENT_ELEMENT_KEY,
+        title: <FormattedMessage defaultMessage="Bank debit" />,
+        subtitle,
+        icon: <Bank color="#c9ced4" size={'1.5em'} />,
+        paymentMethod: {
+          service: PAYMENT_METHOD_SERVICE.STRIPE,
+          type: PAYMENT_METHOD_TYPE.STRIPE_ELEMENTS,
+        },
       });
     }
   }

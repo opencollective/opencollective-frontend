@@ -19,7 +19,6 @@ import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/u
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { Sections } from '../components/collective-page/_constants';
 import Container from '../components/Container';
 import CommentForm from '../components/conversations/CommentForm';
 import { commentFieldsFragment } from '../components/conversations/graphql';
@@ -512,11 +511,10 @@ class ExpensePage extends React.Component {
         <CollectiveNavbar
           collective={collective}
           isLoading={!collective}
-          selected={Sections.BUDGET}
           selectedCategory={NAVBAR_CATEGORIES.BUDGET}
           callsToAction={{ hasSubmitExpense: status === PAGE_STATUS.VIEW }}
         />
-        <Flex flexDirection={['column', 'row']} my={[4, 5]} data-cy="expense-page-content">
+        <Flex flexDirection={['column', 'row']} px={[2, 3, 4]} py={[0, 5]} mt={3} data-cy="expense-page-content">
           <Box width={SIDE_MARGIN_WIDTH}></Box>
           <Box
             flex="1 1 650px"

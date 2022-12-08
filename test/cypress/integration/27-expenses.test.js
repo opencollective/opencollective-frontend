@@ -225,7 +225,7 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-summary-btn').click();
         cy.wait(500);
 
-        cy.getByDataCy('expense-status-msg').should('contain', 'DRAFT');
+        cy.getByDataCy('expense-status-msg').should('contain', 'Draft');
         cy.getByDataCy('expense-draft-banner').should('contain', 'Your invite is on its way');
         cy.getByDataCy('expense-draft-banner').should(
           'contain',
@@ -248,7 +248,7 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-summary-btn').click();
         cy.wait(500);
 
-        cy.getByDataCy('expense-status-msg').should('contain', 'DRAFT');
+        cy.getByDataCy('expense-status-msg').should('contain', 'Draft');
         cy.getByDataCy('expense-draft-banner').should('contain', 'Your invite is on its way');
         cy.getByDataCy('expense-draft-banner').should(
           'contain',
@@ -314,7 +314,7 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-summary-btn').click();
         cy.wait(500);
 
-        cy.getByDataCy('expense-status-msg').should('contain', 'DRAFT');
+        cy.getByDataCy('expense-status-msg').should('contain', 'Draft');
         cy.getByDataCy('expense-draft-banner').should('contain', 'Your invite is on its way');
         cy.getByDataCy('expense-draft-banner').should(
           'contain',

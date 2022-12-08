@@ -38,7 +38,7 @@ const filterContributions = (contributions, filterName) => {
 };
 
 const RecurringContributionsContainer = ({ recurringContributions, filter, account, LoggedInUser }) => {
-  const isAdmin = Boolean(LoggedInUser?.isAdminOfCollectiveOrHost(account));
+  const isAdmin = Boolean(LoggedInUser?.isAdminOfCollective(account));
   const [editingContributionId, setEditingContributionId] = React.useState();
   const displayedRecurringContributions = React.useMemo(() => {
     const filteredContributions = filterContributions(recurringContributions.nodes, filter);

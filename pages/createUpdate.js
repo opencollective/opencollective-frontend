@@ -138,7 +138,7 @@ class CreateUpdatePage extends React.Component {
     }
 
     const collective = data.account;
-    const isAdmin = LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(collective);
+    const isAdmin = LoggedInUser && LoggedInUser.isAdminOfCollective(collective);
 
     return (
       <div>

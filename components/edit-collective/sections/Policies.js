@@ -171,17 +171,18 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
     },
     async onSubmit(values) {
       const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission, expenseTypes, policies } = values;
+      const newSettings = { ...collective.settings, disablePublicExpenseSubmission };
+      if (collective.isHost) {
+        newSettings.expenseTypes = expenseTypes;
+      }
+
       await updateCollective({
         variables: {
           collective: {
             id: collective.id,
             contributionPolicy,
             expensePolicy,
-            settings: {
-              ...collective.settings,
-              disablePublicExpenseSubmission,
-              expenseTypes,
-            },
+            settings: newSettings,
           },
         },
       });
@@ -467,35 +468,40 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
           />
         </Container>
-        <Container>
-          <SettingsSectionTitle mt={4}>
-            <FormattedMessage defaultMessage="Expense types" />
-          </SettingsSectionTitle>
-          <P mb={2}>
-            <FormattedMessage
-              id="editCollective.expenseTypes.description"
-              defaultMessage="Specify the types of expenses allowed for all the collectives you're hosting. If you wish to customize these options for specific collectives, head to the <HostedCollectivesLink>Hosted Collectives</HostedCollectivesLink> section."
-              values={{
-                HostedCollectivesLink: getI18nLink({ as: Link, href: `/${collective.slug}/admin/hosted-collectives` }),
-              }}
-            />
-          </P>
+        {collective.isHost && (
+          <Container>
+            <SettingsSectionTitle mt={4}>
+              <FormattedMessage defaultMessage="Expense types" />
+            </SettingsSectionTitle>
+            <P mb={2}>
+              <FormattedMessage
+                id="editCollective.expenseTypes.description"
+                defaultMessage="Specify the types of expenses allowed for all the collectives you're hosting. If you wish to customize these options for specific collectives, head to the <HostedCollectivesLink>Hosted Collectives</HostedCollectivesLink> section."
+                values={{
+                  HostedCollectivesLink: getI18nLink({
+                    as: Link,
+                    href: `/${collective.slug}/admin/hosted-collectives`,
+                  }),
+                }}
+              />
+            </P>
 
-          {['RECEIPT', 'INVOICE', 'GRANT'].map(type => (
-            <StyledCheckbox
-              key={type}
-              name={`allow-${type}-submission`}
-              label={formatMessage(messages[`expensePolicy.${type}`])}
-              checked={Boolean(formik.values.expenseTypes[type])}
-              onChange={() =>
-                formik.setFieldValue('expenseTypes', {
-                  ...formik.values.expenseTypes,
-                  [type]: !formik.values.expenseTypes[type],
-                })
-              }
-            />
-          ))}
-        </Container>
+            {['RECEIPT', 'INVOICE', 'GRANT'].map(type => (
+              <StyledCheckbox
+                key={type}
+                name={`allow-${type}-submission`}
+                label={formatMessage(messages[`expensePolicy.${type}`])}
+                checked={Boolean(formik.values.expenseTypes[type])}
+                onChange={() =>
+                  formik.setFieldValue('expenseTypes', {
+                    ...formik.values.expenseTypes,
+                    [type]: !formik.values.expenseTypes[type],
+                  })
+                }
+              />
+            ))}
+          </Container>
+        )}
         <Container>
           <SettingsSectionTitle mt={4}>
             <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />

@@ -1,4 +1,6 @@
-import { defineMessages } from 'react-intl';
+import { defineMessages, MessageDescriptor } from 'react-intl';
+
+import { ActivityTypes } from '../constants/activities';
 
 export const ActivityDescriptionI18n = defineMessages({
   // Collective creation & applications
@@ -144,7 +146,7 @@ export const ActivityDescriptionI18n = defineMessages({
   },
   // Contact
   COLLECTIVE_CONTACT: {
-    defaultMessage: 'Contacted <Account></Account>',
+    defaultMessage: '<FromAccount></FromAccount> contacted <Account></Account>',
   },
   // Virtual cards
   // TODO: Link virtual cards and/or admin page
@@ -248,24 +250,240 @@ export const ActivityDescriptionI18n = defineMessages({
   },
 });
 
-export const ActivityAttributionI18n = defineMessages({
-  ALL: {
-    id: 'ActivityAttribution.AllShort',
+type ActivityTranslations = Partial<Record<keyof typeof ActivityTypes, MessageDescriptor>>;
+
+export const ActivityTypeI18n: ActivityTranslations = defineMessages({
+  ACTIVITY_ALL: {
+    id: 'WebhookEvents.All',
     defaultMessage: 'All',
   },
-  AUTHORED: {
-    id: 'ActivityAttribution.AUTHORED',
-    defaultMessage: 'Authored',
+  CONNECTED_ACCOUNT_CREATED: {
+    id: 'WebhookEvents.CONNECTED_ACCOUNT_CREATED',
+    defaultMessage: 'Connected account added',
   },
-  RECEIVED: {
-    id: 'ActivityAttribution.RECEIVED',
-    defaultMessage: 'Received',
+  COLLECTIVE_APPLY: {
+    id: 'WebhookEvents.COLLECTIVE_APPLY',
+    defaultMessage: 'New collective application',
   },
-  SELF: {
-    id: 'ActivityAttribution.SELF',
-    defaultMessage: 'Self actions',
+  COLLECTIVE_APPROVED: {
+    id: 'WebhookEvents.COLLECTIVE_APPROVED',
+    defaultMessage: 'Collective application approved',
   },
-  HOSTED_ACCOUNTS: {
-    defaultMessage: 'Hosted Accounts',
+  COLLECTIVE_REJECTED: {
+    id: 'WebhookEvents.COLLECTIVE_REJECTED',
+    defaultMessage: 'Collective application rejected',
+  },
+  COLLECTIVE_CREATED: {
+    id: 'WebhookEvents.COLLECTIVE_CREATED',
+    defaultMessage: 'Collective created',
+  },
+  ORGANIZATION_COLLECTIVE_CREATED: {
+    defaultMessage: 'Organization created',
+  },
+  USER_CREATED: {
+    defaultMessage: 'User profile created',
+  },
+  USER_NEW_TOKEN: {
+    defaultMessage: 'Signed in',
+  },
+  USER_CHANGE_EMAIL: {
+    defaultMessage: 'Changed email address',
+  },
+  USER_CARD_CLAIMED: {
+    defaultMessage: 'Gift card claimed',
+  },
+  USER_CARD_INVITED: {
+    defaultMessage: 'Gift card invited',
+  },
+  USER_PAYMENT_METHOD_CREATED: {
+    defaultMessage: 'New payment method',
+  },
+  COLLECTIVE_CREATED_GITHUB: {
+    defaultMessage: 'Collective created via GitHub',
+  },
+  COLLECTIVE_EDITED: {
+    defaultMessage: 'Account edited',
+  },
+  COLLECTIVE_CONVERSATION_CREATED: {
+    id: 'Conversation.created',
+    defaultMessage: 'Conversation created',
+  },
+  COLLECTIVE_EXPENSE_CREATED: {
+    id: 'WebhookEvents.COLLECTIVE_EXPENSE_CREATED',
+    defaultMessage: 'New expenses',
+  },
+  COLLECTIVE_EXPENSE_UNAPPROVED: {
+    id: 'Expense.Activity.Unapproved',
+    defaultMessage: 'Expense unapproved',
+  },
+  COLLECTIVE_EXPENSE_DELETED: {
+    defaultMessage: 'Expense deleted',
+  },
+  COLLECTIVE_EXPENSE_UPDATED: {
+    id: 'Expense.Activity.Updated',
+    defaultMessage: 'Expense updated',
+  },
+  COLLECTIVE_EXPENSE_REJECTED: {
+    id: 'Expense.Activity.Rejected',
+    defaultMessage: 'Expense rejected',
+  },
+  COLLECTIVE_EXPENSE_APPROVED: {
+    id: 'Expense.Activity.Approved',
+    defaultMessage: 'Expense approved',
+  },
+  COLLECTIVE_EXPENSE_PAID: {
+    id: 'Expense.Activity.Paid',
+    defaultMessage: 'Expense paid',
+  },
+  COLLECTIVE_EXPENSE_MOVED: {
+    defaultMessage: 'Expense moved',
+  },
+  COLLECTIVE_EXPENSE_MARKED_AS_UNPAID: {
+    id: 'Expense.Activity.MarkedAsUnpaid',
+    defaultMessage: 'Expense marked as unpaid',
+  },
+  COLLECTIVE_EXPENSE_INVITE_DRAFTED: {
+    id: 'Expense.Activity.Invite.Drafted',
+    defaultMessage: 'Expense invited',
+  },
+  COLLECTIVE_EXPENSE_PROCESSING: {
+    id: 'Expense.Activity.Processing',
+    defaultMessage: 'Expense processing',
+  },
+  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT: {
+    id: 'Expense.Activity.ScheduledForPayment',
+    defaultMessage: 'Expense scheduled for payment',
+  },
+  COLLECTIVE_EXPENSE_ERROR: {
+    id: 'Expense.Activity.Error',
+    defaultMessage: 'Expense error',
+  },
+  COLLECTIVE_EXPENSE_MARKED_AS_SPAM: {
+    id: 'Expense.Activity.MarkedAsSpam',
+    defaultMessage: 'Expense marked as spam',
+  },
+  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE: {
+    id: 'Expense.Activity.MarkedAsIncomplete',
+    defaultMessage: 'Expense marked as incomplete',
+  },
+  COLLECTIVE_EXPENSE_RECURRING_DRAFTED: {
+    defaultMessage: 'Recurring expense drafted',
+  },
+  COLLECTIVE_MEMBER_CREATED: {
+    id: 'WebhookEvents.COLLECTIVE_MEMBER_CREATED',
+    defaultMessage: 'New member',
+  },
+  COLLECTIVE_FROZEN: {
+    defaultMessage: 'Frozen account',
+  },
+  COLLECTIVE_UNFROZEN: {
+    defaultMessage: 'Unfrozen account',
+  },
+  COLLECTIVE_MEMBER_INVITED: {
+    defaultMessage: 'Invited members',
+  },
+  COLLECTIVE_CORE_MEMBER_ADDED: {
+    defaultMessage: 'Core member added',
+  },
+  COLLECTIVE_CORE_MEMBER_INVITED: {
+    defaultMessage: 'Core member invited',
+  },
+  COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED: {
+    defaultMessage: 'Core member invitation declined',
+  },
+  COLLECTIVE_CORE_MEMBER_REMOVED: {
+    defaultMessage: 'Core member removed',
+  },
+  COLLECTIVE_CORE_MEMBER_EDITED: {
+    defaultMessage: 'Core member edited',
+  },
+  COLLECTIVE_CONTACT: {
+    id: 'Contact',
+    defaultMessage: 'Contact',
+  },
+  COLLECTIVE_VIRTUAL_CARD_SUSPENDED: {
+    defaultMessage: 'Virtual card suspended',
+  },
+  COLLECTIVE_VIRTUAL_CARD_ADDED: {
+    defaultMessage: 'Virtual card added',
+  },
+  VIRTUAL_CARD_REQUESTED: {
+    defaultMessage: 'Virtual card requested',
+  },
+  VIRTUAL_CARD_CHARGE_DECLINED: {
+    defaultMessage: 'Virtual card charge declined',
+  },
+  CONTRIBUTION_REJECTED: {
+    defaultMessage: 'Contribution rejected',
+  },
+  COLLECTIVE_TRANSACTION_CREATED: {
+    id: 'WebhookEvents.COLLECTIVE_TRANSACTION_CREATED',
+    defaultMessage: 'New transaction',
+  },
+  COLLECTIVE_UPDATE_CREATED: {
+    id: 'WebhookEvents.COLLECTIVE_UPDATE_CREATED',
+    defaultMessage: 'New update drafted',
+  },
+  COLLECTIVE_UPDATE_PUBLISHED: {
+    id: 'connectedAccounts.twitter.updatePublished.toggle.label',
+    defaultMessage: 'Update published',
+  },
+  SUBSCRIPTION_CANCELED: {
+    defaultMessage: 'Recurring contribution cancelled',
+  },
+  SUBSCRIPTION_ACTIVATED: {
+    defaultMessage: 'Recurring contribution activated',
+  },
+  SUBSCRIPTION_CONFIRMED: {
+    defaultMessage: 'Recurring contribution confirmed',
+  },
+  TICKET_CONFIRMED: {
+    id: 'WebhookEvents.TICKET_CONFIRMED',
+    defaultMessage: 'Ticket confirmed',
+  },
+  ORDER_CANCELED_ARCHIVED_COLLECTIVE: {
+    defaultMessage: 'Contribution canceled (archived collective)',
+  },
+  ORDER_PROCESSING: {
+    defaultMessage: 'Contribution processing',
+  },
+  ORDER_PROCESSING_CRYPTO: {
+    defaultMessage: 'Contribution processing (crypto)',
+  },
+  ORDER_PENDING_CONTRIBUTION_NEW: {
+    defaultMessage: 'New pending contribution',
+  },
+  ORDER_THANKYOU: {
+    defaultMessage: 'New order',
+  },
+  ORDERS_SUSPICIOUS: {
+    defaultMessage: 'Suspicious order',
+  },
+  ACTIVATED_COLLECTIVE_AS_HOST: {
+    defaultMessage: 'Activated as host',
+  },
+  ACTIVATED_COLLECTIVE_AS_INDEPENDENT: {
+    defaultMessage: 'Activated as independent',
+  },
+  DEACTIVATED_COLLECTIVE_AS_HOST: {
+    defaultMessage: 'Deactivated as host',
+  },
+  PAYMENT_FAILED: {
+    defaultMessage: 'Payment failed',
+  },
+  TAXFORM_REQUEST: {
+    defaultMessage: 'Tax form request',
+  },
+  COLLECTIVE_COMMENT_CREATED: {
+    defaultMessage: 'Comment posted',
+  },
+  CONVERSATION_COMMENT_CREATED: {
+    defaultMessage: 'New comment on conversation',
+  },
+  UPDATE_COMMENT_CREATED: {
+    defaultMessage: 'New comment on update',
+  },
+  EXPENSE_COMMENT_CREATED: {
+    defaultMessage: 'New comment on expense',
   },
 });
