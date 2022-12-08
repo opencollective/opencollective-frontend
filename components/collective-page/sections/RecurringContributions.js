@@ -89,10 +89,7 @@ class SectionRecurringContributions extends React.Component {
       <Box pb={4}>
         <ContainerSectionContent>
           <SectionTitle textAlign="left" mb={4} fontSize={['20px', '24px', '32px']} color="black.700">
-            <FormattedMessage
-              id="CollectivePage.SectionRecurringContributions.Title"
-              defaultMessage="Recurring Contributions"
-            />
+            <FormattedMessage id="Contributions.Recurring" defaultMessage="Recurring Contributions" />
           </SectionTitle>
         </ContainerSectionContent>
         <Box mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>

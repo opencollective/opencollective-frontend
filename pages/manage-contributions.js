@@ -45,11 +45,11 @@ const TABS = {
 // create defineMessages for TABS
 const I18nTabs = defineMessages({
   [TABS.RECURRING]: {
-    id: 'Subscriptions.Recurring',
+    id: 'Contributions.Recurring',
     defaultMessage: 'Recurring Contributions',
   },
   [TABS.PROCESSING]: {
-    id: 'Subscriptions.Processing',
+    id: 'Contributions.Processing',
     defaultMessage: 'Processing Contributions',
   },
 });
