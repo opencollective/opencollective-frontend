@@ -112,6 +112,7 @@ const RecurringContributionsContainer = ({
             options={filterOptions}
             maxWidth="180px"
             disabled={isLoading}
+            data-cy="recurring-contributions-interval"
           />
         </Box>
       )}
