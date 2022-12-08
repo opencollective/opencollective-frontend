@@ -174,7 +174,7 @@ const nextConfig = {
       // Legacy subscriptions
       {
         source: '/subscriptions',
-        destination: '/recurring-contributions',
+        destination: '/manage-contributions',
         permanent: false,
       },
       {

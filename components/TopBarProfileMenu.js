@@ -91,10 +91,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={getSettingsRoute(LoggedInUser.collective)}>
         <FormattedMessage id="Settings" defaultMessage="Settings" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry
-        isMobileMenuLink={isMobileView}
-        href={`/${LoggedInUser.collective.slug}/recurring-contributions`}
-      >
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/manage-contributions`}>
         <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
       </UserMenuLinkEntry>
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/submitted-expenses`}>
