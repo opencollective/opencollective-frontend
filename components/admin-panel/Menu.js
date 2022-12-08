@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import hasFeature, { FEATURES, isFeatureEnabled } from '../../lib/allowed-features';
+import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective.lib';
 import { getCollectiveTypeKey, isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -173,11 +173,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             if={['ACTIVE', 'AVAILABLE'].includes(collective.features.USE_PAYMENT_METHODS)}
           />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS} if={isIndividual} />
-          <MenuLink
-            collective={collective}
-            section={COLLECTIVE_SECTIONS.NOTIFICATIONS}
-            if={isIndividual && isFeatureEnabled(collective, FEATURES.EMAIL_NOTIFICATIONS_PANEL)}
-          />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.NOTIFICATIONS} if={isIndividual} />
           <MenuLink
             collective={collective}
             section={ORG_BUDGET_SECTIONS.GIFT_CARDS}
