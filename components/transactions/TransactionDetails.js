@@ -182,9 +182,11 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
           {order?.processedAt && (
             <React.Fragment>
               <DetailTitle>
-                <FormattedMessage defaultMessage="Fund Received Date" />
+                <Span textTransform="capitalize">
+                  <FormattedMessage id="processedAt" defaultMessage="Fund received date" />
+                </Span>
               </DetailTitle>
-              <DetailDescription>{intl.formatDate(order.processedAt)}</DetailDescription>
+              <DetailDescription>{intl.formatDate(order.processedAt, { timeZone: 'UTC' })}</DetailDescription>
             </React.Fragment>
           )}
         </Flex>

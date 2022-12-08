@@ -736,9 +736,11 @@ const AddFundsModal = ({ collective, ...props }) => {
                           )}
                           {fundDetails.processedAt && (
                             <li>
-                              <FormattedMessage defaultMessage="Fund Received Date" />
+                              <Span textTransform="capitalize">
+                                <FormattedMessage id="processedAt" defaultMessage="Fund received date" />
+                              </Span>
                               {': '}
-                              <strong>{intl.formatDate(fundDetails.processedAt)}</strong>
+                              <strong>{intl.formatDate(fundDetails.processedAt, { timeZone: 'UTC' })}</strong>
                             </li>
                           )}
                           {fundDetails.tier && (
