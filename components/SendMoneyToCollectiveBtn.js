@@ -111,7 +111,7 @@ const paymentMethodsQuery = gql`
   query SendMoneyToCollectivePaymentMethods($slug: String) {
     account(slug: $slug) {
       id
-      paymentMethods(service: OPENCOLLECTIVE, enumType: COLLECTIVE) {
+      paymentMethods(service: OPENCOLLECTIVE, type: COLLECTIVE) {
         id
         service
         name
