@@ -87,7 +87,6 @@ export const tierPageQuery = gqlV1/* GraphQL */ `
         isAdmin
         isCore
         isBacker
-        isFundraiser
         since
         description
         publicMessage
