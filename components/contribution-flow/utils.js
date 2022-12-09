@@ -211,28 +211,6 @@ export const generatePaymentMethodOptions = (
       });
     }
 
-    // Manual (bank transfer)
-    if (hostHasManual && !interval && !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)) {
-      uniquePMs.push({
-        key: 'manual',
-        title: get(collective, 'host.settings.paymentMethods.manual.title', null) || 'Bank transfer',
-        paymentMethod: {
-          service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
-          type: PAYMENT_METHOD_TYPE.MANUAL,
-        },
-        icon: getPaymentMethodIcon({
-          service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
-          type: PAYMENT_METHOD_TYPE.MANUAL,
-        }),
-        instructions: (
-          <FormattedMessage
-            id="NewContributionFlow.bankInstructions"
-            defaultMessage="Instructions to make a transfer will be given on the next page."
-          />
-        ),
-      });
-    }
-
     if (
       supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYMENT_INTENT) &&
       !interval &&
@@ -249,13 +227,37 @@ export const generatePaymentMethodOptions = (
 
       uniquePMs.push({
         key: STRIPE_PAYMENT_ELEMENT_KEY,
-        title: <FormattedMessage defaultMessage="Bank debit" />,
+        title: <FormattedMessage defaultMessage="Bank debit (automated)" />,
         subtitle,
         icon: <Bank color="#c9ced4" size={'1.5em'} />,
         paymentMethod: {
           service: PAYMENT_METHOD_SERVICE.STRIPE,
           type: PAYMENT_METHOD_TYPE.STRIPE_ELEMENTS,
         },
+      });
+    }
+
+    // Manual (bank transfer)
+    if (hostHasManual && !interval && !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)) {
+      uniquePMs.push({
+        key: 'manual',
+        title: get(collective, 'host.settings.paymentMethods.manual.title', null) || (
+          <FormattedMessage defaultMessage="Bank transfer (manual)" />
+        ),
+        paymentMethod: {
+          service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
+          type: PAYMENT_METHOD_TYPE.MANUAL,
+        },
+        icon: getPaymentMethodIcon({
+          service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
+          type: PAYMENT_METHOD_TYPE.MANUAL,
+        }),
+        instructions: (
+          <FormattedMessage
+            id="NewContributionFlow.bankInstructions"
+            defaultMessage="Instructions to make a transfer will be given on the next page."
+          />
+        ),
       });
     }
   }
