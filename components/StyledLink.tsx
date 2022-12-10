@@ -52,6 +52,12 @@ const StyledLink = styled.a.attrs<StyledLinkProps>(props => {
       rel: 'noopener noreferrer nofollow',
     };
   }
+  if (props.openInNewTabNoFollowRelMe) {
+    return {
+      target: '_blank',
+      rel: 'noopener noreferrer nofollow me',
+    };
+  }
 })<StyledLinkProps>`
   cursor: pointer;
   text-decoration: none;
