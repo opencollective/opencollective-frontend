@@ -270,7 +270,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     </StyledLink>
                   )}
                   {collective.website && (
-                    <StyledLink data-cy="collectiveWebsite" href={collective.website} openInNewTabNoFollow>
+                    <StyledLink data-cy="collectiveWebsite" href={collective.website} openInNewTabNoFollowRelMe>
                       <StyledRoundButton
                         size={32}
                         mr={3}
@@ -282,7 +282,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     </StyledLink>
                   )}
                   {collective.repositoryUrl && (
-                    <StyledLink data-cy="repositoryUrl" href={collective.repositoryUrl} openInNewTabNoFollow>
+                    <StyledLink data-cy="repositoryUrl" href={collective.repositoryUrl} openInNewTabNoFollowRelMe>
                       <StyledButton buttonSize="tiny" color="black.700" height={32} mr={3}>
                         <CodeRepositoryIcon size={12} repositoryUrl={collective.repositoryUrl} />
                         <Span ml={2}>
