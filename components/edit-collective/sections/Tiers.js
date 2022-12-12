@@ -95,11 +95,10 @@ class Tiers extends React.Component {
       },
       DONATION: { id: 'tier.type.donation', defaultMessage: 'donation (gift)' },
       TICKET: {
-        id: 'tier.type.ticket',
+        id: 'ContributionType.Ticket',
         defaultMessage: 'Ticket',
       },
       TICKET_TYPE: {
-        id: 'tier.type.ticketType',
         defaultMessage: 'Single Ticket',
       },
       singleTicketDescription: {

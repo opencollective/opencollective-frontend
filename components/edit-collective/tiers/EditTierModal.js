@@ -427,7 +427,10 @@ function FormFields({ collective, types, values }) {
             )}
           </StyledInputFormikField>
           <FieldDescription>
-            <FormattedMessage defaultMessage="Only allow people to buy a single ticket per order" />
+            <FormattedMessage
+              id="tier.singleTicketDescription"
+              defaultMessage="Only allow people to buy a single ticket per order"
+            />
           </FieldDescription>
         </React.Fragment>
       )}
