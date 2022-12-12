@@ -833,20 +833,20 @@ type Order {
 All order statuses
 """
 enum OrderStatus {
+  NEW
+  REQUIRE_CLIENT_CONFIRMATION
+  PAID
+  ERROR
+  PROCESSING
   ACTIVE
   CANCELLED
-  DISPUTED
-  ERROR
-  EXPIRED
-  IN_REVIEW
-  NEW
-  PAID
   PENDING
-  PROCESSING
+  EXPIRED
   PLEDGED
-  REFUNDED
   REJECTED
-  REQUIRE_CLIENT_CONFIRMATION
+  DISPUTED
+  REFUNDED
+  IN_REVIEW
 }
 
 enum ContributionFrequency {
@@ -3690,6 +3690,7 @@ All supported services a user can connect with
 enum ConnectedAccountService {
   paypal
   stripe
+  stripe_customer
   github
   twitter
   transferwise
@@ -3789,29 +3790,29 @@ type AccountStats {
     kind: [TransactionKind]
 
     """
-    Calculate total amount received before this date
+    Calculate total amount spent before this date
     """
     dateTo: DateTime
 
     """
-    Calculate total amount received after this date
+    Calculate total amount spent after this date
     """
     dateFrom: DateTime
 
     """
-    Computes contributions from the last x months. Cannot be used with startDate/endDate
+    Calculate total amount spent in the last x months. Cannot be used with startDate/endDate
     """
     periodInMonths: Int
+
+    """
+    Include money spent in children (Projects and Events)
+    """
+    includeChildren: Boolean = false
 
     """
     Set this to true to use cached data
     """
     useCache: Boolean! = false
-
-    """
-    Include money received in children (Projects and Events)
-    """
-    includeChildren: Boolean = false
   ): Amount!
 
   """
@@ -3844,7 +3845,32 @@ type AccountStats {
   """
   Total net amount received
   """
-  totalNetAmountReceived: Amount!
+  totalNetAmountReceived(
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+
+    """
+    Calculate total amount spent before this date
+    """
+    dateTo: DateTime
+
+    """
+    Calculate total amount spent after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate total amount spent in the last x months. Cannot be used with startDate/endDate
+    """
+    periodInMonths: Int
+
+    """
+    Include money spent in children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): Amount!
   activeRecurringContributions: JSON
     @deprecated(reason: "2022-10-21: Use activeRecurringContributionsV2 while we migrate to better semantics.")
   activeRecurringContributionsV2(
@@ -8712,6 +8738,11 @@ type Query {
     tag: [String]
 
     """
+    Operator to use when searching with tags. Defaults to 'AND'
+    """
+    tagSearchOperator: TagSearchOperator! = AND
+
+    """
     Host hosting the account
     """
     host: [AccountReferenceInput]
@@ -9380,6 +9411,14 @@ type Query {
   ): PaypalPlan!
   loggedInAccount: Individual
   me: Individual
+}
+
+"""
+The operator to use when searching with tags
+"""
+enum TagSearchOperator {
+  AND
+  OR
 }
 
 """

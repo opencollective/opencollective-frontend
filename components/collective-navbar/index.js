@@ -374,7 +374,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
-        <Link href={`${getCollectivePageRoute(collective)}/recurring-contributions`}>
+        <Link href={`${getCollectivePageRoute(collective)}/manage-contributions`}>
           <ActionButton tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>
