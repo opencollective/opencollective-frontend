@@ -127,7 +127,7 @@ const StepDetailsCrypto = ({ onChange, data, collective }) => {
         inputMode="decimal"
         defaultValue={amount}
         onChange={({ target }) => {
-          const amount = parseFloat(target.value).toFixed(2);
+          const amount = parseFloat(target.value);
           setAmount(amount);
           if (amount >= selectedCryptoCurrency.minDonation) {
             dispatchChange('cryptoAmount', amount);
