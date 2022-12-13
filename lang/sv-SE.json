@@ -1194,7 +1194,7 @@
   "expenses.scheduled.confirmation.title": "Pay Expenses Batch",
   "expenses.scheduled.notification": "You have {count, plural, one {# expense} other {# expenses}} scheduled for payment.",
   "expenses.scheduled.paybatch": "Pay Batch",
-  "expenses.scheduled.paybatch.success": "Expenses paid! They're now being processed by Wise.",
+  "expenses.scheduled.paybatch.success": "Utgifter betalade! Det hanteras nu av Wise.",
   "ExpensesList.Empty": "No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses.",
   "ExpensesOrder.NewestFirst": "Senaste först",
   "ExpensesOrder.OldestFirst": "Äldsta först",
