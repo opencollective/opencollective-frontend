@@ -2889,6 +2889,14 @@ export type DebitRelatedTransactionsArgs = {
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
 };
 
+export type Expense_Author_Cannot_Approve = {
+  __typename?: 'EXPENSE_AUTHOR_CANNOT_APPROVE';
+  amountInCents?: Maybe<Scalars['Int']>;
+  appliesToHostedCollectives?: Maybe<Scalars['Boolean']>;
+  appliesToSingleAdminCollectives?: Maybe<Scalars['Boolean']>;
+  enabled?: Maybe<Scalars['Boolean']>;
+};
+
 export type EmojiReactionResponse = {
   __typename?: 'EmojiReactionResponse';
   /** Reference to the comment corresponding to the emojis */
@@ -6701,9 +6709,16 @@ export type Permission = {
 export type Policies = {
   __typename?: 'Policies';
   COLLECTIVE_MINIMUM_ADMINS?: Maybe<Collective_Minimum_Admins>;
-  EXPENSE_AUTHOR_CANNOT_APPROVE?: Maybe<Scalars['Boolean']>;
+  EXPENSE_AUTHOR_CANNOT_APPROVE?: Maybe<Expense_Author_Cannot_Approve>;
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: Maybe<Maximum_Virtual_Card_Limit_Amount_For_Interval>;
   REQUIRE_2FA_FOR_ADMINS?: Maybe<Scalars['Boolean']>;
+};
+
+export type PoliciesCollectiveExpenseAuthorCannotApprove = {
+  amountInCents?: InputMaybe<Scalars['Int']>;
+  appliesToHostedCollectives?: InputMaybe<Scalars['Boolean']>;
+  appliesToSingleAdminCollectives?: InputMaybe<Scalars['Boolean']>;
+  enabled?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type PoliciesCollectiveMinimumAdminsInput = {
@@ -6714,7 +6729,7 @@ export type PoliciesCollectiveMinimumAdminsInput = {
 
 export type PoliciesInput = {
   COLLECTIVE_MINIMUM_ADMINS?: InputMaybe<PoliciesCollectiveMinimumAdminsInput>;
-  EXPENSE_AUTHOR_CANNOT_APPROVE?: InputMaybe<Scalars['Boolean']>;
+  EXPENSE_AUTHOR_CANNOT_APPROVE?: InputMaybe<PoliciesCollectiveExpenseAuthorCannotApprove>;
   REQUIRE_2FA_FOR_ADMINS?: InputMaybe<Scalars['Boolean']>;
 };
 

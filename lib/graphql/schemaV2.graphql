@@ -4239,10 +4239,17 @@ type VirtualCardCollection implements Collection {
 }
 
 type Policies {
-  EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
+  EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
+}
+
+type EXPENSE_AUTHOR_CANNOT_APPROVE {
+  amountInCents: Int
+  enabled: Boolean
+  appliesToHostedCollectives: Boolean
+  appliesToSingleAdminCollectives: Boolean
 }
 
 type COLLECTIVE_MINIMUM_ADMINS {
@@ -13406,9 +13413,16 @@ input AccountUpdateInput {
 }
 
 input PoliciesInput {
-  EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
+  EXPENSE_AUTHOR_CANNOT_APPROVE: PoliciesCollectiveExpenseAuthorCannotApprove
   REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
+}
+
+input PoliciesCollectiveExpenseAuthorCannotApprove {
+  amountInCents: Int
+  enabled: Boolean
+  appliesToHostedCollectives: Boolean
+  appliesToSingleAdminCollectives: Boolean
 }
 
 input PoliciesCollectiveMinimumAdminsInput {
