@@ -181,6 +181,7 @@ class TransactionsPage extends React.Component {
     LoggedInUser: PropTypes.object,
     query: PropTypes.shape({
       searchTerm: PropTypes.string,
+      offset: PropTypes.string,
       ignoreIncognitoTransactions: PropTypes.string,
       ignoreGiftCardsTransactions: PropTypes.string,
       ignoreChildrenTransactions: PropTypes.string,
@@ -305,7 +306,7 @@ class TransactionsPage extends React.Component {
     }
 
     const transactionsAndProcessingOrders =
-      this.state.hasProcessingOrders && !this.props.query.ignoreProcessingOrders
+      this.state.hasProcessingOrders && !query.ignoreProcessingOrders && !parseInt(query.offset)
         ? [
             ...(account?.processingOrders?.nodes || []).map(convertProcessingOrderIntoTransactionItem),
             ...(transactions?.nodes || []),
