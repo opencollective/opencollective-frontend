@@ -2251,6 +2251,7 @@ type ExpensePermissions {
 type Permission {
   allowed: Boolean!
   reason: String
+  reasonDetails: JSON
 }
 
 """
