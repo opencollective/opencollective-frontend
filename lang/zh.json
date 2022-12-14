@@ -1182,7 +1182,7 @@
   "expenseNeedsTaxForm.hover": "We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks. Need help? Contact <SupportLink>support</SupportLink>",
   "expenseNeedsTaxFormMessage.msg": "We need your tax information before we can pay you. You will receive an email with a link to fill out a form. If you have not received the email within 24 hours, check your spam, then contact <I18nSupportLink>support</I18nSupportLink>. Questions? See <Link>help docs about taxes</Link>.",
   "ExpensePage.title": "{title} · Expense #{id}",
-  "ExpensePermissionReason.AUTHOR_CANNOT_APPROVE": "You cannot approve expenses you have submitted.",
+  "ExpensePermissionReason.AUTHOR_CANNOT_APPROVE": "You cannot approve expenses you have submitted{amount, select, 0 {.} other { when the expense is above {amount} {currency}.}}",
   "ExpensePolicies": "支出政策",
   "ExpenseReceiptImagePreview.Alt": "支出收据预览",
   "Expenses": "支出",

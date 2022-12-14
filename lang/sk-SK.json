@@ -1182,7 +1182,7 @@
   "expenseNeedsTaxForm.hover": "Nemôžeme zaplatiť, kým nedostaneme vaše daňové informácie. Skontrolujte si schránku, či vám spoločnosť HelloWorks neposlala e-mail. Potrebujete pomoc? Kontaktujte <SupportLink>podporu</SupportLink>",
   "expenseNeedsTaxFormMessage.msg": "Skôr ako vám budeme môcť vyplatiť peniaze, potrebujeme vaše daňové údaje. Dostanete e-mail s odkazom na vyplnenie formulára. Ak ste e-mail nedostali do 24 hodín, skontrolujte si spam a potom kontaktujte <I18nSupportLink>podporu</I18nSupportLink>. Máte otázky? Pozrite si <Link>dokumenty pomoci k téme dane</Link>.",
   "ExpensePage.title": "{title} · Výdavok #{id}",
-  "ExpensePermissionReason.AUTHOR_CANNOT_APPROVE": "Výdavky, ktoré ste predložili, nemáte možnosť schváliť.",
+  "ExpensePermissionReason.AUTHOR_CANNOT_APPROVE": "You cannot approve expenses you have submitted{amount, select, 0 {.} other { when the expense is above {amount} {currency}.}}",
   "ExpensePolicies": "Zásady týkajúce sa výdavkov",
   "ExpenseReceiptImagePreview.Alt": "Náhľad výdavkového dokladu",
   "Expenses": "Výdavky",

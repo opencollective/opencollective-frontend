@@ -1182,7 +1182,7 @@
   "expenseNeedsTaxForm.hover": "No podemos pagar hasta que recibamos tu información fiscal. Revisa tu buzón de correo electrónico para ver si tienes un mensaje de HelloWorks. ¿Necesitas ayuda? Ponte en contacto con <SupportLink>el soporte</SupportLink>.",
   "expenseNeedsTaxFormMessage.msg": "Necesitamos tus datos fiscales antes de poder pagarte. Recibirás un correo electrónico que contiene el enlace para rellenar un formulario. Si no has recibido el correo electrónico en 24 horas, comprueba la carpeta de spam y ponte en contacto con <I18nSupportLink>el soporte técnico</I18nSupportLink>. ¿Preguntas? Consulta nuestros <Link>documentos relativos a los impuestos</Link>.",
   "ExpensePage.title": "{title} · Gasto #{id}",
-  "ExpensePermissionReason.AUTHOR_CANNOT_APPROVE": "No puede aprobar los gastos que ha presentado.",
+  "ExpensePermissionReason.AUTHOR_CANNOT_APPROVE": "You cannot approve expenses you have submitted{amount, select, 0 {.} other { when the expense is above {amount} {currency}.}}",
   "ExpensePolicies": "Política de gastos",
   "ExpenseReceiptImagePreview.Alt": "Vista previa del recibo de gasto",
   "Expenses": "Gastos",
