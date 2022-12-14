@@ -257,7 +257,7 @@ class ContributionFlowSuccess extends React.Component {
               </P>
             </Box>
             <StyledLink
-              href="/manage-contributions/processing"
+              href={`${getCollectivePageRoute(order.fromAccount)}/transactions`}
               fontWeight="700"
               fontSize="14px"
               lineHeight="20px"
