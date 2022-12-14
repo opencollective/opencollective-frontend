@@ -108,6 +108,7 @@ class SectionRecurringContributions extends React.Component {
             recurringContributions={recurringContributions}
             account={collective}
             filter={this.state.filter}
+            mt={3}
           />
         </Container>
       </Box>

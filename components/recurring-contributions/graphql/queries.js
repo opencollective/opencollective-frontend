@@ -110,13 +110,6 @@ export const manageContributionsQuery = gql`
           ...ManagedOrderFields
         }
       }
-      processingOrders: orders(filter: OUTGOING, includeIncognito: true, status: [PENDING, PROCESSING]) {
-        totalCount
-        nodes {
-          id
-          ...ManagedOrderFields
-        }
-      }
     }
   }
   ${collectiveNavbarFieldsFragment}
