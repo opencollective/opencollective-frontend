@@ -218,17 +218,16 @@ export const generatePaymentMethodOptions = (
       ['USD', 'EUR'].includes(stepDetails.currency) &&
       stripeAccount
     ) {
-      let subtitle;
+      let debitMethod;
       if (stepDetails.currency === 'USD') {
-        subtitle = 'ACH';
+        debitMethod = 'ACH';
       } else if (stepDetails.currency === 'EUR') {
-        subtitle = 'SEPA';
+        debitMethod = 'SEPA';
       }
 
       uniquePMs.push({
         key: STRIPE_PAYMENT_ELEMENT_KEY,
-        title: <FormattedMessage defaultMessage="Bank debit (automated)" />,
-        subtitle,
+        title: <FormattedMessage defaultMessage="Bank debit ({debitMethod})" values={{ debitMethod }} />,
         icon: <Bank color="#c9ced4" size={'1.5em'} />,
         paymentMethod: {
           service: PAYMENT_METHOD_SERVICE.STRIPE,
