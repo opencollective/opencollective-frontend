@@ -40,23 +40,13 @@ const { CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP } = TransactionKind;
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' • ';
 
-const getDisplayedAmount = (transaction, collective) => {
+const getDisplayedAmount = transaction => {
   const isCredit = transaction.type === TransactionTypes.CREDIT;
   const hasOrder = transaction.order !== null;
-  const isExpense = transaction.kind === TransactionKind.EXPENSE;
-  const isSelf = transaction.fromAccount.slug === collective.slug;
 
-  if (isExpense) {
-    return transaction.netAmount;
-  } else if (isCredit && hasOrder) {
+  if (isCredit && hasOrder) {
     // Credit from donations should display the full amount donated by the user
     return transaction.amount;
-  } else if (transaction.isRefunded) {
-    if ((isSelf && !transaction.isRefund) || (transaction.isRefund && isCredit)) {
-      return transaction.netAmount;
-    } else {
-      return transaction.amount;
-    }
   } else {
     return transaction.netAmount;
   }
@@ -153,7 +143,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
   const isOwnUserProfile = LoggedInUser && LoggedInUser.CollectiveId === legacyCollectiveId;
   const avatarCollective = isCredit ? fromAccount : toAccount;
 
-  const displayedAmount = getDisplayedAmount(transaction, collective);
+  const displayedAmount = getDisplayedAmount(transaction);
 
   const transactionDetailsLink = () => {
     return (
