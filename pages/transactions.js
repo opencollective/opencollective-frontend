@@ -149,7 +149,7 @@ const getVariablesFromQuery = query => {
     includeIncognitoTransactions: !query.ignoreIncognitoTransactions,
     includeGiftCardTransactions: !query.ignoreGiftCardsTransactions,
     includeChildrenTransactions: !query.ignoreChildrenTransactions,
-    ignoreProcessingOrders: query.ignoreProcessingOrders,
+    displayProcessingOrders: query.displayProcessingOrders !== 'false',
   };
 };
 
@@ -185,7 +185,7 @@ class TransactionsPage extends React.Component {
       ignoreIncognitoTransactions: PropTypes.string,
       ignoreGiftCardsTransactions: PropTypes.string,
       ignoreChildrenTransactions: PropTypes.string,
-      ignoreProcessingOrders: PropTypes.string,
+      displayProcessingOrders: PropTypes.string,
     }),
     router: PropTypes.object,
   };
@@ -241,7 +241,7 @@ class TransactionsPage extends React.Component {
     }
 
     const hasProcessingOrders =
-      this.props.data?.account?.processingOrders?.totalCount > 0 || !this.props.query.ignoreProcessingOrders;
+      this.props.data?.account?.processingOrders?.totalCount > 0 || this.props.query.displayProcessingOrders;
     if (isNil(this.state.hasProcessingOrders) && hasProcessingOrders) {
       this.setState({ hasProcessingOrders });
     }
@@ -273,7 +273,7 @@ class TransactionsPage extends React.Component {
       ...omit(params, ['offset', 'collectiveType', 'parentCollectiveSlug']),
     };
 
-    return omitBy(queryParameters, value => !value);
+    return { ...omitBy(queryParameters, value => !value), ...pick(queryParameters, ['displayProcessingOrders']) };
   }
 
   updateFilters(queryParams, collective) {
@@ -306,7 +306,7 @@ class TransactionsPage extends React.Component {
     }
 
     const transactionsAndProcessingOrders =
-      this.state.hasProcessingOrders && !query.ignoreProcessingOrders && !parseInt(query.offset)
+      this.state.hasProcessingOrders && query.displayProcessingOrders !== 'false' && !parseInt(query.offset)
         ? [
             ...(account?.processingOrders?.nodes || []).map(convertProcessingOrderIntoTransactionItem),
             ...(transactions?.nodes || []),
@@ -379,12 +379,12 @@ class TransactionsPage extends React.Component {
             >
               {this.state.hasProcessingOrders && (
                 <StyledCheckbox
-                  checked={this.props.query.ignoreProcessingOrders ? true : false}
-                  onChange={({ checked }) => this.updateFilters({ ignoreProcessingOrders: checked }, collective)}
+                  checked={this.props.query.displayProcessingOrders !== 'false' ? true : false}
+                  onChange={({ checked }) => this.updateFilters({ displayProcessingOrders: checked }, collective)}
                   label={
                     <FormattedMessage
-                      id="transactions.ignoreProcessingOrders"
-                      defaultMessage="Ignore Orders that are still processing"
+                      id="transactions.displayProcessingOrders"
+                      defaultMessage="Display Orders that are still processing"
                     />
                   }
                 />
