@@ -148,6 +148,7 @@ export const orderSuccessFragment = gql`
       id
       name
       type
+      slug
       imageUrl(height: 48)
       ... on Individual {
         isGuest

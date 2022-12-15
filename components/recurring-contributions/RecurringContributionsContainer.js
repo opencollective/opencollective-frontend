@@ -71,6 +71,7 @@ const RecurringContributionsContainer = ({
   LoggedInUser,
   isLoading,
   displayFilters,
+  ...props
 }) => {
   const isAdmin = Boolean(LoggedInUser?.isAdminOfCollective(account));
   const intl = useIntl();
@@ -102,7 +103,7 @@ const RecurringContributionsContainer = ({
   }
 
   return (
-    <Container mt={3}>
+    <Container {...props}>
       {displayFilters && (
         <Box mb={3}>
           <StyledSelectFilter

@@ -2,16 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { css } from '@styled-system/css';
-import { groupBy, isEmpty, mapValues, orderBy, toUpper, uniqBy } from 'lodash';
+import { groupBy, isEmpty, mapValues, orderBy, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import formatCollectiveType from '../lib/i18n/collective-type';
-import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Avatar from '../components/Avatar';
@@ -20,14 +19,12 @@ import { Dimensions } from '../components/collective-page/_constants';
 import SectionTitle from '../components/collective-page/SectionTitle';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
-import { Box, Flex, Grid } from '../components/Grid';
+import { Flex, Grid } from '../components/Grid';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import { manageContributionsQuery } from '../components/recurring-contributions/graphql/queries';
-import ProcessingContributions from '../components/recurring-contributions/ProcessingContributionsContainer';
 import RecurringContributionsContainer from '../components/recurring-contributions/RecurringContributionsContainer';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
-import StyledFilters from '../components/StyledFilters';
 import StyledHr from '../components/StyledHr';
 import { P, Span } from '../components/Text';
 import { withUser } from '../components/UserProvider';
@@ -36,23 +33,6 @@ const MainContainer = styled(Container)`
   max-width: ${Dimensions.MAX_SECTION_WIDTH}px;
   margin: 0 auto;
 `;
-
-const TABS = {
-  RECURRING: 'RECURRING',
-  PROCESSING: 'PROCESSING',
-};
-
-// create defineMessages for TABS
-const I18nTabs = defineMessages({
-  [TABS.RECURRING]: {
-    id: 'Contributions.Recurring',
-    defaultMessage: 'Recurring Contributions',
-  },
-  [TABS.PROCESSING]: {
-    id: 'Contributions.Processing',
-    defaultMessage: 'Processing Contributions',
-  },
-});
 
 const MenuEntry = styled(Link)`
   display: flex;
@@ -83,8 +63,8 @@ const MenuEntry = styled(Link)`
 `;
 
 class ManageContributionsPage extends React.Component {
-  static getInitialProps({ query: { slug, tab } }) {
-    return { slug, tab: TABS[toUpper(tab)] || TABS.RECURRING };
+  static getInitialProps({ query: { slug } }) {
+    return { slug };
   }
 
   static propTypes = {
@@ -122,19 +102,6 @@ class ManageContributionsPage extends React.Component {
     const groupedMemberships = groupBy(uniqMemberships, 'collective.type');
     return mapValues(groupedMemberships, memberships => orderBy(memberships, 'collective.name'));
   });
-
-  changeTab(tab) {
-    const pathname = `${getCollectivePageCanonicalURL(
-      this.props.slug
-        ? {
-            slug: this.props.slug || this.props.LoggedInUser?.collective?.slug,
-          }
-        : undefined,
-    )}/manage-contributions/${tab.toLowerCase()}`;
-    this.props.router.push({
-      pathname,
-    });
-  }
 
   render() {
     const { slug, data, intl, loadingLoggedInUser, LoggedInUser } = this.props;
@@ -214,32 +181,12 @@ class ManageContributionsPage extends React.Component {
                     ))}
                   </div>
                 )}
-                <Box>
-                  <Box>
-                    <StyledFilters
-                      filters={Object.values(TABS)}
-                      getLabel={key => intl.formatMessage(I18nTabs[key])}
-                      selected={this.props.tab}
-                      justifyContent="left"
-                      minButtonWidth={175}
-                      onChange={tab => this.changeTab(tab)}
-                      buttonHeight="40px"
-                      buttonPadding="10px 36px"
-                      disabled={data.loading}
-                    />
-                  </Box>
-                  {this.props.tab === TABS.RECURRING && (
-                    <RecurringContributionsContainer
-                      recurringContributions={recurringContributions}
-                      account={collective}
-                      isLoading={data.loading}
-                      displayFilters
-                    />
-                  )}
-                  {this.props.tab === TABS.PROCESSING && (
-                    <ProcessingContributions isLoading={data.loading} orders={collective?.processingOrders?.nodes} />
-                  )}
-                </Box>
+                <RecurringContributionsContainer
+                  recurringContributions={recurringContributions}
+                  account={collective}
+                  isLoading={data.loading}
+                  displayFilters
+                />
               </Grid>
             </MainContainer>
           </Container>
