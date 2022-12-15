@@ -211,11 +211,38 @@ export const generatePaymentMethodOptions = (
       });
     }
 
+    if (
+      supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYMENT_INTENT) &&
+      !interval &&
+      get(collective, 'settings.features.stripePaymentIntent', false) &&
+      ['USD', 'EUR'].includes(stepDetails.currency) &&
+      stripeAccount
+    ) {
+      let debitMethod;
+      if (stepDetails.currency === 'USD') {
+        debitMethod = 'ACH';
+      } else if (stepDetails.currency === 'EUR') {
+        debitMethod = 'SEPA';
+      }
+
+      uniquePMs.push({
+        key: STRIPE_PAYMENT_ELEMENT_KEY,
+        title: <FormattedMessage defaultMessage="Bank debit ({debitMethod})" values={{ debitMethod }} />,
+        icon: <Bank color="#c9ced4" size={'1.5em'} />,
+        paymentMethod: {
+          service: PAYMENT_METHOD_SERVICE.STRIPE,
+          type: PAYMENT_METHOD_TYPE.STRIPE_ELEMENTS,
+        },
+      });
+    }
+
     // Manual (bank transfer)
     if (hostHasManual && !interval && !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)) {
       uniquePMs.push({
         key: 'manual',
-        title: get(collective, 'host.settings.paymentMethods.manual.title', null) || 'Bank transfer',
+        title: get(collective, 'host.settings.paymentMethods.manual.title', null) || (
+          <FormattedMessage defaultMessage="Bank transfer (manual)" />
+        ),
         paymentMethod: {
           service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
           type: PAYMENT_METHOD_TYPE.MANUAL,
@@ -230,32 +257,6 @@ export const generatePaymentMethodOptions = (
             defaultMessage="Instructions to make a transfer will be given on the next page."
           />
         ),
-      });
-    }
-
-    if (
-      supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYMENT_INTENT) &&
-      !interval &&
-      get(collective, 'settings.features.stripePaymentIntent', false) &&
-      ['USD', 'EUR'].includes(stepDetails.currency) &&
-      stripeAccount
-    ) {
-      let subtitle;
-      if (stepDetails.currency === 'USD') {
-        subtitle = 'ACH';
-      } else if (stepDetails.currency === 'EUR') {
-        subtitle = 'SEPA';
-      }
-
-      uniquePMs.push({
-        key: STRIPE_PAYMENT_ELEMENT_KEY,
-        title: <FormattedMessage defaultMessage="Bank debit" />,
-        subtitle,
-        icon: <Bank color="#c9ced4" size={'1.5em'} />,
-        paymentMethod: {
-          service: PAYMENT_METHOD_SERVICE.STRIPE,
-          type: PAYMENT_METHOD_TYPE.STRIPE_ELEMENTS,
-        },
       });
     }
   }
