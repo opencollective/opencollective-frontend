@@ -62,7 +62,12 @@ export const adminPanelQuery = gql`
           name
           settings
           policies {
-            EXPENSE_AUTHOR_CANNOT_APPROVE
+            EXPENSE_AUTHOR_CANNOT_APPROVE {
+              enabled
+              amountInCents
+              appliesToHostedCollectives
+              appliesToSingleAdminCollectives
+            }
             COLLECTIVE_MINIMUM_ADMINS {
               numberOfAdmins
               applies
