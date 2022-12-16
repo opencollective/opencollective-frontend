@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
-import { get, isNumber, round } from 'lodash';
+import { get, isNumber, round, toNumber } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { border, color, space, typography } from 'styled-system';
@@ -26,6 +26,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledButtonSet from '../StyledButtonSet';
 import StyledCheckbox from '../StyledCheckbox';
+import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
@@ -97,9 +98,11 @@ const validate = values => {
   return errors;
 };
 
-const getTotalPayoutAmount = (expense, { paymentProcessorFee, feesPayer }) => {
+const getTotalPayoutAmount = (expense, { paymentProcessorFee, feesPayer, isMultiCurrency, exchangeRate }) => {
   if (feesPayer === 'PAYEE') {
     return expense.amount;
+  } else if (isMultiCurrency) {
+    return expense.amount + paymentProcessorFee?.valueInCents / exchangeRate.value;
   } else {
     return expense.amount + (paymentProcessorFee?.valueInCents || 0);
   }
@@ -178,12 +181,17 @@ const getInitialValues = (expense, host, payoutMethodType) => {
   };
 };
 
-const getPaymentProcessorFee = (formik, expense, quoteQuery) => {
+const getPaymentProcessorFee = (formik, expense, quoteQuery, collective) => {
   if (formik.values.forceManual) {
-    const fxRate = expense.amountInAccountCurrency?.exchangeRate?.value || 1;
+    const isMultiCurrency =
+      expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
+    const fxRate = isMultiCurrency
+      ? 1
+      : formik.values?.customExchangeRate || expense.amountInAccountCurrency?.exchangeRate?.value || 1;
     return {
       valueInCents: Math.round(formik.values.paymentProcessorFee * fxRate),
-      currency: expense.currency,
+      // PaymentProcessorFee is always in the collective currency
+      currency: collective.currency,
     };
   } else if (quoteQuery?.data?.expense?.quote) {
     const { quote, amountInHostCurrency } = quoteQuery.data.expense;
@@ -221,10 +229,20 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
     skip: !canQuote,
   });
 
-  const paymentProcessorFee = getPaymentProcessorFee(formik, expense, quoteQuery);
+  const paymentProcessorFee = getPaymentProcessorFee(formik, expense, quoteQuery, collective);
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
-  const totalAmount = getTotalPayoutAmount(expense, { paymentProcessorFee, feesPayer: formik.values.feesPayer });
+  const exchangeRate =
+    isMultiCurrency &&
+    (formik.values?.customExchangeRate
+      ? { value: formik.values.customExchangeRate, source: 'CUSTOM' }
+      : expense.amountInAccountCurrency?.exchangeRate);
+  const totalAmount = getTotalPayoutAmount(expense, {
+    paymentProcessorFee,
+    feesPayer: formik.values.feesPayer,
+    exchangeRate: exchangeRate,
+    isMultiCurrency,
+  });
   const amountWithoutTaxes = getAmountWithoutTaxes(expense.amount, expense.taxes);
 
   return (
@@ -271,28 +289,54 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
           </StyledButtonSet>
         )}
         {hasManualPayment && (
-          <StyledInputField
-            name="paymentProcessorFee"
-            htmlFor="payExpensePaymentProcessorFee"
-            inputType="number"
-            error={formik.errors.paymentProcessorFee}
-            required={false}
-            mt={24}
-            label={<FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />}
-          >
-            {inputProps => (
-              <StyledInputAmount
-                {...inputProps}
-                currency={collective.currency}
-                currencyDisplay="FULL"
-                value={formik.values.paymentProcessorFee}
-                placeholder="0.00"
-                min={0}
-                max={100000000}
-                onChange={value => formik.setFieldValue('paymentProcessorFee', value)}
-              />
+          <React.Fragment>
+            <StyledInputField
+              name="paymentProcessorFee"
+              htmlFor="payExpensePaymentProcessorFee"
+              inputType="number"
+              error={formik.errors.paymentProcessorFee}
+              required={false}
+              mt={24}
+              label={<FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />}
+            >
+              {inputProps => (
+                <StyledInputAmount
+                  {...inputProps}
+                  currency={collective.currency}
+                  currencyDisplay="FULL"
+                  value={formik.values.paymentProcessorFee}
+                  placeholder="0.00"
+                  min={0}
+                  max={100000000}
+                  onChange={value => formik.setFieldValue('paymentProcessorFee', value)}
+                />
+              )}
+            </StyledInputField>
+            {isMultiCurrency && (
+              <StyledInputField
+                name="customExchangeRate"
+                htmlFor="payExpensecustomExchangeRate"
+                inputType="number"
+                error={formik.errors.customExchangeRate}
+                required={false}
+                mt={24}
+                label={<FormattedMessage id="PayExpense.FxRateInput" defaultMessage="Exchange Rate" />}
+              >
+                {inputProps => (
+                  <StyledInput
+                    {...inputProps}
+                    maxWidth={140}
+                    inputMode="decimal"
+                    step="0.01"
+                    value={formik.values.customExchangeRate}
+                    onChange={e => {
+                      formik.setFieldValue('customExchangeRate', toNumber(e.target.value) || undefined);
+                    }}
+                  />
+                )}
+              </StyledInputField>
             )}
-          </StyledInputField>
+          </React.Fragment>
         )}
         {getCanCustomizeFeesPayer(
           expense,
@@ -364,7 +408,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
               </Amount>
             </AmountLine>
           )}
-          {isNumber(paymentProcessorFee?.valueInCents) && (
+          {isNumber(paymentProcessorFee?.valueInCents) && !isMultiCurrency && (
             <AmountLine borderTop="0.8px dashed #9D9FA3">
               <Label>
                 <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />
@@ -398,6 +442,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
               />
             </Amount>
           </AmountLine>
+
           {isMultiCurrency && expense.amountInAccountCurrency?.exchangeRate?.value && (
             <AmountLine py={0}>
               <Label color="black.600" fontWeight="500">
@@ -411,9 +456,9 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
                   <AmountWithExchangeRateInfo
                     showCurrencyCode={false}
                     amount={{
-                      valueInCents: Math.round(totalAmount * expense.amountInAccountCurrency.exchangeRate.value),
+                      valueInCents: Math.round(totalAmount * exchangeRate.value),
                       currency: expense.amountInAccountCurrency.currency,
-                      exchangeRate: expense.amountInAccountCurrency.exchangeRate,
+                      exchangeRate: exchangeRate,
                     }}
                   />
                 </Container>
