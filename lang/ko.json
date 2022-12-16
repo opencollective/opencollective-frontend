@@ -2099,6 +2099,8 @@
   "order.require_client_confirmation": "Require client confirmation",
   "order.status": "상태",
   "Order.Status.Completed": "완료",
+  "Order.Status.Pending": "Please follow the payment instructions in the confirmation email to complete your transaction.",
+  "Order.Status.Processing": "We're waiting for a third-party service to confirm the transaction was completed.",
   "Order.Status.Refunded": "환불됨",
   "OrderBudgetItem.Tip": "(includes {amount} platform tip)",
   "orders.all": "모두",

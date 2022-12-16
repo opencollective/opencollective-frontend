@@ -2099,6 +2099,8 @@
   "order.require_client_confirmation": "Вимагається підтвердження клієнтом",
   "order.status": "Стан",
   "Order.Status.Completed": "Завершені",
+  "Order.Status.Pending": "Please follow the payment instructions in the confirmation email to complete your transaction.",
+  "Order.Status.Processing": "We're waiting for a third-party service to confirm the transaction was completed.",
   "Order.Status.Refunded": "Повернено",
   "OrderBudgetItem.Tip": "(includes {amount} platform tip)",
   "orders.all": "Всі",

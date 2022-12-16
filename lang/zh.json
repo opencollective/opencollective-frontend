@@ -2099,6 +2099,8 @@
   "order.require_client_confirmation": "需要客户确认",
   "order.status": "状态",
   "Order.Status.Completed": "已完成",
+  "Order.Status.Pending": "Please follow the payment instructions in the confirmation email to complete your transaction.",
+  "Order.Status.Processing": "We're waiting for a third-party service to confirm the transaction was completed.",
   "Order.Status.Refunded": "已退款",
   "OrderBudgetItem.Tip": "（包括 {amount} 平台费）",
   "orders.all": "全部",

@@ -2099,6 +2099,8 @@
   "order.require_client_confirmation": "Require client confirmation",
   "order.status": "Statut",
   "Order.Status.Completed": "Completé",
+  "Order.Status.Pending": "Please follow the payment instructions in the confirmation email to complete your transaction.",
+  "Order.Status.Processing": "We're waiting for a third-party service to confirm the transaction was completed.",
   "Order.Status.Refunded": "Remboursé",
   "OrderBudgetItem.Tip": "(comprend {amount} de pourboire pour la plateforme)",
   "orders.all": "Toutes",

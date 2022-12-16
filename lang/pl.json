@@ -2099,6 +2099,8 @@
   "order.require_client_confirmation": "Wymagaj potwierdzenia klienta",
   "order.status": "Status",
   "Order.Status.Completed": "Zakończono",
+  "Order.Status.Pending": "Please follow the payment instructions in the confirmation email to complete your transaction.",
+  "Order.Status.Processing": "We're waiting for a third-party service to confirm the transaction was completed.",
   "Order.Status.Refunded": "Zwrócono",
   "OrderBudgetItem.Tip": "(obejmuje {amount} napiwku na platformę)",
   "orders.all": "Wszystkie",
