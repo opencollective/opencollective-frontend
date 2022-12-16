@@ -425,11 +425,13 @@ export const coreContributorsQuery = gql`
     account(slug: $collectiveSlug) {
       id
       isFrozen
-      parentAccount {
-        id
-        slug
-        type
-        name
+      ... on AccountWithParent {
+        parentAccount: parent {
+          id
+          slug
+          type
+          name
+        }
       }
       ... on AccountWithHost {
         host {
