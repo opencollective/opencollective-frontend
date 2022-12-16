@@ -149,7 +149,7 @@ const getVariablesFromQuery = query => {
     includeIncognitoTransactions: !query.ignoreIncognitoTransactions,
     includeGiftCardTransactions: !query.ignoreGiftCardsTransactions,
     includeChildrenTransactions: !query.ignoreChildrenTransactions,
-    displayProcessingOrders: query.displayProcessingOrders !== 'false',
+    displayPendingContributions: query.displayPendingContributions !== 'false',
   };
 };
 
@@ -185,7 +185,7 @@ class TransactionsPage extends React.Component {
       ignoreIncognitoTransactions: PropTypes.string,
       ignoreGiftCardsTransactions: PropTypes.string,
       ignoreChildrenTransactions: PropTypes.string,
-      displayProcessingOrders: PropTypes.string,
+      displayPendingContributions: PropTypes.string,
     }),
     router: PropTypes.object,
   };
@@ -241,7 +241,7 @@ class TransactionsPage extends React.Component {
     }
 
     const hasProcessingOrders =
-      this.props.data?.account?.processingOrders?.totalCount > 0 || this.props.query.displayProcessingOrders;
+      this.props.data?.account?.processingOrders?.totalCount > 0 || this.props.query.displayPendingContributions;
     if (isNil(this.state.hasProcessingOrders) && hasProcessingOrders) {
       this.setState({ hasProcessingOrders });
     }
@@ -273,7 +273,7 @@ class TransactionsPage extends React.Component {
       ...omit(params, ['offset', 'collectiveType', 'parentCollectiveSlug']),
     };
 
-    return { ...omitBy(queryParameters, value => !value), ...pick(queryParameters, ['displayProcessingOrders']) };
+    return { ...omitBy(queryParameters, value => !value), ...pick(queryParameters, ['displayPendingContributions']) };
   }
 
   updateFilters(queryParams, collective) {
@@ -306,7 +306,7 @@ class TransactionsPage extends React.Component {
     }
 
     const transactionsAndProcessingOrders =
-      this.state.hasProcessingOrders && query.displayProcessingOrders !== 'false' && !parseInt(query.offset)
+      this.state.hasProcessingOrders && query.displayPendingContributions !== 'false' && !parseInt(query.offset)
         ? [
             ...(account?.processingOrders?.nodes || []).map(convertProcessingOrderIntoTransactionItem),
             ...(transactions?.nodes || []),
@@ -379,12 +379,12 @@ class TransactionsPage extends React.Component {
             >
               {this.state.hasProcessingOrders && (
                 <StyledCheckbox
-                  checked={this.props.query.displayProcessingOrders !== 'false' ? true : false}
-                  onChange={({ checked }) => this.updateFilters({ displayProcessingOrders: checked }, collective)}
+                  checked={this.props.query.displayPendingContributions !== 'false' ? true : false}
+                  onChange={({ checked }) => this.updateFilters({ displayPendingContributions: checked }, collective)}
                   label={
                     <FormattedMessage
-                      id="transactions.displayProcessingOrders"
-                      defaultMessage="Display Orders that are still processing"
+                      id="transactions.displayPendingContributions"
+                      defaultMessage="Display pending contributions"
                     />
                   }
                 />

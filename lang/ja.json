@@ -2632,7 +2632,7 @@
   "Transaction.Type.Credit": "Credit",
   "transaction.usingGiftCardFrom": "using a {giftCard} from {collective}",
   "TransactionDetails.HostFee": "この取引にはホスト手数料 {amount} が含まれています",
-  "transactions.displayProcessingOrders": "Display Orders that are still processing",
+  "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "Use the filters to define the transactions you would like to download.",
   "transactions.downloadcsvbutton": "CSV をダウンロード",
   "transactions.downloadinvoicesbutton": "領収書をダウンロード",

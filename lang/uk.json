@@ -2632,7 +2632,7 @@
   "Transaction.Type.Credit": "Кредит",
   "transaction.usingGiftCardFrom": "скориставшись {giftCard} від {collective}",
   "TransactionDetails.HostFee": "Транзакція включає комісію фіскального вузла {amount}",
-  "transactions.displayProcessingOrders": "Display Orders that are still processing",
+  "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "Use the filters to define the transactions you would like to download.",
   "transactions.downloadcsvbutton": "Завантажити CSV-файл",
   "transactions.downloadinvoicesbutton": "Завантажити квитанції",

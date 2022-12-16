@@ -2632,7 +2632,7 @@
   "Transaction.Type.Credit": "Kredit",
   "transaction.usingGiftCardFrom": "použitím karty {giftCard} od kolektívu {collective}",
   "TransactionDetails.HostFee": "Táto transakcia zahŕňa čiastku {amount} poplatkov hostiteľa",
-  "transactions.displayProcessingOrders": "Display Orders that are still processing",
+  "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "Pomocou filtrov definujte transakcie, ktoré si želáte prevziať.",
   "transactions.downloadcsvbutton": "Prevziať CSV",
   "transactions.downloadinvoicesbutton": "Prevziať účtenky",

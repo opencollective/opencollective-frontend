@@ -2632,7 +2632,7 @@
   "Transaction.Type.Credit": "Wpłata",
   "transaction.usingGiftCardFrom": "używając {giftCard} z {collective}",
   "TransactionDetails.HostFee": "Ta transakcja zawiera {amount} opłaty dla gospodarza",
-  "transactions.displayProcessingOrders": "Display Orders that are still processing",
+  "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "Użyj filtrów do zdefiniowania transakcji, które chcesz pobrać.",
   "transactions.downloadcsvbutton": "Pobierz plik CSV",
   "transactions.downloadinvoicesbutton": "Pobierz potwierdzenie wpłaty",

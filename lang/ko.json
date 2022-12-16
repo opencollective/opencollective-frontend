@@ -2632,7 +2632,7 @@
   "Transaction.Type.Credit": "입금",
   "transaction.usingGiftCardFrom": "using a {giftCard} from {collective}",
   "TransactionDetails.HostFee": "이 거래에 호스트 수수료 {amount} 포함됨",
-  "transactions.displayProcessingOrders": "Display Orders that are still processing",
+  "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "Use the filters to define the transactions you would like to download.",
   "transactions.downloadcsvbutton": "CSV 다운로드",
   "transactions.downloadinvoicesbutton": "영수증 다운로드",

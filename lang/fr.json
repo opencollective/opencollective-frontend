@@ -2632,7 +2632,7 @@
   "Transaction.Type.Credit": "Crédit",
   "transaction.usingGiftCardFrom": "avec une {giftCard} de {collective}",
   "TransactionDetails.HostFee": "This transaction includes {amount} host fees",
-  "transactions.displayProcessingOrders": "Display Orders that are still processing",
+  "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "Use the filters to define the transactions you would like to download.",
   "transactions.downloadcsvbutton": "Télécharger CSV",
   "transactions.downloadinvoicesbutton": "Télécharger les factures",

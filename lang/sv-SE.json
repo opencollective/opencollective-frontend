@@ -2632,7 +2632,7 @@
   "Transaction.Type.Credit": "Kredit",
   "transaction.usingGiftCardFrom": "använder ett {giftCard} från {collective}",
   "TransactionDetails.HostFee": "Denna transaktion inkluderar {amount} för värdavgifter",
-  "transactions.displayProcessingOrders": "Display Orders that are still processing",
+  "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "Använd filtren för att specificera de transaktioner du vill ladda ner.",
   "transactions.downloadcsvbutton": "Ladda ner CSV",
   "transactions.downloadinvoicesbutton": "Ladda ner kvitton",
