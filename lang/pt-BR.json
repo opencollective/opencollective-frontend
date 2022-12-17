@@ -2137,6 +2137,7 @@
   "Pagination.Prev": "Anterior",
   "PaidWith": "Pago Com",
   "Parameter": "Parâmetro",
+  "PayExpense.FxRateInput": "Exchange Rate",
   "PayExpense.ProcessorFeesInput": "Taxas do processador de pagamento",
   "PayExpenseModal.ManualPayoutWarning": "By clicking below, you acknowledge that this expense has already been paid {payoutMethod}.",
   "PayExpenseModal.RefillBalanceError": "Reabasteça seu saldo do painel do Host",

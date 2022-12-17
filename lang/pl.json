@@ -2137,6 +2137,7 @@
   "Pagination.Prev": "Wróć",
   "PaidWith": "Metoda płatności",
   "Parameter": "Parametr",
+  "PayExpense.FxRateInput": "Exchange Rate",
   "PayExpense.ProcessorFeesInput": "Opłaty za obsługę płatności",
   "PayExpenseModal.ManualPayoutWarning": "Klikając poniżej, potwierdzają Państwo, że ten wydatek został już opłacony {payoutMethod}.",
   "PayExpenseModal.RefillBalanceError": "Uzupełnij swoje saldo z panelu gospodarza",

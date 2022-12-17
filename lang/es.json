@@ -2137,6 +2137,7 @@
   "Pagination.Prev": "Anterior",
   "PaidWith": "Pagado con",
   "Parameter": "Parámetro",
+  "PayExpense.FxRateInput": "Exchange Rate",
   "PayExpense.ProcessorFeesInput": "Tarifas del procesador de pagos",
   "PayExpenseModal.ManualPayoutWarning": "Al hacer clic abajo, reconoces que este gasto ya ha sido pagado {payoutMethod}.",
   "PayExpenseModal.RefillBalanceError": "Recargar el saldo desde el panel de control de Host",

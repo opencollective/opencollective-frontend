@@ -2137,6 +2137,7 @@
   "Pagination.Prev": "이전",
   "PaidWith": "결제 수단",
   "Parameter": "매개변수",
+  "PayExpense.FxRateInput": "Exchange Rate",
   "PayExpense.ProcessorFeesInput": "Payment processor fees",
   "PayExpenseModal.ManualPayoutWarning": "By clicking below, you acknowledge that this expense has already been paid {payoutMethod}.",
   "PayExpenseModal.RefillBalanceError": "Refill your balance from the Host dashboard",

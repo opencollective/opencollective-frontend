@@ -2137,6 +2137,7 @@
   "Pagination.Prev": "Predchádzajúce",
   "PaidWith": "Platobná metóda",
   "Parameter": "Parameter",
+  "PayExpense.FxRateInput": "Exchange Rate",
   "PayExpense.ProcessorFeesInput": "Poplatky za spracovanie platby",
   "PayExpenseModal.ManualPayoutWarning": "Kliknutím nižšie potvrdzujete, že tento výdavok už bol uhradený {payoutMethod}.",
   "PayExpenseModal.RefillBalanceError": "Doplnenie zostatku z riadiaceho panela Hostiteľa",

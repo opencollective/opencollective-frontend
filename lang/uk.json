@@ -2137,6 +2137,7 @@
   "Pagination.Prev": "Попередня",
   "PaidWith": "Сплачено з",
   "Parameter": "Параметр",
+  "PayExpense.FxRateInput": "Exchange Rate",
   "PayExpense.ProcessorFeesInput": "Комісія обробника платежів",
   "PayExpenseModal.ManualPayoutWarning": "By clicking below, you acknowledge that this expense has already been paid {payoutMethod}.",
   "PayExpenseModal.RefillBalanceError": "Refill your balance from the Host dashboard",
