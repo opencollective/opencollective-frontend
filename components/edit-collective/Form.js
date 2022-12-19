@@ -59,6 +59,7 @@ import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
 import { EDIT_COLLECTIVE_SECTIONS } from './Menu';
+import SocialLinksFormField from './SocialLinksFormField';
 
 const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, USER } = CollectiveType;
 
@@ -875,6 +876,10 @@ class EditCollectiveForm extends React.Component {
                       required={field.required}
                     />
                   ))}
+                  <SocialLinksFormField
+                    value={this.state.collective?.socialLinks}
+                    onChange={value => this.handleChange('socialLinks', value)}
+                  />
                 </div>
               </div>
             )}
