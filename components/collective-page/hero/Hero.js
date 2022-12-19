@@ -2,15 +2,19 @@ import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Palette } from '@styled-icons/boxicons-regular/Palette';
 import { Camera } from '@styled-icons/feather/Camera';
+import { Globe } from '@styled-icons/feather/Globe';
 import { Mail } from '@styled-icons/feather/Mail';
+import { Twitter } from '@styled-icons/feather/Twitter';
 import { first } from 'lodash';
 import dynamic from 'next/dynamic';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
+import { twitterProfileUrl } from '../../../lib/url-helpers';
 
+import CodeRepositoryIcon from '../../CodeRepositoryIcon';
 import ContactCollectiveBtn from '../../ContactCollectiveBtn';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
@@ -46,6 +50,13 @@ const HeroBackgroundCropperModal = dynamic(() => import('./HeroBackgroundCropper
         <LoadingPlaceholder height={300} minWidth={280} />
       </StyledModal>
     );
+  },
+});
+
+const Translations = defineMessages({
+  website: {
+    id: 'Fields.website',
+    defaultMessage: 'Website',
   },
 });
 
@@ -89,6 +100,7 @@ const HiddenTagItem = styled(StyledLink)`
  * Collective's page Hero/Banner/Cover component.
  */
 const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
+  const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
@@ -113,6 +125,8 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
     editCover(false);
     showColorPicker(false);
   }, [collective.id]);
+
+  const hasSocialLinks = collective.socialLinks && collective.socialLinks.length > 0;
 
   return (
     <Fragment>
@@ -247,7 +261,40 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       )}
                     </ContactCollectiveBtn>
                   )}
-                  <HeroSocialLinks socialLinks={collective.socialLinks} relMe />
+                  {hasSocialLinks && <HeroSocialLinks socialLinks={collective.socialLinks} relMe />}
+                  {!hasSocialLinks && collective.twitterHandle && (
+                    <StyledLink
+                      data-cy="twitterProfileUrl"
+                      href={twitterProfileUrl(collective.twitterHandle)}
+                      openInNewTab
+                    >
+                      <StyledRoundButton size={32} mr={3} title="Twitter" aria-label="Twitter link">
+                        <Twitter size={12} />
+                      </StyledRoundButton>
+                    </StyledLink>
+                  )}
+                  {!hasSocialLinks && collective.website && (
+                    <StyledLink data-cy="collectiveWebsite" href={collective.website} openInNewTabNoFollow>
+                      <StyledRoundButton
+                        size={32}
+                        mr={3}
+                        title={intl.formatMessage(Translations.website)}
+                        aria-label="Website link"
+                      >
+                        <Globe size={14} />
+                      </StyledRoundButton>
+                    </StyledLink>
+                  )}
+                  {!hasSocialLinks && collective.repositoryUrl && (
+                    <StyledLink data-cy="repositoryUrl" href={collective.repositoryUrl} openInNewTabNoFollow>
+                      <StyledButton buttonSize="tiny" color="black.700" height={32} mr={3}>
+                        <CodeRepositoryIcon size={12} repositoryUrl={collective.repositoryUrl} />
+                        <Span ml={2}>
+                          <FormattedMessage defaultMessage="Code repository" />
+                        </Span>
+                      </StyledButton>
+                    </StyledLink>
+                  )}
                 </Flex>
                 {Boolean(!parentIsHost && collective.parentCollective) && (
                   <Container mx={1} color="black.700" my="12px">
