@@ -188,6 +188,7 @@ interface Account {
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String
+  socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
 
@@ -658,6 +659,37 @@ enum AccountType {
   ORGANIZATION
   PROJECT
   VENDOR
+}
+
+"""
+A social link
+"""
+type SocialLink {
+  type: SocialLinkType!
+  url: URL!
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+"""
+The type of social link
+"""
+enum SocialLinkType {
+  TWITTER
+  TUMBLR
+  MASTODON
+  MATTERMOST
+  SLACK
+  LINKEDIN
+  MEETUP
+  FACEBOOK
+  INSTAGRAM
+  DISCORD
+  YOUTUBE
+  GITHUB
+  GITLAB
+  GIT
+  WEBSITE
 }
 
 enum ImageFormat {
@@ -2465,6 +2497,7 @@ type Host implements Account & AccountWithContributions {
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String
+  socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
 
@@ -5190,6 +5223,7 @@ type Bot implements Account {
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String
+  socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
 
@@ -5706,6 +5740,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String
+  socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
 
@@ -6551,6 +6586,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String
+  socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
 
@@ -7170,6 +7206,7 @@ type Individual implements Account {
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String
+  socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
 
@@ -7846,6 +7883,7 @@ type Organization implements Account & AccountWithContributions {
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String
+  socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
 
@@ -8477,6 +8515,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String
+  socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
 
@@ -11272,6 +11311,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String
+  socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
 
@@ -11883,6 +11923,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String
+  socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
 
@@ -13761,6 +13802,21 @@ type Mutation {
   createPersonalToken(personalToken: PersonalTokenCreateInput!): PersonalToken
   updatePersonalToken(personalToken: PersonalTokenUpdateInput!): PersonalToken
   deletePersonalToken(personalToken: PersonalTokenReferenceInput!): PersonalToken
+
+  """
+  Updates collective social links
+  """
+  updateSocialLinks(
+    """
+    Account where the social link will be associated
+    """
+    account: AccountReferenceInput!
+
+    """
+    The social links in order of preference
+    """
+    socialLinks: [SocialLinkInput!]!
+  ): [SocialLink!]!
 }
 
 input CollectiveCreateInput {
@@ -15178,4 +15234,9 @@ input PersonalTokenReferenceInput {
   The legacy public id identifying the personal-token (ie: 4242)
   """
   legacyId: Int
+}
+
+input SocialLinkInput {
+  type: SocialLinkType!
+  url: URL!
 }

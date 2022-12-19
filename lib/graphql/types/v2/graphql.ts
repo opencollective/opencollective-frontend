@@ -106,6 +106,7 @@ export type Account = {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -1061,6 +1062,7 @@ export type Bot = Account & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -1393,6 +1395,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -3062,6 +3065,7 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   /** The Event start date and time */
   startsAt?: Maybe<Scalars['DateTime']>;
   stats?: Maybe<AccountStats>;
@@ -3853,6 +3857,7 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -4215,6 +4220,7 @@ export type Host = Account & AccountWithContributions & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -4751,6 +4757,7 @@ export type Individual = Account & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -5329,6 +5336,8 @@ export type Mutation = {
   /** Update an Order's amount, tier, or payment method. Scope: "orders". */
   updateOrder?: Maybe<Order>;
   updatePersonalToken?: Maybe<PersonalToken>;
+  /** Updates collective social links */
+  updateSocialLinks: Array<SocialLink>;
   /** Update webhook. Scope: "webhooks". */
   updateWebhook?: Maybe<Webhook>;
   /** To verify and unverified expense. Scope: "expenses". */
@@ -5993,6 +6002,13 @@ export type MutationUpdatePersonalTokenArgs = {
 
 
 /** This is the root mutation */
+export type MutationUpdateSocialLinksArgs = {
+  account: AccountReferenceInput;
+  socialLinks: Array<SocialLinkInput>;
+};
+
+
+/** This is the root mutation */
 export type MutationUpdateWebhookArgs = {
   webhook: WebhookUpdateInput;
 };
@@ -6403,6 +6419,7 @@ export type Organization = Account & AccountWithContributions & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -7082,6 +7099,7 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -7701,6 +7719,39 @@ export type SendMessageResult = {
   __typename?: 'SendMessageResult';
   success?: Maybe<Scalars['Boolean']>;
 };
+
+/** A social link */
+export type SocialLink = {
+  __typename?: 'SocialLink';
+  createdAt?: Maybe<Scalars['DateTime']>;
+  type: SocialLinkType;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  url: Scalars['URL'];
+};
+
+export type SocialLinkInput = {
+  type: SocialLinkType;
+  url: Scalars['URL'];
+};
+
+/** The type of social link */
+export enum SocialLinkType {
+  DISCORD = 'DISCORD',
+  FACEBOOK = 'FACEBOOK',
+  GIT = 'GIT',
+  GITHUB = 'GITHUB',
+  GITLAB = 'GITLAB',
+  INSTAGRAM = 'INSTAGRAM',
+  LINKEDIN = 'LINKEDIN',
+  MASTODON = 'MASTODON',
+  MATTERMOST = 'MATTERMOST',
+  MEETUP = 'MEETUP',
+  SLACK = 'SLACK',
+  TUMBLR = 'TUMBLR',
+  TWITTER = 'TWITTER',
+  WEBSITE = 'WEBSITE',
+  YOUTUBE = 'YOUTUBE'
+}
 
 export type StripeError = {
   __typename?: 'StripeError';
@@ -8376,6 +8427,7 @@ export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
