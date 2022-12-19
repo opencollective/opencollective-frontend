@@ -408,7 +408,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
               </Amount>
             </AmountLine>
           )}
-          {isNumber(paymentProcessorFee?.valueInCents) && !isMultiCurrency && (
+          {isNumber(paymentProcessorFee?.valueInCents) && (
             <AmountLine borderTop="0.8px dashed #9D9FA3">
               <Label>
                 <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />
