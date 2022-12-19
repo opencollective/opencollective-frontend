@@ -23,7 +23,7 @@ import CreatePersonalTokenModal from './CreatePersonalTokenModal';
 
 const personalTokenQuery = gql`
   query PersonalTokens($slug: String!, $limit: Int, $offset: Int) {
-    account(slug: $slug) {
+    individual(slug: $slug) {
       id
       name
       slug
@@ -66,7 +66,7 @@ const PersonalTokensList = ({ accountSlug, onPersonalTokenCreated, offset = 0 })
         </StyledButton>
         {showCreatePersonalToken && (
           <CreatePersonalTokenModal
-            account={data.account}
+            account={data.individual}
             onClose={() => setShowCreatePersonalTokenModal(false)}
             onSuccess={onPersonalTokenCreated}
           />
@@ -78,7 +78,7 @@ const PersonalTokensList = ({ accountSlug, onPersonalTokenCreated, offset = 0 })
       <Box my={4}>
         {error ? (
           <MessageBoxGraphqlError error={error} />
-        ) : !showLoadingState && !data.account.personalTokens.totalCount ? (
+        ) : !showLoadingState && !data.individual.personalTokens.totalCount ? (
           <StyledCard p="24px">
             <Flex>
               <Flex flex="0 0 64px" height="64px" justifyContent="center" alignItems="center">
@@ -112,17 +112,17 @@ const PersonalTokensList = ({ accountSlug, onPersonalTokenCreated, offset = 0 })
           <Grid gridTemplateColumns={['1fr', null, null, '1fr 1fr', '1fr 1fr 1fr']} gridGap="46px">
             {showLoadingState
               ? Array.from({ length: variables.limit }, (_, index) => <LoadingPlaceholder key={index} height="64px" />)
-              : data.account.personalTokens.nodes.map(token => (
+              : data.individual.personalTokens.nodes.map(token => (
                   <Flex key={token.id} data-cy="personal-token" alignItems="center">
                     <Box mr={24}>
-                      <Avatar radius={64} collective={data.account} />
+                      <Avatar radius={64} collective={data.individual} />
                     </Box>
                     <Flex flexDirection="column">
                       <P fontSize="18px" lineHeight="26px" fontWeight="500" color="black.900">
                         {token.name ?? 'Unnamed token'}
                       </P>
                       <P mt="10px" fontSize="14px">
-                        <Link href={getPersonalTokenSettingsRoute(data.account, token)}>
+                        <Link href={getPersonalTokenSettingsRoute(data.individual, token)}>
                           <FormattedMessage id="Settings" defaultMessage="Settings" />
                         </Link>
                       </P>
@@ -132,10 +132,10 @@ const PersonalTokensList = ({ accountSlug, onPersonalTokenCreated, offset = 0 })
           </Grid>
         )}
       </Box>
-      {data?.account?.personalTokens?.totalCount > variables.limit && (
+      {data?.individual?.personalTokens?.totalCount > variables.limit && (
         <Flex mt={5} justifyContent="center">
           <Pagination
-            total={data.account.personalTokens.totalCount}
+            total={data.individual.personalTokens.totalCount}
             limit={variables.limit}
             offset={variables.offset}
             ignoredQueryParams={['slug', 'section']}
