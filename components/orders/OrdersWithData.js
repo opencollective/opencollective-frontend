@@ -87,6 +87,10 @@ const accountOrdersQuery = gql`
           imageUrl
           isHost
           ... on AccountWithHost {
+            host {
+              id
+              currency
+            }
             bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
           }
         }

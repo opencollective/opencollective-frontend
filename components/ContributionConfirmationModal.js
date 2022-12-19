@@ -44,7 +44,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
   const defaultHostFeePercent = order.toAccount.bankTransfersHostFeePercent;
   const platformTipAmount = order.platformTipAmount?.valueInCents || 0;
   const amountInitiated = order.amount.valueInCents + platformTipAmount;
-  const currency = order.amount.currency;
+  const currency = order.toAccount.host.currency;
   const [amountReceived, setAmountReceived] = useState(amountInitiated);
   const [platformTip, setPlatformTip] = useState(platformTipAmount);
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
