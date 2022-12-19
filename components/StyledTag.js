@@ -59,7 +59,6 @@ const StyledTagBase = styled.div`
   text-align: center;
   white-space: nowrap;
   letter-spacing: 0.06em;
-  text-transform: uppercase;
 
   ${variant({
     prop: 'variant',
