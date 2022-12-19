@@ -46,7 +46,7 @@ export default function SocialLinksFormField({ value, onChange }: SocialLinksFor
   );
 
   const addItem = React.useCallback(() => {
-    const newValues = [...value, { url: '', type: SocialLinkType.OTHER }];
+    const newValues = [...value, { url: '', type: SocialLinkType.WEBSITE }];
     onChange(
       newValues.map(sl => ({
         url: sl.url,
@@ -146,7 +146,7 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
       label: 'Mattermost',
     },
     {
-      value: SocialLinkType.OTHER.toString(),
+      value: SocialLinkType.WEBSITE.toString(),
       label: 'Other',
     },
     {
@@ -167,7 +167,7 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
     <StyledSelect
       {...pickerProps}
       value={options.find(o => o.value === value?.toString())}
-      defaultValue={options.find(o => o.value === SocialLinkType.OTHER.toString())}
+      defaultValue={options.find(o => o.value === SocialLinkType.WEBSITE.toString())}
       onChange={({ value }) => onChange(value)}
       options={options}
     />
@@ -208,7 +208,7 @@ function SocialLinkItem({ value, index, onChange, onRemoveItem, onMoveItem }: So
     },
   });
 
-  const [, drag] = useDrag(
+  const [, drag, dragPreview] = useDrag(
     () => ({
       type: 'SocialLink',
       item: { index },
@@ -236,7 +236,7 @@ function SocialLinkItem({ value, index, onChange, onRemoveItem, onMoveItem }: So
   drag(drop(ref));
   return (
     <Flex
-      ref={ref}
+      ref={dragPreview}
       opacity={isOver ? 0 : 1}
       justifyContent="space-between"
       alignItems="center"
@@ -244,7 +244,9 @@ function SocialLinkItem({ value, index, onChange, onRemoveItem, onMoveItem }: So
       gap="5px"
       data-handler-id={handlerId}
     >
-      <DragIndicator size="15px" style={{ cursor: 'grab' }} />
+      <div ref={ref}>
+        <DragIndicator size="15px" style={{ cursor: 'grab' }} />
+      </div>
       <SocialLinkTypePicker width="150px" value={value.type} onChange={type => onFieldChange('type', type)} />
       <StyledInput flexGrow={1} value={value.url} onChange={e => onFieldChange('url', e.target.value)} />
       <StyledButton padding={0} width="20px" height="20px" type="button" buttonStyle="borderless" onClick={onRemove}>

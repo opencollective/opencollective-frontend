@@ -23,7 +23,7 @@ function iconForSocialLinkType(type: SocialLinkType) {
       return Mastodon;
     case SocialLinkType.MATTERMOST:
       return Globe;
-    case SocialLinkType.OTHER:
+    case SocialLinkType.WEBSITE:
       return Globe;
     case SocialLinkType.TWITTER:
       return Twitter;
