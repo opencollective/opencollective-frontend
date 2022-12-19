@@ -95,7 +95,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
     <div data-cy="personal-token-settings">
       <P mt={3} mb={4}>
         <StyledLink data-cy="go-back-link" as={Link} color="black.800" href={backPath}>
-          &larr; <FormattedMessage defaultMessage="Go back to all your apps" />
+          &larr; <FormattedMessage defaultMessage="Go back to all your tokens" />
         </StyledLink>
       </P>
       {loading ? (
@@ -233,6 +233,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                     buttonSize="small"
                     disabled={isSubmitting}
                     onClick={() => setShowDeleteModal(true)}
+                    data-cy="personalToken-delete"
                   >
                     <FormattedMessage defaultMessage="Delete token" />
                   </StyledButton>
