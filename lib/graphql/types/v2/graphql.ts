@@ -90,6 +90,7 @@ export type Account = {
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this account can use to pay for Orders */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
@@ -306,27 +307,7 @@ export type AccountCollection = Collection & {
   limit?: Maybe<Scalars['Int']>;
   nodes?: Maybe<Array<Maybe<Account>>>;
   offset?: Maybe<Scalars['Int']>;
-  /** Stats for the returned results (i.e. accounts within the limit) */
-  stats: AccountCollectionStats;
   totalCount?: Maybe<Scalars['Int']>;
-};
-
-/** Account collection stats */
-export type AccountCollectionStats = {
-  __typename?: 'AccountCollectionStats';
-  /** Time series of the transaction count and sum of amount for these accounts */
-  transactionsTimeSeries: TimeSeriesAmountWithCount;
-};
-
-
-/** Account collection stats */
-export type AccountCollectionStatsTransactionsTimeSeriesArgs = {
-  dateFrom?: InputMaybe<Scalars['DateTime']>;
-  dateTo?: InputMaybe<Scalars['DateTime']>;
-  includeChildren?: InputMaybe<Scalars['Boolean']>;
-  kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
-  timeUnit?: InputMaybe<TimeUnit>;
-  type?: InputMaybe<TransactionType>;
 };
 
 export enum AccountFreezeAction {
@@ -368,7 +349,10 @@ export type AccountStats = {
   activeRecurringContributionsV2?: Maybe<Amount>;
   /** Amount of money in cents in the currency of the collective */
   balance: Amount;
-  /** Amount of money in cents in the currency of the collective currently available to spend */
+  /**
+   * Amount of money in cents in the currency of the collective currently available to spend
+   * @deprecated 2022-12-13: Use balance + withBlockedFunds instead
+   */
   balanceWithBlockedFunds: Amount;
   /**
    * The consolidated amount of all the events and projects combined.
@@ -379,6 +363,8 @@ export type AccountStats = {
   contributionsAmount?: Maybe<Array<Maybe<AmountStats>>>;
   /** Return amount time series for contributions (default, and only for now: one-time vs recurring) */
   contributionsAmountTimeSeries: TimeSeriesAmount;
+  contributionsCount: Scalars['Int'];
+  contributorsCount: Scalars['Int'];
   /** Returns expense tags for collective sorted by popularity */
   expensesTags?: Maybe<Array<Maybe<AmountStats>>>;
   /** History of the expense tags used by this collective. */
@@ -388,10 +374,20 @@ export type AccountStats = {
   monthlySpending: Amount;
   /** Total amount received */
   totalAmountReceived: Amount;
+  /** Total amount received time series */
+  totalAmountReceivedTimeSeries: TimeSeriesAmount;
   /** Total amount spent */
   totalAmountSpent: Amount;
-  /** Total net amount received */
+  /**
+   * Total net amount received
+   * @deprecated 2022-12-13: Use totalAmountReceived + net=true instead
+   */
   totalNetAmountReceived: Amount;
+  /**
+   * Total net amount received time series
+   * @deprecated 2022-12-13: Use totalAmountReceivedTimeSeries + net=true instead
+   */
+  totalNetAmountReceivedTimeSeries: TimeSeriesAmount;
   /** Total of paid expenses to the account, filter per expense type */
   totalPaidExpenses: Amount;
   yearlyBudget: Amount;
@@ -407,9 +403,10 @@ export type AccountStatsActiveRecurringContributionsV2Args = {
 
 /** Stats for the Account */
 export type AccountStatsBalanceArgs = {
-  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  currency?: InputMaybe<Currency>;
   dateTo?: InputMaybe<Scalars['DateTime']>;
   includeChildren?: InputMaybe<Scalars['Boolean']>;
+  withBlockedFunds?: InputMaybe<Scalars['Boolean']>;
 };
 
 
@@ -427,6 +424,22 @@ export type AccountStatsContributionsAmountTimeSeriesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']>;
   includeChildren?: InputMaybe<Scalars['Boolean']>;
   timeUnit?: InputMaybe<TimeUnit>;
+};
+
+
+/** Stats for the Account */
+export type AccountStatsContributionsCountArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  dateTo?: InputMaybe<Scalars['DateTime']>;
+  includeChildren?: InputMaybe<Scalars['Boolean']>;
+};
+
+
+/** Stats for the Account */
+export type AccountStatsContributorsCountArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  dateTo?: InputMaybe<Scalars['DateTime']>;
+  includeChildren?: InputMaybe<Scalars['Boolean']>;
 };
 
 
@@ -450,21 +463,39 @@ export type AccountStatsExpensesTagsTimeSeriesArgs = {
 
 /** Stats for the Account */
 export type AccountStatsTotalAmountReceivedArgs = {
+  currency?: InputMaybe<Currency>;
   dateFrom?: InputMaybe<Scalars['DateTime']>;
   dateTo?: InputMaybe<Scalars['DateTime']>;
   includeChildren?: InputMaybe<Scalars['Boolean']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
+  net?: InputMaybe<Scalars['Boolean']>;
   periodInMonths?: InputMaybe<Scalars['Int']>;
   useCache?: Scalars['Boolean'];
 };
 
 
 /** Stats for the Account */
-export type AccountStatsTotalAmountSpentArgs = {
+export type AccountStatsTotalAmountReceivedTimeSeriesArgs = {
+  currency?: InputMaybe<Currency>;
   dateFrom?: InputMaybe<Scalars['DateTime']>;
   dateTo?: InputMaybe<Scalars['DateTime']>;
   includeChildren?: InputMaybe<Scalars['Boolean']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
+  net?: InputMaybe<Scalars['Boolean']>;
+  periodInMonths?: InputMaybe<Scalars['Int']>;
+  timeUnit?: InputMaybe<TimeUnit>;
+};
+
+
+/** Stats for the Account */
+export type AccountStatsTotalAmountSpentArgs = {
+  currency?: InputMaybe<Currency>;
+  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  dateTo?: InputMaybe<Scalars['DateTime']>;
+  includeChildren?: InputMaybe<Scalars['Boolean']>;
+  includeGiftCards?: InputMaybe<Scalars['Boolean']>;
+  kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
+  net?: InputMaybe<Scalars['Boolean']>;
   periodInMonths?: InputMaybe<Scalars['Int']>;
 };
 
@@ -476,6 +507,18 @@ export type AccountStatsTotalNetAmountReceivedArgs = {
   includeChildren?: InputMaybe<Scalars['Boolean']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   periodInMonths?: InputMaybe<Scalars['Int']>;
+};
+
+
+/** Stats for the Account */
+export type AccountStatsTotalNetAmountReceivedTimeSeriesArgs = {
+  currency?: InputMaybe<Currency>;
+  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  dateTo?: InputMaybe<Scalars['DateTime']>;
+  includeChildren?: InputMaybe<Scalars['Boolean']>;
+  kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
+  periodInMonths?: InputMaybe<Scalars['Int']>;
+  timeUnit?: InputMaybe<TimeUnit>;
 };
 
 
@@ -656,6 +699,7 @@ export enum ActivityAndClassesType {
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS = 'COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS',
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED = 'COLLECTIVE_VIRTUAL_CARD_SUSPENDED',
   CONNECTED_ACCOUNT_CREATED = 'CONNECTED_ACCOUNT_CREATED',
+  CONNECTED_ACCOUNT_ERROR = 'CONNECTED_ACCOUNT_ERROR',
   CONTRIBUTIONS = 'CONTRIBUTIONS',
   CONTRIBUTION_REJECTED = 'CONTRIBUTION_REJECTED',
   CONVERSATION_COMMENT_CREATED = 'CONVERSATION_COMMENT_CREATED',
@@ -794,6 +838,7 @@ export enum ActivityType {
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS = 'COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS',
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED = 'COLLECTIVE_VIRTUAL_CARD_SUSPENDED',
   CONNECTED_ACCOUNT_CREATED = 'CONNECTED_ACCOUNT_CREATED',
+  CONNECTED_ACCOUNT_ERROR = 'CONNECTED_ACCOUNT_ERROR',
   CONTRIBUTION_REJECTED = 'CONTRIBUTION_REJECTED',
   CONVERSATION_COMMENT_CREATED = 'CONVERSATION_COMMENT_CREATED',
   DEACTIVATED_COLLECTIVE_AS_HOST = 'DEACTIVATED_COLLECTIVE_AS_HOST',
@@ -996,6 +1041,7 @@ export type Bot = Account & {
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
@@ -1319,6 +1365,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
@@ -2978,6 +3025,7 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   orders: OrderCollection;
   /** The Account parenting this account */
   parent?: Maybe<Account>;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
@@ -3764,6 +3812,7 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
@@ -4114,6 +4163,7 @@ export type Host = Account & AccountWithContributions & {
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
@@ -4654,6 +4704,7 @@ export type Individual = Account & {
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   oAuthAuthorizations?: Maybe<OAuthAuthorizationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
@@ -6261,6 +6312,7 @@ export type Organization = Account & AccountWithContributions & {
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
@@ -6851,6 +6903,7 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   orders: OrderCollection;
   /** The Account parenting this account */
   parent?: Maybe<Account>;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
@@ -7141,6 +7194,7 @@ export type Query = {
   tier?: Maybe<Tier>;
   transactions: TransactionCollection;
   update?: Maybe<Update>;
+  updates: UpdatesCollection;
 };
 
 
@@ -7396,6 +7450,15 @@ export type QueryUpdateArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   id?: InputMaybe<Scalars['String']>;
   slug?: InputMaybe<Scalars['String']>;
+};
+
+
+/** This is the root query */
+export type QueryUpdatesArgs = {
+  host?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  limit?: Scalars['Int'];
+  offset?: Scalars['Int'];
+  tag?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
 };
 
 /** A recurring expense object */
@@ -7666,26 +7729,6 @@ export type TimeSeriesAmountNode = {
   amount: Amount;
   date: Scalars['DateTime'];
   label?: Maybe<Scalars['String']>;
-};
-
-/** Amounts with count time series */
-export type TimeSeriesAmountWithCount = TimeSeries & {
-  __typename?: 'TimeSeriesAmountWithCount';
-  /** The start date of the time series */
-  dateFrom: Scalars['DateTime'];
-  /** The end date of the time series */
-  dateTo: Scalars['DateTime'];
-  /** Time series data points */
-  nodes: Array<TimeSeriesAmountWithCountNode>;
-  /** The interval between two data points */
-  timeUnit: TimeUnit;
-};
-
-export type TimeSeriesAmountWithCountNode = {
-  __typename?: 'TimeSeriesAmountWithCountNode';
-  amount: Amount;
-  count: Scalars['Int'];
-  date: Scalars['DateTime'];
 };
 
 /** Amounts with settlements time series */
@@ -8060,6 +8103,15 @@ export type UpdateUpdateInput = {
   title?: InputMaybe<Scalars['String']>;
 };
 
+/** A collection of "Updates" */
+export type UpdatesCollection = Collection & {
+  __typename?: 'UpdatesCollection';
+  limit?: Maybe<Scalars['Int']>;
+  nodes?: Maybe<Array<Update>>;
+  offset?: Maybe<Scalars['Int']>;
+  totalCount?: Maybe<Scalars['Int']>;
+};
+
 /** This represents a Vendor account */
 export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   __typename?: 'Vendor';
@@ -8129,6 +8181,7 @@ export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
