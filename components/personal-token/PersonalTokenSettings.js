@@ -199,6 +199,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                       onBlur={() => form.setFieldTouched(field.name, true)}
                       onChange={value => form.setFieldValue(field.name, value)}
                       isMulti
+                      data-cy="personal-token-scope"
                     />
                   )}
                 </StyledInputFormikField>

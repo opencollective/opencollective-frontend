@@ -18,7 +18,7 @@ describe('Personal Token', () => {
     cy.log('Create a first token using the message link');
     cy.getByDataCy('create-token-link').click();
     cy.get('input[name=name]').type('My first token');
-    cy.get('input[name=scope]').select('expenses').select('transactions');
+    cy.getByDataCy('personal-token-scope').click().type('host{enter}').type('transactions{enter}');
     cy.get('input[name=expiresAt]').type('2022-12-31');
     cy.get('[data-cy="create-personal-token-modal"] button[type=submit]').click();
     cy.contains('[data-cy=toast-notification]:last', 'Personal token "My first token" created');
@@ -34,7 +34,7 @@ describe('Personal Token', () => {
     cy.log('Edit the token');
     cy.getByDataCy('personal-token').contains('a', 'Settings').click();
     cy.get('input[name=name]').clear().type('My first token (edited)');
-    cy.get('input[name=scope]').select('host');
+    cy.getByDataCy('personal-token-scope').click().type('email{enter}');
     cy.get('input[name=expiresAt]').clear().type('2022-12-28');
     cy.get('[data-cy="personal-token-settings"] button[type=submit]').click();
     cy.contains('[data-cy=toast-notification]:last', 'Personal token "My first token (edited)" updated');
@@ -44,9 +44,9 @@ describe('Personal Token', () => {
     cy.contains('[data-cy="personal-token"]', 'My first token (edited)');
 
     cy.log('Create a second token using the button');
-    cy.getByDataCy('create-token-button').click();
+    cy.getByDataCy('create-personal-token-btn').click();
     cy.get('input[name=name]').type('My second token');
-    cy.get('input[name=scope]').select('host', 'transactions');
+    cy.getByDataCy('personal-token-scope').click().type('host{enter}').type('account{enter}');
     cy.get('input[name=expiresAt]').type('2022-12-31');
     cy.get('[data-cy="create-personal-token-modal"] button[type=submit]').click();
     cy.contains('[data-cy=toast-notification]:last', 'Personal token "My second token" created');
@@ -83,7 +83,7 @@ describe('Personal Token', () => {
 
       cy.getByDataCy('create-token-link').click();
       cy.get('input[name=name]').type('My first token with 2fa');
-      cy.get('input[name=scope]').select('expenses').select('transactions');
+      cy.getByDataCy('personal-token-scope').click().type('host{enter}').type('transactions{enter}');
       cy.get('input[name=expiresAt]').type('2022-12-31');
       cy.get('[data-cy="create-personal-token-modal"] button[type=submit]').click();
 
@@ -97,7 +97,7 @@ describe('Personal Token', () => {
 
       cy.contains('[data-cy=toast-notification]:last', 'Personal token "My first token with 2fa" created');
       cy.getByDataCy('personalToken-token').should('exist');
-      cy.contains('[data-cy="personal-token-settings "] h3', 'My first token with 2fa');
+      cy.contains('[data-cy="personal-token-settings"] h3', 'My first token with 2fa');
 
       cy.log('Returns to the tokens list to make sure it is there');
       cy.getByDataCy('go-back-link').click();

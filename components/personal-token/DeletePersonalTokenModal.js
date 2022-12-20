@@ -48,7 +48,10 @@ const DeletePersonalTokenModal = ({ personalToken, onDelete, ...props }) => {
           await onDelete(personalToken);
           addToast({
             type: TOAST_TYPE.SUCCESS,
-            message: intl.formatMessage({ defaultMessage: 'Token {name} deleted' }, { name: personalToken.name || '' }),
+            message: intl.formatMessage(
+              { defaultMessage: 'Personal token "{name}" deleted' },
+              { name: personalToken.name || '' },
+            ),
           });
           return CONFIRMATION_MODAL_TERMINATE;
         } catch (e) {
