@@ -1,6 +1,7 @@
 import React from 'react';
 import { Plus, Times } from '@styled-icons/fa-solid';
 import { DragIndicator } from '@styled-icons/material';
+import { sortBy } from 'lodash';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FormattedMessage } from 'react-intl';
@@ -114,6 +115,10 @@ type SocialLinkTypePickerProps = {
 function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTypePickerProps) {
   const options = [
     {
+      value: SocialLinkType.WEBSITE.toString(),
+      label: 'Website',
+    },
+    {
       value: SocialLinkType.DISCORD.toString(),
       label: 'Discord',
     },
@@ -130,7 +135,7 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
       label: 'GitLab',
     },
     {
-      value: SocialLinkType.GIT_REPOSITORY.toString(),
+      value: SocialLinkType.GIT.toString(),
       label: 'Git Repository',
     },
     {
@@ -146,10 +151,6 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
       label: 'Mattermost',
     },
     {
-      value: SocialLinkType.WEBSITE.toString(),
-      label: 'Other',
-    },
-    {
       value: SocialLinkType.TUMBLR.toString(),
       label: 'Tumbrl',
     },
@@ -161,6 +162,18 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
       value: SocialLinkType.YOUTUBE.toString(),
       label: 'YouTube',
     },
+    {
+      value: SocialLinkType.MEETUP.toString(),
+      label: 'Meetup',
+    },
+    {
+      value: SocialLinkType.LINKEDIN.toString(),
+      label: 'LinkedIn',
+    },
+    {
+      value: SocialLinkType.SLACK.toString(),
+      label: 'Slack',
+    },
   ];
 
   return (
@@ -169,7 +182,7 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
       value={options.find(o => o.value === value?.toString())}
       defaultValue={options.find(o => o.value === SocialLinkType.WEBSITE.toString())}
       onChange={({ value }) => onChange(value)}
-      options={options}
+      options={sortBy(options, 'label')}
     />
   );
 }

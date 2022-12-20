@@ -1,6 +1,6 @@
 import React from 'react';
-import { Discord, Mastodon, Tumblr } from '@styled-icons/fa-brands';
-import { Facebook, Github, Gitlab, Globe, Instagram, Twitter, Youtube } from '@styled-icons/feather';
+import { Discord, Mastodon, Meetup, Tumblr } from '@styled-icons/fa-brands';
+import { Facebook, Github, Gitlab, Globe, Instagram, Linkedin, Slack, Twitter, Youtube } from '@styled-icons/feather';
 
 import { SocialLink, SocialLinkType } from '../../../lib/graphql/types/v2/graphql';
 
@@ -31,6 +31,12 @@ function iconForSocialLinkType(type: SocialLinkType) {
       return Youtube;
     case SocialLinkType.TUMBLR:
       return Tumblr;
+    case SocialLinkType.MEETUP:
+      return Meetup;
+    case SocialLinkType.SLACK:
+      return Slack;
+    case SocialLinkType.LINKEDIN:
+      return Linkedin;
     default:
       return Globe;
   }
