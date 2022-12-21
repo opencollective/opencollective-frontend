@@ -636,8 +636,6 @@ class EditCollectiveForm extends React.Component {
     const currencyOptions = Currency.map(c => ({ value: c, label: c }));
     const submitBtnLabel = this.messages[submitBtnMessageId] && intl.formatMessage(this.messages[submitBtnMessageId]);
 
-    const type = collective.type.toLowerCase();
-
     this.fields = {
       info: [
         {
@@ -909,11 +907,7 @@ class EditCollectiveForm extends React.Component {
                       isEvent ? `/${collective.parentCollective.slug}/events/${collective.slug}` : `/${collective.slug}`
                     }
                   >
-                    <FormattedMessage
-                      id="collective.edit.backToProfile"
-                      defaultMessage="view {type} page"
-                      values={{ type }}
-                    />
+                    <FormattedMessage defaultMessage="View profile page" />
                   </Link>
                 </Container>
               </Container>
