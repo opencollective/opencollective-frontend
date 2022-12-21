@@ -34,16 +34,17 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
           values={{ type: collective.type }}
         />
       </P>
-      {[CollectiveType.FUND, CollectiveType.COLLECTIVE].includes(collective.type) && !collective.host.hostCollective && (
-        <P color="rgb(224, 183, 0)" my={2}>
-          <FormattedMessage
-            id="collective.balance.notAvailable"
-            defaultMessage={
-              "The Host doesn't support this feature. Submit an expense, donate to another Collective, or contact support if you're blocked."
-            }
-          />
-        </P>
-      )}
+      {[CollectiveType.FUND, CollectiveType.COLLECTIVE].includes(collective.type) &&
+        !collective.host.hostCollective && (
+          <P color="rgb(224, 183, 0)" my={2}>
+            <FormattedMessage
+              id="collective.balance.notAvailable"
+              defaultMessage={
+                "The Host doesn't support this feature. Submit an expense, donate to another Collective, or contact support if you're blocked."
+              }
+            />
+          </P>
+        )}
       {[CollectiveType.FUND, CollectiveType.COLLECTIVE].includes(collective.type) && collective.host.hostCollective && (
         <SendFundsToCollectiveSection
           LoggedInUser={LoggedInUser}
