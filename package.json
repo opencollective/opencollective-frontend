@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@apollo/client": "3.3.21",
-    "@formatjs/intl-relativetimeformat": "11.1.4",
+    "@formatjs/intl-relativetimeformat": "11.1.8",
     "@graphql-typed-document-node/core": "3.1.1",
     "@hcaptcha/react-hcaptcha": "1.4.4",
     "@hyperwatch/hyperwatch": "3.9.3",
@@ -90,7 +90,7 @@
     "react-easy-crop": "4.6.3",
     "react-flip-move": "3.0.4",
     "react-geosuggest": "2.14.1",
-    "react-intl": "6.2.1",
+    "react-intl": "6.2.5",
     "react-popper": "2.3.0",
     "react-scrollchor": "7.0.2",
     "react-select": "5.5.9",
