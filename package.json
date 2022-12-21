@@ -169,7 +169,7 @@
     "@babel/node": "^7.16.8",
     "@cypress/code-coverage": "^3.9.12",
     "@formatjs/cli": "^5.0.0",
-    "@graphql-codegen/cli": "2.13.12",
+    "@graphql-codegen/cli": "2.16.1",
     "@graphql-codegen/gql-tag-operations-preset": "^1.5.5",
     "@rollup/plugin-babel": "^6.0.0",
     "@rollup/plugin-commonjs": "^23.0.0",
