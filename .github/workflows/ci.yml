@@ -29,6 +29,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
 
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
@@ -48,6 +53,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2-beta
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -69,6 +79,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
 
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
@@ -89,6 +104,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
 
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
@@ -104,6 +124,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2-beta
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -137,6 +162,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
 
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
@@ -151,6 +181,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2-beta
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
 
       - name: Setup project
         uses: ./.github/actions/setup-project
