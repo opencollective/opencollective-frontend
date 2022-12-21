@@ -93,6 +93,10 @@ const ContributionFlowUrlParametersConfig = {
   defaultEmail: { type: 'alias', on: 'email' },
   /** @deprecated Use `name` instead */
   defaultName: { type: 'alias', on: 'name' },
+  /** Cryptocurrency type; BTC, ETH etc **/
+  cryptoCurrency: { type: 'string' },
+  /** Cryptocurrency amount **/
+  cryptoAmount: { type: 'float' },
 };
 
 const EmbedContributionFlowUrlParametersConfig = {
@@ -145,6 +149,14 @@ export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepPro
   // Remove entries that are set to their default values
   if (data.quantity === 1) {
     delete data.quantity;
+  }
+
+  if (isCrypto) {
+    data.cryptoAmount = parseFloat(stepDetails.cryptoAmount) || previousUrlParams.cryptoAmount || 0;
+    data.cryptoCurrency = stepDetails.currency?.value ? stepDetails.currency.value : previousUrlParams.cryptoCurrency;
+    delete data.amount;
+  } else {
+    delete data.cryptoAmount;
   }
 
   return data;

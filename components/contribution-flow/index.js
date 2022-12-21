@@ -144,8 +144,10 @@ class ContributionFlow extends React.Component {
 
     const { collective, tier } = props;
     const isCryptoFlow = props.paymentFlow === PAYMENT_FLOW.CRYPTO;
-    const currency = isCryptoFlow ? CRYPTO_CURRENCIES[0] : tier?.amount?.currency || collective.currency;
     const queryParams = this.getQueryParams();
+    const currency = isCryptoFlow
+      ? find(CRYPTO_CURRENCIES, field => field.value === queryParams.cryptoCurrency) || CRYPTO_CURRENCIES[0]
+      : tier?.amount?.currency || collective.currency;
 
     this.state = {
       error: null,
@@ -161,9 +163,10 @@ class ContributionFlow extends React.Component {
       stepDetails: {
         quantity: queryParams.quantity || 1,
         interval: queryParams.interval || getDefaultInterval(props.tier),
-        amount: isCryptoFlow ? null : queryParams.amount || getDefaultTierAmount(tier, collective, currency),
+        amount: queryParams.amount || getDefaultTierAmount(tier, collective, currency),
         platformTip: queryParams.platformTip,
         currency,
+        cryptoAmount: queryParams.cryptoAmount,
       },
     };
   }
@@ -872,11 +875,13 @@ class ContributionFlow extends React.Component {
     } = this.props;
     const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
     const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
-    const currency = isCrypto ? stepDetails.currency.value : tier?.amount.currency || collective.currency;
     const isLoading = isCrypto ? isSubmitting : isSubmitted || isSubmitting;
     const pastEvent = collective.type === CollectiveType.EVENT && isPastEvent(collective);
     const shouldDisplayCaptcha = isCaptchaEnabled() && !LoggedInUser && stepPayment?.key === NEW_CREDIT_CARD_KEY;
     const queryParams = this.getQueryParams();
+    const currency = isCrypto
+      ? queryParams.cryptoCurrency || stepDetails.currency.value
+      : tier?.amount.currency || collective.currency;
     const currentStepName = this.getCurrentStepName();
 
     if (currentStepName === STEPS.SUCCESS) {
