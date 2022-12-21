@@ -48,6 +48,7 @@
   "3ABdi3": "Dieses Konto existiert nicht",
   "3eueCA": "<FromAccount></FromAccount> ist <Account></Account> als <MemberRole></MemberRole> beigetreten",
   "3I6uVw": "Anwendung löschen",
+  "3IwVoe": "Unnamed token",
   "3PZa76": "Diesen Monat",
   "3RuqnL": "Keiner der derzeit auf Ihrem Konto aktiven Zahlungsanbieter unterstützt wiederkehrende Beiträge. Sie können sie aktivieren, indem Sie Stripe oder PayPal verbinden. Alternativ kannst du die Möglichkeit wiederholt beizutragen in den <TiersLink>Stufen Einstellungen</TiersLink> entfernen.",
   "3Sl9Fc": "Go back to all your tokens",

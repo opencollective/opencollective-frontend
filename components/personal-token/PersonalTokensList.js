@@ -119,7 +119,7 @@ const PersonalTokensList = ({ accountSlug, onPersonalTokenCreated, offset = 0 })
                     </Box>
                     <Flex flexDirection="column">
                       <P fontSize="18px" lineHeight="26px" fontWeight="500" color="black.900">
-                        {token.name ?? 'Unnamed token'}
+                        {token.name ?? <FormattedMessage defaultMessage={'Unnamed token'} />}
                       </P>
                       <P mt="10px" fontSize="14px">
                         <Link href={getPersonalTokenSettingsRoute(data.individual, token)}>

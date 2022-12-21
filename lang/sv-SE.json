@@ -48,6 +48,7 @@
   "3ABdi3": "Detta konto finns inte",
   "3eueCA": "<FromAccount></FromAccount> anslöt sig till <Account></Account> som en <MemberRole></MemberRole>",
   "3I6uVw": "Ta bort app",
+  "3IwVoe": "Unnamed token",
   "3PZa76": "Denna månad",
   "3RuqnL": "Ingen av de betalningsleverantörer som är aktiva på ditt konto stöder återkommande bidrag. Du kan aktivera dem genom att ansluta Stripe eller PayPal. Alternativt kan du ta bort möjligheten att bidra återkommande från <TiersLink>nivåinställningar</TiersLink>.",
   "3Sl9Fc": "Go back to all your tokens",

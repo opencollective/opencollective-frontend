@@ -48,6 +48,7 @@
   "3ABdi3": "Ce compte n'existe pas",
   "3eueCA": "<FromAccount></FromAccount> a rejoint <Account></Account> en tant que <MemberRole></MemberRole>",
   "3I6uVw": "Applications supprimées",
+  "3IwVoe": "Unnamed token",
   "3PZa76": "Ce mois-ci",
   "3RuqnL": "Aucun des fournisseurs de paiement actuellement actifs sur votre compte ne prend en charge les contributions récurrentes. Vous pouvez les activer en connectant Stripe ou PayPal. Alternativement, vous pouvez supprimer la possibilité de contribuer de façon récurrente dans la <TiersLink>configuration des paliers</TiersLink>.",
   "3Sl9Fc": "Go back to all your tokens",
