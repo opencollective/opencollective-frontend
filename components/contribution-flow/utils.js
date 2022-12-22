@@ -213,7 +213,6 @@ export const generatePaymentMethodOptions = (
 
     if (
       supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYMENT_INTENT) &&
-      !interval &&
       ['USD', 'EUR'].includes(stepDetails.currency) &&
       stripeAccount
     ) {
