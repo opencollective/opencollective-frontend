@@ -544,7 +544,7 @@ type Contributor {
   """
   True if the contributor is a fundraiser
   """
-  isFundraiser: Boolean!
+  isFundraiser: Boolean @deprecated(reason: "2022-09-12: This role does not exist anymore")
 
   """
   A list of tier ids that this contributors is a member of. A null value indicates that a membership without tier.
@@ -611,7 +611,6 @@ enum ContributorRole {
   MEMBER
   CONTRIBUTOR
   BACKER
-  FUNDRAISER
   ATTENDEE
   FOLLOWER
   CONNECTED_COLLECTIVE
