@@ -185,7 +185,7 @@
     "@types/styled-system": "^5.1.15",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
     "@typescript-eslint/parser": "^5.30.5",
-    "@wojtekmaj/enzyme-adapter-react-17": "^0.6.6",
+    "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "babel-loader": "^8.2.3",
     "babel-plugin-formatjs": "^10.3.17",
     "babel-plugin-istanbul": "^6.1.1",
