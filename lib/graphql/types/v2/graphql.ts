@@ -3633,7 +3633,7 @@ export type ExpenseQuote = {
   /** Amount of payment processor fee */
   paymentProcessorFeeAmount: Amount;
   /** Amount of this item */
-  totalAmount: Amount;
+  sourceAmount: Amount;
 };
 
 export type ExpenseReferenceInput = {
@@ -6955,10 +6955,12 @@ export type ProcessExpensePaymentParams = {
   feesPayer?: InputMaybe<FeesPayer>;
   /** Bypass automatic integrations (ie. PayPal, Transferwise) to process the expense manually */
   forceManual?: InputMaybe<Scalars['Boolean']>;
-  /** The fee charged by payment processor in collective currency */
-  paymentProcessorFee?: InputMaybe<Scalars['Int']>;
+  /** The fee charged by payment processor in host currency */
+  paymentProcessorFeeInHostCurrency?: InputMaybe<Scalars['Int']>;
   /** Whether the payment processor fees should be refunded when triggering MARK_AS_UNPAID */
   shouldRefundPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
+  /** The total amount paid in host currency */
+  totalAmountPaidInHostCurrency?: InputMaybe<Scalars['Int']>;
 };
 
 /** Action taken for an account application to the host */

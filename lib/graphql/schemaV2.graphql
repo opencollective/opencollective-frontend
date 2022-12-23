@@ -4931,7 +4931,7 @@ type ExpenseQuote {
   """
   Amount of this item
   """
-  totalAmount: Amount!
+  sourceAmount: Amount!
 
   """
   Amount of payment processor fee
@@ -14448,9 +14448,14 @@ Parameters for paying an expense
 """
 input ProcessExpensePaymentParams {
   """
-  The fee charged by payment processor in collective currency
+  The fee charged by payment processor in host currency
   """
-  paymentProcessorFee: Int
+  paymentProcessorFeeInHostCurrency: Int
+
+  """
+  The total amount paid in host currency
+  """
+  totalAmountPaidInHostCurrency: Int
 
   """
   Whether the payment processor fees should be refunded when triggering MARK_AS_UNPAID
