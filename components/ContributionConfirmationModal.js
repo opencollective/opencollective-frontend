@@ -43,10 +43,12 @@ const confirmContributionMutation = gql`
 const ContributionConfirmationModal = ({ order, onClose }) => {
   const defaultHostFeePercent = order.toAccount.bankTransfersHostFeePercent;
   const platformTipAmount = order.platformTipAmount?.valueInCents || 0;
+  const hostCurrencyFxRate = order.hostCurrencyFxRate;
   const amountInitiated = order.amount.valueInCents + platformTipAmount;
-  const currency = order.toAccount.host.currency;
-  const [amountReceived, setAmountReceived] = useState(amountInitiated);
-  const [platformTip, setPlatformTip] = useState(platformTipAmount);
+  const orderCurrency = order.amount.currency;
+  const hostCurrency = order.toAccount.host.currency;
+  const [amountReceived, setAmountReceived] = useState(Math.round(amountInitiated * hostCurrencyFxRate));
+  const [platformTip, setPlatformTip] = useState(Math.round(platformTipAmount * hostCurrencyFxRate));
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
   const [hostFeePercent, setHostFeePercent] = useState(defaultHostFeePercent);
   const [processedAt, setProcessedAt] = useState();
@@ -69,15 +71,18 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
     };
 
     if (amount !== order.amount.valueInCents) {
-      orderUpdate.amount = { valueInCents: amount, currency };
+      orderUpdate.amount = { valueInCents: Math.round(amount / hostCurrencyFxRate), currency: orderCurrency };
     }
 
     if (paymentProcessorFee !== 0) {
-      orderUpdate.paymentProcessorFee = { valueInCents: paymentProcessorFee, currency };
+      orderUpdate.paymentProcessorFee = {
+        valueInCents: Math.round(paymentProcessorFee / hostCurrencyFxRate),
+        currency: orderCurrency,
+      };
     }
 
     if (platformTip !== order.platformTipAmount?.valueInCents) {
-      orderUpdate.platformTip = { valueInCents: platformTip, currency };
+      orderUpdate.platformTip = { valueInCents: Math.round(platformTip / hostCurrencyFxRate), currency: orderCurrency };
     }
 
     if (defaultHostFeePercent !== hostFeePercent) {
@@ -121,7 +126,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
               <FormattedMoneyAmount
                 width="142px"
                 amount={amountInitiated}
-                currency={currency}
+                currency={orderCurrency}
                 precision={2}
                 amountStyles={null}
               />
@@ -138,7 +143,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
               name="amountReceived"
               data-cy="amount-received"
               width="142px"
-              currency={currency}
+              currency={hostCurrency}
               onChange={value => setAmountReceived(value)}
               value={amountReceived}
             />
@@ -153,7 +158,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
             <StyledInputAmount
               name="paymentProcessorFee"
               width="142px"
-              currency={currency}
+              currency={hostCurrency}
               onChange={value => setPaymentProcessorFee(value)}
               value={paymentProcessorFee}
             />
@@ -169,7 +174,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
               name="platformTip"
               data-cy="platform-tip"
               width="142px"
-              currency={currency}
+              currency={hostCurrency}
               onChange={value => setPlatformTip(value)}
               value={platformTip}
             />
@@ -217,7 +222,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
               />
             </Span>
             <Box fontSize="16px" lineHeight="24px" fontWeight="700" ml="16px">
-              <FormattedMoneyAmount amount={amount} currency={currency} precision={2} amountStyles={null} />
+              <FormattedMoneyAmount amount={amount} currency={hostCurrency} precision={2} amountStyles={null} />
             </Box>
           </Flex>
         </Container>
@@ -230,7 +235,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
             <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
               <FormattedMoneyAmount
                 amount={paymentProcessorFee}
-                currency={currency}
+                currency={hostCurrency}
                 precision={2}
                 amountStyles={null}
               />
@@ -242,7 +247,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
                 <FormattedMessage defaultMessage="Host Fee:" />
               </Span>
               <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
-                <FormattedMoneyAmount amount={hostFee} currency={currency} precision={2} amountStyles={null} />
+                <FormattedMoneyAmount amount={hostFee} currency={hostCurrency} precision={2} amountStyles={null} />
               </Box>
             </Flex>
           )}
@@ -254,7 +259,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
               />
             </Span>
             <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
-              <FormattedMoneyAmount amount={netAmount} currency={currency} precision={2} amountStyles={null} />
+              <FormattedMoneyAmount amount={netAmount} currency={hostCurrency} precision={2} amountStyles={null} />
             </Box>
           </Flex>
         </Container>

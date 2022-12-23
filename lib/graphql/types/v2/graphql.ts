@@ -6139,6 +6139,8 @@ export type Order = {
   description?: Maybe<Scalars['String']>;
   frequency?: Maybe<ContributionFrequency>;
   fromAccount?: Maybe<Account>;
+  /** The FX rate used to convert the amount to the host currency */
+  hostCurrencyFxRate?: Maybe<Scalars['Float']>;
   id: Scalars['String'];
   legacyId: Scalars['Int'];
   /** This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order. */

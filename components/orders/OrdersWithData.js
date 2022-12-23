@@ -66,6 +66,7 @@ const accountOrdersQuery = gql`
           valueInCents
           currency
         }
+        hostCurrencyFxRate
         platformTipAmount {
           valueInCents
           currency
