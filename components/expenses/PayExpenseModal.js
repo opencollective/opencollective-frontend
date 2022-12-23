@@ -326,10 +326,10 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
                   currency={host.currency}
                   currencyDisplay="FULL"
                   value={formik.values.totalAmountPaidInHostCurrency}
+                  data-cy="total-amount-paid"
                   placeholder="0.00"
                   maxWidth="100%"
                   min={0}
-                  max={100000000}
                   onChange={value => formik.setFieldValue('totalAmountPaidInHostCurrency', value)}
                 />
               )}
