@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
-import { get, isNumber, round } from 'lodash';
+import { get, round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { border, color, space, typography } from 'styled-system';
@@ -17,7 +17,6 @@ import { i18nTaxType } from '../../lib/i18n/taxes';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { getAmountWithoutTaxes, getTaxAmount } from './lib/utils';
 
-import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -48,6 +47,10 @@ const quoteExpenseQuery = gql`
       }
       quote {
         paymentProcessorFeeAmount {
+          valueInCents
+          currency
+        }
+        sourceAmount {
           valueInCents
           currency
         }
@@ -85,24 +88,20 @@ const getPayoutOptionValue = (payoutMethodType, isAuto, host) => {
 };
 
 const DEFAULT_VALUES = Object.freeze({
-  paymentProcessorFee: null,
+  paymentProcessorFeeInHostCurrency: null,
+  totalAmountPaidInHostCurrency: null,
   feesPayer: 'COLLECTIVE',
 });
 
 const validate = values => {
   const errors = {};
-  if (isNaN(values.paymentProcessorFee)) {
-    errors.paymentProcessorFee = createError(ERROR.FORM_FIELD_PATTERN);
+  if (isNaN(values.paymentProcessorFeeInHostCurrency)) {
+    errors.paymentProcessorFeeInHostCurrency = createError(ERROR.FORM_FIELD_PATTERN);
+  }
+  if (isNaN(values.totalAmountPaidInHostCurrency)) {
+    errors.totalAmountPaidInHostCurrency = createError(ERROR.FORM_FIELD_PATTERN);
   }
   return errors;
-};
-
-const getTotalPayoutAmount = (expense, { paymentProcessorFee, feesPayer }) => {
-  if (feesPayer === 'PAYEE') {
-    return expense.amount;
-  } else {
-    return expense.amount + (paymentProcessorFee?.valueInCents || 0);
-  }
 };
 
 const getCanCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount, isRoot) => {
@@ -178,12 +177,14 @@ const getInitialValues = (expense, host, payoutMethodType) => {
   };
 };
 
-const getPaymentProcessorFee = (formik, expense, quoteQuery) => {
+const getPaymentProcessorFee = (formik, expense, quoteQuery, host) => {
   if (formik.values.forceManual) {
-    const fxRate = expense.amountInAccountCurrency?.exchangeRate?.value || 1;
+    const isMultiCurrency =
+      expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
+    const fxRate = isMultiCurrency ? 1 : expense.amountInAccountCurrency?.exchangeRate?.value || 1;
     return {
-      valueInCents: Math.round(formik.values.paymentProcessorFee * fxRate),
-      currency: expense.currency,
+      valueInCents: Math.round(formik.values.paymentProcessorFeeInHostCurrency * fxRate),
+      currency: host.currency,
     };
   } else if (quoteQuery?.data?.expense?.quote) {
     const { quote, amountInHostCurrency } = quoteQuery.data.expense;
@@ -195,6 +196,27 @@ const getPaymentProcessorFee = (formik, expense, quoteQuery) => {
         valueInCents: quote.paymentProcessorFeeAmount.valueInCents / amountInHostCurrency.exchangeRate.value,
       };
     }
+  }
+};
+
+const calculateAmounts = ({ formik, expense, quote, host, feesPayer }) => {
+  if (formik.values.forceManual) {
+    const totalAmount = { valueInCents: formik.values.totalAmountPaidInHostCurrency, currency: host.currency };
+    const paymentProcessorFee = {
+      valueInCents: formik.values.paymentProcessorFeeInHostCurrency,
+      currency: host.currency,
+    };
+    const VET = expense.currency !== host.currency && totalAmount.valueInCents / expense.amount;
+    return { paymentProcessorFee, totalAmount, VET };
+  } else if (quote) {
+    const VET = expense.currency !== host.currency && quote.sourceAmount.valueInCents / expense.amount;
+    const totalAmount = quote.sourceAmount;
+    if (feesPayer === 'PAYEE') {
+      totalAmount.valueInCents -= quote.paymentProcessorFeeAmount.valueInCents;
+    }
+    return { paymentProcessorFee: quote.paymentProcessorFeeAmount, totalAmount, VET };
+  } else {
+    return {};
   }
 };
 
@@ -213,19 +235,24 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
   const hasAutomaticManualPicker = ![PayoutMethodType.OTHER, PayoutMethodType.ACCOUNT_BALANCE].includes(
     payoutMethodType,
   );
-  const canQuote =
-    host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT && formik.values.feesPayer !== 'PAYEE';
+  const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT;
   const quoteQuery = useQuery(quoteExpenseQuery, {
     variables: { id: expense.id },
     context: API_V2_CONTEXT,
     skip: !canQuote,
   });
 
-  const paymentProcessorFee = getPaymentProcessorFee(formik, expense, quoteQuery);
-  const isMultiCurrency =
-    expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
-  const totalAmount = getTotalPayoutAmount(expense, { paymentProcessorFee, feesPayer: formik.values.feesPayer });
+  const paymentProcessorFee = getPaymentProcessorFee(formik, expense, quoteQuery, host);
   const amountWithoutTaxes = getAmountWithoutTaxes(expense.amount, expense.taxes);
+
+  const amounts = calculateAmounts({
+    formik,
+    expense,
+    quote: quoteQuery?.data?.expense?.quote,
+    collective,
+    host,
+    feesPayer: formik.values.feesPayer,
+  });
 
   return (
     <StyledModal onClose={onClose} width="100%" minWidth={280} maxWidth={334} data-cy="pay-expense-modal" trapFocus>
@@ -254,7 +281,8 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
               formik.setValues({
                 ...formik.values,
                 ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
-                paymentProcessorFee: null,
+                paymentProcessorFeeInHostCurrency: null,
+                totalAmountPaidInHostCurrency: null,
                 feesPayer: !getCanCustomizeFeesPayer(expense, collective, hasManualPayment, null, LoggedInUser.isRoot)
                   ? DEFAULT_VALUES.feesPayer // Reset fees payer if can't customize
                   : formik.values.feesPayer,
@@ -271,34 +299,77 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
           </StyledButtonSet>
         )}
         {hasManualPayment && (
-          <StyledInputField
-            name="paymentProcessorFee"
-            htmlFor="payExpensePaymentProcessorFee"
-            inputType="number"
-            error={formik.errors.paymentProcessorFee}
-            required={false}
-            mt={24}
-            label={<FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />}
-          >
-            {inputProps => (
-              <StyledInputAmount
-                {...inputProps}
-                currency={collective.currency}
-                currencyDisplay="FULL"
-                value={formik.values.paymentProcessorFee}
-                placeholder="0.00"
-                min={0}
-                max={100000000}
-                onChange={value => formik.setFieldValue('paymentProcessorFee', value)}
-              />
-            )}
-          </StyledInputField>
+          <React.Fragment>
+            <StyledInputField
+              name="totalAmountPaidInHostCurrency"
+              htmlFor="totalAmountPaidInHostCurrency"
+              inputType="number"
+              error={formik.errors.totalAmountPaidInHostCurrency}
+              required
+              mt={3}
+              label={
+                <FormattedMessage
+                  id="PayExpense.totalAmountPaidInHostCurrency.Input"
+                  defaultMessage="Total amount paid"
+                />
+              }
+              hint={
+                <FormattedMessage
+                  id="PayExpense.totalAmountPaidInHostCurrency.Hint"
+                  defaultMessage="The total amount debited from your account."
+                />
+              }
+            >
+              {inputProps => (
+                <StyledInputAmount
+                  {...inputProps}
+                  currency={host.currency}
+                  currencyDisplay="FULL"
+                  value={formik.values.totalAmountPaidInHostCurrency}
+                  placeholder="0.00"
+                  maxWidth="100%"
+                  min={0}
+                  max={100000000}
+                  onChange={value => formik.setFieldValue('totalAmountPaidInHostCurrency', value)}
+                />
+              )}
+            </StyledInputField>
+            <StyledInputField
+              name="paymentProcessorFeeInHostCurrency"
+              htmlFor="paymentProcessorFeeInHostCurrency"
+              inputType="number"
+              error={formik.errors.paymentProcessorFeeInHostCurrency}
+              required={false}
+              mt={3}
+              label={<FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />}
+              hint={
+                <FormattedMessage
+                  id="PayExpense.paymentProcessorFeeInHostCurrency.Hint"
+                  defaultMessage="Amount in fees, included in the total amount paid."
+                />
+              }
+            >
+              {inputProps => (
+                <StyledInputAmount
+                  {...inputProps}
+                  currency={host.currency}
+                  currencyDisplay="FULL"
+                  value={formik.values.paymentProcessorFeeInHostCurrency}
+                  placeholder="0.00"
+                  maxWidth="100%"
+                  min={0}
+                  max={100000000}
+                  onChange={value => formik.setFieldValue('paymentProcessorFeeInHostCurrency', value)}
+                />
+              )}
+            </StyledInputField>
+          </React.Fragment>
         )}
         {getCanCustomizeFeesPayer(
           expense,
           collective,
           hasManualPayment,
-          formik.values.paymentProcessorFee,
+          formik.values.paymentProcessorFeeInHostCurrency,
           LoggedInUser.isRoot,
         ) && (
           <Flex mt={16}>
@@ -331,9 +402,9 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
             <Amount>
               <FormattedMoneyAmount
                 amountStyles={{ fontWeight: 500 }}
-                showCurrencyCode={false}
                 amount={amountWithoutTaxes}
                 currency={expense.currency}
+                currencyCodeStyles={{ color: 'black.500' }}
               />
             </Amount>
           </AmountLine>
@@ -354,36 +425,30 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
               </Amount>
             </AmountLine>
           ))}
-          {canQuote && quoteQuery.loading && (
+          {amounts.paymentProcessorFee && (
             <AmountLine borderTop="0.8px dashed #9D9FA3">
               <Label>
                 <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />
               </Label>
               <Amount>
-                <LoadingPlaceholder height="16px" />
-              </Amount>
-            </AmountLine>
-          )}
-          {isNumber(paymentProcessorFee?.valueInCents) && (
-            <AmountLine borderTop="0.8px dashed #9D9FA3">
-              <Label>
-                <FormattedMessage id="PayExpense.ProcessorFeesInput" defaultMessage="Payment processor fees" />
-              </Label>
-              <Amount>
-                <FormattedMoneyAmount
-                  showCurrencyCode={false}
-                  amount={paymentProcessorFee.valueInCents}
-                  currency={paymentProcessorFee.currency}
-                  amountStyles={{
-                    fontWeight: paymentProcessorFee ? 500 : 400,
-                    color: paymentProcessorFee ? 'black.900' : 'black.400',
-                  }}
-                />
+                {quoteQuery.loading ? (
+                  <LoadingPlaceholder height="16px" />
+                ) : (
+                  <FormattedMoneyAmount
+                    amount={amounts.paymentProcessorFee?.valueInCents}
+                    currency={amounts.paymentProcessorFee?.currency}
+                    currencyCodeStyles={{ color: 'black.500' }}
+                    amountStyles={{
+                      fontWeight: paymentProcessorFee ? 500 : 400,
+                      color: paymentProcessorFee ? 'black.900' : 'black.400',
+                    }}
+                  />
+                )}
               </Amount>
             </AmountLine>
           )}
           <AmountLine borderTop="1px solid #4E5052" pt={11}>
-            <Label color="black.900" fontWeight="500">
+            <Label color="black.900" fontWeight="600">
               {paymentProcessorFee !== null ? (
                 <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />
               ) : (
@@ -391,35 +456,27 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
               )}
             </Label>
             <Amount>
-              <FormattedMoneyAmount
-                amount={totalAmount}
-                currency={expense.currency}
-                currencyCodeStyles={{ color: 'black.500' }}
-              />
+              {quoteQuery.loading ? (
+                <LoadingPlaceholder height="16px" />
+              ) : (
+                <FormattedMoneyAmount
+                  amount={amounts.totalAmount?.valueInCents}
+                  currency={amounts.totalAmount?.currency}
+                  currencyCodeStyles={{ color: 'black.500' }}
+                />
+              )}
             </Amount>
           </AmountLine>
-          {isMultiCurrency && expense.amountInAccountCurrency?.exchangeRate?.value && (
+          {amounts?.VET ? (
             <AmountLine py={0}>
               <Label color="black.600" fontWeight="500">
-                <FormattedMessage defaultMessage="Accounted as" />
+                <FormattedMessage defaultMessage="Effective rate (VET)" />
               </Label>
               <Flex>
-                <Container mr={1} color="black.500" letterSpacing="-0.4px">
-                  {expense.amountInAccountCurrency.currency}
-                </Container>
-                <Container color="black.600">
-                  <AmountWithExchangeRateInfo
-                    showCurrencyCode={false}
-                    amount={{
-                      valueInCents: Math.round(totalAmount * expense.amountInAccountCurrency.exchangeRate.value),
-                      currency: expense.amountInAccountCurrency.currency,
-                      exchangeRate: expense.amountInAccountCurrency.exchangeRate,
-                    }}
-                  />
-                </Container>
+                <Container color="black.600">~ {round(amounts.VET, 5)}</Container>
               </Flex>
             </AmountLine>
-          )}
+          ) : null}
         </Box>
         {!error && formik.values.forceManual && payoutMethodType !== PayoutMethodType.OTHER && (
           <MessageBox type="warning" withIcon my={3} fontSize="12px">
@@ -493,6 +550,7 @@ PayExpenseModal.propTypes = {
   host: PropTypes.shape({
     plan: PropTypes.object,
     slug: PropTypes.string,
+    currency: PropTypes.string,
     transferwise: PropTypes.object,
   }),
   onClose: PropTypes.func.isRequired,
