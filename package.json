@@ -208,7 +208,6 @@
     "cypress-file-upload": "^3.5.3",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.8.0",
-    "eslint-config-next": "^13.0.0",
     "eslint-config-opencollective": "^3.0.3",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-cypress": "^2.12.1",
@@ -281,9 +280,9 @@
       "@formatjs/intl-relativetimeformat",
       "@graphql-codegen/gql-tag-operations-preset",
       "cheerio",
-      "eslint-config-next",
       "@storybook/*",
       "@shopify/address",
+      "jest-styled-components",
       "storybook-addon-designs"
     ]
   }
