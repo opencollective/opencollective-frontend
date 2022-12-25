@@ -454,7 +454,7 @@
   "collective.expensePolicy.allowExpense": "Umożliwia tworzenie wydatków jedynie przez członków zespołu i osoby wnoszące wkład finansowy (mogą oni zapraszać wydatki od innych odbiorców)",
   "collective.expensePolicy.description": "Jeśli nie jesteś pewien, co jest dozwolone, może to być trudne. Dostarcz jasną politykę, aby kierować dostawcami wydatków.",
   "collective.expensePolicy.error": "Zasady wydatkowania muszą zawierać mniej niż {maxLength} znaków",
-  "collective.expensePolicy.hasGrant": "Allow grants",
+  "collective.expensePolicy.hasGrant": "Pozwól na przyznanie dotacji",
   "collective.expensePolicy.hasInvoice": "Allow invoices",
   "collective.expensePolicy.hasReceipt": "Allow receipts",
   "collective.expensePolicy.placeholder": "Np. zatwierdza kryteria, ograniczenia lub wymagane dokumenty.",
