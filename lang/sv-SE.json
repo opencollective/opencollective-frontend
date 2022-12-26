@@ -1834,7 +1834,6 @@
   "Member.Role.ConnectedAccount": "Ansluten",
   "Member.Role.CONTRIBUTOR": "Bidragsgivare",
   "Member.Role.FOLLOWER": "Följare",
-  "Member.Role.FUNDRAISER": "Insamlare",
   "Member.Role.HOST": "Värd",
   "Member.Role.MEMBER": "Teammedlem",
   "MemberInvitation.detailsDate": "Inbjuden den {date}",
