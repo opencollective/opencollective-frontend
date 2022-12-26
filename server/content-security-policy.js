@@ -15,9 +15,11 @@ const COMMON_DIRECTIVES = {
     process.env.NEXT_IMAGES_URL,
     'data:',
     '*.paypal.com',
+    'https://cdn.crowdin.com',
     'opencollective.com', // for widgets on /admin/export
     'blog.opencollective.com', // used to easily link images in static pages
     'blob:', // For upload images previews
+    'https://crowdin-static.downloads.crowdin.com',
   ].filter(Boolean),
   workerSrc: [
     SELF,
@@ -27,7 +29,9 @@ const COMMON_DIRECTIVES = {
     SELF,
     UNSAFE_INLINE, // For styled-components. TODO: Limit for nonce
     'https://hcaptcha.com',
+    'https://cdn.crowdin.com',
     'https://*.hcaptcha.com',
+    'https://fonts.googleapis.com',
   ],
   connectSrc: [
     SELF,
@@ -50,6 +54,7 @@ const COMMON_DIRECTIVES = {
     'https://*.hcaptcha.com',
     'https://www.google.com',
     'https://api.cryptonator.com',
+    'https://crowdin.com',
   ],
   scriptSrc: [
     SELF,
@@ -64,6 +69,8 @@ const COMMON_DIRECTIVES = {
     'https://*.hcaptcha.com',
     'https://www.google.com',
     'https://cdn.matomo.cloud',
+    'https://cdn.crowdin.com',
+    'https://vercel.live',
   ],
   frameSrc: [
     'blob:', // For expense invoice previews in the modal, as they're rendered in a blob
@@ -80,6 +87,7 @@ const COMMON_DIRECTIVES = {
     'https://hcaptcha.com',
     'https://*.hcaptcha.com',
     'https://www.google.com',
+    'https://crowdin.com',
   ],
   objectSrc: ['opencollective.com'],
 };

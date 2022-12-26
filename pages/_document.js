@@ -113,7 +113,14 @@ export default class IntlDocument extends Document {
   render() {
     return (
       <Html>
-        <Head nonce={this.props.cspNonce} />
+        <Head nonce={this.props.cspNonce}>
+          {/** TODO Move this to a better place */}
+          <script
+            nonce={this.props.cspNonce}
+            dangerouslySetInnerHTML={{ __html: "window._jipt = []; window._jipt.push(['project', 'opencollective']);" }}
+          />
+          <script nonce={this.props.cspNonce} type="text/javascript" src="//cdn.crowdin.com/jipt/jipt.js"></script>
+        </Head>
         <body>
           <Main nonce={this.props.cspNonce} />
           <script

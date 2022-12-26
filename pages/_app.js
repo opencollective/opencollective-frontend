@@ -124,7 +124,6 @@ class OpenCollectiveFrontendApp extends App {
     const { client, Component, pageProps, scripts, locale, messages } = this.props;
 
     const intl = createIntl({ locale: locale || 'en', defaultLocale: 'en', messages }, cache);
-
     return (
       <Fragment>
         <ApolloProvider client={client}>
