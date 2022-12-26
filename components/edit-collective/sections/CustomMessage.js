@@ -139,11 +139,19 @@ const CustomMessage = ({ collective }) => {
         <PreviewModal
           heading={<FormattedMessage defaultMessage="Preview Notification" />}
           subheading={
-            <FormattedMessage defaultMessage="This is the preview of the email template which your financial contributor will receive." />
+            collective.type === 'EVENT' ? (
+              <FormattedMessage defaultMessage="This is the preview of the email template which your ticket buyer will receive." />
+            ) : (
+              <FormattedMessage defaultMessage="This is the preview of the email template which your financial contributor will receive." />
+            )
           }
           onClose={() => setShowPreview(false)}
-          previewImage="/static/images/custom-email-preview.png"
-          imgHeight="715px"
+          previewImage={
+            collective.type === 'EVENT'
+              ? '/static/images/custom-email-ticket-preview.png'
+              : '/static/images/custom-email-preview.png'
+          }
+          imgHeight={collective.type === 'EVENT' ? '610px' : '715px'}
           imgWidth="809px"
         />
       )}
