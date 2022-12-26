@@ -827,6 +827,11 @@ type Order {
   Memo field which adds additional details about the order. For example in added funds this can be a note to mark what method (cheque, money order) the funds were received.
   """
   memo: String
+
+  """
+  Date the funds were received.
+  """
+  processedAt: DateTime
 }
 
 """
@@ -12174,6 +12179,7 @@ type Mutation {
     amount: AmountInput!
     description: String!
     memo: String
+    processedAt: DateTime
     hostFeePercent: Float
     invoiceTemplate: String
   ): Order!
@@ -14561,6 +14567,11 @@ input OrderUpdateInput {
   Host fee percent to be applied to the order
   """
   hostFeePercent: Float
+
+  """
+  Date the funds were received
+  """
+  processedAt: DateTime
 }
 
 """

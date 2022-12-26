@@ -5322,6 +5322,7 @@ export type MutationAddFundsArgs = {
   hostFeePercent?: InputMaybe<Scalars['Float']>;
   invoiceTemplate?: InputMaybe<Scalars['String']>;
   memo?: InputMaybe<Scalars['String']>;
+  processedAt?: InputMaybe<Scalars['DateTime']>;
   tier?: InputMaybe<TierReferenceInput>;
 };
 
@@ -6069,6 +6070,8 @@ export type Order = {
   /** Platform Tip attached to the Order. */
   platformTipAmount?: Maybe<Amount>;
   platformTipEligible?: Maybe<Scalars['Boolean']>;
+  /** Date the funds were received. */
+  processedAt?: Maybe<Scalars['DateTime']>;
   quantity?: Maybe<Scalars['Int']>;
   status?: Maybe<OrderStatus>;
   tags: Array<Maybe<Scalars['String']>>;
@@ -6237,6 +6240,8 @@ export type OrderUpdateInput = {
   paymentProcessorFee?: InputMaybe<AmountInput>;
   /** Amount intended as tip for the platform */
   platformTip?: InputMaybe<AmountInput>;
+  /** Date the funds were received */
+  processedAt?: InputMaybe<Scalars['DateTime']>;
 };
 
 export type OrderWithPayment = {

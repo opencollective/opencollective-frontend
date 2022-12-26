@@ -179,6 +179,16 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               <DetailDescription>{order.memo}</DetailDescription>
             </React.Fragment>
           )}
+          {order?.processedAt && (
+            <React.Fragment>
+              <DetailTitle>
+                <Span textTransform="capitalize">
+                  <FormattedMessage id="processedAt" defaultMessage="Fund received date" />
+                </Span>
+              </DetailTitle>
+              <DetailDescription>{intl.formatDate(order.processedAt, { timeZone: 'UTC' })}</DetailDescription>
+            </React.Fragment>
+          )}
         </Flex>
       )}
       <Flex flexDirection="column" width={[1, 0.35]}>
@@ -301,6 +311,7 @@ TransactionDetails.propTypes = {
       id: PropTypes.string,
       status: PropTypes.string,
       memo: PropTypes.string,
+      processedAt: PropTypes.string,
     }),
     expense: PropTypes.object,
     id: PropTypes.string,

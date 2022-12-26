@@ -84,6 +84,7 @@ const addFundsMutation = gql`
     $amount: AmountInput!
     $description: String!
     $memo: String
+    $processedAt: DateTime
     $hostFeePercent: Float!
     $invoiceTemplate: String
   ) {
@@ -93,6 +94,7 @@ const addFundsMutation = gql`
       amount: $amount
       description: $description
       memo: $memo
+      processedAt: $processedAt
       hostFeePercent: $hostFeePercent
       tier: $tier
       invoiceTemplate: $invoiceTemplate
@@ -100,6 +102,7 @@ const addFundsMutation = gql`
       id
       description
       memo
+      processedAt
       transactions {
         id
         type
@@ -214,13 +217,14 @@ const getInitialValues = values => ({
   hostFeePercent: null,
   description: '',
   memo: null,
+  processedAt: new Date().toISOString().split('T')[0],
   fromAccount: null,
   tier: null,
   ...values,
 });
 
 const validate = values => {
-  return requireFields(values, ['amount', 'fromAccount', 'description']);
+  return requireFields(values, ['amount', 'fromAccount', 'description', 'processedAt']);
 };
 
 // Build an account reference. Compatible with accounts from V1 and V2.
@@ -401,6 +405,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                   account: buildAccountReference(values.account),
                   tier: !values.tier ? null : { id: values.tier.id },
                   invoiceTemplate: values.invoiceTemplate?.value || defaultInvoiceTemplate,
+                  processedAt: values.processedAt ? new Date(values.processedAt) : null,
                 },
               });
 
@@ -410,6 +415,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                 fundAmount: values.amount,
                 description: resultOrder.description,
                 memo: resultOrder.memo,
+                processedAt: resultOrder.processedAt,
                 source: resultOrder.fromAccount,
                 tier: resultOrder.tier,
               });
@@ -423,6 +429,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                 amount: values.amount,
                 fromAccount: resultOrder.fromAccount,
                 description: resultOrder.description,
+                processedAt: resultOrder.processedAt,
               });
             } else if (selectedOption.value !== 0) {
               const creditTransaction = addFundsResponse.addFunds.transactions.filter(
@@ -516,6 +523,25 @@ const AddFundsModal = ({ collective, ...props }) => {
                       mt={3}
                     >
                       {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
+                    </StyledInputFormikField>
+                    <StyledInputFormikField
+                      name="processedAt"
+                      htmlFor="addFunds-processedAt"
+                      inputType="date"
+                      label={
+                        <span>
+                          <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
+                          {` `}
+                          <StyledTooltip
+                            content={() => <FormattedMessage defaultMessage="Date the funds were received." />}
+                          >
+                            <InfoCircle size={16} />
+                          </StyledTooltip>
+                        </span>
+                      }
+                      mt={3}
+                    >
+                      {({ field }) => <StyledInput data-cy="add-funds-processedAt" {...field} />}
                     </StyledInputFormikField>
                     <StyledInputFormikField
                       name="memo"
@@ -701,11 +727,22 @@ const AddFundsModal = ({ collective, ...props }) => {
                             <FormattedMessage id="AddFundsModal.ForThePurpose" defaultMessage="For the purpose of" />{' '}
                             <strong>{fundDetails.description}</strong>
                           </li>
-                          <li>
-                            <FormattedMessage defaultMessage="Memo" />
-                            {': '}
-                            <strong>{fundDetails.memo}</strong>
-                          </li>
+                          {fundDetails.memo && (
+                            <li>
+                              <FormattedMessage defaultMessage="Memo" />
+                              {': '}
+                              <strong>{fundDetails.memo}</strong>
+                            </li>
+                          )}
+                          {fundDetails.processedAt && (
+                            <li>
+                              <Span textTransform="capitalize">
+                                <FormattedMessage id="processedAt" defaultMessage="Fund received date" />
+                              </Span>
+                              {': '}
+                              <strong>{intl.formatDate(fundDetails.processedAt, { timeZone: 'UTC' })}</strong>
+                            </li>
+                          )}
                           {fundDetails.tier && (
                             <li>
                               <FormattedMessage defaultMessage="For the tier" />{' '}

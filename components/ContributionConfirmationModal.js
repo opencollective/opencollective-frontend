@@ -11,6 +11,7 @@ import FormattedMoneyAmount from './FormattedMoneyAmount';
 import { Box, Flex } from './Grid';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
+import StyledInput from './StyledInput';
 import StyledInputAmount from './StyledInputAmount';
 import StyledInputPercentage from './StyledInputPercentage';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
@@ -48,6 +49,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
   const [platformTip, setPlatformTip] = useState(platformTipAmount);
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
   const [hostFeePercent, setHostFeePercent] = useState(defaultHostFeePercent);
+  const [processedAt, setProcessedAt] = useState();
   const intl = useIntl();
   const { addToast } = useToasts();
   const [confirmOrder, { loading }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
@@ -80,6 +82,10 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
 
     if (defaultHostFeePercent !== hostFeePercent) {
       orderUpdate.hostFeePercent = hostFeePercent;
+    }
+
+    if (processedAt) {
+      orderUpdate.processedAt = new Date(processedAt);
     }
 
     try {
@@ -187,6 +193,20 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
             </Container>
           </Fragment>
         )}
+        <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
+        <Container>
+          <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
+            <Span fontSize="14px" lineHeight="20px" fontWeight="400">
+              <FormattedMessage id="processedAt" defaultMessage="Fund received date" />
+            </Span>
+            <StyledInput
+              name="processedAt"
+              type="date"
+              data-cy="processedAt"
+              onChange={e => setProcessedAt(e.target.value)}
+            />
+          </Flex>
+        </Container>
         <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
         <Container>
           <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
