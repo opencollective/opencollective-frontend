@@ -1834,7 +1834,6 @@
   "Member.Role.ConnectedAccount": "Connected",
   "Member.Role.CONTRIBUTOR": "コントリビューター",
   "Member.Role.FOLLOWER": "フォロワー",
-  "Member.Role.FUNDRAISER": "資金調達者",
   "Member.Role.HOST": "ホスト",
   "Member.Role.MEMBER": "コアコントリビューター",
   "MemberInvitation.detailsDate": "Invited on {date}",

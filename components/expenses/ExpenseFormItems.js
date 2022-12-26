@@ -133,6 +133,7 @@ class ExpenseFormItems extends React.PureComponent {
 
     if (
       !isFeatureEnabled(collective, FEATURES.MULTI_CURRENCY_EXPENSES) ||
+      !isFeatureEnabled(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES) ||
       payoutMethod?.type === PayoutMethodType.ACCOUNT_BALANCE
     ) {
       return [collective?.currency];

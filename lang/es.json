@@ -1834,7 +1834,6 @@
   "Member.Role.ConnectedAccount": "Conectado",
   "Member.Role.CONTRIBUTOR": "Contribuyente",
   "Member.Role.FOLLOWER": "Seguidor",
-  "Member.Role.FUNDRAISER": "Recaudador de fondos",
   "Member.Role.HOST": "Anfitrión",
   "Member.Role.MEMBER": "Colaborador principal",
   "MemberInvitation.detailsDate": "Invitado el {date}",

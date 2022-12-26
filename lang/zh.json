@@ -1834,7 +1834,6 @@
   "Member.Role.ConnectedAccount": "已连接",
   "Member.Role.CONTRIBUTOR": "赞助者",
   "Member.Role.FOLLOWER": "关注者",
-  "Member.Role.FUNDRAISER": "筹款人",
   "Member.Role.HOST": "托管",
   "Member.Role.MEMBER": "核心贡献者",
   "MemberInvitation.detailsDate": "邀请于 {date}",

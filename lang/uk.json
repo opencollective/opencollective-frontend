@@ -1834,7 +1834,6 @@
   "Member.Role.ConnectedAccount": "Під’єднано",
   "Member.Role.CONTRIBUTOR": "Помічник",
   "Member.Role.FOLLOWER": "Підписник",
-  "Member.Role.FUNDRAISER": "Fundraiser",
   "Member.Role.HOST": "Скарбник",
   "Member.Role.MEMBER": "Основний помічник",
   "MemberInvitation.detailsDate": "Запрошено {date}",

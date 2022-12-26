@@ -1834,7 +1834,6 @@
   "Member.Role.ConnectedAccount": "Connected",
   "Member.Role.CONTRIBUTOR": "Вкладчик",
   "Member.Role.FOLLOWER": "Подписчик",
-  "Member.Role.FUNDRAISER": "Сборщик средств",
   "Member.Role.HOST": "Представитель",
   "Member.Role.MEMBER": "Основной Участник",
   "MemberInvitation.detailsDate": "Invited on {date}",

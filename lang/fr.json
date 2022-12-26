@@ -1834,7 +1834,6 @@
   "Member.Role.ConnectedAccount": "Connected",
   "Member.Role.CONTRIBUTOR": "Contributeur",
   "Member.Role.FOLLOWER": "Abonné",
-  "Member.Role.FUNDRAISER": "Leveur de fonds",
   "Member.Role.HOST": "Hôte",
   "Member.Role.MEMBER": "Membre de l'équipe",
   "MemberInvitation.detailsDate": "Invited on {date}",

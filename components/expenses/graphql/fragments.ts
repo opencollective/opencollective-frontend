@@ -387,6 +387,7 @@ export const expensePageExpenseFieldsFragment = gql`
       approve {
         allowed
         reason
+        reasonDetails
       }
     }
     activities {
@@ -479,6 +480,7 @@ export const expensesListFieldsFragment = gql`
       approve {
         allowed
         reason
+        reasonDetails
       }
     }
     payoutMethod {

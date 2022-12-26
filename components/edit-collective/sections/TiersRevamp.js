@@ -75,15 +75,10 @@ const getFinancialContributions = (collective, sortedTiers) => {
 };
 
 const CardsContainer = styled(Grid).attrs({
+  justifyItems: 'center',
   gridGap: '30px',
-  justifyContent: ['center', 'space-between'],
-  gridTemplateColumns: [
-    'minmax(280px, 400px)',
-    'repeat(2, minmax(280px, 350px))',
-    'repeat(3, minmax(240px, 350px))',
-    'repeat(3, minmax(280px, 350px))',
-    'repeat(4, 280px)',
-  ],
+  gridTemplateColumns: ['repeat(auto-fit, minmax(280px, 1fr))'],
+  gridAutoRows: ['1fr'],
 })`
   & > * {
     padding: 0;

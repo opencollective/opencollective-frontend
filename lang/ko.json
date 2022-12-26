@@ -1834,7 +1834,6 @@
   "Member.Role.ConnectedAccount": "Connected",
   "Member.Role.CONTRIBUTOR": "기여자",
   "Member.Role.FOLLOWER": "팔로워",
-  "Member.Role.FUNDRAISER": "Fundraiser",
   "Member.Role.HOST": "호스트",
   "Member.Role.MEMBER": "주요 기여자",
   "MemberInvitation.detailsDate": "Invited on {date}",

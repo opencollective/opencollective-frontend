@@ -51,7 +51,7 @@ export const getContributorsFilters = contributors => {
       if (addFilter(CONTRIBUTOR_FILTERS.CORE)) {
         break;
       }
-    } else if (c.isBacker || c.isFundraiser) {
+    } else if (c.isBacker) {
       if (addFilter(CONTRIBUTOR_FILTERS.FINANCIAL)) {
         break;
       }

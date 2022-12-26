@@ -250,7 +250,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasManageSubscriptions && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS}>
-                        <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/recurring-contributions`}>
+                        <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/manage-contributions`}>
                           <Container p={ITEM_PADDING}>
                             <Stack size="20px" />
                             <span>
