@@ -14480,12 +14480,12 @@ input PaymentMethodInput {
 
 input CreditCardCreateInput {
   token: String!
-  brand: String!
-  country: String!
-  expMonth: Int!
-  expYear: Int!
-  fullName: String
-  funding: String
+  brand: String @deprecated(reason: "2022-11-22: the `token` parameter is sufficient")
+  country: String @deprecated(reason: "2022-11-22: the `token` parameter is sufficient")
+  expMonth: Int @deprecated(reason: "2022-11-22: the `token` parameter is sufficient")
+  expYear: Int @deprecated(reason: "2022-11-22: the `token` parameter is sufficient")
+  fullName: String @deprecated(reason: "2022-11-22: the field was not used since 2017")
+  funding: String @deprecated(reason: "2022-11-22: the `token` parameter is sufficient")
   zip: String
 }
 
