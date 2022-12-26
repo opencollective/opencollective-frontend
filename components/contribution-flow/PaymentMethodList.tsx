@@ -162,10 +162,9 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
 
   const hostSupportedPaymentMethods = props.host?.supportedPaymentMethods ?? [];
   const hostHasStripe = hostSupportedPaymentMethods.includes(PaymentMethodLegacyType.CREDIT_CARD);
-  const collectiveHasStripePaymentIntent = get(props.toAccount, 'settings.features.stripePaymentIntent', false);
 
   React.useEffect(() => {
-    if (hostHasStripe && collectiveHasStripePaymentIntent) {
+    if (hostHasStripe) {
       createPaymentIntent();
     }
   }, [hostHasStripe]);
@@ -192,7 +191,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     stripeAccount,
   ]);
 
-  const loading = loadingPaymentMethods || (collectiveHasStripePaymentIntent && loadingPaymentIntent);
+  const loading = loadingPaymentMethods || loadingPaymentIntent;
   const error = paymentMethodsError;
 
   const setNewPaymentMethod = React.useCallback(
