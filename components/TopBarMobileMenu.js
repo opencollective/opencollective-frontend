@@ -79,12 +79,11 @@ const TopBarMobileMenu = props => {
             </Flex>
             {state.viewSolutionsMenu && (
               <Box as="ul" my={2} pl="12px">
-                {/* TODO: Add this part back when the /collectives page is designed*/}
-                {/* <ListItem>*/}
-                {/*  <Link href="/collectives" onClick={closeMenu}>*/}
-                {/*    <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />*/}
-                {/*  </Link>*/}
-                {/* </ListItem>*/}
+                <SubListItem>
+                  <Link href="/collectives" onClick={closeMenu}>
+                    <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />
+                  </Link>
+                </SubListItem>
                 <SubListItem>
                   <Link href="/become-a-sponsor" onClick={closeMenu}>
                     <FormattedMessage defaultMessage="For Contributors" />
