@@ -229,6 +229,7 @@
   "AQNF/n": "Потрібно ввійти як адміністратор",
   "archive.account.confirmation": "Ви впевнені, що хочете архівувати {type, select, EVENT {цю Подію} PROJECT {цей Проєкт} FUND {цей Збір коштів} COLLECTIVE {цей колектив} ORGANIZATION {цю Організацію} other {цей обліковий запис}}?",
   "archive.modal.header": "Архівувати {name}",
+  "Archived": "Archived",
   "asqGnV": "Рішення",
   "Attachment.Private": "Це вкладення приватне",
   "AttachReceipt": "Надіслати квитанцію",

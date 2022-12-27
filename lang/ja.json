@@ -229,6 +229,7 @@
   "AQNF/n": "You need to be logged in as an admin",
   "archive.account.confirmation": "{type, select, EVENT {このイベント} PROJECT {このプロジェクト} FUND {この基金} COLLECTIVE {このコレクティブ} ORGANIZATION {この組織} other {このアカウント}}をアーカイブ解除",
   "archive.modal.header": "{name}をアーカイブ",
+  "Archived": "Archived",
   "asqGnV": "ソリューション",
   "Attachment.Private": "この添付ファイルは非公開です",
   "AttachReceipt": "Submit receipt",

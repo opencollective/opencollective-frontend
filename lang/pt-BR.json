@@ -229,6 +229,7 @@
   "AQNF/n": "Você precisa estar logado como administrador",
   "archive.account.confirmation": "Tem certeza de que deseja arquivar {type, select, EVENT {este Evento} PROJECT {este Projeto} FUND {este Fundo} COLLECTIVE {este Collectivo} ORGANIZATION {esta Organização} other {esta conta}}?",
   "archive.modal.header": "Arquivar {name}",
+  "Archived": "Archived",
   "asqGnV": "Soluções",
   "Attachment.Private": "Este anexo é privado",
   "AttachReceipt": "Enviar recibo",

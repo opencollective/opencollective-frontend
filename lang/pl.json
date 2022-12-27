@@ -229,6 +229,7 @@
   "AQNF/n": "Musisz być zalogowany jako administrator",
   "archive.account.confirmation": "Jesteś pewien, że chcesz zarchiwizować {type, select, EVENT {to wydarzenie} PROJECT {ten projekt} FUND {ten fundusz} COLLECTIVE {ten kolektyw} ORGANIZATION {tą organizację} other {to konto}}?",
   "archive.modal.header": "Archiwum {name}",
+  "Archived": "Archived",
   "asqGnV": "Rozwiązania",
   "Attachment.Private": "Ten załącznik jest prywatny",
   "AttachReceipt": "Prześlij pokwitowanie",
