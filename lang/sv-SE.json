@@ -229,6 +229,7 @@
   "AQNF/n": "Du behöver vara inloggad som administratör",
   "archive.account.confirmation": "Är du säker på att du vill arkivera {type, select, EVENT {eventet} PROJECT {projektet} FUND {insamlingen} COLLECTIVE {kollektivet} ORGANIZATION {organisationen} other {ditt konto}}?",
   "archive.modal.header": "Arkiv {name}",
+  "Archived": "Archived",
   "asqGnV": "Lösningar",
   "Attachment.Private": "Denna bilaga är privat",
   "AttachReceipt": "Skicka kvitto",

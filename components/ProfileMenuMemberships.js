@@ -231,40 +231,43 @@ const ProfileMenuMemberships = ({ user }) => {
           const sectionData = MENU_SECTIONS[accountType];
           return (
             <Box key={accountType} mb={3}>
-              <Collapse
-                defaultIsOpen={accountType !== 'ARCHIVED'}
-                title={<MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} />}
-              >
-                {sectionIsEmpty ? (
-                  <Box my={2}>
-                    <P fontSize="12px" lineHeight="18px" color="black.700">
-                      {intl.formatMessage(sectionData.emptyMessage)}
-                    </P>
-                    {Boolean(sectionData.plusButton) && (
-                      <Link href={sectionData.plusButton.href}>
-                        <StyledButton mt="12px" mb="16px" borderRadius="8px" width="100%" fontSize="12px">
-                          <Flex alignItems="center" justifyContent="center">
-                            <Container
-                              display="flex"
-                              justifyContent="center"
-                              alignItems="center"
-                              borderRadius="100%"
-                              border="1px solid #C4C7CC"
-                              mr="16px"
-                              size="24px"
-                            >
-                              <Plus size={12} />
-                            </Container>
-                            <span>{intl.formatMessage(sectionData.plusButton.text)}</span>
-                          </Flex>
-                        </StyledButton>
-                      </Link>
-                    )}
-                  </Box>
-                ) : (
+              {accountType !== 'ARCHIVED' && <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} />}
+              {sectionIsEmpty ? (
+                <Box my={2}>
+                  <P fontSize="12px" lineHeight="18px" color="black.700">
+                    {intl.formatMessage(sectionData.emptyMessage)}
+                  </P>
+                  {Boolean(sectionData.plusButton) && (
+                    <Link href={sectionData.plusButton.href}>
+                      <StyledButton mt="12px" mb="16px" borderRadius="8px" width="100%" fontSize="12px">
+                        <Flex alignItems="center" justifyContent="center">
+                          <Container
+                            display="flex"
+                            justifyContent="center"
+                            alignItems="center"
+                            borderRadius="100%"
+                            border="1px solid #C4C7CC"
+                            mr="16px"
+                            size="24px"
+                          >
+                            <Plus size={12} />
+                          </Container>
+                          <span>{intl.formatMessage(sectionData.plusButton.text)}</span>
+                        </Flex>
+                      </StyledButton>
+                    </Link>
+                  )}
+                </Box>
+              ) : accountType === 'ARCHIVED' ? (
+                <Collapse
+                  defaultIsOpen={false}
+                  title={<MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} />}
+                >
                   <MembershipsList memberships={memberships} user={user} />
-                )}
-              </Collapse>
+                </Collapse>
+              ) : (
+                <MembershipsList memberships={memberships} user={user} />
+              )}
             </Box>
           );
         })}

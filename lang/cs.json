@@ -229,6 +229,7 @@
   "AQNF/n": "Musíte být přihlášení jako administrátor",
   "archive.account.confirmation": "Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "archive.modal.header": "Archivovat {name}",
+  "Archived": "Archived",
   "asqGnV": "Řešení",
   "Attachment.Private": "Tato příloha je soukromá",
   "AttachReceipt": "Odeslat účtenku",
