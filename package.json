@@ -138,6 +138,7 @@
     "langs:check": "cross-env scripts/check_translations.sh",
     "langs:translate": "babel-node scripts/translate.js",
     "langs:update": "npm-run-all langs:build langs:translate",
+    "langs:update-progress": "babel-node scripts/update-translation-progress.js && prettier --write lib/constants/locales.js",
     "lint": "eslint . --ignore-path .gitignore --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "npm run lint -- --fix",
     "lint:quiet": "npm run lint -- --quiet",
