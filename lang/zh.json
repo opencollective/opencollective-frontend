@@ -2496,7 +2496,7 @@
   "subscription.menu.updateTier": "更新等级",
   "Subscriptions.Active": "活跃",
   "Subscriptions.Cancelled": "取消",
-  "Subscriptions.ContributedToDate": "贡献日期",
+  "Subscriptions.ContributedToDate": "迄今为止的捐款",
   "Subscriptions.FeesOnTopTooltip": "贡献 + 平台费用",
   "Subscriptions.Status": "{status, select, ACTIVE {Active contribution} CANCELLED {Cancelled contribution} ERROR {Error} REJECTED {Rejected contribution} other {}}",
   "Success": "成功",
