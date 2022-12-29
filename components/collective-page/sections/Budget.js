@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { isIndividualAccount } from '../../../lib/collective.lib';
+import { TransactionKind } from '../../../lib/constants/transactions';
 import { EMPTY_ARRAY } from '../../../lib/constants/utils';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
@@ -31,6 +32,8 @@ import ContainerSectionContent from '../ContainerSectionContent';
 const budgetSectionAccountFieldsFragment = gql`
   fragment BudgetSectionAccountFields on Account {
     id
+    isHost
+    type
     stats {
       id
       balance {
@@ -91,6 +94,45 @@ export const budgetSectionQuery = gql`
   ${budgetSectionAccountFieldsFragment}
 `;
 
+export const budgetSectionForIndividualQuery = gql`
+  query BudgetSectionForIndividual($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
+    transactions(
+      account: { slug: $slug }
+      limit: $limit
+      kind: $kind
+      includeIncognitoTransactions: true
+      includeGiftCardTransactions: true
+    ) {
+      ...TransactionsQueryCollectionFragment
+    }
+    expenses(createdByAccount: { slug: $slug }, limit: $limit) {
+      totalCount
+      nodes {
+        id
+        ...ExpensesListFieldsFragment
+      }
+    }
+    account(slug: $slug) {
+      id
+      isHost
+      type
+      stats {
+        id
+        totalAmountSpent(net: true) {
+          valueInCents
+          currency
+        }
+        totalPaidExpenses {
+          valueInCents
+          currency
+        }
+      }
+    }
+  }
+  ${transactionsQueryCollectionFragment}
+  ${expensesListFieldsFragment}
+`;
+
 export const budgetSectionWithHostQuery = gql`
   query BudgetSectionWithHost($slug: String!, $hostSlug: String!, $limit: Int!, $kind: [TransactionKind]) {
     host(slug: $hostSlug) {
@@ -125,13 +167,23 @@ export const budgetSectionWithHostQuery = gql`
   ${budgetSectionAccountFieldsFragment}
 `;
 
-export const getBudgetSectionQuery = hasHost => {
-  return hasHost ? budgetSectionWithHostQuery : budgetSectionQuery;
+export const getBudgetSectionQuery = (hasHost, isIndividual) => {
+  if (hasHost) {
+    return budgetSectionWithHostQuery;
+  } else if (isIndividual) {
+    return budgetSectionForIndividualQuery;
+  } else {
+    return budgetSectionQuery;
+  }
 };
 
 // Any change here should be reflected in API's `server/graphql/cache.js`
-export const getBudgetSectionQueryVariables = (collectiveSlug, hostSlug) => {
-  return { slug: collectiveSlug, hostSlug, limit: 3, kind: getDefaultKinds() };
+export const getBudgetSectionQueryVariables = (collectiveSlug, hostSlug, isIndividual) => {
+  if (isIndividual) {
+    return { slug: collectiveSlug, limit: 3, kind: getDefaultKinds().filter(kind => kind !== TransactionKind.EXPENSE) };
+  } else {
+    return { slug: collectiveSlug, hostSlug, limit: 3, kind: getDefaultKinds() };
+  }
 };
 
 const BudgetItemContainer = styled.div`
@@ -144,14 +196,18 @@ const BudgetItemContainer = styled.div`
 
 const FILTERS = ['all', 'expenses', 'transactions'];
 
-const geFilterLabel = filter => {
+const geFilterLabel = (filter, isIndividual) => {
   switch (filter) {
     case 'all':
       return <FormattedMessage id="SectionTransactions.All" defaultMessage="All" />;
     case 'expenses':
       return <FormattedMessage id="Expenses" defaultMessage="Expenses" />;
     case 'transactions':
-      return <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />;
+      return isIndividual ? (
+        <FormattedMessage id="Contributions" defaultMessage="Contributions" />
+      ) : (
+        <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
+      );
     default:
       return null;
   }
@@ -171,11 +227,14 @@ const getBudgetItems = (transactions, expenses, filter) => {
   }
 };
 
-const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions }) => {
+const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions, isIndividual }) => {
   const isFilterAll = filter === 'all';
   if (filter === 'expenses' || (isFilterAll && hasExpenses && !hasTransactions)) {
     return (
-      <Link href={`${getCollectivePageRoute(collective)}/expenses`} data-cy="view-all-expenses-link">
+      <Link
+        href={`${getCollectivePageRoute(collective)}/${isIndividual ? 'submitted-expenses' : 'expenses'}`}
+        data-cy="view-all-expenses-link"
+      >
         <span>
           <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
           &rarr;
@@ -183,7 +242,18 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions }) => {
       </Link>
     );
   } else if (filter === 'transactions' || (isFilterAll && hasTransactions && !hasExpenses)) {
-    return (
+    return isIndividual ? (
+      <Link
+        href={`${getCollectivePageRoute(collective)}/transactions?kind=ADDED_FUNDS,CONTRIBUTION,PLATFORM_TIP`}
+        data-cy="view-all-transactions-link"
+      >
+        <FormattedMessage
+          id="CollectivePage.SectionBudget.ViewAllContributions"
+          defaultMessage="View all contributions"
+        />{' '}
+        &rarr;
+      </Link>
+    ) : (
       <Link href={`${getCollectivePageRoute(collective)}/transactions`} data-cy="view-all-transactions-link">
         <FormattedMessage id="CollectivePage.SectionBudget.ViewAll" defaultMessage="View all transactions" /> &rarr;
       </Link>
@@ -196,6 +266,7 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions }) => {
 ViewAllLink.propTypes = {
   collective: PropTypes.object,
   hasExpenses: PropTypes.bool,
+  isIndividual: PropTypes.bool,
   hasTransactions: PropTypes.bool,
   filter: PropTypes.oneOf(FILTERS),
 };
@@ -206,8 +277,9 @@ ViewAllLink.propTypes = {
  */
 const SectionBudget = ({ collective, LoggedInUser }) => {
   const [filter, setFilter] = React.useState('all');
-  const budgetQueryResult = useQuery(getBudgetSectionQuery(Boolean(collective.host)), {
-    variables: getBudgetSectionQueryVariables(collective.slug, collective.host?.slug),
+  const isIndividual = isIndividualAccount(collective) && !collective.isHost;
+  const budgetQueryResult = useQuery(getBudgetSectionQuery(Boolean(collective.host), isIndividual), {
+    variables: getBudgetSectionQueryVariables(collective.slug, collective.host?.slug, isIndividual),
     context: API_V2_CONTEXT,
   });
   const { data, refetch } = budgetQueryResult;
@@ -230,13 +302,25 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
   return (
     <ContainerSectionContent pb={4}>
       {(hasExpenses || hasTransactions) && (
-        <Flex mb={3} flexWrap="wrap" justifyContent="space-between" alignItems="center" maxWidth={720}>
-          <StyledFilters filters={FILTERS} getLabel={geFilterLabel} selected={filter} onChange={setFilter} />
+        <Flex
+          mb={3}
+          flexWrap="wrap"
+          justifyContent="space-between"
+          alignItems="center"
+          maxWidth={['100%', null, 'min(748px, 55vw)']}
+        >
+          <StyledFilters
+            filters={FILTERS}
+            getLabel={filter => geFilterLabel(filter, isIndividual)}
+            selected={filter}
+            onChange={setFilter}
+          />
           <ViewAllLink
             collective={collective}
             filter={filter}
             hasExpenses={hasExpenses}
             hasTransactions={hasTransactions}
+            isIndividual={isIndividual}
           />
         </Flex>
       )}
@@ -289,8 +373,6 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
 
         {isLoading ? (
           <LoadingPlaceholder height={300} />
-        ) : isIndividualAccount(collective) ? (
-          <div />
         ) : (
           <BudgetStats collective={collective} stats={data?.account?.stats} />
         )}
@@ -307,6 +389,7 @@ SectionBudget.propTypes = {
     type: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     isArchived: PropTypes.bool,
+    isHost: PropTypes.bool,
     settings: PropTypes.object,
     host: PropTypes.object,
   }),
