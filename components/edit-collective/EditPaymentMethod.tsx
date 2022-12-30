@@ -2,6 +2,7 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { matchPm, PAYMENT_METHOD_SERVICE, PAYMENT_METHOD_TYPE } from '../../lib/constants/payment-methods';
+import { PaymentMethod } from '../../lib/graphql/types/v2/graphql';
 import { paymentMethodLabelWithIcon } from '../../lib/payment_method_label';
 
 import { Box, Flex } from '../Grid';
@@ -13,9 +14,9 @@ type EditPaymentMethodProps = {
   isSaving: boolean;
   needsConfirmation: boolean;
   nbActiveSubscriptions: number;
-  paymentMethod: any; // TODO Replace with PaymentMethod type once parent will be typed
-  onConfirm: (paymentMethod: any) => void; // TODO Replace with PaymentMethod type once parent will be typed
-  onRemove: (paymentMethod: any) => void; // TODO Replace with PaymentMethod type once parent will be typed
+  paymentMethod: PaymentMethod;
+  onConfirm: (paymentMethod: PaymentMethod) => void;
+  onRemove: (paymentMethod: PaymentMethod) => void;
 };
 
 const EditPaymentMethod = ({
