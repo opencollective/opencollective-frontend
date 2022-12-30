@@ -399,8 +399,8 @@ class ContributionFlow extends React.Component {
   getContributeProfiles = memoizeOne(getContributeProfiles);
 
   getDefaultStepProfile() {
-    const { LoggedInUser, loadingLoggedInUser, collective, tier } = this.props;
-    const profiles = this.getContributeProfiles(LoggedInUser, collective, tier);
+    const { LoggedInUser, loadingLoggedInUser, collective } = this.props;
+    const profiles = this.getContributeProfiles(LoggedInUser, collective);
     const queryParams = this.getQueryParams();
 
     // We want to wait for the user to be logged in before matching the profile
@@ -992,7 +992,7 @@ class ContributionFlow extends React.Component {
                     order={this.state.createdOrder}
                     disabledPaymentMethodTypes={queryParams.disabledPaymentMethodTypes}
                     hideCreditCardPostalCode={queryParams.hideCreditCardPostalCode}
-                    contributeProfiles={this.getContributeProfiles(LoggedInUser, collective, tier)}
+                    contributeProfiles={this.getContributeProfiles(LoggedInUser, collective)}
                   />
                   {!nextStep && shouldDisplayCaptcha && (
                     <Flex mt={40} justifyContent="center">

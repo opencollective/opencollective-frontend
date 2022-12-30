@@ -17,7 +17,7 @@ const formatAccountName = (intl, account) => {
     : truncate(account.name, { length: 40 });
 };
 
-const getProfileOptions = (intl, profiles, canUseIncognito) => {
+const getProfileOptions = (intl, profiles) => {
   const getOptionFromAccount = value => ({ [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true, value, label: value.name });
   const sortOptions = options => sortBy(options, 'value.name');
   const profileOptions = profiles.map(getOptionFromAccount);
@@ -26,18 +26,16 @@ const getProfileOptions = (intl, profiles, canUseIncognito) => {
   const myOrganizations = sortOptions(profilesByType[ORGANIZATION] || []);
 
   // Add incognito profile entry if it doesn't exists
-  if (canUseIncognito) {
-    const hasIncognitoProfile = profiles.some(p => p.type === CollectiveType.USER && p.isIncognito);
-    if (!hasIncognitoProfile) {
-      myself.push(
-        getOptionFromAccount({
-          id: 'incognito',
-          type: CollectiveType.USER,
-          isIncognito: true,
-          name: intl.formatMessage({ id: 'profile.incognito', defaultMessage: 'Incognito' }),
-        }),
-      );
-    }
+  const hasIncognitoProfile = profiles.some(p => p.type === CollectiveType.USER && p.isIncognito);
+  if (!hasIncognitoProfile) {
+    myself.push(
+      getOptionFromAccount({
+        id: 'incognito',
+        type: CollectiveType.USER,
+        isIncognito: true,
+        name: intl.formatMessage({ id: 'profile.incognito', defaultMessage: 'Incognito' }),
+      }),
+    );
   }
 
   // Add an entry for creating a new organization
@@ -112,9 +110,9 @@ const formatProfileOption = (option, _, intl) => {
   );
 };
 
-const ContributeProfilePicker = ({ profiles, selectedProfile, canUseIncognito, onChange }) => {
+const ContributeProfilePicker = ({ profiles, selectedProfile, onChange }) => {
   const intl = useIntl();
-  const getOptionsArgs = [intl, profiles, canUseIncognito];
+  const getOptionsArgs = [intl, profiles];
   const options = React.useMemo(() => getProfileOptions(...getOptionsArgs), getOptionsArgs);
   return (
     <CollectivePicker
@@ -140,7 +138,6 @@ const ContributeProfilePicker = ({ profiles, selectedProfile, canUseIncognito, o
 
 ContributeProfilePicker.propTypes = {
   profiles: PropTypes.array,
-  canUseIncognito: PropTypes.bool,
   onChange: PropTypes.func,
   selectedProfile: PropTypes.object,
 };

@@ -15,7 +15,6 @@ import StepDetailsCrypto from './StepDetailsCrypto';
 import StepPayment from './StepPayment';
 import StepProfile from './StepProfile';
 import StepSummary from './StepSummary';
-import { canUseIncognitoForContribution } from './utils';
 
 class ContributionFlowStepContainer extends React.Component {
   static propTypes = {
@@ -105,7 +104,6 @@ class ContributionFlowStepContainer extends React.Component {
             defaultName={this.props.defaultName}
             onChange={this.props.onChange}
             data={stepProfile}
-            canUseIncognito={canUseIncognitoForContribution(collective, tier)}
             onSignInClick={this.props.onSignInClick}
             isEmbed={isEmbed}
           />

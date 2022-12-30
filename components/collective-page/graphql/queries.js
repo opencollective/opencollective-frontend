@@ -196,6 +196,7 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
             name
             company
             image
+            isIncognito
             imageUrl
             slug
             twitterHandle
