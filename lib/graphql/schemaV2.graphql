@@ -417,6 +417,11 @@ interface Account {
     includeHostedAccounts: Boolean
 
     """
+    Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
+    """
+    paymentMethod: PaymentMethodReferenceInput
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -471,6 +476,11 @@ interface Account {
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
+
+    """
+    Same as onlySubscriptions, but returns only orders with active subscriptions
+    """
+    onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -528,6 +538,11 @@ interface Account {
     """
     includeExpired: Boolean
   ): [PaymentMethod]
+
+  """
+  The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA)
+  """
+  paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...)
@@ -682,7 +697,7 @@ enum MemberRole {
   HOST
   ATTENDEE
   MEMBER
-  FUNDRAISER
+  FUNDRAISER @deprecated(reason: "2022-09-12: This role does not exist anymore")
   FOLLOWER
   ACCOUNTANT
   CONNECTED_ACCOUNT
@@ -832,6 +847,11 @@ type Order {
   Date the funds were received.
   """
   processedAt: DateTime
+
+  """
+  Whether the order needs confirmation (3DSecure/SCA)
+  """
+  needsConfirmation: Boolean
 }
 
 """
@@ -2706,6 +2726,11 @@ type Host implements Account & AccountWithContributions {
     includeHostedAccounts: Boolean
 
     """
+    Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
+    """
+    paymentMethod: PaymentMethodReferenceInput
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -2760,6 +2785,11 @@ type Host implements Account & AccountWithContributions {
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
+
+    """
+    Same as onlySubscriptions, but returns only orders with active subscriptions
+    """
+    onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -2806,6 +2836,11 @@ type Host implements Account & AccountWithContributions {
     """
     includeExpired: Boolean
   ): [PaymentMethod]
+
+  """
+  The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA)
+  """
+  paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
@@ -3280,7 +3315,6 @@ enum ContributorRole {
   MEMBER
   CONTRIBUTOR
   BACKER
-  FUNDRAISER
   ATTENDEE
   FOLLOWER
   CONNECTED_COLLECTIVE
@@ -3420,6 +3454,13 @@ enum PaymentMethodType {
   SEPA_DEBIT
 }
 
+input PaymentMethodReferenceInput {
+  """
+  The id assigned to the payment method
+  """
+  id: String
+}
+
 """
 Account orders filter (INCOMING or OUTGOING)
 """
@@ -3540,6 +3581,92 @@ type PaymentMethod {
   limitedToHosts: [Host]
   expiryDate: DateTime
   createdAt: DateTime
+
+  """
+  For monthly gift cards, this field will return the monthly limit
+  """
+  monthlyLimit: Amount
+
+  """
+  Get all the orders associated with this payment method
+  """
+  orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
+    """
+    onlySubscriptions: Boolean
+
+    """
+    Same as onlySubscriptions, but returns only orders with active subscriptions
+    """
+    onlyActiveSubscriptions: Boolean
+  ): OrderCollection
 }
 
 enum PaymentMethodService {
@@ -5324,6 +5451,11 @@ type Bot implements Account {
     includeHostedAccounts: Boolean
 
     """
+    Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
+    """
+    paymentMethod: PaymentMethodReferenceInput
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -5378,6 +5510,11 @@ type Bot implements Account {
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
+
+    """
+    Same as onlySubscriptions, but returns only orders with active subscriptions
+    """
+    onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -5424,6 +5561,11 @@ type Bot implements Account {
     """
     includeExpired: Boolean
   ): [PaymentMethod]
+
+  """
+  The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA)
+  """
+  paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
@@ -5825,6 +5967,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     includeHostedAccounts: Boolean
 
     """
+    Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
+    """
+    paymentMethod: PaymentMethodReferenceInput
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -5879,6 +6026,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
+
+    """
+    Same as onlySubscriptions, but returns only orders with active subscriptions
+    """
+    onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -5925,6 +6077,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     includeExpired: Boolean
   ): [PaymentMethod]
+
+  """
+  The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA)
+  """
+  paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
@@ -6655,6 +6812,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     includeHostedAccounts: Boolean
 
     """
+    Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
+    """
+    paymentMethod: PaymentMethodReferenceInput
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -6709,6 +6871,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
+
+    """
+    Same as onlySubscriptions, but returns only orders with active subscriptions
+    """
+    onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -6755,6 +6922,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     includeExpired: Boolean
   ): [PaymentMethod]
+
+  """
+  The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA)
+  """
+  paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
@@ -7259,6 +7431,11 @@ type Individual implements Account {
     includeHostedAccounts: Boolean
 
     """
+    Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
+    """
+    paymentMethod: PaymentMethodReferenceInput
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -7313,6 +7490,11 @@ type Individual implements Account {
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
+
+    """
+    Same as onlySubscriptions, but returns only orders with active subscriptions
+    """
+    onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -7359,6 +7541,11 @@ type Individual implements Account {
     """
     includeExpired: Boolean
   ): [PaymentMethod]
+
+  """
+  The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA)
+  """
+  paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
@@ -7850,6 +8037,11 @@ type Organization implements Account & AccountWithContributions {
     includeHostedAccounts: Boolean
 
     """
+    Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
+    """
+    paymentMethod: PaymentMethodReferenceInput
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -7904,6 +8096,11 @@ type Organization implements Account & AccountWithContributions {
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
+
+    """
+    Same as onlySubscriptions, but returns only orders with active subscriptions
+    """
+    onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -7950,6 +8147,11 @@ type Organization implements Account & AccountWithContributions {
     """
     includeExpired: Boolean
   ): [PaymentMethod]
+
+  """
+  The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA)
+  """
+  paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
@@ -8466,6 +8668,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     includeHostedAccounts: Boolean
 
     """
+    Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
+    """
+    paymentMethod: PaymentMethodReferenceInput
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -8520,6 +8727,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
+
+    """
+    Same as onlySubscriptions, but returns only orders with active subscriptions
+    """
+    onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -8566,6 +8778,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     includeExpired: Boolean
   ): [PaymentMethod]
+
+  """
+  The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA)
+  """
+  paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
@@ -9234,6 +9451,11 @@ type Query {
     includeHostedAccounts: Boolean
 
     """
+    Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
+    """
+    paymentMethod: PaymentMethodReferenceInput
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -9288,6 +9510,11 @@ type Query {
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
+
+    """
+    Same as onlySubscriptions, but returns only orders with active subscriptions
+    """
+    onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   organization(
     """
@@ -9494,12 +9721,17 @@ type Query {
     offset: Int! = 0
 
     """
-    Only from accounts that have one of these tags
+    Only return updates from accounts that have one of these tags
     """
-    tag: [String]
+    accountTag: [String]
 
     """
-    Host for the account for which to get updates
+    Only return updates from accounts that match these types (COLLECTIVE, FUND, EVENT, PROJECT, ORGANIZATION or INDIVIDUAL)
+    """
+    accountType: [AccountType]
+
+    """
+    Host for the accounts for which to get updates
     """
     host: [AccountReferenceInput]
   ): UpdatesCollection!
@@ -11216,6 +11448,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     includeHostedAccounts: Boolean
 
     """
+    Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
+    """
+    paymentMethod: PaymentMethodReferenceInput
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -11270,6 +11507,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
+
+    """
+    Same as onlySubscriptions, but returns only orders with active subscriptions
+    """
+    onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -11316,6 +11558,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     includeExpired: Boolean
   ): [PaymentMethod]
+
+  """
+  The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA)
+  """
+  paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
@@ -11812,6 +12059,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     includeHostedAccounts: Boolean
 
     """
+    Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
+    """
+    paymentMethod: PaymentMethodReferenceInput
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -11866,6 +12118,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
     """
     onlySubscriptions: Boolean
+
+    """
+    Same as onlySubscriptions, but returns only orders with active subscriptions
+    """
+    onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   settings: JSON!
   conversations(
@@ -11912,6 +12169,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     includeExpired: Boolean
   ): [PaymentMethod]
+
+  """
+  The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA)
+  """
+  paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
   The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
@@ -14528,13 +14790,6 @@ input OrderContextInput {
   Whether this order was created using the embedded contribution flow
   """
   isEmbed: Boolean
-}
-
-input PaymentMethodReferenceInput {
-  """
-  The id assigned to the payment method
-  """
-  id: String
 }
 
 input OrderUpdateInput {
