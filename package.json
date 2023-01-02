@@ -175,7 +175,7 @@
     "@rollup/plugin-babel": "^6.0.0",
     "@rollup/plugin-commonjs": "^24.0.0",
     "@rollup/plugin-image": "^3.0.0",
-    "@rollup/plugin-json": "^5.0.0",
+    "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-typescript": "^9.0.1",
     "@storybook/addon-actions": "6.5.15",
     "@storybook/addon-docs": "6.5.15",
