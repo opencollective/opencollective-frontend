@@ -2,7 +2,9 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import { Download as DownloadIcon } from '@styled-icons/feather/Download';
 import { Info } from '@styled-icons/feather/Info';
+import { saveAs } from 'file-saver';
 import { Field, Form, Formik } from 'formik';
 import { get } from 'lodash';
 import QRCode from 'qrcode.react';
@@ -370,20 +372,27 @@ class UserTwoFactorAuth extends React.Component {
                         })}
                       </Container>
                       <Container>
-                        <Flex justifyContent={['center', 'left']} mb={4}>
+                        <Flex justifyContent={['center', 'left']} mb={4} gap="16px">
                           <StyledButton
-                            fontSize="13px"
                             minWidth="148px"
-                            minHeight="36px"
                             buttonStyle="primary"
                             onClick={() => this.setState({ showRecoveryCodesModal: true })}
                             loading={showRecoveryCodesModal}
                             data-cy="add-two-factor-auth-confirm-recovery-codes-button"
                           >
-                            <FormattedMessage
-                              id="TwoFactorAuth.Setup.Form.FinishSetup"
-                              defaultMessage="Finish 2FA setup"
-                            />
+                            <FormattedMessage id="TwoFactorAuth.Setup.Form.FinishSetup" defaultMessage="Finish setup" />
+                          </StyledButton>
+                          <StyledButton
+                            onClick={() =>
+                              saveAs(
+                                new Blob([recoveryCodes.join('\n')], { type: 'text/plain;charset=utf-8' }),
+                                'opencollective-recovery-codes.txt',
+                              )
+                            }
+                          >
+                            <FormattedMessage defaultMessage="Download codes" />
+                            &nbsp;
+                            <DownloadIcon size="1em" />
                           </StyledButton>
                         </Flex>
                       </Container>
