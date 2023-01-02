@@ -2687,7 +2687,7 @@
   "TwoFactorAuth.Setup.Form.FinishSetup": "Finish setup",
   "TwoFactorAuth.Setup.Form.InputLabel": "Zadajte svoj 6-miestny kód bez pomlčiek.",
   "TwoFactorAuth.Setup.Form.VerifyButton": "Overenie a zobrazenie kódov na obnovenie",
-  "TwoFactorAuth.Setup.Info": "Dvojfaktorové overovanie zvyšuje úroveň zabezpečenia vášho konta pri prihlasovaní.",
+  "TwoFactorAuth.Setup.Info": "Two-factor authentication adds an extra layer of security for your account when logging in or performing admin actions.",
   "TwoFactorAuth.Setup.ManualEntry": "Ručné zadávanie: {token}",
   "TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Body": "Akonáhle kliknete na tlačidlo \"Potvrdiť\", nebudete už mať prístup k vašim kódom na obnovenie.",
   "TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Header": "Určite?",

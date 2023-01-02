@@ -2687,7 +2687,7 @@
   "TwoFactorAuth.Setup.Form.FinishSetup": "Finish setup",
   "TwoFactorAuth.Setup.Form.InputLabel": "6자리 숫자 코드를 입력해주세요.",
   "TwoFactorAuth.Setup.Form.VerifyButton": "Verify & see recovery codes",
-  "TwoFactorAuth.Setup.Info": "2단계 인증은 계정에 로그인할 때에 추가 보안 계층을 더합니다.",
+  "TwoFactorAuth.Setup.Info": "Two-factor authentication adds an extra layer of security for your account when logging in or performing admin actions.",
   "TwoFactorAuth.Setup.ManualEntry": "직접 입력: {token}",
   "TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Body": "Once you click 'Confirm', you will no longer have access to your recovery codes.",
   "TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Header": "Are you sure?",

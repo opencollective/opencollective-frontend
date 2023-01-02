@@ -2687,7 +2687,7 @@
   "TwoFactorAuth.Setup.Form.FinishSetup": "Finish setup",
   "TwoFactorAuth.Setup.Form.InputLabel": "Please enter your 6-digit code without any dashes.",
   "TwoFactorAuth.Setup.Form.VerifyButton": "验证并查看恢复码",
-  "TwoFactorAuth.Setup.Info": "双因素认证可以在你登录时增加一层额外的安全保护机制。",
+  "TwoFactorAuth.Setup.Info": "Two-factor authentication adds an extra layer of security for your account when logging in or performing admin actions.",
   "TwoFactorAuth.Setup.ManualEntry": "Manual entry: {token}",
   "TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Body": "Once you click 'Confirm', you will no longer have access to your recovery codes.",
   "TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Header": "你确定吗？",
