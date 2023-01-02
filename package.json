@@ -176,7 +176,7 @@
     "@rollup/plugin-commonjs": "^24.0.0",
     "@rollup/plugin-image": "^3.0.0",
     "@rollup/plugin-json": "^6.0.0",
-    "@rollup/plugin-typescript": "^9.0.1",
+    "@rollup/plugin-typescript": "^10.0.0",
     "@storybook/addon-actions": "6.5.15",
     "@storybook/addon-docs": "6.5.15",
     "@storybook/addon-essentials": "6.5.15",
