@@ -177,28 +177,6 @@ const getInitialValues = (expense, host, payoutMethodType) => {
   };
 };
 
-const getPaymentProcessorFee = (formik, expense, quoteQuery, host) => {
-  if (formik.values.forceManual) {
-    const isMultiCurrency =
-      expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
-    const fxRate = isMultiCurrency ? 1 : expense.amountInAccountCurrency?.exchangeRate?.value || 1;
-    return {
-      valueInCents: Math.round(formik.values.paymentProcessorFeeInHostCurrency * fxRate),
-      currency: host.currency,
-    };
-  } else if (quoteQuery?.data?.expense?.quote) {
-    const { quote, amountInHostCurrency } = quoteQuery.data.expense;
-    if (quote.paymentProcessorFeeAmount.currency === expense.currency) {
-      return quote.paymentProcessorFeeAmount;
-    } else if (amountInHostCurrency.exchangeRate) {
-      return {
-        currency: expense.currency,
-        valueInCents: quote.paymentProcessorFeeAmount.valueInCents / amountInHostCurrency.exchangeRate.value,
-      };
-    }
-  }
-};
-
 const calculateAmounts = ({ formik, expense, quote, host, feesPayer }) => {
   if (formik.values.forceManual) {
     const totalAmount = { valueInCents: formik.values.totalAmountPaidInHostCurrency, currency: host.currency };
@@ -206,15 +184,15 @@ const calculateAmounts = ({ formik, expense, quote, host, feesPayer }) => {
       valueInCents: formik.values.paymentProcessorFeeInHostCurrency,
       currency: host.currency,
     };
-    const VET = expense.currency !== host.currency && totalAmount.valueInCents / expense.amount;
-    return { paymentProcessorFee, totalAmount, VET };
+    const effectiveRate = expense.currency !== host.currency && totalAmount.valueInCents / expense.amount;
+    return { paymentProcessorFee, totalAmount, effectiveRate };
   } else if (quote) {
-    const VET = expense.currency !== host.currency && quote.sourceAmount.valueInCents / expense.amount;
+    const effectiveRate = expense.currency !== host.currency && quote.sourceAmount.valueInCents / expense.amount;
     const totalAmount = quote.sourceAmount;
     if (feesPayer === 'PAYEE') {
       totalAmount.valueInCents -= quote.paymentProcessorFeeAmount.valueInCents;
     }
-    return { paymentProcessorFee: quote.paymentProcessorFeeAmount, totalAmount, VET };
+    return { paymentProcessorFee: quote.paymentProcessorFeeAmount, totalAmount, effectiveRate };
   } else {
     return {};
   }
@@ -242,7 +220,6 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
     skip: !canQuote,
   });
 
-  const paymentProcessorFee = getPaymentProcessorFee(formik, expense, quoteQuery, host);
   const amountWithoutTaxes = getAmountWithoutTaxes(expense.amount, expense.taxes);
 
   const amounts = calculateAmounts({
@@ -439,8 +416,8 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
                     currency={amounts.paymentProcessorFee?.currency}
                     currencyCodeStyles={{ color: 'black.500' }}
                     amountStyles={{
-                      fontWeight: paymentProcessorFee ? 500 : 400,
-                      color: paymentProcessorFee ? 'black.900' : 'black.400',
+                      fontWeight: amounts.paymentProcessorFee ? 500 : 400,
+                      color: amounts.paymentProcessorFee ? 'black.900' : 'black.400',
                     }}
                   />
                 )}
@@ -449,7 +426,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
           )}
           <AmountLine borderTop="1px solid #4E5052" pt={11}>
             <Label color="black.900" fontWeight="600">
-              {paymentProcessorFee !== null ? (
+              {amounts.paymentProcessorFee !== null ? (
                 <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />
               ) : (
                 <FormattedMessage id="TotalAmountWithoutFee" defaultMessage="Total amount (without fees)" />
@@ -467,13 +444,13 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
               )}
             </Amount>
           </AmountLine>
-          {amounts?.VET ? (
+          {amounts?.effectiveRate ? (
             <AmountLine py={0}>
               <Label color="black.600" fontWeight="500">
                 <FormattedMessage defaultMessage="Effective rate (VET)" />
               </Label>
               <Flex>
-                <Container color="black.600">~ {round(amounts.VET, 5)}</Container>
+                <Container color="black.600">~ {round(amounts.effectiveRate, 5)}</Container>
               </Flex>
             </AmountLine>
           ) : null}
