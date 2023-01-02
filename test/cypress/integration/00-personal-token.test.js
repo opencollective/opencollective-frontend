@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import speakeasy from 'speakeasy';
 
 describe('Personal Token', () => {
@@ -19,7 +20,7 @@ describe('Personal Token', () => {
     cy.getByDataCy('create-token-link').click();
     cy.get('input[name=name]').type('My first token');
     cy.getByDataCy('personal-token-scope').click().type('host{enter}').type('transactions{enter}');
-    cy.get('input[name=expiresAt]').type('2022-12-31');
+    cy.get('input[name=expiresAt]').type(`${dayjs().add(1, 'day').format('YYYY-MM-DD')}`);
     cy.get('[data-cy="create-personal-token-modal"] button[type=submit]').click();
     cy.contains('[data-cy=toast-notification]:last', 'Personal token "My first token" created');
 
@@ -35,7 +36,9 @@ describe('Personal Token', () => {
     cy.getByDataCy('personal-token').contains('a', 'Settings').click();
     cy.get('input[name=name]').clear().type('My first token (edited)');
     cy.getByDataCy('personal-token-scope').click().type('email{enter}');
-    cy.get('input[name=expiresAt]').clear().type('2022-12-28');
+    cy.get('input[name=expiresAt]')
+      .clear()
+      .type(`${dayjs().add(2, 'day').format('YYYY-MM-DD')}`);
     cy.get('[data-cy="personal-token-settings"] button[type=submit]').click();
     cy.contains('[data-cy=toast-notification]:last', 'Personal token "My first token (edited)" updated');
 
@@ -47,7 +50,7 @@ describe('Personal Token', () => {
     cy.getByDataCy('create-personal-token-btn').click();
     cy.get('input[name=name]').type('My second token');
     cy.getByDataCy('personal-token-scope').click().type('host{enter}').type('account{enter}');
-    cy.get('input[name=expiresAt]').type('2022-12-31');
+    cy.get('input[name=expiresAt]').type(`${dayjs().add(1, 'day').format('YYYY-MM-DD')}`);
     cy.get('[data-cy="create-personal-token-modal"] button[type=submit]').click();
     cy.contains('[data-cy=toast-notification]:last', 'Personal token "My second token" created');
     cy.getByDataCy('personalToken-token').should('exist');
@@ -84,7 +87,7 @@ describe('Personal Token', () => {
       cy.getByDataCy('create-token-link').click();
       cy.get('input[name=name]').type('My first token with 2fa');
       cy.getByDataCy('personal-token-scope').click().type('host{enter}').type('transactions{enter}');
-      cy.get('input[name=expiresAt]').type('2022-12-31');
+      cy.get('input[name=expiresAt]').type(`${dayjs().add(1, 'day').format('YYYY-MM-DD')}`);
       cy.get('[data-cy="create-personal-token-modal"] button[type=submit]').click();
 
       cy.complete2FAPrompt(
