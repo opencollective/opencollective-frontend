@@ -4743,6 +4743,8 @@ export type Individual = Account & {
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
   permissions: AccountPermissions;
+  /** The list of personal tokens created by this account. Admin only. Scope: "applications". */
+  personalTokens?: Maybe<PersonalTokenCollection>;
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
   repositoryUrl?: Maybe<Scalars['String']>;
@@ -4902,6 +4904,13 @@ export type IndividualPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Individual account */
+export type IndividualPersonalTokensArgs = {
+  limit?: Scalars['Int'];
+  offset?: Scalars['Int'];
 };
 
 
@@ -5200,6 +5209,7 @@ export type Mutation = {
   createPaymentIntent: PaymentIntent;
   /** Create a new Payout Method to get paid through the platform. Scope: "expenses". */
   createPayoutMethod?: Maybe<PayoutMethod>;
+  createPersonalToken?: Maybe<PersonalToken>;
   /** Create a Project. Scope: "account". */
   createProject?: Maybe<Project>;
   /** Create a tier. */
@@ -5218,6 +5228,7 @@ export type Mutation = {
   deleteConnectedAccount?: Maybe<ConnectedAccount>;
   /** Delete an expense. Only work if the expense is rejected - please check permissions.canDelete. Scope: "expenses". */
   deleteExpense: Expense;
+  deletePersonalToken?: Maybe<PersonalToken>;
   /** Delete a tier. */
   deleteTier: Tier;
   /** Delete update. Scope: "updates". */
@@ -5317,6 +5328,7 @@ export type Mutation = {
   updateApplication?: Maybe<Application>;
   /** Update an Order's amount, tier, or payment method. Scope: "orders". */
   updateOrder?: Maybe<Order>;
+  updatePersonalToken?: Maybe<PersonalToken>;
   /** Update webhook. Scope: "webhooks". */
   updateWebhook?: Maybe<Webhook>;
   /** To verify and unverified expense. Scope: "expenses". */
@@ -5530,6 +5542,12 @@ export type MutationCreatePayoutMethodArgs = {
 
 
 /** This is the root mutation */
+export type MutationCreatePersonalTokenArgs = {
+  personalToken: PersonalTokenCreateInput;
+};
+
+
+/** This is the root mutation */
 export type MutationCreateProjectArgs = {
   parent?: InputMaybe<AccountReferenceInput>;
   project: ProjectCreateInput;
@@ -5592,6 +5610,12 @@ export type MutationDeleteConnectedAccountArgs = {
 /** This is the root mutation */
 export type MutationDeleteExpenseArgs = {
   expense: ExpenseReferenceInput;
+};
+
+
+/** This is the root mutation */
+export type MutationDeletePersonalTokenArgs = {
+  personalToken: PersonalTokenReferenceInput;
 };
 
 
@@ -5959,6 +5983,12 @@ export type MutationUpdateOrderArgs = {
   paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   paypalSubscriptionId?: InputMaybe<Scalars['String']>;
   tier?: InputMaybe<TierReferenceInput>;
+};
+
+
+/** This is the root mutation */
+export type MutationUpdatePersonalTokenArgs = {
+  personalToken: PersonalTokenUpdateInput;
 };
 
 
@@ -6829,6 +6859,63 @@ export type Permission = {
   reasonDetails?: Maybe<Scalars['JSON']>;
 };
 
+/** A personal token */
+export type PersonalToken = {
+  __typename?: 'PersonalToken';
+  /** The account that owns this personal token */
+  account: Individual;
+  /** The date on which the personal token was created */
+  createdAt?: Maybe<Scalars['DateTime']>;
+  /** The date on which the personal token expires */
+  expiresAt?: Maybe<Scalars['DateTime']>;
+  /** Unique identifier for this personal token */
+  id: Scalars['String'];
+  /** A friendly name for users to easily find their personal tokens */
+  name?: Maybe<Scalars['String']>;
+  /** The scopes of the personal token */
+  scope?: Maybe<Array<Maybe<OAuthScope>>>;
+  /** The personal token */
+  token?: Maybe<Scalars['String']>;
+  /** The date on which the personal token was last updated */
+  updatedAt?: Maybe<Scalars['DateTime']>;
+};
+
+/** A collection of "PersonalToken" */
+export type PersonalTokenCollection = Collection & {
+  __typename?: 'PersonalTokenCollection';
+  limit?: Maybe<Scalars['Int']>;
+  nodes?: Maybe<Array<Maybe<PersonalToken>>>;
+  offset?: Maybe<Scalars['Int']>;
+  totalCount?: Maybe<Scalars['Int']>;
+};
+
+/** Input type for PersonalToken */
+export type PersonalTokenCreateInput = {
+  /** The account to use as the owner of the application. Defaults to currently logged in user. */
+  account?: InputMaybe<AccountReferenceInput>;
+  expiresAt?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+  scope?: InputMaybe<Array<InputMaybe<OAuthScope>>>;
+};
+
+export type PersonalTokenReferenceInput = {
+  /** The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
+  id?: InputMaybe<Scalars['String']>;
+  /** The legacy public id identifying the personal-token (ie: 4242) */
+  legacyId?: InputMaybe<Scalars['Int']>;
+};
+
+/** Input type for PersonalToken */
+export type PersonalTokenUpdateInput = {
+  expiresAt?: InputMaybe<Scalars['String']>;
+  /** The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
+  id?: InputMaybe<Scalars['String']>;
+  /** The legacy public id identifying the personal-token (ie: 4242) */
+  legacyId?: InputMaybe<Scalars['Int']>;
+  name?: InputMaybe<Scalars['String']>;
+  scope?: InputMaybe<Array<InputMaybe<OAuthScope>>>;
+};
+
 export type Policies = {
   __typename?: 'Policies';
   COLLECTIVE_MINIMUM_ADMINS?: Maybe<Collective_Minimum_Admins>;
@@ -7263,6 +7350,8 @@ export type Query = {
   orders: OrderCollection;
   organization?: Maybe<Organization>;
   paypalPlan: PaypalPlan;
+  /** Get a personal token by reference */
+  personalToken?: Maybe<PersonalToken>;
   project?: Maybe<Project>;
   tagStats: TagStatsCollection;
   tier?: Maybe<Tier>;
@@ -7466,6 +7555,13 @@ export type QueryPaypalPlanArgs = {
   amount: AmountInput;
   frequency: ContributionFrequency;
   tier?: InputMaybe<TierReferenceInput>;
+};
+
+
+/** This is the root query */
+export type QueryPersonalTokenArgs = {
+  id?: InputMaybe<Scalars['String']>;
+  legacyId?: InputMaybe<Scalars['Int']>;
 };
 
 

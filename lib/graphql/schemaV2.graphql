@@ -7738,7 +7738,7 @@ type PersonalToken {
   """
   The date on which the personal token expires
   """
-  expiresAt: DateString
+  expiresAt: DateTime
 
   """
   The scopes of the personal token
@@ -7753,15 +7753,13 @@ type PersonalToken {
   """
   The date on which the personal token was created
   """
-  createdAt: DateString
+  createdAt: DateTime
 
   """
   The date on which the personal token was last updated
   """
-  updatedAt: DateString
+  updatedAt: DateTime
 }
-
-scalar DateString
 
 """
 This represents a Member relationship (ie: Organization backing a Collective)
@@ -9824,6 +9822,21 @@ type Query {
     """
     tier: TierReferenceInput
   ): PaypalPlan!
+
+  """
+  Get a personal token by reference
+  """
+  personalToken(
+    """
+    The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+    """
+    id: String
+
+    """
+    The legacy public id identifying the personal-token (ie: 4242)
+    """
+    legacyId: Int
+  ): PersonalToken
   loggedInAccount: Individual
   me: Individual
 }
@@ -13745,6 +13758,9 @@ type Mutation {
   Delete a tier.
   """
   deleteTier(tier: TierReferenceInput!, stopRecurringContributions: Boolean! = false): Tier!
+  createPersonalToken(personalToken: PersonalTokenCreateInput!): PersonalToken
+  updatePersonalToken(personalToken: PersonalTokenUpdateInput!): PersonalToken
+  deletePersonalToken(personalToken: PersonalTokenReferenceInput!): PersonalToken
 }
 
 input CollectiveCreateInput {
@@ -15113,4 +15129,48 @@ input TierCreateInput {
   maxQuantity: Int
   minimumAmount: AmountInput
   useStandalonePage: Boolean
+}
+
+"""
+Input type for PersonalToken
+"""
+input PersonalTokenCreateInput {
+  name: String
+  scope: [OAuthScope]
+  expiresAt: String
+
+  """
+  The account to use as the owner of the application. Defaults to currently logged in user.
+  """
+  account: AccountReferenceInput
+}
+
+"""
+Input type for PersonalToken
+"""
+input PersonalTokenUpdateInput {
+  """
+  The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the personal-token (ie: 4242)
+  """
+  legacyId: Int
+  name: String
+  scope: [OAuthScope]
+  expiresAt: String
+}
+
+input PersonalTokenReferenceInput {
+  """
+  The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the personal-token (ie: 4242)
+  """
+  legacyId: Int
 }
