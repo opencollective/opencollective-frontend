@@ -60,6 +60,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
               ...values,
               account: { id: account.id },
               scope: values.scope.map(scope => scope.value),
+              expiresAt: values.expiresAt ? values.expiresAt : null,
             };
             const result = await createPersonalToken({ variables: { personalToken: tokenInput } });
             addToast({

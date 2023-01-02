@@ -140,6 +140,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                   ...filteredValue,
                   id,
                   scope: filteredValue.scope.map(s => s.value),
+                  expiresAt: filteredValue.expiresAt ? filteredValue.expiresAt : null,
                 };
                 const result = await updateToken({ variables: { personalToken } });
                 addToast({
