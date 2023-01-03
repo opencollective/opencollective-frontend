@@ -4,7 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { CardElement } from '@stripe/react-stripe-js';
 import { Add } from '@styled-icons/material/Add';
-import { get, isEmpty, merge, pick, remove, sortBy } from 'lodash';
+import { get, isEmpty, merge, pick, sortBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -240,13 +240,15 @@ class EditPaymentMethods extends React.Component {
 
   getPaymentMethodsToDisplay() {
     const { data } = this.props;
-    const paymentMethodsWithPendingConfirmation = get(data, 'account.paymentMethodsWithPendingConfirmation', []);
-    const paymentMethods = get(data, 'account.paymentMethods', []).filter(
-      pm => pm.balance.valueInCents > 0 || (pm.type === PAYMENT_METHOD_TYPE.GIFTCARD && pm.monthlyLimit),
+    const paymentMethodsWithPendingConfirmation = get(data, 'account.paymentMethodsWithPendingConfirmation') || [];
+    const paymentMethods = (get(data, 'account.paymentMethods') || []).filter(
+      pm =>
+        // Remove payment methods with no balance, unless it's a gift card with a monthly limit
+        (pm.balance.valueInCents > 0 || (pm.type === PAYMENT_METHOD_TYPE.GIFTCARD && pm.monthlyLimit)) &&
+        // Remove payment methods with pending confirmation, they'll be displayed at the top
+        !paymentMethodsWithPendingConfirmation.some(p => p.id === pm.id),
     );
 
-    // Remove payment methods with pending confirmation, they'll be displayed at the top
-    remove(paymentMethods, pm => paymentMethodsWithPendingConfirmation.some(p => p.id === pm.id));
     return [
       ...sortBy(paymentMethodsWithPendingConfirmation, ['type', 'id']),
       ...sortBy(paymentMethods, ['type', 'id']),
