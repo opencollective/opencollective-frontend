@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { useFormik } from 'formik';
-import { get, round } from 'lodash';
+import { cloneDeep, get, round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { border, color, space, typography } from 'styled-system';
@@ -188,7 +188,7 @@ const calculateAmounts = ({ formik, expense, quote, host, feesPayer }) => {
     return { paymentProcessorFee, totalAmount, effectiveRate };
   } else if (quote) {
     const effectiveRate = expense.currency !== host.currency && quote.sourceAmount.valueInCents / expense.amount;
-    const totalAmount = quote.sourceAmount;
+    const totalAmount = cloneDeep(quote.sourceAmount);
     if (feesPayer === 'PAYEE') {
       totalAmount.valueInCents -= quote.paymentProcessorFeeAmount.valueInCents;
     }
