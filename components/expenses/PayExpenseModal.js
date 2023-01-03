@@ -447,7 +447,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
           {amounts?.effectiveRate ? (
             <AmountLine py={0}>
               <Label color="black.600" fontWeight="500">
-                <FormattedMessage defaultMessage="Effective rate (VET)" />
+                <FormattedMessage id="EffectiveRate" defaultMessage="Effective rate" />
               </Label>
               <Flex>
                 <Container color="black.600">~ {round(amounts.effectiveRate, 5)}</Container>
