@@ -179,7 +179,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               <DetailDescription>{order.memo}</DetailDescription>
             </React.Fragment>
           )}
-          {order?.processedAt && (
+          {order?.processedAt && transaction.kind === 'ADDED_FUNDS' && (
             <React.Fragment>
               <DetailTitle>
                 <Span textTransform="capitalize">
