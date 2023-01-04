@@ -252,27 +252,24 @@ function SocialLinkItem({ value, error, index, onChange, onRemoveItem, onMoveIte
 
   drag(drop(ref));
   return (
-    <Flex
-      ref={dragPreview}
-      opacity={isOver ? 0 : 1}
-      justifyContent="space-between"
-      alignItems="center"
-      my={1}
-      gap="5px"
-      data-handler-id={handlerId}
-    >
+    <Flex ref={dragPreview} opacity={isOver ? 0 : 1} alignItems="center" my={1} gap="5px" data-handler-id={handlerId}>
       <div ref={ref}>
         <DragIndicator size="15px" style={{ cursor: 'grab' }} />
       </div>
-      <SocialLinkTypePicker width="150px" value={value.type} onChange={type => onFieldChange('type', type)} />
-      <StyledInput
-        autoFocus={value.url === ''}
-        error={error}
-        flexGrow={1}
-        value={value.url}
-        onChange={e => onFieldChange('url', e.target.value)}
-        placeholder="https://opencollective.com/"
-      />
+      <Flex flexGrow={1} flexWrap="wrap" gap="5px">
+        <Box width={['100%', '150px']}>
+          <SocialLinkTypePicker value={value.type} onChange={type => onFieldChange('type', type)} />
+        </Box>
+        <StyledInput
+          autoFocus={value.url === ''}
+          error={error}
+          flexGrow={1}
+          value={value.url}
+          onChange={e => onFieldChange('url', e.target.value)}
+          placeholder="https://opencollective.com/"
+        />
+      </Flex>
+
       <StyledButton padding={0} width="20px" height="20px" type="button" buttonStyle="borderless" onClick={onRemove}>
         <Times size="10px" />
       </StyledButton>
