@@ -8,11 +8,11 @@ import I18nFormatters from './I18nFormatters';
 const ROLES_DETAILS = defineMessages({
   [roles.ADMIN]: {
     defaultMessage:
-      '<strong>Admins</strong> can edit settings and approve expenses, and receive activity notifications (such as when a new expense is submitted). They are the active managers of a Collective.',
+      '<strong>Admins</strong> can edit settings, approve expenses, and receive activity notifications (such as when a new expense is submitted). They are the active managers of a Collective.',
   },
   [roles.MEMBER]: {
     defaultMessage:
-      '<strong>Core Contributors</strong> are shown as part of the team on your page, but do not have admin access or get notifications. They do not play an active role on the platform.',
+      '<strong>Core Contributors</strong> are shown as part of the team on your page but do not have admin access or get notifications. They do not play an active role on the platform.',
   },
   [roles.ACCOUNTANT]: {
     defaultMessage:
