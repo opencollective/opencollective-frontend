@@ -151,7 +151,7 @@ class ContributionFlowStepContainer extends React.Component {
   };
 
   render() {
-    const { LoggedInUser, step } = this.props;
+    const { LoggedInUser, step, isEmbed } = this.props;
 
     return (
       <StyledCard p={[16, 32]} mx={[16, 'none']} borderRadius={15}>
@@ -166,9 +166,11 @@ class ContributionFlowStepContainer extends React.Component {
               <Flex flexGrow={1} alignItems="center" justifyContent="center">
                 <StyledHr width="100%" ml={3} borderColor="black.300" />
               </Flex>
-              <Box ml={2}>
-                <ShareButton />
-              </Box>
+              {!isEmbed && (
+                <Box ml={2}>
+                  <ShareButton />
+                </Box>
+              )}
             </Flex>
           )}
           {this.renderStep(step.name)}
