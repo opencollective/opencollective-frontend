@@ -14,6 +14,7 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
+import { isValidUrl } from '../../lib/utils';
 
 import ActivityLog from '../admin-panel/sections/ActivityLog';
 import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
@@ -297,6 +298,7 @@ class EditCollectiveForm extends React.Component {
       tickets: tickets.length === 0 ? [] : tickets,
       validStartDate: true,
       validEndDate: true,
+      isValidSocialLinks: true,
     };
   }
 
@@ -343,6 +345,11 @@ class EditCollectiveForm extends React.Component {
           collective.endsAt = convertDateToApiUtc(convertDateFromApiUtc(endsAt, timezone), value);
           collective.timezone = value;
         }
+      } else if (fieldname === 'socialLinks') {
+        const isValid = value?.filter(l => !isValidUrl(l.url))?.length === 0;
+
+        this.setState({ isValidSocialLinks: isValid });
+        set(collective, 'socialLinks', value);
       } else {
         set(collective, fieldname, value);
       }
@@ -878,6 +885,7 @@ class EditCollectiveForm extends React.Component {
                   ))}
                   <SocialLinksFormField
                     value={this.state.collective?.socialLinks}
+                    touched={this.state.modified}
                     onChange={value => this.handleChange('socialLinks', value)}
                   />
                 </div>
@@ -899,7 +907,8 @@ class EditCollectiveForm extends React.Component {
                     status === 'loading' ||
                     !this.state.modified ||
                     !this.state.validStartDate ||
-                    !this.state.validEndDate
+                    !this.state.validEndDate ||
+                    !this.state.isValidSocialLinks
                   }
                 >
                   {submitBtnLabel}

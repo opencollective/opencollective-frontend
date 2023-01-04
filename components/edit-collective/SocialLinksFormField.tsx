@@ -7,6 +7,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FormattedMessage } from 'react-intl';
 
 import { SocialLink, SocialLinkInput, SocialLinkType } from '../../lib/graphql/types/v2/graphql';
+import { isValidUrl } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
@@ -16,10 +17,11 @@ import { Span } from '../Text';
 
 export type SocialLinksFormFieldProps = {
   value?: SocialLink[];
+  touched?: boolean;
   onChange: (value: SocialLinkInput[]) => void;
 };
 
-export default function SocialLinksFormField({ value, onChange }: SocialLinksFormFieldProps) {
+export default function SocialLinksFormField({ value, touched, onChange }: SocialLinksFormFieldProps) {
   const onItemChange = React.useCallback(
     (socialLink, index) => {
       const newValues = [...value.slice(0, index), socialLink, ...value.slice(index + 1)];
@@ -86,6 +88,7 @@ export default function SocialLinksFormField({ value, onChange }: SocialLinksFor
                 // eslint-disable-next-line react/no-array-index-key
                 key={i}
                 index={i}
+                error={touched && !isValidUrl(socialLink.url)}
                 onMoveItem={onMoveItem}
                 value={socialLink}
                 onChange={onItemChange}
@@ -93,7 +96,7 @@ export default function SocialLinksFormField({ value, onChange }: SocialLinksFor
               />
             );
           })}
-          <Flex>
+          <Flex mt={2}>
             <StyledButton disabled={value.length >= 10} buttonSize="tiny" buttonStyle="standard" onClick={addItem}>
               <Plus size="10px" />
               <Span ml={2}>
@@ -189,13 +192,14 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
 
 type SocialLinkItemProps = {
   value: SocialLink;
+  error?: boolean;
   index: number;
   onMoveItem: (fromIndex: number, toIndex: number) => void;
   onChange: (value: SocialLink, index: number) => void;
   onRemoveItem: (index: number) => void;
 };
 
-function SocialLinkItem({ value, index, onChange, onRemoveItem, onMoveItem }: SocialLinkItemProps) {
+function SocialLinkItem({ value, error, index, onChange, onRemoveItem, onMoveItem }: SocialLinkItemProps) {
   const ref = React.useRef<HTMLDivElement>(null);
   const [{ handlerId, isOver }, drop] = useDrop({
     accept: 'SocialLink',
@@ -261,7 +265,14 @@ function SocialLinkItem({ value, index, onChange, onRemoveItem, onMoveItem }: So
         <DragIndicator size="15px" style={{ cursor: 'grab' }} />
       </div>
       <SocialLinkTypePicker width="150px" value={value.type} onChange={type => onFieldChange('type', type)} />
-      <StyledInput flexGrow={1} value={value.url} onChange={e => onFieldChange('url', e.target.value)} />
+      <StyledInput
+        autoFocus={value.url === ''}
+        error={error}
+        flexGrow={1}
+        value={value.url}
+        onChange={e => onFieldChange('url', e.target.value)}
+        placeholder="https://opencollective.com/"
+      />
       <StyledButton padding={0} width="20px" height="20px" type="button" buttonStyle="borderless" onClick={onRemove}>
         <Times size="10px" />
       </StyledButton>
