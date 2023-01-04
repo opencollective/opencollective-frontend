@@ -4,7 +4,6 @@ import { isNil } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import INTERVALS from '../../lib/constants/intervals';
 import { formatCurrency } from '../../lib/currency-utils';
 
 import Container from '../Container';
@@ -160,7 +159,6 @@ PlatformTipInput.propTypes = {
   quantity: PropTypes.number,
   value: PropTypes.number,
   isEmbed: PropTypes.bool,
-  interval: PropTypes.oneOf(Object.values(INTERVALS)),
 };
 
 export default PlatformTipInput;

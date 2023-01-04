@@ -5,7 +5,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { getGQLV2FrequencyFromInterval } from '../lib/constants/intervals';
+import INTERVALS, { getGQLV2FrequencyFromInterval } from '../lib/constants/intervals';
 import { getEnvVar } from '../lib/env-utils';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getPaypal } from '../lib/paypal';
@@ -98,13 +98,18 @@ class PayWithPaypalButton extends Component {
     layout: 'horizontal',
   };
 
+  isRecurring = () => {
+    return [INTERVALS.month, INTERVALS.year].includes(this.props.interval);
+  };
+
   async initialize() {
     if (!this.state.isLoading) {
       this.setState({ isLoading: true });
     }
 
     // If using subscriptions, wait for to plan to be loaded
-    if (this.props.interval && (this.props.data?.loading || !this.props.data?.paypalPlan)) {
+    const isRecurring = this.isRecurring();
+    if (isRecurring && (this.props.data?.loading || !this.props.data?.paypalPlan)) {
       return;
     }
 
@@ -114,7 +119,7 @@ class PayWithPaypalButton extends Component {
     // Initialize button
     const { host, currency } = this.props;
     const clientId = host.paypalClientId;
-    const intent = this.props.interval ? 'subscription' : 'capture';
+    const intent = isRecurring ? 'subscription' : 'capture';
     const paypal = await getPaypal({ clientId, currency, intent });
     const options = this.getOptions();
     paypal.Buttons(options).render(this.paypalTarget.current);
@@ -134,7 +139,7 @@ class PayWithPaypalButton extends Component {
     };
 
     /* eslint-disable camelcase */
-    if (this.props.interval) {
+    if (this.isRecurring()) {
       options.intent = 'subscription';
       options.createSubscription = (data, actions) => {
         return actions.subscription.create({
@@ -218,7 +223,7 @@ const paypalPlanQuery = gql`
 
 const addPaypalPlan = graphql(paypalPlanQuery, {
   // We only need a plan if using an interval
-  skip: props => !props.interval,
+  skip: props => props.interval && props.interval !== INTERVALS.oneTime,
   options: props => ({
     context: API_V2_CONTEXT,
     variables: {

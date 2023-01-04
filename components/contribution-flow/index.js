@@ -25,7 +25,7 @@ import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { confirmPayment } from '../../lib/stripe/confirm-payment';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
-import { getCollectivePageRoute, isTrustedRedirectHost, objectToQueryString } from '../../lib/url-helpers';
+import { getCollectivePageRoute, isTrustedRedirectHost } from '../../lib/url-helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
@@ -61,6 +61,7 @@ import {
   getContributeProfiles,
   getGQLV2AmountInput,
   getTotalAmount,
+  isSupportedInterval,
   NEW_CREDIT_CARD_KEY,
   STRIPE_PAYMENT_ELEMENT_KEY,
 } from './utils';
@@ -142,7 +143,7 @@ class ContributionFlow extends React.Component {
     this.formRef = React.createRef();
     this.captchaRef = React.createRef();
 
-    const { collective, tier } = props;
+    const { collective, tier, LoggedInUser } = props;
     const isCryptoFlow = props.paymentFlow === PAYMENT_FLOW.CRYPTO;
     const queryParams = this.getQueryParams();
     const currency = isCryptoFlow
@@ -162,7 +163,9 @@ class ContributionFlow extends React.Component {
       createdOrder: null,
       stepDetails: {
         quantity: queryParams.quantity || 1,
-        interval: queryParams.interval || getDefaultInterval(props.tier),
+        interval: isSupportedInterval(collective, tier, LoggedInUser, queryParams.interval)
+          ? queryParams.interval
+          : getDefaultInterval(props.tier),
         amount: queryParams.amount || getDefaultTierAmount(tier, collective, currency),
         platformTip: queryParams.platformTip,
         currency,
@@ -657,6 +660,14 @@ class ContributionFlow extends React.Component {
     return `${getCollectivePageRoute(collective)}/${verb}${stepRoute}`;
   };
 
+  getRedirectUrlForSignIn = () => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    } else {
+      return `${window.location.pathname}${window.location.search || ''}`;
+    }
+  };
+
   scrollToTop = () => {
     if (this.mainContainerRef.current) {
       this.mainContainerRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -835,27 +846,6 @@ class ContributionFlow extends React.Component {
       };
     }
   }
-
-  getRedirectUrlForSignIn = () => {
-    if (typeof window === 'undefined') {
-      return undefined;
-    }
-
-    const { stepDetails } = this.state;
-    const stepDetailsParams = objectToQueryString({
-      amount: stepDetails.amount / 100,
-      interval: stepDetails.interval || undefined,
-      quantity: stepDetails.quantity !== 1 ? stepDetails.quantity : undefined,
-      platformTip: !isNil(stepDetails.platformTip) ? stepDetails.platformTip / 100 : undefined,
-    });
-
-    const path = window.location.pathname;
-    if (window.location.search) {
-      return `${path}${window.location.search}&${stepDetailsParams.slice(1)}`;
-    } else {
-      return `${path}${stepDetailsParams}`;
-    }
-  };
 
   cryptoOrderCompleted = () => {
     const { createdOrder } = this.state;

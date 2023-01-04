@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import INTERVALS from '../../lib/constants/intervals';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 
 import Container from '../Container';
@@ -33,7 +32,7 @@ const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, isCryp
     const totalAmount = amount + (stepDetails.platformTip || 0);
     return (
       <FormattedMoneyAmount
-        interval={stepDetails.interval !== INTERVALS.flexible ? stepDetails.interval : null}
+        interval={stepDetails.interval}
         currency={currency}
         amount={totalAmount}
         abbreviateInterval

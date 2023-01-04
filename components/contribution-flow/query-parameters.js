@@ -140,7 +140,7 @@ export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepPro
   }
 
   // Step profile
-  if (stepProfile.slug) {
+  if (stepProfile?.slug) {
     data.contributeAs = stepProfile.slug;
   } else {
     assign(data, pick(stepProfile, ['name', 'legalName', 'email']));
