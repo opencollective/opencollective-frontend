@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
-import { Form, Formik } from 'formik';
+import { getApplicableTaxes } from '@opencollective/taxes';
+import { Form, Formik, useFormikContext } from 'formik';
 import { omit } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -12,13 +13,15 @@ import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { requireFields } from '../../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import ContributeTier from '../../contribute-cards/ContributeTier';
-import { Flex } from '../../Grid';
+import { Box, Flex } from '../../Grid';
 import InputFieldPresets from '../../InputFieldPresets';
 import InputSwitch from '../../InputSwitch';
 import Link from '../../Link';
+import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledInputAmount from '../../StyledInputAmount';
@@ -27,6 +30,7 @@ import StyledLink from '../../StyledLink';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
+import { Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
 import ConfirmTierDeleteModal from './ConfirmTierDeleteModal';
@@ -38,10 +42,6 @@ const { FIXED, FLEXIBLE } = AmountTypes;
 function getTierTypeOptions(intl, collectiveType) {
   const simplifiedTierTypes = [
     { value: TIER, label: intl.formatMessage({ id: 'tier.type.tier', defaultMessage: 'generic tier' }) },
-    {
-      value: MEMBERSHIP,
-      label: intl.formatMessage({ id: 'tier.type.membership', defaultMessage: 'membership (recurring)' }),
-    },
     {
       value: SERVICE,
       label: intl.formatMessage({ id: 'tier.type.service', defaultMessage: 'service (e.g., support)' }),
@@ -102,6 +102,22 @@ function FormFields({ collective, types, values }) {
 
   const receiptTemplateOptions = getReceiptTemplates(collective.host);
 
+  const taxes = getApplicableTaxes(collective, collective.host, values.type);
+
+  const formik = useFormikContext();
+  React.useEffect(() => {
+    if (values.interval === 'flexible') {
+      formik.setFieldValue('amountType', FLEXIBLE);
+    }
+  }, [values.interval]);
+
+  React.useEffect(() => {
+    if (values.type === PRODUCT) {
+      formik.setFieldValue('interval', null);
+      formik.setFieldValue('amountType', FIXED);
+    }
+  }, [values.type]);
+
   return (
     <React.Fragment>
       {(![FUND].includes(collective.type) || types?.length === 1) && (
@@ -125,6 +141,18 @@ function FormFields({ collective, types, values }) {
           )}
         </StyledInputFormikField>
       )}
+      {(![FUND].includes(collective.type) || types?.length === 1) &&
+        taxes.map(({ type, percentage }) => (
+          <Flex key={`${type}-${percentage}`} mt={3}>
+            <MessageBox type="info" withIcon css={{ flexGrow: 1 }} fontSize="12px">
+              <Span fontWeight="bold">
+                <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: i18nTaxType(intl, type) }} />{' '}
+                {percentage}%
+              </Span>
+              <Box mt={2}>{i18nTaxDescription(intl, type)}</Box>
+            </MessageBox>
+          </Flex>
+        ))}
       <StyledInputFormikField
         name="name"
         label={intl.formatMessage({ id: 'Fields.name', defaultMessage: 'Name' })}
@@ -170,7 +198,7 @@ function FormFields({ collective, types, values }) {
           )}
         </StyledInputFormikField>
       )}
-      {values.interval !== FLEXIBLE && (
+      {values.interval !== 'flexible' && (
         <StyledInputFormikField
           name="amountType"
           label={intl.formatMessage({
@@ -301,7 +329,7 @@ function FormFields({ collective, types, values }) {
           )}
         </StyledInputFormikField>
       )}
-      {([TICKET, PRODUCT].includes(values.type) ||
+      {([TICKET, PRODUCT, MEMBERSHIP].includes(values.type) ||
         (values.type === TIER && ![FUND, PROJECT].includes(collective.type))) && (
         <React.Fragment>
           <StyledInputFormikField
