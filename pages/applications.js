@@ -20,7 +20,7 @@ class Apps extends React.Component {
         {LoggedInUser => (
           <Flex flexDirection="column" alignItems="center" justifyContent="center" width={1} my={5}>
             <MessageBox type="info" withIcon>
-              <FormattedMessage defaultMessage="Application has been deprecated in favour of personal token" />
+              <FormattedMessage defaultMessage="Applications have been deprecated in favor of personal token" />
             </MessageBox>
             <StyledLink href={`/${LoggedInUser.collective.slug}/admin/for-developers`}>
               <StyledButton buttonStyle="primary" buttonSize="medium" mt={3}>
