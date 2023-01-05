@@ -12,6 +12,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
@@ -116,9 +117,6 @@ const PersonalTokenSettings = ({ backPath, id }) => {
             </H4>
             <Flex flexWrap="wrap" justifyContent="space-between">
               <Flex flexDirection="column" width="100%">
-                <P fontSize="15px" fontWeight="500" color="black.800" mb={2}>
-                  <FormattedMessage defaultMessage="Secret" />
-                </P>
                 <CodeContainer data-cy="personalToken-token" fontSize="14px" color="black.800" css={{}}>
                   {data.personalToken.token}
                 </CodeContainer>
@@ -166,7 +164,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                 <WarnIfUnsavedChanges hasUnsavedChanges={dirty && !showDeleteModal} />
                 <StyledInputFormikField
                   name="name"
-                  label={intl.formatMessage({ defaultMessage: 'Name of token' })}
+                  label={intl.formatMessage({ defaultMessage: 'Token name' })}
                   labelProps={LABEL_STYLES}
                   required
                 >
@@ -186,9 +184,17 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                   label="Scopes"
                   labelProps={LABEL_STYLES}
                   mt={20}
-                  hint={intl.formatMessage({
-                    defaultMessage: 'Scopes define the access for personal tokens.',
-                  })}
+                  hint={intl.formatMessage(
+                    {
+                      defaultMessage: 'Scopes define the access for personal tokens. <Link>More info</Link>.',
+                    },
+                    {
+                      Link: getI18nLink({
+                        href: 'https://docs.opencollective.com/help/developers/oauth#text-available-scopes',
+                        openInNewTab: true,
+                      }),
+                    },
+                  )}
                 >
                   {({ form, field }) => (
                     <StyledSelect
