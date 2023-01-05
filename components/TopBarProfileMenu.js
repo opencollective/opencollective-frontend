@@ -100,6 +100,9 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/transactions`}>
         <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
       </UserMenuLinkEntry>
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href="/applications">
+        <FormattedMessage id="menu.applications" defaultMessage="Applications" />
+      </UserMenuLinkEntry>
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} as="a" href="/help">
         <FormattedMessage id="menu.help" defaultMessage="Help" />
       </UserMenuLinkEntry>

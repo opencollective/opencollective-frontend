@@ -8,6 +8,7 @@ import { getPersonalTokenSettingsRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
 import { Box, Flex, Grid } from '../Grid';
+import I18nFormatters from '../I18nFormatters';
 import Image from '../Image';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -73,7 +74,10 @@ const PersonalTokensList = ({ accountSlug, onPersonalTokenCreated, offset = 0 })
         )}
       </Flex>
       <P my={2} color="black.700">
-        <FormattedMessage defaultMessage="Personal tokens are used to authenticate with the API. They are not tied to a specific application." />
+        <FormattedMessage
+          defaultMessage="Personal tokens are used to authenticate with the API. They are not tied to a specific application. Pass it as <code>Personal-Token</code> HTTP header or <code>personalToken</code> query paramater in the URL."
+          values={I18nFormatters}
+        />
       </P>
       <Box my={4}>
         {error ? (
@@ -90,7 +94,7 @@ const PersonalTokensList = ({ accountSlug, onPersonalTokenCreated, offset = 0 })
                 </P>
                 <P fontSize="12px" lineHeight="18px" color="black.700">
                   <FormattedMessage
-                    defaultMessage="You can create personal token that integrate with the Open Collective platform. <CreateTokenLink>Create an token</CreateTokenLink> using the Open Collective's API."
+                    defaultMessage="You can create personal token that integrate with the Open Collective platform. <CreateTokenLink>Create Personal Token</CreateTokenLink>."
                     values={{
                       CreateTokenLink: children => (
                         <StyledLink

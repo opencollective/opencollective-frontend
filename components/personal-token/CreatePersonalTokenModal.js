@@ -9,6 +9,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
@@ -81,7 +82,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
             <ModalBody mt="36px">
               <StyledInputFormikField
                 name="name"
-                label={intl.formatMessage({ defaultMessage: 'Name of the token' })}
+                label={intl.formatMessage({ defaultMessage: 'Token Name' })}
                 labelProps={LABEL_STYLES}
                 required
               >
@@ -100,9 +101,17 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
                 label="Scopes"
                 labelProps={LABEL_STYLES}
                 mt={20}
-                hint={intl.formatMessage({
-                  defaultMessage: 'Scopes define the access for personal tokens.',
-                })}
+                hint={intl.formatMessage(
+                  {
+                    defaultMessage: 'Scopes define the access for personal tokens. <Link>More info</Link>.',
+                  },
+                  {
+                    Link: getI18nLink({
+                      href: 'https://docs.opencollective.com/help/developers/oauth#text-available-scopes',
+                      openInNewTab: true,
+                    }),
+                  },
+                )}
               >
                 {({ form, field }) => (
                   <StyledSelect
