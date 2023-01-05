@@ -31,6 +31,8 @@ const Illustration = styled.img.attrs({ src: illustration })`
 `;
 
 const DEFAULT_PERCENTAGES = [0.1, 0.15, 0.2];
+const DEFAULT_PLATFORM_TIP_INDEX = 1;
+export const DEFAULT_PLATFORM_TIP_PERCENTAGE = DEFAULT_PERCENTAGES[DEFAULT_PLATFORM_TIP_INDEX];
 
 const getOptionFromPercentage = (amount, currency, percentage) => {
   const tipAmount = isNaN(amount) ? 0 : Math.round(amount * percentage);
@@ -81,7 +83,7 @@ const PlatformTipInput = ({ currency, amount, quantity, value, onChange, isEmbed
       return option.label;
     }
   };
-  const [selectedOption, setSelectedOption] = React.useState(options[1]);
+  const [selectedOption, setSelectedOption] = React.useState(options[DEFAULT_PLATFORM_TIP_INDEX]);
   const [isReady, setReady] = React.useState(false);
 
   // Load initial value on mount

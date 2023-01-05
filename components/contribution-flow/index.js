@@ -48,6 +48,7 @@ import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import ContributionFlowSuccess from './ContributionFlowSuccess';
 import ContributionSummary from './ContributionSummary';
 import { validateNewOrg } from './CreateOrganizationForm';
+import { DEFAULT_PLATFORM_TIP_PERCENTAGE } from './PlatformTipInput';
 import {
   ContributionFlowUrlQueryHelper,
   EmbedContributionFlowUrlQueryHelper,
@@ -149,6 +150,7 @@ class ContributionFlow extends React.Component {
     const currency = isCryptoFlow
       ? find(CRYPTO_CURRENCIES, field => field.value === queryParams.cryptoCurrency) || CRYPTO_CURRENCIES[0]
       : tier?.amount?.currency || collective.currency;
+    const amount = queryParams.amount || getDefaultTierAmount(tier, collective, currency);
 
     this.state = {
       error: null,
@@ -166,8 +168,8 @@ class ContributionFlow extends React.Component {
         interval: isSupportedInterval(collective, tier, LoggedInUser, queryParams.interval)
           ? queryParams.interval
           : getDefaultInterval(props.tier),
-        amount: queryParams.amount || getDefaultTierAmount(tier, collective, currency),
-        platformTip: queryParams.platformTip,
+        amount,
+        platformTip: this.canHavePlatformTips() ? Math.round(amount * DEFAULT_PLATFORM_TIP_PERCENTAGE) : 0,
         currency,
         cryptoAmount: queryParams.cryptoAmount,
       },

@@ -16,11 +16,6 @@ const ContributionFlowUrlParametersConfig = {
    */
   amount: { type: 'amount' },
   /**
-   * Default platform tip
-   * @private
-   */
-  platformTip: { type: 'amount' },
-  /**
    * Default number of units (for products and tickets only)
    * @default 1
    * @example 5
@@ -87,8 +82,6 @@ const ContributionFlowUrlParametersConfig = {
    * @example 4200
    */
   totalAmount: { type: 'alias', on: 'amount', modifier: value => Math.round(value / 100) },
-  /** @deprecated Use `platformTip` instead */
-  platformContribution: { type: 'alias', on: 'platformTip' },
   /** @deprecated Use `email` instead */
   defaultEmail: { type: 'alias', on: 'email' },
   /** @deprecated Use `name` instead */
@@ -133,7 +126,7 @@ export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepPro
   const data = pick(previousUrlParams, ['redirect', 'hideFAQ', 'hideHeader', 'backgroundColor', 'useTheme']);
 
   // Step details
-  assign(data, pick(stepDetails, ['interval', 'quantity', 'platformTip', 'customData']));
+  assign(data, pick(stepDetails, ['interval', 'quantity', 'customData']));
 
   if (!isCrypto) {
     data.amount = stepDetails.amount;
