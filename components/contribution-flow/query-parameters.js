@@ -121,13 +121,26 @@ const EmbedContributionFlowUrlParametersConfig = {
    * @example true
    */
   useTheme: { type: 'boolean' },
+  /**
+   * Whether to redirect the parent of the iframe rather than the iframe itself. The `iframe` needs to have
+   * its `sandbox` property set to `allow-top-navigation` for this to work.
+   */
+  shouldRedirectParent: { type: 'boolean' },
 };
 
 /**
  * Returns an un-sanitized version of the URL query parameters
  */
 export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepProfile, stepPayment, isCrypto) => {
-  const data = pick(previousUrlParams, ['redirect', 'hideFAQ', 'hideHeader', 'backgroundColor', 'useTheme']);
+  // Static params that are not meant to be changed during the flow
+  const data = pick(previousUrlParams, [
+    'redirect',
+    'shouldRedirectParent',
+    'hideFAQ',
+    'hideHeader',
+    'backgroundColor',
+    'useTheme',
+  ]);
 
   // Step details
   assign(data, pick(stepDetails, ['interval', 'quantity', 'customData']));

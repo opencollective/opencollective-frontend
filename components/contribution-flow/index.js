@@ -388,9 +388,16 @@ class ContributionFlow extends React.Component {
       const verb = 'donate';
       const fallback = `/${this.props.collective.slug}/${verb}/success?OrderId=${order.id}`;
       if (isTrustedRedirectHost(url.host)) {
-        window.location.href = url.href;
+        if (queryParams.shouldRedirectParent) {
+          window.parent.location.href = url.href;
+        } else {
+          window.location.href = url.href;
+        }
       } else {
-        await this.props.router.push({ pathname: '/external-redirect', query: { url: url.href, fallback } });
+        await this.props.router.push({
+          pathname: '/external-redirect',
+          query: { url: url.href, fallback, shouldRedirectParent: queryParams.shouldRedirectParent },
+        });
         return this.scrollToTop();
       }
     } else {
