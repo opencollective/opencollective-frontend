@@ -158,11 +158,15 @@ class ContributionFlow extends React.Component {
       stripeElements: null,
       isSubmitted: false,
       isSubmitting: false,
-      stepProfile: this.getDefaultStepProfile(),
-      stepPayment: null,
-      stepSummary: null,
       showSignIn: false,
       createdOrder: null,
+      // Steps data
+      stepProfile: this.getDefaultStepProfile(),
+      stepPayment: {
+        key: queryParams.paymentMethod,
+        isKeyOnly: true, // For the step payment to recognize if it needs to load the payment method
+      },
+      stepSummary: null,
       stepDetails: {
         quantity: queryParams.quantity || 1,
         interval: isSupportedInterval(collective, tier, LoggedInUser, queryParams.interval)
@@ -195,27 +199,28 @@ class ContributionFlow extends React.Component {
           this.pushStepRoute(STEPS.PROFILE); // Force user to re-fill profile
         }
       }
-    }
-
-    // Reflect state changes in the URL
-    const currentStepName = this.getCurrentStepName();
-    if (currentStepName !== STEPS.SUCCESS) {
-      const { stepDetails, stepProfile } = this.state;
-      const currentUrlState = this.getQueryParams();
-      const expectedUrlState = stepsDataToUrlParamsData(
-        currentUrlState,
-        stepDetails,
-        stepProfile,
-        this.props.paymentFlow === PAYMENT_FLOW.CRYPTO,
-      );
-      if (!isEqual(currentUrlState, omitBy(expectedUrlState, isNil))) {
-        const route = this.getRoute(currentStepName);
-        const queryHelper = this.getQueryHelper();
-        this.props.router.replace(
-          { pathname: route, query: omitBy(queryHelper.encode(expectedUrlState), isNil) },
-          null,
-          { scroll: false, shallow: true },
+    } else if (!this.props.loadingLoggedInUser) {
+      // Reflect state changes in the URL
+      const currentStepName = this.getCurrentStepName();
+      if (currentStepName !== STEPS.SUCCESS) {
+        const { stepDetails, stepProfile, stepPayment } = this.state;
+        const currentUrlState = this.getQueryParams();
+        const expectedUrlState = stepsDataToUrlParamsData(
+          currentUrlState,
+          stepDetails,
+          stepProfile,
+          stepPayment,
+          this.props.paymentFlow === PAYMENT_FLOW.CRYPTO,
         );
+        if (!isEqual(currentUrlState, omitBy(expectedUrlState, isNil))) {
+          const route = this.getRoute(currentStepName);
+          const queryHelper = this.getQueryHelper();
+          this.props.router.replace(
+            { pathname: route, query: omitBy(queryHelper.encode(expectedUrlState), isNil) },
+            null,
+            { scroll: false, shallow: true },
+          );
+        }
       }
     }
   }
@@ -781,6 +786,8 @@ class ContributionFlow extends React.Component {
         validate: action => {
           if (action === 'prev') {
             return true;
+          } else if (stepPayment?.isKeyOnly) {
+            return false; // Need to redirect to the payment step to load the payment method
           } else if (stepPayment?.key === STRIPE_PAYMENT_ELEMENT_KEY) {
             return stepPayment.isCompleted;
           } else {
@@ -886,6 +893,7 @@ class ContributionFlow extends React.Component {
         currentStepName={currentStepName}
         onStepChange={this.onStepChange}
         onComplete={isCrypto && isSubmitted ? this.cryptoOrderCompleted : this.submitOrder}
+        delayCompletionCheck={Boolean(loadingLoggedInUser && stepProfile)}
       >
         {({
           steps,

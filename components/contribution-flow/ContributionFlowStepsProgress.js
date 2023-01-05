@@ -12,7 +12,7 @@ import StepsProgress from '../StepsProgress';
 import { P, Span } from '../Text';
 
 import { STEPS } from './constants';
-import { getTotalAmount } from './utils';
+import { getTotalAmount, NEW_CREDIT_CARD_KEY } from './utils';
 
 // Styles for the steps label rendered in StepsProgress
 const StepLabel = styled(Span)`
@@ -87,6 +87,8 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
   } else if (step.name === STEPS.PAYMENT) {
     if (isFreeTier && getTotalAmount(stepDetails, stepSummary) === 0) {
       return <FormattedMessage id="noPaymentRequired" defaultMessage="No payment required" />;
+    } else if (stepPayment?.key === NEW_CREDIT_CARD_KEY) {
+      return <FormattedMessage id="contribute.newcreditcard" defaultMessage="New credit/debit card" />;
     } else {
       return (!isCrypto && stepPayment?.paymentMethod && getPaymentMethodName(stepPayment.paymentMethod)) || null;
     }

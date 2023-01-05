@@ -30,6 +30,10 @@ const ContributionFlowUrlParametersConfig = {
    * A custom description
    */
   description: { type: 'string' },
+  /**
+   * ID of the payment method to use. Will fallback to another payment method if not available.
+   */
+  paymentMethod: { type: 'string' },
   // -- Profile
   /**
    * Slug of the default profile to use to contribute
@@ -122,7 +126,7 @@ const EmbedContributionFlowUrlParametersConfig = {
 /**
  * Returns an un-sanitized version of the URL query parameters
  */
-export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepProfile, isCrypto) => {
+export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepProfile, stepPayment, isCrypto) => {
   const data = pick(previousUrlParams, ['redirect', 'hideFAQ', 'hideHeader', 'backgroundColor', 'useTheme']);
 
   // Step details
@@ -137,6 +141,11 @@ export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepPro
     data.contributeAs = stepProfile.slug;
   } else {
     assign(data, pick(stepProfile, ['name', 'legalName', 'email']));
+  }
+
+  // Step payment
+  if (stepPayment?.key) {
+    data.paymentMethod = stepPayment.key;
   }
 
   // Remove entries that are set to their default values
