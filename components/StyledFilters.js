@@ -19,7 +19,7 @@ const FilterButton = styled(StyledButton).attrs({
   color: ${props => props.theme.colors.black[800]};
 
   ${props =>
-    props.$isSelected &&
+    props['data-selected'] &&
     css`
       &,
       &:hover,
@@ -74,7 +74,7 @@ const StyledFilters = ({
             <FilterButton
               data-cy={`filter-button ${filter.toLowerCase()}`}
               onClick={isSelected ? undefined : () => onChange(filter)}
-              $isSelected={isSelected}
+              data-selected={isSelected}
               minWidth={minButtonWidth}
               disabled={disabled}
               height={buttonHeight}
