@@ -26,7 +26,7 @@ import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { confirmPayment } from '../../lib/stripe/confirm-payment';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { getCollectivePageRoute, isTrustedRedirectHost, objectToQueryString } from '../../lib/url-helpers';
-import { reportValidityHTML5 } from '../../lib/utils';
+import { removeEmptyAndDuplicateQueryParams, reportValidityHTML5 } from '../../lib/utils';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
 import Captcha, { isCaptchaEnabled } from '../Captcha';
@@ -850,10 +850,13 @@ class ContributionFlow extends React.Component {
     });
 
     const path = window.location.pathname;
+    let redirectUrl = '';
     if (window.location.search) {
-      return `${path}${window.location.search}&${stepDetailsParams.slice(1)}`;
+      redirectUrl = removeEmptyAndDuplicateQueryParams(`${window.location.search}&${stepDetailsParams.slice(1)}`);
+      return `${path}?${redirectUrl}`;
     } else {
-      return `${path}${stepDetailsParams}`;
+      redirectUrl = removeEmptyAndDuplicateQueryParams(stepDetailsParams);
+      return `${path}?${redirectUrl}`;
     }
   };
 
