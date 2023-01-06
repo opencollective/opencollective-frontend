@@ -66,6 +66,14 @@ const TokenBox = styled(Box)`
 const Code = styled.code`
   background: ${props => props.theme.colors.black[100]};
   color: ${props => props.theme.colors.black[700]};
+  word-break: break-all;
+  display: block;
+  margin-top: 8px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #4d4f51;
+  max-width: 350px;
 `;
 
 class UserTwoFactorAuth extends React.Component {
@@ -327,8 +335,7 @@ class UserTwoFactorAuth extends React.Component {
                                   <Field
                                     as={StyledInput}
                                     {...inputProps}
-                                    minWidth={300}
-                                    maxWidth={350}
+                                    width={240}
                                     minHeight={75}
                                     fontSize="20px"
                                     autoComplete="off"
@@ -379,7 +386,12 @@ class UserTwoFactorAuth extends React.Component {
                         </H3>
                       </Flex>
                       <Container maxWidth={480} border="2px solid black" borderRadius={8} my={3}>
-                        <Grid gridTemplateColumns="1fr 1fr" p="32px" gridGap="16px" data-cy="recovery-codes-container">
+                        <Grid
+                          gridTemplateColumns={['1fr', '1fr 1fr']}
+                          p="32px"
+                          gridGap="16px"
+                          data-cy="recovery-codes-container"
+                        >
                           {recoveryCodes.map(code => {
                             return (
                               <P key={code} fontSize="16px" fontWeight="700" m="0 16px 16px 0">
@@ -473,7 +485,7 @@ class UserTwoFactorAuth extends React.Component {
                             includeMargin
                             data-cy="qr-code"
                           />
-                          <TokenBox maxWidth={350} data-cy="manual-entry-2fa-token">
+                          <TokenBox data-cy="manual-entry-2fa-token">
                             <P>
                               <FormattedMessage
                                 id="TwoFactorAuth.Setup.ManualEntry"
@@ -521,8 +533,7 @@ class UserTwoFactorAuth extends React.Component {
                                     <Field
                                       as={StyledInput}
                                       {...inputProps}
-                                      minWidth={300}
-                                      maxWidth={350}
+                                      width={240}
                                       minHeight={60}
                                       fontSize="20px"
                                       lineHeight="28px"
