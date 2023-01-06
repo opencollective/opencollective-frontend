@@ -20,6 +20,10 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       twitterHandle
       repositoryUrl
       website
+      socialLinks {
+        type
+        url
+      }
       tags
       company
       type

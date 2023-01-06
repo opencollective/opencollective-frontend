@@ -63,6 +63,7 @@ const AccountSettings = ({ account, section }) => {
       'website',
       'twitterHandle',
       'repositoryUrl',
+      'socialLinks',
       'location',
       'privateInstructions',
       'startsAt',
