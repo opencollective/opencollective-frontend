@@ -569,28 +569,38 @@ class EditCollectiveForm extends React.Component {
     const taxes = getApplicableTaxesForCountry(country);
 
     if (taxes.includes(TaxType.VAT)) {
+      const getVATOptions = () => {
+        const options = [
+          {
+            value: '',
+            label: intl.formatMessage(this.messages['VAT.None']),
+          },
+          {
+            value: VAT_OPTIONS.HOST,
+            label: intl.formatMessage(this.messages['VAT.Host']),
+          },
+        ];
+
+        return collective.isHost
+          ? options
+          : [
+              ...options,
+              {
+                value: VAT_OPTIONS.OWN,
+                label: intl.formatMessage(this.messages['VAT.Own']),
+              },
+            ];
+      };
+
       fields.push(
         {
           name: 'VAT',
           type: 'select',
-          defaultValue: get(collective, 'settings.VAT.type'),
+          defaultValue: get(collective, 'settings.VAT.type') || VAT_OPTIONS.HOST,
           when: () => {
-            return AccountTypesWithHost.includes(collective.type);
+            return collective.isHost || AccountTypesWithHost.includes(collective.type);
           },
-          options: [
-            {
-              value: '',
-              label: intl.formatMessage(this.messages['VAT.None']),
-            },
-            {
-              value: VAT_OPTIONS.HOST,
-              label: intl.formatMessage(this.messages['VAT.Host']),
-            },
-            {
-              value: VAT_OPTIONS.OWN,
-              label: intl.formatMessage(this.messages['VAT.Own']),
-            },
-          ],
+          options: getVATOptions(),
         },
         {
           name: 'VAT-number',
