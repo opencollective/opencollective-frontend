@@ -121,38 +121,43 @@ function FormFields({ collective, types, values }) {
   return (
     <React.Fragment>
       {(![FUND].includes(collective.type) || types?.length === 1) && (
-        <StyledInputFormikField
-          name="type"
-          label={intl.formatMessage({ id: 'tier.type.label', defaultMessage: 'Type' })}
-          labelFontWeight="bold"
-          mt="3"
-        >
-          {({ field, form, loading }) => (
-            <StyledSelect
-              inputId={field.name}
-              data-cy={field.name}
-              error={field.error}
-              onBlur={() => form.setFieldTouched(field.name, true)}
-              onChange={({ value }) => form.setFieldValue(field.name, value)}
-              isLoading={loading}
-              options={tierTypeOptions}
-              value={tierTypeOptions.find(option => option.value === field.value)}
-            />
-          )}
-        </StyledInputFormikField>
+        <React.Fragment>
+          <StyledInputFormikField
+            name="type"
+            label={intl.formatMessage({ id: 'tier.type.label', defaultMessage: 'Type' })}
+            labelFontWeight="bold"
+            mt="3"
+          >
+            {({ field, form, loading }) => (
+              <StyledSelect
+                inputId={field.name}
+                data-cy={field.name}
+                error={field.error}
+                onBlur={() => form.setFieldTouched(field.name, true)}
+                onChange={({ value }) => form.setFieldValue(field.name, value)}
+                isLoading={loading}
+                options={tierTypeOptions}
+                value={tierTypeOptions.find(option => option.value === field.value)}
+              />
+            )}
+          </StyledInputFormikField>
+          {taxes.map(({ type, percentage }) => (
+            <Flex key={`${type}-${percentage}`} mt={3}>
+              <MessageBox type="info" withIcon css={{ flexGrow: 1 }} fontSize="12px">
+                <Span fontWeight="bold">
+                  <FormattedMessage
+                    id="withColon"
+                    defaultMessage="{item}:"
+                    values={{ item: i18nTaxType(intl, type) }}
+                  />{' '}
+                  {percentage}%
+                </Span>
+                <Box mt={2}>{i18nTaxDescription(intl, type)}</Box>
+              </MessageBox>
+            </Flex>
+          ))}
+        </React.Fragment>
       )}
-      {(![FUND].includes(collective.type) || types?.length === 1) &&
-        taxes.map(({ type, percentage }) => (
-          <Flex key={`${type}-${percentage}`} mt={3}>
-            <MessageBox type="info" withIcon css={{ flexGrow: 1 }} fontSize="12px">
-              <Span fontWeight="bold">
-                <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: i18nTaxType(intl, type) }} />{' '}
-                {percentage}%
-              </Span>
-              <Box mt={2}>{i18nTaxDescription(intl, type)}</Box>
-            </MessageBox>
-          </Flex>
-        ))}
       <StyledInputFormikField
         name="name"
         label={intl.formatMessage({ id: 'Fields.name', defaultMessage: 'Name' })}
