@@ -16,7 +16,6 @@ const StepProfile = ({
   defaultName,
   onChange,
   data,
-  canUseIncognito,
   onSignInClick,
   isEmbed,
 }) => {
@@ -27,7 +26,6 @@ const StepProfile = ({
         <StepProfileLoggedInForm
           profiles={profiles}
           onChange={onChange}
-          canUseIncognito={canUseIncognito}
           collective={collective}
           data={data}
           stepDetails={stepDetails}
@@ -59,7 +57,6 @@ StepProfile.propTypes = {
   profiles: PropTypes.arrayOf(PropTypes.object),
   defaultEmail: PropTypes.string,
   defaultName: PropTypes.string,
-  canUseIncognito: PropTypes.bool,
   isEmbed: PropTypes.bool,
 };
 

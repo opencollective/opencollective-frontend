@@ -4,6 +4,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import Avatar from './Avatar';
 import Container from './Container';
+import LinkCollective from './LinkCollective';
 
 class Response extends React.Component {
   static propTypes = {
@@ -34,38 +35,36 @@ class Response extends React.Component {
       return <div />;
     }
 
-    const linkTo = `/${user.slug}`;
     const title = intl.formatMessage(this.messages[status], { name });
-
     return (
-      <a href={linkTo} title={title}>
-        <div>
-          <Container
-            display="flex"
-            alignItems="flex-start"
-            width="100%"
-            margin="10px"
-            maxWidth="300px"
-            float="left"
-            position="relative"
-            height="90px"
-            overflow="hidden"
-          >
-            <Avatar collective={user} radius={40} />
-            <Container padding="0.25rem 1rem">
-              <Container fontSize="1.5rem">{name}</Container>
-              <Container fontSize="1.2rem" color="black.600">
-                {description || user.description}
-              </Container>
-              {count > 1 && (
-                <Container pt={1} fontSize="1.2rem" color="black.600">
-                  <FormattedMessage defaultMessage="{count} tickets" values={{ count }} />
-                </Container>
-              )}
+      <LinkCollective collective={user} title={title}>
+        <Container
+          display="flex"
+          alignItems="center"
+          width="100%"
+          margin="10px"
+          maxWidth="300px"
+          float="left"
+          position="relative"
+          height="90px"
+          overflow="hidden"
+        >
+          <Avatar collective={user} radius={40} />
+          <Container padding="0.25rem 1rem">
+            <Container fontSize="1.5rem">
+              {user.isIncognito ? <FormattedMessage id="profile.incognito" defaultMessage="Incognito" /> : name}
             </Container>
+            <Container fontSize="1.2rem" color="black.600">
+              {description || user.description}
+            </Container>
+            {count > 1 && (
+              <Container pt={1} fontSize="1.2rem" color="black.600">
+                <FormattedMessage defaultMessage="{count} tickets" values={{ count }} />
+              </Container>
+            )}
           </Container>
-        </div>
-      </a>
+        </Container>
+      </LinkCollective>
     );
   }
 }
