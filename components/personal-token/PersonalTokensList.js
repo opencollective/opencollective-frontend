@@ -41,8 +41,8 @@ const personalTokenQuery = gql`
   }
 `;
 
-const PersonalTokensList = ({ accountSlug, onPersonalTokenCreated, offset = 0 }) => {
-  const variables = { slug: accountSlug, limit: 12, offset: offset };
+const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => {
+  const variables = { slug: account.slug, limit: 12, offset: offset };
   const [showCreatePersonalToken, setShowCreatePersonalTokenModal] = React.useState(false);
   const { data, loading, error, networkStatus } = useQuery(personalTokenQuery, {
     variables,
@@ -151,7 +151,9 @@ const PersonalTokensList = ({ accountSlug, onPersonalTokenCreated, offset = 0 })
 };
 
 PersonalTokensList.propTypes = {
-  accountSlug: PropTypes.string.isRequired,
+  account: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+  }),
   onPersonalTokenCreated: PropTypes.func.isRequired,
   offset: PropTypes.number,
 };
