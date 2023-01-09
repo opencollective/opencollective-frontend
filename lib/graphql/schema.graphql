@@ -4229,7 +4229,7 @@ type Query {
     fetchDataFromLedger: Boolean
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction]
-  Application(id: Int): Application
+  Application(id: Int): Application @deprecated(reason: "2023-01-03: Please use PersonalToken from GQLV2")
   Transaction(id: Int, uuid: String): Transaction
   allCollectives(
     """
@@ -4590,7 +4590,8 @@ type Mutation {
     @deprecated(reason: "2022-11-18: This mutation has been moved to GQLV2")
   refundTransaction(id: Int!): Transaction @deprecated(reason: "2022-01-27: Please use refundTransaction from GQLV2")
   createApplication(application: ApplicationInput!): Application
-  deleteApplication(id: Int!): Application
+    @deprecated(reason: "2023-01-03: Please use createPersonalToken from GQLV2")
+  deleteApplication(id: Int!): Application @deprecated(reason: "2023-01-03: Please use deletePersonalToken from GQLV2")
 
   """
   Update a payment method

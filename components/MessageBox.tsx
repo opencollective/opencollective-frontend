@@ -26,8 +26,8 @@ import {
 import { whiteSpace, WhiteSpaceProps } from '../lib/styled-system-custom-properties';
 import { MessageType, messageType } from '../lib/theme/variants/message';
 
+import { Box } from './Grid';
 import StyledSpinner from './StyledSpinner';
-import { Span } from './Text';
 
 type MessageProps = BordersProps &
   ShadowProps &
@@ -47,13 +47,17 @@ type MessageBoxProps = MessageProps & {
 };
 
 const Message = styled.div<MessageProps>`
-  border: 1px solid;
+  border: 0.6px solid;
   border-radius: 12px;
-  padding: ${themeGet('space.3')}px;
+  padding: ${themeGet('space.3')}px 24px;
+  font-size: 13px;
+  line-height: 20px;
 
-  a {
-    text-decoration: underline !important;
-  }
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  box-shadow: 0px 1px 4px 1px rgba(49, 50, 51, 0.05);
 
   ${borders}
   ${shadow}
@@ -67,36 +71,52 @@ const Message = styled.div<MessageProps>`
 
   ${messageType}
 
-  svg[data-type="message-icon"] {
+  a {
+    text-decoration: underline !important;
+    color: ${themeGet('colors.black.800')};
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-size: 13px;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+  }
+  svg[data-type='message-icon'] {
     vertical-align: text-bottom;
   }
 `;
 
+const iconColors = {
+  white: 'black.600',
+  info: 'blue.500',
+  success: 'green.500',
+  warning: 'yellow.600',
+  error: 'red.500',
+};
+
 const icons = {
-  info: <InfoCircle data-type="message-icon" size="1em" color="#5CA3FF" />,
-  success: <CheckCircle data-type="message-icon" size="1em" color="#25B869" />,
-  warning: <ExclamationTriangle data-type="message-icon" size="1em" color="#CCCC18" />,
-  error: <ExclamationCircle data-type="message-icon" size="1em" color="#E03F6A" />,
+  info: <InfoCircle data-type="message-icon" size="1.1em" color="inherit" />,
+  success: <CheckCircle data-type="message-icon" size="1.1em" />,
+  warning: <ExclamationTriangle data-type="message-icon" size="1.1em" />,
+  error: <ExclamationCircle data-type="message-icon" size="1.1em" />,
 };
 
 /**
  * Display messages in a box contextualized for message type (error, success...etc)
  */
 const MessageBox = ({ type = 'white', withIcon = false, isLoading, children, ...props }: MessageBoxProps) => {
-  const icon = withIcon && icons[type];
+  const icon = withIcon ? icons[type] : null;
   return (
     <Message type={type} {...props}>
-      {isLoading && (
-        <Span mr={2} style={{ display: 'inline-block' }}>
-          <StyledSpinner size="1.5em" />
-        </Span>
+      {(icon || isLoading) && (
+        <Box flexShrink={0} alignSelf={'start'} color={iconColors[type]}>
+          {isLoading ? <StyledSpinner size="1.2em" /> : icon}
+        </Box>
       )}
-      {icon && !isLoading && (
-        <Span mr={2} style={{ display: 'inline-block', verticalAlign: 'text-bottom' }}>
-          {icon}
-        </Span>
-      )}
-      {children}
+
+      <Box>{children}</Box>
     </Message>
   );
 };

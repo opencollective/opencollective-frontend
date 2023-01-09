@@ -99,7 +99,7 @@ const messages = defineMessages({
   },
   userIsArchivedDescription: {
     id: 'user.isArchived.edit.description',
-    defaultMessage: 'This account has been archived is no longer active.',
+    defaultMessage: 'This account has been archived and is no longer active.',
   },
 });
 
@@ -120,16 +120,15 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
 
 const getNotification = (intl, account) => {
   if (account?.isArchived) {
-    const notification = { status: 'collectiveArchived' };
     if (account.type === 'USER') {
       return {
-        ...notification,
+        type: 'warning',
         title: intl.formatMessage(messages.userIsArchived),
         description: intl.formatMessage(messages.userIsArchivedDescription),
       };
     } else {
       return {
-        ...notification,
+        type: 'warning',
         title: intl.formatMessage(messages.collectiveIsArchived, { name: account.name }),
         description: intl.formatMessage(messages.collectiveIsArchivedDescription, {
           type: account.type.toLowerCase(),
@@ -191,13 +190,7 @@ const AdminPanelPage = () => {
             display={['flex', null, 'none']}
           />
         )}
-        {Boolean(notification) && (
-          <NotificationBar
-            status={notification.status}
-            title={notification.title}
-            description={notification.description}
-          />
-        )}
+        {Boolean(notification) && <NotificationBar {...notification} />}
         {blocker ? (
           <Flex flexDirection="column" alignItems="center" my={6}>
             <MessageBox type="warning" mb={4} maxWidth={400} withIcon>

@@ -28,7 +28,7 @@ export const generateTheme = ({ colors = defaultColors, space = defaultSpaces } 
       color: colors.black[800],
     },
     success: {
-      backgroundColor: colors.green[100],
+      backgroundColor: colors.green[50],
       borderColor: colors.green[500],
       color: colors.black[800],
     },
@@ -38,7 +38,7 @@ export const generateTheme = ({ colors = defaultColors, space = defaultSpaces } 
       color: colors.black[800],
     },
     error: {
-      backgroundColor: colors.red[100],
+      backgroundColor: colors.red[50],
       borderColor: colors.red[500],
       color: colors.black[800],
     },
