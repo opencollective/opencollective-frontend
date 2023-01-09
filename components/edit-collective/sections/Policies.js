@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
-import { filter, get, isEmpty, omit, size } from 'lodash';
+import { filter, get, isEmpty, size } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
@@ -368,7 +368,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                   options={numberOfAdminsOptions}
                   onChange={option => {
                     if (option.value === 0) {
-                      formik.setFieldValue('policies', omit(formik.values.policies, ['COLLECTIVE_MINIMUM_ADMINS']));
+                      formik.setFieldValue('policies', { ...formik.values.policies, COLLECTIVE_MINIMUM_ADMINS: null });
                     } else {
                       formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
                         ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
