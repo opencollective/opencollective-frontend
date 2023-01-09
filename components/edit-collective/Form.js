@@ -893,11 +893,13 @@ class EditCollectiveForm extends React.Component {
                       required={field.required}
                     />
                   ))}
-                  <SocialLinksFormField
-                    value={this.state.collective?.socialLinks}
-                    touched={this.state.modified}
-                    onChange={value => this.handleChange('socialLinks', value)}
-                  />
+                  {section === 'info' && (
+                    <SocialLinksFormField
+                      value={this.state.collective?.socialLinks}
+                      touched={this.state.modified}
+                      onChange={value => this.handleChange('socialLinks', value)}
+                    />
+                  )}
                 </div>
               </div>
             )}
