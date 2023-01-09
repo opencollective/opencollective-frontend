@@ -179,7 +179,7 @@ const HostDashboardExpenses = ({ hostSlug, isNewAdmin }) => {
             flexWrap={'wrap'}
           >
             <P fontWeight={700}>
-              <FormattedMessage defaultMessage="Fraud Protection Warning" />
+              <FormattedMessage id="host.fraudProtectionWarning" defaultMessage="Fraud Protection Warning" />
             </P>
             {hasDisputedOrders && (
               <P>

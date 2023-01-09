@@ -19,6 +19,7 @@ import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
+import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
@@ -57,7 +58,12 @@ const setPoliciesMutation = gql`
     setPolicies(account: $account, policies: $policies) {
       id
       policies {
-        EXPENSE_AUTHOR_CANNOT_APPROVE
+        EXPENSE_AUTHOR_CANNOT_APPROVE {
+          enabled
+          amountInCents
+          appliesToHostedCollectives
+          appliesToSingleAdminCollectives
+        }
         REQUIRE_2FA_FOR_ADMINS
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
@@ -253,6 +259,10 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
     { value: 'ALL_COLLECTIVES', label: <FormattedMessage defaultMessage="All Collectives" /> },
   ];
 
+  const hostAuthorCannotApproveExpensePolicy = data?.account?.host?.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'];
+  const authorCannotApproveExpenseEnforcedByHost =
+    hostAuthorCannotApproveExpensePolicy?.enabled && hostAuthorCannotApproveExpensePolicy?.appliesToHostedCollectives;
+
   return (
     <Flex flexDirection="column">
       {error && <MessageBoxGraphqlError error={error} />}
@@ -428,28 +438,129 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               />
             }
             onChange={() =>
-              formik.setFieldValue(
-                'policies',
-                formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']
-                  ? omit(formik.values.policies, ['EXPENSE_AUTHOR_CANNOT_APPROVE'])
-                  : { ...formik.values.policies, EXPENSE_AUTHOR_CANNOT_APPROVE: true },
-              )
+              formik.setFieldValue('policies', {
+                ...formik.values.policies,
+                ['EXPENSE_AUTHOR_CANNOT_APPROVE']: {
+                  ...formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'],
+                  enabled: !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled,
+                  appliesToHostedCollectives: false,
+                  appliesToSingleAdminCollectives: false,
+                  amountInCents: 0,
+                },
+              })
             }
-            checked={Boolean(formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'])}
+            checked={
+              authorCannotApproveExpenseEnforcedByHost ||
+              Boolean(formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled)
+            }
             disabled={
               isSettingPolicies ||
-              (numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']))
+              (numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled)) ||
+              authorCannotApproveExpenseEnforcedByHost
             }
           />
-          {collective?.isHost && (
-            <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
-              <FormattedMessage
-                id="editCollective.expenseApprovalsPolicy.authorCannotApprove.hostDescription"
-                defaultMessage="This policy is only enforced on your fiscal host and does not affect collectives hosted by you."
-              />
+          <Flex
+            ml="2.2rem"
+            mt="1rem"
+            alignItems="center"
+            color={!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled ? 'black.600' : undefined}
+          >
+            <P mr="2rem">
+              <FormattedMessage defaultMessage="Enforce for expenses above:" />
             </P>
+            <StyledInputAmount
+              maxWidth="11em"
+              disabled={
+                isSettingPolicies ||
+                authorCannotApproveExpenseEnforcedByHost ||
+                !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled
+              }
+              currency={data?.account?.currency}
+              currencyDisplay="CODE"
+              placeholder="0"
+              value={
+                authorCannotApproveExpenseEnforcedByHost
+                  ? hostAuthorCannotApproveExpensePolicy.amountInCents
+                  : formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.amountInCents
+              }
+              onChange={value =>
+                formik.setFieldValue('policies', {
+                  ...formik.values.policies,
+                  ['EXPENSE_AUTHOR_CANNOT_APPROVE']: {
+                    ...formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'],
+                    amountInCents: value,
+                  },
+                })
+              }
+            />
+          </Flex>
+          {collective?.isHost && (
+            <React.Fragment>
+              <P
+                ml="2.2rem"
+                mt="1rem"
+                color={!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled ? 'black.600' : undefined}
+              >
+                <StyledCheckbox
+                  name="authorCannotApproveExpense.appliesToHostedCollectives"
+                  label={
+                    <FormattedMessage
+                      id="editCollective.expenseApprovalsPolicy.authorCannotApprove.appliesToHostedCollectives"
+                      defaultMessage="Enforce this policy on collectives hosted by you."
+                    />
+                  }
+                  checked={formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.appliesToHostedCollectives}
+                  disabled={isSettingPolicies || !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled}
+                  onChange={() =>
+                    formik.setFieldValue('policies', {
+                      ...formik.values.policies,
+                      ['EXPENSE_AUTHOR_CANNOT_APPROVE']: {
+                        ...formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'],
+                        appliesToHostedCollectives:
+                          !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.appliesToHostedCollectives,
+                        appliesToSingleAdminCollectives: false,
+                      },
+                    })
+                  }
+                />
+              </P>
+              <P
+                ml="2.2rem"
+                mt="1rem"
+                color={
+                  !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.appliesToHostedCollectives
+                    ? 'black.600'
+                    : undefined
+                }
+              >
+                <StyledCheckbox
+                  name="authorCannotApproveExpense.appliesToSingleAdminCollectives"
+                  label={
+                    <FormattedMessage
+                      id="editCollective.expenseApprovalsPolicy.authorCannotApprove.appliesToSingleAdminCollectives"
+                      defaultMessage="Enforce this policy on collectives with a single admin."
+                    />
+                  }
+                  checked={formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.appliesToSingleAdminCollectives}
+                  disabled={
+                    isSettingPolicies ||
+                    !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.appliesToHostedCollectives
+                  }
+                  onChange={() =>
+                    formik.setFieldValue('policies', {
+                      ...formik.values.policies,
+                      ['EXPENSE_AUTHOR_CANNOT_APPROVE']: {
+                        ...formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'],
+                        appliesToSingleAdminCollectives:
+                          !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.appliesToSingleAdminCollectives,
+                      },
+                    })
+                  }
+                />
+              </P>
+            </React.Fragment>
           )}
-          {numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']) && (
+          {numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled) && (
             <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
               <FormattedMessage
                 id="editCollective.expenseApprovalsPolicy.authorCannotApprove.minAdminRequired"

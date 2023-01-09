@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { omitBy } from 'lodash';
 import { defineMessage, useIntl } from 'react-intl';
 
 import { isIndividualAccount } from '../../../../lib/collective.lib';
@@ -129,9 +130,19 @@ const getOptions = (intl, account) => {
   // const unclassified = difference(Object.keys(ActivityTypes), allClassified);
   // console.log(unclassified);
 
+  const categories = !account
+    ? ActivityCategories
+    : omitBy(ActivityCategories, (_, category) => {
+        if (category === 'HOST' && !account.isHost) {
+          return true;
+        } else if (category === 'USER' && !isIndividualAccount(account)) {
+          return true;
+        }
+      });
+
   return [
     { label: intl.formatMessage({ id: 'WebhookEvents.All', defaultMessage: 'All' }) },
-    ...Object.values(ActivityCategories).map(({ title, activities }) => {
+    ...Object.values(categories).map(({ title, activities }) => {
       return {
         label: intl.formatMessage(title),
         options: activities

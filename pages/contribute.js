@@ -387,7 +387,6 @@ const contributePageQuery = gqlV1/* GraphQL */ `
         isAdmin
         isCore
         isBacker
-        isFundraiser
         since
         description
         collectiveSlug

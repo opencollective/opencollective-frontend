@@ -32,9 +32,11 @@ describe('Recurring contributions', () => {
 
   it('Has contributions in the right categories', () => {
     cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
-      cy.getByDataCy('filter-button monthly').click();
+      cy.getByDataCy('recurring-contributions-interval').click();
+      cy.getByDataCy('recurring-contributions-interval').get('[data-cy="select-option"]:nth-child(2)').click();
       cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
-      cy.getByDataCy('filter-button yearly').click();
+      cy.getByDataCy('recurring-contributions-interval').click();
+      cy.getByDataCy('recurring-contributions-interval').get('[data-cy="select-option"]:nth-child(3)').click();
       cy.getByDataCy('recurring-contribution-card').should('have.length', 0);
     });
   });
@@ -149,7 +151,7 @@ describe('Recurring contributions', () => {
 
   it('Can cancel an active contribution with reasons displayed in modal, "other" displays text area', () => {
     cy.clearInbox();
-    cy.login({ email: user.email, redirect: `/${user.collective.slug}/recurring-contributions` }).then(() => {
+    cy.login({ email: user.email, redirect: `/${user.collective.slug}/manage-contributions` }).then(() => {
       cy.getByDataCy('recurring-contribution-edit-activate-button').first().contains('Edit');
       cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
       cy.getByDataCy('recurring-contribution-menu').should('exist');
@@ -167,7 +169,8 @@ describe('Recurring contributions', () => {
         .click()
         .then(() => {
           cy.getByDataCy('toast-notification').contains('Your recurring contribution has been cancelled');
-          cy.getByDataCy('filter-button cancelled').click();
+          cy.getByDataCy('recurring-contributions-interval').click();
+          cy.getByDataCy('recurring-contributions-interval').get('[data-cy="select-option"]:nth-child(4)').click();
           cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
         });
       cy.openEmail(({ subject }) => subject.includes(`Contribution cancelled to Test Collective`));

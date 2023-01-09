@@ -99,12 +99,14 @@ const hostVirtualCardsQuery = gql`
           name
           legacyId
           imageUrl(height: 64)
-          parentAccount {
-            id
-            slug
-            name
-            legacyId
-            imageUrl(height: 64)
+          ... on AccountWithParent {
+            parentAccount: parent {
+              id
+              slug
+              name
+              legacyId
+              imageUrl(height: 64)
+            }
           }
         }
       }

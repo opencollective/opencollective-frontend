@@ -179,6 +179,7 @@ interface CollectiveInterface {
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String
   website: String
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -288,6 +289,7 @@ type UserDetails {
   isLimited: Boolean
   hasSeenLatestChangelogEntry: Boolean!
   hasTwoFactorAuth: Boolean
+  isRoot: Boolean!
 }
 
 """
@@ -543,7 +545,7 @@ type Contributor {
   """
   True if the contributor is a fundraiser
   """
-  isFundraiser: Boolean!
+  isFundraiser: Boolean @deprecated(reason: "2022-09-12: This role does not exist anymore")
 
   """
   A list of tier ids that this contributors is a member of. A null value indicates that a membership without tier.
@@ -610,7 +612,6 @@ enum ContributorRole {
   MEMBER
   CONTRIBUTOR
   BACKER
-  FUNDRAISER
   ATTENDEE
   FOLLOWER
   CONNECTED_COLLECTIVE
@@ -982,6 +983,47 @@ type ExpenseAttachedFile {
 }
 
 """
+A social link
+"""
+type SocialLink {
+  type: SocialLinkType!
+  url: URL!
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+"""
+The type of social link
+"""
+enum SocialLinkType {
+  TWITTER
+  TUMBLR
+  MASTODON
+  MATTERMOST
+  SLACK
+  LINKEDIN
+  MEETUP
+  FACEBOOK
+  INSTAGRAM
+  DISCORD
+  YOUTUBE
+  GITHUB
+  GITLAB
+  GIT
+  WEBSITE
+}
+
+"""
+A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
+"""
+scalar URL
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
+
+"""
 This represents an Update
 """
 type UpdateType {
@@ -1170,10 +1212,17 @@ type PlanType {
 }
 
 type Policies {
-  EXPENSE_AUTHOR_CANNOT_APPROVE: Boolean
+  EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
+}
+
+type EXPENSE_AUTHOR_CANNOT_APPROVE {
+  amountInCents: Int
+  enabled: Boolean
+  appliesToHostedCollectives: Boolean
+  appliesToSingleAdminCollectives: Boolean
 }
 
 type COLLECTIVE_MINIMUM_ADMINS {
@@ -1936,11 +1985,6 @@ enum CurrencyExchangeRateSourceType {
 }
 
 """
-A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
-"""
-scalar DateTime
-
-"""
 The results from searching for collectives with pagination info
 """
 type CollectiveSearchResults {
@@ -2313,6 +2357,7 @@ type Collective implements CollectiveInterface {
   """
   repositoryUrl: String
   website: String
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -2565,6 +2610,7 @@ type Event implements CollectiveInterface {
   """
   repositoryUrl: String
   website: String
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -2817,6 +2863,7 @@ type Fund implements CollectiveInterface {
   """
   repositoryUrl: String
   website: String
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -3069,6 +3116,7 @@ type Organization implements CollectiveInterface {
   """
   repositoryUrl: String
   website: String
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -3322,6 +3370,7 @@ type Project implements CollectiveInterface {
   """
   repositoryUrl: String
   website: String
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -3816,6 +3865,7 @@ type User implements CollectiveInterface {
   """
   repositoryUrl: String
   website: String
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -4070,6 +4120,7 @@ type Vendor implements CollectiveInterface {
   """
   repositoryUrl: String
   website: String
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -4178,7 +4229,7 @@ type Query {
     fetchDataFromLedger: Boolean
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction]
-  Application(id: Int): Application
+  Application(id: Int): Application @deprecated(reason: "2023-01-03: Please use PersonalToken from GQLV2")
   Transaction(id: Int, uuid: String): Transaction
   allCollectives(
     """
@@ -4536,9 +4587,11 @@ type Mutation {
   createOrder(order: OrderInputType!): OrderType
     @deprecated(reason: "2020-10-13: This endpoint has been moved to GQLV2")
   confirmOrder(order: ConfirmOrderInputType!): OrderType
+    @deprecated(reason: "2022-11-18: This mutation has been moved to GQLV2")
   refundTransaction(id: Int!): Transaction @deprecated(reason: "2022-01-27: Please use refundTransaction from GQLV2")
   createApplication(application: ApplicationInput!): Application
-  deleteApplication(id: Int!): Application
+    @deprecated(reason: "2023-01-03: Please use createPersonalToken from GQLV2")
+  deleteApplication(id: Int!): Application @deprecated(reason: "2023-01-03: Please use deletePersonalToken from GQLV2")
 
   """
   Update a payment method
@@ -4719,6 +4772,7 @@ input CollectiveInputType {
   twitterHandle: String
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String
+  socialLinks: [SocialLinkInput!]
   description: String
   longDescription: String
   expensePolicy: String
@@ -4747,6 +4801,11 @@ input CollectiveInputType {
   isIncognito: Boolean
   isActive: Boolean
   contributionPolicy: String
+}
+
+input SocialLinkInput {
+  type: SocialLinkType!
+  url: URL!
 }
 
 """

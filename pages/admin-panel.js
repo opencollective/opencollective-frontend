@@ -41,7 +41,6 @@ export const adminPanelQuery = gql`
         VIRTUAL_CARDS
         USE_PAYMENT_METHODS
         EMIT_GIFT_CARDS
-        EMAIL_NOTIFICATIONS_PANEL
       }
       policies {
         REQUIRE_2FA_FOR_ADMINS
@@ -63,7 +62,12 @@ export const adminPanelQuery = gql`
           name
           settings
           policies {
-            EXPENSE_AUTHOR_CANNOT_APPROVE
+            EXPENSE_AUTHOR_CANNOT_APPROVE {
+              enabled
+              amountInCents
+              appliesToHostedCollectives
+              appliesToSingleAdminCollectives
+            }
             COLLECTIVE_MINIMUM_ADMINS {
               numberOfAdmins
               applies

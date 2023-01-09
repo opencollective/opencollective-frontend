@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -54,9 +54,7 @@ const AccountSettings = () => {
       {selectedAccountOption.length !== 0 && (
         <React.Fragment>
           <Container px={1} pt={3} pb={3}>
-            <Box pb={2}>
-              <FormattedMessage defaultMessage="Flags" />
-            </Box>
+            <Box pb={2}>Flags</Box>
             <Flex flexWrap="wrap" px={1} mt={2}>
               <Box pr={4}>
                 <StyledCheckbox
@@ -102,7 +100,7 @@ const AccountSettings = () => {
                 addToast({
                   type: TOAST_TYPE.SUCCESS,
                   title: 'Success',
-                  message: <FormattedMessage defaultMessage="Account flags saved" />,
+                  message: 'Account flags saved',
                 });
                 setEnableSave(false);
               } catch (e) {
