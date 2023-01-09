@@ -501,7 +501,7 @@ class EditCollectiveForm extends React.Component {
         return <AuthorizedApps />;
 
       case EDIT_COLLECTIVE_SECTIONS.FOR_DEVELOPERS:
-        return <ForDevelopers accountSlug={collective.slug} />;
+        return <ForDevelopers account={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.ACTIVITY_LOG:
         return <ActivityLog accountSlug={collective.slug} />;
