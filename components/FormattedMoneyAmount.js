@@ -50,7 +50,7 @@ const FormattedMoneyAmount = ({
   const currencyCode = showCurrencyCode ? <Span {...currencyCodeStyles}>{currency}</Span> : '';
   if (isCrypto) {
     return <Span {...amountStyles}>{`${amount} ${currency}`}</Span>;
-  } else if (!interval || interval === INTERVALS.flexible) {
+  } else if (!interval || interval === INTERVALS.flexible || interval === INTERVALS.oneTime) {
     return (
       <FormattedMessage
         id="Amount"

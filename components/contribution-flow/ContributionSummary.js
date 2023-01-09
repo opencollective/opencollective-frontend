@@ -196,7 +196,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
         </AmountLine>
       )}
       <StyledHr borderColor="black.500" my={1} />
-      {stepDetails?.interval && stepDetails?.interval !== INTERVALS.flexible && (
+      {stepDetails?.interval && stepDetails?.interval !== INTERVALS.oneTime && (
         <P color="black.700" fontSize="11px" fontStyle="italic" mt={2}>
           <FormattedMessage
             id="ContributionSummary.NextCharge"

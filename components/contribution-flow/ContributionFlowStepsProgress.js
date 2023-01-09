@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import INTERVALS from '../../lib/constants/intervals';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 
 import Container from '../Container';
@@ -13,7 +12,7 @@ import StepsProgress from '../StepsProgress';
 import { P, Span } from '../Text';
 
 import { STEPS } from './constants';
-import { getTotalAmount } from './utils';
+import { getTotalAmount, NEW_CREDIT_CARD_KEY } from './utils';
 
 // Styles for the steps label rendered in StepsProgress
 const StepLabel = styled(Span)`
@@ -33,7 +32,7 @@ const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, isCryp
     const totalAmount = amount + (stepDetails.platformTip || 0);
     return (
       <FormattedMoneyAmount
-        interval={stepDetails.interval !== INTERVALS.flexible ? stepDetails.interval : null}
+        interval={stepDetails.interval}
         currency={currency}
         amount={totalAmount}
         abbreviateInterval
@@ -88,6 +87,8 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
   } else if (step.name === STEPS.PAYMENT) {
     if (isFreeTier && getTotalAmount(stepDetails, stepSummary) === 0) {
       return <FormattedMessage id="noPaymentRequired" defaultMessage="No payment required" />;
+    } else if (stepPayment?.key === NEW_CREDIT_CARD_KEY) {
+      return <FormattedMessage id="contribute.newcreditcard" defaultMessage="New credit/debit card" />;
     } else {
       return (!isCrypto && stepPayment?.paymentMethod && getPaymentMethodName(stepPayment.paymentMethod)) || null;
     }

@@ -45,7 +45,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, canUseIncognito, collecti
           profiles={profiles}
           canUseIncognito={canUseIncognito}
           selectedProfile={data}
-          onChange={profile => onChange({ stepProfile: profile })}
+          onChange={profile => onChange({ stepProfile: profile, stepPayment: null })}
         />
       </Box>
       {!isContributingFromSameHost && contributionRequiresLegalName(stepDetails) && (

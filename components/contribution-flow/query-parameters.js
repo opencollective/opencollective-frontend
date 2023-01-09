@@ -16,11 +16,6 @@ const ContributionFlowUrlParametersConfig = {
    */
   amount: { type: 'amount' },
   /**
-   * Default platform tip
-   * @private
-   */
-  platformTip: { type: 'amount' },
-  /**
    * Default number of units (for products and tickets only)
    * @default 1
    * @example 5
@@ -35,6 +30,10 @@ const ContributionFlowUrlParametersConfig = {
    * A custom description
    */
   description: { type: 'string' },
+  /**
+   * ID of the payment method to use. Will fallback to another payment method if not available.
+   */
+  paymentMethod: { type: 'string' },
   // -- Profile
   /**
    * Slug of the default profile to use to contribute
@@ -87,8 +86,6 @@ const ContributionFlowUrlParametersConfig = {
    * @example 4200
    */
   totalAmount: { type: 'alias', on: 'amount', modifier: value => Math.round(value / 100) },
-  /** @deprecated Use `platformTip` instead */
-  platformContribution: { type: 'alias', on: 'platformTip' },
   /** @deprecated Use `email` instead */
   defaultEmail: { type: 'alias', on: 'email' },
   /** @deprecated Use `name` instead */
@@ -124,26 +121,44 @@ const EmbedContributionFlowUrlParametersConfig = {
    * @example true
    */
   useTheme: { type: 'boolean' },
+  /**
+   * Whether to redirect the parent of the iframe rather than the iframe itself. The `iframe` needs to have
+   * its `sandbox` property set to `allow-top-navigation` for this to work.
+   */
+  shouldRedirectParent: { type: 'boolean' },
 };
 
 /**
  * Returns an un-sanitized version of the URL query parameters
  */
-export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepProfile, isCrypto) => {
-  const data = pick(previousUrlParams, ['redirect', 'hideFAQ', 'hideHeader', 'backgroundColor', 'useTheme']);
+export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepProfile, stepPayment, isCrypto) => {
+  // Static params that are not meant to be changed during the flow
+  const data = pick(previousUrlParams, [
+    'redirect',
+    'shouldRedirectParent',
+    'hideFAQ',
+    'hideHeader',
+    'backgroundColor',
+    'useTheme',
+  ]);
 
   // Step details
-  assign(data, pick(stepDetails, ['interval', 'quantity', 'platformTip', 'customData']));
+  assign(data, pick(stepDetails, ['interval', 'quantity', 'customData']));
 
   if (!isCrypto) {
     data.amount = stepDetails.amount;
   }
 
   // Step profile
-  if (stepProfile.slug) {
+  if (stepProfile?.slug) {
     data.contributeAs = stepProfile.slug;
   } else {
     assign(data, pick(stepProfile, ['name', 'legalName', 'email']));
+  }
+
+  // Step payment
+  if (stepPayment?.key) {
+    data.paymentMethod = stepPayment.key;
   }
 
   // Remove entries that are set to their default values

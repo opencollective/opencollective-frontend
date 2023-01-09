@@ -106,7 +106,7 @@ type PaymentMethodListProps = {
   disabledPaymentMethodTypes: string[];
   stepSummary: object;
   stepDetails: { amount: number; currency: string };
-  stepPayment: { key: string };
+  stepPayment: { key: string; isKeyOnly?: boolean };
   isEmbed: boolean;
   isSubmitting: boolean;
   hideCreditCardPostalCode: boolean;
@@ -213,10 +213,20 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
   );
 
   React.useEffect(() => {
-    if (!loading && !props.stepPayment && !isEmpty(paymentMethodOptions)) {
-      const firstOption = paymentMethodOptions.find(pm => !pm.disabled);
-      if (firstOption) {
-        setNewPaymentMethod(firstOption.key, { ...firstOption.paymentMethod, paymentIntentId });
+    if (loading) {
+      return;
+    } else if (isEmpty(paymentMethodOptions)) {
+      return props.onChange({ stepPayment: null });
+    }
+
+    if (!props.stepPayment || props.stepPayment.isKeyOnly) {
+      // Select the option given in URL if it's available, otherwise select the first available option
+      const keyToSelect = props.stepPayment?.key;
+      const newOption = paymentMethodOptions.find(pm => !pm.disabled && (!keyToSelect || pm.key === keyToSelect));
+      if (newOption) {
+        setNewPaymentMethod(newOption.key, { ...newOption.paymentMethod, paymentIntentId });
+      } else if (props.stepPayment) {
+        props.onChange({ stepPayment: null }); // Make sure we unselect the option if it's not available
       }
     }
   }, [paymentMethodOptions, props.stepPayment, loading]);

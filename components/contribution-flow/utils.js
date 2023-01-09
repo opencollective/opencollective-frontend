@@ -3,7 +3,7 @@ import { Bank } from '@styled-icons/boxicons-solid';
 import { find, get, isEmpty, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
-import { getCollectivePageMetadata } from '../../lib/collective.lib';
+import { canContributeRecurring, getCollectivePageMetadata } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import INTERVALS from '../../lib/constants/intervals';
 import {
@@ -195,7 +195,7 @@ export const generatePaymentMethodOptions = (
     }
 
     if (
-      !interval &&
+      interval === INTERVALS.oneTime &&
       !isEmbed &&
       supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.ALIPAY) &&
       !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.ALIPAY)
@@ -235,7 +235,7 @@ export const generatePaymentMethodOptions = (
     }
 
     // Manual (bank transfer)
-    if (hostHasManual && !interval && !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)) {
+    if (hostHasManual && INTERVALS.oneTime && !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)) {
       uniquePMs.push({
         key: 'manual',
         title: get(collective, 'host.settings.paymentMethods.manual.title', null) || (
@@ -317,6 +317,27 @@ export const getContributionFlowMetadata = (intl, account, tier) => {
         ? intl.formatMessage(PAGE_META_MSGS.eventTitle, { event: account.name })
         : intl.formatMessage(PAGE_META_MSGS.collectiveTitle, { collective: account.name }),
   };
+};
+
+export const isSupportedInterval = (collective, tier, user, interval) => {
+  // Interval must be set
+  if (!interval) {
+    return false;
+  }
+
+  // Enforce for fixed interval tiers
+  const isFixedInterval = tier?.interval && tier.interval !== INTERVALS.flexible;
+  if (isFixedInterval && tier.interval !== interval) {
+    return false;
+  }
+
+  // If not fixed, one time is always supported
+  if (interval === INTERVALS.oneTime) {
+    return true;
+  }
+
+  // Enforce for recurring
+  return canContributeRecurring(collective, user);
 };
 
 const getTotalYearlyAmount = stepDetails => {
