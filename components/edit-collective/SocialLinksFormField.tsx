@@ -181,6 +181,7 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
   return (
     <StyledSelect
       {...pickerProps}
+      data-cy="social-link-type-picker"
       value={options.find(o => o.value === value?.toString())}
       defaultValue={options.find(o => o.value === SocialLinkType.WEBSITE.toString())}
       onChange={({ value }) => onChange(value)}
