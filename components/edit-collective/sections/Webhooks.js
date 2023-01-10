@@ -194,7 +194,7 @@ class Webhooks extends React.Component {
           </Box>
           <Box>
             <Label fontSize="14px" mb={1}>
-              <FormattedMessage id="webhooks.types.label" defaultMessage="Activity" />
+              <FormattedMessage defaultMessage="Activity" />
             </Label>
             <Flex alignItems="center">
               <StyledSelect

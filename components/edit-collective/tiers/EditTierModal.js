@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
-import { Form, Formik } from 'formik';
+import { getApplicableTaxes } from '@opencollective/taxes';
+import { Form, Formik, useFormikContext } from 'formik';
 import { omit } from 'lodash';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -12,13 +13,15 @@ import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { requireFields } from '../../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import ContributeTier from '../../contribute-cards/ContributeTier';
-import { Flex } from '../../Grid';
+import { Box, Flex } from '../../Grid';
 import InputFieldPresets from '../../InputFieldPresets';
 import InputSwitch from '../../InputSwitch';
 import Link from '../../Link';
+import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledInputAmount from '../../StyledInputAmount';
@@ -27,6 +30,7 @@ import StyledLink from '../../StyledLink';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
+import { Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
 import ConfirmTierDeleteModal from './ConfirmTierDeleteModal';
@@ -38,10 +42,6 @@ const { FIXED, FLEXIBLE } = AmountTypes;
 function getTierTypeOptions(intl, collectiveType) {
   const simplifiedTierTypes = [
     { value: TIER, label: intl.formatMessage({ id: 'tier.type.tier', defaultMessage: 'generic tier' }) },
-    {
-      value: MEMBERSHIP,
-      label: intl.formatMessage({ id: 'tier.type.membership', defaultMessage: 'membership (recurring)' }),
-    },
     {
       value: SERVICE,
       label: intl.formatMessage({ id: 'tier.type.service', defaultMessage: 'service (e.g., support)' }),
@@ -86,44 +86,77 @@ function FormFields({ collective, types, values }) {
 
   const tierTypeOptions = getTierTypeOptions(intl, collective.type);
   const intervalOptions = [
-    { value: 'onetime', label: intl.formatMessage({ id: 'tier.interval.onetime', defaultMessage: 'one time' }) },
-    { value: 'month', label: intl.formatMessage({ id: 'tier.interval.month', defaultMessage: 'monthly' }) },
-    { value: 'year', label: intl.formatMessage({ id: 'tier.interval.year', defaultMessage: 'yearly' }) },
-    { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'flexible' }) },
+    { value: 'onetime', label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) },
+    { value: 'month', label: intl.formatMessage({ id: 'Frequency.Monthly', defaultMessage: 'Monthly' }) },
+    { value: 'year', label: intl.formatMessage({ id: 'Frequency.Yearly', defaultMessage: 'Yearly' }) },
+    { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
   ];
 
   const amountTypeOptions = [
-    { value: FIXED, label: intl.formatMessage({ id: 'tier.amountType.fixed', defaultMessage: 'fixed amount' }) },
+    { value: FIXED, label: intl.formatMessage({ id: 'tier.amountType.fixed', defaultMessage: 'Fixed amount' }) },
     {
       value: FLEXIBLE,
-      label: intl.formatMessage({ id: 'tier.amountType.flexible', defaultMessage: 'flexible amount' }),
+      label: intl.formatMessage({ id: 'tier.amountType.flexible', defaultMessage: 'Flexible amount' }),
     },
   ];
 
   const receiptTemplateOptions = getReceiptTemplates(collective.host);
 
+  const taxes = getApplicableTaxes(collective, collective.host, values.type);
+
+  const formik = useFormikContext();
+  React.useEffect(() => {
+    if (values.interval === 'flexible') {
+      formik.setFieldValue('amountType', FLEXIBLE);
+    }
+  }, [values.interval]);
+
+  React.useEffect(() => {
+    if (values.type === PRODUCT) {
+      formik.setFieldValue('interval', null);
+      formik.setFieldValue('amountType', FIXED);
+    }
+  }, [values.type]);
+
   return (
     <React.Fragment>
       {(![FUND].includes(collective.type) || types?.length === 1) && (
-        <StyledInputFormikField
-          name="type"
-          label={intl.formatMessage({ id: 'tier.type.label', defaultMessage: 'Type' })}
-          labelFontWeight="bold"
-          mt="3"
-        >
-          {({ field, form, loading }) => (
-            <StyledSelect
-              inputId={field.name}
-              data-cy={field.name}
-              error={field.error}
-              onBlur={() => form.setFieldTouched(field.name, true)}
-              onChange={({ value }) => form.setFieldValue(field.name, value)}
-              isLoading={loading}
-              options={tierTypeOptions}
-              value={tierTypeOptions.find(option => option.value === field.value)}
-            />
-          )}
-        </StyledInputFormikField>
+        <React.Fragment>
+          <StyledInputFormikField
+            name="type"
+            label={intl.formatMessage({ id: 'tier.type.label', defaultMessage: 'Type' })}
+            labelFontWeight="bold"
+            mt="3"
+          >
+            {({ field, form, loading }) => (
+              <StyledSelect
+                inputId={field.name}
+                data-cy={field.name}
+                error={field.error}
+                onBlur={() => form.setFieldTouched(field.name, true)}
+                onChange={({ value }) => form.setFieldValue(field.name, value)}
+                isLoading={loading}
+                options={tierTypeOptions}
+                value={tierTypeOptions.find(option => option.value === field.value)}
+              />
+            )}
+          </StyledInputFormikField>
+          {taxes.map(({ type, percentage }) => (
+            <Flex key={`${type}-${percentage}`} mt={3}>
+              <MessageBox type="info" withIcon css={{ flexGrow: 1 }} fontSize="12px">
+                <Span fontWeight="bold">
+                  <FormattedMessage
+                    id="withColon"
+                    defaultMessage="{item}:"
+                    values={{ item: i18nTaxType(intl, type) }}
+                  />{' '}
+                  {percentage}%
+                </Span>
+                <Box mt={2}>{i18nTaxDescription(intl, type)}</Box>
+              </MessageBox>
+            </Flex>
+          ))}
+        </React.Fragment>
       )}
       <StyledInputFormikField
         name="name"
@@ -143,14 +176,14 @@ function FormFields({ collective, types, values }) {
         mt="3"
         required={false}
       >
-        {({ field }) => <StyledTextarea data-cy={field.name} {...field} />}
+        {({ field }) => <StyledTextarea data-cy={field.name} maxLength={510} width="100%" showCount {...field} />}
       </StyledInputFormikField>
       {[DONATION, MEMBERSHIP, TIER, SERVICE].includes(values.type) && (
         <StyledInputFormikField
           name="interval"
           label={intl.formatMessage({
             id: 'tier.interval.label',
-            defaultMessage: 'interval',
+            defaultMessage: 'Interval',
           })}
           labelFontWeight="bold"
           mt="3"
@@ -170,7 +203,7 @@ function FormFields({ collective, types, values }) {
           )}
         </StyledInputFormikField>
       )}
-      {values.interval !== FLEXIBLE && (
+      {values.interval !== 'flexible' && (
         <StyledInputFormikField
           name="amountType"
           label={intl.formatMessage({
@@ -227,7 +260,7 @@ function FormFields({ collective, types, values }) {
           name="presets"
           label={intl.formatMessage({
             id: 'tier.presets.label',
-            defaultMessage: 'suggested amounts',
+            defaultMessage: 'Suggested amounts',
           })}
           labelFontWeight="bold"
           mt="3"
@@ -246,7 +279,7 @@ function FormFields({ collective, types, values }) {
           name="amount"
           label={intl.formatMessage({
             id: 'tier.defaultAmount.label',
-            defaultMessage: 'default amount',
+            defaultMessage: 'Default amount',
           })}
           labelFontWeight="bold"
           mt="3"
@@ -275,7 +308,7 @@ function FormFields({ collective, types, values }) {
       {values.amountType === FLEXIBLE && (
         <StyledInputFormikField
           name="minimumAmount"
-          label={intl.formatMessage({ id: 'tier.minimumAmount.label', defaultMessage: 'minimum amount' })}
+          label={intl.formatMessage({ id: 'tier.minimumAmount.label', defaultMessage: 'Minimum amount' })}
           labelFontWeight="bold"
           mt="3"
           required={false}
@@ -301,7 +334,7 @@ function FormFields({ collective, types, values }) {
           )}
         </StyledInputFormikField>
       )}
-      {([TICKET, PRODUCT].includes(values.type) ||
+      {([TICKET, PRODUCT, MEMBERSHIP].includes(values.type) ||
         (values.type === TIER && ![FUND, PROJECT].includes(collective.type))) && (
         <React.Fragment>
           <StyledInputFormikField
@@ -478,7 +511,7 @@ FormFields.propTypes = {
 };
 
 const EditSectionContainer = styled(Flex)`
-  overflow: scroll;
+  overflow-y: scroll;
   flex-grow: 1;
   flex-direction: column;
   padding-right: 1rem;
@@ -586,7 +619,7 @@ export function ContributeCardPreview({ tier, collective }) {
 
   return (
     <ContributeCardPreviewContainer>
-      <ContributeTier intl={intl} tier={previewTier} collective={collective} hideContributors />
+      <ContributeTier isPreview intl={intl} tier={previewTier} collective={collective} hideContributors />
     </ContributeCardPreviewContainer>
   );
 }
@@ -724,6 +757,12 @@ const deleteTierMutation = gql`
   }
 `;
 
+const i18nMessages = defineMessages({
+  EDIT_SUCCESS: { id: 'EditTier.Edit.Success', defaultMessage: 'Tier updated.' },
+  CREATE_SUCCESS: { id: 'EditTier.Create.Success', defaultMessage: 'Tier created.' },
+  DELETE_SUCCESS: { id: 'EditTier.Delete.Success', defaultMessage: 'Tier deleted.' },
+});
+
 export function EditTierForm({ tier, collective, onClose }) {
   const intl = useIntl();
   const isEditing = React.useMemo(() => !!tier?.id);
@@ -806,6 +845,10 @@ export function EditTierForm({ tier, collective, onClose }) {
           },
         });
         onClose();
+        addToast({
+          type: TOAST_TYPE.SUCCESS,
+          message: intl.formatMessage(i18nMessages['DELETE_SUCCESS']),
+        });
       } catch (e) {
         addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e.message) });
       } finally {
@@ -835,6 +878,10 @@ export function EditTierForm({ tier, collective, onClose }) {
               variables: {
                 tier,
               },
+            });
+            addToast({
+              type: TOAST_TYPE.SUCCESS,
+              message: intl.formatMessage(i18nMessages[isEditing ? 'EDIT_SUCCESS' : 'CREATE_SUCCESS']),
             });
             onClose();
           } catch (e) {

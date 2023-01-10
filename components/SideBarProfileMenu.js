@@ -101,6 +101,7 @@ const StyledProfileButton = styled.button`
   &:hover {
     background: #e8edf4;
   }
+  // border: 1px solid rgba(18, 19, 20, 0.12);
 `;
 
 const UserMenuLinkEntry = props => {
@@ -285,13 +286,22 @@ class TopBarProfileMenu extends React.Component {
   renderLoggedInUser() {
     const { showProfileMenu } = this.state;
     const { LoggedInUser, activeCollective } = this.props;
-    console.log({ activeCollective });
+    console.log({ activeCollective, LoggedInUser });
     return (
       <Box>
         <StyledProfileButton isBorderless onClick={this.toggleProfileMenu}>
           <Flex width="100%" justifyContent="" alignItems="center" data-cy="user-menu-trigger">
-            <Flex width="100%" alignItems="center" overflow={'hidden'} gap={'8px'}>
-              <Avatar collective={activeCollective} radius={36} mr="2px" />
+            <Flex width="100%" alignItems="center" gap={'8px'}>
+              <div style={{ position: 'relative' }}>
+                <Avatar collective={activeCollective} radius={36} mr="2px" />
+                {activeCollective.slug !== LoggedInUser.collective.slug && (
+                  <Avatar
+                    style={{ position: 'absolute', bottom: '-4px', right: '-4px' }}
+                    radius={16}
+                    collective={LoggedInUser.collective}
+                  />
+                )}
+              </div>
               <Flex flexDirection="column" overflow="hidden" truncateOverflow>
                 <P fontSize="14px" fontWeight="500" lineHeight="20px" color="black.800" truncateOverflow width="100%">
                   {activeCollective.name}

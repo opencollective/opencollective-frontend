@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { editCollectivePageQuery } from '../../lib/graphql/queries';
 
-import { getI18nLink } from '../I18nFormatters';
+import { getI18nLink, I18nSignInLink } from '../I18nFormatters';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
@@ -26,14 +26,6 @@ const createConnectedAccountMutation = gql`
   }
 `;
 
-const deleteConnectedAccountMutation = gql`
-  mutation deleteConnectedAccount($connectedAccount: ConnectedAccountReferenceInput!) {
-    deleteConnectedAccount(connectedAccount: $connectedAccount) {
-      id
-    }
-  }
-`;
-
 const EditPayPalAccount = props => {
   const isReceiving = props.variation === 'RECEIVING';
   const mutationOptions = {
@@ -44,10 +36,6 @@ const EditPayPalAccount = props => {
   const [connectedAccount, setConnectedAccount] = React.useState(props.connectedAccount);
   const [createConnectedAccount, { loading: isCreating, error: createError }] = useMutation(
     createConnectedAccountMutation,
-    mutationOptions,
-  );
-  const [deleteConnectedAccount, { loading: isDeleting }] = useMutation(
-    deleteConnectedAccountMutation,
     mutationOptions,
   );
   const formik = useFormik({
@@ -81,11 +69,6 @@ const EditPayPalAccount = props => {
       return errors;
     },
   });
-
-  const handleDelete = async () => {
-    await deleteConnectedAccount({ variables: { connectedAccount: { legacyId: props.connectedAccount.id } } });
-    setConnectedAccount();
-  };
 
   if (!connectedAccount) {
     return (
@@ -155,10 +138,11 @@ const EditPayPalAccount = props => {
             }}
           />
         </P>
-        <P>
-          <StyledButton type="submit" mt={2} loading={isDeleting} onClick={handleDelete}>
-            <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
-          </StyledButton>
+        <P mt={3} fontStyle="italic">
+          <FormattedMessage
+            defaultMessage="Please contact <SupportLink>support</SupportLink> to disconnect PayPal."
+            values={{ SupportLink: I18nSignInLink }}
+          />
         </P>
       </React.Fragment>
     );

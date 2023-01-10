@@ -2,7 +2,9 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import { Download as DownloadIcon } from '@styled-icons/feather/Download';
 import { Info } from '@styled-icons/feather/Info';
+import { saveAs } from 'file-saver';
 import { Field, Form, Formik } from 'formik';
 import { get } from 'lodash';
 import QRCode from 'qrcode.react';
@@ -16,11 +18,13 @@ import { compose } from '../../../lib/utils';
 
 import ConfirmationModal from '../../ConfirmationModal';
 import Container from '../../Container';
-import { Box, Flex } from '../../Grid';
+import { Box, Flex, Grid } from '../../Grid';
+import Image from '../../Image';
 import Loading from '../../Loading';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
+import StyledCard from '../../StyledCard';
 import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
@@ -62,6 +66,14 @@ const TokenBox = styled(Box)`
 const Code = styled.code`
   background: ${props => props.theme.colors.black[100]};
   color: ${props => props.theme.colors.black[700]};
+  word-break: break-all;
+  display: block;
+  margin-top: 8px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: #4d4f51;
+  max-width: 350px;
 `;
 
 class UserTwoFactorAuth extends React.Component {
@@ -71,6 +83,8 @@ class UserTwoFactorAuth extends React.Component {
     /** From graphql query */
     addTwoFactorAuthTokenToIndividual: PropTypes.func.isRequired,
     removeTwoFactorAuthTokenFromIndividual: PropTypes.func.isRequired,
+    /** From withUser */
+    refetchLoggedInUser: PropTypes.func.isRequired,
     data: PropTypes.shape({
       individual: PropTypes.object,
       loading: PropTypes.bool,
@@ -147,6 +161,9 @@ class UserTwoFactorAuth extends React.Component {
           })
           .then(data => {
             this.setState({ recoveryCodes: get(data, 'data.addTwoFactorAuthTokenToIndividual.recoveryCodes') });
+          })
+          .then(() => {
+            this.props.refetchLoggedInUser(); // No need to await
           });
         this.setState({ error: null, enablingTwoFactorAuth: true });
       }
@@ -169,6 +186,7 @@ class UserTwoFactorAuth extends React.Component {
           code: twoFactorAuthenticatorCode,
         },
       });
+      this.props.refetchLoggedInUser(); // No need to await
       this.setState({ disablingTwoFactorAuth: false, error: null });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
@@ -227,14 +245,37 @@ class UserTwoFactorAuth extends React.Component {
         <Flex flexDirection="column">
           {doesAccountAlreadyHave2FA && !enablingTwoFactorAuth ? (
             <Fragment>
-              <Flex alignItems="center" mb={3}>
-                <MessageBox type="success" withIcon data-cy="add-two-factor-auth-success">
-                  <FormattedMessage
-                    id="TwoFactorAuth.Setup.AlreadyAdded"
-                    defaultMessage="Two-factor authentication (2FA) is enabled on this account. Well done! 🎉"
-                  />
-                </MessageBox>
-              </Flex>
+              <P>
+                <FormattedMessage
+                  id="TwoFactorAuth.Setup.Info"
+                  defaultMessage="Two-factor authentication adds an extra layer of security for your account when logging in or performing admin actions."
+                />
+              </P>
+              <StyledCard
+                display="flex"
+                flexWrap="wrap"
+                alignItems="center"
+                justifyContent="center"
+                my="32px"
+                p="36px"
+                maxWidth="496px"
+                data-cy="add-two-factor-auth-success"
+                padding="36px"
+                borderWidth="2px"
+                borderColor="green.500"
+              >
+                <Box flex="0 0 183px">
+                  <Image src="/static/images/lock-green.png" width="183px" height="183px" alt="" />
+                </Box>
+                <Box flex="1 1 223px" pr="9px">
+                  <P fontSize="20px" fontWeight="500">
+                    <FormattedMessage
+                      id="TwoFactorAuth.Setup.AlreadyAdded"
+                      defaultMessage="Two-factor authentication (2FA) is enabled on this account. Well done! 🎉"
+                    />
+                  </P>
+                </Box>
+              </StyledCard>
               <Container>
                 <StyledButton
                   my={1}
@@ -294,10 +335,10 @@ class UserTwoFactorAuth extends React.Component {
                                   <Field
                                     as={StyledInput}
                                     {...inputProps}
-                                    minWidth={300}
-                                    maxWidth={350}
+                                    width={240}
                                     minHeight={75}
                                     fontSize="20px"
+                                    autoComplete="off"
                                     placeholder="123456"
                                     pattern="[0-9]{6}"
                                     inputMode="numeric"
@@ -337,47 +378,51 @@ class UserTwoFactorAuth extends React.Component {
                   <Container>
                     <Box>
                       <Flex alignItems="center" mt={3}>
-                        <H3 fontSize="15px" mr={1}>
+                        <H3 fontSize="18px" mr={1}>
                           <FormattedMessage
                             id="TwoFactorAuth.Setup.StepThree"
                             defaultMessage="Step three: save your recovery codes"
                           />
                         </H3>
                       </Flex>
-                      <Container
-                        display="flex"
-                        flexWrap="wrap"
-                        p={2}
-                        border="2px solid black"
-                        borderRadius={8}
-                        my={3}
-                        data-cy="recovery-codes-container"
-                      >
-                        {recoveryCodes.map(code => {
-                          return (
-                            <Flex key={code} flex="1 1 250px" my={2} alignItems="center" justifyContent="center">
-                              <P fontSize="20px" fontWeight="700">
+                      <Container maxWidth={480} border="2px solid black" borderRadius={8} my={3}>
+                        <Grid
+                          gridTemplateColumns={['1fr', '1fr 1fr']}
+                          p="32px"
+                          gridGap="16px"
+                          data-cy="recovery-codes-container"
+                        >
+                          {recoveryCodes.map(code => {
+                            return (
+                              <P key={code} fontSize="16px" fontWeight="700" m="0 16px 16px 0">
                                 {code}
                               </P>
-                            </Flex>
-                          );
-                        })}
+                            );
+                          })}
+                        </Grid>
                       </Container>
                       <Container>
-                        <Flex justifyContent={['center', 'left']} mb={4}>
+                        <Flex justifyContent={['center', 'left']} mb={4} gap="16px">
                           <StyledButton
-                            fontSize="13px"
                             minWidth="148px"
-                            minHeight="36px"
                             buttonStyle="primary"
                             onClick={() => this.setState({ showRecoveryCodesModal: true })}
                             loading={showRecoveryCodesModal}
                             data-cy="add-two-factor-auth-confirm-recovery-codes-button"
                           >
-                            <FormattedMessage
-                              id="TwoFactorAuth.Setup.Form.FinishSetup"
-                              defaultMessage="Finish 2FA setup"
-                            />
+                            <FormattedMessage id="TwoFactorAuth.Setup.Form.FinishSetup" defaultMessage="Finish setup" />
+                          </StyledButton>
+                          <StyledButton
+                            onClick={() =>
+                              saveAs(
+                                new Blob([recoveryCodes.join('\n')], { type: 'text/plain;charset=utf-8' }),
+                                'opencollective-recovery-codes.txt',
+                              )
+                            }
+                          >
+                            <FormattedMessage defaultMessage="Download codes" />
+                            &nbsp;
+                            <DownloadIcon size="1em" />
                           </StyledButton>
                         </Flex>
                       </Container>
@@ -414,13 +459,13 @@ class UserTwoFactorAuth extends React.Component {
                   <P>
                     <FormattedMessage
                       id="TwoFactorAuth.Setup.Info"
-                      defaultMessage="Two-factor authentication adds an extra layer of security for your account when logging in."
+                      defaultMessage="Two-factor authentication adds an extra layer of security for your account when logging in or performing admin actions."
                     />
                   </P>
                   <Container>
                     <Box>
                       <Flex alignItems="center" mt={3}>
-                        <H3 fontSize="15px" mr={1}>
+                        <H3 fontSize="18px" fontWeight="700" mr={1}>
                           <FormattedMessage
                             id="TwoFactorAuth.Setup.StepOne"
                             defaultMessage="Step one: scan this QR code with an authenticator app"
@@ -440,7 +485,7 @@ class UserTwoFactorAuth extends React.Component {
                             includeMargin
                             data-cy="qr-code"
                           />
-                          <TokenBox maxWidth={350} data-cy="manual-entry-2fa-token">
+                          <TokenBox data-cy="manual-entry-2fa-token">
                             <P>
                               <FormattedMessage
                                 id="TwoFactorAuth.Setup.ManualEntry"
@@ -457,7 +502,7 @@ class UserTwoFactorAuth extends React.Component {
                       )}
                     </Box>
                     <Box mt={3}>
-                      <H3 fontSize="15px">
+                      <H3 fontSize="18px">
                         <FormattedMessage
                           id="TwoFactorAuth.Setup.StepTwo"
                           defaultMessage="Step two: enter the code from your authentication app"
@@ -488,8 +533,7 @@ class UserTwoFactorAuth extends React.Component {
                                     <Field
                                       as={StyledInput}
                                       {...inputProps}
-                                      minWidth={300}
-                                      maxWidth={350}
+                                      width={240}
                                       minHeight={60}
                                       fontSize="20px"
                                       lineHeight="28px"

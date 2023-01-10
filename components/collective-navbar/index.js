@@ -374,7 +374,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
-        <Link href={`${getCollectivePageRoute(collective)}/recurring-contributions`}>
+        <Link href={`${getCollectivePageRoute(collective)}/manage-contributions`}>
           <ActionButton tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>
@@ -444,7 +444,7 @@ const CollectiveNavbar = ({
   const [isExpanded, setExpanded] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
   const isAccountant = LoggedInUser?.hasRole(roles.ACCOUNTANT, collective);
-  isAdmin = isAdmin || LoggedInUser?.isAdminOfCollectiveOrHost(collective);
+  isAdmin = isAdmin || LoggedInUser?.isAdminOfCollective(collective);
   const isHostAdmin = LoggedInUser?.isHostAdmin(collective);
   const { data, dataLoading } = useQuery(accountPermissionsQuery, {
     context: API_V2_CONTEXT,

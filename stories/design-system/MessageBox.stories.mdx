@@ -1,12 +1,13 @@
 import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
 import MessageBox from '../../components/MessageBox';
 import { Flex } from '../../components/Grid';
+import Image from '../../components/Image';
 
 <Meta
   title="Design system/MessageBox"
   component={MessageBox}
   argTypes={{
-    type: { options: ['white', 'dark', 'info', 'success', 'warning', 'error'], control: { type: 'radio' } },
+    type: { options: ['white', 'info', 'success', 'warning', 'error'], control: { type: 'radio' } },
     withIcon: { control: { type: 'boolean' } },
     isLoading: { control: { type: 'boolean' } },
   }}
@@ -28,25 +29,12 @@ export const DefaultStory = props => (
 
 <Canvas>
   <Story name="Types" parameters={{ controls: { hideNoControlsWarning: true } }}>
-    <Flex>
-      <MessageBox m={3} withIcon type="dark">
-        Dark
-      </MessageBox>
-      <MessageBox m={3} type="white">
-        White (default)
-      </MessageBox>
-      <MessageBox m={3} type="info">
-        Info
-      </MessageBox>
-      <MessageBox m={3} type="success">
-        Success
-      </MessageBox>
-      <MessageBox m={3} type="warning">
-        Warning
-      </MessageBox>
-      <MessageBox m={3} type="error">
-        Error
-      </MessageBox>
+    <Flex flexDirection="column" gridGap="20px" px={2} maxWidth="800px">
+      <MessageBox type="white">You must be signed in as an admin or the expense submitter to read them.</MessageBox>
+      <MessageBox type="info">You must be signed in as an admin or the expense submitter to read them.</MessageBox>
+      <MessageBox type="success">You must be signed in as an admin or the expense submitter to read them.</MessageBox>
+      <MessageBox type="warning">You must be signed in as an admin or the expense submitter to read them.</MessageBox>
+      <MessageBox type="error">You must be signed in as an admin or the expense submitter to read them.</MessageBox>
     </Flex>
   </Story>
 </Canvas>
@@ -55,24 +43,21 @@ export const DefaultStory = props => (
 
 <Canvas>
   <Story name="With loading spinner" parameters={{ controls: { hideNoControlsWarning: true } }}>
-    <Flex>
-      <MessageBox m={3} isLoading type="dark">
-        Dark
+    <Flex flexDirection="column" gridGap="20px" px={2} maxWidth="800px">
+      <MessageBox withIcon isLoading type="white">
+        You must be signed in as an admin or the expense submitter to read them.
       </MessageBox>
-      <MessageBox m={3} isLoading type="white">
-        White
+      <MessageBox withIcon isLoading type="info">
+        You must be signed in as an admin or the expense submitter to read them.
       </MessageBox>
-      <MessageBox m={3} isLoading type="info">
-        Info
+      <MessageBox withIcon isLoading type="success">
+        You must be signed in as an admin or the expense submitter to read them.
       </MessageBox>
-      <MessageBox m={3} isLoading type="success">
-        Success
+      <MessageBox withIcon isLoading type="warning">
+        You must be signed in as an admin or the expense submitter to read them.
       </MessageBox>
-      <MessageBox m={3} isLoading type="warning">
-        Warning
-      </MessageBox>
-      <MessageBox m={3} isLoading type="error">
-        Error
+      <MessageBox withIcon isLoading type="error">
+        You must be signed in as an admin or the expense submitter to read them.
       </MessageBox>
     </Flex>
   </Story>
@@ -82,18 +67,21 @@ export const DefaultStory = props => (
 
 <Canvas>
   <Story name="With icons" parameters={{ controls: { hideNoControlsWarning: true } }}>
-    <Flex flexDirection="colunm">
-      <MessageBox withIcon m={3} type="info">
-        Info
+    <Flex flexDirection="column" gridGap="20px" px={2} maxWidth="800px">
+      <MessageBox type="white" withIcon>
+        You must be signed in as an admin or the expense submitter to read them.
       </MessageBox>
-      <MessageBox withIcon m={3} type="success">
-        Success
+      <MessageBox type="info" withIcon>
+        You must be signed in as an admin or the expense submitter to read them.
       </MessageBox>
-      <MessageBox withIcon m={3} type="warning">
-        Warning
+      <MessageBox withIcon type="success" withIcon>
+        You must be signed in as an admin or the expense submitter to read them.
       </MessageBox>
-      <MessageBox withIcon m={3} type="error">
-        Error
+      <MessageBox withIcon type="warning" withIcon>
+        You must be signed in as an admin or the expense submitter to read them.
+      </MessageBox>
+      <MessageBox withIcon type="error" withIcon>
+        You must be signed in as an admin or the expense submitter to read them.
       </MessageBox>
     </Flex>
   </Story>

@@ -516,11 +516,7 @@ class CreateGiftCardsForm extends Component {
             />
           </InlineField>
 
-          <InlineField
-            name="expiryDate"
-            isLabelClickable
-            label={<FormattedMessage id="giftCards.create.expiryDate" defaultMessage="Expiry date" />}
-          >
+          <InlineField name="expiryDate" isLabelClickable label={<FormattedMessage defaultMessage="Expiry date" />}>
             <StyledInput
               id="giftcard-expiryDate"
               name="expiryDate"

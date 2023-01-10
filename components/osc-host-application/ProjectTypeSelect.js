@@ -77,12 +77,12 @@ const msg = defineMessages({
     defaultMessage: 'My project is primarily concerned with the development and maintenance of a specific codebase.',
   },
   community: {
-    id: 'HostApplication.ProjectTypeSelect.community',
+    id: 'community',
     defaultMessage: 'Community',
   },
   communityDescription: {
     id: 'HostApplication.ProjectTypeSelect.communityDescription',
-    defaultMessage: 'My project is not strongly associated with with a specific codebase.',
+    defaultMessage: 'My project is not strongly associated with a specific codebase.',
   },
 });
 

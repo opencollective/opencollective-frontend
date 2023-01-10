@@ -3,6 +3,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { ApolloClient } from '@apollo/client';
 import { getDataFromTree } from '@apollo/client/react/ssr';
 
 import { withTwoFactorAuthentication } from './two-factor-authentication/TwoFactorAuthenticationContext';
@@ -14,8 +15,13 @@ function getComponentDisplayName(Component) {
   return Component.displayName || Component.name || 'Unknown';
 }
 
+type WithDataProps = {
+  serverState: any;
+  twoFactorAuthContext: any;
+};
+
 const withData = ComposedComponent => {
-  return class WithData extends React.Component {
+  return class WithData extends React.Component<WithDataProps> {
     static async getInitialProps(context) {
       const { Component } = context;
 
@@ -29,7 +35,7 @@ const withData = ComposedComponent => {
 
       try {
         // Run all GraphQL queries
-        const skipDataFromTree = composedInitialProps.pageProps?.skipDataFromTree || false;
+        const skipDataFromTree = composedInitialProps['pageProps']?.skipDataFromTree || false;
         if (!skipDataFromTree) {
           await getDataFromTree(<ComposedComponent Component={Component} {...composedInitialProps} />, { client });
         }
@@ -77,6 +83,8 @@ const withData = ComposedComponent => {
       const { serverState, twoFactorAuthContext } = this.props;
       this.client = initClient({ initialState: serverState.apollo.data, twoFactorAuthContext });
     }
+
+    client: ApolloClient<{}> | null;
 
     render() {
       return <ComposedComponent {...this.props} client={this.client} />;

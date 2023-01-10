@@ -31,13 +31,13 @@ const FooterLabel = styled.span`
   text-transform: uppercase;
 `;
 
-const ExpensesTotal = ({ collective, host, expenses }) => {
+const ExpensesTotal = ({ collective, host, expenses, expenseFieldForTotalAmount }) => {
   const { total, isApproximate } = React.useMemo(() => {
     let isApproximate = false;
     let total = 0;
     for (const expense of expenses) {
-      total += expense.amountInAccountCurrency?.valueInCents || expense.amount;
-      if (expense.amountInAccountCurrency?.exchangeRate?.isApproximate) {
+      total += expense[expenseFieldForTotalAmount]?.valueInCents || expense.amount;
+      if (expense[expenseFieldForTotalAmount]?.exchangeRate?.isApproximate) {
         isApproximate = true;
       }
     }
@@ -57,6 +57,7 @@ ExpensesTotal.propTypes = {
   collective: PropTypes.object,
   host: PropTypes.object,
   expenses: PropTypes.array,
+  expenseFieldForTotalAmount: PropTypes.string,
 };
 
 const ExpensesList = ({
@@ -70,6 +71,7 @@ const ExpensesList = ({
   view,
   onDelete,
   onProcess,
+  expenseFieldForTotalAmount,
 }) => {
   if (!expenses?.length && !isLoading) {
     return null;
@@ -118,7 +120,12 @@ const ExpensesList = ({
                   <FormattedMessage id="expense.page.total" defaultMessage="Page Total" />:
                 </FooterLabel>
                 <FooterLabel color="black.500">
-                  <ExpensesTotal expenses={expenses} collective={collective} host={host} />
+                  <ExpensesTotal
+                    expenses={expenses}
+                    collective={collective}
+                    host={host}
+                    expenseFieldForTotalAmount={expenseFieldForTotalAmount}
+                  />
                 </FooterLabel>
               </Box>
               <P fontSize="12px" color="black.600">
@@ -139,10 +146,12 @@ ExpensesList.propTypes = {
   /** When `isLoading` is true, this sets the number of "loadin" items displayed */
   nbPlaceholders: PropTypes.number,
   host: PropTypes.object,
-  view: PropTypes.oneOf(['public', 'admin']),
+  view: PropTypes.oneOf(['public', 'admin', 'submitter']),
   suggestedTags: PropTypes.arrayOf(PropTypes.string),
   onDelete: PropTypes.func,
   onProcess: PropTypes.func,
+  /** Defines the field in `expense` that holds the amount. Useful to display the right one based on the context for multi-currency expenses. */
+  expenseFieldForTotalAmount: PropTypes.string,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     parent: PropTypes.shape({
@@ -162,6 +171,7 @@ ExpensesList.propTypes = {
 ExpensesList.defaultProps = {
   nbPlaceholders: 10,
   view: 'public',
+  expenseFieldForTotalAmount: 'amountInAccountCurrency',
 };
 
 export default ExpensesList;

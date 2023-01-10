@@ -13,7 +13,6 @@ class ContributionFlowButtons extends React.Component {
   static propTypes = {
     goNext: PropTypes.func,
     goBack: PropTypes.func,
-    step: PropTypes.shape({ name: PropTypes.string }),
     prevStep: PropTypes.shape({ name: PropTypes.string }),
     nextStep: PropTypes.shape({ name: PropTypes.string }),
     isValidating: PropTypes.bool,

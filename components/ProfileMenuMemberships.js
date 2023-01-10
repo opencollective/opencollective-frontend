@@ -13,6 +13,7 @@ import { isPastEvent } from '../lib/events';
 import { getSettingsRoute } from '../lib/url-helpers';
 
 import Avatar from './Avatar';
+import Collapse from './Collapse';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Link from './Link';
@@ -96,9 +97,25 @@ const sortMemberships = memberships => {
   }
 };
 
+const filterArchivedMemberships = memberships => {
+  const archivedMemberships = memberships.filter(m => {
+    if (
+      m.role !== 'BACKER' &&
+      m.collective.isArchived &&
+      !(m.collective.type === 'EVENT' && isPastEvent(m.collective))
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+
+  return uniqBy(archivedMemberships, m => m.collective.id);
+};
+
 const filterMemberships = memberships => {
   const filteredMemberships = memberships.filter(m => {
-    if (m.role === 'BACKER') {
+    if (m.role === 'BACKER' || m.collective.isArchived) {
       return false;
     } else if (m.collective.type === 'EVENT' && isPastEvent(m.collective)) {
       return false;
@@ -154,10 +171,15 @@ const MENU_SECTIONS = {
   [CollectiveType.INDIVIDUAL]: {
     title: defineMessage({ id: 'myAccount', defaultMessage: 'My Account' }),
   },
+  ARCHIVED: {
+    title: defineMessage({ id: 'Archived', defaultMessage: 'Archived' }),
+  },
 };
 
 function figureOutRole(collective, role) {
-  if (role === 'Personal profile') {return role;}
+  if (role === 'Personal profile') {
+    return role;
+  }
   if (collective.type === 'ORGANIZATION') {
     if (collective.isHost) {
       return role === 'ADMIN' ? 'Fiscal host admin' : 'Member';
@@ -199,7 +221,9 @@ MenuSectionHeader.propTypes = {
 
 const ProfileMenuMemberships = ({ user, activeCollective, setActiveCollective }) => {
   const memberships = filterMemberships(user.memberOf);
+  const archivedMemberships = filterArchivedMemberships(user.memberOf);
   const groupedMemberships = groupBy(memberships, m => m.collective.type);
+  groupedMemberships.ARCHIVED = archivedMemberships;
   const hasNoMemberships = isEmpty(memberships);
   const shouldDisplaySection = section => {
     return MENU_SECTIONS[section].emptyMessage || !isEmpty(groupedMemberships[section]);

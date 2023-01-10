@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
+import { omit } from 'lodash';
 import styled, { css } from 'styled-components';
 import { size, typography } from 'styled-system';
 
@@ -77,35 +78,6 @@ const CheckboxContainer = styled.div`
       `}
   }
 
-  /* Hover label / checkbox - only for pointer devices (ignored on touch devices) */
-  @media (hover: hover) {
-    &:hover input:not(:disabled):not(:checked) ~ ${CustomCheckbox} {
-      background: ${themeGet('colors.primary.100')};
-      border-color: ${themeGet('colors.primary.100')};
-      svg {
-        opacity: 1;
-      }
-    }
-  }
-
-  /* Checked */
-  input:checked ~ ${CustomCheckbox} {
-    background: ${themeGet('colors.primary.500')};
-    border-color: ${themeGet('colors.primary.500')};
-    svg {
-      opacity: 1;
-    }
-    ${StyledSpinner} {
-      fill: #eeeeee;
-    }
-  }
-
-  /* Focused */
-  input:focus ~ ${CustomCheckbox} {
-    background: ${themeGet('colors.primary.400')};
-    border-color: ${themeGet('colors.primary.400')};
-  }
-
   /* Disabled */
   input:disabled {
     & ~ ${CustomCheckbox} {
@@ -120,6 +92,34 @@ const CheckboxContainer = styled.div`
       cursor: not-allowed;
     }
   }
+
+  ${props =>
+    props.$checked
+      ? css`
+          /* Checked */
+          ${CustomCheckbox} {
+            background: ${themeGet('colors.primary.500')};
+            border-color: ${themeGet('colors.primary.500')};
+            svg {
+              opacity: 1;
+            }
+            ${StyledSpinner} {
+              fill: #eeeeee;
+            }
+          }
+        `
+      : css`
+          /* Hover label / checkbox - only for pointer devices (ignored on touch devices) */
+          @media (hover: hover) {
+            &:hover ${CustomCheckbox} {
+              background: ${themeGet('colors.primary.100')};
+              border-color: ${themeGet('colors.primary.100')};
+              svg {
+                opacity: 1;
+              }
+            }
+          }
+        `}
 `;
 
 class StyledCheckbox extends React.Component {
@@ -148,12 +148,16 @@ class StyledCheckbox extends React.Component {
     const { name, checked, label, disabled, size, inputId, width, alignItems, isLoading, fontSize, ...props } =
       this.props;
     const realChecked = checked === undefined ? this.state.checked : checked;
-
     return (
       <CheckboxContainer
         role="button"
         tabIndex={0}
-        onClick={() => this.onChange(!realChecked)}
+        $checked={realChecked}
+        onClick={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.onChange(!realChecked);
+        }}
         onKeyDown={event => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
@@ -165,9 +169,17 @@ class StyledCheckbox extends React.Component {
         width={width}
         alignItems={alignItems}
         data-cy={`checkbox-${name}`}
-        {...props}
+        {...omit(props, ['defaultChecked', 'onChange'])}
       >
-        <input id={inputId} name={name} type="checkbox" checked={realChecked} disabled={disabled} readOnly />
+        <input
+          id={inputId}
+          name={name}
+          type="checkbox"
+          checked={realChecked}
+          disabled={disabled}
+          readOnly
+          tabIndex="-1" // Prevents the checkbox from being focused, since we're using the container as the focusable element
+        />
         <CustomCheckbox data-cy="custom-checkbox">
           {isLoading ? <StyledSpinner size={size} /> : <IconCheckmark />}
         </CustomCheckbox>

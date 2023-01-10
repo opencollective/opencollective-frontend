@@ -40,8 +40,8 @@ const applicationsQuery = gql`
   }
 `;
 
-const OAuthApplicationsList = ({ accountSlug, onApplicationCreated, offset = 0 }) => {
-  const variables = { slug: accountSlug, limit: 12, offset: offset };
+const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) => {
+  const variables = { slug: account.slug, limit: 12, offset: offset };
   const [showCreateApplicationModal, setShowCreateApplicationModal] = React.useState(false);
   const { data, loading, error, networkStatus } = useQuery(applicationsQuery, {
     variables,
@@ -150,7 +150,9 @@ const OAuthApplicationsList = ({ accountSlug, onApplicationCreated, offset = 0 }
 };
 
 OAuthApplicationsList.propTypes = {
-  accountSlug: PropTypes.string.isRequired,
+  account: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+  }),
   onApplicationCreated: PropTypes.func.isRequired,
   offset: PropTypes.number,
 };

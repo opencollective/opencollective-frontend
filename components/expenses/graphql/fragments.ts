@@ -10,6 +10,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
     type
     name
     legalName
+    hasTwoFactorAuth
     location {
       id
       address
@@ -35,6 +36,17 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
           legalName
           isActive
           isHost
+          policies {
+            REQUIRE_2FA_FOR_ADMINS
+          }
+          ... on AccountWithParent {
+            parent {
+              id
+              policies {
+                REQUIRE_2FA_FOR_ADMINS
+              }
+            }
+          }
           ... on AccountWithHost {
             host {
               id
@@ -174,6 +186,7 @@ export const expensePageExpenseFieldsFragment = gql`
     attachedFiles {
       id
       url
+      name
     }
     payee {
       id
@@ -200,6 +213,14 @@ export const expensePageExpenseFieldsFragment = gql`
         isApproved
         host {
           id
+          # For Expenses across hosts
+          payoutMethods {
+            id
+            type
+            name
+            data
+            isSaved
+          }
         }
       }
 
@@ -366,6 +387,7 @@ export const expensePageExpenseFieldsFragment = gql`
       approve {
         allowed
         reason
+        reasonDetails
       }
     }
     activities {
@@ -458,6 +480,7 @@ export const expensesListFieldsFragment = gql`
       approve {
         allowed
         reason
+        reasonDetails
       }
     }
     payoutMethod {
@@ -521,6 +544,7 @@ export const expensesListAdminFieldsFragment = gql`
     attachedFiles {
       id
       url
+      name
     }
     securityChecks {
       level

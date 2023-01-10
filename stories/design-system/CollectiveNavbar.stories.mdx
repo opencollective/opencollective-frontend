@@ -8,8 +8,10 @@ import { useState } from 'react';
 <Canvas>
   <Story name="Default">
     {() => {
-      const [selected, setSelected] = useState('contribute');
-      return <CollectiveNavbar collective={webpackCollective} selected={selected} onSectionClick={setSelected} />;
+      const [selected, setSelected] = useState('CONTRIBUTE');
+      return (
+        <CollectiveNavbar collective={webpackCollective} selectedCategory={selected} onSectionClick={setSelected} />
+      );
     }}
   </Story>
 </Canvas>
@@ -25,11 +27,11 @@ import { useState } from 'react';
 <Canvas>
   <Story name="Customize CTAs">
     {() => {
-      const [selected, setSelected] = useState('contribute');
+      const [selected, setSelected] = useState('CONTRIBUTE');
       return (
         <CollectiveNavbar
           collective={webpackCollective}
-          selected={selected}
+          selectedCategory={selected}
           onSectionClick={setSelected}
           callsToAction={{ hasContact: true, hasSubmitExpense: true }}
         />

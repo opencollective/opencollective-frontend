@@ -6,6 +6,7 @@ export const transactionsQueryCollectionFragment = gql`
     offset
     limit
     kinds
+    paymentMethodTypes
     nodes {
       id
       uuid
@@ -137,6 +138,7 @@ export const transactionsQueryCollectionFragment = gql`
         legacyId
         status
         memo
+        processedAt
       }
       expense {
         id

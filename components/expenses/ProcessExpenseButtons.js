@@ -99,7 +99,7 @@ const PermissionButton = ({ icon, label, permission, ...props }) => {
       {label}
     </StyledButton>
   );
-  const message = permission.reason && intl.formatMessage(ReasonMessage[permission.reason]);
+  const message = permission.reason && intl.formatMessage(ReasonMessage[permission.reason], permission.reasonDetails);
   if (message) {
     button = <StyledTooltip content={message}>{button}</StyledTooltip>;
   }
@@ -113,6 +113,7 @@ PermissionButton.propTypes = {
   permission: PropTypes.shape({
     allowed: PropTypes.bool,
     reason: PropTypes.string,
+    reasonDetails: PropTypes.object,
   }).isRequired,
 };
 

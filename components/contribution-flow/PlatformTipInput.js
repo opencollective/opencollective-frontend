@@ -4,7 +4,6 @@ import { isNil } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import INTERVALS from '../../lib/constants/intervals';
 import { formatCurrency } from '../../lib/currency-utils';
 
 import Container from '../Container';
@@ -32,18 +31,20 @@ const Illustration = styled.img.attrs({ src: illustration })`
 `;
 
 const DEFAULT_PERCENTAGES = [0.1, 0.15, 0.2];
+const DEFAULT_PLATFORM_TIP_INDEX = 1;
+export const DEFAULT_PLATFORM_TIP_PERCENTAGE = DEFAULT_PERCENTAGES[DEFAULT_PLATFORM_TIP_INDEX];
 
 const getOptionFromPercentage = (amount, currency, percentage) => {
-  const feeAmount = isNaN(amount) ? 0 : Math.round(amount * percentage);
-  let label = `${feeAmount / 100} ${currency}`;
-  if (feeAmount) {
+  const tipAmount = isNaN(amount) ? 0 : Math.round(amount * percentage);
+  let label = `${tipAmount / 100} ${currency}`;
+  if (tipAmount) {
     label += ` (${percentage * 100}%)`; // Don't show percentages of 0
   }
 
   return {
-    // Value must be unique, so we set a special key if feeAmount is 0
-    value: feeAmount || `${percentage}%`,
-    feeAmount,
+    // Value must be unique, so we set a special key if tipAmount is 0
+    value: tipAmount || `${percentage}%`,
+    tipAmount,
     percentage,
     currency,
     label,
@@ -66,7 +67,7 @@ const getOptions = (amount, currency, intl) => {
   ];
 };
 
-const PlatformTipInput = ({ currency, amount, quantity, fees, onChange, isEmbed }) => {
+const PlatformTipInput = ({ currency, amount, quantity, value, onChange, isEmbed }) => {
   const intl = useIntl();
   const orderAmount = amount * quantity;
   const options = React.useMemo(() => getOptions(orderAmount, currency, intl), [orderAmount, currency]);
@@ -74,36 +75,37 @@ const PlatformTipInput = ({ currency, amount, quantity, fees, onChange, isEmbed 
     if (option.currency) {
       return (
         <span>
-          {formatCurrency(option.feeAmount, option.currency, { locale: intl.locale })}{' '}
-          {Boolean(option.feeAmount) && <Span color="black.500">({option.percentage * 100}%)</Span>}
+          {formatCurrency(option.tipAmount, option.currency, { locale: intl.locale })}{' '}
+          {Boolean(option.tipAmount) && <Span color="black.500">({option.percentage * 100}%)</Span>}
         </span>
       );
     } else {
       return option.label;
     }
   };
-  const [selectedOption, setSelectedOption] = React.useState(options[1]);
+  const [selectedOption, setSelectedOption] = React.useState(options[DEFAULT_PLATFORM_TIP_INDEX]);
   const [isReady, setReady] = React.useState(false);
 
   // Load initial value on mount
   React.useEffect(() => {
-    if (!isNil(fees)) {
-      const option = options.find(({ value }) => value === fees) || options.find(({ value }) => value === 'CUSTOM');
+    if (!isNil(value)) {
+      const option =
+        options.find(option => option.value === value) || options.find(option => option.value === 'CUSTOM');
       setSelectedOption(option);
     }
     setReady(true);
   }, []);
 
-  // Dispatch new fees on top when amount changes
+  // Dispatch new platform tip when amount changes
   React.useEffect(() => {
     if (!isReady) {
       return;
-    } else if (selectedOption.value === 0 && fees) {
+    } else if (selectedOption.value === 0 && value) {
       onChange(0);
     } else if (selectedOption.percentage) {
       const newOption = getOptionFromPercentage(orderAmount, currency, selectedOption.percentage);
-      if (newOption.feeAmount !== fees) {
-        onChange(newOption.feeAmount);
+      if (newOption.tipAmount !== value) {
+        onChange(newOption.tipAmount);
         setSelectedOption(newOption);
       }
     }
@@ -145,7 +147,7 @@ const PlatformTipInput = ({ currency, amount, quantity, fees, onChange, isEmbed 
       </Flex>
       {selectedOption.value === 'CUSTOM' && (
         <Flex justifyContent="flex-end" mt={2}>
-          <StyledInputAmount id="feesOnTop" name="platformTip" currency={currency} onChange={onChange} value={fees} />
+          <StyledInputAmount id="feesOnTop" name="platformTip" currency={currency} onChange={onChange} value={value} />
         </Flex>
       )}
     </Container>
@@ -157,9 +159,8 @@ PlatformTipInput.propTypes = {
   onChange: PropTypes.func.isRequired,
   amount: PropTypes.number,
   quantity: PropTypes.number,
-  fees: PropTypes.number,
+  value: PropTypes.number,
   isEmbed: PropTypes.bool,
-  interval: PropTypes.oneOf(Object.values(INTERVALS)),
 };
 
 export default PlatformTipInput;

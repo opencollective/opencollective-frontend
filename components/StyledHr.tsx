@@ -1,3 +1,4 @@
+import React from 'react';
 import propTypes from '@styled-system/prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
@@ -16,7 +17,13 @@ import {
   SpaceProps,
 } from 'styled-system';
 
-type StyledHrProps = SpaceProps & FlexProps & LayoutProps & ShadowProps & BorderProps & DisplayProps;
+type StyledHrProps = SpaceProps &
+  FlexProps &
+  LayoutProps &
+  ShadowProps &
+  BorderProps &
+  DisplayProps &
+  React.HTMLProps<HTMLHRElement>;
 
 /**
  * An horizontal line. Control the color and size using border properties.

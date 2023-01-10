@@ -5,7 +5,7 @@ import { css } from '@styled-system/css';
 import { groupBy, isEmpty, mapValues, orderBy, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { generateNotFoundError } from '../lib/errors';
@@ -19,14 +19,12 @@ import { Dimensions } from '../components/collective-page/_constants';
 import SectionTitle from '../components/collective-page/SectionTitle';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
-import { Box, Flex, Grid } from '../components/Grid';
+import { Flex, Grid, Box } from '../components/Grid';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
-import LoadingPlaceholder from '../components/LoadingPlaceholder';
-import { recurringContributionsQuery } from '../components/recurring-contributions/graphql/queries';
+import { manageContributionsQuery } from '../components/recurring-contributions/graphql/queries';
 import RecurringContributionsContainer from '../components/recurring-contributions/RecurringContributionsContainer';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
-import StyledFilters from '../components/StyledFilters';
 import StyledHr from '../components/StyledHr';
 import { P, Span } from '../components/Text';
 import { withUser } from '../components/UserProvider';
@@ -35,32 +33,6 @@ const MainContainer = styled(Container)`
   max-width: ${Dimensions.MAX_SECTION_WIDTH}px;
   margin: 0 auto;
 `;
-
-const FILTERS = {
-  ACTIVE: 'ACTIVE',
-  MONTHLY: 'MONTHLY',
-  YEARLY: 'YEARLY',
-  CANCELLED: 'CANCELLED',
-};
-
-const I18nFilters = defineMessages({
-  [FILTERS.ACTIVE]: {
-    id: 'Subscriptions.Active',
-    defaultMessage: 'Active',
-  },
-  [FILTERS.MONTHLY]: {
-    id: 'Frequency.Monthly',
-    defaultMessage: 'Monthly',
-  },
-  [FILTERS.YEARLY]: {
-    id: 'Frequency.Yearly',
-    defaultMessage: 'Yearly',
-  },
-  [FILTERS.CANCELLED]: {
-    id: 'Subscriptions.Cancelled',
-    defaultMessage: 'Cancelled',
-  },
-});
 
 const MenuEntry = styled(Link)`
   display: flex;
@@ -90,13 +62,14 @@ const MenuEntry = styled(Link)`
   }
 `;
 
-class recurringContributionsPage extends React.Component {
+class ManageContributionsPage extends React.Component {
   static getInitialProps({ query: { slug } }) {
     return { slug };
   }
 
   static propTypes = {
     slug: PropTypes.string,
+    tab: PropTypes.string,
     loadingLoggedInUser: PropTypes.bool,
     LoggedInUser: PropTypes.object,
     data: PropTypes.shape({
@@ -110,7 +83,6 @@ class recurringContributionsPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { filter: 'ACTIVE' };
   }
 
   componentDidUpdate() {
@@ -119,7 +91,7 @@ class recurringContributionsPage extends React.Component {
       // We used to send links like `/guest-12345/recurring-contributions` by email, which caused troubles when updating the slug.
       // This redirect ensures compatibility with old links byt redirecting them to the unified page.
       // See https://github.com/opencollective/opencollective/issues/4876
-      router.replace('/recurring-contributions');
+      router.replace('/manage-contributions');
     }
   }
 
@@ -134,8 +106,6 @@ class recurringContributionsPage extends React.Component {
   render() {
     const { slug, data, intl, loadingLoggedInUser, LoggedInUser } = this.props;
 
-    const filters = ['ACTIVE', 'MONTHLY', 'YEARLY', 'CANCELLED'];
-
     if (!data?.loading && !loadingLoggedInUser && LoggedInUser) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
@@ -145,10 +115,11 @@ class recurringContributionsPage extends React.Component {
     }
 
     const collective = data && data.account;
-    const canEditCollective = Boolean(LoggedInUser?.isAdminOfCollectiveOrHost(collective));
+    const canEditCollective = Boolean(LoggedInUser?.isAdminOfCollective(collective));
     const recurringContributions = collective && collective.orders;
     const groupedAdminOf = this.getAdministratedAccounts(LoggedInUser);
     const isAdminOfGroups = !isEmpty(groupedAdminOf);
+    const mainGridColumns = isAdminOfGroups ? ['1fr', '250px 1fr'] : ['1fr'];
     return (
       <AuthenticatedPage disableSignup>
         {loadingLoggedInUser || (data?.loading && !isAdminOfGroups) ? (
@@ -168,33 +139,18 @@ class recurringContributionsPage extends React.Component {
         ) : (
           <Container>
             {/* <CollectiveNavbar collective={collective} /> */}
-            <MainContainer pb={[3, 4]} px={[2, 3, 4]} pt={2}>
-              <SectionTitle textAlign="left" mb={1} mt={4}>
-                <FormattedMessage id="Subscriptions.Title" defaultMessage="Recurring contributions" />
+            <MainContainer py={[3, 4]} px={[2, 3, 4]}>
+              <SectionTitle textAlign="left" mb={1}>
+                <FormattedMessage id="ManageContributions.Title" defaultMessage="Manage contributions" />
               </SectionTitle>
-              <Box mt={4}>
-                <Box>
-                  <Box mx="auto">
-                    <StyledFilters
-                      filters={filters}
-                      getLabel={key => intl.formatMessage(I18nFilters[key])}
-                      selected={this.state.filter}
-                      justifyContent="left"
-                      minButtonWidth={175}
-                      onChange={filter => this.setState({ filter: filter })}
-                    />
-                  </Box>
-                  {data.loading ? (
-                    <LoadingPlaceholder maxHeight="400px" mt={3} />
-                  ) : (
-                    <RecurringContributionsContainer
-                      recurringContributions={recurringContributions}
-                      account={collective}
-                      filter={this.state.filter}
-                    />
-                  )}
-                </Box>
-              </Box>
+              <Box>
+                <RecurringContributionsContainer
+                  recurringContributions={recurringContributions}
+                  account={collective}
+                  isLoading={data.loading}
+                  displayFilters
+                />
+              </Box>{' '}
             </MainContainer>
           </Container>
         )}
@@ -203,16 +159,16 @@ class recurringContributionsPage extends React.Component {
   }
 }
 
-const addRecurringContributionsPageData = graphql(recurringContributionsQuery, {
+const addManageContributionsPageData = graphql(manageContributionsQuery, {
   skip: props => !props.LoggedInUser,
   options: props => ({
     context: API_V2_CONTEXT,
     variables: {
-      // If slug is passed in the URL (e.g. /facebook/recurring-contributions), use it.
+      // If slug is passed in the URL (e.g. /facebook/manage-contributions), use it.
       // Otherwise, use the slug of the LoggedInUser.
       slug: props.slug || props.LoggedInUser?.collective?.slug,
     },
   }),
 });
 
-export default withRouter(withUser(injectIntl(addRecurringContributionsPageData(recurringContributionsPage))));
+export default withRouter(withUser(injectIntl(addManageContributionsPageData(ManageContributionsPage))));

@@ -42,7 +42,6 @@ const FILTER_PROPS = [
         CollectiveRoles.CONTRIBUTOR,
         CollectiveRoles.BACKER,
         CollectiveRoles.MEMBER,
-        CollectiveRoles.FUNDRAISER,
       ],
       accountType: null,
       orderBy: { field: 'MEMBER_COUNT', direction: 'DESC' },

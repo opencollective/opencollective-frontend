@@ -131,13 +131,16 @@ exports.REWRITES = [
     destination: '/create-expense',
   },
   {
-    source:
-      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
     destination: '/expense',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:version(v2)?',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses',
     destination: '/expenses',
+  },
+  {
+    source: '/:collectiveSlug/submitted-expenses',
+    destination: '/submitted-expenses',
   },
   {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders',
@@ -148,7 +151,7 @@ exports.REWRITES = [
     destination: '/order',
   },
   {
-    source: '/orders/:id([0-9]+)/confirm',
+    source: '/:collectiveSlug?/orders/:id([0-9]+)/confirm',
     destination: '/confirmOrder',
   },
   {
@@ -262,16 +265,24 @@ exports.REWRITES = [
   },
   // New recurring contributions page
   {
-    source: '/:slug/recurring-contributions',
-    destination: '/recurring-contributions',
+    source: '/:slug/manage-contributions/:tab(recurring|processing)?',
+    destination: '/manage-contributions',
   },
   {
-    source: '/recurring-contributions',
-    destination: '/recurring-contributions',
+    source: '/manage-contributions/:tab(recurring|processing)?',
+    destination: '/manage-contributions',
+  },
+  {
+    source: '/:slug/recurring-contributions/:tab(recurring|processing)?',
+    destination: '/manage-contributions',
+  },
+  {
+    source: '/recurring-contributions/:tab(recurring|processing)?',
+    destination: '/manage-contributions',
   },
   {
     source: '/:slug/subscriptions',
-    destination: '/recurring-contributions',
+    destination: '/manage-contributions',
   },
   // Path routing: all the rewrites below are ready to be removed as soon as we
   // set `useFileSystemPublicRoutes` to true (default) in `next.config.js`

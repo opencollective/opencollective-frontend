@@ -7,7 +7,7 @@ export const commentFieldsFragment = gql`
     html
     reactions
     userReactions
-    fromCollective {
+    fromAccount {
       id
       type
       name
@@ -29,7 +29,7 @@ export const conversationListFragment = gql`
       slug
       createdAt
       tags
-      fromCollective {
+      fromAccount {
         id
         name
         type

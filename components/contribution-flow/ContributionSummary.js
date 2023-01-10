@@ -50,9 +50,10 @@ const Amount = styled(Span)`
 
 const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment, currency, isCrypto }) => {
   const intl = useIntl();
+  const amount = isCrypto ? stepDetails.cryptoAmount : stepDetails.amount;
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
   const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, currency);
-  const platformContribution = stepDetails.platformContribution || 0;
+  const platformTip = stepDetails.platformTip || 0;
 
   return (
     <Container fontSize="12px">
@@ -79,7 +80,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
             </Label>
             <Amount>
               <FormattedMoneyAmount
-                amount={stepDetails.amount || 0}
+                amount={amount || 0}
                 currency={currency}
                 amountStyles={{ color: 'black.700', fontWeight: 400 }}
                 isCrypto={isCrypto}
@@ -98,7 +99,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               </Amount>
             </AmountLine>
           )}
-          {Boolean(platformContribution) && (
+          {Boolean(platformTip) && (
             <AmountLine color="black.700" data-cy="ContributionSummary-Tip">
               <Label>
                 <FormattedMessage
@@ -109,7 +110,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               </Label>
               <Amount>
                 <FormattedMoneyAmount
-                  amount={platformContribution}
+                  amount={platformTip}
                   currency={currency}
                   amountStyles={{ color: 'black.700', fontWeight: 400 }}
                 />
@@ -187,7 +188,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
           </Label>
           <Amount>
             <FormattedMoneyAmount
-              amount={totalAmount - pmFeeInfo.fee - platformContribution}
+              amount={totalAmount - pmFeeInfo.fee - platformTip}
               currency={currency}
               amountStyles={null}
             />
@@ -195,7 +196,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
         </AmountLine>
       )}
       <StyledHr borderColor="black.500" my={1} />
-      {stepDetails?.interval && stepDetails?.interval !== INTERVALS.flexible && (
+      {stepDetails?.interval && stepDetails?.interval !== INTERVALS.oneTime && (
         <P color="black.700" fontSize="11px" fontStyle="italic" mt={2}>
           <FormattedMessage
             id="ContributionSummary.NextCharge"

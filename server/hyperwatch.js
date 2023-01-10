@@ -104,7 +104,7 @@ const load = async app => {
 
   // Start
 
-  modules.beforeStart();
+  modules.start();
 
   pipeline.start();
 };

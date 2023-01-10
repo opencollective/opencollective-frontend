@@ -234,9 +234,9 @@ const ArrowLeft = ({ size }) => {
 
 const userPages = slug => [
   { label: 'Profile page', href: `/${slug}`, icon: <Template size="16" /> },
-  { label: 'Contributions', href: `/${slug}/recurring-contributions`, icon: <CircleStack size="16" /> },
+  { label: 'Contributions', href: `/${slug}/manage-contributions`, icon: <CircleStack size="16" /> },
   { label: 'Transactions', href: `/${slug}/transactions`, icon: <Wallet size="16" /> },
-  { label: 'Applications', href: `/applications`, icon: <ViewGrid size="16" /> },
+  // { label: 'Applications', href: `/applications`, icon: <ViewGrid size="16" /> },
   { label: 'Settings', href: `/${slug}/admin/info`, icon: <Cog size="16" />, subMenu: true },
 ];
 
@@ -256,7 +256,7 @@ const orgPages = slug => [
 
 const collectivePages = slug => [
   { label: 'Profile page', href: `/${slug}`, icon: <Template size="16" /> },
-  { label: 'Contributions', href: `/${slug}/recurring-contributions`, icon: <CircleStack size="16" /> },
+  { label: 'Contributions', href: `/${slug}/manage-contributions`, icon: <CircleStack size="16" /> },
   { label: 'Financial Contributions', href: `/${slug}/admin/orders`, icon: <Wallet size="16" /> },
   { label: 'Expenses', href: `/${slug}/expenses`, icon: <CircleStack size="16" /> },
   { label: 'Transactions', href: `/${slug}/transactions`, icon: <Wallet size="16" /> },
@@ -364,7 +364,6 @@ export const Sidebar = () => {
     m => m.role === 'ADMIN' || m.role === 'MEMBER',
   );
   useEffect(() => {
-
     if (!activeCollective) return;
     const isUserSettings =
       (activeCollective.type === 'USER' || activeCollective.type === 'COLLECTIVE') &&

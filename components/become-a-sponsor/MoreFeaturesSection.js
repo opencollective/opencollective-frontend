@@ -5,8 +5,10 @@ import styled from 'styled-components';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import { Box, Flex } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
 import { SectionDescription, SectionTitle } from '../marketing/Text';
-import { H3, P, Span } from '../Text';
+import StyledLink from '../StyledLink';
+import { H3, P } from '../Text';
 
 const SectionWrapper = styled(Flex)`
   padding: 0 16px;
@@ -80,17 +82,11 @@ const MoreFeatures = () => (
           <P fontSize="18px" lineHeight="32px" fontWeight="400" letterSpacing="-0.16px" color="black.600">
             <FormattedMessage
               id="becomeASponsor.backYourStack.description"
-              defaultMessage="Discover your Open Source dependencies and support them. {knowMore}"
-              values={{
-                knowMore: (
-                  <a href="https://backyourstack.com">
-                    <Span color="rgb(220, 95, 125)">
-                      Learn more <ArrowRight2 size="18" />
-                    </Span>
-                  </a>
-                ),
-              }}
+              defaultMessage="Discover your Open Source dependencies and support them."
             />
+            <StyledLink href="https://backyourstack.com" color="rgb(220, 95, 125)">
+              <FormattedMessage defaultMessage="Learn more" /> <ArrowRight2 size="18" />
+            </StyledLink>
           </P>
         </Box>
       </Flex>
@@ -103,13 +99,12 @@ const MoreFeatures = () => (
         <SectionDescription>
           <FormattedMessage
             id="becomeASponsor.sustainersKit.description"
-            defaultMessage="We know making the case up the chain is not always easy. For all you heroes inside companies, we put together {resourcesLink}"
+            defaultMessage="We know making the case up the chain is not always easy. For all you heroes inside companies, we put together <Link>some resources to help you succeed</Link>."
             values={{
-              resourcesLink: (
-                <a href="https://docs.opencollective.com/help/financial-contributors/organizations/sustainer-resources">
-                  <Span color="rgb(220, 95, 125)">some resources to help you succeed.</Span>
-                </a>
-              ),
+              Link: getI18nLink({
+                href: 'https://docs.opencollective.com/help/financial-contributors/organizations/sustainer-resources',
+                color: 'rgb(220, 95, 125)',
+              }),
             }}
           />
         </SectionDescription>

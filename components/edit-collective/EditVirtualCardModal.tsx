@@ -9,6 +9,7 @@ import roles from '../../lib/constants/roles';
 import { graphqlAmountValueInCents } from '../../lib/currency-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { Account, VirtualCard, VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import {
   VirtualCardLimitIntervalDescriptionsI18n,
   VirtualCardLimitIntervalI18n,
@@ -28,7 +29,6 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal
 import StyledSelect from '../StyledSelect';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
-import { useLoggedInUser } from '../UserProvider';
 
 const editVirtualCardMutation = gql`
   mutation editVirtualCard(
@@ -467,7 +467,7 @@ export default function EditVirtualCardModal({
               textTransform="capitalize"
             >
               {isEditing ? (
-                <FormattedMessage defaultMessage="Update" />
+                <FormattedMessage id="actions.update" defaultMessage="Update" />
               ) : (
                 <FormattedMessage defaultMessage="Create virtual card" />
               )}

@@ -63,7 +63,7 @@ const MoreFeatures = () => (
         </Box>
         <Box width="288px">
           <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" color="black.800" mb={3}>
-            <FormattedMessage id="CollectivePage.SectionProjects.Title" defaultMessage="Projects" />
+            <FormattedMessage id="Projects" defaultMessage="Projects" />
           </H3>
           <P fontSize="18px" lineHeight="26px" color="black.700" fontWeight="500">
             <FormattedMessage
@@ -130,7 +130,7 @@ const MoreFeatures = () => (
         href="https://docs.opencollective.com/help/"
         fontWeight="500"
       >
-        <FormattedMessage id="LearnMore" defaultMessage="Learn more" />
+        <FormattedMessage defaultMessage="Learn more" />
       </StyledLink>
     </Box>
   </Flex>

@@ -37,6 +37,7 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import CollectiveColorPicker from './CollectiveColorPicker';
 import HeroAvatar from './HeroAvatar';
 import HeroBackground from './HeroBackground';
+import HeroSocialLinks from './HeroSocialLinks';
 import HeroTotalCollectiveContributionsWithData from './HeroTotalCollectiveContributionsWithData';
 
 // Dynamic imports
@@ -124,6 +125,8 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
     editCover(false);
     showColorPicker(false);
   }, [collective.id]);
+
+  const hasSocialLinks = collective.socialLinks && collective.socialLinks.length > 0;
 
   return (
     <Fragment>
@@ -258,7 +261,8 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       )}
                     </ContactCollectiveBtn>
                   )}
-                  {collective.twitterHandle && (
+                  {hasSocialLinks && <HeroSocialLinks socialLinks={collective.socialLinks} relMe />}
+                  {!hasSocialLinks && collective.twitterHandle && (
                     <StyledLink
                       data-cy="twitterProfileUrl"
                       href={twitterProfileUrl(collective.twitterHandle)}
@@ -269,7 +273,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       </StyledRoundButton>
                     </StyledLink>
                   )}
-                  {collective.website && (
+                  {!hasSocialLinks && collective.website && (
                     <StyledLink data-cy="collectiveWebsite" href={collective.website} openInNewTabNoFollow>
                       <StyledRoundButton
                         size={32}
@@ -281,7 +285,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       </StyledRoundButton>
                     </StyledLink>
                   )}
-                  {collective.repositoryUrl && (
+                  {!hasSocialLinks && collective.repositoryUrl && (
                     <StyledLink data-cy="repositoryUrl" href={collective.repositoryUrl} openInNewTabNoFollow>
                       <StyledButton buttonSize="tiny" color="black.700" height={32} mr={3}>
                         <CodeRepositoryIcon size={12} repositoryUrl={collective.repositoryUrl} />
@@ -439,6 +443,7 @@ Hero.propTypes = {
     twitterHandle: PropTypes.string,
     repositoryUrl: PropTypes.string,
     website: PropTypes.string,
+    socialLinks: PropTypes.arrayOf(PropTypes.object),
     description: PropTypes.string,
     isHost: PropTypes.bool,
     hostFeePercent: PropTypes.number,

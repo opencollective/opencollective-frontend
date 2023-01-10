@@ -4,7 +4,7 @@ import { isEmpty, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { canContributeRecurring, hostIsTaxDeductibeInTheUs } from '../../lib/collective.lib';
+import { canContributeRecurring, hostIsTaxDeductibleInTheUs } from '../../lib/collective.lib';
 import INTERVALS from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
@@ -16,6 +16,8 @@ import StyledButtonSet from '../../components/StyledButtonSet';
 import StyledInputAmount from '../../components/StyledInputAmount';
 import StyledInputField from '../../components/StyledInputField';
 
+import { AutoCollapse } from '../AutoCollapse';
+import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import StyledAmountPicker, { OTHER_AMOUNT_KEY } from '../StyledAmountPicker';
@@ -32,7 +34,7 @@ const getCustomFields = (collective, tier) => {
   return [...(tier?.customFields || []), ...(collective.host?.settings?.contributionFlow?.customFields || [])];
 };
 
-const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, isEmbed }) => {
+const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router, isEmbed }) => {
   const intl = useIntl();
   const amount = data?.amount;
   const currency = tier?.amount.currency || collective.currency;
@@ -46,7 +48,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
   const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
   const customFields = getCustomFields(collective, tier);
-  const selectedInterval = data?.interval !== INTERVALS.flexible ? data?.interval : null;
+  const selectedInterval = data?.interval;
   const supportsRecurring = canContributeRecurring(collective, LoggedInUser) && (!tier || tier?.interval);
   const isFixedInterval = tier?.interval && tier.interval !== INTERVALS.flexible;
 
@@ -58,19 +60,25 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
   // collective doesn't support it, we reset the interval
   React.useEffect(() => {
     if (selectedInterval && !isFixedInterval && !supportsRecurring) {
-      dispatchChange('interval', null);
+      dispatchChange('interval', INTERVALS.oneTime);
     }
   }, [selectedInterval, isFixedInterval, supportsRecurring]);
 
   return (
     <Box width={1}>
+      {tier?.type === 'TICKET' && tier.description && (
+        <Container mb={4} whiteSpace="pre-line">
+          <AutoCollapse maxCollapsedHeight={125}>{tier.description}</AutoCollapse>
+        </Container>
+      )}
+
       {!isFixedInterval && supportsRecurring && (
         <StyledButtonSet
           id="interval"
           justifyContent="center"
           mt={[4, 0]}
           mb="30px"
-          items={[null, INTERVALS.month, INTERVALS.year]}
+          items={[INTERVALS.oneTime, INTERVALS.month, INTERVALS.year]}
           selected={selectedInterval || null}
           buttonProps={{ px: 2, py: '5px' }}
           role="group"
@@ -85,7 +93,7 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
         >
           {({ item, isSelected }) => (
             <Span fontSize={isSelected ? '20px' : '18px'} lineHeight="28px" fontWeight={isSelected ? 500 : 400}>
-              {i18nInterval(intl, item || INTERVALS.oneTime)}
+              {i18nInterval(intl, item)}
             </Span>
           )}
         </StyledButtonSet>
@@ -190,16 +198,19 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
                   max={tier.availableQuantity}
                   value={data?.quantity}
                   maxWidth={80}
-                  onChange={e => dispatchChange('quantity', parseInt(e.target.value))}
                   fontSize="15px"
                   minWidth={100}
+                  onChange={e => {
+                    const newValue = parseInt(e.target.value);
+                    dispatchChange('quantity', isNaN(newValue) ? null : newValue);
+                  }}
                 />
               </div>
             )}
           </StyledInputField>
         </Box>
       )}
-      {hostIsTaxDeductibeInTheUs(collective.host) && (
+      {hostIsTaxDeductibleInTheUs(collective.host) && (
         <React.Fragment>
           <StyledHr borderColor="black.300" mb={16} mt={32} />
           <P fontSize="14px" lineHeight="20px" fontStyle="italic" color="black.500" letterSpacing="0em">
@@ -211,15 +222,14 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
           <StyledHr borderColor="black.300" mt={16} mb={32} />
         </React.Fragment>
       )}
-      {showFeesOnTop && (
+      {showPlatformTip && (
         <Box mt={28}>
           <PlatformTipInput
             currency={currency}
             amount={data?.amount}
-            fees={data?.platformContribution}
-            interval={data?.interval}
+            value={data?.platformTip}
             quantity={data?.quantity}
-            onChange={value => dispatchChange('platformContribution', value)}
+            onChange={value => dispatchChange('platformTip', value)}
             isEmbed={isEmbed}
           />
         </Box>
@@ -253,12 +263,12 @@ const StepDetails = ({ onChange, data, collective, tier, showFeesOnTop, router, 
 
 StepDetails.propTypes = {
   onChange: PropTypes.func,
-  showFeesOnTop: PropTypes.bool,
+  showPlatformTip: PropTypes.bool,
   isEmbed: PropTypes.bool,
   LoggedInUser: PropTypes.object,
   data: PropTypes.shape({
     amount: PropTypes.number,
-    platformContribution: PropTypes.number,
+    platformTip: PropTypes.number,
     quantity: PropTypes.number,
     interval: PropTypes.string,
     customData: PropTypes.object,
@@ -272,6 +282,7 @@ StepDetails.propTypes = {
   tier: PropTypes.shape({
     amountType: PropTypes.string,
     interval: PropTypes.string,
+    description: PropTypes.string,
     name: PropTypes.string,
     maxQuantity: PropTypes.number,
     availableQuantity: PropTypes.number,

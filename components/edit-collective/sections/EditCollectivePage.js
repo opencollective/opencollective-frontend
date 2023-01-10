@@ -39,15 +39,34 @@ export const getSettingsQuery = gql`
     account(slug: $slug) {
       id
       type
+      currency
       isActive
       isHost
       settings
       policies {
-        EXPENSE_AUTHOR_CANNOT_APPROVE
+        EXPENSE_AUTHOR_CANNOT_APPROVE {
+          enabled
+          amountInCents
+          appliesToHostedCollectives
+          appliesToSingleAdminCollectives
+        }
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
           applies
           freeze
+        }
+      }
+      ... on AccountWithHost {
+        host {
+          id
+          policies {
+            EXPENSE_AUTHOR_CANNOT_APPROVE {
+              enabled
+              amountInCents
+              appliesToHostedCollectives
+              appliesToSingleAdminCollectives
+            }
+          }
         }
       }
     }
@@ -140,7 +159,7 @@ const CollectiveSectionEntry = ({
       value: 'ADMIN',
     },
     {
-      label: <FormattedMessage id="EditCollectivePage.ShowSection.Disabled" defaultMessage="Disabled" />,
+      label: <FormattedMessage defaultMessage="Disabled" />,
       value: 'DISABLED',
     },
   ];

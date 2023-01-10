@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
-import { get } from 'lodash';
+import { get, sortBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -75,15 +75,10 @@ const getFinancialContributions = (collective, sortedTiers) => {
 };
 
 const CardsContainer = styled(Grid).attrs({
+  justifyItems: 'center',
   gridGap: '30px',
-  justifyContent: ['center', 'space-between'],
-  gridTemplateColumns: [
-    'minmax(280px, 400px)',
-    'repeat(2, minmax(280px, 350px))',
-    'repeat(3, minmax(240px, 350px))',
-    'repeat(3, minmax(280px, 350px))',
-    'repeat(4, 280px)',
-  ],
+  gridTemplateColumns: ['repeat(auto-fit, minmax(280px, 1fr))'],
+  gridAutoRows: ['1fr'],
 })`
   & > * {
     padding: 0;
@@ -138,7 +133,7 @@ const tiersQuery = gql`
 const TiersRevamp = ({ collective }) => {
   const variables = { accountSlug: collective.slug };
   const { data, loading, error } = useQuery(tiersQuery, { variables, context: API_V2_CONTEXT });
-  const tiers = get(data, 'account.tiers.nodes', []);
+  const tiers = sortBy(get(data, 'account.tiers.nodes', []), 'legacyId');
   const intl = useIntl();
 
   return (

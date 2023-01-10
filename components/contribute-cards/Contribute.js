@@ -200,11 +200,16 @@ const ContributeCard = ({
   enableEditing,
   tier,
   collective,
+  isPreview,
   ...props
 }) => {
   const [isEditTierModalOpen, setIsEditTierModalOpen] = React.useState(false);
 
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
+
+  if (isPreview) {
+    route = '#';
+  }
 
   return (
     <StyledContributeCard {...props}>
@@ -341,6 +346,7 @@ ContributeCard.propTypes = {
   enableEditing: PropTypes.bool,
   tier: PropTypes.object,
   collective: PropTypes.object,
+  isPreview: PropTypes.bool,
 };
 
 ContributeCard.defaultProps = {

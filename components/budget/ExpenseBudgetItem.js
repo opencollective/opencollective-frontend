@@ -14,7 +14,7 @@ import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
-import Avatar from '../Avatar';
+import { AvatarWithLink } from '../AvatarWithLink';
 import Container from '../Container';
 import DateTime from '../DateTime';
 import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
@@ -79,7 +79,7 @@ const getNbAttachedFiles = expense => {
   if (!expense) {
     return 0;
   } else if (expense.type === expenseTypes.INVOICE) {
-    return 1 + size(expense.attachedFiles);
+    return size(expense.attachedFiles);
   } else {
     return size(expense.attachedFiles) + size(expense.items.filter(({ url }) => Boolean(url)));
   }
@@ -99,6 +99,7 @@ const ExpenseBudgetItem = ({
   const [hasFilesPreview, showFilesPreview] = React.useState(false);
   const featuredProfile = isInverted ? expense?.account : expense?.payee;
   const isAdminView = view === 'admin';
+  const isSubmitterView = view === 'submitter';
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const pendingReceipt = isCharge && expense?.items?.every(i => i.url === null);
   const nbAttachedFiles = !isAdminView ? 0 : getNbAttachedFiles(expense);
@@ -117,9 +118,11 @@ const ExpenseBudgetItem = ({
             {isLoading ? (
               <LoadingPlaceholder width={40} height={40} />
             ) : (
-              <StyledLink as={LinkCollective} collective={featuredProfile}>
-                <Avatar collective={featuredProfile} radius={40} />
-              </StyledLink>
+              <AvatarWithLink
+                size={40}
+                account={featuredProfile}
+                secondaryAccount={featuredProfile.id === expense.createdByAccount.id ? null : expense.createdByAccount}
+              />
             )}
           </Box>
           {isLoading ? (
@@ -162,12 +165,14 @@ const ExpenseBudgetItem = ({
 
               <P mt="5px" fontSize="12px" color="black.700">
                 {isAdminView ? (
-                  <StyledLink as={LinkCollective} collective={expense.account} />
+                  <LinkCollective collective={expense.account} />
                 ) : (
                   <FormattedMessage
-                    id="CreatedBy"
-                    defaultMessage="by {name}"
-                    values={{ name: <StyledLink as={LinkCollective} collective={expense.createdByAccount} /> }}
+                    defaultMessage="from {payee} to {account}"
+                    values={{
+                      payee: <LinkCollective collective={expense.payee} />,
+                      account: <LinkCollective collective={expense.account} />,
+                    }}
                   />
                 )}
                 {' • '}
@@ -229,7 +234,7 @@ const ExpenseBudgetItem = ({
             <LoadingPlaceholder height={20} width={140} />
           ) : (
             <Flex>
-              {isAdminView && pendingReceipt && (
+              {(isAdminView || isSubmitterView) && pendingReceipt && (
                 <Box mr="1px">
                   <StyledTooltip
                     content={
@@ -240,7 +245,7 @@ const ExpenseBudgetItem = ({
                   </StyledTooltip>
                 </Box>
               )}
-              {isAdminView && (
+              {(isAdminView || isSubmitterView) && (
                 <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} mb={0} py={0} mr="2px" fontSize="9px" />
               )}
               {shouldDisplayStatusTagActions ? (
@@ -263,7 +268,7 @@ const ExpenseBudgetItem = ({
       </Flex>
       <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}>
         <Box mt={2}>
-          {isAdminView ? (
+          {isAdminView || isSubmitterView ? (
             <Flex>
               <Box mr={[3, 4]}>
                 <DetailColumnHeader>
@@ -350,7 +355,7 @@ ExpenseBudgetItem.propTypes = {
   onDelete: PropTypes.func,
   onProcess: PropTypes.func,
   showProcessActions: PropTypes.bool,
-  view: PropTypes.oneOf(['public', 'admin']),
+  view: PropTypes.oneOf(['public', 'admin', 'submitter']),
   host: PropTypes.object,
   suggestedTags: PropTypes.arrayOf(PropTypes.string),
   expense: PropTypes.shape({
@@ -379,6 +384,7 @@ ExpenseBudgetItem.propTypes = {
       type: PropTypes.string,
     }),
     createdByAccount: PropTypes.shape({
+      id: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,

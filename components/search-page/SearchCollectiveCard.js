@@ -65,7 +65,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                     {` `}
                     <Span fontSize="12px" fontWeight={400} color="black.700">
                       <FormattedMessage
-                        defaultMessage="{ count, plural, one {Contributor} other {Contributors}}"
+                        defaultMessage="Financial {count, plural, one {Contributor} other {Contributors}}"
                         values={{ count: collective.backers.totalCount }}
                       />
                     </Span>
@@ -73,21 +73,39 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                 )}
               </P>
 
-              {collective.stats.totalAmountReceived.valueInCents > 0 && (
-                <Box pb="6px">
-                  <Span fontSize="14px" fontWeight={700} color="black.900">
-                    <Currency
-                      currency={collective.stats.totalAmountReceived.currency}
-                      formatWithSeparators
-                      value={collective.stats.totalAmountReceived.valueInCents}
-                    />
-                  </Span>
-                  {` `}
-                  <Span fontSize="12px" fontWeight={400} color="black.700">
-                    <FormattedMessage defaultMessage="Money raised" />
-                  </Span>
-                </Box>
-              )}
+              {collective.type !== CollectiveType.ORGANIZATION &&
+                collective.stats.totalAmountReceived.valueInCents > 0 && (
+                  <Box pb="6px">
+                    <Span fontSize="14px" fontWeight={700} color="black.900">
+                      <Currency
+                        currency={collective.stats.totalAmountReceived.currency}
+                        formatWithSeparators
+                        value={collective.stats.totalAmountReceived.valueInCents}
+                      />
+                    </Span>
+                    {` `}
+                    <Span fontSize="12px" fontWeight={400} color="black.700">
+                      <FormattedMessage defaultMessage="Money raised" />
+                    </Span>
+                  </Box>
+                )}
+
+              {collective.type === CollectiveType.ORGANIZATION &&
+                Math.abs(collective.stats.totalAmountSpent.valueInCents) > 0 && (
+                  <Box pb="6px">
+                    <Span fontSize="14px" fontWeight={700} color="black.900">
+                      <Currency
+                        currency={collective.stats.totalAmountSpent.currency}
+                        formatWithSeparators
+                        value={Math.abs(collective.stats.totalAmountSpent.valueInCents)}
+                      />
+                    </Span>
+                    {` `}
+                    <Span fontSize="12px" fontWeight={400} color="black.700">
+                      <FormattedMessage id="AmountContributed" defaultMessage="Contributed" />
+                    </Span>
+                  </Box>
+                )}
             </React.Fragment>
           )}
           {collective.description && (
@@ -117,6 +135,10 @@ SearchCollectiveCard.propTypes = {
     isHost: PropTypes.bool,
     stats: PropTypes.shape({
       totalAmountReceived: PropTypes.shape({
+        valueInCents: PropTypes.number,
+        currency: PropTypes.string,
+      }),
+      totalAmountSpent: PropTypes.shape({
         valueInCents: PropTypes.number,
         currency: PropTypes.string,
       }),

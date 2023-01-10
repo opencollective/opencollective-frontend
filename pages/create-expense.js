@@ -17,6 +17,7 @@ import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/u
 import { parseToBoolean } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
+import { Dimensions } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
@@ -359,7 +360,7 @@ class CreateExpensePage extends React.Component {
                   </SignInOverlayBackground>
                 </ContainerOverlay>
               )}
-              <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
+              <Box maxWidth={Dimensions.MAX_SECTION_WIDTH} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
                 <Flex justifyContent="space-between" flexDirection={['column', 'row']}>
                   <Box minWidth={300} maxWidth={['100%', null, null, 728]} mr={[0, 3, 5]} mb={5} flexGrow="1">
                     <SummaryHeader fontSize="24px" lineHeight="32px" mb={24} py={2}>

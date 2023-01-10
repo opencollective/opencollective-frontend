@@ -90,9 +90,12 @@ export type Account = {
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this account can use to pay for Orders */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this account can use to get paid */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -103,6 +106,7 @@ export type Account = {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -221,8 +225,10 @@ export type AccountOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -348,7 +354,10 @@ export type AccountStats = {
   activeRecurringContributionsV2?: Maybe<Amount>;
   /** Amount of money in cents in the currency of the collective */
   balance: Amount;
-  /** Amount of money in cents in the currency of the collective currently available to spend */
+  /**
+   * Amount of money in cents in the currency of the collective currently available to spend
+   * @deprecated 2022-12-13: Use balance + withBlockedFunds instead
+   */
   balanceWithBlockedFunds: Amount;
   /**
    * The consolidated amount of all the events and projects combined.
@@ -359,6 +368,8 @@ export type AccountStats = {
   contributionsAmount?: Maybe<Array<Maybe<AmountStats>>>;
   /** Return amount time series for contributions (default, and only for now: one-time vs recurring) */
   contributionsAmountTimeSeries: TimeSeriesAmount;
+  contributionsCount: Scalars['Int'];
+  contributorsCount: Scalars['Int'];
   /** Returns expense tags for collective sorted by popularity */
   expensesTags?: Maybe<Array<Maybe<AmountStats>>>;
   /** History of the expense tags used by this collective. */
@@ -368,10 +379,20 @@ export type AccountStats = {
   monthlySpending: Amount;
   /** Total amount received */
   totalAmountReceived: Amount;
+  /** Total amount received time series */
+  totalAmountReceivedTimeSeries: TimeSeriesAmount;
   /** Total amount spent */
   totalAmountSpent: Amount;
-  /** Total net amount received */
+  /**
+   * Total net amount received
+   * @deprecated 2022-12-13: Use totalAmountReceived + net=true instead
+   */
   totalNetAmountReceived: Amount;
+  /**
+   * Total net amount received time series
+   * @deprecated 2022-12-13: Use totalAmountReceivedTimeSeries + net=true instead
+   */
+  totalNetAmountReceivedTimeSeries: TimeSeriesAmount;
   /** Total of paid expenses to the account, filter per expense type */
   totalPaidExpenses: Amount;
   yearlyBudget: Amount;
@@ -387,9 +408,10 @@ export type AccountStatsActiveRecurringContributionsV2Args = {
 
 /** Stats for the Account */
 export type AccountStatsBalanceArgs = {
-  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  currency?: InputMaybe<Currency>;
   dateTo?: InputMaybe<Scalars['DateTime']>;
   includeChildren?: InputMaybe<Scalars['Boolean']>;
+  withBlockedFunds?: InputMaybe<Scalars['Boolean']>;
 };
 
 
@@ -407,6 +429,22 @@ export type AccountStatsContributionsAmountTimeSeriesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']>;
   includeChildren?: InputMaybe<Scalars['Boolean']>;
   timeUnit?: InputMaybe<TimeUnit>;
+};
+
+
+/** Stats for the Account */
+export type AccountStatsContributionsCountArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  dateTo?: InputMaybe<Scalars['DateTime']>;
+  includeChildren?: InputMaybe<Scalars['Boolean']>;
+};
+
+
+/** Stats for the Account */
+export type AccountStatsContributorsCountArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  dateTo?: InputMaybe<Scalars['DateTime']>;
+  includeChildren?: InputMaybe<Scalars['Boolean']>;
 };
 
 
@@ -430,22 +468,62 @@ export type AccountStatsExpensesTagsTimeSeriesArgs = {
 
 /** Stats for the Account */
 export type AccountStatsTotalAmountReceivedArgs = {
+  currency?: InputMaybe<Currency>;
   dateFrom?: InputMaybe<Scalars['DateTime']>;
   dateTo?: InputMaybe<Scalars['DateTime']>;
   includeChildren?: InputMaybe<Scalars['Boolean']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
+  net?: InputMaybe<Scalars['Boolean']>;
   periodInMonths?: InputMaybe<Scalars['Int']>;
   useCache?: Scalars['Boolean'];
 };
 
 
 /** Stats for the Account */
+export type AccountStatsTotalAmountReceivedTimeSeriesArgs = {
+  currency?: InputMaybe<Currency>;
+  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  dateTo?: InputMaybe<Scalars['DateTime']>;
+  includeChildren?: InputMaybe<Scalars['Boolean']>;
+  kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
+  net?: InputMaybe<Scalars['Boolean']>;
+  periodInMonths?: InputMaybe<Scalars['Int']>;
+  timeUnit?: InputMaybe<TimeUnit>;
+};
+
+
+/** Stats for the Account */
 export type AccountStatsTotalAmountSpentArgs = {
+  currency?: InputMaybe<Currency>;
+  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  dateTo?: InputMaybe<Scalars['DateTime']>;
+  includeChildren?: InputMaybe<Scalars['Boolean']>;
+  includeGiftCards?: InputMaybe<Scalars['Boolean']>;
+  kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
+  net?: InputMaybe<Scalars['Boolean']>;
+  periodInMonths?: InputMaybe<Scalars['Int']>;
+};
+
+
+/** Stats for the Account */
+export type AccountStatsTotalNetAmountReceivedArgs = {
   dateFrom?: InputMaybe<Scalars['DateTime']>;
   dateTo?: InputMaybe<Scalars['DateTime']>;
   includeChildren?: InputMaybe<Scalars['Boolean']>;
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
   periodInMonths?: InputMaybe<Scalars['Int']>;
+};
+
+
+/** Stats for the Account */
+export type AccountStatsTotalNetAmountReceivedTimeSeriesArgs = {
+  currency?: InputMaybe<Currency>;
+  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  dateTo?: InputMaybe<Scalars['DateTime']>;
+  includeChildren?: InputMaybe<Scalars['Boolean']>;
+  kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
+  periodInMonths?: InputMaybe<Scalars['Int']>;
+  timeUnit?: InputMaybe<TimeUnit>;
 };
 
 
@@ -606,6 +684,7 @@ export enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_REJECTED = 'COLLECTIVE_EXPENSE_REJECTED',
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT = 'COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT',
   COLLECTIVE_EXPENSE_UNAPPROVED = 'COLLECTIVE_EXPENSE_UNAPPROVED',
+  COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT = 'COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT',
   COLLECTIVE_EXPENSE_UPDATED = 'COLLECTIVE_EXPENSE_UPDATED',
   COLLECTIVE_FROZEN = 'COLLECTIVE_FROZEN',
   COLLECTIVE_MEMBER_CREATED = 'COLLECTIVE_MEMBER_CREATED',
@@ -626,6 +705,7 @@ export enum ActivityAndClassesType {
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS = 'COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS',
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED = 'COLLECTIVE_VIRTUAL_CARD_SUSPENDED',
   CONNECTED_ACCOUNT_CREATED = 'CONNECTED_ACCOUNT_CREATED',
+  CONNECTED_ACCOUNT_ERROR = 'CONNECTED_ACCOUNT_ERROR',
   CONTRIBUTIONS = 'CONTRIBUTIONS',
   CONTRIBUTION_REJECTED = 'CONTRIBUTION_REJECTED',
   CONVERSATION_COMMENT_CREATED = 'CONVERSATION_COMMENT_CREATED',
@@ -637,10 +717,12 @@ export enum ActivityAndClassesType {
   OAUTH_APPLICATION_AUTHORIZED = 'OAUTH_APPLICATION_AUTHORIZED',
   ORDERS_SUSPICIOUS = 'ORDERS_SUSPICIOUS',
   ORDER_CANCELED_ARCHIVED_COLLECTIVE = 'ORDER_CANCELED_ARCHIVED_COLLECTIVE',
+  ORDER_PAYMENT_FAILED = 'ORDER_PAYMENT_FAILED',
+  ORDER_PENDING = 'ORDER_PENDING',
   ORDER_PENDING_CONTRIBUTION_NEW = 'ORDER_PENDING_CONTRIBUTION_NEW',
   ORDER_PENDING_CONTRIBUTION_REMINDER = 'ORDER_PENDING_CONTRIBUTION_REMINDER',
+  ORDER_PENDING_CRYPTO = 'ORDER_PENDING_CRYPTO',
   ORDER_PROCESSING = 'ORDER_PROCESSING',
-  ORDER_PROCESSING_CRYPTO = 'ORDER_PROCESSING_CRYPTO',
   ORDER_THANKYOU = 'ORDER_THANKYOU',
   ORGANIZATION_COLLECTIVE_CREATED = 'ORGANIZATION_COLLECTIVE_CREATED',
   PAYMENT_CREDITCARD_CONFIRMATION = 'PAYMENT_CREDITCARD_CONFIRMATION',
@@ -742,6 +824,7 @@ export enum ActivityType {
   COLLECTIVE_EXPENSE_REJECTED = 'COLLECTIVE_EXPENSE_REJECTED',
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT = 'COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT',
   COLLECTIVE_EXPENSE_UNAPPROVED = 'COLLECTIVE_EXPENSE_UNAPPROVED',
+  COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT = 'COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT',
   COLLECTIVE_EXPENSE_UPDATED = 'COLLECTIVE_EXPENSE_UPDATED',
   COLLECTIVE_FROZEN = 'COLLECTIVE_FROZEN',
   COLLECTIVE_MEMBER_CREATED = 'COLLECTIVE_MEMBER_CREATED',
@@ -762,6 +845,7 @@ export enum ActivityType {
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS = 'COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS',
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED = 'COLLECTIVE_VIRTUAL_CARD_SUSPENDED',
   CONNECTED_ACCOUNT_CREATED = 'CONNECTED_ACCOUNT_CREATED',
+  CONNECTED_ACCOUNT_ERROR = 'CONNECTED_ACCOUNT_ERROR',
   CONTRIBUTION_REJECTED = 'CONTRIBUTION_REJECTED',
   CONVERSATION_COMMENT_CREATED = 'CONVERSATION_COMMENT_CREATED',
   DEACTIVATED_COLLECTIVE_AS_HOST = 'DEACTIVATED_COLLECTIVE_AS_HOST',
@@ -770,10 +854,12 @@ export enum ActivityType {
   OAUTH_APPLICATION_AUTHORIZED = 'OAUTH_APPLICATION_AUTHORIZED',
   ORDERS_SUSPICIOUS = 'ORDERS_SUSPICIOUS',
   ORDER_CANCELED_ARCHIVED_COLLECTIVE = 'ORDER_CANCELED_ARCHIVED_COLLECTIVE',
+  ORDER_PAYMENT_FAILED = 'ORDER_PAYMENT_FAILED',
+  ORDER_PENDING = 'ORDER_PENDING',
   ORDER_PENDING_CONTRIBUTION_NEW = 'ORDER_PENDING_CONTRIBUTION_NEW',
   ORDER_PENDING_CONTRIBUTION_REMINDER = 'ORDER_PENDING_CONTRIBUTION_REMINDER',
+  ORDER_PENDING_CRYPTO = 'ORDER_PENDING_CRYPTO',
   ORDER_PROCESSING = 'ORDER_PROCESSING',
-  ORDER_PROCESSING_CRYPTO = 'ORDER_PROCESSING_CRYPTO',
   ORDER_THANKYOU = 'ORDER_THANKYOU',
   ORGANIZATION_COLLECTIVE_CREATED = 'ORGANIZATION_COLLECTIVE_CREATED',
   PAYMENT_CREDITCARD_CONFIRMATION = 'PAYMENT_CREDITCARD_CONFIRMATION',
@@ -840,7 +926,7 @@ export type AmountStats = {
   label: Scalars['String'];
 };
 
-/** An OAuth application or a personal token */
+/** An OAuth application. */
 export type Application = {
   __typename?: 'Application';
   account: Account;
@@ -962,9 +1048,12 @@ export type Bot = Account & {
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -975,6 +1064,7 @@ export type Bot = Account & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -1099,8 +1189,10 @@ export type BotOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -1285,9 +1377,12 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -1302,6 +1397,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -1444,8 +1540,10 @@ export type CollectiveOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -1587,6 +1685,7 @@ export type CollectiveFeatures = {
   RECEIVE_HOST_APPLICATIONS?: Maybe<CollectiveFeatureStatus>;
   RECURRING_CONTRIBUTIONS?: Maybe<CollectiveFeatureStatus>;
   REQUEST_VIRTUAL_CARDS?: Maybe<CollectiveFeatureStatus>;
+  STRIPE_PAYMENT_INTENT?: Maybe<CollectiveFeatureStatus>;
   TEAM?: Maybe<CollectiveFeatureStatus>;
   TOP_FINANCIAL_CONTRIBUTORS?: Maybe<CollectiveFeatureStatus>;
   TRANSACTIONS?: Maybe<CollectiveFeatureStatus>;
@@ -1706,6 +1805,7 @@ export enum ConnectedAccountService {
   paypal = 'paypal',
   privacy = 'privacy',
   stripe = 'stripe',
+  stripe_customer = 'stripe_customer',
   thegivingblock = 'thegivingblock',
   transferwise = 'transferwise',
   twitter = 'twitter'
@@ -1800,7 +1900,6 @@ export enum ContributorRole {
   CONNECTED_COLLECTIVE = 'CONNECTED_COLLECTIVE',
   CONTRIBUTOR = 'CONTRIBUTOR',
   FOLLOWER = 'FOLLOWER',
-  FUNDRAISER = 'FUNDRAISER',
   HOST = 'HOST',
   MEMBER = 'MEMBER'
 }
@@ -2447,11 +2546,17 @@ export type CreditRelatedTransactionsArgs = {
 };
 
 export type CreditCardCreateInput = {
-  brand: Scalars['String'];
-  country: Scalars['String'];
-  expMonth: Scalars['Int'];
-  expYear: Scalars['Int'];
+  /** @deprecated 2022-11-22: the `token` parameter is sufficient */
+  brand?: InputMaybe<Scalars['String']>;
+  /** @deprecated 2022-11-22: the `token` parameter is sufficient */
+  country?: InputMaybe<Scalars['String']>;
+  /** @deprecated 2022-11-22: the `token` parameter is sufficient */
+  expMonth?: InputMaybe<Scalars['Int']>;
+  /** @deprecated 2022-11-22: the `token` parameter is sufficient */
+  expYear?: InputMaybe<Scalars['Int']>;
+  /** @deprecated 2022-11-22: the field was not used since 2017 */
   fullName?: InputMaybe<Scalars['String']>;
+  /** @deprecated 2022-11-22: the `token` parameter is sufficient */
   funding?: InputMaybe<Scalars['String']>;
   token: Scalars['String'];
   zip?: InputMaybe<Scalars['String']>;
@@ -2853,6 +2958,14 @@ export type DebitRelatedTransactionsArgs = {
   kind?: InputMaybe<Array<InputMaybe<TransactionKind>>>;
 };
 
+export type Expense_Author_Cannot_Approve = {
+  __typename?: 'EXPENSE_AUTHOR_CANNOT_APPROVE';
+  amountInCents?: Maybe<Scalars['Int']>;
+  appliesToHostedCollectives?: Maybe<Scalars['Boolean']>;
+  appliesToSingleAdminCollectives?: Maybe<Scalars['Boolean']>;
+  enabled?: Maybe<Scalars['Boolean']>;
+};
+
 export type EmojiReactionResponse = {
   __typename?: 'EmojiReactionResponse';
   /** Reference to the comment corresponding to the emojis */
@@ -2934,9 +3047,12 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   orders: OrderCollection;
   /** The Account parenting this account */
   parent?: Maybe<Account>;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -2951,6 +3067,7 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   /** The Event start date and time */
   startsAt?: Maybe<Scalars['DateTime']>;
   stats?: Maybe<AccountStats>;
@@ -3097,8 +3214,10 @@ export type EventOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -3297,12 +3416,16 @@ export type ExpenseAttachedFile = {
   __typename?: 'ExpenseAttachedFile';
   /** Unique identifier for this file */
   id: Scalars['String'];
+  /** The original filename */
+  name?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['URL']>;
 };
 
 export type ExpenseAttachedFileInput = {
   /** ID of the file */
   id?: InputMaybe<Scalars['String']>;
+  /** Original filename */
+  name?: InputMaybe<Scalars['String']>;
   /** URL of the file */
   url: Scalars['URL'];
 };
@@ -3349,6 +3472,8 @@ export type ExpenseCreateInput = {
 export enum ExpenseCurrencySource {
   /** The expense currency expressed as the account currency */
   ACCOUNT = 'ACCOUNT',
+  /** The expense currency expressed as the expense currency */
+  CREATED_BY_ACCOUNT = 'CREATED_BY_ACCOUNT',
   /** The expense currency expressed as the expense currency */
   EXPENSE = 'EXPENSE',
   /** The expense currency expressed as the host currency */
@@ -3514,7 +3639,7 @@ export type ExpenseQuote = {
   /** Amount of payment processor fee */
   paymentProcessorFeeAmount: Amount;
   /** Amount of this item */
-  totalAmount: Amount;
+  sourceAmount: Amount;
 };
 
 export type ExpenseReferenceInput = {
@@ -3714,9 +3839,12 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -3731,6 +3859,7 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -3873,8 +4002,10 @@ export type FundOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -4064,9 +4195,12 @@ export type Host = Account & AccountWithContributions & {
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** If the host supports PayPal, this will contain the client ID to use in the frontend */
@@ -4088,6 +4222,7 @@ export type Host = Account & AccountWithContributions & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -4291,8 +4426,10 @@ export type HostOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -4604,19 +4741,25 @@ export type Individual = Account & {
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   oAuthAuthorizations?: Maybe<OAuthAuthorizationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
   permissions: AccountPermissions;
+  /** The list of personal tokens created by this account. Admin only. Scope: "applications". */
+  personalTokens?: Maybe<PersonalTokenCollection>;
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -4754,8 +4897,10 @@ export type IndividualOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -4768,6 +4913,13 @@ export type IndividualPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Individual account */
+export type IndividualPersonalTokensArgs = {
+  limit?: Scalars['Int'];
+  offset?: Scalars['Int'];
 };
 
 
@@ -4995,6 +5147,7 @@ export enum MemberRole {
   CONNECTED_ACCOUNT = 'CONNECTED_ACCOUNT',
   CONTRIBUTOR = 'CONTRIBUTOR',
   FOLLOWER = 'FOLLOWER',
+  /** @deprecated 2022-09-12: This role does not exist anymore */
   FUNDRAISER = 'FUNDRAISER',
   HOST = 'HOST',
   MEMBER = 'MEMBER'
@@ -5061,8 +5214,11 @@ export type Mutation = {
   createOrder: OrderWithPayment;
   /** Create an Organization. Scope: "account". */
   createOrganization?: Maybe<Organization>;
+  /** Creates a Stripe payment intent */
+  createPaymentIntent: PaymentIntent;
   /** Create a new Payout Method to get paid through the platform. Scope: "expenses". */
   createPayoutMethod?: Maybe<PayoutMethod>;
+  createPersonalToken?: Maybe<PersonalToken>;
   /** Create a Project. Scope: "account". */
   createProject?: Maybe<Project>;
   /** Create a tier. */
@@ -5081,6 +5237,7 @@ export type Mutation = {
   deleteConnectedAccount?: Maybe<ConnectedAccount>;
   /** Delete an expense. Only work if the expense is rejected - please check permissions.canDelete. Scope: "expenses". */
   deleteExpense: Expense;
+  deletePersonalToken?: Maybe<PersonalToken>;
   /** Delete a tier. */
   deleteTier: Tier;
   /** Delete update. Scope: "updates". */
@@ -5180,6 +5337,9 @@ export type Mutation = {
   updateApplication?: Maybe<Application>;
   /** Update an Order's amount, tier, or payment method. Scope: "orders". */
   updateOrder?: Maybe<Order>;
+  updatePersonalToken?: Maybe<PersonalToken>;
+  /** Updates collective social links */
+  updateSocialLinks: Array<SocialLink>;
   /** Update webhook. Scope: "webhooks". */
   updateWebhook?: Maybe<Webhook>;
   /** To verify and unverified expense. Scope: "expenses". */
@@ -5213,6 +5373,7 @@ export type MutationAddFundsArgs = {
   hostFeePercent?: InputMaybe<Scalars['Float']>;
   invoiceTemplate?: InputMaybe<Scalars['String']>;
   memo?: InputMaybe<Scalars['String']>;
+  processedAt?: InputMaybe<Scalars['DateTime']>;
   tier?: InputMaybe<TierReferenceInput>;
 };
 
@@ -5379,9 +5540,21 @@ export type MutationCreateOrganizationArgs = {
 
 
 /** This is the root mutation */
+export type MutationCreatePaymentIntentArgs = {
+  paymentIntent: PaymentIntentInput;
+};
+
+
+/** This is the root mutation */
 export type MutationCreatePayoutMethodArgs = {
   account: AccountReferenceInput;
   payoutMethod: PayoutMethodInput;
+};
+
+
+/** This is the root mutation */
+export type MutationCreatePersonalTokenArgs = {
+  personalToken: PersonalTokenCreateInput;
 };
 
 
@@ -5448,6 +5621,12 @@ export type MutationDeleteConnectedAccountArgs = {
 /** This is the root mutation */
 export type MutationDeleteExpenseArgs = {
   expense: ExpenseReferenceInput;
+};
+
+
+/** This is the root mutation */
+export type MutationDeletePersonalTokenArgs = {
+  personalToken: PersonalTokenReferenceInput;
 };
 
 
@@ -5819,6 +5998,19 @@ export type MutationUpdateOrderArgs = {
 
 
 /** This is the root mutation */
+export type MutationUpdatePersonalTokenArgs = {
+  personalToken: PersonalTokenUpdateInput;
+};
+
+
+/** This is the root mutation */
+export type MutationUpdateSocialLinksArgs = {
+  account: AccountReferenceInput;
+  socialLinks: Array<SocialLinkInput>;
+};
+
+
+/** This is the root mutation */
 export type MutationUpdateWebhookArgs = {
   webhook: WebhookUpdateInput;
 };
@@ -5947,6 +6139,8 @@ export type Order = {
   membership?: Maybe<MemberOf>;
   /** Memo field which adds additional details about the order. For example in added funds this can be a note to mark what method (cheque, money order) the funds were received. */
   memo?: Maybe<Scalars['String']>;
+  /** Whether the order needs confirmation (3DSecure/SCA) */
+  needsConfirmation?: Maybe<Scalars['Boolean']>;
   nextChargeDate?: Maybe<Scalars['DateTime']>;
   paymentMethod?: Maybe<PaymentMethod>;
   /** The permissions given to current logged in user for this order */
@@ -5954,6 +6148,8 @@ export type Order = {
   /** Platform Tip attached to the Order. */
   platformTipAmount?: Maybe<Amount>;
   platformTipEligible?: Maybe<Scalars['Boolean']>;
+  /** Date the funds were received. */
+  processedAt?: Maybe<Scalars['DateTime']>;
   quantity?: Maybe<Scalars['Int']>;
   status?: Maybe<OrderStatus>;
   tags: Array<Maybe<Scalars['String']>>;
@@ -6079,6 +6275,7 @@ export enum OrderStatus {
   PAID = 'PAID',
   PENDING = 'PENDING',
   PLEDGED = 'PLEDGED',
+  PROCESSING = 'PROCESSING',
   REFUNDED = 'REFUNDED',
   REJECTED = 'REJECTED',
   REQUIRE_CLIENT_CONFIRMATION = 'REQUIRE_CLIENT_CONFIRMATION'
@@ -6121,6 +6318,8 @@ export type OrderUpdateInput = {
   paymentProcessorFee?: InputMaybe<AmountInput>;
   /** Amount intended as tip for the platform */
   platformTip?: InputMaybe<AmountInput>;
+  /** Date the funds were received */
+  processedAt?: InputMaybe<Scalars['DateTime']>;
 };
 
 export type OrderWithPayment = {
@@ -6202,9 +6401,12 @@ export type Organization = Account & AccountWithContributions & {
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -6219,6 +6421,7 @@ export type Organization = Account & AccountWithContributions & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -6354,8 +6557,10 @@ export type OrganizationOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -6457,6 +6662,22 @@ export type OrganizationCreateInput = {
   website?: InputMaybe<Scalars['String']>;
 };
 
+/** A Stripe payment intent */
+export type PaymentIntent = {
+  __typename?: 'PaymentIntent';
+  id: Scalars['String'];
+  paymentIntentClientSecret: Scalars['String'];
+  stripeAccount: Scalars['String'];
+  stripeAccountPublishableSecret: Scalars['String'];
+};
+
+/** Input to create a Stripe payment intent */
+export type PaymentIntentInput = {
+  amount: AmountInput;
+  fromAccount?: InputMaybe<AccountReferenceInput>;
+  toAccount: AccountReferenceInput;
+};
+
 /** PaymentMethod model */
 export type PaymentMethod = {
   __typename?: 'PaymentMethod';
@@ -6469,7 +6690,11 @@ export type PaymentMethod = {
   id?: Maybe<Scalars['String']>;
   legacyId?: Maybe<Scalars['Int']>;
   limitedToHosts?: Maybe<Array<Maybe<Host>>>;
+  /** For monthly gift cards, this field will return the monthly limit */
+  monthlyLimit?: Maybe<Amount>;
   name?: Maybe<Scalars['String']>;
+  /** Get all the orders associated with this payment method */
+  orders?: Maybe<OrderCollection>;
   /**
    * Defines the type of the payment method. Meant to be moved to "type" in the future.
    * @deprecated 2021-03-02: Please use service + type
@@ -6479,6 +6704,27 @@ export type PaymentMethod = {
   /** For gift cards, this field will return to the source payment method */
   sourcePaymentMethod?: Maybe<PaymentMethod>;
   type?: Maybe<PaymentMethodType>;
+};
+
+
+/** PaymentMethod model */
+export type PaymentMethodOrdersArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  dateTo?: InputMaybe<Scalars['DateTime']>;
+  filter?: InputMaybe<AccountOrdersFilter>;
+  frequency?: InputMaybe<ContributionFrequency>;
+  includeHostedAccounts?: InputMaybe<Scalars['Boolean']>;
+  includeIncognito?: InputMaybe<Scalars['Boolean']>;
+  limit?: Scalars['Int'];
+  maxAmount?: InputMaybe<Scalars['Int']>;
+  minAmount?: InputMaybe<Scalars['Int']>;
+  offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
+  onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
+  orderBy?: ChronologicalOrderInput;
+  searchTerm?: InputMaybe<Scalars['String']>;
+  status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
+  tierSlug?: InputMaybe<Scalars['String']>;
 };
 
 /** An input to use for creating or retrieving payment methods */
@@ -6498,6 +6744,8 @@ export type PaymentMethodInput = {
   name?: InputMaybe<Scalars['String']>;
   /** @deprecated 2021-08-20: Please use type instead */
   newType?: InputMaybe<PaymentMethodType>;
+  /** The Payment Intent ID used in this checkout */
+  paymentIntentId?: InputMaybe<Scalars['String']>;
   /** To pass when type is PAYPAL */
   paypalInfo?: InputMaybe<PaypalPaymentInput>;
   /** Service of this payment method */
@@ -6514,8 +6762,11 @@ export enum PaymentMethodLegacyType {
   CREDIT_CARD = 'CREDIT_CARD',
   CRYPTO = 'CRYPTO',
   GIFT_CARD = 'GIFT_CARD',
+  PAYMENT_INTENT = 'PAYMENT_INTENT',
   PAYPAL = 'PAYPAL',
-  PREPAID_BUDGET = 'PREPAID_BUDGET'
+  PREPAID_BUDGET = 'PREPAID_BUDGET',
+  SEPA_DEBIT = 'SEPA_DEBIT',
+  US_BANK_ACCOUNT = 'US_BANK_ACCOUNT'
 }
 
 export type PaymentMethodReferenceInput = {
@@ -6541,8 +6792,11 @@ export enum PaymentMethodType {
   HOST = 'HOST',
   MANUAL = 'MANUAL',
   PAYMENT = 'PAYMENT',
+  PAYMENT_INTENT = 'PAYMENT_INTENT',
   PREPAID = 'PREPAID',
+  SEPA_DEBIT = 'SEPA_DEBIT',
   SUBSCRIPTION = 'SUBSCRIPTION',
+  US_BANK_ACCOUNT = 'US_BANK_ACCOUNT',
   /** @deprecated Please use uppercase values */
   adaptive = 'adaptive',
   /** @deprecated Please use uppercase values */
@@ -6562,9 +6816,15 @@ export enum PaymentMethodType {
   /** @deprecated Please use uppercase values */
   payment = 'payment',
   /** @deprecated Please use uppercase values */
+  paymentintent = 'paymentintent',
+  /** @deprecated Please use uppercase values */
   prepaid = 'prepaid',
   /** @deprecated Please use uppercase values */
-  subscription = 'subscription'
+  sepa_debit = 'sepa_debit',
+  /** @deprecated Please use uppercase values */
+  subscription = 'subscription',
+  /** @deprecated Please use uppercase values */
+  us_bank_account = 'us_bank_account'
 }
 
 /** A payout method */
@@ -6615,13 +6875,79 @@ export type Permission = {
   __typename?: 'Permission';
   allowed: Scalars['Boolean'];
   reason?: Maybe<Scalars['String']>;
+  reasonDetails?: Maybe<Scalars['JSON']>;
+};
+
+/** A personal token */
+export type PersonalToken = {
+  __typename?: 'PersonalToken';
+  /** The account that owns this personal token */
+  account: Individual;
+  /** The date on which the personal token was created */
+  createdAt?: Maybe<Scalars['DateTime']>;
+  /** The date on which the personal token expires */
+  expiresAt?: Maybe<Scalars['DateTime']>;
+  /** Unique identifier for this personal token */
+  id: Scalars['String'];
+  /** A friendly name for users to easily find their personal tokens */
+  name?: Maybe<Scalars['String']>;
+  /** The scopes of the personal token */
+  scope?: Maybe<Array<Maybe<OAuthScope>>>;
+  /** The personal token */
+  token?: Maybe<Scalars['String']>;
+  /** The date on which the personal token was last updated */
+  updatedAt?: Maybe<Scalars['DateTime']>;
+};
+
+/** A collection of "PersonalToken" */
+export type PersonalTokenCollection = Collection & {
+  __typename?: 'PersonalTokenCollection';
+  limit?: Maybe<Scalars['Int']>;
+  nodes?: Maybe<Array<Maybe<PersonalToken>>>;
+  offset?: Maybe<Scalars['Int']>;
+  totalCount?: Maybe<Scalars['Int']>;
+};
+
+/** Input type for PersonalToken */
+export type PersonalTokenCreateInput = {
+  /** The account to use as the owner of the application. Defaults to currently logged in user. */
+  account?: InputMaybe<AccountReferenceInput>;
+  expiresAt?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+  scope?: InputMaybe<Array<InputMaybe<OAuthScope>>>;
+};
+
+export type PersonalTokenReferenceInput = {
+  /** The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
+  id?: InputMaybe<Scalars['String']>;
+  /** The legacy public id identifying the personal-token (ie: 4242) */
+  legacyId?: InputMaybe<Scalars['Int']>;
+};
+
+/** Input type for PersonalToken */
+export type PersonalTokenUpdateInput = {
+  expiresAt?: InputMaybe<Scalars['String']>;
+  /** The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
+  id?: InputMaybe<Scalars['String']>;
+  /** The legacy public id identifying the personal-token (ie: 4242) */
+  legacyId?: InputMaybe<Scalars['Int']>;
+  name?: InputMaybe<Scalars['String']>;
+  scope?: InputMaybe<Array<InputMaybe<OAuthScope>>>;
 };
 
 export type Policies = {
   __typename?: 'Policies';
   COLLECTIVE_MINIMUM_ADMINS?: Maybe<Collective_Minimum_Admins>;
-  EXPENSE_AUTHOR_CANNOT_APPROVE?: Maybe<Scalars['Boolean']>;
+  EXPENSE_AUTHOR_CANNOT_APPROVE?: Maybe<Expense_Author_Cannot_Approve>;
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: Maybe<Maximum_Virtual_Card_Limit_Amount_For_Interval>;
+  REQUIRE_2FA_FOR_ADMINS?: Maybe<Scalars['Boolean']>;
+};
+
+export type PoliciesCollectiveExpenseAuthorCannotApprove = {
+  amountInCents?: InputMaybe<Scalars['Int']>;
+  appliesToHostedCollectives?: InputMaybe<Scalars['Boolean']>;
+  appliesToSingleAdminCollectives?: InputMaybe<Scalars['Boolean']>;
+  enabled?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type PoliciesCollectiveMinimumAdminsInput = {
@@ -6632,7 +6958,8 @@ export type PoliciesCollectiveMinimumAdminsInput = {
 
 export type PoliciesInput = {
   COLLECTIVE_MINIMUM_ADMINS?: InputMaybe<PoliciesCollectiveMinimumAdminsInput>;
-  EXPENSE_AUTHOR_CANNOT_APPROVE?: InputMaybe<Scalars['Boolean']>;
+  EXPENSE_AUTHOR_CANNOT_APPROVE?: InputMaybe<PoliciesCollectiveExpenseAuthorCannotApprove>;
+  REQUIRE_2FA_FOR_ADMINS?: InputMaybe<Scalars['Boolean']>;
 };
 
 /** Defines how the policy is applied */
@@ -6643,16 +6970,16 @@ export enum PolicyApplication {
 
 /** Parameters for paying an expense */
 export type ProcessExpensePaymentParams = {
-  /** 2FA code for if the host account has 2FA for payouts turned on. */
+  /** Who is responsible for paying any due fees. */
   feesPayer?: InputMaybe<FeesPayer>;
   /** Bypass automatic integrations (ie. PayPal, Transferwise) to process the expense manually */
   forceManual?: InputMaybe<Scalars['Boolean']>;
-  /** The fee charged by payment processor in collective currency */
-  paymentProcessorFee?: InputMaybe<Scalars['Int']>;
+  /** The fee charged by payment processor in host currency */
+  paymentProcessorFeeInHostCurrency?: InputMaybe<Scalars['Int']>;
   /** Whether the payment processor fees should be refunded when triggering MARK_AS_UNPAID */
   shouldRefundPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
-  /** 2FA code for if the host account has 2FA for payouts turned on. */
-  twoFactorAuthenticatorCode?: InputMaybe<Scalars['String']>;
+  /** The total amount paid in host currency */
+  totalAmountPaidInHostCurrency?: InputMaybe<Scalars['Int']>;
 };
 
 /** Action taken for an account application to the host */
@@ -6754,9 +7081,12 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   orders: OrderCollection;
   /** The Account parenting this account */
   parent?: Maybe<Account>;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -6771,6 +7101,7 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -6913,8 +7244,10 @@ export type ProjectOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -7039,11 +7372,14 @@ export type Query = {
   orders: OrderCollection;
   organization?: Maybe<Organization>;
   paypalPlan: PaypalPlan;
+  /** Get a personal token by reference */
+  personalToken?: Maybe<PersonalToken>;
   project?: Maybe<Project>;
   tagStats: TagStatsCollection;
   tier?: Maybe<Tier>;
   transactions: TransactionCollection;
   update?: Maybe<Update>;
+  updates: UpdatesCollection;
 };
 
 
@@ -7060,6 +7396,7 @@ export type QueryAccountArgs = {
 export type QueryAccountsArgs = {
   country?: InputMaybe<Array<InputMaybe<CountryIso>>>;
   hasCustomContributionsEnabled?: InputMaybe<Scalars['Boolean']>;
+  host?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   includeArchived?: InputMaybe<Scalars['Boolean']>;
   isActive?: InputMaybe<Scalars['Boolean']>;
   isHost?: InputMaybe<Scalars['Boolean']>;
@@ -7070,6 +7407,7 @@ export type QueryAccountsArgs = {
   skipRecentAccounts?: InputMaybe<Scalars['Boolean']>;
   supportedPaymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   tag?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  tagSearchOperator?: TagSearchOperator;
   type?: InputMaybe<Array<InputMaybe<AccountType>>>;
 };
 
@@ -7131,6 +7469,7 @@ export type QueryExpenseArgs = {
 /** This is the root query */
 export type QueryExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
+  createdByAccount?: InputMaybe<AccountReferenceInput>;
   dateFrom?: InputMaybe<Scalars['DateTime']>;
   dateTo?: InputMaybe<Scalars['DateTime']>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
@@ -7213,8 +7552,10 @@ export type QueryOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -7236,6 +7577,13 @@ export type QueryPaypalPlanArgs = {
   amount: AmountInput;
   frequency: ContributionFrequency;
   tier?: InputMaybe<TierReferenceInput>;
+};
+
+
+/** This is the root query */
+export type QueryPersonalTokenArgs = {
+  id?: InputMaybe<Scalars['String']>;
+  legacyId?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -7296,6 +7644,16 @@ export type QueryUpdateArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   id?: InputMaybe<Scalars['String']>;
   slug?: InputMaybe<Scalars['String']>;
+};
+
+
+/** This is the root query */
+export type QueryUpdatesArgs = {
+  accountTag?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  accountType?: InputMaybe<Array<InputMaybe<AccountType>>>;
+  host?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  limit?: Scalars['Int'];
+  offset?: Scalars['Int'];
 };
 
 /** A recurring expense object */
@@ -7364,6 +7722,39 @@ export type SendMessageResult = {
   success?: Maybe<Scalars['Boolean']>;
 };
 
+/** A social link */
+export type SocialLink = {
+  __typename?: 'SocialLink';
+  createdAt?: Maybe<Scalars['DateTime']>;
+  type: SocialLinkType;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  url: Scalars['URL'];
+};
+
+export type SocialLinkInput = {
+  type: SocialLinkType;
+  url: Scalars['URL'];
+};
+
+/** The type of social link */
+export enum SocialLinkType {
+  DISCORD = 'DISCORD',
+  FACEBOOK = 'FACEBOOK',
+  GIT = 'GIT',
+  GITHUB = 'GITHUB',
+  GITLAB = 'GITLAB',
+  INSTAGRAM = 'INSTAGRAM',
+  LINKEDIN = 'LINKEDIN',
+  MASTODON = 'MASTODON',
+  MATTERMOST = 'MATTERMOST',
+  MEETUP = 'MEETUP',
+  SLACK = 'SLACK',
+  TUMBLR = 'TUMBLR',
+  TWITTER = 'TWITTER',
+  WEBSITE = 'WEBSITE',
+  YOUTUBE = 'YOUTUBE'
+}
+
 export type StripeError = {
   __typename?: 'StripeError';
   account?: Maybe<Scalars['String']>;
@@ -7371,11 +7762,17 @@ export type StripeError = {
   response?: Maybe<Scalars['JSON']>;
 };
 
+/** The operator to use when searching with tags */
+export enum TagSearchOperator {
+  AND = 'AND',
+  OR = 'OR'
+}
+
 /** Statistics for a given tag */
 export type TagStat = {
   __typename?: 'TagStat';
   /** Total amount for this tag */
-  amount: Amount;
+  amount?: Maybe<Amount>;
   /** Number of entries for this tag */
   count: Scalars['Int'];
   /** An unique identifier for this tag */
@@ -7934,6 +8331,15 @@ export type UpdateUpdateInput = {
   title?: InputMaybe<Scalars['String']>;
 };
 
+/** A collection of "Updates" */
+export type UpdatesCollection = Collection & {
+  __typename?: 'UpdatesCollection';
+  limit?: Maybe<Scalars['Int']>;
+  nodes?: Maybe<Array<Update>>;
+  offset?: Maybe<Scalars['Int']>;
+  totalCount?: Maybe<Scalars['Int']>;
+};
+
 /** This represents a Vendor account */
 export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   __typename?: 'Vendor';
@@ -8003,9 +8409,12 @@ export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
   orders: OrderCollection;
+  /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -8020,6 +8429,7 @@ export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -8162,8 +8572,10 @@ export type VendorOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -8357,6 +8769,22 @@ export type WebhookUpdateInput = {
   webhookUrl: Scalars['URL'];
 };
 
+export type NavbarFieldsFragment = { __typename?: 'CollectiveFeatures', id: string, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null };
+
+export type CreatePaymentIntentMutationVariables = Exact<{
+  paymentIntent: PaymentIntentInput;
+}>;
+
+
+export type CreatePaymentIntentMutation = { __typename?: 'Mutation', createPaymentIntent: { __typename?: 'PaymentIntent', id: string, paymentIntentClientSecret: string, stripeAccount: string, stripeAccountPublishableSecret: string } };
+
+export type ContributionFlowPaymentMethodsQueryVariables = Exact<{
+  slug?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type ContributionFlowPaymentMethodsQuery = { __typename?: 'Query', account?: { __typename?: 'Bot', id: string, paymentMethods?: Array<{ __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, sourcePaymentMethod?: { __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, balance: { __typename?: 'Amount', currency?: Currency | null }, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null, balance: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null }, account?: { __typename?: 'Bot', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Collective', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Event', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Fund', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Host', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Individual', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Organization', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Project', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Vendor', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | null, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null> | null } | { __typename?: 'Collective', id: string, paymentMethods?: Array<{ __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, sourcePaymentMethod?: { __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, balance: { __typename?: 'Amount', currency?: Currency | null }, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null, balance: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null }, account?: { __typename?: 'Bot', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Collective', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Event', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Fund', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Host', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Individual', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Organization', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Project', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Vendor', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | null, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null> | null } | { __typename?: 'Event', id: string, paymentMethods?: Array<{ __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, sourcePaymentMethod?: { __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, balance: { __typename?: 'Amount', currency?: Currency | null }, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null, balance: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null }, account?: { __typename?: 'Bot', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Collective', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Event', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Fund', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Host', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Individual', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Organization', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Project', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Vendor', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | null, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null> | null } | { __typename?: 'Fund', id: string, paymentMethods?: Array<{ __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, sourcePaymentMethod?: { __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, balance: { __typename?: 'Amount', currency?: Currency | null }, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null, balance: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null }, account?: { __typename?: 'Bot', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Collective', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Event', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Fund', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Host', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Individual', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Organization', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Project', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Vendor', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | null, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null> | null } | { __typename?: 'Host', id: string, paymentMethods?: Array<{ __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, sourcePaymentMethod?: { __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, balance: { __typename?: 'Amount', currency?: Currency | null }, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null, balance: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null }, account?: { __typename?: 'Bot', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Collective', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Event', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Fund', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Host', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Individual', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Organization', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Project', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Vendor', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | null, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null> | null } | { __typename?: 'Individual', id: string, paymentMethods?: Array<{ __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, sourcePaymentMethod?: { __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, balance: { __typename?: 'Amount', currency?: Currency | null }, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null, balance: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null }, account?: { __typename?: 'Bot', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Collective', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Event', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Fund', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Host', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Individual', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Organization', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Project', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Vendor', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | null, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null> | null } | { __typename?: 'Organization', id: string, paymentMethods?: Array<{ __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, sourcePaymentMethod?: { __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, balance: { __typename?: 'Amount', currency?: Currency | null }, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null, balance: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null }, account?: { __typename?: 'Bot', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Collective', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Event', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Fund', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Host', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Individual', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Organization', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Project', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Vendor', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | null, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null> | null } | { __typename?: 'Project', id: string, paymentMethods?: Array<{ __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, sourcePaymentMethod?: { __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, balance: { __typename?: 'Amount', currency?: Currency | null }, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null, balance: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null }, account?: { __typename?: 'Bot', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Collective', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Event', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Fund', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Host', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Individual', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Organization', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Project', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Vendor', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | null, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null> | null } | { __typename?: 'Vendor', id: string, paymentMethods?: Array<{ __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, sourcePaymentMethod?: { __typename?: 'PaymentMethod', id?: string | null, name?: string | null, data?: any | null, service?: PaymentMethodService | null, type?: PaymentMethodType | null, expiryDate?: any | null, providerType?: PaymentMethodLegacyType | null, balance: { __typename?: 'Amount', currency?: Currency | null }, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null, balance: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null }, account?: { __typename?: 'Bot', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Collective', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Event', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Fund', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Host', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Individual', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Organization', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Project', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | { __typename?: 'Vendor', id: string, slug: string, type: AccountType, name?: string | null, imageUrl?: string | null } | null, limitedToHosts?: Array<{ __typename?: 'Host', id: string, legacyId: number, slug: string } | null> | null } | null> | null } | null };
+
 export type EditVirtualCardMutationVariables = Exact<{
   virtualCard: VirtualCardReferenceInput;
   name: Scalars['String'];
@@ -8393,6 +8821,16 @@ export type VirtualCardPoliciesQueryQueryVariables = Exact<{
 
 export type VirtualCardPoliciesQueryQuery = { __typename?: 'Query', account?: { __typename?: 'Bot', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Collective', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Event', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Fund', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Host', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Individual', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Organization', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Project', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | { __typename?: 'Vendor', id: string, policies: { __typename?: 'Policies', MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: { __typename?: 'MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL', ALL_TIME?: { __typename?: 'Amount', valueInCents?: number | null } | null, DAILY?: { __typename?: 'Amount', valueInCents?: number | null } | null, MONTHLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, PER_AUTHORIZATION?: { __typename?: 'Amount', valueInCents?: number | null } | null, WEEKLY?: { __typename?: 'Amount', valueInCents?: number | null } | null, YEARLY?: { __typename?: 'Amount', valueInCents?: number | null } | null } | null } } | null };
 
+export type LoggedInAccountExpensePayoutFieldsFragment = { __typename?: 'Individual', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, legalName?: string | null, hasTwoFactorAuth?: boolean | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null, structured?: any | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null, adminMemberships: { __typename?: 'MemberOfCollection', nodes?: Array<{ __typename?: 'MemberOf', id?: string | null, account?: { __typename?: 'Bot', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, legalName?: string | null, isActive?: boolean | null, isHost: boolean, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null }, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null, structured?: any | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null, childrenAccounts: { __typename?: 'AccountCollection', nodes?: Array<{ __typename?: 'Bot', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Collective', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Event', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Fund', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Host', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Individual', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Organization', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Project', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Vendor', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | null> | null } } | { __typename?: 'Collective', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, legalName?: string | null, isActive: boolean, isHost: boolean, host?: { __typename?: 'Host', id: string, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | null, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null }, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null, structured?: any | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null, childrenAccounts: { __typename?: 'AccountCollection', nodes?: Array<{ __typename?: 'Bot', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Collective', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Event', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Fund', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Host', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Individual', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Organization', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Project', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Vendor', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | null> | null } } | { __typename?: 'Event', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, legalName?: string | null, isActive: boolean, isHost: boolean, parent?: { __typename?: 'Bot', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Collective', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Event', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Fund', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Host', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Individual', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Organization', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Project', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Vendor', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | null, host?: { __typename?: 'Host', id: string, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | null, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null }, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null, structured?: any | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null, childrenAccounts: { __typename?: 'AccountCollection', nodes?: Array<{ __typename?: 'Bot', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Collective', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Event', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Fund', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Host', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Individual', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Organization', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Project', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Vendor', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | null> | null } } | { __typename?: 'Fund', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, legalName?: string | null, isActive: boolean, isHost: boolean, host?: { __typename?: 'Host', id: string, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | null, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null }, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null, structured?: any | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null, childrenAccounts: { __typename?: 'AccountCollection', nodes?: Array<{ __typename?: 'Bot', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Collective', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Event', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Fund', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Host', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Individual', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Organization', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Project', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Vendor', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | null> | null } } | { __typename?: 'Host', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, legalName?: string | null, isActive?: boolean | null, isHost: boolean, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null }, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null, structured?: any | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null, childrenAccounts: { __typename?: 'AccountCollection', nodes?: Array<{ __typename?: 'Bot', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Collective', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Event', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Fund', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Host', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Individual', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Organization', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Project', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Vendor', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | null> | null } } | { __typename?: 'Individual', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, legalName?: string | null, isActive?: boolean | null, isHost: boolean, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null }, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null, structured?: any | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null, childrenAccounts: { __typename?: 'AccountCollection', nodes?: Array<{ __typename?: 'Bot', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Collective', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Event', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Fund', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Host', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Individual', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Organization', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Project', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Vendor', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | null> | null } } | { __typename?: 'Organization', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, legalName?: string | null, isActive?: boolean | null, isHost: boolean, host?: { __typename?: 'Host', id: string, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | null, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null }, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null, structured?: any | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null, childrenAccounts: { __typename?: 'AccountCollection', nodes?: Array<{ __typename?: 'Bot', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Collective', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Event', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Fund', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Host', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Individual', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Organization', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Project', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Vendor', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | null> | null } } | { __typename?: 'Project', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, legalName?: string | null, isActive: boolean, isHost: boolean, parent?: { __typename?: 'Bot', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Collective', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Event', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Fund', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Host', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Individual', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Organization', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Project', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | { __typename?: 'Vendor', id: string, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null } } | null, host?: { __typename?: 'Host', id: string, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | null, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null }, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null, structured?: any | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null, childrenAccounts: { __typename?: 'AccountCollection', nodes?: Array<{ __typename?: 'Bot', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Collective', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Event', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Fund', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Host', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Individual', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Organization', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Project', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Vendor', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | null> | null } } | { __typename?: 'Vendor', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, legalName?: string | null, isActive: boolean, isHost: boolean, host?: { __typename?: 'Host', id: string, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | null, policies: { __typename?: 'Policies', REQUIRE_2FA_FOR_ADMINS?: boolean | null }, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null, structured?: any | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null, childrenAccounts: { __typename?: 'AccountCollection', nodes?: Array<{ __typename?: 'Bot', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Collective', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Event', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Fund', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Host', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Individual', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Organization', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive?: boolean | null } | { __typename?: 'Project', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | { __typename?: 'Vendor', id: string, slug: string, imageUrl?: string | null, type: AccountType, name?: string | null, isActive: boolean } | null> | null } } | null } | null> | null } };
+
+export type ExpenseHostFieldsFragment = { __typename?: 'Host', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, currency?: string | null, isHost: boolean, expensePolicy?: string | null, website?: string | null, settings: any, supportedPayoutMethods?: Array<PayoutMethodType | null> | null, isTrustedHost: boolean, hasDisputedOrders: boolean, hasInReviewOrders: boolean, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, PAYPAL_PAYOUTS?: CollectiveFeatureStatus | null }, paypalPreApproval?: { __typename?: 'PaymentMethod', id?: string | null, balance: { __typename?: 'Amount', currency?: Currency | null, valueInCents?: number | null } } | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, transferwise?: { __typename?: 'TransferWise', id: string, availableCurrencies?: Array<any | null> | null } | null, plan: { __typename?: 'HostPlan', id?: string | null } };
+
+export type ExpensePageExpenseFieldsFragment = { __typename?: 'Expense', id: string, legacyId: number, description: string, longDescription?: string | null, currency: Currency, type: ExpenseType, status: ExpenseStatus, privateMessage?: string | null, tags: Array<string | null>, amount: number, createdAt: any, invoiceInfo?: string | null, requiredLegalDocuments?: Array<LegalDocumentType | null> | null, feesPayer: FeesPayer, draft?: any | null, amountInAccountCurrency?: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null, exchangeRate?: { __typename?: 'CurrencyExchangeRate', date: any, value: number, source: CurrencyExchangeRateSourceType, isApproximate: boolean } | null } | null, items?: Array<{ __typename?: 'ExpenseItem', id: string, incurredAt: any, description?: string | null, amount: number, url?: any | null } | null> | null, taxes: Array<{ __typename?: 'TaxInfo', id: string, type: OrderTaxType, rate: number, idNumber?: string | null } | null>, attachedFiles?: Array<{ __typename?: 'ExpenseAttachedFile', id: string, url?: any | null, name?: string | null }> | null, payee: { __typename?: 'Bot', id: string, slug: string, name?: string | null, legalName?: string | null, type: AccountType, isAdmin: boolean, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | { __typename?: 'Collective', isApproved: boolean, id: string, slug: string, name?: string | null, legalName?: string | null, type: AccountType, isAdmin: boolean, host?: { __typename?: 'Host', id: string, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | { __typename?: 'Event', isApproved: boolean, id: string, slug: string, name?: string | null, legalName?: string | null, type: AccountType, isAdmin: boolean, host?: { __typename?: 'Host', id: string, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | { __typename?: 'Fund', isApproved: boolean, id: string, slug: string, name?: string | null, legalName?: string | null, type: AccountType, isAdmin: boolean, host?: { __typename?: 'Host', id: string, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | { __typename?: 'Host', id: string, slug: string, name?: string | null, legalName?: string | null, type: AccountType, isAdmin: boolean, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | { __typename?: 'Individual', id: string, slug: string, name?: string | null, legalName?: string | null, type: AccountType, isAdmin: boolean, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | { __typename?: 'Organization', id: string, slug: string, name?: string | null, legalName?: string | null, type: AccountType, isAdmin: boolean, host?: { __typename?: 'Host', id: string } | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | { __typename?: 'Project', isApproved: boolean, id: string, slug: string, name?: string | null, legalName?: string | null, type: AccountType, isAdmin: boolean, host?: { __typename?: 'Host', id: string, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | { __typename?: 'Vendor', isApproved: boolean, id: string, slug: string, name?: string | null, legalName?: string | null, type: AccountType, isAdmin: boolean, host?: { __typename?: 'Host', id: string, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null } | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, payoutMethods?: Array<{ __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, name?: string | null, data?: any | null, isSaved?: boolean | null } | null> | null }, payeeLocation?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null, structured?: any | null } | null, createdByAccount?: { __typename?: 'Bot', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Collective', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Event', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Fund', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Host', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Individual', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Organization', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Project', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Vendor', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | null, host?: { __typename?: 'Bot', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, website?: string | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null } | { __typename?: 'Collective', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, website?: string | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null } | { __typename?: 'Event', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, website?: string | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null } | { __typename?: 'Fund', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, website?: string | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null } | { __typename?: 'Host', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, website?: string | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null } | { __typename?: 'Individual', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, website?: string | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null } | { __typename?: 'Organization', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, website?: string | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null } | { __typename?: 'Project', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, website?: string | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null } | { __typename?: 'Vendor', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, website?: string | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null } | null, requestedByAccount?: { __typename?: 'Bot', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Collective', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Event', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Fund', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Host', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Individual', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Organization', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Project', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | { __typename?: 'Vendor', id: string, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null } | null, account: { __typename?: 'Bot', id: string, legacyId: number, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, isActive?: boolean | null, description?: string | null, settings: any, twitterHandle?: string | null, currency?: string | null, expensePolicy?: string | null, supportedExpenseTypes: Array<ExpenseType>, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null }, expensesTags?: Array<{ __typename?: 'TagStat', id: string, tag: string } | null> | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Collective', isApproved: boolean, id: string, legacyId: number, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, isActive: boolean, description?: string | null, settings: any, twitterHandle?: string | null, currency?: string | null, expensePolicy?: string | null, supportedExpenseTypes: Array<ExpenseType>, host?: { __typename?: 'Host', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, currency?: string | null, isHost: boolean, expensePolicy?: string | null, website?: string | null, settings: any, supportedPayoutMethods?: Array<PayoutMethodType | null> | null, isTrustedHost: boolean, hasDisputedOrders: boolean, hasInReviewOrders: boolean, transferwise?: { __typename?: 'TransferWise', id: string, availableCurrencies?: Array<any | null> | null } | null, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, PAYPAL_PAYOUTS?: CollectiveFeatureStatus | null }, paypalPreApproval?: { __typename?: 'PaymentMethod', id?: string | null, balance: { __typename?: 'Amount', currency?: Currency | null, valueInCents?: number | null } } | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, plan: { __typename?: 'HostPlan', id?: string | null } } | null, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null }, expensesTags?: Array<{ __typename?: 'TagStat', id: string, tag: string } | null> | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Event', isApproved: boolean, id: string, legacyId: number, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, isActive: boolean, description?: string | null, settings: any, twitterHandle?: string | null, currency?: string | null, expensePolicy?: string | null, supportedExpenseTypes: Array<ExpenseType>, parent?: { __typename?: 'Bot', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Collective', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Event', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Fund', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Host', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Individual', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Organization', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Project', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Vendor', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | null, host?: { __typename?: 'Host', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, currency?: string | null, isHost: boolean, expensePolicy?: string | null, website?: string | null, settings: any, supportedPayoutMethods?: Array<PayoutMethodType | null> | null, isTrustedHost: boolean, hasDisputedOrders: boolean, hasInReviewOrders: boolean, transferwise?: { __typename?: 'TransferWise', id: string, availableCurrencies?: Array<any | null> | null } | null, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, PAYPAL_PAYOUTS?: CollectiveFeatureStatus | null }, paypalPreApproval?: { __typename?: 'PaymentMethod', id?: string | null, balance: { __typename?: 'Amount', currency?: Currency | null, valueInCents?: number | null } } | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, plan: { __typename?: 'HostPlan', id?: string | null } } | null, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null }, expensesTags?: Array<{ __typename?: 'TagStat', id: string, tag: string } | null> | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Fund', isApproved: boolean, id: string, legacyId: number, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, isActive: boolean, description?: string | null, settings: any, twitterHandle?: string | null, currency?: string | null, expensePolicy?: string | null, supportedExpenseTypes: Array<ExpenseType>, host?: { __typename?: 'Host', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, currency?: string | null, isHost: boolean, expensePolicy?: string | null, website?: string | null, settings: any, supportedPayoutMethods?: Array<PayoutMethodType | null> | null, isTrustedHost: boolean, hasDisputedOrders: boolean, hasInReviewOrders: boolean, transferwise?: { __typename?: 'TransferWise', id: string, availableCurrencies?: Array<any | null> | null } | null, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, PAYPAL_PAYOUTS?: CollectiveFeatureStatus | null }, paypalPreApproval?: { __typename?: 'PaymentMethod', id?: string | null, balance: { __typename?: 'Amount', currency?: Currency | null, valueInCents?: number | null } } | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, plan: { __typename?: 'HostPlan', id?: string | null } } | null, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null }, expensesTags?: Array<{ __typename?: 'TagStat', id: string, tag: string } | null> | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Host', id: string, legacyId: number, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, isActive?: boolean | null, description?: string | null, settings: any, twitterHandle?: string | null, currency?: string | null, expensePolicy?: string | null, supportedExpenseTypes: Array<ExpenseType>, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null }, expensesTags?: Array<{ __typename?: 'TagStat', id: string, tag: string } | null> | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Individual', id: string, legacyId: number, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, isActive?: boolean | null, description?: string | null, settings: any, twitterHandle?: string | null, currency?: string | null, expensePolicy?: string | null, supportedExpenseTypes: Array<ExpenseType>, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null }, expensesTags?: Array<{ __typename?: 'TagStat', id: string, tag: string } | null> | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Organization', isHost: boolean, isActive?: boolean | null, id: string, legacyId: number, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, description?: string | null, settings: any, twitterHandle?: string | null, currency?: string | null, expensePolicy?: string | null, supportedExpenseTypes: Array<ExpenseType>, host?: { __typename?: 'Host', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, currency?: string | null, isHost: boolean, expensePolicy?: string | null, website?: string | null, settings: any, supportedPayoutMethods?: Array<PayoutMethodType | null> | null, isTrustedHost: boolean, hasDisputedOrders: boolean, hasInReviewOrders: boolean, transferwise?: { __typename?: 'TransferWise', id: string, availableCurrencies?: Array<any | null> | null } | null, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, PAYPAL_PAYOUTS?: CollectiveFeatureStatus | null }, paypalPreApproval?: { __typename?: 'PaymentMethod', id?: string | null, balance: { __typename?: 'Amount', currency?: Currency | null, valueInCents?: number | null } } | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, plan: { __typename?: 'HostPlan', id?: string | null } } | null, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null }, expensesTags?: Array<{ __typename?: 'TagStat', id: string, tag: string } | null> | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Project', isApproved: boolean, id: string, legacyId: number, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, isActive: boolean, description?: string | null, settings: any, twitterHandle?: string | null, currency?: string | null, expensePolicy?: string | null, supportedExpenseTypes: Array<ExpenseType>, parent?: { __typename?: 'Bot', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Collective', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Event', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Fund', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Host', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Individual', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Organization', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Project', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | { __typename?: 'Vendor', id: string, slug: string, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, type: AccountType } | null, host?: { __typename?: 'Host', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, currency?: string | null, isHost: boolean, expensePolicy?: string | null, website?: string | null, settings: any, supportedPayoutMethods?: Array<PayoutMethodType | null> | null, isTrustedHost: boolean, hasDisputedOrders: boolean, hasInReviewOrders: boolean, transferwise?: { __typename?: 'TransferWise', id: string, availableCurrencies?: Array<any | null> | null } | null, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, PAYPAL_PAYOUTS?: CollectiveFeatureStatus | null }, paypalPreApproval?: { __typename?: 'PaymentMethod', id?: string | null, balance: { __typename?: 'Amount', currency?: Currency | null, valueInCents?: number | null } } | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, plan: { __typename?: 'HostPlan', id?: string | null } } | null, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null }, expensesTags?: Array<{ __typename?: 'TagStat', id: string, tag: string } | null> | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Vendor', isApproved: boolean, id: string, legacyId: number, slug: string, name?: string | null, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, isActive: boolean, description?: string | null, settings: any, twitterHandle?: string | null, currency?: string | null, expensePolicy?: string | null, supportedExpenseTypes: Array<ExpenseType>, host?: { __typename?: 'Host', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, currency?: string | null, isHost: boolean, expensePolicy?: string | null, website?: string | null, settings: any, supportedPayoutMethods?: Array<PayoutMethodType | null> | null, isTrustedHost: boolean, hasDisputedOrders: boolean, hasInReviewOrders: boolean, transferwise?: { __typename?: 'TransferWise', id: string, availableCurrencies?: Array<any | null> | null } | null, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, PAYPAL_PAYOUTS?: CollectiveFeatureStatus | null }, paypalPreApproval?: { __typename?: 'PaymentMethod', id?: string | null, balance: { __typename?: 'Amount', currency?: Currency | null, valueInCents?: number | null } } | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, plan: { __typename?: 'HostPlan', id?: string | null } } | null, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null }, expensesTags?: Array<{ __typename?: 'TagStat', id: string, tag: string } | null> | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null }, payoutMethod?: { __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, data?: any | null, isSaved?: boolean | null } | null, virtualCard?: { __typename?: 'VirtualCard', id?: string | null, name?: string | null, last4?: string | null } | null, permissions: { __typename?: 'ExpensePermissions', id: string, canEdit: boolean, canEditTags: boolean, canDelete: boolean, canSeeInvoiceInfo: boolean, canApprove: boolean, canUnapprove: boolean, canReject: boolean, canMarkAsSpam: boolean, canPay: boolean, canMarkAsUnpaid: boolean, canMarkAsIncomplete: boolean, canComment: boolean, canUnschedulePayment: boolean, approve: { __typename?: 'Permission', allowed: boolean, reason?: string | null, reasonDetails?: any | null } }, activities: Array<{ __typename?: 'Activity', id: string, type: ActivityType, createdAt: any, data: any, individual?: { __typename?: 'Individual', id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null } | null }>, recurringExpense?: { __typename?: 'RecurringExpense', id: string, interval: RecurringExpenseInterval, endsAt?: any | null } | null, securityChecks?: Array<{ __typename?: 'SecurityCheck', level: SecurityCheckLevel, message: string, scope: SecurityCheckScope, details?: string | null } | null> | null };
+
+export type ExpensesListFieldsFragmentFragment = { __typename?: 'Expense', id: string, legacyId: number, description: string, status: ExpenseStatus, createdAt: any, tags: Array<string | null>, amount: number, currency: Currency, type: ExpenseType, requiredLegalDocuments?: Array<LegalDocumentType | null> | null, feesPayer: FeesPayer, amountInAccountCurrency?: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null, exchangeRate?: { __typename?: 'CurrencyExchangeRate', date: any, value: number, source: CurrencyExchangeRateSourceType, isApproximate: boolean } | null } | null, account: { __typename?: 'Bot', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Collective', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Event', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, parent?: { __typename?: 'Bot', id: string, slug: string } | { __typename?: 'Collective', id: string, slug: string } | { __typename?: 'Event', id: string, slug: string } | { __typename?: 'Fund', id: string, slug: string } | { __typename?: 'Host', id: string, slug: string } | { __typename?: 'Individual', id: string, slug: string } | { __typename?: 'Organization', id: string, slug: string } | { __typename?: 'Project', id: string, slug: string } | { __typename?: 'Vendor', id: string, slug: string } | null, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Fund', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Host', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Individual', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Organization', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Project', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, parent?: { __typename?: 'Bot', id: string, slug: string } | { __typename?: 'Collective', id: string, slug: string } | { __typename?: 'Event', id: string, slug: string } | { __typename?: 'Fund', id: string, slug: string } | { __typename?: 'Host', id: string, slug: string } | { __typename?: 'Individual', id: string, slug: string } | { __typename?: 'Organization', id: string, slug: string } | { __typename?: 'Project', id: string, slug: string } | { __typename?: 'Vendor', id: string, slug: string } | null, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Vendor', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null }, permissions: { __typename?: 'ExpensePermissions', id: string, canDelete: boolean, canApprove: boolean, canUnapprove: boolean, canReject: boolean, canMarkAsSpam: boolean, canPay: boolean, canMarkAsUnpaid: boolean, canMarkAsIncomplete: boolean, canSeeInvoiceInfo: boolean, canEditTags: boolean, canUnschedulePayment: boolean, approve: { __typename?: 'Permission', allowed: boolean, reason?: string | null, reasonDetails?: any | null } }, payoutMethod?: { __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, data?: any | null, isSaved?: boolean | null } | null, payee: { __typename?: 'Bot', id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean } | { __typename?: 'Collective', isApproved: boolean, id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean, host?: { __typename?: 'Host', id: string } | null } | { __typename?: 'Event', isApproved: boolean, id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean, host?: { __typename?: 'Host', id: string } | null } | { __typename?: 'Fund', isApproved: boolean, id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean, host?: { __typename?: 'Host', id: string } | null } | { __typename?: 'Host', id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean } | { __typename?: 'Individual', id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean } | { __typename?: 'Organization', id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean, host?: { __typename?: 'Host', id: string } | null } | { __typename?: 'Project', isApproved: boolean, id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean, host?: { __typename?: 'Host', id: string } | null } | { __typename?: 'Vendor', isApproved: boolean, id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean, host?: { __typename?: 'Host', id: string } | null }, createdByAccount?: { __typename?: 'Bot', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Collective', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Event', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Fund', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Host', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Individual', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Organization', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Project', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Vendor', id: string, type: AccountType, slug: string, name?: string | null } | null };
+
+export type ExpensesListAdminFieldsFragmentFragment = { __typename?: 'Expense', id: string, payoutMethod?: { __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, data?: any | null } | null, items?: Array<{ __typename?: 'ExpenseItem', id: string, description?: string | null, incurredAt: any, url?: any | null, amount: number } | null> | null, taxes: Array<{ __typename?: 'TaxInfo', id: string, type: OrderTaxType, rate: number } | null>, attachedFiles?: Array<{ __typename?: 'ExpenseAttachedFile', id: string, url?: any | null, name?: string | null }> | null, securityChecks?: Array<{ __typename?: 'SecurityCheck', level: SecurityCheckLevel, message: string, scope: SecurityCheckScope, details?: string | null } | null> | null };
+
 export type ClearCacheMutationVariables = Exact<{
   account: AccountReferenceInput;
   cacheTypes?: InputMaybe<Array<AccountCacheType> | AccountCacheType>;
@@ -8401,9 +8839,36 @@ export type ClearCacheMutationVariables = Exact<{
 
 export type ClearCacheMutation = { __typename?: 'Mutation', clearCacheForAccount: { __typename?: 'Bot', id: string, slug: string, name?: string | null } | { __typename?: 'Collective', id: string, slug: string, name?: string | null } | { __typename?: 'Event', id: string, slug: string, name?: string | null } | { __typename?: 'Fund', id: string, slug: string, name?: string | null } | { __typename?: 'Host', id: string, slug: string, name?: string | null } | { __typename?: 'Individual', id: string, slug: string, name?: string | null } | { __typename?: 'Organization', id: string, slug: string, name?: string | null } | { __typename?: 'Project', id: string, slug: string, name?: string | null } | { __typename?: 'Vendor', id: string, slug: string, name?: string | null } };
 
+export type SubmittedExpensesPageQueryVariables = Exact<{
+  collectiveSlug: Scalars['String'];
+  limit: Scalars['Int'];
+  offset: Scalars['Int'];
+  type?: InputMaybe<ExpenseType>;
+  tags?: InputMaybe<Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>>;
+  status?: InputMaybe<ExpenseStatusFilter>;
+  minAmount?: InputMaybe<Scalars['Int']>;
+  maxAmount?: InputMaybe<Scalars['Int']>;
+  payoutMethodType?: InputMaybe<PayoutMethodType>;
+  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  dateTo?: InputMaybe<Scalars['DateTime']>;
+  searchTerm?: InputMaybe<Scalars['String']>;
+  orderBy?: InputMaybe<ChronologicalOrderInput>;
+}>;
 
+
+export type SubmittedExpensesPageQuery = { __typename?: 'Query', account?: { __typename?: 'Bot', id: string, legacyId: number, slug: string, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, currency?: string | null, isArchived: boolean, isActive?: boolean | null, settings: any, createdAt?: any | null, supportedExpenseTypes: Array<ExpenseType>, isHost: boolean, features: { __typename?: 'CollectiveFeatures', id: string, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null } } | { __typename?: 'Collective', id: string, legacyId: number, slug: string, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, currency?: string | null, isArchived: boolean, isActive: boolean, settings: any, createdAt?: any | null, supportedExpenseTypes: Array<ExpenseType>, isHost: boolean, features: { __typename?: 'CollectiveFeatures', id: string, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null } } | { __typename?: 'Event', id: string, legacyId: number, slug: string, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, currency?: string | null, isArchived: boolean, isActive: boolean, settings: any, createdAt?: any | null, supportedExpenseTypes: Array<ExpenseType>, isHost: boolean, features: { __typename?: 'CollectiveFeatures', id: string, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null } } | { __typename?: 'Fund', id: string, legacyId: number, slug: string, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, currency?: string | null, isArchived: boolean, isActive: boolean, settings: any, createdAt?: any | null, supportedExpenseTypes: Array<ExpenseType>, isHost: boolean, features: { __typename?: 'CollectiveFeatures', id: string, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null } } | { __typename?: 'Host', id: string, legacyId: number, slug: string, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, currency?: string | null, isArchived: boolean, isActive?: boolean | null, settings: any, createdAt?: any | null, supportedExpenseTypes: Array<ExpenseType>, isHost: boolean, features: { __typename?: 'CollectiveFeatures', id: string, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null } } | { __typename?: 'Individual', id: string, legacyId: number, slug: string, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, currency?: string | null, isArchived: boolean, isActive?: boolean | null, settings: any, createdAt?: any | null, supportedExpenseTypes: Array<ExpenseType>, isHost: boolean, features: { __typename?: 'CollectiveFeatures', id: string, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null } } | { __typename?: 'Organization', id: string, legacyId: number, slug: string, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, currency?: string | null, isArchived: boolean, isActive?: boolean | null, settings: any, createdAt?: any | null, supportedExpenseTypes: Array<ExpenseType>, isHost: boolean, features: { __typename?: 'CollectiveFeatures', id: string, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null } } | { __typename?: 'Project', id: string, legacyId: number, slug: string, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, currency?: string | null, isArchived: boolean, isActive: boolean, settings: any, createdAt?: any | null, supportedExpenseTypes: Array<ExpenseType>, isHost: boolean, features: { __typename?: 'CollectiveFeatures', id: string, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null } } | { __typename?: 'Vendor', id: string, legacyId: number, slug: string, type: AccountType, imageUrl?: string | null, backgroundImageUrl?: string | null, twitterHandle?: string | null, name?: string | null, currency?: string | null, isArchived: boolean, isActive: boolean, settings: any, createdAt?: any | null, supportedExpenseTypes: Array<ExpenseType>, isHost: boolean, features: { __typename?: 'CollectiveFeatures', id: string, ABOUT?: CollectiveFeatureStatus | null, CONNECTED_ACCOUNTS?: CollectiveFeatureStatus | null, RECEIVE_FINANCIAL_CONTRIBUTIONS?: CollectiveFeatureStatus | null, RECURRING_CONTRIBUTIONS?: CollectiveFeatureStatus | null, EVENTS?: CollectiveFeatureStatus | null, PROJECTS?: CollectiveFeatureStatus | null, USE_EXPENSES?: CollectiveFeatureStatus | null, RECEIVE_EXPENSES?: CollectiveFeatureStatus | null, COLLECTIVE_GOALS?: CollectiveFeatureStatus | null, TOP_FINANCIAL_CONTRIBUTORS?: CollectiveFeatureStatus | null, CONVERSATIONS?: CollectiveFeatureStatus | null, UPDATES?: CollectiveFeatureStatus | null, TEAM?: CollectiveFeatureStatus | null, CONTACT_FORM?: CollectiveFeatureStatus | null, RECEIVE_HOST_APPLICATIONS?: CollectiveFeatureStatus | null, HOST_DASHBOARD?: CollectiveFeatureStatus | null, TRANSACTIONS?: CollectiveFeatureStatus | null, REQUEST_VIRTUAL_CARDS?: CollectiveFeatureStatus | null } } | null, expenses: { __typename?: 'ExpenseCollection', totalCount?: number | null, offset?: number | null, limit?: number | null, nodes?: Array<{ __typename?: 'Expense', id: string, legacyId: number, description: string, status: ExpenseStatus, createdAt: any, tags: Array<string | null>, amount: number, currency: Currency, type: ExpenseType, requiredLegalDocuments?: Array<LegalDocumentType | null> | null, feesPayer: FeesPayer, amountInCreatedByAccountCurrency?: { __typename?: 'Amount', value?: number | null, valueInCents?: number | null, currency?: Currency | null, exchangeRate?: { __typename?: 'CurrencyExchangeRate', date: any, value: number, source: CurrencyExchangeRateSourceType, isApproximate: boolean } | null } | null, host?: { __typename?: 'Bot', id: string } | { __typename?: 'Collective', id: string } | { __typename?: 'Event', id: string } | { __typename?: 'Fund', id: string } | { __typename?: 'Host', id: string, name?: string | null, legalName?: string | null, slug: string, type: AccountType, currency?: string | null, isHost: boolean, expensePolicy?: string | null, website?: string | null, settings: any, supportedPayoutMethods?: Array<PayoutMethodType | null> | null, isTrustedHost: boolean, hasDisputedOrders: boolean, hasInReviewOrders: boolean, features: { __typename?: 'CollectiveFeatures', id: string, MULTI_CURRENCY_EXPENSES?: CollectiveFeatureStatus | null, PAYPAL_PAYOUTS?: CollectiveFeatureStatus | null }, paypalPreApproval?: { __typename?: 'PaymentMethod', id?: string | null, balance: { __typename?: 'Amount', currency?: Currency | null, valueInCents?: number | null } } | null, location?: { __typename?: 'Location', id?: string | null, address?: string | null, country?: string | null } | null, transferwise?: { __typename?: 'TransferWise', id: string, availableCurrencies?: Array<any | null> | null } | null, plan: { __typename?: 'HostPlan', id?: string | null } } | { __typename?: 'Individual', id: string } | { __typename?: 'Organization', id: string } | { __typename?: 'Project', id: string } | { __typename?: 'Vendor', id: string } | null, amountInAccountCurrency?: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null, exchangeRate?: { __typename?: 'CurrencyExchangeRate', date: any, value: number, source: CurrencyExchangeRateSourceType, isApproximate: boolean } | null } | null, account: { __typename?: 'Bot', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Collective', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Event', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, parent?: { __typename?: 'Bot', id: string, slug: string } | { __typename?: 'Collective', id: string, slug: string } | { __typename?: 'Event', id: string, slug: string } | { __typename?: 'Fund', id: string, slug: string } | { __typename?: 'Host', id: string, slug: string } | { __typename?: 'Individual', id: string, slug: string } | { __typename?: 'Organization', id: string, slug: string } | { __typename?: 'Project', id: string, slug: string } | { __typename?: 'Vendor', id: string, slug: string } | null, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Fund', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Host', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Individual', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Organization', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Project', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, parent?: { __typename?: 'Bot', id: string, slug: string } | { __typename?: 'Collective', id: string, slug: string } | { __typename?: 'Event', id: string, slug: string } | { __typename?: 'Fund', id: string, slug: string } | { __typename?: 'Host', id: string, slug: string } | { __typename?: 'Individual', id: string, slug: string } | { __typename?: 'Organization', id: string, slug: string } | { __typename?: 'Project', id: string, slug: string } | { __typename?: 'Vendor', id: string, slug: string } | null, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null } | { __typename?: 'Vendor', id: string, name?: string | null, slug: string, createdAt?: any | null, currency?: string | null, type: AccountType, stats?: { __typename?: 'AccountStats', id?: string | null, balanceWithBlockedFunds: { __typename?: 'Amount', valueInCents?: number | null, currency?: Currency | null } } | null }, permissions: { __typename?: 'ExpensePermissions', id: string, canDelete: boolean, canApprove: boolean, canUnapprove: boolean, canReject: boolean, canMarkAsSpam: boolean, canPay: boolean, canMarkAsUnpaid: boolean, canMarkAsIncomplete: boolean, canSeeInvoiceInfo: boolean, canEditTags: boolean, canUnschedulePayment: boolean, approve: { __typename?: 'Permission', allowed: boolean, reason?: string | null, reasonDetails?: any | null } }, payoutMethod?: { __typename?: 'PayoutMethod', id: string, type?: PayoutMethodType | null, data?: any | null, isSaved?: boolean | null } | null, payee: { __typename?: 'Bot', id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean } | { __typename?: 'Collective', isApproved: boolean, id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean, host?: { __typename?: 'Host', id: string } | null } | { __typename?: 'Event', isApproved: boolean, id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean, host?: { __typename?: 'Host', id: string } | null } | { __typename?: 'Fund', isApproved: boolean, id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean, host?: { __typename?: 'Host', id: string } | null } | { __typename?: 'Host', id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean } | { __typename?: 'Individual', id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean } | { __typename?: 'Organization', id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean, host?: { __typename?: 'Host', id: string } | null } | { __typename?: 'Project', isApproved: boolean, id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean, host?: { __typename?: 'Host', id: string } | null } | { __typename?: 'Vendor', isApproved: boolean, id: string, type: AccountType, slug: string, name?: string | null, imageUrl?: string | null, isAdmin: boolean, host?: { __typename?: 'Host', id: string } | null }, createdByAccount?: { __typename?: 'Bot', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Collective', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Event', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Fund', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Host', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Individual', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Organization', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Project', id: string, type: AccountType, slug: string, name?: string | null } | { __typename?: 'Vendor', id: string, type: AccountType, slug: string, name?: string | null } | null } | null> | null } };
+
+export const LoggedInAccountExpensePayoutFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"LoggedInAccountExpensePayoutFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Individual"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"legalName"}},{"kind":"Field","name":{"kind":"Name","value":"hasTwoFactorAuth"}},{"kind":"Field","name":{"kind":"Name","value":"location"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"structured"}}]}},{"kind":"Field","name":{"kind":"Name","value":"payoutMethods"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"data"}},{"kind":"Field","name":{"kind":"Name","value":"isSaved"}}]}},{"kind":"Field","alias":{"kind":"Name","value":"adminMemberships"},"name":{"kind":"Name","value":"memberOf"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"role"},"value":{"kind":"EnumValue","value":"ADMIN"}},{"kind":"Argument","name":{"kind":"Name","value":"includeIncognito"},"value":{"kind":"BooleanValue","value":false}},{"kind":"Argument","name":{"kind":"Name","value":"accountType"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"ORGANIZATION"},{"kind":"EnumValue","value":"COLLECTIVE"},{"kind":"EnumValue","value":"FUND"}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"account"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"legalName"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}},{"kind":"Field","name":{"kind":"Name","value":"isHost"}},{"kind":"Field","name":{"kind":"Name","value":"policies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"REQUIRE_2FA_FOR_ADMINS"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AccountWithParent"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"parent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"policies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"REQUIRE_2FA_FOR_ADMINS"}}]}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AccountWithHost"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"host"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"payoutMethods"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"data"}},{"kind":"Field","name":{"kind":"Name","value":"isSaved"}}]}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Organization"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"host"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"payoutMethods"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"data"}},{"kind":"Field","name":{"kind":"Name","value":"isSaved"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"location"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"structured"}}]}},{"kind":"Field","name":{"kind":"Name","value":"payoutMethods"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"data"}},{"kind":"Field","name":{"kind":"Name","value":"isSaved"}}]}},{"kind":"Field","name":{"kind":"Name","value":"childrenAccounts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<LoggedInAccountExpensePayoutFieldsFragment, unknown>;
+export const NavbarFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"NavbarFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CollectiveFeatures"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"ABOUT"}},{"kind":"Field","name":{"kind":"Name","value":"CONNECTED_ACCOUNTS"}},{"kind":"Field","name":{"kind":"Name","value":"RECEIVE_FINANCIAL_CONTRIBUTIONS"}},{"kind":"Field","name":{"kind":"Name","value":"RECURRING_CONTRIBUTIONS"}},{"kind":"Field","name":{"kind":"Name","value":"EVENTS"}},{"kind":"Field","name":{"kind":"Name","value":"PROJECTS"}},{"kind":"Field","name":{"kind":"Name","value":"USE_EXPENSES"}},{"kind":"Field","name":{"kind":"Name","value":"RECEIVE_EXPENSES"}},{"kind":"Field","name":{"kind":"Name","value":"USE_EXPENSES"}},{"kind":"Field","name":{"kind":"Name","value":"COLLECTIVE_GOALS"}},{"kind":"Field","name":{"kind":"Name","value":"TOP_FINANCIAL_CONTRIBUTORS"}},{"kind":"Field","name":{"kind":"Name","value":"CONVERSATIONS"}},{"kind":"Field","name":{"kind":"Name","value":"UPDATES"}},{"kind":"Field","name":{"kind":"Name","value":"TEAM"}},{"kind":"Field","name":{"kind":"Name","value":"CONTACT_FORM"}},{"kind":"Field","name":{"kind":"Name","value":"RECEIVE_HOST_APPLICATIONS"}},{"kind":"Field","name":{"kind":"Name","value":"HOST_DASHBOARD"}},{"kind":"Field","name":{"kind":"Name","value":"TRANSACTIONS"}},{"kind":"Field","name":{"kind":"Name","value":"REQUEST_VIRTUAL_CARDS"}}]}}]} as unknown as DocumentNode<NavbarFieldsFragment, unknown>;
+export const ExpenseHostFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ExpenseHostFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Host"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"legalName"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"isHost"}},{"kind":"Field","name":{"kind":"Name","value":"expensePolicy"}},{"kind":"Field","name":{"kind":"Name","value":"website"}},{"kind":"Field","name":{"kind":"Name","value":"settings"}},{"kind":"Field","name":{"kind":"Name","value":"features"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"MULTI_CURRENCY_EXPENSES"}},{"kind":"Field","name":{"kind":"Name","value":"PAYPAL_PAYOUTS"}}]}},{"kind":"Field","name":{"kind":"Name","value":"paypalPreApproval"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"balance"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"location"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}},{"kind":"Field","name":{"kind":"Name","value":"transferwise"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"availableCurrencies"}}]}},{"kind":"Field","name":{"kind":"Name","value":"supportedPayoutMethods"}},{"kind":"Field","name":{"kind":"Name","value":"isTrustedHost"}},{"kind":"Field","name":{"kind":"Name","value":"hasDisputedOrders"}},{"kind":"Field","name":{"kind":"Name","value":"hasInReviewOrders"}},{"kind":"Field","name":{"kind":"Name","value":"plan"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ExpenseHostFieldsFragment, unknown>;
+export const ExpensePageExpenseFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ExpensePageExpenseFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Expense"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"legacyId"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"longDescription"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"privateMessage"}},{"kind":"Field","name":{"kind":"Name","value":"tags"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","alias":{"kind":"Name","value":"amountInAccountCurrency"},"name":{"kind":"Name","value":"amountV2"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"currencySource"},"value":{"kind":"EnumValue","value":"ACCOUNT"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"exchangeRate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"source"}},{"kind":"Field","name":{"kind":"Name","value":"isApproximate"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"invoiceInfo"}},{"kind":"Field","name":{"kind":"Name","value":"requiredLegalDocuments"}},{"kind":"Field","name":{"kind":"Name","value":"feesPayer"}},{"kind":"Field","name":{"kind":"Name","value":"draft"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"incurredAt"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"url"}}]}},{"kind":"Field","name":{"kind":"Name","value":"taxes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"rate"}},{"kind":"Field","name":{"kind":"Name","value":"idNumber"}}]}},{"kind":"Field","name":{"kind":"Name","value":"attachedFiles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"payee"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"legalName"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"isAdmin"}},{"kind":"Field","name":{"kind":"Name","value":"location"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}},{"kind":"Field","name":{"kind":"Name","value":"payoutMethods"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"data"}},{"kind":"Field","name":{"kind":"Name","value":"isSaved"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AccountWithHost"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"isApproved"}},{"kind":"Field","name":{"kind":"Name","value":"host"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"payoutMethods"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"data"}},{"kind":"Field","name":{"kind":"Name","value":"isSaved"}}]}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Organization"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"host"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"payeeLocation"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"country"}},{"kind":"Field","name":{"kind":"Name","value":"structured"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdByAccount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}}]}},{"kind":"Field","name":{"kind":"Name","value":"host"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"legalName"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"website"}},{"kind":"Field","name":{"kind":"Name","value":"location"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"requestedByAccount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}}]}},{"kind":"Field","name":{"kind":"Name","value":"account"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"legacyId"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"backgroundImageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"settings"}},{"kind":"Field","name":{"kind":"Name","value":"twitterHandle"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"expensePolicy"}},{"kind":"Field","name":{"kind":"Name","value":"supportedExpenseTypes"}},{"kind":"Field","name":{"kind":"Name","value":"features"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"NavbarFields"}},{"kind":"Field","name":{"kind":"Name","value":"MULTI_CURRENCY_EXPENSES"}}]}},{"kind":"Field","name":{"kind":"Name","value":"expensesTags"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tag"}}]}},{"kind":"Field","name":{"kind":"Name","value":"location"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"country"}}]}},{"kind":"Field","name":{"kind":"Name","value":"stats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"balanceWithBlockedFunds"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AccountWithParent"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"parent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"backgroundImageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"twitterHandle"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AccountWithHost"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"isApproved"}},{"kind":"Field","name":{"kind":"Name","value":"host"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ExpenseHostFields"}},{"kind":"Field","name":{"kind":"Name","value":"transferwise"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"availableCurrencies"}}]}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Organization"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"isHost"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}},{"kind":"Field","name":{"kind":"Name","value":"host"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ExpenseHostFields"}},{"kind":"Field","name":{"kind":"Name","value":"transferwise"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"availableCurrencies"}}]}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Event"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"parent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Project"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"parent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"payoutMethod"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"}},{"kind":"Field","name":{"kind":"Name","value":"isSaved"}}]}},{"kind":"Field","name":{"kind":"Name","value":"virtualCard"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"last4"}}]}},{"kind":"Field","name":{"kind":"Name","value":"permissions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"canEdit"}},{"kind":"Field","name":{"kind":"Name","value":"canEditTags"}},{"kind":"Field","name":{"kind":"Name","value":"canDelete"}},{"kind":"Field","name":{"kind":"Name","value":"canSeeInvoiceInfo"}},{"kind":"Field","name":{"kind":"Name","value":"canApprove"}},{"kind":"Field","name":{"kind":"Name","value":"canUnapprove"}},{"kind":"Field","name":{"kind":"Name","value":"canReject"}},{"kind":"Field","name":{"kind":"Name","value":"canMarkAsSpam"}},{"kind":"Field","name":{"kind":"Name","value":"canPay"}},{"kind":"Field","name":{"kind":"Name","value":"canMarkAsUnpaid"}},{"kind":"Field","name":{"kind":"Name","value":"canMarkAsIncomplete"}},{"kind":"Field","name":{"kind":"Name","value":"canComment"}},{"kind":"Field","name":{"kind":"Name","value":"canUnschedulePayment"}},{"kind":"Field","name":{"kind":"Name","value":"approve"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"allowed"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"reasonDetails"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"activities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"data"}},{"kind":"Field","name":{"kind":"Name","value":"individual"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"recurringExpense"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"interval"}},{"kind":"Field","name":{"kind":"Name","value":"endsAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"securityChecks"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"scope"}},{"kind":"Field","name":{"kind":"Name","value":"details"}}]}}]}},...NavbarFieldsFragmentDoc.definitions,...ExpenseHostFieldsFragmentDoc.definitions]} as unknown as DocumentNode<ExpensePageExpenseFieldsFragment, unknown>;
+export const ExpensesListFieldsFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ExpensesListFieldsFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Expense"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"legacyId"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"tags"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","alias":{"kind":"Name","value":"amountInAccountCurrency"},"name":{"kind":"Name","value":"amountV2"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"currencySource"},"value":{"kind":"EnumValue","value":"ACCOUNT"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"exchangeRate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"source"}},{"kind":"Field","name":{"kind":"Name","value":"isApproximate"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"requiredLegalDocuments"}},{"kind":"Field","name":{"kind":"Name","value":"feesPayer"}},{"kind":"Field","name":{"kind":"Name","value":"account"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"stats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"balanceWithBlockedFunds"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AccountWithParent"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"parent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"permissions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"canDelete"}},{"kind":"Field","name":{"kind":"Name","value":"canApprove"}},{"kind":"Field","name":{"kind":"Name","value":"canUnapprove"}},{"kind":"Field","name":{"kind":"Name","value":"canReject"}},{"kind":"Field","name":{"kind":"Name","value":"canMarkAsSpam"}},{"kind":"Field","name":{"kind":"Name","value":"canPay"}},{"kind":"Field","name":{"kind":"Name","value":"canMarkAsUnpaid"}},{"kind":"Field","name":{"kind":"Name","value":"canMarkAsIncomplete"}},{"kind":"Field","name":{"kind":"Name","value":"canSeeInvoiceInfo"}},{"kind":"Field","name":{"kind":"Name","value":"canEditTags"}},{"kind":"Field","name":{"kind":"Name","value":"canUnschedulePayment"}},{"kind":"Field","name":{"kind":"Name","value":"approve"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"allowed"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"reasonDetails"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"payoutMethod"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"}},{"kind":"Field","name":{"kind":"Name","value":"isSaved"}}]}},{"kind":"Field","name":{"kind":"Name","value":"payee"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"height"},"value":{"kind":"IntValue","value":"80"}}]},{"kind":"Field","name":{"kind":"Name","value":"isAdmin"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AccountWithHost"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"isApproved"}},{"kind":"Field","name":{"kind":"Name","value":"host"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Organization"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"host"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdByAccount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<ExpensesListFieldsFragmentFragment, unknown>;
+export const ExpensesListAdminFieldsFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ExpensesListAdminFieldsFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Expense"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"payoutMethod"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"data"}}]}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"incurredAt"}},{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}}]}},{"kind":"Field","name":{"kind":"Name","value":"taxes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"rate"}}]}},{"kind":"Field","name":{"kind":"Name","value":"attachedFiles"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"securityChecks"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"scope"}},{"kind":"Field","name":{"kind":"Name","value":"details"}}]}}]}}]} as unknown as DocumentNode<ExpensesListAdminFieldsFragmentFragment, unknown>;
+export const CreatePaymentIntentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreatePaymentIntent"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"paymentIntent"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PaymentIntentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createPaymentIntent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"paymentIntent"},"value":{"kind":"Variable","name":{"kind":"Name","value":"paymentIntent"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"paymentIntentClientSecret"}},{"kind":"Field","name":{"kind":"Name","value":"stripeAccount"}},{"kind":"Field","name":{"kind":"Name","value":"stripeAccountPublishableSecret"}}]}}]}}]} as unknown as DocumentNode<CreatePaymentIntentMutation, CreatePaymentIntentMutationVariables>;
+export const ContributionFlowPaymentMethodsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ContributionFlowPaymentMethods"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"slug"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"account"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"slug"},"value":{"kind":"Variable","name":{"kind":"Name","value":"slug"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"paymentMethods"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"type"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"CREDITCARD"},{"kind":"EnumValue","value":"US_BANK_ACCOUNT"},{"kind":"EnumValue","value":"SEPA_DEBIT"},{"kind":"EnumValue","value":"GIFTCARD"},{"kind":"EnumValue","value":"PREPAID"},{"kind":"EnumValue","value":"COLLECTIVE"}]}},{"kind":"Argument","name":{"kind":"Name","value":"includeExpired"},"value":{"kind":"BooleanValue","value":true}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"data"}},{"kind":"Field","name":{"kind":"Name","value":"service"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"expiryDate"}},{"kind":"Field","name":{"kind":"Name","value":"providerType"}},{"kind":"Field","name":{"kind":"Name","value":"sourcePaymentMethod"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"data"}},{"kind":"Field","name":{"kind":"Name","value":"service"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"expiryDate"}},{"kind":"Field","name":{"kind":"Name","value":"providerType"}},{"kind":"Field","name":{"kind":"Name","value":"balance"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currency"}}]}},{"kind":"Field","name":{"kind":"Name","value":"limitedToHosts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"legacyId"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"balance"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}}]}},{"kind":"Field","name":{"kind":"Name","value":"account"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}}]}},{"kind":"Field","name":{"kind":"Name","value":"limitedToHosts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"legacyId"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}}]}}]}}]}}]}}]} as unknown as DocumentNode<ContributionFlowPaymentMethodsQuery, ContributionFlowPaymentMethodsQueryVariables>;
 export const EditVirtualCardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"editVirtualCard"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"virtualCard"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"VirtualCardReferenceInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limitAmount"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"AmountInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limitInterval"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"VirtualCardLimitInterval"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"assignee"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountReferenceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"editVirtualCard"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"virtualCard"},"value":{"kind":"Variable","name":{"kind":"Name","value":"virtualCard"}}},{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}},{"kind":"Argument","name":{"kind":"Name","value":"limitAmount"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limitAmount"}}},{"kind":"Argument","name":{"kind":"Name","value":"limitInterval"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limitInterval"}}},{"kind":"Argument","name":{"kind":"Name","value":"assignee"},"value":{"kind":"Variable","name":{"kind":"Name","value":"assignee"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"spendingLimitAmount"}},{"kind":"Field","name":{"kind":"Name","value":"spendingLimitInterval"}},{"kind":"Field","name":{"kind":"Name","value":"assignee"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}}]}}]}}]}}]} as unknown as DocumentNode<EditVirtualCardMutation, EditVirtualCardMutationVariables>;
 export const CreateVirtualCardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createVirtualCard"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limitAmount"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AmountInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limitInterval"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"VirtualCardLimitInterval"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"account"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountReferenceInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"assignee"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountReferenceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createVirtualCard"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}},{"kind":"Argument","name":{"kind":"Name","value":"limitAmount"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limitAmount"}}},{"kind":"Argument","name":{"kind":"Name","value":"limitInterval"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limitInterval"}}},{"kind":"Argument","name":{"kind":"Name","value":"account"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}},{"kind":"Argument","name":{"kind":"Name","value":"assignee"},"value":{"kind":"Variable","name":{"kind":"Name","value":"assignee"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"last4"}},{"kind":"Field","name":{"kind":"Name","value":"data"}}]}}]}}]} as unknown as DocumentNode<CreateVirtualCardMutation, CreateVirtualCardMutationVariables>;
 export const CollectiveMembersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CollectiveMembers"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"slug"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"account"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"slug"},"value":{"kind":"Variable","name":{"kind":"Name","value":"slug"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"members"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"role"},"value":{"kind":"EnumValue","value":"ADMIN"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"account"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<CollectiveMembersQuery, CollectiveMembersQueryVariables>;
 export const VirtualCardPoliciesQueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"VirtualCardPoliciesQuery"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"slug"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"account"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"slug"},"value":{"kind":"Variable","name":{"kind":"Name","value":"slug"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"policies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ALL_TIME"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}}]}},{"kind":"Field","name":{"kind":"Name","value":"DAILY"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}}]}},{"kind":"Field","name":{"kind":"Name","value":"MONTHLY"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}}]}},{"kind":"Field","name":{"kind":"Name","value":"PER_AUTHORIZATION"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}}]}},{"kind":"Field","name":{"kind":"Name","value":"WEEKLY"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}}]}},{"kind":"Field","name":{"kind":"Name","value":"YEARLY"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<VirtualCardPoliciesQueryQuery, VirtualCardPoliciesQueryQueryVariables>;
 export const ClearCacheDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ClearCache"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"account"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountReferenceInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"cacheTypes"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AccountCacheType"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"clearCacheForAccount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"account"},"value":{"kind":"Variable","name":{"kind":"Name","value":"account"}}},{"kind":"Argument","name":{"kind":"Name","value":"type"},"value":{"kind":"Variable","name":{"kind":"Name","value":"cacheTypes"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<ClearCacheMutation, ClearCacheMutationVariables>;
+export const SubmittedExpensesPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SubmittedExpensesPage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"collectiveSlug"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"type"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ExpenseType"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tags"}},"type":{"kind":"ListType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"status"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ExpenseStatusFilter"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"minAmount"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"maxAmount"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"payoutMethodType"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PayoutMethodType"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"dateFrom"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"dateTo"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"searchTerm"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ChronologicalOrderInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"account"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"slug"},"value":{"kind":"Variable","name":{"kind":"Name","value":"collectiveSlug"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"legacyId"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"backgroundImageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"twitterHandle"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"isArchived"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}},{"kind":"Field","name":{"kind":"Name","value":"settings"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"supportedExpenseTypes"}},{"kind":"Field","name":{"kind":"Name","value":"isHost"}},{"kind":"Field","name":{"kind":"Name","value":"features"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"NavbarFields"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"expenses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"createdByAccount"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"slug"},"value":{"kind":"Variable","name":{"kind":"Name","value":"collectiveSlug"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"type"},"value":{"kind":"Variable","name":{"kind":"Name","value":"type"}}},{"kind":"Argument","name":{"kind":"Name","value":"tag"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tags"}}},{"kind":"Argument","name":{"kind":"Name","value":"status"},"value":{"kind":"Variable","name":{"kind":"Name","value":"status"}}},{"kind":"Argument","name":{"kind":"Name","value":"minAmount"},"value":{"kind":"Variable","name":{"kind":"Name","value":"minAmount"}}},{"kind":"Argument","name":{"kind":"Name","value":"maxAmount"},"value":{"kind":"Variable","name":{"kind":"Name","value":"maxAmount"}}},{"kind":"Argument","name":{"kind":"Name","value":"payoutMethodType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"payoutMethodType"}}},{"kind":"Argument","name":{"kind":"Name","value":"dateFrom"},"value":{"kind":"Variable","name":{"kind":"Name","value":"dateFrom"}}},{"kind":"Argument","name":{"kind":"Name","value":"dateTo"},"value":{"kind":"Variable","name":{"kind":"Name","value":"dateTo"}}},{"kind":"Argument","name":{"kind":"Name","value":"searchTerm"},"value":{"kind":"Variable","name":{"kind":"Name","value":"searchTerm"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"offset"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ExpensesListFieldsFragment"}},{"kind":"Field","alias":{"kind":"Name","value":"amountInCreatedByAccountCurrency"},"name":{"kind":"Name","value":"amountV2"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"currencySource"},"value":{"kind":"EnumValue","value":"CREATED_BY_ACCOUNT"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"valueInCents"}},{"kind":"Field","name":{"kind":"Name","value":"currency"}},{"kind":"Field","name":{"kind":"Name","value":"exchangeRate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"source"}},{"kind":"Field","name":{"kind":"Name","value":"isApproximate"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"host"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ExpenseHostFields"}}]}}]}}]}}]}},...NavbarFieldsFragmentDoc.definitions,...ExpensesListFieldsFragmentFragmentDoc.definitions,...ExpenseHostFieldsFragmentDoc.definitions]} as unknown as DocumentNode<SubmittedExpensesPageQuery, SubmittedExpensesPageQueryVariables>;

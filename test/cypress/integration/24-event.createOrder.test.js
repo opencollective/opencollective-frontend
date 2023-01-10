@@ -35,7 +35,7 @@ describe('event.createOrder page', () => {
     cy.get('.EditTiers input[name="name"]').type('Free Ticket');
     cy.get('.EditTiers input[name="amount"]').type('0');
     cy.contains('button', 'Save').click();
-    cy.contains('a', 'view event page').click();
+    cy.contains('a', 'View profile page').click();
 
     // Go to the contribution flow
     cy.contains('button', 'RSVP').click();
@@ -59,7 +59,7 @@ describe('event.createOrder page', () => {
     cy.get('.EditTiers input[name="name"]').type('Paying Ticket');
     cy.get('.EditTiers input[name="amount"]').type('10');
     cy.contains('button', 'Save').click();
-    cy.contains('a', 'view event page').click();
+    cy.contains('a', 'View profile page').click();
 
     // Go to the contribution flow
     cy.contains('button', 'RSVP').click();
@@ -87,10 +87,10 @@ describe('event.createOrder page', () => {
     cy.get('.addTier').click();
     cy.get('.EditTiers input[name="name"]').type('Flexible Paying Ticket');
     cy.get('[data-cy="amountType"]').click();
-    cy.contains('[data-cy="select-option"]', 'flexible amount').click();
+    cy.contains('[data-cy="select-option"]', 'Flexible amount').click();
     cy.get('.EditTiers input[name="amount"]').type('10');
     cy.contains('button', 'Save').click();
-    cy.contains('a', 'view event page').click();
+    cy.contains('a', 'View profile page').click();
 
     // Go to the contribution flow
     cy.contains('button', 'RSVP').click();
@@ -128,7 +128,7 @@ describe('event.createOrder page', () => {
     cy.get('.EditTiers input[name="name"]').type('Ticket with VAT');
     cy.get('.EditTiers input[name="amount"]').type('10');
     cy.contains('button', 'Save').click();
-    cy.contains('a', 'view event page').click();
+    cy.contains('a', 'View profile page').click();
 
     // Go to the contribution flow
     cy.contains('button', 'RSVP').click();
