@@ -223,7 +223,7 @@ const paypalPlanQuery = gql`
 
 const addPaypalPlan = graphql(paypalPlanQuery, {
   // We only need a plan if using an interval
-  skip: props => props.interval && props.interval !== INTERVALS.oneTime,
+  skip: props => !props.interval || props.interval === INTERVALS.oneTime,
   options: props => ({
     context: API_V2_CONTEXT,
     variables: {
