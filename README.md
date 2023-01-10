@@ -68,7 +68,7 @@ To update:
 
 ## Styleguide
 
-We use [Storybook](https://storybook.js.org/docs/react/get-started/introduction) to develop and document our React components in isolation with [styled-components](https://www.styled-components.com/) and [styled-system](https://jxnblk.com/styled-system/).
+We use [Storybook](https://storybook.js.org/docs/react/get-started/introduction) to develop and document our React components in isolation with [styled-components](https://www.styled-components.com/) and [styled-system](https://styled-system.com/).
 
 More info: [docs/styleguide.md](docs/styleguide.md)
 
