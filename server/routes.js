@@ -8,6 +8,7 @@ const { template, trim } = require('lodash');
 const { sendMessage } = require('./email');
 const intl = require('./intl');
 const logger = require('./logger');
+const prependHttp = require('prepend-http');
 
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
@@ -90,7 +91,13 @@ module.exports = (expressApp, nextApp) => {
       res.status(400).send('All inputs required');
     }
 
-    const additionalLink = body.link ? `Additional Link: <a href="https://${body.link}">${body.link}</a></br>` : '';
+    let additionalLink;
+    if (body.link) {
+      const bodyLink = prependHttp(body.link);
+      additionalLink = body.link
+        ? `Additional Link: <a href="${prependHttp(bodyLink)}">${prependHttp(bodyLink)}</a></br>`
+        : '';
+    }
 
     logger.info(`Contact From: ${body.name} <${body.email}>`);
     logger.info(`Contact Subject: ${body.topic}`);
