@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { alignSeries } from '../../../lib/charts';
 import { formatCurrency } from '../../../lib/currency-utils';
@@ -18,6 +19,11 @@ import { formatAmountForLegend } from './helpers';
 // Dynamic imports
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
+const StyledBox = styled(Box)`
+  .apexcharts-toolbar {
+    z-index: 0;
+  }
+`;
 const getChartOptions = (intl, timeUnit, hostCurrency, series) => {
   return {
     chart: {
@@ -267,7 +273,7 @@ const TransactionsOverviewSection = ({ host, isLoading }) => {
           </div>
         )}
       </Box>
-      <Box mt="24px" mb="12px">
+      <StyledBox mt="24px" mb="12px">
         {isLoading ? (
           <LoadingPlaceholder height={21} width="100%" borderRadius="8px" />
         ) : (
@@ -279,7 +285,7 @@ const TransactionsOverviewSection = ({ host, isLoading }) => {
             series={series}
           />
         )}
-      </Box>
+      </StyledBox>
     </React.Fragment>
   );
 };
