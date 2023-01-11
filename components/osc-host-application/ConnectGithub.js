@@ -111,7 +111,7 @@ class ConnectGithub extends React.Component {
                   values={{
                     ApplyLink: getI18nLink({
                       as: Link,
-                      href: { pathname: `/opensource/create/form`, query: { hostTos: true } },
+                      href: nextLinkPath,
                       color: 'purple.500',
                     }),
                     AltVerificationLink: getI18nLink({
