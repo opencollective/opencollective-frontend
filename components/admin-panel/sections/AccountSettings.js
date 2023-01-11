@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
-import { isArray, pick } from 'lodash';
+import { isArray, omit, pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -105,6 +105,11 @@ const AccountSettings = ({ account, section }) => {
         ]),
       );
     }
+
+    if (isArray(collective.socialLinks)) {
+      CollectiveInputType.socialLinks = collective.socialLinks.map(sl => omit(sl, '__typename'));
+    }
+
     if (collective.location === null) {
       CollectiveInputType.location = null;
     } else {
