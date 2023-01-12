@@ -10,6 +10,7 @@ import { sendContactMessage } from '../../lib/api';
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { getCollectivePageCanonicalURL } from '../../lib/url-helpers';
 import { isValidEmail } from '../../lib/utils';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -77,7 +78,7 @@ const ContactForm = () => {
           'relatedCollectives',
           LoggedInUser.memberOf.map(member => {
             if (member.role === 'ADMIN') {
-              return `https://opencollective.com/${member.collective.slug}`;
+              return getCollectivePageCanonicalURL(member.collective);
             }
           }),
         );
@@ -102,7 +103,7 @@ const ContactForm = () => {
         'relatedCollectives',
         LoggedInUser.memberOf
           .filter(member => member.role === 'ADMIN')
-          .map(member => `https://opencollective.com/${member.collective.slug}`),
+          .map(member => getCollectivePageCanonicalURL(member.collective)),
       );
     }
   }, [LoggedInUser]);
@@ -223,7 +224,7 @@ const ContactForm = () => {
                     onChange={value =>
                       setFieldValue(
                         'relatedCollectives',
-                        value.map(element => `https://opencollective.com/${element.value.slug}`),
+                        value.map(element => getCollectivePageCanonicalURL(element.value)),
                       )
                     }
                   />
