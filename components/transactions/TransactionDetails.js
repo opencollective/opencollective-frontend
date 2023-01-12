@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Info } from '@styled-icons/feather/Info';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -182,11 +183,17 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
           {order?.processedAt && transaction.kind === 'ADDED_FUNDS' && (
             <React.Fragment>
               <DetailTitle>
-                <Span textTransform="capitalize">
-                  <FormattedMessage id="processedAt" defaultMessage="Fund received date" />
-                </Span>
+                <span>
+                  <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
+                  {` `}
+                  <StyledTooltip content={() => <FormattedMessage defaultMessage="Date the funds were received." />}>
+                    <InfoCircle size={13} />
+                  </StyledTooltip>
+                </span>
               </DetailTitle>
-              <DetailDescription>{intl.formatDate(order.processedAt, { timeZone: 'UTC' })}</DetailDescription>
+              <DetailDescription>
+                {intl.formatDate(order.processedAt, { dateStyle: 'long', timeZone: 'UTC' })}
+              </DetailDescription>
             </React.Fragment>
           )}
         </Flex>
