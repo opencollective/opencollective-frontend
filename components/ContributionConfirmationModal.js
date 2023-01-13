@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';
@@ -15,6 +16,7 @@ import StyledInput from './StyledInput';
 import StyledInputAmount from './StyledInputAmount';
 import StyledInputPercentage from './StyledInputPercentage';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
+import StyledTooltip from './StyledTooltip';
 import { P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
@@ -49,7 +51,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
   const [platformTip, setPlatformTip] = useState(platformTipAmount);
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
   const [hostFeePercent, setHostFeePercent] = useState(defaultHostFeePercent);
-  const [processedAt, setProcessedAt] = useState();
+  const [processedAt, setProcessedAt] = useState(new Date().toISOString().split('T')[0]);
   const intl = useIntl();
   const { addToast } = useToasts();
   const [confirmOrder, { loading }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
@@ -197,12 +199,19 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
         <Container>
           <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
             <Span fontSize="14px" lineHeight="20px" fontWeight="400">
-              <FormattedMessage id="processedAt" defaultMessage="Fund received date" />
+              <span>
+                <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
+                {` `}
+                <StyledTooltip content={() => <FormattedMessage defaultMessage="Date the funds were received." />}>
+                  <InfoCircle size={16} />
+                </StyledTooltip>
+              </span>
             </Span>
             <StyledInput
               name="processedAt"
               type="date"
               data-cy="processedAt"
+              defaultValue={processedAt}
               onChange={e => setProcessedAt(e.target.value)}
             />
           </Flex>
