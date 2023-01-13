@@ -253,7 +253,7 @@ class ContributionFlowSuccess extends React.Component {
             </P>
             <Box mt={1} maxWidth="672px">
               <P fontWeight="400" fontSize="14px" lineHeight="20px" textAlign="center">
-                <FormattedMessage defaultMessage="Your contribution will remain in the processing state till it is completed from Stripe's end. You will receive an email when it goes through successfully. No further action is required from your end." />
+                <FormattedMessage defaultMessage="Your contribution will remain in processing state until it is completed from the payment processor's end. You will receive an email when it goes through successfully. No further action is required from your end." />
               </P>
             </Box>
             <StyledLink
