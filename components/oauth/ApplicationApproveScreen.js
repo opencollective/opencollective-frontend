@@ -10,6 +10,7 @@ import { ERROR, formatErrorType } from '../../lib/errors';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
+import { getI18nLink } from '../I18nFormatters';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -188,7 +189,15 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
                     values={{ service: 'Open Collective' }}
                   />{' '}
                   <br />
-                  <strong>({LoggedInUser.collective.name})</strong>
+                  <strong>{LoggedInUser.collective.name}</strong>{' '}
+                  <small>
+                    <FormattedMessage
+                      defaultMessage="Not you? <SignOutLink>Sign Out</SignOutLink> to switch profile."
+                      values={{ SignOutLink: getI18nLink({ href: `/signout` }) }}
+                    />
+
+                    {/**/}
+                  </small>
                 </P>
               </Flex>
               {filteredScopes.map(([scope, { label }]) => (
