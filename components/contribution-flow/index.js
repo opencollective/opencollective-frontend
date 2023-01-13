@@ -151,6 +151,7 @@ class ContributionFlow extends React.Component {
       ? find(CRYPTO_CURRENCIES, field => field.value === queryParams.cryptoCurrency) || CRYPTO_CURRENCIES[0]
       : tier?.amount?.currency || collective.currency;
     const amount = queryParams.amount || getDefaultTierAmount(tier, collective, currency);
+    const quantity = queryParams.quantity || 1;
 
     this.state = {
       error: null,
@@ -168,12 +169,12 @@ class ContributionFlow extends React.Component {
       },
       stepSummary: null,
       stepDetails: {
-        quantity: queryParams.quantity || 1,
+        quantity,
         interval: isSupportedInterval(collective, tier, LoggedInUser, queryParams.interval)
           ? queryParams.interval
           : getDefaultInterval(props.tier),
         amount,
-        platformTip: this.canHavePlatformTips() ? Math.round(amount * DEFAULT_PLATFORM_TIP_PERCENTAGE) : 0,
+        platformTip: this.canHavePlatformTips() ? Math.round(amount * quantity * DEFAULT_PLATFORM_TIP_PERCENTAGE) : 0,
         currency,
         cryptoAmount: queryParams.cryptoAmount,
       },
