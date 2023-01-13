@@ -89,7 +89,7 @@ FormattedMoneyAmount.propTypes = {
   /** How many numbers should we display after the comma */
   precision: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf(['auto'])]),
   /** An interval that goes with the amount */
-  interval: PropTypes.oneOf(['month', 'year']),
+  interval: PropTypes.oneOf(['month', 'year', 'oneTime']),
   /** ContributionFrequency from GQLV2 */
   frequency: PropTypes.oneOf(['MONTHLY', 'YEARLY', 'ONETIME']),
   /** Style for the amount (eg. `$10`). Doesn't apply on interval */
