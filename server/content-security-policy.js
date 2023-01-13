@@ -63,7 +63,7 @@ const COMMON_DIRECTIVES = {
     'https://js.hcaptcha.com',
     'https://*.hcaptcha.com',
     'https://www.google.com',
-    'https://cdn.matomo.cloud',
+    'https://plausible.io',
   ],
   frameSrc: [
     'blob:', // For expense invoice previews in the modal, as they're rendered in a blob
