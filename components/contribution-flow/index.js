@@ -100,7 +100,7 @@ const OTHER_MESSAGES = defineMessages({
   tipAmountContributionWarning: {
     id: 'Warning.TipAmountContributionWarning',
     defaultMessage:
-      'You are about to make a contribution of {contributionAmount} to {accountName}, with a tip to the Open Collective platform of {tipAmount}. The tip amount looks unusually high.{newLine}{newLine}Are you sure you want to do this?',
+      'You are about to make a contribution of {contributionAmount} to {accountName} that includes a {tipAmount} tip to the Open Collective platform. The tip amount looks unusually high.{newLine}{newLine}Are you sure you want to do this?',
   },
   pastEventWarning: {
     id: 'Warning.PastEvent',
@@ -743,7 +743,7 @@ class ContributionFlow extends React.Component {
           } else if (
             !this.checkFormValidity() ||
             !stepDetails ||
-            stepDetails.amount < minAmount ||
+            stepDetails.amount < minAmount || // Min amount is per-item, so we don't need to multiply by quantity
             !stepDetails.quantity
           ) {
             return false;
@@ -752,11 +752,13 @@ class ContributionFlow extends React.Component {
           } else if (
             stepDetails.amount &&
             stepDetails.platformTip &&
-            stepDetails.platformTip / stepDetails.amount >= 0.5
+            stepDetails.platformTip / getTotalAmount(stepDetails, stepSummary) >= 0.5
           ) {
             return confirm(
               intl.formatMessage(OTHER_MESSAGES.tipAmountContributionWarning, {
-                contributionAmount: formatCurrency(stepDetails.amount, currency, { locale: intl.locale }),
+                contributionAmount: formatCurrency(getTotalAmount(stepDetails, stepSummary), currency, {
+                  locale: intl.locale,
+                }),
                 tipAmount: formatCurrency(stepDetails.platformTip, currency, { locale: intl.locale }),
                 accountName: collective.name,
                 newLine: '\n',
