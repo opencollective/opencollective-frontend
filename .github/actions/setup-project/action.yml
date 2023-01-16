@@ -17,7 +17,7 @@ runs:
     - name: Setup node
       uses: actions/setup-node@v3
       with:
-        node-version: ${{steps.parse_package_json.outputs.node_version}}
+        node-version-file: 'package.json'
 
     - name: Restore node_modules
       uses: actions/cache@v3

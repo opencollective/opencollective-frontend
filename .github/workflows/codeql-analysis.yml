@@ -22,7 +22,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version-file: 'package.json'
 
       # If this run was triggered by a pull request event, then checkout
       # the head of the pull request instead of the merge commit.
