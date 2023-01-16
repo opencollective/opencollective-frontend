@@ -29,7 +29,6 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   PAYMENT_RECEIPTS: 'payment-receipts',
   TICKETS: 'tickets',
   TIERS: 'tiers',
-  TIERS_REVAMP: 'tiers-revamp',
   GIFT_CARDS: 'gift-cards',
   AUTHORIZED_APPS: 'authorized-apps',
   FOR_DEVELOPERS: 'for-developers',

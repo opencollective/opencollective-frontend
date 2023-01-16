@@ -52,7 +52,6 @@ import ReceivingMoney from './sections/ReceivingMoney';
 import Security from './sections/Security';
 import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
-import Tiers from './sections/Tiers';
 import TiersRevamp from './sections/TiersRevamp';
 import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
 import VirtualCards from './sections/virtual-cards/VirtualCards';
@@ -427,19 +426,6 @@ class EditCollectiveForm extends React.Component {
         return <PaymentMethods collectiveSlug={collective.slug} />;
 
       case EDIT_COLLECTIVE_SECTIONS.TIERS:
-        return (
-          <Tiers
-            title="Tiers"
-            types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
-            tiers={this.state.tiers}
-            collective={collective}
-            currency={collective.currency}
-            onChange={tiers => this.setState({ tiers, modified: true })}
-            defaultType="TIER"
-          />
-        );
-
-      case EDIT_COLLECTIVE_SECTIONS.TIERS_REVAMP:
         return <TiersRevamp collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
 
       case EDIT_COLLECTIVE_SECTIONS.TICKETS:
