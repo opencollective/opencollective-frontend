@@ -53,7 +53,6 @@ const CoverImage = styled.div`
 
   ${props => {
     const image = props.image ? `url(${props.image}), ` : '';
-<<<<<<< HEAD
     const applyGrayscale = (isDisabled, contributionType) => {
       if (isDisabled) {
         return 'filter: grayscale(0.75);';
@@ -61,7 +60,6 @@ const CoverImage = styled.div`
         return 'filter: grayscale(0.50);';
       }
     };
-=======
 
     if (props.customPrimaryColor) {
       const primary = props.customPrimaryColor;
@@ -71,18 +69,16 @@ const CoverImage = styled.div`
       )} 100%), `;
       return css`
         background: ${image} ${radial} ${props.customPrimaryColor};
-        ${props.isDisabled && `filter: grayscale(0.75);`}
+        ${applyGrayscale(props.isDisabled, props.contributionType)}
+      `;
+    } else {
+      const primary = props.theme.colors.primary;
+      const radial = `radial-gradient(circle, ${primary[300]} 0%, ${primary[800]} 100%), `;
+      return css`
+        background: ${image} ${radial} ${primary[500]};
+        ${applyGrayscale(props.isDisabled, props.contributionType)}
       `;
     }
-
-    const primary = props.theme.colors.primary;
-    const radial = `radial-gradient(circle, ${primary[300]} 0%, ${primary[800]} 100%), `;
->>>>>>> fd40a06c0 (refactor: do not regenerate theme)
-
-    return css`
-      background: ${image} ${radial} ${primary[500]};
-      ${applyGrayscale(props.isDisabled, props.contributionType)}
-    `;
   }};
 `;
 
@@ -230,8 +226,8 @@ const ContributeCard = ({
   }
 
   return (
-    <StyledContributeCard customPrimaryColor={customPrimaryColor} {...props}>
-      <CoverImage image={image} isDisabled={disableCTA} contributionType={type} customPrimaryColor={customPrimaryColor}>
+    <StyledContributeCard customPrimaryColor={color} {...props}>
+      <CoverImage image={image} isDisabled={disableCTA} contributionType={type} customPrimaryColor={color}>
         <StyledTag
           position="absolute"
           bottom="8px"
