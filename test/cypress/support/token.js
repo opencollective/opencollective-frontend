@@ -2,8 +2,26 @@
 // Setting it in config could result in the entry being set by the person who deploys.
 const TEST_JWT_SECRET = 'vieneixaGhahk2aej2pohsh2aeB1oa6o';
 
-function jwtSign(data, key) {
-  window.crypto.subtle
+function encodeBase64Url(data) {
+  return btoa(data).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+async function createToken(payload, key) {
+  const header = { typ: 'JWT', alg: 'HS256' };
+
+  const segments = [];
+  segments.push(encodeURIComponent(encodeBase64Url(JSON.stringify(header))));
+  segments.push(encodeURIComponent(encodeBase64Url(JSON.stringify(payload))));
+
+  const footer = await sign(segments.join('.'), key);
+
+  segments.push(footer);
+
+  return segments.join('.');
+}
+
+function sign(data, key) {
+  return window.crypto.subtle
     .importKey(
       'jwk', // can be "jwk" or "raw"
       {
@@ -36,7 +54,7 @@ function jwtSign(data, key) {
     })
     .then(token => {
       const u8 = new Uint8Array(token);
-      const b64encoded = btoa(String.fromCharCode.apply(null, u8));
+      const b64encoded = encodeBase64Url(String.fromCharCode.apply(null, u8));
 
       return b64encoded;
     });
@@ -55,7 +73,7 @@ function jwtSign(data, key) {
  * @param `expiresIn`: An expiry duration, default to 1h. Set to a negative value
  *                     to generate an expired token.
  */
-export default function generateToken(user, expiresIn = 3000000) {
+export default async function generateToken(user, expiresIn = 3000000) {
   const defaultUser = {
     id: 9474,
     sub: 9474,
@@ -63,5 +81,6 @@ export default function generateToken(user, expiresIn = 3000000) {
     email: 'testuser+admin@opencollective.com',
     exp: new Date(Date.now() + expiresIn).toISOString(),
   };
-  return jwtSign(user || defaultUser, TEST_JWT_SECRET);
+  const jwtToken = await createToken(user || defaultUser, TEST_JWT_SECRET);
+  return jwtToken;
 }
