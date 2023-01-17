@@ -99,6 +99,14 @@ const tiersQuery = gql`
           }
         }
       }
+      ... on Organization {
+        tiers {
+          nodes {
+            id
+            ...EditTiersFields
+          }
+        }
+      }
     }
   }
   ${editTiersFieldsFragment}
@@ -200,7 +208,7 @@ const Tiers = ({ collective }) => {
 Tiers.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
-    id: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
   }).isRequired,
 };
 
