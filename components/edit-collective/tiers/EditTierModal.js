@@ -7,6 +7,7 @@ import { omit } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { getLegacyIdForCollective } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
@@ -773,6 +774,18 @@ export function EditTierForm({ tier, collective, onClose }) {
       },
     ],
     awaitRefetchQueries: true,
+    update: cache => {
+      // Invalidate the cache for the collective page query to make sure we'll fetch the latest data next time we visit
+      const cachedCollective = cache.identify({ __typename: 'Collective', id: getLegacyIdForCollective(collective) });
+      if (cachedCollective) {
+        cache.modify({
+          id: cachedCollective,
+          fields: {
+            tiers: (_, { DELETE }) => DELETE,
+          },
+        });
+      }
+    },
   });
 
   const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation, { context: API_V2_CONTEXT });
@@ -793,7 +806,8 @@ export function EditTierForm({ tier, collective, onClose }) {
             stopRecurringContributions: !keepRecurringContributions,
           },
           update: cache => {
-            cache.evict({ id: cache.identify(tier) });
+            cache.evict({ id: cache.identify(tier) }); // Evict from GraphQL V1
+            cache.evict({ id: cache.identify({ __typename: 'Tier', id: tier.legacyId }) }); // Evict from GraphQL V2
             cache.gc();
           },
         });
