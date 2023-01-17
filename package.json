@@ -199,7 +199,7 @@
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "cheerio": "1.0.0-rc.12",
     "codecov": "^3.8.3",
-    "commander": "^9.4.1",
+    "commander": "^10.0.0",
     "commitizen": "^4.2.4",
     "cross-env": "^7.0.3",
     "css-loader": "^6.6.0",
