@@ -775,24 +775,7 @@ export function EditTierForm({ tier, collective, onClose }) {
     awaitRefetchQueries: true,
   });
 
-  const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation, {
-    context: API_V2_CONTEXT,
-    variables: {
-      tier: {
-        id: tier?.id,
-      },
-    },
-    refetchQueries: [
-      {
-        query: listTierQuery,
-        context: API_V2_CONTEXT,
-        variables: {
-          accountSlug: collective.slug,
-        },
-      },
-    ],
-    awaitRefetchQueries: true,
-  });
+  const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation, { context: API_V2_CONTEXT });
 
   const [isConfirmingDelete, setIsConfirmingDelete] = React.useState(false);
   const { addToast } = useToasts();
@@ -806,7 +789,12 @@ export function EditTierForm({ tier, collective, onClose }) {
       try {
         await deleteTier({
           variables: {
+            tier: { id: tier.id },
             stopRecurringContributions: !keepRecurringContributions,
+          },
+          update: cache => {
+            cache.evict({ id: cache.identify(tier) });
+            cache.gc();
           },
         });
         onClose();
