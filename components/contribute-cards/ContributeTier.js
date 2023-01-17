@@ -64,7 +64,7 @@ const TierTitle = ({ collective, tier }) => {
       >
         <StyledLink
           as={Link}
-          href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}`}
+          href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.legacyId || tier.id}`}
           color="black.900"
           hoverColor="black.900"
           underlineOnHover
@@ -81,7 +81,8 @@ TierTitle.propTypes = {
     slug: PropTypes.string,
   }),
   tier: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    legacyId: PropTypes.number,
     slug: PropTypes.string,
     name: PropTypes.string,
     useStandalonePage: PropTypes.bool,
@@ -100,6 +101,7 @@ const ContributeTier = ({ intl, collective, tier, enableEditing, isPreview, ...p
   const hasNoneLeft = stats?.availableQuantity === 0;
   const canContributeToCollective = collective.isActive && !isPastEvent(collective);
   const isDisabled = !canContributeToCollective || tierIsExpired || hasNoneLeft;
+  const tierLegacyId = tier.legacyId || tier.id;
 
   let description = tier.description;
   if (!tier.description) {
@@ -113,7 +115,7 @@ const ContributeTier = ({ intl, collective, tier, enableEditing, isPreview, ...p
 
   return (
     <Contribute
-      route={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}/checkout`}
+      route={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tierLegacyId}/checkout`}
       title={<TierTitle collective={collective} tier={tier} />}
       type={tierType}
       buttonText={tier.button}
@@ -148,7 +150,9 @@ const ContributeTier = ({ intl, collective, tier, enableEditing, isPreview, ...p
                 <StyledLink
                   as={Link}
                   whiteSpace="nowrap"
-                  href={isPreview ? '#' : `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}`}
+                  href={
+                    isPreview ? '#' : `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tierLegacyId}`
+                  }
                 >
                   <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
                 </StyledLink>
@@ -225,6 +229,7 @@ ContributeTier.propTypes = {
   }),
   tier: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    legacyId: PropTypes.number,
     slug: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     description: PropTypes.string,
