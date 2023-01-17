@@ -9,7 +9,7 @@ import styled from 'styled-components';
 
 import { getLegacyIdForCollective } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
+import INTERVALS, { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { requireFields } from '../../../lib/form-utils';
@@ -87,10 +87,10 @@ function FormFields({ collective, types, values }) {
 
   const tierTypeOptions = getTierTypeOptions(intl, collective.type);
   const intervalOptions = [
+    { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
     { value: 'onetime', label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) },
     { value: 'month', label: intl.formatMessage({ id: 'Frequency.Monthly', defaultMessage: 'Monthly' }) },
     { value: 'year', label: intl.formatMessage({ id: 'Frequency.Yearly', defaultMessage: 'Yearly' }) },
-    { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
   ];
 
   const amountTypeOptions = [
@@ -182,13 +182,10 @@ function FormFields({ collective, types, values }) {
       {[DONATION, MEMBERSHIP, TIER, SERVICE].includes(values.type) && (
         <StyledInputFormikField
           name="interval"
-          label={intl.formatMessage({
-            id: 'tier.interval.label',
-            defaultMessage: 'Interval',
-          })}
+          label={intl.formatMessage({ id: 'tier.interval.label', defaultMessage: 'Interval' })}
           labelFontWeight="bold"
           mt="3"
-          required={false}
+          required
         >
           {({ field, form, loading }) => (
             <StyledSelect
@@ -756,7 +753,7 @@ export function EditTierForm({ tier, collective, onClose }) {
         type: TierTypes.TIER,
         amountType: AmountTypes.FIXED,
         amount: null,
-        interval: null,
+        interval: INTERVALS.month,
         description: '',
         presets: [1000],
       };
@@ -837,10 +834,10 @@ export function EditTierForm({ tier, collective, onClose }) {
     <React.Fragment>
       <Formik
         initialValues={initialValues}
-        validate={values => requireFields(values, ['name', 'type', 'amountType', 'amount'])}
+        validate={values => requireFields(values, ['name', 'type', 'amountType', 'amount', 'interval'])}
         onSubmit={async values => {
           const tier = {
-            ...omit(values, 'interval'),
+            ...omit(values, ['interval']),
             frequency: getGQLV2FrequencyFromInterval(values.interval),
             maxQuantity: parseInt(values.maxQuantity),
             goal: values?.goal?.valueInCents ? values.goal : null,
