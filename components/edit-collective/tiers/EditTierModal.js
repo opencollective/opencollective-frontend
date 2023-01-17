@@ -802,7 +802,8 @@ export function EditTierForm({ tier, collective, onClose }) {
     awaitRefetchQueries: true,
     update: cache => {
       // Invalidate the cache for the collective page query to make sure we'll fetch the latest data next time we visit
-      const cachedCollective = cache.identify({ __typename: 'Collective', id: getLegacyIdForCollective(collective) });
+      const __typename = collective.type === CollectiveType.EVENT ? 'Event' : 'Collective';
+      const cachedCollective = cache.identify({ __typename, id: getLegacyIdForCollective(collective) });
       if (cachedCollective) {
         cache.modify({
           id: cachedCollective,

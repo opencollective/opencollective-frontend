@@ -202,7 +202,7 @@ describe('edit collective', () => {
     // Ensure the new tiers are properly displayed on order form
     cy.get('#amount > button').should('have.length', 4); // 3 presets + "Other"
 
-    cy.visit(`/${collectiveSlug}/admin/tiers`);
+    cy.login({ redirect: `/${collectiveSlug}/admin/tiers-legacy` });
     cy.get('.EditTiers .tier').first().find('.amountType [data-cy="amountType"]').click();
     cy.contains('[data-cy="select-option"]', 'Fixed amount').click();
     cy.get('.EditTiers .tier').last().find('.removeTier').click();
@@ -223,9 +223,11 @@ describe('edit collective', () => {
     cy.contains('button', 'Save').click();
     cy.contains('Saved');
     cy.visit(`${collectiveSlug}/admin/tiers`);
-    cy.get('[data-cy="tier-input-field-type"]:first [data-cy="type"]').click();
-    cy.contains('[data-cy="select-option"]', 'product').click();
-    cy.contains('[data-cy="tier-input-field-type"]:first', 'Value-added tax (VAT): 21%');
+    cy.getByDataCy('contribute-card-tier').first().find('button').click();
+    cy.getByDataCy('select-type').click();
+    cy.contains('[data-cy=select-option]', 'product').click();
+    cy.contains('[data-cy="edit-tier-modal-form"]:first', 'Value-added tax (VAT): 21%');
+    // TODO save and make sure it's enabled
   });
 });
 

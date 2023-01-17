@@ -904,11 +904,11 @@ class EditCollectiveForm extends React.Component {
               </div>
             )}
 
-            {[EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
+            {[EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
               this.renderSection(section)}
 
             {((fields && fields.length > 0) ||
-              [EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section)) && (
+              [EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section)) && (
               <Container className="actions" margin="5rem auto 1rem" textAlign="center">
                 <StyledButton
                   buttonStyle="primary"
@@ -939,7 +939,7 @@ class EditCollectiveForm extends React.Component {
               </Container>
             )}
 
-            {![EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
+            {![EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
               this.renderSection(section)}
           </Flex>
         </Flex>

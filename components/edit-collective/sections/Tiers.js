@@ -125,7 +125,7 @@ const Tiers = ({ collective }) => {
       </Grid>
       <StyledHr my={4} borderColor="black.300" />
 
-      <Box mt={4}>
+      <Box my={4}>
         {loading ? (
           <LoadingPlaceholder height={500} width="100%" />
         ) : error ? (
