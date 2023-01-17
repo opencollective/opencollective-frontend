@@ -131,7 +131,7 @@ function FormFields({ collective, types, values }) {
             {({ field, form, loading }) => (
               <StyledSelect
                 inputId={field.name}
-                data-cy={field.name}
+                data-cy={`select-${field.name}`}
                 error={field.error}
                 onBlur={() => form.setFieldTouched(field.name, true)}
                 onChange={({ value }) => form.setFieldValue(field.name, value)}
@@ -632,6 +632,43 @@ ContributeCardPreview.propTypes = {
   collective: PropTypes.object,
 };
 
+export const editTiersFieldsFragment = gql`
+  fragment EditTiersFields on Tier {
+    id
+    legacyId
+    amount {
+      value
+      valueInCents
+      currency
+    }
+    amountType
+    availableQuantity
+    button
+    customFields
+    description
+    endsAt
+    frequency
+    goal {
+      value
+      valueInCents
+      currency
+    }
+    interval
+    invoiceTemplate
+    maxQuantity
+    minimumAmount {
+      value
+      valueInCents
+      currency
+    }
+    name
+    presets
+    slug
+    type
+    useStandalonePage
+  }
+`;
+
 const listTierQuery = gql`
   query AccountTiers($accountSlug: String!) {
     account(slug: $accountSlug) {
@@ -640,113 +677,33 @@ const listTierQuery = gql`
         tiers {
           nodes {
             id
-            legacyId
-            name
-            slug
-            description
-            interval
-            frequency
-            amount {
-              valueInCents
-              currency
-            }
-            minimumAmount {
-              valueInCents
-              currency
-            }
-            goal {
-              valueInCents
-              currency
-            }
-            amountType
-            endsAt
-            type
-            maxQuantity
-            presets
-            button
-            useStandalonePage
+            ...EditTiersFields
           }
         }
       }
     }
   }
+  ${editTiersFieldsFragment}
 `;
 
 const editTierMutation = gql`
   mutation EditTier($tier: TierUpdateInput!) {
     editTier(tier: $tier) {
       id
-      legacyId
-      slug
-      name
-      description
-      amount {
-        value
-        currency
-        valueInCents
-      }
-      button
-      goal {
-        value
-        currency
-        valueInCents
-      }
-      type
-      interval
-      frequency
-      presets
-      maxQuantity
-      availableQuantity
-      customFields
-      amountType
-      minimumAmount {
-        value
-        currency
-        valueInCents
-      }
-      endsAt
-      invoiceTemplate
-      useStandalonePage
+      ...EditTiersFields
     }
   }
+  ${editTiersFieldsFragment}
 `;
 
 const createTierMutation = gql`
   mutation CreateTier($tier: TierCreateInput!, $account: AccountReferenceInput!) {
     createTier(tier: $tier, account: $account) {
       id
-      legacyId
-      slug
-      name
-      description
-      amount {
-        value
-        currency
-        valueInCents
-      }
-      button
-      goal {
-        value
-        currency
-        valueInCents
-      }
-      type
-      interval
-      presets
-      maxQuantity
-      availableQuantity
-      customFields
-      amountType
-      minimumAmount {
-        value
-        currency
-        valueInCents
-      }
-      endsAt
-      invoiceTemplate
-      useStandalonePage
+      ...EditTiersFields
     }
   }
+  ${editTiersFieldsFragment}
 `;
 
 const deleteTierMutation = gql`
@@ -769,7 +726,15 @@ export function EditTierForm({ tier, collective, onClose }) {
   const initialValues = React.useMemo(() => {
     if (isEditing) {
       return {
-        ...omit(tier, ['__typename', 'endsAt', 'slug', 'legacyId']),
+        ...omit(tier, [
+          '__typename',
+          'endsAt',
+          'slug',
+          'legacyId',
+          'invoiceTemplate',
+          'customFields',
+          'availableQuantity',
+        ]),
         amount: omit(tier.amount, '__typename'),
         goal: omit(tier.goal, '__typename'),
         minimumAmount: omit(tier.minimumAmount, '__typename'),

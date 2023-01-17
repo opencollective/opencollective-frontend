@@ -21,6 +21,7 @@ import StyledHr from '../../StyledHr';
 import StyledLink from '../../StyledLink';
 import { P, Span, Strong } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
+import { editTiersFieldsFragment } from '../tiers/EditTierModal';
 
 import { collectiveSettingsV1Query } from './EditCollectivePage';
 
@@ -94,37 +95,13 @@ const tiersQuery = gql`
         tiers {
           nodes {
             id
-            legacyId
-            name
-            slug
-            description
-            interval
-            frequency
-            amount {
-              valueInCents
-              currency
-            }
-            minimumAmount {
-              valueInCents
-              currency
-            }
-            goal {
-              valueInCents
-              currency
-            }
-            amountType
-            endsAt
-            type
-            maxQuantity
-            availableQuantity
-            presets
-            button
-            useStandalonePage
+            ...EditTiersFields
           }
         }
       }
     }
   }
+  ${editTiersFieldsFragment}
 `;
 
 /**
