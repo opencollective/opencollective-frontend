@@ -180,22 +180,24 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               <DetailDescription>{order.memo}</DetailDescription>
             </React.Fragment>
           )}
-          {order?.processedAt && (transaction.kind === 'ADDED_FUNDS' || !paymentMethod) && (
-            <React.Fragment>
-              <DetailTitle>
-                <span>
-                  <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
-                  {` `}
-                  <StyledTooltip content={() => <FormattedMessage defaultMessage="Date the funds were received." />}>
-                    <InfoCircle size={13} />
-                  </StyledTooltip>
-                </span>
-              </DetailTitle>
-              <DetailDescription>
-                {intl.formatDate(order.processedAt, { dateStyle: 'long', timeZone: 'UTC' })}
-              </DetailDescription>
-            </React.Fragment>
-          )}
+          {order?.processedAt &&
+            (transaction.kind === TransactionKind.ADDED_FUNDS ||
+              (!paymentMethod && transaction.kind === TransactionKind.CONTRIBUTION)) && (
+              <React.Fragment>
+                <DetailTitle>
+                  <span>
+                    <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
+                    {` `}
+                    <StyledTooltip content={() => <FormattedMessage defaultMessage="Date the funds were received." />}>
+                      <InfoCircle size={13} />
+                    </StyledTooltip>
+                  </span>
+                </DetailTitle>
+                <DetailDescription>
+                  {intl.formatDate(order.processedAt, { dateStyle: 'long', timeZone: 'UTC' })}
+                </DetailDescription>
+              </React.Fragment>
+            )}
         </Flex>
       )}
       <Flex flexDirection="column" width={[1, 0.35]}>

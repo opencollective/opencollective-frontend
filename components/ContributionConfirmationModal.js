@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { getCurrentDateInUTC } from '../lib/utils';
 
 import Container from './Container';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
@@ -51,7 +52,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
   const [platformTip, setPlatformTip] = useState(platformTipAmount);
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
   const [hostFeePercent, setHostFeePercent] = useState(defaultHostFeePercent);
-  const [processedAt, setProcessedAt] = useState(new Date().toISOString().split('T')[0]);
+  const [processedAt, setProcessedAt] = useState(getCurrentDateInUTC());
   const intl = useIntl();
   const { addToast } = useToasts();
   const [confirmOrder, { loading }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
