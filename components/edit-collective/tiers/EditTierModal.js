@@ -667,7 +667,7 @@ export const editTiersFieldsFragment = gql`
   }
 `;
 
-const listTierQuery = gql`
+export const listTierQuery = gql`
   query AccountTiers($accountSlug: String!) {
     account(slug: $accountSlug) {
       id

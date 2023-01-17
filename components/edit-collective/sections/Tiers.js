@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { get, sortBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -21,7 +21,7 @@ import StyledHr from '../../StyledHr';
 import StyledLink from '../../StyledLink';
 import { P, Span, Strong } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
-import { editTiersFieldsFragment } from '../tiers/EditTierModal';
+import { listTierQuery } from '../tiers/EditTierModal';
 
 import { collectiveSettingsV1Query } from './EditCollectivePage';
 
@@ -86,39 +86,13 @@ const CardsContainer = styled(Grid).attrs({
   }
 `;
 
-// TODO: Make sure this query works with organizations
-const tiersQuery = gql`
-  query AccountTiers($accountSlug: String!) {
-    account(slug: $accountSlug) {
-      id
-      ... on AccountWithContributions {
-        tiers {
-          nodes {
-            id
-            ...EditTiersFields
-          }
-        }
-      }
-      ... on Organization {
-        tiers {
-          nodes {
-            id
-            ...EditTiersFields
-          }
-        }
-      }
-    }
-  }
-  ${editTiersFieldsFragment}
-`;
-
 /**
  * A revamp of `components/edit-collective/sections/Tiers.js`. Meant to be renamed once we'll be ready
  * to replace the old tiers form.
  */
 const Tiers = ({ collective }) => {
   const variables = { accountSlug: collective.slug };
-  const { data, loading, error } = useQuery(tiersQuery, { variables, context: API_V2_CONTEXT });
+  const { data, loading, error } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
   const tiers = sortBy(get(data, 'account.tiers.nodes', []), 'legacyId');
   const intl = useIntl();
 
