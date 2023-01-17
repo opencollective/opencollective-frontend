@@ -193,7 +193,7 @@ function FormFields({ collective, types, values }) {
           {({ field, form, loading }) => (
             <StyledSelect
               inputId={field.name}
-              data-cy={field.name}
+              data-cy={`select-${field.name}`}
               error={field.error}
               onBlur={() => form.setFieldTouched(field.name, true)}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
@@ -753,8 +753,8 @@ export function EditTierForm({ tier, collective, onClose }) {
     } else {
       return {
         name: '',
-        type: null,
-        amountType: null,
+        type: TierTypes.TIER,
+        amountType: AmountTypes.FIXED,
         amount: null,
         interval: null,
         description: '',
