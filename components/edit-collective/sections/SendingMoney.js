@@ -47,6 +47,7 @@ class SendingMoney extends React.Component {
 
   render() {
     const services = ['transferwise'];
+    const isIndependentCollective = this.props.collective.host?.id === this.props.collective.id;
     if (hasFeature(this.props.collective, FEATURES.PAYPAL_PAYOUTS)) {
       services.push('paypal');
     }
@@ -71,7 +72,7 @@ class SendingMoney extends React.Component {
           connectedAccounts={this.props.collective.connectedAccounts}
           services={services}
         />
-        {!services.includes('paypal') && (
+        {!services.includes('paypal') && !isIndependentCollective && (
           <Fragment>
             <SettingsSectionTitle>
               <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage={'PayPal'} />
