@@ -135,7 +135,7 @@ const ContributeTier = ({ intl, collective, tier, enableEditing, isPreview, ...p
                 id="tier.limited"
                 values={{
                   maxQuantity: tier.maxQuantity,
-                  availableQuantity: stats?.availableQuantity,
+                  availableQuantity: (stats?.availableQuantity ?? tier.availableQuantity) || 0,
                 }}
                 defaultMessage="LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}"
               />
@@ -224,7 +224,7 @@ ContributeTier.propTypes = {
     }),
   }),
   tier: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     slug: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     description: PropTypes.string,
@@ -238,6 +238,7 @@ ContributeTier.propTypes = {
     minimumAmount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
     amount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
     maxQuantity: PropTypes.number,
+    availableQuantity: PropTypes.number,
     stats: PropTypes.shape({
       totalRecurringDonations: PropTypes.number,
       totalDonated: PropTypes.number,

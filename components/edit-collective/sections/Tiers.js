@@ -116,6 +116,7 @@ const tiersQuery = gql`
             endsAt
             type
             maxQuantity
+            availableQuantity
             presets
             button
             useStandalonePage
