@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
-import { omit } from 'lodash';
+import { isNil, omit } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -309,7 +309,7 @@ function FormFields({ collective, types, values }) {
           label={intl.formatMessage({ id: 'tier.minimumAmount.label', defaultMessage: 'Minimum amount' })}
           labelFontWeight="bold"
           mt="3"
-          required={false}
+          required
         >
           {({ field, form }) => (
             <StyledInputAmount
@@ -324,7 +324,9 @@ function FormFields({ collective, types, values }) {
               onChange={value =>
                 form.setFieldValue(
                   field.name,
-                  value ? { currency: field.value?.currency ?? collective.currency, valueInCents: value } : null,
+                  !isNil(value) && !isNaN(value)
+                    ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                    : null,
                 )
               }
               onBlur={() => form.setFieldTouched(field.name, true)}
@@ -726,6 +728,24 @@ const i18nMessages = defineMessages({
   DELETE_SUCCESS: { id: 'EditTier.Delete.Success', defaultMessage: 'Tier deleted.' },
 });
 
+const getRequiredFields = values => {
+  const fields = ['name', 'type', 'amountType'];
+
+  // Depending on type
+  if (values.type !== 'PRODUCT') {
+    fields.push('interval');
+  }
+
+  // Depending on amount type
+  if (values.amountType === 'FIXED') {
+    fields.push('amount');
+  } else if (values.amountType === 'FLEXIBLE') {
+    fields.push('minimumAmount');
+  }
+
+  return fields;
+};
+
 export function EditTierForm({ tier, collective, onClose }) {
   const intl = useIntl();
   const isEditing = React.useMemo(() => !!tier?.id);
@@ -753,6 +773,7 @@ export function EditTierForm({ tier, collective, onClose }) {
         type: TierTypes.TIER,
         amountType: AmountTypes.FIXED,
         amount: null,
+        minimumAmount: null,
         interval: INTERVALS.month,
         description: '',
         presets: [1000],
@@ -834,7 +855,7 @@ export function EditTierForm({ tier, collective, onClose }) {
     <React.Fragment>
       <Formik
         initialValues={initialValues}
-        validate={values => requireFields(values, ['name', 'type', 'amountType', 'amount', 'interval'])}
+        validate={values => requireFields(values, getRequiredFields(values))}
         onSubmit={async values => {
           const tier = {
             ...omit(values, ['interval']),
@@ -842,7 +863,7 @@ export function EditTierForm({ tier, collective, onClose }) {
             maxQuantity: parseInt(values.maxQuantity),
             goal: values?.goal?.valueInCents ? values.goal : null,
             amount: values?.amount?.valueInCents ? values.amount : null,
-            minimumAmount: values?.minimumAmount?.valueInCents ? values.minimumAmount : null,
+            minimumAmount: !isNil(values?.minimumAmount?.valueInCents) ? values.minimumAmount : null,
           };
 
           try {

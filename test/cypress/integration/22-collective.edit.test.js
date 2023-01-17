@@ -117,9 +117,9 @@ describe('edit collective', () => {
     cy.get('input[data-cy=amount]').type('25.00');
     cy.get('input[data-cy=maxQuantity]').type('100');
     cy.get('input[data-cy=button]').type('Buy it!');
-    cy.get('form').submit();
-    cy.getByDataCy('contribute-card-tier').should('have.length', 3);
+    cy.getByDataCy('confirm-btn').click();
     cy.checkToast({ type: 'SUCCESS', message: 'Tier created.' });
+    cy.getByDataCy('contribute-card-tier').should('have.length', 3);
 
     // TODO: Also do the check below on the profile page (need https://github.com/opencollective/opencollective/issues/6331)
     cy.getByDataCy('contribute-card-tier')
@@ -159,7 +159,7 @@ describe('edit collective', () => {
   });
 
   it('edit tiers (legacy)', () => {
-    cy.visit(`/${collectiveSlug}/admin/tiers-legacy`);
+    cy.login({ redirect: `/${collectiveSlug}/admin/tiers-legacy` });
     cy.get('.EditTiers .tier:first .name.inputField input').type('{selectall}Backer edited');
     cy.get('.EditTiers .tier:first .description.inputField textarea').type('{selectall}New description for backers');
     cy.get('.EditTiers .tier:first .amount.inputField input').type('{selectall}5');
