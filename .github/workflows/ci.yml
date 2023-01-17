@@ -27,16 +27,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v3
 
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
-
-      - name: Install dependencies
-        if: steps.node-modules.outputs.cache-hit != 'true'
-        run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
 
       - run: npm run lint:quiet
 
@@ -47,16 +43,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v3
 
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
-
-      - name: Install dependencies
-        if: steps.node-modules.outputs.cache-hit != 'true'
-        run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
 
       - run: npm run prettier:check
 
@@ -67,16 +59,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v3
 
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
-
-      - name: Install dependencies
-        if: steps.node-modules.outputs.cache-hit != 'true'
-        run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
 
       - run: npm run depcheck
 
@@ -87,7 +75,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v3
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -103,7 +91,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v3
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -135,7 +123,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v3
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -150,7 +138,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v3
 
       - name: Setup project
         uses: ./.github/actions/setup-project
