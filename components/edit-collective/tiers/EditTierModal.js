@@ -856,7 +856,7 @@ export function EditTierForm({ tier, collective, onClose }) {
       >
         {({ values, isSubmitting }) => {
           return (
-            <Form>
+            <Form data-cy="edit-tier-modal-form">
               <ModalHeader onClose={onClose} hideCloseIcon>
                 {isEditing ? (
                   <FormattedMessage id="modal.edit-tier.title" defaultMessage="Edit Tier" />
