@@ -642,6 +642,8 @@ export type Activity = {
   isSystem: Scalars['Boolean'];
   /** The order related to this activity, if any */
   order?: Maybe<Order>;
+  /** The transaction related to this activity, if any */
+  transaction?: Maybe<Transaction>;
   /** The type of the activity */
   type: ActivityType;
 };
@@ -5062,6 +5064,8 @@ export type Member = {
   /** Custom user description */
   description?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
+  /** If membership is inherited from parent collective */
+  inherited?: Maybe<Scalars['Boolean']>;
   /** Custom user message from member to the collective */
   publicMessage?: Maybe<Scalars['String']>;
   role?: Maybe<MemberRole>;
@@ -5111,6 +5115,8 @@ export type MemberOf = {
   /** Custom user description */
   description?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
+  /** If membership is inherited from parent collective */
+  inherited?: Maybe<Scalars['Boolean']>;
   /** Custom user message from member to the collective */
   publicMessage?: Maybe<Scalars['String']>;
   role?: Maybe<MemberRole>;

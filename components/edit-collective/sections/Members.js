@@ -160,6 +160,7 @@ class Members extends React.Component {
 
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
     const isInvitation = member.__typename === 'MemberInvitation';
+    const isInherited = member.inherited;
     const collectiveId = get(member, 'memberAccount.id');
     const memberCollective = member.account || member.memberAccount;
     const memberKey = member.id ? `member-${member.id}` : `collective-${collectiveId}`;
@@ -196,12 +197,24 @@ class Members extends React.Component {
               canRemove={!isLastAdmin}
             />
           ) : (
-            <StyledRoundButton
-              onClick={() => this.handleShowModalChange('edit', true, index, memberModalKey)}
-              size={26}
+            <StyledTooltip
+              noTooltip={!isInherited}
+              content={
+                <FormattedMessage
+                  id="MemberEdit.Disable.Inherited"
+                  defaultMessage="This member is inherited from {parentCollectiveName} and cannot be removed."
+                  values={{ parentCollectiveName: collective.parentCollective?.name }}
+                />
+              }
             >
-              <Edit height={16} />
-            </StyledRoundButton>
+              <StyledRoundButton
+                onClick={() => this.handleShowModalChange('edit', true, index, memberModalKey)}
+                size={26}
+                disabled={isInherited}
+              >
+                <Edit height={16} />
+              </StyledRoundButton>
+            </StyledTooltip>
           )}
         </Container>
         <Flex flexDirection="column" alignItems="center">
@@ -374,19 +387,6 @@ class Members extends React.Component {
           {i18nGraphqlException(intl, data.error)}
         </MessageBox>
       );
-    } else if (data.account?.parentAccount) {
-      const parent = data.account.parentAccount;
-      return (
-        <MessageBox type="info" withIcon fontSize="13px">
-          <FormattedMessage
-            id="Members.DefinedInParent"
-            defaultMessage="Team members are defined in the settings of {parentName}"
-            values={{
-              parentName: <Link href={`/${parent.slug}/admin/members`}>{parent.name}</Link>,
-            }}
-          />
-        </MessageBox>
-      );
     } else if (data.account?.isFrozen) {
       return (
         <MessageBox type="warning" fontSize="13px" withIcon>
@@ -412,6 +412,7 @@ const memberFieldsFragment = gql`
     since
     createdAt
     description
+    inherited
     account {
       id
       name
