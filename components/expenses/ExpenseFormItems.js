@@ -161,9 +161,9 @@ class ExpenseFormItems extends React.PureComponent {
   getApplicableTaxType() {
     const { collective, form } = this.props;
     if (form.values.type === expenseTypes.INVOICE) {
-      if (accountHasVAT(collective)) {
+      if (accountHasVAT(collective, collective.host)) {
         return TaxType.VAT;
-      } else if (accountHasGST(collective)) {
+      } else if (accountHasGST(collective.host || collective)) {
         return TaxType.GST;
       }
     }
