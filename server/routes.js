@@ -91,12 +91,10 @@ module.exports = (expressApp, nextApp) => {
       res.status(400).send('All inputs required');
     }
 
-    let additionalLink;
+    let additionalLink = '';
     if (body.link) {
       const bodyLink = prependHttp(body.link);
-      additionalLink = body.link
-        ? `Additional Link: <a href="${prependHttp(bodyLink)}">${prependHttp(bodyLink)}</a></br>`
-        : '';
+      additionalLink = `Additional Link: <a href="${bodyLink}">${bodyLink}</a></br>`;
     }
 
     logger.info(`Contact From: ${body.name} <${body.email}>`);
