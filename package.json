@@ -78,6 +78,7 @@
     "nprogress": "0.2.0",
     "payment": "2.4.6",
     "polished": "4.2.2",
+    "prepend-http": "3.0.1",
     "prop-types": "15.8.1",
     "qrcode.react": "3.1.0",
     "react": "17.0.2",
