@@ -54,7 +54,7 @@ export const StripePaymentMethodsLabels = defineMessages<StripePaymentMethod>({
   [StripePaymentMethod.card]: { id: 'Stripe.PaymentMethod.Label.card', defaultMessage: 'Card' },
   [StripePaymentMethod.customer_balance]: {
     id: 'Stripe.PaymentMethod.Label.customer_balance',
-    defaultMessage: 'Balance',
+    defaultMessage: 'Stripe Balance',
   },
   [StripePaymentMethod.eps]: { id: 'Stripe.PaymentMethod.Label.eps', defaultMessage: 'EPS' },
   [StripePaymentMethod.fpx]: { id: 'Stripe.PaymentMethod.Label.fpx', defaultMessage: 'FPX' },
