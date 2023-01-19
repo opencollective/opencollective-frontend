@@ -140,24 +140,24 @@ describe('event.createOrder page', () => {
     cy.getByDataCy('cf-next-step').click();
 
     // Check step summary
-    const breakdownLineSelector = '[data-cy="breakdown-line"]';
-    cy.contains(breakdownLineSelector, 'Item price').contains('$10.00');
+    const breakdownLineSelector = '[data-cy="ContributionSummary-AmountLine"]';
+    cy.contains(breakdownLineSelector, 'Contribution to Test Event with VAT - "Ticket with VAT"').contains('$10.00');
     cy.contains(breakdownLineSelector, 'Quantity').contains('8');
-    cy.contains(breakdownLineSelector, 'Your contribution').contains('$80.00');
+    cy.contains(breakdownLineSelector, "Today's charge").contains('$80.00');
     cy.wait(1000);
 
     // Algeria should not have taxes
     cy.contains('[data-cy="country-select"]', 'Please select your country').click();
     cy.contains('[data-cy="select-option"]', 'Algeria').click();
-    cy.contains(breakdownLineSelector, 'VAT').contains('+ $0.00');
-    cy.contains(breakdownLineSelector, 'TOTAL').contains('$80.00');
+    cy.getByDataCy('VAT-amount').contains('$0.00');
+    cy.contains(breakdownLineSelector, "Today's charge").contains('$80.00');
     cy.get('button[data-cy="cf-next-step"]').should('not.be.disabled');
 
     // French should have taxes
     cy.get('[data-cy="country-select"]').click();
     cy.contains('[data-cy="select-option"]', 'France').click();
-    cy.contains(breakdownLineSelector, 'VAT').contains('+ $16.80');
-    cy.contains(breakdownLineSelector, 'TOTAL').contains('$96.80');
+    cy.getByDataCy('VAT-amount').contains('$16.80');
+    cy.contains(breakdownLineSelector, "Today's charge").contains('$96.80');
     cy.get('button[data-cy="cf-next-step"]').should('not.be.disabled');
 
     // ...except if they can provide a valid VAT number
@@ -173,10 +173,10 @@ describe('event.createOrder page', () => {
 
     // Must provide a valid VAT number
     cy.contains('div', 'Enter VAT number (if you have one)').click();
-    cy.get('input[name=taxIndentificationNumber]').type('424242');
+    cy.get('input[name=taxIdNumber]').type('424242');
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.contains('Invalid VAT number');
-    cy.get('input[name=taxIndentificationNumber]').type('{selectall}FR-XX999999999');
+    cy.get('input[name=taxIdNumber]').type('{selectall}FR-XX999999999');
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.contains('Choose payment method');
     cy.get('button[data-cy="cf-prev-step"]').click();
@@ -184,13 +184,13 @@ describe('event.createOrder page', () => {
     // Values should be updated
     cy.get('button[data-cy="cf-next-step"]').should('not.be.disabled');
     cy.contains('FRXX999999999'); // Number is properly formatted
-    cy.contains(breakdownLineSelector, 'VAT').contains('+ $0.00');
-    cy.contains(breakdownLineSelector, 'TOTAL').contains('$80.00');
+    cy.getByDataCy('VAT-amount').contains('$0.00');
+    cy.contains(breakdownLineSelector, "Today's charge").contains('80.00');
 
     // User can update the number
     cy.contains('div', 'Change VAT number').click();
-    cy.get('input[name=taxIndentificationNumber]').should('have.value', 'FRXX999999999');
-    cy.get('input[name=taxIndentificationNumber]').type('{selectall}FR-XX-999999998');
+    cy.get('input[name=taxIdNumber]').should('have.value', 'FRXX999999999');
+    cy.get('input[name=taxIdNumber]').type('{selectall}FR-XX-999999998');
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.contains('Choose payment method');
     cy.get('button[data-cy="cf-prev-step"]').click();
@@ -200,20 +200,20 @@ describe('event.createOrder page', () => {
     // even if the contributor is an organization
     cy.get('[data-cy="country-select"]').click();
     cy.contains('[data-cy="select-option"]', 'Belgium').click();
-    cy.contains(breakdownLineSelector, 'VAT').contains('+ $16.80');
-    cy.contains(breakdownLineSelector, 'TOTAL').contains('$96.80');
+    cy.getByDataCy('VAT-amount').contains('$16.80');
+    cy.contains(breakdownLineSelector, "Today's charge").contains('$96.80');
     cy.contains('div', 'Enter VAT number (if you have one)').click();
-    cy.get('input[name=taxIndentificationNumber]').type('FRXX999999998');
+    cy.get('input[name=taxIdNumber]').type('FRXX999999998');
     cy.get('button[data-cy="cf-next-step"]').click();
     // Tried to use a french VAT number with Belgium
     cy.contains("The VAT number doesn't match the country");
-    cy.get('input[name=taxIndentificationNumber]').type('{selectall}BE-0414445663');
+    cy.get('input[name=taxIdNumber]').type('{selectall}BE-0414445663');
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.contains('Choose payment method');
     cy.get('button[data-cy="cf-prev-step"]').click();
     cy.contains('BE0414445663'); // Number is properly formatted
-    cy.contains(breakdownLineSelector, 'VAT').contains('+ $16.80');
-    cy.contains(breakdownLineSelector, 'TOTAL').contains('$96.80');
+    cy.getByDataCy('VAT-amount').contains('$16.80');
+    cy.contains(breakdownLineSelector, "Today's charge").contains('$96.80');
 
     // Let's submit this order!
     cy.getByDataCy('cf-next-step').click();

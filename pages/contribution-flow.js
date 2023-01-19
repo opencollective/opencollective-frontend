@@ -36,7 +36,6 @@ class NewContributionFlowPage extends React.Component {
       // Route parameters
       collectiveSlug: query.eventSlug || query.collectiveSlug,
       tierId: parseInt(query.tierId) || null,
-      verb: query.verb,
       paymentFlow: query.paymentFlow,
       // Query parameters
       error: query.error,
@@ -45,7 +44,6 @@ class NewContributionFlowPage extends React.Component {
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
-    verb: PropTypes.string,
     paymentFlow: PropTypes.string,
     tierId: PropTypes.number,
     error: PropTypes.string,
@@ -121,7 +119,6 @@ class NewContributionFlowPage extends React.Component {
           collective={account}
           host={account.host}
           tier={tier}
-          verb={this.props.verb}
           paymentFlow={paymentFlow}
           error={error}
         />

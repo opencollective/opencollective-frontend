@@ -20,6 +20,7 @@ class InputTypeCountry extends Component {
     name: PropTypes.string,
     /** To force a specific locale */
     locale: PropTypes.string,
+    fontSize: PropTypes.string,
     defaultValue: PropTypes.string,
     /** Use this to control the component state */
     value: PropTypes.string,
@@ -40,7 +41,7 @@ class InputTypeCountry extends Component {
     ),
   };
 
-  static defaultProps = { name: 'country', customOptions: [] };
+  static defaultProps = { name: 'country', customOptions: [], fontSize: '14px' };
 
   constructor(props) {
     super(props);
@@ -62,7 +63,7 @@ class InputTypeCountry extends Component {
     const countryName = this.countryNames.of(countryCode);
     const emoji = getEmojiByCountryCode(countryCode);
     return (
-      <Flex fontSize="14px" lineHeight="20px" fontWeight="500" title={countryName}>
+      <Flex fontSize={this.props.fontSize} lineHeight="20px" fontWeight="500" title={countryName}>
         {emoji && <Span>{emoji}</Span>}
         &nbsp;&nbsp;
         <Span color="black.800">{countryName}</Span>

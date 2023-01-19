@@ -38,7 +38,6 @@ class EmbedContributionFlowPage extends React.Component {
     return {
       // Route parameters
       collectiveSlug: query.eventSlug || query.collectiveSlug,
-      verb: query.verb,
       tierId: parseInt(query.tierId) || null,
       // Query parameters
       error: query.error,
@@ -48,7 +47,6 @@ class EmbedContributionFlowPage extends React.Component {
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
-    verb: PropTypes.string,
     paymentFlow: PropTypes.string,
     tierId: PropTypes.number,
     error: PropTypes.string,
@@ -130,7 +128,6 @@ class EmbedContributionFlowPage extends React.Component {
             collective={account}
             host={account.host}
             tier={tier}
-            verb={this.props.verb}
             error={this.props.error}
           />
         </Box>
