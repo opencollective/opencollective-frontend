@@ -27,6 +27,7 @@ import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import { H5, P, Span } from './Text';
 import { TOAST_TYPE, withToasts } from './ToastProvider';
+import { withUser } from './UserProvider';
 
 const messages = defineMessages({
   twoFactorAuthCodeInputLabel: {
@@ -98,6 +99,7 @@ class SignInOrJoinFree extends React.Component {
         imageUrl: PropTypes.string,
       }),
     }),
+    login: PropTypes.func,
   };
 
   constructor(props) {
@@ -119,7 +121,7 @@ class SignInOrJoinFree extends React.Component {
   componentDidMount() {
     // Auto signin if an email is provided
     if (this.props.email && isEmail(this.props.email)) {
-      this.signIn(this.props.email, false);
+      this.signIn(this.props.email);
     }
   }
 
@@ -145,7 +147,7 @@ class SignInOrJoinFree extends React.Component {
     return encodeURIComponent(redirectUrl || currentPath || '/');
   }
 
-  signIn = async (email, createProfile) => {
+  signIn = async (email, password = null) => {
     if (this.state.submitting) {
       return false;
     }
@@ -154,16 +156,20 @@ class SignInOrJoinFree extends React.Component {
 
     try {
       const response = await signin({
-        user: { email },
+        user: { email, password },
         redirect: this.getRedirectURL(),
         websiteUrl: getWebsiteUrl(),
-        createProfile: createProfile,
       });
 
       // In dev/test, API directly returns a redirect URL for emails like
       // test*@opencollective.com.
       if (response.redirect) {
         await this.props.router.replace(response.redirect);
+      } else if (response.token) {
+        const user = await this.props.login(response.token);
+        if (!user) {
+          this.setState({ error: 'Token rejected' });
+        }
       } else {
         await this.props.router.push({ pathname: '/signin/sent', query: { email } });
       }
@@ -171,6 +177,8 @@ class SignInOrJoinFree extends React.Component {
     } catch (e) {
       if (e.json?.errorCode === 'EMAIL_DOES_NOT_EXIST') {
         this.setState({ unknownEmailError: true, submitting: false });
+      } else if (e.json?.errorCode === 'PASSWORD_REQUIRED') {
+        this.setState({ passwordRequired: true, submitting: false });
       } else {
         this.props.addToast({
           type: TOAST_TYPE.ERROR,
@@ -349,13 +357,13 @@ class SignInOrJoinFree extends React.Component {
   };
 
   render() {
-    const { submitting, error, unknownEmailError, email, useRecoveryCodes } = this.state;
+    const { submitting, error, unknownEmailError, passwordRequired, email, password, useRecoveryCodes } = this.state;
     const displayedForm = this.props.form || this.state.form;
     const routes = this.props.routes || {};
     const { enforceTwoFactorAuthForLoggedInUser } = this.props;
 
     // No need to show the form if an email is provided
-    const hasError = Boolean(unknownEmailError || error);
+    const hasError = Boolean(unknownEmailError || passwordRequired || error);
     if (this.props.email && !hasError) {
       return <Loading />;
     }
@@ -370,6 +378,7 @@ class SignInOrJoinFree extends React.Component {
               <SignIn
                 email={email}
                 onEmailChange={email => this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })}
+                onPasswordChange={password => this.setState({ password })}
                 onSecondaryAction={
                   routes.join ||
                   (() =>
@@ -379,9 +388,10 @@ class SignInOrJoinFree extends React.Component {
                       oAuthAppImage: this.props.oAuthApplication?.account?.imageUrl,
                     }))
                 }
-                onSubmit={email => this.signIn(email, false)}
+                onSubmit={email => this.signIn(email, password)}
                 loading={submitting}
                 unknownEmail={unknownEmailError}
+                passwordRequired={passwordRequired}
                 label={this.props.signInLabel}
                 showSubHeading={this.props.showSubHeading}
                 showOCLogo={this.props.showOCLogo}
@@ -463,4 +473,4 @@ const signupMutation = gqlV1/* GraphQL */ `
 
 export const addSignupMutation = graphql(signupMutation, { name: 'createUser' });
 
-export default withToasts(injectIntl(addSignupMutation(withRouter(SignInOrJoinFree))));
+export default withToasts(injectIntl(addSignupMutation(withUser(withRouter(SignInOrJoinFree)))));

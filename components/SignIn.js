@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
@@ -27,12 +27,16 @@ export default class SignIn extends React.Component {
     showSecondaryAction: PropTypes.bool,
     /** Set this to true to display the unknown email message */
     unknownEmail: PropTypes.bool,
+    /** Set this to true to display the password field */
+    passwordRequired: PropTypes.bool,
     /** Label, defaults to "Continue with your email" */
     label: PropTypes.node,
     /** Set the value of email input */
     email: PropTypes.string.isRequired,
     /** handles changes in the email input */
     onEmailChange: PropTypes.func.isRequired,
+    /** handles changes in the password input */
+    onPasswordChange: PropTypes.func.isRequired,
     /** Oauth Sign In **/
     isOAuth: PropTypes.bool,
     /** Oauth App Name **/
@@ -106,7 +110,7 @@ export default class SignIn extends React.Component {
   }
 
   render() {
-    const { onSubmit, loading, email, onEmailChange, label } = this.props;
+    const { onSubmit, loading, email, onEmailChange, onPasswordChange, label } = this.props;
     const { error, showError } = this.state;
     return (
       <React.Fragment>
@@ -150,9 +154,6 @@ export default class SignIn extends React.Component {
           )}
           {!this.state.unknownEmail ? (
             <React.Fragment>
-              <Container fontWeight={600} fontSize="13px" alignItems="left" mb="4px" width="100%">
-                <FormattedMessage id="Form.yourEmail" defaultMessage="Your email address" />
-              </Container>
               <Container
                 as="form"
                 method="POST"
@@ -167,6 +168,9 @@ export default class SignIn extends React.Component {
                   this.setState({ unknownEmail: this.props.unknownEmail });
                 }}
               >
+                <Container fontWeight={600} fontSize="13px" alignItems="left" mb="4px" width="100%">
+                  <FormattedMessage id="Form.yourEmail" defaultMessage="Your email address" />
+                </Container>
                 <StyledInput
                   error={!!error}
                   fontSize="14px"
@@ -198,6 +202,41 @@ export default class SignIn extends React.Component {
                   type="email"
                   width={1}
                 />
+                {this.props.passwordRequired && (
+                  <Fragment>
+                    <Container fontWeight={600} fontSize="13px" alignItems="left" mb="4px" width="100%">
+                      <FormattedMessage id="Form.yourEmail" defaultMessage="Your password" />
+                    </Container>
+                    <StyledInput
+                      fontSize="14px"
+                      id="password"
+                      name="password"
+                      type="password"
+                      required
+                      width={1}
+                      autoFocus
+                      onChange={({ target }) => {
+                        target.value = target.value.trim();
+                        onPasswordChange(target.value);
+                        this.setState({ error: target.validationMessage, showError: false });
+                      }}
+                      onKeyDown={e => {
+                        // See https://github.com/facebook/react/issues/6368
+                        if (e.key === ' ') {
+                          e.preventDefault();
+                        } else if (e.key === 'Enter') {
+                          onPasswordChange(e.target.value);
+                          this.setState({ error: e.target.validationMessage, showError: true });
+                        }
+                      }}
+                      onBlur={() => this.setState({ showError: true })}
+                      onInvalid={event => {
+                        event.preventDefault();
+                        this.setState({ error: event.target.validationMessage });
+                      }}
+                    />
+                  </Fragment>
+                )}
                 {error && showError && (
                   <Span display="block" color="red.500" pt={2} fontSize="10px" lineHeight="14px" aria-live="assertive">
                     {error}
