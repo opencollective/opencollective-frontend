@@ -1115,7 +1115,7 @@ type Expense {
     """
     Source of the currency to express the amount. Defaults to the expense currency
     """
-    currencySource: ExpenseCurrencySource
+    currencySource: ExpenseCurrencySource = EXPENSE
   ): Amount
 
   """
@@ -2359,6 +2359,11 @@ type Activity {
   The order related to this activity, if any
   """
   order: Order
+
+  """
+  The transaction related to this activity, if any
+  """
+  transaction: Transaction
 
   """
   Data attached to this activity (if any)
@@ -9673,6 +9678,11 @@ type Query {
     Return tags from collectives which includes this search term
     """
     searchTerm: String
+
+    """
+    Return tags which includes this search term
+    """
+    tagSearchTerm: String
     limit: Int! = 10
     offset: Int! = 0
   ): TagStatsCollection!

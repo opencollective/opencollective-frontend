@@ -9,10 +9,12 @@ import styled from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective.lib';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
+import withData from '../../lib/withData';
 
 import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';
+import CollectiveTagsInput from '../CollectiveTagsInput';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -24,7 +26,6 @@ import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
-import StyledInputTags from '../StyledInputTags';
 import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { H1, P } from '../Text';
@@ -83,7 +84,6 @@ class CreateCollectiveForm extends React.Component {
     intl: PropTypes.object.isRequired,
     onChange: PropTypes.func,
     router: PropTypes.object.isRequired,
-    popularTags: PropTypes.arrayOf(PropTypes.string),
     loggedInUser: PropTypes.object,
   };
 
@@ -96,7 +96,7 @@ class CreateCollectiveForm extends React.Component {
   }
 
   render() {
-    const { intl, error, host, loading, popularTags, loggedInUser } = this.props;
+    const { intl, error, host, loading, loggedInUser } = this.props;
     const hasHostTerms = this.hasHostTerms();
 
     const initialValues = {
@@ -363,9 +363,8 @@ class CreateCollectiveForm extends React.Component {
                         data-cy="ccf-form-tags"
                       >
                         {({ field }) => (
-                          <StyledInputTags
+                          <CollectiveTagsInput
                             {...field}
-                            suggestedTags={popularTags}
                             onChange={tags => {
                               formik.setFieldValue(
                                 'tags',
@@ -483,4 +482,4 @@ class CreateCollectiveForm extends React.Component {
   }
 }
 
-export default injectIntl(withRouter(CreateCollectiveForm));
+export default injectIntl(withData(withRouter(CreateCollectiveForm)));

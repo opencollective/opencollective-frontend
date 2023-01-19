@@ -32,7 +32,6 @@ const EditTag = styled(StyledTag).attrs({
   color: ${props => props.theme.colors.black[700]};
   margin-right: 4px;
   margin-bottom: 4px;
-
   &:not([disabled]) {
     &:hover,
     &:focus {
@@ -43,16 +42,13 @@ const EditTag = styled(StyledTag).attrs({
       }
     }
   }
-
   &:focus {
     outline: 0;
   }
-
   &[disabled] {
     cursor: not-allowed;
     background: #f0f1f2;
   }
-
   ${props =>
     props.active &&
     css`
