@@ -31,11 +31,12 @@ describe('event.createOrder page', () => {
 
     // Create Ticket
     cy.contains('a', 'Create Ticket').click();
-    cy.get('.addTier').click();
-    cy.get('.EditTiers input[name="name"]').type('Free Ticket');
-    cy.get('.EditTiers input[name="amount"]').type('0');
-    cy.contains('button', 'Save').click();
-    cy.contains('a', 'View profile page').click();
+    cy.get('[data-cy="admin-panel-container"] [data-cy="create-contribute-tier"]').click();
+    cy.get('[data-cy=name]').type('Free ticket');
+    cy.get('input[data-cy=amount]').type('0');
+    cy.getByDataCy('confirm-btn').click();
+    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.getByDataCy('menu-account-avatar-link').click();
 
     // Go to the contribution flow
     cy.contains('button', 'RSVP').click();
@@ -55,11 +56,12 @@ describe('event.createOrder page', () => {
 
     // Create Ticket
     cy.contains('a', 'Create Ticket').click();
-    cy.get('.addTier').click();
-    cy.get('.EditTiers input[name="name"]').type('Paying Ticket');
-    cy.get('.EditTiers input[name="amount"]').type('10');
-    cy.contains('button', 'Save').click();
-    cy.contains('a', 'View profile page').click();
+    cy.get('[data-cy="admin-panel-container"] [data-cy="create-contribute-tier"]').click();
+    cy.get('[data-cy=name]').type('Paying Ticket');
+    cy.get('input[data-cy=amount]').type('10');
+    cy.getByDataCy('confirm-btn').click();
+    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.getByDataCy('menu-account-avatar-link').click();
 
     // Go to the contribution flow
     cy.contains('button', 'RSVP').click();
@@ -84,13 +86,15 @@ describe('event.createOrder page', () => {
 
     // Create Ticket
     cy.contains('a', 'Create Ticket').click();
-    cy.get('.addTier').click();
-    cy.get('.EditTiers input[name="name"]').type('Flexible Paying Ticket');
-    cy.get('[data-cy="amountType"]').click();
-    cy.contains('[data-cy="select-option"]', 'Flexible amount').click();
-    cy.get('.EditTiers input[name="amount"]').type('10');
-    cy.contains('button', 'Save').click();
-    cy.contains('a', 'View profile page').click();
+    cy.get('[data-cy="admin-panel-container"] [data-cy="create-contribute-tier"]').click();
+    cy.get('[data-cy=name]').type('Flexible Paying Ticket');
+    cy.get('[data-cy=amountType]').click();
+    cy.contains('[data-cy=select-option]', 'Flexible').click();
+    cy.get('input[data-cy=amount]').type('10');
+    cy.get('input[data-cy=minimumAmount]').type('5');
+    cy.getByDataCy('confirm-btn').click();
+    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.getByDataCy('menu-account-avatar-link').click();
 
     // Go to the contribution flow
     cy.contains('button', 'RSVP').click();
@@ -122,13 +126,14 @@ describe('event.createOrder page', () => {
     createEvent('Test Event with VAT');
 
     cy.contains('a', 'Create Ticket').click();
-    cy.get('.addTier').click();
 
     // Create tickets
-    cy.get('.EditTiers input[name="name"]').type('Ticket with VAT');
-    cy.get('.EditTiers input[name="amount"]').type('10');
-    cy.contains('button', 'Save').click();
-    cy.contains('a', 'View profile page').click();
+    cy.get('[data-cy="admin-panel-container"] [data-cy="create-contribute-tier"]').click();
+    cy.get('[data-cy=name]').type('Ticket with VAT');
+    cy.get('input[data-cy=amount]').type('10');
+    cy.getByDataCy('confirm-btn').click();
+    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.getByDataCy('menu-account-avatar-link').click();
 
     // Go to the contribution flow
     cy.contains('button', 'RSVP').click();
