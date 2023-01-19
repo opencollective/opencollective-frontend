@@ -53,7 +53,7 @@ import Security from './sections/Security';
 import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
-import TiersRevamp from './sections/TiersRevamp';
+import TiersLegacy from './sections/TiersLegacy';
 import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
 import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
@@ -426,9 +426,9 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS:
         return <PaymentMethods collectiveSlug={collective.slug} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.TIERS:
+      case EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY:
         return (
-          <Tiers
+          <TiersLegacy
             title="Tiers"
             types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
             tiers={this.state.tiers}
@@ -439,8 +439,8 @@ class EditCollectiveForm extends React.Component {
           />
         );
 
-      case EDIT_COLLECTIVE_SECTIONS.TIERS_REVAMP:
-        return <TiersRevamp collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
+      case EDIT_COLLECTIVE_SECTIONS.TIERS:
+        return <Tiers collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
 
       case EDIT_COLLECTIVE_SECTIONS.TICKETS:
         return (
@@ -904,11 +904,11 @@ class EditCollectiveForm extends React.Component {
               </div>
             )}
 
-            {[EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
+            {[EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
               this.renderSection(section)}
 
             {((fields && fields.length > 0) ||
-              [EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section)) && (
+              [EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section)) && (
               <Container className="actions" margin="5rem auto 1rem" textAlign="center">
                 <StyledButton
                   buttonStyle="primary"
@@ -939,7 +939,7 @@ class EditCollectiveForm extends React.Component {
               </Container>
             )}
 
-            {![EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
+            {![EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
               this.renderSection(section)}
           </Flex>
         </Flex>

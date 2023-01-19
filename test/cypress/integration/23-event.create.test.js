@@ -61,15 +61,15 @@ describe('event.create.test.js', () => {
     cy.get('.actions > [data-cy="collective-save"]').contains('Saved');
     // edit event tiers
     cy.getByDataCy('menu-item-tiers').click();
-    cy.get('.addTier').click();
-    cy.get('.EditTiers .tier .inputField.name input').type('Sponsor');
-    cy.get('.EditTiers .tier .inputField.description textarea').type('Become a sponsor');
-    cy.get('.EditTiers .tier .inputField.amount input').type(200);
-    cy.wait(400);
-    cy.get('.actions > [data-cy="collective-save"]').click();
-    cy.get('.actions > [data-cy="collective-save"]').contains('Saved');
+    cy.getByDataCy('create-contribute-tier').click();
+    cy.get('[data-cy=name]').type('Sponsor');
+    cy.get('[data-cy=description]').type('Become a sponsor');
+    cy.get('input[data-cy=amount]').type('200');
+    cy.getByDataCy('confirm-btn').click();
+    cy.checkToast({ type: 'SUCCESS', message: 'Tier created.' });
+    cy.wait(2000);
     // verify update
-    cy.contains('a', 'View profile page').click();
+    cy.getByDataCy('menu-account-avatar-link').click();
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 1);
     cy.wait(100);
     cy.get('[data-cy="financial-contributions"] [data-cy=contribute-card-tier]').should('have.length', 1);

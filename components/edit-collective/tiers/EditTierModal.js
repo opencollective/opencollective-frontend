@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
-import { omit } from 'lodash';
+import { isNil, omit } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { getLegacyIdForCollective } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
+import INTERVALS, { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { requireFields } from '../../../lib/form-utils';
@@ -86,10 +87,10 @@ function FormFields({ collective, types, values }) {
 
   const tierTypeOptions = getTierTypeOptions(intl, collective.type);
   const intervalOptions = [
+    { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
     { value: 'onetime', label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) },
     { value: 'month', label: intl.formatMessage({ id: 'Frequency.Monthly', defaultMessage: 'Monthly' }) },
     { value: 'year', label: intl.formatMessage({ id: 'Frequency.Yearly', defaultMessage: 'Yearly' }) },
-    { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
   ];
 
   const amountTypeOptions = [
@@ -131,7 +132,7 @@ function FormFields({ collective, types, values }) {
             {({ field, form, loading }) => (
               <StyledSelect
                 inputId={field.name}
-                data-cy={field.name}
+                data-cy={`select-${field.name}`}
                 error={field.error}
                 onBlur={() => form.setFieldTouched(field.name, true)}
                 onChange={({ value }) => form.setFieldValue(field.name, value)}
@@ -181,18 +182,15 @@ function FormFields({ collective, types, values }) {
       {[DONATION, MEMBERSHIP, TIER, SERVICE].includes(values.type) && (
         <StyledInputFormikField
           name="interval"
-          label={intl.formatMessage({
-            id: 'tier.interval.label',
-            defaultMessage: 'Interval',
-          })}
+          label={intl.formatMessage({ id: 'tier.interval.label', defaultMessage: 'Interval' })}
           labelFontWeight="bold"
           mt="3"
-          required={false}
+          required
         >
           {({ field, form, loading }) => (
             <StyledSelect
               inputId={field.name}
-              data-cy={field.name}
+              data-cy={`select-${field.name}`}
               error={field.error}
               onBlur={() => form.setFieldTouched(field.name, true)}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
@@ -311,7 +309,7 @@ function FormFields({ collective, types, values }) {
           label={intl.formatMessage({ id: 'tier.minimumAmount.label', defaultMessage: 'Minimum amount' })}
           labelFontWeight="bold"
           mt="3"
-          required={false}
+          required
         >
           {({ field, form }) => (
             <StyledInputAmount
@@ -326,7 +324,9 @@ function FormFields({ collective, types, values }) {
               onChange={value =>
                 form.setFieldValue(
                   field.name,
-                  value ? { currency: field.value?.currency ?? collective.currency, valueInCents: value } : null,
+                  !isNil(value) && !isNaN(value)
+                    ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                    : null,
                 )
               }
               onBlur={() => form.setFieldTouched(field.name, true)}
@@ -632,7 +632,44 @@ ContributeCardPreview.propTypes = {
   collective: PropTypes.object,
 };
 
-const listTierQuery = gql`
+export const editTiersFieldsFragment = gql`
+  fragment EditTiersFields on Tier {
+    id
+    legacyId
+    amount {
+      value
+      valueInCents
+      currency
+    }
+    amountType
+    availableQuantity
+    button
+    customFields
+    description
+    endsAt
+    frequency
+    goal {
+      value
+      valueInCents
+      currency
+    }
+    interval
+    invoiceTemplate
+    maxQuantity
+    minimumAmount {
+      value
+      valueInCents
+      currency
+    }
+    name
+    presets
+    slug
+    type
+    useStandalonePage
+  }
+`;
+
+export const listTierQuery = gql`
   query AccountTiers($accountSlug: String!) {
     account(slug: $accountSlug) {
       id
@@ -640,113 +677,41 @@ const listTierQuery = gql`
         tiers {
           nodes {
             id
-            legacyId
-            name
-            slug
-            description
-            interval
-            frequency
-            amount {
-              valueInCents
-              currency
-            }
-            minimumAmount {
-              valueInCents
-              currency
-            }
-            goal {
-              valueInCents
-              currency
-            }
-            amountType
-            endsAt
-            type
-            maxQuantity
-            presets
-            button
-            useStandalonePage
+            ...EditTiersFields
+          }
+        }
+      }
+      ... on Organization {
+        tiers {
+          nodes {
+            id
+            ...EditTiersFields
           }
         }
       }
     }
   }
+  ${editTiersFieldsFragment}
 `;
 
 const editTierMutation = gql`
   mutation EditTier($tier: TierUpdateInput!) {
     editTier(tier: $tier) {
       id
-      legacyId
-      slug
-      name
-      description
-      amount {
-        value
-        currency
-        valueInCents
-      }
-      button
-      goal {
-        value
-        currency
-        valueInCents
-      }
-      type
-      interval
-      frequency
-      presets
-      maxQuantity
-      availableQuantity
-      customFields
-      amountType
-      minimumAmount {
-        value
-        currency
-        valueInCents
-      }
-      endsAt
-      invoiceTemplate
-      useStandalonePage
+      ...EditTiersFields
     }
   }
+  ${editTiersFieldsFragment}
 `;
 
 const createTierMutation = gql`
   mutation CreateTier($tier: TierCreateInput!, $account: AccountReferenceInput!) {
     createTier(tier: $tier, account: $account) {
       id
-      legacyId
-      slug
-      name
-      description
-      amount {
-        value
-        currency
-        valueInCents
-      }
-      button
-      goal {
-        value
-        currency
-        valueInCents
-      }
-      type
-      interval
-      presets
-      maxQuantity
-      availableQuantity
-      customFields
-      amountType
-      minimumAmount {
-        value
-        currency
-        valueInCents
-      }
-      endsAt
-      invoiceTemplate
-      useStandalonePage
+      ...EditTiersFields
     }
   }
+  ${editTiersFieldsFragment}
 `;
 
 const deleteTierMutation = gql`
@@ -763,13 +728,39 @@ const i18nMessages = defineMessages({
   DELETE_SUCCESS: { id: 'EditTier.Delete.Success', defaultMessage: 'Tier deleted.' },
 });
 
+const getRequiredFields = values => {
+  const fields = ['name', 'type', 'amountType'];
+
+  // Depending on type
+  if (values.type !== 'PRODUCT') {
+    fields.push('interval');
+  }
+
+  // Depending on amount type
+  if (values.amountType === 'FIXED') {
+    fields.push('amount');
+  } else if (values.amountType === 'FLEXIBLE') {
+    fields.push('minimumAmount');
+  }
+
+  return fields;
+};
+
 export function EditTierForm({ tier, collective, onClose }) {
   const intl = useIntl();
   const isEditing = React.useMemo(() => !!tier?.id);
   const initialValues = React.useMemo(() => {
     if (isEditing) {
       return {
-        ...omit(tier, ['__typename', 'endsAt', 'slug', 'legacyId']),
+        ...omit(tier, [
+          '__typename',
+          'endsAt',
+          'slug',
+          'legacyId',
+          'invoiceTemplate',
+          'customFields',
+          'availableQuantity',
+        ]),
         amount: omit(tier.amount, '__typename'),
         goal: omit(tier.goal, '__typename'),
         minimumAmount: omit(tier.minimumAmount, '__typename'),
@@ -779,10 +770,11 @@ export function EditTierForm({ tier, collective, onClose }) {
     } else {
       return {
         name: '',
-        type: null,
-        amountType: null,
+        type: TierTypes.TIER,
+        amountType: AmountTypes.FIXED,
         amount: null,
-        interval: null,
+        minimumAmount: null,
+        interval: INTERVALS.month,
         description: '',
         presets: [1000],
       };
@@ -808,26 +800,22 @@ export function EditTierForm({ tier, collective, onClose }) {
       },
     ],
     awaitRefetchQueries: true,
+    update: cache => {
+      // Invalidate the cache for the collective page query to make sure we'll fetch the latest data next time we visit
+      const __typename = collective.type === CollectiveType.EVENT ? 'Event' : 'Collective';
+      const cachedCollective = cache.identify({ __typename, id: getLegacyIdForCollective(collective) });
+      if (cachedCollective) {
+        cache.modify({
+          id: cachedCollective,
+          fields: {
+            tiers: (_, { DELETE }) => DELETE,
+          },
+        });
+      }
+    },
   });
 
-  const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation, {
-    context: API_V2_CONTEXT,
-    variables: {
-      tier: {
-        id: tier?.id,
-      },
-    },
-    refetchQueries: [
-      {
-        query: listTierQuery,
-        context: API_V2_CONTEXT,
-        variables: {
-          accountSlug: collective.slug,
-        },
-      },
-    ],
-    awaitRefetchQueries: true,
-  });
+  const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation, { context: API_V2_CONTEXT });
 
   const [isConfirmingDelete, setIsConfirmingDelete] = React.useState(false);
   const { addToast } = useToasts();
@@ -841,7 +829,13 @@ export function EditTierForm({ tier, collective, onClose }) {
       try {
         await deleteTier({
           variables: {
+            tier: { id: tier.id },
             stopRecurringContributions: !keepRecurringContributions,
+          },
+          update: cache => {
+            cache.evict({ id: cache.identify(tier) }); // Evict from GraphQL V1
+            cache.evict({ id: cache.identify({ __typename: 'Tier', id: tier.legacyId }) }); // Evict from GraphQL V2
+            cache.gc();
           },
         });
         onClose();
@@ -862,15 +856,15 @@ export function EditTierForm({ tier, collective, onClose }) {
     <React.Fragment>
       <Formik
         initialValues={initialValues}
-        validate={values => requireFields(values, ['name', 'type', 'amountType', 'amount'])}
+        validate={values => requireFields(values, getRequiredFields(values))}
         onSubmit={async values => {
           const tier = {
-            ...omit(values, 'interval'),
+            ...omit(values, ['interval']),
             frequency: getGQLV2FrequencyFromInterval(values.interval),
             maxQuantity: parseInt(values.maxQuantity),
             goal: values?.goal?.valueInCents ? values.goal : null,
             amount: values?.amount?.valueInCents ? values.amount : null,
-            minimumAmount: values?.minimumAmount?.valueInCents ? values.minimumAmount : null,
+            minimumAmount: !isNil(values?.minimumAmount?.valueInCents) ? values.minimumAmount : null,
           };
 
           try {
@@ -891,7 +885,7 @@ export function EditTierForm({ tier, collective, onClose }) {
       >
         {({ values, isSubmitting }) => {
           return (
-            <Form>
+            <Form data-cy="edit-tier-modal-form">
               <ModalHeader onClose={onClose} hideCloseIcon>
                 {isEditing ? (
                   <FormattedMessage id="modal.edit-tier.title" defaultMessage="Edit Tier" />
