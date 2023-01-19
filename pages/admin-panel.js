@@ -207,6 +207,7 @@ const AdminPanelPage = () => {
             m="0 auto"
             px={3}
             py={4}
+            data-cy="admin-panel-container"
           >
             <AdminPanelSideBar
               isLoading={isLoading}

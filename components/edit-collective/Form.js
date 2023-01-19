@@ -288,6 +288,7 @@ class EditCollectiveForm extends React.Component {
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
     collective.tos = get(collective, 'settings.tos');
 
+    // TODO Remove this once tier legacy is removed
     const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
     const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
 
@@ -443,15 +444,7 @@ class EditCollectiveForm extends React.Component {
         return <Tiers collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
 
       case EDIT_COLLECTIVE_SECTIONS.TICKETS:
-        return (
-          <Tickets
-            title="Tickets"
-            tiers={this.state.tickets}
-            collective={collective}
-            currency={collective.currency}
-            onChange={tickets => this.setState({ tickets, modified: true })}
-          />
-        );
+        return <Tickets collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS:
         return <GiftCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
@@ -904,11 +897,9 @@ class EditCollectiveForm extends React.Component {
               </div>
             )}
 
-            {[EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
-              this.renderSection(section)}
+            {[EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY].includes(section) && this.renderSection(section)}
 
-            {((fields && fields.length > 0) ||
-              [EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section)) && (
+            {((fields && fields.length > 0) || [EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY].includes(section)) && (
               <Container className="actions" margin="5rem auto 1rem" textAlign="center">
                 <StyledButton
                   buttonStyle="primary"
@@ -939,8 +930,7 @@ class EditCollectiveForm extends React.Component {
               </Container>
             )}
 
-            {![EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
-              this.renderSection(section)}
+            {![EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY].includes(section) && this.renderSection(section)}
           </Flex>
         </Flex>
       </div>

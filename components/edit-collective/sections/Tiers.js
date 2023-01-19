@@ -92,8 +92,9 @@ const CardsContainer = styled(Grid).attrs({
  */
 const Tiers = ({ collective }) => {
   const variables = { accountSlug: collective.slug };
-  const { data, loading, error } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
+  const { data, loading, error, refetch } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
   const tiers = sortBy(get(data, 'account.tiers.nodes', []), 'legacyId');
+  const filteredTiers = collective.type === 'EVENT' ? tiers.filter(tier => tier.type !== 'TICKET') : tiers; // Events have their tickets displayed in the "Tickets" section
   const intl = useIntl();
 
   return (
@@ -167,10 +168,11 @@ const Tiers = ({ collective }) => {
             </Box>
             <AdminContributeCardsContainer
               collective={collective}
-              cards={getFinancialContributions(collective, tiers)}
+              cards={getFinancialContributions(collective, filteredTiers)}
               CardsContainer={CardsContainer}
               useTierModals
               enableReordering={false}
+              onTierUpdate={() => refetch()}
             />
           </div>
         )}
@@ -182,6 +184,7 @@ const Tiers = ({ collective }) => {
 Tiers.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
     id: PropTypes.number.isRequired,
   }).isRequired,
 };

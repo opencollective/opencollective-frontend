@@ -4,7 +4,7 @@ import { gql, useMutation } from '@apollo/client';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
 import { isNil, omit } from 'lodash';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getLegacyIdForCollective } from '../../../lib/collective.lib';
@@ -82,7 +82,7 @@ function getReceiptTemplates(host) {
   return receiptTemplateTitles;
 }
 
-function FormFields({ collective, types, values }) {
+function FormFields({ collective, values, hideTypeSelect }) {
   const intl = useIntl();
 
   const tierTypeOptions = getTierTypeOptions(intl, collective.type);
@@ -121,7 +121,7 @@ function FormFields({ collective, types, values }) {
 
   return (
     <React.Fragment>
-      {(![FUND].includes(collective.type) || types?.length === 1) && (
+      {collective.type !== FUND && !hideTypeSelect && (
         <React.Fragment>
           <StyledInputFormikField
             name="type"
@@ -245,7 +245,9 @@ function FormFields({ collective, types, values }) {
               onChange={value =>
                 form.setFieldValue(
                   field.name,
-                  value ? { currency: field.value?.currency ?? collective.currency, valueInCents: value } : null,
+                  !isNil(value) && !isNaN(value)
+                    ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                    : null,
                 )
               }
               onBlur={() => form.setFieldTouched(field.name, true)}
@@ -394,7 +396,9 @@ function FormFields({ collective, types, values }) {
             onChange={value =>
               form.setFieldValue(
                 field.name,
-                value ? { currency: field.value?.currency ?? collective.currency, valueInCents: value } : null,
+                !isNil(value) && !isNaN(value)
+                  ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                  : null,
               )
             }
             onBlur={() => form.setFieldTouched(field.name, true)}
@@ -507,7 +511,7 @@ FormFields.propTypes = {
     amountType: PropTypes.string,
     interval: PropTypes.string,
   }),
-  types: PropTypes.array,
+  hideTypeSelect: PropTypes.bool,
 };
 
 const EditSectionContainer = styled(Flex)`
@@ -590,10 +594,10 @@ const ContributeCardPreviewContainer = styled.div`
   }
 `;
 
-export default function EditTierModal({ tier, collective, onClose }) {
+export default function EditTierModal({ tier, collective, onClose, onUpdate, forcedType }) {
   return (
     <ModalContainer onClose={onClose} ignoreEscapeKey>
-      <EditTierForm tier={tier} collective={collective} onClose={onClose} />
+      <EditTierForm tier={tier} collective={collective} onClose={onClose} forcedType={forcedType} onUpdate={onUpdate} />
     </ModalContainer>
   );
 }
@@ -602,6 +606,8 @@ EditTierModal.propTypes = {
   tier: PropTypes.object,
   collective: PropTypes.object,
   onClose: PropTypes.func,
+  onUpdate: PropTypes.func,
+  forcedType: PropTypes.string,
 };
 
 export function ContributeCardPreview({ tier, collective }) {
@@ -722,12 +728,6 @@ const deleteTierMutation = gql`
   }
 `;
 
-const i18nMessages = defineMessages({
-  EDIT_SUCCESS: { id: 'EditTier.Edit.Success', defaultMessage: 'Tier updated.' },
-  CREATE_SUCCESS: { id: 'EditTier.Create.Success', defaultMessage: 'Tier created.' },
-  DELETE_SUCCESS: { id: 'EditTier.Delete.Success', defaultMessage: 'Tier deleted.' },
-});
-
 const getRequiredFields = values => {
   const fields = ['name', 'type', 'amountType'];
 
@@ -746,7 +746,7 @@ const getRequiredFields = values => {
   return fields;
 };
 
-export function EditTierForm({ tier, collective, onClose }) {
+export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
   const intl = useIntl();
   const isEditing = React.useMemo(() => !!tier?.id);
   const initialValues = React.useMemo(() => {
@@ -770,7 +770,7 @@ export function EditTierForm({ tier, collective, onClose }) {
     } else {
       return {
         name: '',
-        type: TierTypes.TIER,
+        type: forcedType || TierTypes.TIER,
         amountType: AmountTypes.FIXED,
         amount: null,
         minimumAmount: null,
@@ -785,21 +785,6 @@ export function EditTierForm({ tier, collective, onClose }) {
 
   const [submitFormMutation] = useMutation(formMutation, {
     context: API_V2_CONTEXT,
-    variables: {
-      account: {
-        legacyId: collective.id,
-      },
-    },
-    refetchQueries: [
-      {
-        query: listTierQuery,
-        context: API_V2_CONTEXT,
-        variables: {
-          accountSlug: collective.slug,
-        },
-      },
-    ],
-    awaitRefetchQueries: true,
     update: cache => {
       // Invalidate the cache for the collective page query to make sure we'll fetch the latest data next time we visit
       const __typename = collective.type === CollectiveType.EVENT ? 'Event' : 'Collective';
@@ -841,7 +826,10 @@ export function EditTierForm({ tier, collective, onClose }) {
         onClose();
         addToast({
           type: TOAST_TYPE.SUCCESS,
-          message: intl.formatMessage(i18nMessages['DELETE_SUCCESS']),
+          message: intl.formatMessage(
+            { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} deleted.' },
+            { type: tier.type },
+          ),
         });
       } catch (e) {
         addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e.message) });
@@ -862,20 +850,25 @@ export function EditTierForm({ tier, collective, onClose }) {
             ...omit(values, ['interval']),
             frequency: getGQLV2FrequencyFromInterval(values.interval),
             maxQuantity: parseInt(values.maxQuantity),
-            goal: values?.goal?.valueInCents ? values.goal : null,
-            amount: values?.amount?.valueInCents ? values.amount : null,
+            goal: !isNil(values?.goal?.valueInCents) ? values.goal : null,
+            amount: !isNil(values?.amount?.valueInCents) ? values.amount : null,
             minimumAmount: !isNil(values?.minimumAmount?.valueInCents) ? values.minimumAmount : null,
           };
 
           try {
-            await submitFormMutation({
-              variables: {
-                tier,
-              },
-            });
+            const result = await submitFormMutation({ variables: { tier, account: { legacyId: collective.id } } });
+            onUpdate?.(result);
             addToast({
               type: TOAST_TYPE.SUCCESS,
-              message: intl.formatMessage(i18nMessages[isEditing ? 'EDIT_SUCCESS' : 'CREATE_SUCCESS']),
+              message: isEditing
+                ? intl.formatMessage(
+                    { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} updated.' },
+                    { type: values.type },
+                  )
+                : intl.formatMessage(
+                    { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} created.' },
+                    { type: values.type },
+                  ),
             });
             onClose();
           } catch (e) {
@@ -888,15 +881,21 @@ export function EditTierForm({ tier, collective, onClose }) {
             <Form data-cy="edit-tier-modal-form">
               <ModalHeader onClose={onClose} hideCloseIcon>
                 {isEditing ? (
-                  <FormattedMessage id="modal.edit-tier.title" defaultMessage="Edit Tier" />
+                  <FormattedMessage
+                    defaultMessage="Edit {type, select, TICKET {Ticket} other {Tier}}"
+                    values={{ type: tier.type }}
+                  />
                 ) : (
-                  <FormattedMessage id="modal.create-tier.title" defaultMessage="Create Tier" />
+                  <FormattedMessage
+                    defaultMessage="Create {type, select, TICKET {Ticket} other {Tier}}"
+                    values={{ type: forcedType }}
+                  />
                 )}
               </ModalHeader>
               <ModalBody>
                 <ModalSectionContainer>
                   <EditSectionContainer>
-                    <FormFields collective={collective} values={values} />
+                    <FormFields collective={collective} values={values} hideTypeSelect={Boolean(forcedType)} />
                   </EditSectionContainer>
                   <PreviewSectionContainer>
                     <ContributeCardPreview collective={collective} tier={values} />
@@ -950,6 +949,7 @@ export function EditTierForm({ tier, collective, onClose }) {
       </Formik>
       {isConfirmingDelete && (
         <ConfirmTierDeleteModal
+          tier={tier}
           isDeleting={isDeleting}
           onClose={() => setIsConfirmingDelete(false)}
           onConfirmDelete={onConfirmDelete}
@@ -963,4 +963,6 @@ EditTierForm.propTypes = {
   collective: PropTypes.object,
   tier: PropTypes.object,
   onClose: PropTypes.func,
+  onUpdate: PropTypes.func,
+  forcedType: PropTypes.string,
 };

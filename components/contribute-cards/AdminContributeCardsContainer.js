@@ -25,12 +25,20 @@ const AdminContributeCardsContainer = ({
   CardsContainer,
   useTierModals,
   enableReordering,
+  createNewType,
+  onTierUpdate,
 }) => {
   const [showCreateModal, setShowCreateModal] = React.useState(false);
   const isEvent = collective.type === CollectiveType.EVENT;
   const createContributionTierRoute = isEvent
     ? `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/admin/tiers`
     : `/${collective.slug}/admin/tiers`;
+  const addNewMessage =
+    createNewType === 'TICKET' ? (
+      <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
+    ) : (
+      <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
+    );
 
   React.useEffect(() => {
     if (onMount) {
@@ -60,16 +68,21 @@ const AdminContributeCardsContainer = ({
         <ContributeCardContainer>
           {useTierModals ? (
             <CreateNew as="div" data-cy="create-contribute-tier" onClick={() => setShowCreateModal(true)}>
-              <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
+              {addNewMessage}
             </CreateNew>
           ) : (
             <CreateNew data-cy="create-contribute-tier" route={createContributionTierRoute}>
-              <FormattedMessage id="Contribute.CreateTier" defaultMessage="Create Contribution Tier" />
+              {addNewMessage}
             </CreateNew>
           )}
         </ContributeCardContainer>
         {showCreateModal && (
-          <EditTierModal collective={collective} onClose={() => setShowCreateModal(false)}></EditTierModal>
+          <EditTierModal
+            collective={collective}
+            onClose={() => setShowCreateModal(false)}
+            forcedType={createNewType}
+            onUpdate={onTierUpdate}
+          />
         )}
       </CardsContainer>
     </DndProvider>
@@ -94,7 +107,9 @@ AdminContributeCardsContainer.propTypes = {
   onContributionCardDrop: PropTypes.func,
   onMount: PropTypes.func,
   CardsContainer: PropTypes.node,
+  createNewType: PropTypes.string,
   enableReordering: PropTypes.bool,
+  onTierUpdate: PropTypes.func,
 };
 
 AdminContributeCardsContainer.defaultProps = {
