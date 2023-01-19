@@ -64,6 +64,7 @@ export function PayWithStripeForm({
     <React.Fragment>
       <PaymentElement
         options={{
+          paymentMethodOrder: ['card', 'apple_pay', 'google_pay'],
           defaultValues: {
             billingDetails: {
               name: bilingDetails?.name,

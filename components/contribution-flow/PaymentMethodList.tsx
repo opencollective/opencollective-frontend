@@ -1,15 +1,17 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { Elements } from '@stripe/react-stripe-js';
+import { StripeElementsOptions } from '@stripe/stripe-js';
 import { themeGet } from '@styled-system/theme-get';
 import { get, isEmpty, pick } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { Account, Host, Individual, PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getStripe } from '../../lib/stripe';
+import usePaymentIntent from '../../lib/stripe/usePaymentIntent';
 
 import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
@@ -21,17 +23,6 @@ import { P } from '../Text';
 
 import { PayWithStripeForm } from './PayWithStripe';
 import { generatePaymentMethodOptions, NEW_CREDIT_CARD_KEY, STRIPE_PAYMENT_ELEMENT_KEY } from './utils';
-
-const createPaymentIntentMutation = gql`
-  mutation CreatePaymentIntent($paymentIntent: PaymentIntentInput!) {
-    createPaymentIntent(paymentIntent: $paymentIntent) {
-      id
-      paymentIntentClientSecret
-      stripeAccount
-      stripeAccountPublishableSecret
-    }
-  }
-`;
 
 const paymentMethodsQuery = gql`
   query ContributionFlowPaymentMethods($slug: String) {
@@ -115,6 +106,7 @@ type PaymentMethodListProps = {
 };
 
 export default function PaymentMethodList(props: PaymentMethodListProps) {
+  const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
 
   const {
@@ -128,46 +120,17 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     fetchPolicy: 'no-cache',
   });
 
-  const [createPaymentIntent, { data: paymentIntentData, loading: loadingPaymentIntent, error: paymentIntentError }] =
-    useMutation(createPaymentIntentMutation, {
-      context: API_V2_CONTEXT,
-      variables: {
-        paymentIntent: {
-          amount: { valueInCents: props.stepDetails.amount, currency: props.stepDetails.currency },
-          fromAccount: props.fromAccount.isGuest
-            ? undefined
-            : typeof props.fromAccount.id === 'string'
-            ? { id: props.fromAccount.id }
-            : { legacyId: props.fromAccount.id },
-          toAccount: pick(props.toAccount, 'id'),
-        },
-      },
-      errorPolicy: 'all',
-    });
-
-  const {
-    id: paymentIntentId,
-    paymentIntentClientSecret,
-    stripeAccountPublishableSecret,
-    stripeAccount,
-  } = paymentIntentData?.createPaymentIntent ?? {};
-
-  const stripe = React.useMemo(() => {
-    if (!stripeAccount) {
-      return null;
-    }
-
-    return window.Stripe(stripeAccountPublishableSecret, stripeAccount ? { stripeAccount } : {});
-  }, [stripeAccount]);
-
   const hostSupportedPaymentMethods = props.host?.supportedPaymentMethods ?? [];
-  const hostHasStripe = hostSupportedPaymentMethods.includes(PaymentMethodLegacyType.CREDIT_CARD);
-
-  React.useEffect(() => {
-    if (hostHasStripe) {
-      createPaymentIntent();
-    }
-  }, [hostHasStripe]);
+  const [paymentIntent, stripe, loadingPaymentIntent] = usePaymentIntent({
+    skip: !hostSupportedPaymentMethods.includes(PaymentMethodLegacyType.PAYMENT_INTENT),
+    amount: { valueInCents: props.stepDetails.amount, currency: props.stepDetails.currency },
+    fromAccount: props.fromAccount.isGuest
+      ? undefined
+      : typeof props.fromAccount.id === 'string'
+      ? { id: props.fromAccount.id }
+      : { legacyId: props.fromAccount.id },
+    toAccount: pick(props.toAccount, 'id'),
+  });
 
   const paymentMethodOptions = React.useMemo(() => {
     return generatePaymentMethodOptions(
@@ -178,7 +141,8 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
       props.toAccount,
       props.isEmbed,
       props.disabledPaymentMethodTypes,
-      stripeAccount,
+      paymentIntent,
+      intl,
     ) as any[];
   }, [
     paymentMethodsData?.account?.paymentMethods,
@@ -188,7 +152,8 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     props.toAccount,
     props.isEmbed,
     props.disabledPaymentMethodTypes,
-    stripeAccount,
+    paymentIntent,
+    intl,
   ]);
 
   const loading = loadingPaymentMethods || loadingPaymentIntent;
@@ -200,16 +165,16 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
         stepPayment: {
           key,
           paymentMethod,
-          stripeData: stripe
+          stripeData: paymentIntent
             ? {
                 stripe,
-                paymentIntentClientSecret,
+                paymentIntentClientSecret: paymentIntent.client_secret,
               }
             : undefined,
         },
       });
     },
-    [props.onChange, stripeAccount],
+    [props.onChange, stripe, paymentIntent],
   );
 
   React.useEffect(() => {
@@ -224,12 +189,12 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
       const keyToSelect = props.stepPayment?.key;
       const newOption = paymentMethodOptions.find(pm => !pm.disabled && (!keyToSelect || pm.key === keyToSelect));
       if (newOption) {
-        setNewPaymentMethod(newOption.key, { ...newOption.paymentMethod, paymentIntentId });
+        setNewPaymentMethod(newOption.key, { ...newOption.paymentMethod, paymentIntentId: paymentIntent?.id });
       } else if (props.stepPayment) {
         props.onChange({ stepPayment: null }); // Make sure we unselect the option if it's not available
       }
     }
-  }, [paymentMethodOptions, props.stepPayment, loading]);
+  }, [paymentMethodOptions, props.stepPayment, loading, paymentIntent]);
 
   if (loading) {
     return <Loading />;
@@ -253,7 +218,9 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
       name="PaymentMethod"
       keyGetter="key"
       options={paymentMethodOptions}
-      onChange={option => setNewPaymentMethod(option.key, { ...option.value.paymentMethod, paymentIntentId })}
+      onChange={option =>
+        setNewPaymentMethod(option.key, { ...option.value.paymentMethod, paymentIntentId: paymentIntent?.id })
+      }
       value={props.stepPayment?.key || null}
       disabled={props.isSubmitting}
       containerProps={undefined}
@@ -310,8 +277,8 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
                   name: props.fromAccount?.name,
                   email: LoggedInUser?.email,
                 }}
-                paymentIntentId={paymentIntentId}
-                paymentIntentClientSecret={paymentIntentClientSecret}
+                paymentIntentId={paymentIntent.id}
+                paymentIntentClientSecret={paymentIntent.client_secret}
                 onChange={props.onChange}
                 defaultIsSaved={!props.fromAccount?.isGuest}
                 hasSaveCheckBox={!props.fromAccount?.isGuest}
@@ -323,11 +290,22 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     </StyledRadioList>
   );
 
-  const options = {
-    clientSecret: paymentIntentClientSecret,
-  };
+  if (paymentIntent && stripe) {
+    const options: StripeElementsOptions = {
+      clientSecret: paymentIntent.client_secret,
+      appearance: {
+        theme: 'stripe',
+        variables: {
+          fontFamily: 'Inter, sans-serif',
+        },
+      },
+      fonts: [
+        {
+          cssSrc: 'https://fonts.googleapis.com/css?family=Inter',
+        },
+      ],
+    };
 
-  if (hostHasStripe && !paymentIntentError) {
     return (
       <Elements options={options} stripe={stripe}>
         {list}
