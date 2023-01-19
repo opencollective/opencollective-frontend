@@ -12,7 +12,7 @@ import {
   PAYMENT_METHOD_TYPE,
 } from '../../lib/constants/payment-methods';
 import roles from '../../lib/constants/roles';
-import { PaymentMethodService } from '../../lib/graphql/types/v2/graphql';
+import { PaymentMethodService, PaymentMethodType } from '../../lib/graphql/types/v2/graphql';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
   getPaymentMethodIcon,
@@ -100,14 +100,6 @@ export const generatePaymentMethodOptions = (
       paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE || collective.host.legacyId === stepProfile.host?.id,
   );
 
-  uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
-    if (paymentMethod?.data?.stripeAccount && paymentIntent) {
-      return paymentMethod?.data?.stripeAccount === paymentIntent.stripeAccount;
-    } else {
-      return true;
-    }
-  });
-
   if (paymentIntent) {
     const allowedStripeTypes = [...paymentIntent.payment_method_types];
     if (allowedStripeTypes.includes('card')) {
@@ -119,7 +111,18 @@ export const generatePaymentMethodOptions = (
         return true;
       }
 
-      return allowedStripeTypes.includes(paymentMethod.type);
+      return (
+        allowedStripeTypes.includes(paymentMethod.type.toLowerCase()) &&
+        (!paymentMethod?.data?.stripeAccount || paymentMethod?.data?.stripeAccount === paymentIntent.stripeAccount)
+      );
+    });
+  } else {
+    uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
+      if (paymentMethod.service !== PaymentMethodService.STRIPE) {
+        return true;
+      }
+
+      return paymentMethod.type === PaymentMethodType.CREDITCARD && !paymentMethod?.data?.stripeAccount;
     });
   }
 
@@ -223,15 +226,12 @@ export const generatePaymentMethodOptions = (
         intl.formatMessage(StripePaymentMethodsLabels[type]),
       );
 
-      const title =
-        labels.length === 1 ? (
-          labels[0]
-        ) : (
-          <FormattedMessage
-            defaultMessage="Pick a new payment method ({methods})"
-            values={{ methods: `${take(labels, 2).join(', ')}, etc` }}
-          />
-        );
+      const title = (
+        <FormattedMessage
+          defaultMessage="New {methods}"
+          values={{ methods: labels.length === 1 ? labels[0] : `${take(labels, 2).join(', ')}, etc` }}
+        />
+      );
 
       uniquePMs.push({
         key: STRIPE_PAYMENT_ELEMENT_KEY,
