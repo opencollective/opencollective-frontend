@@ -703,6 +703,7 @@ export const editTiersFieldsFragment = gql`
     slug
     type
     useStandalonePage
+    singleTicket
   }
 `;
 
@@ -927,7 +928,12 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
               <ModalBody>
                 <ModalSectionContainer>
                   <EditSectionContainer>
-                    <FormFields collective={collective} values={values} hideTypeSelect={Boolean(forcedType)} />
+                    <FormFields
+                      collective={collective}
+                      values={values}
+                      tier={tier}
+                      hideTypeSelect={Boolean(forcedType)}
+                    />
                   </EditSectionContainer>
                   <PreviewSectionContainer>
                     <ContributeCardPreview collective={collective} tier={values} />
