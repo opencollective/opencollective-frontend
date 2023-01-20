@@ -11,6 +11,7 @@ import { isEmail } from 'validator';
 import { signin } from '../lib/api';
 import { i18nGraphqlException } from '../lib/errors';
 import { gqlV1 } from '../lib/graphql/helpers';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { getWebsiteUrl } from '../lib/utils';
 
 import Container from './Container';
@@ -84,9 +85,6 @@ class SignInOrJoinFree extends React.Component {
     /** Label for signIn, defaults to "Continue with your email" */
     signInLabel: PropTypes.node,
     intl: PropTypes.object,
-    enforceTwoFactorAuthForLoggedInUser: PropTypes.bool,
-    submitTwoFactorAuthenticatorCode: PropTypes.func,
-    submitRecoveryCode: PropTypes.func,
     router: PropTypes.object,
     addToast: PropTypes.func.isRequired,
     hideFooter: PropTypes.bool,
@@ -99,7 +97,9 @@ class SignInOrJoinFree extends React.Component {
         imageUrl: PropTypes.string,
       }),
     }),
+    /* From UserProvider / withUser */
     login: PropTypes.func,
+    enforceTwoFactorAuthForLoggedInUser: PropTypes.bool,
   };
 
   constructor(props) {
@@ -252,13 +252,17 @@ class SignInOrJoinFree extends React.Component {
             onSubmit={async values => {
               const { twoFactorAuthenticatorCode, recoveryCode } = values;
               if (recoveryCode) {
-                const user = await this.props.submitRecoveryCode(recoveryCode);
+                const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+                const user = this.props.login(localStorage2FAToken, { recoveryCode });
                 return this.props.router.replace({
                   pathname: '/[slug]/admin/two-factor-auth',
                   query: { slug: user.collective.slug },
                 });
               } else {
-                return this.props.submitTwoFactorAuthenticatorCode(twoFactorAuthenticatorCode);
+                const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+                return this.props.login(localStorage2FAToken, {
+                  twoFactorAuthenticatorCode,
+                });
               }
             }}
           >

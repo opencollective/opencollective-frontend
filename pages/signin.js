@@ -46,7 +46,6 @@ class SigninV2Page extends React.Component {
     errorLoggedInUser: PropTypes.string,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
-    enforceTwoFactorAuthForLoggedInUser: PropTypes.bool,
     isSuspiciousUserAgent: PropTypes.bool,
     router: PropTypes.object,
   };
@@ -126,15 +125,7 @@ class SigninV2Page extends React.Component {
   }
 
   renderContent() {
-    const {
-      loadingLoggedInUser,
-      errorLoggedInUser,
-      token,
-      next,
-      form,
-      LoggedInUser,
-      enforceTwoFactorAuthForLoggedInUser,
-    } = this.props;
+    const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser } = this.props;
 
     if (this.state.isRobot && token) {
       return (
@@ -193,23 +184,7 @@ class SigninV2Page extends React.Component {
             )}
           </MessageBox>
         )}
-        <SignInOrJoinFree
-          email={this.props.email}
-          redirect={next || '/'}
-          form={form}
-          routes={this.getRoutes()}
-          enforceTwoFactorAuthForLoggedInUser={enforceTwoFactorAuthForLoggedInUser}
-          submitTwoFactorAuthenticatorCode={twoFactorAuthenticatorCode => {
-            const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-            return this.props.login(localStorage2FAToken, {
-              twoFactorAuthenticatorCode,
-            });
-          }}
-          submitRecoveryCode={recoveryCode => {
-            const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-            return this.props.login(localStorage2FAToken, { recoveryCode });
-          }}
-        />
+        <SignInOrJoinFree email={this.props.email} redirect={next || '/'} form={form} routes={this.getRoutes()} />
       </React.Fragment>
     );
   }
