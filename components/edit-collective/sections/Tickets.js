@@ -24,6 +24,7 @@ const prepareCards = (collective, sortedTiers) => {
         hideContributors: true,
         hideCTA: true,
         enableEditing: true,
+        forcedType: 'TICKET',
       },
     };
   });
