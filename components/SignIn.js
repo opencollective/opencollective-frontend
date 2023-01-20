@@ -168,40 +168,44 @@ export default class SignIn extends React.Component {
                   this.setState({ unknownEmail: this.props.unknownEmail });
                 }}
               >
-                <Container fontWeight={600} fontSize="13px" alignItems="left" mb="4px" width="100%">
-                  <FormattedMessage id="Form.yourEmail" defaultMessage="Your email address" />
-                </Container>
-                <StyledInput
-                  error={!!error}
-                  fontSize="14px"
-                  id="email"
-                  name="email"
-                  minWidth={120}
-                  onChange={({ target }) => {
-                    target.value = target.value.trim();
-                    onEmailChange(target.value);
-                    this.setState({ error: target.validationMessage, showError: false });
-                  }}
-                  onKeyDown={e => {
-                    // See https://github.com/facebook/react/issues/6368
-                    if (e.key === ' ') {
-                      e.preventDefault();
-                    } else if (e.key === 'Enter') {
-                      onEmailChange(e.target.value);
-                      this.setState({ error: e.target.validationMessage, showError: true });
-                    }
-                  }}
-                  onBlur={() => this.setState({ showError: true })}
-                  onInvalid={event => {
-                    event.preventDefault();
-                    this.setState({ error: event.target.validationMessage });
-                  }}
-                  placeholder="e.g., yourname@yourhost.com"
-                  required
-                  value={email}
-                  type="email"
-                  width={1}
-                />
+                {!this.props.passwordRequired && (
+                  <Fragment>
+                    <Container fontWeight={600} fontSize="13px" alignItems="left" mb="4px" width="100%">
+                      <FormattedMessage id="Form.yourEmail" defaultMessage="Your email address" />
+                    </Container>
+                    <StyledInput
+                      error={!!error}
+                      fontSize="14px"
+                      id="email"
+                      name="email"
+                      minWidth={120}
+                      onChange={({ target }) => {
+                        target.value = target.value.trim();
+                        onEmailChange(target.value);
+                        this.setState({ error: target.validationMessage, showError: false });
+                      }}
+                      onKeyDown={e => {
+                        // See https://github.com/facebook/react/issues/6368
+                        if (e.key === ' ') {
+                          e.preventDefault();
+                        } else if (e.key === 'Enter') {
+                          onEmailChange(e.target.value);
+                          this.setState({ error: e.target.validationMessage, showError: true });
+                        }
+                      }}
+                      onBlur={() => this.setState({ showError: true })}
+                      onInvalid={event => {
+                        event.preventDefault();
+                        this.setState({ error: event.target.validationMessage });
+                      }}
+                      placeholder="e.g., yourname@yourhost.com"
+                      required
+                      value={email}
+                      type="email"
+                      width={1}
+                    />
+                  </Fragment>
+                )}
                 {this.props.passwordRequired && (
                   <Fragment>
                     <Container fontWeight={600} fontSize="13px" alignItems="left" mb="4px" width="100%">

@@ -179,6 +179,8 @@ class SignInOrJoinFree extends React.Component {
         this.setState({ unknownEmailError: true, submitting: false });
       } else if (e.json?.errorCode === 'PASSWORD_REQUIRED') {
         this.setState({ passwordRequired: true, submitting: false });
+      } else if (e.message?.includes('Two-factor authentication is enabled')) {
+        this.setState({ submitting: false });
       } else {
         this.props.addToast({
           type: TOAST_TYPE.ERROR,
