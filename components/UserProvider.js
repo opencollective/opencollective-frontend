@@ -5,7 +5,7 @@ import { isEqual } from 'lodash';
 import Router from 'next/router';
 
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
-import { LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
 
 export const UserContext = React.createContext({
@@ -32,7 +32,7 @@ class UserProvider extends React.Component {
   };
 
   state = {
-    loadingLoggedInUser: true,
+    loadingLoggedInUser: Boolean(getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN)),
     LoggedInUser: null,
     errorLoggedInUser: null,
     enforceTwoFactorAuthForLoggedInUser: null,

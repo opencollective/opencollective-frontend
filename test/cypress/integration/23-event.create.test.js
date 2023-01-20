@@ -27,20 +27,24 @@ describe('event.create.test.js', () => {
     cy.get('#location .address').contains('Lesbroussart');
     cy.get('#location .address').contains('1050');
 
-    // Go to "Edit tiers"
+    // Go to "Edit Tickets"
     cy.get('[data-cy=edit-collective-btn]:first').click();
     cy.getByDataCy('menu-item-tickets').click();
-    cy.getByDataCy('add-tier-button').click();
-    cy.get('.EditTiers .tier .inputField.name input').type('Free ticket');
-    cy.get('.EditTiers .tier .inputField.description textarea').type('Free ticket for students');
-    cy.get('.EditTiers .tier .inputField.maxQuantity input').type('10');
-    cy.get('.addTier').click();
-    cy.get('.EditTiers .tier').last().find('.inputField.name input').type('Paid ticket');
-    cy.get('.EditTiers .tier').last().find('.inputField.amount input').type(15).blur();
-    cy.wait(100);
-    cy.contains('button', 'Save').click();
-    cy.get('.actions > [data-cy="collective-save"]').contains('Saved');
-    cy.getByDataCy('edit-collective-back-to-profile').click();
+    cy.getByDataCy('create-contribute-tier').click();
+    cy.get('[data-cy=name]').type('Free ticket');
+    cy.get('[data-cy=description]').type('Free ticket for students');
+    cy.get('input[data-cy=amount]').type('0');
+    cy.get('input[data-cy=maxQuantity]').type('10');
+    cy.getByDataCy('confirm-btn').click();
+    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+
+    cy.getByDataCy('menu-item-tickets').click();
+    cy.getByDataCy('create-contribute-tier').click();
+    cy.get('[data-cy=name]').type('Paid ticket');
+    cy.get('input[data-cy=amount]').type('15');
+    cy.getByDataCy('confirm-btn').click();
+    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.getByDataCy('menu-account-avatar-link').click();
 
     // Check collective page
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 2);
@@ -55,21 +59,21 @@ describe('event.create.test.js', () => {
     cy.get('.actions > [data-cy="collective-save"]').contains('Saved');
     // edit event tickets
     cy.getByDataCy('menu-item-tickets').click();
-    cy.get('.EditTiers .tier:nth-child(2) .removeTier').click();
-    cy.wait(400);
-    cy.get('.actions > [data-cy="collective-save"]').click();
-    cy.get('.actions > [data-cy="collective-save"]').contains('Saved');
+    cy.getByDataCy('contribute-card-tier').last().find('button').click();
+    cy.getByDataCy('delete-btn').click();
+    cy.getByDataCy('confirm-delete-btn').click();
+    cy.checkToast({ type: 'SUCCESS', message: 'Ticket deleted.' });
     // edit event tiers
     cy.getByDataCy('menu-item-tiers').click();
-    cy.get('.addTier').click();
-    cy.get('.EditTiers .tier .inputField.name input').type('Sponsor');
-    cy.get('.EditTiers .tier .inputField.description textarea').type('Become a sponsor');
-    cy.get('.EditTiers .tier .inputField.amount input').type(200);
-    cy.wait(400);
-    cy.get('.actions > [data-cy="collective-save"]').click();
-    cy.get('.actions > [data-cy="collective-save"]').contains('Saved');
+    cy.getByDataCy('create-contribute-tier').click();
+    cy.get('[data-cy=name]').type('Sponsor');
+    cy.get('[data-cy=description]').type('Become a sponsor');
+    cy.get('input[data-cy=amount]').type('200');
+    cy.getByDataCy('confirm-btn').click();
+    cy.checkToast({ type: 'SUCCESS', message: 'Tier created.' });
+    cy.wait(2000);
     // verify update
-    cy.contains('a', 'View profile page').click();
+    cy.getByDataCy('menu-account-avatar-link').click();
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 1);
     cy.wait(100);
     cy.get('[data-cy="financial-contributions"] [data-cy=contribute-card-tier]').should('have.length', 1);

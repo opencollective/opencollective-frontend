@@ -26,9 +26,7 @@ class ContributionFlowStepContainer extends React.Component {
     showPlatformTip: PropTypes.bool,
     onNewCardFormReady: PropTypes.func,
     onSignInClick: PropTypes.func,
-    defaultEmail: PropTypes.string,
     isEmbed: PropTypes.bool,
-    defaultName: PropTypes.string,
     disabledPaymentMethodTypes: PropTypes.array,
     isSubmitting: PropTypes.bool,
     hideCreditCardPostalCode: PropTypes.bool,
@@ -100,8 +98,6 @@ class ContributionFlowStepContainer extends React.Component {
             profiles={this.props.contributeProfiles}
             collective={collective}
             stepDetails={stepDetails}
-            defaultEmail={this.props.defaultEmail}
-            defaultName={this.props.defaultName}
             onChange={this.props.onChange}
             data={stepProfile}
             onSignInClick={this.props.onSignInClick}
@@ -137,7 +133,9 @@ class ContributionFlowStepContainer extends React.Component {
             tier={tier}
             stepProfile={stepProfile}
             stepDetails={stepDetails}
+            stepPayment={stepPayment}
             data={stepSummary}
+            isCrypto={isCrypto}
             onChange={this.props.onChange}
             taxes={this.props.taxes}
             applyTaxes

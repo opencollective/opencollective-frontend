@@ -294,7 +294,10 @@ const ContributeCard = ({
                 data-cy="edit-btn"
                 onClick={() => setIsEditTierModalOpen(true)}
               >
-                Edit tier
+                <FormattedMessage
+                  defaultMessage="Edit {type, select, TICKET {Ticket} other {Tier}}"
+                  values={{ type: tier.type }}
+                />
               </StyledButton>
             </Box>
           )}
