@@ -1704,12 +1704,8 @@ export type CollectiveFeatures = {
 export type Comment = {
   __typename?: 'Comment';
   account?: Maybe<Account>;
-  /** @deprecated 2020-02-25: Please use account */
-  collective?: Maybe<Account>;
   createdAt?: Maybe<Scalars['DateTime']>;
   fromAccount?: Maybe<Account>;
-  /** @deprecated 2020-02-25: Please use fromAccount */
-  fromCollective?: Maybe<Account>;
   html?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
   /** Returns a map of reactions counts for this comment */
@@ -1912,15 +1908,11 @@ export type Conversation = {
   account?: Maybe<Account>;
   /** The root comment / starter for this conversation */
   body?: Maybe<Comment>;
-  /** @deprecated 2022-09-14: Please use account */
-  collective?: Maybe<Account>;
   /** List the comments for this conversation. Not backed by a loader, don't use this in lists. */
   comments: CommentCollection;
   createdAt: Scalars['DateTime'];
   followers: AccountCollection;
   fromAccount?: Maybe<Account>;
-  /** @deprecated 2022-09-14: Please use fromAccount */
-  fromCollective?: Maybe<Account>;
   id: Scalars['String'];
   slug: Scalars['String'];
   stats?: Maybe<ConversationStats>;
@@ -3656,11 +3648,6 @@ export type ExpenseStats = {
   __typename?: 'ExpenseStats';
   /** The daily average paid in expenses */
   dailyAverageAmount: Amount;
-  /**
-   * The total number of expenses over time
-   * @deprecated 2022-04-21: Please use hostMetricsTimeSeries.totalSpent
-   */
-  expenseAmountOverTime?: Maybe<TimeSeriesAmount>;
   /** The total number of expenses */
   expensesCount: Scalars['Int'];
   /** Number of grants */
