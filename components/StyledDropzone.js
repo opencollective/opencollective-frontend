@@ -100,9 +100,10 @@ const StyledDropzone = ({
   error,
   value,
   isMulti,
+  kind,
   ...props
 }) => {
-  const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess, onReject };
+  const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess, onReject, kind };
   const { uploadFiles, isUploading, uploadProgress } = useImageUploader(imgUploaderParams);
   const dropzoneParams = { accept, minSize, maxSize, multiple: isMulti, onDrop: uploadFiles };
   const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneParams);
@@ -243,6 +244,8 @@ StyledDropzone.propTypes = {
   required: PropTypes.bool,
   /** if set, the image will be displayed and a "replace" banner will be added */
   value: PropTypes.string,
+  /** A unique identified for the category of uploaded files */
+  kind: PropTypes.string.isRequired,
 };
 
 StyledDropzone.defaultProps = {

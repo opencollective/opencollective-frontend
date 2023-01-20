@@ -102,6 +102,7 @@ const CustomMessage = ({ collective }) => {
           </StyledButton>
         </Flex>
         <RichTextEditor
+          kind="ACCOUNT_CUSTOM_EMAIL"
           inputName="message"
           onChange={e => onChange(e.target.value)}
           defaultValue={customMessage}

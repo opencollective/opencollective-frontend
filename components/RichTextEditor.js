@@ -175,6 +175,8 @@ export default class RichTextEditor extends React.Component {
     value: PropTypes.string,
     placeholder: PropTypes.string,
     toolbarBackgroundColor: PropTypes.string.isRequired,
+    /** A unique identified for the category of uploaded files. Required if version is not "simplified" */
+    kind: PropTypes.string,
     /** Font size for the text */
     fontSize: PropTypes.string,
     autoFocus: PropTypes.bool,
@@ -471,7 +473,7 @@ export default class RichTextEditor extends React.Component {
       this.props.setUploading?.(false);
       this.setState({ error: 'File upload failed' });
     };
-    uploadImageWithXHR(attachment.file, { onProgress, onSuccess, onFailure });
+    uploadImageWithXHR(attachment.file, this.props.kind, { onProgress, onSuccess, onFailure });
     return e;
   };
 
