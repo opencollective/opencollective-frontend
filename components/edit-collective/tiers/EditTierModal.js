@@ -11,6 +11,7 @@ import { getLegacyIdForCollective } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
+import { getIntervalFromContributionFrequency } from '../../../lib/date-utils';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { requireFields } from '../../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
@@ -88,7 +89,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
   const tierTypeOptions = getTierTypeOptions(intl, collective.type);
   const intervalOptions = [
     { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
-    { value: 'onetime', label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) },
+    { value: null, label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) },
     { value: 'month', label: intl.formatMessage({ id: 'Frequency.Monthly', defaultMessage: 'Monthly' }) },
     { value: 'year', label: intl.formatMessage({ id: 'Frequency.Yearly', defaultMessage: 'Yearly' }) },
   ];
@@ -106,18 +107,24 @@ function FormFields({ collective, values, hideTypeSelect }) {
   const taxes = getApplicableTaxes(collective, collective.host, values.type);
 
   const formik = useFormikContext();
-  React.useEffect(() => {
-    if (values.interval === 'flexible') {
-      formik.setFieldValue('amountType', FLEXIBLE);
-    }
-  }, [values.interval]);
 
+  // Enforce certain rules when updating
   React.useEffect(() => {
-    if (values.type === PRODUCT) {
+    // Flexible amount implies flexible interval, and vice versa
+    if (values.interval === 'flexible' && values.amountType !== FLEXIBLE) {
+      formik.setFieldValue('amountType', FLEXIBLE);
+    } else if (values.amountType === FIXED && values.interval === 'flexible') {
+      formik.setFieldValue('interval', 'onetime');
+    }
+
+    // No interval for products and tickets
+    if ([PRODUCT, TICKET].includes(values.type)) {
       formik.setFieldValue('interval', null);
       formik.setFieldValue('amountType', FIXED);
     }
-  }, [values.type]);
+  }, [values.interval, values.type]);
+
+  React.useEffect(() => {}, [values.type]);
 
   return (
     <React.Fragment>
@@ -277,10 +284,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
       {values.amountType === FLEXIBLE && (
         <StyledInputFormikField
           name="amount"
-          label={intl.formatMessage({
-            id: 'tier.defaultAmount.label',
-            defaultMessage: 'Default amount',
-          })}
+          label={intl.formatMessage({ id: 'tier.defaultAmount.label', defaultMessage: 'Default amount' })}
           labelFontWeight="bold"
           mt="3"
         >
@@ -731,11 +735,6 @@ const deleteTierMutation = gql`
 const getRequiredFields = values => {
   const fields = ['name', 'type', 'amountType'];
 
-  // Depending on type
-  if (values.type !== 'PRODUCT') {
-    fields.push('interval');
-  }
-
   // Depending on amount type
   if (values.amountType === 'FIXED') {
     fields.push('amount');
@@ -762,6 +761,7 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
           'availableQuantity',
         ]),
         amount: omit(tier.amount, '__typename'),
+        interval: getIntervalFromContributionFrequency(tier.frequency),
         goal: omit(tier.goal, '__typename'),
         minimumAmount: omit(tier.minimumAmount, '__typename'),
         description: tier.description || '',
