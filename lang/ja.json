@@ -1296,7 +1296,7 @@
   "fiscalHosting.hosts.OSC": "A US 501(c)(6) nonprofit entity serving as fiscal host to open source projects and related communities around the world.",
   "fiscalHosting.hosts.socialchangenestcollective": "A UK host for mutual aid groups and social movements, providing tools, strategy, and back office support to scale up and get on with changing the world.",
   "fiscalHosting.howCanAFiscalHostHelp": "財務ホストはどのような支援をしてくれるのですか？",
-  "fiscalHosting.legalStructure": "Legal structure",
+  "fiscalHosting.legalStructure": "組織の法的立場",
   "fiscalHosting.legalStructure.description": "Do you want your host to be a charity, a company, a cooperative, or something else? E.g. a charity structure can enable tax-deductible donations, but may also have more restrictions on allowed activities.",
   "fiscalHosting.location.description": "財務ホストが拠点をどの国に置くかによって、あなたのお金を勘定する際の通貨と、法的な意味でのあなたの所在地が決まります。例えばEUの補助金を申請する場合、EUに拠点を置く財務ホストが必要な場合があります。",
   "fiscalHosting.missionAlignment": "ミッションの整合性",
