@@ -8,7 +8,7 @@ import {
   TaxType,
 } from '@opencollective/taxes';
 import { Close } from '@styled-icons/material/Close';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -250,6 +250,7 @@ const StepSummary = ({
   const [formState, setFormState] = useState({ isEnabled: false, error: false });
   const taxPercentage = getTaxPercentageForProfile(taxes, tierType, hostCountry, collectiveCountry, data);
   const taxInfo = prepareTaxInfo(taxes, data, amount, quantity, taxPercentage, formState.isEnabled);
+  const hasCustomTaxRenderer = taxInfo?.taxType === TaxType.VAT && applyTaxes && amount > 0;
 
   // Helper to prepare onChange data
   const dispatchChange = (newValues, hasFormParam) => {
@@ -264,12 +265,17 @@ const StepSummary = ({
   };
 
   useEffect(() => {
-    // Dispatch initial value on mount
-    dispatchChange({
-      countryISO: data?.countryISO || get(stepProfile, 'location.country'),
-      number: data?.number || get(stepProfile, 'settings.VAT.number'),
-    });
-  }, []);
+    if (!isEmpty(taxes)) {
+      // Dispatch initial value on mount
+      dispatchChange({
+        countryISO: data?.countryISO || get(stepProfile, 'location.country'),
+        number: data?.number || get(stepProfile, 'settings.VAT.number'),
+      });
+    } else if (!data?.isReady) {
+      // Remove stepSummary if taxes are not applied
+      onChange({ stepSummary: { isReady: true } });
+    }
+  }, [taxes]);
 
   return (
     <Box width="100%" px={[0, null, null, 2]}>
@@ -282,21 +288,20 @@ const StepSummary = ({
         isCrypto={isCrypto}
         tier={tier}
         renderTax={
-          taxInfo?.taxType === TaxType.VAT &&
-          applyTaxes &&
-          amount > 0 &&
-          (({ Amount, Label, AmountLine }) => (
-            <VATInputs
-              currency={currency}
-              dispatchChange={dispatchChange}
-              setFormState={setFormState}
-              formState={formState}
-              taxInfo={taxInfo}
-              Amount={Amount}
-              Label={Label}
-              AmountLine={AmountLine}
-            />
-          ))
+          !hasCustomTaxRenderer
+            ? null
+            : ({ Amount, Label, AmountLine }) => (
+                <VATInputs
+                  currency={currency}
+                  dispatchChange={dispatchChange}
+                  setFormState={setFormState}
+                  formState={formState}
+                  taxInfo={taxInfo}
+                  Amount={Amount}
+                  Label={Label}
+                  AmountLine={AmountLine}
+                />
+              )
         }
       />
     </Box>
