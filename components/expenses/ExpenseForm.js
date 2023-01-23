@@ -349,6 +349,18 @@ const ExpenseFormBody = ({
     }
   }, [values.payeeLocation]);
 
+  React.useEffect(() => {
+    if (
+      values.currency &&
+      values.payoutMethod?.data?.currency &&
+      values.payoutMethod.data.currency !== values.currency
+    ) {
+      const items = values.items.map(item => ({ ...item, amount: null }));
+      formik.setFieldValue('currency', null);
+      formik.setFieldValue('items', items);
+    }
+  }, [values.payoutMethod]);
+
   // Load values from localstorage
   React.useEffect(() => {
     if (shouldLoadValuesFromPersister && formPersister && !dirty && !isDraft) {
