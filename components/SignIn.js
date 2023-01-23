@@ -8,6 +8,7 @@ import Image from './Image';
 import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
+import StyledInputField from './StyledInputField';
 import StyledLink from './StyledLink';
 import StyledLinkButton from './StyledLinkButton';
 import { Span } from './Text';
@@ -168,79 +169,94 @@ export default class SignIn extends React.Component {
                   this.setState({ unknownEmail: this.props.unknownEmail });
                 }}
               >
-                {!this.props.passwordRequired && (
-                  <Fragment>
-                    <Container fontWeight={600} fontSize="13px" alignItems="left" mb="4px" width="100%">
-                      <FormattedMessage id="Form.yourEmail" defaultMessage="Your email address" />
-                    </Container>
-                    <StyledInput
-                      error={!!error}
-                      fontSize="14px"
-                      id="email"
-                      name="email"
-                      minWidth={120}
-                      onChange={({ target }) => {
-                        target.value = target.value.trim();
-                        onEmailChange(target.value);
-                        this.setState({ error: target.validationMessage, showError: false });
-                      }}
-                      onKeyDown={e => {
-                        // See https://github.com/facebook/react/issues/6368
-                        if (e.key === ' ') {
-                          e.preventDefault();
-                        } else if (e.key === 'Enter') {
-                          onEmailChange(e.target.value);
-                          this.setState({ error: e.target.validationMessage, showError: true });
-                        }
-                      }}
-                      onBlur={() => this.setState({ showError: true })}
-                      onInvalid={event => {
-                        event.preventDefault();
-                        this.setState({ error: event.target.validationMessage });
-                      }}
-                      placeholder="e.g., yourname@yourhost.com"
-                      required
-                      value={email}
-                      type="email"
-                      width={1}
-                    />
-                  </Fragment>
-                )}
-                {this.props.passwordRequired && (
-                  <Fragment>
-                    <Container fontWeight={600} fontSize="13px" alignItems="left" mb="4px" width="100%">
-                      <FormattedMessage id="Form.yourEmail" defaultMessage="Your password" />
-                    </Container>
-                    <StyledInput
-                      fontSize="14px"
-                      id="password"
-                      name="password"
-                      type="password"
-                      required
-                      width={1}
-                      autoFocus
-                      onChange={({ target }) => {
-                        target.value = target.value.trim();
-                        onPasswordChange(target.value);
-                        this.setState({ error: target.validationMessage, showError: false });
-                      }}
-                      onKeyDown={e => {
-                        // See https://github.com/facebook/react/issues/6368
-                        if (e.key === ' ') {
-                          e.preventDefault();
-                        } else if (e.key === 'Enter') {
-                          onPasswordChange(e.target.value);
-                          this.setState({ error: e.target.validationMessage, showError: true });
-                        }
-                      }}
-                      onBlur={() => this.setState({ showError: true })}
-                      onInvalid={event => {
-                        event.preventDefault();
-                        this.setState({ error: event.target.validationMessage });
-                      }}
-                    />
-                  </Fragment>
-                )}
+                <StyledInputField
+                  style={{ display: this.props.passwordRequired ? 'none' : 'block' }}
+                  labelFontWeight={600}
+                  labelFontSize="13px"
+                  alignItems="left"
+                  width="100%"
+                  label={<FormattedMessage id="Form.yourEmail" defaultMessage="Your email address" />}
+                  htmlFor="email"
+                  my={2}
+                >
+                  <StyledInput
+                    error={!!error}
+                    fontSize="14px"
+                    id="email"
+                    autoComplete="email"
+                    name="email"
+                    minWidth={120}
+                    onChange={({ target }) => {
+                      target.value = target.value.trim();
+                      onEmailChange(target.value);
+                      this.setState({ error: target.validationMessage, showError: false });
+                    }}
+                    onKeyDown={e => {
+                      // See https://github.com/facebook/react/issues/6368
+                      if (e.key === ' ') {
+                        e.preventDefault();
+                      } else if (e.key === 'Enter') {
+                        onEmailChange(e.target.value);
+                        this.setState({ error: e.target.validationMessage, showError: true });
+                      }
+                    }}
+                    onBlur={() => this.setState({ showError: true })}
+                    onInvalid={event => {
+                      event.preventDefault();
+                      this.setState({ error: event.target.validationMessage });
+                    }}
+                    placeholder="e.g., yourname@yourhost.com"
+                    autoFocus
+                    required
+                    value={email}
+                    type="email"
+                    width={1}
+                  />
+                </StyledInputField>
+                <StyledInputField
+                  style={{ display: this.props.passwordRequired ? 'block' : 'none' }}
+                  labelFontWeight={600}
+                  labelFontSize="13px"
+                  alignItems="left"
+                  width="100%"
+                  label={<FormattedMessage id="Form.yourPassword" defaultMessage="Your password" />}
+                  htmlFor="password"
+                  my={2}
+                >
+                  <StyledInput
+                    key={this.props.passwordRequired ? 'required' : 'initial'}
+                    fontSize="14px"
+                    id="password"
+                    name="password"
+                    autoComplete="current-password"
+                    type="password"
+                    width={1}
+                    autoFocus={this.props.passwordRequired ? true : false}
+                    required={this.props.passwordRequired ? true : false}
+                    onChange={({ target }) => {
+                      if (!this.props.passwordRequired) {
+                        return;
+                      }
+                      target.value = target.value.trim();
+                      onPasswordChange(target.value);
+                      this.setState({ error: target.validationMessage, showError: false });
+                    }}
+                    onKeyDown={e => {
+                      // See https://github.com/facebook/react/issues/6368
+                      if (e.key === ' ') {
+                        e.preventDefault();
+                      } else if (e.key === 'Enter') {
+                        onPasswordChange(e.target.value);
+                        this.setState({ error: e.target.validationMessage, showError: true });
+                      }
+                    }}
+                    onBlur={() => this.setState({ showError: true })}
+                    onInvalid={event => {
+                      event.preventDefault();
+                      this.setState({ error: event.target.validationMessage });
+                    }}
+                  />
+                </StyledInputField>
                 {error && showError && (
                   <Span display="block" color="red.500" pt={2} fontSize="10px" lineHeight="14px" aria-live="assertive">
                     {error}

@@ -219,8 +219,8 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Tickets',
   },
   [ALL_SECTIONS.TWO_FACTOR_AUTH]: {
-    id: 'TwoFactorAuth',
-    defaultMessage: 'Two-factor authentication',
+    id: 'Security',
+    defaultMessage: 'Security',
   },
   [ALL_SECTIONS.PAYMENT_RECEIPTS]: {
     id: 'editCollective.menu.paymentReceipts',

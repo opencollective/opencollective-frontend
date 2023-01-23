@@ -2035,8 +2035,6 @@ type Comment {
   Returns the list of reactions added to this comment by logged in user
   """
   userReactions: [String]
-  fromCollective: Account @deprecated(reason: "2020-02-25: Please use fromAccount")
-  collective: Account @deprecated(reason: "2020-02-25: Please use account")
 }
 
 """
@@ -2458,6 +2456,7 @@ enum ActivityType {
   TWO_FACTOR_CODE_DELETED
   USER_CHANGE_EMAIL
   USER_PAYMENT_METHOD_CREATED
+  USER_PASSWORD_SET
   USER_CARD_CLAIMED
   USER_CARD_INVITED
   WEBHOOK_STRIPE_RECEIVED
@@ -3530,9 +3529,7 @@ type Conversation {
   updatedAt: DateTime!
   tags: [String]
   summary: String!
-  collective: Account @deprecated(reason: "2022-09-14: Please use account")
   account: Account
-  fromCollective: Account @deprecated(reason: "2022-09-14: Please use fromAccount")
   fromAccount: Account
 
   """
@@ -4927,11 +4924,6 @@ type ExpenseStats {
   The total number of expenses
   """
   expensesCount: Int!
-
-  """
-  The total number of expenses over time
-  """
-  expenseAmountOverTime: TimeSeriesAmount @deprecated(reason: "2022-04-21: Please use hostMetricsTimeSeries.totalSpent")
 
   """
   The daily average paid in expenses
@@ -7738,6 +7730,11 @@ type Individual implements Account {
     """
     offset: Int! = 0
   ): PersonalTokenCollection
+
+  """
+  Has the account a password set? For authenticated user: scope: "account".
+  """
+  hasPassword: Boolean
 }
 
 """
@@ -11231,6 +11228,7 @@ enum ActivityAndClassesType {
   TWO_FACTOR_CODE_DELETED
   USER_CHANGE_EMAIL
   USER_PAYMENT_METHOD_CREATED
+  USER_PASSWORD_SET
   USER_CARD_CLAIMED
   USER_CARD_INVITED
   WEBHOOK_STRIPE_RECEIVED
@@ -13170,6 +13168,21 @@ type Mutation {
   Update newsletter opt-in preference. Scope: "account".
   """
   setNewsletterOptIn(newsletterOptIn: Boolean!): Individual!
+
+  """
+  Set password to Individual. Scope: "account". 2FA.
+  """
+  setPassword(
+    """
+    The password to set.
+    """
+    password: String!
+
+    """
+    The current password (if any) to confirm password change.
+    """
+    currentPassword: String
+  ): Individual!
 
   """
   Invite a new member to the Collective. Scope: "account".
