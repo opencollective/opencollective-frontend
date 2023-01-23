@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bank } from '@styled-icons/boxicons-solid';
+import { CreditCard } from '@styled-icons/fa-solid';
 import { find, get, isEmpty, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
@@ -12,6 +12,7 @@ import {
   PAYMENT_METHOD_TYPE,
 } from '../../lib/constants/payment-methods';
 import roles from '../../lib/constants/roles';
+import { PaymentMethodService, PaymentMethodType } from '../../lib/graphql/types/v2/graphql';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
   getPaymentMethodIcon,
@@ -71,7 +72,7 @@ export const generatePaymentMethodOptions = (
   collective,
   isEmbed,
   disabledPaymentMethodTypes,
-  stripeAccount,
+  paymentIntent,
 ) => {
   const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
@@ -97,13 +98,31 @@ export const generatePaymentMethodOptions = (
       paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE || collective.host.legacyId === stepProfile.host?.id,
   );
 
-  uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
-    if (paymentMethod?.data?.stripeAccount) {
-      return paymentMethod?.data?.stripeAccount === stripeAccount;
-    } else {
-      return true;
+  if (paymentIntent) {
+    const allowedStripeTypes = [...paymentIntent.payment_method_types];
+    if (allowedStripeTypes.includes('card')) {
+      allowedStripeTypes.push('creditcard'); // we store this type as creditcard
     }
-  });
+
+    uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
+      if (paymentMethod.service !== PaymentMethodService.STRIPE) {
+        return true;
+      }
+
+      return (
+        allowedStripeTypes.includes(paymentMethod.type.toLowerCase()) &&
+        (!paymentMethod?.data?.stripeAccount || paymentMethod?.data?.stripeAccount === paymentIntent.stripeAccount)
+      );
+    });
+  } else {
+    uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
+      if (paymentMethod.service !== PaymentMethodService.STRIPE) {
+        return true;
+      }
+
+      return paymentMethod.type === PaymentMethodType.CREDITCARD && !paymentMethod?.data?.stripeAccount;
+    });
+  }
 
   // prepaid budget: limited to a specific host
   const matchesHostCollectiveIdPrepaid = prepaid => {
@@ -156,7 +175,9 @@ export const generatePaymentMethodOptions = (
 
   // adding payment methods
   if (!balanceOnlyCollectiveTypes.includes(stepProfile.type)) {
-    if (hostHasStripe) {
+    const paymentIntentIncludesCard = paymentIntent && paymentIntent.payment_method_types.includes('card');
+
+    if (hostHasStripe && !paymentIntentIncludesCard) {
       // New credit card
       uniquePMs.push({
         key: NEW_CREDIT_CARD_KEY,
@@ -193,27 +214,18 @@ export const generatePaymentMethodOptions = (
           service: PAYMENT_METHOD_SERVICE.STRIPE,
           type: PAYMENT_METHOD_TYPE.ALIPAY,
         },
-        title: <FormattedMessage id="Alipay" defaultMessage="Alipay" />,
+        title: <FormattedMessage id="Stripe.PaymentMethod.Label.alipay" defaultMessage="Alipay" />,
         icon: getPaymentMethodIcon({ service: PAYMENT_METHOD_SERVICE.STRIPE, type: PAYMENT_METHOD_TYPE.ALIPAY }),
       });
     }
 
-    if (
-      supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYMENT_INTENT) &&
-      ['USD', 'EUR'].includes(stepDetails.currency) &&
-      stripeAccount
-    ) {
-      let debitMethod;
-      if (stepDetails.currency === 'USD') {
-        debitMethod = 'ACH';
-      } else if (stepDetails.currency === 'EUR') {
-        debitMethod = 'SEPA';
-      }
+    if (paymentIntent) {
+      const title = <FormattedMessage defaultMessage="New payment method" />;
 
       uniquePMs.push({
         key: STRIPE_PAYMENT_ELEMENT_KEY,
-        title: <FormattedMessage defaultMessage="Bank debit ({debitMethod})" values={{ debitMethod }} />,
-        icon: <Bank color="#c9ced4" size={'1.5em'} />,
+        title: title,
+        icon: <CreditCard color="#c9ced4" size={'1.5em'} />,
         paymentMethod: {
           service: PAYMENT_METHOD_SERVICE.STRIPE,
           type: PAYMENT_METHOD_TYPE.STRIPE_ELEMENTS,
