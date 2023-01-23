@@ -70,10 +70,13 @@ jobs:
       - name: Install graphicsmagick
         run: sudo apt-get install -y graphicsmagick
 
+      - name: Checkout (frontend)
+        uses: actions/checkout@v3
+
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
+          node-version-file: 'package.json'
 
       # Npm cache
 
@@ -87,9 +90,6 @@ jobs:
             - ${{ runner.os }}-npm-cache-
 
       # Checkouts
-
-      - name: Checkout (frontend)
-        uses: actions/checkout@v3
 
       - name: Set REF in env, removing the `refs/` part
         run: echo "MATCHING_BRANCH_REF=$(echo $GITHUB_REF | sed 's|refs/||')" >> $GITHUB_ENV

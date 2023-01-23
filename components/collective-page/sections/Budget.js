@@ -236,9 +236,16 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions, isIndiv
         data-cy="view-all-expenses-link"
       >
         <span>
-          <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
-          &rarr;
+          <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />
+          &nbsp; &rarr;
         </span>
+      </Link>
+    );
+  } else if (isFilterAll && isIndividual) {
+    return (
+      <Link href={`${getCollectivePageRoute(collective)}/transactions`} data-cy="view-all-transactions-link">
+        <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" />
+        &nbsp; &rarr;
       </Link>
     );
   } else if (filter === 'transactions' || (isFilterAll && hasTransactions && !hasExpenses)) {
@@ -250,8 +257,8 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions, isIndiv
         <FormattedMessage
           id="CollectivePage.SectionBudget.ViewAllContributions"
           defaultMessage="View all contributions"
-        />{' '}
-        &rarr;
+        />
+        &nbsp; &rarr;
       </Link>
     ) : (
       <Link href={`${getCollectivePageRoute(collective)}/transactions`} data-cy="view-all-transactions-link">

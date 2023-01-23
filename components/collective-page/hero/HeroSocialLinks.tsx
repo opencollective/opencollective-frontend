@@ -55,8 +55,8 @@ export default function HeroSocialLinks({ socialLinks, relMe }: HeroSocialLinksP
         key={socialLink.type + socialLink.url}
         data-cy={`social-link-${index}`}
         href={socialLink.url}
-        target="_blank"
-        rel={`noopener noreferrer nofollow ${relMe ? 'me' : ''}`}
+        openInNewTabNoFollow={!relMe}
+        openInNewTabNoFollowRelMe={!!relMe}
       >
         <StyledRoundButton size={32} mr={3}>
           <Icon size={12} />

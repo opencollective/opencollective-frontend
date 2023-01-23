@@ -155,7 +155,7 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
     },
     {
       value: SocialLinkType.TUMBLR.toString(),
-      label: 'Tumbrl',
+      label: 'Tumblr',
     },
     {
       value: SocialLinkType.TWITTER.toString(),

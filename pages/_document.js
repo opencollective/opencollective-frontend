@@ -15,24 +15,14 @@ const cspHeader = getCSPHeader();
 // data for the user's locale for React Intl to work in the browser.
 export default class IntlDocument extends Document {
   static async getInitialProps(ctx) {
-    const { locale, localeDataScript, url } = ctx.req;
+    const { locale, localeDataScript } = ctx.req;
 
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
 
     const clientAnalytics = {
       enabled: parseToBoolean(process.env.CLIENT_ANALYTICS_ENABLED),
-      siteId: Number(process.env.CLIENT_ANALYTICS_SITE_ID),
-      customUrl: null,
     };
-    if (url.match(/\.html/) || url.match(/\/button/)) {
-      clientAnalytics.enabled = false;
-    }
-    if (url.match(/\/signin\/sent/)) {
-      clientAnalytics.customUrl = '/signin/sent';
-    } else if (url.match(/\/signin\//)) {
-      clientAnalytics.customUrl = '/signin/token';
-    }
 
     // On server-side, add a CSP header
     let requestNonce;
@@ -92,24 +82,6 @@ export default class IntlDocument extends Document {
     ]);
   }
 
-  clientAnalyticsCode() {
-    const lines = [];
-    lines.push(`var _paq = window._paq = window._paq || [];`);
-    if (this.props.clientAnalytics.customUrl) {
-      lines.push(`_paq.push(['setCustomUrl', '${this.props.clientAnalytics.customUrl}']);`);
-    }
-    lines.push(`_paq.push(['trackPageView']);`);
-    lines.push(`_paq.push(['enableLinkTracking']);`);
-    lines.push(`(function() {
-      var u="https://opencollective.matomo.cloud/";
-      _paq.push(['setTrackerUrl', u+'matomo.php']);
-      _paq.push(['setSiteId', '${this.props.clientAnalytics.siteId}']);
-      var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-      g.async=true; g.src='//cdn.matomo.cloud/opencollective.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
-    })();`);
-    return lines.join('\n');
-  }
-
   render() {
     return (
       <Html>
@@ -124,7 +96,12 @@ export default class IntlDocument extends Document {
           />
           <NextScript nonce={this.props.cspNonce} />
           {this.props.clientAnalytics.enabled && (
-            <script nonce={this.props.cspNonce} dangerouslySetInnerHTML={{ __html: this.clientAnalyticsCode() }} />
+            <script
+              nonce={this.props.cspNonce}
+              defer
+              data-domain="opencollective.com"
+              src="https://plausible.io/js/script.js"
+            />
           )}
         </body>
       </Html>

@@ -7829,6 +7829,11 @@ type Member {
   Custom user description
   """
   description: String
+
+  """
+  If membership is inherited from parent collective
+  """
+  inherited: Boolean
   account: Account
 }
 
@@ -7857,6 +7862,11 @@ type MemberOf {
   Custom user description
   """
   description: String
+
+  """
+  If membership is inherited from parent collective
+  """
+  inherited: Boolean
   account: Account
 }
 
