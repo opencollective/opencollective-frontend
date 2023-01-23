@@ -1,6 +1,6 @@
 import React from 'react';
 import { CreditCard } from '@styled-icons/fa-solid';
-import { find, get, isEmpty, sortBy, take, uniqBy } from 'lodash';
+import { find, get, isEmpty, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { canContributeRecurring, getCollectivePageMetadata } from '../../lib/collective.lib';
@@ -19,7 +19,6 @@ import {
   getPaymentMethodMetadata,
   isPaymentMethodDisabled,
 } from '../../lib/payment-method-utils';
-import { StripePaymentMethodsLabels } from '../../lib/stripe/payment-methods';
 import { getWebsiteUrl } from '../../lib/utils';
 
 import CreditCardInactive from '../icons/CreditCardInactive';
@@ -74,7 +73,6 @@ export const generatePaymentMethodOptions = (
   isEmbed,
   disabledPaymentMethodTypes,
   paymentIntent,
-  intl,
 ) => {
   const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
@@ -222,16 +220,7 @@ export const generatePaymentMethodOptions = (
     }
 
     if (paymentIntent) {
-      const labels = paymentIntent.payment_method_types.map(type =>
-        intl.formatMessage(StripePaymentMethodsLabels[type]),
-      );
-
-      const title = (
-        <FormattedMessage
-          defaultMessage="New {methods}"
-          values={{ methods: labels.length === 1 ? labels[0] : `${take(labels, 2).join(', ')}, etc` }}
-        />
-      );
+      const title = <FormattedMessage defaultMessage="New payment method" />;
 
       uniquePMs.push({
         key: STRIPE_PAYMENT_ELEMENT_KEY,

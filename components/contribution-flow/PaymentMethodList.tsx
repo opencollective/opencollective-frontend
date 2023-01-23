@@ -142,7 +142,6 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
       props.isEmbed,
       props.disabledPaymentMethodTypes,
       paymentIntent,
-      intl,
     ) as any[];
   }, [
     paymentMethodsData?.account?.paymentMethods,
