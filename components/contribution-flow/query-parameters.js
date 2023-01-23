@@ -140,6 +140,7 @@ export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepPro
     'hideHeader',
     'backgroundColor',
     'useTheme',
+    'tags',
   ]);
 
   // Step details
