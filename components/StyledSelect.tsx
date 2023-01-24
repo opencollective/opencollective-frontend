@@ -37,7 +37,6 @@ const Messages = defineMessages({
 
 /* eslint-disable react/prop-types */
 const Option = ({ innerProps, ...props }: OptionProps & { 'data-cy': string }) => {
-  console.log({ innerProps, props });
   return (
     <ReactSelectComponents.Option
       {...props}
