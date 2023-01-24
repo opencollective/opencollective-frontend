@@ -415,6 +415,33 @@ function FormFields({ collective, values, hideTypeSelect }) {
           defaultMessage: 'Amount you aim to raise',
         })}
       </FieldDescription>
+      {values.type === TICKET && (
+        <React.Fragment>
+          <StyledInputFormikField
+            name="singleTicket"
+            label={<FormattedMessage defaultMessage="Single Ticket" />}
+            labelFontWeight="bold"
+            mt="3"
+            flexDirection={'row'}
+            justifyContent={'space-between'}
+            alignItems={'center'}
+          >
+            {({ field, form }) => (
+              <InputSwitch
+                name={field.name}
+                checked={field.value}
+                onChange={event => form.setFieldValue(field.name, event.target.checked)}
+              />
+            )}
+          </StyledInputFormikField>
+          <FieldDescription>
+            <FormattedMessage
+              id="tier.singleTicketDescription"
+              defaultMessage="Only allow people to buy a single ticket per order"
+            />
+          </FieldDescription>
+        </React.Fragment>
+      )}
       {![FUND, PROJECT].includes(collective.type) && (
         <React.Fragment>
           <StyledInputFormikField
@@ -516,6 +543,10 @@ FormFields.propTypes = {
     interval: PropTypes.string,
   }),
   hideTypeSelect: PropTypes.bool,
+  tier: PropTypes.shape({
+    type: PropTypes.string,
+    singleTicket: PropTypes.bool,
+  }),
 };
 
 const EditSectionContainer = styled(Flex)`
@@ -676,6 +707,7 @@ export const editTiersFieldsFragment = gql`
     slug
     type
     useStandalonePage
+    singleTicket
   }
 `;
 
@@ -853,6 +885,7 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
             goal: !isNil(values?.goal?.valueInCents) ? values.goal : null,
             amount: !isNil(values?.amount?.valueInCents) ? values.amount : null,
             minimumAmount: !isNil(values?.minimumAmount?.valueInCents) ? values.minimumAmount : null,
+            singleTicket: values?.singleTicket,
           };
 
           try {
@@ -895,7 +928,12 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
               <ModalBody>
                 <ModalSectionContainer>
                   <EditSectionContainer>
-                    <FormFields collective={collective} values={values} hideTypeSelect={Boolean(forcedType)} />
+                    <FormFields
+                      collective={collective}
+                      values={values}
+                      tier={tier}
+                      hideTypeSelect={Boolean(forcedType)}
+                    />
                   </EditSectionContainer>
                   <PreviewSectionContainer>
                     <ContributeCardPreview collective={collective} tier={values} />
