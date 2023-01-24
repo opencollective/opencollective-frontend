@@ -147,7 +147,7 @@ class SignInOrJoinFree extends React.Component {
     return encodeURIComponent(redirectUrl || currentPath || '/');
   }
 
-  signIn = async (email, password = null) => {
+  signIn = async (email, password = null, { sendLink = false } = {}) => {
     if (this.state.submitting) {
       return false;
     }
@@ -159,6 +159,7 @@ class SignInOrJoinFree extends React.Component {
         user: { email, password },
         redirect: this.getRedirectURL(),
         websiteUrl: getWebsiteUrl(),
+        sendLink,
       });
 
       // In dev/test, API directly returns a redirect URL for emails like
@@ -296,6 +297,7 @@ class SignInOrJoinFree extends React.Component {
                         pattern={useRecoveryCodes ? '[a-zA-Z0-9]{16}' : '[0-9]{6}'}
                         inputMode={useRecoveryCodes ? 'none' : 'numeric'}
                         autoFocus
+                        autoComplete={useRecoveryCodes ? 'on' : 'one-time-code'}
                         data-cy={useRecoveryCodes ? null : 'signin-two-factor-auth-input'}
                       />
                     )}
@@ -395,7 +397,7 @@ class SignInOrJoinFree extends React.Component {
                       oAuthAppImage: this.props.oAuthApplication?.account?.imageUrl,
                     }))
                 }
-                onSubmit={() => this.signIn(email, password)}
+                onSubmit={options => this.signIn(email, password, options)}
                 loading={submitting}
                 unknownEmail={unknownEmailError}
                 passwordRequired={passwordRequired}

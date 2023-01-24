@@ -281,13 +281,32 @@ export default class SignIn extends React.Component {
                 </Flex>
               </Container>
 
-              {this.props.showSecondaryAction && (
+              {this.props.showSecondaryAction && !this.props.passwordRequired && (
                 <Box>
                   <Flex color="black.800" mr={1} fontSize="14px" justifyContent="center">
                     <FormattedMessage defaultMessage="Don't have one?" />
                   </Flex>
                   <Flex fontSize="14px" justifyContent="center" mt={2}>
                     {this.renderSecondaryAction(<FormattedMessage defaultMessage="Create an account" />)}
+                  </Flex>
+                </Box>
+              )}
+
+              {this.props.passwordRequired && (
+                <Box>
+                  <Flex color="black.800" mr={1} fontSize="14px" justifyContent="center">
+                    <FormattedMessage defaultMessage="Want to receive a login link instead?" />
+                  </Flex>
+                  <Flex fontSize="14px" justifyContent="center" mt={2}>
+                    <StyledLinkButton
+                      fontSize="14px"
+                      onClick={() => onSubmit({ sendLink: true })}
+                      disabled={loading}
+                      data-cy="signin-secondary-action-btn"
+                      underlineOnHover
+                    >
+                      <FormattedMessage defaultMessage="Yes, send me an email" />
+                    </StyledLinkButton>
                   </Flex>
                 </Box>
               )}
