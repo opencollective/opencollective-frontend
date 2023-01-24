@@ -231,6 +231,9 @@ export const ActivityDescriptionI18n = defineMessages({
   USER_CHANGE_EMAIL: {
     defaultMessage: 'Changed email address',
   },
+  USER_PASSWORD_SET: {
+    defaultMessage: 'Changed password',
+  },
   // Gift cards
   USER_CARD_CLAIMED: {
     defaultMessage: 'Claimed a gift card from <FromAccount></FromAccount>',
