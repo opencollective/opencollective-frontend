@@ -98,7 +98,7 @@ export default function TwoFactorAuthenticationModal() {
                 defaultMessage="To enable Two-Factor Authentication (2FA), follow the steps <link>here</link>"
                 values={{
                   link: getI18nLink({
-                    href: getSettingsRoute(LoggedInUser.collective, 'two-factor-auth'),
+                    href: getSettingsRoute(LoggedInUser.collective, 'user-security'),
                     as: Link,
                   }),
                 }}

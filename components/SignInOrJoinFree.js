@@ -258,7 +258,7 @@ class SignInOrJoinFree extends React.Component {
                 const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
                 const user = this.props.login(localStorage2FAToken, { recoveryCode });
                 return this.props.router.replace({
-                  pathname: '/[slug]/admin/two-factor-auth',
+                  pathname: '/[slug]/admin/user-security',
                   query: { slug: user.collective.slug },
                 });
               } else {
