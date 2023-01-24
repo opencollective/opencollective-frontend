@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { MouseEventHandler, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { useIntl } from 'react-intl';
@@ -7,10 +7,18 @@ import {
   InputProps,
   MultiValueGenericProps,
   MultiValueProps,
+  OnChangeValue,
   OptionProps,
+  Props,
 } from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
-import { SortableContainer, SortableElement, SortableHandle, SortEndHandler } from 'react-sortable-hoc';
+import {
+  SortableContainer,
+  SortableContainerProps,
+  SortableElement,
+  SortableHandle,
+  SortEndHandler,
+} from 'react-sortable-hoc';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
@@ -28,6 +36,11 @@ export const searchTagsQuery = gql`
   }
 `;
 
+type TagOption = {
+  label: string;
+  value: string;
+};
+
 // Sorting logic from https://react-select.com/advanced#sortable-multiselect
 function arrayMove<T>(array: readonly T[], from: number, to: number) {
   const slicedArray = array.slice();
@@ -35,10 +48,10 @@ function arrayMove<T>(array: readonly T[], from: number, to: number) {
   return slicedArray;
 }
 
-const SortableMultiValue = SortableElement((props: MultiValueProps) => {
+const SortableMultiValue = SortableElement((props: MultiValueProps<TagOption>) => {
   // This prevents the menu from being opened/closed when the user clicks
   // on a value to begin dragging it
-  const onMouseDown = e => {
+  const onMouseDown: MouseEventHandler<HTMLDivElement> = e => {
     e.preventDefault();
     e.stopPropagation();
   };
@@ -50,7 +63,7 @@ const SortableMultiValueLabel = SortableHandle((props: MultiValueGenericProps) =
   <ReactSelectComponents.MultiValueLabel {...props} />
 ));
 
-const SortableSelect = SortableContainer(AsyncCreatableSelect);
+const SortableSelect = SortableContainer(AsyncCreatableSelect) as React.ComponentClass<Props & SortableContainerProps>;
 
 const Input = (props: InputProps) => {
   return <ReactSelectComponents.Input {...props} data-cy={'tags-select-input'} />;
@@ -60,17 +73,21 @@ const Option = ({ innerProps, ...props }: OptionProps) => {
   return (
     <ReactSelectComponents.Option
       {...props}
-      innerProps={{
-        ...innerProps,
-        'data-cy': `tags-select-option-${props.data['value']}`,
-      }}
+      innerProps={
+        {
+          ...innerProps,
+          'data-cy': `tags-select-option-${props.data['value']}`,
+        } as React.HTMLProps<HTMLDivElement>
+      }
     />
   );
 };
 
 function CollectiveTagsInput({ defaultValue = [], onChange, client }) {
   const intl = useIntl();
-  const [selected, setSelected] = useState(defaultValue.map(tag => ({ label: tag, value: tag })) || []);
+  const [selected, setSelected] = useState<readonly TagOption[]>(
+    defaultValue.map(tag => ({ label: tag, value: tag })) || [],
+  );
 
   useEffect(() => {
     onChange(selected);
@@ -115,14 +132,16 @@ function CollectiveTagsInput({ defaultValue = [], onChange, client }) {
       isMulti
       value={selected}
       components={{
+        // @ts-ignore We're failing to provide a required index prop to SortableElement
         MultiValue: SortableMultiValue,
+        // @ts-ignore We're failing to provide a required index prop to SortableElement
         MultiValueLabel: SortableMultiValueLabel,
         Input,
         Option,
       }}
       defaultOptions={true}
       loadOptions={fetchTags}
-      onChange={selectedOptions => setSelected(selectedOptions)}
+      onChange={(selectedOptions: OnChangeValue<TagOption, true>) => setSelected(selectedOptions)}
       data-cy="tags-select"
       styles={{
         multiValue: baseStyles => ({
