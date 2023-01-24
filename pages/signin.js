@@ -5,7 +5,6 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isValidRelativeUrl } from '../lib/utils';
 
