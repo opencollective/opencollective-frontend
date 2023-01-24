@@ -86,6 +86,7 @@ const CurrencyPicker = ({ availableCurrencies, value, onChange }) => {
   return (
     <StyledSelect
       inputId="currency-picker"
+      data-cy="currency-picker"
       placeholder="----"
       error={!value}
       isSearchable={availableCurrencies?.length > 10}

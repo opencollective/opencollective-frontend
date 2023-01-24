@@ -7,7 +7,6 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { accountSupportsGrants } from '../../lib/collective.lib';
 import { PayPalSupportedCurrencies } from '../../lib/constants/currency';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
