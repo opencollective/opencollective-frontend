@@ -12,6 +12,7 @@ import {
   flexbox,
   FlexboxProps,
   grid,
+  GridProps,
   layout,
   LayoutProps,
   space,
@@ -60,7 +61,7 @@ export const Flex = styled(Box)<FlexProps>(
 
 Flex.displayName = 'Flex';
 
-export const Grid = styled.div(
+export const Grid = styled.div<BoxProps & GridProps>(
   {
     boxSizing: 'border-box',
     display: 'grid',
