@@ -22,7 +22,7 @@ export const ABOUT_ORG_SECTIONS = {
   COLLECTIVE_PAGE: 'collective-page',
   CONNECTED_ACCOUNTS: 'connected-accounts',
   INFO: 'info',
-  TEAM: 'members',
+  TEAM: 'team',
 };
 
 export const ORG_BUDGET_SECTIONS = {
@@ -61,7 +61,7 @@ export const COLLECTIVE_SECTIONS = {
   NOTIFICATIONS: 'notifications',
   POLICIES: 'policies',
   CUSTOM_EMAIL: 'custom-email',
-  TEAM: 'members',
+  TEAM: 'team',
   TICKETS: 'tickets',
   TIERS: 'tiers',
   TIERS_LEGACY: 'tiers-legacy',

@@ -9,7 +9,9 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import roles from '../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
+import { teamPageQuery } from '../../admin-panel/sections/Team';
 import Container from '../../Container';
 import { Flex } from '../../Grid';
 import StyledButton from '../../StyledButton';
@@ -18,7 +20,6 @@ import StyledTooltip from '../../StyledTooltip';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
 import MemberForm from './MemberForm';
-import { coreContributorsQuery } from './Members';
 
 const editMemberMutation = gql`
   mutation EditMember(
@@ -78,7 +79,9 @@ const removeMemberMutation = gql`
 `;
 
 const EditMemberModal = props => {
-  const { intl, member, collective, canRemove, isLastAdmin, cancelHandler, LoggedInUser, refetchLoggedInUser } = props;
+  const { intl, member, collective, canRemove, isLastAdmin, cancelHandler, onEdit } = props;
+
+  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
 
   const { addToast } = useToasts();
 
@@ -108,7 +111,7 @@ const EditMemberModal = props => {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
-        query: coreContributorsQuery,
+        query: teamPageQuery,
         context: API_V2_CONTEXT,
         variables: {
           collectiveSlug: get(collective, 'slug'),
@@ -150,6 +153,7 @@ const EditMemberModal = props => {
         await refetchLoggedInUser();
       }
 
+      onEdit?.();
       cancelHandler();
     } catch (error) {
       addToast({
@@ -187,6 +191,7 @@ const EditMemberModal = props => {
         ),
       });
 
+      onEdit?.();
       cancelHandler();
     } catch (error) {
       addToast({
@@ -243,6 +248,7 @@ const EditMemberModal = props => {
           await refetchLoggedInUser();
         }
 
+        onEdit?.();
         cancelHandler();
       } catch (error) {
         addToast({
@@ -350,11 +356,10 @@ const EditMemberModal = props => {
 EditMemberModal.propTypes = {
   collective: PropTypes.object,
   cancelHandler: PropTypes.func,
+  onEdit: PropTypes.func,
   intl: PropTypes.object.isRequired,
   isLastAdmin: PropTypes.bool,
   member: PropTypes.object,
-  LoggedInUser: PropTypes.object.isRequired,
-  refetchLoggedInUser: PropTypes.func.isRequired,
   router: PropTypes.object,
   canRemove: PropTypes.bool,
 };

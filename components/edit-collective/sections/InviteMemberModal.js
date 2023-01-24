@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
+import { teamPageQuery } from '../../admin-panel/sections/Team';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import { Flex } from '../../Grid';
@@ -17,7 +18,6 @@ import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
 import MemberForm from './MemberForm';
-import { coreContributorsQuery } from './Members';
 
 export const inviteMemberMutation = gql`
   mutation InviteMember(
@@ -52,7 +52,7 @@ const InviteMemberModal = props => {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
-        query: coreContributorsQuery,
+        query: teamPageQuery,
         context: API_V2_CONTEXT,
         variables: {
           collectiveSlug: get(collective, 'slug'),
