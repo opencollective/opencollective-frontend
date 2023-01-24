@@ -4,6 +4,7 @@ import { gql } from '@apollo/client';
 import { useIntl } from 'react-intl';
 import {
   components as ReactSelectComponents,
+  ContainerProps,
   InputProps,
   MultiValueGenericProps,
   MultiValueProps,
@@ -24,6 +25,7 @@ import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import colors from '../lib/theme/colors';
 import withData from '../lib/withData';
+import { SelectProps } from '@material-ui/core';
 
 export const searchTagsQuery = gql`
   query SearchTags($term: String!) {
@@ -48,6 +50,8 @@ function arrayMove<T>(array: readonly T[], from: number, to: number) {
   return slicedArray;
 }
 
+const SortableSelect = SortableContainer(AsyncCreatableSelect) as React.ComponentClass<Props & SortableContainerProps>;
+
 const SortableMultiValue = SortableElement((props: MultiValueProps<TagOption>) => {
   // This prevents the menu from being opened/closed when the user clicks
   // on a value to begin dragging it
@@ -62,8 +66,6 @@ const SortableMultiValue = SortableElement((props: MultiValueProps<TagOption>) =
 const SortableMultiValueLabel = SortableHandle((props: MultiValueGenericProps) => (
   <ReactSelectComponents.MultiValueLabel {...props} />
 ));
-
-const SortableSelect = SortableContainer(AsyncCreatableSelect) as React.ComponentClass<Props & SortableContainerProps>;
 
 const Input = (props: InputProps) => {
   return <ReactSelectComponents.Input {...props} data-cy={'tags-select-input'} />;
@@ -82,6 +84,13 @@ const Option = ({ innerProps, ...props }: OptionProps) => {
     />
   );
 };
+
+const SelectContainer = ({ innerProps, ...props }: ContainerProps) => (
+  <ReactSelectComponents.SelectContainer
+    {...props}
+    innerProps={{ ...innerProps, 'data-cy': 'tags-select' } as React.HTMLProps<HTMLDivElement>}
+  />
+);
 
 function CollectiveTagsInput({ defaultValue = [], onChange, client }) {
   const intl = useIntl();
@@ -136,13 +145,13 @@ function CollectiveTagsInput({ defaultValue = [], onChange, client }) {
         MultiValue: SortableMultiValue,
         // @ts-ignore We're failing to provide a required index prop to SortableElement
         MultiValueLabel: SortableMultiValueLabel,
+        SelectContainer,
         Input,
         Option,
       }}
       defaultOptions={true}
       loadOptions={fetchTags}
       onChange={(selectedOptions: OnChangeValue<TagOption, true>) => setSelected(selectedOptions)}
-      data-cy="tags-select"
       styles={{
         multiValue: baseStyles => ({
           ...baseStyles,
