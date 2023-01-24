@@ -77,7 +77,7 @@ const Code = styled.code`
   max-width: 350px;
 `;
 
-class UserTwoFactorAuth extends React.Component {
+class UserSecurity extends React.Component {
   static propTypes = {
     /** From intl */
     intl: PropTypes.object.isRequired,
@@ -773,4 +773,4 @@ const addGraphql = compose(
   addAccountHasTwoFactorAuthData,
 );
 
-export default injectIntl(withToasts(withUser(addGraphql(UserTwoFactorAuth))));
+export default injectIntl(withToasts(withUser(addGraphql(UserSecurity))));

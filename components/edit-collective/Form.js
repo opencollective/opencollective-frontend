@@ -54,7 +54,7 @@ import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import TiersLegacy from './sections/TiersLegacy';
-import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
+import UserSecurity from './sections/UserSecurity';
 import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
@@ -536,8 +536,8 @@ class EditCollectiveForm extends React.Component {
         return <Security collective={collective} />;
 
       // 2FA
-      case EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH:
-        return <UserTwoFactorAuth slug={collective.slug} userEmail={LoggedInUser.email} />;
+      case EDIT_COLLECTIVE_SECTIONS.USER_SECURITY:
+        return <UserSecurity slug={collective.slug} userEmail={LoggedInUser.email} />;
 
       // Payment Receipts
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS:

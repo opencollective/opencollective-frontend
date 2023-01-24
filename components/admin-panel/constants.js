@@ -65,7 +65,7 @@ export const COLLECTIVE_SECTIONS = {
   TICKETS: 'tickets',
   TIERS: 'tiers',
   TIERS_LEGACY: 'tiers-legacy',
-  TWO_FACTOR_AUTH: 'two-factor-auth',
+  USER_SECURITY: 'user-security',
   VIRTUAL_CARDS: 'virtual-cards',
   WEBHOOKS: 'webhooks',
   ACTIVITY_LOG: 'activity-log',
@@ -218,7 +218,7 @@ export const SECTION_LABELS = defineMessages({
     id: 'section.tickets.title',
     defaultMessage: 'Tickets',
   },
-  [ALL_SECTIONS.TWO_FACTOR_AUTH]: {
+  [ALL_SECTIONS.USER_SECURITY]: {
     id: 'Security',
     defaultMessage: 'Security',
   },
