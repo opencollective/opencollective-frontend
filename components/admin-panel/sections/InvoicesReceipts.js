@@ -12,15 +12,14 @@ import Container from '../../Container';
 import SettingsSectionTitle from '../../edit-collective/sections/SettingsSectionTitle';
 import { Box, Flex } from '../../Grid';
 import MessageBox from '../../MessageBox';
-import PreviewModal from '../../PreviewModal';
 import StyledButton from '../../StyledButton';
 import StyledHr from '../../StyledHr';
-import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
-import StyledTextarea from '../../StyledTextarea';
 import { H2, P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+
+import ReceiptTemplateForm from './ReceiptTemplateForm';
 
 const messages = defineMessages({
   extraInfoPlaceholder: {
@@ -57,7 +56,6 @@ const InvoicesReceipts = ({ collective }) => {
   const [showAlternativeReceiptsSection, setShowAlternativeReceiptsSection] = React.useState(
     defaultAlternativeReceiptTitle !== null,
   );
-  const [showPreview, setShowPreview] = React.useState(false);
   const [isFieldChanged, setIsFieldChanged] = React.useState(false);
   const isSaved =
     get(data, 'editCollective.settings.invoice.templates.default.title') === receiptTitle &&
@@ -96,6 +94,26 @@ const InvoicesReceipts = ({ collective }) => {
     return { templates, expenseTemplates };
   };
 
+  const onChangeDefault = (title, info) => {
+    if (title) {
+      setReceiptTitle(title === '' ? defaultReceiptTitlePlaceholder : title);
+    }
+    if (info) {
+      setInfo(info);
+    }
+    setIsFieldChanged(true);
+  };
+
+  const onChangeAlternate = (title, info) => {
+    if (title) {
+      setAlternativeReceiptTitle(title);
+    }
+    if (info) {
+      setAlternativeInfo(info);
+    }
+    setIsFieldChanged(true);
+  };
+
   const onChange = (value, stateFunction) => {
     stateFunction(value);
     setIsFieldChanged(true);
@@ -131,9 +149,9 @@ const InvoicesReceipts = ({ collective }) => {
         </StyledInputField>
       </Box>
       <SettingsSectionTitle>
-        <FormattedMessage defaultMessage="Financial contributions" />
+        <FormattedMessage id="financialContributions" defaultMessage="Financial contributions" />
       </SettingsSectionTitle>
-      <P>
+      <P pb="26px">
         <FormattedMessage
           id="EditHostInvoice.Receipt.Instructions"
           defaultMessage="You can customize the title (and add custom text) on automatically generated receipts for financial contributions to your Collective(s), e.g., 'donation receipt' or 'tax receipt' or a phrase appropriate for your legal entity type, language, and location. Keep this field empty to use the default title:"
@@ -147,53 +165,17 @@ const InvoicesReceipts = ({ collective }) => {
         </MessageBox>
       )}
       <Flex flexWrap="wrap" flexDirection="column" width="100%">
-        <Box color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px" pt="26px">
-          <FormattedMessage defaultMessage="Receipt title" />
-        </Box>
-        <StyledInput
-          placeholder={defaultReceiptTitlePlaceholder}
-          defaultValue={defaultReceiptTitlePlaceholder === receiptTitle || receiptTitle === null ? null : receiptTitle}
-          onChange={e =>
-            onChange(e.target.value === '' ? defaultReceiptTitlePlaceholder : e.target.value, setReceiptTitle)
-          }
-          width="100%"
-          maxWidth={414}
-          mt="6px"
-        />
-        <P mt="6px">
-          <FormattedMessage
-            defaultMessage={`Keep this field empty to use the default title: ${defaultReceiptTitlePlaceholder}.`}
-          />
-        </P>
-        <Flex justifyContent="space-between" flexDirection={['column', 'row']} pt="26px">
-          <Box color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px">
-            <FormattedMessage defaultMessage="Custom Message" />
-          </Box>
-          <StyledButton
-            buttonStyle="secondary"
-            buttonSize="tiny"
-            maxWidth="78px"
-            pt="4px"
-            pb="4px"
-            pl="14px"
-            pr="14px"
-            height="24px"
-            onClick={() => setShowPreview(true)}
-          >
-            <Span fontSize="13px" fontWeight={500} lineHeight="16px">
-              <FormattedMessage defaultMessage="Preview" />
-            </Span>
-          </StyledButton>
-        </Flex>
-        <StyledTextarea
-          placeholder={intl.formatMessage(messages.extraInfoPlaceholder)}
-          defaultValue={info}
-          onChange={e => onChange(e.target.value, setInfo)}
-          width="100%"
-          height="150px"
-          fontSize="13px"
-          mt="14px"
-          mb="23px"
+        <ReceiptTemplateForm
+          defaultTemplate
+          value={{
+            title: defaultReceiptTitlePlaceholder === receiptTitle || receiptTitle === null ? null : receiptTitle,
+            info,
+          }}
+          placeholders={{
+            title: defaultReceiptTitlePlaceholder,
+            info: intl.formatMessage(messages.extraInfoPlaceholder),
+          }}
+          onChange={onChangeDefault}
         />
         <SettingsSectionTitle>
           <FormattedMessage defaultMessage="Alternative receipt template" />
@@ -213,57 +195,28 @@ const InvoicesReceipts = ({ collective }) => {
             pr="16px"
             onClick={() => setShowAlternativeReceiptsSection(true)}
           >
-            <Plus size={14} color="#1869F5" />
-            <FormattedMessage defaultMessage="Add alternative receipt" />
+            <Flex fontSize="14px" fontWeight={500} lineHeight="18px" color="#1869F5">
+              <Box pr="10px">
+                <Plus size={17} />
+              </Box>
+              <FormattedMessage defaultMessage="Add alternative receipt" />
+            </Flex>
           </StyledButton>
         )}
         {showAlternativeReceiptsSection && (
           <Container mt="26px" mb="24px">
             <Flex flexWrap="wrap" flexDirection="column" width="100%">
-              <Box color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px">
-                <FormattedMessage defaultMessage="Receipt title" />
-              </Box>
-              <StyledInput
-                placeholder="Custom Receipt"
-                defaultValue={alternativeReceiptTitle}
-                onChange={e => onChange(e.target.value, setAlternativeReceiptTitle)}
-                width="100%"
-                maxWidth={414}
-                mt="6px"
-              />
-              <Flex justifyContent="space-between" flexDirection={['column', 'row']} pt="26px">
-                <Box color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px">
-                  <FormattedMessage defaultMessage="Custom Message" />
-                </Box>
-                <StyledButton
-                  buttonStyle="secondary"
-                  buttonSize="tiny"
-                  maxWidth="78px"
-                  pt="4px"
-                  pb="4px"
-                  pl="14px"
-                  pr="14px"
-                  height="24px"
-                  onClick={() => setShowPreview(true)}
-                >
-                  <Span fontSize="13px" fontWeight={500} lineHeight="16px">
-                    <FormattedMessage defaultMessage="Preview" />
-                  </Span>
-                </StyledButton>
-              </Flex>
-              <StyledTextarea
-                placeholder={intl.formatMessage(messages.extraInfoPlaceholder)}
-                defaultValue={alternativeInfo}
-                onChange={e => onChange(e.target.value, setAlternativeInfo)}
-                width="100%"
-                height="150px"
-                fontSize="13px"
-                mt="14px"
+              <ReceiptTemplateForm
+                value={{ title: alternativeReceiptTitle, info: alternativeInfo }}
+                placeholders={{ title: 'Custom Receipt', info: intl.formatMessage(messages.extraInfoPlaceholder) }}
+                onChange={onChangeAlternate}
               />
             </Flex>
             <StyledButton
               buttonStyle="danger"
-              style={{ backgroundColor: 'white', background: 'none', borderColor: '#CC2955' }}
+              borderColor="#CC2955"
+              backgroundColor="white"
+              background="none"
               mt="24px"
               maxWidth={225}
               pt="7px"
@@ -272,8 +225,10 @@ const InvoicesReceipts = ({ collective }) => {
               pr="16px"
               onClick={() => deleteAlternativeReceipt()}
             >
-              <Trash size={14} color="#CC2955" />
-              <Span fontSize="14px" fontWeight={500} lineHeight="18px" style={{ color: '#CC2955' }}>
+              <Span display="flex" fontSize="14px" fontWeight={500} lineHeight="18px" color="#CC2955">
+                <Box pr="10px">
+                  <Trash size={17} />
+                </Box>
                 <FormattedMessage defaultMessage="Delete alternative receipt" />
               </Span>
             </StyledButton>
@@ -317,15 +272,6 @@ const InvoicesReceipts = ({ collective }) => {
           )}
         </StyledButton>
       </Flex>
-      {showPreview && (
-        <PreviewModal
-          heading={<FormattedMessage defaultMessage="Receipt Preview" />}
-          onClose={() => setShowPreview(false)}
-          previewImage="/static/images/invoice-title-preview.jpg"
-          imgHeight="548.6px"
-          imgWidth="667px"
-        />
-      )}
     </Container>
   );
 };

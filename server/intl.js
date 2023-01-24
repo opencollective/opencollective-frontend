@@ -55,7 +55,10 @@ function middleware() {
 
     logger.debug('url %s locale %s', req.url, req.locale);
     req.localeDataScript = getLocaleDataScript(req.locale);
-    req.messages = getMessages(req.locale);
+    if (req.locale !== 'en') {
+      req.messages = getMessages(req.locale);
+    }
+
     next();
   };
 }

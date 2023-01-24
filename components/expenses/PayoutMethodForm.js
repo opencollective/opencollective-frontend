@@ -67,7 +67,7 @@ export const validatePayoutMethod = payoutMethod => {
  * This component is **fully controlled**, you need to call `validatePayoutMethod`
  * to proceed with the validation and pass the result with the `errors` prop.
  */
-const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
+const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const isNew = !payoutMethod.id;
@@ -87,7 +87,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
               label={formatMessage(msg.paypalEmail)}
               labelFontSize="13px"
               disabled={!isNew}
-              required
+              required={required !== false}
             >
               {inputProps => <StyledInput placeholder="e.g., yourname@yourhost.com" {...inputProps} {...field} />}
             </StyledInputField>
@@ -104,7 +104,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
               labelFontSize="13px"
               disabled={!isNew}
               data-cy="payout-other-info"
-              required
+              required={required !== false}
             >
               {inputProps => <StyledTextarea minHeight={100} {...inputProps} {...field} />}
             </StyledInputField>
@@ -112,7 +112,12 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host }) => {
         </Field>
       )}
       {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && (
-        <PayoutBankInformationForm isNew={isNew} getFieldName={getFieldName} host={host} />
+        <PayoutBankInformationForm
+          isNew={isNew}
+          getFieldName={getFieldName}
+          host={host}
+          optional={required === false}
+        />
       )}
       {isNew && (
         <Box mt={3}>
@@ -139,6 +144,7 @@ PayoutMethodForm.propTypes = {
   }).isRequired,
   /** Base name of the field in the form */
   fieldsPrefix: PropTypes.string,
+  required: PropTypes.bool,
 };
 
 export default React.memo(PayoutMethodForm);

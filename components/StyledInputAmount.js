@@ -147,7 +147,7 @@ const StyledInputAmount = ({
       if (parsedValue === null || isNaN(parsedValue)) {
         onChange(parsedValue, e);
       } else if (!e.target.checkValidity() || parsedValue !== valueWithIgnoredComma) {
-        onChange(e.target.value ? NaN : null, e);
+        onChange(isNaN(e.target.value) ? NaN : null, e);
       } else {
         onChange(floatAmountToCents(parsedValue), e);
       }
@@ -166,7 +166,7 @@ const StyledInputAmount = ({
       error={props.error || getError(curValue, minAmount, props.required)}
       defaultValue={isUndefined(defaultValue) ? undefined : defaultValue / 100}
       value={curValue}
-      prependProps={!hasCurrencyPicker ? undefined : { p: 0 }}
+      prependProps={!hasCurrencyPicker ? { color: props.disabled ? 'black.400' : 'black.800' } : { p: 0 }}
       prepend={
         !hasCurrencyPicker ? (
           formatCurrencyName(currency, currencyDisplay)

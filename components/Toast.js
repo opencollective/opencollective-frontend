@@ -15,21 +15,22 @@ const CloseButton = styled(StyledRoundButton).attrs({
   'data-cy': 'dismiss-toast-btn',
   buttonSize: 'tiny',
   isBorderless: true,
+  p: 0,
 })``;
 
 const ToastTitle = styled.span`
-  font-size: 11px;
-  line-height: 12px;
+  font-size: 12px;
+  line-height: 16px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 `;
 
 const ToastMessage = styled.span`
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 13px;
+  line-height: 20px;
   font-weight: 500;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   margin-top: 8px;
   word-break: break-word;
 `;
@@ -67,21 +68,21 @@ const variantType = variant({
         [Separator]: { bg: 'blue.600' },
       },
       '&[data-type="ERROR"]': {
-        [IconContainer]: { bg: 'red.500' },
-        [Separator]: { bg: 'red.500' },
+        [IconContainer]: { bg: '#E03F6A' },
+        [Separator]: { bg: '#E03F6A' },
       },
       '&[data-type="SUCCESS"]': {
-        [IconContainer]: { bg: 'green.500' },
-        [Separator]: { bg: 'green.500' },
+        [IconContainer]: { bg: '#29CC75' },
+        [Separator]: { bg: '#29CC75' },
       },
     },
 
     dark: {
-      bg: '#5a5b5c',
-      borderColor: 'black.700',
+      bg: 'rgba(50, 51, 52, 0.8)',
+      borderColor: 'black.900',
 
       [ToastTitle]: { color: '#FFFFFF' },
-      [ToastMessage]: { color: 'black.300' },
+      [ToastMessage]: { color: 'black.100' },
       [CloseButton]: {
         color: 'black.200',
         '&:hover': { color: 'black.800', boxShadow: '4px 4px 4px #505050' },
@@ -92,12 +93,12 @@ const variantType = variant({
         [Separator]: { bg: 'blue.500' },
       },
       '&[data-type="ERROR"]': {
-        [IconContainer]: { bg: 'red.500' },
-        [Separator]: { bg: 'red.500' },
+        [IconContainer]: { bg: 'red.400' },
+        [Separator]: { bg: 'red.400' },
       },
       '&[data-type="SUCCESS"]': {
-        [IconContainer]: { bg: 'green.500' },
-        [Separator]: { bg: 'green.500' },
+        [IconContainer]: { bg: '#29CC75' },
+        [Separator]: { bg: '#29CC75' },
       },
       a: {
         color: 'white.full',
@@ -114,6 +115,7 @@ const StyledToast = styled.div`
   justify-content: space-between;
   align-items: stretch;
   padding: 24px;
+  padding-right: 18px;
   border-radius: 8px;
   border: 1px solid #efefef;
   opacity: 1;
@@ -199,13 +201,13 @@ const Toast = ({ toast, timeLeft, onClose, variant }) => {
       </Flex>
       <Flex alignItems="center">
         <CloseButton
-          size={42}
+          size={36}
           onClick={() => {
             setClosing(true);
             onClose();
           }}
         >
-          <Close size={12} />
+          <Close size={14} />
         </CloseButton>
       </Flex>
     </StyledToast>

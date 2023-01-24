@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
+import { CollectiveType } from '../../../../lib/constants/collectives';
 import { parseDateInterval } from '../../../../lib/date-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
 import Collapse from '../../../Collapse';
 import { Box, Flex, Grid } from '../../../Grid';
@@ -19,7 +20,7 @@ import VirtualCard from '../../VirtualCard';
 
 import VirtualCardFilters from './VirtualCardFilters';
 
-const virtualCardsQuery = gqlV2/* GraphQL */ `
+const virtualCardsQuery = gql`
   query AccountVirtualCards(
     $slug: String
     $limit: Int!
@@ -63,13 +64,24 @@ const virtualCardsQuery = gqlV2/* GraphQL */ `
           name
           last4
           data
+          currency
+          provider
           privateData
           createdAt
           spendingLimitAmount
           spendingLimitInterval
+          spendingLimitRenewsOn
+          remainingLimit
           account {
             id
+            slug
             name
+            imageUrl
+          }
+          assignee {
+            id
+            name
+            slug
             imageUrl
           }
         }
@@ -169,8 +181,17 @@ const VirtualCards = props => {
         </Flex>
       </Box>
       <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
-        {data.account.virtualCards.nodes.map(vc => (
-          <VirtualCard key={vc.id} {...vc} />
+        {data.account.virtualCards.nodes.map(virtualCard => (
+          <VirtualCard
+            host={data.account.host}
+            canEditVirtualCard={virtualCard.data.status === 'active'}
+            canPauseOrResumeVirtualCard
+            canDeleteVirtualCard
+            confirmOnPauseCard={props.collective.type === CollectiveType.COLLECTIVE}
+            key={virtualCard.id}
+            virtualCard={virtualCard}
+            onDeleteRefetchQuery="AccountVirtualCards"
+          />
         ))}
       </Grid>
       <Flex mt={5} justifyContent="center">
@@ -180,7 +201,6 @@ const VirtualCards = props => {
           limit={VIRTUAL_CARDS_PER_PAGE}
           offset={offset}
           ignoredQueryParams={['slug', 'section']}
-          scrollToTopOnChange
         />
       </Flex>
     </Box>
@@ -190,6 +210,7 @@ const VirtualCards = props => {
 VirtualCards.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string,
+    type: PropTypes.string,
     virtualCards: PropTypes.object,
     virtualCardMerchants: PropTypes.array,
     host: PropTypes.object,

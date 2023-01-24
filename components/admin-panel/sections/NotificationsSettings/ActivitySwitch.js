@@ -1,17 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
-import { FormattedMessage } from 'react-intl';
+import { gql, useMutation } from '@apollo/client';
+import { Info } from '@styled-icons/feather/Info';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ActivityClasses, ActivityTypes } from '../../../../lib/constants/activities';
-import { API_V2_CONTEXT, gqlV2 } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 
+import { Box, Flex } from '../../../Grid';
 import InputSwitch from '../../../InputSwitch';
+import StyledTooltip from '../../../StyledTooltip';
 import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
 
 import { accountActivitySubscriptionsFragment } from './fragments';
 
-const refetchEmailNotificationQuery = gqlV2/* GraphQL */ `
+const refetchEmailNotificationQuery = gql`
   query NotificationsSettingsRefetchQuery($id: String!) {
     account(id: $id) {
       id
@@ -21,7 +25,7 @@ const refetchEmailNotificationQuery = gqlV2/* GraphQL */ `
   ${accountActivitySubscriptionsFragment}
 `;
 
-const setEmailNotificationMutation = gqlV2/* GraphQL */ `
+const setEmailNotificationMutation = gql`
   mutation SetEmailNotification($type: ActivityAndClassesType!, $account: AccountReferenceInput, $active: Boolean!) {
     setEmailNotification(type: $type, account: $account, active: $active) {
       id
@@ -31,14 +35,21 @@ const setEmailNotificationMutation = gqlV2/* GraphQL */ `
 
 const ActivitySwitch = ({ account, activityType }) => {
   const { addToast } = useToasts();
+  const intl = useIntl();
   const existingSetting = account.activitySubscriptions?.find(
     notification =>
       ActivityClasses[activityType] === notification.type || notification.type === ActivityTypes.ACTIVITY_ALL,
   );
-  const isIndeterminate =
+  const isResetingSettings =
     activityType === 'ACTIVITY_ALL' &&
-    account.activitySubscriptions?.some(notification => notification.type !== ActivityTypes.ACTIVITY_ALL);
-  const subscribed = existingSetting ? existingSetting.active : true;
+    account.activitySubscriptions
+      ?.filter(notification => notification.type !== ActivityTypes.ACTIVITY_ALL)
+      .map(notification =>
+        ActivityClassesI18N[`${notification.type}.title`]
+          ? intl.formatMessage(ActivityClassesI18N[`${notification.type}.title`])
+          : notification.type,
+      );
+  const [isSubscribed, setSubscribed] = React.useState(existingSetting ? existingSetting.active : true);
   const isOverridedByAll = activityType !== 'ACTIVITY_ALL' && existingSetting?.type === ActivityTypes.ACTIVITY_ALL;
 
   const [setEmailNotification] = useMutation(setEmailNotificationMutation, {
@@ -48,6 +59,7 @@ const ActivitySwitch = ({ account, activityType }) => {
 
   const handleToggle = async variables => {
     try {
+      setSubscribed(variables.active);
       await setEmailNotification({ variables });
     } catch (e) {
       addToast({
@@ -67,14 +79,31 @@ const ActivitySwitch = ({ account, activityType }) => {
   };
 
   return (
-    <InputSwitch
-      name={`${activityType}-switch`}
-      checked={subscribed}
-      disabled={isIndeterminate || isOverridedByAll}
-      onChange={event =>
-        handleToggle({ type: activityType, account: { id: account.id }, active: event.target.checked })
-      }
-    />
+    <Flex alignItems="center">
+      {isResetingSettings?.length > 0 ? (
+        <StyledTooltip
+          content={() => (
+            <FormattedMessage
+              id="NotificationsSettings.ToggleResetSettings"
+              defaultMessage="By toggling this setting, you're also reseting previously set options for: {activities}"
+              values={{ activities: isResetingSettings.join(', ') }}
+            />
+          )}
+        >
+          <Info size={16} />
+        </StyledTooltip>
+      ) : (
+        <Box width="16px" />
+      )}
+      <InputSwitch
+        name={`${activityType}-switch`}
+        checked={isSubscribed}
+        disabled={isOverridedByAll}
+        onChange={event =>
+          handleToggle({ type: activityType, account: { id: account.id }, active: event.target.checked })
+        }
+      />
+    </Flex>
   );
 };
 

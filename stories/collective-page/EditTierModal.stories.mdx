@@ -1,0 +1,38 @@
+import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
+import EditTierModal from '../../components/edit-collective/tiers/EditTierModal';
+
+<Meta title="Collective Page/EditTierModal" component={EditTierModal} argTypes={{}} />
+
+# EditTierModal
+
+## Default
+
+export const DefaultStory = props => <EditTierModal {...props} />;
+
+<Canvas>
+  <Story
+    name="Create"
+    parameters={{
+      design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/ZQBMWhnGGtRWeIZknFW1eP/%5BOC-Design%5D-Production-Ready-%E2%9C%85?node-id=13426%3A217743',
+      },
+    }}
+  >
+    <EditTierModal collective={{ type: 'ORGANIZATION', currency: 'USD', isActive: true }} />
+  </Story>
+</Canvas>
+
+<Canvas>
+  <Story
+    name="Edit"
+    parameters={{
+      design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/ZQBMWhnGGtRWeIZknFW1eP/%5BOC-Design%5D-Production-Ready-%E2%9C%85?node-id=13426%3A217743',
+      },
+    }}
+  >
+    <EditTierModal collective={{ type: 'ORGANIZATION', currency: 'USD', isActive: true }} tier={{ id: 'xpto' }} />
+  </Story>
+</Canvas>

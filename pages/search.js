@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular';
 import copy from 'copy-to-clipboard';
@@ -9,7 +10,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
 
@@ -389,7 +390,7 @@ class SearchPage extends React.Component {
             {showTagFilterSection && (
               <Container pl={[0, '23px']} pt={['20px', 0]}>
                 <FilterLabel htmlFor="tag-filter-type">
-                  <FormattedMessage defaultMessage="Tags" />
+                  <FormattedMessage id="Tags" defaultMessage="Tags" />
                 </FilterLabel>
                 <Flex flexWrap="wrap">
                   {uniqBy(
@@ -539,7 +540,7 @@ class SearchPage extends React.Component {
 
 export { SearchPage as MockSearchPage };
 
-export const searchPageQuery = gqlV2/* GraphQL */ `
+export const searchPageQuery = gql`
   query SearchPage(
     $term: String!
     $type: [AccountType]
@@ -581,6 +582,10 @@ export const searchPageQuery = gqlV2/* GraphQL */ `
         stats {
           id
           totalAmountReceived(useCache: true) {
+            currency
+            valueInCents
+          }
+          totalAmountSpent {
             currency
             valueInCents
           }

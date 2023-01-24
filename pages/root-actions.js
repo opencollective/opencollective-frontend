@@ -1,12 +1,15 @@
 import React from 'react';
 import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
 import { useRouter } from 'next/router';
+import slugify from 'slugify';
 import styled, { css } from 'styled-components';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
 import { Box, Grid } from '../components/Grid';
+import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
+import AccountSettings from '../components/root-actions/AccountSettings';
 import BanAccounts from '../components/root-actions/BanAccounts';
 import BanAccountsWithSearch from '../components/root-actions/BanAccountsWithSearch';
 import ClearCacheForAccountForm from '../components/root-actions/ClearCacheForAccountForm';
@@ -15,6 +18,7 @@ import MergeAccountsForm from '../components/root-actions/MergeAccountsForm';
 import MoveAuthoredContributions from '../components/root-actions/MoveAuthoredContributions';
 import MoveExpenses from '../components/root-actions/MoveExpenses';
 import MoveReceivedContributions from '../components/root-actions/MoveReceivedContributions';
+import RootActivityLog from '../components/root-actions/RootActivityLog';
 import UnhostAccountForm from '../components/root-actions/UnhostAccountForm';
 import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
@@ -36,6 +40,8 @@ const MENU = [
     description: `Before merging user accounts, you must always make sure that the person who requested it own both emails. Merging means payment methods are merged too, so if we just merge 2 accounts because someones ask for it without verifying we could end up in a very bad situation.\nA simple way to do that is to send a unique random code to the other account they want to claim and ask them to share this code.`,
   },
   { id: 'Unhost account', Component: UnhostAccountForm },
+  { id: 'Account Settings', Component: AccountSettings },
+  { id: 'Activity Log', Component: RootActivityLog, useCard: false },
   {
     id: 'Contributions & Expenses',
     type: 'category',
@@ -69,13 +75,17 @@ const MENU = [
     description: 'Use this action to ban an account or a network of accounts.',
   },
   {
-    id: 'Search & destroy',
+    id: 'Search & ban',
     Component: BanAccountsWithSearch,
     isDangerous: true,
   },
 ];
 
-const MenuEntry = styled.button`
+// Add slug for menu sections
+MENU.forEach(menu => (menu.slug = slugify(menu.id, { lower: true })));
+
+const MenuEntry = styled.div`
+  display: block;
   background: white;
   padding: 16px;
   cursor: pointer;
@@ -88,7 +98,7 @@ const MenuEntry = styled.button`
   text-align: left;
 
   ${props =>
-    props.isActive &&
+    props.$isActive &&
     css`
       font-weight: 800;
       background: #f5faff;
@@ -109,8 +119,8 @@ const MenuEntry = styled.button`
 `;
 
 const RootActionsPage = () => {
-  const [selectedMenuEntry, setSelectedMenuEntry] = React.useState(MENU[1]);
   const router = useRouter();
+  const selectedMenuEntry = MENU.find(m => m.slug === router.query.section) || MENU[1];
   const showHiddenActions = Boolean(router.query.showHiddenActions);
   return (
     <AuthenticatedPage disableSignup rootOnly>
@@ -121,17 +131,25 @@ const RootActionsPage = () => {
       </Container>
       <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" mb={5}>
         <Container borderRight="1px solid #e5e5e5">
-          {MENU.filter(e => showHiddenActions || !e.isHidden).map(menuEntry => (
-            <MenuEntry
-              key={menuEntry.id}
-              title={menuEntry.title || menuEntry.id}
-              isActive={selectedMenuEntry.id === menuEntry.id}
-              onClick={() => (menuEntry.type === 'category' ? null : setSelectedMenuEntry(menuEntry))}
-              $type={menuEntry.type}
-            >
-              {menuEntry.id}
-            </MenuEntry>
-          ))}
+          {MENU.filter(e => showHiddenActions || !e.isHidden).map(menuEntry =>
+            menuEntry.type === 'category' ? (
+              <MenuEntry key={menuEntry.id} title={menuEntry.title || menuEntry.id} $type="category">
+                {menuEntry.id}
+              </MenuEntry>
+            ) : (
+              <MenuEntry
+                key={menuEntry.id}
+                as={Link}
+                href={`/opencollective/root-actions/${menuEntry.slug}`}
+                shallow
+                title={menuEntry.title || menuEntry.id}
+                $isActive={selectedMenuEntry.id === menuEntry.id}
+                $type={menuEntry.type}
+              >
+                {menuEntry.id}
+              </MenuEntry>
+            ),
+          )}
         </Container>
         <div>
           <H3 lineHeight="30px" fontSize="24px" backgroundColor="black.50" color="black.800" p={3}>
@@ -156,9 +174,13 @@ const RootActionsPage = () => {
                 {selectedMenuEntry.description}
               </MessageBox>
             )}
-            <StyledCard p={4} my={4} width="100%">
+            {selectedMenuEntry.useCard === false ? (
               <selectedMenuEntry.Component />
-            </StyledCard>
+            ) : (
+              <StyledCard p={4} my={4} width="100%">
+                <selectedMenuEntry.Component />
+              </StyledCard>
+            )}
           </Box>
         </div>
       </Grid>

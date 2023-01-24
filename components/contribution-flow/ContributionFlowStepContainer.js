@@ -2,19 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
 
-import { Flex } from '../Grid';
+import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import { H4 } from '../Text';
 import { withUser } from '../UserProvider';
 
+import ShareButton from './ShareButton';
 import StepCheckout from './StepCheckout';
 import StepDetails from './StepDetails';
 import StepDetailsCrypto from './StepDetailsCrypto';
 import StepPayment from './StepPayment';
 import StepProfile from './StepProfile';
 import StepSummary from './StepSummary';
-import { canUseIncognitoForContribution } from './utils';
 
 class ContributionFlowStepContainer extends React.Component {
   static propTypes = {
@@ -23,12 +23,10 @@ class ContributionFlowStepContainer extends React.Component {
     collective: PropTypes.object,
     tier: PropTypes.object,
     onChange: PropTypes.func,
-    showFeesOnTop: PropTypes.bool,
+    showPlatformTip: PropTypes.bool,
     onNewCardFormReady: PropTypes.func,
     onSignInClick: PropTypes.func,
-    defaultEmail: PropTypes.string,
     isEmbed: PropTypes.bool,
-    defaultName: PropTypes.string,
     disabledPaymentMethodTypes: PropTypes.array,
     isSubmitting: PropTypes.bool,
     hideCreditCardPostalCode: PropTypes.bool,
@@ -88,7 +86,7 @@ class ContributionFlowStepContainer extends React.Component {
             tier={tier}
             onChange={this.props.onChange}
             data={stepDetails}
-            showFeesOnTop={this.props.showFeesOnTop}
+            showPlatformTip={this.props.showPlatformTip}
             isEmbed={isEmbed}
           />
         ) : (
@@ -100,11 +98,8 @@ class ContributionFlowStepContainer extends React.Component {
             profiles={this.props.contributeProfiles}
             collective={collective}
             stepDetails={stepDetails}
-            defaultEmail={this.props.defaultEmail}
-            defaultName={this.props.defaultName}
             onChange={this.props.onChange}
             data={stepProfile}
-            canUseIncognito={canUseIncognitoForContribution(collective, tier)}
             onSignInClick={this.props.onSignInClick}
             isEmbed={isEmbed}
           />
@@ -138,7 +133,9 @@ class ContributionFlowStepContainer extends React.Component {
             tier={tier}
             stepProfile={stepProfile}
             stepDetails={stepDetails}
+            stepPayment={stepPayment}
             data={stepSummary}
+            isCrypto={isCrypto}
             onChange={this.props.onChange}
             taxes={this.props.taxes}
             applyTaxes
@@ -150,13 +147,13 @@ class ContributionFlowStepContainer extends React.Component {
   };
 
   render() {
-    const { LoggedInUser, step } = this.props;
+    const { LoggedInUser, step, isEmbed } = this.props;
 
     return (
       <StyledCard p={[16, 32]} mx={[16, 'none']} borderRadius={15}>
         <Flex flexDirection="column" alignItems="center">
           {step.name !== 'checkout' && (
-            <Flex width="100%" mb={3}>
+            <Flex width="100%" mb={3} alignItems="center">
               <Flex alignItems="center">
                 <H4 fontSize={['20px', '24px']} fontWeight={500} py={2}>
                   {this.renderHeader(step.name, LoggedInUser)}
@@ -165,6 +162,11 @@ class ContributionFlowStepContainer extends React.Component {
               <Flex flexGrow={1} alignItems="center" justifyContent="center">
                 <StyledHr width="100%" ml={3} borderColor="black.300" />
               </Flex>
+              {!isEmbed && (
+                <Box ml={2}>
+                  <ShareButton />
+                </Box>
+              )}
             </Flex>
           )}
           {this.renderStep(step.name)}

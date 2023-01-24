@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
+
+import { gqlV1 } from '../lib/graphql/helpers';
 
 import CollectiveCard from './CollectiveCard';
 import Container from './Container';
@@ -100,7 +101,7 @@ class CollectivesWithData extends React.Component {
   }
 }
 
-const collectivesQuery = gql`
+const collectivesQuery = gqlV1/* GraphQL */ `
   query Collectives(
     $HostCollectiveId: Int
     $hostCollectiveSlug: String

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
@@ -6,12 +6,12 @@ import { get, pick } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { formatCurrency } from '../lib/currency-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { compose } from '../lib/utils';
 
-import Container from './Container';
 import { Flex } from './Grid';
 import StyledButton from './StyledButton';
+import { TOAST_TYPE, withToasts } from './ToastProvider';
 
 class SendMoneyToCollectiveBtn extends React.Component {
   static propTypes = {
@@ -26,6 +26,8 @@ class SendMoneyToCollectiveBtn extends React.Component {
     sendMoneyToCollective: PropTypes.func,
     confirmTransfer: PropTypes.func,
     isTransferApproved: PropTypes.bool,
+    customButton: PropTypes.function,
+    addToast: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -42,13 +44,15 @@ class SendMoneyToCollectiveBtn extends React.Component {
 
   async onClick() {
     const { currency, amount, fromCollective, toCollective, description, data, LoggedInUser } = this.props;
-    if (!LoggedInUser || !LoggedInUser.canEditCollective(fromCollective) || !get(data, 'account')) {
+    if (!LoggedInUser || !LoggedInUser.isAdminOfCollectiveOrHost(fromCollective) || !get(data, 'account')) {
       return;
     }
     const paymentMethods = get(data, 'account.paymentMethods');
     if (!paymentMethods || paymentMethods.length === 0) {
-      const error = "We couldn't find a payment method to make this transaction";
-      this.setState({ error });
+      this.props.addToast({
+        type: TOAST_TYPE.ERROR,
+        message: <FormattedMessage defaultMessage="We couldn't find a payment method to make this transaction" />,
+      });
       return;
     }
     this.setState({ loading: true });
@@ -74,44 +78,76 @@ class SendMoneyToCollectiveBtn extends React.Component {
           });
         },
       });
+      this.props.addToast({
+        type: TOAST_TYPE.SUCCESS,
+        message: (
+          <FormattedMessage
+            defaultMessage="Balance sent to {toCollectiveName}"
+            values={{ toCollectiveName: toCollective.name }}
+          />
+        ),
+      });
       this.setState({ loading: false });
     } catch (e) {
-      const error = e.message;
-      this.setState({ error, loading: false });
+      this.setState({ loading: false });
+      this.props.addToast({
+        type: TOAST_TYPE.ERROR,
+        message: e.message,
+      });
     }
   }
 
   render() {
-    const { amount, currency, toCollective, intl } = this.props;
+    const { amount, currency, toCollective, intl, customButton } = this.props;
     const { locale } = intl;
     return (
       <div className="SendMoneyToCollectiveBtn">
         <Flex justifyContent="center" mb={1}>
-          <StyledButton onClick={this.props.confirmTransfer || this.onClick}>
-            {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
-            {!this.state.loading && (
-              <FormattedMessage
-                id="SendMoneyToCollective.btn"
-                defaultMessage="Send {amount} to {collective}"
-                values={{
-                  amount: formatCurrency(amount, currency, locale),
-                  collective: toCollective.name,
-                }}
-              />
-            )}
-          </StyledButton>
+          {customButton ? (
+            customButton({
+              onClick: this.props.confirmTransfer || this.onClick,
+              children: (
+                <Fragment>
+                  {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
+                  {!this.state.loading && (
+                    <FormattedMessage
+                      id="SendMoneyToCollective.btn"
+                      defaultMessage="Send {amount} to {collective}"
+                      values={{
+                        amount: formatCurrency(amount, currency, locale),
+                        collective: toCollective.name,
+                      }}
+                    />
+                  )}
+                </Fragment>
+              ),
+            })
+          ) : (
+            <StyledButton onClick={this.props.confirmTransfer || this.onClick}>
+              {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
+              {!this.state.loading && (
+                <FormattedMessage
+                  id="SendMoneyToCollective.btn"
+                  defaultMessage="Send {amount} to {collective}"
+                  values={{
+                    amount: formatCurrency(amount, currency, locale),
+                    collective: toCollective.name,
+                  }}
+                />
+              )}
+            </StyledButton>
+          )}
         </Flex>
-        {this.state.error && <Container fontSize="1.1rem">{this.state.error}</Container>}
       </div>
     );
   }
 }
 
-const paymentMethodsQuery = gqlV2/* GraphQL */ `
+const paymentMethodsQuery = gql`
   query SendMoneyToCollectivePaymentMethods($slug: String) {
     account(slug: $slug) {
       id
-      paymentMethods(service: OPENCOLLECTIVE, enumType: COLLECTIVE) {
+      paymentMethods(service: OPENCOLLECTIVE, type: COLLECTIVE) {
         id
         service
         name
@@ -132,14 +168,14 @@ const addPaymentMethodsData = graphql(paymentMethodsQuery, {
   },
 });
 
-const collectiveBalanceFragment = gql`
+const collectiveBalanceFragment = gqlV1/* GraphQL */ `
   fragment StatFieldsFragment on CollectiveStatsType {
     id
     balance
   }
 `;
 
-const sendMoneyToCollectiveMutation = gqlV2/* GraphQL */ `
+const sendMoneyToCollectiveMutation = gql`
   mutation SendMoneyToCollective($order: OrderCreateInput!) {
     createOrder(order: $order) {
       order {
@@ -165,4 +201,4 @@ const addSendMoneyToCollectiveMutation = graphql(sendMoneyToCollectiveMutation, 
 
 const addGraphql = compose(addPaymentMethodsData, addSendMoneyToCollectiveMutation);
 
-export default addGraphql(injectIntl(SendMoneyToCollectiveBtn));
+export default addGraphql(withToasts(injectIntl(SendMoneyToCollectiveBtn)));

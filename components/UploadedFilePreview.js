@@ -83,6 +83,11 @@ const MainContainer = styled(Container)`
     `}
 `;
 
+const FileName = styled(P)`
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
 const PrivateIconContainer = styled.div`
   text-align: center;
   svg {
@@ -130,14 +135,7 @@ const UploadedFilePreview = ({
   } else if (!url) {
     content = <FileText color="#dcdee0" size="60%" />;
   } else if (isText) {
-    const icon = <FileTextIcon color="#dcdee0" size="60%" />;
-    content = url ? (
-      <StyledLink href={url} key={url} textAlign="center" openInNewTab>
-        {icon}
-      </StyledLink>
-    ) : (
-      icon
-    );
+    content = <FileTextIcon color="#dcdee0" size="60%" />;
   } else {
     const resizeWidth = Array.isArray(size) ? max(size) : size;
     content = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt || fileName} />;
@@ -150,19 +148,20 @@ const UploadedFilePreview = ({
       maxWidth={size}
       as={url ? Link : 'div'}
       href={url}
+      title={fileName}
       openInNewTab
     >
       <CardContainer size={size} maxHeight={maxHeight} title={fileName} border={border}>
         {content}
       </CardContainer>
       {showFileName && (
-        <Container mt="6px" maxWidth={100}>
+        <Container mt="6px" maxWidth={size || 100}>
           {isLoading ? (
             <LoadingPlaceholder height={12} />
           ) : fileName ? (
-            <P fontSize="12px" color="black.600" fontWeight="500">
+            <FileName fontSize="12px" color="black.600" fontWeight="500">
               {fileName}
-            </P>
+            </FileName>
           ) : (
             <P fontStyle="italic" fontSize="12px" color="black.600">
               <FormattedMessage id="File.NoFilename" defaultMessage="No filename" />

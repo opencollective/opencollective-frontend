@@ -1,7 +1,9 @@
 import React from 'react';
+import { CreditCard } from '@styled-icons/fa-solid';
 import { find, get, isEmpty, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
+import { canContributeRecurring, getCollectivePageMetadata } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import INTERVALS from '../../lib/constants/intervals';
 import {
@@ -10,23 +12,23 @@ import {
   PAYMENT_METHOD_TYPE,
 } from '../../lib/constants/payment-methods';
 import roles from '../../lib/constants/roles';
+import { PaymentMethodService, PaymentMethodType } from '../../lib/graphql/types/v2/graphql';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
   getPaymentMethodIcon,
   getPaymentMethodMetadata,
   isPaymentMethodDisabled,
 } from '../../lib/payment-method-utils';
+import { getWebsiteUrl } from '../../lib/utils';
 
 import CreditCardInactive from '../icons/CreditCardInactive';
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
+export const STRIPE_PAYMENT_ELEMENT_KEY = 'stripe-payment-element';
 const PAYPAL_MAX_AMOUNT = 999999999; // See MAX_VALUE_EXCEEDED https://developer.paypal.com/api/rest/reference/orders/v2/errors/#link-createorder
 
-const memberCanBeUsedToContribute = (member, account, canUseIncognito) => {
+const memberCanBeUsedToContribute = (member, account) => {
   if (member.role !== roles.ADMIN) {
-    return false;
-  } else if (!canUseIncognito && member.collective.isIncognito) {
-    // Incognito can't be used to contribute if not allowed
     return false;
   } else if (
     [CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(member.collective.type) &&
@@ -39,21 +41,11 @@ const memberCanBeUsedToContribute = (member, account, canUseIncognito) => {
   }
 };
 
-/**
- * Cannot use contributions for events and "Tickets" tiers, because we need the ticket holder's identity
- */
-export const canUseIncognitoForContribution = (collective, tier) => {
-  return collective.type !== CollectiveType.EVENT && (!tier || tier.type !== 'TICKET');
-};
-
-export const getContributeProfiles = (loggedInUser, collective, tier) => {
+export const getContributeProfiles = (loggedInUser, collective) => {
   if (!loggedInUser) {
     return [];
   } else {
-    const canUseIncognito = canUseIncognitoForContribution(collective, tier);
-    const filteredMembers = loggedInUser.memberOf.filter(member =>
-      memberCanBeUsedToContribute(member, collective, canUseIncognito),
-    );
+    const filteredMembers = loggedInUser.memberOf.filter(member => memberCanBeUsedToContribute(member, collective));
     const personalProfile = { email: loggedInUser.email, image: loggedInUser.image, ...loggedInUser.collective };
     const contributorProfiles = [personalProfile];
     filteredMembers.forEach(member => {
@@ -80,6 +72,7 @@ export const generatePaymentMethodOptions = (
   collective,
   isEmbed,
   disabledPaymentMethodTypes,
+  paymentIntent,
 ) => {
   const supportedPaymentMethods = get(collective, 'host.supportedPaymentMethods', []);
   const hostHasManual = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.BANK_TRANSFER);
@@ -93,7 +86,7 @@ export const generatePaymentMethodOptions = (
     key: `pm-${pm.id}`,
     title: getPaymentMethodName(pm),
     subtitle: getPaymentMethodMetadata(pm, totalAmount),
-    icon: getPaymentMethodIcon(pm),
+    icon: getPaymentMethodIcon(pm, pm.account),
     disabled: isPaymentMethodDisabled(pm, totalAmount),
     paymentMethod: pm,
   }));
@@ -104,6 +97,32 @@ export const generatePaymentMethodOptions = (
     ({ paymentMethod }) =>
       paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE || collective.host.legacyId === stepProfile.host?.id,
   );
+
+  if (paymentIntent) {
+    const allowedStripeTypes = [...paymentIntent.payment_method_types];
+    if (allowedStripeTypes.includes('card')) {
+      allowedStripeTypes.push('creditcard'); // we store this type as creditcard
+    }
+
+    uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
+      if (paymentMethod.service !== PaymentMethodService.STRIPE) {
+        return true;
+      }
+
+      return (
+        allowedStripeTypes.includes(paymentMethod.type.toLowerCase()) &&
+        (!paymentMethod?.data?.stripeAccount || paymentMethod?.data?.stripeAccount === paymentIntent.stripeAccount)
+      );
+    });
+  } else {
+    uniquePMs = uniquePMs.filter(({ paymentMethod }) => {
+      if (paymentMethod.service !== PaymentMethodService.STRIPE) {
+        return true;
+      }
+
+      return paymentMethod.type === PaymentMethodType.CREDITCARD && !paymentMethod?.data?.stripeAccount;
+    });
+  }
 
   // prepaid budget: limited to a specific host
   const matchesHostCollectiveIdPrepaid = prepaid => {
@@ -156,7 +175,9 @@ export const generatePaymentMethodOptions = (
 
   // adding payment methods
   if (!balanceOnlyCollectiveTypes.includes(stepProfile.type)) {
-    if (hostHasStripe) {
+    const paymentIntentIncludesCard = paymentIntent && paymentIntent.payment_method_types.includes('card');
+
+    if (hostHasStripe && !paymentIntentIncludesCard) {
       // New credit card
       uniquePMs.push({
         key: NEW_CREDIT_CARD_KEY,
@@ -177,15 +198,12 @@ export const generatePaymentMethodOptions = (
           service: PAYMENT_METHOD_SERVICE.PAYPAL,
           type: PAYMENT_METHOD_TYPE.PAYMENT,
         },
-        icon: getPaymentMethodIcon(
-          { service: PAYMENT_METHOD_SERVICE.PAYPAL, type: PAYMENT_METHOD_TYPE.PAYMENT },
-          collective,
-        ),
+        icon: getPaymentMethodIcon({ service: PAYMENT_METHOD_SERVICE.PAYPAL, type: PAYMENT_METHOD_TYPE.PAYMENT }),
       });
     }
 
     if (
-      !interval &&
+      interval === INTERVALS.oneTime &&
       !isEmbed &&
       supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.ALIPAY) &&
       !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.ALIPAY)
@@ -196,27 +214,40 @@ export const generatePaymentMethodOptions = (
           service: PAYMENT_METHOD_SERVICE.STRIPE,
           type: PAYMENT_METHOD_TYPE.ALIPAY,
         },
-        title: <FormattedMessage id="Alipay" defaultMessage="Alipay" />,
-        icon: getPaymentMethodIcon(
-          { service: PAYMENT_METHOD_SERVICE.STRIPE, type: PAYMENT_METHOD_TYPE.ALIPAY },
-          collective,
-        ),
+        title: <FormattedMessage id="Stripe.PaymentMethod.Label.alipay" defaultMessage="Alipay" />,
+        icon: getPaymentMethodIcon({ service: PAYMENT_METHOD_SERVICE.STRIPE, type: PAYMENT_METHOD_TYPE.ALIPAY }),
+      });
+    }
+
+    if (paymentIntent) {
+      const title = <FormattedMessage defaultMessage="New payment method" />;
+
+      uniquePMs.push({
+        key: STRIPE_PAYMENT_ELEMENT_KEY,
+        title: title,
+        icon: <CreditCard color="#c9ced4" size={'1.5em'} />,
+        paymentMethod: {
+          service: PAYMENT_METHOD_SERVICE.STRIPE,
+          type: PAYMENT_METHOD_TYPE.STRIPE_ELEMENTS,
+        },
       });
     }
 
     // Manual (bank transfer)
-    if (hostHasManual && !interval && !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)) {
+    if (hostHasManual && INTERVALS.oneTime && !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)) {
       uniquePMs.push({
         key: 'manual',
-        title: get(collective, 'host.settings.paymentMethods.manual.title', null) || 'Bank transfer',
+        title: get(collective, 'host.settings.paymentMethods.manual.title', null) || (
+          <FormattedMessage defaultMessage="Bank transfer (manual)" />
+        ),
         paymentMethod: {
           service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
           type: PAYMENT_METHOD_TYPE.MANUAL,
         },
-        icon: getPaymentMethodIcon(
-          { service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE, type: PAYMENT_METHOD_TYPE.MANUAL },
-          collective,
-        ),
+        icon: getPaymentMethodIcon({
+          service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,
+          type: PAYMENT_METHOD_TYPE.MANUAL,
+        }),
         instructions: (
           <FormattedMessage
             id="NewContributionFlow.bankInstructions"
@@ -232,9 +263,9 @@ export const generatePaymentMethodOptions = (
 
 export const getTotalAmount = (stepDetails, stepSummary = null) => {
   const quantity = get(stepDetails, 'quantity') || 1;
-  const amount = get(stepDetails, 'amount') || 0;
+  const amount = get(stepDetails, 'cryptoAmount') || get(stepDetails, 'amount') || 0;
   const taxAmount = get(stepSummary, 'amount') || 0;
-  const platformFeeAmount = get(stepDetails, 'platformContribution') || 0;
+  const platformFeeAmount = get(stepDetails, 'platformTip') || 0;
   return quantity * amount + platformFeeAmount + taxAmount;
 };
 
@@ -250,12 +281,12 @@ export const getGQLV2AmountInput = (valueInCents, defaultValue) => {
 
 const getCanonicalURL = (collective, tier) => {
   if (!tier) {
-    return `${process.env.WEBSITE_URL}/${collective.slug}/donate`;
+    return `${getWebsiteUrl()}/${collective.slug}/donate`;
   } else if (collective.type === CollectiveType.EVENT) {
     const parentSlug = get(collective.parent, 'slug', collective.slug);
-    return `${process.env.WEBSITE_URL}/${parentSlug}/events/${collective.slug}/order/${tier.id}`;
+    return `${getWebsiteUrl()}/${parentSlug}/events/${collective.slug}/order/${tier.id}`;
   } else {
-    return `${process.env.WEBSITE_URL}/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
+    return `${getWebsiteUrl()}/${collective.slug}/contribute/${tier.slug}-${tier.id}/checkout`;
   }
 };
 
@@ -271,20 +302,41 @@ const PAGE_META_MSGS = defineMessages({
 });
 
 export const getContributionFlowMetadata = (intl, account, tier) => {
+  const baseMetadata = getCollectivePageMetadata(account);
   if (!account) {
-    return { title: 'Contribute' };
+    return { ...baseMetadata, title: 'Contribute' };
   }
 
   return {
+    ...baseMetadata,
     canonicalURL: getCanonicalURL(account, tier),
-    description: account.description,
-    twitterHandle: account.twitterHandle,
-    image: account.imageUrl || account.backgroundImageUrl,
+    noRobots: false,
     title:
       account.type === CollectiveType.EVENT
         ? intl.formatMessage(PAGE_META_MSGS.eventTitle, { event: account.name })
         : intl.formatMessage(PAGE_META_MSGS.collectiveTitle, { collective: account.name }),
   };
+};
+
+export const isSupportedInterval = (collective, tier, user, interval) => {
+  // Interval must be set
+  if (!interval) {
+    return false;
+  }
+
+  // Enforce for fixed interval tiers
+  const isFixedInterval = tier?.interval && tier.interval !== INTERVALS.flexible;
+  if (isFixedInterval && tier.interval !== interval) {
+    return false;
+  }
+
+  // If not fixed, one time is always supported
+  if (interval === INTERVALS.oneTime) {
+    return true;
+  }
+
+  // Enforce for recurring
+  return canContributeRecurring(collective, user);
 };
 
 const getTotalYearlyAmount = stepDetails => {

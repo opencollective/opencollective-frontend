@@ -12,7 +12,9 @@ import { PayPalSupportedCurrencies } from '../../lib/constants/currency';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { getSupportedExpenseTypes } from '../../lib/expenses';
 import { requireFields } from '../../lib/form-utils';
+import { usePrevious } from '../../lib/hooks/usePrevious';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep } from '../../lib/utils';
 import { checkRequiresAddress, validateExpenseTaxes } from './lib/utils';
@@ -31,7 +33,7 @@ import { P, Span } from '../Text';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseFormItems, { addNewExpenseItem } from './ExpenseFormItems';
-import ExpenseFormPayeeInviteNewStep from './ExpenseFormPayeeInviteNewStep';
+import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
 import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';
 import { validateExpenseItem } from './ExpenseItemForm';
@@ -79,15 +81,19 @@ const msg = defineMessages({
     defaultMessage: 'Payee information',
   },
   cancelEditExpense: {
+    id: 'ExpenseForm.CancelEditExpense',
     defaultMessage: 'Cancel Edit',
   },
   confirmCancelEditExpense: {
+    id: 'ExpenseForm.ConfirmCancelEditExpense',
     defaultMessage: 'Are you sure you want to cancel the edits?',
   },
   clearExpenseForm: {
+    id: 'ExpenseForm.ClearExpenseForm',
     defaultMessage: 'Clear Form',
   },
   confirmClearExpenseForm: {
+    id: 'ExpenseForm.ConfirmClearExpenseForm',
     defaultMessage: 'Are you sure you want to clear the expense form?',
   },
 });
@@ -102,7 +108,7 @@ const getDefaultExpense = collective => ({
   privateMessage: '',
   invoiceInfo: '',
   currency: collective.currency,
-  taxes: [],
+  taxes: null,
   payeeLocation: {
     address: '',
     country: null,
@@ -127,6 +133,11 @@ export const prepareExpenseForSubmit = expenseData => {
     ? pick(expenseData.payeeLocation, ['address', 'country', 'structured'])
     : null;
 
+  const payoutMethod = pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']);
+  if (payoutMethod.id === 'new') {
+    payoutMethod.id = null;
+  }
+
   return {
     ...pick(expenseData, [
       'id',
@@ -140,8 +151,8 @@ export const prepareExpenseForSubmit = expenseData => {
     ]),
     payee,
     payeeLocation,
-    payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
-    attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])) : [],
+    payoutMethod,
+    attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => {
       return pick(item, [
@@ -211,7 +222,7 @@ const HiddenFragment = styled.div`
   display: ${({ show }) => (show ? 'block' : 'none')};
 `;
 
-const STEPS = {
+export const EXPENSE_FORM_STEPS = {
   PAYEE: 'PAYEE',
   EXPENSE: 'EXPENSE',
 };
@@ -221,6 +232,17 @@ const checkAddressValuesAreCompleted = values => {
     return values.payeeLocation?.country && values.payeeLocation?.address;
   }
   return true;
+};
+
+const getDefaultStep = (defaultStep, stepOneCompleted, isCreditCardCharge) => {
+  // Card Charges take priority here because they are technically incomplete.
+  if (isCreditCardCharge) {
+    return EXPENSE_FORM_STEPS.EXPENSE;
+  } else if (!stepOneCompleted) {
+    return EXPENSE_FORM_STEPS.PAYEE;
+  } else {
+    return defaultStep || EXPENSE_FORM_STEPS.PAYEE;
+  }
 };
 
 const ExpenseFormBody = ({
@@ -236,6 +258,7 @@ const ExpenseFormBody = ({
   expensesTags,
   shouldLoadValuesFromPersister,
   isDraft,
+  defaultStep,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -247,6 +270,7 @@ const ExpenseFormBody = ({
   const isReceipt = values.type === expenseTypes.RECEIPT;
   const isGrant = values.type === expenseTypes.GRANT;
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
+  const supportedExpenseTypes = React.useMemo(() => getSupportedExpenseTypes(collective), [collective]);
   const isRecurring = expense && expense.recurringExpense !== null;
   const stepOneCompleted =
     values.payoutMethod &&
@@ -261,7 +285,8 @@ const ExpenseFormBody = ({
   const isMultiCurrency =
     collectiveSupportsMultiCurrency && values.payoutMethod?.data?.currency !== collective?.currency;
 
-  const [step, setStep] = React.useState(stepOneCompleted || isCreditCardCharge ? STEPS.EXPENSE : STEPS.PAYEE);
+  const [step, setStep] = React.useState(() => getDefaultStep(defaultStep, stepOneCompleted, isCreditCardCharge));
+
   // Only true when logged in and drafting the expense
   const [isOnBehalf, setOnBehalf] = React.useState(false);
   const [showResetModal, setShowResetModal] = React.useState(false);
@@ -278,7 +303,7 @@ const ExpenseFormBody = ({
 
   // When user logs in we set its account as the default payout profile if not yet defined
   React.useEffect(() => {
-    if (values?.draft?.payee && !loggedInAccount) {
+    if (values?.draft?.payee && !loggedInAccount && !isRecurring) {
       formik.setFieldValue('payee', {
         ...values.draft.payee,
         isInvite: false,
@@ -291,9 +316,14 @@ const ExpenseFormBody = ({
         (values.payee && payoutProfiles.find(p => p.slug === values.payee.slug)) || first(payoutProfiles);
       formik.setFieldValue('payee', defaultProfile);
     }
-    // If recurring expense with selected Payout Method
-    if (isDraft && loggedInAccount && !values.payoutMethod && expense.payoutMethod) {
-      formik.setFieldValue('payoutMethod', expense.payoutMethod);
+    // Update the form state with private fields that were refeched after the user was authenticated
+    if (isDraft && loggedInAccount) {
+      const privateFields = ['payoutMethod', 'invoiceInfo'];
+      for (const field of privateFields) {
+        if (!values[field] && expense[field]) {
+          formik.setFieldValue(field, expense[field]);
+        }
+      }
     }
   }, [payoutProfiles, loggedInAccount]);
 
@@ -302,16 +332,13 @@ const ExpenseFormBody = ({
     if (!values.payeeLocation?.address && values.payee?.location) {
       setLocationFromPayee(formik, values.payee);
     }
-    if (!isDraft && values.payee?.isInvite) {
-      setOnBehalf(values.payee.isInvite);
-      setStep(STEPS.EXPENSE);
-    }
   }, [values.payee]);
 
   // Return to Payee step if type is changed and reset some values
+  const previousType = usePrevious(values.type);
   React.useEffect(() => {
-    if (!isCreditCardCharge) {
-      setStep(STEPS.PAYEE);
+    if (!isCreditCardCharge && previousType && values.type !== previousType) {
+      setStep(EXPENSE_FORM_STEPS.PAYEE);
       setOnBehalf(false);
 
       if (!isDraft && values.payee?.isInvite) {
@@ -379,7 +406,7 @@ const ExpenseFormBody = ({
         collective={collective}
         formik={formik}
         onCancel={onCancel}
-        onNext={() => setStep(STEPS.EXPENSE)}
+        onNext={() => setStep(EXPENSE_FORM_STEPS.EXPENSE)}
       />
     );
   } else if (isOnBehalf === true && isNewUser) {
@@ -388,7 +415,7 @@ const ExpenseFormBody = ({
         collective={collective}
         formik={formik}
         onBack={() => {
-          setStep(STEPS.PAYEE);
+          setStep(EXPENSE_FORM_STEPS.PAYEE);
           setOnBehalf(false);
           formik.setFieldValue('payee', null);
           formik.setFieldValue('payoutMethod', null);
@@ -396,6 +423,12 @@ const ExpenseFormBody = ({
         }}
         onNext={() => {
           formik.setFieldValue('payee', { ...values.payee, isInvite: true });
+          const errors = validateExpenseFormPayeeInviteNewStep(formik.values);
+          if (!isEmpty(errors)) {
+            formik.setErrors(errors);
+          } else {
+            setStep(EXPENSE_FORM_STEPS.EXPENSE);
+          }
         }}
         payoutProfiles={payoutProfiles}
       />
@@ -407,17 +440,25 @@ const ExpenseFormBody = ({
         formik={formik}
         isOnBehalf={isOnBehalf}
         onCancel={onCancel}
+        handleClearPayeeStep={() => setShowResetModal(true)}
         payoutProfiles={payoutProfiles}
         loggedInAccount={loggedInAccount}
+        onChange={payee => {
+          setOnBehalf(payee.isInvite);
+        }}
         onNext={() => {
           const shouldSkipValidation = isOnBehalf && isEmpty(values.payoutMethod);
           const validation = !shouldSkipValidation && validatePayoutMethod(values.payoutMethod);
           if (isEmpty(validation)) {
-            setStep(STEPS.EXPENSE);
+            setStep(EXPENSE_FORM_STEPS.EXPENSE);
           } else {
             setErrors({ payoutMethod: validation });
           }
         }}
+        editingExpense={editingExpense}
+        resetDefaultStep={() => setStep(EXPENSE_FORM_STEPS.PAYEE)}
+        formPersister={formPersister}
+        getDefaultExpense={getDefaultExpense}
         onInvite={isInvite => {
           setOnBehalf(isInvite);
           formik.setFieldValue('payeeLocation', {});
@@ -433,265 +474,265 @@ const ExpenseFormBody = ({
       {!isCreditCardCharge && (
         <ExpenseTypeRadioSelect
           name="type"
-          onChange={e => {
-            handleChange(e);
-          }}
+          onChange={handleChange}
           value={values.type}
-          options={{
-            hasGrant: accountSupportsGrants(collective, collective?.host),
-          }}
+          supportedExpenseTypes={supportedExpenseTypes}
         />
       )}
       {isRecurring && <ExpenseRecurringBanner expense={expense} />}
       {values.type && (
         <StyledCard mt={4} p={[16, 16, 32]} overflow="initial">
-          <HiddenFragment show={step === STEPS.PAYEE}>
-            <Flex alignItems="center" mb={16}>
-              <Span color="black.900" fontSize="18px" lineHeight="26px" fontWeight="bold">
-                {formatMessage(msg.stepPayee)}
-              </Span>
-              <Box ml={2}>
-                <PrivateInfoIcon size={12} color="#969BA3" tooltipProps={{ display: 'flex' }} />
-              </Box>
-              <StyledHr flex="1" borderColor="black.300" mx={2} />
-            </Flex>
-            {payeeForm}
-          </HiddenFragment>
-
-          <HiddenFragment show={step === STEPS.EXPENSE}>
-            <Flex alignItems="center" mb={10}>
-              <P
-                as="label"
-                htmlFor="expense-description"
-                color="black.900"
-                fontSize="18px"
-                lineHeight="26px"
-                fontWeight="bold"
-              >
-                {values.type === expenseTypes.GRANT ? (
-                  <FormattedMessage
-                    id="Expense.EnterRequestSubject"
-                    defaultMessage="Enter grant subject <small>(Public)</small>"
-                    values={{
-                      small(msg) {
-                        return (
-                          <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
-                            {msg}
-                          </Span>
-                        );
-                      },
-                    }}
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="Expense.EnterExpenseTitle"
-                    defaultMessage="Expense title <small>(Public)</small>"
-                    values={{
-                      small(msg) {
-                        return (
-                          <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
-                            {msg}
-                          </Span>
-                        );
-                      },
-                    }}
-                  />
-                )}
-              </P>
-              <StyledHr flex="1" borderColor="black.300" ml={2} />
-            </Flex>
-            <P fontSize="12px" color="black.600">
-              <FormattedMessage
-                id="Expense.PrivacyWarning"
-                defaultMessage="This information is public. Do not put any private details in this field."
-              />
-            </P>
-            <Field
-              as={StyledInput}
-              autoFocus={autoFocusTitle}
-              border="0"
-              error={errors.description}
-              fontSize="24px"
-              id="expense-description"
-              maxLength={255}
-              mt={3}
-              name="description"
-              px={2}
-              py={1}
-              width="100%"
-              withOutline
-              placeholder={
-                values.type === expenseTypes.GRANT
-                  ? formatMessage(msg.grantSubjectPlaceholder)
-                  : formatMessage(msg.descriptionPlaceholder)
-              }
-            />
-            <HiddenFragment show={hasBaseFormFieldsCompleted || isInvite}>
-              <Flex alignItems="flex-start" mt={3}>
-                <ExpenseTypeTag type={values.type} mr="4px" />
-                <StyledInputTags
-                  suggestedTags={expensesTags}
-                  onChange={tags => {
-                    formik.setFieldValue(
-                      'tags',
-                      tags.map(t => t.value.toLowerCase()),
-                    );
-                  }}
-                  value={values.tags}
-                />
-              </Flex>
-              {values.type === expenseTypes.INVOICE && (
-                <Box my={40}>
-                  <ExpenseAttachedFilesForm
-                    title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
-                    description={
-                      <FormattedMessage
-                        id="UploadInvoiceDescription"
-                        defaultMessage="If you already have an invoice document, you can upload it here."
-                      />
-                    }
-                    onChange={files => formik.setFieldValue('attachedFiles', files)}
-                    defaultValue={values.attachedFiles}
-                  />
-                </Box>
-              )}
-
-              <Flex alignItems="center" my={24}>
+          {step === EXPENSE_FORM_STEPS.PAYEE ? (
+            <div>
+              <Flex alignItems="center" mb={16}>
                 <Span color="black.900" fontSize="18px" lineHeight="26px" fontWeight="bold">
-                  {formatMessage(isReceipt ? msg.stepReceipt : isGrant ? msg.stepFundingRequest : msg.stepInvoice)}
+                  {formatMessage(msg.stepPayee)}
                 </Span>
-                <StyledHr flex="1" borderColor="black.300" mx={2} />
-                <StyledButton
-                  buttonSize="tiny"
-                  type="button"
-                  onClick={() => addNewExpenseItem(formik)}
-                  minWidth={135}
-                  data-cy="expense-add-item-btn"
-                  disabled={isCreditCardCharge}
-                >
-                  +&nbsp;
-                  {formatMessage(isReceipt ? msg.addNewReceipt : isGrant ? msg.addNewGrantItem : msg.addNewItem)}
-                </StyledButton>
-              </Flex>
-              <Box>
-                <FieldArray name="items">
-                  {fieldsArrayProps => <ExpenseFormItems {...fieldsArrayProps} collective={collective} />}
-                </FieldArray>
-              </Box>
-
-              {values.type === expenseTypes.GRANT && (
-                <Box my={40}>
-                  <ExpenseAttachedFilesForm
-                    title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}
-                    description={
-                      <FormattedMessage
-                        id="UploadDocumentationDescription"
-                        defaultMessage="If you want to include any documentation, you can upload it here."
-                      />
-                    }
-                    onChange={files => formik.setFieldValue('attachedFiles', files)}
-                    defaultValue={values.attachedFiles}
-                  />
+                <Box ml={2}>
+                  <PrivateInfoIcon size={12} color="#969BA3" tooltipProps={{ display: 'flex' }} />
                 </Box>
-              )}
-
-              <StyledHr flex="1" mt={4} borderColor="black.300" />
-              <Flex mt={3} flexWrap="wrap" alignItems="center">
-                <StyledButton
-                  type="button"
-                  width={['100%', 'auto']}
-                  mx={[2, 0]}
-                  mr={[null, 3]}
-                  mt={2}
-                  whiteSpace="nowrap"
-                  data-cy="expense-back"
-                  onClick={() => {
-                    if (isCreditCardCharge) {
-                      onCancel();
-                    } else {
-                      setStep(STEPS.PAYEE);
-                    }
-                  }}
+                <StyledHr flex="1" borderColor="black.300" mx={2} />
+              </Flex>
+              {payeeForm}
+            </div>
+          ) : step === EXPENSE_FORM_STEPS.EXPENSE ? (
+            <div>
+              <Flex alignItems="center" mb={10}>
+                <P
+                  as="label"
+                  htmlFor="expense-description"
+                  color="black.900"
+                  fontSize="18px"
+                  lineHeight="26px"
+                  fontWeight="bold"
                 >
-                  ←&nbsp;
-                  <FormattedMessage id="Back" defaultMessage="Back" />
-                </StyledButton>
-                <StyledButton
-                  type="submit"
-                  width={['100%', 'auto']}
-                  mx={[2, 0]}
-                  mr={[null, 3]}
-                  mt={2}
-                  whiteSpace="nowrap"
-                  data-cy="expense-summary-btn"
-                  buttonStyle="primary"
-                  disabled={!stepTwoCompleted || !formik.isValid}
-                  loading={formik.isSubmitting}
-                >
-                  {isInvite && !isDraft ? (
-                    <FormattedMessage id="Expense.SendInvite" defaultMessage="Send Invite" />
-                  ) : isCreditCardCharge ? (
-                    <FormattedMessage id="Expense.SaveReceipt" defaultMessage="Save Receipt" />
+                  {values.type === expenseTypes.GRANT ? (
+                    <FormattedMessage
+                      id="Expense.EnterRequestSubject"
+                      defaultMessage="Enter grant subject <small>(Public)</small>"
+                      values={{
+                        small(msg) {
+                          return (
+                            <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
+                              {msg}
+                            </Span>
+                          );
+                        },
+                      }}
+                    />
                   ) : (
-                    <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
+                    <FormattedMessage
+                      id="Expense.EnterExpenseTitle"
+                      defaultMessage="Expense title <small>(Public)</small>"
+                      values={{
+                        small(msg) {
+                          return (
+                            <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
+                              {msg}
+                            </Span>
+                          );
+                        },
+                      }}
+                    />
                   )}
-                  &nbsp;→
-                </StyledButton>
-                {errors.payoutMethod?.data?.currency && touched.items?.some?.(i => i.amount) && (
-                  <Box mx={[2, 0]} mt={2} color="red.500" fontSize="12px" letterSpacing={0}>
-                    {errors.payoutMethod.data.currency.toString()}
+                </P>
+                <StyledHr flex="1" borderColor="black.300" ml={2} />
+              </Flex>
+              <P fontSize="12px" color="black.600">
+                <FormattedMessage
+                  id="Expense.PrivacyWarning"
+                  defaultMessage="This information is public. Do not put any private details in this field."
+                />
+              </P>
+              <Field
+                as={StyledInput}
+                autoFocus={autoFocusTitle}
+                border="0"
+                error={errors.description}
+                fontSize="24px"
+                id="expense-description"
+                maxLength={255}
+                mt={3}
+                name="description"
+                px={2}
+                py={1}
+                width="100%"
+                withOutline
+                placeholder={
+                  values.type === expenseTypes.GRANT
+                    ? formatMessage(msg.grantSubjectPlaceholder)
+                    : formatMessage(msg.descriptionPlaceholder)
+                }
+              />
+              <HiddenFragment show={hasBaseFormFieldsCompleted || isInvite}>
+                <Flex alignItems="flex-start" mt={3}>
+                  <ExpenseTypeTag type={values.type} mr="4px" />
+                  <StyledInputTags
+                    suggestedTags={expensesTags}
+                    onChange={tags => {
+                      formik.setFieldValue(
+                        'tags',
+                        tags.map(t => t.value.toLowerCase()),
+                      );
+                    }}
+                    value={values.tags}
+                  />
+                </Flex>
+                {values.type === expenseTypes.INVOICE && (
+                  <Box my={40}>
+                    <ExpenseAttachedFilesForm
+                      title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
+                      description={
+                        <FormattedMessage
+                          id="UploadInvoiceDescription"
+                          defaultMessage="If you already have an invoice document, you can upload it here."
+                        />
+                      }
+                      onChange={files => formik.setFieldValue('attachedFiles', files)}
+                      defaultValue={values.attachedFiles}
+                    />
                   </Box>
                 )}
-                <StyledHr flex="1" borderColor="white.full" mx={2} />
-                {showResetModal ? (
-                  <ConfirmationModal
-                    onClose={() => setShowResetModal(false)}
-                    header={editingExpense ? formatMessage(msg.cancelEditExpense) : formatMessage(msg.clearExpenseForm)}
-                    body={
-                      editingExpense
-                        ? formatMessage(msg.confirmCancelEditExpense)
-                        : formatMessage(msg.confirmClearExpenseForm)
-                    }
-                    continueHandler={() => {
-                      if (editingExpense) {
-                        onCancel();
-                      } else {
-                        setStep(STEPS.PAYEE);
-                        resetForm({ values: getDefaultExpense(collective) });
-                        if (formPersister) {
-                          formPersister.clearValues();
-                          window.scrollTo(0, 0);
-                        }
+
+                <Flex alignItems="center" my={24}>
+                  <Span color="black.900" fontSize="18px" lineHeight="26px" fontWeight="bold">
+                    {formatMessage(isReceipt ? msg.stepReceipt : isGrant ? msg.stepFundingRequest : msg.stepInvoice)}
+                  </Span>
+                  <StyledHr flex="1" borderColor="black.300" mx={2} />
+                  <StyledButton
+                    buttonSize="tiny"
+                    type="button"
+                    onClick={() => addNewExpenseItem(formik)}
+                    minWidth={135}
+                    data-cy="expense-add-item-btn"
+                    disabled={isCreditCardCharge}
+                  >
+                    +&nbsp;
+                    {formatMessage(isReceipt ? msg.addNewReceipt : isGrant ? msg.addNewGrantItem : msg.addNewItem)}
+                  </StyledButton>
+                </Flex>
+                <Box>
+                  <FieldArray name="items">
+                    {fieldsArrayProps => <ExpenseFormItems {...fieldsArrayProps} collective={collective} />}
+                  </FieldArray>
+                </Box>
+
+                {values.type === expenseTypes.GRANT && (
+                  <Box my={40}>
+                    <ExpenseAttachedFilesForm
+                      title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}
+                      description={
+                        <FormattedMessage
+                          id="UploadDocumentationDescription"
+                          defaultMessage="If you want to include any documentation, you can upload it here."
+                        />
                       }
-                      setShowResetModal(false);
-                    }}
-                    {...(editingExpense && {
-                      continueLabel: formatMessage({ defaultMessage: 'Yes, cancel editing' }),
-                      cancelLabel: formatMessage({ defaultMessage: 'No, continue editing' }),
-                    })}
-                  />
-                ) : (
+                      onChange={files => formik.setFieldValue('attachedFiles', files)}
+                      defaultValue={values.attachedFiles}
+                    />
+                  </Box>
+                )}
+
+                <StyledHr flex="1" mt={4} borderColor="black.300" />
+                <Flex mt={3} flexWrap="wrap" alignItems="center">
                   <StyledButton
                     type="button"
-                    buttonStyle="borderless"
                     width={['100%', 'auto']}
-                    color="red.500"
-                    mt={1}
                     mx={[2, 0]}
                     mr={[null, 3]}
+                    mt={2}
                     whiteSpace="nowrap"
-                    onClick={() => setShowResetModal(true)}
+                    data-cy="expense-back"
+                    onClick={() => {
+                      if (isCreditCardCharge) {
+                        onCancel();
+                      } else {
+                        setStep(EXPENSE_FORM_STEPS.PAYEE);
+                      }
+                    }}
                   >
-                    <Undo size={11} />
-                    <Span mx={1}>{formatMessage(editingExpense ? msg.cancelEditExpense : msg.clearExpenseForm)}</Span>
+                    ←&nbsp;
+                    <FormattedMessage id="Back" defaultMessage="Back" />
                   </StyledButton>
-                )}
-              </Flex>
-            </HiddenFragment>
-          </HiddenFragment>
+                  <StyledButton
+                    type="submit"
+                    width={['100%', 'auto']}
+                    mx={[2, 0]}
+                    mr={[null, 3]}
+                    mt={2}
+                    whiteSpace="nowrap"
+                    data-cy="expense-summary-btn"
+                    buttonStyle="primary"
+                    disabled={!stepTwoCompleted || !formik.isValid}
+                    loading={formik.isSubmitting}
+                  >
+                    {isInvite && !isDraft ? (
+                      <FormattedMessage id="Expense.SendInvite" defaultMessage="Send Invite" />
+                    ) : isCreditCardCharge ? (
+                      <FormattedMessage id="Expense.SaveReceipt" defaultMessage="Save Receipt" />
+                    ) : (
+                      <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
+                    )}
+                    &nbsp;→
+                  </StyledButton>
+                  {errors.payoutMethod?.data?.currency && touched.items?.some?.(i => i.amount) && (
+                    <Box mx={[2, 0]} mt={2} color="red.500" fontSize="12px" letterSpacing={0}>
+                      {errors.payoutMethod.data.currency.toString()}
+                    </Box>
+                  )}
+                  <StyledHr flex="1" borderColor="white.full" mx={2} />
+                  {showResetModal ? (
+                    <ConfirmationModal
+                      onClose={() => setShowResetModal(false)}
+                      header={
+                        editingExpense ? formatMessage(msg.cancelEditExpense) : formatMessage(msg.clearExpenseForm)
+                      }
+                      body={
+                        editingExpense
+                          ? formatMessage(msg.confirmCancelEditExpense)
+                          : formatMessage(msg.confirmClearExpenseForm)
+                      }
+                      continueHandler={() => {
+                        if (editingExpense) {
+                          onCancel();
+                        } else {
+                          setStep(EXPENSE_FORM_STEPS.PAYEE);
+                          resetForm({ values: getDefaultExpense(collective) });
+                          if (formPersister) {
+                            formPersister.clearValues();
+                            window.scrollTo(0, 0);
+                          }
+                        }
+                        setShowResetModal(false);
+                      }}
+                      {...(editingExpense && {
+                        continueLabel: formatMessage({ defaultMessage: 'Yes, cancel editing' }),
+                        cancelLabel: formatMessage({ defaultMessage: 'No, continue editing' }),
+                      })}
+                    />
+                  ) : (
+                    <StyledButton
+                      type="button"
+                      buttonStyle="borderless"
+                      width={['100%', 'auto']}
+                      color="red.500"
+                      mt={1}
+                      mx={[2, 0]}
+                      mr={[null, 3]}
+                      whiteSpace="nowrap"
+                      onClick={() => setShowResetModal(true)}
+                    >
+                      <Undo size={11} />
+                      <Span mx={1}>{formatMessage(editingExpense ? msg.cancelEditExpense : msg.clearExpenseForm)}</Span>
+                    </StyledButton>
+                  )}
+                </Flex>
+              </HiddenFragment>
+            </div>
+          ) : null}
         </StyledCard>
       )}
-      {step === STEPS.EXPENSE && (
+      {step === EXPENSE_FORM_STEPS.EXPENSE && (
         <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
           <ExpensePayeeDetails expense={formik.values} host={collective.host} borderless collective={collective} />
         </StyledCard>
@@ -707,6 +748,8 @@ ExpenseFormBody.propTypes = {
   shouldLoadValuesFromPersister: PropTypes.bool,
   onCancel: PropTypes.func,
   formPersister: PropTypes.object,
+  /** Defines the default selected step, if accessible (previous steps need to be completed) */
+  defaultStep: PropTypes.oneOf(Object.values(EXPENSE_FORM_STEPS)),
   loggedInAccount: PropTypes.object,
   loading: PropTypes.bool,
   isDraft: PropTypes.bool,
@@ -720,7 +763,11 @@ ExpenseFormBody.propTypes = {
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
       settings: PropTypes.shape({
-        disableGrantsByDefault: PropTypes.bool,
+        expenseTypes: PropTypes.shape({
+          GRANT: PropTypes.bool,
+          RECEIPT: PropTypes.bool,
+          INVOICE: PropTypes.bool,
+        }),
       }),
     }),
     settings: PropTypes.object,
@@ -764,6 +811,7 @@ const ExpenseForm = ({
   loading,
   expensesTags,
   shouldLoadValuesFromPersister,
+  defaultStep,
 }) => {
   const isDraft = expense?.status === expenseStatus.DRAFT;
   const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
@@ -776,7 +824,7 @@ const ExpenseForm = ({
     initialValues.attachedFiles = expense.draft.attachedFiles;
     initialValues.payoutMethod = expense.draft.payoutMethod;
     initialValues.payeeLocation = expense.draft.payeeLocation;
-    initialValues.payee = expense.draft.payee;
+    initialValues.payee = expense.recurringExpense ? expense.payee : expense.draft.payee;
   }
 
   return (
@@ -809,6 +857,7 @@ const ExpenseForm = ({
           loading={loading}
           shouldLoadValuesFromPersister={shouldLoadValuesFromPersister}
           isDraft={isDraft}
+          defaultStep={defaultStep}
         />
       )}
     </Formik>
@@ -826,6 +875,8 @@ ExpenseForm.propTypes = {
   loggedInAccount: PropTypes.object,
   loading: PropTypes.bool,
   expensesTags: PropTypes.arrayOf(PropTypes.string),
+  /** Defines the default selected step, if accessible (previous steps need to be completed) */
+  defaultStep: PropTypes.oneOf(Object.values(EXPENSE_FORM_STEPS)),
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
@@ -845,6 +896,7 @@ ExpenseForm.propTypes = {
     status: PropTypes.string,
     payee: PropTypes.object,
     draft: PropTypes.object,
+    recurringExpense: PropTypes.object,
     items: PropTypes.arrayOf(
       PropTypes.shape({
         url: PropTypes.string,

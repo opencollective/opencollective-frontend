@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { color, typography } from 'styled-system';
+import { color, flex, typography } from 'styled-system';
 
 import INTERVALS from '../../lib/constants/intervals';
 import { getNextChargeDate } from '../../lib/date-utils';
@@ -20,12 +20,15 @@ import { P, Span } from '../Text';
 
 import { getTotalAmount } from './utils';
 
-const AmountLine = styled.div`
+const AmountLine = styled.div.attrs({
+  'data-cy': 'ContributionSummary-AmountLine',
+})`
   display: flex;
   justify-content: space-between;
   font-weight: 400;
   padding: 7px 0;
   line-height: 18px;
+  color: #4e5052;
 
   ${color}
   ${typography}
@@ -37,6 +40,7 @@ const Label = styled(Span)`
   flex: 0 1 70%;
   margin-right: 8px;
   word-break: break-word;
+  ${flex}
 `;
 
 Label.defaultProps = {
@@ -48,20 +52,28 @@ const Amount = styled(Span)`
   text-align: right;
 `;
 
-const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment, currency, isCrypto }) => {
+const ContributionSummary = ({
+  collective,
+  stepDetails,
+  stepSummary,
+  stepPayment,
+  currency,
+  isCrypto,
+  tier,
+  renderTax,
+}) => {
   const intl = useIntl();
+  const amount = isCrypto ? stepDetails.cryptoAmount : stepDetails.amount;
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
   const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, currency);
-  const platformContribution = stepDetails.platformContribution || 0;
-
+  const platformTip = stepDetails.platformTip || 0;
+  const showQuantity = stepDetails.quantity > 1 || ['TICKET', 'PRODUCT'].includes(tier?.type);
+  const contributionName = tier?.name ? `${collective.name} - "${tier.name}"` : collective.name;
   return (
-    <Container fontSize="12px">
-      <P fontWeight="500" fontSize="inherit" mb={3}>
-        <FormattedMessage id="ContributionSummary" defaultMessage="Contribution Summary" />
-      </P>
+    <Container>
       {stepDetails && (
         <React.Fragment>
-          {stepDetails.quantity > 1 && (
+          {showQuantity && (
             <AmountLine color="black.700">
               <Label>
                 <FormattedMessage id="contribution.quantity" defaultMessage="Quantity" />
@@ -74,32 +86,38 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               <FormattedMessage
                 id="ContributionToProject"
                 defaultMessage="Contribution to {projectName}"
-                values={{ projectName: collective.name }}
+                values={{ projectName: contributionName }}
               />
             </Label>
             <Amount>
               <FormattedMoneyAmount
-                amount={stepDetails.amount || 0}
+                amount={amount || 0}
                 currency={currency}
                 amountStyles={{ color: 'black.700', fontWeight: 400 }}
                 isCrypto={isCrypto}
               />
             </Amount>
           </AmountLine>
-          {Boolean(stepSummary?.amount) && (
+          {Boolean(stepSummary?.taxType) &&
+            (renderTax ? (
+              renderTax({ AmountLine, Amount, Label })
+            ) : (
+              <AmountLine color="black.700">
+                <Label>
+                  {i18nTaxType(intl, stepSummary.taxType)} {stepSummary.percentage}%
+                </Label>
+                <Amount>
+                  <FormattedMoneyAmount
+                    amount={stepSummary.amount}
+                    currency={currency}
+                    amountStyles={{ color: 'black.700', fontWeight: 400 }}
+                  />
+                </Amount>
+              </AmountLine>
+            ))}
+
+          {Boolean(platformTip) && (
             <AmountLine color="black.700">
-              <Label>{i18nTaxType(intl, stepSummary.taxType)}</Label>
-              <Amount>
-                <FormattedMoneyAmount
-                  amount={stepSummary.amount}
-                  currency={currency}
-                  amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                />
-              </Amount>
-            </AmountLine>
-          )}
-          {Boolean(platformContribution) && (
-            <AmountLine color="black.700" data-cy="ContributionSummary-Tip">
               <Label>
                 <FormattedMessage
                   id="SupportProject"
@@ -107,57 +125,9 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                   values={{ projectName: 'Open Collective' }}
                 />
               </Label>
-              <Amount>
+              <Amount data-cy="ContributionSummary-Tip">
                 <FormattedMoneyAmount
-                  amount={platformContribution}
-                  currency={currency}
-                  amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                />
-              </Amount>
-            </AmountLine>
-          )}
-          {Boolean(pmFeeInfo.fee) && !isCrypto && (
-            <AmountLine color="black.700">
-              <Label>
-                <FormattedMessage
-                  id="PaymentProviderFees.Label"
-                  defaultMessage="{providerName} fees"
-                  values={{ providerName: pmFeeInfo.name }}
-                />
-              </Label>
-              <Amount>
-                {!pmFeeInfo.isExact && (
-                  <Box display="inline-block" mr={1} verticalAlign="text-bottom">
-                    <StyledTooltip
-                      verticalAlign="top"
-                      content={
-                        <Span>
-                          <FormattedMessage
-                            id="Fees.ApproximationDisclaimer"
-                            defaultMessage="This amount can vary due to currency exchange rates or payment processor fees."
-                          />
-                          {pmFeeInfo.aboutURL && (
-                            <React.Fragment>
-                              <br />
-                              <br />
-                              <StyledLink href={pmFeeInfo.aboutURL} openInNewTab>
-                                <FormattedMessage
-                                  id="LearnMoreAboutServiceFees"
-                                  defaultMessage="Learn more about {service} fees"
-                                  values={{ service: pmFeeInfo.name }}
-                                />
-                              </StyledLink>
-                            </React.Fragment>
-                          )}
-                        </Span>
-                      }
-                    >
-                      <InfoCircle size="16px" color="#76777A" />
-                    </StyledTooltip>
-                  </Box>
-                )}
-                <FormattedMoneyAmount
-                  amount={pmFeeInfo.fee}
+                  amount={platformTip}
                   currency={currency}
                   amountStyles={{ color: 'black.700', fontWeight: 400 }}
                 />
@@ -177,25 +147,89 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
         </Amount>
       </AmountLine>
       {Boolean(pmFeeInfo.fee) && !isCrypto && (
-        <AmountLine color="black.700">
-          <Label>
-            <FormattedMessage
-              id="NetAmountFor"
-              defaultMessage="Net amount for {name}"
-              values={{ name: collective.name }}
-            />
-          </Label>
-          <Amount>
-            <FormattedMoneyAmount
-              amount={totalAmount - pmFeeInfo.fee - platformContribution}
-              currency={currency}
-              amountStyles={null}
-            />
-          </Amount>
-        </AmountLine>
+        <React.Fragment>
+          <AmountLine color="black.700">
+            <Label>
+              {pmFeeInfo.name ? (
+                <FormattedMessage
+                  id="PaymentProviderFees.Label"
+                  defaultMessage="{isExact, select, false {Estimated } other {}}{providerName} fees"
+                  values={{ providerName: pmFeeInfo.name, isExact: pmFeeInfo.isExact }}
+                />
+              ) : (
+                <FormattedMessage id="contribution.paymentFee" defaultMessage="Payment processor fee" />
+              )}
+            </Label>
+            <Amount>
+              {!pmFeeInfo.isExact && (
+                <Box display="inline-block" mr={1} verticalAlign="text-bottom">
+                  <StyledTooltip
+                    verticalAlign="top"
+                    content={
+                      <Span>
+                        <FormattedMessage
+                          id="Fees.ApproximationDisclaimer"
+                          defaultMessage="This amount can vary due to currency exchange rates or depending on the selected service."
+                        />
+                        {pmFeeInfo.aboutURL && (
+                          <React.Fragment>
+                            <br />
+                            <br />
+                            <StyledLink href={pmFeeInfo.aboutURL} openInNewTab>
+                              <FormattedMessage
+                                id="LearnMoreAboutServiceFees"
+                                defaultMessage="Learn more about {service} fees"
+                                values={{ service: pmFeeInfo.name }}
+                              />
+                            </StyledLink>
+                          </React.Fragment>
+                        )}
+                      </Span>
+                    }
+                  >
+                    <InfoCircle size="16px" color="#76777A" />
+                  </StyledTooltip>
+                </Box>
+              )}
+              <FormattedMoneyAmount
+                amount={pmFeeInfo.fee || null}
+                currency={currency}
+                amountStyles={{ color: 'black.700', fontWeight: 400 }}
+              />
+            </Amount>
+          </AmountLine>
+          <AmountLine color="black.700">
+            <Label>
+              <FormattedMessage
+                id="NetAmountFor"
+                defaultMessage="Net amount for {name}"
+                values={{ name: collective.name }}
+              />
+            </Label>
+            <Amount>
+              {!pmFeeInfo.isExact && (
+                <Box display="inline-block" mr={1} verticalAlign="text-bottom">
+                  <StyledTooltip
+                    verticalAlign="top"
+                    content={
+                      <FormattedMessage defaultMessage="Net Amount = Today's charge - Payment processor fee - Support Open Collective" />
+                    }
+                  >
+                    <InfoCircle size="16px" color="#76777A" />
+                  </StyledTooltip>
+                </Box>
+              )}
+              <FormattedMoneyAmount
+                amount={totalAmount - pmFeeInfo.fee - platformTip}
+                currency={currency}
+                amountStyles={null}
+              />
+            </Amount>
+          </AmountLine>
+        </React.Fragment>
       )}
       <StyledHr borderColor="black.500" my={1} />
-      {stepDetails?.interval && stepDetails?.interval !== INTERVALS.flexible && (
+      {stepDetails?.interval && stepDetails?.interval !== INTERVALS.oneTime && (
         <P color="black.700" fontSize="11px" fontStyle="italic" mt={2}>
           <FormattedMessage
             id="ContributionSummary.NextCharge"
@@ -220,11 +254,13 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
 
 ContributionSummary.propTypes = {
   collective: PropTypes.object,
+  tier: PropTypes.object,
   stepDetails: PropTypes.object,
   stepSummary: PropTypes.object,
   stepPayment: PropTypes.object,
   currency: PropTypes.string,
   isCrypto: PropTypes.bool,
+  renderTax: PropTypes.func,
 };
 
 export default ContributionSummary;

@@ -1,23 +1,24 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import { Box, Flex } from './Grid';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
+import StyledInput from './StyledInput';
 import StyledInputAmount from './StyledInputAmount';
 import StyledInputPercentage from './StyledInputPercentage';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
-const confirmContributionMutation = gqlV2/* GraphQL */ `
+const confirmContributionMutation = gql`
   mutation ConfirmContribution($order: OrderUpdateInput!, $action: ProcessOrderAction!) {
     processPendingOrder(order: $order, action: $action) {
       id
@@ -48,6 +49,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
   const [platformTip, setPlatformTip] = useState(platformTipAmount);
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
   const [hostFeePercent, setHostFeePercent] = useState(defaultHostFeePercent);
+  const [processedAt, setProcessedAt] = useState();
   const intl = useIntl();
   const { addToast } = useToasts();
   const [confirmOrder, { loading }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
@@ -80,6 +82,10 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
 
     if (defaultHostFeePercent !== hostFeePercent) {
       orderUpdate.hostFeePercent = hostFeePercent;
+    }
+
+    if (processedAt) {
+      orderUpdate.processedAt = new Date(processedAt);
     }
 
     try {
@@ -189,6 +195,20 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
         )}
         <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
         <Container>
+          <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
+            <Span fontSize="14px" lineHeight="20px" fontWeight="400">
+              <FormattedMessage id="processedAt" defaultMessage="Fund received date" />
+            </Span>
+            <StyledInput
+              name="processedAt"
+              type="date"
+              data-cy="processedAt"
+              onChange={e => setProcessedAt(e.target.value)}
+            />
+          </Flex>
+        </Container>
+        <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
+        <Container>
           <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
             <Span fontSize="14px" lineHeight="20px" fontWeight="500">
               <FormattedMessage
@@ -257,12 +277,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
             onClick={() => triggerAction()}
             data-cy="order-confirmation-modal-submit"
           >
-            <FormattedMessage
-              defaultMessage="Confirm contribution of {amount}"
-              values={{
-                amount: <FormattedMoneyAmount amount={amount} currency={currency} precision={2} amountStyles={null} />,
-              }}
-            />
+            <FormattedMessage defaultMessage="Confirm contribution" />
           </StyledButton>
         </Container>
       </ModalFooter>

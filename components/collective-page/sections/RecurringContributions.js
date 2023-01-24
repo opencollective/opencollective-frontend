@@ -9,7 +9,7 @@ import Container from '../../Container';
 import { Box } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
-import { recurringContributionsQuery } from '../../recurring-contributions/graphql/queries';
+import { manageContributionsQuery } from '../../recurring-contributions/graphql/queries';
 import RecurringContributionsContainer from '../../recurring-contributions/RecurringContributionsContainer';
 import StyledFilters from '../../StyledFilters';
 import { Dimensions } from '../_constants';
@@ -89,10 +89,7 @@ class SectionRecurringContributions extends React.Component {
       <Box pb={4}>
         <ContainerSectionContent>
           <SectionTitle textAlign="left" mb={4} fontSize={['20px', '24px', '32px']} color="black.700">
-            <FormattedMessage
-              id="CollectivePage.SectionRecurringContributions.Title"
-              defaultMessage="Recurring Contributions"
-            />
+            <FormattedMessage id="Contributions.Recurring" defaultMessage="Recurring Contributions" />
           </SectionTitle>
         </ContainerSectionContent>
         <Box mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
@@ -111,6 +108,7 @@ class SectionRecurringContributions extends React.Component {
             recurringContributions={recurringContributions}
             account={collective}
             filter={this.state.filter}
+            mt={3}
           />
         </Container>
       </Box>
@@ -118,7 +116,7 @@ class SectionRecurringContributions extends React.Component {
   }
 }
 
-const getData = graphql(recurringContributionsQuery, {
+const getData = graphql(manageContributionsQuery, {
   options: props => ({
     context: API_V2_CONTEXT,
     variables: getRecurringContributionsSectionQueryVariables(props.slug),

@@ -17,7 +17,7 @@ If you see a step below that could be improved (or is outdated), please update t
 
 ### Prerequisite
 
-1. Make sure you have Node.js version 16.x and NPM version 8.x.
+1. Make sure you have Node.js version 18.x and NPM version 8.x.
 
 - We recommend using [nvm](https://github.com/creationix/nvm): `nvm install && nvm use`.
 
@@ -68,7 +68,7 @@ To update:
 
 ## Styleguide
 
-We use [Storybook](https://storybook.js.org/docs/react/get-started/introduction) to develop and document our React components in isolation with [styled-components](https://www.styled-components.com/) and [styled-system](https://jxnblk.com/styled-system/).
+We use [Storybook](https://storybook.js.org/docs/react/get-started/introduction) to develop and document our React components in isolation with [styled-components](https://www.styled-components.com/) and [styled-system](https://styled-system.com/).
 
 More info: [docs/styleguide.md](docs/styleguide.md)
 
@@ -101,6 +101,16 @@ This repo is part of the Open Collective bounty program. Get paid to contribute 
 This project is currently deployed to staging and production with [Heroku](https://www.heroku.com/). To deploy, you need to be a core member of the Open Collective team.
 
 More info: [docs/deployment.md](docs/deployment.md)
+
+## Publishing components
+
+To publish a frontend components update to [NPM](https://www.npmjs.com/package/@opencollective/frontend-components), you need to be a core member of the Open Collective team. Steps:
+
+1. Check the currently published version with `npm view @opencollective/frontend-components version`
+2. Trigger the publishing script by running `npm run publish-components {NEW_VERSION}`, where `{NEW_VERSION}` is the new version number (please follow [semver](https://semver.org/)).
+3. Review the changes, and confirm if everything makes sense.
+
+To add new files or dependencies to this exported package, have a look at [scripts/publish-components/config.ts](scripts/publish-components/config.ts).
 
 ## Discussion
 

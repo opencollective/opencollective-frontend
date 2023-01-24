@@ -8,7 +8,7 @@ import { H5, P } from '../Text';
 
 const messages = defineMessages({
   'home.payment': {
-    id: 'home.payment',
+    id: 'ContributionFlow.Payment',
     defaultMessage: 'Payment',
   },
   'home.payment.description': {

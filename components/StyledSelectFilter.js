@@ -3,17 +3,17 @@ import PropTypes from 'prop-types';
 
 import StyledSelect from './StyledSelect';
 
-const getSelectStyles = stylesFromProps => ({
+export const getSelectFilterStyles = stylesFromProps => ({
   ...(stylesFromProps || null),
   control: (baseStyles, state) => {
     const styles = {
       ...baseStyles,
-      ...(stylesFromProps?.control || null),
-      borderRadius: 100,
       background: '#F7F8FA',
+      borderRadius: 100,
       padding: '0 8px',
       fontWeight: 500,
       borderColor: '#E8E9EB',
+      ...(stylesFromProps?.control || null),
       '&:hover': {
         borderColor: '#C4C7CC',
       },
@@ -33,7 +33,7 @@ const getSelectStyles = stylesFromProps => ({
  * filters for lists.
  */
 export const StyledSelectFilter = props => {
-  const styles = React.useMemo(() => getSelectStyles(props.styles), [props.styles]);
+  const styles = React.useMemo(() => getSelectFilterStyles(props.styles), [props.styles]);
   return (
     <StyledSelect minWidth={80} fontSize="12px" lineHeight="14px" isSearchable={false} {...props} styles={styles} />
   );

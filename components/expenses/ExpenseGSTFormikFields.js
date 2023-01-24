@@ -60,7 +60,7 @@ const ExpenseGSTFormikFields = ({ formik, isOptional }) => {
       <StyledInputFormikField
         name="taxes.0.idNumber"
         htmlFor="GST-number"
-        label={intl.formatMessage({ defaultMessage: 'GST number' })}
+        label={intl.formatMessage({ id: 'EditCollective.GSTNumber', defaultMessage: 'GST number' })}
         required={!isOptional}
         mr={2}
       >

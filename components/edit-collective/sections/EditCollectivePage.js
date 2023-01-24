@@ -14,7 +14,7 @@ import { getCollectiveSections, getSectionPath } from '../../../lib/collective-s
 import { CollectiveType } from '../../../lib/constants/collectives';
 import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import i18nNavbarCategory from '../../../lib/i18n/navbar-categories';
 import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
 
@@ -34,27 +34,46 @@ import { P, Span } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
 import SettingsSubtitle from '../SettingsSubtitle';
 
-export const getSettingsQuery = gqlV2/* GraphQL */ `
+export const getSettingsQuery = gql`
   query GetSettingsForEditCollectivePage($slug: String!) {
     account(slug: $slug) {
       id
       type
+      currency
       isActive
       isHost
       settings
       policies {
-        EXPENSE_AUTHOR_CANNOT_APPROVE
+        EXPENSE_AUTHOR_CANNOT_APPROVE {
+          enabled
+          amountInCents
+          appliesToHostedCollectives
+          appliesToSingleAdminCollectives
+        }
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
           applies
           freeze
         }
       }
+      ... on AccountWithHost {
+        host {
+          id
+          policies {
+            EXPENSE_AUTHOR_CANNOT_APPROVE {
+              enabled
+              amountInCents
+              appliesToHostedCollectives
+              appliesToSingleAdminCollectives
+            }
+          }
+        }
+      }
     }
   }
 `;
 
-const collectiveSettingsV1Query = gql`
+export const collectiveSettingsV1Query = gqlV1/* GraphQL */ `
   query EditCollectivePage($slug: String) {
     Collective(slug: $slug) {
       id
@@ -140,7 +159,7 @@ const CollectiveSectionEntry = ({
       value: 'ADMIN',
     },
     {
-      label: <FormattedMessage id="EditCollectivePage.ShowSection.Disabled" defaultMessage="Disabled" />,
+      label: <FormattedMessage defaultMessage="Disabled" />,
       value: 'DISABLED',
     },
   ];
@@ -155,12 +174,15 @@ const CollectiveSectionEntry = ({
     if (isEnabled && !isEqual(restrictedTo, ['ADMIN'])) {
       options = options.filter(({ value }) => value !== 'ADMIN' && value !== 'DISABLED');
     }
-    options.push({
-      label: (
-        <FormattedMessage id="EditCollectivePage.ShowSection.AlwaysVisibleV2" defaultMessage="New version visible" />
-      ),
-      value: 'ALWAYS_V2',
-    });
+    // New budget version not available for
+    if (collectiveType !== CollectiveType.USER) {
+      options.push({
+        label: (
+          <FormattedMessage id="EditCollectivePage.ShowSection.AlwaysVisibleV2" defaultMessage="New version visible" />
+        ),
+        value: 'ALWAYS_V2',
+      });
+    }
   }
 
   let defaultValue;
@@ -283,8 +305,8 @@ const MenuCategory = ({ item, index, collective, onMove, onDrop, onSectionToggle
         py="10px"
         fontSize="14px"
         fontWeight="bold"
-        alignItems="middle"
         boxShadow="0 3px 4px 0px #6b6b6b38"
+        alignItems="center"
       >
         <Container display="inline-block" mr={3} cursor="move" ref={ref}>
           <DragIndicator size={14} />
@@ -356,9 +378,12 @@ const EditCollectivePage = ({ collective }) => {
   };
 
   const onDrop = () => {
-    setSections(tmpSections);
-    setTmpSections(null);
-    setDirty(true);
+    // Ignore if the drop happened outside of a valid dropzone (tmpSections=null)
+    if (tmpSections) {
+      setSections(tmpSections);
+      setTmpSections(null);
+      setDirty(true);
+    }
   };
 
   const onSectionToggle = (selectedSection, { isEnabled, restrictedTo, version }) => {

@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import expenseStatus from '../../lib/constants/expense-status';
 import { encodeDateInterval } from '../../lib/date-utils';
 
 import AmountFilter from '../budget/filters/AmountFilter';
-import PeriodFilter from '../budget/filters/PeriodFilter';
+import PeriodFilter from '../filters/PeriodFilter';
 import { Flex } from '../Grid';
 
 import ExpensesOrder from './filters/ExpensesOrder';
@@ -28,7 +29,14 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const ExpensesFilters = ({ collective, filters, onChange, wrap = true }) => {
+const ExpensesFilters = ({
+  collective,
+  filters,
+  onChange,
+  ignoredExpenseStatus,
+  showOrderFilter = true,
+  wrap = true,
+}) => {
   const getFilterProps = (name, valueModifier) => ({
     inputId: `expenses-filter-${name}`,
     value: filters?.[name],
@@ -68,14 +76,16 @@ const ExpensesFilters = ({ collective, filters, onChange, wrap = true }) => {
         <FilterLabel htmlFor="expenses-filter-status">
           <FormattedMessage id="expense.status" defaultMessage="Status" />
         </FilterLabel>
-        <ExpensesStatusFilter {...getFilterProps('status')} />
+        <ExpensesStatusFilter {...getFilterProps('status')} ignoredExpenseStatus={ignoredExpenseStatus} />
       </FilterContainer>
-      <FilterContainer>
-        <FilterLabel htmlFor="expenses-order">
-          <FormattedMessage id="expense.order" defaultMessage="Order" />
-        </FilterLabel>
-        <ExpensesOrder {...getFilterProps('orderBy')} />
-      </FilterContainer>
+      {showOrderFilter && (
+        <FilterContainer>
+          <FilterLabel htmlFor="expenses-order">
+            <FormattedMessage id="expense.order" defaultMessage="Order" />
+          </FilterLabel>
+          <ExpensesOrder {...getFilterProps('orderBy')} />
+        </FilterContainer>
+      )}
     </Flex>
   );
 };
@@ -83,11 +93,13 @@ const ExpensesFilters = ({ collective, filters, onChange, wrap = true }) => {
 ExpensesFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
+  showOrderFilter: PropTypes.bool,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     createdAt: PropTypes.string,
   }).isRequired,
   wrap: PropTypes.bool,
+  ignoredExpenseStatus: PropTypes.arrayOf(PropTypes.oneOf(Object.values(expenseStatus))),
 };
 
 export default React.memo(ExpensesFilters);

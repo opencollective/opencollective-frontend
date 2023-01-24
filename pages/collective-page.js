@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { withRouter } from 'next/router';
 import { createGlobalStyle } from 'styled-components';
 
+import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
@@ -137,29 +137,6 @@ class CollectivePage extends React.Component {
     addParentToURLIfMissing(router, collective);
   }
 
-  getPageMetaData(collective) {
-    const defaultImage = '/static/images/defaultBackgroundImage.png';
-    if (collective) {
-      return {
-        title: collective.name,
-        description: collective.description,
-        twitterHandle: collective.twitterHandle || get(collective, 'parentCollective.twitterHandle'),
-        noRobots: collective.type === 'USER' && !collective.isHost,
-        image:
-          collective.backgroundImageUrl ||
-          get(collective, 'parentCollective.backgroundImageUrl') ||
-          collective.image ||
-          get(collective, 'parentCollective.image') ||
-          defaultImage,
-      };
-    } else {
-      return {
-        title: 'Collective',
-        image: defaultImage,
-      };
-    }
-  }
-
   setShowOnboardingModal = bool => {
     this.setState({ showOnboardingModal: bool });
   };
@@ -195,7 +172,7 @@ class CollectivePage extends React.Component {
       <Page
         collective={collective}
         canonicalURL={getCollectivePageCanonicalURL(collective)}
-        {...this.getPageMetaData(collective)}
+        {...getCollectivePageMetadata(collective)}
       >
         <GlobalStyles />
         {loading ? (
@@ -228,9 +205,9 @@ class CollectivePage extends React.Component {
                   updates={collective.updates}
                   conversations={collective.conversations}
                   LoggedInUser={LoggedInUser}
-                  isAdmin={Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective))}
-                  isHostAdmin={Boolean(LoggedInUser && LoggedInUser.canEditCollective(collective.host))}
-                  isRoot={Boolean(LoggedInUser && LoggedInUser.isRoot())}
+                  isAdmin={Boolean(LoggedInUser && LoggedInUser.isAdminOfCollective(collective))}
+                  isHostAdmin={Boolean(LoggedInUser && LoggedInUser.isHostAdmin(collective))}
+                  isRoot={Boolean(LoggedInUser && LoggedInUser.isRoot)}
                   onPrimaryColorChange={onPrimaryColorChange}
                   step={step}
                   mode={mode}
@@ -238,7 +215,7 @@ class CollectivePage extends React.Component {
                 />
               )}
             </CollectiveThemeProvider>
-            {mode === 'onboarding' && LoggedInUser?.canEditCollective(collective) && (
+            {mode === 'onboarding' && LoggedInUser?.isAdminOfCollective(collective) && (
               <OnboardingModal
                 showOnboardingModal={showOnboardingModal}
                 setShowOnboardingModal={this.setShowOnboardingModal}

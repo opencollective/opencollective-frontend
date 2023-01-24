@@ -8,20 +8,25 @@ import locales from '../lib/constants/locales';
 const MESSAGES_FILE = './dist/messages/messages.json';
 const LANG_DIR = './lang/';
 const DEFAULT_TRANSLATIONS_FILE = `${LANG_DIR}en.json`;
-const DUPLICATED_IGNORED_IDS = new Set([
-  'section.team.title',
-  'contribute.step.details',
-  'order.status',
-  'expense.status',
-  'expense.markAsPaid',
-  'expense.approved',
-  'expense.rejected',
-  'order.rejected',
-  'AdminPanel.button',
-]);
-const DUPLICATED_IGNORED_MESSAGES = new Set(['all', 'type', 'paid', 'pending', 'other', 'expired']);
 
-/* eslint-disable no-console */
+// Use lowercase values
+const DUPLICATED_IGNORED_MESSAGES = new Set([
+  'admin', // Can have different masculine/feminine for some languages based on the context (role or action button)
+  'all', // Can have different masculine/feminine for some languages based on the context
+  'approved', // Can have different masculine/feminine for some languages based on the context
+  'completed', // Can have different masculine/feminine for some languages based on the context
+  'confirm', // Can have different masculine/feminine for some languages based on the context
+  'expired', // Can have different masculine/feminine for some languages based on the context
+  'mark as paid', // Can have different masculine/feminine for some languages based on the context (order or expense)
+  'order', // Depends on whether we're talking about ordering (sorting) or an order (contribution)
+  'other', // Can have different masculine/feminine for some languages based on the context
+  'paid', // Can have different masculine/feminine for some languages based on the context
+  'pending', // Can have different masculine/feminine for some languages based on the context
+  'refunded', // Can have different masculine/feminine for some languages based on the context
+  'rejected', // Can have different masculine/feminine for some languages based on the context
+  'status', // Can have different masculine/feminine for some languages based on the context
+  'type', // Can have different masculine/feminine for some languages based on the context
+]);
 
 // Aggregates the default messages that were extracted from the app's
 // React components via the React Intl Babel plugin. An error will be thrown if
@@ -99,18 +104,30 @@ const translate = (locale, defaultMessages, updatedKeys) => {
   fs.writeFileSync(`${LANG_DIR}${locale}.json`, translations);
 };
 
-const warnForDuplicateMessages = messages => {
+const getDuplicateMessages = messages => {
   const groupedMessages = invertBy(messages);
+  const duplicates = [];
   Object.entries(groupedMessages).forEach(([message, ids]) => {
-    const filteredIds = ids.filter(id => !DUPLICATED_IGNORED_IDS.has(id));
-    if (filteredIds.length > 1 && !DUPLICATED_IGNORED_MESSAGES.has(message.toLowerCase())) {
-      console.info(`ℹ️  Found similar message for IDs (${filteredIds.join(', ')}): ${message}`);
+    if (ids.length > 1 && !DUPLICATED_IGNORED_MESSAGES.has(message.toLowerCase())) {
+      duplicates.push({ ids: ids, message });
     }
   });
+
+  return duplicates;
 };
 
 // Look for duplicate messages
-warnForDuplicateMessages(defaultMessages);
+const duplicates = getDuplicateMessages(defaultMessages);
+if (duplicates.length > 0) {
+  const warningsList = duplicates.map(({ ids, message }) => `(${ids.join(', ')}): ${message}`);
+  const whatToDo = `
+To fix this, you can either:
+- Look for the original string and update the "id" or "defaultMessage"
+- Or add the string to "DUPLICATED_IGNORED_MESSAGES" in "scripts/translate.js" (if the translation depends on the context)
+  `;
+
+  throw new Error(`Found duplicate messages with different IDs:\n${warningsList.join('\n')}\n${whatToDo}`);
+}
 
 // Load existing translations, check what changed
 const existingTranslationsObj = JSON.parse(fs.readFileSync(DEFAULT_TRANSLATIONS_FILE, 'utf8'));

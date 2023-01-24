@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import AddressFormatter from '@shopify/address';
 import { Field } from 'formik';
-import { cloneDeep, get, isEmpty, isNil, isUndefined, orderBy, pick, set, truncate } from 'lodash';
+import { cloneDeep, get, isEmpty, isNil, orderBy, pick, set, truncate } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import LoadingPlaceholder from './LoadingPlaceholder';
@@ -107,7 +107,7 @@ const ZoneSelect = ({ info, required, value, name, label, onChange, id, error, .
       options={zoneOptions}
       error={error}
       placeholder={`Please select your ${label}`} // TODO i18n
-      data-cy={`payee-address-${name}`} // TODO: Should not be locked on payee-address
+      data-cy={`address-${name}`} // TODO: Should not be locked on payee-address
       value={zoneOptions.find(option => option?.value === value) || null}
       onChange={v => {
         onChange({ target: { name: name, value: v.value } });
@@ -147,7 +147,7 @@ export const FormikLocationFieldRenderer = ({ name, label, required, prefix, inf
                   />
                 );
               default:
-                return <StyledInput {...inputProps} {...field} error={meta.error} data-cy={`payee-address-${name}`} />;
+                return <StyledInput {...inputProps} {...field} error={meta.error} data-cy={`address-${name}`} />;
             }
           }}
         </StyledInputField>
@@ -194,7 +194,15 @@ export const SimpleLocationFieldRenderer = ({ name, label, required, prefix, val
               />
             );
           default:
-            return <StyledInput {...inputProps} value={value} error={error} onChange={dispatchOnChange} />;
+            return (
+              <StyledInput
+                {...inputProps}
+                value={value}
+                error={error}
+                onChange={dispatchOnChange}
+                data-cy={`address-${name}`}
+              />
+            );
         }
       }}
     </StyledInputField>
@@ -291,7 +299,7 @@ const I18nAddressFields = ({
           label={fieldLabel}
           info={fieldInfo}
           value={value?.[fieldName]}
-          required={!isUndefined(required) ? !Object.keys(data?.optionalLabels).includes(fieldName) : required}
+          required={required === false ? false : !Object.keys(data?.optionalLabels).includes(fieldName)}
           fieldProps={fieldProps}
           onChange={({ target: { name, value: fieldValue } }) =>
             onCountryChange(set(cloneDeep(value || {}), name, fieldValue))

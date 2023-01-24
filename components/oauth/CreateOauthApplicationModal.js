@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import StyledButton from '../StyledButton';
@@ -17,7 +17,7 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import { validateOauthApplicationValues } from './lib';
 
-const createApplicationMutation = gqlV2/* GraphQL */ `
+const createApplicationMutation = gql`
   mutation CreateApplication($application: ApplicationCreateInput!) {
     createApplication(application: $application) {
       id

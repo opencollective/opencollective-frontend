@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { API_V2_CONTEXT, gqlV2 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
@@ -19,7 +19,7 @@ import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import MemberForm from './MemberForm';
 import { coreContributorsQuery } from './Members';
 
-export const inviteMemberMutation = gqlV2/* GraphQL */ `
+export const inviteMemberMutation = gql`
   mutation InviteMember(
     $memberAccount: AccountReferenceInput!
     $account: AccountReferenceInput!

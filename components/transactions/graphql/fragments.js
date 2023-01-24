@@ -1,11 +1,12 @@
-import { gqlV2 } from '../../../lib/graphql/helpers';
+import { gql } from '@apollo/client';
 
-export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
+export const transactionsQueryCollectionFragment = gql`
   fragment TransactionsQueryCollectionFragment on TransactionCollection {
     totalCount
     offset
     limit
     kinds
+    paymentMethodTypes
     nodes {
       id
       uuid
@@ -128,10 +129,16 @@ export const transactionsQueryCollectionFragment = gqlV2/* GraphQL */ `
         id
         type
       }
+      payoutMethod {
+        id
+        type
+      }
       order {
         id
         legacyId
         status
+        memo
+        processedAt
       }
       expense {
         id

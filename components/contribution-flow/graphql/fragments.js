@@ -1,6 +1,6 @@
-import { gqlV2 } from '../../../lib/graphql/helpers';
+import { gql } from '@apollo/client';
 
-const contributionFlowHostFieldsFragment = gqlV2/* GraphQL */ `
+const contributionFlowHostFieldsFragment = gql`
   fragment ContributionFlowHostFields on Host {
     id
     legacyId
@@ -23,7 +23,7 @@ const contributionFlowHostFieldsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
+export const contributionFlowAccountFieldsFragment = gql`
   fragment ContributionFlowAccountFields on Account {
     id
     legacyId
@@ -35,6 +35,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
     twitterHandle
     description
     imageUrl(height: 192)
+    backgroundImageUrl
     isHost
     isActive
     settings
@@ -80,6 +81,8 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
         id
         slug
         settings
+        imageUrl
+        backgroundImageUrl
         location {
           id
           country
@@ -96,7 +99,7 @@ export const contributionFlowAccountFieldsFragment = gqlV2/* GraphQL */ `
   ${contributionFlowHostFieldsFragment}
 `;
 
-const orderSuccessHostFragment = gqlV2/* GraphQL */ `
+const orderSuccessHostFragment = gql`
   fragment OrderSuccessHostFragment on Host {
     id
     slug
@@ -110,7 +113,7 @@ const orderSuccessHostFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-export const orderSuccessFragment = gqlV2/* GraphQL */ `
+export const orderSuccessFragment = gql`
   fragment OrderSuccessFragment on Order {
     id
     legacyId
@@ -145,6 +148,7 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
       id
       name
       type
+      slug
       imageUrl(height: 48)
       ... on Individual {
         isGuest
@@ -193,7 +197,7 @@ export const orderSuccessFragment = gqlV2/* GraphQL */ `
   ${orderSuccessHostFragment}
 `;
 
-export const orderResponseFragment = gqlV2/* GraphQL */ `
+export const orderResponseFragment = gql`
   fragment OrderResponseFragment on OrderWithPayment {
     guestToken
     order {

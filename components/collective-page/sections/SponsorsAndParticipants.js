@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, uniqBy } from 'lodash';
+import { get, groupBy, mapValues } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -55,12 +55,17 @@ const Participants = ({ collective: event, LoggedInUser, refetch }) => {
       guestOrders.push(order);
     }
   });
-
-  const responses = uniqBy(guestOrders, order => order.fromCollective && order.fromCollective.id).map(order => ({
-    user: order.fromCollective,
-    createdAt: order.createdAt,
-    status: 'YES',
-  }));
+  const responses = Object.values(
+    mapValues(
+      groupBy(guestOrders, order => order.fromCollective && order.fromCollective.id),
+      orders => ({
+        user: orders[0].fromCollective,
+        createdAt: orders[0].createdAt,
+        status: 'YES',
+        count: orders.length,
+      }),
+    ),
+  );
 
   const sponsors = sponsorOrders.map(order => {
     const sponsorCollective = Object.assign({}, order.fromCollective);
@@ -97,7 +102,7 @@ const Participants = ({ collective: event, LoggedInUser, refetch }) => {
           <SectionTitle textAlign="center">
             <FormattedMessage
               id="event.responses.title.going"
-              values={{ n: responses.length }}
+              values={{ n: guestOrders.length }}
               defaultMessage="{n} {n, plural, one {person going} other {people going}}"
             />
           </SectionTitle>

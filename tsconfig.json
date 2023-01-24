@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "checkJs": false,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "typeRoots": ["node_modules/@types", "lib/custom_typings"],
+    "jsx": "preserve",
+    "resolveJsonModule": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "lib/graphql/types/v2/gql.d.ts",
+    "components",
+    "cypress",
+    "lib",
+    "pages",
+    "scripts",
+    "server",
+    "stories",
+    "test"
+  ],
+  "exclude": ["node_modules"]
+}

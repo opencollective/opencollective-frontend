@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -18,7 +19,7 @@ import EmojiReactionPicker from './EmojiReactionPicker';
 import CommentReactions from './EmojiReactions';
 import { commentFieldsFragment } from './graphql';
 
-const editCommentMutation = gqlV2/* GraphQL */ `
+const editCommentMutation = gql`
   mutation EditComment($comment: CommentUpdateInput!) {
     editComment(comment: $comment) {
       id
@@ -55,14 +56,14 @@ const Comment = ({
       <Flex mb={3} justifyContent="space-between">
         <Flex>
           <Box mr={3}>
-            <LinkCollective collective={comment.fromCollective}>
-              <Avatar collective={comment.fromCollective} radius={40} />
+            <LinkCollective collective={comment.fromAccount}>
+              <Avatar collective={comment.fromAccount} radius={40} />
             </LinkCollective>
           </Box>
           <Flex flexDirection="column">
-            <LinkCollective collective={comment.fromCollective}>
+            <LinkCollective collective={comment.fromAccount}>
               <P color="black.800" fontWeight="500" truncateOverflow>
-                {comment.fromCollective.name}
+                {comment.fromAccount.name}
               </P>
             </LinkCollective>
             <P fontSize="12px" color="black.600" truncateOverflow title={comment.createdAt}>
@@ -101,7 +102,7 @@ const Comment = ({
           warnIfUnsavedChanges
           required
         >
-          {({ isEditing, setValue }) =>
+          {({ isEditing, setValue, setUploading }) =>
             !isEditing ? (
               <HTMLContent content={comment.html} fontSize="13px" data-cy="comment-body" />
             ) : (
@@ -110,6 +111,7 @@ const Comment = ({
                 onChange={e => setValue(e.target.value)}
                 fontSize="13px"
                 autoFocus
+                setUploading={setUploading}
               />
             )
           }
@@ -130,7 +132,7 @@ Comment.propTypes = {
     id: PropTypes.string.isRequired,
     html: PropTypes.string,
     createdAt: PropTypes.string,
-    fromCollective: PropTypes.shape({
+    fromAccount: PropTypes.shape({
       id: PropTypes.string,
       name: PropTypes.string,
     }),

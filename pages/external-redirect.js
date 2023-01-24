@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { isURL } from 'validator';
 
 import { isRelativeHref, isTrustedRedirectHost } from '../lib/url-helpers';
-import { isValidRelativeUrl } from '../lib/utils';
+import { isValidRelativeUrl, parseToBoolean } from '../lib/utils';
 
 import Container from '../components/Container';
 import { Flex } from '../components/Grid';
@@ -51,6 +51,7 @@ const ExternalRedirectPage = () => {
   const [pendingAction, setPendingAction] = React.useState(false);
   const query = router?.query || {};
   const fallback = getFallback(query.fallback);
+  const shouldRedirectParent = parseToBoolean(query.shouldRedirectParent);
 
   React.useEffect(() => {
     if (router && !query.url) {
@@ -60,7 +61,11 @@ const ExternalRedirectPage = () => {
     } else if (!isValidExternalRedirect(query.url)) {
       router.push(fallback);
     } else if (shouldRedirectDirectly(query.url)) {
-      router.push(query.url);
+      if (shouldRedirectParent) {
+        window.parent.location.href = query.url;
+      } else {
+        router.push(query.url);
+      }
     } else {
       setReady(true);
     }
@@ -88,7 +93,16 @@ const ExternalRedirectPage = () => {
               </P>
             </Container>
             <Container display="flex" justifyContent="flex-end" backgroundColor="black.100" p={1}>
-              <a href={query.url} onClick={() => setPendingAction('REDIRECT')}>
+              <a
+                href={query.url}
+                onClick={e => {
+                  setPendingAction('REDIRECT');
+                  if (shouldRedirectParent) {
+                    e.preventDefault();
+                    window.parent.location.href = query.url;
+                  }
+                }}
+              >
                 <StyledButton
                   buttonSize="small"
                   my={2}

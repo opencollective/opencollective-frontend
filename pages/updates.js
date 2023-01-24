@@ -1,17 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, omitBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
@@ -54,7 +54,7 @@ class UpdatesPage extends React.Component {
   componentDidUpdate(prevProps) {
     const { data, LoggedInUser } = this.props;
     const collective = data.account;
-    if (!prevProps.LoggedInUser && LoggedInUser && LoggedInUser.canEditCollective(collective)) {
+    if (!prevProps.LoggedInUser && LoggedInUser && LoggedInUser.isAdminOfCollective(collective)) {
       // We refetch the data to get the updates that are not published yet
       data.refetch({ options: { fetchPolicy: 'network-only' } });
     }
@@ -86,8 +86,7 @@ class UpdatesPage extends React.Component {
         <Body>
           <CollectiveNavbar
             collective={collective}
-            isAdmin={LoggedInUser && LoggedInUser.canEditCollective(collective)}
-            selected={Sections.UPDATES}
+            isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollective(collective)}
             selectedCategory={NAVBAR_CATEGORIES.CONNECT}
           />
 
@@ -104,7 +103,7 @@ class UpdatesPage extends React.Component {
                   />
                 </P>
               </Container>
-              {LoggedInUser?.canEditCollective(collective) && (
+              {LoggedInUser?.isAdminOfCollective(collective) && (
                 <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
                   <StyledButton buttonStyle="primary" m={2}>
                     <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />
@@ -142,7 +141,7 @@ class UpdatesPage extends React.Component {
   }
 }
 
-export const updatesQuery = gqlV2/* GraphQL */ `
+export const updatesQuery = gql`
   query Updates(
     $collectiveSlug: String!
     $limit: Int
@@ -152,6 +151,7 @@ export const updatesQuery = gqlV2/* GraphQL */ `
   ) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
+      legacyId
       name
       slug
       type

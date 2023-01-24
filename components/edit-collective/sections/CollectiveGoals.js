@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, sortBy, startCase } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
+
+import { gqlV1 } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import GoalsCover from '../../GoalsCover';
@@ -63,7 +64,7 @@ class CollectiveGoals extends React.Component {
       title: { id: 'goal.title.label', defaultMessage: 'Title' },
       description: { id: 'Fields.description', defaultMessage: 'Description' },
       amount: { id: 'Fields.amount', defaultMessage: 'Amount' },
-      showToggle: { id: 'goal.show', defaultMessage: 'Show goals on my Collective page' },
+      showToggle: { id: 'goal.show', defaultMessage: 'Show goals on my Profile page' },
     });
 
     const getOptions = arr => {
@@ -301,7 +302,7 @@ class CollectiveGoals extends React.Component {
   }
 }
 
-const editCollectiveSettingsMutation = gql`
+const editCollectiveSettingsMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveSettings($id: Int!, $settings: JSON) {
     editCollective(collective: { id: $id, settings: $settings }) {
       id

@@ -51,7 +51,7 @@ export const getContributorsFilters = contributors => {
       if (addFilter(CONTRIBUTOR_FILTERS.CORE)) {
         break;
       }
-    } else if (c.isBacker || c.isFundraiser) {
+    } else if (c.isBacker) {
       if (addFilter(CONTRIBUTOR_FILTERS.FINANCIAL)) {
         break;
       }
@@ -91,14 +91,13 @@ export const filterContributors = (contributors, filter) => {
  * - `getContributorsFilters`: For a given list of Contributors, returns all the filters that can be applied to the list.
  * - `filterContributors`: A helper to filter a Contributors list by contributor roles.
  */
-const ContributorsFilter = ({ intl, selected, onChange, filters, selectedButtonStyle, ...props }) => {
+const ContributorsFilter = ({ intl, selected, onChange, filters, ...props }) => {
   return (
     <StyledFilters
       filters={filters}
       getLabel={filter => intl.formatMessage(Translations[filter])}
       onChange={onChange}
       selected={selected || CONTRIBUTOR_FILTERS.ALL}
-      selectedButtonStyle={selectedButtonStyle}
       {...props}
     />
   );
@@ -111,15 +110,12 @@ ContributorsFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
   /** An optional list of active filters */
   filters: PropTypes.arrayOf(PropTypes.oneOf(FILTERS_LIST)),
-  /** Default button style when selected */
-  selectedButtonStyle: PropTypes.oneOf(['primary', 'secondary', 'standard', 'dark']),
   /** @ignore from injectIntl */
   intl: PropTypes.object,
 };
 
 ContributorsFilter.defaultProps = {
   filters: FILTERS_LIST,
-  selectedButtonStyle: 'dark',
 };
 
 export default injectIntl(ContributorsFilter);

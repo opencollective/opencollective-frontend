@@ -13,9 +13,8 @@ import { compose } from '../../lib/utils';
 
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';
 import Container from '../../components/Container';
-import { PAYMENT_FLOW, STEPS } from '../../components/contribution-flow/constants';
+import { PAYMENT_FLOW } from '../../components/contribution-flow/constants';
 import ContributionBlocker, { getContributionBlocker } from '../../components/contribution-flow/ContributionBlocker';
-import ContributionFlowSuccess from '../../components/contribution-flow/ContributionFlowSuccess';
 import {
   contributionFlowAccountQuery,
   contributionFlowAccountWithTierQuery,
@@ -39,8 +38,6 @@ class EmbedContributionFlowPage extends React.Component {
     return {
       // Route parameters
       collectiveSlug: query.eventSlug || query.collectiveSlug,
-      step: query.step || 'details',
-      verb: query.verb,
       tierId: parseInt(query.tierId) || null,
       // Query parameters
       error: query.error,
@@ -50,7 +47,6 @@ class EmbedContributionFlowPage extends React.Component {
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
-    verb: PropTypes.string,
     paymentFlow: PropTypes.string,
     tierId: PropTypes.number,
     error: PropTypes.string,
@@ -64,7 +60,6 @@ class EmbedContributionFlowPage extends React.Component {
     loadStripe: PropTypes.func,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
-    step: PropTypes.oneOf(Object.values(STEPS)),
     router: PropTypes.object,
     queryParams: PropTypes.shape({
       useTheme: PropTypes.bool,
@@ -104,7 +99,7 @@ class EmbedContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, step, paymentFlow, LoggedInUser } = this.props;
+    const { data = {}, paymentFlow, LoggedInUser } = this.props;
     const { account, tier } = data;
     const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
 
@@ -125,8 +120,6 @@ class EmbedContributionFlowPage extends React.Component {
     );
     if (contributionBlocker) {
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
-    } else if (step === 'success') {
-      return <ContributionFlowSuccess collective={account} isEmbed />;
     } else {
       return (
         <Box height="100%" pt={3}>
@@ -135,9 +128,6 @@ class EmbedContributionFlowPage extends React.Component {
             collective={account}
             host={account.host}
             tier={tier}
-            step={step}
-            verb={this.props.verb}
-            queryParams={this.props.queryParams}
             error={this.props.error}
           />
         </Box>

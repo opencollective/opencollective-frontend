@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import EXPENSE_STATUS from '../../lib/constants/expense-status';
 import { parseDateInterval } from '../../lib/date-utils';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { useLazyGraphQLPaginatedResults } from '../../lib/hooks/useLazyGraphQLPaginatedResults';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
@@ -29,12 +29,12 @@ import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
-import { H1 } from '../Text';
+import { H1, P } from '../Text';
 
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
-const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
+const hostDashboardExpensesQuery = gql`
   query HostDashboardExpenses(
     $hostSlug: String!
     $limit: Int!
@@ -64,7 +64,7 @@ const hostDashboardExpensesQuery = gqlV2/* GraphQL */ `
       limit: $limit
       offset: $offset
       type: $type
-      tags: $tags
+      tag: $tags
       status: $status
       minAmount: $minAmount
       maxAmount: $maxAmount
@@ -164,12 +164,45 @@ const HostDashboardExpenses = ({ hostSlug, isNewAdmin }) => {
   }, [query.paypalApprovalError]);
 
   const { data, error, loading } = expenses;
+  const { hasDisputedOrders, hasInReviewOrders } = data?.host || {};
   const getQueryParams = newParams => {
     return omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
   };
 
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
+      {!loading && (hasDisputedOrders || hasInReviewOrders) && (
+        <MessageBox type="warning" withIcon mb={3}>
+          <Flex
+            flexDirection={hasDisputedOrders && hasInReviewOrders ? 'column' : 'row'}
+            gridGap={'8px'}
+            flexWrap={'wrap'}
+          >
+            <P fontWeight={700}>
+              <FormattedMessage id="host.fraudProtectionWarning" defaultMessage="Fraud Protection Warning" />
+            </P>
+            {hasDisputedOrders && (
+              <P>
+                <FormattedMessage
+                  id="host.disputes.warning"
+                  defaultMessage="There are disputed charges that need review."
+                />{' '}
+                <Link href={`/${hostSlug}/admin/orders?status=DISPUTED`}>Disputed Orders</Link>{' '}
+              </P>
+            )}
+            {hasInReviewOrders && (
+              <P>
+                <FormattedMessage
+                  id="host.in_review.warning"
+                  defaultMessage="There are charges under review that need attention."
+                />{' '}
+                <Link href={`/${hostSlug}/admin/orders?status=IN_REVIEW`}>In Review Orders</Link>{' '}
+              </P>
+            )}
+          </Flex>
+        </MessageBox>
+      )}
+
       <Flex mb={24} alignItems="center" flexWrap="wrap">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
@@ -303,7 +336,6 @@ const HostDashboardExpenses = ({ hostSlug, isNewAdmin }) => {
               limit={paginatedExpenses.limit}
               offset={paginatedExpenses.offset}
               ignoredQueryParams={ROUTE_PARAMS}
-              scrollToTopOnChange
             />
           </Flex>
         </React.Fragment>

@@ -174,7 +174,7 @@ const nextConfig = {
       // Legacy subscriptions
       {
         source: '/subscriptions',
-        destination: '/recurring-contributions',
+        destination: '/manage-contributions',
         permanent: false,
       },
       {
@@ -198,6 +198,12 @@ const nextConfig = {
       {
         source: '/discover',
         destination: '/search',
+        permanent: true,
+      },
+      // Redirect legacy /create/opensource to new OSC apply flow
+      {
+        source: '/create/opensource/:step*',
+        destination: '/opensource/apply/intro',
         permanent: true,
       },
     ];

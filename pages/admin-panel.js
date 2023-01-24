@@ -1,12 +1,13 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { isHostAccount } from '../lib/collective.lib';
 import roles from '../lib/constants/roles';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { require2FAForAdmins } from '../lib/policies';
 
 import { AdminPanelContext } from '../components/admin-panel/AdminPanelContext';
 import AdminPanelSection from '../components/admin-panel/AdminPanelSection';
@@ -19,8 +20,9 @@ import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
+import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 
-export const adminPanelQuery = gqlV2/* GraphQL */ `
+export const adminPanelQuery = gql`
   query AdminPanel($slug: String!) {
     account(slug: $slug) {
       id
@@ -39,12 +41,17 @@ export const adminPanelQuery = gqlV2/* GraphQL */ `
         VIRTUAL_CARDS
         USE_PAYMENT_METHODS
         EMIT_GIFT_CARDS
-        EMAIL_NOTIFICATIONS_PANEL
+      }
+      policies {
+        REQUIRE_2FA_FOR_ADMINS
       }
       ... on AccountWithParent {
         parent {
           id
           slug
+          policies {
+            REQUIRE_2FA_FOR_ADMINS
+          }
         }
       }
       ... on AccountWithHost {
@@ -55,7 +62,12 @@ export const adminPanelQuery = gqlV2/* GraphQL */ `
           name
           settings
           policies {
-            EXPENSE_AUTHOR_CANNOT_APPROVE
+            EXPENSE_AUTHOR_CANNOT_APPROVE {
+              enabled
+              amountInCents
+              appliesToHostedCollectives
+              appliesToSingleAdminCollectives
+            }
             COLLECTIVE_MINIMUM_ADMINS {
               numberOfAdmins
               applies
@@ -87,7 +99,7 @@ const messages = defineMessages({
   },
   userIsArchivedDescription: {
     id: 'user.isArchived.edit.description',
-    defaultMessage: 'This account has been archived is no longer active.',
+    defaultMessage: 'This account has been archived and is no longer active.',
   },
 });
 
@@ -96,7 +108,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return ALL_SECTIONS.INFO;
   }
 
-  const isAdmin = loggedInUser?.canEditCollective(account);
+  const isAdmin = loggedInUser?.isAdminOfCollective(account);
   const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
   const isAccountantOnly = !isAdmin && isAccountant;
   if (isHostAccount(account)) {
@@ -108,16 +120,15 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
 
 const getNotification = (intl, account) => {
   if (account?.isArchived) {
-    const notification = { status: 'collectiveArchived' };
     if (account.type === 'USER') {
       return {
-        ...notification,
+        type: 'warning',
         title: intl.formatMessage(messages.userIsArchived),
         description: intl.formatMessage(messages.userIsArchivedDescription),
       };
     } else {
       return {
-        ...notification,
+        type: 'warning',
         title: intl.formatMessage(messages.collectiveIsArchived, { name: account.name }),
         description: intl.formatMessage(messages.collectiveIsArchivedDescription, {
           type: account.type.toLowerCase(),
@@ -137,7 +148,7 @@ function getBlocker(LoggedInUser, account, section) {
   }
 
   // Check permissions
-  const isAdmin = LoggedInUser.canEditCollective(account);
+  const isAdmin = LoggedInUser.isAdminOfCollective(account);
   if (SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS.includes(section)) {
     if (!isAdmin && !LoggedInUser.hasRole(roles.ACCOUNTANT, account)) {
       return <FormattedMessage defaultMessage="You need to be logged in as an admin or accountant to view this page" />;
@@ -148,7 +159,7 @@ function getBlocker(LoggedInUser, account, section) {
 }
 
 const getIsAccountantOnly = (LoggedInUser, account) => {
-  return LoggedInUser && !LoggedInUser.canEditCollective(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account);
+  return LoggedInUser && !LoggedInUser.isAdminOfCollective(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account);
 };
 
 const AdminPanelPage = () => {
@@ -179,13 +190,7 @@ const AdminPanelPage = () => {
             display={['flex', null, 'none']}
           />
         )}
-        {Boolean(notification) && (
-          <NotificationBar
-            status={notification.status}
-            title={notification.title}
-            description={notification.description}
-          />
-        )}
+        {Boolean(notification) && <NotificationBar {...notification} />}
         {blocker ? (
           <Flex flexDirection="column" alignItems="center" my={6}>
             <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
@@ -202,6 +207,7 @@ const AdminPanelPage = () => {
             m="0 auto"
             px={3}
             py={4}
+            data-cy="admin-panel-container"
           >
             <AdminPanelSideBar
               isLoading={isLoading}
@@ -210,7 +216,16 @@ const AdminPanelPage = () => {
               display={['none', null, 'block']}
               isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
             />
-            <AdminPanelSection section={selectedSection} isLoading={isLoading} collective={account} subpath={subpath} />
+            {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
+              <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
+            ) : (
+              <AdminPanelSection
+                section={selectedSection}
+                isLoading={isLoading}
+                collective={account}
+                subpath={subpath}
+              />
+            )}
           </Grid>
         )}
       </Page>

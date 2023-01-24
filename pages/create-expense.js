@@ -1,37 +1,40 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { compose, omit, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { expenseSubmissionAllowed, getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { expenseSubmissionAllowed, getCollectivePageMetadata, getCollectiveTypeForUrl } from '../lib/collective.lib';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import FormPersister from '../lib/form-persister';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { parseToBoolean } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
+import { Dimensions } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
 import ErrorPage from '../components/ErrorPage';
 import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
-import ExpenseForm, { prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
+import ExpenseForm, { EXPENSE_FORM_STEPS, prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseRecurringForm from '../components/expenses/ExpenseRecurringForm';
-import ExpenseSummary from '../components/expenses/ExpenseSummary';
+import ExpenseSummary, { SummaryHeader } from '../components/expenses/ExpenseSummary';
 import {
   expensePageExpenseFieldsFragment,
   loggedInAccountExpensePayoutFieldsFragment,
 } from '../components/expenses/graphql/fragments';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
 import { Box, Flex } from '../components/Grid';
+import LinkCollective from '../components/LinkCollective';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
@@ -39,11 +42,10 @@ import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree, { SignInOverlayBackground } from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import StyledCard from '../components/StyledCard';
-import { H1 } from '../components/Text';
 import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
 import { withUser } from '../components/UserProvider';
 
-const STEPS = { FORM: 'FORM', SUMMARY: 'summary' };
+const STEPS = { ...EXPENSE_FORM_STEPS, SUMMARY: 'summary' };
 
 class CreateExpensePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, parentCollectiveSlug } }) {
@@ -84,6 +86,7 @@ class CreateExpensePage extends React.Component {
         twitterHandle: PropTypes.string,
         imageUrl: PropTypes.string,
         isArchived: PropTypes.bool,
+        supportedExpenseTypes: PropTypes.array,
         expensesTags: PropTypes.arrayOf(
           PropTypes.shape({
             id: PropTypes.string.isRequired,
@@ -116,7 +119,7 @@ class CreateExpensePage extends React.Component {
     super(props);
     this.formTopRef = React.createRef();
     this.state = {
-      step: STEPS.FORM,
+      step: STEPS.PAYEE,
       expense: null,
       isSubmitting: false,
       formPersister: null,
@@ -165,11 +168,12 @@ class CreateExpensePage extends React.Component {
   }
 
   getPageMetaData(collective) {
+    const baseMetadata = getCollectivePageMetadata(collective);
     const canonicalURL = `${getCollectivePageCanonicalURL(collective)}/expenses/new`;
     if (collective) {
-      return { title: `${collective.name} - New expense`, canonicalURL };
+      return { ...baseMetadata, title: `${collective.name} - New expense`, canonicalURL };
     } else {
-      return { title: `New expense`, canonicalURL };
+      return { ...baseMetadata, title: `New expense`, canonicalURL };
     }
   }
 
@@ -304,7 +308,10 @@ class CreateExpensePage extends React.Component {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
-      } else if (!hasFeature(data.account, FEATURES.RECEIVE_EXPENSES)) {
+      } else if (
+        !hasFeature(data.account, FEATURES.RECEIVE_EXPENSES) ||
+        data.account.supportedExpenseTypes.length === 0
+      ) {
         return <PageFeatureNotSupported />;
       } else if (data.account.isArchived) {
         return <PageFeatureNotSupported showContactSupportLink={false} />;
@@ -353,22 +360,30 @@ class CreateExpensePage extends React.Component {
                   </SignInOverlayBackground>
                 </ContainerOverlay>
               )}
-              <Box maxWidth={1242} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
+              <Box maxWidth={Dimensions.MAX_SECTION_WIDTH} m="0 auto" px={[2, 3, 4]} py={[4, 5]}>
                 <Flex justifyContent="space-between" flexDirection={['column', 'row']}>
                   <Box minWidth={300} maxWidth={['100%', null, null, 728]} mr={[0, 3, 5]} mb={5} flexGrow="1">
-                    <H1 fontSize="24px" lineHeight="32px" mb={24} py={2}>
-                      {step === STEPS.FORM ? (
+                    <SummaryHeader fontSize="24px" lineHeight="32px" mb={24} py={2}>
+                      {step !== STEPS.SUMMARY ? (
                         <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
                       ) : (
-                        <FormattedMessage id="Summary" defaultMessage="Summary" />
+                        <FormattedMessage
+                          id="ExpenseSummaryTitle"
+                          defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
+                          values={{
+                            type: this.state.expense?.type,
+                            collectiveName: collective?.name,
+                            LinkCollective: text => <LinkCollective collective={collective}>{text}</LinkCollective>,
+                          }}
+                        />
                       )}
-                    </H1>
+                    </SummaryHeader>
                     {data.loading || loadingLoggedInUser ? (
                       <LoadingPlaceholder width="100%" height={400} />
                     ) : (
                       <Box>
                         <CreateExpenseDismissibleIntro collectiveName={collective.name} />
-                        {step === STEPS.FORM && (
+                        {step !== STEPS.SUMMARY ? (
                           <ExpenseForm
                             collective={collective}
                             loading={loadingLoggedInUser}
@@ -379,10 +394,10 @@ class CreateExpensePage extends React.Component {
                             payoutProfiles={payoutProfiles}
                             formPersister={this.state.formPersister}
                             shouldLoadValuesFromPersister={this.state.isInitialForm}
+                            defaultStep={step}
                             autoFocusTitle
                           />
-                        )}
-                        {step === STEPS.SUMMARY && (
+                        ) : (
                           <div>
                             <StyledCard p={[16, 24, 32]} mb={0}>
                               <ExpenseSummary
@@ -414,7 +429,7 @@ class CreateExpensePage extends React.Component {
                                   mr={[null, 3]}
                                   whiteSpace="nowrap"
                                   data-cy="edit-expense-btn"
-                                  onClick={() => this.setState({ step: STEPS.FORM })}
+                                  onClick={() => this.setState({ step: STEPS.EXPENSE })}
                                   disabled={this.state.isSubmitting}
                                 >
                                   ← <FormattedMessage id="Expense.edit" defaultMessage="Edit expense" />
@@ -457,7 +472,7 @@ class CreateExpensePage extends React.Component {
   }
 }
 
-const hostFieldsFragment = gqlV2/* GraphQL */ `
+const hostFieldsFragment = gql`
   fragment CreateExpenseHostFields on Host {
     id
     name
@@ -485,21 +500,24 @@ const hostFieldsFragment = gqlV2/* GraphQL */ `
   }
 `;
 
-const createExpensePageQuery = gqlV2/* GraphQL */ `
+const createExpensePageQuery = gql`
   query CreateExpensePage($collectiveSlug: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
+      legacyId
       slug
       name
       type
       description
       settings
-      imageUrl
       twitterHandle
+      imageUrl
+      backgroundImageUrl
       currency
       isArchived
       isActive
       expensePolicy
+      supportedExpenseTypes
       features {
         id
         ...NavbarFields
@@ -543,6 +561,9 @@ const createExpensePageQuery = gqlV2/* GraphQL */ `
           id
           slug
           expensePolicy
+          imageUrl
+          backgroundImageUrl
+          twitterHandle
         }
       }
     }
@@ -564,7 +585,7 @@ const addCreateExpensePageData = graphql(createExpensePageQuery, {
   },
 });
 
-const createExpenseMutation = gqlV2/* GraphQL */ `
+const createExpenseMutation = gql`
   mutation CreateExpense(
     $expense: ExpenseCreateInput!
     $account: AccountReferenceInput!
@@ -583,7 +604,7 @@ const addCreateExpenseMutation = graphql(createExpenseMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
-const draftExpenseAndInviteUserMutation = gqlV2/* GraphQL */ `
+const draftExpenseAndInviteUserMutation = gql`
   mutation DraftExpenseAndInviteUser($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
     draftExpenseAndInviteUser(expense: $expense, account: $account) {
       id

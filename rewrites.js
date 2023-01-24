@@ -23,6 +23,10 @@ exports.REWRITES = [
     destination: '/ocf-host-application',
   },
   {
+    source: '/opensource/apply/:step(intro|pick-repo|fees|form|success)',
+    destination: '/osc-host-application',
+  },
+  {
     source: '/signin/sent',
     destination: '/signinLinkSent',
   },
@@ -119,11 +123,6 @@ exports.REWRITES = [
     destination: '/collective-contact',
   },
   {
-    source:
-      '/:hostCollectiveSlug/legacy-dashboard/:view(expenses|pending-applications|hosted-collectives|donations|reports)?',
-    destination: '/host.dashboard',
-  },
-  {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions',
     destination: '/transactions',
   },
@@ -132,13 +131,16 @@ exports.REWRITES = [
     destination: '/create-expense',
   },
   {
-    source:
-      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
     destination: '/expense',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:version(v2)?',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses',
     destination: '/expenses',
+  },
+  {
+    source: '/:collectiveSlug/submitted-expenses',
+    destination: '/submitted-expenses',
   },
   {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders',
@@ -149,7 +151,7 @@ exports.REWRITES = [
     destination: '/order',
   },
   {
-    source: '/orders/:id([0-9]+)/confirm',
+    source: '/:collectiveSlug?/orders/:id([0-9]+)/confirm',
     destination: '/confirmOrder',
   },
   {
@@ -159,7 +161,7 @@ exports.REWRITES = [
 
   // New Create Collective Flow
   {
-    source: '/:hostCollectiveSlug?/:verb(create)/:version(v2)?/:category(opensource|community|climate)?/:step(form)?',
+    source: '/:hostCollectiveSlug?/:verb(create)/:version(v2)?/:category(community|climate)?/:step(form)?',
     destination: '/create-collective',
   },
   // Events and Projects using collective page
@@ -174,6 +176,11 @@ exports.REWRITES = [
   // "Ways to contribute" pages
   {
     source: '/:collectiveSlug/:verb(tiers|contribute|events|projects|connected-collectives)',
+    destination: '/contribute',
+  },
+  {
+    source:
+      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(tiers|contribute|connected-collectives)',
     destination: '/contribute',
   },
   // Embed
@@ -258,16 +265,24 @@ exports.REWRITES = [
   },
   // New recurring contributions page
   {
-    source: '/:slug/recurring-contributions',
-    destination: '/recurring-contributions',
+    source: '/:slug/manage-contributions/:tab(recurring|processing)?',
+    destination: '/manage-contributions',
   },
   {
-    source: '/recurring-contributions',
-    destination: '/recurring-contributions',
+    source: '/manage-contributions/:tab(recurring|processing)?',
+    destination: '/manage-contributions',
+  },
+  {
+    source: '/:slug/recurring-contributions/:tab(recurring|processing)?',
+    destination: '/manage-contributions',
+  },
+  {
+    source: '/recurring-contributions/:tab(recurring|processing)?',
+    destination: '/manage-contributions',
   },
   {
     source: '/:slug/subscriptions',
-    destination: '/recurring-contributions',
+    destination: '/manage-contributions',
   },
   // Path routing: all the rewrites below are ready to be removed as soon as we
   // set `useFileSystemPublicRoutes` to true (default) in `next.config.js`

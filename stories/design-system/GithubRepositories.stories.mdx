@@ -1,5 +1,5 @@
 import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
-import GithubRepositories from '../../components/create-collective/GithubRepositories';
+import GithubRepositories from '../../components/osc-host-application/GithubRepositories';
 
 <Meta title="Design system/GithubRepositories" component={GithubRepositories} />
 
@@ -33,7 +33,7 @@ Display the list of repositories
           onCreateCollective={data => {
             console.log(data);
           }}
-          submitGithubInfo={githubInfo => {
+          setGithubInfo={githubInfo => {
             console.log(githubInfo);
           }}
         />

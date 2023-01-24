@@ -8,125 +8,32 @@ import {
   TaxType,
 } from '@opencollective/taxes';
 import { Close } from '@styled-icons/material/Close';
-import { get } from 'lodash';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { get, isEmpty } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import tiersTypes from '../../lib/constants/tiers-types';
-import { formatCurrency } from '../../lib/currency-utils';
 import { propTypeCountry } from '../../lib/custom-prop-types';
-import getPaymentMethodFees from '../../lib/fees';
-import { capitalize } from '../../lib/utils';
 
 import Container from '../Container';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import InputTypeCountry from '../InputTypeCountry';
-import StyledHr from '../StyledHr';
+import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
-import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 
-const AmountLine = styled.div.attrs({
-  'data-cy': 'breakdown-line',
-})`
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  margin: 8px 0;
-`;
+import ContributionSummary from './ContributionSummary';
 
-const Label = styled.span`
-  min-width: 210px;
-  font-size: 14px;
-  margin-right: 4px;
-`;
-
-const FeesBreakdown = ({ amount, platformFeePercent, hostFeePercent, paymentMethod, currency }) => {
-  const { locale } = useIntl();
-  const platformFee = amount * (platformFeePercent / 100);
-  const hostFee = amount * ((hostFeePercent || 0) / 100);
-  const pmFeeInfo = getPaymentMethodFees(paymentMethod, amount, currency);
-  const netAmountForCollective = amount - platformFee - hostFee - pmFeeInfo.fee;
-
-  return (
-    <React.Fragment>
-      <AmountLine>
-        <Label fontWeight={500} color="black.800">
-          <FormattedMessage id="contribution.netAmountForCollective" defaultMessage="Net amount for Collective" />
-        </Label>
-        <Span fontSize="16px" fontWeight={500} color="black.700">
-          {formatCurrency(netAmountForCollective, currency, { locale })}
-        </Span>
-      </AmountLine>
-      {Boolean(platformFee) && (
-        <AmountLine>
-          <Label color="black.500">
-            <FormattedMessage id="PlatformFee" defaultMessage="Platform fee" />
-            {` (-${platformFeePercent}%)`}
-          </Label>
-          <Span fontSize="16px" color="black.500">
-            {formatCurrency(platformFee, currency, { locale })}
-          </Span>
-        </AmountLine>
-      )}
-      {Boolean(hostFeePercent) && (
-        <AmountLine>
-          <Label color="black.500">
-            <FormattedMessage id="contribution.hostFeePercent" defaultMessage="Fiscal Host fee" />
-            {` (-${hostFeePercent}%)`}
-          </Label>
-          <Span fontSize="16px" color="black.500">
-            {formatCurrency(hostFee, currency, { locale })}
-          </Span>
-        </AmountLine>
-      )}
-      {Boolean(pmFeeInfo.fee) && (
-        <AmountLine>
-          <Label color="black.500">
-            <FormattedMessage id="contribution.paymentFee" defaultMessage="Payment processor fee" />
-            {' ('}
-            {pmFeeInfo.aboutURL ? (
-              <StyledLink href={pmFeeInfo.aboutURL} openInNewTab>
-                {capitalize(paymentMethod.service)}
-              </StyledLink>
-            ) : (
-              capitalize(paymentMethod.service)
-            )}
-            {`, ${pmFeeInfo.isExact ? '-' : '~'}${pmFeeInfo.feePercent.toFixed(1)}%)`}
-          </Label>
-          <Span fontSize="16px" color="black.500">
-            {!pmFeeInfo.isExact && '~ '}
-            {formatCurrency(pmFeeInfo.fee, currency, { locale })}
-          </Span>
-        </AmountLine>
-      )}
-      <StyledHr borderStyle="dashed" my={3} />
-    </React.Fragment>
-  );
-};
-
-FeesBreakdown.propTypes = {
-  amount: PropTypes.object,
-  platformFeePercent: PropTypes.object,
-  hostFeePercent: PropTypes.object,
-  paymentMethod: PropTypes.object,
-  currency: PropTypes.string,
-};
-
-FeesBreakdown.defaultProps = {
-  platformFeePercent: 5,
-};
-
-const ClickableLabel = styled(Container)``;
-ClickableLabel.defaultProps = {
+const ClickableLabel = styled(Container).attrs({
   display: 'inline-block',
   borderBottom: '1px dashed',
   borderColor: 'black.400',
-  fontSize: '14px',
+  fontSize: '13px',
   color: 'black.500',
   cursor: 'pointer',
   mb: 2,
-};
+})``;
 
 /** Add missing fields to taxInfo and calculate tax amount */
 const prepareTaxInfo = (taxes, userTaxInfo, amount, quantity, taxPercentage, hasForm) => {
@@ -140,7 +47,7 @@ const prepareTaxInfo = (taxes, userTaxInfo, amount, quantity, taxPercentage, has
   };
 };
 
-const getTaxPerentageForProfile = (taxes, tierType, hostCountry, collectiveCountry, profile) => {
+const getTaxPercentageForProfile = (taxes, tierType, hostCountry, collectiveCountry, profile) => {
   if (taxes.some(({ type }) => type === TaxType.VAT)) {
     const originCountry = getVatOriginCountry(tierType, hostCountry, collectiveCountry);
     return getVatPercentage(tierType, originCountry, get(profile, 'countryISO'), get(profile, 'number'));
@@ -151,138 +58,160 @@ const getTaxPerentageForProfile = (taxes, tierType, hostCountry, collectiveCount
   }
 };
 
-const VATInputs = ({ currency, taxInfo, dispatchChange, setFormState, formState }) => {
-  const { locale } = useIntl();
+const COUNTRY_SELECT_STYLES = {
+  dropdownIndicator: { paddingTop: 0, paddingBottom: 0 },
+  option: { fontSize: '12px', color: 'red' },
+  control: { minHeight: '32px' },
+};
+
+const VATInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChange, setFormState, formState }) => {
   const hasConfirmedTaxID = taxInfo.number && taxInfo.isReady;
   const vatShortLabel = <FormattedMessage id="tax.vatShort" defaultMessage="VAT" />;
-
   return (
-    <React.Fragment>
-      <AmountLine my={3}>
-        <Flex flexDirection="column">
-          <Container display="flex" alignItems="center">
-            <Span fontSize="14px" fontWeight="bold" mr={2}>
-              {vatShortLabel}
-            </Span>
+    <AmountLine my={3}>
+      <Flex flexDirection="column">
+        <Flex alignItems="center" flexWrap="wrap">
+          <Label mr={2} flex="1 1 auto">
+            {vatShortLabel}
+          </Label>
+          <Box flex="1 1 180px">
             <InputTypeCountry
               inputId="step-summary-location"
-              minWidth={250}
-              maxMenuHeight={100}
+              minWidth={100}
+              maxWidth={190}
+              maxMenuHeight={150}
               onChange={code => dispatchChange({ countryISO: code, number: null })}
               value={taxInfo.countryISO}
               error={!taxInfo.countryISO}
+              styles={COUNTRY_SELECT_STYLES}
+              fontSize="12px"
               autoDetect
             />
-          </Container>
-          {taxInfo.countryISO && (
-            <Box mt={3}>
-              {hasConfirmedTaxID && !formState.isEnabled ? (
-                <Flex>
-                  <Span mr={3}>{taxInfo.number}</Span>
-                  <ClickableLabel
-                    onClick={() => {
-                      setFormState({ isEnabled: true, error: false });
-                      dispatchChange(null, true);
-                    }}
-                  >
-                    <FormattedMessage
-                      id="contribute.changeTaxNumber"
-                      defaultMessage="Change {taxName} number"
-                      values={{ taxName: vatShortLabel }}
-                    />
-                  </ClickableLabel>
-                </Flex>
-              ) : (
+          </Box>
+        </Flex>
+        {taxInfo.countryISO && (
+          <Box mt={2}>
+            {hasConfirmedTaxID && !formState.isEnabled ? (
+              <Flex>
+                <Span mr={3}>{taxInfo.number}</Span>
                 <ClickableLabel
                   onClick={() => {
-                    if (!formState.isEnabled) {
-                      setFormState({ isEnabled: true, error: false });
-                      dispatchChange(null, true);
-                    }
+                    setFormState({ isEnabled: true, error: false });
+                    dispatchChange(null, true);
                   }}
                 >
                   <FormattedMessage
-                    id="contribute.enterTaxNumber"
-                    defaultMessage="Enter {taxName} number (if you have one)"
+                    id="contribute.changeTaxNumber"
+                    defaultMessage="Change {taxName} number"
                     values={{ taxName: vatShortLabel }}
                   />
                 </ClickableLabel>
-              )}
-              {formState.isEnabled && (
-                <Flex flexDirection="column" className="cf-tax-form">
-                  <Container display="flex" ml={[-20, -26]} alignItems="center">
-                    <Close
-                      data-cy="remove-vat-btn"
-                      size={16}
-                      color="#333333"
-                      cursor="pointer"
-                      aria-label="Remove"
-                      onClick={() => {
-                        setFormState({ isEnabled: false, error: false });
-                        dispatchChange({ number: null }, false);
-                      }}
-                    />
-                    <StyledInput
-                      value={taxInfo.number || ''}
-                      name="taxIndentificationNumber"
-                      mx={[1, 2]}
-                      px={2}
-                      py={1}
-                      autoFocus
-                      required
-                      maxWidth={180}
-                      onBlur={e => {
-                        const rawNumber = e.target.value;
-                        let error = false;
-                        let validationResult = checkVATNumberFormat(rawNumber);
+              </Flex>
+            ) : (
+              <ClickableLabel
+                onClick={() => {
+                  if (!formState.isEnabled) {
+                    setFormState({ isEnabled: true, error: false });
+                    dispatchChange(null, true);
+                  }
+                }}
+              >
+                <FormattedMessage
+                  id="contribute.enterTaxNumber"
+                  defaultMessage="Enter {taxName} number (if you have one)"
+                  values={{ taxName: vatShortLabel }}
+                />
+              </ClickableLabel>
+            )}
+            {formState.isEnabled && (
+              <Flex flexDirection="column" className="cf-tax-form">
+                <Container display="flex" alignItems="center" ml={[null, null, '-24px']}>
+                  <Close
+                    data-cy="remove-vat-btn"
+                    size={16}
+                    color="#333333"
+                    cursor="pointer"
+                    aria-label="Remove"
+                    onClick={() => {
+                      setFormState({ isEnabled: false, error: false });
+                      dispatchChange({ number: null }, false);
+                    }}
+                  />
+                  <StyledInput
+                    value={taxInfo.number || ''}
+                    name="taxIdNumber"
+                    mx={[1, 2]}
+                    px={2}
+                    py={1}
+                    autoFocus
+                    fontSize="13px"
+                    required
+                    maxWidth={180}
+                    error={formState.error}
+                    onBlur={e => {
+                      const rawNumber = e.target.value;
+                      let error = false;
+                      let validationResult = checkVATNumberFormat(rawNumber);
+                      if (!validationResult.isValid) {
+                        // Try again with the country code
+                        validationResult = checkVATNumberFormat(`${taxInfo.countryISO}${rawNumber}`);
                         if (!validationResult.isValid) {
-                          // Try again with the country code
-                          validationResult = checkVATNumberFormat(`${taxInfo.countryISO}${rawNumber}`);
-                          if (!validationResult.isValid) {
-                            error = 'invalid';
-                          }
-                        } else if (get(validationResult, 'country.isoCode.short') !== taxInfo.countryISO) {
-                          error = 'bad_country';
+                          error = 'invalid';
                         }
+                      } else if (get(validationResult, 'country.isoCode.short') !== taxInfo.countryISO) {
+                        error = 'bad_country';
+                      }
 
-                        const number = !error ? validationResult.value : rawNumber;
-                        const hasError = Boolean(error);
-                        setFormState({ isEnabled: true, error: error });
-                        dispatchChange({ number }, hasError);
-                      }}
-                      onChange={e => {
-                        setFormState({ isEnabled: true, error: false });
-                        dispatchChange({ number: e.target.value });
-                      }}
+                      const number = !error ? validationResult.value : rawNumber;
+                      const hasError = Boolean(error);
+                      setFormState({ isEnabled: true, error: error });
+                      dispatchChange({ number }, hasError);
+                    }}
+                    onChange={e => {
+                      setFormState({ isEnabled: true, error: false });
+                      dispatchChange({ number: e.target.value });
+                    }}
+                  />
+                  <StyledButton
+                    buttonSize="tiny"
+                    disabled={formState.error}
+                    onClick={() => {
+                      setFormState({ isEnabled: false });
+                    }}
+                  >
+                    <FormattedMessage id="save" defaultMessage="Save" />
+                  </StyledButton>
+                </Container>
+                {formState.error === 'invalid' && (
+                  <Span mt={1} fontSize="12px" color="red.500">
+                    <FormattedMessage
+                      id="contribute.taxInfoInvalid"
+                      defaultMessage="Invalid {taxName} number"
+                      values={{ taxName: vatShortLabel }}
                     />
-                  </Container>
-                  {formState.error === 'invalid' && (
-                    <Span mt={1} fontSize="12px" color="red.500">
-                      <FormattedMessage
-                        id="contribute.taxInfoInvalid"
-                        defaultMessage="Invalid {taxName} number"
-                        values={{ taxName: vatShortLabel }}
-                      />
-                    </Span>
-                  )}
-                  {formState.error === 'bad_country' && (
-                    <Span mt={1} fontSize="12px" color="red.500">
-                      <FormattedMessage
-                        id="contribute.vatBadCountry"
-                        defaultMessage="The VAT number doesn't match the country"
-                      />
-                    </Span>
-                  )}
-                </Flex>
-              )}
-            </Box>
-          )}
-        </Flex>
-        <Span fontSize="16px" pt={2}>
-          {taxInfo.isReady && `+ ${formatCurrency(taxInfo.amount, currency, { locale })}`}
-        </Span>
-      </AmountLine>
-    </React.Fragment>
+                  </Span>
+                )}
+                {formState.error === 'bad_country' && (
+                  <Span mt={1} fontSize="12px" color="red.500">
+                    <FormattedMessage
+                      id="contribute.vatBadCountry"
+                      defaultMessage="The VAT number doesn't match the country"
+                    />
+                  </Span>
+                )}
+              </Flex>
+            )}
+          </Box>
+        )}
+      </Flex>
+      <Amount pt={2} ml={2} data-cy="VAT-amount">
+        <FormattedMoneyAmount
+          amount={taxInfo.amount}
+          currency={currency}
+          amountStyles={{ color: 'black.700', fontWeight: 400 }}
+        />
+      </Amount>
+    </AmountLine>
   );
 };
 
@@ -292,6 +221,9 @@ VATInputs.propTypes = {
   currency: PropTypes.string,
   dispatchChange: PropTypes.func,
   setFormState: PropTypes.func,
+  AmountLine: PropTypes.node,
+  Amount: PropTypes.node,
+  Label: PropTypes.node,
 };
 
 /**
@@ -301,31 +233,30 @@ const StepSummary = ({
   stepProfile,
   stepDetails,
   collective,
-  paymentMethod,
-  showFees,
+  stepPayment,
+  isCrypto,
   applyTaxes,
   taxes,
   data,
   onChange,
   tier,
 }) => {
-  const { locale } = useIntl();
   const { amount, quantity } = stepDetails;
   const tierType = tier?.type;
   const hostCountry = get(collective.host, 'location.country');
   const collectiveCountry = collective.location.country || get(collective.parent, 'location.country');
-
   const currency = tier?.amount.currency || collective.currency;
 
   const [formState, setFormState] = useState({ isEnabled: false, error: false });
-  const taxPercentage = getTaxPerentageForProfile(taxes, tierType, hostCountry, collectiveCountry, data);
+  const taxPercentage = getTaxPercentageForProfile(taxes, tierType, hostCountry, collectiveCountry, data);
   const taxInfo = prepareTaxInfo(taxes, data, amount, quantity, taxPercentage, formState.isEnabled);
+  const hasCustomTaxRenderer = taxInfo?.taxType === TaxType.VAT && applyTaxes && amount > 0;
 
   // Helper to prepare onChange data
   const dispatchChange = (newValues, hasFormParam) => {
     if (onChange) {
       const newTaxInfo = { ...taxInfo, ...newValues };
-      const percent = getTaxPerentageForProfile(taxes, tierType, hostCountry, collectiveCountry, newTaxInfo);
+      const percent = getTaxPercentageForProfile(taxes, tierType, hostCountry, collectiveCountry, newTaxInfo);
       const hasForm = hasFormParam === undefined ? formState.isEnabled : hasFormParam;
       return onChange({
         stepSummary: prepareTaxInfo(taxes, newTaxInfo, amount, quantity, percent, hasForm),
@@ -334,84 +265,45 @@ const StepSummary = ({
   };
 
   useEffect(() => {
-    // Dispatch initial value on mount
-    dispatchChange({
-      countryISO: data?.countryISO || get(stepProfile, 'location.country'),
-      number: data?.number || get(stepProfile, 'settings.VAT.number'),
-    });
-  }, []);
+    if (!isEmpty(taxes)) {
+      // Dispatch initial value on mount
+      dispatchChange({
+        countryISO: data?.countryISO || get(stepProfile, 'location.country'),
+        number: data?.number || get(stepProfile, 'settings.VAT.number'),
+      });
+    } else if (!data?.isReady) {
+      // Remove stepSummary if taxes are not applied
+      onChange({ stepSummary: { isReady: true } });
+    }
+  }, [taxes]);
 
   return (
-    <Box width="100%" px={[0, null, null, 3]}>
-      {showFees && (
-        <FeesBreakdown
-          platformFeePercent={collective.platformFeePercent}
-          hostFeePercent={collective.hostFeePercent}
-          currency={currency}
-          paymentMethod={paymentMethod}
-          amount={amount}
-        />
-      )}
-      {quantity && (tierType === 'TICKET' || quantity > 1) && (
-        <React.Fragment>
-          <AmountLine my={3}>
-            <Label fontWeight="bold">
-              <FormattedMessage id="contribution.quantity" defaultMessage="Quantity" />
-            </Label>
-            <Span fontSize="16px">{quantity}</Span>
-          </AmountLine>
-          <AmountLine my={3}>
-            <Label fontWeight="bold">
-              <FormattedMessage id="contribution.itemPrice" defaultMessage="Item price" />
-            </Label>
-            <Span fontSize="16px">
-              {amount ? (
-                formatCurrency(amount, currency, { locale })
-              ) : (
-                <FormattedMessage id="Amount.Free" defaultMessage="Free" />
-              )}
-            </Span>
-          </AmountLine>
-        </React.Fragment>
-      )}
-      <AmountLine my={3}>
-        <Label fontWeight="bold">
-          <FormattedMessage id="contribution.your" defaultMessage="Your contribution" />
-        </Label>
-        <Span fontSize="16px">{formatCurrency(amount * quantity, currency, { locale })}</Span>
-      </AmountLine>
-      {applyTaxes && amount > 0 && (
-        <div>
-          {taxes.some(({ type }) => type === TaxType.VAT) && (
-            <VATInputs
-              currency={currency}
-              dispatchChange={dispatchChange}
-              setFormState={setFormState}
-              formState={formState}
-              taxInfo={taxInfo}
-            />
-          )}
-          {taxes.some(({ type }) => type === TaxType.GST) && (
-            <AmountLine>
-              <Span fontSize="16px" pt={2}>
-                GST ({taxPercentage}%)
-              </Span>
-              <Span fontSize="16px" pt={2}>
-                {`+ ${formatCurrency(taxInfo.amount, currency, { locale })}`}
-              </Span>
-            </AmountLine>
-          )}
-        </div>
-      )}
-      <StyledHr my={3} />
-      <AmountLine>
-        <Label fontWeight="bold">
-          <FormattedMessage id="contribution.total" defaultMessage="TOTAL" />
-        </Label>
-        <Span fontWeight="bold" fontSize="16px" color={taxInfo.isReady ? 'black.800' : 'black.400'}>
-          {formatCurrency(amount * quantity + (taxInfo.isReady ? taxInfo.amount : 0), currency, { locale })}
-        </Span>
-      </AmountLine>
+    <Box width="100%" px={[0, null, null, 2]}>
+      <ContributionSummary
+        collective={collective}
+        stepDetails={stepDetails}
+        stepSummary={data}
+        stepPayment={stepPayment}
+        currency={currency}
+        isCrypto={isCrypto}
+        tier={tier}
+        renderTax={
+          !hasCustomTaxRenderer
+            ? null
+            : ({ Amount, Label, AmountLine }) => (
+                <VATInputs
+                  currency={currency}
+                  dispatchChange={dispatchChange}
+                  setFormState={setFormState}
+                  formState={formState}
+                  taxInfo={taxInfo}
+                  Amount={Amount}
+                  Label={Label}
+                  AmountLine={AmountLine}
+                />
+              )
+        }
+      />
     </Box>
   );
 };
@@ -448,6 +340,7 @@ StepSummary.propTypes = {
       }),
     }),
   }),
+  stepPayment: PropTypes.object,
   /** If we need to activate tax for this order */
   applyTaxes: PropTypes.bool,
   /** The tax identification information from user */
@@ -477,15 +370,10 @@ StepSummary.propTypes = {
     /** Payment method currency */
     currency: PropTypes.string,
   }),
-  /** Do we want to show the fees? */
-  showFees: PropTypes.bool,
   /** Called with the step info as `{countryCode, taxInfoNumber, isValid}`  */
   onChange: PropTypes.func.isRequired,
   taxes: PropTypes.arrayOf(PropTypes.oneOf(Object.values(TaxType))),
-};
-
-StepSummary.defaultProps = {
-  showFees: true,
+  isCrypto: PropTypes.bool,
 };
 
 export default StepSummary;

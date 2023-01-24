@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Add } from '@styled-icons/material/Add';
@@ -13,6 +12,7 @@ import { isURL } from 'validator';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { WebhookEventsList } from '../../../lib/constants/notificationEvents';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
+import { gqlV1 } from '../../../lib/graphql/helpers';
 import { i18nWebhookEventType } from '../../../lib/i18n/webhook-event-type';
 import { compose } from '../../../lib/utils';
 
@@ -194,7 +194,7 @@ class Webhooks extends React.Component {
           </Box>
           <Box>
             <Label fontSize="14px" mb={1}>
-              <FormattedMessage id="webhooks.types.label" defaultMessage="Activity" />
+              <FormattedMessage defaultMessage="Activity" />
             </Label>
             <Flex alignItems="center">
               <StyledSelect
@@ -315,7 +315,7 @@ class Webhooks extends React.Component {
   }
 }
 
-const editCollectiveWebhooksQuery = gql`
+const editCollectiveWebhooksQuery = gqlV1/* GraphQL */ `
   query EditCollectiveWebhooks($collectiveSlug: String) {
     Collective(slug: $collectiveSlug) {
       id
@@ -332,7 +332,7 @@ const editCollectiveWebhooksQuery = gql`
   }
 `;
 
-const editCollectiveWebhooksMutation = gql`
+const editCollectiveWebhooksMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveWebhooks($collectiveId: Int!, $notifications: [NotificationInputType]) {
     editWebhooks(collectiveId: $collectiveId, notifications: $notifications) {
       id

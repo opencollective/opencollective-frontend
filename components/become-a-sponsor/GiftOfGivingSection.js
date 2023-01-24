@@ -62,7 +62,7 @@ const GiftOFGiving = () => (
       <Box alignSelf={['center', null, 'flex-start']}>
         <a href="https://docs.opencollective.com/help/financial-contributors/organizations/gift-cards">
           <StyledButton whiteSpace="nowrap" letterSpacing="normal">
-            <FormattedMessage id="becomeASponsor.learnMore" defaultMessage="Learn More" />
+            <FormattedMessage defaultMessage="Learn More" />
           </StyledButton>
         </a>
       </Box>

@@ -63,7 +63,7 @@ const messages = defineMessages({
     defaultMessage: 'Explainer video',
   },
   'platform.howItWorks': {
-    id: 'platform.howItWorks',
+    id: 'howItWorks',
     defaultMessage: 'How it works',
   },
   'platform.useCases': {

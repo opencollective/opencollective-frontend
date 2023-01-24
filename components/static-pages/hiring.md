@@ -2,16 +2,78 @@
 
 ## Come Work at a Mission Driven Tech Company with High Impact that Cares about You
 
-Do you want to get paid to work on your passion for open source, mutual aid, and the commons, while earning a good livelihood and having great work-life balance? Come work with us at [Open Collective](https://opencollective.com)!
+Do you want to get paid to work on your passion for open source, mutual aid, and the commons, while earning a good livelihood and having great work-life balance? Come work with us!
 
-<!--include photo!-->
+![](https://blog.opencollective.com/content/images/2022/10/P1199711-ANIMATION.gif)
 
-Open Collective is a tech platform that enabled a network of 600+ nonprofits, co-ops, and fiscal hosts to support 7000+ groups to raise and spend $25 million last year with full transparency—and we're growing fast! We love open source, mutual aid, climate justice, and decentralized collaborative groups.
+Open Collective is a financial and legal toolbox for grassroots groups. We support 15,000 groups and 30+ nonprofits around the world with one shared backend solution for fundraising and money management. This year our Collectives are on track to raise and spend $35 million dollars in full transparency.
+
+<strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>
 
 <!--
-<strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>
+Right now, [Open Collective](https://opencollective.com) is hiring for a Senior UX Designer.
+
+## Senior UX Designer
+
+Pay $48K-$60K/year, open to applicants worldwide, role with Open Collective Inc.
+
+We are looking for a Senior UX designer who is passionate about: the future of money, collective work, transparent budgets, open source, mutual aid, and distributed leadership. If this describes you, and you are happy with remote and asynchronous work (except for mandatory stand-up calls at 9am ET / 3pm CET weekdays), read more.
+
+### About
+
+**The design team at [Open Collective](https://opencollective.com)** is currently based in Mexico, India, Brazil, and the United States. It is responsible for planning, designing, and delivering the features that will make this goal possible in a way that embraces the contributions of multiple designers and creatives worldwide. So far, we have not had a UX-focused designer and we are thrilled to add this skillset to the team.
+
+### As a senior UX designer, you will:
+
+- Build on and incrementally improve our current user-experience approach across the platform and within our design practice.
+- Lead the process of user-experience support and development for features, components, and interface design complex solutions.
+- Build tailored artifacts such as presentations, visual maps, service maps, sophisticated journey maps, service blueprints, etc. to drive design ideas forward.
+- Keep a record of the creative development process, using different formats to help the team keep track of a project.
+- Work with peers across Insights, Research, Engineering, and Product to turn workflow brainstorms and business needs into user journey diagrams and service blueprints.
+- Build on top of existing insights, technical constraints, business needs, and specific platform demands to produce well-informed design solutions.
+- Lead the user research process for complex projects, identifying and codifying user needs, pains, and opportunities that will help us deliver better services..
+- Establish and maintain user research tools and practices: discovery calls, prototype testing, surveying, interpreting production data, and building context for other team members to do their best work.
+- Work on different projects at a time, producing multiple concepts and workflows.
+
+### What is expected from you
+
+- You know how to work with different teams, and you can comfortably reach out to people, make proposals, lead workshops, and explain concepts.
+- You are proficient in reviewing and producing interface design and graphic design; while this won't be the majority of your work, you are capable of performing senior QA on any design project related to the platform.
+- You understand when deeper exploration is needed before moving forward and when it is better to change paths and try a different approach.
+- You possess a strong understanding of usability and user experience principles.
+- You love thinking big, and at the same time, you know when to apply pixel-perfect attention to detail.
+- You are comfortable building on top of already existing ideas and letting others build on your ideas.
+- You are autonomous by taking full ownership of your work. You’ll be responsible for every detail, every step of the way, from drafting and sketching to high-fidelity design solutions.
+
+### Pay
+
+Open Collective exists to sustain contributors to the commons, including our team. Our budgets and salaries are transparent and based on where you live. We estimate that this role will require $48K - $60K for you to show up joyfully to work (We will propose you something based on your skills and situation). Our aim is that you can earn a good livelihood, have a great work-life balance, and join a team that truly practices what it preaches - no bullshit.
+
+### Perks
+
+Additional to the monetary compensation, we offer a couple of extra perks:
+
+- $1K per year for improving your workspace, buying tools, and other office expenses that help you perform better.
+- An opportunity to travel when we have retreats (Weeks of face-to-face work every ~8 months) with transportation, allocation, and meals covered during our time together. The last one was in September 2022 in Marseille, France.
+
+### Values
+
+We are a group of optimistic, driven, nerdy, and open people. Open Collective stands for Transparency (“open”) and Group Work (“collective”).
+
+**OPEN**: Our product is built to help groups with financial transparency, and all of our internal team salaries, organizational files, code, and designs are open, too. See our [issue repo](https://github.com/opencollective/opencollective/issues) and [design budget transactions](https://opencollective.com/design/transactions).
+
+**COLLECTIVE**: The happiest people here tend to be rigorous, generous people who love group feedback on slack and want to lead a project and take responsibility for it at a high level. We were founded in 2015 and are on a path to [co-governance of the platform with the community](http://opencollective.com/e2c).
+
+### Tools
+
+Our main tools are Google Docs for file sharing and copyediting, Figma for design, GitHub for product development, Slack for daily communication, Loom for asynchronous recordings, Loomio for decision making, CoBudget for money decisions, and Around for video-conferencing. It is OK if you don’t know how to use some of these - you can learn on the job.
+
+### Apply for the Senior UX Designer Role
+
+Please fill out [this form](https://x7rwr9qad3h.typeform.com/to/lySp1Tfn) to apply.
 -->
 
+<!--
 **We're hiring Senior Software Engineers.**
 
 ## A little about us
@@ -70,3 +132,4 @@ Your message should be convincing enough for us to consider you and move to the 
 - Experience. What is your greatest achievment in software engineering? Can you tell us about a past project you're proud of (it doesn’t have to be an engineering one or even a technical one.)? What do you think you can bring to Open Collective?
 
 As part of our screening process, we'll also ask you to make a small contribution to [our codebase](https://github.com/opencollective). Have a look, do one now or be ready for it!
+-->

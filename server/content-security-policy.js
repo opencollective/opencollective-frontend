@@ -16,6 +16,7 @@ const COMMON_DIRECTIVES = {
     'data:',
     '*.paypal.com',
     'opencollective.com', // for widgets on /admin/export
+    'blog.opencollective.com', // used to easily link images in static pages
     'blob:', // For upload images previews
   ].filter(Boolean),
   workerSrc: [
@@ -49,6 +50,7 @@ const COMMON_DIRECTIVES = {
     'https://*.hcaptcha.com',
     'https://www.google.com',
     'https://api.cryptonator.com',
+    'https://plausible.io',
   ],
   scriptSrc: [
     SELF,
@@ -62,7 +64,7 @@ const COMMON_DIRECTIVES = {
     'https://js.hcaptcha.com',
     'https://*.hcaptcha.com',
     'https://www.google.com',
-    'https://cdn.matomo.cloud',
+    'https://plausible.io',
   ],
   frameSrc: [
     'blob:', // For expense invoice previews in the modal, as they're rendered in a blob

@@ -101,11 +101,70 @@ describe('edit collective', () => {
 
   it('edit tiers', () => {
     cy.getByDataCy('menu-item-tiers').click();
+    cy.getByDataCy('contribute-card-tier').should('have.length', 2);
+
+    // Create a new fixed tier
+    cy.getByDataCy('create-contribute-tier').click();
+    cy.getByDataCy('confirm-btn').click();
+    cy.getByDataCy('edit-tier-modal-form').should('contain', 'This field is required');
+    cy.getByDataCy('select-type').click();
+    cy.contains('[data-cy=select-option]', 'product').click();
+    cy.get('[data-cy=name]').click();
+    cy.get('[data-cy=name]').type('Tshirt');
+    cy.get('[data-cy=description]').type('Made with love');
+    cy.getByDataCy('confirm-btn').click();
+    cy.getByDataCy('edit-tier-modal-form').should('contain', 'This field is required');
+    cy.get('input[data-cy=amount]').type('25.00');
+    cy.get('input[data-cy=maxQuantity]').type('100');
+    cy.get('input[data-cy=button]').type('Buy it!');
+    cy.getByDataCy('confirm-btn').click();
+    cy.checkToast({ type: 'SUCCESS', message: 'Tier created.' });
+    cy.getByDataCy('contribute-card-tier').should('have.length', 3);
+
+    // TODO: Also do the check below on the profile page (need https://github.com/opencollective/opencollective/issues/6331)
+    cy.getByDataCy('contribute-card-tier')
+      .last()
+      .should('contain', 'Tshirt')
+      .should('contain', 'LIMITED: 100 LEFT OUT OF 100') // FIXME Quantity is missing, see https://github.com/opencollective/opencollective/issues/6332
+      .should('contain', 'Made with love')
+      .should('contain', '$25 USD');
+
+    // Edit it
+    cy.getByDataCy('contribute-card-tier').last().find('button').click();
+    cy.get('[data-cy=name]').click();
+    cy.get('[data-cy=name]').type('{selectall}Potatoes');
+    cy.get('[data-cy=description]').type('!');
+    cy.get('[data-cy=amountType]').click();
+    cy.contains('[data-cy=select-option]', 'Flexible').click();
+    cy.get('.currency1.inputField input').type('{selectall}25');
+    cy.get('.currency2.inputField input').type('{selectall}50');
+    cy.getByDataCy('confirm-btn').click();
+    cy.checkToast({ type: 'SUCCESS', message: 'Tier updated.' });
+    cy.getByDataCy('contribute-card-tier')
+      .last()
+      .should('contain', 'Potatoes')
+      .should('contain', 'LIMITED: 100 LEFT OUT OF 100') // FIXME Quantity is missing, see https://github.com/opencollective/opencollective/issues/6332
+      .should('contain', 'Made with love!')
+      .should('not.contain', '$25 USD'); // No amount displayed since there's no default nor minimum amounts set
+
+    // TODO: Check profile page (need https://github.com/opencollective/opencollective/issues/6331)
+
+    // Delete it
+    cy.getByDataCy('contribute-card-tier').last().find('button').click();
+    cy.getByDataCy('delete-btn').click();
+    cy.getByDataCy('confirm-delete-btn').click();
+    cy.checkToast({ type: 'SUCCESS', message: 'Tier deleted.' });
+
+    // TODO: Check profile page (need https://github.com/opencollective/opencollective/issues/6331)
+  });
+
+  it('edit tiers (legacy)', () => {
+    cy.login({ redirect: `/${collectiveSlug}/admin/tiers-legacy` });
     cy.get('.EditTiers .tier:first .name.inputField input').type('{selectall}Backer edited');
     cy.get('.EditTiers .tier:first .description.inputField textarea').type('{selectall}New description for backers');
     cy.get('.EditTiers .tier:first .amount.inputField input').type('{selectall}5');
     cy.get('.EditTiers .tier:first .amountType.inputField [data-cy="amountType"]').click();
-    cy.contains('[data-cy="select-option"]', 'flexible amount').click();
+    cy.contains('[data-cy="select-option"]', 'Flexible amount').click();
     cy.get('.EditTiers .tier:first .currency1.inputField input').type('{selectall}5');
     cy.get('.EditTiers .tier:first .currency2.inputField input').type('{selectall}10');
     cy.get('.EditTiers .tier:first .currency3.inputField input').type('{selectall}20');
@@ -115,8 +174,8 @@ describe('edit collective', () => {
       name: 'Donor (one time donation)',
       type: 'DONATION',
       amount: 500,
-      amountType: 'fixed amount',
-      interval: 'one time',
+      amountType: 'Fixed amount',
+      interval: 'One time',
       description: 'New description for donor',
     });
     addTier({
@@ -124,8 +183,8 @@ describe('edit collective', () => {
       name: 'Priority Support',
       description: 'Get priority support from the core contributors',
       amount: 1000,
-      amountType: 'fixed amount',
-      interval: 'monthly',
+      amountType: 'Fixed amount',
+      interval: 'Monthly',
       maxQuantity: 10,
     });
     cy.wait(500);
@@ -143,9 +202,9 @@ describe('edit collective', () => {
     // Ensure the new tiers are properly displayed on order form
     cy.get('#amount > button').should('have.length', 4); // 3 presets + "Other"
 
-    cy.visit(`/${collectiveSlug}/admin/tiers`);
+    cy.login({ redirect: `/${collectiveSlug}/admin/tiers-legacy` });
     cy.get('.EditTiers .tier').first().find('.amountType [data-cy="amountType"]').click();
-    cy.contains('[data-cy="select-option"]', 'fixed amount').click();
+    cy.contains('[data-cy="select-option"]', 'Fixed amount').click();
     cy.get('.EditTiers .tier').last().find('.removeTier').click();
     cy.get('.EditTiers .tier').last().find('.removeTier').click();
     cy.wait(500);
@@ -164,9 +223,11 @@ describe('edit collective', () => {
     cy.contains('button', 'Save').click();
     cy.contains('Saved');
     cy.visit(`${collectiveSlug}/admin/tiers`);
-    cy.get('[data-cy="tier-input-field-type"]:first [data-cy="type"]').click();
-    cy.contains('[data-cy="select-option"]', 'product').click();
-    cy.contains('[data-cy="tier-input-field-type"]:first', 'Value-added tax (VAT): 21%');
+    cy.getByDataCy('contribute-card-tier').first().find('button').click();
+    cy.getByDataCy('select-type').click();
+    cy.contains('[data-cy=select-option]', 'product').click();
+    cy.contains('[data-cy="edit-tier-modal-form"]:first', 'Value-added tax (VAT): 21%');
+    // TODO save and make sure it's enabled
   });
 });
 

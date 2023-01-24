@@ -1,10 +1,10 @@
 import React from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -21,7 +21,7 @@ import StyledTag from '../StyledTag';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const moveOrdersMutation = gqlV2/* GraphQL */ `
+const moveOrdersMutation = gql`
   mutation MoveOrdersMutation($orders: [OrderReferenceInput!]!, $tier: TierReferenceInput) {
     moveOrders(orders: $orders, tier: $tier) {
       id
@@ -52,7 +52,7 @@ const moveOrdersMutation = gqlV2/* GraphQL */ `
   }
 `;
 
-const accountTiersQuery = gqlV2/* GraphQL */ `
+const accountTiersQuery = gql`
   query MoveContributionsTiersQuery($accountSlug: String!) {
     account(slug: $accountSlug) {
       id

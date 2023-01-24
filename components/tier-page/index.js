@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -8,13 +7,13 @@ import styled from 'styled-components';
 
 // Open Collective Frontend imports
 import INTERVALS from '../../lib/constants/intervals';
+import { gqlV1 } from '../../lib/graphql/helpers';
 import { isTierExpired } from '../../lib/tier-utils';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { getWebsiteUrl } from '../../lib/utils';
 
 import CollectiveNavbar from '../collective-navbar';
 import { NAVBAR_CATEGORIES } from '../collective-navbar/constants';
-import { Sections } from '../collective-page/_constants';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -81,7 +80,7 @@ const ProgressInfoContainer = styled.div`
 `;
 
 /** A mutation with all the info that user is allowed to edit on this page */
-const editTierMutation = gql`
+const editTierMutation = gqlV1/* GraphQL */ `
   mutation UpdateTier($id: Int!, $name: String, $description: String, $longDescription: String, $videoUrl: String) {
     editTier(
       tier: { id: $id, description: $description, name: $name, longDescription: $longDescription, videoUrl: $videoUrl }
@@ -118,7 +117,7 @@ class TierPage extends Component {
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
-      interval: PropTypes.string.isRequired,
+      interval: PropTypes.string,
       currency: PropTypes.string,
       endsAt: PropTypes.string,
       button: PropTypes.string,
@@ -166,7 +165,7 @@ class TierPage extends Component {
 
   render() {
     const { collective, tier, contributors, contributorsStats, redirect, LoggedInUser } = this.props;
-    const canEdit = LoggedInUser && LoggedInUser.canEditCollective(collective);
+    const canEdit = LoggedInUser && LoggedInUser.isAdminOfCollective(collective);
     const isFlexibleInterval = tier.interval === INTERVALS.flexible;
     const amountRaisedKey = tier.interval && !isFlexibleInterval ? 'totalRecurringDonations' : 'totalDonated';
     const amountRaised = tier.stats?.[amountRaisedKey] || 0;
@@ -178,12 +177,7 @@ class TierPage extends Component {
       <Container>
         {/** ---- Hero / Banner ---- */}
         <Container position="sticky" top={0} zIndex={999}>
-          <CollectiveNavbar
-            collective={collective}
-            selected={Sections.CONTRIBUTE}
-            selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE}
-            isAdmin={canEdit}
-          />
+          <CollectiveNavbar collective={collective} selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE} isAdmin={canEdit} />
         </Container>
         <Container position="relative">
           <Container position="absolute" width={1} zIndex={-1} overflow="hidden">

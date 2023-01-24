@@ -8,6 +8,8 @@ import ContributorsGrid from '../ContributorsGrid';
 import { Box } from '../Grid';
 import { H2, P } from '../Text';
 
+const CONTENT_WIDTH = 1440;
+
 export default class TierContributors extends React.Component {
   static propTypes = {
     /** Contributors */
@@ -17,7 +19,6 @@ export default class TierContributors extends React.Component {
         roles: PropTypes.arrayOf(PropTypes.string.isRequired),
         isCore: PropTypes.bool.isRequired,
         isBacker: PropTypes.bool.isRequired,
-        isFundraiser: PropTypes.bool.isRequired,
       }),
     ),
     /** Some statistics about this tier */
@@ -57,7 +58,7 @@ export default class TierContributors extends React.Component {
 
     return (
       <Box>
-        <Box m="0 auto" css={{ maxWidth: 1440 }}>
+        <Box m="0 auto" css={{ maxWidth: CONTENT_WIDTH }}>
           <H2 mb={3} px={3}>
             <FormattedMessage
               id="TierPage.ContributorsCountGoal"
@@ -82,7 +83,12 @@ export default class TierContributors extends React.Component {
           )}
         </Box>
         <Box mb={4}>
-          <ContributorsGrid contributors={filteredContributors} currency={currency} collectiveId={collectiveId} />
+          <ContributorsGrid
+            contributors={filteredContributors}
+            currency={currency}
+            collectiveId={collectiveId}
+            maxWidthWhenNotFull={CONTENT_WIDTH + 16} // Add 16 to compensate for the margin of the card
+          />
         </Box>
       </Box>
     );

@@ -10,7 +10,7 @@ import { isURL, matches } from 'validator';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
 import { compose } from '../../lib/utils';
 
 import Container from '../../components/Container';
@@ -391,7 +391,7 @@ class OnboardingModal extends React.Component {
 }
 
 // GraphQL for editing Collective admins info
-const editCollectiveMembersMutation = gql`
+const editCollectiveMembersMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveMembers($collectiveId: Int!, $members: [MemberInputType!]!) {
     editCoreContributors(collectiveId: $collectiveId, members: $members) {
       id
@@ -412,7 +412,7 @@ export const addEditCollectiveMembersMutation = graphql(editCollectiveMembersMut
 });
 
 // GraphQL for editing Collective contact info
-const editCollectiveContactMutation = gql`
+const editCollectiveContactMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveContact($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
       id
@@ -428,7 +428,7 @@ const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, 
 });
 
 const addMemberInvitationQuery = graphql(
-  gqlV2/* GraphQL */ `
+  gql`
     query MemberInvitationsQuery($slug: String!) {
       memberInvitations(account: { slug: $slug }, role: [ADMIN]) {
         id

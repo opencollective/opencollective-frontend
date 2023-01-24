@@ -174,7 +174,7 @@ const Transparency = () => (
             color="primary.900"
             mb={2}
           >
-            <FormattedMessage id="becomeASponsor.reporting" defaultMessage="Reporting" />
+            <FormattedMessage id="home.reporting" defaultMessage="Reporting" />
           </H3>
           <Box width={['286px', '560px', '250px', null, '297px']}>
             <P

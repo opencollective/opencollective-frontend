@@ -1,8 +1,8 @@
-import { gqlV2 } from '../../../lib/graphql/helpers';
+import { gql } from '@apollo/client';
 
 import { contributionFlowAccountFieldsFragment } from './fragments';
 
-export const contributionFlowAccountQuery = gqlV2/* GraphQL */ `
+export const contributionFlowAccountQuery = gql`
   query ContributionFlowAccountQuery($collectiveSlug: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
@@ -12,7 +12,7 @@ export const contributionFlowAccountQuery = gqlV2/* GraphQL */ `
   ${contributionFlowAccountFieldsFragment}
 `;
 
-export const contributionFlowAccountWithTierQuery = gqlV2/* GraphQL */ `
+export const contributionFlowAccountWithTierQuery = gql`
   query ContributionFlowAccountWithTierQuery($collectiveSlug: String!, $tier: TierReferenceInput!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
@@ -27,6 +27,7 @@ export const contributionFlowAccountWithTierQuery = gqlV2/* GraphQL */ `
       description
       customFields
       availableQuantity
+      singleTicket
       maxQuantity
       endsAt
       amount {

@@ -29,6 +29,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   PAYMENT_RECEIPTS: 'payment-receipts',
   TICKETS: 'tickets',
   TIERS: 'tiers',
+  TIERS_LEGACY: 'tiers-legacy',
   GIFT_CARDS: 'gift-cards',
   AUTHORIZED_APPS: 'authorized-apps',
   FOR_DEVELOPERS: 'for-developers',
@@ -43,7 +44,7 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   INVOICES_RECEIPTS: 'invoices-receipts',
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
-  HOST_TWO_FACTOR_AUTH: 'host-two-factor-auth',
+  SECURITY: 'security',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   HOST_VIRTUAL_CARDS_SETTINGS: 'host-virtual-cards-settings',
 };
@@ -121,7 +122,7 @@ const SECTION_LABELS = defineMessages({
     defaultMessage: 'Payment Methods',
   },
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: {
-    id: 'editCollective.menu.tiers',
+    id: 'Tiers',
     defaultMessage: 'Tiers',
   },
   [EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS]: {
@@ -144,9 +145,9 @@ const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.paymentReceipts',
     defaultMessage: 'Payment Receipts',
   },
-  [EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH]: {
-    id: 'TwoFactorAuth',
-    defaultMessage: 'Two-factor authentication',
+  [EDIT_COLLECTIVE_SECTIONS.SECURITY]: {
+    id: 'Security',
+    defaultMessage: 'Security',
   },
   [EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS]: {
     id: 'VirtualCards.Title',
@@ -186,7 +187,7 @@ const isCollective = c => c.type === COLLECTIVE;
 
 const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.INFO]: () => true,
-  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: c => isCollective(c),
+  [EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS]: c => isOneOfTypes(c, COLLECTIVE, PROJECT),
   [EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS]: c => isHost(c) || isCollective(c),
   [EDIT_COLLECTIVE_SECTIONS.POLICIES]: c => isCollective(c) || isFund(c),
   [EDIT_COLLECTIVE_SECTIONS.EXPORT]: c => isCollective(c),
@@ -202,7 +203,6 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.TIERS]: c =>
     isOneOfTypes(c, COLLECTIVE, FUND, EVENT, PROJECT) || (c.type === ORGANIZATION && c.isActive),
   [EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS]: c => isType(c, ORGANIZATION) || c.createdGiftCards.total > 0,
-  [EDIT_COLLECTIVE_SECTIONS.WEBHOOKS]: c => isOneOfTypes(c, COLLECTIVE, ORGANIZATION, USER, EVENT, PROJECT),
   [EDIT_COLLECTIVE_SECTIONS.ADVANCED]: () => true,
   [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: c => isType(c, USER),
   // Fiscal Host
@@ -211,7 +211,6 @@ const sectionsDisplayConditions = {
   [EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY]: () => false,
-  [EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS]: () => false,
 };
 
@@ -268,7 +267,6 @@ const EditCollectiveMenu = ({ collective, selectedSection }) => {
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY))}
           {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY))}
           {collective.type === COLLECTIVE && renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS))}
-          {renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_TWO_FACTOR_AUTH))}
           {hasFeature(collective, FEATURES.VIRTUAL_CARDS) &&
             renderMenuItem(getSectionInfo(EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS))}
         </Fragment>

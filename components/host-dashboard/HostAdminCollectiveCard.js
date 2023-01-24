@@ -125,13 +125,11 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
             </StyledRoundButton>
           </Flex>
           {[CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(collective.type) && (
-            <HostAdminCollectiveCardMoreButton collective={collective} />
+            <HostAdminCollectiveCardMoreButton collective={collective} host={host} />
           )}
         </Container>
       </Box>
-      {currentModal === 'addFunds' && (
-        <AddFundsModal collective={collective} host={host} onClose={() => setCurrentModal(null)} />
-      )}
+      {currentModal === 'addFunds' && <AddFundsModal collective={collective} onClose={() => setCurrentModal(null)} />}
       {currentModal === 'accountSettings' && (
         <CollectiveSettingsModal collective={collective} host={host} onClose={() => setCurrentModal(null)} />
       )}

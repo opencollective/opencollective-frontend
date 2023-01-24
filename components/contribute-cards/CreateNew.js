@@ -17,6 +17,7 @@ const CreateNewCard = styled(Link)`
   border-radius: ${CONTRIBUTE_CARD_BORDER_RADIUS}px;
   border: 1px dashed #c0c5cc;
   padding: 32px;
+  cursor: pointer;
 
   a {
     text-decoration: none;

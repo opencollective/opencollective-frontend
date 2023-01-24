@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gqlV1 } from '../../../lib/graphql/helpers';
 
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/Contribute';
 
@@ -6,7 +6,7 @@ import * as fragments from './fragments';
 
 // We have to disable the linter because it's not able to detect that `nbContributorsPerContributeCard` is used in fragments
 /* eslint-disable graphql/template-strings */
-export const collectivePageQuery = gql`
+export const collectivePageQuery = gqlV1/* GraphQL */ `
   query CollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug, throwIfMissing: false) {
       id
@@ -20,6 +20,10 @@ export const collectivePageQuery = gql`
       twitterHandle
       repositoryUrl
       website
+      socialLinks {
+        type
+        url
+      }
       tags
       company
       type
@@ -39,6 +43,7 @@ export const collectivePageQuery = gql`
       imageUrl(height: 256)
       canApply
       canContact
+      supportedExpenseTypes
       features {
         id
         ...NavbarFields
@@ -108,6 +113,12 @@ export const collectivePageQuery = gql`
           id
           VIRTUAL_CARDS
         }
+        policies {
+          COLLECTIVE_MINIMUM_ADMINS {
+            freeze
+            numberOfAdmins
+          }
+        }
       }
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {
         id
@@ -128,6 +139,9 @@ export const collectivePageQuery = gql`
       projects {
         id
         ...ContributeCardProjectFields
+      }
+      admins: members(role: "ADMIN") {
+        id
       }
       connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
         id
@@ -186,6 +200,7 @@ export const collectivePageQuery = gql`
             name
             company
             image
+            isIncognito
             imageUrl
             slug
             twitterHandle

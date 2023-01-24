@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
@@ -68,10 +69,11 @@ class ConversationsPage extends React.Component {
   };
 
   getPageMetaData(collective) {
+    const baseMetadata = getCollectivePageMetadata(collective);
     if (collective) {
-      return { title: `${collective.name}'s conversations` };
+      return { ...baseMetadata, title: `${collective.name}'s conversations` };
     } else {
-      return { title: 'Conversations' };
+      return { ...baseMetadata, title: 'Conversations' };
     }
   }
 
@@ -133,11 +135,7 @@ class ConversationsPage extends React.Component {
         ) : (
           <CollectiveThemeProvider collective={collective}>
             <Container data-cy="page-conversations">
-              <CollectiveNavbar
-                collective={collective}
-                selected={Sections.CONVERSATIONS}
-                selectedCategory={NAVBAR_CATEGORIES.CONNECT}
-              />
+              <CollectiveNavbar collective={collective} selectedCategory={NAVBAR_CATEGORIES.CONNECT} />
               <Container py={[4, 5]} px={[2, 3, 4]}>
                 <Container maxWidth={1200} m="0 auto">
                   <H1 fontSize="40px" fontWeight="normal" textAlign="left" mb={2}>
@@ -206,7 +204,7 @@ class ConversationsPage extends React.Component {
   }
 }
 
-const conversationsPageQuery = gqlV2/* GraphQL */ `
+const conversationsPageQuery = gql`
   query ConversationsPage($collectiveSlug: String!, $tag: String) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
@@ -216,8 +214,17 @@ const conversationsPageQuery = gqlV2/* GraphQL */ `
       type
       description
       settings
-      imageUrl
       twitterHandle
+      imageUrl
+      backgroundImageUrl
+      ... on AccountWithParent {
+        parent {
+          id
+          imageUrl
+          backgroundImageUrl
+          twitterHandle
+        }
+      }
       conversations(tag: $tag) {
         ...ConversationListFragment
       }

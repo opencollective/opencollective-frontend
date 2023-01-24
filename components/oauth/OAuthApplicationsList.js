@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { NetworkStatus, useQuery } from '@apollo/client';
+import { gql, NetworkStatus, useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { getOauthAppSettingsRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
@@ -21,7 +21,7 @@ import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
 import { H3, P } from '../Text';
 
-const applicationsQuery = gqlV2/* GraphQL */ `
+const applicationsQuery = gql`
   query ApplicationsQuery($slug: String!, $limit: Int, $offset: Int) {
     account(slug: $slug) {
       id
@@ -40,8 +40,8 @@ const applicationsQuery = gqlV2/* GraphQL */ `
   }
 `;
 
-const OAuthApplicationsList = ({ accountSlug, onApplicationCreated, offset = 0 }) => {
-  const variables = { slug: accountSlug, limit: 12, offset: offset };
+const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) => {
+  const variables = { slug: account.slug, limit: 12, offset: offset };
   const [showCreateApplicationModal, setShowCreateApplicationModal] = React.useState(false);
   const { data, loading, error, networkStatus } = useQuery(applicationsQuery, {
     variables,
@@ -142,7 +142,6 @@ const OAuthApplicationsList = ({ accountSlug, onApplicationCreated, offset = 0 }
             limit={variables.limit}
             offset={variables.offset}
             ignoredQueryParams={['slug', 'section']}
-            scrollToTopOnChange
           />
         </Flex>
       )}
@@ -151,7 +150,9 @@ const OAuthApplicationsList = ({ accountSlug, onApplicationCreated, offset = 0 }
 };
 
 OAuthApplicationsList.propTypes = {
-  accountSlug: PropTypes.string.isRequired,
+  account: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+  }),
   onApplicationCreated: PropTypes.func.isRequired,
   offset: PropTypes.number,
 };

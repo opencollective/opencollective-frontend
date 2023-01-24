@@ -1,10 +1,10 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV2 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Flex } from '../Grid';
@@ -13,7 +13,7 @@ import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const connectAccountsMutation = gqlV2/* GraphQL */ `
+const connectAccountsMutation = gql`
   mutation ConnectAccounts($memberAccount: AccountReferenceInput!, $account: AccountReferenceInput!) {
     createMember(memberAccount: $memberAccount, account: $account, role: CONNECTED_ACCOUNT) {
       id

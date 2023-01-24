@@ -12,18 +12,16 @@ import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-help
 import { compose } from '../lib/utils';
 
 import Container from '../components/Container';
-import { PAYMENT_FLOW, STEPS } from '../components/contribution-flow/constants';
+import { PAYMENT_FLOW } from '../components/contribution-flow/constants';
 import ContributionBlocker, {
   CONTRIBUTION_BLOCKER,
   getContributionBlocker,
 } from '../components/contribution-flow/ContributionBlocker';
-import ContributionFlowSuccess from '../components/contribution-flow/ContributionFlowSuccess';
 import {
   contributionFlowAccountQuery,
   contributionFlowAccountWithTierQuery,
 } from '../components/contribution-flow/graphql/queries';
 import ContributionFlowContainer from '../components/contribution-flow/index';
-import { ContributionFlowUrlQueryHelper } from '../components/contribution-flow/query-parameters';
 import { getContributionFlowMetadata } from '../components/contribution-flow/utils';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
@@ -38,18 +36,14 @@ class NewContributionFlowPage extends React.Component {
       // Route parameters
       collectiveSlug: query.eventSlug || query.collectiveSlug,
       tierId: parseInt(query.tierId) || null,
-      verb: query.verb,
-      step: query.step || 'details',
       paymentFlow: query.paymentFlow,
       // Query parameters
-      queryParams: ContributionFlowUrlQueryHelper.decode(query),
       error: query.error,
     };
   }
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
-    verb: PropTypes.string,
     paymentFlow: PropTypes.string,
     tierId: PropTypes.number,
     error: PropTypes.string,
@@ -63,9 +57,7 @@ class NewContributionFlowPage extends React.Component {
     loadStripe: PropTypes.func,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
-    step: PropTypes.oneOf(Object.values(STEPS)),
     router: PropTypes.object,
-    queryParams: PropTypes.object,
   };
 
   componentDidMount() {
@@ -96,7 +88,7 @@ class NewContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, step, paymentFlow, LoggedInUser, error } = this.props;
+    const { data = {}, paymentFlow, LoggedInUser, error } = this.props;
     const { account, tier } = data;
     const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
 
@@ -115,23 +107,19 @@ class NewContributionFlowPage extends React.Component {
       Boolean(this.props.tierId),
       isCrypto,
     );
+
     if (contributionBlocker) {
       if (contributionBlocker.reason === CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION) {
         return <Redirect to={`${getCollectivePageRoute(account)}/contribute`} />;
       }
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
-    } else if (step === 'success') {
-      return <ContributionFlowSuccess collective={account} />;
     } else {
       return (
         <ContributionFlowContainer
           collective={account}
           host={account.host}
           tier={tier}
-          step={step}
-          verb={this.props.verb}
           paymentFlow={paymentFlow}
-          queryParams={this.props.queryParams}
           error={error}
         />
       );

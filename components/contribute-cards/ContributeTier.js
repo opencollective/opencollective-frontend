@@ -6,7 +6,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import INTERVALS from '../../lib/constants/intervals';
 import { TierTypes } from '../../lib/constants/tiers-types';
-import { formatCurrency, getPrecisionFromAmount } from '../../lib/currency-utils';
+import { formatCurrency, getPrecisionFromAmount, graphqlAmountValueInCents } from '../../lib/currency-utils';
 import { isPastEvent } from '../../lib/events';
 import { isTierExpired } from '../../lib/tier-utils';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -34,7 +34,7 @@ const messages = defineMessages({
 const getContributionTypeFromTier = (tier, isPassed) => {
   if (isPassed) {
     return ContributionTypes.TIER_PASSED;
-  } else if (tier.goal) {
+  } else if (graphqlAmountValueInCents(tier.goal) > 0) {
     return ContributionTypes.FINANCIAL_GOAL;
   } else if (tier.type === TierTypes.PRODUCT) {
     return ContributionTypes.PRODUCT;
@@ -64,7 +64,7 @@ const TierTitle = ({ collective, tier }) => {
       >
         <StyledLink
           as={Link}
-          href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}`}
+          href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.legacyId || tier.id}`}
           color="black.900"
           hoverColor="black.900"
           underlineOnHover
@@ -81,25 +81,27 @@ TierTitle.propTypes = {
     slug: PropTypes.string,
   }),
   tier: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    legacyId: PropTypes.number,
     slug: PropTypes.string,
     name: PropTypes.string,
     useStandalonePage: PropTypes.bool,
   }),
 };
 
-const ContributeTier = ({ intl, collective, tier, ...props }) => {
+const ContributeTier = ({ intl, collective, tier, enableEditing, isPreview, ...props }) => {
   const { stats } = tier;
   const currency = tier.currency || collective.currency;
   const isFlexibleAmount = tier.amountType === 'FLEXIBLE';
   const isFlexibleInterval = tier.interval === INTERVALS.flexible;
   const minAmount = isFlexibleAmount ? tier.minimumAmount : tier.amount;
-  const amountRaised = stats[tier.interval && !isFlexibleInterval ? 'totalRecurringDonations' : 'totalDonated'] || 0;
+  const amountRaised = stats?.[tier.interval && !isFlexibleInterval ? 'totalRecurringDonations' : 'totalDonated'] || 0;
   const tierIsExpired = isTierExpired(tier);
   const tierType = getContributionTypeFromTier(tier, tierIsExpired);
-  const hasNoneLeft = tier.stats.availableQuantity === 0;
+  const hasNoneLeft = stats?.availableQuantity === 0;
   const canContributeToCollective = collective.isActive && !isPastEvent(collective);
   const isDisabled = !canContributeToCollective || tierIsExpired || hasNoneLeft;
+  const tierLegacyId = tier.legacyId || tier.id;
 
   let description = tier.description;
   if (!tier.description) {
@@ -113,14 +115,18 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
 
   return (
     <Contribute
-      route={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}/checkout`}
+      route={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tierLegacyId}/checkout`}
       title={<TierTitle collective={collective} tier={tier} />}
       type={tierType}
       buttonText={tier.button}
       contributors={tier.contributors}
-      stats={tier.stats.contributors}
+      stats={stats?.contributors}
       data-cy="contribute-card-tier"
-      disableCTA={isDisabled}
+      isPreview={isPreview}
+      disableCTA={!isPreview && isDisabled}
+      enableEditing={enableEditing}
+      tier={tier}
+      collective={collective}
       {...props}
     >
       <Flex flexDirection="column" justifyContent="space-between" height="100%">
@@ -131,7 +137,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                 id="tier.limited"
                 values={{
                   maxQuantity: tier.maxQuantity,
-                  availableQuantity: tier.stats && tier.stats.availableQuantity,
+                  availableQuantity: (stats?.availableQuantity ?? tier.availableQuantity) || 0,
                 }}
                 defaultMessage="LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}"
               />
@@ -144,7 +150,9 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                 <StyledLink
                   as={Link}
                   whiteSpace="nowrap"
-                  href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}`}
+                  href={
+                    isPreview ? '#' : `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tierLegacyId}`
+                  }
                 >
                   <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
                 </StyledLink>
@@ -153,7 +161,7 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
               <CollapsableText text={description} maxLength={150} />
             )}
           </P>
-          {tier.goal && (
+          {tierType === ContributionTypes.FINANCIAL_GOAL && (
             <Box mb={1} mt={3}>
               <P fontSize="12px" color="black.600" fontWeight="400">
                 <FormattedMessage
@@ -163,31 +171,31 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
                     amount: (
                       <FormattedMoneyAmount
                         amountStyles={{ fontWeight: '700', color: 'black.700' }}
-                        amount={amountRaised}
+                        amount={graphqlAmountValueInCents(amountRaised)}
                         currency={currency}
-                        precision={getPrecisionFromAmount(amountRaised)}
+                        precision={getPrecisionFromAmount(graphqlAmountValueInCents(amountRaised))}
                       />
                     ),
                     goalWithInterval: (
                       <FormattedMoneyAmount
                         amountStyles={{ fontWeight: '700', color: 'black.700' }}
-                        amount={tier.goal}
+                        amount={graphqlAmountValueInCents(tier.goal)}
                         currency={currency}
                         interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                        precision={getPrecisionFromAmount(tier.goal)}
+                        precision={getPrecisionFromAmount(graphqlAmountValueInCents(tier.goal))}
                       />
                     ),
                   }}
                 />
-                {tier.goal && ` (${Math.round((amountRaised / tier.goal) * 100)}%)`}
+                {` (${Math.round((amountRaised / graphqlAmountValueInCents(tier.goal)) * 100)}%)`}
               </P>
               <Box mt={1}>
-                <StyledProgressBar percentage={amountRaised / tier.goal} />
+                <StyledProgressBar percentage={amountRaised / graphqlAmountValueInCents(tier.goal)} />
               </Box>
             </Box>
           )}
         </Box>
-        {!isDisabled && minAmount > 0 && (
+        {!isDisabled && graphqlAmountValueInCents(minAmount) > 0 && (
           <P mt={3} color="black.700">
             {isFlexibleAmount && (
               <Span display="block" fontSize="10px" textTransform="uppercase">
@@ -196,11 +204,11 @@ const ContributeTier = ({ intl, collective, tier, ...props }) => {
             )}
             <Span display="block" data-cy="amount">
               <FormattedMoneyAmount
-                amount={minAmount}
+                amount={graphqlAmountValueInCents(minAmount)}
                 interval={tier.interval && tier.interval !== INTERVALS.flexible ? tier.interval : null}
                 currency={currency}
                 amountStyles={{ fontSize: '24px', lineHeight: '32px', fontWeight: 'bold', color: 'black.900' }}
-                precision={getPrecisionFromAmount(minAmount)}
+                precision={getPrecisionFromAmount(graphqlAmountValueInCents(minAmount))}
               />
             </Span>
           </P>
@@ -220,7 +228,8 @@ ContributeTier.propTypes = {
     }),
   }),
   tier: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    legacyId: PropTypes.number,
     slug: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     description: PropTypes.string,
@@ -230,20 +239,27 @@ ContributeTier.propTypes = {
     amountType: PropTypes.string,
     endsAt: PropTypes.string,
     button: PropTypes.string,
-    goal: PropTypes.number,
-    minimumAmount: PropTypes.number,
-    amount: PropTypes.number,
+    goal: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
+    minimumAmount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
+    amount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
     maxQuantity: PropTypes.number,
+    availableQuantity: PropTypes.number,
     stats: PropTypes.shape({
       totalRecurringDonations: PropTypes.number,
       totalDonated: PropTypes.number,
       contributors: PropTypes.object,
       availableQuantity: PropTypes.number,
-    }).isRequired,
+    }),
     contributors: PropTypes.arrayOf(PropTypes.object),
   }),
   /** @ignore */
   intl: PropTypes.object.isRequired,
+  enableEditing: PropTypes.bool,
+  isPreview: PropTypes.bool,
+};
+
+ContributeTier.defaultProps = {
+  enableEditing: false,
 };
 
 export default injectIntl(ContributeTier);
