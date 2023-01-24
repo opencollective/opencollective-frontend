@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
+import { components as ReactSelectComponents, InputProps, OptionProps } from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
@@ -20,6 +21,24 @@ export const searchTagsQuery = gql`
     }
   }
 `;
+
+const Input = (props: InputProps & { 'data-cy': string }) => {
+  return <ReactSelectComponents.Input {...props} data-cy={'tags-select-input'} />;
+};
+
+const Option = ({ innerProps, ...props }: OptionProps & { 'data-cy': string }) => {
+  return (
+    <ReactSelectComponents.Option
+      {...props}
+      innerProps={
+        {
+          ...innerProps,
+          'data-cy': `tags-select-option-${props.data['value']}`,
+        } as React.HTMLProps<HTMLDivElement>
+      }
+    />
+  );
+};
 
 function CollectiveTagsInput({ value = [], onChange, client, ...props }) {
   const fetchTags = async inputValue => {
@@ -46,11 +65,17 @@ function CollectiveTagsInput({ value = [], onChange, client, ...props }) {
       openMenuOnFocus
       placeholder="+ Add tags"
       isMulti
-      components={{ MultiValue: customComponents.MultiValue }}
+      components={{
+        MultiValue: customComponents.MultiValue,
+        SelectContainer: customComponents.SelectContainer,
+        Input,
+        Option,
+      }}
       value={value.map(tag => ({ value: tag, label: tag }))}
       defaultOptions={true}
       loadOptions={fetchTags}
       onChange={onChange}
+      data-cy="tags-select"
       styles={{
         control: (baseStyles, state) => ({
           ...baseStyles,
