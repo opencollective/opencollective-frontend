@@ -1901,6 +1901,7 @@
   "mustBeLoggedIn": "Você precisa estar logado para ver esta página",
   "mustBeLoggedInWithLink": "Você precisa estar <login-link>logado</login-link>",
   "mustBeMemberOfCollective": "You must be a member of the collective to see this page",
+  "mwacQu": "Want to receive a login link instead?",
   "MZB6HL": "Create a collective to collect and spend money transparently",
   "mzfp0+": "Search our <Link>Docs</Link> for more info about using the Open Collective platform",
   "mzGohi": "on {date}",
@@ -2354,6 +2355,7 @@
   "r96v2J": "Where we're heading...",
   "RaVvOv": "Core member invited",
   "RC6rA2": "Criado recentemente",
+  "RC94HJ": "Yes, send me an email",
   "RdCCty": "Broaden your search (e.g. search 'garden' instead of 'community garden')",
   "ReadOurStories": "Read our stories",
   "RecurringContribution.Incognito": "This is an incognito recurring contribution, only you can see it.",
@@ -2975,5 +2977,6 @@
   "ZqbBGv": "wk",
   "zu5ckP": "Refund and reject recorded transactions.",
   "ZvWD3X": "Support the event or buy tickets to attend.",
-  "zWgbGg": "Hoje"
+  "zWgbGg": "Hoje",
+  "zwk1/y": "Password succesfully updated"
 }

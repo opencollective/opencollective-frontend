@@ -1901,6 +1901,7 @@
   "mustBeLoggedIn": "Pre zobrazenie tejto stránky je potrebné byť prihlásený",
   "mustBeLoggedInWithLink": "Je potrebné byť <login-link>prihlásený</login-link>",
   "mustBeMemberOfCollective": "Pre zobrazenie tejto stránky je potrebné byť členom kolektívu",
+  "mwacQu": "Want to receive a login link instead?",
   "MZB6HL": "Vytvoriť kolektív pre transparentné zhromažďovanie a čerpanie peňazí",
   "mzfp0+": "Pre viac informácií o používaní platformy Open Collective vyhľadajte naše <Link>Dokumenty</Link>",
   "mzGohi": "dňa {date}",
@@ -2354,6 +2355,7 @@
   "r96v2J": "Kam smerujeme...",
   "RaVvOv": "Core member invited",
   "RC6rA2": "Nedávno vytvorené",
+  "RC94HJ": "Yes, send me an email",
   "RdCCty": "Rozšírte vyhľadávanie (napr. namiesto \"komunitná záhrada\" hľadajte \"záhrada\")",
   "ReadOurStories": "Prečítajte si naše príbehy",
   "RecurringContribution.Incognito": "Toto je opakujúci sa príspevok typu inkognito, ktorý môžete vidieť len vy.",
@@ -2975,5 +2977,6 @@
   "ZqbBGv": "wk",
   "zu5ckP": "Vrátiť a odmietnuť zaznamenané transakcie.",
   "ZvWD3X": "Podporte podujatie alebo si zakúpte vstupenky, ak si želáte zúčastniť sa.",
-  "zWgbGg": "Dnes"
+  "zWgbGg": "Dnes",
+  "zwk1/y": "Password succesfully updated"
 }

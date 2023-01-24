@@ -1901,6 +1901,7 @@
   "mustBeLoggedIn": "Necesitas iniciar cesión para ver esta página",
   "mustBeLoggedInWithLink": "Debes estar <login-link>conectado</login-link>",
   "mustBeMemberOfCollective": "Debes ser miembro del Colectivo para ver esta página",
+  "mwacQu": "Want to receive a login link instead?",
   "MZB6HL": "Crea un colectivo para colectar y gastar dinero de forma transparente",
   "mzfp0+": "Busca en nuestros <Link>Documentos</Link> para obtener más información sobre el uso de la plataforma Open Collective",
   "mzGohi": "el {date}",
@@ -2354,6 +2355,7 @@
   "r96v2J": "Hacia dónde vamos...",
   "RaVvOv": "Miembro principal invitado",
   "RC6rA2": "Creado recientemente",
+  "RC94HJ": "Yes, send me an email",
   "RdCCty": "Amplía tu búsqueda (p. ej., busca \"huerto\" en lugar de \"huerto comunitario\")",
   "ReadOurStories": "Lee nuestras historias",
   "RecurringContribution.Incognito": "Esta es una contribución recurrente incógnita, sólo tú puedes verla.",
@@ -2975,5 +2977,6 @@
   "ZqbBGv": "semana",
   "zu5ckP": "Reembolsa y rechaza las transacciones registradas.",
   "ZvWD3X": "Apoya el evento o compra tickets para asistir.",
-  "zWgbGg": "Hoy"
+  "zWgbGg": "Hoy",
+  "zwk1/y": "Password succesfully updated"
 }

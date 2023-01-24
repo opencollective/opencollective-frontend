@@ -1901,6 +1901,7 @@
   "mustBeLoggedIn": "Musisz być zalogowany aby uzyskać dostęp do tej strony",
   "mustBeLoggedInWithLink": "Musisz być <login-link>zalogowany</login-link>",
   "mustBeMemberOfCollective": "Musisz być członkiem zbiórki aby zobaczyć tę stronę",
+  "mwacQu": "Want to receive a login link instead?",
   "MZB6HL": "Stworzenie zbiórki, w ramach której pieniądze będą gromadzone i wydawane w sposób przejrzysty",
   "mzfp0+": "Search our <Link>Docs</Link> for more info about using the Open Collective platform",
   "mzGohi": "na {date}",
@@ -2354,6 +2355,7 @@
   "r96v2J": "Dokąd zmierzamy...",
   "RaVvOv": "Zaproszony członek główny",
   "RC6rA2": "Ostatnio stworzone",
+  "RC94HJ": "Yes, send me an email",
   "RdCCty": "Broaden your search (e.g. search 'garden' instead of 'community garden')",
   "ReadOurStories": "Poznaj naszą historię",
   "RecurringContribution.Incognito": "To jest cykliczny wkład incognito, tylko Ty możesz go zobaczyć.",
@@ -2975,5 +2977,6 @@
   "ZqbBGv": "wk",
   "zu5ckP": "Refund and reject recorded transactions.",
   "ZvWD3X": "Wesprzyj wydarzenie lub kup bilety, aby uczestniczyć.",
-  "zWgbGg": "Dzisiaj"
+  "zWgbGg": "Dzisiaj",
+  "zwk1/y": "Password succesfully updated"
 }

@@ -1901,6 +1901,7 @@
   "mustBeLoggedIn": "このページを閲覧するにはログインする必要があります。",
   "mustBeLoggedInWithLink": "<login-link>ログイン</login-link>する必要があります",
   "mustBeMemberOfCollective": "You must be a member of the collective to see this page",
+  "mwacQu": "Want to receive a login link instead?",
   "MZB6HL": "Create a collective to collect and spend money transparently",
   "mzfp0+": "Search our <Link>Docs</Link> for more info about using the Open Collective platform",
   "mzGohi": "on {date}",
@@ -2354,6 +2355,7 @@
   "r96v2J": "私たちが向かう先は…",
   "RaVvOv": "コアメンバーとして招待しました",
   "RC6rA2": "作成日（新しい順）",
+  "RC94HJ": "Yes, send me an email",
   "RdCCty": "Broaden your search (e.g. search 'garden' instead of 'community garden')",
   "ReadOurStories": "ストーリーを読む",
   "RecurringContribution.Incognito": "This is an incognito recurring contribution, only you can see it.",
@@ -2975,5 +2977,6 @@
   "ZqbBGv": "wk",
   "zu5ckP": "Refund and reject recorded transactions.",
   "ZvWD3X": "Support the event or buy tickets to attend.",
-  "zWgbGg": "今日"
+  "zWgbGg": "今日",
+  "zwk1/y": "Password succesfully updated"
 }

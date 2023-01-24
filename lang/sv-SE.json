@@ -1901,6 +1901,7 @@
   "mustBeLoggedIn": "Du måste vara inloggad för att se denna sida",
   "mustBeLoggedInWithLink": "Du måste vara <login-link>inloggad</login-link>",
   "mustBeMemberOfCollective": "Du måste vara medlem i kollektivet för att se denna sida",
+  "mwacQu": "Want to receive a login link instead?",
   "MZB6HL": "Skapa ett kollektiv för att samla in och spendera pengar på ett transparent sätt",
   "mzfp0+": "Sök i vår <Link>Dokumentation</Link> för mer information om att använda plattformen Open Collective",
   "mzGohi": "på {date}",
@@ -2354,6 +2355,7 @@
   "r96v2J": "Vart vi är på väg...",
   "RaVvOv": "Teammedlem inbjuden",
   "RC6rA2": "Nyligen skapad",
+  "RC94HJ": "Yes, send me an email",
   "RdCCty": "Bredda din sökning (t.ex. sök efter 'trädgård' istället för 'gemensam trädgård')",
   "ReadOurStories": "Läs fler berättelser",
   "RecurringContribution.Incognito": "Detta är ett återkommande bidrag som inkognito, bara du kan se det.",
@@ -2975,5 +2977,6 @@
   "ZqbBGv": "v",
   "zu5ckP": "Återbetala transaktioner.",
   "ZvWD3X": "Stöd evenemanget eller köp biljetter för att delta.",
-  "zWgbGg": "Idag"
+  "zWgbGg": "Idag",
+  "zwk1/y": "Password succesfully updated"
 }

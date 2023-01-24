@@ -1901,6 +1901,7 @@
   "mustBeLoggedIn": "You must be logged in to see this page",
   "mustBeLoggedInWithLink": "You must be <login-link>logged in</login-link>",
   "mustBeMemberOfCollective": "You must be a member of the collective to see this page",
+  "mwacQu": "Want to receive a login link instead?",
   "MZB6HL": "Create a collective to collect and spend money transparently",
   "mzfp0+": "Search our <Link>Docs</Link> for more info about using the Open Collective platform",
   "mzGohi": "在 {date}",
@@ -2354,6 +2355,7 @@
   "r96v2J": "Where we're heading...",
   "RaVvOv": "Core member invited",
   "RC6rA2": "最近创建",
+  "RC94HJ": "Yes, send me an email",
   "RdCCty": "Broaden your search (e.g. search 'garden' instead of 'community garden')",
   "ReadOurStories": "阅读我们的故事",
   "RecurringContribution.Incognito": "This is an incognito recurring contribution, only you can see it.",
@@ -2975,5 +2977,6 @@
   "ZqbBGv": "wk",
   "zu5ckP": "退款和拒绝记录的交易。",
   "ZvWD3X": "支持活动或购买门票。",
-  "zWgbGg": "今天"
+  "zWgbGg": "今天",
+  "zwk1/y": "Password succesfully updated"
 }
