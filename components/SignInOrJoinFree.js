@@ -383,6 +383,7 @@ class SignInOrJoinFree extends React.Component {
             {displayedForm !== 'create-account' && !error ? (
               <SignIn
                 email={email}
+                password={password}
                 onEmailChange={email => this.setState({ email, unknownEmailError: false, emailAlreadyExists: false })}
                 onPasswordChange={password => this.setState({ password })}
                 onSecondaryAction={
@@ -394,7 +395,7 @@ class SignInOrJoinFree extends React.Component {
                       oAuthAppImage: this.props.oAuthApplication?.account?.imageUrl,
                     }))
                 }
-                onSubmit={email => this.signIn(email, password)}
+                onSubmit={() => this.signIn(email, password)}
                 loading={submitting}
                 unknownEmail={unknownEmailError}
                 passwordRequired={passwordRequired}

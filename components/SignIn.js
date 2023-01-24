@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
@@ -34,6 +34,8 @@ export default class SignIn extends React.Component {
     label: PropTypes.node,
     /** Set the value of email input */
     email: PropTypes.string.isRequired,
+    /** Set the value of password input */
+    password: PropTypes.string.isRequired,
     /** handles changes in the email input */
     onEmailChange: PropTypes.func.isRequired,
     /** handles changes in the password input */
@@ -111,7 +113,7 @@ export default class SignIn extends React.Component {
   }
 
   render() {
-    const { onSubmit, loading, email, onEmailChange, onPasswordChange, label } = this.props;
+    const { onSubmit, loading, email, password, onEmailChange, onPasswordChange, label } = this.props;
     const { error, showError } = this.state;
     return (
       <React.Fragment>
@@ -165,7 +167,7 @@ export default class SignIn extends React.Component {
                   if (error) {
                     return;
                   }
-                  onSubmit(email);
+                  onSubmit();
                   this.setState({ unknownEmail: this.props.unknownEmail });
                 }}
               >
@@ -231,6 +233,7 @@ export default class SignIn extends React.Component {
                     autoComplete="current-password"
                     type="password"
                     width={1}
+                    value={password}
                     autoFocus={this.props.passwordRequired ? true : false}
                     required={this.props.passwordRequired ? true : false}
                     onChange={({ target }) => {

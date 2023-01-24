@@ -263,13 +263,13 @@ class UserTwoFactorAuth extends React.Component {
           <P py={2} mb={2}>
             {!this.props.LoggedInUser.hasPassword && (
               <FormattedMessage
-                id="Password.Setup.Info"
+                id="Password.Set.Info"
                 defaultMessage="Setting a password is optional but this can be useful for regular users."
               />
             )}
             {this.props.LoggedInUser.hasPassword && (
               <FormattedMessage
-                id="Password.Set.Info"
+                id="Password.Change.Info"
                 defaultMessage="You already have a password set, you can change it using the following form."
               />
             )}
@@ -277,7 +277,7 @@ class UserTwoFactorAuth extends React.Component {
 
           {this.props.LoggedInUser.hasPassword && (
             <StyledInputField
-              label="Current Password"
+              label={<FormattedMessage defaultMessage="Current Password" />}
               labelFontWeight="bold"
               htmlFor="current-password"
               mb={2}
@@ -299,7 +299,7 @@ class UserTwoFactorAuth extends React.Component {
           )}
 
           <StyledInputField
-            label="New Password"
+            label={<FormattedMessage defaultMessage="New Password" />}
             labelFontWeight="bold"
             htmlFor="new-password"
             mt={2}
@@ -334,14 +334,18 @@ class UserTwoFactorAuth extends React.Component {
                 await this.props.refetchLoggedInUser();
                 this.setState({
                   passwordError: null,
-                  passwordKey: Math.round(Math.random() * 10000000), // to reset html inputs
+                  passwordKey: Math.round(Math.random() * 10000000), // to reset html inputs in the DOM
                 });
               } catch (e) {
                 this.setState({ passwordError: e.message });
               }
             }}
           >
-            <FormattedMessage id="Security.UpdatePassword.Button" defaultMessage="Update Password" />
+            {this.props.LoggedInUser.hasPassword ? (
+              <FormattedMessage id="Security.UpdatePassword.Button" defaultMessage="Update Password" />
+            ) : (
+              <FormattedMessage id="Security.SetPassword.Button" defaultMessage="Set Password" />
+            )}
           </StyledButton>
         </Container>
 
