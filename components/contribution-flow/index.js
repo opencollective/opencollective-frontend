@@ -240,6 +240,7 @@ class ContributionFlow extends React.Component {
   // ---- Order submission & error handling ----
 
   submitOrder = async () => {
+    const { collective, host, tier } = this.props;
     const { stepDetails, stepProfile, stepSummary } = this.state;
     this.setState({ error: null, isSubmitting: true });
 
@@ -251,6 +252,7 @@ class ContributionFlow extends React.Component {
     }
 
     try {
+      const skipTaxes = isEmpty(this.getApplicableTaxes(collective, host, tier?.type));
       const response = await this.props.createOrder({
         variables: {
           order: {
@@ -283,14 +285,16 @@ class ContributionFlow extends React.Component {
             tier: this.props.tier && { legacyId: this.props.tier.legacyId },
             context: { isEmbed: this.props.isEmbed || false },
             tags: this.getQueryParams().tags,
-            taxes: stepSummary && [
-              {
-                type: stepSummary.taxType,
-                amount: getGQLV2AmountInput(stepSummary.amount, 0),
-                country: stepSummary.countryISO,
-                idNumber: stepSummary.number,
-              },
-            ],
+            taxes: skipTaxes
+              ? null
+              : [
+                  {
+                    type: stepSummary.taxType,
+                    amount: getGQLV2AmountInput(stepSummary.amount, 0),
+                    country: stepSummary.countryISO,
+                    idNumber: stepSummary.number,
+                  },
+                ],
           },
         },
       });
