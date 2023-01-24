@@ -323,13 +323,18 @@ class UserTwoFactorAuth extends React.Component {
             minWidth={140}
             disabled={!this.state.password || (this.props.LoggedInUser.hasPassword && !this.state.currentPassword)}
             onClick={async () => {
+              const hadPassword = this.props.LoggedInUser.hasPassword;
               try {
                 await this.props.setPassword({
                   variables: { password: this.state.password, currentPassword: this.state.currentPassword },
                 });
                 this.props.addToast({
                   type: TOAST_TYPE.SUCCESS,
-                  message: <FormattedMessage defaultMessage="Password succesfully set" />,
+                  message: hadPassword ? (
+                    <FormattedMessage defaultMessage="Password succesfully updated" />
+                  ) : (
+                    <FormattedMessage defaultMessage="Password succesfully set" />
+                  ),
                 });
                 await this.props.refetchLoggedInUser();
                 this.setState({
