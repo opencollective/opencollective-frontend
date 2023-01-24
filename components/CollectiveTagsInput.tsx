@@ -25,7 +25,6 @@ import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import colors from '../lib/theme/colors';
 import withData from '../lib/withData';
-import { SelectProps } from '@material-ui/core';
 
 export const searchTagsQuery = gql`
   query SearchTags($term: String!) {
