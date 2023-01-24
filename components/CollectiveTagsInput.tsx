@@ -94,7 +94,7 @@ const SelectContainer = ({ innerProps, ...props }: ContainerProps) => (
 function CollectiveTagsInput({ defaultValue = [], onChange, client }) {
   const intl = useIntl();
   const [selected, setSelected] = useState<readonly TagOption[]>(
-    defaultValue.map(tag => ({ label: tag, value: tag })) || [],
+    defaultValue?.map(tag => ({ label: tag, value: tag })) || [],
   );
 
   useEffect(() => {
