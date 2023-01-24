@@ -36,16 +36,14 @@ const Messages = defineMessages({
 });
 
 /* eslint-disable react/prop-types */
-const Option = ({ innerProps, ...props }: OptionProps & { 'data-cy': string }) => {
-  return (
-    <ReactSelectComponents.Option
-      {...props}
-      innerProps={
-        { ...innerProps, 'data-cy': 'select-option', title: props.data['title'] } as React.HTMLProps<HTMLDivElement>
-      }
-    />
-  );
-};
+const Option = ({ innerProps, ...props }: OptionProps & { 'data-cy': string }) => (
+  <ReactSelectComponents.Option
+    {...props}
+    innerProps={
+      { ...innerProps, 'data-cy': 'select-option', title: props.data['title'] } as React.HTMLProps<HTMLDivElement>
+    }
+  />
+);
 
 const SelectContainer = ({ innerProps, ...props }: ContainerProps) => (
   <ReactSelectComponents.SelectContainer

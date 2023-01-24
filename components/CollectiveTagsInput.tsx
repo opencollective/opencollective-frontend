@@ -22,20 +22,18 @@ export const searchTagsQuery = gql`
   }
 `;
 
-const Input = (props: InputProps & { 'data-cy': string }) => {
+const Input = (props: InputProps) => {
   return <ReactSelectComponents.Input {...props} data-cy={'tags-select-input'} />;
 };
 
-const Option = ({ innerProps, ...props }: OptionProps & { 'data-cy': string }) => {
+const Option = ({ innerProps, ...props }: OptionProps) => {
   return (
     <ReactSelectComponents.Option
       {...props}
-      innerProps={
-        {
-          ...innerProps,
-          'data-cy': `tags-select-option-${props.data['value']}`,
-        } as React.HTMLProps<HTMLDivElement>
-      }
+      innerProps={{
+        ...innerProps,
+        'data-cy': `tags-select-option-${props.data['value']}`,
+      }}
     />
   );
 };
