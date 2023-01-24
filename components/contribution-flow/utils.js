@@ -175,6 +175,20 @@ export const generatePaymentMethodOptions = (
 
   // adding payment methods
   if (!balanceOnlyCollectiveTypes.includes(stepProfile.type)) {
+    if (paymentIntent) {
+      const title = <FormattedMessage defaultMessage="New payment method" />;
+
+      uniquePMs.push({
+        key: STRIPE_PAYMENT_ELEMENT_KEY,
+        title: title,
+        icon: <CreditCard color="#c9ced4" size={'1.5em'} />,
+        paymentMethod: {
+          service: PAYMENT_METHOD_SERVICE.STRIPE,
+          type: PAYMENT_METHOD_TYPE.STRIPE_ELEMENTS,
+        },
+      });
+    }
+
     const paymentIntentIncludesCard = paymentIntent && paymentIntent.payment_method_types.includes('card');
 
     if (hostHasStripe && !paymentIntentIncludesCard) {
@@ -216,20 +230,6 @@ export const generatePaymentMethodOptions = (
         },
         title: <FormattedMessage id="Stripe.PaymentMethod.Label.alipay" defaultMessage="Alipay" />,
         icon: getPaymentMethodIcon({ service: PAYMENT_METHOD_SERVICE.STRIPE, type: PAYMENT_METHOD_TYPE.ALIPAY }),
-      });
-    }
-
-    if (paymentIntent) {
-      const title = <FormattedMessage defaultMessage="New payment method" />;
-
-      uniquePMs.push({
-        key: STRIPE_PAYMENT_ELEMENT_KEY,
-        title: title,
-        icon: <CreditCard color="#c9ced4" size={'1.5em'} />,
-        paymentMethod: {
-          service: PAYMENT_METHOD_SERVICE.STRIPE,
-          type: PAYMENT_METHOD_TYPE.STRIPE_ELEMENTS,
-        },
       });
     }
 
