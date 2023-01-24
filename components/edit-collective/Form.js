@@ -133,6 +133,10 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.tags.edit.description',
         defaultMessage: 'Help people find you',
       },
+      'tags.input.placeholder': {
+        id: 'collective.tags.input.placeholder',
+        defaultMessage: '+ Add tags',
+      },
       'company.label': {
         id: 'collective.company.label',
         defaultMessage: 'company',
@@ -781,8 +785,8 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'tags',
           maxLength: 128,
-          type: 'tags',
-          placeholder: 'meetup, javascript',
+          type: 'collective-tags',
+          placeholder: intl.formatMessage(this.messages['tags.input.placeholder']),
           when: () => ![EVENT, PROJECT, FUND].includes(collective.type),
         },
       ],

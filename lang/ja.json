@@ -496,6 +496,7 @@
   "collective.subtitle.opensource": "オープンソースプロジェクトは、Open Source Collective の財務ホストに参加するよう招待されます。",
   "collective.subtitle.seeRepo": "Don't see the repository you're looking for? {helplink}.",
   "collective.tags.edit.description": "他の人があなたを見つけやすくなります",
+  "collective.tags.input.placeholder": "+ Add tags",
   "collective.tooFewAdmins": "Your collective was approved but you need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.",
   "collective.tooFewAdmins.description": "You will automatically be able to accept contributions when {missingAdminsCount, plural, one {an invited administrator} other {# invited administrators} } has joined.",
   "collective.tos.description": "Link to the terms under which this Host collects and holds funds.",

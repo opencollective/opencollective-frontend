@@ -496,6 +496,7 @@
   "collective.subtitle.opensource": "Projetos de código aberto são convidados a participar do Administradores Fiscais de Coletivos de Código Aberto.",
   "collective.subtitle.seeRepo": "Não vê o repositório que você está procurando? {helplink}.",
   "collective.tags.edit.description": "Ajude pessoas a te encontrarem",
+  "collective.tags.input.placeholder": "+ Add tags",
   "collective.tooFewAdmins": "Your collective was approved but you need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.",
   "collective.tooFewAdmins.description": "You will automatically be able to accept contributions when {missingAdminsCount, plural, one {an invited administrator} other {# invited administrators} } has joined.",
   "collective.tos.description": "Link para os termos nos quais este administrador coleta e detém fundos.",

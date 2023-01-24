@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
+import { useIntl } from 'react-intl';
 import { components as ReactSelectComponents, InputProps, OptionProps } from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 
@@ -38,7 +39,8 @@ const Option = ({ innerProps, ...props }: OptionProps) => {
   );
 };
 
-function CollectiveTagsInput({ value = [], onChange, client, ...props }) {
+function CollectiveTagsInput({ defaultValue = [], onChange, client, ...props }) {
+  const intl = useIntl();
   const fetchTags = async inputValue => {
     const { data } = await client.query({
       query: searchTagsQuery,
@@ -61,7 +63,7 @@ function CollectiveTagsInput({ value = [], onChange, client, ...props }) {
   return (
     <AsyncCreatableSelect
       openMenuOnFocus
-      placeholder="+ Add tags"
+      placeholder={intl.formatMessage({ id: 'collective.tags.input.placeholder', defaultMessage: '+ Add tags' })}
       isMulti
       components={{
         MultiValue: customComponents.MultiValue,
@@ -69,7 +71,7 @@ function CollectiveTagsInput({ value = [], onChange, client, ...props }) {
         Input,
         Option,
       }}
-      value={value.map(tag => ({ value: tag, label: tag }))}
+      defaultValue={defaultValue.map(tag => ({ label: tag, value: tag }))}
       defaultOptions={true}
       loadOptions={fetchTags}
       onChange={onChange}
@@ -90,7 +92,7 @@ function CollectiveTagsInput({ value = [], onChange, client, ...props }) {
 }
 
 CollectiveTagsInput.propTypes = {
-  value: PropTypes.arrayOf(PropTypes.string),
+  defaultValue: PropTypes.arrayOf(PropTypes.string),
   renderUpdatedTags: PropTypes.bool,
   onChange: PropTypes.func,
   client: PropTypes.object,

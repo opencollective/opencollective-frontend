@@ -496,6 +496,7 @@
   "collective.subtitle.opensource": "Проекты с открытым исходным кодом приглашаются присоединиться к фискальному представителю Open Source Collective.",
   "collective.subtitle.seeRepo": "Не видите интересующий репозиторий? {helplink}.",
   "collective.tags.edit.description": "Помогите людям найти вас",
+  "collective.tags.input.placeholder": "+ Add tags",
   "collective.tooFewAdmins": "Your collective was approved but you need {missingAdminsCount, plural, one {one more admin} other {# more admins} } before you can accept financial contributions.",
   "collective.tooFewAdmins.description": "You will automatically be able to accept contributions when {missingAdminsCount, plural, one {an invited administrator} other {# invited administrators} } has joined.",
   "collective.tos.description": "Link to the terms under which this Host collects and holds funds.",

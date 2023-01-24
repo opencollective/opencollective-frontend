@@ -496,6 +496,7 @@
   "collective.subtitle.opensource": "Los proyectos de código abierto están invitados a unirse al Anfitrión Fiscal de Open Source Collective.",
   "collective.subtitle.seeRepo": "¿No ves el repositorio que estás buscando? {helplink}.",
   "collective.tags.edit.description": "Haz que la gente te encuentre",
+  "collective.tags.input.placeholder": "+ Add tags",
   "collective.tooFewAdmins": "Tu Colectivo fue aprobado pero necesitas {missingAdminsCount, plural, one {un administrador más} other {# administradores más} } antes de que puedas aceptar contribuciones financieras.",
   "collective.tooFewAdmins.description": "Podrás aceptar automáticamente las contribuciones cuando {missingAdminsCount, plural, one {un administrador invitado} other {# administradores invitados} } se haya(n) unido(s).",
   "collective.tos.description": "Enlace a los términos bajo los cuales este Anfitrión recoge y sostiene fondos.",

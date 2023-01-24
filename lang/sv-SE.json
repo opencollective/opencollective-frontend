@@ -496,6 +496,7 @@
   "collective.subtitle.opensource": "Projekt med öppen källkod inbjuds att gå med i finansiella värden Open Source Collective.",
   "collective.subtitle.seeRepo": "Ser du inte repot du letar efter? {helplink}.",
   "collective.tags.edit.description": "Hjälp människor att hitta dig",
+  "collective.tags.input.placeholder": "+ Add tags",
   "collective.tooFewAdmins": "Din ansökan för kollektivet godkändes men du behöver {missingAdminsCount, plural, one {en till admin} other {# administratörer till} } innan du kan acceptera ekonomiska bidrag.",
   "collective.tooFewAdmins.description": "Du kommer automatiskt att kunna ta emot bidrag när {missingAdminsCount, plural, one {inbjuden admin} other {# inbjudna admins} } har godkänt inbjudan.",
   "collective.tos.description": "Länk till de villkor som denna värd ska följa för att samla in och hantera pengar.",

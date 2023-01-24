@@ -371,7 +371,6 @@ class CreateCollectiveForm extends React.Component {
                                 tags.map(t => t.value.toLowerCase()),
                               );
                             }}
-                            value={values.tags}
                           />
                         )}
                       </StyledInputFormikField>
