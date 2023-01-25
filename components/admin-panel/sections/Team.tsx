@@ -90,8 +90,8 @@ const memberFieldsFragment = gql`
   }
 `;
 
-export const teamPageQuery = gql`
-  query CoreContributors($collectiveSlug: String!, $account: AccountReferenceInput!) {
+export const teamSectionQuery = gql`
+  query TeamSection($collectiveSlug: String!, $account: AccountReferenceInput!) {
     account(slug: $collectiveSlug) {
       id
       isFrozen
@@ -126,7 +126,7 @@ export const teamPageQuery = gql`
           slug
           type
           name
-          members(includeInheritedMembers: false, role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {
+          members(includeInherited: false, role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {
             nodes {
               id
               ...MemberFields
@@ -283,7 +283,7 @@ const ChildrenCollectiveSection = ({ account, refetch }: ChildrenCollectiveSecti
 const Team = (props: AdminSectionProps) => {
   const [showInviteModal, setShowInviteModal] = React.useState(false);
   const intl = useIntl();
-  const { loading, data, refetch, error } = useQuery(teamPageQuery, {
+  const { loading, data, refetch, error } = useQuery(teamSectionQuery, {
     context: API_V2_CONTEXT,
     variables: { collectiveSlug: props.account.slug, account: { slug: props.account.slug } },
   });

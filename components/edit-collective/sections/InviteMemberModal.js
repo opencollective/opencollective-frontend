@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
-import { teamPageQuery } from '../../admin-panel/sections/Team';
+import { teamSectionQuery } from '../../admin-panel/sections/Team';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import Container from '../../Container';
 import { Flex } from '../../Grid';
@@ -52,7 +52,7 @@ const InviteMemberModal = props => {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
-        query: teamPageQuery,
+        query: teamSectionQuery,
         context: API_V2_CONTEXT,
         variables: {
           collectiveSlug: get(collective, 'slug'),

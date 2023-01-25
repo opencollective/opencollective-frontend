@@ -11,7 +11,7 @@ import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
-import { teamPageQuery } from '../../admin-panel/sections/Team';
+import { teamSectionQuery } from '../../admin-panel/sections/Team';
 import Container from '../../Container';
 import { Flex } from '../../Grid';
 import StyledButton from '../../StyledButton';
@@ -111,7 +111,7 @@ const EditMemberModal = props => {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
-        query: teamPageQuery,
+        query: teamSectionQuery,
         context: API_V2_CONTEXT,
         variables: {
           collectiveSlug: get(collective, 'slug'),
