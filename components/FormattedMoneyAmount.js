@@ -81,7 +81,7 @@ FormattedMoneyAmount.propTypes = {
   /** The amount to display, in cents */
   amount: PropTypes.number,
   /** The currency (eg. `USD`, `EUR`...etc) */
-  currency: PropTypes.string.isRequired,
+  currency: PropTypes.string,
   /** Abbreviate the interval (eg. year => yr.) */
   abbreviateInterval: PropTypes.bool,
   /** Whether to show the full currency code (ie. USD) */

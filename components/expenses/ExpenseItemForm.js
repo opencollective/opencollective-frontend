@@ -268,7 +268,7 @@ const ExpenseItemForm = ({
 
 ExpenseItemForm.propTypes = {
   /** The currency of the collective */
-  currency: PropTypes.string.isRequired,
+  currency: PropTypes.string,
   /** ReactHookForm key */
   name: PropTypes.string.isRequired,
   /** Called when clicking on remove */

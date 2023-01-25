@@ -6,12 +6,15 @@ import { first, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import hasFeature, { FEATURES } from '../../lib/allowed-features';
+import { PayPalSupportedCurrencies } from '../../lib/constants/currency';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { getSupportedExpenseTypes } from '../../lib/expenses';
 import { requireFields } from '../../lib/form-utils';
 import { usePrevious } from '../../lib/hooks/usePrevious';
+import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep } from '../../lib/utils';
 import { checkRequiresAddress, validateExpenseTaxes } from './lib/utils';
 
@@ -275,6 +278,11 @@ const ExpenseFormBody = ({
   const stepTwoCompleted = isInvite
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
+  const collectiveSupportsMultiCurrency =
+    hasFeature(collective, FEATURES.MULTI_CURRENCY_EXPENSES) ||
+    hasFeature(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES);
+  const isMultiCurrency =
+    collectiveSupportsMultiCurrency && values.payoutMethod?.data?.currency !== collective?.currency;
 
   const [step, setStep] = React.useState(() => getDefaultStep(defaultStep, stepOneCompleted, isCreditCardCharge));
 
@@ -348,6 +356,18 @@ const ExpenseFormBody = ({
       formik.setFieldValue('payeeLocation.address', serializeAddress(values.payeeLocation.structured));
     }
   }, [values.payeeLocation]);
+
+  React.useEffect(() => {
+    if (values.payoutMethod?.type === PayoutMethodType.PAYPAL) {
+      if (!PayPalSupportedCurrencies.includes(values.currency)) {
+        formik.setFieldValue('currency', 'USD');
+      }
+    } else if (isMultiCurrency) {
+      formik.setFieldValue('currency', undefined);
+    } else {
+      formik.setFieldValue('currency', collective?.currency);
+    }
+  }, [values.payoutMethod]);
 
   // Load values from localstorage
   React.useEffect(() => {
@@ -736,6 +756,7 @@ ExpenseFormBody.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
+    currency: PropTypes.string.isRequired,
     host: PropTypes.shape({
       transferwise: PropTypes.shape({
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
@@ -753,6 +774,7 @@ ExpenseFormBody.propTypes = {
   }).isRequired,
   expense: PropTypes.shape({
     type: PropTypes.oneOf(Object.values(expenseTypes)),
+    currency: PropTypes.string,
     description: PropTypes.string,
     status: PropTypes.string,
     payee: PropTypes.object,
@@ -762,6 +784,7 @@ ExpenseFormBody.propTypes = {
       interval: PropTypes.string,
       endsAt: PropTypes.string,
     }),
+    amountInAccountCurrency: AmountPropTypeShape,
     items: PropTypes.arrayOf(
       PropTypes.shape({
         url: PropTypes.string,

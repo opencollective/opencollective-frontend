@@ -210,7 +210,7 @@ export const SimpleLocationFieldRenderer = ({ name, label, required, prefix, val
 };
 
 const fieldRenderPropTypes = {
-  info: PropTypes.array.isRequired,
+  info: PropTypes.array,
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   label: PropTypes.string.isRequired,
