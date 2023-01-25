@@ -11,6 +11,7 @@ import QRCode from 'qrcode.react';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import speakeasy from 'speakeasy';
 import styled from 'styled-components';
+import PasswordStrengthBar from 'react-password-strength-bar';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
@@ -115,6 +116,7 @@ class UserSecurity extends React.Component {
       currentPassword: '',
       password: '',
       passwordKey: 'initial',
+      passwordScore: null,
     };
 
     this.enableTwoFactorAuth = this.enableTwoFactorAuth.bind(this);
@@ -318,11 +320,29 @@ class UserSecurity extends React.Component {
               }}
             />
           </StyledInputField>
+
+          <PasswordStrengthBar
+            style={{ visibility: this.state.password ? 'visible' : 'hidden' }}
+            password={this.state.password}
+            onChangeScore={score => {
+              this.setState({ passwordScore: score });
+            }}
+          />
+
           <StyledButton
             my={2}
             minWidth={140}
             disabled={!this.state.password || (this.props.LoggedInUser.hasPassword && !this.state.currentPassword)}
             onClick={async () => {
+              if (this.state.passwordScore <= 1) {
+                this.setState({
+                  passwordError: (
+                    <FormattedMessage defaultMessage="Password is too weak. Try to use more characters or use a password manager to generate a strong one." />
+                  ),
+                });
+                return;
+              }
+
               const hadPassword = this.props.LoggedInUser.hasPassword;
               try {
                 await this.props.setPassword({
@@ -338,7 +358,10 @@ class UserSecurity extends React.Component {
                 });
                 await this.props.refetchLoggedInUser();
                 this.setState({
+                  currentPassword: '',
+                  password: '',
                   passwordError: null,
+                  passwordScore: null,
                   passwordKey: Math.round(Math.random() * 10000000), // to reset html inputs in the DOM
                 });
               } catch (e) {
