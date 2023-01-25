@@ -160,6 +160,7 @@ class SignInOrJoinFree extends React.Component {
         redirect: this.getRedirectURL(),
         websiteUrl: getWebsiteUrl(),
         sendLink,
+        createProfile: false,
       });
 
       // In dev/test, API directly returns a redirect URL for emails like
