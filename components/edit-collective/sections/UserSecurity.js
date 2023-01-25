@@ -9,9 +9,9 @@ import { Field, Form, Formik } from 'formik';
 import { get } from 'lodash';
 import QRCode from 'qrcode.react';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import PasswordStrengthBar from 'react-password-strength-bar';
 import speakeasy from 'speakeasy';
 import styled from 'styled-components';
-import PasswordStrengthBar from 'react-password-strength-bar';
 
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
@@ -88,7 +88,9 @@ class UserSecurity extends React.Component {
     removeTwoFactorAuthTokenFromIndividual: PropTypes.func.isRequired,
     /** From withUser */
     LoggedInUser: PropTypes.shape({
-      hasPassword: PropTypes.bool,
+      isRoot: PropTypes.bool.isRequired,
+      hasPassword: PropTypes.bool.isRequired,
+      isAdminOfCollective: PropTypes.func.isRequired,
     }),
     refetchLoggedInUser: PropTypes.func.isRequired,
     data: PropTypes.shape({
@@ -122,6 +124,7 @@ class UserSecurity extends React.Component {
 
     this.enableTwoFactorAuth = this.enableTwoFactorAuth.bind(this);
     this.disableTwoFactorAuth = this.disableTwoFactorAuth.bind(this);
+    this.setPassword = this.setPassword.bind(this);
   }
 
   componentDidMount() {
@@ -209,51 +212,51 @@ class UserSecurity extends React.Component {
     }
   }
 
-  render() {
-    const { intl, data } = this.props;
-    const {
-      error,
-      disableError,
-      secret,
-      base32,
-      otpAuthUrl,
-      disablingTwoFactorAuth,
-      enablingTwoFactorAuth,
-      recoveryCodes,
-      showRecoveryCodesModal,
-      passwordError,
-      passwordKey,
-    } = this.state;
+  async setPassword() {
+    const { password, passwordKey, currentPassword, passwordScore } = this.state;
 
-    const { loading } = data;
-
-    if (loading) {
-      return <Loading />;
+    if (passwordScore <= 1) {
+      this.setState({
+        passwordError: (
+          <FormattedMessage defaultMessage="Password is too weak. Try to use more characters or use a password manager to generate a strong one." />
+        ),
+      });
+      return;
     }
 
-    const account = get(data, 'individual', null);
-    const doesAccountAlreadyHave2FA = get(account, 'hasTwoFactorAuth', false);
+    try {
+      this.setState({ passwordLoading: true });
+      await this.props.setPassword({
+        variables: { password, currentPassword },
+      });
+      this.props.addToast({
+        type: TOAST_TYPE.SUCCESS,
+        message: this.props.LoggedInUser.hasPassword ? (
+          <FormattedMessage defaultMessage="Password succesfully updated" />
+        ) : (
+          <FormattedMessage defaultMessage="Password succesfully set" />
+        ),
+      });
+      await this.props.refetchLoggedInUser();
+      this.setState({
+        currentPassword: '',
+        password: '',
+        passwordError: null,
+        passwordScore: null,
+        passwordLoading: false,
+        passwordKey: Number(passwordKey) + 1,
+      });
+    } catch (e) {
+      this.setState({ passwordError: e.message, passwordLoading: false });
+    }
+  }
 
-    const initialSetupFormValues = {
-      twoFactorAuthenticatorCode: '',
-    };
-
-    const initialDisableFormValues = {
-      twoFactorAuthenticatorCode: '',
-    };
-
-    const validate = values => {
-      const errors = {};
-
-      if (values.twoFactorAuthenticatorCode.toString().length !== 6) {
-        errors.twoFactorAuthenticatorCode = intl.formatMessage(messages.errorWrongLength);
-      }
-
-      return errors;
-    };
+  renderPasswordManagement() {
+    const { LoggedInUser } = this.props;
+    const { password, passwordError, passwordLoading, passwordKey, currentPassword } = this.state;
 
     return (
-      <Flex flexDirection="column">
+      <Fragment>
         <H3 fontSize="18px" fontWeight="700" mb={2}>
           <FormattedMessage id="Password" defaultMessage="Password" />
         </H3>
@@ -264,21 +267,20 @@ class UserSecurity extends React.Component {
         )}
         <Container mb="4">
           <P py={2} mb={2}>
-            {!this.props.LoggedInUser.hasPassword && (
+            {LoggedInUser.hasPassword ? (
+              <FormattedMessage
+                id="Password.Change.Info"
+                defaultMessage="You already have a password set, you can change it using the following form."
+              />
+            ) : (
               <FormattedMessage
                 id="Password.Set.Info"
                 defaultMessage="Setting a password is optional but this can be useful for regular users."
               />
             )}
-            {this.props.LoggedInUser.hasPassword && (
-              <FormattedMessage
-                id="Password.Change.Info"
-                defaultMessage="You already have a password set, you can change it using the following form."
-              />
-            )}
           </P>
 
-          {this.props.LoggedInUser.hasPassword && (
+          {LoggedInUser.hasPassword && (
             <StyledInputField
               label={<FormattedMessage defaultMessage="Current Password" />}
               labelFontWeight="bold"
@@ -323,66 +325,79 @@ class UserSecurity extends React.Component {
           </StyledInputField>
 
           <PasswordStrengthBar
-            style={{ visibility: this.state.password ? 'visible' : 'hidden' }}
+            style={{ visibility: password ? 'visible' : 'hidden' }}
             password={this.state.password}
-            onChangeScore={score => {
-              this.setState({ passwordScore: score });
+            onChangeScore={passwordScore => {
+              this.setState({ passwordScore });
             }}
           />
 
           <StyledButton
             my={2}
             minWidth={140}
-            disabled={
-              this.state.passwordLoading ||
-              !this.state.password ||
-              (this.props.LoggedInUser.hasPassword && !this.state.currentPassword)
-            }
-            onClick={async () => {
-              if (this.state.passwordScore <= 1) {
-                this.setState({
-                  passwordError: (
-                    <FormattedMessage defaultMessage="Password is too weak. Try to use more characters or use a password manager to generate a strong one." />
-                  ),
-                });
-                return;
-              }
-
-              const hadPassword = this.props.LoggedInUser.hasPassword;
-              try {
-                this.setState({ passwordLoading: true });
-                await this.props.setPassword({
-                  variables: { password: this.state.password, currentPassword: this.state.currentPassword },
-                });
-                this.props.addToast({
-                  type: TOAST_TYPE.SUCCESS,
-                  message: hadPassword ? (
-                    <FormattedMessage defaultMessage="Password succesfully updated" />
-                  ) : (
-                    <FormattedMessage defaultMessage="Password succesfully set" />
-                  ),
-                });
-                await this.props.refetchLoggedInUser();
-                this.setState({
-                  currentPassword: '',
-                  password: '',
-                  passwordError: null,
-                  passwordScore: null,
-                  passwordLoading: false,
-                  passwordKey: Number(this.state.passwordKey) + 1,
-                });
-              } catch (e) {
-                this.setState({ passwordError: e.message, passwordLoading: false });
-              }
-            }}
+            disabled={passwordLoading || !password || (LoggedInUser.hasPassword && !currentPassword)}
+            onClick={this.setPassword}
           >
-            {this.props.LoggedInUser.hasPassword ? (
+            {LoggedInUser.hasPassword ? (
               <FormattedMessage id="Security.UpdatePassword.Button" defaultMessage="Update Password" />
             ) : (
               <FormattedMessage id="Security.SetPassword.Button" defaultMessage="Set Password" />
             )}
           </StyledButton>
         </Container>
+      </Fragment>
+    );
+  }
+
+  render() {
+    const { intl, data } = this.props;
+    const {
+      error,
+      disableError,
+      secret,
+      base32,
+      otpAuthUrl,
+      disablingTwoFactorAuth,
+      enablingTwoFactorAuth,
+      recoveryCodes,
+      showRecoveryCodesModal,
+    } = this.state;
+
+    const { loading } = data;
+
+    if (loading) {
+      return <Loading />;
+    }
+
+    const account = get(data, 'individual', null);
+    const doesAccountAlreadyHave2FA = get(account, 'hasTwoFactorAuth', false);
+
+    const initialSetupFormValues = {
+      twoFactorAuthenticatorCode: '',
+    };
+
+    const initialDisableFormValues = {
+      twoFactorAuthenticatorCode: '',
+    };
+
+    const validate = values => {
+      const errors = {};
+
+      if (values.twoFactorAuthenticatorCode.toString().length !== 6) {
+        errors.twoFactorAuthenticatorCode = intl.formatMessage(messages.errorWrongLength);
+      }
+
+      return errors;
+    };
+
+    const canManagePassword =
+      this.props.LoggedInUser.hasPassword ||
+      this.props.LoggedInUser.isAdminOfCollective({ slug: 'opencollective' }) ||
+      process.env.OC_ENV !== 'production';
+
+    return (
+      <Flex flexDirection="column">
+        {canManagePassword && this.renderPasswordManagement()}
 
         <H3 fontSize="18px" fontWeight="700" mb={2}>
           <FormattedMessage id="TwoFactorAuth" defaultMessage="Two-factor authentication" />
