@@ -371,7 +371,7 @@ class SignInOrJoinFree extends React.Component {
     const { enforceTwoFactorAuthForLoggedInUser } = this.props;
 
     // No need to show the form if an email is provided
-    const hasError = Boolean(unknownEmailError || passwordRequired || error);
+    const hasError = Boolean(unknownEmailError || error);
     if (this.props.email && !hasError) {
       return <Loading />;
     }
