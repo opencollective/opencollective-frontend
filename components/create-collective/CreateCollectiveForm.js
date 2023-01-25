@@ -96,7 +96,7 @@ class CreateCollectiveForm extends React.Component {
   }
 
   render() {
-    const { intl, error, host, loading, loggedInUser } = this.props;
+    const { intl, error, host, loading, popularTags, loggedInUser } = this.props;
     const hasHostTerms = this.hasHostTerms();
 
     const initialValues = {
@@ -371,6 +371,7 @@ class CreateCollectiveForm extends React.Component {
                                 tags.map(t => t.value.toLowerCase()),
                               );
                             }}
+                            suggestedTags={popularTags}
                           />
                         )}
                       </StyledInputFormikField>

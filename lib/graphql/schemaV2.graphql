@@ -9685,6 +9685,11 @@ type Query {
     Return tags which includes this search term. Using this argument will ignore searchTerm.
     """
     tagSearchTerm: String
+
+    """
+    Return tags from collectives hosted by this host.
+    """
+    host: AccountReferenceInput
     limit: Int! = 10
     offset: Int! = 0
   ): TagStatsCollection!

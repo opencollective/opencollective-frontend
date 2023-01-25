@@ -7591,6 +7591,7 @@ export type QueryProjectArgs = {
 
 /** This is the root query */
 export type QueryTagStatsArgs = {
+  host?: InputMaybe<AccountReferenceInput>;
   limit?: Scalars['Int'];
   offset?: Scalars['Int'];
   searchTerm?: InputMaybe<Scalars['String']>;

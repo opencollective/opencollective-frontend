@@ -5,6 +5,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
+import { IGNORED_TAGS } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
@@ -25,6 +26,16 @@ class CreateCollective extends Component {
     refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
     router: PropTypes.object.isRequired, // from withRouter
     createCollective: PropTypes.func.isRequired, // addCreateCollectiveMutation
+    data: PropTypes.shape({
+      // from addTagStatsQuery
+      tagStats: PropTypes.shape({
+        nodes: PropTypes.arrayOf(
+          PropTypes.shape({
+            tag: PropTypes.string,
+          }),
+        ),
+      }),
+    }),
   };
 
   constructor(props) {
@@ -77,9 +88,11 @@ class CreateCollective extends Component {
   }
 
   render() {
-    const { LoggedInUser, host, router } = this.props;
+    const { LoggedInUser, host, router, data } = this.props;
     const { error } = this.state;
     const { category } = router.query;
+    const tags = data?.tagStats?.nodes?.filter(node => !IGNORED_TAGS.includes(node.tag));
+    const popularTags = tags?.map(value => value.tag);
 
     if (host && !host.isOpenToApplications) {
       return (
@@ -125,6 +138,7 @@ class CreateCollective extends Component {
         onChange={this.handleChange}
         loading={this.state.creating}
         error={error}
+        popularTags={popularTags}
         loggedInUser={LoggedInUser}
       />
     );
@@ -151,9 +165,31 @@ const createCollectiveMutation = gql`
   }
 `;
 
+const tagStatsQuery = gql`
+  query TagStatsQuery($host: AccountReferenceInput) {
+    tagStats(limit: 6, host: $host) {
+      nodes {
+        id
+        tag
+      }
+    }
+  }
+`;
+
 const addCreateCollectiveMutation = graphql(createCollectiveMutation, {
   name: 'createCollective',
   options: { context: API_V2_CONTEXT },
 });
 
-export default withRouter(withUser(addCreateCollectiveMutation(injectIntl(CreateCollective))));
+const addTagStatsQuery = graphql(tagStatsQuery, {
+  options: props => {
+    return {
+      context: API_V2_CONTEXT,
+      variables: {
+        host: props.host ? { slug: props.host.slug } : undefined,
+      },
+    };
+  },
+});
+
+export default withRouter(withUser(addCreateCollectiveMutation(addTagStatsQuery(injectIntl(CreateCollective)))));
