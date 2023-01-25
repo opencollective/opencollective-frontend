@@ -4227,6 +4227,9 @@ type Query {
     """
     includeExpenseTransactions: Boolean
     fetchDataFromLedger: Boolean
+      @deprecated(
+        reason: "2023-01-11: Removed support for this in 2019 (https://github.com/opencollective/opencollective-api/pull/2384)"
+      )
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction]
   Application(id: Int): Application @deprecated(reason: "2023-01-03: Please use PersonalToken from GQLV2")
@@ -4503,8 +4506,6 @@ type Mutation {
   deleteUserCollective(id: Int!): CollectiveInterface
   archiveCollective(id: Int!): CollectiveInterface
   unarchiveCollective(id: Int!): CollectiveInterface
-  sendMessageToCollective(collectiveId: Int!, message: String!, subject: String): SendMessageToCollectiveResult
-    @deprecated(reason: "2022-08-01: Please use the sendMessage mutation from GraphQL v2 instead.")
 
   """
   Create a user with an optional organization.
@@ -4585,10 +4586,7 @@ type Mutation {
   editPublicMessage(FromCollectiveId: Int!, CollectiveId: Int!, message: String): [Member]
     @deprecated(reason: "2021-01-27: Please use editPublicMessage from GQLV2")
   createOrder(order: OrderInputType!): OrderType
-    @deprecated(reason: "2020-10-13: This endpoint has been moved to GQLV2")
-  confirmOrder(order: ConfirmOrderInputType!): OrderType
-    @deprecated(reason: "2022-11-18: This mutation has been moved to GQLV2")
-  refundTransaction(id: Int!): Transaction @deprecated(reason: "2022-01-27: Please use refundTransaction from GQLV2")
+    @deprecated(reason: "2020-10-13: This mutation has been moved to GQLV2")
   createApplication(application: ApplicationInput!): Application
     @deprecated(reason: "2023-01-03: Please use createPersonalToken from GQLV2")
   deleteApplication(id: Int!): Application @deprecated(reason: "2023-01-03: Please use deletePersonalToken from GQLV2")
@@ -4971,10 +4969,6 @@ input NotificationInputType {
   webhookUrl: String
 }
 
-type SendMessageToCollectiveResult {
-  success: Boolean
-}
-
 type CreateUserResult {
   user: UserDetails
   organization: CollectiveInterface
@@ -5128,13 +5122,6 @@ Implemented Captcha Providers
 enum CaptchaProvider {
   HCAPTCHA
   RECAPTCHA
-}
-
-"""
-Input type for ConfirmOrderType
-"""
-input ConfirmOrderInputType {
-  id: Int
 }
 
 """

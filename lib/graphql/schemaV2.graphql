@@ -2034,8 +2034,6 @@ type Comment {
   Returns the list of reactions added to this comment by logged in user
   """
   userReactions: [String]
-  fromCollective: Account @deprecated(reason: "2020-02-25: Please use fromAccount")
-  collective: Account @deprecated(reason: "2020-02-25: Please use account")
 }
 
 """
@@ -3529,9 +3527,7 @@ type Conversation {
   updatedAt: DateTime!
   tags: [String]
   summary: String!
-  collective: Account @deprecated(reason: "2022-09-14: Please use account")
   account: Account
-  fromCollective: Account @deprecated(reason: "2022-09-14: Please use fromAccount")
   fromAccount: Account
 
   """
@@ -4926,11 +4922,6 @@ type ExpenseStats {
   The total number of expenses
   """
   expensesCount: Int!
-
-  """
-  The total number of expenses over time
-  """
-  expenseAmountOverTime: TimeSeriesAmount @deprecated(reason: "2022-04-21: Please use hostMetricsTimeSeries.totalSpent")
 
   """
   The daily average paid in expenses
@@ -9685,12 +9676,12 @@ type Query {
   ): Project
   tagStats(
     """
-    Return tags from collectives which includes this search term
+    Return tags from collectives which includes this search term. Using this argument will ignore tagSearchTerm. Skipping this argument will use a more efficient query.
     """
     searchTerm: String
 
     """
-    Return tags which includes this search term
+    Return tags which includes this search term. Using this argument will ignore searchTerm.
     """
     tagSearchTerm: String
     limit: Int! = 10

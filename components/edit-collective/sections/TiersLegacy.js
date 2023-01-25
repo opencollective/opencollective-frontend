@@ -95,8 +95,15 @@ class Tiers extends React.Component {
       },
       DONATION: { id: 'tier.type.donation', defaultMessage: 'donation (gift)' },
       TICKET: {
-        id: 'tier.type.ticket',
-        defaultMessage: 'ticket (allow multiple tickets per order)',
+        id: 'ContributionType.Ticket',
+        defaultMessage: 'Ticket',
+      },
+      TICKET_TYPE: {
+        defaultMessage: 'Single Ticket',
+      },
+      singleTicketDescription: {
+        id: 'tier.singleTicketDescription',
+        defaultMessage: 'Only allow people to buy a single ticket per order',
       },
       'TIER.remove': {
         id: 'tier.type.tier.remove',
@@ -233,7 +240,9 @@ class Tiers extends React.Component {
         options: collective =>
           getOptions(props.types || (collective.type === PROJECT ? SIMPLIFIED_TIER_TYPES : DEFAULT_TIER_TYPES)),
         label: intl.formatMessage(this.messages['type.label']),
-        when: (tier, collective) => ![FUND].includes(collective.type) || props.types?.length === 1,
+        when: (tier, collective) =>
+          ![FUND].includes(collective.type) &&
+          (props.types || (collective.type === PROJECT ? SIMPLIFIED_TIER_TYPES : DEFAULT_TIER_TYPES)).length > 1,
       },
       {
         name: 'name',
@@ -309,6 +318,13 @@ class Tiers extends React.Component {
         type: 'currency',
         label: intl.formatMessage(this.messages['goal.label']),
         description: intl.formatMessage(this.messages['goal.description']),
+      },
+      {
+        name: 'singleTicket',
+        type: 'switch',
+        label: intl.formatMessage(this.messages['TICKET_TYPE']),
+        when: tier => tier.type === 'TICKET',
+        description: intl.formatMessage(this.messages.singleTicketDescription),
       },
       {
         name: 'useStandalonePage',
@@ -428,6 +444,7 @@ class Tiers extends React.Component {
       ...tier,
       type: tier.type || this.defaultType,
       invoiceTemplate: tier.data?.invoiceTemplate,
+      singleTicket: tier.data?.singleTicket,
     };
 
     return (
@@ -450,6 +467,7 @@ class Tiers extends React.Component {
                     type={field.type}
                     defaultValue={defaultValues[field.name]}
                     options={typeof field.options === 'function' ? field.options(collective) : field.options}
+                    disabled={field.disabled}
                     pre={field.pre}
                     maxLength={field.maxLength}
                     placeholder={field.placeholder}

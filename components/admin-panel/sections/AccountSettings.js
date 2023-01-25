@@ -102,6 +102,7 @@ const AccountSettings = ({ account, section }) => {
           'goal',
           'button',
           'invoiceTemplate',
+          'singleTicket',
         ]),
       );
     }
