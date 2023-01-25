@@ -56,7 +56,7 @@ const ContributionFlowUrlParametersConfig = {
   hideCreditCardPostalCode: { type: 'boolean', static: true },
   /**
    * To disable specific payment method types
-   * @example MANUAL,BANK_TRANSFER
+   * @example "MANUAL", "BANK_TRANSFER", "PAYMENT" (for PayPal)
    */
   disabledPaymentMethodTypes: { type: 'stringArray', static: true },
   // -- Success
