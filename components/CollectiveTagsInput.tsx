@@ -205,32 +205,30 @@ function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTag
         }}
       />
       {suggestedTags.length && (
-        <div>
-          <Flex mt={2} gap={'6px'} flexWrap="wrap" alignItems={'center'}>
-            <Span color="black.600">
-              <FormattedMessage defaultMessage="Popular tags:" />
-            </Span>
+        <Flex mt={2} gap={'6px'} flexWrap="wrap" alignItems={'center'}>
+          <Span color="black.600">
+            <FormattedMessage defaultMessage="Popular tags:" />
+          </Span>
 
-            {suggestedTags.map(tag => {
-              const isSelected = selected.some(({ value }) => value === tag);
-              return (
-                <StyledTagButton
-                  type="button"
-                  tabIndex={-1}
-                  key={tag}
-                  isSelected={isSelected}
-                  onClick={() =>
-                    isSelected
-                      ? setSelected(selected.filter(({ value }) => value !== tag))
-                      : setSelected([...selected, { value: tag, label: tag }])
-                  }
-                >
-                  {tag}
-                </StyledTagButton>
-              );
-            })}
-          </Flex>
-        </div>
+          {suggestedTags.map(tag => {
+            const isSelected = selected.some(({ value }) => value === tag);
+            return (
+              <StyledTagButton
+                type="button"
+                tabIndex={-1}
+                key={tag}
+                isSelected={isSelected}
+                onClick={() =>
+                  isSelected
+                    ? setSelected(selected.filter(({ value }) => value !== tag))
+                    : setSelected([...selected, { value: tag, label: tag }])
+                }
+              >
+                {tag}
+              </StyledTagButton>
+            );
+          })}
+        </Flex>
       )}
     </Fragment>
   );
