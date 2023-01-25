@@ -7834,6 +7834,7 @@ export type Tier = {
   /** Get all orders */
   orders: OrderCollection;
   presets?: Maybe<Array<Maybe<Scalars['Int']>>>;
+  singleTicket?: Maybe<Scalars['Boolean']>;
   slug?: Maybe<Scalars['String']>;
   type: TierType;
   useStandalonePage?: Maybe<Scalars['Boolean']>;
@@ -7872,6 +7873,7 @@ export type TierCreateInput = {
   minimumAmount?: InputMaybe<AmountInput>;
   name?: InputMaybe<Scalars['NonEmptyString']>;
   presets?: InputMaybe<Array<Scalars['Int']>>;
+  singleTicket?: InputMaybe<Scalars['Boolean']>;
   type: TierType;
   useStandalonePage?: InputMaybe<Scalars['Boolean']>;
 };
@@ -7916,10 +7918,12 @@ export type TierUpdateInput = {
   goal?: InputMaybe<AmountInput>;
   /** The public id identifying the tier (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
   id: Scalars['String'];
+  invoiceTemplate?: InputMaybe<Scalars['String']>;
   maxQuantity?: InputMaybe<Scalars['Int']>;
   minimumAmount?: InputMaybe<AmountInput>;
   name?: InputMaybe<Scalars['NonEmptyString']>;
   presets?: InputMaybe<Array<Scalars['Int']>>;
+  singleTicket?: InputMaybe<Scalars['Boolean']>;
   type: TierType;
   useStandalonePage?: InputMaybe<Scalars['Boolean']>;
 };
