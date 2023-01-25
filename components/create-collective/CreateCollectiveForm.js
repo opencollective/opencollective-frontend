@@ -85,6 +85,7 @@ class CreateCollectiveForm extends React.Component {
     onChange: PropTypes.func,
     router: PropTypes.object.isRequired,
     loggedInUser: PropTypes.object,
+    popularTags: PropTypes.arrayOf(PropTypes.string),
   };
 
   hasHostTerms() {
