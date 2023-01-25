@@ -149,7 +149,10 @@ export const stepsDataToUrlParamsData = (
   // Step details
   assign(data, pick(stepDetails, ['interval', 'quantity', 'customData']));
 
-  if (!isCrypto) {
+  if (isCrypto) {
+    data.cryptoAmount = parseFloat(stepDetails.cryptoAmount) || previousUrlParams.cryptoAmount || 0;
+    data.cryptoCurrency = stepDetails.currency?.value ? stepDetails.currency.value : previousUrlParams.cryptoCurrency;
+  } else {
     data.amount = stepDetails.amount;
   }
 
@@ -168,14 +171,6 @@ export const stepsDataToUrlParamsData = (
   // Remove entries that are set to their default values
   if (data.quantity === 1) {
     delete data.quantity;
-  }
-
-  if (isCrypto) {
-    data.cryptoAmount = parseFloat(stepDetails.cryptoAmount) || previousUrlParams.cryptoAmount || 0;
-    data.cryptoCurrency = stepDetails.currency?.value ? stepDetails.currency.value : previousUrlParams.cryptoCurrency;
-    delete data.amount;
-  } else {
-    delete data.cryptoAmount;
   }
 
   return data;
