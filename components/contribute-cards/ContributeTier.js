@@ -8,6 +8,7 @@ import INTERVALS from '../../lib/constants/intervals';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency, getPrecisionFromAmount, graphqlAmountValueInCents } from '../../lib/currency-utils';
 import { isPastEvent } from '../../lib/events';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { isTierExpired } from '../../lib/tier-utils';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { capitalize } from '../../lib/utils';
@@ -89,7 +90,18 @@ TierTitle.propTypes = {
   }),
 };
 
+const canContribute = (collective, LoggedInUser) => {
+  if (!collective.isActive) {
+    return false;
+  } else if (collective.type === 'EVENT') {
+    return !isPastEvent(collective) || Boolean(LoggedInUser.isAdminOfCollectiveOrHost(collective));
+  } else {
+    return true;
+  }
+};
+
 const ContributeTier = ({ intl, collective, tier, enableEditing, isPreview, ...props }) => {
+  const { LoggedInUser } = useLoggedInUser();
   const { stats } = tier;
   const currency = tier.currency || collective.currency;
   const isFlexibleAmount = tier.amountType === 'FLEXIBLE';
@@ -99,7 +111,7 @@ const ContributeTier = ({ intl, collective, tier, enableEditing, isPreview, ...p
   const tierIsExpired = isTierExpired(tier);
   const tierType = getContributionTypeFromTier(tier, tierIsExpired);
   const hasNoneLeft = stats?.availableQuantity === 0;
-  const canContributeToCollective = collective.isActive && !isPastEvent(collective);
+  const canContributeToCollective = canContribute(collective, LoggedInUser);
   const isDisabled = !canContributeToCollective || tierIsExpired || hasNoneLeft;
   const tierLegacyId = tier.legacyId || tier.id;
 
