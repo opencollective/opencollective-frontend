@@ -1,7 +1,7 @@
-import React, { MouseEventHandler, useEffect, useState } from 'react';
+import React, { Fragment, MouseEventHandler, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import {
   components as ReactSelectComponents,
   ContainerProps,
@@ -20,11 +20,30 @@ import {
   SortableHandle,
   SortEndHandler,
 } from 'react-sortable-hoc';
+import styled from 'styled-components';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import colors from '../lib/theme/colors';
 import withData from '../lib/withData';
+
+import { Flex } from './Grid';
+import { Span } from './Text';
+
+const StyledTagButton = styled.button<{ isSelected: boolean }>`
+  border-radius: 2px 12px 12px 2px;
+  padding: 3px 10px 3px 6px;
+  color: black.700;
+  background: #f0f2f5;
+  font-size: 12px;
+  border: 0;
+  cursor: pointer;
+  opacity: ${props => (props.isSelected ? '25%' : '100%')};
+  transition: opacity 0.1s;
+  &:focus {
+    outline: none;
+  }
+`;
 
 export const searchTagsQuery = gql`
   query SearchTags($term: String!) {
@@ -91,7 +110,7 @@ const SelectContainer = ({ innerProps, ...props }: ContainerProps) => (
   />
 );
 
-function CollectiveTagsInput({ defaultValue = [], onChange, client }) {
+function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTags = [] }) {
   const intl = useIntl();
   const [selected, setSelected] = useState<readonly TagOption[]>(
     defaultValue?.map(tag => ({ label: tag, value: tag })) || [],
@@ -126,68 +145,100 @@ function CollectiveTagsInput({ defaultValue = [], onChange, client }) {
   };
 
   return (
-    <SortableSelect
-      useDragHandle
-      // react-sortable-hoc props:
-      axis="xy"
-      onSortEnd={onSortEnd}
-      distance={0}
-      // small fix for https://github.com/clauderic/react-sortable-hoc/pull/352:
-      getHelperDimensions={({ node }) => node.getBoundingClientRect()}
-      // react-select props:
-      openMenuOnFocus
-      placeholder={intl.formatMessage({ id: 'collective.tags.input.placeholder', defaultMessage: '+ Add tags' })}
-      isMulti
-      value={selected}
-      components={{
-        // @ts-ignore We're failing to provide a required index prop to SortableElement
-        MultiValue: SortableMultiValue,
-        // @ts-ignore We're failing to provide a required index prop to SortableElement
-        MultiValueLabel: SortableMultiValueLabel,
-        SelectContainer,
-        Input,
-        Option,
-      }}
-      defaultOptions={true}
-      loadOptions={fetchTags}
-      onChange={(selectedOptions: OnChangeValue<TagOption, true>) => setSelected(selectedOptions)}
-      styles={{
-        multiValue: baseStyles => ({
-          ...baseStyles,
-          borderRadius: '2px 12px 12px 2px',
-          overflow: 'hidden',
-        }),
-        multiValueLabel: baseStyles => ({
-          ...baseStyles,
-          cursor: 'grab',
-        }),
-        multiValueRemove: (baseStyles, state) => ({
-          ...baseStyles,
-          color: state.isFocused ? colors.black[900] : colors.black[600],
-          backgroundColor: state.isFocused ? colors.black[400] : 'transparent',
-          borderRadius: 0,
-          paddingLeft: '3px',
-          cursor: 'pointer',
-          '&:hover': {
-            backgroundColor: colors.black[400],
-            color: colors.black[900],
-          },
-        }),
-        control: (baseStyles, state) => ({
-          ...baseStyles,
-          boxShadow: `inset 0px 2px 2px ${colors.primary[50]}`,
-          borderColor: state.isFocused ? colors.primary[500] : colors.black[300],
-          '&:hover': {
-            borderColor: state.isFocused ? colors.primary[500] : colors.primary[300],
-          },
-        }),
-      }}
-    />
+    <Fragment>
+      <SortableSelect
+        useDragHandle
+        // react-sortable-hoc props:
+        axis="xy"
+        onSortEnd={onSortEnd}
+        distance={0}
+        // small fix for https://github.com/clauderic/react-sortable-hoc/pull/352:
+        getHelperDimensions={({ node }) => node.getBoundingClientRect()}
+        // react-select props:
+        openMenuOnFocus
+        placeholder={intl.formatMessage({ id: 'collective.tags.input.placeholder', defaultMessage: '+ Add tags' })}
+        isMulti
+        value={selected}
+        components={{
+          // @ts-ignore We're failing to provide a required index prop to SortableElement
+          MultiValue: SortableMultiValue,
+          // @ts-ignore We're failing to provide a required index prop to SortableElement
+          MultiValueLabel: SortableMultiValueLabel,
+          SelectContainer,
+          Input,
+          Option,
+        }}
+        defaultOptions={true}
+        loadOptions={fetchTags}
+        onChange={(selectedOptions: OnChangeValue<TagOption, true>) => setSelected(selectedOptions)}
+        styles={{
+          multiValue: baseStyles => ({
+            ...baseStyles,
+            borderRadius: '2px 12px 12px 2px',
+            background: colors.black[100],
+            overflow: 'hidden',
+          }),
+          multiValueLabel: baseStyles => ({
+            ...baseStyles,
+            cursor: 'grab',
+          }),
+          multiValueRemove: (baseStyles, state) => ({
+            ...baseStyles,
+            color: state.isFocused ? colors.black[900] : colors.black[600],
+            backgroundColor: state.isFocused ? colors.black[400] : 'transparent',
+            borderRadius: 0,
+            paddingLeft: '3px',
+            cursor: 'pointer',
+            '&:hover': {
+              backgroundColor: colors.black[400],
+              color: colors.black[900],
+            },
+          }),
+          control: (baseStyles, state) => ({
+            ...baseStyles,
+            boxShadow: `inset 0px 2px 2px ${colors.primary[50]}`,
+            borderColor: state.isFocused ? colors.primary[500] : colors.black[300],
+            '&:hover': {
+              borderColor: state.isFocused ? colors.primary[500] : colors.primary[300],
+            },
+          }),
+        }}
+      />
+      {suggestedTags.length && (
+        <div>
+          <Flex mt={2} gap={'6px'} flexWrap="wrap" alignItems={'center'}>
+            <Span color="black.600">
+              <FormattedMessage defaultMessage="Popular tags:" />
+            </Span>
+
+            {suggestedTags.map(tag => {
+              const isSelected = selected.some(({ value }) => value === tag);
+              return (
+                <StyledTagButton
+                  type="button"
+                  tabIndex={-1}
+                  key={tag}
+                  isSelected={isSelected}
+                  onClick={() =>
+                    isSelected
+                      ? setSelected(selected.filter(({ value }) => value !== tag))
+                      : setSelected([...selected, { value: tag, label: tag }])
+                  }
+                >
+                  {tag}
+                </StyledTagButton>
+              );
+            })}
+          </Flex>
+        </div>
+      )}
+    </Fragment>
   );
 }
 
 CollectiveTagsInput.propTypes = {
   defaultValue: PropTypes.arrayOf(PropTypes.string),
+  suggestedTags: PropTypes.arrayOf(PropTypes.string),
   renderUpdatedTags: PropTypes.bool,
   onChange: PropTypes.func,
   client: PropTypes.object,
