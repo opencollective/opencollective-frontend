@@ -112,10 +112,11 @@ class UserSecurity extends React.Component {
       enablingTwoFactorAuth: false,
       showRecoveryCodesModal: false,
       /* Password management state */
+      passwordLoading: false,
       passwordError: null,
       currentPassword: '',
       password: '',
-      passwordKey: 'initial',
+      passwordKey: 1,
       passwordScore: null,
     };
 
@@ -332,7 +333,11 @@ class UserSecurity extends React.Component {
           <StyledButton
             my={2}
             minWidth={140}
-            disabled={!this.state.password || (this.props.LoggedInUser.hasPassword && !this.state.currentPassword)}
+            disabled={
+              this.state.passwordLoading ||
+              !this.state.password ||
+              (this.props.LoggedInUser.hasPassword && !this.state.currentPassword)
+            }
             onClick={async () => {
               if (this.state.passwordScore <= 1) {
                 this.setState({
@@ -345,6 +350,7 @@ class UserSecurity extends React.Component {
 
               const hadPassword = this.props.LoggedInUser.hasPassword;
               try {
+                this.setState({ passwordLoading: true });
                 await this.props.setPassword({
                   variables: { password: this.state.password, currentPassword: this.state.currentPassword },
                 });
@@ -362,10 +368,11 @@ class UserSecurity extends React.Component {
                   password: '',
                   passwordError: null,
                   passwordScore: null,
-                  passwordKey: Math.round(Math.random() * 10000000), // to reset html inputs in the DOM
+                  passwordLoading: false,
+                  passwordKey: Number(this.state.passwordKey) + 1,
                 });
               } catch (e) {
-                this.setState({ passwordError: e.message });
+                this.setState({ passwordError: e.message, passwordLoading: false });
               }
             }}
           >
