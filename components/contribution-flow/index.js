@@ -215,6 +215,7 @@ class ContributionFlow extends React.Component {
           stepProfile,
           stepPayment,
           this.props.paymentFlow === PAYMENT_FLOW.CRYPTO,
+          this.props.isEmbed,
         );
         if (!isEqual(currentUrlState, omitBy(expectedUrlState, isNil))) {
           const route = this.getRoute(currentStepName);
