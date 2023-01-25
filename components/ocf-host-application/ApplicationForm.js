@@ -574,7 +574,7 @@ const ApplicationForm = ({
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
-                          label={intl.formatMessage({ defaultMessage: 'Tags' })}
+                          label={intl.formatMessage({ id: 'Tags', defaultMessage: 'Tags' })}
                           data-cy="ccf-form-tags"
                         >
                           {({ field }) => (
