@@ -1,6 +1,6 @@
 {
   "++1FQ+": "<Account></Account> にクレジットカードの期限切れについてのリマインダーを送信しました",
-  "+5KHJy": "Delete token",
+  "+5KHJy": "トークンを削除",
   "+a+2ug": "メンバー",
   "+cQ6YM": "カバーが更新されました",
   "+cR4M7": "{service} で本人確認してください。",
@@ -304,7 +304,7 @@
   "becomeAHost.networks": "グループまたはチャプターのネットワーク",
   "becomeAHost.networks.description": "Who want to enable local fundraising while operating a single common legal entity, such as meetups and social movements.",
   "becomeAHost.nonprofits": "非営利団体、慈善団体",
-  "becomeAHost.nonprofits.description": "Who want to enable unincorporated projects that further their mission areas to receive grants and donations under their umbrella.",
+  "becomeAHost.nonprofits.description": "自分たちのミッションにあてはまる活動をしている法人格のないプロジェクトを庇護し、そのプロジェクトが助成金や寄付金を受け取れるようになってもらいたい。",
   "becomeAHost.reduceOverhead": "オーバーヘッドの削減",
   "becomeAHost.reduceOverhead.description": "When you’re managing funds for multiple projects or groups, it's easy to get overwhelmed by complex spreadsheets and countless email threads. Open Collective automates budget tracking, reporting, expense processing, and payments, making your job a lot easier.",
   "becomeAHost.title": "財務支援はかつてないほど簡単になりました",
