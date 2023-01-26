@@ -13,6 +13,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import speakeasy from 'speakeasy';
 import styled from 'styled-components';
 
+import ROLES from '../../../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { compose } from '../../../lib/utils';
@@ -93,7 +94,7 @@ class UserSecurity extends React.Component {
     LoggedInUser: PropTypes.shape({
       isRoot: PropTypes.bool.isRequired,
       hasPassword: PropTypes.bool.isRequired,
-      isAdminOfCollective: PropTypes.func.isRequired,
+      hasRole: PropTypes.func.isRequired,
     }),
     refetchLoggedInUser: PropTypes.func.isRequired,
     data: PropTypes.shape({
@@ -403,7 +404,9 @@ class UserSecurity extends React.Component {
 
     const canManagePassword =
       this.props.LoggedInUser.hasPassword ||
-      this.props.LoggedInUser.isAdminOfCollective({ slug: 'opencollective' }) ||
+      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'opencollective' }) ||
+      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'opensource' }) ||
+      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'foundation' }) ||
       process.env.OC_ENV !== 'production';
 
     return (
