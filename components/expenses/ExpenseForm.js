@@ -6,8 +6,6 @@ import { first, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { PayPalSupportedCurrencies } from '../../lib/constants/currency';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -16,7 +14,7 @@ import { requireFields } from '../../lib/form-utils';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep } from '../../lib/utils';
-import { checkRequiresAddress, validateExpenseTaxes } from './lib/utils';
+import { checkRequiresAddress, getSupportedCurrencies, validateExpenseTaxes } from './lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
@@ -278,12 +276,7 @@ const ExpenseFormBody = ({
   const stepTwoCompleted = isInvite
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
-  const collectiveSupportsMultiCurrency =
-    hasFeature(collective, FEATURES.MULTI_CURRENCY_EXPENSES) ||
-    hasFeature(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES);
-  const isMultiCurrency =
-    collectiveSupportsMultiCurrency && values.payoutMethod?.data?.currency !== collective?.currency;
-
+  const availableCurrencies = getSupportedCurrencies(collective, values.payoutMethod);
   const [step, setStep] = React.useState(() => getDefaultStep(defaultStep, stepOneCompleted, isCreditCardCharge));
 
   // Only true when logged in and drafting the expense
@@ -358,14 +351,16 @@ const ExpenseFormBody = ({
   }, [values.payeeLocation]);
 
   React.useEffect(() => {
-    if (values.payoutMethod?.type === PayoutMethodType.PAYPAL) {
-      if (!PayPalSupportedCurrencies.includes(values.currency)) {
-        formik.setFieldValue('currency', 'USD');
+    // If the currency is not supported anymore, we need to do something
+    if (!values.currency || !availableCurrencies.includes(values.currency)) {
+      const hasItemsWithAmounts = values.items.some(item => Boolean(item.amount));
+      if (!hasItemsWithAmounts) {
+        // If no items have amounts yet, we can safely set the default currency
+        formik.setFieldValue('currency', availableCurrencies[0]);
+      } else if (values.currency) {
+        // If there are items with amounts, we need to reset the currency
+        formik.setFieldValue('currency', null);
       }
-    } else if (isMultiCurrency) {
-      formik.setFieldValue('currency', undefined);
-    } else {
-      formik.setFieldValue('currency', collective?.currency);
     }
   }, [values.payoutMethod]);
 
@@ -612,7 +607,13 @@ const ExpenseFormBody = ({
                 </Flex>
                 <Box>
                   <FieldArray name="items">
-                    {fieldsArrayProps => <ExpenseFormItems {...fieldsArrayProps} collective={collective} />}
+                    {fieldsArrayProps => (
+                      <ExpenseFormItems
+                        {...fieldsArrayProps}
+                        collective={collective}
+                        availableCurrencies={availableCurrencies}
+                      />
+                    )}
                   </FieldArray>
                 </Box>
 
