@@ -35,7 +35,7 @@ export default class SignIn extends React.Component {
     /** Set the value of email input */
     email: PropTypes.string.isRequired,
     /** Set the value of password input */
-    password: PropTypes.string.isRequired,
+    password: PropTypes.string,
     /** handles changes in the email input */
     onEmailChange: PropTypes.func.isRequired,
     /** handles changes in the password input */
@@ -240,7 +240,6 @@ export default class SignIn extends React.Component {
                       if (!this.props.passwordRequired) {
                         return;
                       }
-                      target.value = target.value.trim();
                       onPasswordChange(target.value);
                       this.setState({ error: target.validationMessage, showError: false });
                     }}

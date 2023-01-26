@@ -229,14 +229,6 @@ class UserSecurity extends React.Component {
       await this.props.setPassword({
         variables: { password, currentPassword },
       });
-      this.props.addToast({
-        type: TOAST_TYPE.SUCCESS,
-        message: this.props.LoggedInUser.hasPassword ? (
-          <FormattedMessage defaultMessage="Password succesfully updated" />
-        ) : (
-          <FormattedMessage defaultMessage="Password succesfully set" />
-        ),
-      });
       await this.props.refetchLoggedInUser();
       this.setState({
         currentPassword: '',
@@ -245,6 +237,14 @@ class UserSecurity extends React.Component {
         passwordScore: null,
         passwordLoading: false,
         passwordKey: Number(passwordKey) + 1,
+      });
+      this.props.addToast({
+        type: TOAST_TYPE.SUCCESS,
+        message: this.props.LoggedInUser.hasPassword ? (
+          <FormattedMessage defaultMessage="Password successfully updated" />
+        ) : (
+          <FormattedMessage defaultMessage="Password successfully set" />
+        ),
       });
     } catch (e) {
       this.setState({ passwordError: e.message, passwordLoading: false });
@@ -275,7 +275,7 @@ class UserSecurity extends React.Component {
             ) : (
               <FormattedMessage
                 id="Password.Set.Info"
-                defaultMessage="Setting a password is optional but this can be useful for regular users."
+                defaultMessage="Setting a password is optional but can be useful if you're using a password manager."
               />
             )}
           </P>
@@ -335,7 +335,8 @@ class UserSecurity extends React.Component {
           <StyledButton
             my={2}
             minWidth={140}
-            disabled={passwordLoading || !password || (LoggedInUser.hasPassword && !currentPassword)}
+            loading={passwordLoading}
+            disabled={!password || (LoggedInUser.hasPassword && !currentPassword)}
             onClick={this.setPassword}
           >
             {LoggedInUser.hasPassword ? (
