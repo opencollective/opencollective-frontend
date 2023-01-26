@@ -7,9 +7,9 @@ import { Info } from '@styled-icons/feather/Info';
 import { saveAs } from 'file-saver';
 import { Field, Form, Formik } from 'formik';
 import { get } from 'lodash';
+import dynamic from 'next/dynamic';
 import QRCode from 'qrcode.react';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import PasswordStrengthBar from 'react-password-strength-bar';
 import speakeasy from 'speakeasy';
 import styled from 'styled-components';
 
@@ -33,6 +33,9 @@ import StyledTooltip from '../../StyledTooltip';
 import { H3, P } from '../../Text';
 import { TOAST_TYPE, withToasts } from '../../ToastProvider';
 import { withUser } from '../../UserProvider';
+
+// Dynamic imports
+const PasswordStrengthBar = dynamic(() => import('react-password-strength-bar'));
 
 const messages = defineMessages({
   errorWrongLength: {
