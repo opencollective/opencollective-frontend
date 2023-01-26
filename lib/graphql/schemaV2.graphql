@@ -2165,9 +2165,14 @@ type ExpenseAttachedFile {
   url: URL
 
   """
+  The file info associated with this item (if any)
+  """
+  info: FileInfo
+
+  """
   The original filename
   """
-  name: String
+  name: String @deprecated(reason: "2023-01-23: We're moving this field to \"file.name\"")
 }
 
 """
@@ -2204,6 +2209,11 @@ type ExpenseItem {
   """
   description: String
   url: URL
+
+  """
+  The file associated with this item (if any)
+  """
+  file: FileInfo
 }
 
 """
@@ -7183,6 +7193,81 @@ interface AccountWithParent {
   The Account parenting this account
   """
   parent: Account
+}
+
+"""
+Exposes information about an uploaded file (image, pdf, etc.)
+"""
+interface FileInfo {
+  """
+  Unique identifier for the file
+  """
+  id: String!
+
+  """
+  URL to access the file
+  """
+  url: URL!
+
+  """
+  Name of the file
+  """
+  name: String
+
+  """
+  Mime type of the file
+  """
+  type: String!
+
+  """
+  Size of the file in bytes
+  """
+  size: Int!
+}
+
+"""
+Exposes information about an uploaded image file
+"""
+type ImageFileInfo implements FileInfo {
+  """
+  Unique identifier for the file
+  """
+  id: String!
+
+  """
+  URL to access the file
+  """
+  url: URL!
+
+  """
+  Name of the file
+  """
+  name: String
+
+  """
+  Mime type of the file
+  """
+  type: String!
+
+  """
+  Size of the file in bytes
+  """
+  size: Int!
+
+  """
+  If the file is an image, this will be the width of the image in pixels
+  """
+  width: Int
+
+  """
+  If the file is an image, this will be the height of the image in pixels
+  """
+  height: Int
+
+  """
+  Blurhash of the image
+  """
+  blurHash: String
 }
 
 """
