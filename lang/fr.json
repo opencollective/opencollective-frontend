@@ -81,6 +81,7 @@
   "6EnwoZ": "Dépense déplacée depuis {movedFromCollective}",
   "6hDP83": "Tous les administrateurs de {account} doivent avoir une authentification à deux facteurs",
   "6mlPiP": "Nouveau commentaire sur la conversation",
+  "6oGOC9": "Password successfully updated",
   "6P4LG/": "Factures mises à jour avec succès",
   "6QW6MJ": "La <Order>contribution</Order> en crypto-monnaie depuis <FromAccount></FromAccount> vers <Account></Account> est en cours de traitement",
   "6VPa5L": "Cela mettra en pause la carte virtuelle. Pour annuler la pause, vous devrez contacter l'hôte.",
@@ -262,7 +263,6 @@
   "B0DOrM": "Année Passée",
   "b4iDeN": "Ajouter une image de couverture",
   "B5z1AU": "de {payee} à {account}",
-  "b7hlQD": "Password succesfully set",
   "B7p2EC": "Clé secrète du Client",
   "Back": "Retour",
   "BalanceAmount": "Solde {balance}",
@@ -380,6 +380,7 @@
   "Clipboard.Copy": "Copier",
   "Close": "Fermer",
   "closeDetails": "Masquer les détails",
+  "cLP25w": "Password successfully set",
   "Clvp6T": "Abonnement PayPal",
   "CMlTK9": "Vous devez configurer 2FA pour accéder à cette fonctionnalité",
   "cNkrNr": "Abonnez-vous à notre newsletter mensuelle",
@@ -2155,7 +2156,7 @@
   "Parameter": "Paramètre",
   "Password": "Password",
   "Password.Change.Info": "You already have a password set, you can change it using the following form.",
-  "Password.Set.Info": "Setting a password is optional but this can be useful for regular users.",
+  "Password.Set.Info": "Setting a password is optional but can be useful if you're using a password manager.",
   "PayExpense.paymentProcessorFeeInHostCurrency.Hint": "Amount in fees, included in the total amount paid.",
   "PayExpense.ProcessorFeesInput": "Frais du processeur de paiement",
   "PayExpense.totalAmountPaidInHostCurrency.Hint": "The total amount debited from your account.",
@@ -2980,6 +2981,5 @@
   "ZqbBGv": "wk",
   "zu5ckP": "Refund and reject recorded transactions.",
   "ZvWD3X": "Support the event or buy tickets to attend.",
-  "zWgbGg": "Aujourd'hui",
-  "zwk1/y": "Password succesfully updated"
+  "zWgbGg": "Aujourd'hui"
 }

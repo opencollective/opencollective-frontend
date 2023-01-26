@@ -81,6 +81,7 @@
   "6EnwoZ": "支出已从 {movedFromCollective} 移动",
   "6hDP83": "All {account} admins must have two-factor authentication",
   "6mlPiP": "对话有了新评论",
+  "6oGOC9": "Password successfully updated",
   "6P4LG/": "发票更新成功",
   "6QW6MJ": "Crypto <Order>contribution</Order> from <FromAccount></FromAccount> to <Account></Account> set as processing",
   "6VPa5L": "This will pause the virtual card. To unpause, you will need to contact the host.",
@@ -262,7 +263,6 @@
   "B0DOrM": "去年",
   "b4iDeN": "添加封面图像",
   "B5z1AU": "from {payee} to {account}",
-  "b7hlQD": "Password succesfully set",
   "B7p2EC": "客户密钥",
   "Back": "返回",
   "BalanceAmount": "余额 {balance}",
@@ -380,6 +380,7 @@
   "Clipboard.Copy": "复制到剪贴板",
   "Close": "关闭",
   "closeDetails": "关闭详情",
+  "cLP25w": "Password successfully set",
   "Clvp6T": "PayPal subscription",
   "CMlTK9": "您必须配置 2FA 才能访问此功能",
   "cNkrNr": "订阅我们的每月新闻",
@@ -2155,7 +2156,7 @@
   "Parameter": "参数",
   "Password": "Password",
   "Password.Change.Info": "You already have a password set, you can change it using the following form.",
-  "Password.Set.Info": "Setting a password is optional but this can be useful for regular users.",
+  "Password.Set.Info": "Setting a password is optional but can be useful if you're using a password manager.",
   "PayExpense.paymentProcessorFeeInHostCurrency.Hint": "Amount in fees, included in the total amount paid.",
   "PayExpense.ProcessorFeesInput": "支付手续费",
   "PayExpense.totalAmountPaidInHostCurrency.Hint": "The total amount debited from your account.",
@@ -2980,6 +2981,5 @@
   "ZqbBGv": "wk",
   "zu5ckP": "退款和拒绝记录的交易。",
   "ZvWD3X": "支持活动或购买门票。",
-  "zWgbGg": "今天",
-  "zwk1/y": "Password succesfully updated"
+  "zWgbGg": "今天"
 }

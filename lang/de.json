@@ -81,6 +81,7 @@
   "6EnwoZ": "Ausgabe verschoben von {movedFromCollective}",
   "6hDP83": "Alle {account} Administratoren müssen eine Zwei-Faktor-Authentifizierung nutzen",
   "6mlPiP": "Neuer Kommentar zu der Unterhaltung",
+  "6oGOC9": "Password successfully updated",
   "6P4LG/": "Rechnungen wurden erfolgreich aktualisiert",
   "6QW6MJ": "Crypto <Order>contribution</Order> from <FromAccount></FromAccount> to <Account></Account> set as processing",
   "6VPa5L": "This will pause the virtual card. To unpause, you will need to contact the host.",
@@ -262,7 +263,6 @@
   "B0DOrM": "Letztes Jahr",
   "b4iDeN": "Ein Cover-Bild hinzufügen",
   "B5z1AU": "from {payee} to {account}",
-  "b7hlQD": "Password succesfully set",
   "B7p2EC": "Client-Secret",
   "Back": "Zurück",
   "BalanceAmount": "Guthaben: {balance}",
@@ -380,6 +380,7 @@
   "Clipboard.Copy": "In die Zwischenablage kopieren",
   "Close": "Schließen",
   "closeDetails": "Details schließen",
+  "cLP25w": "Password successfully set",
   "Clvp6T": "PayPal subscription",
   "CMlTK9": "You must configure 2FA to access this feature",
   "cNkrNr": "Abonnieren Sie unseren monatlichen Newsletter",
@@ -2155,7 +2156,7 @@
   "Parameter": "Parameter",
   "Password": "Password",
   "Password.Change.Info": "You already have a password set, you can change it using the following form.",
-  "Password.Set.Info": "Setting a password is optional but this can be useful for regular users.",
+  "Password.Set.Info": "Setting a password is optional but can be useful if you're using a password manager.",
   "PayExpense.paymentProcessorFeeInHostCurrency.Hint": "Amount in fees, included in the total amount paid.",
   "PayExpense.ProcessorFeesInput": "Payment processor fees",
   "PayExpense.totalAmountPaidInHostCurrency.Hint": "The total amount debited from your account.",
@@ -2980,6 +2981,5 @@
   "ZqbBGv": "wk",
   "zu5ckP": "Refund and reject recorded transactions.",
   "ZvWD3X": "Support the event or buy tickets to attend.",
-  "zWgbGg": "Today",
-  "zwk1/y": "Password succesfully updated"
+  "zWgbGg": "Today"
 }
