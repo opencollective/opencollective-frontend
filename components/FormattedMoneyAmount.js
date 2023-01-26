@@ -13,6 +13,8 @@ import { Span } from './Text';
 /** Default styles for the amount (not including currency) */
 export const DEFAULT_AMOUNT_STYLES = { letterSpacing: 0, fontWeight: 'bold', color: 'black.900' };
 
+const EMPTY_AMOUNT_PLACEHOLDER = '--.--';
+
 /**
  * A practical component to format amounts and their intervals with proper
  * internationalization support.
@@ -30,9 +32,13 @@ const FormattedMoneyAmount = ({
   currencyCodeStyles,
   isCrypto,
 }) => {
+  if (!currency) {
+    return <Span {...amountStyles}>{EMPTY_AMOUNT_PLACEHOLDER}</Span>;
+  }
+
   const formattedAmount =
     isNaN(amount) || isNil(amount) ? (
-      <Span {...amountStyles}>--.--</Span>
+      <Span {...amountStyles}>{EMPTY_AMOUNT_PLACEHOLDER}</Span>
     ) : (
       <Currency
         value={amount}

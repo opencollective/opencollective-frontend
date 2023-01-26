@@ -77,6 +77,11 @@ export const validateExpenseItem = (expense, item) => {
     }
   }
 
+  // Show the expense currency errors on the amount field, since it's displayed next to it
+  if (!expense.currency) {
+    errors.amount = createError(ERROR.FORM_FIELD_REQUIRED);
+  }
+
   return errors;
 };
 
@@ -238,7 +243,7 @@ const ExpenseItemForm = ({
                       placeholder="0.00"
                       onChange={(value, e) => setFieldValue(e.target.name, value)}
                       onCurrencyChange={onCurrencyChange}
-                      hasCurrencyPicker={hasMultiCurrency}
+                      hasCurrencyPicker={hasMultiCurrency || !currency} // Makes sure user can re-select currency after a reset
                       availableCurrencies={availableCurrencies}
                     />
                   )}
