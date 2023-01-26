@@ -218,6 +218,13 @@ class UserSecurity extends React.Component {
   async setPassword() {
     const { password, passwordKey, currentPassword, passwordScore } = this.state;
 
+    if (password === currentPassword) {
+      this.setState({
+        passwordError: <FormattedMessage defaultMessage="Password can't be the same as current password" />,
+      });
+      return;
+    }
+
     if (passwordScore <= 1) {
       this.setState({
         passwordError: (

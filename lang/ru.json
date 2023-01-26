@@ -1492,6 +1492,7 @@
   "HeroAvatar.Edit": "Edit {imgType, select, AVATAR {avatar} other {logo}}",
   "HeroAvatar.Remove": "Remove {imgType, select, AVATAR {avatar} other {logo}}",
   "hfh76h": "Authorization for {appName} revoked",
+  "HhwRys": "Password can't be the same as current password",
   "Hide": "Скрыть",
   "HM2YJg": "Do you want to create an account for your organization?",
   "home": "Главная страница",
