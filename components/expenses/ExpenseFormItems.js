@@ -214,6 +214,7 @@ class ExpenseFormItems extends React.PureComponent {
           {this.renderErrors()}
           <StyledDropzone
             {...attachmentDropzoneParams}
+            kind="EXPENSE_ITEM"
             data-cy="expense-multi-attachments-dropzone"
             onSuccess={files => filesListToItems(files).map(this.props.push)}
             onReject={uploadErrors => this.setState({ uploadErrors })}

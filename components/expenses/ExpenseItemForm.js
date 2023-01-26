@@ -133,6 +133,7 @@ const ExpenseItemForm = ({
                 >
                   <StyledDropzone
                     {...attachmentDropzoneParams}
+                    kind="EXPENSE_ITEM"
                     data-cy={`${field.name}-dropzone`}
                     name={field.name}
                     isMulti={false}

@@ -107,6 +107,7 @@ const Comment = ({
               <HTMLContent content={comment.html} fontSize="13px" data-cy="comment-body" />
             ) : (
               <RichTextEditor
+                kind="COMMENT"
                 defaultValue={comment.html}
                 onChange={e => setValue(e.target.value)}
                 fontSize="13px"
