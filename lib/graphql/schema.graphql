@@ -175,10 +175,10 @@ interface CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -291,7 +291,7 @@ type UserDetails {
   hasTwoFactorAuth: Boolean
 
   """
-  Has the account a password set? For authenticated user: scope: "account".
+  Has the account a password set?
   """
   hasPassword: Boolean
   isRoot: Boolean!
@@ -2354,14 +2354,14 @@ type Collective implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -2607,14 +2607,14 @@ type Event implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -2860,14 +2860,14 @@ type Fund implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -3113,14 +3113,14 @@ type Organization implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -3367,14 +3367,14 @@ type Project implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -3862,14 +3862,14 @@ type User implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -4117,14 +4117,14 @@ type Vendor implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -4771,10 +4771,10 @@ input CollectiveInputType {
   name: String
   legalName: String
   company: String
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLinkInput!]
   description: String
   longDescription: String
@@ -4950,10 +4950,10 @@ input CollectiveAttributesInputType {
   description: String
   longDescription: String
   expensePolicy: String
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   location: LocationInputType
   startsAt: String
   endsAt: String
@@ -4991,10 +4991,10 @@ input UserInputType {
   image: String
   username: String @deprecated(reason: "2022-01-13: Not used anymore. Will be ignored")
   description: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   newsletterOptIn: Boolean
   location: LocationInputType
 }
