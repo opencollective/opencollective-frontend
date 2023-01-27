@@ -237,6 +237,12 @@ export const ActivityDescriptionI18n = defineMessages({
   USER_PASSWORD_SET: {
     defaultMessage: 'Changed password',
   },
+  TWO_FACTOR_CODE_ADDED: {
+    defaultMessage: 'Two factor authentication added',
+  },
+  TWO_FACTOR_CODE_DELETED: {
+    defaultMessage: 'Two factor authentication removed',
+  },
   // Gift cards
   USER_CARD_CLAIMED: {
     defaultMessage: 'Claimed a gift card from <FromAccount></FromAccount>',
