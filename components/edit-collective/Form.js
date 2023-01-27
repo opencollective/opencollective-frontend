@@ -537,7 +537,7 @@ class EditCollectiveForm extends React.Component {
 
       // 2FA
       case EDIT_COLLECTIVE_SECTIONS.USER_SECURITY:
-        return <UserSecurity slug={collective.slug} userEmail={LoggedInUser.email} />;
+        return <UserSecurity slug={collective.slug} />;
 
       // Payment Receipts
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS:
