@@ -31,6 +31,10 @@ exports.REWRITES = [
     destination: '/signinLinkSent',
   },
   {
+    source: '/reset-password/sent',
+    destination: '/resetPasswordLinkSent',
+  },
+  {
     source: '/oauth/authorize',
     destination: '/oauth/authorize',
   },
