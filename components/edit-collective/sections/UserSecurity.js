@@ -290,6 +290,8 @@ class UserSecurity extends React.Component {
               />
             )}
           </P>
+
+          {/* We're adding a hidden email field to helper password managers remember the credentials */}
           <StyledInput
             style={{ display: 'none' }}
             id="email"
