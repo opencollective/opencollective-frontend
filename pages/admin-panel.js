@@ -175,7 +175,7 @@ const AdminPanelPage = () => {
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   const titleBase = !LoggedInUser
-    ? 'Sign In' // intl.formatMessage({ id: 'signIn', defaultMessage: 'Sign In' }) 1password works better in english
+    ? 'Open Collective - Sign In' // 1password works better with this
     : account?.isHost
     ? intl.formatMessage({ id: 'AdminPanel.button', defaultMessage: 'Admin' })
     : intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' });

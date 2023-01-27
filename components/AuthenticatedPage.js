@@ -42,6 +42,8 @@ class AuthenticatedPage extends React.Component {
     loadingLoggedInUser: PropTypes.bool,
     /** @ignore from withUser */
     LoggedInUser: PropTypes.object,
+    /* Title for the page */
+    title: PropTypes.string,
   };
 
   renderContent(loadingLoggedInUser, LoggedInUser) {
@@ -84,8 +86,10 @@ class AuthenticatedPage extends React.Component {
   render() {
     const { LoggedInUser, loadingLoggedInUser, ...pageProps } = this.props;
 
+    const title = !title ? null : LoggedInUser ? this.props.title : `${this.props.title} - Open Collective - Sign In`; // 1password works better with this
+
     return (
-      <Page noRobots {...pageProps}>
+      <Page noRobots {...pageProps} title={title}>
         {this.renderContent(loadingLoggedInUser, LoggedInUser)}
       </Page>
     );

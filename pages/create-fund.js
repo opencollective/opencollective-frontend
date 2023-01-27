@@ -6,13 +6,13 @@ import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
-const CreateFundPage = ({ loadingLoggedInUser }) => {
+const CreateFundPage = ({ loadingLoggedInUser, LoggedInUser }) => {
   if (loadingLoggedInUser) {
     return <ErrorPage loading={true} />;
   }
 
   return (
-    <Page>
+    <Page title={LoggedInUser ? null : 'Open Collective - Sign In'}>
       <CreateFund />
     </Page>
   );
@@ -20,6 +20,7 @@ const CreateFundPage = ({ loadingLoggedInUser }) => {
 
 CreateFundPage.propTypes = {
   loadingLoggedInUser: PropTypes.bool.isRequired,
+  LoggedInUser: PropTypes.object.isRequired,
 };
 
 export default withUser(CreateFundPage);

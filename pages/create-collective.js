@@ -50,7 +50,7 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
   }
 
   return (
-    <Page showFooter={Boolean(LoggedInUser)}>
+    <Page showFooter={Boolean(LoggedInUser)} title={LoggedInUser ? null : 'Open Collective - Sign In'}>
       <CreateCollective host={data && data.host} />
     </Page>
   );
