@@ -691,6 +691,11 @@ enum SocialLinkType {
   GITLAB
   GIT
   WEBSITE
+  DISCOURSE
+  PIXELFED
+  GHOST
+  PEERTUBE
+  TIKTOK
 }
 
 enum ImageFormat {
