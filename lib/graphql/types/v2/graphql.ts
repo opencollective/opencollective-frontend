@@ -744,6 +744,7 @@ export enum ActivityAndClassesType {
   USER_CHANGE_EMAIL = 'USER_CHANGE_EMAIL',
   USER_CREATED = 'USER_CREATED',
   USER_NEW_TOKEN = 'USER_NEW_TOKEN',
+  USER_PASSWORD_SET = 'USER_PASSWORD_SET',
   USER_PAYMENT_METHOD_CREATED = 'USER_PAYMENT_METHOD_CREATED',
   VIRTUAL_CARDS = 'VIRTUAL_CARDS',
   VIRTUAL_CARD_CHARGE_DECLINED = 'VIRTUAL_CARD_CHARGE_DECLINED',
@@ -880,6 +881,7 @@ export enum ActivityType {
   USER_CHANGE_EMAIL = 'USER_CHANGE_EMAIL',
   USER_CREATED = 'USER_CREATED',
   USER_NEW_TOKEN = 'USER_NEW_TOKEN',
+  USER_PASSWORD_SET = 'USER_PASSWORD_SET',
   USER_PAYMENT_METHOD_CREATED = 'USER_PAYMENT_METHOD_CREATED',
   VIRTUAL_CARD_CHARGE_DECLINED = 'VIRTUAL_CARD_CHARGE_DECLINED',
   VIRTUAL_CARD_PURCHASE = 'VIRTUAL_CARD_PURCHASE',
@@ -1704,12 +1706,8 @@ export type CollectiveFeatures = {
 export type Comment = {
   __typename?: 'Comment';
   account?: Maybe<Account>;
-  /** @deprecated 2020-02-25: Please use account */
-  collective?: Maybe<Account>;
   createdAt?: Maybe<Scalars['DateTime']>;
   fromAccount?: Maybe<Account>;
-  /** @deprecated 2020-02-25: Please use fromAccount */
-  fromCollective?: Maybe<Account>;
   html?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
   /** Returns a map of reactions counts for this comment */
@@ -1912,15 +1910,11 @@ export type Conversation = {
   account?: Maybe<Account>;
   /** The root comment / starter for this conversation */
   body?: Maybe<Comment>;
-  /** @deprecated 2022-09-14: Please use account */
-  collective?: Maybe<Account>;
   /** List the comments for this conversation. Not backed by a loader, don't use this in lists. */
   comments: CommentCollection;
   createdAt: Scalars['DateTime'];
   followers: AccountCollection;
   fromAccount?: Maybe<Account>;
-  /** @deprecated 2022-09-14: Please use fromAccount */
-  fromCollective?: Maybe<Account>;
   id: Scalars['String'];
   slug: Scalars['String'];
   stats?: Maybe<ConversationStats>;
@@ -3656,11 +3650,6 @@ export type ExpenseStats = {
   __typename?: 'ExpenseStats';
   /** The daily average paid in expenses */
   dailyAverageAmount: Amount;
-  /**
-   * The total number of expenses over time
-   * @deprecated 2022-04-21: Please use hostMetricsTimeSeries.totalSpent
-   */
-  expenseAmountOverTime?: Maybe<TimeSeriesAmount>;
   /** The total number of expenses */
   expensesCount: Scalars['Int'];
   /** Number of grants */
@@ -4699,6 +4688,8 @@ export type Individual = Account & {
   features: CollectiveFeatures;
   /** @deprecated 2022-06-03: Please use repositoryUrl */
   githubHandle?: Maybe<Scalars['String']>;
+  /** Has the account a password set? For authenticated user: scope: "account". */
+  hasPassword?: Maybe<Scalars['Boolean']>;
   hasSeenLatestChangelogEntry: Scalars['Boolean'];
   hasTwoFactorAuth?: Maybe<Scalars['Boolean']>;
   /** If the individual is a host account, this will return the matching Host object */
@@ -5336,6 +5327,8 @@ export type Mutation = {
   setEmailNotification?: Maybe<ActivitySubscription>;
   /** Update newsletter opt-in preference. Scope: "account". */
   setNewsletterOptIn: Individual;
+  /** Set password to Individual. Scope: "account". 2FA. */
+  setPassword: Individual;
   /** Adds or removes a policy on a given account. Scope: "account". */
   setPolicies: Account;
   /** Unpublish update. Scope: "updates". */
@@ -5971,6 +5964,13 @@ export type MutationSetEmailNotificationArgs = {
 /** This is the root mutation */
 export type MutationSetNewsletterOptInArgs = {
   newsletterOptIn: Scalars['Boolean'];
+};
+
+
+/** This is the root mutation */
+export type MutationSetPasswordArgs = {
+  currentPassword?: InputMaybe<Scalars['String']>;
+  password: Scalars['String'];
 };
 
 

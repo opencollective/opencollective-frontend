@@ -92,6 +92,7 @@
     "react-flip-move": "3.0.5",
     "react-geosuggest": "2.14.1",
     "react-intl": "6.2.5",
+    "react-password-strength-bar": "0.4.1",
     "react-popper": "2.3.0",
     "react-scrollchor": "7.0.2",
     "react-select": "5.5.9",

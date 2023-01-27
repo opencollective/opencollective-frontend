@@ -7,11 +7,13 @@ import { Info } from '@styled-icons/feather/Info';
 import { saveAs } from 'file-saver';
 import { Field, Form, Formik } from 'formik';
 import { get } from 'lodash';
+import dynamic from 'next/dynamic';
 import QRCode from 'qrcode.react';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import speakeasy from 'speakeasy';
 import styled from 'styled-components';
 
+import ROLES from '../../../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { compose } from '../../../lib/utils';
@@ -30,7 +32,11 @@ import StyledInputField from '../../StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import StyledTooltip from '../../StyledTooltip';
 import { H3, P } from '../../Text';
+import { TOAST_TYPE, withToasts } from '../../ToastProvider';
 import { withUser } from '../../UserProvider';
+
+// Dynamic imports
+const PasswordStrengthBar = dynamic(() => import('react-password-strength-bar'));
 
 const messages = defineMessages({
   errorWrongLength: {
@@ -76,19 +82,27 @@ const Code = styled.code`
   max-width: 350px;
 `;
 
-class UserTwoFactorAuth extends React.Component {
+class UserSecurity extends React.Component {
   static propTypes = {
     /** From intl */
     intl: PropTypes.object.isRequired,
     /** From graphql query */
+    setPassword: PropTypes.func.isRequired,
     addTwoFactorAuthTokenToIndividual: PropTypes.func.isRequired,
     removeTwoFactorAuthTokenFromIndividual: PropTypes.func.isRequired,
     /** From withUser */
+    LoggedInUser: PropTypes.shape({
+      isRoot: PropTypes.bool.isRequired,
+      hasPassword: PropTypes.bool.isRequired,
+      hasRole: PropTypes.func.isRequired,
+    }),
     refetchLoggedInUser: PropTypes.func.isRequired,
     data: PropTypes.shape({
       individual: PropTypes.object,
       loading: PropTypes.bool,
     }),
+    /** From withToasts */
+    addToast: PropTypes.func.isRequired,
     /** From parent component */
     slug: PropTypes.string,
     userEmail: PropTypes.string,
@@ -103,10 +117,18 @@ class UserTwoFactorAuth extends React.Component {
       recoveryCodes: null,
       enablingTwoFactorAuth: false,
       showRecoveryCodesModal: false,
+      /* Password management state */
+      passwordLoading: false,
+      passwordError: null,
+      currentPassword: '',
+      password: '',
+      passwordKey: 1,
+      passwordScore: null,
     };
 
     this.enableTwoFactorAuth = this.enableTwoFactorAuth.bind(this);
     this.disableTwoFactorAuth = this.disableTwoFactorAuth.bind(this);
+    this.setPassword = this.setPassword.bind(this);
   }
 
   componentDidMount() {
@@ -143,7 +165,7 @@ class UserTwoFactorAuth extends React.Component {
 
       // if not verified, ask the user to try again
       if (!verified) {
-        this.setState({ error: 'Secret not verified. Please try again.' });
+        this.setState({ error: '2FA token not verified. Please try again.' });
       }
 
       // if ok, send secret to backend
@@ -194,6 +216,151 @@ class UserTwoFactorAuth extends React.Component {
     }
   }
 
+  async setPassword() {
+    const { password, passwordKey, currentPassword, passwordScore } = this.state;
+
+    if (password === currentPassword) {
+      this.setState({
+        passwordError: <FormattedMessage defaultMessage="Password can't be the same as current password" />,
+      });
+      return;
+    }
+
+    if (passwordScore <= 1) {
+      this.setState({
+        passwordError: (
+          <FormattedMessage defaultMessage="Password is too weak. Try to use more characters or use a password manager to generate a strong one." />
+        ),
+      });
+      return;
+    }
+
+    try {
+      this.setState({ passwordLoading: true });
+      await this.props.setPassword({
+        variables: { password, currentPassword },
+      });
+      await this.props.refetchLoggedInUser();
+      this.setState({
+        currentPassword: '',
+        password: '',
+        passwordError: null,
+        passwordScore: null,
+        passwordLoading: false,
+        passwordKey: Number(passwordKey) + 1,
+      });
+      this.props.addToast({
+        type: TOAST_TYPE.SUCCESS,
+        message: this.props.LoggedInUser.hasPassword ? (
+          <FormattedMessage defaultMessage="Password successfully updated" />
+        ) : (
+          <FormattedMessage defaultMessage="Password successfully set" />
+        ),
+      });
+    } catch (e) {
+      this.setState({ passwordError: e.message, passwordLoading: false });
+    }
+  }
+
+  renderPasswordManagement() {
+    const { LoggedInUser } = this.props;
+    const { password, passwordError, passwordLoading, passwordKey, currentPassword } = this.state;
+
+    return (
+      <Fragment>
+        <H3 fontSize="18px" fontWeight="700" mb={2}>
+          <FormattedMessage id="Password" defaultMessage="Password" />
+        </H3>
+        {passwordError && (
+          <MessageBox type="error" withIcon my={2} data-cy="password-error">
+            {passwordError}
+          </MessageBox>
+        )}
+        <Container mb="4">
+          <P py={2} mb={2}>
+            {LoggedInUser.hasPassword ? (
+              <FormattedMessage
+                id="Password.Change.Info"
+                defaultMessage="You already have a password set, you can change it using the following form."
+              />
+            ) : (
+              <FormattedMessage
+                id="Password.Set.Info"
+                defaultMessage="Setting a password is optional but can be useful if you're using a password manager."
+              />
+            )}
+          </P>
+
+          {LoggedInUser.hasPassword && (
+            <StyledInputField
+              label={<FormattedMessage defaultMessage="Current Password" />}
+              labelFontWeight="bold"
+              htmlFor="current-password"
+              mb={2}
+              width="100%"
+            >
+              <StyledInput
+                key={`current-password-${passwordKey}`}
+                fontSize="14px"
+                id="current-password"
+                autoComplete="current-password"
+                name="current-password"
+                type="password"
+                required
+                onChange={e => {
+                  this.setState({ passwordError: null, currentPassword: e.target.value });
+                }}
+              />
+            </StyledInputField>
+          )}
+
+          <StyledInputField
+            label={<FormattedMessage defaultMessage="New Password" />}
+            labelFontWeight="bold"
+            htmlFor="new-password"
+            mt={2}
+            mb={2}
+            width="100%"
+          >
+            <StyledInput
+              key={`current-password-${passwordKey}`}
+              fontSize="14px"
+              id="new-password"
+              autoComplete="new-password"
+              type="password"
+              required
+              onChange={e => {
+                this.setState({ passwordError: null, password: e.target.value });
+              }}
+            />
+          </StyledInputField>
+
+          <PasswordStrengthBar
+            style={{ visibility: password ? 'visible' : 'hidden' }}
+            password={this.state.password}
+            onChangeScore={passwordScore => {
+              this.setState({ passwordScore });
+            }}
+          />
+
+          <StyledButton
+            my={2}
+            minWidth={140}
+            loading={passwordLoading}
+            disabled={!password || (LoggedInUser.hasPassword && !currentPassword)}
+            onClick={this.setPassword}
+          >
+            {LoggedInUser.hasPassword ? (
+              <FormattedMessage id="Security.UpdatePassword.Button" defaultMessage="Update Password" />
+            ) : (
+              <FormattedMessage id="Security.SetPassword.Button" defaultMessage="Set Password" />
+            )}
+          </StyledButton>
+        </Container>
+      </Fragment>
+    );
+  }
+
   render() {
     const { intl, data } = this.props;
     const {
@@ -235,8 +402,20 @@ class UserTwoFactorAuth extends React.Component {
       return errors;
     };
 
+    const canManagePassword =
+      this.props.LoggedInUser.hasPassword ||
+      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'opencollective' }) ||
+      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'opensource' }) ||
+      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'foundation' }) ||
+      process.env.OC_ENV !== 'production';
+
     return (
       <Flex flexDirection="column">
+        {canManagePassword && this.renderPasswordManagement()}
+
+        <H3 fontSize="18px" fontWeight="700" mb={2}>
+          <FormattedMessage id="TwoFactorAuth" defaultMessage="Two-factor authentication" />
+        </H3>
         {error && (
           <MessageBox type="error" withIcon my={2} data-cy="add-two-factor-auth-error">
             {error}
@@ -540,7 +719,6 @@ class UserTwoFactorAuth extends React.Component {
                                       placeholder="123456"
                                       pattern="[0-9]{6}"
                                       inputMode="numeric"
-                                      autoFocus
                                       minLength={6}
                                       maxLength={6}
                                       data-cy="add-two-factor-auth-totp-code-field"
@@ -588,9 +766,7 @@ const addTwoFactorAuthToIndividualMutation = gql`
     addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
       account {
         id
-        ... on Individual {
-          hasTwoFactorAuth
-        }
+        hasTwoFactorAuth
       }
       recoveryCodes
     }
@@ -601,9 +777,7 @@ const removeTwoFactorAuthFromIndividualMutation = gql`
   mutation RemoveTwoFactorAuthFromIndividual($account: AccountReferenceInput!, $code: String!) {
     removeTwoFactorAuthTokenFromIndividual(account: $account, code: $code) {
       id
-      ... on Individual {
-        hasTwoFactorAuth
-      }
+      hasTwoFactorAuth
     }
   }
 `;
@@ -619,9 +793,16 @@ const accountHasTwoFactorAuthQuery = gql`
       slug
       name
       type
-      ... on Individual {
-        hasTwoFactorAuth
-      }
+      hasTwoFactorAuth
+    }
+  }
+`;
+
+const setPasswordMutation = gql`
+  mutation SetPassword($password: String!, $currentPassword: String) {
+    setPassword(password: $password, currentPassword: $currentPassword) {
+      id
+      hasPassword
     }
   }
 `;
@@ -636,6 +817,10 @@ const addAccountHasTwoFactorAuthData = graphql(accountHasTwoFactorAuthQuery, {
 });
 
 const addGraphql = compose(
+  graphql(setPasswordMutation, {
+    name: 'setPassword',
+    options: { context: API_V2_CONTEXT },
+  }),
   graphql(addTwoFactorAuthToIndividualMutation, {
     name: 'addTwoFactorAuthTokenToIndividual',
     options: { context: API_V2_CONTEXT },
@@ -647,4 +832,4 @@ const addGraphql = compose(
   addAccountHasTwoFactorAuthData,
 );
 
-export default injectIntl(withUser(addGraphql(UserTwoFactorAuth)));
+export default injectIntl(withToasts(withUser(addGraphql(UserSecurity))));
