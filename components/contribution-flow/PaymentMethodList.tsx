@@ -29,7 +29,7 @@ const paymentMethodsQuery = gql`
     account(slug: $slug) {
       id
       paymentMethods(
-        type: [CREDITCARD, US_BANK_ACCOUNT, SEPA_DEBIT, GIFTCARD, PREPAID, COLLECTIVE]
+        type: [CREDITCARD, US_BANK_ACCOUNT, SEPA_DEBIT, BACS_DEBIT, GIFTCARD, PREPAID, COLLECTIVE]
         includeExpired: true
       ) {
         id
