@@ -176,6 +176,26 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
       value: SocialLinkType.SLACK.toString(),
       label: 'Slack',
     },
+    {
+      value: SocialLinkType.DISCOURSE.toString(),
+      label: 'Discourse',
+    },
+    {
+      value: SocialLinkType.PIXELFED.toString(),
+      label: 'Pixelfed',
+    },
+    {
+      value: SocialLinkType.GHOST.toString(),
+      label: 'Ghost',
+    },
+    {
+      value: SocialLinkType.PEERTUBE.toString(),
+      label: 'PeerTube',
+    },
+    {
+      value: SocialLinkType.TIKTOK.toString(),
+      label: 'TikTok',
+    },
   ];
 
   return (
