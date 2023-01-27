@@ -267,6 +267,7 @@
   "B5z1AU": "from {payee} to {account}",
   "B7p2EC": "Tajný klíč klienta",
   "Back": "Zpět",
+  "BacsDebit": "Bacs Debit",
   "BalanceAmount": "Zůstatek {balance}",
   "BankAccount": "Bankovní účet",
   "bankaccount.instructions.account": "Údaje o bankovním účtu, které jste přidali výše.",

@@ -267,6 +267,7 @@
   "B5z1AU": "from {payee} to {account}",
   "B7p2EC": "Client secret",
   "Back": "Enrere",
+  "BacsDebit": "Bacs Debit",
   "BalanceAmount": "Saldo {balance}",
   "BankAccount": "Compte bancari",
   "bankaccount.instructions.account": "The bank account details you added above.",
