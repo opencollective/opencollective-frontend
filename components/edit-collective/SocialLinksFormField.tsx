@@ -341,17 +341,17 @@ function SocialLinkItem({ value, error, index, onChange, onRemoveItem, onMoveIte
 
 const knownSocialLinkDomains = [
   { type: SocialLinkType.DISCORD, regexp: /^(https:\/\/)?discord.com/ },
-  { type: SocialLinkType.FACEBOOK, regexp: /^(https:\/\/)?(www.)?facebook.com/ },
+  { type: SocialLinkType.FACEBOOK, regexp: /^(https:\/\/)?(www\.)?facebook.com/ },
   { type: SocialLinkType.GITHUB, regexp: /^(https:\/\/)?github.com/ },
   { type: SocialLinkType.GITLAB, regexp: /^(https:\/\/)?gitlab.com/ },
-  { type: SocialLinkType.INSTAGRAM, regexp: /^(https:\/\/)?(www.)?instagram.com/ },
-  { type: SocialLinkType.LINKEDIN, regexp: /^(https:\/\/)?(www.)?linkedin.com/ },
+  { type: SocialLinkType.INSTAGRAM, regexp: /^(https:\/\/)?(www\.)?instagram.com/ },
+  { type: SocialLinkType.LINKEDIN, regexp: /^(https:\/\/)?(www\.)?linkedin.com/ },
   { type: SocialLinkType.MEETUP, regexp: /^(https:\/\/)?meetup.com/ },
   { type: SocialLinkType.SLACK, regexp: /^(https:\/\/)?[^.]+.?slack.com/ },
-  { type: SocialLinkType.TIKTOK, regexp: /^(https:\/\/)?(www.)?tiktok.com/ },
-  { type: SocialLinkType.TUMBLR, regexp: /^(https:\/\/)?[^.]+.?tumblr.com/ },
+  { type: SocialLinkType.TIKTOK, regexp: /^(https:\/\/)?(www\.)?tiktok.com/ },
+  { type: SocialLinkType.TUMBLR, regexp: /^(https:\/\/)?[^.]+\.?tumblr.com/ },
   { type: SocialLinkType.TWITTER, regexp: /^(https:\/\/)?twitter.com/ },
-  { type: SocialLinkType.YOUTUBE, regexp: /^(https:\/\/)?(www.)?youtube.com/ },
+  { type: SocialLinkType.YOUTUBE, regexp: /^(https:\/\/)?(www\.)?youtube.com/ },
 ];
 
 function typeFromUrl(url: string): SocialLinkType | null {
