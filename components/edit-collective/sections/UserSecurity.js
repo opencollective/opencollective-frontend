@@ -95,6 +95,7 @@ class UserSecurity extends React.Component {
       isRoot: PropTypes.bool.isRequired,
       hasPassword: PropTypes.bool.isRequired,
       hasRole: PropTypes.func.isRequired,
+      email: PropTypes.string.isRequired,
     }),
     refetchLoggedInUser: PropTypes.func.isRequired,
     data: PropTypes.shape({
@@ -105,7 +106,6 @@ class UserSecurity extends React.Component {
     addToast: PropTypes.func.isRequired,
     /** From parent component */
     slug: PropTypes.string,
-    userEmail: PropTypes.string,
   };
 
   constructor(props) {
@@ -144,7 +144,7 @@ class UserSecurity extends React.Component {
       issuer = '&issuer=Open%20Collective';
     }
     const options = {
-      name: this.props.userEmail,
+      name: this.props.LoggedInUser.email,
       length: 64,
     };
     const secret = speakeasy.generateSecret(options);
@@ -290,6 +290,16 @@ class UserSecurity extends React.Component {
               />
             )}
           </P>
+
+          {/* We're adding a hidden email field to helper password managers remember the credentials */}
+          <StyledInput
+            style={{ display: 'none' }}
+            id="email"
+            autoComplete="email"
+            name="email"
+            value={LoggedInUser.email}
+            type="email"
+          />
 
           {LoggedInUser.hasPassword && (
             <StyledInputField
