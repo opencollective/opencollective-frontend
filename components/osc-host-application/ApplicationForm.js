@@ -518,7 +518,6 @@ const ApplicationForm = ({
                               labelFontSize="16px"
                               labelProps={{ fontWeight: '600' }}
                               label={intl.formatMessage(messages.tagsLabel)}
-                              // required
                               data-cy="ccf-form-tags"
                             >
                               {({ field }) => (
