@@ -174,7 +174,9 @@ const AdminPanelPage = () => {
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
-  const titleBase = account?.isHost
+  const titleBase = !LoggedInUser
+    ? 'Sign In' // intl.formatMessage({ id: 'signIn', defaultMessage: 'Sign In' }) 1password works better in english
+    : account?.isHost
     ? intl.formatMessage({ id: 'AdminPanel.button', defaultMessage: 'Admin' })
     : intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' });
 
