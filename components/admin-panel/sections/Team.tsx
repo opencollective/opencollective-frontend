@@ -41,18 +41,12 @@ import { AdminSectionProps } from '../types';
 
 const MemberContainer = styled(Container)`
   display: block;
-  height: 100%;
-  min-height: 232px;
   min-width: 164px;
   background: white;
   width: 170px;
+  height: 270px;
   border-radius: 8px;
   border: 1px solid #c0c5cc;
-`;
-
-const TagContainer = styled(Box)`
-  position: absolute;
-  bottom: 16%;
 `;
 
 const InviteNewCard = styled(MemberContainer)`
@@ -221,16 +215,18 @@ const MemberCard = ({ member, account, index, nbAdmins, refetch }: MemberCardPro
           <FormattedMessage id="user.since.label" defaultMessage="Since" />:{' '}
           <FormattedDate value={get(member, 'since')} />
         </P>
-        <Box mb={5} overflow="hidden" height={32}>
-          <P fontSize="11px" lineHeight="16px" mx={2} fontWeight={400}>
-            {truncate(get(member, 'description'), {
-              length: 30,
-            })}
-          </P>
-        </Box>
+        {!isInvitation && (
+          <Box mb={4} overflow="hidden" height={32}>
+            <P fontSize="11px" lineHeight="16px" mx={2} fontWeight={400}>
+              {truncate(get(member, 'description'), {
+                length: 30,
+              })}
+            </P>
+          </Box>
+        )}
         {isInvitation && (
           <React.Fragment>
-            <TagContainer>
+            <Box mb={4}>
               <StyledTooltip
                 content={
                   <FormattedMessage
@@ -249,7 +245,7 @@ const MemberCard = ({ member, account, index, nbAdmins, refetch }: MemberCardPro
                   <FormattedMessage id="Pending" defaultMessage="Pending" />
                 </StyledTag>
               </StyledTooltip>
-            </TagContainer>
+            </Box>
             <ResendMemberInviteBtn member={member} collective={account} />
           </React.Fragment>
         )}
@@ -271,7 +267,14 @@ const ChildrenCollectiveSection = ({ account, refetch }: ChildrenCollectiveSecti
           {account.name}
         </P>
       </Box>
-      <Grid mt={3} gridGap={20} gridTemplateColumns="repeat(auto-fill, 164px)" flexGrow="1" gap="2px">
+      <Grid
+        mt={3}
+        gridGap={20}
+        gridTemplateColumns="repeat(auto-fill, 164px)"
+        flexGrow="1"
+        gap="2px"
+        justifyContent={['center', null, 'start']}
+      >
         {account.members.nodes.map((m: Member & MemberInvitation, idx) => (
           <MemberCard key={`${m.id}-${account.id}`} index={idx} member={m} account={account} refetch={refetch} />
         ))}
@@ -363,7 +366,14 @@ const Team = (props: AdminSectionProps) => {
         </P>
       </Box>
 
-      <Grid mt={4} gridGap={20} gridTemplateColumns="repeat(auto-fill, 164px)" flexGrow="1" gap="2px">
+      <Grid
+        mt={4}
+        gridGap={20}
+        gridTemplateColumns="repeat(auto-fill, 164px)"
+        flexGrow="1"
+        gap="2px"
+        justifyContent={['center', null, 'start']}
+      >
         <InviteNewCard>
           <Flex alignItems="center" justifyContent="center" height="100%" onClick={() => setShowInviteModal(true)}>
             <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100%">
