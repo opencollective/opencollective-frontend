@@ -29,13 +29,13 @@ export const EDIT_COLLECTIVE_SECTIONS = {
   PAYMENT_RECEIPTS: 'payment-receipts',
   TICKETS: 'tickets',
   TIERS: 'tiers',
-  TIERS_REVAMP: 'tiers-revamp',
+  TIERS_LEGACY: 'tiers-legacy',
   GIFT_CARDS: 'gift-cards',
   AUTHORIZED_APPS: 'authorized-apps',
   FOR_DEVELOPERS: 'for-developers',
   WEBHOOKS: 'webhooks',
   PENDING_ORDERS: 'pending-orders',
-  TWO_FACTOR_AUTH: 'two-factor-auth',
+  USER_SECURITY: 'user-security',
   ACTIVITY_LOG: 'activity-log', // Last on purpose
   ADVANCED: 'advanced', // Last on purpose
   VIRTUAL_CARDS: 'virtual-cards',
@@ -137,9 +137,9 @@ const SECTION_LABELS = defineMessages({
     id: 'section.tickets.title',
     defaultMessage: 'Tickets',
   },
-  [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: {
-    id: 'TwoFactorAuth',
-    defaultMessage: 'Two-factor authentication',
+  [EDIT_COLLECTIVE_SECTIONS.USER_SECURITY]: {
+    id: 'Security',
+    defaultMessage: 'Security',
   },
   [EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS]: {
     id: 'editCollective.menu.paymentReceipts',
@@ -204,7 +204,7 @@ const sectionsDisplayConditions = {
     isOneOfTypes(c, COLLECTIVE, FUND, EVENT, PROJECT) || (c.type === ORGANIZATION && c.isActive),
   [EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS]: c => isType(c, ORGANIZATION) || c.createdGiftCards.total > 0,
   [EDIT_COLLECTIVE_SECTIONS.ADVANCED]: () => true,
-  [EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH]: c => isType(c, USER),
+  [EDIT_COLLECTIVE_SECTIONS.USER_SECURITY]: c => isType(c, USER),
   // Fiscal Host
   [EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING]: () => false,
   [EDIT_COLLECTIVE_SECTIONS.INVOICES_RECEIPTS]: () => false,

@@ -8,6 +8,7 @@ import Image from './Image';
 import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
+import StyledInputField from './StyledInputField';
 import StyledLink from './StyledLink';
 import StyledLinkButton from './StyledLinkButton';
 import { Span } from './Text';
@@ -27,12 +28,18 @@ export default class SignIn extends React.Component {
     showSecondaryAction: PropTypes.bool,
     /** Set this to true to display the unknown email message */
     unknownEmail: PropTypes.bool,
+    /** Set this to true to display the password field */
+    passwordRequired: PropTypes.bool,
     /** Label, defaults to "Continue with your email" */
     label: PropTypes.node,
     /** Set the value of email input */
     email: PropTypes.string.isRequired,
+    /** Set the value of password input */
+    password: PropTypes.string,
     /** handles changes in the email input */
     onEmailChange: PropTypes.func.isRequired,
+    /** handles changes in the password input */
+    onPasswordChange: PropTypes.func.isRequired,
     /** Oauth Sign In **/
     isOAuth: PropTypes.bool,
     /** Oauth App Name **/
@@ -106,7 +113,7 @@ export default class SignIn extends React.Component {
   }
 
   render() {
-    const { onSubmit, loading, email, onEmailChange, label } = this.props;
+    const { onSubmit, loading, email, password, onEmailChange, onPasswordChange, label } = this.props;
     const { error, showError } = this.state;
     return (
       <React.Fragment>
@@ -150,9 +157,6 @@ export default class SignIn extends React.Component {
           )}
           {!this.state.unknownEmail ? (
             <React.Fragment>
-              <Container fontWeight={600} fontSize="13px" alignItems="left" mb="4px" width="100%">
-                <FormattedMessage id="Form.yourEmail" defaultMessage="Your email address" />
-              </Container>
               <Container
                 as="form"
                 method="POST"
@@ -163,41 +167,98 @@ export default class SignIn extends React.Component {
                   if (error) {
                     return;
                   }
-                  onSubmit(email);
+                  onSubmit();
                   this.setState({ unknownEmail: this.props.unknownEmail });
                 }}
               >
-                <StyledInput
-                  error={!!error}
-                  fontSize="14px"
-                  id="email"
-                  name="email"
-                  minWidth={120}
-                  onChange={({ target }) => {
-                    target.value = target.value.trim();
-                    onEmailChange(target.value);
-                    this.setState({ error: target.validationMessage, showError: false });
-                  }}
-                  onKeyDown={e => {
-                    // See https://github.com/facebook/react/issues/6368
-                    if (e.key === ' ') {
-                      e.preventDefault();
-                    } else if (e.key === 'Enter') {
-                      onEmailChange(e.target.value);
-                      this.setState({ error: e.target.validationMessage, showError: true });
-                    }
-                  }}
-                  onBlur={() => this.setState({ showError: true })}
-                  onInvalid={event => {
-                    event.preventDefault();
-                    this.setState({ error: event.target.validationMessage });
-                  }}
-                  placeholder="e.g., yourname@yourhost.com"
-                  required
-                  value={email}
-                  type="email"
-                  width={1}
-                />
+                <StyledInputField
+                  style={{ display: this.props.passwordRequired ? 'none' : 'block' }}
+                  labelFontWeight={600}
+                  labelFontSize="13px"
+                  alignItems="left"
+                  width="100%"
+                  label={<FormattedMessage id="Form.yourEmail" defaultMessage="Your email address" />}
+                  htmlFor="email"
+                  my={2}
+                >
+                  <StyledInput
+                    error={!!error}
+                    fontSize="14px"
+                    id="email"
+                    autoComplete="email"
+                    name="email"
+                    minWidth={120}
+                    onChange={({ target }) => {
+                      target.value = target.value.trim();
+                      onEmailChange(target.value);
+                      this.setState({ error: target.validationMessage, showError: false });
+                    }}
+                    onKeyDown={e => {
+                      // See https://github.com/facebook/react/issues/6368
+                      if (e.key === ' ') {
+                        e.preventDefault();
+                      } else if (e.key === 'Enter') {
+                        onEmailChange(e.target.value);
+                        this.setState({ error: e.target.validationMessage, showError: true });
+                      }
+                    }}
+                    onBlur={() => this.setState({ showError: true })}
+                    onInvalid={event => {
+                      event.preventDefault();
+                      this.setState({ error: event.target.validationMessage });
+                    }}
+                    placeholder="e.g., yourname@yourhost.com"
+                    autoFocus
+                    required
+                    value={email}
+                    type="email"
+                    width={1}
+                  />
+                </StyledInputField>
+                <StyledInputField
+                  style={{ display: this.props.passwordRequired ? 'block' : 'none' }}
+                  labelFontWeight={600}
+                  labelFontSize="13px"
+                  alignItems="left"
+                  width="100%"
+                  label={<FormattedMessage id="Form.yourPassword" defaultMessage="Your password" />}
+                  htmlFor="password"
+                  my={2}
+                >
+                  <StyledInput
+                    key={this.props.passwordRequired ? 'required' : 'initial'}
+                    fontSize="14px"
+                    id="password"
+                    name="password"
+                    autoComplete="current-password"
+                    type="password"
+                    width={1}
+                    value={password}
+                    autoFocus={this.props.passwordRequired ? true : false}
+                    required={this.props.passwordRequired ? true : false}
+                    onChange={({ target }) => {
+                      if (!this.props.passwordRequired) {
+                        return;
+                      }
+                      onPasswordChange(target.value);
+                      this.setState({ error: target.validationMessage, showError: false });
+                    }}
+                    onKeyDown={e => {
+                      // See https://github.com/facebook/react/issues/6368
+                      if (e.key === ' ') {
+                        e.preventDefault();
+                      } else if (e.key === 'Enter') {
+                        onPasswordChange(e.target.value);
+                        this.setState({ error: e.target.validationMessage, showError: true });
+                      }
+                    }}
+                    onBlur={() => this.setState({ showError: true })}
+                    onInvalid={event => {
+                      event.preventDefault();
+                      this.setState({ error: event.target.validationMessage });
+                    }}
+                  />
+                </StyledInputField>
                 {error && showError && (
                   <Span display="block" color="red.500" pt={2} fontSize="10px" lineHeight="14px" aria-live="assertive">
                     {error}
@@ -219,13 +280,32 @@ export default class SignIn extends React.Component {
                 </Flex>
               </Container>
 
-              {this.props.showSecondaryAction && (
+              {this.props.showSecondaryAction && !this.props.passwordRequired && (
                 <Box>
                   <Flex color="black.800" mr={1} fontSize="14px" justifyContent="center">
                     <FormattedMessage defaultMessage="Don't have one?" />
                   </Flex>
                   <Flex fontSize="14px" justifyContent="center" mt={2}>
                     {this.renderSecondaryAction(<FormattedMessage defaultMessage="Create an account" />)}
+                  </Flex>
+                </Box>
+              )}
+
+              {this.props.passwordRequired && (
+                <Box>
+                  <Flex color="black.800" mr={1} fontSize="14px" justifyContent="center">
+                    <FormattedMessage defaultMessage="Want to receive a login link instead?" />
+                  </Flex>
+                  <Flex fontSize="14px" justifyContent="center" mt={2}>
+                    <StyledLinkButton
+                      fontSize="14px"
+                      onClick={() => onSubmit({ sendLink: true })}
+                      disabled={loading}
+                      data-cy="signin-secondary-action-btn"
+                      underlineOnHover
+                    >
+                      <FormattedMessage defaultMessage="Yes, send me an email" />
+                    </StyledLinkButton>
                   </Flex>
                 </Box>
               )}

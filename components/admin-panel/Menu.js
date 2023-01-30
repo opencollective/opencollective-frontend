@@ -38,11 +38,6 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
       {!isAccountantOnly && (
         <React.Fragment>
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} />
-          <MenuLink
-            collective={collective}
-            section={COLLECTIVE_SECTIONS.TIERS_REVAMP}
-            if={['development', 'staging'].includes(process.env.OC_ENV)}
-          />
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
           <MenuLink collective={collective} section={ALL_SECTIONS.WEBHOOKS} />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
@@ -194,21 +189,13 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={COLLECTIVE_SECTIONS.TIERS}
             if={isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT])}
           />
-          <MenuLink
-            collective={collective}
-            section={COLLECTIVE_SECTIONS.TIERS_REVAMP}
-            if={
-              ['development', 'staging'].includes(process.env.OC_ENV) &&
-              isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT])
-            }
-          />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.WEBHOOKS} />
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.AUTHORIZED_APPS}
             if={isType(collective, USER)}
           />
-          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH} if={isIndividual} />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.USER_SECURITY} if={isIndividual} />
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS}

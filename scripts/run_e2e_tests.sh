@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "> Starting maildev server"
-npx maildev@2.0.4 &
+npx maildev@2.0.5 &
 MAILDEV_PID=$!
 
 echo "> Starting api server"

@@ -17,7 +17,7 @@ If you see a step below that could be improved (or is outdated), please update t
 
 ### Prerequisite
 
-1. Make sure you have Node.js version 16.x and NPM version 8.x.
+1. Make sure you have Node.js version 18.x and NPM version 8.x.
 
 - We recommend using [nvm](https://github.com/creationix/nvm): `nvm install && nvm use`.
 
@@ -68,7 +68,7 @@ To update:
 
 ## Styleguide
 
-We use [Storybook](https://storybook.js.org/docs/react/get-started/introduction) to develop and document our React components in isolation with [styled-components](https://www.styled-components.com/) and [styled-system](https://jxnblk.com/styled-system/).
+We use [Storybook](https://storybook.js.org/docs/react/get-started/introduction) to develop and document our React components in isolation with [styled-components](https://www.styled-components.com/) and [styled-system](https://styled-system.com/).
 
 More info: [docs/styleguide.md](docs/styleguide.md)
 

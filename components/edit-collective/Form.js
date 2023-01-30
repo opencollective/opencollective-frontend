@@ -14,6 +14,7 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
+import { isValidUrl } from '../../lib/utils';
 
 import ActivityLog from '../admin-panel/sections/ActivityLog';
 import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
@@ -52,13 +53,14 @@ import Security from './sections/Security';
 import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
-import TiersRevamp from './sections/TiersRevamp';
-import UserTwoFactorAuth from './sections/UserTwoFactorAuth';
+import TiersLegacy from './sections/TiersLegacy';
+import UserSecurity from './sections/UserSecurity';
 import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
 import { EDIT_COLLECTIVE_SECTIONS } from './Menu';
+import SocialLinksFormField from './SocialLinksFormField';
 
 const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, USER } = CollectiveType;
 
@@ -286,6 +288,7 @@ class EditCollectiveForm extends React.Component {
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
     collective.tos = get(collective, 'settings.tos');
 
+    // TODO Remove this once tier legacy is removed
     const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
     const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
 
@@ -296,6 +299,7 @@ class EditCollectiveForm extends React.Component {
       tickets: tickets.length === 0 ? [] : tickets,
       validStartDate: true,
       validEndDate: true,
+      isValidSocialLinks: true,
     };
   }
 
@@ -342,6 +346,11 @@ class EditCollectiveForm extends React.Component {
           collective.endsAt = convertDateToApiUtc(convertDateFromApiUtc(endsAt, timezone), value);
           collective.timezone = value;
         }
+      } else if (fieldname === 'socialLinks') {
+        const isValid = value?.filter(l => !isValidUrl(l.url))?.length === 0;
+
+        this.setState({ isValidSocialLinks: isValid });
+        set(collective, 'socialLinks', value);
       } else {
         set(collective, fieldname, value);
       }
@@ -418,9 +427,9 @@ class EditCollectiveForm extends React.Component {
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS:
         return <PaymentMethods collectiveSlug={collective.slug} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.TIERS:
+      case EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY:
         return (
-          <Tiers
+          <TiersLegacy
             title="Tiers"
             types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
             tiers={this.state.tiers}
@@ -431,19 +440,11 @@ class EditCollectiveForm extends React.Component {
           />
         );
 
-      case EDIT_COLLECTIVE_SECTIONS.TIERS_REVAMP:
-        return <TiersRevamp collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
+      case EDIT_COLLECTIVE_SECTIONS.TIERS:
+        return <Tiers collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
 
       case EDIT_COLLECTIVE_SECTIONS.TICKETS:
-        return (
-          <Tickets
-            title="Tickets"
-            tiers={this.state.tickets}
-            collective={collective}
-            currency={collective.currency}
-            onChange={tickets => this.setState({ tickets, modified: true })}
-          />
-        );
+        return <Tickets collective={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS:
         return <GiftCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
@@ -493,7 +494,7 @@ class EditCollectiveForm extends React.Component {
         return <AuthorizedApps />;
 
       case EDIT_COLLECTIVE_SECTIONS.FOR_DEVELOPERS:
-        return <ForDevelopers accountSlug={collective.slug} />;
+        return <ForDevelopers account={collective} />;
 
       case EDIT_COLLECTIVE_SECTIONS.ACTIVITY_LOG:
         return <ActivityLog accountSlug={collective.slug} />;
@@ -535,8 +536,8 @@ class EditCollectiveForm extends React.Component {
         return <Security collective={collective} />;
 
       // 2FA
-      case EDIT_COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH:
-        return <UserTwoFactorAuth slug={collective.slug} userEmail={LoggedInUser.email} />;
+      case EDIT_COLLECTIVE_SECTIONS.USER_SECURITY:
+        return <UserSecurity slug={collective.slug} />;
 
       // Payment Receipts
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS:
@@ -569,28 +570,38 @@ class EditCollectiveForm extends React.Component {
     const taxes = getApplicableTaxesForCountry(country);
 
     if (taxes.includes(TaxType.VAT)) {
+      const getVATOptions = () => {
+        const options = [
+          {
+            value: '',
+            label: intl.formatMessage(this.messages['VAT.None']),
+          },
+          {
+            value: VAT_OPTIONS.HOST,
+            label: intl.formatMessage(this.messages['VAT.Host']),
+          },
+        ];
+
+        return collective.isHost
+          ? options
+          : [
+              ...options,
+              {
+                value: VAT_OPTIONS.OWN,
+                label: intl.formatMessage(this.messages['VAT.Own']),
+              },
+            ];
+      };
+
       fields.push(
         {
           name: 'VAT',
           type: 'select',
-          defaultValue: get(collective, 'settings.VAT.type'),
+          defaultValue: get(collective, 'settings.VAT.type') || VAT_OPTIONS.HOST,
           when: () => {
-            return AccountTypesWithHost.includes(collective.type);
+            return collective.isHost || AccountTypesWithHost.includes(collective.type);
           },
-          options: [
-            {
-              value: '',
-              label: intl.formatMessage(this.messages['VAT.None']),
-            },
-            {
-              value: VAT_OPTIONS.HOST,
-              label: intl.formatMessage(this.messages['VAT.Host']),
-            },
-            {
-              value: VAT_OPTIONS.OWN,
-              label: intl.formatMessage(this.messages['VAT.Own']),
-            },
-          ],
+          options: getVATOptions(),
         },
         {
           name: 'VAT-number',
@@ -875,15 +886,25 @@ class EditCollectiveForm extends React.Component {
                       required={field.required}
                     />
                   ))}
+                  {section === 'info' && (
+                    <Box p={1}>
+                      <Box my="5px" fontWeight={700}>
+                        <FormattedMessage defaultMessage="Social Links" />
+                      </Box>
+                      <SocialLinksFormField
+                        value={this.state.collective?.socialLinks}
+                        touched={this.state.modified}
+                        onChange={value => this.handleChange('socialLinks', value)}
+                      />
+                    </Box>
+                  )}
                 </div>
               </div>
             )}
 
-            {[EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
-              this.renderSection(section)}
+            {[EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY].includes(section) && this.renderSection(section)}
 
-            {((fields && fields.length > 0) ||
-              [EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section)) && (
+            {((fields && fields.length > 0) || [EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY].includes(section)) && (
               <Container className="actions" margin="5rem auto 1rem" textAlign="center">
                 <StyledButton
                   buttonStyle="primary"
@@ -894,7 +915,8 @@ class EditCollectiveForm extends React.Component {
                     status === 'loading' ||
                     !this.state.modified ||
                     !this.state.validStartDate ||
-                    !this.state.validEndDate
+                    !this.state.validEndDate ||
+                    !this.state.isValidSocialLinks
                   }
                 >
                   {submitBtnLabel}
@@ -913,8 +935,7 @@ class EditCollectiveForm extends React.Component {
               </Container>
             )}
 
-            {![EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section) &&
-              this.renderSection(section)}
+            {![EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY].includes(section) && this.renderSection(section)}
           </Flex>
         </Flex>
       </div>

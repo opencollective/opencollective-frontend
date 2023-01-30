@@ -62,6 +62,8 @@ describe('New expense flow', () => {
       // Fill info for first attachment
       cy.get('input[name="items[0].description"]').type('Fancy restaurant');
       cy.get('input[name="items[0].amount"]').type('{selectall}183');
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.get('input:invalid').should('have.length', 2); // Missing attachment desctiption+amount
       cy.getByDataCy('expense-items-total-amount').should('contain', '--.--'); // amount for second item is missing
 
@@ -116,6 +118,8 @@ describe('New expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('expense-next').click();
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.getByDataCy('expense-summary-btn').click();
       cy.getByDataCy('save-expense-btn').click();
       cy.getByDataCy('save-expense-btn').should('not.exist'); // wait for form to be submitted
@@ -159,6 +163,8 @@ describe('New expense flow', () => {
       // Fill info for first attachment
       cy.get('input[name="items[0].description"]').type('Fancy restaurant');
       cy.get('input[name="items[0].amount"]').type('{selectall}183');
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
       cy.get('input[name="items[1].amount"]').type('{selectall}92.50');
       cy.getByDataCy('expense-summary-btn').click();
@@ -197,6 +203,8 @@ describe('New expense flow', () => {
       // Fill the form with valid data
       cy.get('input[name="description"]').type('March invoice');
       cy.get('input[name="items[0].description"]').type('Peeling potatoes');
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.get('input[name="items[0].amount"]').type('{selectall}4200');
 
       // Switch to receipt and acknowledge error
@@ -279,6 +287,8 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-next').click();
 
         cy.get('input[name="items[0].description"]').type('That service');
+        cy.getByDataCy('currency-picker').click();
+        cy.contains('[data-cy="select-option"]', 'US Dollar').click();
         cy.getByDataCy('expense-summary-btn').click();
         cy.get('[data-cy="checkbox-tos"] [data-cy="custom-checkbox"]').click();
         cy.getByDataCy('save-expense-btn').click();
@@ -347,6 +357,8 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-next').click();
 
         cy.get('input[name="items[0].description"]').type('That service');
+        cy.getByDataCy('currency-picker').click();
+        cy.contains('[data-cy="select-option"]', 'US Dollar').click();
         cy.getByDataCy('expense-summary-btn').click();
         cy.get('[data-cy="checkbox-tos"] [data-cy="custom-checkbox"]').click();
         cy.getByDataCy('save-expense-btn').click();
@@ -398,6 +410,8 @@ describe('New expense flow', () => {
       cy.get('input[name="description"]').type('Brussels January team retreat');
       cy.get('input[name="items[0].description"]').type('TShirts');
       cy.get('input[name="items[0].amount"]').type('{selectall}112');
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.getByDataCy('expense-add-item-btn').click();
       cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
       cy.get('input[name="items[1].amount"]').type('{selectall}75.5');
@@ -438,6 +452,8 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-next').click();
 
       // Add new item
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.getByDataCy('expense-add-item-btn').click();
       cy.get('input[name="items[2].description"]').type('Some more delicious stuff');
       cy.get('input[name="items[2].amount"]').type('{selectall}34');
@@ -464,6 +480,8 @@ describe('New expense flow', () => {
 
       // Disable VAT
       cy.getByDataCy('checkbox-tax-VAT').click();
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.getByDataCy('expense-summary-btn').click();
       cy.getByDataCy('save-expense-btn').click();
       cy.getByDataCy('save-expense-btn').should('not.exist'); // wait for form to be submitted

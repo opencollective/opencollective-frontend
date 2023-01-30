@@ -152,16 +152,24 @@ class TopBarProfileMenu extends React.Component {
   }
 
   componentDidMount() {
-    document.addEventListener('keydown', this.handleKeyPress);
-    document.addEventListener('click', this.onClickOutside);
+    const main = document.querySelector('main');
+    main.addEventListener('keydown', this.handleKeyPress);
+    main.addEventListener('click', this.onClickOutside);
     if (!getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN)) {
       this.setState({ loading: false });
     }
   }
 
+  componentDidUpdate(prevProps) {
+    if (!prevProps.LoggedInUser && this.props.LoggedInUser) {
+      this.setState({ status: 'loggedin' });
+    }
+  }
+
   componentWillUnmount() {
-    document.removeEventListener('click', this.onClickOutside);
-    document.removeEventListener('keydown', this.handleEscKey);
+    const main = document.querySelector('main');
+    main.removeEventListener('click', this.onClickOutside);
+    main.removeEventListener('keydown', this.handleKeyPress);
   }
 
   handleKeyPress = event => {
@@ -298,7 +306,7 @@ class TopBarProfileMenu extends React.Component {
                 overflowY={['hidden', 'auto']}
               >
                 <Hide lg md sm>
-                  <Box height="100vh" p={3} overflowY="auto" onClick={this.toggleAccountInfo}>
+                  <Box height="90vh" p={3} overflowY="auto">
                     <Flex alignItems="center">
                       {showUserAccount ? (
                         <P
@@ -330,7 +338,15 @@ class TopBarProfileMenu extends React.Component {
                         </React.Fragment>
                       )}
                     </Flex>
-                    <Flex py={3} pb={2} my={3} alignItems="center" justifyContent="space-between">
+                    <Flex
+                      py={3}
+                      pb={2}
+                      my={3}
+                      alignItems="center"
+                      justifyContent="space-between"
+                      onClick={this.toggleAccountInfo}
+                      style={{ cursor: 'pointer' }}
+                    >
                       <Flex position="relative">
                         <Avatar collective={LoggedInUser.collective} radius={40} mr={2} />
                         <Box>

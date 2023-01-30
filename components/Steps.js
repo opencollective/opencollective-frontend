@@ -26,6 +26,8 @@ export default class Steps extends React.Component {
     onComplete: PropTypes.func.isRequired,
     /** A function that gets passed everything needed to show the current step */
     children: PropTypes.func.isRequired,
+    /** If false on initial mount, the check for steps completion (and thus the redirect) will be delayed until the flag becomes true */
+    delayCompletionCheck: PropTypes.bool.isRequired,
   };
 
   state = {
@@ -36,6 +38,20 @@ export default class Steps extends React.Component {
   };
 
   componentDidMount() {
+    if (!this.props.delayCompletionCheck) {
+      this.redirectIfStepIsInvalid();
+    }
+  }
+
+  componentDidUpdate(oldProps) {
+    if (!this.props.delayCompletionCheck) {
+      if (oldProps.delayCompletionCheck || oldProps.currentStepName !== this.props.currentStepName) {
+        this.redirectIfStepIsInvalid();
+      }
+    }
+  }
+
+  redirectIfStepIsInvalid = () => {
     const currentStep = this.getStepByName(this.props.currentStepName);
     const lastValidStep = this.getLastCompletedStep();
     const maxIdx = lastValidStep ? lastValidStep.index + 1 : 0;
@@ -44,21 +60,7 @@ export default class Steps extends React.Component {
     } else {
       this.props.steps.slice(0, currentStep.index + 1).map(this.markStepAsVisited);
     }
-  }
-
-  componentDidUpdate(oldProps) {
-    const { currentStepName } = this.props;
-    if (oldProps.currentStepName !== currentStepName) {
-      const currentStep = this.getStepByName(currentStepName);
-      const lastValidStep = this.getLastCompletedStep();
-      const maxIdx = lastValidStep ? lastValidStep.index + 1 : 0;
-      if (!currentStep || currentStep.index > maxIdx) {
-        this.onInvalidStep(currentStep, lastValidStep);
-      } else {
-        this.props.steps.slice(0, currentStep.index + 1).map(this.markStepAsVisited);
-      }
-    }
-  }
+  };
 
   onInvalidStep = (step, lastValidStep) => {
     const firstStep = this.getStepByIndex(0);

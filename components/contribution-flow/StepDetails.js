@@ -45,10 +45,10 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
   const { LoggedInUser } = useLoggedInUser();
 
   const minAmount = getTierMinAmount(tier, currency);
-  const hasQuantity = tier?.type === TierTypes.TICKET || tier?.type === TierTypes.PRODUCT;
+  const hasQuantity = (tier?.type === TierTypes.TICKET && !tier.singleTicket) || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
   const customFields = getCustomFields(collective, tier);
-  const selectedInterval = data?.interval !== INTERVALS.flexible ? data?.interval : null;
+  const selectedInterval = data?.interval;
   const supportsRecurring = canContributeRecurring(collective, LoggedInUser) && (!tier || tier?.interval);
   const isFixedInterval = tier?.interval && tier.interval !== INTERVALS.flexible;
 
@@ -60,7 +60,7 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
   // collective doesn't support it, we reset the interval
   React.useEffect(() => {
     if (selectedInterval && !isFixedInterval && !supportsRecurring) {
-      dispatchChange('interval', null);
+      dispatchChange('interval', INTERVALS.oneTime);
     }
   }, [selectedInterval, isFixedInterval, supportsRecurring]);
 
@@ -78,7 +78,7 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
           justifyContent="center"
           mt={[4, 0]}
           mb="30px"
-          items={[null, INTERVALS.month, INTERVALS.year]}
+          items={[INTERVALS.oneTime, INTERVALS.month, INTERVALS.year]}
           selected={selectedInterval || null}
           buttonProps={{ px: 2, py: '5px' }}
           role="group"
@@ -93,7 +93,7 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
         >
           {({ item, isSelected }) => (
             <Span fontSize={isSelected ? '20px' : '18px'} lineHeight="28px" fontWeight={isSelected ? 500 : 400}>
-              {i18nInterval(intl, item || INTERVALS.oneTime)}
+              {i18nInterval(intl, item)}
             </Span>
           )}
         </StyledButtonSet>
@@ -228,7 +228,6 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
             currency={currency}
             amount={data?.amount}
             value={data?.platformTip}
-            interval={data?.interval}
             quantity={data?.quantity}
             onChange={value => dispatchChange('platformTip', value)}
             isEmbed={isEmbed}
@@ -296,6 +295,7 @@ StepDetails.propTypes = {
     minAmount: PropTypes.shape({
       valueInCents: PropTypes.number,
     }),
+    singleTicket: PropTypes.bool,
   }),
   router: PropTypes.object,
 };

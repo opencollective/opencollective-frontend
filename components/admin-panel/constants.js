@@ -64,8 +64,8 @@ export const COLLECTIVE_SECTIONS = {
   TEAM: 'members',
   TICKETS: 'tickets',
   TIERS: 'tiers',
-  TIERS_REVAMP: 'tiers-revamp',
-  TWO_FACTOR_AUTH: 'two-factor-auth',
+  TIERS_LEGACY: 'tiers-legacy',
+  USER_SECURITY: 'user-security',
   VIRTUAL_CARDS: 'virtual-cards',
   WEBHOOKS: 'webhooks',
   ACTIVITY_LOG: 'activity-log',
@@ -200,9 +200,6 @@ export const SECTION_LABELS = defineMessages({
     id: 'Tiers',
     defaultMessage: 'Tiers',
   },
-  [ALL_SECTIONS.TIERS_REVAMP]: {
-    defaultMessage: 'Tiers (New!)',
-  },
   [ALL_SECTIONS.GIFT_CARDS]: {
     id: 'editCollective.menu.giftCards',
     defaultMessage: 'Gift Cards',
@@ -221,9 +218,9 @@ export const SECTION_LABELS = defineMessages({
     id: 'section.tickets.title',
     defaultMessage: 'Tickets',
   },
-  [ALL_SECTIONS.TWO_FACTOR_AUTH]: {
-    id: 'TwoFactorAuth',
-    defaultMessage: 'Two-factor authentication',
+  [ALL_SECTIONS.USER_SECURITY]: {
+    id: 'Security',
+    defaultMessage: 'Security',
   },
   [ALL_SECTIONS.PAYMENT_RECEIPTS]: {
     id: 'editCollective.menu.paymentReceipts',

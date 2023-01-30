@@ -1,3 +1,4 @@
+const path = require('path');
 require('./env');
 
 const { REWRITES } = require('./rewrites');
@@ -78,7 +79,7 @@ const nextConfig = {
 
     // Configuration for images
     config.module.rules.unshift({
-      test: /public\/.*\/images[\\/].*\.(jpg|gif|png|svg)$/,
+      test: /\.(jpg|gif|png|svg)$/,
       use: {
         loader: 'file-loader',
         options: {
@@ -88,6 +89,7 @@ const nextConfig = {
           esModule: false,
         },
       },
+      include: [path.resolve(__dirname, 'public')],
     });
 
     // Configuration for static/marketing pages
@@ -101,13 +103,14 @@ const nextConfig = {
 
     // Load images in base64
     config.module.rules.push({
-      test: /components\/.*\.(svg|png|jpg|gif)$/,
+      test: /\.(svg|png|jpg|gif)$/,
       use: {
         loader: 'url-loader',
         options: {
           limit: 1000000,
         },
       },
+      include: [path.resolve(__dirname, 'components')],
     });
 
     if (['ci', 'e2e'].includes(process.env.OC_ENV)) {

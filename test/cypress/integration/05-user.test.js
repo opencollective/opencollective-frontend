@@ -48,34 +48,29 @@ describe('New users profiles', () => {
     });
   });
 
-  describe('Transactions section', () => {
+  describe('Budget section', () => {
     it('Can filter by expense/contributions', () => {
-      scrollToSection('transactions');
-      cy.get('button[data-cy="filter-button expenses"]').click();
-      cy.wait(300);
-      cy.get('[data-cy="transaction-sign"]').first().contains('+');
-      cy.get('button[data-cy="filter-button contributions"]').click();
-      cy.wait(300);
-      cy.get('[data-cy="transaction-sign"]').first().contains('-');
-    });
+      scrollToSection('budget');
 
-    it('Show transactions with all info and links', () => {
-      cy.get('[data-cy="transaction-item"]:first a[href="/brusselstogether"]').should('exist');
-      cy.get('[data-cy="transaction-item"]')
-        .first()
-        .get('[data-cy=transaction-description]')
-        .contains('monthly recurring subscription');
-      cy.get('[data-cy="transaction-item"]')
-        .first()
-        .get('[data-cy=transaction-details] > [data-cy=transaction-date]')
-        .contains('November 30, 2017');
-      cy.get('[data-cy="transaction-item"]').first().get('[data-cy=transaction-amount] > span').eq(0).contains('-');
-      cy.get('[data-cy="transaction-item"]')
-        .first()
-        .get('[data-cy=transaction-amount] > span')
-        .eq(1)
-        .contains('€10.00');
-      cy.get('[data-cy="transaction-item"]').first().get('[data-cy=transaction-amount] > span').eq(2).contains('EUR');
+      // Default view = mixed contributions/expenses
+      cy.get('#section-budget button[data-cy="filter-button all"]').should('have.attr', 'data-selected', 'true');
+      cy.get('#section-budget [data-cy=single-budget-item]').its('length').should('eq', 3);
+
+      // Expenses
+      cy.get('#section-budget button[data-cy="filter-button expenses"]').click();
+      cy.contains('#section-budget a[href="/xdamman/submitted-expenses"]', 'View all expenses');
+      cy.get('#section-budget [data-cy=single-budget-item]').its('length').should('eq', 3);
+      cy.get('#section-budget [data-cy^=expense-container-]').its('length').should('eq', 3);
+
+      // Contributions
+      cy.get('#section-budget button[data-cy="filter-button transactions"]').click();
+      cy.contains('#section-budget a[href^="/xdamman/transactions"]', 'View all contributions').should(
+        'have.attr',
+        'href',
+        '/xdamman/transactions?kind=ADDED_FUNDS,CONTRIBUTION,PLATFORM_TIP',
+      );
+      cy.get('#section-budget [data-cy=single-budget-item]').its('length').should('eq', 3);
+      cy.get('#section-budget [data-cy=transaction-item]').its('length').should('eq', 3);
     });
   });
 });

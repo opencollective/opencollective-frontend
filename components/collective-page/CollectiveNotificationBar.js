@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { moneyCanMoveFromEvent } from '../../lib/events';
 
-import NotificationBar from '../NotificationBar';
+import NotificationBar, { NotificationBarButton, NotificationBarLink } from '../NotificationBar';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
+
+import PendingApplicationActions from './PendingApplicationActions';
 
 const messages = defineMessages({
   // Collective Created
@@ -95,24 +97,30 @@ const messages = defineMessages({
   },
 });
 
-const getNotification = (intl, status, collective, host, LoggedInUser) => {
+const getNotification = (intl, status, collective, host, LoggedInUser, refetch) => {
   if (status === 'collectiveCreated') {
     switch (collective.type) {
       case CollectiveType.ORGANIZATION:
         return {
           title: intl.formatMessage(messages.organizationCreated),
           description: intl.formatMessage(messages.organizationCreateDescription),
+          type: 'success',
+          inline: false,
         };
       default:
         if (collective.isApproved) {
           return {
             title: intl.formatMessage(messages.collectiveCreated),
             description: intl.formatMessage(messages.collectiveApprovedDescription, { host: host.name }),
+            type: 'success',
+            inline: true,
           };
         }
         return {
           title: intl.formatMessage(messages.collectiveCreated),
           description: host ? intl.formatMessage(messages.collectiveCreatedDescription, { host: host.name }) : '',
+          type: 'info',
+          inline: true,
         };
     }
   } else if (status === 'fundCreated') {
@@ -120,31 +128,43 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
       return {
         title: intl.formatMessage(messages.fundCreated),
         description: intl.formatMessage(messages.fundCreatedApprovedDescription, { host: host.name }),
+        type: 'success',
+        inline: true,
       };
     }
     return {
       title: intl.formatMessage(messages.fundCreated),
       description: host ? intl.formatMessage(messages.fundCreatedDescription, { host: host.name }) : '',
+      type: 'info',
+      inline: true,
     };
   } else if (status === 'eventCreated') {
     return {
       title: intl.formatMessage(messages.eventCreated),
+      type: 'success',
+      inline: true,
     };
   } else if (status === 'projectCreated') {
     return {
       title: intl.formatMessage(messages.projectCreated),
+      type: 'success',
+      inline: true,
     };
   } else if (status === 'collectiveArchived' || collective.isArchived) {
     return {
       title: intl.formatMessage(messages.collectiveArchived, { name: collective.name }),
       description: intl.formatMessage(messages.collectiveArchivedDescription, { name: collective.name }),
-      status: 'collectiveArchived',
+      type: 'warning',
+      inline: true,
     };
   } else if (!collective.isApproved && collective.host && collective.type === CollectiveType.COLLECTIVE) {
     return {
       title: intl.formatMessage(messages.approvalPending),
       description: intl.formatMessage(messages.approvalPendingDescription, { host: collective.host.name }),
-      status: 'collectivePending',
+      type: 'warning',
+      actions: LoggedInUser?.isHostAdmin(collective) && (
+        <PendingApplicationActions collective={collective} refetch={refetch} />
+      ),
     };
   } else if (
     LoggedInUser?.isAdminOfCollectiveOrHost(collective) &&
@@ -160,6 +180,12 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
       description: intl.formatMessage(messages.tooFewAdminsDescription, {
         missingAdminsCount: host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins - collective.admins.length,
       }),
+      type: 'warning',
+      actions: (
+        <NotificationBarLink href={`/${collective.slug}/admin/members`}>
+          <FormattedMessage defaultMessage="Manage members" />
+        </NotificationBarLink>
+      ),
     };
   } else if (get(collective, 'type') === CollectiveType.EVENT && moneyCanMoveFromEvent(collective)) {
     if (!LoggedInUser || !LoggedInUser.isAdminOfCollectiveOrHost(collective)) {
@@ -170,16 +196,17 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
       description: intl.formatMessage(messages['event.over.sendMoneyToParent.description'], {
         collective: collective.parentCollective.name,
       }),
-      actions: [
+      type: 'info',
+      actions: (
         <SendMoneyToCollectiveBtn
-          key="SendMoneyToCollectiveBtn"
           fromCollective={collective}
           toCollective={collective.parentCollective}
           LoggedInUser={LoggedInUser}
           amount={collective.stats.balance}
           currency={collective.currency}
-        />,
-      ],
+          customButton={props => <NotificationBarButton {...props} />}
+        />
+      ),
     };
   }
 };
@@ -188,19 +215,9 @@ const getNotification = (intl, status, collective, host, LoggedInUser) => {
  * Adds a notification bar for the collective.
  */
 const CollectiveNotificationBar = ({ intl, status, collective, host, LoggedInUser, refetch }) => {
-  const notification = getNotification(intl, status, collective, host, LoggedInUser);
+  const notification = getNotification(intl, status, collective, host, LoggedInUser, refetch);
 
-  return !notification ? null : (
-    <NotificationBar
-      status={status || notification.status}
-      collective={collective}
-      title={notification.title}
-      description={notification.description}
-      actions={notification.actions}
-      LoggedInUser={LoggedInUser}
-      refetch={refetch}
-    />
-  );
+  return !notification ? null : <NotificationBar {...notification} />;
 };
 
 CollectiveNotificationBar.propTypes = {

@@ -94,6 +94,8 @@ export type Account = {
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this account can use to pay for Orders */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this account can use to get paid */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -104,6 +106,7 @@ export type Account = {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -222,8 +225,10 @@ export type AccountOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -637,6 +642,8 @@ export type Activity = {
   isSystem: Scalars['Boolean'];
   /** The order related to this activity, if any */
   order?: Maybe<Order>;
+  /** The transaction related to this activity, if any */
+  transaction?: Maybe<Transaction>;
   /** The type of the activity */
   type: ActivityType;
 };
@@ -679,6 +686,7 @@ export enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_REJECTED = 'COLLECTIVE_EXPENSE_REJECTED',
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT = 'COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT',
   COLLECTIVE_EXPENSE_UNAPPROVED = 'COLLECTIVE_EXPENSE_UNAPPROVED',
+  COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT = 'COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT',
   COLLECTIVE_EXPENSE_UPDATED = 'COLLECTIVE_EXPENSE_UPDATED',
   COLLECTIVE_FROZEN = 'COLLECTIVE_FROZEN',
   COLLECTIVE_MEMBER_CREATED = 'COLLECTIVE_MEMBER_CREATED',
@@ -736,6 +744,7 @@ export enum ActivityAndClassesType {
   USER_CHANGE_EMAIL = 'USER_CHANGE_EMAIL',
   USER_CREATED = 'USER_CREATED',
   USER_NEW_TOKEN = 'USER_NEW_TOKEN',
+  USER_PASSWORD_SET = 'USER_PASSWORD_SET',
   USER_PAYMENT_METHOD_CREATED = 'USER_PAYMENT_METHOD_CREATED',
   VIRTUAL_CARDS = 'VIRTUAL_CARDS',
   VIRTUAL_CARD_CHARGE_DECLINED = 'VIRTUAL_CARD_CHARGE_DECLINED',
@@ -818,6 +827,7 @@ export enum ActivityType {
   COLLECTIVE_EXPENSE_REJECTED = 'COLLECTIVE_EXPENSE_REJECTED',
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT = 'COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT',
   COLLECTIVE_EXPENSE_UNAPPROVED = 'COLLECTIVE_EXPENSE_UNAPPROVED',
+  COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT = 'COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT',
   COLLECTIVE_EXPENSE_UPDATED = 'COLLECTIVE_EXPENSE_UPDATED',
   COLLECTIVE_FROZEN = 'COLLECTIVE_FROZEN',
   COLLECTIVE_MEMBER_CREATED = 'COLLECTIVE_MEMBER_CREATED',
@@ -871,6 +881,7 @@ export enum ActivityType {
   USER_CHANGE_EMAIL = 'USER_CHANGE_EMAIL',
   USER_CREATED = 'USER_CREATED',
   USER_NEW_TOKEN = 'USER_NEW_TOKEN',
+  USER_PASSWORD_SET = 'USER_PASSWORD_SET',
   USER_PAYMENT_METHOD_CREATED = 'USER_PAYMENT_METHOD_CREATED',
   VIRTUAL_CARD_CHARGE_DECLINED = 'VIRTUAL_CARD_CHARGE_DECLINED',
   VIRTUAL_CARD_PURCHASE = 'VIRTUAL_CARD_PURCHASE',
@@ -919,7 +930,7 @@ export type AmountStats = {
   label: Scalars['String'];
 };
 
-/** An OAuth application or a personal token */
+/** An OAuth application. */
 export type Application = {
   __typename?: 'Application';
   account: Account;
@@ -1045,6 +1056,8 @@ export type Bot = Account & {
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -1055,6 +1068,7 @@ export type Bot = Account & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -1179,8 +1193,10 @@ export type BotOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -1369,6 +1385,8 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -1383,6 +1401,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -1525,8 +1544,10 @@ export type CollectiveOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -1685,12 +1706,8 @@ export type CollectiveFeatures = {
 export type Comment = {
   __typename?: 'Comment';
   account?: Maybe<Account>;
-  /** @deprecated 2020-02-25: Please use account */
-  collective?: Maybe<Account>;
   createdAt?: Maybe<Scalars['DateTime']>;
   fromAccount?: Maybe<Account>;
-  /** @deprecated 2020-02-25: Please use fromAccount */
-  fromCollective?: Maybe<Account>;
   html?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
   /** Returns a map of reactions counts for this comment */
@@ -1883,7 +1900,6 @@ export enum ContributorRole {
   CONNECTED_COLLECTIVE = 'CONNECTED_COLLECTIVE',
   CONTRIBUTOR = 'CONTRIBUTOR',
   FOLLOWER = 'FOLLOWER',
-  FUNDRAISER = 'FUNDRAISER',
   HOST = 'HOST',
   MEMBER = 'MEMBER'
 }
@@ -1894,15 +1910,11 @@ export type Conversation = {
   account?: Maybe<Account>;
   /** The root comment / starter for this conversation */
   body?: Maybe<Comment>;
-  /** @deprecated 2022-09-14: Please use account */
-  collective?: Maybe<Account>;
   /** List the comments for this conversation. Not backed by a loader, don't use this in lists. */
   comments: CommentCollection;
   createdAt: Scalars['DateTime'];
   followers: AccountCollection;
   fromAccount?: Maybe<Account>;
-  /** @deprecated 2022-09-14: Please use fromAccount */
-  fromCollective?: Maybe<Account>;
   id: Scalars['String'];
   slug: Scalars['String'];
   stats?: Maybe<ConversationStats>;
@@ -3035,6 +3047,8 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -3049,6 +3063,7 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   /** The Event start date and time */
   startsAt?: Maybe<Scalars['DateTime']>;
   stats?: Maybe<AccountStats>;
@@ -3195,8 +3210,10 @@ export type EventOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -3618,7 +3635,7 @@ export type ExpenseQuote = {
   /** Amount of payment processor fee */
   paymentProcessorFeeAmount: Amount;
   /** Amount of this item */
-  totalAmount: Amount;
+  sourceAmount: Amount;
 };
 
 export type ExpenseReferenceInput = {
@@ -3633,11 +3650,6 @@ export type ExpenseStats = {
   __typename?: 'ExpenseStats';
   /** The daily average paid in expenses */
   dailyAverageAmount: Amount;
-  /**
-   * The total number of expenses over time
-   * @deprecated 2022-04-21: Please use hostMetricsTimeSeries.totalSpent
-   */
-  expenseAmountOverTime?: Maybe<TimeSeriesAmount>;
   /** The total number of expenses */
   expensesCount: Scalars['Int'];
   /** Number of grants */
@@ -3822,6 +3834,8 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -3836,6 +3850,7 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -3978,8 +3993,10 @@ export type FundOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -4173,6 +4190,8 @@ export type Host = Account & AccountWithContributions & {
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** If the host supports PayPal, this will contain the client ID to use in the frontend */
@@ -4194,6 +4213,7 @@ export type Host = Account & AccountWithContributions & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -4397,8 +4417,10 @@ export type HostOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -4666,6 +4688,8 @@ export type Individual = Account & {
   features: CollectiveFeatures;
   /** @deprecated 2022-06-03: Please use repositoryUrl */
   githubHandle?: Maybe<Scalars['String']>;
+  /** Has the account a password set? For authenticated user: scope: "account". */
+  hasPassword?: Maybe<Scalars['Boolean']>;
   hasSeenLatestChangelogEntry: Scalars['Boolean'];
   hasTwoFactorAuth?: Maybe<Scalars['Boolean']>;
   /** If the individual is a host account, this will return the matching Host object */
@@ -4714,16 +4738,21 @@ export type Individual = Account & {
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
   permissions: AccountPermissions;
+  /** The list of personal tokens created by this account. Admin only. Scope: "applications". */
+  personalTokens?: Maybe<PersonalTokenCollection>;
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -4861,8 +4890,10 @@ export type IndividualOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -4875,6 +4906,13 @@ export type IndividualPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Individual account */
+export type IndividualPersonalTokensArgs = {
+  limit?: Scalars['Int'];
+  offset?: Scalars['Int'];
 };
 
 
@@ -5017,6 +5055,8 @@ export type Member = {
   /** Custom user description */
   description?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
+  /** If membership is inherited from parent collective */
+  inherited?: Maybe<Scalars['Boolean']>;
   /** Custom user message from member to the collective */
   publicMessage?: Maybe<Scalars['String']>;
   role?: Maybe<MemberRole>;
@@ -5066,6 +5106,8 @@ export type MemberOf = {
   /** Custom user description */
   description?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
+  /** If membership is inherited from parent collective */
+  inherited?: Maybe<Scalars['Boolean']>;
   /** Custom user message from member to the collective */
   publicMessage?: Maybe<Scalars['String']>;
   role?: Maybe<MemberRole>;
@@ -5102,6 +5144,7 @@ export enum MemberRole {
   CONNECTED_ACCOUNT = 'CONNECTED_ACCOUNT',
   CONTRIBUTOR = 'CONTRIBUTOR',
   FOLLOWER = 'FOLLOWER',
+  /** @deprecated 2022-09-12: This role does not exist anymore */
   FUNDRAISER = 'FUNDRAISER',
   HOST = 'HOST',
   MEMBER = 'MEMBER'
@@ -5172,6 +5215,7 @@ export type Mutation = {
   createPaymentIntent: PaymentIntent;
   /** Create a new Payout Method to get paid through the platform. Scope: "expenses". */
   createPayoutMethod?: Maybe<PayoutMethod>;
+  createPersonalToken?: Maybe<PersonalToken>;
   /** Create a Project. Scope: "account". */
   createProject?: Maybe<Project>;
   /** Create a tier. */
@@ -5190,6 +5234,7 @@ export type Mutation = {
   deleteConnectedAccount?: Maybe<ConnectedAccount>;
   /** Delete an expense. Only work if the expense is rejected - please check permissions.canDelete. Scope: "expenses". */
   deleteExpense: Expense;
+  deletePersonalToken?: Maybe<PersonalToken>;
   /** Delete a tier. */
   deleteTier: Tier;
   /** Delete update. Scope: "updates". */
@@ -5282,6 +5327,8 @@ export type Mutation = {
   setEmailNotification?: Maybe<ActivitySubscription>;
   /** Update newsletter opt-in preference. Scope: "account". */
   setNewsletterOptIn: Individual;
+  /** Set password to Individual. Scope: "account". 2FA. */
+  setPassword: Individual;
   /** Adds or removes a policy on a given account. Scope: "account". */
   setPolicies: Account;
   /** Unpublish update. Scope: "updates". */
@@ -5289,6 +5336,9 @@ export type Mutation = {
   updateApplication?: Maybe<Application>;
   /** Update an Order's amount, tier, or payment method. Scope: "orders". */
   updateOrder?: Maybe<Order>;
+  updatePersonalToken?: Maybe<PersonalToken>;
+  /** Updates collective social links */
+  updateSocialLinks: Array<SocialLink>;
   /** Update webhook. Scope: "webhooks". */
   updateWebhook?: Maybe<Webhook>;
   /** To verify and unverified expense. Scope: "expenses". */
@@ -5502,6 +5552,12 @@ export type MutationCreatePayoutMethodArgs = {
 
 
 /** This is the root mutation */
+export type MutationCreatePersonalTokenArgs = {
+  personalToken: PersonalTokenCreateInput;
+};
+
+
+/** This is the root mutation */
 export type MutationCreateProjectArgs = {
   parent?: InputMaybe<AccountReferenceInput>;
   project: ProjectCreateInput;
@@ -5564,6 +5620,12 @@ export type MutationDeleteConnectedAccountArgs = {
 /** This is the root mutation */
 export type MutationDeleteExpenseArgs = {
   expense: ExpenseReferenceInput;
+};
+
+
+/** This is the root mutation */
+export type MutationDeletePersonalTokenArgs = {
+  personalToken: PersonalTokenReferenceInput;
 };
 
 
@@ -5906,6 +5968,13 @@ export type MutationSetNewsletterOptInArgs = {
 
 
 /** This is the root mutation */
+export type MutationSetPasswordArgs = {
+  currentPassword?: InputMaybe<Scalars['String']>;
+  password: Scalars['String'];
+};
+
+
+/** This is the root mutation */
 export type MutationSetPoliciesArgs = {
   account: AccountReferenceInput;
   policies: PoliciesInput;
@@ -5931,6 +6000,19 @@ export type MutationUpdateOrderArgs = {
   paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   paypalSubscriptionId?: InputMaybe<Scalars['String']>;
   tier?: InputMaybe<TierReferenceInput>;
+};
+
+
+/** This is the root mutation */
+export type MutationUpdatePersonalTokenArgs = {
+  personalToken: PersonalTokenUpdateInput;
+};
+
+
+/** This is the root mutation */
+export type MutationUpdateSocialLinksArgs = {
+  account: AccountReferenceInput;
+  socialLinks: Array<SocialLinkInput>;
 };
 
 
@@ -6063,6 +6145,8 @@ export type Order = {
   membership?: Maybe<MemberOf>;
   /** Memo field which adds additional details about the order. For example in added funds this can be a note to mark what method (cheque, money order) the funds were received. */
   memo?: Maybe<Scalars['String']>;
+  /** Whether the order needs confirmation (3DSecure/SCA) */
+  needsConfirmation?: Maybe<Scalars['Boolean']>;
   nextChargeDate?: Maybe<Scalars['DateTime']>;
   paymentMethod?: Maybe<PaymentMethod>;
   /** The permissions given to current logged in user for this order */
@@ -6327,6 +6411,8 @@ export type Organization = Account & AccountWithContributions & {
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -6341,6 +6427,7 @@ export type Organization = Account & AccountWithContributions & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -6476,8 +6563,10 @@ export type OrganizationOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -6607,7 +6696,11 @@ export type PaymentMethod = {
   id?: Maybe<Scalars['String']>;
   legacyId?: Maybe<Scalars['Int']>;
   limitedToHosts?: Maybe<Array<Maybe<Host>>>;
+  /** For monthly gift cards, this field will return the monthly limit */
+  monthlyLimit?: Maybe<Amount>;
   name?: Maybe<Scalars['String']>;
+  /** Get all the orders associated with this payment method */
+  orders?: Maybe<OrderCollection>;
   /**
    * Defines the type of the payment method. Meant to be moved to "type" in the future.
    * @deprecated 2021-03-02: Please use service + type
@@ -6617,6 +6710,27 @@ export type PaymentMethod = {
   /** For gift cards, this field will return to the source payment method */
   sourcePaymentMethod?: Maybe<PaymentMethod>;
   type?: Maybe<PaymentMethodType>;
+};
+
+
+/** PaymentMethod model */
+export type PaymentMethodOrdersArgs = {
+  dateFrom?: InputMaybe<Scalars['DateTime']>;
+  dateTo?: InputMaybe<Scalars['DateTime']>;
+  filter?: InputMaybe<AccountOrdersFilter>;
+  frequency?: InputMaybe<ContributionFrequency>;
+  includeHostedAccounts?: InputMaybe<Scalars['Boolean']>;
+  includeIncognito?: InputMaybe<Scalars['Boolean']>;
+  limit?: Scalars['Int'];
+  maxAmount?: InputMaybe<Scalars['Int']>;
+  minAmount?: InputMaybe<Scalars['Int']>;
+  offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
+  onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
+  orderBy?: ChronologicalOrderInput;
+  searchTerm?: InputMaybe<Scalars['String']>;
+  status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
+  tierSlug?: InputMaybe<Scalars['String']>;
 };
 
 /** An input to use for creating or retrieving payment methods */
@@ -6770,6 +6884,63 @@ export type Permission = {
   reasonDetails?: Maybe<Scalars['JSON']>;
 };
 
+/** A personal token */
+export type PersonalToken = {
+  __typename?: 'PersonalToken';
+  /** The account that owns this personal token */
+  account: Individual;
+  /** The date on which the personal token was created */
+  createdAt?: Maybe<Scalars['DateTime']>;
+  /** The date on which the personal token expires */
+  expiresAt?: Maybe<Scalars['DateTime']>;
+  /** Unique identifier for this personal token */
+  id: Scalars['String'];
+  /** A friendly name for users to easily find their personal tokens */
+  name?: Maybe<Scalars['String']>;
+  /** The scopes of the personal token */
+  scope?: Maybe<Array<Maybe<OAuthScope>>>;
+  /** The personal token */
+  token?: Maybe<Scalars['String']>;
+  /** The date on which the personal token was last updated */
+  updatedAt?: Maybe<Scalars['DateTime']>;
+};
+
+/** A collection of "PersonalToken" */
+export type PersonalTokenCollection = Collection & {
+  __typename?: 'PersonalTokenCollection';
+  limit?: Maybe<Scalars['Int']>;
+  nodes?: Maybe<Array<Maybe<PersonalToken>>>;
+  offset?: Maybe<Scalars['Int']>;
+  totalCount?: Maybe<Scalars['Int']>;
+};
+
+/** Input type for PersonalToken */
+export type PersonalTokenCreateInput = {
+  /** The account to use as the owner of the application. Defaults to currently logged in user. */
+  account?: InputMaybe<AccountReferenceInput>;
+  expiresAt?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+  scope?: InputMaybe<Array<InputMaybe<OAuthScope>>>;
+};
+
+export type PersonalTokenReferenceInput = {
+  /** The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
+  id?: InputMaybe<Scalars['String']>;
+  /** The legacy public id identifying the personal-token (ie: 4242) */
+  legacyId?: InputMaybe<Scalars['Int']>;
+};
+
+/** Input type for PersonalToken */
+export type PersonalTokenUpdateInput = {
+  expiresAt?: InputMaybe<Scalars['String']>;
+  /** The public id identifying the personal-token (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
+  id?: InputMaybe<Scalars['String']>;
+  /** The legacy public id identifying the personal-token (ie: 4242) */
+  legacyId?: InputMaybe<Scalars['Int']>;
+  name?: InputMaybe<Scalars['String']>;
+  scope?: InputMaybe<Array<InputMaybe<OAuthScope>>>;
+};
+
 export type Policies = {
   __typename?: 'Policies';
   COLLECTIVE_MINIMUM_ADMINS?: Maybe<Collective_Minimum_Admins>;
@@ -6809,10 +6980,12 @@ export type ProcessExpensePaymentParams = {
   feesPayer?: InputMaybe<FeesPayer>;
   /** Bypass automatic integrations (ie. PayPal, Transferwise) to process the expense manually */
   forceManual?: InputMaybe<Scalars['Boolean']>;
-  /** The fee charged by payment processor in collective currency */
-  paymentProcessorFee?: InputMaybe<Scalars['Int']>;
+  /** The fee charged by payment processor in host currency */
+  paymentProcessorFeeInHostCurrency?: InputMaybe<Scalars['Int']>;
   /** Whether the payment processor fees should be refunded when triggering MARK_AS_UNPAID */
   shouldRefundPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
+  /** The total amount paid in host currency */
+  totalAmountPaidInHostCurrency?: InputMaybe<Scalars['Int']>;
 };
 
 /** Action taken for an account application to the host */
@@ -6918,6 +7091,8 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -6932,6 +7107,7 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -7074,8 +7250,10 @@ export type ProjectOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -7200,6 +7378,8 @@ export type Query = {
   orders: OrderCollection;
   organization?: Maybe<Organization>;
   paypalPlan: PaypalPlan;
+  /** Get a personal token by reference */
+  personalToken?: Maybe<PersonalToken>;
   project?: Maybe<Project>;
   tagStats: TagStatsCollection;
   tier?: Maybe<Tier>;
@@ -7378,8 +7558,10 @@ export type QueryOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;
@@ -7401,6 +7583,13 @@ export type QueryPaypalPlanArgs = {
   amount: AmountInput;
   frequency: ContributionFrequency;
   tier?: InputMaybe<TierReferenceInput>;
+};
+
+
+/** This is the root query */
+export type QueryPersonalTokenArgs = {
+  id?: InputMaybe<Scalars['String']>;
+  legacyId?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -7466,10 +7655,11 @@ export type QueryUpdateArgs = {
 
 /** This is the root query */
 export type QueryUpdatesArgs = {
+  accountTag?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  accountType?: InputMaybe<Array<InputMaybe<AccountType>>>;
   host?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   limit?: Scalars['Int'];
   offset?: Scalars['Int'];
-  tag?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
 };
 
 /** A recurring expense object */
@@ -7537,6 +7727,39 @@ export type SendMessageResult = {
   __typename?: 'SendMessageResult';
   success?: Maybe<Scalars['Boolean']>;
 };
+
+/** A social link */
+export type SocialLink = {
+  __typename?: 'SocialLink';
+  createdAt?: Maybe<Scalars['DateTime']>;
+  type: SocialLinkType;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  url: Scalars['URL'];
+};
+
+export type SocialLinkInput = {
+  type: SocialLinkType;
+  url: Scalars['URL'];
+};
+
+/** The type of social link */
+export enum SocialLinkType {
+  DISCORD = 'DISCORD',
+  FACEBOOK = 'FACEBOOK',
+  GIT = 'GIT',
+  GITHUB = 'GITHUB',
+  GITLAB = 'GITLAB',
+  INSTAGRAM = 'INSTAGRAM',
+  LINKEDIN = 'LINKEDIN',
+  MASTODON = 'MASTODON',
+  MATTERMOST = 'MATTERMOST',
+  MEETUP = 'MEETUP',
+  SLACK = 'SLACK',
+  TUMBLR = 'TUMBLR',
+  TWITTER = 'TWITTER',
+  WEBSITE = 'WEBSITE',
+  YOUTUBE = 'YOUTUBE'
+}
 
 export type StripeError = {
   __typename?: 'StripeError';
@@ -7623,6 +7846,7 @@ export type Tier = {
   /** Get all orders */
   orders: OrderCollection;
   presets?: Maybe<Array<Maybe<Scalars['Int']>>>;
+  singleTicket?: Maybe<Scalars['Boolean']>;
   slug?: Maybe<Scalars['String']>;
   type: TierType;
   useStandalonePage?: Maybe<Scalars['Boolean']>;
@@ -7709,6 +7933,7 @@ export type TierUpdateInput = {
   minimumAmount?: InputMaybe<AmountInput>;
   name?: InputMaybe<Scalars['NonEmptyString']>;
   presets?: InputMaybe<Array<Scalars['Int']>>;
+  singleTicket?: InputMaybe<Scalars['Boolean']>;
   type: TierType;
   useStandalonePage?: InputMaybe<Scalars['Boolean']>;
 };
@@ -8196,6 +8421,8 @@ export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   parentAccount?: Maybe<Account>;
   /** The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders". */
   paymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
+  /** The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA) */
+  paymentMethodsWithPendingConfirmation?: Maybe<Array<Maybe<PaymentMethod>>>;
   /** The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses". */
   payoutMethods?: Maybe<Array<Maybe<PayoutMethod>>>;
   /** Logged-in user permissions on an account */
@@ -8210,6 +8437,7 @@ export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
   slug: Scalars['String'];
+  socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
@@ -8352,8 +8580,10 @@ export type VendorOrdersArgs = {
   maxAmount?: InputMaybe<Scalars['Int']>;
   minAmount?: InputMaybe<Scalars['Int']>;
   offset?: Scalars['Int'];
+  onlyActiveSubscriptions?: InputMaybe<Scalars['Boolean']>;
   onlySubscriptions?: InputMaybe<Scalars['Boolean']>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
   tierSlug?: InputMaybe<Scalars['String']>;

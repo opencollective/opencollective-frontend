@@ -24,6 +24,7 @@ import HorizontalScroller from '../../HorizontalScroller';
 import { getI18nLink } from '../../I18nFormatters';
 import Link from '../../Link';
 import Loading from '../../Loading';
+import MemberRoleDescription from '../../MemberRoleDescription';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledHr from '../../StyledHr';
@@ -159,6 +160,7 @@ class Members extends React.Component {
 
     const membersCollectiveIds = this.getMembersCollectiveIds(this.state.members);
     const isInvitation = member.__typename === 'MemberInvitation';
+    const isInherited = member.inherited;
     const collectiveId = get(member, 'memberAccount.id');
     const memberCollective = member.account || member.memberAccount;
     const memberKey = member.id ? `member-${member.id}` : `collective-${collectiveId}`;
@@ -195,12 +197,24 @@ class Members extends React.Component {
               canRemove={!isLastAdmin}
             />
           ) : (
-            <StyledRoundButton
-              onClick={() => this.handleShowModalChange('edit', true, index, memberModalKey)}
-              size={26}
+            <StyledTooltip
+              noTooltip={!isInherited}
+              content={
+                <FormattedMessage
+                  id="MemberEdit.Disable.Inherited"
+                  defaultMessage="This member is inherited from {parentCollectiveName} and cannot be removed."
+                  values={{ parentCollectiveName: collective.parentCollective?.name }}
+                />
+              }
             >
-              <Edit height={16} />
-            </StyledRoundButton>
+              <StyledRoundButton
+                onClick={() => this.handleShowModalChange('edit', true, index, memberModalKey)}
+                size={26}
+                disabled={isInherited}
+              >
+                <Edit height={16} />
+              </StyledRoundButton>
+            </StyledTooltip>
           )}
         </Container>
         <Flex flexDirection="column" alignItems="center">
@@ -249,12 +263,9 @@ class Members extends React.Component {
 
     return (
       <React.Fragment>
-        <Box className="members" mt={3}>
-          <P lineHeight="20px" letterSpacing="normal">
-            <FormattedMessage defaultMessage="Core Contributors are the people closely associated with your Collective, who will show up on your Collective page as part of the team. Collective Admins are Core Contributors with extra permissions, like editing the Collective settings and approving expenses. Admins get notifications of activity on your Collective. " />
-          </P>
+        <Box className="members">
           {[CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(collective.type) &&
-            host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+            Boolean(host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins) && (
               <P lineHeight="20px" letterSpacing="normal" mt={3}>
                 <FormattedMessage
                   defaultMessage="Your host requires that Collectives have {numberOfAdmins, plural, one {# active administrator} other {# active administrators} }."
@@ -272,17 +283,24 @@ class Members extends React.Component {
               </P>
             )}
 
-          <StyledHr mt={4} borderColor="black.200" flex="1 1" />
-
           {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
             nbAdmins < host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins && (
-              <MessageBox type="error" mt={4} fontSize="13px">
+              <MessageBox type="error" my={3} fontSize="13px">
                 <FormattedMessage
                   defaultMessage="Your collective doesn’t meet the requirements of having a minimum of {numberOfAdmins, plural, one {# administrator} other {# administrators} }. Add more administrators to comply with your host’s policy."
                   values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                 />
               </MessageBox>
             )}
+
+          <StyledHr mt={3} borderColor="black.200" flex="1 1" />
+          <P as="ul" fontSize="14px" lineHeight="18px" mt={4}>
+            {[roles.ADMIN, roles.MEMBER, roles.ACCOUNTANT].map(role => (
+              <Box as="li" key={role} mb={2}>
+                <MemberRoleDescription role={role} />
+              </Box>
+            ))}
+          </P>
 
           <Hide md lg>
             <Grid mt={4}>
@@ -369,19 +387,6 @@ class Members extends React.Component {
           {i18nGraphqlException(intl, data.error)}
         </MessageBox>
       );
-    } else if (data.account?.parentAccount) {
-      const parent = data.account.parentAccount;
-      return (
-        <MessageBox type="info" withIcon fontSize="13px">
-          <FormattedMessage
-            id="Members.DefinedInParent"
-            defaultMessage="Team members are defined in the settings of {parentName}"
-            values={{
-              parentName: <Link href={`/${parent.slug}/admin/members`}>{parent.name}</Link>,
-            }}
-          />
-        </MessageBox>
-      );
     } else if (data.account?.isFrozen) {
       return (
         <MessageBox type="warning" fontSize="13px" withIcon>
@@ -407,6 +412,7 @@ const memberFieldsFragment = gql`
     since
     createdAt
     description
+    inherited
     account {
       id
       name

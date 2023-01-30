@@ -174,12 +174,15 @@ const CollectiveSectionEntry = ({
     if (isEnabled && !isEqual(restrictedTo, ['ADMIN'])) {
       options = options.filter(({ value }) => value !== 'ADMIN' && value !== 'DISABLED');
     }
-    options.push({
-      label: (
-        <FormattedMessage id="EditCollectivePage.ShowSection.AlwaysVisibleV2" defaultMessage="New version visible" />
-      ),
-      value: 'ALWAYS_V2',
-    });
+    // New budget version not available for
+    if (collectiveType !== CollectiveType.USER) {
+      options.push({
+        label: (
+          <FormattedMessage id="EditCollectivePage.ShowSection.AlwaysVisibleV2" defaultMessage="New version visible" />
+        ),
+        value: 'ALWAYS_V2',
+      });
+    }
   }
 
   let defaultValue;

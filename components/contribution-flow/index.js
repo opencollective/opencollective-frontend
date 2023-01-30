@@ -25,7 +25,7 @@ import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { confirmPayment } from '../../lib/stripe/confirm-payment';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
-import { getCollectivePageRoute, isTrustedRedirectHost, objectToQueryString } from '../../lib/url-helpers';
+import { getCollectivePageRoute, isTrustedRedirectHost } from '../../lib/url-helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
@@ -36,6 +36,7 @@ import { Box, Flex, Grid } from '../Grid';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import Steps from '../Steps';
+import { P } from '../Text';
 import { withUser } from '../UserProvider';
 
 import { orderResponseFragment } from './graphql/fragments';
@@ -48,6 +49,7 @@ import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import ContributionFlowSuccess from './ContributionFlowSuccess';
 import ContributionSummary from './ContributionSummary';
 import { validateNewOrg } from './CreateOrganizationForm';
+import { DEFAULT_PLATFORM_TIP_PERCENTAGE } from './PlatformTipInput';
 import {
   ContributionFlowUrlQueryHelper,
   EmbedContributionFlowUrlQueryHelper,
@@ -61,6 +63,7 @@ import {
   getContributeProfiles,
   getGQLV2AmountInput,
   getTotalAmount,
+  isSupportedInterval,
   NEW_CREDIT_CARD_KEY,
   STRIPE_PAYMENT_ELEMENT_KEY,
 } from './utils';
@@ -98,7 +101,7 @@ const OTHER_MESSAGES = defineMessages({
   tipAmountContributionWarning: {
     id: 'Warning.TipAmountContributionWarning',
     defaultMessage:
-      'You are about to make a contribution of {contributionAmount} to {accountName}, with a tip to the Open Collective platform of {tipAmount}. The tip amount looks unusually high.{newLine}{newLine}Are you sure you want to do this?',
+      'You are about to make a contribution of {contributionAmount} to {accountName} that includes a {tipAmount} tip to the Open Collective platform. The tip amount looks unusually high.{newLine}{newLine}Are you sure you want to do this?',
   },
   pastEventWarning: {
     id: 'Warning.PastEvent',
@@ -125,7 +128,6 @@ class ContributionFlow extends React.Component {
     confirmOrder: PropTypes.func.isRequired,
     loadingLoggedInUser: PropTypes.bool,
     isEmbed: PropTypes.bool,
-    verb: PropTypes.string,
     paymentFlow: PropTypes.string,
     error: PropTypes.string,
     /** @ignore from withUser */
@@ -142,29 +144,37 @@ class ContributionFlow extends React.Component {
     this.formRef = React.createRef();
     this.captchaRef = React.createRef();
 
-    const { collective, tier } = props;
+    const { collective, tier, LoggedInUser } = props;
     const isCryptoFlow = props.paymentFlow === PAYMENT_FLOW.CRYPTO;
     const queryParams = this.getQueryParams();
     const currency = isCryptoFlow
       ? find(CRYPTO_CURRENCIES, field => field.value === queryParams.cryptoCurrency) || CRYPTO_CURRENCIES[0]
       : tier?.amount?.currency || collective.currency;
-
+    const amount = queryParams.amount || getDefaultTierAmount(tier, collective, currency);
+    const quantity = queryParams.quantity || 1;
     this.state = {
       error: null,
       stripe: null,
       stripeElements: null,
       isSubmitted: false,
       isSubmitting: false,
-      stepProfile: this.getDefaultStepProfile(),
-      stepPayment: null,
-      stepSummary: null,
       showSignIn: false,
       createdOrder: null,
+      forceSummaryStep: this.getCurrentStepName() !== STEPS.DETAILS, // If not starting the flow with the details step, we force the summary step to make sure contributors have an easy way to review their contribution
+      // Steps data
+      stepProfile: this.getDefaultStepProfile(),
+      stepPayment: {
+        key: queryParams.paymentMethod,
+        isKeyOnly: true, // For the step payment to recognize if it needs to load the payment method
+      },
+      stepSummary: null,
       stepDetails: {
-        quantity: queryParams.quantity || 1,
-        interval: queryParams.interval || getDefaultInterval(props.tier),
-        amount: queryParams.amount || getDefaultTierAmount(tier, collective, currency),
-        platformTip: queryParams.platformTip,
+        quantity,
+        interval: isSupportedInterval(collective, tier, LoggedInUser, queryParams.interval)
+          ? queryParams.interval
+          : getDefaultInterval(props.tier),
+        amount,
+        platformTip: this.canHavePlatformTips() ? Math.round(amount * quantity * DEFAULT_PLATFORM_TIP_PERCENTAGE) : 0,
         currency,
         cryptoAmount: queryParams.cryptoAmount,
       },
@@ -190,27 +200,32 @@ class ContributionFlow extends React.Component {
           this.pushStepRoute(STEPS.PROFILE); // Force user to re-fill profile
         }
       }
-    }
-
-    // Reflect state changes in the URL
-    const currentStepName = this.getCurrentStepName();
-    if (currentStepName !== STEPS.SUCCESS) {
-      const { stepDetails, stepProfile } = this.state;
-      const currentUrlState = this.getQueryParams();
-      const expectedUrlState = stepsDataToUrlParamsData(
-        currentUrlState,
-        stepDetails,
-        stepProfile,
-        this.props.paymentFlow === PAYMENT_FLOW.CRYPTO,
-      );
-      if (!isEqual(currentUrlState, omitBy(expectedUrlState, isNil))) {
-        const route = this.getRoute(currentStepName);
-        const queryHelper = this.getQueryHelper();
-        this.props.router.replace(
-          { pathname: route, query: omitBy(queryHelper.encode(expectedUrlState), isNil) },
-          null,
-          { scroll: false, shallow: true },
+    } else if (oldProps.loadingLoggedInUser && !this.props.loadingLoggedInUser) {
+      // Login failed, reset the state to make sure we fallback on guest mode
+      this.setState({ stepProfile: this.getDefaultStepProfile() });
+    } else if (!this.props.loadingLoggedInUser) {
+      // Reflect state changes in the URL
+      const currentStepName = this.getCurrentStepName();
+      if (currentStepName !== STEPS.SUCCESS) {
+        const { stepDetails, stepProfile, stepPayment } = this.state;
+        const currentUrlState = this.getQueryParams();
+        const expectedUrlState = stepsDataToUrlParamsData(
+          currentUrlState,
+          stepDetails,
+          stepProfile,
+          stepPayment,
+          this.props.paymentFlow === PAYMENT_FLOW.CRYPTO,
+          this.props.isEmbed,
         );
+        if (!isEqual(currentUrlState, omitBy(expectedUrlState, isNil))) {
+          const route = this.getRoute(currentStepName);
+          const queryHelper = this.getQueryHelper();
+          this.props.router.replace(
+            { pathname: route, query: omitBy(queryHelper.encode(expectedUrlState), isNil) },
+            null,
+            { scroll: false, shallow: true },
+          );
+        }
       }
     }
   }
@@ -226,6 +241,7 @@ class ContributionFlow extends React.Component {
   // ---- Order submission & error handling ----
 
   submitOrder = async () => {
+    const { collective, host, tier } = this.props;
     const { stepDetails, stepProfile, stepSummary } = this.state;
     this.setState({ error: null, isSubmitting: true });
 
@@ -237,6 +253,7 @@ class ContributionFlow extends React.Component {
     }
 
     try {
+      const skipTaxes = isEmpty(this.getApplicableTaxes(collective, host, tier?.type));
       const response = await this.props.createOrder({
         variables: {
           order: {
@@ -269,14 +286,16 @@ class ContributionFlow extends React.Component {
             tier: this.props.tier && { legacyId: this.props.tier.legacyId },
             context: { isEmbed: this.props.isEmbed || false },
             tags: this.getQueryParams().tags,
-            taxes: stepSummary && [
-              {
-                type: stepSummary.taxType,
-                amount: getGQLV2AmountInput(stepSummary.amount, 0),
-                country: stepSummary.countryISO,
-                idNumber: stepSummary.number,
-              },
-            ],
+            taxes: skipTaxes
+              ? null
+              : [
+                  {
+                    type: stepSummary.taxType,
+                    amount: getGQLV2AmountInput(stepSummary.amount, 0),
+                    country: stepSummary.countryISO,
+                    idNumber: stepSummary.number,
+                  },
+                ],
           },
         },
       });
@@ -378,9 +397,16 @@ class ContributionFlow extends React.Component {
       const verb = 'donate';
       const fallback = `/${this.props.collective.slug}/${verb}/success?OrderId=${order.id}`;
       if (isTrustedRedirectHost(url.host)) {
-        window.location.href = url.href;
+        if (queryParams.shouldRedirectParent) {
+          window.parent.location.href = url.href;
+        } else {
+          window.location.href = url.href;
+        }
       } else {
-        await this.props.router.push({ pathname: '/external-redirect', query: { url: url.href, fallback } });
+        await this.props.router.push({
+          pathname: '/external-redirect',
+          query: { url: url.href, fallback, shouldRedirectParent: queryParams.shouldRedirectParent },
+        });
         return this.scrollToTop();
       }
     } else {
@@ -399,8 +425,8 @@ class ContributionFlow extends React.Component {
   getContributeProfiles = memoizeOne(getContributeProfiles);
 
   getDefaultStepProfile() {
-    const { LoggedInUser, loadingLoggedInUser, collective, tier } = this.props;
-    const profiles = this.getContributeProfiles(LoggedInUser, collective, tier);
+    const { LoggedInUser, loadingLoggedInUser, collective } = this.props;
+    const profiles = this.getContributeProfiles(LoggedInUser, collective);
     const queryParams = this.getQueryParams();
 
     // We want to wait for the user to be logged in before matching the profile
@@ -631,8 +657,8 @@ class ContributionFlow extends React.Component {
 
   /** Get the route for the given step. Doesn't include query string. */
   getRoute = step => {
-    const { collective, tier, isEmbed } = this.props;
-    const verb = this.props.verb || 'donate';
+    const { collective, tier, isEmbed, router } = this.props;
+    const verb = router.query.verb || 'donate';
     const stepRoute = !step || step === STEPS.DETAILS ? '' : `/${step}`;
     if (isEmbed) {
       if (tier) {
@@ -655,6 +681,14 @@ class ContributionFlow extends React.Component {
     }
 
     return `${getCollectivePageRoute(collective)}/${verb}${stepRoute}`;
+  };
+
+  getRedirectUrlForSignIn = () => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    } else {
+      return `${window.location.pathname}${window.location.search || ''}`;
+    }
   };
 
   scrollToTop = () => {
@@ -717,7 +751,7 @@ class ContributionFlow extends React.Component {
           } else if (
             !this.checkFormValidity() ||
             !stepDetails ||
-            stepDetails.amount < minAmount ||
+            stepDetails.amount < minAmount || // Min amount is per-item, so we don't need to multiply by quantity
             !stepDetails.quantity
           ) {
             return false;
@@ -726,11 +760,13 @@ class ContributionFlow extends React.Component {
           } else if (
             stepDetails.amount &&
             stepDetails.platformTip &&
-            stepDetails.platformTip / stepDetails.amount >= 0.5
+            stepDetails.platformTip / (stepDetails.amount * stepDetails.quantity) >= 0.5
           ) {
             return confirm(
               intl.formatMessage(OTHER_MESSAGES.tipAmountContributionWarning, {
-                contributionAmount: formatCurrency(stepDetails.amount, currency, { locale: intl.locale }),
+                contributionAmount: formatCurrency(getTotalAmount(stepDetails, stepSummary), currency, {
+                  locale: intl.locale,
+                }),
                 tipAmount: formatCurrency(stepDetails.platformTip, currency, { locale: intl.locale }),
                 accountName: collective.name,
                 newLine: '\n',
@@ -750,7 +786,10 @@ class ContributionFlow extends React.Component {
     ];
 
     // Show the summary step only if the order has tax
-    if (!noPaymentRequired && this.getApplicableTaxes(collective, host, tier?.type).length) {
+    if (
+      !noPaymentRequired &&
+      (this.getApplicableTaxes(collective, host, tier?.type).length || this.state.forceSummaryStep)
+    ) {
       steps.push({
         name: 'summary',
         label: intl.formatMessage(STEP_LABELS.summary),
@@ -768,6 +807,8 @@ class ContributionFlow extends React.Component {
         validate: action => {
           if (action === 'prev') {
             return true;
+          } else if (stepPayment?.isKeyOnly) {
+            return false; // Need to redirect to the payment step to load the payment method
           } else if (stepPayment?.key === STRIPE_PAYMENT_ELEMENT_KEY) {
             return stepPayment.isCompleted;
           } else {
@@ -836,27 +877,6 @@ class ContributionFlow extends React.Component {
     }
   }
 
-  getRedirectUrlForSignIn = () => {
-    if (typeof window === 'undefined') {
-      return undefined;
-    }
-
-    const { stepDetails } = this.state;
-    const stepDetailsParams = objectToQueryString({
-      amount: stepDetails.amount / 100,
-      interval: stepDetails.interval || undefined,
-      quantity: stepDetails.quantity !== 1 ? stepDetails.quantity : undefined,
-      platformTip: !isNil(stepDetails.platformTip) ? stepDetails.platformTip / 100 : undefined,
-    });
-
-    const path = window.location.pathname;
-    if (window.location.search) {
-      return `${path}${window.location.search}&${stepDetailsParams.slice(1)}`;
-    } else {
-      return `${path}${stepDetailsParams}`;
-    }
-  };
-
   cryptoOrderCompleted = () => {
     const { createdOrder } = this.state;
     this.pushStepRoute('success', { replace: false, query: { OrderId: createdOrder.id } });
@@ -894,6 +914,7 @@ class ContributionFlow extends React.Component {
         currentStepName={currentStepName}
         onStepChange={this.onStepChange}
         onComplete={isCrypto && isSubmitted ? this.cryptoOrderCompleted : this.submitOrder}
+        delayCompletionCheck={Boolean(loadingLoggedInUser && stepProfile)}
       >
         {({
           steps,
@@ -983,8 +1004,6 @@ class ContributionFlow extends React.Component {
                     isCrypto={isCrypto}
                     showPlatformTip={this.canHavePlatformTips()}
                     onNewCardFormReady={({ stripe, stripeElements }) => this.setState({ stripe, stripeElements })}
-                    defaultEmail={queryParams.email}
-                    defaultName={queryParams.name}
                     taxes={this.getApplicableTaxes(collective, host, tier?.type)}
                     onSignInClick={() => this.setState({ showSignIn: true })}
                     isEmbed={isEmbed}
@@ -992,7 +1011,7 @@ class ContributionFlow extends React.Component {
                     order={this.state.createdOrder}
                     disabledPaymentMethodTypes={queryParams.disabledPaymentMethodTypes}
                     hideCreditCardPostalCode={queryParams.hideCreditCardPostalCode}
-                    contributeProfiles={this.getContributeProfiles(LoggedInUser, collective, tier)}
+                    contributeProfiles={this.getContributeProfiles(LoggedInUser, collective)}
                   />
                   {!nextStep && shouldDisplayCaptcha && (
                     <Flex mt={40} justifyContent="center">
@@ -1038,16 +1057,22 @@ class ContributionFlow extends React.Component {
                   <Box minWidth={[null, '300px']} mt={[4, null, 0]} ml={[0, 3, 4, 5]}>
                     <Box maxWidth={['100%', null, 300]} px={[1, null, 0]}>
                       <SafeTransactionMessage />
-                      <Box mt={4}>
-                        <ContributionSummary
-                          collective={collective}
-                          stepDetails={stepDetails}
-                          stepSummary={stepSummary}
-                          stepPayment={stepPayment}
-                          currency={currency}
-                          isCrypto={isCrypto}
-                        />
-                      </Box>
+                      {currentStepName !== STEPS.SUMMARY && (
+                        <Container fontSize="12px" mt={4}>
+                          <P fontWeight="500" fontSize="inherit" mb={3}>
+                            <FormattedMessage id="ContributionSummary" defaultMessage="Contribution Summary" />
+                          </P>
+                          <ContributionSummary
+                            collective={collective}
+                            stepDetails={stepDetails}
+                            stepSummary={stepSummary}
+                            stepPayment={stepPayment}
+                            currency={currency}
+                            isCrypto={isCrypto}
+                            tier={tier}
+                          />
+                        </Container>
+                      )}
                       <ContributeFAQ collective={collective} mt={4} titleProps={{ mb: 2 }} isCrypto={isCrypto} />
                     </Box>
                   </Box>

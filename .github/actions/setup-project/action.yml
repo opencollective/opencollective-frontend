@@ -7,17 +7,10 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Get Node version from package.json
-      shell: bash
-      id: parse_package_json
-      run: |
-        result=`jq -r '.engines.node' package.json`
-        echo "::set-output name=node_version::$result"
-
     - name: Setup node
       uses: actions/setup-node@v3
       with:
-        node-version: ${{steps.parse_package_json.outputs.node_version}}
+        node-version-file: 'package.json'
 
     - name: Restore node_modules
       uses: actions/cache@v3

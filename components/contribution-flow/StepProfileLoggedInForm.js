@@ -34,7 +34,7 @@ const getProfileInfo = (stepProfile, profiles) => {
   }
 };
 
-const StepProfileLoggedInForm = ({ profiles, onChange, canUseIncognito, collective, data, stepDetails }) => {
+const StepProfileLoggedInForm = ({ profiles, onChange, collective, data, stepDetails }) => {
   const profileInfo = getProfileInfo(data, profiles);
   const isContributingFromSameHost = data?.host?.id === collective.host.legacyId;
 
@@ -43,9 +43,8 @@ const StepProfileLoggedInForm = ({ profiles, onChange, canUseIncognito, collecti
       <Box mb={4}>
         <ContributeProfilePicker
           profiles={profiles}
-          canUseIncognito={canUseIncognito}
           selectedProfile={data}
-          onChange={profile => onChange({ stepProfile: profile })}
+          onChange={profile => onChange({ stepProfile: profile, stepPayment: null })}
         />
       </Box>
       {!isContributingFromSameHost && contributionRequiresLegalName(stepDetails) && (
@@ -123,7 +122,6 @@ StepProfileLoggedInForm.propTypes = {
   stepDetails: PropTypes.object,
   onChange: PropTypes.func,
   profiles: PropTypes.arrayOf(PropTypes.object),
-  canUseIncognito: PropTypes.bool,
   collective: PropTypes.shape({
     host: PropTypes.shape({
       legacyId: PropTypes.number,

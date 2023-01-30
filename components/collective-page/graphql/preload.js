@@ -1,3 +1,4 @@
+import { isIndividualAccount } from '../../../lib/collective.lib';
 import { getFilteredSectionsForCollective, getSectionsNames } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
@@ -25,11 +26,12 @@ export const preloadCollectivePageGraphqlQueries = async (slug, client) => {
     const sections = getFilteredSectionsForCollective(collective);
     const sectionsNames = getSectionsNames(sections);
     const queries = [];
+    const isIndividual = isIndividualAccount(collective) && !collective.isHost;
     if (sectionsNames.includes('budget')) {
       queries.push(
         client.query({
-          query: getBudgetSectionQuery(Boolean(collective.host)),
-          variables: getBudgetSectionQueryVariables(slug, collective.host?.slug),
+          query: getBudgetSectionQuery(Boolean(collective.host), isIndividual),
+          variables: getBudgetSectionQueryVariables(slug, collective.host?.slug, isIndividual),
           context: API_V2_CONTEXT,
         }),
       );

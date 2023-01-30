@@ -13,6 +13,8 @@ import { Span } from './Text';
 /** Default styles for the amount (not including currency) */
 export const DEFAULT_AMOUNT_STYLES = { letterSpacing: 0, fontWeight: 'bold', color: 'black.900' };
 
+const EMPTY_AMOUNT_PLACEHOLDER = '--.--';
+
 /**
  * A practical component to format amounts and their intervals with proper
  * internationalization support.
@@ -30,9 +32,13 @@ const FormattedMoneyAmount = ({
   currencyCodeStyles,
   isCrypto,
 }) => {
+  if (!currency) {
+    return <Span {...amountStyles}>{EMPTY_AMOUNT_PLACEHOLDER}</Span>;
+  }
+
   const formattedAmount =
     isNaN(amount) || isNil(amount) ? (
-      <Span {...amountStyles}>--.--</Span>
+      <Span {...amountStyles}>{EMPTY_AMOUNT_PLACEHOLDER}</Span>
     ) : (
       <Currency
         value={amount}
@@ -50,7 +56,7 @@ const FormattedMoneyAmount = ({
   const currencyCode = showCurrencyCode ? <Span {...currencyCodeStyles}>{currency}</Span> : '';
   if (isCrypto) {
     return <Span {...amountStyles}>{`${amount} ${currency}`}</Span>;
-  } else if (!interval || interval === INTERVALS.flexible) {
+  } else if (!interval || interval === INTERVALS.flexible || interval === INTERVALS.oneTime) {
     return (
       <FormattedMessage
         id="Amount"
@@ -81,7 +87,7 @@ FormattedMoneyAmount.propTypes = {
   /** The amount to display, in cents */
   amount: PropTypes.number,
   /** The currency (eg. `USD`, `EUR`...etc) */
-  currency: PropTypes.string.isRequired,
+  currency: PropTypes.string,
   /** Abbreviate the interval (eg. year => yr.) */
   abbreviateInterval: PropTypes.bool,
   /** Whether to show the full currency code (ie. USD) */
@@ -89,7 +95,7 @@ FormattedMoneyAmount.propTypes = {
   /** How many numbers should we display after the comma */
   precision: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf(['auto'])]),
   /** An interval that goes with the amount */
-  interval: PropTypes.oneOf(['month', 'year']),
+  interval: PropTypes.oneOf(['month', 'year', 'oneTime']),
   /** ContributionFrequency from GQLV2 */
   frequency: PropTypes.oneOf(['MONTHLY', 'YEARLY', 'ONETIME']),
   /** Style for the amount (eg. `$10`). Doesn't apply on interval */

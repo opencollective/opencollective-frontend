@@ -201,6 +201,7 @@ const ContributeCard = ({
   tier,
   collective,
   isPreview,
+  forcedType,
   ...props
 }) => {
   const [isEditTierModalOpen, setIsEditTierModalOpen] = React.useState(false);
@@ -294,12 +295,20 @@ const ContributeCard = ({
                 data-cy="edit-btn"
                 onClick={() => setIsEditTierModalOpen(true)}
               >
-                Edit tier
+                <FormattedMessage
+                  defaultMessage="Edit {type, select, TICKET {Ticket} other {Tier}}"
+                  values={{ type: tier.type }}
+                />
               </StyledButton>
             </Box>
           )}
           {isEditTierModalOpen && (
-            <EditTierModal tier={tier} collective={collective} onClose={() => setIsEditTierModalOpen(false)} />
+            <EditTierModal
+              tier={tier}
+              collective={collective}
+              onClose={() => setIsEditTierModalOpen(false)}
+              forcedType={forcedType}
+            />
           )}
         </Box>
       </Flex>
@@ -347,6 +356,7 @@ ContributeCard.propTypes = {
   tier: PropTypes.object,
   collective: PropTypes.object,
   isPreview: PropTypes.bool,
+  forcedType: PropTypes.string,
 };
 
 ContributeCard.defaultProps = {

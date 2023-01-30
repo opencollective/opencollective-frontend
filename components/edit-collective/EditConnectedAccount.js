@@ -154,7 +154,7 @@ class EditConnectedAccount extends React.Component {
     }
 
     return (
-      <Flex className="EditConnectedAccount">
+      <Flex width="100%">
         {!connectedAccount && (
           <Box>
             <P fontSize="12px" color="black.600" fontWeight="normal" mb={2}>
@@ -171,13 +171,8 @@ class EditConnectedAccount extends React.Component {
           </Box>
         )}
         {connectedAccount && (
-          <Flex flexDirection="column">
+          <Flex flexDirection="column" width="100%">
             <Box>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.connected`], vars)}</Box>
-            {connectedAccount.service === 'twitter' && (
-              <Box my={2}>
-                <EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />
-              </Box>
-            )}
             <Box mt={1}>
               <StyledButton buttonSize="small" onClick={() => this.connect(service)}>
                 {intl.formatMessage(this.messages['collective.connectedAccounts.reconnect.button'])}
@@ -186,6 +181,11 @@ class EditConnectedAccount extends React.Component {
                 {intl.formatMessage(this.messages['collective.connectedAccounts.disconnect.button'])}
               </StyledButton>
             </Box>
+            {connectedAccount.service === 'twitter' && (
+              <Box my={3}>
+                <EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />
+              </Box>
+            )}
           </Flex>
         )}
       </Flex>

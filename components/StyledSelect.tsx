@@ -341,7 +341,7 @@ StyledSelect['propTypes'] = {
   /** @ignore from injectIntl */
   intl: PropTypes.object,
   /** Default option */
-  defaultValue: PropTypes.object,
+  defaultValue: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
   styles: PropTypes.object,
   /** To render menu in a portal */
   menuPortalTarget: PropTypes.any,

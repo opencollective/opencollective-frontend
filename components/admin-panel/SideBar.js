@@ -21,7 +21,7 @@ const AdminPanelSideBar = ({ collective, isAccountantOnly, isLoading, selectedSe
           {isLoading ? (
             <LoadingPlaceholder height={56} width={56} borderRadius="50%" />
           ) : (
-            <Link href={pageUrl}>
+            <Link href={pageUrl} data-cy="menu-account-avatar-link">
               <Avatar collective={collective} radius={56} />
             </Link>
           )}

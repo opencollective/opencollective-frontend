@@ -88,7 +88,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
       .then(() => {
         expect(confirmStub).to.be.calledOnce;
         expect(confirmStub).to.be.calledWith(
-          'You are about to make a contribution of $50.00 to TestCollective, with a tip to the Open Collective platform of $48.00. The tip amount looks unusually high.\n\nAre you sure you want to do this?',
+          'You are about to make a contribution of $98.00 to TestCollective that includes a $48.00 tip to the Open Collective platform. The tip amount looks unusually high.\n\nAre you sure you want to do this?',
         );
       });
 
@@ -112,8 +112,10 @@ describe('Contribution Flow: contribute with platform tips', () => {
     // Create a special tier to allow free contributions
     // TODO: Would be great to have that as a cypress command for that part, but there's no mutation to edit tiers on GQLV2 yet
     cy.login({ redirect: `/${collective.slug}/admin/tiers` });
-    cy.get('[data-cy="tier-input-field-minimumAmount"]:first input').type('{backspace}{backspace}{backspace}0');
-    cy.contains('button[type=submit]', 'Save').click();
+    cy.getByDataCy('contribute-card-tier').first().find('button').click();
+    cy.get('[data-cy="minimumAmount"]input').type('{backspace}{backspace}{backspace}0');
+    cy.getByDataCy('confirm-btn').click();
+    cy.checkToast({ type: 'SUCCESS', message: 'Tier updated.' });
     cy.visit(`/${collective.slug}/contribute`);
     cy.get('[data-cy="contribute-btn"]:first').click();
 

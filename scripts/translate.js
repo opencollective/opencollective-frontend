@@ -15,6 +15,7 @@ const DUPLICATED_IGNORED_MESSAGES = new Set([
   'all', // Can have different masculine/feminine for some languages based on the context
   'approved', // Can have different masculine/feminine for some languages based on the context
   'completed', // Can have different masculine/feminine for some languages based on the context
+  'confirm', // Can have different masculine/feminine for some languages based on the context
   'expired', // Can have different masculine/feminine for some languages based on the context
   'mark as paid', // Can have different masculine/feminine for some languages based on the context (order or expense)
   'order', // Depends on whether we're talking about ordering (sorting) or an order (contribution)
