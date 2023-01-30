@@ -2804,7 +2804,7 @@
   "User.EmailAddress": "E-mailová adresa",
   "User.InviteNew": "Pozvať nového používateľa",
   "user.isArchived": "Účet bol archivovaný.",
-  "user.isArchived.edit.description": "Tento účet bol archivovaný, už nie je aktívny.",
+  "user.isArchived.edit.description": "This account has been archived and is no longer active.",
   "user.since.label": "Od",
   "user.unknown": "Neznámy(a)",
   "UserCollective.incognito.description": "Tento používateľ sa rozhodol zostať inkognito",
