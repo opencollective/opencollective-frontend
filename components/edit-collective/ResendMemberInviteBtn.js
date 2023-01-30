@@ -29,7 +29,7 @@ const ResendMemberInviteBtn = ({ member, collective }) => {
         try {
           await inviteMember({
             variables: {
-              memberAccount: { id: member.memberAccount.id },
+              memberAccount: { id: member.account.id },
               account: { legacyId: getLegacyIdForCollective(collective) },
               role: member.role,
             },
@@ -56,7 +56,7 @@ ResendMemberInviteBtn.propTypes = {
   collective: PropTypes.object.isRequired,
   member: PropTypes.shape({
     role: PropTypes.string,
-    memberAccount: PropTypes.shape({ id: PropTypes.string.isRequired }).isRequired,
+    account: PropTypes.shape({ id: PropTypes.string.isRequired }).isRequired,
   }),
 };
 

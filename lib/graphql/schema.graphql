@@ -4901,11 +4901,6 @@ input TierInputType {
   Invoice receipt template
   """
   invoiceTemplate: String
-
-  """
-  Only one ticket per order
-  """
-  singleTicket: Boolean
 }
 
 """

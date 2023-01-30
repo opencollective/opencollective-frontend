@@ -248,6 +248,7 @@ interface Account {
     Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
     """
     accountType: [AccountType]
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -2564,6 +2565,7 @@ type Host implements Account & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -5283,6 +5285,7 @@ type Bot implements Account {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -5800,6 +5803,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -6646,6 +6650,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -7266,6 +7271,7 @@ type Individual implements Account {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -7958,6 +7964,7 @@ type Organization implements Account & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -8590,6 +8597,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -11388,6 +11396,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -12000,6 +12009,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -15206,6 +15216,7 @@ input TierUpdateInput {
   maxQuantity: Int
   minimumAmount: AmountInput
   useStandalonePage: Boolean
+  invoiceTemplate: String
   singleTicket: Boolean
 }
 
@@ -15222,6 +15233,7 @@ input TierCreateInput {
   maxQuantity: Int
   minimumAmount: AmountInput
   useStandalonePage: Boolean
+  singleTicket: Boolean
 }
 
 """
