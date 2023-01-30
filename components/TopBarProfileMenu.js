@@ -160,6 +160,12 @@ class TopBarProfileMenu extends React.Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    if (!prevProps.LoggedInUser && this.props.LoggedInUser) {
+      this.setState({ status: 'loggedin' });
+    }
+  }
+
   componentWillUnmount() {
     const main = document.querySelector('main');
     main.removeEventListener('click', this.onClickOutside);

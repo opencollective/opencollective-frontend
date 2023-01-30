@@ -589,7 +589,7 @@ function signinRequest(user, redirect) {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ user, redirect }),
+    body: JSON.stringify({ user, redirect, createProfile: true }),
   });
 }
 

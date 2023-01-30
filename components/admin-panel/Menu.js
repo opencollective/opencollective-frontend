@@ -195,7 +195,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={COLLECTIVE_SECTIONS.AUTHORIZED_APPS}
             if={isType(collective, USER)}
           />
-          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.TWO_FACTOR_AUTH} if={isIndividual} />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.USER_SECURITY} if={isIndividual} />
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS}

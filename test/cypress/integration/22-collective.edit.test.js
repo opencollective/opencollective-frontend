@@ -242,7 +242,7 @@ describe('edit user collective', () => {
 
   it('adds two-factor authentication', () => {
     cy.visit(`/${user.collective.slug}/admin`).then(() => {
-      cy.getByDataCy('menu-item-two-factor-auth').click();
+      cy.getByDataCy('menu-item-user-security').click();
       cy.getByDataCy('qr-code').should('exist');
       cy.getByDataCy('manual-entry-2fa-token')
         .invoke('text')

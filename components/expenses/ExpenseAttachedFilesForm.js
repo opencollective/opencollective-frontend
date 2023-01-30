@@ -64,6 +64,7 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue, title, des
         <StyledDropzone
           {...attachmentDropzoneParams}
           name="attachedFiles"
+          kind="EXPENSE_ATTACHED_FILE"
           disabled={disabled}
           minHeight={72}
           onSuccess={uploadedFiles => {

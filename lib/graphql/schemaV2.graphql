@@ -2456,6 +2456,7 @@ enum ActivityType {
   TWO_FACTOR_CODE_DELETED
   USER_CHANGE_EMAIL
   USER_PAYMENT_METHOD_CREATED
+  USER_PASSWORD_SET
   USER_CARD_CLAIMED
   USER_CARD_INVITED
   WEBHOOK_STRIPE_RECEIVED
@@ -7729,6 +7730,11 @@ type Individual implements Account {
     """
     offset: Int! = 0
   ): PersonalTokenCollection
+
+  """
+  Has the account a password set? For authenticated user: scope: "account".
+  """
+  hasPassword: Boolean
 }
 
 """
@@ -11232,6 +11238,7 @@ enum ActivityAndClassesType {
   TWO_FACTOR_CODE_DELETED
   USER_CHANGE_EMAIL
   USER_PAYMENT_METHOD_CREATED
+  USER_PASSWORD_SET
   USER_CARD_CLAIMED
   USER_CARD_INVITED
   WEBHOOK_STRIPE_RECEIVED
@@ -13171,6 +13178,21 @@ type Mutation {
   Update newsletter opt-in preference. Scope: "account".
   """
   setNewsletterOptIn(newsletterOptIn: Boolean!): Individual!
+
+  """
+  Set password to Individual. Scope: "account". 2FA.
+  """
+  setPassword(
+    """
+    The password to set.
+    """
+    password: String!
+
+    """
+    The current password (if any) to confirm password change.
+    """
+    currentPassword: String
+  ): Individual!
 
   """
   Invite a new member to the Collective. Scope: "account".

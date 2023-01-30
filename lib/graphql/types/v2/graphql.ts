@@ -744,6 +744,7 @@ export enum ActivityAndClassesType {
   USER_CHANGE_EMAIL = 'USER_CHANGE_EMAIL',
   USER_CREATED = 'USER_CREATED',
   USER_NEW_TOKEN = 'USER_NEW_TOKEN',
+  USER_PASSWORD_SET = 'USER_PASSWORD_SET',
   USER_PAYMENT_METHOD_CREATED = 'USER_PAYMENT_METHOD_CREATED',
   VIRTUAL_CARDS = 'VIRTUAL_CARDS',
   VIRTUAL_CARD_CHARGE_DECLINED = 'VIRTUAL_CARD_CHARGE_DECLINED',
@@ -880,6 +881,7 @@ export enum ActivityType {
   USER_CHANGE_EMAIL = 'USER_CHANGE_EMAIL',
   USER_CREATED = 'USER_CREATED',
   USER_NEW_TOKEN = 'USER_NEW_TOKEN',
+  USER_PASSWORD_SET = 'USER_PASSWORD_SET',
   USER_PAYMENT_METHOD_CREATED = 'USER_PAYMENT_METHOD_CREATED',
   VIRTUAL_CARD_CHARGE_DECLINED = 'VIRTUAL_CARD_CHARGE_DECLINED',
   VIRTUAL_CARD_PURCHASE = 'VIRTUAL_CARD_PURCHASE',
@@ -4686,6 +4688,8 @@ export type Individual = Account & {
   features: CollectiveFeatures;
   /** @deprecated 2022-06-03: Please use repositoryUrl */
   githubHandle?: Maybe<Scalars['String']>;
+  /** Has the account a password set? For authenticated user: scope: "account". */
+  hasPassword?: Maybe<Scalars['Boolean']>;
   hasSeenLatestChangelogEntry: Scalars['Boolean'];
   hasTwoFactorAuth?: Maybe<Scalars['Boolean']>;
   /** If the individual is a host account, this will return the matching Host object */
@@ -5323,6 +5327,8 @@ export type Mutation = {
   setEmailNotification?: Maybe<ActivitySubscription>;
   /** Update newsletter opt-in preference. Scope: "account". */
   setNewsletterOptIn: Individual;
+  /** Set password to Individual. Scope: "account". 2FA. */
+  setPassword: Individual;
   /** Adds or removes a policy on a given account. Scope: "account". */
   setPolicies: Account;
   /** Unpublish update. Scope: "updates". */
@@ -5958,6 +5964,13 @@ export type MutationSetEmailNotificationArgs = {
 /** This is the root mutation */
 export type MutationSetNewsletterOptInArgs = {
   newsletterOptIn: Scalars['Boolean'];
+};
+
+
+/** This is the root mutation */
+export type MutationSetPasswordArgs = {
+  currentPassword?: InputMaybe<Scalars['String']>;
+  password: Scalars['String'];
 };
 
 

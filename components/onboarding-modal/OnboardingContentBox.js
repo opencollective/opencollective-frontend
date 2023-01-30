@@ -1,16 +1,12 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Twitter } from '@styled-icons/fa-brands/Twitter';
-import { Field } from 'formik';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import CollectivePickerAsync from '../../components/CollectivePickerAsync';
 import Container from '../../components/Container';
 import StyledHr from '../../components/StyledHr';
-import StyledInputField from '../../components/StyledInputField';
-import StyledInputGroup from '../../components/StyledInputGroup';
 
-import CodeRepositoryIcon from '../CodeRepositoryIcon';
+import SocialLinksFormField from '../edit-collective/SocialLinksFormField';
 import { Box, Flex } from '../Grid';
 import { H1, P } from '../Text';
 
@@ -29,6 +25,8 @@ class OnboardingContentBox extends React.Component {
     values: PropTypes.object,
     errors: PropTypes.object,
     touched: PropTypes.object,
+    setFieldValue: PropTypes.func,
+    setFieldTouched: PropTypes.func,
   };
 
   constructor(props) {
@@ -63,7 +61,7 @@ class OnboardingContentBox extends React.Component {
   };
 
   render() {
-    const { slug, step, collective, updateAdmins, intl, values, errors, touched } = this.props;
+    const { slug, step, collective, updateAdmins, intl, values, touched } = this.props;
     const { admins } = this.state;
 
     return (
@@ -163,80 +161,14 @@ class OnboardingContentBox extends React.Component {
                 <FormattedMessage id="onboarding.contact.header" defaultMessage="Links and contact info" />
               </H1>
             </Box>
-            <Flex flexDirection="column" width="100%">
-              <P>
-                <FormattedMessage id="onboarding.contact.website" defaultMessage="Do you have a website?" />
-              </P>
-              <StyledInputField
-                my={[3, 2]}
-                htmlFor="website"
-                name="website"
-                value={values.website}
-                error={touched.website && errors.website}
-              >
-                {inputProps => (
-                  <Field
-                    as={StyledInputGroup}
-                    type="text"
-                    prepend="http://"
-                    placeholder="www.agora.com"
-                    {...inputProps}
-                  />
-                )}
-              </StyledInputField>
-              <P>
-                <FormattedMessage id="onboarding.contact.connect" defaultMessage="Connect your social platforms" />
-              </P>
-              <P my={2} fontSize="12px" color="black.500">
-                <FormattedMessage
-                  id="onboarding.contact.social"
-                  defaultMessage="Tell your contributors how to connect with you."
-                />
-              </P>
-              <Flex alignItems="center">
-                <Twitter size={20} color="black.500" />
-                <StyledInputField
-                  ml={2}
-                  my={2}
-                  htmlFor="twitterHandle"
-                  name="twitterHandle"
-                  flexGrow={1}
-                  value={values.twitterHandle}
-                  error={touched.twitterHandle && errors.twitterHandle}
-                >
-                  {inputProps => (
-                    <Field as={StyledInputGroup} type="text" placeholder="agora" prepend="@" {...inputProps} />
-                  )}
-                </StyledInputField>
-              </Flex>
-              <Flex alignItems="center">
-                <CodeRepositoryIcon
-                  repositoryUrl={values.repositoryUrl}
-                  size={16}
-                  color="#333"
-                  title={intl.formatMessage({ defaultMessage: 'Code repository' })}
-                />
-                <StyledInputField
-                  ml={2}
-                  my={2}
-                  htmlFor="repositoryUrl"
-                  name="repositoryUrl"
-                  flexGrow={1}
-                  value={values.repositoryUrl}
-                  error={touched.repositoryUrl && errors.repositoryUrl}
-                >
-                  {inputProps => (
-                    <Field
-                      as={StyledInputGroup}
-                      type="text"
-                      placeholder="github.com/my-organization/my-repo"
-                      prepend="https://"
-                      {...inputProps}
-                    />
-                  )}
-                </StyledInputField>
-              </Flex>
-            </Flex>
+            <SocialLinksFormField
+              value={values.socialLinks}
+              touched={touched.socialLinks}
+              onChange={s => {
+                this.props.setFieldValue('socialLinks', s);
+                this.props.setFieldTouched('socialLinks');
+              }}
+            />
           </Fragment>
         )}
       </Container>

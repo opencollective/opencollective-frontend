@@ -44,7 +44,7 @@ export async function confirmPayment(stripe: Stripe, clientSecret: string, payme
   }
 
   if (paymentIntentResult.error) {
-    throw new Error('Payment Intent Error', { cause: paymentIntentResult.error });
+    throw new Error(paymentIntentResult.error.message, { cause: paymentIntentResult.error });
   }
 
   return paymentIntentResult.paymentIntent;

@@ -135,6 +135,7 @@ class EditUpdateForm extends React.Component {
               <Box as="span">Message</Box>
             </Container>
             <RichTextEditor
+              kind="UPDATE"
               onChange={e => this.handleChange('html', e.target.value)}
               defaultValue={update.html}
               editorMinHeight={300}

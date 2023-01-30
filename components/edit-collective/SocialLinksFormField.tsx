@@ -75,35 +75,34 @@ export default function SocialLinksFormField({ value, touched, onChange }: Socia
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <Flex p={1} flexDirection="column">
-        <Flex>
-          <Box my="5px" fontWeight={700}>
-            <FormattedMessage defaultMessage="Social Links" />
-          </Box>
-        </Flex>
-        <Flex flexDirection="column">
-          {(value || []).map((socialLink, i) => {
-            return (
-              <SocialLinkItem
-                // eslint-disable-next-line react/no-array-index-key
-                key={i}
-                index={i}
-                error={touched && !isValidUrl(socialLink.url)}
-                onMoveItem={onMoveItem}
-                value={socialLink}
-                onChange={onItemChange}
-                onRemoveItem={onRemoveItem}
-              />
-            );
-          })}
-          <Flex mt={2}>
-            <StyledButton disabled={value.length >= 10} buttonSize="tiny" buttonStyle="standard" onClick={addItem}>
-              <Plus size="10px" />
-              <Span ml={2}>
-                <FormattedMessage defaultMessage="Add social link" />
-              </Span>
-            </StyledButton>
-          </Flex>
+      <Flex width="100%" flexDirection="column">
+        {(value || []).map((socialLink, i) => {
+          return (
+            <SocialLinkItem
+              // eslint-disable-next-line react/no-array-index-key
+              key={i}
+              index={i}
+              error={touched && !isValidUrl(socialLink.url)}
+              onMoveItem={onMoveItem}
+              value={socialLink}
+              onChange={onItemChange}
+              onRemoveItem={onRemoveItem}
+            />
+          );
+        })}
+        <Flex mt={2} justifyContent="center">
+          <StyledButton
+            disabled={value.length >= 10}
+            type="button"
+            buttonSize="tiny"
+            buttonStyle="standard"
+            onClick={addItem}
+          >
+            <Plus size="10px" />
+            <Span ml={2}>
+              <FormattedMessage defaultMessage="Add social link" />
+            </Span>
+          </StyledButton>
         </Flex>
       </Flex>
     </DndProvider>
@@ -182,6 +181,7 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
   return (
     <StyledSelect
       {...pickerProps}
+      data-cy="social-link-type-picker"
       value={options.find(o => o.value === value?.toString())}
       defaultValue={options.find(o => o.value === SocialLinkType.WEBSITE.toString())}
       onChange={({ value }) => onChange(value)}
@@ -257,7 +257,7 @@ function SocialLinkItem({ value, error, index, onChange, onRemoveItem, onMoveIte
         <DragIndicator size="15px" style={{ cursor: 'grab' }} />
       </div>
       <Flex flexGrow={1} flexWrap="wrap" gap="5px">
-        <Box width={['100%', '150px']}>
+        <Box width={['100%', '120px']}>
           <SocialLinkTypePicker value={value.type} onChange={type => onFieldChange('type', type)} />
         </Box>
         <StyledInput

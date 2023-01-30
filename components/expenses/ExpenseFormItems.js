@@ -1,14 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
-import { isEmpty, uniq } from 'lodash';
+import { isEmpty } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import { FEATURES, isFeatureEnabled } from '../../lib/allowed-features';
-import { Currency, PayPalSupportedCurrencies } from '../../lib/constants/currency';
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { toIsoDateStr } from '../../lib/date-utils';
 import { formatErrorMessage } from '../../lib/errors';
 import { i18nTaxType } from '../../lib/i18n/taxes';
@@ -49,6 +46,7 @@ export const addNewExpenseItem = (formik, defaultValues) => {
 class ExpenseFormItems extends React.PureComponent {
   static propTypes = {
     collective: PropTypes.object,
+    availableCurrencies: PropTypes.arrayOf(PropTypes.string),
     /** @ignore from injectIntl */
     intl: PropTypes.object,
     /** Array helper as provided by formik */
@@ -61,6 +59,7 @@ class ExpenseFormItems extends React.PureComponent {
       touched: PropTypes.object,
       errors: PropTypes.object,
       setFieldValue: PropTypes.func,
+      setFieldTouched: PropTypes.func,
     }).isRequired,
   };
 
@@ -124,38 +123,12 @@ class ExpenseFormItems extends React.PureComponent {
     }
   }
 
-  onCurrencyChange = newCurrency => {
-    this.props.form.setFieldValue('currency', newCurrency);
-  };
-
-  getPossibleCurrencies = () => {
-    const { collective, form } = this.props;
-
-    if (
-      !isFeatureEnabled(collective, FEATURES.MULTI_CURRENCY_EXPENSES) ||
-      !isFeatureEnabled(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES) ||
-      payoutMethod?.type === PayoutMethodType.ACCOUNT_BALANCE
-    ) {
-      return [collective?.currency];
-    }
-
-    const { payoutMethod, currency } = form.values;
-    const isPayPal = payoutMethod?.type === PayoutMethodType.PAYPAL;
-    if (isPayPal) {
-      return PayPalSupportedCurrencies;
-    } else if (payoutMethod?.type === PayoutMethodType.OTHER) {
-      return Currency;
-    } else {
-      return uniq(
-        [
-          currency,
-          collective?.currency,
-          collective?.host?.currency,
-          payoutMethod?.currency,
-          payoutMethod?.data?.currency,
-        ].filter(Boolean),
-      );
-    }
+  onCurrencyChange = async newCurrency => {
+    /* If we are calling setFieldValue in response to a field change and has validations
+     * we should set the field to touched; https://github.com/jaredpalmer/formik/issues/2059
+     */
+    await this.props.form.setFieldValue('currency', newCurrency);
+    this.props.form.setFieldTouched('currency', true);
   };
 
   getApplicableTaxType() {
@@ -196,6 +169,7 @@ class ExpenseFormItems extends React.PureComponent {
   }
 
   render() {
+    const { availableCurrencies } = this.props;
     const { values, errors, setFieldValue } = this.props.form;
     const requireFile = attachmentRequiresFile(values.type);
     const isGrant = values.type === expenseTypes.GRANT;
@@ -209,6 +183,7 @@ class ExpenseFormItems extends React.PureComponent {
           {this.renderErrors()}
           <StyledDropzone
             {...attachmentDropzoneParams}
+            kind="EXPENSE_ITEM"
             data-cy="expense-multi-attachments-dropzone"
             onSuccess={files => filesListToItems(files).map(this.props.push)}
             onReject={uploadErrors => this.setState({ uploadErrors })}
@@ -228,7 +203,6 @@ class ExpenseFormItems extends React.PureComponent {
     }
 
     const onRemove = requireFile || items.length > 1 ? this.remove : null;
-    const availableCurrencies = this.getPossibleCurrencies();
     const taxType = this.getApplicableTaxType();
     const hasTaxFields = this.hasTaxFields(taxType);
     return (
@@ -250,7 +224,7 @@ class ExpenseFormItems extends React.PureComponent {
             editOnlyDescriptiveInfo={isCreditCardCharge}
             hasMultiCurrency={!index && availableCurrencies?.length > 1} // Only display currency picker for the first item
             availableCurrencies={availableCurrencies}
-            onCurrencyChange={this.onCurrencyChange}
+            onCurrencyChange={async value => await this.onCurrencyChange(value)}
             isLastItem={index === items.length - 1}
           />
         ))}
