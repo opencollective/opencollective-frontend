@@ -2,7 +2,6 @@ import React from 'react';
 import { Discord, Discourse, Mastodon, Meetup, Tiktok, Tumblr } from '@styled-icons/fa-brands';
 import { Facebook, Github, Gitlab, Globe, Instagram, Linkedin, Slack, Twitter, Youtube } from '@styled-icons/feather';
 import { Pixelfed } from '@styled-icons/remix-line';
-import { Ghost, Peertube } from '@styled-icons/simple-icons';
 
 import { SocialLink, SocialLinkType } from '../../../lib/graphql/types/v2/graphql';
 
@@ -27,8 +26,8 @@ const SocialLinkIcon = {
   [SocialLinkType.WEBSITE]: Globe,
   [SocialLinkType.DISCOURSE]: Discourse,
   [SocialLinkType.PIXELFED]: Pixelfed,
-  [SocialLinkType.GHOST]: Ghost,
-  [SocialLinkType.PEERTUBE]: Peertube,
+  [SocialLinkType.GHOST]: Globe,
+  [SocialLinkType.PEERTUBE]: Globe,
   [SocialLinkType.TIKTOK]: Tiktok,
 };
 
