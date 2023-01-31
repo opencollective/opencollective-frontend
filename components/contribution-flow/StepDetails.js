@@ -127,6 +127,17 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
                 prependProps={{ color: 'black.500' }}
                 required
                 onChange={value => {
+                  const previousValue = data?.amount;
+                  // Increase/Decrease the amount by 0.5 instead of 0.01 when using the arrows
+                  const isTopArrowClicked = value - previousValue === 1;
+                  const isBottomArrowClicked = value - previousValue === -1;
+
+                  if (isTopArrowClicked) {
+                    value = value + 49;
+                  } else if (isBottomArrowClicked) {
+                    value = value - 49;
+                  }
+
                   dispatchChange('amount', value);
                 }}
               />
