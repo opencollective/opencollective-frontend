@@ -1,10 +1,13 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import dynamic from 'next/dynamic';
 import { withRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
-import { resetPassword } from '../lib/api';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { i18nGraphqlException } from '../lib/errors';
 
 import Body from '../components/Body';
 import Container from '../components/Container';
@@ -25,8 +28,14 @@ class ResetPasswordPage extends React.Component {
   }
 
   static propTypes = {
+    /* From getInitialProps */
     token: PropTypes.string,
-    router: PropTypes.object,
+    /* From withRouter */
+    router: PropTypes.object.isRequired,
+    /* From injectIntl */
+    intl: PropTypes.object.isRequired,
+    /* From withRouter */
+    resetPassword: PropTypes.func,
   };
 
   constructor(props) {
@@ -42,7 +51,6 @@ class ResetPasswordPage extends React.Component {
   }
 
   async submitResetPassword() {
-    const accessToken = this.props.token;
     const { password, passwordScore } = this.state;
 
     if (passwordScore <= 1) {
@@ -58,10 +66,12 @@ class ResetPasswordPage extends React.Component {
     this.setState({ passwordLoading: true });
 
     try {
-      await resetPassword(accessToken, password);
+      await this.props.resetPassword({ variables: { password } });
       await this.props.router.push({ pathname: '/reset-password/completed' });
     } catch (error) {
-      this.setState({ passwordError: error.message, showError: true, passwordLoading: false });
+      const errorMessage = i18nGraphqlException(this.props.intl, error);
+
+      this.setState({ passwordError: errorMessage, showError: true, passwordLoading: false });
     }
   }
 
@@ -187,4 +197,22 @@ class ResetPasswordPage extends React.Component {
   }
 }
 
-export default withRouter(ResetPasswordPage);
+const resetPasswordMutation = gql`
+  mutation ResetPassword($password: String!) {
+    setPassword(password: $password) {
+      id
+    }
+  }
+`;
+
+const addResetPasswordMutation = graphql(resetPasswordMutation, {
+  name: 'resetPassword',
+  options: props => ({
+    context: {
+      ...API_V2_CONTEXT,
+      headers: { authorization: `Bearer ${props.token}` },
+    },
+  }),
+});
+
+export default withRouter(injectIntl(addResetPasswordMutation(ResetPasswordPage)));
