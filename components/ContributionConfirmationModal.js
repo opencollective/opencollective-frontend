@@ -16,7 +16,7 @@ import StyledHr from './StyledHr';
 import StyledInput from './StyledInput';
 import StyledInputAmount from './StyledInputAmount';
 import StyledInputPercentage from './StyledInputPercentage';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
+import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from './StyledModal';
 import StyledTooltip from './StyledTooltip';
 import { P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
@@ -105,14 +105,17 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
 
   return (
     <StyledModal width="578px" onClose={onClose} trapFocus>
-      <ModalHeader>
-        <FormattedMessage defaultMessage="Confirm Contribution" />
-      </ModalHeader>
+      <CollectiveModalHeader
+        collective={order.toAccount}
+        customText={
+          <FormattedMessage defaultMessage="Confirm contribution to {payee}" values={{ payee: order.toAccount.name }} />
+        }
+      />
       <ModalBody>
-        <P mb={4} fontSize="13px">
+        <P mt={3} fontSize="13px">
           <FormattedMessage defaultMessage="Confirm the amount of funds you have received in your host account." />
         </P>
-        <Container mt="58px">
+        <Container mt={4}>
           <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
             <Span fontSize="14px" lineHeight="20px" fontWeight="700">
               <FormattedMessage
