@@ -6,4 +6,5 @@ export type LoggedInUser = {
     name: string;
     type: string;
   };
+  hasTwoFactorAuth?: boolean;
 };
