@@ -10,6 +10,14 @@ export function gql(source: "\n  query SearchTags($term: String!) {\n    tagStat
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  fragment MemberFields on Member {\n    id\n    role\n    since\n    createdAt\n    description\n    inherited\n    account {\n      id\n      name\n      slug\n      type\n      imageUrl(height: 64)\n      ... on Individual {\n        email\n      }\n    }\n  }\n"): typeof import('./graphql').MemberFieldsFragmentDoc;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query TeamSection($collectiveSlug: String!, $account: AccountReferenceInput!) {\n    account(slug: $collectiveSlug) {\n      id\n      isFrozen\n      ... on AccountWithParent {\n        parent {\n          id\n          slug\n          type\n          name\n        }\n      }\n      ... on AccountWithHost {\n        host {\n          id\n          slug\n          name\n          features {\n            id\n            CONTACT_FORM\n          }\n        }\n      }\n      members(role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {\n        nodes {\n          id\n          ...MemberFields\n        }\n      }\n      childrenAccounts {\n        nodes {\n          id\n          slug\n          type\n          name\n          members(includeInherited: false, role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {\n            nodes {\n              id\n              ...MemberFields\n            }\n          }\n        }\n      }\n    }\n    memberInvitations(account: $account) {\n      id\n      role\n      since\n      createdAt\n      description\n      account: memberAccount {\n        id\n        name\n        slug\n        type\n        imageUrl(height: 64)\n        ... on Individual {\n          email\n        }\n      }\n    }\n  }\n  \n"): typeof import('./graphql').TeamSectionDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  fragment NavbarFields on CollectiveFeatures {\n    id\n    ABOUT\n    CONNECTED_ACCOUNTS\n    RECEIVE_FINANCIAL_CONTRIBUTIONS\n    RECURRING_CONTRIBUTIONS\n    EVENTS\n    PROJECTS\n    USE_EXPENSES\n    RECEIVE_EXPENSES\n    USE_EXPENSES\n    COLLECTIVE_GOALS\n    TOP_FINANCIAL_CONTRIBUTORS\n    CONVERSATIONS\n    UPDATES\n    TEAM\n    CONTACT_FORM\n    RECEIVE_HOST_APPLICATIONS\n    HOST_DASHBOARD\n    TRANSACTIONS\n    REQUEST_VIRTUAL_CARDS\n  }\n"): typeof import('./graphql').NavbarFieldsFragmentDoc;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.

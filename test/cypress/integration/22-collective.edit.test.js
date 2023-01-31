@@ -44,7 +44,7 @@ describe('edit collective', () => {
     const invitedUserEmail = randomEmail();
 
     // Add a new member by creating it inline with the collective picker
-    cy.getByDataCy('menu-item-members').click();
+    cy.getByDataCy('menu-item-team').click();
     cy.wait(200);
     cy.getByDataCy('invite-member-btn').click();
     cy.wait(200);
@@ -78,7 +78,7 @@ describe('edit collective', () => {
     cy.url().should('eq', `${Cypress.config().baseUrl}/${collectiveSlug}`);
     cy.contains('#section-our-team', 'AmazingNewUser');
 
-    cy.visit(`/${collectiveSlug}/admin/members`);
+    cy.visit(`/${collectiveSlug}/admin/team`);
     cy.get('[data-cy="member-1"]').find('[data-cy="member-pending-tag"]').should('not.exist');
     cy.getByDataCy('resend-invite-btn').should('not.exist');
   });

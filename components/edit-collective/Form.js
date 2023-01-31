@@ -44,7 +44,6 @@ import FiscalHosting from './sections/FiscalHosting';
 import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
 import HostVirtualCardsSettings from './sections/HostVirtualCardsSettings';
-import Members from './sections/Members';
 import PaymentMethods from './sections/PaymentMethods';
 import PaymentReceipts from './sections/PaymentReceipts';
 import Policies from './sections/Policies';
@@ -399,7 +398,7 @@ class EditCollectiveForm extends React.Component {
   }
 
   renderSection(section) {
-    const { collective, host, LoggedInUser } = this.props;
+    const { collective, LoggedInUser } = this.props;
 
     switch (section) {
       case EDIT_COLLECTIVE_SECTIONS.INFO:
@@ -424,9 +423,6 @@ class EditCollectiveForm extends React.Component {
         return (
           <Host collective={collective} LoggedInUser={LoggedInUser} editCollectiveMutation={this.props.onSubmit} />
         );
-
-      case EDIT_COLLECTIVE_SECTIONS.MEMBERS:
-        return <Members collective={collective} host={host} />;
 
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS:
         return <PaymentMethods collectiveSlug={collective.slug} />;

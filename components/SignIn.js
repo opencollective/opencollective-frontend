@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Head from 'next/head';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
@@ -117,6 +118,10 @@ export default class SignIn extends React.Component {
     const { error, showError } = this.state;
     return (
       <React.Fragment>
+        <Head>
+          {/* Add title hint for 1password and perhaps other password managers*/}
+          <title>Sign In - Open Collective</title>
+        </Head>
         <Box maxWidth={390} px={['20px', 0]}>
           {this.props.isOAuth ? (
             <React.Fragment>
