@@ -184,10 +184,10 @@ interface Account {
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -2452,6 +2452,7 @@ enum ActivityType {
   PAYMENT_CREDITCARD_EXPIRING
   USER_CREATED
   USER_NEW_TOKEN
+  USER_SIGNIN
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_CODE_ADDED
   TWO_FACTOR_CODE_DELETED
@@ -2500,10 +2501,10 @@ type Host implements Account & AccountWithContributions {
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -3479,6 +3480,7 @@ enum PaymentMethodType {
   paymentintent @deprecated(reason: "Please use uppercase values")
   us_bank_account @deprecated(reason: "Please use uppercase values")
   sepa_debit @deprecated(reason: "Please use uppercase values")
+  bacs_debit @deprecated(reason: "Please use uppercase values")
   ALIPAY
   CREDITCARD
   PREPAID
@@ -3493,6 +3495,7 @@ enum PaymentMethodType {
   PAYMENT_INTENT
   US_BANK_ACCOUNT
   SEPA_DEBIT
+  BACS_DEBIT
 }
 
 input PaymentMethodReferenceInput {
@@ -3729,6 +3732,7 @@ enum PaymentMethodLegacyType {
   PAYMENT_INTENT
   US_BANK_ACCOUNT
   SEPA_DEBIT
+  BACS_DEBIT
 }
 
 """
@@ -5220,10 +5224,10 @@ type Bot implements Account {
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -5738,10 +5742,10 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -6585,10 +6589,10 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -7206,10 +7210,10 @@ type Individual implements Account {
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -7899,10 +7903,10 @@ type Organization implements Account & AccountWithContributions {
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -8532,10 +8536,10 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -9691,9 +9695,19 @@ type Query {
   ): Project
   tagStats(
     """
-    Return tags from collectives which includes this search term
+    Return tags from collectives which includes this search term. Using this argument will ignore tagSearchTerm. Skipping this argument will use a more efficient query.
     """
     searchTerm: String
+
+    """
+    Return tags which includes this search term. Using this argument will ignore searchTerm.
+    """
+    tagSearchTerm: String
+
+    """
+    Return tags from collectives hosted by this host.
+    """
+    host: AccountReferenceInput
     limit: Int! = 10
     offset: Int! = 0
   ): TagStatsCollection!
@@ -11231,6 +11245,7 @@ enum ActivityAndClassesType {
   PAYMENT_CREDITCARD_EXPIRING
   USER_CREATED
   USER_NEW_TOKEN
+  USER_SIGNIN
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_CODE_ADDED
   TWO_FACTOR_CODE_DELETED
@@ -11331,10 +11346,10 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -11944,10 +11959,10 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -13866,7 +13881,7 @@ input CollectiveCreateInput {
   description: String!
   tags: [String]
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   settings: JSON
 }
 
@@ -15233,6 +15248,7 @@ input TierCreateInput {
   maxQuantity: Int
   minimumAmount: AmountInput
   useStandalonePage: Boolean
+  invoiceTemplate: String
   singleTicket: Boolean
 }
 

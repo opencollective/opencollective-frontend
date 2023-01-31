@@ -509,6 +509,7 @@ class ContributionFlow extends React.Component {
     if (
       stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.US_BANK_ACCOUNT ||
       stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.SEPA_DEBIT ||
+      stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.BACS_DEBIT ||
       stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.PAYMENT_INTENT
     ) {
       paymentMethod.paymentIntentId = stepPayment.paymentMethod.paymentIntentId;

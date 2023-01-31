@@ -267,6 +267,7 @@
   "B5z1AU": "from {payee} to {account}",
   "B7p2EC": "客户密钥",
   "Back": "返回",
+  "BacsDebit": "Bacs Debit",
   "BalanceAmount": "余额 {balance}",
   "BankAccount": "银行账户",
   "bankaccount.instructions.account": "如上为您添加的银行账户信息。",

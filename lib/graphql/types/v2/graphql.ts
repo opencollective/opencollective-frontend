@@ -102,6 +102,7 @@ export type Account = {
   permissions: AccountPermissions;
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
@@ -113,6 +114,7 @@ export type Account = {
   tags?: Maybe<Array<Maybe<Scalars['String']>>>;
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   twitterHandle?: Maybe<Scalars['String']>;
   /** The type of the account (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL/VENDOR) */
   type: AccountType;
@@ -124,6 +126,7 @@ export type Account = {
   virtualCardMerchants?: Maybe<AccountCollection>;
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']>;
 };
 
@@ -747,6 +750,7 @@ export enum ActivityAndClassesType {
   USER_NEW_TOKEN = 'USER_NEW_TOKEN',
   USER_PASSWORD_SET = 'USER_PASSWORD_SET',
   USER_PAYMENT_METHOD_CREATED = 'USER_PAYMENT_METHOD_CREATED',
+  USER_SIGNIN = 'USER_SIGNIN',
   VIRTUAL_CARDS = 'VIRTUAL_CARDS',
   VIRTUAL_CARD_CHARGE_DECLINED = 'VIRTUAL_CARD_CHARGE_DECLINED',
   VIRTUAL_CARD_PURCHASE = 'VIRTUAL_CARD_PURCHASE',
@@ -884,6 +888,7 @@ export enum ActivityType {
   USER_NEW_TOKEN = 'USER_NEW_TOKEN',
   USER_PASSWORD_SET = 'USER_PASSWORD_SET',
   USER_PAYMENT_METHOD_CREATED = 'USER_PAYMENT_METHOD_CREATED',
+  USER_SIGNIN = 'USER_SIGNIN',
   VIRTUAL_CARD_CHARGE_DECLINED = 'VIRTUAL_CARD_CHARGE_DECLINED',
   VIRTUAL_CARD_PURCHASE = 'VIRTUAL_CARD_PURCHASE',
   VIRTUAL_CARD_REQUESTED = 'VIRTUAL_CARD_REQUESTED',
@@ -1065,6 +1070,7 @@ export type Bot = Account & {
   permissions: AccountPermissions;
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
@@ -1076,6 +1082,7 @@ export type Bot = Account & {
   tags?: Maybe<Array<Maybe<Scalars['String']>>>;
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   twitterHandle?: Maybe<Scalars['String']>;
   type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
@@ -1086,6 +1093,7 @@ export type Bot = Account & {
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
   webhooks: WebhookCollection;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']>;
 };
 
@@ -1399,6 +1407,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   platformFeePercent: Scalars['Int'];
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
@@ -1413,6 +1422,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   totalFinancialContributors: Scalars['Int'];
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   twitterHandle?: Maybe<Scalars['String']>;
   type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
@@ -1423,6 +1433,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
   webhooks: WebhookCollection;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']>;
 };
 
@@ -1648,6 +1659,7 @@ export type CollectiveCreateInput = {
   /** @deprecated 2022-06-03: Please use repositoryUrl */
   githubHandle?: InputMaybe<Scalars['String']>;
   name: Scalars['String'];
+  /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: InputMaybe<Scalars['String']>;
   settings?: InputMaybe<Scalars['JSON']>;
   slug: Scalars['String'];
@@ -3062,6 +3074,7 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   platformFeePercent: Scalars['Int'];
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
@@ -3080,6 +3093,7 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   totalFinancialContributors: Scalars['Int'];
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   twitterHandle?: Maybe<Scalars['String']>;
   type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
@@ -3090,6 +3104,7 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
   webhooks: WebhookCollection;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']>;
 };
 
@@ -3850,6 +3865,7 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   platformFeePercent: Scalars['Int'];
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
@@ -3864,6 +3880,7 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   totalFinancialContributors: Scalars['Int'];
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   twitterHandle?: Maybe<Scalars['String']>;
   type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
@@ -3874,6 +3891,7 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
   webhooks: WebhookCollection;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']>;
 };
 
@@ -4214,6 +4232,7 @@ export type Host = Account & AccountWithContributions & {
   platformFeePercent: Scalars['Int'];
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
@@ -4236,6 +4255,7 @@ export type Host = Account & AccountWithContributions & {
   transferwise?: Maybe<TransferWise>;
   /** Transferwise balances. Returns null if Transferwise account is not connected. */
   transferwiseBalances?: Maybe<Array<Maybe<Amount>>>;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   twitterHandle?: Maybe<Scalars['String']>;
   type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
@@ -4246,6 +4266,7 @@ export type Host = Account & AccountWithContributions & {
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
   webhooks: WebhookCollection;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']>;
 };
 
@@ -4754,6 +4775,7 @@ export type Individual = Account & {
   personalTokens?: Maybe<PersonalTokenCollection>;
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
@@ -4765,6 +4787,7 @@ export type Individual = Account & {
   tags?: Maybe<Array<Maybe<Scalars['String']>>>;
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   twitterHandle?: Maybe<Scalars['String']>;
   type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
@@ -4775,6 +4798,7 @@ export type Individual = Account & {
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
   webhooks: WebhookCollection;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']>;
 };
 
@@ -6430,6 +6454,7 @@ export type Organization = Account & AccountWithContributions & {
   platformFeePercent: Scalars['Int'];
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
@@ -6444,6 +6469,7 @@ export type Organization = Account & AccountWithContributions & {
   totalFinancialContributors: Scalars['Int'];
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   twitterHandle?: Maybe<Scalars['String']>;
   type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
@@ -6454,6 +6480,7 @@ export type Organization = Account & AccountWithContributions & {
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
   webhooks: WebhookCollection;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']>;
 };
 
@@ -6772,6 +6799,7 @@ export enum PaymentMethodLegacyType {
   ACCOUNT_BALANCE = 'ACCOUNT_BALANCE',
   ADDED_FUNDS = 'ADDED_FUNDS',
   ALIPAY = 'ALIPAY',
+  BACS_DEBIT = 'BACS_DEBIT',
   BANK_TRANSFER = 'BANK_TRANSFER',
   CREDIT_CARD = 'CREDIT_CARD',
   CRYPTO = 'CRYPTO',
@@ -6799,6 +6827,7 @@ export enum PaymentMethodService {
 export enum PaymentMethodType {
   ADAPTIVE = 'ADAPTIVE',
   ALIPAY = 'ALIPAY',
+  BACS_DEBIT = 'BACS_DEBIT',
   COLLECTIVE = 'COLLECTIVE',
   CREDITCARD = 'CREDITCARD',
   CRYPTO = 'CRYPTO',
@@ -6815,6 +6844,8 @@ export enum PaymentMethodType {
   adaptive = 'adaptive',
   /** @deprecated Please use uppercase values */
   alipay = 'alipay',
+  /** @deprecated Please use uppercase values */
+  bacs_debit = 'bacs_debit',
   /** @deprecated Please use uppercase values */
   collective = 'collective',
   /** @deprecated Please use uppercase values */
@@ -7111,6 +7142,7 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   platformFeePercent: Scalars['Int'];
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
@@ -7125,6 +7157,7 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   totalFinancialContributors: Scalars['Int'];
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   twitterHandle?: Maybe<Scalars['String']>;
   type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
@@ -7135,6 +7168,7 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
   webhooks: WebhookCollection;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']>;
 };
 
@@ -7613,9 +7647,11 @@ export type QueryProjectArgs = {
 
 /** This is the root query */
 export type QueryTagStatsArgs = {
+  host?: InputMaybe<AccountReferenceInput>;
   limit?: Scalars['Int'];
   offset?: Scalars['Int'];
   searchTerm?: InputMaybe<Scalars['String']>;
+  tagSearchTerm?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -7890,6 +7926,7 @@ export type TierCreateInput = {
   description?: InputMaybe<Scalars['String']>;
   frequency: TierFrequency;
   goal?: InputMaybe<AmountInput>;
+  invoiceTemplate?: InputMaybe<Scalars['String']>;
   maxQuantity?: InputMaybe<Scalars['Int']>;
   minimumAmount?: InputMaybe<AmountInput>;
   name?: InputMaybe<Scalars['NonEmptyString']>;
@@ -8444,6 +8481,7 @@ export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   platformFeePercent: Scalars['Int'];
   /** Policies for the account. To see non-public policies you need to be admin and have the scope: "account". */
   policies: Policies;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: Maybe<Scalars['String']>;
   settings: Scalars['JSON'];
   /** The slug identifying the account (ie: babel) */
@@ -8458,6 +8496,7 @@ export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   totalFinancialContributors: Scalars['Int'];
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   twitterHandle?: Maybe<Scalars['String']>;
   type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
@@ -8468,6 +8507,7 @@ export type Vendor = Account & AccountWithContributions & AccountWithHost & {
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
   webhooks: WebhookCollection;
+  /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']>;
 };
 
