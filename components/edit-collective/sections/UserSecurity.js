@@ -347,7 +347,7 @@ class UserSecurity extends React.Component {
 
           <PasswordStrengthBar
             style={{ visibility: password ? 'visible' : 'hidden' }}
-            password={this.state.password}
+            password={password}
             onChangeScore={passwordScore => {
               this.setState({ passwordScore });
             }}
