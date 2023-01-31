@@ -708,6 +708,7 @@ export const editTiersFieldsFragment = gql`
     type
     useStandalonePage
     singleTicket
+    invoiceTemplate
   }
 `;
 
@@ -783,21 +784,14 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
   const initialValues = React.useMemo(() => {
     if (isEditing) {
       return {
-        ...omit(tier, [
-          '__typename',
-          'endsAt',
-          'slug',
-          'legacyId',
-          'invoiceTemplate',
-          'customFields',
-          'availableQuantity',
-        ]),
+        ...omit(tier, ['__typename', 'endsAt', 'slug', 'legacyId', 'customFields', 'availableQuantity']),
         amount: omit(tier.amount, '__typename'),
         interval: getIntervalFromContributionFrequency(tier.frequency),
         goal: omit(tier.goal, '__typename'),
         minimumAmount: omit(tier.minimumAmount, '__typename'),
         description: tier.description || '',
         presets: tier.presets || [1000],
+        invoiceTemplate: tier.invoiceTemplate,
       };
     } else {
       return {
