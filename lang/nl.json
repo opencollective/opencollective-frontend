@@ -267,6 +267,7 @@
   "B5z1AU": "van {payee} naar {account}",
   "B7p2EC": "Client secret",
   "Back": "Terug",
+  "BacsDebit": "Bacs Debit",
   "BalanceAmount": "Saldo {balance}",
   "BankAccount": "Bankrekening",
   "bankaccount.instructions.account": "The bank account details you added above.",
