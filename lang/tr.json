@@ -267,6 +267,7 @@
   "B5z1AU": "from {payee} to {account}",
   "B7p2EC": "Client secret",
   "Back": "Geri",
+  "BacsDebit": "Bacs Debit",
   "BalanceAmount": "Bakiye {balance}",
   "BankAccount": "Banka hesabı",
   "bankaccount.instructions.account": "Yukarıda eklediğiniz banka hesap bilgileri.",
