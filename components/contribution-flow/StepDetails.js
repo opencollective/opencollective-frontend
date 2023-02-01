@@ -128,10 +128,12 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
                 required
                 onChange={value => {
                   const previousValue = data?.amount;
-                  // Increase/Decrease the amount by 0.5 instead of 0.01 when using the arrows
+                  // Increase/Decrease the amount by $0.5 instead of $0.01 when using the arrows
                   const isTopArrowClicked = value - previousValue === 1;
                   const isBottomArrowClicked = value - previousValue === -1;
 
+                  // We use value in cents, 1 cent is already increased/decreased by the input field itself when arrow was clicked
+                  // so we need to increase/decrease the value by 49 cents to get the desired increament/decreament of $0.5
                   if (isTopArrowClicked) {
                     value = value + 49;
                   } else if (isBottomArrowClicked) {
