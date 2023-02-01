@@ -2242,6 +2242,11 @@ type Collective implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean!
+
+  """
   Returns whether this host accepts applications for new collectives
   """
   canApply: Boolean
@@ -2493,6 +2498,11 @@ type Event implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean!
 
   """
   Returns whether this host accepts applications for new collectives
@@ -2748,6 +2758,11 @@ type Fund implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean!
+
+  """
   Returns whether this host accepts applications for new collectives
   """
   canApply: Boolean
@@ -2999,6 +3014,11 @@ type Organization implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean!
 
   """
   Returns whether this host accepts applications for new collectives
@@ -3253,6 +3273,11 @@ type Project implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean!
 
   """
   Returns whether this host accepts applications for new collectives
@@ -3750,6 +3775,11 @@ type User implements CollectiveInterface {
   isTrustedHost: Boolean!
 
   """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean!
+
+  """
   Returns whether this host accepts applications for new collectives
   """
   canApply: Boolean
@@ -4003,6 +4033,11 @@ type Vendor implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean!
 
   """
   Returns whether this host accepts applications for new collectives

@@ -5767,6 +5767,7 @@ export type MutationEditAccountFlagsArgs = {
   account: AccountReferenceInput;
   isArchived?: InputMaybe<Scalars['Boolean']>;
   isTrustedHost?: InputMaybe<Scalars['Boolean']>;
+  isTwoFactorAuthEnabled?: InputMaybe<Scalars['Boolean']>;
 };
 
 

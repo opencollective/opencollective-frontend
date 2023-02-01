@@ -13634,6 +13634,11 @@ type Mutation {
     Specify whether the account is a trusted host
     """
     isTrustedHost: Boolean
+
+    """
+    Specify whether 2FA should be enabled
+    """
+    isTwoFactorAuthEnabled: Boolean
   ): Account!
 
   """
