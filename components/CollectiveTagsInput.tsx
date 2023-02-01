@@ -12,6 +12,8 @@ import {
   OptionProps,
   Props,
 } from 'react-select';
+import AnimateHeight from 'react-animate-height';
+
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import {
   SortableContainer,
@@ -159,6 +161,7 @@ function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTag
         placeholder={intl.formatMessage({ id: 'collective.tags.input.placeholder', defaultMessage: '+ Add tags' })}
         isMulti
         value={selected}
+        menuPortalTarget={document.body}
         components={{
           // @ts-ignore We're failing to provide a required index prop to SortableElement
           MultiValue: SortableMultiValue,
@@ -177,6 +180,7 @@ function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTag
             borderRadius: '2px 12px 12px 2px',
             background: colors.black[100],
             overflow: 'hidden',
+            zIndex: 9999,
           }),
           multiValueLabel: baseStyles => ({
             ...baseStyles,
@@ -194,6 +198,7 @@ function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTag
               color: colors.black[900],
             },
           }),
+          menuPortal: styles => ({ ...styles, zIndex: 9999 }),
           control: (baseStyles, state) => ({
             ...baseStyles,
             boxShadow: `inset 0px 2px 2px ${colors.primary[50]}`,
@@ -204,13 +209,15 @@ function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTag
           }),
         }}
       />
-      {!!suggestedTags.length && (
+      <AnimateHeight height={suggestedTags?.length > 0 ? 'auto' : 0}>
         <Flex mt={2} gap={'6px'} flexWrap="wrap" alignItems={'center'}>
-          <Span color="black.600" mr={1}>
-            <FormattedMessage defaultMessage="Popular tags:" />
-          </Span>
+          {suggestedTags && (
+            <Span color="black.600" mr={1}>
+              <FormattedMessage defaultMessage="Popular tags:" />
+            </Span>
+          )}
 
-          {suggestedTags.map(tag => {
+          {suggestedTags?.map(tag => {
             const isSelected = selected.some(({ value }) => value === tag);
             return (
               <StyledTagButton
@@ -229,7 +236,7 @@ function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTag
             );
           })}
         </Flex>
-      )}
+      </AnimateHeight>
     </Fragment>
   );
 }

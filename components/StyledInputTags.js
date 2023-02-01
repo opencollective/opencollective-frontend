@@ -19,7 +19,7 @@ const TagIcon = styled(PriceTags)`
   margin-right: 4px;
 `;
 
-const EditTag = styled(StyledTag).attrs({
+export const EditTag = styled(StyledTag).attrs({
   variant: 'rounded-right',
   tabIndex: 0,
 })`
