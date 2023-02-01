@@ -134,6 +134,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
 
   const paymentMethodOptions = React.useMemo(() => {
     return generatePaymentMethodOptions(
+      intl,
       paymentMethodsData?.account?.paymentMethods ?? [],
       props.fromAccount,
       props.stepDetails,
