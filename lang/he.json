@@ -267,6 +267,7 @@
   "B5z1AU": "from {payee} to {account}",
   "B7p2EC": "סוד לקוח",
   "Back": "חזרה",
+  "BacsDebit": "Bacs Debit",
   "BalanceAmount": "יתרה {balance}",
   "BankAccount": "חשבון בנק",
   "bankaccount.instructions.account": "פרטי חשבון הבנק שהוספת להלן.",
