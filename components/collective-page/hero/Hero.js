@@ -5,11 +5,11 @@ import { Camera } from '@styled-icons/feather/Camera';
 import { Globe } from '@styled-icons/feather/Globe';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
+import { PriceTags } from '@styled-icons/icomoon/PriceTags';
 import { first } from 'lodash';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { PriceTags } from '@styled-icons/icomoon/PriceTags';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
@@ -27,6 +27,7 @@ import LinkCollective from '../../LinkCollective';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import { Dropdown, DropdownContent } from '../../StyledDropdown';
+import { EditTag } from '../../StyledInputTags';
 import StyledLink from '../../StyledLink';
 import StyledModal from '../../StyledModal';
 import StyledRoundButton from '../../StyledRoundButton';
@@ -41,7 +42,6 @@ import HeroAvatar from './HeroAvatar';
 import HeroBackground from './HeroBackground';
 import HeroSocialLinks from './HeroSocialLinks';
 import HeroTotalCollectiveContributionsWithData from './HeroTotalCollectiveContributionsWithData';
-import { EditTag } from '../../StyledInputTags';
 
 // Dynamic imports
 const HeroEventDetails = dynamic(() => import('./HeroEventDetails'));
