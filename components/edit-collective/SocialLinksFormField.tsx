@@ -176,6 +176,26 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
       value: SocialLinkType.SLACK.toString(),
       label: 'Slack',
     },
+    {
+      value: SocialLinkType.DISCOURSE.toString(),
+      label: 'Discourse',
+    },
+    {
+      value: SocialLinkType.PIXELFED.toString(),
+      label: 'Pixelfed',
+    },
+    {
+      value: SocialLinkType.GHOST.toString(),
+      label: 'Ghost',
+    },
+    {
+      value: SocialLinkType.PEERTUBE.toString(),
+      label: 'PeerTube',
+    },
+    {
+      value: SocialLinkType.TIKTOK.toString(),
+      label: 'TikTok',
+    },
   ];
 
   return (
@@ -243,8 +263,41 @@ function SocialLinkItem({ value, error, index, onChange, onRemoveItem, onMoveIte
         index,
       );
     },
-    [onChange, index],
+    [onChange, value, index],
   );
+
+  const onUrlChange = React.useCallback(
+    e => {
+      const newUrl = e.target.value;
+
+      onChange(
+        {
+          type: typeFromUrl(newUrl) ?? value.type,
+          url: newUrl,
+        },
+        index,
+      );
+    },
+    [onChange, value, index],
+  );
+
+  const onUrlBlur = React.useCallback(() => {
+    const hasSchemaRegexp = /^[^:]+:\/\//;
+
+    if (value.url.trim() === '') {
+      return;
+    }
+
+    if (!value.url.match(hasSchemaRegexp)) {
+      onChange(
+        {
+          ...value,
+          url: `https://${value.url}`,
+        },
+        index,
+      );
+    }
+  }, [onChange, value, index]);
 
   const onRemove = React.useCallback(() => {
     onRemoveItem(index);
@@ -265,14 +318,48 @@ function SocialLinkItem({ value, error, index, onChange, onRemoveItem, onMoveIte
           error={error}
           flexGrow={1}
           value={value.url}
-          onChange={e => onFieldChange('url', e.target.value)}
+          onBlur={onUrlBlur}
+          onChange={onUrlChange}
           placeholder="https://opencollective.com/"
         />
       </Flex>
 
-      <StyledButton padding={0} width="20px" height="20px" type="button" buttonStyle="borderless" onClick={onRemove}>
+      <StyledButton
+        tabIndex={-1}
+        padding={0}
+        width="20px"
+        height="20px"
+        type="button"
+        buttonStyle="borderless"
+        onClick={onRemove}
+      >
         <Times size="10px" />
       </StyledButton>
     </Flex>
   );
+}
+
+const knownSocialLinkDomains = [
+  { type: SocialLinkType.DISCORD, regexp: /^(https:\/\/)?discord.com/ },
+  { type: SocialLinkType.FACEBOOK, regexp: /^(https:\/\/)?(www\.)?facebook.com/ },
+  { type: SocialLinkType.GITHUB, regexp: /^(https:\/\/)?github.com/ },
+  { type: SocialLinkType.GITLAB, regexp: /^(https:\/\/)?gitlab.com/ },
+  { type: SocialLinkType.INSTAGRAM, regexp: /^(https:\/\/)?(www\.)?instagram.com/ },
+  { type: SocialLinkType.LINKEDIN, regexp: /^(https:\/\/)?(www\.)?linkedin.com/ },
+  { type: SocialLinkType.MEETUP, regexp: /^(https:\/\/)?meetup.com/ },
+  { type: SocialLinkType.SLACK, regexp: /^(https:\/\/)?[^.]+.?slack.com/ },
+  { type: SocialLinkType.TIKTOK, regexp: /^(https:\/\/)?(www\.)?tiktok.com/ },
+  { type: SocialLinkType.TUMBLR, regexp: /^(https:\/\/)?[^.]+\.?tumblr.com/ },
+  { type: SocialLinkType.TWITTER, regexp: /^(https:\/\/)?twitter.com/ },
+  { type: SocialLinkType.YOUTUBE, regexp: /^(https:\/\/)?(www\.)?youtube.com/ },
+];
+
+function typeFromUrl(url: string): SocialLinkType | null {
+  for (const knownDomain of knownSocialLinkDomains) {
+    if (url.match(knownDomain.regexp)) {
+      return knownDomain.type;
+    }
+  }
+
+  return null;
 }

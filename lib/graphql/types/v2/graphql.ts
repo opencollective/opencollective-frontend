@@ -7790,7 +7790,9 @@ export type SocialLinkInput = {
 /** The type of social link */
 export enum SocialLinkType {
   DISCORD = 'DISCORD',
+  DISCOURSE = 'DISCOURSE',
   FACEBOOK = 'FACEBOOK',
+  GHOST = 'GHOST',
   GIT = 'GIT',
   GITHUB = 'GITHUB',
   GITLAB = 'GITLAB',
@@ -7799,7 +7801,10 @@ export enum SocialLinkType {
   MASTODON = 'MASTODON',
   MATTERMOST = 'MATTERMOST',
   MEETUP = 'MEETUP',
+  PEERTUBE = 'PEERTUBE',
+  PIXELFED = 'PIXELFED',
   SLACK = 'SLACK',
+  TIKTOK = 'TIKTOK',
   TUMBLR = 'TUMBLR',
   TWITTER = 'TWITTER',
   WEBSITE = 'WEBSITE',
