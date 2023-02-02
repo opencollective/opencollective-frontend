@@ -870,6 +870,7 @@
   "DefaultValue": "Valeur par défaut",
   "Details": "Détails",
   "deViVP": "{type, select, TICKET {Ticket} other {Palier}} créé.",
+  "DewidR": "There was an error while trying to process your request to reset password. Try again or contact support if the problem persists.",
   "dG3sDf": "Pour plus d'informations sur les applications OAuth, consultez <link>notre documentation</link>.",
   "dHCod9": "Nouveau commentaire sur la dépense",
   "DhxIpu": "Nouveau commentaire sur <CommentEntity></CommentEntity>",

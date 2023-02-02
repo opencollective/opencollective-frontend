@@ -870,6 +870,7 @@
   "DefaultValue": "기본값",
   "Details": "상세",
   "deViVP": "{type, select, TICKET {Ticket} other {Tier}} created.",
+  "DewidR": "There was an error while trying to process your request to reset password. Try again or contact support if the problem persists.",
   "dG3sDf": "For more information about OAuth applications, check <link>our documentation</link>.",
   "dHCod9": "New comment on expense",
   "DhxIpu": "New comment on <CommentEntity></CommentEntity>",

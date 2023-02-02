@@ -870,6 +870,7 @@
   "DefaultValue": "Förvalt värde",
   "Details": "Detaljer",
   "deViVP": "{type, select, TICKET {Ticket} other {Tier}} created.",
+  "DewidR": "There was an error while trying to process your request to reset password. Try again or contact support if the problem persists.",
   "dG3sDf": "För mer information om OAuth applikationer, se <link>vår dokumentation</link>.",
   "dHCod9": "Ny kommentar på utgiften",
   "DhxIpu": "Ny kommentar på <CommentEntity></CommentEntity>",
