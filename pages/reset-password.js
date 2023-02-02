@@ -83,6 +83,8 @@ class ResetPasswordPage extends React.Component {
   render() {
     const { password, passwordLoading, passwordError, showError } = this.state;
 
+    const errorMessage = i18nGraphqlException(this.props.intl, this.props.data.error);
+
     return (
       <Fragment>
         <Header
@@ -110,9 +112,9 @@ class ResetPasswordPage extends React.Component {
                   <FormattedMessage defaultMessage="Reset Password" />
                 </Flex>
 
-                {this.props.data?.error && (
+                {errorMessage && (
                   <MessageBox type="error" withIcon my={5}>
-                    {i18nGraphqlException(this.props.intl, this.props.data.error)}
+                    {errorMessage}
                   </MessageBox>
                 )}
 
