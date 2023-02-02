@@ -1,6 +1,8 @@
 import React, { Fragment, MouseEventHandler, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
+import debouncePromise from 'debounce-promise';
+import AnimateHeight from 'react-animate-height';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   components as ReactSelectComponents,
@@ -12,8 +14,6 @@ import {
   OptionProps,
   Props,
 } from 'react-select';
-import AnimateHeight from 'react-animate-height';
-
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import {
   SortableContainer,
@@ -111,6 +111,13 @@ const SelectContainer = ({ innerProps, ...props }: ContainerProps) => (
     innerProps={{ ...innerProps, 'data-cy': 'tags-select' } as React.HTMLProps<HTMLDivElement>}
   />
 );
+// const throttledCall = debounce((searchFunc, input) => {
+//   return searchFunc(input);
+// }, 750);
+
+// const _loadSuggestions = (query, callback) => {
+//   search(query).then(resp => callback(resp));
+// };
 
 function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTags = [] }) {
   const intl = useIntl();
@@ -135,21 +142,24 @@ function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTag
     });
 
     if (data && data.tagStats.nodes) {
-      return data.tagStats.nodes
+      const tags = data.tagStats.nodes
         .filter(({ tag }) => !IGNORED_TAGS.includes(tag))
         .map(({ tag }) => ({
           label: tag,
           value: tag,
         }));
+      return tags;
     }
-
     return [];
   };
+
+  const debouncedFetchTags = debouncePromise(fetchTags, 500, { leading: true });
 
   return (
     <Fragment>
       <SortableSelect
         useDragHandle
+        // cacheOptions
         // react-sortable-hoc props:
         axis="xy"
         onSortEnd={onSortEnd}
@@ -171,8 +181,8 @@ function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTag
           Input,
           Option,
         }}
-        defaultOptions={true}
-        loadOptions={fetchTags}
+        defaultOptions
+        loadOptions={inputValue => debouncedFetchTags(inputValue)}
         onChange={(selectedOptions: OnChangeValue<TagOption, true>) => setSelected(selectedOptions)}
         styles={{
           multiValue: baseStyles => ({
