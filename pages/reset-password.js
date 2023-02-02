@@ -110,13 +110,9 @@ class ResetPasswordPage extends React.Component {
                   <FormattedMessage defaultMessage="Reset Password" />
                 </Flex>
 
-                <Flex fontWeight={400} fontSize="16px" color="black.700" mb="50px" justifyContent="center">
-                  <FormattedMessage defaultMessage="Enter your new password" />
-                </Flex>
-
-                {!this.props.data?.loggedInAccount && (
-                  <MessageBox type="error" withIcon my={2} data-cy="password-error">
-                    <FormattedMessage defaultMessage="There was an error while trying to process your request to reset password. Try again or contact support if the problem persists." />
+                {this.props.data?.error && (
+                  <MessageBox type="error" withIcon my={5}>
+                    {i18nGraphqlException(this.props.intl, this.props.data.error)}
                   </MessageBox>
                 )}
 
@@ -131,7 +127,7 @@ class ResetPasswordPage extends React.Component {
                       this.submitResetPassword();
                     }}
                   >
-                    <Flex mb={'4'}>
+                    <Flex my={4} justifyContent="center">
                       <Avatar collective={this.props.data.loggedInAccount} radius={40} mr={2} />
                       <Box>
                         <P color="black.800" fontWeight="500" fontSize="14px" lineHeight="20px">
@@ -245,6 +241,7 @@ const resetPasswordAccountQuery = gql`
   query ResetPasswordAccount {
     loggedInAccount {
       id
+      type
       slug
       name
       email
