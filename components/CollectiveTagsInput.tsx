@@ -111,13 +111,6 @@ const SelectContainer = ({ innerProps, ...props }: ContainerProps) => (
     innerProps={{ ...innerProps, 'data-cy': 'tags-select' } as React.HTMLProps<HTMLDivElement>}
   />
 );
-// const throttledCall = debounce((searchFunc, input) => {
-//   return searchFunc(input);
-// }, 750);
-
-// const _loadSuggestions = (query, callback) => {
-//   search(query).then(resp => callback(resp));
-// };
 
 function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTags = [] }) {
   const intl = useIntl();
