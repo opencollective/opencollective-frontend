@@ -376,7 +376,12 @@ class CreateCollectiveForm extends React.Component {
                           />
                         )}
                       </StyledInputFormikField>
-
+                      <MessageBox type="info" mt={3}>
+                        <FormattedMessage
+                          id="collective.tags.info"
+                          defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world."
+                        />
+                      </MessageBox>
                       {host && (
                         <StyledInputFormikField
                           name="message"

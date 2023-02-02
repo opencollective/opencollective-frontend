@@ -126,7 +126,10 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
                 }}
               </StyledInputFormikField>
               <MessageBox type="info" mt={3}>
-                <FormattedMessage defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world." />
+                <FormattedMessage
+                  id="collective.tags.info"
+                  defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world."
+                />
               </MessageBox>
             </ModalBody>
             <ModalFooter isFullWidth>
@@ -138,7 +141,7 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
                   disabled={loading || !formik.dirty}
                   type="submit"
                 >
-                  <FormattedMessage defaultMessage="Save" />
+                  <FormattedMessage id="save" defaultMessage="Save" />
                 </StyledButton>
                 <StyledButton
                   minWidth={132}
@@ -148,7 +151,7 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
                   type="button"
                   onClick={handleClose}
                 >
-                  <FormattedMessage defaultMessage="Cancel" />
+                  <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                 </StyledButton>
               </Flex>
             </ModalFooter>
