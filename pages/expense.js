@@ -48,6 +48,7 @@ import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
+import StyledCard from '../components/StyledCard';
 import StyledCheckbox from '../components/StyledCheckbox';
 import StyledLink from '../components/StyledLink';
 import { H5, Span } from '../components/Text';
@@ -530,7 +531,7 @@ class ExpensePage extends React.Component {
                 id="ExpenseSummaryTitle"
                 defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
                 values={{
-                  type: expense?.type,
+                  type: (editedExpense || expense)?.type,
                   collectiveName: collective?.name,
                   LinkCollective: text => <LinkCollective collective={collective}>{text}</LinkCollective>,
                 }}
@@ -582,8 +583,8 @@ class ExpensePage extends React.Component {
                 {status !== PAGE_STATUS.EDIT_SUMMARY && (
                   <React.Fragment>
                     {hasAttachedFiles && (
-                      <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
-                        <H5 fontSize="16px" mb={3}>
+                      <StyledCard mt="32px" p="32px">
+                        <H5 fontSize="16px" fontWeight="700" mb={3}>
                           <FormattedMessage id="Downloads" defaultMessage="Downloads" />
                         </H5>
                         <ExpenseAttachedFiles
@@ -592,7 +593,7 @@ class ExpensePage extends React.Component {
                           expense={expense}
                           showInvoice={canSeeInvoiceInfo}
                         />
-                      </Container>
+                      </StyledCard>
                     )}
                     {expense?.privateMessage && (
                       <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
