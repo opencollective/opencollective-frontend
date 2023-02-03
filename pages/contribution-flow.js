@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 import { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
 
@@ -64,8 +64,10 @@ class NewContributionFlowPage extends React.Component {
     this.loadExternalScripts();
     const { router, data } = this.props;
     const account = data?.account;
-    const path = router.asPath;
-    addParentToURLIfMissing(router, account, path.replace(new RegExp(`^/${account?.slug}/`), '/'));
+    const queryParameters = {
+      ...omit(router.query, ['verb', 'step', 'collectiveSlug']),
+    };
+    addParentToURLIfMissing(router, account, `/${router.query.verb}/${router.query.step}`, queryParameters);
   }
 
   componentDidUpdate(prevProps) {
