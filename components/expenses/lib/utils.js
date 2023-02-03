@@ -83,9 +83,8 @@ export const getSupportedCurrencies = (collective, payoutMethod) => {
 
   const isPayPal = payoutMethod?.type === PayoutMethodType.PAYPAL;
   if (isPayPal) {
-    return PayPalSupportedCurrencies.includes(collective?.currency)
-      ? uniq([collective?.currency, ...PayPalSupportedCurrencies])
-      : PayPalSupportedCurrencies;
+    const defaultCurrency = PayPalSupportedCurrencies.includes(collective?.currency) ? collective.currency : 'USD';
+    return uniq([defaultCurrency, ...PayPalSupportedCurrencies]);
   } else if (payoutMethod?.type === PayoutMethodType.OTHER) {
     return Currency.includes(collective?.currency) ? uniq([collective?.currency, ...Currency]) : Currency;
   } else {

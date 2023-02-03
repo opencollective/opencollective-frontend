@@ -268,6 +268,7 @@
   "B5z1AU": "de {payee} a {account}",
   "B7p2EC": "Secreto de cliente",
   "Back": "Atrás",
+  "BacsDebit": "Bacs Debit",
   "BalanceAmount": "Balance {balance}",
   "BankAccount": "Cuenta bancaria",
   "bankaccount.instructions.account": "Los detalles de la cuenta bancaria que has añadido arriba.",

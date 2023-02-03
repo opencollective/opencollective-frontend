@@ -268,6 +268,7 @@
   "B5z1AU": "from {payee} to {account}",
   "B7p2EC": "Client secret",
   "Back": "뒤로가기",
+  "BacsDebit": "Bacs Debit",
   "BalanceAmount": "잔액 {balance}",
   "BankAccount": "은행 계좌",
   "bankaccount.instructions.account": "The bank account details you added above.",
