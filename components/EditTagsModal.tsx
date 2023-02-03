@@ -13,6 +13,7 @@ import StyledButton from './StyledButton';
 import StyledInputFormikField from './StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
+import { IGNORED_TAGS } from '../lib/constants/collectives';
 
 const editTagsMutation = gqlV1`
   mutation editCollective(
@@ -120,7 +121,7 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
                           tags.map(t => t.value.toLowerCase()),
                         );
                       }}
-                      suggestedTags={tagStats?.nodes?.map(node => node.tag)}
+                      suggestedTags={tagStats?.nodes?.map(node => node.tag).filter(tag => !IGNORED_TAGS.includes(tag))}
                     />
                   );
                 }}
