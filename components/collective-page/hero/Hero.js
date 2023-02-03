@@ -5,7 +5,7 @@ import { Camera } from '@styled-icons/feather/Camera';
 import { Globe } from '@styled-icons/feather/Globe';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
-import { PriceTags } from '@styled-icons/icomoon/PriceTags';
+import { Tags } from '@styled-icons/bootstrap/Tags';
 import { first } from 'lodash';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -256,7 +256,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                   )}
                   {isAdmin && (
                     <EditTag ml="10px" mt={['5px', 0]} active={isEditingTags} onClick={() => editTags(true)}>
-                      <PriceTags size="14px" />{' '}
+                      <Tags size="14px" />{' '}
                       <Span ml="4px" letterSpacing={0}>
                         <FormattedMessage id="StyledInputTags.EditLabel" defaultMessage="Edit Tags" />
                       </Span>
