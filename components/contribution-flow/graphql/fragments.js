@@ -162,6 +162,9 @@ export const orderSuccessFragment = gql`
       type
       isHost
       settings
+      socialLinks {
+        type
+      }
       ... on AccountWithContributions {
         # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
         contributors(limit: 1) {
@@ -172,6 +175,10 @@ export const orderSuccessFragment = gql`
         parent {
           id
           slug
+          tags
+          socialLinks {
+            type
+          }
         }
       }
       ... on AccountWithHost {

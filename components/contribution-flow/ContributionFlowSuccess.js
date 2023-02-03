@@ -96,6 +96,15 @@ const successMsgs = defineMessages({
   },
 });
 
+const isAccountFediverse = account => {
+  return (
+    account &&
+    (account.tags?.includes('mastodon') ||
+      account.tags?.includes('fediverse') ||
+      (account.socialLinks || []).map(el => el.type).includes('MASTODON'))
+  );
+};
+
 const getMainTag = collective => {
   if (collective.host?.slug === 'opensource' || collective.tags?.includes('open source')) {
     return 'open source';
@@ -224,6 +233,7 @@ class ContributionFlowSuccess extends React.Component {
     const { order } = data;
     const shareURL = `${getWebsiteUrl()}/${collective.slug}`;
     const isProcessing = order?.status === ORDER_STATUS.PROCESSING;
+    const isFediverse = order && (isAccountFediverse(order.toAccount) || isAccountFediverse(order.toAccount.parent));
 
     if (!data.loading && !order) {
       return (
@@ -234,8 +244,6 @@ class ContributionFlowSuccess extends React.Component {
         </Flex>
       );
     }
-
-    const isFediverse = order?.toAccount?.tags?.includes('mastodon') || order?.toAccount?.tags?.includes('fediverse');
 
     return (
       <React.Fragment>
