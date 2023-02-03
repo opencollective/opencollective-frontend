@@ -19,6 +19,7 @@ import {
   getPaymentMethodMetadata,
   isPaymentMethodDisabled,
 } from '../../lib/payment-method-utils';
+import { StripePaymentMethodsLabels } from '../../lib/stripe/payment-methods';
 import { getWebsiteUrl } from '../../lib/utils';
 
 import CreditCardInactive from '../icons/CreditCardInactive';
@@ -65,6 +66,7 @@ export const getContributeProfiles = (loggedInUser, collective) => {
 };
 
 export const generatePaymentMethodOptions = (
+  intl,
   paymentMethods,
   stepProfile,
   stepDetails,
@@ -176,9 +178,22 @@ export const generatePaymentMethodOptions = (
   // adding payment methods
   if (!balanceOnlyCollectiveTypes.includes(stepProfile.type)) {
     if (paymentIntent) {
-      const title = <FormattedMessage defaultMessage="New payment method" />;
+      let availableMethodLabels = paymentIntent.payment_method_types.map(method => {
+        return intl.formatMessage(StripePaymentMethodsLabels[method]);
+      });
 
-      uniquePMs.push({
+      if (availableMethodLabels.length > 3) {
+        availableMethodLabels = [...availableMethodLabels.slice(0, 3), 'etc'];
+      }
+
+      const title = (
+        <FormattedMessage
+          defaultMessage="New payment method: {methods}"
+          values={{ methods: availableMethodLabels.join(', ') }}
+        />
+      );
+
+      uniquePMs.unshift({
         key: STRIPE_PAYMENT_ELEMENT_KEY,
         title: title,
         icon: <CreditCard color="#c9ced4" size={'1.5em'} />,
