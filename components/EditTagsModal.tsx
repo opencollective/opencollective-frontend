@@ -28,7 +28,7 @@ const editTagsMutation = gqlV1`
 `;
 
 const tagStatsQuery = gql`
-  query tagStats($host: AccountReferenceInput!) {
+  query tagStats($host: AccountReferenceInput) {
     tagStats(host: $host, limit: 5) {
       nodes {
         id
