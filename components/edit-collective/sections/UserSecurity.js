@@ -424,16 +424,9 @@ class UserSecurity extends React.Component {
       return errors;
     };
 
-    const canManagePassword =
-      this.props.LoggedInUser.hasPassword ||
-      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'opencollective' }) ||
-      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'opensource' }) ||
-      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'foundation' }) ||
-      process.env.OC_ENV !== 'production';
-
     return (
       <Flex flexDirection="column">
-        {canManagePassword && this.renderPasswordManagement()}
+        {this.renderPasswordManagement()}
 
         <H3 fontSize="18px" fontWeight="700" mb={2}>
           <FormattedMessage id="TwoFactorAuth" defaultMessage="Two-factor authentication" />
