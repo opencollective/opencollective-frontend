@@ -195,7 +195,7 @@ class ExpensePage extends React.Component {
     super(props);
     this.expenseTopRef = React.createRef();
     this.state = {
-      isRefetchingDataForUser: false,
+      hasRefetchedDataForUser: Boolean(props.LoggedInUser), // If the page is loaded directly with a logged in user, we can consider the query was already authenticated
       error: null,
       status:
         this.props.draftKey && this.props.data.expense?.status === expenseStatus.DRAFT
@@ -306,10 +306,10 @@ class ExpensePage extends React.Component {
 
   async refetchDataForUser() {
     try {
-      this.setState({ isRefetchingDataForUser: true });
+      this.setState({ hasRefetchedDataForUser: false });
       await this.props.data.refetch();
     } finally {
-      this.setState({ isRefetchingDataForUser: false });
+      this.setState({ hasRefetchedDataForUser: true });
     }
   }
 
@@ -461,8 +461,9 @@ class ExpensePage extends React.Component {
   };
 
   render() {
-    const { collectiveSlug, data, loadingLoggedInUser, intl } = this.props;
-    const { isRefetchingDataForUser, error, status, editedExpense } = this.state;
+    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, intl } = this.props;
+    const { hasRefetchedDataForUser, error, status, editedExpense } = this.state;
+    const isRefetchingDataForUser = LoggedInUser && !hasRefetchedDataForUser;
 
     if (!data.loading && !isRefetchingDataForUser) {
       if (!data || data.error) {
