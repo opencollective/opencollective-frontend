@@ -67,7 +67,7 @@ An operations and community oriented person who is:
 
 Please fill out [this form](https://docs.google.com/forms/d/e/1FAIpQLSfRC2ZivuNQdklHlsABKhdXf42EweeNk9jJUXy02mjbftyWzA/viewform) to apply.
 
-If you have questions, reach out to [hello@oscollective.org] (mailto:hello@oscollective.org)
+If you have questions, reach out to [hello@oscollective.org](mailto:hello@oscollective.org)
 
 <!--
 Right now, [Open Collective](https://opencollective.com) is hiring for a Senior UX Designer.
