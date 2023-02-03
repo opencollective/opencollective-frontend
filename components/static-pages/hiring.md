@@ -28,23 +28,24 @@ OSC is a tech-first nonprofit. We are one node in a growing international networ
 - [What is Open Collective (video)](https://www.youtube.com/@OpenCollective)
 - [Our documentation](https://docs.oscollective.org/)
 
-
 ### Who we're looking for
 
 An operations and community oriented person who is:
+
 - Excited to support our Collectives to make the best use of our services
 - Self-motivated and autonomous, able to thrive in our fully remote, high-trust, low-hierarchy environment
 - Technology driven, able to learn new digital tools quickly, and eager to understand the ins and outs of the Open Collective software platform
-- Experienced with working openly or excited to develop this practice 
+- Experienced with working openly or excited to develop this practice
 
 ### Must-have skills
 
 - Financial administration skills (accounts receivable and payable—you will process incoming contributions and outgoing expenses, so you need a basic understanding of budgets and finance processes)
 - Helpdesk support and customer service - you'll support Collectives through the application process and answer day-to-day questions. Experience writing or updating user guides is ideal.
-- Detail oriented, practical and organized, great at handling information overload and finding the path forward 
+- Detail oriented, practical and organized, great at handling information overload and finding the path forward
 - Flexible and comfortable working in a fast-paced, quickly-scaling startup environment
 
 ### Additional desired experience
+
 (We don’t expect you to have all of these! Any of them would be a bonus)
 
 - 501(c)(3) or (c)(6) nonprofit and/or fiscal sponsorship
@@ -57,8 +58,8 @@ An operations and community oriented person who is:
 - Flexible schedule (we have a few weekly meetings and the rest us up to you)
 - Open to applicants anywhere within 4 hours of the EST time zone.
 - The pay range will be $60k ~ $80k plus benefits. Pay scale is contingent on experience.
-- This is a full-time position and we are seeking someone to commit 40 hours per week 
-- 25 days off for vacation + 10 days off for chosen holidays 
+- This is a full-time position and we are seeking someone to commit 40 hours per week
+- 25 days off for vacation + 10 days off for chosen holidays
 - $1K per year for improving your workspace, buying tools, and other office expenses that help you perform better.
 - An opportunity to travel when we have retreats (Weeks of face-to-face work every ~8 months) with transportation, allocation, and meals covered during our time together. The last one was in September 2022 in Marseille, France.
 
