@@ -34,7 +34,7 @@ describe('create a collective', () => {
     cy.getByDataCy('ccf-form-description').type('I do not like them');
     cy.get('[data-cy=tags-select]').click();
     cy.get('[data-cy=tags-select-option-meetup]').click();
-    cy.get('[data-cy=tags-select-input]').type('opencollective-tag{enter}{esc}', { delay: 100 });
+    cy.get('[data-cy=tags-select-input]').type('opencollective-tag{enter}{esc}', { delay: 750 });
     cy.get('[data-cy=ccf-form-tags]').contains('opencollective-tag');
     cy.get('[data-cy="custom-checkbox"').click();
     cy.get('[data-cy=ccf-form-submit]').click();
