@@ -13,7 +13,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import speakeasy from 'speakeasy';
 import styled from 'styled-components';
 
-import ROLES from '../../../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { compose } from '../../../lib/utils';
@@ -21,6 +20,7 @@ import { compose } from '../../../lib/utils';
 import ConfirmationModal from '../../ConfirmationModal';
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
+import { getI18nLink } from '../../I18nFormatters';
 import Image from '../../Image';
 import Loading from '../../Loading';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -331,6 +331,17 @@ class UserSecurity extends React.Component {
             mt={2}
             mb={2}
             width="100%"
+            hint={
+              <FormattedMessage
+                defaultMessage="Strong password recommended. Short or weak one restricted. <link>The strength of a password is a function of length, complexity, and unpredictability.</link>"
+                values={{
+                  link: getI18nLink({
+                    href: 'https://en.wikipedia.org/wiki/Password_strength',
+                    openInNewTab: true,
+                  }),
+                }}
+              />
+            }
           >
             <StyledInput
               key={`current-password-${passwordKey}`}
@@ -347,7 +358,7 @@ class UserSecurity extends React.Component {
 
           <PasswordStrengthBar
             style={{ visibility: password ? 'visible' : 'hidden' }}
-            password={this.state.password}
+            password={password}
             onChangeScore={passwordScore => {
               this.setState({ passwordScore });
             }}
@@ -412,16 +423,9 @@ class UserSecurity extends React.Component {
       return errors;
     };
 
-    const canManagePassword =
-      this.props.LoggedInUser.hasPassword ||
-      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'opencollective' }) ||
-      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'opensource' }) ||
-      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'foundation' }) ||
-      process.env.OC_ENV !== 'production';
-
     return (
       <Flex flexDirection="column">
-        {canManagePassword && this.renderPasswordManagement()}
+        {this.renderPasswordManagement()}
 
         <H3 fontSize="18px" fontWeight="700" mb={2}>
           <FormattedMessage id="TwoFactorAuth" defaultMessage="Two-factor authentication" />

@@ -11,7 +11,7 @@ import OpenEmailProviderButton from '../components/OpenEmailProviderButton';
 import Page from '../components/Page';
 import { P } from '../components/Text';
 
-class SignInLinkSent extends Component {
+class ResetPasswordSent extends Component {
   static async getInitialProps({ res, query = {}, router }) {
     if (query.email) {
       return { email: query.email };
@@ -31,11 +31,11 @@ class SignInLinkSent extends Component {
     const { email } = this.props;
     const isValidEmail = email && isEmail(email);
     return (
-      <Page title="Login Link Sent" noRobots showFooter={false}>
+      <Page noRobots showFooter={false}>
         <Container pt={[4, 5]} pb={6} px={3} textAlign="center">
           <Image src="/static/images/sign-in-illustration.png" width="624px" height="372px" />
-          <P fontSize="32px" lineHeight="40px" fontWeight={700} color="black.900">
-            <FormattedMessage id="SignIn.LinkSent" defaultMessage="Your magic link is on its way!" />
+          <P fontSize="32px" lineHeight="40px" color="black.900" fontWeight={700}>
+            <FormattedMessage defaultMessage="Your reset password email is on its way." />
           </P>
           {isValidEmail && (
             <P fontSize="20px" lineHeight="28px" color="black.800" fontWeight={500} mt={4}>
@@ -46,12 +46,7 @@ class SignInLinkSent extends Component {
             </P>
           )}
           <OpenEmailProviderButton email={email}>{button => <Box mt={3}>{button}</Box>}</OpenEmailProviderButton>
-          <P color="black.800" fontSize="16px" fontWeight={500} lineHeight="24px" my={4}>
-            <FormattedMessage
-              id="SignIn.SuccessDetails"
-              defaultMessage="You’ll be redirected from the link in the email, you can safely close this tab."
-            />
-            <br />
+          <P fontSize="16px" lineHeight="24px" color="black.800" fontWeight={500} my={4}>
             <FormattedMessage
               id="signinLinkSent."
               defaultMessage="<Link>Learn more</Link> about our login system."
@@ -69,8 +64,8 @@ class SignInLinkSent extends Component {
   }
 }
 
-SignInLinkSent.propTypes = {
+ResetPasswordSent.propTypes = {
   email: PropTypes.string.isRequired,
 };
 
-export default SignInLinkSent;
+export default ResetPasswordSent;
