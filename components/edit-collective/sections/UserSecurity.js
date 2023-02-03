@@ -21,6 +21,7 @@ import { compose } from '../../../lib/utils';
 import ConfirmationModal from '../../ConfirmationModal';
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
+import { getI18nLink } from '../../I18nFormatters';
 import Image from '../../Image';
 import Loading from '../../Loading';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
@@ -331,6 +332,17 @@ class UserSecurity extends React.Component {
             mt={2}
             mb={2}
             width="100%"
+            hint={
+              <FormattedMessage
+                defaultMessage="Strong password recommended. Short or weak one restricted. <link>The strength of a password is a function of length, complexity, and unpredictability.</link>"
+                values={{
+                  link: getI18nLink({
+                    href: 'https://en.wikipedia.org/wiki/Password_strength',
+                    openInNewTab: true,
+                  }),
+                }}
+              />
+            }
           >
             <StyledInput
               key={`current-password-${passwordKey}`}

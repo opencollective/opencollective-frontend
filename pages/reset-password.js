@@ -14,6 +14,7 @@ import Body from '../components/Body';
 import Container from '../components/Container';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
+import I18nFormatters, { getI18nLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
 import MessageBox from '../components/MessageBox';
 import StyledButton from '../components/StyledButton';
@@ -83,8 +84,6 @@ class ResetPasswordPage extends React.Component {
   render() {
     const { password, passwordLoading, passwordError, showError } = this.state;
 
-    const errorMessage = i18nGraphqlException(this.props.intl, this.props.data.error);
-
     return (
       <Fragment>
         <Header
@@ -112,9 +111,16 @@ class ResetPasswordPage extends React.Component {
                   <FormattedMessage defaultMessage="Reset Password" />
                 </Flex>
 
-                {errorMessage && (
+                {!this.props.data?.loggedInAccount && (
                   <MessageBox type="error" withIcon my={5}>
-                    {errorMessage}
+                    {this.props.data.error ? (
+                      i18nGraphqlException(this.props.intl, this.props.data.error)
+                    ) : (
+                      <FormattedMessage
+                        defaultMessage="Something went wrong while trying to reset your password. Please try again or <SupportLink>contact support</SupportLink> if the problem persists."
+                        values={I18nFormatters}
+                      />
+                    )}
                   </MessageBox>
                 )}
 
@@ -166,6 +172,17 @@ class ResetPasswordPage extends React.Component {
                       label={<FormattedMessage defaultMessage="New Password" />}
                       htmlFor="new-password"
                       my={2}
+                      helpText={
+                        <FormattedMessage
+                          defaultMessage="Strong password recommended. Short or weak one restricted. <link>The strength of a password is a function of length, complexity, and unpredictability.</link>"
+                          values={{
+                            link: getI18nLink({
+                              href: 'https://en.wikipedia.org/wiki/Password_strength',
+                              openInNewTab: true,
+                            }),
+                          }}
+                        />
+                      }
                     >
                       <StyledInput
                         fontSize="14px"
@@ -208,7 +225,6 @@ class ResetPasswordPage extends React.Component {
 
                     <Flex justifyContent="center" mb="24px" mt="26px">
                       <StyledButton
-                        data-cy="signin-btn"
                         buttonStyle="primary"
                         fontWeight="500"
                         disabled={!password}
