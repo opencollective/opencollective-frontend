@@ -42,6 +42,7 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
   const getDefaultOtherAmountSelected = () => isNil(amount) || !presets?.includes(amount);
   const [isOtherAmountSelected, setOtherAmountSelected] = React.useState(getDefaultOtherAmountSelected);
   const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
+  const [pressedKey, setPressedKey] = React.useState();
   const { LoggedInUser } = useLoggedInUser();
 
   const minAmount = getTierMinAmount(tier, currency);
@@ -126,21 +127,31 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
                 currencyDisplay="full"
                 prependProps={{ color: 'black.500' }}
                 required
+                onKeyDown={event => {
+                  setPressedKey(event.key);
+                }}
                 onChange={value => {
-                  const previousValue = data?.amount;
                   // Increase/Decrease the amount by $0.5 instead of $0.01 when using the arrows
-                  const isTopArrowClicked = value - previousValue === 1;
-                  const isBottomArrowClicked = value - previousValue === -1;
+                  if (
+                    !pressedKey ||
+                    !(/[0-9]/g.test(pressedKey) || pressedKey === 'Backspace' || pressedKey === 'Delete')
+                  ) {
+                    const previousValue = data?.amount;
+                    const isTopArrowClicked = value - previousValue === 1;
+                    const isBottomArrowClicked = value - previousValue === -1;
+                    // We use value in cents, 1 cent is already increased/decreased by the input field itself when arrow was clicked
+                    // so we need to increase/decrease the value by 49 cents to get the desired increament/decreament of $0.5
+                    const valueChange = 49;
 
-                  // We use value in cents, 1 cent is already increased/decreased by the input field itself when arrow was clicked
-                  // so we need to increase/decrease the value by 49 cents to get the desired increament/decreament of $0.5
-                  if (isTopArrowClicked) {
-                    value = value + 49;
-                  } else if (isBottomArrowClicked) {
-                    value = value - 49;
+                    if (isTopArrowClicked) {
+                      value += valueChange;
+                    } else if (isBottomArrowClicked) {
+                      value -= valueChange;
+                    }
                   }
-
                   dispatchChange('amount', value);
+                  // Reset the pressed key
+                  setPressedKey(null);
                 }}
               />
               {Boolean(minAmount) && (
