@@ -254,7 +254,8 @@ class ContributionFlow extends React.Component {
     }
 
     try {
-      const skipTaxes = isEmpty(this.getApplicableTaxes(collective, host, tier?.type));
+      const totalAmount = getTotalAmount(stepDetails, stepSummary);
+      const skipTaxes = !totalAmount || isEmpty(this.getApplicableTaxes(collective, host, tier?.type));
       const response = await this.props.createOrder({
         variables: {
           order: {
