@@ -19,6 +19,7 @@ import FinancialContributions from './sections/FinancialContributions';
 import HostVirtualCards from './sections/HostVirtualCards';
 import InvoicesReceipts from './sections/InvoicesReceipts';
 import NotificationsSettings from './sections/NotificationsSettings';
+import PendingContributions from './sections/PendingContributions';
 import TeamSettings from './sections/Team';
 import {
   COLLECTIVE_SECTIONS,
@@ -31,6 +32,7 @@ import {
 const ADMIN_PANEL_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
   [HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS]: FinancialContributions,
+  [HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS]: PendingContributions,
   [HOST_DASHBOARD_SECTIONS.EXPENSES]: HostDashboardExpenses,
   [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: PendingApplications,
   [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,

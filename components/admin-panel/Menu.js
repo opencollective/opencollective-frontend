@@ -74,6 +74,11 @@ const Menu = ({ collective, isAccountantOnly }) => {
           </MenuSectionHeader>
           <MenuLink collective={collective} section={HOST_SECTIONS.EXPENSES} if={!isAccountantOnly} />
           <MenuLink collective={collective} section={HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS} if={!isAccountantOnly} />
+          <MenuLink
+            collective={collective}
+            section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS}
+            if={!isAccountantOnly}
+          />
           <MenuLink collective={collective} section={HOST_SECTIONS.PENDING_APPLICATIONS} if={!isAccountantOnly} />
           <MenuLink collective={collective} section={HOST_SECTIONS.HOSTED_COLLECTIVES} if={!isAccountantOnly} />
           <MenuLink
