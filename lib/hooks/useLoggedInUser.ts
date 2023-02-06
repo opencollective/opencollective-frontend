@@ -5,11 +5,11 @@ import { UserContext } from '../../components/UserProvider';
 import type { LoggedInUser as LoggedInUserType } from '../custom_typings/LoggedInUser';
 
 type UserContextProps = {
-  loadingLoggedInUser: boolean;
   errorLoggedInUser?: Error;
+  loadingLoggedInUser: boolean;
   LoggedInUser: LoggedInUserType | null;
-  logout: () => void;
   login: () => void;
+  logout: () => void;
   refetchLoggedInUser: () => void;
 };
 
