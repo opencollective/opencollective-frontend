@@ -1160,7 +1160,7 @@
   "ExpenseForm.inviteeLabel": "Who will receive the money for this expense?",
   "ExpenseForm.inviteeOrgDescriptionLabel": "What does your organization do?",
   "ExpenseForm.inviteeOrgNameLabel": "What's the name of the organization?",
-  "ExpenseForm.inviteNameLabel": "Contact name",
+  "ContactName": "Contact name",
   "ExpenseForm.inviteOrgDescriptionLabel": "Organization description",
   "ExpenseForm.InvoiceDescription": "Bill for your time or a service.",
   "ExpenseForm.InvoiceInfo": "Additional invoice information",

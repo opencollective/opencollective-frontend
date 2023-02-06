@@ -268,7 +268,7 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
     },
   ];
   const paymentMethodOptions = [
-    { value: 'UNKNOWN', label: intl.formatMessage({ defaultMessage: 'Unknown' }) },
+    { value: 'UNKNOWN', label: intl.formatMessage({ id: 'user.unknown', defaultMessage: 'Unknown' }) },
     { value: 'BANK_TRANSFER', label: intl.formatMessage({ defaultMessage: 'Bank Transfer' }) },
     { value: 'CHECK', label: intl.formatMessage({ defaultMessage: 'Check' }) },
   ];
@@ -344,7 +344,7 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
         <Field
           name="fromAccountInfo.name"
           htmlFor="CreatePendingContribution-fromAccountInfo-name"
-          label={<FormattedMessage id="Fields.fromAccountInfo.name" defaultMessage="Contact name" />}
+          label={<FormattedMessage id="ContactName" defaultMessage="Contact name" />}
           mt={3}
         >
           {({ field }) => <StyledInput data-cy="create-pending-contribution-contact-name" {...field} />}
@@ -383,7 +383,7 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
         <Field
           name="customData.memo"
           htmlFor="CreatePendingContribution-memo"
-          label={<FormattedMessage defaultMessage="Private note" />}
+          label={<FormattedMessage id="Expense.PrivateNote" defaultMessage="Private note" />}
           required={false}
           mt={3}
         >
