@@ -1,18 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
-import { Tags } from '@styled-icons/bootstrap/Tags';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
-import EditTagsModal from '../EditTagsModal';
 import { Flex } from '../Grid';
-import StyledInputTags, { EditTag } from '../StyledInputTags';
+import StyledInputTags from '../StyledInputTags';
 import StyledTag from '../StyledTag';
-import { Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import ExpenseTypeTag from './ExpenseTypeTag';
@@ -65,9 +62,6 @@ const ExpenseTag = styled(StyledTag).attrs({
 
 const ExpenseTags = ({ expense, isLoading, limit, getTagProps, children, canEdit, suggestedTags, showUntagged }) => {
   const intl = useIntl();
-  const [isEditingTags, setEditingTags] = React.useState(false);
-  const [submitTags, { loading }] = useMutation(editExpenseTagsMutation, { context: API_V2_CONTEXT });
-  // const intl = useIntl();
 
   const renderTag = ({ tag, label }) => {
     const extraTagProps = getTagProps?.(tag) || {};
@@ -81,22 +75,13 @@ const ExpenseTags = ({ expense, isLoading, limit, getTagProps, children, canEdit
     return children ? children({ key: tag, tag, renderedTag, props: extraTagProps }) : renderedTag;
   };
   return (
-    <React.Fragment>
-      {isEditingTags && (
-        <EditTagsModal
-          onClose={() => setEditingTags(false)}
-          onSubmit={async tags => {
-            await submitTags({ variables: { id: expense.id, tags: tags.map(tag => tag.value) } });
-          }}
-          options={suggestedTags} // TODO: fix naming..
-          value={expense.tags}
-          loading={loading}
-        />
-      )}
+    <Flex flexWrap="wrap" alignItems="flex-start">
+      {expense?.type && <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} isLoading={isLoading} />}
 
-      <Flex flexWrap="wrap" alignItems="flex-start">
-        {expense?.type && <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} isLoading={isLoading} />}
-        {expense?.tags && (
+      {canEdit ? (
+        <ExpenseTagsForAdmins expense={expense} suggestedTags={suggestedTags} />
+      ) : (
+        expense?.tags && (
           <React.Fragment>
             {expense.tags.slice(0, limit).map(tag => renderTag({ tag }))}
             {showUntagged &&
@@ -115,17 +100,9 @@ const ExpenseTags = ({ expense, isLoading, limit, getTagProps, children, canEdit
               </ExpenseTag>
             )}
           </React.Fragment>
-        )}{' '}
-        {canEdit && (
-          <EditTag ml="10px" mt={['5px', 0]} active={isEditingTags} onClick={() => setEditingTags(true)}>
-            <Tags size="14px" />{' '}
-            <Span ml="4px" letterSpacing={0}>
-              <FormattedMessage id="StyledInputTags.EditLabel" defaultMessage="Edit Tags" />
-            </Span>
-          </EditTag>
-        )}
-      </Flex>
-    </React.Fragment>
+        )
+      )}
+    </Flex>
   );
 };
 
@@ -142,7 +119,6 @@ ExpenseTags.propTypes = {
   /** If canEdit is true, this array is used to display suggested tags */
   suggestedTags: PropTypes.arrayOf(PropTypes.string),
   expense: PropTypes.shape({
-    id: PropTypes.string.isRequired, // number? string?
     status: PropTypes.string,
     tags: PropTypes.arrayOf(PropTypes.string),
     legacyId: PropTypes.number,
