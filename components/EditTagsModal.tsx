@@ -1,13 +1,14 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { Form, Formik } from 'formik';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
+import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { Collective } from '../lib/graphql/types/v2/graphql';
 
-import CollectiveTagsInput from './CollectiveTagsInput';
+import CollectiveTagsInput, { TagOption } from './CollectiveTagsInput';
 import { Flex } from './Grid';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
@@ -40,53 +41,63 @@ const tagStatsQuery = gql`
 `;
 
 export type EditTagsModalProps = {
-  collective: Collective;
+  suggestedTags: string[];
+  value: string[];
+  loadOptions: (inputValue: string) => Promise<TagOption[]>;
+  options: string[];
+  onSubmit: (tags: string[]) => void;
   onClose: () => void;
 };
 
-export default function EditTagsModal({ collective, onClose }: EditTagsModalProps) {
-  const { addToast } = useToasts();
-  const [editTags, { loading }] = useMutation(editTagsMutation);
+// not rely on collective....
+// the suggested tags is coming from that, and should be coming from the parent component instead
+// suggestedTags and then another one that is, ALL options..
 
-  const { data: { tagStats } = { tagStats: null } } = useQuery(tagStatsQuery, {
-    variables: { ...(collective.host?.slug ? { host: { slug: collective.host.slug } } : {}) },
-    context: API_V2_CONTEXT,
-  });
+export default function EditTagsModal({
+  suggestedTags,
+  value,
+  loading,
+  loadOptions,
+  options,
+  onSubmit,
+  onClose,
+  infoMessage,
+}: EditTagsModalProps) {
+  const { addToast } = useToasts();
+  const intl = useIntl();
+
+  // const [editTags, { loading }] = useMutation(editTagsMutation);
+
+  // const { data: { tagStats } = { tagStats: null } } = useQuery(tagStatsQuery, {
+  //   variables: { ...(collective.host?.slug ? { host: { slug: collective.host.slug } } : {}) },
+  //   context: API_V2_CONTEXT,
+  // });
 
   const initialValues = {
-    tags: collective.tags,
+    tags: value,
   };
 
   const submit = async values => {
     const { tags } = values;
-    try {
-      const variables = {
-        collective: {
-          id: collective.id,
-          tags: tags,
-        },
-      };
 
-      await editTags({ variables });
-    } catch (e) {
+    try {
+      await onSubmit(tags);
       addToast({
-        type: TOAST_TYPE.ERROR,
-        message: (
-          <FormattedMessage
-            defaultMessage="Error submiting form: {error}"
-            values={{
-              error: e.message,
-            }}
-          />
-        ),
+        type: TOAST_TYPE.SUCCESS,
+        message: <FormattedMessage defaultMessage="Successfully updated tags" />,
       });
-      return;
+      handleClose();
+      // const variables = {
+      //   collective: {
+      //     id: collective.id,
+      //     tags: tags,
+      //   },
+      // };
+
+      // await editTags({ variables });
+    } catch (e) {
+      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
     }
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
-      message: <FormattedMessage defaultMessage="Successfully updated tags" />,
-    });
-    handleClose();
   };
 
   const handleClose = () => {
@@ -121,17 +132,24 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
                           tags.map(t => t.value.toLowerCase()),
                         );
                       }}
-                      suggestedTags={tagStats?.nodes?.map(node => node.tag).filter(tag => !IGNORED_TAGS.includes(tag))}
+                      suggestedTags={suggestedTags}
+                      options={options}
+                      loadOptions={loadOptions}
                     />
                   );
                 }}
               </StyledInputFormikField>
-              <MessageBox type="info" mt={3}>
-                <FormattedMessage
-                  id="collective.tags.info"
-                  defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world."
-                />
-              </MessageBox>
+              {infoMessage && (
+                <MessageBox type="info" mt={3}>
+                  {infoMessage}
+                </MessageBox>
+              )}
+              {/* // <MessageBox type="info" mt={3}>
+              //   <FormattedMessage
+              //     id="collective.tags.info"
+              //     defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world."
+              //   />
+              // </MessageBox> */}
             </ModalBody>
             <ModalFooter isFullWidth>
               <Flex justifyContent="flex-start" flexWrap="wrap" gap="16px">

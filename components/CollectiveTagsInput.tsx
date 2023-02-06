@@ -58,7 +58,7 @@ export const searchTagsQuery = gql`
   }
 `;
 
-type TagOption = {
+export type TagOption = {
   label: string;
   value: string;
 };
