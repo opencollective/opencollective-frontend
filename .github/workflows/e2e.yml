@@ -58,6 +58,9 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
+      - name: Hack sources.list
+        run: sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu/|http://mirror.arizona.edu/ubuntu/|g' /etc/apt/sources.list
+
       - name: Update apt
         run: sudo apt-get update || exit 0
 
