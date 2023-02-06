@@ -611,7 +611,7 @@ const CreatePendingContributionModal = ({ host: _host, ...props }) => {
   };
 
   return (
-    <CreatePendingContributionModalContainer {...props} trapFocus onClose={handleClose}>
+    <CreatePendingContributionModalContainer {...props} onClose={handleClose}>
       <ModalHeader>
         <FormattedMessage defaultMessage="Create Pending Contribution" />
       </ModalHeader>
