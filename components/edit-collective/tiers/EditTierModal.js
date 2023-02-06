@@ -301,7 +301,9 @@ function FormFields({ collective, values, hideTypeSelect }) {
               onChange={value =>
                 form.setFieldValue(
                   field.name,
-                  value ? { currency: field.value?.currency ?? collective.currency, valueInCents: value } : null,
+                  !isNil(value) && !isNaN(value)
+                    ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                    : null,
                 )
               }
               onBlur={() => form.setFieldTouched(field.name, true)}
