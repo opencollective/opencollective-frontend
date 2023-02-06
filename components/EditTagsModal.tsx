@@ -114,7 +114,7 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
                   return (
                     <CollectiveTagsInput
                       {...field}
-                      defaultValue={formik.values.tags} // TODO: fix default Value
+                      defaultValue={formik.values.tags}
                       onChange={tags => {
                         formik.setFieldValue(
                           'tags',
