@@ -3515,6 +3515,7 @@ enum PaymentMethodType {
   us_bank_account @deprecated(reason: "Please use uppercase values")
   sepa_debit @deprecated(reason: "Please use uppercase values")
   bacs_debit @deprecated(reason: "Please use uppercase values")
+  bancontact @deprecated(reason: "Please use uppercase values")
   ALIPAY
   CREDITCARD
   PREPAID
@@ -3530,6 +3531,7 @@ enum PaymentMethodType {
   US_BANK_ACCOUNT
   SEPA_DEBIT
   BACS_DEBIT
+  BANCONTACT
 }
 
 input PaymentMethodReferenceInput {

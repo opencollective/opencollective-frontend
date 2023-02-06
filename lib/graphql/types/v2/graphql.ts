@@ -6930,6 +6930,7 @@ export enum PaymentMethodType {
   ADAPTIVE = 'ADAPTIVE',
   ALIPAY = 'ALIPAY',
   BACS_DEBIT = 'BACS_DEBIT',
+  BANCONTACT = 'BANCONTACT',
   COLLECTIVE = 'COLLECTIVE',
   CREDITCARD = 'CREDITCARD',
   CRYPTO = 'CRYPTO',
@@ -6948,6 +6949,8 @@ export enum PaymentMethodType {
   alipay = 'alipay',
   /** @deprecated Please use uppercase values */
   bacs_debit = 'bacs_debit',
+  /** @deprecated Please use uppercase values */
+  bancontact = 'bancontact',
   /** @deprecated Please use uppercase values */
   collective = 'collective',
   /** @deprecated Please use uppercase values */
