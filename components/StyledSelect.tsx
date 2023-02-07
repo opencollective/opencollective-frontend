@@ -17,6 +17,7 @@ import Container from './Container';
 import { Flex } from './Grid';
 import SearchIcon from './SearchIcon';
 import StyledHr from './StyledHr';
+import { ModalReferenceContext } from './StyledModal';
 import StyledTag from './StyledTag';
 import { P } from './Text';
 
@@ -189,9 +190,13 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     options,
   }) => {
     isSearchable = isSearchable ?? options?.length > 8;
+    // If a StyledSelect is rendered within a modal, make sure we use the modal as the portal target
+    const modalRef = React.useContext(ModalReferenceContext);
+
     return {
       isSearchable,
-      menuPortalTarget: menuPortalTarget === null || typeof document === 'undefined' ? undefined : document.body,
+      menuPortalTarget:
+        menuPortalTarget === null || typeof document === 'undefined' ? undefined : modalRef?.current || document.body,
       isDisabled: disabled || isDisabled,
       placeholder: placeholder || intl.formatMessage(Messages.placeholder),
       loadingMessage: () => intl.formatMessage(Messages.loading),
