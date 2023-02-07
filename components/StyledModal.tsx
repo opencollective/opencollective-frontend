@@ -163,12 +163,12 @@ ModalHeader.displayName = 'Header';
 /**
  * A special header that displays collective name + avatar in the header.
  */
-export const CollectiveModalHeader = ({ collective, ...props }) => (
+export const CollectiveModalHeader = ({ collective, customText, ...props }) => (
   <ModalHeader {...props}>
     <Flex alignItems="center">
       <Avatar collective={collective} radius={40} />
       <P fontSize="16px" lineHeight="24px" fontWeight="bold" ml={3}>
-        {collective.name}
+        {customText || collective.name}
       </P>
     </Flex>
   </ModalHeader>
@@ -178,6 +178,7 @@ CollectiveModalHeader.propTypes = {
   collective: PropTypes.shape({
     name: PropTypes.string,
   }),
+  customText: PropTypes.string,
 };
 
 CollectiveModalHeader.displayName = 'Header';

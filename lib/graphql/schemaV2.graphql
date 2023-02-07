@@ -2460,6 +2460,9 @@ enum ActivityType {
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
+  ORDER_PENDING_CREATED
+  ORDER_PENDING_FOLLOWUP
+  ORDER_PENDING_RECEIVED
   ORDERS_SUSPICIOUS
   BACKYOURSTACK_DISPATCH_CONFIRMED
   PAYMENT_FAILED
@@ -11328,6 +11331,9 @@ enum ActivityAndClassesType {
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
+  ORDER_PENDING_CREATED
+  ORDER_PENDING_FOLLOWUP
+  ORDER_PENDING_RECEIVED
   ORDERS_SUSPICIOUS
   BACKYOURSTACK_DISPATCH_CONFIRMED
   PAYMENT_FAILED
@@ -13556,6 +13562,11 @@ type Mutation {
   createPaymentIntent(paymentIntent: PaymentIntentInput!): PaymentIntent!
 
   """
+  To submit a new order. Scope: "orders".
+  """
+  createPendingOrder(order: PendingOrderCreateInput!): Order!
+
+  """
   Add a new payment method to be used with an Order. Scope: "orders".
   """
   addCreditCard(
@@ -14934,6 +14945,7 @@ input OrderFromAccountInfo {
   """
   location: LocationInput
   name: String
+  email: String
   legalName: String
 }
 
@@ -15156,6 +15168,67 @@ input PaymentIntentInput {
   amount: AmountInput!
   fromAccount: AccountReferenceInput
   toAccount: AccountReferenceInput!
+}
+
+"""
+Input to create a new pending order
+"""
+input PendingOrderCreateInput {
+  """
+  The contribution amount for 1 quantity, without platform contribution and taxes
+  """
+  amount: AmountInput!
+
+  """
+  The profile making the order.
+  """
+  fromAccount: AccountReferenceInput!
+
+  """
+  Additional information about the contributing profile
+  """
+  fromAccountInfo: OrderFromAccountInfo
+
+  """
+  The profile you want to contribute to
+  """
+  toAccount: AccountReferenceInput!
+
+  """
+  Platform tip attached to this order
+  """
+  platformTipAmount: AmountInput
+
+  """
+  Use this field to set the taxes associated to this order
+  """
+  taxes: [OrderTaxInput]
+
+  """
+  The tier you are contributing to
+  """
+  tier: TierReferenceInput
+
+  """
+  Public order description
+  """
+  description: String
+
+  """
+  Private order memo
+  """
+  memo: String
+
+  """
+  If the tier has some "customFields", use this field to set their values
+  """
+  customData: JSON
+
+  """
+  When was the money spent?
+  """
+  expectedAt: DateString
+  hostFeePercent: Int
 }
 
 type CreditCardWithStripeError {

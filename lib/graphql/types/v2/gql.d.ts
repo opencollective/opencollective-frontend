@@ -58,6 +58,18 @@ export function gql(source: "\n  fragment ExpensesListAdminFieldsFragment on Exp
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query CreatePendingContributionModal($slug: String!) {\n    host(slug: $slug) {\n      id\n      legacyId\n      type\n      isHost\n      name\n      slug\n      currency\n      settings\n\n      plan {\n        id\n        hostFees\n      }\n      policies {\n        REQUIRE_2FA_FOR_ADMINS\n      }\n      hostFeePercent\n      isTrustedHost\n    }\n  }\n"): typeof import('./graphql').CreatePendingContributionModalDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query CreatePendingContributionCollective($slug: String!) {\n    account(slug: $slug) {\n      id\n      type\n      currency\n      ... on AccountWithContributions {\n        tiers {\n          nodes {\n            id\n            id\n            slug\n            legacyId\n            name\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').CreatePendingContributionCollectiveDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation CreatePendingContribution($order: PendingOrderCreateInput!) {\n    createPendingOrder(order: $order) {\n      legacyId\n      id\n      status\n    }\n  }\n"): typeof import('./graphql').CreatePendingContributionDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  mutation ClearCache($account: AccountReferenceInput!, $cacheTypes: [AccountCacheType!]) {\n    clearCacheForAccount(account: $account, type: $cacheTypes) {\n      id\n      slug\n      name\n    }\n  }\n"): typeof import('./graphql').ClearCacheDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.

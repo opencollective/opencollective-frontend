@@ -1,7 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import type { LoggedInUser } from '../lib/custom_typings/LoggedInUser';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { getSettingsRoute } from '../lib/url-helpers';
 
@@ -14,7 +13,6 @@ import StyledHr from './StyledHr';
 import { P, Strong } from './Text';
 
 type TwoFactorAuthRequiredMessageProps = {
-  loggedInUser: LoggedInUser;
   borderWidth?: string | number;
   noTitle?: boolean;
 };
