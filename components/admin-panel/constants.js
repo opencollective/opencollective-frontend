@@ -64,7 +64,6 @@ export const COLLECTIVE_SECTIONS = {
   TEAM: 'team',
   TICKETS: 'tickets',
   TIERS: 'tiers',
-  TIERS_LEGACY: 'tiers-legacy',
   USER_SECURITY: 'user-security',
   VIRTUAL_CARDS: 'virtual-cards',
   WEBHOOKS: 'webhooks',
