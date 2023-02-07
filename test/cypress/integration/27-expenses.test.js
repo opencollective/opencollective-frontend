@@ -534,7 +534,8 @@ describe('New expense flow', () => {
       cy.get('[data-cy="expense-status-msg"]').contains('Rejected');
 
       // Now delete the expense
-      cy.get('[data-cy="delete-expense-button"]:visible').click();
+      cy.getByDataCy('more-actions').click();
+      cy.getByDataCy('more-actions-delete-expense-btn').click();
       cy.getByDataCy('confirmation-modal-continue').click();
       cy.url().should('eq', `${Cypress.config().baseUrl}/${collective.slug}/expenses`);
       cy.visit(expenseUrl);

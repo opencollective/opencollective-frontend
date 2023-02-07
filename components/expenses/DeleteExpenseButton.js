@@ -13,7 +13,7 @@ import StyledButton from '../StyledButton';
 import { Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const deleteExpenseMutation = gql`
+export const deleteExpenseMutation = gql`
   mutation DeleteExpense($id: String!) {
     deleteExpense(expense: { id: $id }) {
       id
@@ -21,7 +21,7 @@ const deleteExpenseMutation = gql`
   }
 `;
 
-const removeExpenseFromCache = (cache, { data: { deleteExpense } }) => {
+export const removeExpenseFromCache = (cache, { data: { deleteExpense } }) => {
   cache.modify({
     fields: {
       expenses(existingExpenses, { readField }) {
