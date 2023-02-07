@@ -299,9 +299,8 @@ export default class SignIn extends React.Component {
               {this.props.passwordRequired && (
                 <Box>
                   <Flex color="black.800" mr={1} fontSize="14px" justifyContent="center">
-                    <FormattedMessage defaultMessage="Want to receive a login link instead?" />
-                  </Flex>
-                  <Flex fontSize="14px" justifyContent="center" mt={2}>
+                    <FormattedMessage defaultMessage="Want to receive a login link?" />
+                    &nbsp;
                     <StyledLinkButton
                       fontSize="14px"
                       onClick={() => onSubmit({ sendLink: true })}
@@ -309,7 +308,21 @@ export default class SignIn extends React.Component {
                       data-cy="signin-secondary-action-btn"
                       underlineOnHover
                     >
-                      <FormattedMessage defaultMessage="Yes, send me an email" />
+                      <FormattedMessage defaultMessage="Send me an email" />
+                    </StyledLinkButton>
+                  </Flex>
+
+                  <Flex color="black.800" mr={1} mt={2} fontSize="14px" justifyContent="center">
+                    <FormattedMessage defaultMessage="Lost your password?" />
+                    &nbsp;
+                    <StyledLinkButton
+                      fontSize="14px"
+                      onClick={() => onSubmit({ resetPassword: true })}
+                      disabled={loading}
+                      data-cy="signin-secondary-action-btn"
+                      underlineOnHover
+                    >
+                      <FormattedMessage defaultMessage="Reset my password" />
                     </StyledLinkButton>
                   </Flex>
                 </Box>

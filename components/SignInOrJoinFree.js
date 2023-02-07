@@ -147,7 +147,7 @@ class SignInOrJoinFree extends React.Component {
     return encodeURIComponent(redirectUrl || currentPath || '/');
   }
 
-  signIn = async (email, password = null, { sendLink = false } = {}) => {
+  signIn = async (email, password = null, { sendLink = false, resetPassword = false } = {}) => {
     if (this.state.submitting) {
       return false;
     }
@@ -160,6 +160,7 @@ class SignInOrJoinFree extends React.Component {
         redirect: this.getRedirectURL(),
         websiteUrl: getWebsiteUrl(),
         sendLink,
+        resetPassword,
         createProfile: false,
       });
 
@@ -172,6 +173,8 @@ class SignInOrJoinFree extends React.Component {
         if (!user) {
           this.setState({ error: 'Token rejected' });
         }
+      } else if (resetPassword) {
+        await this.props.router.push({ pathname: '/reset-password/sent', query: { email } });
       } else {
         await this.props.router.push({ pathname: '/signin/sent', query: { email } });
       }

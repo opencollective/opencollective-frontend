@@ -10,6 +10,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { getCollectiveTypeForUrl } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';
@@ -253,7 +254,8 @@ class ContributionFlow extends React.Component {
     }
 
     try {
-      const skipTaxes = isEmpty(this.getApplicableTaxes(collective, host, tier?.type));
+      const totalAmount = getTotalAmount(stepDetails, stepSummary);
+      const skipTaxes = !totalAmount || isEmpty(this.getApplicableTaxes(collective, host, tier?.type));
       const response = await this.props.createOrder({
         variables: {
           order: {
@@ -321,7 +323,14 @@ class ContributionFlow extends React.Component {
         stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.SEPA_DEBIT)
     ) {
       const { stripeData } = stepPayment;
-      const returnUrl = `${window.location.origin}/${this.props.collective.slug}/donate/success?OrderId=${order.id}`;
+
+      const baseRoute = this.props.collective.parent?.slug
+        ? `${window.location.origin}/${this.props.collective.parent?.slug}/${getCollectiveTypeForUrl(
+            this.props.collective,
+          )}/${this.props.collective.slug}`
+        : `${window.location.origin}/${this.props.collective.slug}`;
+
+      const returnUrl = `${baseRoute}/donate/success?OrderId=${order.id}`;
 
       try {
         await confirmPayment(stripeData?.stripe, stripeData?.paymentIntentClientSecret, {

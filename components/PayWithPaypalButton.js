@@ -119,7 +119,7 @@ class PayWithPaypalButton extends Component {
     // Initialize button
     const { host, currency } = this.props;
     const clientId = host.paypalClientId;
-    const intent = isRecurring ? 'subscription' : 'capture';
+    const intent = isRecurring ? 'subscription' : 'authorize';
     const paypal = await getPaypal({ clientId, currency, intent });
     const options = this.getOptions();
     paypal.Buttons(options).render(this.paypalTarget.current);
@@ -157,10 +157,10 @@ class PayWithPaypalButton extends Component {
         this.props.onSuccess({ subscriptionId: data.subscriptionID });
       };
     } else {
-      options.intent = 'capture';
+      options.intent = 'authorize';
       options.createOrder = (data, actions) => {
         return actions.order.create({
-          intent: 'CAPTURE',
+          intent: 'AUTHORIZE',
           application_context: {
             brand_name: `${this.props.collective.name} - Open Collective`,
             locale: this.props.intl.locale,

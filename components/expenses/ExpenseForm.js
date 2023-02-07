@@ -352,7 +352,7 @@ const ExpenseFormBody = ({
 
   React.useEffect(() => {
     // If the currency is not supported anymore, we need to do something
-    if (!values.currency || !availableCurrencies.includes(values.currency)) {
+    if (!loading && (!values.currency || !availableCurrencies.includes(values.currency))) {
       const hasItemsWithAmounts = values.items.some(item => Boolean(item.amount));
       if (!hasItemsWithAmounts) {
         // If no items have amounts yet, we can safely set the default currency
@@ -362,7 +362,7 @@ const ExpenseFormBody = ({
         formik.setFieldValue('currency', null);
       }
     }
-  }, [values.payoutMethod]);
+  }, [loading, values.payoutMethod]);
 
   // Load values from localstorage
   React.useEffect(() => {

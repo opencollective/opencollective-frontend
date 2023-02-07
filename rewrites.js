@@ -31,6 +31,14 @@ exports.REWRITES = [
     destination: '/signinLinkSent',
   },
   {
+    source: '/reset-password/sent',
+    destination: '/reset-password-sent',
+  },
+  {
+    source: '/reset-password/completed',
+    destination: '/reset-password-completed',
+  },
+  {
     source: '/oauth/authorize',
     destination: '/oauth/authorize',
   },
@@ -85,6 +93,10 @@ exports.REWRITES = [
   {
     source: '/signin/:token?',
     destination: '/signin',
+  },
+  {
+    source: '/reset-password/:token?',
+    destination: '/reset-password',
   },
   {
     source: '/confirm/email/:token',
