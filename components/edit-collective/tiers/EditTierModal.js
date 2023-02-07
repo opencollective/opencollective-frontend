@@ -120,7 +120,6 @@ function FormFields({ collective, values, hideTypeSelect }) {
     // No interval for products and tickets
     if ([PRODUCT, TICKET].includes(values.type)) {
       formik.setFieldValue('interval', null);
-      formik.setFieldValue('amountType', FIXED);
     }
   }, [values.interval, values.type]);
 
