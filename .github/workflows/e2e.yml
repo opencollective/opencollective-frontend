@@ -30,6 +30,7 @@ env:
   TERM: xterm
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   STRIPE_WEBHOOK_KEY: ${{ secrets.STRIPE_WEBHOOK_KEY }}
+  STRIPE_WEBHOOK_SIGNING_SECRET: ${{ secrets.STRIPE_WEBHOOK_SIGNING_SECRET }}
 
 jobs:
   e2e:
