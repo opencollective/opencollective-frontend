@@ -2471,6 +2471,7 @@ enum ActivityType {
   USER_CREATED
   USER_NEW_TOKEN
   USER_SIGNIN
+  USER_RESET_PASSWORD
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_CODE_ADDED
   TWO_FACTOR_CODE_DELETED
@@ -7230,7 +7231,7 @@ interface FileInfo {
   """
   Size of the file in bytes
   """
-  size: Int!
+  size: Int
 }
 
 """
@@ -7260,7 +7261,7 @@ type ImageFileInfo implements FileInfo {
   """
   Size of the file in bytes
   """
-  size: Int!
+  size: Int
 
   """
   If the file is an image, this will be the width of the image in pixels
@@ -7276,6 +7277,33 @@ type ImageFileInfo implements FileInfo {
   Blurhash of the image
   """
   blurHash: String
+}
+
+type GenericFileInfo implements FileInfo {
+  """
+  Unique identifier for the file
+  """
+  id: String!
+
+  """
+  URL to access the file
+  """
+  url: URL!
+
+  """
+  Name of the file
+  """
+  name: String
+
+  """
+  Mime type of the file
+  """
+  type: String!
+
+  """
+  Size of the file in bytes
+  """
+  size: Int
 }
 
 """
@@ -11342,6 +11370,7 @@ enum ActivityAndClassesType {
   USER_CREATED
   USER_NEW_TOKEN
   USER_SIGNIN
+  USER_RESET_PASSWORD
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_CODE_ADDED
   TWO_FACTOR_CODE_DELETED
@@ -13636,7 +13665,7 @@ type Mutation {
     isTrustedHost: Boolean
 
     """
-    Specify whether 2FA should be enabled
+    Set this to false to disable 2FA. Other values have no effect.
     """
     isTwoFactorAuthEnabled: Boolean
   ): Account!
@@ -14391,6 +14420,9 @@ input ExpenseAttachedFileInput {
   Original filename
   """
   name: String
+    @deprecated(
+      reason: "2023-02-02: This must now be provided when uploading the file. This parameter will be ignored."
+    )
 
   """
   URL of the file
@@ -15180,12 +15212,12 @@ Input to create a new pending order
 """
 input PendingOrderCreateInput {
   """
-  The contribution amount for 1 quantity, without platform contribution and taxes
+  The contribution amount, without platform contribution and taxes
   """
   amount: AmountInput!
 
   """
-  The profile making the order.
+  The profile making the contribution.
   """
   fromAccount: AccountReferenceInput!
 
@@ -15195,7 +15227,7 @@ input PendingOrderCreateInput {
   fromAccountInfo: OrderFromAccountInfo
 
   """
-  The profile you want to contribute to
+  The collective/event/project you want to contribute to
   """
   toAccount: AccountReferenceInput!
 
@@ -15220,17 +15252,12 @@ input PendingOrderCreateInput {
   description: String
 
   """
-  Private order memo
-  """
-  memo: String
-
-  """
-  If the tier has some "customFields", use this field to set their values
+  Custom data related to the Pending Order
   """
   customData: JSON
 
   """
-  When was the money spent?
+  When is the money expected?
   """
   expectedAt: DateString
   hostFeePercent: Int

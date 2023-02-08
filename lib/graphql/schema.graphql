@@ -2244,7 +2244,7 @@ type Collective implements CollectiveInterface {
   """
   Returns whether this user has two factor authentication enabled
   """
-  isTwoFactorAuthEnabled: Boolean!
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -2502,7 +2502,7 @@ type Event implements CollectiveInterface {
   """
   Returns whether this user has two factor authentication enabled
   """
-  isTwoFactorAuthEnabled: Boolean!
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -2760,7 +2760,7 @@ type Fund implements CollectiveInterface {
   """
   Returns whether this user has two factor authentication enabled
   """
-  isTwoFactorAuthEnabled: Boolean!
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -3018,7 +3018,7 @@ type Organization implements CollectiveInterface {
   """
   Returns whether this user has two factor authentication enabled
   """
-  isTwoFactorAuthEnabled: Boolean!
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -3277,7 +3277,7 @@ type Project implements CollectiveInterface {
   """
   Returns whether this user has two factor authentication enabled
   """
-  isTwoFactorAuthEnabled: Boolean!
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -3777,7 +3777,7 @@ type User implements CollectiveInterface {
   """
   Returns whether this user has two factor authentication enabled
   """
-  isTwoFactorAuthEnabled: Boolean!
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -4037,7 +4037,7 @@ type Vendor implements CollectiveInterface {
   """
   Returns whether this user has two factor authentication enabled
   """
-  isTwoFactorAuthEnabled: Boolean!
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
