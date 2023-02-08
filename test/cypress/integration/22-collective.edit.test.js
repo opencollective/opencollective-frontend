@@ -86,17 +86,20 @@ describe('edit collective', () => {
   it('edit info', () => {
     cy.get('.name.inputField input', { timeout: 10000 }).type(' edited');
     cy.get('.description.inputField input').type(' edited');
-    cy.get('.twitterHandle.inputField input').type('{selectall}opencollect');
-    cy.get('input[name="repositoryUrl"]').type('{selectall}https://github.com/AwesomeHandle');
-    cy.get('.website.inputField input').type('{selectall}opencollective.com');
+    cy.contains('Add social link').click();
+    cy.focused().type('https://opencollective.com/');
+    cy.contains('Add social link').click();
+    cy.focused().type('https://twitter.com/opencollective');
+    cy.contains('Add social link').click();
+    cy.focused().type('https://github.com/opencollective');
     cy.wait(500);
     cy.get('.actions > [data-cy="collective-save"]').click(); // save changes
     cy.get('.backToProfile a').click(); // back to profile
     cy.wait(500);
     cy.get('[data-cy="collective-hero"] [data-cy="collective-title"]').contains('edited');
-    cy.get('[data-cy="collective-hero"] a[href="https://twitter.com/opencollect"] [title="Twitter"]');
-    cy.contains('[data-cy="collective-hero"] a[href="https://github.com/AwesomeHandle"]', 'Code repository');
-    cy.get('[data-cy="collective-hero"] a[href="https://opencollective.com"] [title="Website"]');
+    cy.get('[data-cy="social-link-0"]').should('have.attr', 'href', 'https://opencollective.com/');
+    cy.get('[data-cy="social-link-1"]').should('have.attr', 'href', 'https://twitter.com/opencollective');
+    cy.get('[data-cy="social-link-2"]').should('have.attr', 'href', 'https://github.com/opencollective');
   });
 
   it('edit tiers', () => {
