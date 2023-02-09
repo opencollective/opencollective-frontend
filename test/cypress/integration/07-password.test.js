@@ -19,13 +19,13 @@ describe('passwords', () => {
     cy.getByDataCy('password-strength-bar').should('contain', 'too short');
 
     cy.get('input#new-password').type('{selectall}{backspace}12345678');
-    cy.getByDataCy('password-strength-bar').should('contain', 'weak');
+    cy.getByDataCy('password-strength-bar').should('contain', 'Weak');
 
     cy.get('input#new-password').type('{selectall}{backspace}qwerty');
-    cy.getByDataCy('password-strength-bar').should('contain', 'weak');
+    cy.getByDataCy('password-strength-bar').should('contain', 'Weak');
 
     cy.get('input#new-password').type('{selectall}{backspace}qwerty123456');
-    cy.getByDataCy('password-strength-bar').should('contain', 'weak');
+    cy.getByDataCy('password-strength-bar').should('contain', 'Weak');
 
     // Can't submit with a weak password
     cy.contains('button', 'Set Password').click();
@@ -34,11 +34,15 @@ describe('passwords', () => {
       'Password is too weak. Try to use more characters or use a password manager to generate a strong one.',
     );
 
-    cy.get('input#new-password').type('{selectall}{backspace}qwerty123456!@#');
-    cy.getByDataCy('password-strength-bar').should('contain', 'okay');
+    // Other strength levels
+    cy.get('input#new-password').type('{selectall}{backspace}fairPasswd');
+    cy.getByDataCy('password-strength-bar').should('contain', 'Fair');
+
+    cy.get('input#new-password').type('{selectall}{backspace}g00dPasswd!');
+    cy.getByDataCy('password-strength-bar').should('contain', 'Good');
 
     cy.get('input#new-password').type('{selectall}{backspace}qwerty123456!@#amazing!');
-    cy.getByDataCy('password-strength-bar').should('contain', 'strong');
+    cy.getByDataCy('password-strength-bar').should('contain', 'Strong');
 
     // Submit new password
     cy.contains('button', 'Set Password').click();
