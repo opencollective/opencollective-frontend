@@ -39,6 +39,7 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
         <React.Fragment>
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
           <MenuLink collective={collective} section={ALL_SECTIONS.WEBHOOKS} />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS} />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
           <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SECURITY} />
           <MenuLink collective={collective} section={ALL_SECTIONS.ADVANCED} />
@@ -204,7 +205,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS}
-            if={isOneOfTypes(collective, [COLLECTIVE, ORGANIZATION, USER])}
+            if={isOneOfTypes(collective, [COLLECTIVE, USER])}
           />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
           <MenuLink
