@@ -657,6 +657,7 @@
   "contribute.step.payment": "Информация о платеже",
   "contribute.submit": "Сделайте вклад",
   "contribute.taxInfoInvalid": "Некорректный номер {taxName}",
+  "contribute.ticket": "Get {quantity, select, 1 {ticket} other {tickets}}",
   "contribute.tierDetails": "Вы будете вносить {amount}{interval, select, month { ежемесячно} year { ежегодно} other {}}.",
   "contribute.vatBadCountry": "Номер НДС не соответствует стране",
   "contributeAs.org.twitter": "Twitter (не обязательно)",

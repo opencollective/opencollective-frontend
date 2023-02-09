@@ -657,6 +657,7 @@
   "contribute.step.payment": "Betalingsinfo",
   "contribute.submit": "Maak een bijdrage",
   "contribute.taxInfoInvalid": "Ongeldig {taxName} nummer",
+  "contribute.ticket": "Get {quantity, select, 1 {ticket} other {tickets}}",
   "contribute.tierDetails": "Je zal{interval, select, month { monthly } year { yearly} other {}}bijdragen met {amount}.",
   "contribute.vatBadCountry": "Het VAT nummer komt niet overeen met het land",
   "contributeAs.org.twitter": "Twitter (optioneel)",

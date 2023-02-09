@@ -657,6 +657,7 @@
   "contribute.step.payment": "支払い情報",
   "contribute.submit": "コントリビュートする",
   "contribute.taxInfoInvalid": "正しくない {taxName} 番号",
+  "contribute.ticket": "Get {quantity, select, 1 {ticket} other {tickets}}",
   "contribute.tierDetails": "あなたは {interval, select, month {月間} year {年間} other {}} {amount} を支援するでしょう。",
   "contribute.vatBadCountry": "VAT番号が国と一致していません",
   "contributeAs.org.twitter": "Twitter (オプション)",

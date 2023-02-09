@@ -657,6 +657,7 @@
   "contribute.step.payment": "결제 정보",
   "contribute.submit": "기여 만들기",
   "contribute.taxInfoInvalid": "잘못된 {taxName} 번호",
+  "contribute.ticket": "Get {quantity, select, 1 {ticket} other {tickets}}",
   "contribute.tierDetails": "You’ll contribute {amount}{interval, select, month { monthly} year { yearly} other {}}.",
   "contribute.vatBadCountry": "VAT가 귀하의 국가와 일치하지 않습니다.",
   "contributeAs.org.twitter": "트위터 (선택)",
