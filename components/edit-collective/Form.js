@@ -52,7 +52,6 @@ import Security from './sections/Security';
 import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
-import TiersLegacy from './sections/TiersLegacy';
 import UserSecurity from './sections/UserSecurity';
 import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
@@ -422,19 +421,6 @@ class EditCollectiveForm extends React.Component {
 
       case EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS:
         return <PaymentMethods collectiveSlug={collective.slug} />;
-
-      case EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY:
-        return (
-          <TiersLegacy
-            title="Tiers"
-            types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
-            tiers={this.state.tiers}
-            collective={collective}
-            currency={collective.currency}
-            onChange={tiers => this.setState({ tiers, modified: true })}
-            defaultType="TIER"
-          />
-        );
 
       case EDIT_COLLECTIVE_SECTIONS.TIERS:
         return <Tiers collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
@@ -898,9 +884,7 @@ class EditCollectiveForm extends React.Component {
               </div>
             )}
 
-            {[EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY].includes(section) && this.renderSection(section)}
-
-            {((fields && fields.length > 0) || [EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY].includes(section)) && (
+            {fields && fields.length > 0 && (
               <Container className="actions" margin="5rem auto 1rem" textAlign="center">
                 <StyledButton
                   buttonStyle="primary"
@@ -931,7 +915,7 @@ class EditCollectiveForm extends React.Component {
               </Container>
             )}
 
-            {![EDIT_COLLECTIVE_SECTIONS.TIERS_LEGACY].includes(section) && this.renderSection(section)}
+            {this.renderSection(section)}
           </Flex>
         </Flex>
       </div>

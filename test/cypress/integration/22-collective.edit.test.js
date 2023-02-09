@@ -2,28 +2,6 @@ import speakeasy from 'speakeasy';
 
 import { randomEmail } from '../support/faker';
 
-const addTier = tier => {
-  cy.get('.addTier').click();
-
-  const fields = [
-    { type: 'input', name: 'name' },
-    { type: 'textarea', name: 'description' },
-    { type: '[data-cy="amountType"]', name: 'amountType' },
-    { type: 'input', name: 'maxQuantity' },
-    { type: 'input', name: 'amount' },
-    { type: '[data-cy="interval"]', name: 'interval' },
-  ];
-
-  fields.map(field => {
-    if (field.type === 'input' || field.type === 'textarea') {
-      cy.get(`.EditTiers .tier:last .${field.name}.inputField ${field.type}`).type(`{selectall}${tier[field.name]}`);
-    } else {
-      cy.get(`.EditTiers .tier:last .${field.name}.inputField ${field.type}`).click();
-      cy.contains('[data-cy="select-option"]', tier[field.name]).click();
-    }
-  });
-};
-
 describe('edit collective', () => {
   let collectiveSlug = null;
 
@@ -156,62 +134,6 @@ describe('edit collective', () => {
     cy.checkToast({ type: 'SUCCESS', message: 'Tier deleted.' });
 
     // TODO: Check profile page (need https://github.com/opencollective/opencollective/issues/6331)
-  });
-
-  it('edit tiers (legacy)', () => {
-    cy.login({ redirect: `/${collectiveSlug}/admin/tiers-legacy` });
-    cy.get('.EditTiers .tier:first .name.inputField input').type('{selectall}Backer edited');
-    cy.get('.EditTiers .tier:first .description.inputField textarea').type('{selectall}New description for backers');
-    cy.get('.EditTiers .tier:first .amount.inputField input').type('{selectall}5');
-    cy.get('.EditTiers .tier:first .amountType.inputField [data-cy="amountType"]').click();
-    cy.contains('[data-cy="select-option"]', 'Flexible amount').click();
-    cy.get('.EditTiers .tier:first .currency1.inputField input').type('{selectall}5');
-    cy.get('.EditTiers .tier:first .currency2.inputField input').type('{selectall}10');
-    cy.get('.EditTiers .tier:first .currency3.inputField input').type('{selectall}20');
-    cy.get('.EditTiers .tier:first .minimumAmount.inputField input').type('{selectall}5');
-    cy.get('.EditTiers .tier:first .currency0.inputField input').type('{selectall}{backspace}');
-    addTier({
-      name: 'Donor (one time donation)',
-      type: 'DONATION',
-      amount: 500,
-      amountType: 'Fixed amount',
-      interval: 'One time',
-      description: 'New description for donor',
-    });
-    addTier({
-      type: 'SERVICE',
-      name: 'Priority Support',
-      description: 'Get priority support from the core contributors',
-      amount: 1000,
-      amountType: 'Fixed amount',
-      interval: 'Monthly',
-      maxQuantity: 10,
-    });
-    cy.wait(500);
-    cy.get('.actions > [data-cy="collective-save"]').click(); // save changes
-    cy.contains('.actions > [data-cy="collective-save"]', 'Saved');
-    cy.get('.backToProfile a').click(); // back to profile
-    const tierCardSelector = '[data-cy="admin-contribute-cards"] [data-cy="contribute-card-tier"]';
-    cy.get(tierCardSelector);
-    cy.get(tierCardSelector).first().find('[data-cy="contribute-title"]').contains('Backer edited');
-    cy.get(tierCardSelector).first().find('[data-cy="contribute-description"]').contains('New description for backers');
-    cy.get(tierCardSelector).first().contains('$5 USD / month');
-    cy.get(tierCardSelector).should('have.length', 4).last().should('contain', 'Priority Support');
-    cy.get(tierCardSelector).first().find('[data-cy="contribute-btn"]').click();
-
-    // Ensure the new tiers are properly displayed on order form
-    cy.get('#amount > button').should('have.length', 4); // 3 presets + "Other"
-
-    cy.login({ redirect: `/${collectiveSlug}/admin/tiers-legacy` });
-    cy.get('.EditTiers .tier').first().find('.amountType [data-cy="amountType"]').click();
-    cy.contains('[data-cy="select-option"]', 'Fixed amount').click();
-    cy.get('.EditTiers .tier').last().find('.removeTier').click();
-    cy.get('.EditTiers .tier').last().find('.removeTier').click();
-    cy.wait(500);
-    cy.get('.actions > [data-cy="collective-save"]').click(); // save changes
-    cy.contains('.actions > [data-cy="collective-save"]', 'Saved');
-    cy.get('.backToProfile a').click(); // back to profile
-    cy.get(tierCardSelector).should('have.length', 2);
   });
 
   it('enables VAT', () => {
