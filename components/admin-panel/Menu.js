@@ -37,7 +37,6 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
       <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.PAYMENT_RECEIPTS} />
       {!isAccountantOnly && (
         <React.Fragment>
-          <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} />
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
           <MenuLink collective={collective} section={ALL_SECTIONS.WEBHOOKS} />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
@@ -99,6 +98,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             if={isType(collective, ORGANIZATION) && isHost}
           >
             <OrganizationSettingsMenuLinks collective={collective} isAccountantOnly={isAccountantOnly} />
+            <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} />
           </SubMenu>
           <SubMenu
             label={<FormattedMessage id="AdminPanel.FiscalHostSettings" defaultMessage="Fiscal Host Settings" />}
