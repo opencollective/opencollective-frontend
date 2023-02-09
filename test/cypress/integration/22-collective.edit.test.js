@@ -84,7 +84,9 @@ describe('edit collective', () => {
     // Create a new fixed tier
     cy.getByDataCy('create-contribute-tier').click();
     cy.getByDataCy('confirm-btn').click();
-    cy.getByDataCy('edit-tier-modal-form').should('contain', 'This field is required');
+    cy.get('input[name="name"]')
+      .invoke('prop', 'validity')
+      .should('deep.include', { valid: false, valueMissing: true });
     cy.getByDataCy('select-type').click();
     cy.contains('[data-cy=select-option]', 'product').click();
     cy.get('[data-cy=name]').click();

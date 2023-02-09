@@ -170,6 +170,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
         label={intl.formatMessage({ id: 'Fields.name', defaultMessage: 'Name' })}
         labelFontWeight="bold"
         mt="3"
+        required
       >
         {({ field }) => <StyledInput data-cy={field.name} placeholder="E.g. Donation" {...field} />}
       </StyledInputFormikField>
