@@ -16,6 +16,7 @@ import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
 import { isValidUrl } from '../../lib/utils';
 
+import { ALL_SECTIONS } from '../admin-panel/constants';
 import ActivityLog from '../admin-panel/sections/ActivityLog';
 import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
 import ForDevelopers from '../admin-panel/sections/ForDevelopers';
@@ -57,7 +58,6 @@ import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
-import { EDIT_COLLECTIVE_SECTIONS } from './Menu';
 import SocialLinksFormField from './SocialLinksFormField';
 
 const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, USER } = CollectiveType;
@@ -386,7 +386,7 @@ class EditCollectiveForm extends React.Component {
 
   getMenuSelectedSection(section) {
     if (['gift-cards-create', 'gift-cards-send', 'gift-cards'].includes(section)) {
-      return EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS;
+      return ALL_SECTIONS.GIFT_CARDS;
     } else {
       return section;
     }
@@ -396,39 +396,39 @@ class EditCollectiveForm extends React.Component {
     const { collective, LoggedInUser } = this.props;
 
     switch (section) {
-      case EDIT_COLLECTIVE_SECTIONS.INFO:
+      case ALL_SECTIONS.INFO:
         return null;
 
-      case EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_GOALS:
+      case ALL_SECTIONS.COLLECTIVE_GOALS:
         return <CollectiveGoals collective={collective} currency={collective.currency} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.COLLECTIVE_PAGE:
+      case ALL_SECTIONS.COLLECTIVE_PAGE:
         return <EditCollectivePage collective={collective} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS:
+      case ALL_SECTIONS.CONNECTED_ACCOUNTS:
         return <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.EXPENSES:
+      case ALL_SECTIONS.EXPENSES:
         return null;
 
-      case EDIT_COLLECTIVE_SECTIONS.EXPORT:
+      case ALL_SECTIONS.EXPORT:
         return <Export collective={collective} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.HOST:
+      case ALL_SECTIONS.HOST:
         return (
           <Host collective={collective} LoggedInUser={LoggedInUser} editCollectiveMutation={this.props.onSubmit} />
         );
 
-      case EDIT_COLLECTIVE_SECTIONS.PAYMENT_METHODS:
+      case ALL_SECTIONS.PAYMENT_METHODS:
         return <PaymentMethods collectiveSlug={collective.slug} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.TIERS:
+      case ALL_SECTIONS.TIERS:
         return <Tiers collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.TICKETS:
+      case ALL_SECTIONS.TICKETS:
         return <Tickets collective={collective} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.GIFT_CARDS:
+      case ALL_SECTIONS.GIFT_CARDS:
         return <GiftCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
 
       case 'gift-cards-create':
@@ -469,19 +469,19 @@ class EditCollectiveForm extends React.Component {
           </Flex>
         );
 
-      case EDIT_COLLECTIVE_SECTIONS.WEBHOOKS:
+      case ALL_SECTIONS.WEBHOOKS:
         return <Webhooks collectiveSlug={collective.slug} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.AUTHORIZED_APPS:
+      case ALL_SECTIONS.AUTHORIZED_APPS:
         return <AuthorizedApps />;
 
-      case EDIT_COLLECTIVE_SECTIONS.FOR_DEVELOPERS:
+      case ALL_SECTIONS.FOR_DEVELOPERS:
         return <ForDevelopers account={collective} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.ACTIVITY_LOG:
+      case ALL_SECTIONS.ACTIVITY_LOG:
         return <ActivityLog accountSlug={collective.slug} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.ADVANCED:
+      case ALL_SECTIONS.ADVANCED:
         return (
           <Box>
             {collective.type === USER && <EditUserEmailForm />}
@@ -495,13 +495,13 @@ class EditCollectiveForm extends React.Component {
 
       // Fiscal Hosts
 
-      case EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING:
+      case ALL_SECTIONS.FISCAL_HOSTING:
         return <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.RECEIVING_MONEY:
+      case ALL_SECTIONS.RECEIVING_MONEY:
         return <ReceivingMoney collective={collective} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.PENDING_ORDERS:
+      case ALL_SECTIONS.PENDING_ORDERS:
         return (
           <OrdersWithData
             accountSlug={collective.slug}
@@ -511,32 +511,32 @@ class EditCollectiveForm extends React.Component {
           />
         );
 
-      case EDIT_COLLECTIVE_SECTIONS.SENDING_MONEY:
+      case ALL_SECTIONS.SENDING_MONEY:
         return <SendingMoney collective={collective} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.SECURITY:
+      case ALL_SECTIONS.SECURITY:
         return <Security collective={collective} />;
 
       // 2FA
-      case EDIT_COLLECTIVE_SECTIONS.USER_SECURITY:
+      case ALL_SECTIONS.USER_SECURITY:
         return <UserSecurity slug={collective.slug} />;
 
       // Payment Receipts
-      case EDIT_COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS:
+      case ALL_SECTIONS.PAYMENT_RECEIPTS:
         return <PaymentReceipts collective={collective} />;
 
       // Policies and moderation
-      case EDIT_COLLECTIVE_SECTIONS.POLICIES:
+      case ALL_SECTIONS.POLICIES:
         return <Policies collective={collective} />;
 
       // Policies and moderation
-      case EDIT_COLLECTIVE_SECTIONS.CUSTOM_EMAIL:
+      case ALL_SECTIONS.CUSTOM_EMAIL:
         return <CustomMessage collective={collective} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS:
+      case ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS:
         return <HostVirtualCardsSettings collective={collective} />;
 
-      case EDIT_COLLECTIVE_SECTIONS.VIRTUAL_CARDS:
+      case ALL_SECTIONS.VIRTUAL_CARDS:
         return <VirtualCards collective={collective} />;
 
       default:
