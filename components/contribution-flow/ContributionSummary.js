@@ -64,9 +64,9 @@ const ContributionSummary = ({
 }) => {
   const intl = useIntl();
   const amount = isCrypto ? stepDetails.cryptoAmount : stepDetails.amount;
-  const totalAmount = getTotalAmount(stepDetails, stepSummary);
+  const totalAmount = getTotalAmount(stepDetails, stepSummary, isCrypto);
   const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, currency);
-  const platformTip = stepDetails.platformTip || 0;
+  const platformTip = !isCrypto ? stepDetails.platformTip || 0 : 0;
   const showQuantity = stepDetails.quantity > 1 || ['TICKET', 'PRODUCT'].includes(tier?.type);
   const contributionName = tier?.name ? `${collective.name} - "${tier.name}"` : collective.name;
   return (
@@ -116,7 +116,7 @@ const ContributionSummary = ({
               </AmountLine>
             ))}
 
-          {Boolean(platformTip) && (
+          {Boolean(platformTip) && !isCrypto && (
             <AmountLine color="black.700">
               <Label>
                 <FormattedMessage

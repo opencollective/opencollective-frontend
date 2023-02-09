@@ -28,8 +28,9 @@ const StepLabel = styled(Span)`
 
 const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, isCrypto }) => {
   if (stepDetails.amount || stepDetails.cryptoAmount) {
-    const amount = isCrypto ? stepDetails.cryptoAmount : stepDetails.amount;
-    const totalAmount = amount + (stepDetails.platformTip || 0);
+    const totalAmount = isCrypto
+      ? stepDetails.cryptoAmount || 0
+      : stepDetails.amount + (stepDetails.platformTip || 0) || 0;
     return (
       <FormattedMoneyAmount
         interval={stepDetails.interval}
