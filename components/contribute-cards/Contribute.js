@@ -15,10 +15,11 @@ import StyledHr from '../StyledHr';
 import StyledTag from '../StyledTag';
 import { P } from '../Text';
 
-/** Max number of contributors on each tier card */
-export const MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD = 4;
-export const CONTRIBUTE_CARD_WIDTH = 280;
-export const CONTRIBUTE_CARD_BORDER_RADIUS = 16;
+import {
+  CONTRIBUTE_CARD_BORDER_RADIUS,
+  CONTRIBUTE_CARD_WIDTH,
+  MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+} from './constants';
 
 /** The main container */
 const StyledContributeCard = styled.div`
