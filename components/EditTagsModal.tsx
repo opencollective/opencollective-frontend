@@ -147,7 +147,6 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
                 <StyledButton
                   minWidth={132}
                   buttonStyle="secondary"
-                  loading={loading}
                   disabled={loading}
                   type="button"
                   onClick={handleClose}
