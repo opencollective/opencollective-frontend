@@ -5,6 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
+import { getSettingsRoute } from '../../lib/url-helpers';
 
 import ContributeCardsContainer from '../collective-page/ContributeCardsContainer';
 import EditTierModal from '../edit-collective/tiers/EditTierModal';
@@ -29,10 +30,7 @@ const AdminContributeCardsContainer = ({
   onTierUpdate,
 }) => {
   const [showCreateModal, setShowCreateModal] = React.useState(false);
-  const isEvent = collective.type === CollectiveType.EVENT;
-  const createContributionTierRoute = isEvent
-    ? `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/admin/tiers`
-    : `/${collective.slug}/admin/tiers`;
+  const createContributionTierRoute = getSettingsRoute(collective, 'tiers');
   const addNewMessage =
     createNewType === 'TICKET' ? (
       <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />

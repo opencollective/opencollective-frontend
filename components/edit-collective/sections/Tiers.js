@@ -149,13 +149,13 @@ const Tiers = ({ collective }) => {
                       id: 'tier.customContributions.label',
                       defaultMessage: 'Enable flexible contributions',
                     })}
-                    defaultChecked={!get(collective, 'settings.disableCustomContributions', false)}
+                    defaultChecked={!get(data.account, 'settings.disableCustomContributions', false)}
                     width="auto"
                     isLoading={loading}
                     onChange={({ target }) => {
                       editSettings({
                         variables: {
-                          account: { legacyId: collective.id },
+                          account: { id: data.account.id },
                           key: 'disableCustomContributions',
                           value: !target.value,
                         },
@@ -167,8 +167,8 @@ const Tiers = ({ collective }) => {
               </Mutation>
             </Box>
             <AdminContributeCardsContainer
-              collective={collective}
-              cards={getFinancialContributions(collective, filteredTiers)}
+              collective={data.account}
+              cards={getFinancialContributions(data.account, filteredTiers)}
               CardsContainer={CardsContainer}
               useTierModals
               enableReordering={false}

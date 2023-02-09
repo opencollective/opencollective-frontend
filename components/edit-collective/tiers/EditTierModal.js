@@ -105,7 +105,6 @@ function FormFields({ collective, values, hideTypeSelect }) {
   const receiptTemplateOptions = getReceiptTemplates(collective.host);
 
   const taxes = getApplicableTaxes(collective, collective.host, values.type);
-
   const formik = useFormikContext();
 
   // Enforce certain rules when updating
@@ -718,6 +717,31 @@ export const listTierQuery = gql`
   query AccountTiers($accountSlug: String!) {
     account(slug: $accountSlug) {
       id
+      legacyId
+      name
+      slug
+      type
+      settings
+      ... on AccountWithHost {
+        host {
+          id
+          legacyId
+          name
+          slug
+          type
+          settings
+        }
+      }
+      ... on AccountWithParent {
+        parent {
+          id
+          legacyId
+          name
+          slug
+          type
+          settings
+        }
+      }
       ... on AccountWithContributions {
         tiers {
           nodes {
@@ -885,7 +909,7 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
           };
 
           try {
-            const result = await submitFormMutation({ variables: { tier, account: { legacyId: collective.id } } });
+            const result = await submitFormMutation({ variables: { tier, account: { id: collective.id } } });
             onUpdate?.(result);
             addToast({
               type: TOAST_TYPE.SUCCESS,

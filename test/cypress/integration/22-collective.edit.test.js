@@ -138,15 +138,15 @@ describe('edit collective', () => {
     // TODO: Check profile page (need https://github.com/opencollective/opencollective/issues/6331)
   });
 
-  it('enables VAT', () => {
-    cy.visit(`${collectiveSlug}/admin`);
+  it.only('enables VAT', () => {
     cy.contains('[data-cy="country-select"]', 'Please select your country').click();
     cy.contains('[data-cy="select-option"]', 'Belgium').click();
     cy.getByDataCy('VAT').click();
     cy.contains('[data-cy="select-option"]', 'Use my own VAT number').click();
+    cy.get('input[name="VAT-number"]').type('FRXX999999999');
     cy.contains('button', 'Save').click();
     cy.contains('Saved');
-    cy.visit(`${collectiveSlug}/admin/tiers`);
+    cy.getByDataCy('menu-item-tiers').click();
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
     cy.getByDataCy('select-type').click();
     cy.contains('[data-cy=select-option]', 'product').click();

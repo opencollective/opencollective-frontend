@@ -14,7 +14,6 @@ import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import { adminPanelQuery } from '../../../pages/admin-panel';
 import SettingsForm from '../../edit-collective/Form';
-import { EDIT_COLLECTIVE_SECTIONS } from '../../edit-collective/Menu';
 import Loading from '../../Loading';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 
@@ -78,10 +77,6 @@ const AccountSettings = ({ account, section }) => {
       'hostFeePercent',
       'isActive',
     ];
-
-    if (![EDIT_COLLECTIVE_SECTIONS.TIERS, EDIT_COLLECTIVE_SECTIONS.TICKETS].includes(section)) {
-      collectiveFields.push('settings');
-    }
 
     const CollectiveInputType = pick(collective, collectiveFields);
     if (isArray(collective.tiers)) {
