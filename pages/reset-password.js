@@ -20,7 +20,7 @@ import MessageBox from '../components/MessageBox';
 import StyledButton from '../components/StyledButton';
 import StyledInput from '../components/StyledInput';
 import StyledInputField from '../components/StyledInputField';
-import { P } from '../components/Text';
+import { H1, P } from '../components/Text';
 
 // Dynamic imports
 const PasswordStrengthBar = dynamic(() => import('react-password-strength-bar'));
@@ -99,17 +99,9 @@ class ResetPasswordPage extends React.Component {
                   <Image src="/static/images/oc-logo-watercolor-256.png" height={128} width={128} />
                 </Flex>
 
-                <Flex
-                  as="label"
-                  fontWeight={700}
-                  htmlFor="password"
-                  fontSize={'32px'}
-                  mb={12}
-                  mt={3}
-                  justifyContent="center"
-                >
+                <H1 fontWeight={700} fontSize="32px" mb={12} mt={3} textAlign="center">
                   <FormattedMessage defaultMessage="Reset Password" />
-                </Flex>
+                </H1>
 
                 {!this.props.data?.loggedInAccount && (
                   <MessageBox type="error" withIcon my={5}>

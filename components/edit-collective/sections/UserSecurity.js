@@ -356,13 +356,15 @@ class UserSecurity extends React.Component {
             />
           </StyledInputField>
 
-          <PasswordStrengthBar
-            style={{ visibility: password ? 'visible' : 'hidden' }}
-            password={password}
-            onChangeScore={passwordScore => {
-              this.setState({ passwordScore });
-            }}
-          />
+          <div data-cy="password-strength-bar">
+            <PasswordStrengthBar
+              style={{ visibility: password ? 'visible' : 'hidden' }}
+              password={password}
+              onChangeScore={passwordScore => {
+                this.setState({ passwordScore });
+              }}
+            />
+          </div>
 
           <StyledButton
             my={2}

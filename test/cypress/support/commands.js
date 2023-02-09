@@ -18,10 +18,10 @@ import { randomEmail, randomSlug } from './faker';
  *    - email: User email
  */
 Cypress.Commands.add('login', (params = {}) => {
-  const { email = defaultTestUserEmail, redirect = null, visitParams } = params;
+  const { email = defaultTestUserEmail, redirect = null, visitParams, sendLink } = params;
   const user = { email, newsletterOptIn: false };
 
-  return signinRequest(user, redirect).then(({ body: { redirect } }) => {
+  return signinRequest(user, redirect, sendLink).then(({ body: { redirect } }) => {
     // Test users are allowed to signin directly with E2E, thus a signin URL
     // is directly returned by the API. See signin function in
     // opencollective-api/server/controllers/users.js for more info
@@ -440,9 +440,14 @@ Cypress.Commands.add('checkToast', ({ type, message }) => {
 /**
  * Check if user is logged in by searching for its username in navbar
  */
-Cypress.Commands.add('assertLoggedIn', () => {
+Cypress.Commands.add('assertLoggedIn', user => {
   cy.log('Ensure user is logged in');
   cy.getByDataCy('user-menu-trigger').should('be.visible');
+  if (user) {
+    cy.getByDataCy('user-menu-trigger').click();
+    cy.contains('[data-cy="user-menu"]', user.email);
+    cy.getByDataCy('user-menu-trigger').click(); // To close the menu
+  }
 });
 
 /**
@@ -581,7 +586,7 @@ Cypress.Commands.add('restoreLocalStorage', () => {
 /**
  * @param {object} user - should have `email` and `id` set
  */
-function signinRequest(user, redirect) {
+function signinRequest(user, redirect, sendLink) {
   return cy.request({
     url: '/api/users/signin',
     method: 'POST',
@@ -589,7 +594,7 @@ function signinRequest(user, redirect) {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ user, redirect, createProfile: true }),
+    body: JSON.stringify({ user, redirect, createProfile: true, sendLink }),
   });
 }
 
@@ -602,7 +607,7 @@ function getTokenFromRedirectUrl(url) {
  * @param {object} user - should have `email` and `id` set
  */
 function signinRequestAndReturnToken(user, redirect) {
-  return signinRequest(user, redirect).then(({ body }) => getTokenFromRedirectUrl(body.redirect));
+  return signinRequest(user, redirect, true).then(({ body }) => getTokenFromRedirectUrl(body.redirect));
 }
 
 function graphqlQuery(token, body) {
@@ -677,7 +682,7 @@ function loopOpenEmail(emailMatcher, timeout = 8000) {
 
 function getEmail(emailMatcher, timeout = 8000) {
   if (timeout < 0) {
-    return assert.fail('getEmail timed out');
+    return assert.fail('Could not find email: getEmail timed out');
   }
 
   return cy.getInbox().then(inbox => {
