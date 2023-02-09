@@ -1,7 +1,7 @@
 import React, { Fragment, MouseEventHandler, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
-import debouncePromise from 'debounce-promise';
+import { gql, useLazyQuery } from '@apollo/client';
+import { debounce } from 'lodash';
 import AnimateHeight from 'react-animate-height';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -14,7 +14,7 @@ import {
   OptionProps,
   Props,
 } from 'react-select';
-import AsyncCreatableSelect from 'react-select/async-creatable';
+import CreatableSelect from 'react-select/creatable';
 import {
   SortableContainer,
   SortableContainerProps,
@@ -27,7 +27,6 @@ import styled from 'styled-components';
 import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import colors from '../lib/theme/colors';
-import withData from '../lib/withData';
 
 import { Flex } from './Grid';
 import { Span } from './Text';
@@ -48,7 +47,7 @@ const StyledTagButton = styled.button<{ isSelected: boolean }>`
 `;
 
 export const searchTagsQuery = gql`
-  query SearchTags($term: String!) {
+  query SearchTags($term: String) {
     tagStats(tagSearchTerm: $term) {
       nodes {
         id
@@ -70,7 +69,7 @@ function arrayMove<T>(array: readonly T[], from: number, to: number) {
   return slicedArray;
 }
 
-const SortableSelect = SortableContainer(AsyncCreatableSelect) as React.ComponentClass<Props & SortableContainerProps>;
+const SortableSelect = SortableContainer(CreatableSelect) as React.ComponentClass<Props & SortableContainerProps>;
 
 const SortableMultiValue = SortableElement((props: MultiValueProps<TagOption>) => {
   // This prevents the menu from being opened/closed when the user clicks
@@ -112,8 +111,18 @@ const SelectContainer = ({ innerProps, ...props }: ContainerProps) => (
   />
 );
 
-function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTags = [] }) {
+const debouncedSearch = debounce((searchFunc, variables) => {
+  return searchFunc({ variables });
+}, 500);
+function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }) {
   const intl = useIntl();
+  const [searchTags, { loading: fetching, data }] = useLazyQuery(searchTagsQuery, {
+    context: API_V2_CONTEXT,
+  });
+  const [debouncing, setDebouncing] = useState<boolean>(false);
+  const loading = fetching || debouncing;
+  const [input, setInput] = useState<string>('');
+  const [options, setOptions] = useState<TagOption[]>([]);
   const [selected, setSelected] = useState<readonly TagOption[]>(
     defaultValue?.map(tag => ({ label: tag, value: tag })) || [],
   );
@@ -122,31 +131,36 @@ function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTag
     onChange(selected);
   }, [selected]);
 
+  useEffect(() => {
+    if (input?.length) {
+      setDebouncing(true);
+      debouncedSearch(searchTags, {
+        term: input,
+      });
+    } else {
+      // Skip debouncing when input is empty (on initial load for instance)
+      searchTags();
+    }
+  }, [input]);
+
+  useEffect(() => {
+    if (!fetching) {
+      setOptions(
+        data?.tagStats?.nodes
+          .filter(({ tag }) => !IGNORED_TAGS.includes(tag))
+          .map(({ tag }) => ({
+            label: tag,
+            value: tag,
+          })) || [],
+      );
+      setDebouncing(false);
+    }
+  }, [fetching, data]);
+
   const onSortEnd: SortEndHandler = ({ oldIndex, newIndex }) => {
     const newValue = arrayMove(selected, oldIndex, newIndex);
     setSelected(newValue);
   };
-
-  const fetchTags = async inputValue => {
-    const { data } = await client.query({
-      query: searchTagsQuery,
-      variables: { term: inputValue },
-      context: API_V2_CONTEXT,
-    });
-
-    if (data && data.tagStats.nodes) {
-      const tags = data.tagStats.nodes
-        .filter(({ tag }) => !IGNORED_TAGS.includes(tag))
-        .map(({ tag }) => ({
-          label: tag,
-          value: tag,
-        }));
-      return tags;
-    }
-    return [];
-  };
-
-  const debouncedFetchTags = debouncePromise(fetchTags, 500, { leading: true });
 
   return (
     <Fragment>
@@ -174,8 +188,9 @@ function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTag
           Input,
           Option,
         }}
-        defaultOptions
-        loadOptions={inputValue => debouncedFetchTags(inputValue)}
+        onInputChange={value => setInput(value)}
+        options={options}
+        isLoading={loading}
         onChange={(selectedOptions: OnChangeValue<TagOption, true>) => setSelected(selectedOptions)}
         styles={{
           multiValue: baseStyles => ({
@@ -247,9 +262,8 @@ function CollectiveTagsInput({ defaultValue = [], onChange, client, suggestedTag
 CollectiveTagsInput.propTypes = {
   defaultValue: PropTypes.arrayOf(PropTypes.string),
   suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  renderUpdatedTags: PropTypes.bool,
   onChange: PropTypes.func,
-  client: PropTypes.object,
+  preload: PropTypes.bool,
 };
 
-export default withData(CollectiveTagsInput);
+export default CollectiveTagsInput;
