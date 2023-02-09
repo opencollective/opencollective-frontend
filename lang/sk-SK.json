@@ -657,6 +657,7 @@
   "contribute.step.payment": "Platobné informácie",
   "contribute.submit": "Prispieť",
   "contribute.taxInfoInvalid": "Neplatné číslo {taxName}",
+  "contribute.ticket": "Get {quantity, select, 1 {ticket} other {tickets}}",
   "contribute.tierDetails": "Budete prispievať {amount}{interval, select, month { mesačne} year { ročne} other {}}.",
   "contribute.vatBadCountry": "Číslo DPH nezodpovedá hodnote platnej v krajine",
   "contributeAs.org.twitter": "Twitter (voliteľné)",

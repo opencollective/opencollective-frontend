@@ -657,6 +657,7 @@
   "contribute.step.payment": "Платіжні дані",
   "contribute.submit": "Зробити внесок",
   "contribute.taxInfoInvalid": "Не правильний номер {taxName}",
+  "contribute.ticket": "Get {quantity, select, 1 {ticket} other {tickets}}",
   "contribute.tierDetails": "Ви робитимете внесок {amount}{interval, select, month { щомісяця} year { щороку } other {}}.",
   "contribute.vatBadCountry": "Номер платника ПДВ не відповідає країні",
   "contributeAs.org.twitter": "Twitter (необов'язково)",

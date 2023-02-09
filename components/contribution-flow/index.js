@@ -1047,9 +1047,11 @@ class ContributionFlow extends React.Component {
                       nextStep={nextStep}
                       isValidating={isValidating || isLoading}
                       paypalButtonProps={!nextStep ? this.getPaypalButtonProps({ currency }) : null}
-                      totalAmount={getTotalAmount(stepDetails, stepSummary)}
                       currency={currency}
                       isCrypto={isCrypto}
+                      tier={tier}
+                      stepDetails={stepDetails}
+                      stepSummary={stepSummary}
                     />
                   </Box>
                   {!isEmbed && (

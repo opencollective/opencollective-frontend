@@ -45,7 +45,7 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy="contribution-quantity"]').should('exist');
 
     cy.getByDataCy('cf-next-step').click();
-    cy.getByDataCy('cf-next-step').contains('Make contribution').click();
+    cy.getByDataCy('cf-next-step').contains('Get ticket').click();
 
     cy.wait(500);
     cy.getByDataCy('order-success', { timeout: 20000 });
@@ -76,7 +76,7 @@ describe('event.createOrder page', () => {
 
     cy.useAnyPaymentMethod();
     cy.wait(500);
-    cy.contains('button', 'Contribute $10').click();
+    cy.contains('button', 'Get ticket').click();
     cy.wait(500);
     cy.getByDataCy('order-success', { timeout: 20000 });
   });
@@ -109,7 +109,7 @@ describe('event.createOrder page', () => {
 
     cy.useAnyPaymentMethod();
     cy.wait(500);
-    cy.contains('button', 'Contribute $10').click();
+    cy.contains('button', 'Get ticket').click();
     cy.wait(500);
     cy.getByDataCy('order-success', { timeout: 20000 });
   });
@@ -224,7 +224,7 @@ describe('event.createOrder page', () => {
     cy.getByDataCy('cf-next-step').click();
     cy.useAnyPaymentMethod();
     cy.wait(500);
-    cy.contains('button', 'Contribute $96.80').click();
+    cy.contains('button', 'Get tickets').click();
     cy.wait(500);
     cy.getByDataCy('order-success', { timeout: 20000 });
   });

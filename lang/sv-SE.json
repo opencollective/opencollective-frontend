@@ -657,6 +657,7 @@
   "contribute.step.payment": "Betalningsinformaiton",
   "contribute.submit": "Bidra",
   "contribute.taxInfoInvalid": "Ogiltigt {taxName} nummer",
+  "contribute.ticket": "Get {quantity, select, 1 {ticket} other {tickets}}",
   "contribute.tierDetails": "Du bidrar med {amount}{interval, select, month { månadsvis} year { årligen} other {}}.",
   "contribute.vatBadCountry": "Momsregistreringsnumret matchar inte landet",
   "contributeAs.org.twitter": "Twitter (valfritt)",

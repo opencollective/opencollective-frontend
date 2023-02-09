@@ -657,6 +657,7 @@
   "contribute.step.payment": "Zahlungsinformationen",
   "contribute.submit": "Jetzt spenden",
   "contribute.taxInfoInvalid": "Ungültige {taxName} Nummer",
+  "contribute.ticket": "Get {quantity, select, 1 {ticket} other {tickets}}",
   "contribute.tierDetails": "Du wirst{interval, select, month { monatlich} year { jährlich} other {}} {amount} spenden.",
   "contribute.vatBadCountry": "Die MwSt.-Nummer stimmt nicht mit dem Land überein",
   "contributeAs.org.twitter": "Twitter (optional)",

@@ -657,6 +657,7 @@
   "contribute.step.payment": "Informação de pagamento",
   "contribute.submit": "Fazer contribuição",
   "contribute.taxInfoInvalid": "Número de {taxName} inválido",
+  "contribute.ticket": "Get {quantity, select, 1 {ticket} other {tickets}}",
   "contribute.tierDetails": "You’ll contribute {amount}{interval, select, month { monthly} year { yearly} other {}}.",
   "contribute.vatBadCountry": "O número de VAT não corresponde ao país selecionado",
   "contributeAs.org.twitter": "Twitter (opcional)",
