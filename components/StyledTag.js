@@ -59,6 +59,8 @@ const StyledTagBase = styled.div`
   text-align: center;
   white-space: nowrap;
   letter-spacing: 0.06em;
+  position: relative;
+  overflow: hidden;
 
   ${variant({
     prop: 'variant',
@@ -110,12 +112,27 @@ const CloseButton = styled.button.attrs({
   'data-cy': 'remove-btn',
 })`
   cursor: pointer;
-  color: inherit;
   text-align: center;
-  background-color: transparent;
+  padding: 0 2px 0 0;
+  width: 20px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: colors 0.1s;
   border: none;
-  padding: 0;
   line-height: inherit;
+  color: ${props => (props.isFocused ? props.theme.colors.black[900] : props.theme.colors.black[500])};
+  background-color: ${props => (props.isFocused ? props.theme.colors.black[300] : 'transparent')};
+  &:hover,
+  &:focus {
+    color: ${props => props.theme.colors.black[900]};
+    background-color: ${props => props.theme.colors.black[300]};
+  }
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
@@ -128,11 +145,11 @@ const StyledTag = ({ closeButtonProps, children, ...props }) => {
     <StyledTagBase {...props}>{children}</StyledTagBase>
   ) : (
     <StyledTagBase {...props}>
-      <Span mr={2} letterSpacing="inherit">
+      <Span mr="12px" letterSpacing="inherit">
         {children}
       </Span>
       <CloseButton {...closeButtonProps}>
-        <Times size="10px" />
+        <Times size="12px" />
       </CloseButton>
     </StyledTagBase>
   );
