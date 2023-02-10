@@ -158,7 +158,8 @@ const StyledInputAmount = ({
   return (
     <StyledInputGroup
       maxWidth="10em"
-      step="0.01"
+      // Increase/Decrease the amount by $0.5 instead of $0.01 when using the arrows
+      step="0.5"
       {...props}
       min={minAmount}
       max={isUndefined(max) ? max : max / 100}
