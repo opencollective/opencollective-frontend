@@ -12,7 +12,6 @@ import {
   ContainerProps,
   InputProps,
   MultiValueProps,
-  OnChangeValue,
   OptionProps,
 } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
