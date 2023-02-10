@@ -195,6 +195,12 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
               Input,
               Option,
             }}
+            onKeyDown={e => {
+              // Stop enter key from closing the menu and submitting the form when it's loading and there are no options
+              if (e.key === 'Enter' && loading && options.length === 0) {
+                e.preventDefault();
+              }
+            }}
             onInputChange={value => setInput(value)}
             options={options}
             isLoading={loading}
