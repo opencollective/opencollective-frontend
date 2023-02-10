@@ -12,6 +12,9 @@
   },
   "dependencies": {
     "@apollo/client": "3.3.21",
+    "@dnd-kit/core": "6.0.7",
+    "@dnd-kit/sortable": "7.0.2",
+    "@dnd-kit/utilities": "3.2.1",
     "@formatjs/intl-relativetimeformat": "11.1.8",
     "@graphql-typed-document-node/core": "3.1.1",
     "@hcaptcha/react-hcaptcha": "1.4.4",
@@ -96,7 +99,6 @@
     "react-popper": "2.3.0",
     "react-scrollchor": "7.0.2",
     "react-select": "5.5.9",
-    "react-sortable-hoc": "2.0.0",
     "react-swipeable": "7.0.0",
     "react-text-mask": "5.5.0",
     "react-window": "1.8.8",
