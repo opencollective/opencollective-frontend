@@ -88,8 +88,8 @@ class SectionContribute extends React.PureComponent {
 
   state = {
     showTiersAdmin: false,
-    draggingContributionsOrder: null,
     isSaving: false,
+    isDragging: false,
   };
 
   onTiersAdminReady = () => {
@@ -104,31 +104,13 @@ class SectionContribute extends React.PureComponent {
     return contributors.find(c => c.isBacker);
   });
 
-  onContributionCardMove = memoizeOne((dragIndex, hoverIndex) => {
-    this.setState(() => {
-      const baseCardsOrder = getCollectiveContributionCardsOrder(this.props.collective);
-      const sortedTiers = this.getSortedCollectiveTiers(this.props.tiers, baseCardsOrder);
-      const cardKeys = [...this.getFinancialContributions(sortedTiers).map(c => c.key)];
-      cardKeys.splice(hoverIndex, 0, cardKeys.splice(dragIndex, 1)[0]);
-      return { draggingContributionsOrder: cardKeys };
-    });
-  });
-
-  onContributionCardDrop = async (dragIndex, hoverIndex) => {
-    const { collective, tiers, editAccountSettings } = this.props;
-
-    // No need to update if not moving the card
-    if (dragIndex === hoverIndex) {
-      return this.setState({ draggingContributionsOrder: null });
-    }
+  onContributeCardsReorder = async cards => {
+    const { collective, editAccountSettings } = this.props;
+    const cardKeys = cards.map(c => c.key);
 
     // Save the new positions
     this.setState({ isSaving: true });
     try {
-      const baseCardsOrder = getCollectiveContributionCardsOrder(collective);
-      const sortedTiers = this.getSortedCollectiveTiers(tiers, baseCardsOrder);
-      const cardKeys = [...this.getFinancialContributions(sortedTiers).map(c => c.key)];
-      cardKeys.splice(hoverIndex, 0, cardKeys.splice(dragIndex, 1)[0]);
       const mutationVariables = { collectiveId: collective.id, key: TIERS_ORDER_KEY, value: cardKeys };
       await editAccountSettings({
         variables: mutationVariables,
@@ -140,7 +122,7 @@ class SectionContribute extends React.PureComponent {
           store.writeQuery({ query: collectivePageQuery, variables: collectivePageQueryVariables, data: newData });
         },
       });
-      this.setState({ isSaving: false, draggingContributionsOrder: null });
+      this.setState({ isSaving: false });
     } catch (e) {
       this.setState({ error: getErrorFromGraphqlException(e), isSaving: false });
     }
@@ -219,8 +201,8 @@ class SectionContribute extends React.PureComponent {
 
   render() {
     const { collective, tiers, events, connectedCollectives, contributors, isAdmin } = this.props;
-    const { draggingContributionsOrder, isSaving, showTiersAdmin } = this.state;
-    const orderKeys = draggingContributionsOrder || getCollectiveContributionCardsOrder(collective);
+    const { isSaving, showTiersAdmin } = this.state;
+    const orderKeys = getCollectiveContributionCardsOrder(collective);
     const sortedTiers = this.getSortedCollectiveTiers(tiers, orderKeys);
     const isEvent = collective.type === CollectiveType.EVENT;
     const isProject = collective.type === CollectiveType.PROJECT;
@@ -292,7 +274,7 @@ class SectionContribute extends React.PureComponent {
                   <HorizontalScroller
                     getScrollDistance={this.getContributeCardsScrollDistance}
                     container={ContributeCardsContainer}
-                    containerProps={{ disableScrollSnapping: Boolean(draggingContributionsOrder) }}
+                    containerProps={{ disableScrollSnapping: this.state.isDragging }}
                   >
                     <React.Fragment>
                       {isSaving && (
@@ -314,8 +296,8 @@ class SectionContribute extends React.PureComponent {
                           <AdminContributeCardsContainer
                             collective={collective}
                             cards={waysToContribute}
-                            onContributionCardMove={this.onContributionCardMove}
-                            onContributionCardDrop={this.onContributionCardDrop}
+                            onReorder={this.onContributeCardsReorder}
+                            setDragging={dragging => this.setState({ isDragging: dragging })}
                             onMount={this.onTiersAdminReady}
                           />
                         </Container>

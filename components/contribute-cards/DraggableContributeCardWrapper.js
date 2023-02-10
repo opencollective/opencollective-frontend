@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Move as MoveIcon } from '@styled-icons/feather/Move';
-import { useDrag, useDrop } from 'react-dnd';
 import styled, { css } from 'styled-components';
-
-import DRAG_AND_DROP_TYPES from '../../lib/constants/drag-and-drop';
 
 import StyledRoundButton from '../StyledRoundButton';
 
@@ -52,35 +51,24 @@ const StyledDragHandle = styled(DragHandle)`
 /**
  * A wrapper arround contribute cards that makes them draggable
  */
-const DraggableContributeCardWrapper = ({ Component, componentProps, index, onMove, onDrop }) => {
-  const ref = React.useRef(null);
+const DraggableContributeCardWrapper = ({ Component, componentProps, id }) => {
+  const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({ id });
 
-  const [, drop] = useDrop({
-    accept: DRAG_AND_DROP_TYPES.CONTRIBUTE_CARD,
-    hover: item => onMove(item.index, index),
-  });
-
-  const [{ isDragging }, drag, preview] = useDrag({
-    type: DRAG_AND_DROP_TYPES.CONTRIBUTE_CARD,
-    item: { index },
-    end: item => onDrop(item.index, index),
-    collect: monitor => ({ isDragging: monitor.isDragging() }),
-  });
-
-  drag(drop(ref));
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
 
   return (
-    <MainContainer ref={preview} isDragging={isDragging}>
+    <MainContainer ref={setNodeRef} style={style} isDragging={isDragging}>
       <Component {...componentProps} />
-      <StyledDragHandle ref={ref} />
+      <StyledDragHandle {...attributes} {...listeners} />
     </MainContainer>
   );
 };
 
 DraggableContributeCardWrapper.propTypes = {
-  index: PropTypes.number.isRequired,
-  onMove: PropTypes.func.isRequired,
-  onDrop: PropTypes.func.isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   Component: PropTypes.any.isRequired,
   componentProps: PropTypes.object,
 };

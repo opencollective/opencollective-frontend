@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { closestCenter, DndContext } from '@dnd-kit/core';
+import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
+import { isEqual } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -19,8 +20,8 @@ import DraggableContributeCardWrapper from './DraggableContributeCardWrapper';
 const AdminContributeCardsContainer = ({
   collective,
   cards,
-  onContributionCardMove,
-  onContributionCardDrop,
+  onReorder,
+  setDragging,
   onMount,
   CardsContainer,
   useTierModals,
@@ -28,6 +29,32 @@ const AdminContributeCardsContainer = ({
   createNewType,
   onTierUpdate,
 }) => {
+  const [items, setItems] = React.useState(cards || []);
+
+  React.useEffect(() => {
+    if (!isEqual(cards, items)) {
+      onReorder(items);
+    }
+  }, [items]);
+
+  function handleDragStart() {
+    setDragging(true);
+  }
+
+  function handleDragEnd(event) {
+    setDragging(false);
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setItems(items => {
+        const oldIndex = items.findIndex(item => item.key === active.id);
+        const newIndex = items.findIndex(item => item.key === over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  }
+
   const [showTierModal, setShowTierModal] = React.useState(false);
   const isEvent = collective.type === CollectiveType.EVENT;
   const createContributionTierRoute = isEvent
@@ -47,53 +74,49 @@ const AdminContributeCardsContainer = ({
   }, [onMount]);
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <CardsContainer>
-        {cards.map(({ key, Component, componentProps }, index) => {
-          // Add onClickEdit to the component props if we're using tier modals
-          componentProps =
-            useTierModals && componentProps.tier
-              ? { ...componentProps, onClickEdit: () => setShowTierModal(componentProps.tier) }
-              : componentProps;
+    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
+      <SortableContext items={items.map(c => c.key)} strategy={horizontalListSortingStrategy}>
+        <CardsContainer>
+          {items.map(({ key, Component, componentProps }) => {
+            // Add onClickEdit to the component props if we're using tier modals
+            componentProps =
+              useTierModals && componentProps.tier
+                ? { ...componentProps, onClickEdit: () => setShowTierModal(componentProps.tier) }
+                : componentProps;
 
-          return (
-            <ContributeCardContainer key={key}>
-              {cards.length === 1 || !enableReordering ? (
-                <Component {...componentProps} />
-              ) : (
-                <DraggableContributeCardWrapper
-                  Component={Component}
-                  componentProps={componentProps}
-                  index={index}
-                  onMove={onContributionCardMove}
-                  onDrop={onContributionCardDrop}
-                />
-              )}
-            </ContributeCardContainer>
-          );
-        })}
-        <ContributeCardContainer>
-          {useTierModals ? (
-            <CreateNew as="div" data-cy="create-contribute-tier" onClick={() => setShowTierModal('new')}>
-              {addNewMessage}
-            </CreateNew>
-          ) : (
-            <CreateNew data-cy="create-contribute-tier" route={createContributionTierRoute}>
-              {addNewMessage}
-            </CreateNew>
+            return (
+              <ContributeCardContainer key={key}>
+                {cards.length === 1 || !enableReordering ? (
+                  <Component {...componentProps} />
+                ) : (
+                  <DraggableContributeCardWrapper Component={Component} componentProps={componentProps} id={key} />
+                )}
+              </ContributeCardContainer>
+            );
+          })}
+          <ContributeCardContainer>
+            {useTierModals ? (
+              <CreateNew as="div" data-cy="create-contribute-tier" onClick={() => setShowTierModal('new')}>
+                {addNewMessage}
+              </CreateNew>
+            ) : (
+              <CreateNew data-cy="create-contribute-tier" route={createContributionTierRoute}>
+                {addNewMessage}
+              </CreateNew>
+            )}
+          </ContributeCardContainer>
+          {showTierModal && (
+            <EditTierModal
+              tier={showTierModal === 'new' ? null : showTierModal}
+              collective={collective}
+              onClose={() => setShowTierModal(false)}
+              forcedType={createNewType}
+              onUpdate={onTierUpdate}
+            />
           )}
-        </ContributeCardContainer>
-        {showTierModal && (
-          <EditTierModal
-            tier={showTierModal === 'new' ? null : showTierModal}
-            collective={collective}
-            onClose={() => setShowTierModal(false)}
-            forcedType={createNewType}
-            onUpdate={onTierUpdate}
-          />
-        )}
-      </CardsContainer>
-    </DndProvider>
+        </CardsContainer>
+      </SortableContext>
+    </DndContext>
   );
 };
 
@@ -111,8 +134,8 @@ AdminContributeCardsContainer.propTypes = {
     }),
   }).isRequired,
   /** Whether to use the new modals to edit/create tiers */ useTierModals: PropTypes.bool,
-  onContributionCardMove: PropTypes.func,
-  onContributionCardDrop: PropTypes.func,
+  onReorder: PropTypes.func,
+  setDragging: PropTypes.func,
   onMount: PropTypes.func,
   CardsContainer: PropTypes.node,
   createNewType: PropTypes.string,
