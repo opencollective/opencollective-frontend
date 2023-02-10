@@ -1,7 +1,9 @@
 const path = require('path');
 require('./env');
-
 const { REWRITES } = require('./rewrites');
+
+// eslint-disable-next-line node/no-unpublished-require
+const CircularDependencyPlugin = require('circular-dependency-plugin');
 
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
@@ -39,6 +41,14 @@ const nextConfig = {
     config.plugins.push(
       new webpack.DefinePlugin({
         'process.env.SENTRY_RELEASE': JSON.stringify(buildId),
+      }),
+    );
+
+    config.plugins.push(
+      new CircularDependencyPlugin({
+        include: /components|pages|server/,
+        failOnError: true,
+        cwd: process.cwd(),
       }),
     );
 

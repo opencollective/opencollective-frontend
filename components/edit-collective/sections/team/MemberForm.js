@@ -6,18 +6,18 @@ import { get } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
-import roles from '../../../lib/constants/roles';
-import formatMemberRole from '../../../lib/i18n/member-role';
+import { CollectiveType } from '../../../../lib/constants/collectives';
+import roles from '../../../../lib/constants/roles';
+import formatMemberRole from '../../../../lib/i18n/member-role';
 
-import Avatar from '../../Avatar';
-import Container from '../../Container';
-import { Box, Flex } from '../../Grid';
-import MemberRoleDescription, { hasRoleDescription } from '../../MemberRoleDescription';
-import StyledInput from '../../StyledInput';
-import StyledInputFormikField from '../../StyledInputFormikField';
-import StyledSelect from '../../StyledSelect';
-import { P } from '../../Text';
+import Avatar from '../../../Avatar';
+import Container from '../../../Container';
+import { Box, Flex } from '../../../Grid';
+import MemberRoleDescription, { hasRoleDescription } from '../../../MemberRoleDescription';
+import StyledInput from '../../../StyledInput';
+import StyledInputFormikField from '../../../StyledInputFormikField';
+import StyledSelect from '../../../StyledSelect';
+import { P } from '../../../Text';
 
 const MemberContainer = styled(Container)`
   border: 1px solid #dcdee0;

@@ -5,7 +5,7 @@ import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
+import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';
 import ContributeProject from '../../contribute-cards/ContributeProject';
 import CreateNew from '../../contribute-cards/CreateNew';
 import { Box } from '../../Grid';

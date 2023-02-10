@@ -7,7 +7,6 @@ import { ContributionTypes } from '../../lib/constants/contribution-types';
 
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
-import EditTierModal from '../edit-collective/tiers/EditTierModal';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
@@ -198,15 +197,11 @@ const ContributeCard = ({
   image,
   disableCTA,
   hideCTA,
-  enableEditing,
+  onClickEdit,
   tier,
-  collective,
   isPreview,
-  forcedType,
   ...props
 }) => {
-  const [isEditTierModalOpen, setIsEditTierModalOpen] = React.useState(false);
-
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
 
   if (isPreview) {
@@ -286,30 +281,15 @@ const ContributeCard = ({
               )}
             </Box>
           )}
-          {enableEditing && (
+          {onClickEdit && (
             <Box>
-              <StyledButton
-                buttonStyle="secondary"
-                width={1}
-                mb={2}
-                mt={3}
-                data-cy="edit-btn"
-                onClick={() => setIsEditTierModalOpen(true)}
-              >
+              <StyledButton buttonStyle="secondary" width={1} mb={2} mt={3} data-cy="edit-btn" onClick={onClickEdit}>
                 <FormattedMessage
                   defaultMessage="Edit {type, select, TICKET {Ticket} other {Tier}}"
                   values={{ type: tier.type }}
                 />
               </StyledButton>
             </Box>
-          )}
-          {isEditTierModalOpen && (
-            <EditTierModal
-              tier={tier}
-              collective={collective}
-              onClose={() => setIsEditTierModalOpen(false)}
-              forcedType={forcedType}
-            />
           )}
         </Box>
       </Flex>
@@ -353,15 +333,10 @@ ContributeCard.propTypes = {
   /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
   router: PropTypes.object,
-  enableEditing: PropTypes.bool,
   tier: PropTypes.object,
   collective: PropTypes.object,
   isPreview: PropTypes.bool,
-  forcedType: PropTypes.string,
-};
-
-ContributeCard.defaultProps = {
-  enableEditing: false,
+  onClickEdit: PropTypes.func,
 };
 
 export default injectIntl(ContributeCard);

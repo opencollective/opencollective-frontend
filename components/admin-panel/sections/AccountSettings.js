@@ -12,11 +12,11 @@ import { editCollectiveMutation } from '../../../lib/graphql/mutations';
 import { editCollectivePageQuery } from '../../../lib/graphql/queries';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
-import { adminPanelQuery } from '../../../pages/admin-panel';
 import SettingsForm from '../../edit-collective/Form';
 import Loading from '../../Loading';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import { ALL_SECTIONS } from '../constants';
+import { adminPanelQuery } from '../queries';
 
 const AccountSettings = ({ account, section }) => {
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
