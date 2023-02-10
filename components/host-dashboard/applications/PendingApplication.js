@@ -9,32 +9,33 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { padding } from 'styled-system';
 
-import { getCollectiveMainTag } from '../../lib/collective.lib';
-import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { i18nOCFApplicationFormLabel } from '../../lib/i18n/ocf-form';
-import { CustomScrollbarCSS } from '../../lib/styled-components-shared-styles';
+import { getCollectiveMainTag } from '../../../lib/collective.lib';
+import { i18nGraphqlException } from '../../../lib/errors';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { i18nOCFApplicationFormLabel } from '../../../lib/i18n/ocf-form';
+import { CustomScrollbarCSS } from '../../../lib/styled-components-shared-styles';
 
-import Avatar from '../Avatar';
-import Container from '../Container';
-import { Box, Flex } from '../Grid';
-import I18nCollectiveTags from '../I18nCollectiveTags';
-import CommentIcon from '../icons/CommentIcon';
-import Link from '../Link';
-import LinkCollective from '../LinkCollective';
-import { APPLICATION_DATA_AMOUNT_FIELDS } from '../ocf-host-application/ApplicationForm';
-import StyledCollectiveCard from '../StyledCollectiveCard';
-import StyledHr from '../StyledHr';
-import StyledLink from '../StyledLink';
-import StyledRoundButton from '../StyledRoundButton';
-import StyledTag from '../StyledTag';
-import StyledTooltip from '../StyledTooltip';
-import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import Avatar from '../../Avatar';
+import Container from '../../Container';
+import { Box, Flex } from '../../Grid';
+import I18nCollectiveTags from '../../I18nCollectiveTags';
+import CommentIcon from '../../icons/CommentIcon';
+import Link from '../../Link';
+import LinkCollective from '../../LinkCollective';
+import { APPLICATION_DATA_AMOUNT_FIELDS } from '../../ocf-host-application/ApplicationForm';
+import StyledCollectiveCard from '../../StyledCollectiveCard';
+import StyledHr from '../../StyledHr';
+import StyledLink from '../../StyledLink';
+import StyledRoundButton from '../../StyledRoundButton';
+import StyledTag from '../../StyledTag';
+import StyledTooltip from '../../StyledTooltip';
+import { P, Span } from '../../Text';
+import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import AcceptRejectButtons from '../AcceptRejectButtons';
+import ApplicationMessageModal from '../ApplicationMessageModal';
+import ValidatedRepositoryInfo from '../ValidatedRepositoryInfo';
 
-import AcceptRejectButtons from './AcceptRejectButtons';
-import ApplicationMessageModal from './ApplicationMessageModal';
-import ValidatedRepositoryInfo from './ValidatedRepositoryInfo';
+import { InfoSectionHeader } from './InfoSectionHeader';
 
 const ApplicationBody = styled.div`
   height: 267px;
@@ -193,21 +194,6 @@ const getSuccessToast = (intl, action, collective, result) => {
   } else {
     return { type: TOAST_TYPE.SUCCESS };
   }
-};
-
-export const InfoSectionHeader = ({ children, icon = null }) => (
-  <Flex alignItems="center" mb={3}>
-    {icon && <Box mr={2}>{icon}</Box>}
-    <Span fontSize="11px" fontWeight="500" color="black.500" textTransform="uppercase" mr={2}>
-      {children}
-    </Span>
-    <StyledHr borderColor="black.200" flex="1 1" />
-  </Flex>
-);
-
-InfoSectionHeader.propTypes = {
-  icon: PropTypes.node,
-  children: PropTypes.node,
 };
 
 const UserInputContainer = styled(P).attrs({

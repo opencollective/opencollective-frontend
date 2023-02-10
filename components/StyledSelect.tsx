@@ -305,12 +305,19 @@ type StyledSelectCustomComponent = Select &
       SpaceProps & {
         intl: IntlShape;
         /** Alias for isDisabled */
+        inputId: string;
         disabled?: boolean;
         useSearchIcon?: boolean;
         hideDropdownIndicator?: boolean;
         hideMenu?: boolean;
         error?: boolean;
-        style: Record<string, unknown>;
+        style?: Record<string, unknown>;
+        onBlur?: Function;
+        onChange?: Function;
+        isLoading?: boolean;
+        isSearchable?: boolean;
+        options?: any;
+        value?: any;
       }
   >;
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -12,77 +12,15 @@ import { require2FAForAdmins } from '../lib/policies';
 import { AdminPanelContext } from '../components/admin-panel/AdminPanelContext';
 import AdminPanelSection from '../components/admin-panel/AdminPanelSection';
 import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/admin-panel/constants';
+import { adminPanelQuery } from '../components/admin-panel/queries';
 import AdminPanelSideBar from '../components/admin-panel/SideBar';
 import AdminPanelTopBar from '../components/admin-panel/TopBar';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import { Flex, Grid } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
-
-export const adminPanelQuery = gql`
-  query AdminPanel($slug: String!) {
-    account(slug: $slug) {
-      id
-      legacyId
-      slug
-      name
-      isHost
-      type
-      settings
-      isArchived
-      isIncognito
-      imageUrl(height: 256)
-      features {
-        id
-        ...NavbarFields
-        VIRTUAL_CARDS
-        USE_PAYMENT_METHODS
-        EMIT_GIFT_CARDS
-      }
-      policies {
-        REQUIRE_2FA_FOR_ADMINS
-      }
-      ... on AccountWithParent {
-        parent {
-          id
-          slug
-          policies {
-            REQUIRE_2FA_FOR_ADMINS
-          }
-        }
-      }
-      ... on AccountWithHost {
-        hostFeePercent
-        host {
-          id
-          slug
-          name
-          settings
-          policies {
-            EXPENSE_AUTHOR_CANNOT_APPROVE {
-              enabled
-              amountInCents
-              appliesToHostedCollectives
-              appliesToSingleAdminCollectives
-            }
-            COLLECTIVE_MINIMUM_ADMINS {
-              numberOfAdmins
-              applies
-              freeze
-            }
-          }
-        }
-      }
-      ... on AccountWithHost {
-        isApproved
-      }
-    }
-  }
-  ${collectiveNavbarFieldsFragment}
-`;
 
 const messages = defineMessages({
   collectiveIsArchived: {

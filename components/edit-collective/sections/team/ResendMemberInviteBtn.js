@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { getLegacyIdForCollective } from '../../lib/collective.lib';
-import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { getLegacyIdForCollective } from '../../../../lib/collective.lib';
+import { i18nGraphqlException } from '../../../../lib/errors';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
-import StyledButton from '../StyledButton';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import StyledButton from '../../../StyledButton';
+import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
 
-import { inviteMemberMutation } from './sections/InviteMemberModal';
+import { inviteMemberMutation } from './InviteMemberModal';
 
 const ResendMemberInviteBtn = ({ member, collective }) => {
   const [inviteMember, { loading, error, data }] = useMutation(inviteMemberMutation, { context: API_V2_CONTEXT });

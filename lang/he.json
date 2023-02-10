@@ -1160,7 +1160,7 @@
   "ExpenseForm.inviteeLabel": "מי יקבל את הכסף עבור התשלום הזה?",
   "ExpenseForm.inviteeOrgDescriptionLabel": "מה הארגון שלך עושה?",
   "ExpenseForm.inviteeOrgNameLabel": "מה שם הארגון?",
-  "ExpenseForm.inviteNameLabel": "איש קשר",
+  "ContactName": "איש קשר",
   "ExpenseForm.inviteOrgDescriptionLabel": "תיאור הארגון",
   "ExpenseForm.InvoiceDescription": "דרישת תשלום עבור שירותים/טובין.",
   "ExpenseForm.InvoiceInfo": "מידע נוסף לדרישת התשלום",

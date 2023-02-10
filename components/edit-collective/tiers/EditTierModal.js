@@ -120,7 +120,6 @@ function FormFields({ collective, values, hideTypeSelect }) {
     // No interval for products and tickets
     if ([PRODUCT, TICKET].includes(values.type)) {
       formik.setFieldValue('interval', null);
-      formik.setFieldValue('amountType', FIXED);
     }
   }, [values.interval, values.type]);
 
@@ -171,6 +170,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
         label={intl.formatMessage({ id: 'Fields.name', defaultMessage: 'Name' })}
         labelFontWeight="bold"
         mt="3"
+        required
       >
         {({ field }) => <StyledInput data-cy={field.name} placeholder="E.g. Donation" {...field} />}
       </StyledInputFormikField>

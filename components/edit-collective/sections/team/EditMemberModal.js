@@ -6,20 +6,20 @@ import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
-import roles from '../../../lib/constants/roles';
-import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
+import roles from '../../../../lib/constants/roles';
+import { i18nGraphqlException } from '../../../../lib/errors';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 
-import { teamSectionQuery } from '../../admin-panel/sections/Team';
-import Container from '../../Container';
-import { Flex } from '../../Grid';
-import StyledButton from '../../StyledButton';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
-import StyledTooltip from '../../StyledTooltip';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import Container from '../../../Container';
+import { Flex } from '../../../Grid';
+import StyledButton from '../../../StyledButton';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
+import StyledTooltip from '../../../StyledTooltip';
+import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
 
 import MemberForm from './MemberForm';
+import { teamSectionQuery } from './queries';
 
 const editMemberMutation = gql`
   mutation EditMember(

@@ -19,7 +19,7 @@ import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import * as fragments from '../components/collective-page/graphql/fragments';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
-import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/Contribute';
+import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/constants';
 import ContributeCollective from '../components/contribute-cards/ContributeCollective';
 import ContributeCrypto from '../components/contribute-cards/ContributeCrypto';
 import ContributeCustom from '../components/contribute-cards/ContributeCustom';

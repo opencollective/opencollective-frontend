@@ -13,6 +13,7 @@ export const HOST_DASHBOARD_SECTIONS = {
   // Existing Host Dashboard Sections
   EXPENSES: 'expenses',
   FINANCIAL_CONTRIBUTIONS: 'orders',
+  PENDING_CONTRIBUTIONS: 'pending-contributions',
   HOSTED_COLLECTIVES: 'hosted-collectives',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   PENDING_APPLICATIONS: 'pending-applications',
@@ -64,7 +65,6 @@ export const COLLECTIVE_SECTIONS = {
   TEAM: 'team',
   TICKETS: 'tickets',
   TIERS: 'tiers',
-  TIERS_LEGACY: 'tiers-legacy',
   USER_SECURITY: 'user-security',
   VIRTUAL_CARDS: 'virtual-cards',
   WEBHOOKS: 'webhooks',
@@ -108,6 +108,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.FINANCIAL_CONTRIBUTIONS]: {
     id: 'FinancialContributions',
     defaultMessage: 'Financial Contributions',
+  },
+  [ALL_SECTIONS.PENDING_CONTRIBUTIONS]: {
+    id: 'PendingContributions',
+    defaultMessage: 'Pending Contributions',
   },
   [ALL_SECTIONS.PENDING_APPLICATIONS]: {
     id: 'AdminPanel.Menu.PendingApplications',

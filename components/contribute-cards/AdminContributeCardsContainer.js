@@ -28,7 +28,7 @@ const AdminContributeCardsContainer = ({
   createNewType,
   onTierUpdate,
 }) => {
-  const [showCreateModal, setShowCreateModal] = React.useState(false);
+  const [showTierModal, setShowTierModal] = React.useState(false);
   const isEvent = collective.type === CollectiveType.EVENT;
   const createContributionTierRoute = isEvent
     ? `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/admin/tiers`
@@ -49,25 +49,32 @@ const AdminContributeCardsContainer = ({
   return (
     <DndProvider backend={HTML5Backend}>
       <CardsContainer>
-        {cards.map(({ key, Component, componentProps }, index) => (
-          <ContributeCardContainer key={key}>
-            {cards.length === 1 || !enableReordering ? (
-              // TODO Add edit button here
-              <Component {...componentProps} />
-            ) : (
-              <DraggableContributeCardWrapper
-                Component={Component}
-                componentProps={componentProps}
-                index={index}
-                onMove={onContributionCardMove}
-                onDrop={onContributionCardDrop}
-              />
-            )}
-          </ContributeCardContainer>
-        ))}
+        {cards.map(({ key, Component, componentProps }, index) => {
+          // Add onClickEdit to the component props if we're using tier modals
+          componentProps =
+            useTierModals && componentProps.tier
+              ? { ...componentProps, onClickEdit: () => setShowTierModal(componentProps.tier) }
+              : componentProps;
+
+          return (
+            <ContributeCardContainer key={key}>
+              {cards.length === 1 || !enableReordering ? (
+                <Component {...componentProps} />
+              ) : (
+                <DraggableContributeCardWrapper
+                  Component={Component}
+                  componentProps={componentProps}
+                  index={index}
+                  onMove={onContributionCardMove}
+                  onDrop={onContributionCardDrop}
+                />
+              )}
+            </ContributeCardContainer>
+          );
+        })}
         <ContributeCardContainer>
           {useTierModals ? (
-            <CreateNew as="div" data-cy="create-contribute-tier" onClick={() => setShowCreateModal(true)}>
+            <CreateNew as="div" data-cy="create-contribute-tier" onClick={() => setShowTierModal('new')}>
               {addNewMessage}
             </CreateNew>
           ) : (
@@ -76,10 +83,11 @@ const AdminContributeCardsContainer = ({
             </CreateNew>
           )}
         </ContributeCardContainer>
-        {showCreateModal && (
+        {showTierModal && (
           <EditTierModal
+            tier={showTierModal === 'new' ? null : showTierModal}
             collective={collective}
-            onClose={() => setShowCreateModal(false)}
+            onClose={() => setShowTierModal(false)}
             forcedType={createNewType}
             onUpdate={onTierUpdate}
           />

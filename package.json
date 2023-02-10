@@ -203,6 +203,7 @@
     "babel-plugin-styled-components": "^2.0.2",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "cheerio": "1.0.0-rc.12",
+    "circular-dependency-plugin": "^5.2.2",
     "codecov": "^3.8.3",
     "commander": "^10.0.0",
     "commitizen": "^4.2.4",

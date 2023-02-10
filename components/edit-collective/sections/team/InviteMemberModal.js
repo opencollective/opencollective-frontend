@@ -4,20 +4,20 @@ import { gql, useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { CollectiveType } from '../../../../lib/constants/collectives';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
-import { teamSectionQuery } from '../../admin-panel/sections/Team';
-import CollectivePickerAsync from '../../CollectivePickerAsync';
-import Container from '../../Container';
-import { Flex } from '../../Grid';
-import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
-import { P } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import CollectivePickerAsync from '../../../CollectivePickerAsync';
+import Container from '../../../Container';
+import { Flex } from '../../../Grid';
+import MessageBox from '../../../MessageBox';
+import StyledButton from '../../../StyledButton';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
+import { P } from '../../../Text';
+import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
 
 import MemberForm from './MemberForm';
+import { teamSectionQuery } from './queries';
 
 export const inviteMemberMutation = gql`
   mutation InviteMember(

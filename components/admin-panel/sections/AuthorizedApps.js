@@ -7,7 +7,6 @@ import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { getSettingsRoute } from '../../../lib/url-helpers';
 
-import { EDIT_COLLECTIVE_SECTIONS } from '../../edit-collective/Menu';
 import { Box, Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Link from '../../Link';
@@ -19,6 +18,7 @@ import { authorizedAppsQuery } from '../../oauth/queries';
 import Pagination from '../../Pagination';
 import StyledHr from '../../StyledHr';
 import { P } from '../../Text';
+import { ALL_SECTIONS } from '../constants';
 
 const AuthorizedAppsSection = () => {
   const router = useRouter() || {};
@@ -55,7 +55,7 @@ const AuthorizedAppsSection = () => {
             values={{
               ForDevelopersLink: getI18nLink({
                 as: Link,
-                href: getSettingsRoute(LoggedInUser.collective, EDIT_COLLECTIVE_SECTIONS.FOR_DEVELOPERS),
+                href: getSettingsRoute(LoggedInUser.collective, ALL_SECTIONS.FOR_DEVELOPERS),
               }),
             }}
           />

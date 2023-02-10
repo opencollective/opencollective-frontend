@@ -47,6 +47,7 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
         isArchived
         isHost
         isTrustedHost
+        isTwoFactorAuthEnabled
       }
     }
   }

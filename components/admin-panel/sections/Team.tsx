@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Edit } from '@styled-icons/material/Edit';
 import { get, truncate } from 'lodash';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
@@ -22,9 +22,10 @@ import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import Avatar from '../../Avatar';
 import Container from '../../Container';
-import ResendMemberInviteBtn from '../../edit-collective/ResendMemberInviteBtn';
-import EditMemberModal from '../../edit-collective/sections/EditMemberModal';
-import InviteMemberModal from '../../edit-collective/sections/InviteMemberModal';
+import EditMemberModal from '../../edit-collective/sections/team/EditMemberModal';
+import InviteMemberModal from '../../edit-collective/sections/team/InviteMemberModal';
+import { teamSectionQuery } from '../../edit-collective/sections/team/queries';
+import ResendMemberInviteBtn from '../../edit-collective/sections/team/ResendMemberInviteBtn';
 import { Box, Flex, Grid } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Link from '../../Link';
@@ -61,93 +62,6 @@ const MemberLogoContainer = styled(Box)`
   align-items: center;
   width: 100%;
   border-top: 1px solid #e6e8eb;
-`;
-
-const memberFieldsFragment = gql`
-  fragment MemberFields on Member {
-    id
-    role
-    since
-    createdAt
-    description
-    inherited
-    account {
-      id
-      name
-      slug
-      type
-      imageUrl(height: 64)
-      ... on Individual {
-        email
-      }
-    }
-  }
-`;
-
-export const teamSectionQuery = gql`
-  query TeamSection($collectiveSlug: String!, $account: AccountReferenceInput!) {
-    account(slug: $collectiveSlug) {
-      id
-      isFrozen
-      ... on AccountWithParent {
-        parent {
-          id
-          slug
-          type
-          name
-        }
-      }
-      ... on AccountWithHost {
-        host {
-          id
-          slug
-          name
-          features {
-            id
-            CONTACT_FORM
-          }
-        }
-      }
-      members(role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {
-        nodes {
-          id
-          ...MemberFields
-        }
-      }
-      childrenAccounts {
-        nodes {
-          id
-          slug
-          type
-          name
-          members(includeInherited: false, role: [ADMIN, MEMBER, ACCOUNTANT], limit: 100) {
-            nodes {
-              id
-              ...MemberFields
-            }
-          }
-        }
-      }
-    }
-    memberInvitations(account: $account) {
-      id
-      role
-      since
-      createdAt
-      description
-      account: memberAccount {
-        id
-        name
-        slug
-        type
-        imageUrl(height: 64)
-        ... on Individual {
-          email
-        }
-      }
-    }
-  }
-  ${memberFieldsFragment}
 `;
 
 type MemberCardProps = {

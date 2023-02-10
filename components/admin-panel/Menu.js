@@ -37,9 +37,9 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
       <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.PAYMENT_RECEIPTS} />
       {!isAccountantOnly && (
         <React.Fragment>
-          <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} />
           <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
           <MenuLink collective={collective} section={ALL_SECTIONS.WEBHOOKS} />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS} />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
           <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SECURITY} />
           <MenuLink collective={collective} section={ALL_SECTIONS.ADVANCED} />
@@ -74,6 +74,11 @@ const Menu = ({ collective, isAccountantOnly }) => {
           </MenuSectionHeader>
           <MenuLink collective={collective} section={HOST_SECTIONS.EXPENSES} if={!isAccountantOnly} />
           <MenuLink collective={collective} section={HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS} if={!isAccountantOnly} />
+          <MenuLink
+            collective={collective}
+            section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS}
+            if={!isAccountantOnly}
+          />
           <MenuLink collective={collective} section={HOST_SECTIONS.PENDING_APPLICATIONS} if={!isAccountantOnly} />
           <MenuLink collective={collective} section={HOST_SECTIONS.HOSTED_COLLECTIVES} if={!isAccountantOnly} />
           <MenuLink
@@ -94,6 +99,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             if={isType(collective, ORGANIZATION) && isHost}
           >
             <OrganizationSettingsMenuLinks collective={collective} isAccountantOnly={isAccountantOnly} />
+            <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} />
           </SubMenu>
           <SubMenu
             label={<FormattedMessage id="AdminPanel.FiscalHostSettings" defaultMessage="Fiscal Host Settings" />}
@@ -199,7 +205,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
           <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS}
-            if={isOneOfTypes(collective, [COLLECTIVE, ORGANIZATION, USER])}
+            if={isOneOfTypes(collective, [COLLECTIVE, USER])}
           />
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
           <MenuLink

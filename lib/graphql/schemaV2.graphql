@@ -2460,6 +2460,9 @@ enum ActivityType {
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
+  ORDER_PENDING_CREATED
+  ORDER_PENDING_FOLLOWUP
+  ORDER_PENDING_RECEIVED
   ORDERS_SUSPICIOUS
   BACKYOURSTACK_DISPATCH_CONFIRMED
   PAYMENT_FAILED
@@ -2468,6 +2471,7 @@ enum ActivityType {
   USER_CREATED
   USER_NEW_TOKEN
   USER_SIGNIN
+  USER_RESET_PASSWORD
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_CODE_ADDED
   TWO_FACTOR_CODE_DELETED
@@ -7227,7 +7231,7 @@ interface FileInfo {
   """
   Size of the file in bytes
   """
-  size: Int!
+  size: Int
 }
 
 """
@@ -7257,7 +7261,7 @@ type ImageFileInfo implements FileInfo {
   """
   Size of the file in bytes
   """
-  size: Int!
+  size: Int
 
   """
   If the file is an image, this will be the width of the image in pixels
@@ -7273,6 +7277,33 @@ type ImageFileInfo implements FileInfo {
   Blurhash of the image
   """
   blurHash: String
+}
+
+type GenericFileInfo implements FileInfo {
+  """
+  Unique identifier for the file
+  """
+  id: String!
+
+  """
+  URL to access the file
+  """
+  url: URL!
+
+  """
+  Name of the file
+  """
+  name: String
+
+  """
+  Mime type of the file
+  """
+  type: String!
+
+  """
+  Size of the file in bytes
+  """
+  size: Int
 }
 
 """
@@ -11328,6 +11359,9 @@ enum ActivityAndClassesType {
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
+  ORDER_PENDING_CREATED
+  ORDER_PENDING_FOLLOWUP
+  ORDER_PENDING_RECEIVED
   ORDERS_SUSPICIOUS
   BACKYOURSTACK_DISPATCH_CONFIRMED
   PAYMENT_FAILED
@@ -11336,6 +11370,7 @@ enum ActivityAndClassesType {
   USER_CREATED
   USER_NEW_TOKEN
   USER_SIGNIN
+  USER_RESET_PASSWORD
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_CODE_ADDED
   TWO_FACTOR_CODE_DELETED
@@ -13556,6 +13591,11 @@ type Mutation {
   createPaymentIntent(paymentIntent: PaymentIntentInput!): PaymentIntent!
 
   """
+  To submit a new order. Scope: "orders".
+  """
+  createPendingOrder(order: PendingOrderCreateInput!): Order!
+
+  """
   Add a new payment method to be used with an Order. Scope: "orders".
   """
   addCreditCard(
@@ -13623,6 +13663,11 @@ type Mutation {
     Specify whether the account is a trusted host
     """
     isTrustedHost: Boolean
+
+    """
+    Set this to false to disable 2FA. Other values have no effect.
+    """
+    isTwoFactorAuthEnabled: Boolean
   ): Account!
 
   """
@@ -14375,6 +14420,9 @@ input ExpenseAttachedFileInput {
   Original filename
   """
   name: String
+    @deprecated(
+      reason: "2023-02-02: This must now be provided when uploading the file. This parameter will be ignored."
+    )
 
   """
   URL of the file
@@ -14934,6 +14982,7 @@ input OrderFromAccountInfo {
   """
   location: LocationInput
   name: String
+  email: String
   legalName: String
 }
 
@@ -15156,6 +15205,62 @@ input PaymentIntentInput {
   amount: AmountInput!
   fromAccount: AccountReferenceInput
   toAccount: AccountReferenceInput!
+}
+
+"""
+Input to create a new pending order
+"""
+input PendingOrderCreateInput {
+  """
+  The contribution amount, without platform contribution and taxes
+  """
+  amount: AmountInput!
+
+  """
+  The profile making the contribution.
+  """
+  fromAccount: AccountReferenceInput!
+
+  """
+  Additional information about the contributing profile
+  """
+  fromAccountInfo: OrderFromAccountInfo
+
+  """
+  The collective/event/project you want to contribute to
+  """
+  toAccount: AccountReferenceInput!
+
+  """
+  Platform tip attached to this order
+  """
+  platformTipAmount: AmountInput
+
+  """
+  Use this field to set the taxes associated to this order
+  """
+  taxes: [OrderTaxInput]
+
+  """
+  The tier you are contributing to
+  """
+  tier: TierReferenceInput
+
+  """
+  Public order description
+  """
+  description: String
+
+  """
+  Custom data related to the Pending Order
+  """
+  customData: JSON
+
+  """
+  When is the money expected?
+  """
+  expectedAt: DateString
+  hostFeePercent: Int
 }
 
 type CreditCardWithStripeError {
