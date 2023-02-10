@@ -113,9 +113,7 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
   const loading = fetching || debouncing;
   const [input, setInput] = useState<string>('');
   const [options, setOptions] = useState<TagOption[]>([]);
-  const [selected, setSelected] = useState<readonly TagOption[]>(
-    defaultValue?.map(tag => ({ label: tag, value: tag })) || [],
-  );
+  const [selected, setSelected] = useState<TagOption[]>(defaultValue?.map(tag => ({ label: tag, value: tag })) || []);
   const [draggingTag, setDraggingTag] = useState<string | null>(null);
 
   // Fix for infinity loop bug in dnd-kit with variable width items: https://github.com/clauderic/dnd-kit/issues/842#issuecomment-1192622612
@@ -204,7 +202,7 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
             onInputChange={value => setInput(value)}
             options={options}
             isLoading={loading}
-            onChange={(selectedOptions: OnChangeValue<TagOption, true>) => setSelected(selectedOptions)}
+            onChange={(selectedOptions: TagOption[]) => setSelected(selectedOptions)}
             styles={{
               menuPortal: styles => ({ ...styles, zIndex: 9999 }),
               control: (baseStyles, state) => ({
