@@ -6,10 +6,10 @@ import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box } from '../Grid';
+import PendingApplications from '../host-dashboard/applications/PendingApplications';
 import HostDashboardExpenses from '../host-dashboard/HostDashboardExpenses';
 import HostDashboardHostedCollectives from '../host-dashboard/HostDashboardHostedCollectives';
 import HostDashboardReports from '../host-dashboard/HostDashboardReports';
-import PendingApplications from '../host-dashboard/applications/PendingApplications';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 import { H2 } from '../Text';

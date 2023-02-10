@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
+import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';
 import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
 import ContributeCollective from '../../contribute-cards/ContributeCollective';
 import { Box } from '../../Grid';

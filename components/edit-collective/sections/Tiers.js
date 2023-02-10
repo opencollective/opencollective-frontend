@@ -66,7 +66,6 @@ const getFinancialContributions = (collective, sortedTiers) => {
           tier,
           hideContributors: true,
           hideCTA: true,
-          enableEditing: true,
         },
       });
     }
