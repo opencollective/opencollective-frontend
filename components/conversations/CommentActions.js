@@ -15,12 +15,13 @@ import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import { Flex } from '../Grid';
+import HTMLContent from '../HTMLContent';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { P } from '../Text';
 
-import Comment from './Comment';
+import { CommentMetadata } from './CommentMetadata';
 
 const AdminActionsPopupContainer = styled(Flex)`
   flex-direction: column;
@@ -205,7 +206,10 @@ const CommentActions = ({ comment, isConversationRoot, canEdit, canDelete, onDel
             </MessageBox>
           )}
           <Container padding={2} borderRadius={8} border="1px solid #e1e4e6">
-            <Comment comment={comment} maxCommentHeight={150} withoutActions />
+            <CommentMetadata comment={comment} />
+            <Container mt={3} maxHeight={150} overflowY="auto">
+              <HTMLContent content={comment.html} fontSize="12px" data-cy="comment-body" />
+            </Container>
           </Container>
           {deleteError && (
             <MessageBox type="error" withIcon mt={3}>
