@@ -63,6 +63,7 @@ const CheckboxContainer = styled.div`
     cursor: pointer;
     margin: 0;
     margin-left: 2.2rem;
+    z-index: 9;
     font-weight: normal;
     width: auto;
   }
