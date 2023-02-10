@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
+import { get } from 'lodash';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { color, flex, typography } from 'styled-system';
@@ -65,8 +66,9 @@ const ContributionSummary = ({
   const intl = useIntl();
   const amount = isCrypto ? stepDetails.cryptoAmount : stepDetails.amount;
   const totalAmount = getTotalAmount(stepDetails, stepSummary, isCrypto);
-  const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, currency);
-  const platformTip = !isCrypto ? stepDetails.platformTip || 0 : 0;
+  const displayCurrency = isCrypto ? stepDetails.currency.value : currency;
+  const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, displayCurrency);
+  const platformTip = !isCrypto ? get(stepDetails, 'platformTip', 0) : 0;
   const showQuantity = stepDetails.quantity > 1 || ['TICKET', 'PRODUCT'].includes(tier?.type);
   const contributionName = tier?.name ? `${collective.name} - "${tier.name}"` : collective.name;
   return (
@@ -92,7 +94,7 @@ const ContributionSummary = ({
             <Amount>
               <FormattedMoneyAmount
                 amount={amount || 0}
-                currency={currency}
+                currency={displayCurrency}
                 amountStyles={{ color: 'black.700', fontWeight: 400 }}
                 isCrypto={isCrypto}
               />
@@ -116,7 +118,7 @@ const ContributionSummary = ({
               </AmountLine>
             ))}
 
-          {Boolean(platformTip) && !isCrypto && (
+          {Boolean(platformTip) && (
             <AmountLine color="black.700">
               <Label>
                 <FormattedMessage
@@ -143,7 +145,12 @@ const ContributionSummary = ({
           <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
         </Label>
         <Amount fontWeight="700" data-cy="ContributionSummary-TodaysCharge">
-          <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} isCrypto={isCrypto} />
+          <FormattedMoneyAmount
+            amount={totalAmount}
+            currency={displayCurrency}
+            amountStyles={null}
+            isCrypto={isCrypto}
+          />
         </Amount>
       </AmountLine>
       {Boolean(pmFeeInfo.fee) && !isCrypto && (
