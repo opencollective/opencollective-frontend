@@ -2,9 +2,6 @@ const path = require('path');
 require('./env');
 const { REWRITES } = require('./rewrites');
 
-// eslint-disable-next-line node/no-unpublished-require
-const CircularDependencyPlugin = require('circular-dependency-plugin');
-
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true',
@@ -44,13 +41,17 @@ const nextConfig = {
       }),
     );
 
-    config.plugins.push(
-      new CircularDependencyPlugin({
-        include: /components|pages|server/,
-        failOnError: true,
-        cwd: process.cwd(),
-      }),
-    );
+    if (['ci', 'test', 'development'].includes(process.env.OC_ENV)) {
+      // eslint-disable-next-line node/no-unpublished-require
+      const CircularDependencyPlugin = require('circular-dependency-plugin');
+      config.plugins.push(
+        new CircularDependencyPlugin({
+          include: /components|pages|server/,
+          failOnError: true,
+          cwd: process.cwd(),
+        }),
+      );
+    }
 
     // XXX See https://github.com/zeit/next.js/blob/canary/examples/with-sentry-simple/next.config.js
     // In `pages/_app.js`, Sentry is imported from @sentry/node. While
