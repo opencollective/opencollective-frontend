@@ -139,7 +139,7 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
                   minWidth={132}
                   buttonStyle="primary"
                   loading={loading}
-                  disabled={loading || !formik.dirty}
+                  disabled={!formik.dirty}
                   type="submit"
                 >
                   <FormattedMessage id="save" defaultMessage="Save" />
