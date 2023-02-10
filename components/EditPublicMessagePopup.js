@@ -14,7 +14,7 @@ import withViewport from '../lib/withViewport';
 import { collectivePageQuery } from '../components/collective-page/graphql/queries';
 import { tierPageQuery } from '../components/tier-page/graphql/queries';
 
-import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from './contribute-cards/Contribute';
+import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from './contribute-cards/constants';
 import { Box, Flex } from './Grid';
 import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
