@@ -1,4 +1,4 @@
-import React, { Fragment, MouseEventHandler, useEffect, useState } from 'react';
+import React, { Fragment, MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useLazyQuery } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
@@ -115,9 +115,6 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
   const [selected, setSelected] = useState<TagOption[]>(defaultValue?.map(tag => ({ label: tag, value: tag })) || []);
   const [draggingTag, setDraggingTag] = useState<string | null>(null);
 
-  // Fix for infinity loop bug in dnd-kit with variable width items: https://github.com/clauderic/dnd-kit/issues/842#issuecomment-1192622612
-  const [overItemsForDelta, setOverItemsForDelta] = useState({});
-
   useEffect(() => {
     onChange(selected);
   }, [selected]);
@@ -149,18 +146,25 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
   }, [fetching, data]);
 
   function handleDragOver(event) {
-    const { active, over, delta } = event;
+    const { active, over } = event;
 
-    const jsonDelta = JSON.stringify(delta);
-    if (over && active.id !== over.id && !overItemsForDelta[jsonDelta]) {
+    if (over && active.id !== over.id) {
       setSelected(selected => {
         const oldIndex = selected.findIndex(item => item.value === active.id);
         const newIndex = selected.findIndex(item => item.value === over.id);
         return arrayMove(selected, oldIndex, newIndex);
       });
-      setOverItemsForDelta({ ...overItemsForDelta, [jsonDelta]: over.id });
     }
   }
+
+  // Fix to avoid infinite loop caused by dragging over two items with variable sizes: https://github.com/clauderic/dnd-kit/issues/44#issuecomment-1018686592
+  const debouncedDragOver = useCallback(
+    debounce(handleDragOver, 40, {
+      trailing: false,
+      leading: true,
+    }),
+    [],
+  );
 
   function handleDragStart(event) {
     setDraggingTag(event.active.id);
@@ -168,14 +172,13 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
 
   function handleDragEnd() {
     setDraggingTag(null);
-    setOverItemsForDelta({});
   }
 
   return (
     <Fragment>
       <DndContext
         onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
+        onDragOver={debouncedDragOver}
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragEnd}
       >
