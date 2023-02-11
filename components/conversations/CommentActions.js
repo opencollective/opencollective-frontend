@@ -56,7 +56,14 @@ const CommentBtn = styled(StyledButton).attrs({ buttonSize: 'small' })`
 /**
  * Action buttons for the comment owner. Styles change between mobile and desktop.
  */
-const AdminActionButtons = ({ canEdit, canDelete, openDeleteConfirmation, onEdit, copyToClipboard, closePopup }) => {
+const AdminActionButtons = ({
+  canEdit,
+  canDelete,
+  openDeleteConfirmation,
+  onEdit,
+  copyLinkToClipboard,
+  closePopup,
+}) => {
   return (
     <React.Fragment>
       {/** Buttons */}
@@ -64,7 +71,7 @@ const AdminActionButtons = ({ canEdit, canDelete, openDeleteConfirmation, onEdit
         data-cy="share-comment-btn"
         onClick={() => {
           closePopup();
-          copyToClipboard();
+          copyLinkToClipboard();
         }}
       >
         <ShareIcon size="1em" mr={2} />
@@ -107,7 +114,7 @@ AdminActionButtons.propTypes = {
   isConversationRoot: PropTypes.bool,
   canEdit: PropTypes.bool,
   canDelete: PropTypes.bool,
-  copyToClipboard: PropTypes.func,
+  copyLinkToClipboard: PropTypes.func,
 };
 
 const deleteCommentMutation = gql`
@@ -142,9 +149,9 @@ const CommentActions = ({ comment, anchorHash, isConversationRoot, canEdit, canD
     modifiers: REACT_POPPER_MODIFIERS,
   });
 
-  const copyToClipboard = () => {
+  const copyLinkToClipboard = () => {
     const [baseLink] = window.location.href.split('#');
-    const linkWithAnchorHash = `${baseLink}${anchorHash ? `#${anchorHash}` : ''}`;
+    const linkWithAnchorHash = `${baseLink}#${anchorHash}`;
     copy(linkWithAnchorHash);
   };
 
@@ -191,7 +198,7 @@ const CommentActions = ({ comment, anchorHash, isConversationRoot, canEdit, canD
               onEdit={onEditClick}
               canEdit={canEdit}
               canDelete={canDelete}
-              copyToClipboard={copyToClipboard}
+              copyLinkToClipboard={copyLinkToClipboard}
               closePopup={() => setShowAdminActions(false)}
             />
           </Flex>
