@@ -80,6 +80,7 @@ const CreateFundCategoryPicker = () => {
               </Flex>
             </Container>
             <Container
+              borderLeft={['none', '1px solid #E6E8EB']}
               borderTop={['1px solid #E6E8EB', 'none']}
               alignItems="center"
               width={[null, 280, 312]}
