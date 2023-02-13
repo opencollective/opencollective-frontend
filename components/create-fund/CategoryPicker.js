@@ -25,7 +25,7 @@ const Image = styled.img`
 `;
 
 const messages = defineMessages({
-  foundation: { id: 'createFund.category.foundation', defaultMessage: 'For non-profit initiatives in USA' },
+  foundation: { id: 'createFund.category.foundation', defaultMessage: 'For non-profit initiatives in the USA' },
   europe: { id: 'createFund.category.europe', defaultMessage: 'For non-profit initiatives in Europe' },
   opensource: { id: 'createFund.category.opensource', defaultMessage: 'For open source initiatives' },
   fund: { id: 'createFund.category.fund', defaultMessage: 'For other initiatives' },
