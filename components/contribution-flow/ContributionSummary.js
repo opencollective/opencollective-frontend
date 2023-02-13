@@ -66,8 +66,7 @@ const ContributionSummary = ({
   const intl = useIntl();
   const amount = isCrypto ? stepDetails.cryptoAmount : stepDetails.amount;
   const totalAmount = getTotalAmount(stepDetails, stepSummary, isCrypto);
-  const displayCurrency = isCrypto ? stepDetails.currency.value : currency;
-  const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, displayCurrency);
+  const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, currency);
   const platformTip = !isCrypto ? get(stepDetails, 'platformTip', 0) : 0;
   const showQuantity = stepDetails.quantity > 1 || ['TICKET', 'PRODUCT'].includes(tier?.type);
   const contributionName = tier?.name ? `${collective.name} - "${tier.name}"` : collective.name;
@@ -94,7 +93,7 @@ const ContributionSummary = ({
             <Amount>
               <FormattedMoneyAmount
                 amount={amount || 0}
-                currency={displayCurrency}
+                currency={currency}
                 amountStyles={{ color: 'black.700', fontWeight: 400 }}
                 isCrypto={isCrypto}
               />
@@ -145,12 +144,7 @@ const ContributionSummary = ({
           <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
         </Label>
         <Amount fontWeight="700" data-cy="ContributionSummary-TodaysCharge">
-          <FormattedMoneyAmount
-            amount={totalAmount}
-            currency={displayCurrency}
-            amountStyles={null}
-            isCrypto={isCrypto}
-          />
+          <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} isCrypto={isCrypto} />
         </Amount>
       </AmountLine>
       {Boolean(pmFeeInfo.fee) && !isCrypto && (
