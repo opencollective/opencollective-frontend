@@ -314,6 +314,10 @@ StepSummary.propTypes = {
     amount: PropTypes.number.isRequired,
     /** Number of items to order */
     quantity: PropTypes.number,
+    /** Currency of the order (for crypto flow) */
+    currency: {
+      value: PropTypes.string,
+    },
   }),
   stepProfile: PropTypes.shape({
     location: PropTypes.shape({
