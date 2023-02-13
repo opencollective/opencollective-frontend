@@ -276,11 +276,11 @@ export const generatePaymentMethodOptions = (
   return uniquePMs;
 };
 
-export const getTotalAmount = (stepDetails, stepSummary = null) => {
-  const quantity = get(stepDetails, 'quantity') || 1;
-  const amount = get(stepDetails, 'cryptoAmount') || get(stepDetails, 'amount') || 0;
-  const taxAmount = get(stepSummary, 'amount') || 0;
-  const platformFeeAmount = get(stepDetails, 'platformTip') || 0;
+export const getTotalAmount = (stepDetails, stepSummary = null, isCrypto = false) => {
+  const quantity = get(stepDetails, 'quantity', 1);
+  const amount = isCrypto ? get(stepDetails, 'cryptoAmount', 0) : get(stepDetails, 'amount', 0);
+  const taxAmount = get(stepSummary, 'amount', 0);
+  const platformFeeAmount = !isCrypto ? get(stepDetails, 'platformTip', 0) : 0;
   return quantity * amount + platformFeeAmount + taxAmount;
 };
 

@@ -58,7 +58,7 @@ const StepCheckout = ({ stepDetails, order }) => {
             amount: (
               <span style={{ color: 'black.900' }}>
                 <b>
-                  {stepDetails.amount} {stepDetails.currency.value}
+                  {stepDetails.cryptoAmount} {stepDetails.currency.value}
                 </b>
               </span>
             ),
