@@ -95,6 +95,8 @@ const Tiers = ({ collective }) => {
   const tiers = sortBy(get(data, 'account.tiers.nodes', []), 'legacyId');
   const filteredTiers = collective.type === 'EVENT' ? tiers.filter(tier => tier.type !== 'TICKET') : tiers; // Events have their tickets displayed in the "Tickets" section
   const intl = useIntl();
+  const cryptoContributionsEnabledByHost = get(collective, 'host.settings.cryptoEnabled', false);
+  const hasCryptoContributionsDisabled = get(collective, 'settings.disableCryptoContributions', true);
 
   return (
     <div>
@@ -165,6 +167,42 @@ const Tiers = ({ collective }) => {
                 )}
               </Mutation>
             </Box>
+            {cryptoContributionsEnabledByHost && (
+              <Box mb={4}>
+                <StyledHr my={4} borderColor="black.300" />
+                <P fontSize="14px" lineHeight="20x" mb={3}>
+                  <FormattedMessage defaultMessage="Enabling this will add a tier that allows users to support your collective with Cryptocurrencies such as Bitcoin or Ethereum." />
+                </P>
+                <Mutation
+                  mutation={editAccountSettingsMutation}
+                  refetchQueries={[{ query: collectiveSettingsV1Query, variables: { slug: collective.slug } }]}
+                  awaitRefetchQueries
+                >
+                  {(editSettings, { loading }) => (
+                    <StyledCheckbox
+                      name="crypto-contributions"
+                      label={intl.formatMessage({
+                        id: 'tier.cryptoContributions.label',
+                        defaultMessage: 'Enable crypto contributions',
+                      })}
+                      defaultChecked={!hasCryptoContributionsDisabled}
+                      width="auto"
+                      isLoading={loading}
+                      onChange={({ target }) => {
+                        editSettings({
+                          variables: {
+                            account: { legacyId: collective.id },
+                            key: 'disableCryptoContributions',
+                            value: !target.value,
+                          },
+                          context: API_V2_CONTEXT,
+                        });
+                      }}
+                    />
+                  )}
+                </Mutation>
+              </Box>
+            )}
             <AdminContributeCardsContainer
               collective={collective}
               cards={getFinancialContributions(collective, filteredTiers)}
