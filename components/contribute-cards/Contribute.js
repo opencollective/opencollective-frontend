@@ -203,6 +203,12 @@ const ContributeCard = ({
   ...props
 }) => {
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
+  const isFinancialContribution = [
+    ContributionTypes.FINANCIAL_CUSTOM,
+    ContributionTypes.FINANCIAL_ONE_TIME,
+    ContributionTypes.FINANCIAL_GOAL,
+    ContributionTypes.FINANCIAL_RECURRING,
+  ].includes(type);
 
   if (isPreview) {
     route = '#';
@@ -277,6 +283,28 @@ const ContributeCard = ({
                       </Container>
                     )}
                   </Flex>
+                </React.Fragment>
+              )}
+              {isFinancialContribution && totalContributors === 0 && (
+                <React.Fragment>
+                  <Flex alignItems="center" mt={3} mb={2}>
+                    <P
+                      color="black.700"
+                      fontSize="12px"
+                      lineHeight="16px"
+                      fontWeight="500"
+                      letterSpacing="0.06em"
+                      pr={2}
+                      textTransform="uppercase"
+                      whiteSpace="nowrap"
+                    >
+                      {getFooterHeading(type)}
+                    </P>
+                    <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+                  </Flex>
+                  <Container pt="0.7em" color="black.600">
+                    <FormattedMessage defaultMessage="Be the first one to contribute!" />
+                  </Container>
                 </React.Fragment>
               )}
             </Box>

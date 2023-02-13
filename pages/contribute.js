@@ -111,7 +111,7 @@ class TiersPage extends React.Component {
             ContributeCardComponent: ContributeCustom,
             key: 'contribute-tier-custom',
             props: {
-              hideContributors: !hasContributors,
+              hideContributors: false,
               collective: collective,
               contributors: this.getFinancialContributorsWithoutTier(collective.contributors),
               stats: collective.stats.backers,
@@ -133,7 +133,7 @@ class TiersPage extends React.Component {
             props: {
               collective: collective,
               tier: tier,
-              hideContributors: !hasContributors,
+              hideContributors: false,
               'data-cy': 'contribute-tier',
             },
           });
