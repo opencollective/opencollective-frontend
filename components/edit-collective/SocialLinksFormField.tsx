@@ -1,12 +1,6 @@
 import React from 'react';
-import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { closestCenter, DndContext } from '@dnd-kit/core';
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Plus, Times } from '@styled-icons/fa-solid';
 import { DragIndicator } from '@styled-icons/material';
@@ -64,13 +58,6 @@ export default function SocialLinksFormField({ value = [], touched, onChange }: 
     setItems(newItems);
   }, [items, onChange]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
-
   function handleDragEnd(event) {
     const { active, over } = event;
     if (active.id !== over.id) {
@@ -82,7 +69,7 @@ export default function SocialLinksFormField({ value = [], touched, onChange }: 
   }
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <Flex width="100%" flexDirection="column">
         <SortableContext items={items.map(item => item.sortId)} strategy={verticalListSortingStrategy}>
           {items.map(socialLink => {
