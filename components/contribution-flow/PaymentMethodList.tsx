@@ -96,7 +96,7 @@ type PaymentMethodListProps = {
   fromAccount?: Individual;
   disabledPaymentMethodTypes: string[];
   stepSummary: object;
-  stepDetails: { amount: number; currency: string };
+  stepDetails: { amount: number; currency: string; interval?: string };
   stepPayment: { key: string; isKeyOnly?: boolean };
   isEmbed: boolean;
   isSubmitting: boolean;
@@ -277,6 +277,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
                   name: props.fromAccount?.name,
                   email: LoggedInUser?.email ?? props?.fromAccount?.email,
                 }}
+                stepDetails={props.stepDetails}
                 paymentIntentId={paymentIntent.id}
                 paymentIntentClientSecret={paymentIntent.client_secret}
                 onChange={props.onChange}
