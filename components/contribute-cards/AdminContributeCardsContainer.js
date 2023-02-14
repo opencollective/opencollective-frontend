@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { closestCenter, DndContext } from '@dnd-kit/core';
+import { closestCenter, DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { isEqual } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -12,7 +12,7 @@ import EditTierModal from '../edit-collective/tiers/EditTierModal';
 
 import ContributeCardContainer from './ContributeCardContainer';
 import CreateNew from './CreateNew';
-import DraggableContributeCardWrapper from './DraggableContributeCardWrapper';
+import DraggableContributeCardWrapper, { ContributeCardWithDragHandle } from './DraggableContributeCardWrapper';
 
 /**
  * Display a list of contribution cards wrapped in a DragAndDrop provider
@@ -21,7 +21,8 @@ const AdminContributeCardsContainer = ({
   collective,
   cards,
   onReorder,
-  setDragging,
+  draggingId,
+  setDraggingId,
   onMount,
   CardsContainer,
   useTierModals,
@@ -37,12 +38,14 @@ const AdminContributeCardsContainer = ({
     }
   }, [items]);
 
-  function handleDragStart() {
+  function handleDragStart(event) {
     setDragging(true);
+    setDraggingId(event.active.id);
   }
 
   function handleDragEnd(event) {
     setDragging(false);
+    setDraggingId(null);
     const { active, over } = event;
 
     if (active.id !== over.id) {
@@ -72,6 +75,8 @@ const AdminContributeCardsContainer = ({
       onMount();
     }
   }, [onMount]);
+
+  const draggingItem = items.find(i => i.key === draggingId);
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
@@ -115,6 +120,15 @@ const AdminContributeCardsContainer = ({
             />
           )}
         </CardsContainer>
+        <DragOverlay>
+          {draggingItem ? (
+            <ContributeCardWithDragHandle
+              Component={draggingItem.Component}
+              componentProps={draggingItem.componentProps}
+              isDragOverlay
+            />
+          ) : null}
+        </DragOverlay>
       </SortableContext>
     </DndContext>
   );
@@ -135,7 +149,8 @@ AdminContributeCardsContainer.propTypes = {
   }).isRequired,
   /** Whether to use the new modals to edit/create tiers */ useTierModals: PropTypes.bool,
   onReorder: PropTypes.func,
-  setDragging: PropTypes.func,
+  setDraggingId: PropTypes.func,
+  draggingId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onMount: PropTypes.func,
   CardsContainer: PropTypes.node,
   createNewType: PropTypes.string,

@@ -89,7 +89,7 @@ class SectionContribute extends React.PureComponent {
   state = {
     showTiersAdmin: false,
     isSaving: false,
-    isDragging: false,
+    draggingId: null,
   };
 
   onTiersAdminReady = () => {
@@ -274,7 +274,7 @@ class SectionContribute extends React.PureComponent {
                   <HorizontalScroller
                     getScrollDistance={this.getContributeCardsScrollDistance}
                     container={ContributeCardsContainer}
-                    containerProps={{ disableScrollSnapping: this.state.isDragging }}
+                    containerProps={{ disableScrollSnapping: !!this.state.draggingId }}
                   >
                     <React.Fragment>
                       {isSaving && (
@@ -297,7 +297,8 @@ class SectionContribute extends React.PureComponent {
                             collective={collective}
                             cards={waysToContribute}
                             onReorder={this.onContributeCardsReorder}
-                            setDragging={dragging => this.setState({ isDragging: dragging })}
+                            setDraggingId={draggingId => this.setState({ draggingId })}
+                            draggingId={this.state.draggingId}
                             onMount={this.onTiersAdminReady}
                           />
                         </Container>
