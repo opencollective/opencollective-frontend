@@ -11,7 +11,7 @@ import { TierTypes } from '../../../lib/constants/tiers-types';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { getCollectiveContributionCardsOrder, sortTiers, TIERS_ORDER_KEY } from '../../../lib/tier-utils';
+import { getCollectiveContributionCardsOrder, TIERS_ORDER_KEY } from '../../../lib/tier-utils';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import Container from '../../Container';
@@ -139,11 +139,14 @@ class SectionContribute extends React.PureComponent {
     }
   }
 
-  getSortedCollectiveTiers = memoizeOne((baseTiers, orderKeys) => {
-    return sortTiers(baseTiers, orderKeys, true);
+  sortContributeCards = memoizeOne((cards, orderKeys) => {
+    return orderBy(cards, card => {
+      const index = orderKeys.findIndex(key => key === card.key);
+      return index === -1 ? Infinity : index; // put unsorted cards at the end
+    });
   });
 
-  getFinancialContributions = memoizeOne(sortedTiers => {
+  getContributeCards = memoizeOne(tiers => {
     const { collective, contributors, contributorsStats, isAdmin } = this.props;
     const hasNoContributor = !this.hasContributors(contributors);
     const canContribute = collective.isActive && (!isPastEvent(collective) || isAdmin);
@@ -151,44 +154,45 @@ class SectionContribute extends React.PureComponent {
     const hasCryptoContribution =
       !get(collective, 'settings.disableCryptoContributions', true) &&
       get(collective, 'host.settings.cryptoEnabled', false);
-    const waysToContribute = [];
 
-    sortedTiers.forEach(tier => {
-      if (tier === 'custom') {
-        if (hasCustomContribution) {
-          waysToContribute.push({
-            key: 'custom',
-            Component: ContributeCustom,
-            componentProps: {
-              collective,
-              contributors: this.getFinancialContributorsWithoutTier(contributors),
-              stats: contributorsStats,
-              hideContributors: hasNoContributor,
-              disableCTA: !canContribute,
-            },
-          });
-        }
-        if (hasCryptoContribution) {
-          waysToContribute.push({
-            key: 'crypto',
-            Component: ContributeCrypto,
-            componentProps: {
-              collective,
-              hideContributors: true, // for the MVP we shall not display the financial contributors for crypto
-              disableCTA: !canContribute,
-            },
-          });
-        }
-      } else {
-        waysToContribute.push({
-          key: tier.id,
-          Component: ContributeTier,
-          componentProps: { collective, tier, hideContributors: hasNoContributor },
-        });
-      }
-    });
+    // Remove tickets
+    const baseTiers = tiers.filter(tier => tier.type !== TierTypes.TICKET);
 
-    return waysToContribute;
+    const contributeCards = [
+      ...baseTiers.map(tier => ({
+        key: tier.id,
+        Component: ContributeTier,
+        componentProps: { collective, tier, hideContributors: hasNoContributor },
+      })),
+    ];
+
+    if (hasCustomContribution) {
+      contributeCards.push({
+        key: 'custom',
+        Component: ContributeCustom,
+        componentProps: {
+          collective,
+          contributors: this.getFinancialContributorsWithoutTier(contributors),
+          stats: contributorsStats,
+          hideContributors: hasNoContributor,
+          disableCTA: !canContribute,
+        },
+      });
+    }
+
+    if (hasCryptoContribution) {
+      contributeCards.push({
+        key: 'crypto',
+        Component: ContributeCrypto,
+        componentProps: {
+          collective,
+          hideContributors: true, // for the MVP we shall not display the financial contributors for crypto
+          disableCTA: !canContribute,
+        },
+      });
+    }
+
+    return contributeCards;
   });
 
   sortTicketTiers = memoizeOne(tiers => {
@@ -202,23 +206,18 @@ class SectionContribute extends React.PureComponent {
   render() {
     const { collective, tiers, events, connectedCollectives, contributors, isAdmin } = this.props;
     const { isSaving, showTiersAdmin } = this.state;
-    const orderKeys = getCollectiveContributionCardsOrder(collective);
-    const sortedTiers = this.getSortedCollectiveTiers(tiers, orderKeys);
     const isEvent = collective.type === CollectiveType.EVENT;
     const isProject = collective.type === CollectiveType.PROJECT;
     const isFund = collective.type === CollectiveType.FUND;
-    const hasCustomContribution = !get(collective, 'settings.disableCustomContributions', false);
-    const hasCryptoContribution =
-      !get(collective, 'settings.disableCryptoContributions', true) &&
-      get(collective, 'host.settings.cryptoEnabled', false);
-    const hasContribute =
-      isAdmin || (collective.isActive && (sortedTiers.length || hasCustomContribution || hasCryptoContribution));
     const hasOtherWaysToContribute =
       !isEvent && !isProject && !isFund && (isAdmin || events.length > 0 || connectedCollectives.length > 0);
     const isActive = collective.isActive;
     const hasHost = collective.host;
     const isHost = collective.isHost;
-    const waysToContribute = this.getFinancialContributions(sortedTiers);
+    const orderKeys = getCollectiveContributionCardsOrder(collective);
+    const contributeCards = this.getContributeCards(tiers);
+    const sortedContributeCards = this.sortContributeCards(contributeCards, orderKeys);
+    const hasContribute = isAdmin || (collective.isActive && contributeCards.length);
     const hasNoContributor = !this.hasContributors(contributors);
     const sortedTicketTiers = this.sortTicketTiers(this.filterTickets(tiers));
     const hideTicketsFromNonAdmins = (sortedTicketTiers.length === 0 || !collective.isActive) && !isAdmin;
@@ -286,7 +285,7 @@ class SectionContribute extends React.PureComponent {
                         </ContainerOverlay>
                       )}
                       {!(isAdmin && showTiersAdmin) &&
-                        waysToContribute.map(({ key, Component, componentProps }) => (
+                        sortedContributeCards.map(({ key, Component, componentProps }) => (
                           <ContributeCardContainer key={key}>
                             <Component {...componentProps} />
                           </ContributeCardContainer>
@@ -295,8 +294,9 @@ class SectionContribute extends React.PureComponent {
                         <Container display={showTiersAdmin ? 'block' : 'none'} data-cy="admin-contribute-cards">
                           <AdminContributeCardsContainer
                             collective={collective}
-                            cards={waysToContribute}
+                            cards={sortedContributeCards}
                             onReorder={this.onContributeCardsReorder}
+                            isSaving={this.state.isSaving}
                             setDraggingId={draggingId => this.setState({ draggingId })}
                             draggingId={this.state.draggingId}
                             onMount={this.onTiersAdminReady}

@@ -32,6 +32,14 @@ const AdminContributeCardsContainer = ({
 }) => {
   const [items, setItems] = React.useState(cards || []);
 
+  // Reset items if the cards order have changed.
+  React.useEffect(() => {
+    if (!isEqual(cards, items)) {
+      setItems(cards);
+    }
+  }, [JSON.stringify(cards)]);
+
+  // Save reorder to the backend if internal order has changed
   React.useEffect(() => {
     if (!isEqual(cards, items)) {
       onReorder(items);
@@ -43,17 +51,17 @@ const AdminContributeCardsContainer = ({
   }
 
   function handleDragEnd(event) {
-    setDraggingId(null);
     const { active, over } = event;
 
     if (active.id !== over.id) {
       setItems(items => {
         const oldIndex = items.findIndex(item => item.key === active.id);
         const newIndex = items.findIndex(item => item.key === over.id);
-
         return arrayMove(items, oldIndex, newIndex);
       });
     }
+
+    setDraggingId(null);
   }
 
   const [showTierModal, setShowTierModal] = React.useState(false);

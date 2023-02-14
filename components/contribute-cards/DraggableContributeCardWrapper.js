@@ -55,27 +55,20 @@ const StyledDragHandle = styled(DragHandle)`
   }
 `;
 
-export const ContributeCardWithDragHandle = React.forwardRef(
-  ({ Component, componentProps, dragHandleProps, isDragging, isDragOverlay, style }, ref) => {
-    return (
-      <MainContainer ref={ref} style={style} isDragging={isDragging} isDragOverlay={isDragOverlay}>
-        <Component {...componentProps} />
-        <StyledDragHandle {...dragHandleProps} />
-      </MainContainer>
-    );
-  },
-);
-
-ContributeCardWithDragHandle.displayName = 'ContributeCardWithDragHandle';
+export const ContributeCardWithDragHandle = ({ Component, componentProps, dragHandleProps, isDragOverlay }) => {
+  return (
+    <MainContainer isDragOverlay={isDragOverlay}>
+      <Component {...componentProps} />
+      <StyledDragHandle {...dragHandleProps} />
+    </MainContainer>
+  );
+};
 
 ContributeCardWithDragHandle.propTypes = {
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   Component: PropTypes.any.isRequired,
   componentProps: PropTypes.object,
   dragHandleProps: PropTypes.object,
-  isDragging: PropTypes.bool,
   isDragOverlay: PropTypes.bool,
-  style: PropTypes.object,
 };
 
 // Memoized for improved performance when dragging
@@ -93,18 +86,14 @@ export default function DraggableContributeCardWrapper(props) {
   };
 
   return (
-    <MemoizedContributeCardWithDragHandle
-      ref={setNodeRef}
-      style={style}
-      dragHandleProps={{ ...attributes, ...listeners }}
-      isDragging={isDragging}
-      {...props}
-    />
+    <MainContainer ref={setNodeRef} style={style} isDragging={isDragging}>
+      <MemoizedContributeCardWithDragHandle dragHandleProps={{ ...attributes, ...listeners }} {...props} />
+    </MainContainer>
   );
 }
+
 DraggableContributeCardWrapper.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   Component: PropTypes.any.isRequired,
   componentProps: PropTypes.object,
-  isDragOverlay: PropTypes.bool,
 };
