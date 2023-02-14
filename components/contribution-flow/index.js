@@ -277,7 +277,7 @@ class ContributionFlow extends React.Component {
               this.props.paymentFlow === PAYMENT_FLOW.CRYPTO
                 ? {
                     thegivingblock: {
-                      pledgeAmount: stepDetails.amount,
+                      pledgeAmount: stepDetails.cryptoAmount,
                       pledgeCurrency: stepDetails.currency.value,
                     },
                   }
