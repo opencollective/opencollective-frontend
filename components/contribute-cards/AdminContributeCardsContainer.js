@@ -39,12 +39,10 @@ const AdminContributeCardsContainer = ({
   }, [items]);
 
   function handleDragStart(event) {
-    setDragging(true);
     setDraggingId(event.active.id);
   }
 
   function handleDragEnd(event) {
-    setDragging(false);
     setDraggingId(null);
     const { active, over } = event;
 
