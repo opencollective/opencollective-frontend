@@ -171,7 +171,10 @@ const Tiers = ({ collective }) => {
               <Box mb={4}>
                 <StyledHr my={4} borderColor="black.300" />
                 <P fontSize="14px" lineHeight="20x" mb={3}>
-                  <FormattedMessage defaultMessage="Enabling this will add a tier that allows users to support your collective with Cryptocurrencies such as Bitcoin or Ethereum." />
+                  <FormattedMessage
+                    id="Tiers.CryptoTierDescription"
+                    defaultMessage="Enabling this will enable support for donations with Cryptocurrencies such as Bitcoin or Ethereum."
+                  />
                 </P>
                 <Mutation
                   mutation={editAccountSettingsMutation}
@@ -183,7 +186,7 @@ const Tiers = ({ collective }) => {
                       name="crypto-contributions"
                       label={intl.formatMessage({
                         id: 'tier.cryptoContributions.label',
-                        defaultMessage: 'Enable crypto contributions',
+                        defaultMessage: 'Enable Crypto contributions',
                       })}
                       defaultChecked={!hasCryptoContributionsDisabled}
                       width="auto"
