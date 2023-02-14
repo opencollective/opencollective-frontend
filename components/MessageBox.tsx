@@ -26,7 +26,7 @@ import {
 import { whiteSpace, WhiteSpaceProps } from '../lib/styled-system-custom-properties';
 import { MessageType, messageType } from '../lib/theme/variants/message';
 
-import { Box } from './Grid';
+import { Box, Flex } from './Grid';
 import StyledSpinner from './StyledSpinner';
 
 type MessageProps = BordersProps &
@@ -52,10 +52,6 @@ const Message = styled.div<MessageProps>`
   padding: ${themeGet('space.3')}px 24px;
   font-size: 13px;
   line-height: 20px;
-
-  display: flex;
-  align-items: center;
-  gap: 16px;
 
   box-shadow: 0px 1px 4px 1px rgba(49, 50, 51, 0.05);
 
@@ -110,13 +106,15 @@ const MessageBox = ({ type = 'white', withIcon = false, isLoading, children, ...
   const icon = withIcon ? icons[type] : null;
   return (
     <Message type={type} {...props}>
-      {(icon || isLoading) && (
-        <Box flexShrink={0} alignSelf={'start'} color={iconColors[type]}>
-          {isLoading ? <StyledSpinner size="1.2em" /> : icon}
-        </Box>
-      )}
+      <Flex gap="16px">
+        {(icon || isLoading) && (
+          <Box flexShrink={0} alignSelf="start" color={iconColors[type]}>
+            {isLoading ? <StyledSpinner size="1.2em" /> : icon}
+          </Box>
+        )}
 
-      <Box>{children}</Box>
+        <Box>{children}</Box>
+      </Flex>
     </Message>
   );
 };
