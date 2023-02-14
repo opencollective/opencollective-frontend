@@ -32,7 +32,7 @@ const AdminContributeCardsContainer = ({
 }) => {
   const [items, setItems] = React.useState(cards || []);
 
-  // Reset items if the cards order have changed.
+  // Reset items if the cards order have changed
   React.useEffect(() => {
     if (!isEqual(cards, items)) {
       setItems(cards);
@@ -158,7 +158,7 @@ AdminContributeCardsContainer.propTypes = {
   setDraggingId: PropTypes.func,
   draggingId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onMount: PropTypes.func,
-  CardsContainer: PropTypes.node,
+  CardsContainer: PropTypes.elementType,
   createNewType: PropTypes.string,
   enableReordering: PropTypes.bool,
   onTierUpdate: PropTypes.func,
