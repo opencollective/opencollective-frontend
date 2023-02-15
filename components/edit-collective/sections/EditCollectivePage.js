@@ -476,7 +476,7 @@ const EditCollectivePage = ({ collective }) => {
         <FormattedMessage
           id="EditCollectivePage.SectionsDescription"
           defaultMessage="Drag and drop to reorder sections. Toggle on and off with the visibility setting dropdown. Remember to click save at the bottom!"
-        />{' '}
+        />
       </SettingsSubtitle>
       <Flex flexWrap="wrap" mt={4}>
         <Box width="100%" maxWidth={436}>
