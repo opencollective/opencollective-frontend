@@ -42,7 +42,7 @@ const AdminContributeCardsContainer = ({
   // Save reorder to the backend if internal order has changed
   React.useEffect(() => {
     if (!isEqual(cards, items)) {
-      onReorder(items);
+      onReorder?.(items);
     }
   }, [items]);
 
