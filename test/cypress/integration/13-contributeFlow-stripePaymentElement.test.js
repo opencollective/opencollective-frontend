@@ -234,6 +234,7 @@ describe.skip('Contribute Flow: Stripe Payment Element', () => {
       contributeNewSEPADebit({ email, name: 'guest user' });
 
       cy.getByDataCy('order-success').contains('Thank you!');
+      cy.wait(5000);
 
       cy.get('@collective').then(col => {
         cy.visit(`${col.slug}/orders`);
