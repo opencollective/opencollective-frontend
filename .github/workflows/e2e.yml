@@ -37,6 +37,7 @@ jobs:
     timeout-minutes: 30
 
     strategy:
+      fail-fast: false
       matrix:
         files: ['0*.js', '1*.js', '2*.js', '3*.js']
 
