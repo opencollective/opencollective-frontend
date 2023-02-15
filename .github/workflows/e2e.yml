@@ -1,9 +1,7 @@
 name: E2E
 
 on:
-  push:
-    branches-ignore:
-      - 'i18n/crowdin'
+  workflow_call:
 
 env:
   TZ: UTC
@@ -107,7 +105,8 @@ jobs:
       # Checkouts
 
       - name: Set REF in env, removing the `refs/` part
-        run: echo "MATCHING_BRANCH_REF=$(echo $GITHUB_REF | sed 's|refs/||')" >> $GITHUB_ENV
+        run: |
+          echo "MATCHING_BRANCH_REF=${GITHUB_HEAD_REF-${GITHUB_REF##*/}}" >> $GITHUB_ENV
 
       - name: Check matching branch (api)
         id: check-matching-branch
@@ -116,7 +115,7 @@ jobs:
           route: GET /repos/{owner}/{repo}/git/ref/{ref}
           owner: opencollective
           repo: opencollective-api
-          ref: ${{ env.MATCHING_BRANCH_REF }}
+          ref: heads/${{ env.MATCHING_BRANCH_REF }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
@@ -127,7 +126,7 @@ jobs:
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
-          ref: ${{ github.ref }}
+          ref: ${{ env.MATCHING_BRANCH_REF }}
 
       - name: Checkout (api - main)
         if: steps.check-matching-branch.outputs.status != 200
