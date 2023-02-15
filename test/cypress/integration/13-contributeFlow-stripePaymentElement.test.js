@@ -45,7 +45,7 @@ function contributeWithNewUsBankAccount({ email, name } = {}) {
   cy.get('button[data-cy="cf-next-step"]').click();
 }
 
-describe.skip('Contribute Flow: Stripe Payment Element', () => {
+describe('Contribute Flow: Stripe Payment Element', () => {
   describe('Card', () => {
     beforeEach(() => {
       cy.intercept('GET', 'https://js.stripe.com/v3/', req => {
@@ -70,7 +70,7 @@ describe.skip('Contribute Flow: Stripe Payment Element', () => {
 
       cy.getByDataCy('order-success').contains('Thank you!');
 
-      cy.wait(3000);
+      cy.wait(10000);
       cy.get('@collective').then(col => {
         cy.visit(`${col.slug}/orders`);
       });
@@ -101,6 +101,7 @@ describe.skip('Contribute Flow: Stripe Payment Element', () => {
       contributeWithNewCard();
 
       cy.getByDataCy('order-success').contains('Thank you!');
+      cy.wait(10000);
 
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate`);
@@ -113,7 +114,6 @@ describe.skip('Contribute Flow: Stripe Payment Element', () => {
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.getByDataCy('order-success').contains('Thank you!');
 
-      cy.wait(2000);
       cy.get('@collective').then(col => {
         cy.visit(`${col.slug}/orders`);
       });
@@ -152,6 +152,7 @@ describe.skip('Contribute Flow: Stripe Payment Element', () => {
       contributeWithNewUsBankAccount({ email, name: 'guest user' });
 
       cy.getByDataCy('order-success').contains('Thank you!');
+      cy.wait(10000);
 
       cy.get('@collective').then(col => {
         cy.visit(`${col.slug}/orders`);
@@ -171,7 +172,7 @@ describe.skip('Contribute Flow: Stripe Payment Element', () => {
       cy.get('button[data-cy="cf-next-step"]').click();
       contributeWithNewUsBankAccount();
       cy.getByDataCy('order-success').contains('Thank you!');
-      cy.wait(5000);
+      cy.wait(10000);
 
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate`);

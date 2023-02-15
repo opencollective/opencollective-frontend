@@ -63,16 +63,11 @@ jobs:
       - name: Hack sources.list
         run: sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu/|http://mirror.arizona.edu/ubuntu/|g' /etc/apt/sources.list
 
-      # - name: Add stripe apt sources
-      #   run: |
-      #     curl -s https://packages.stripe.dev/api/security/keypair/stripe-cli-gpg/public | gpg --dearmor | sudo tee /usr/share/keyrings/stripe.gpg
-      #     echo "deb [signed-by=/usr/share/keyrings/stripe.gpg] https://packages.stripe.dev/stripe-cli-debian-local stable main" | sudo tee -a /etc/apt/sources.list.d/stripe.list
-
       - name: Update apt
         run: sudo apt-get update || exit 0
 
       - name: Install Cypress dependencies
-        run: sudo apt-get install --no-install-recommends -y libgtk2.0-0 libgtk-3-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb fonts-arphic-bkai00mp fonts-arphic-bsmi00lp fonts-arphic-gbsn00lp fonts-arphic-gkai00mp fonts-arphic-ukai fonts-arphic-uming ttf-wqy-zenhei ttf-wqy-microhei xfonts-wqy
+        run: sudo apt-get install --no-install-recommends -y wget libgtk2.0-0 libgtk-3-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb fonts-arphic-bkai00mp fonts-arphic-bsmi00lp fonts-arphic-gbsn00lp fonts-arphic-gkai00mp fonts-arphic-ukai fonts-arphic-uming ttf-wqy-zenhei ttf-wqy-microhei xfonts-wqy
 
       - name: Install postgresql-client
         run: sudo apt-get install -y postgresql-client
@@ -80,8 +75,10 @@ jobs:
       - name: Install graphicsmagick
         run: sudo apt-get install -y graphicsmagick
 
-      # - name: Install stripe-cli
-      #   run: sudo apt-get install -y stripe
+      - name: Install stripe-cli
+        run: |
+          wget https://github.com/stripe/stripe-cli/releases/download/v1.13.9/stripe_1.13.9_linux_x86_64.tar.gz -O /tmp/stripe_1.13.9_linux_x86_64.tar.gz
+          sudo tar xzvf /tmp/stripe_1.13.9_linux_x86_64.tar.gz -C /bin/
 
       - name: Checkout (frontend)
         uses: actions/checkout@v3
