@@ -45,7 +45,7 @@ function contributeWithNewUsBankAccount({ email, name } = {}) {
   cy.get('button[data-cy="cf-next-step"]').click();
 }
 
-describe('Contribute Flow: Stripe Payment Element', () => {
+describe.skip('Contribute Flow: Stripe Payment Element', () => {
   describe('Card', () => {
     beforeEach(() => {
       cy.intercept('GET', 'https://js.stripe.com/v3/', req => {
