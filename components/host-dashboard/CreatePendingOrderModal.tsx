@@ -288,15 +288,15 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     expectedAtOptions.push({
       value: dayjs(edit.pendingContributionData.expectedAt),
       label: intl.formatMessage(
-        { defaultMessage: 'Around {date}' },
+        { defaultMessage: 'Around {date}', id: 'Fields.expectedAt.date' },
         { date: dayjs(edit.pendingContributionData.expectedAt).format('MMMM D, YYYY') },
       ),
     });
   }
   const paymentMethodOptions = [
-    { value: 'UNKNOWN', label: intl.formatMessage({ id: 'user.unknown', defaultMessage: 'Unknown' }) },
+    { value: 'UNKNOWN', label: intl.formatMessage({ id: 'Unknown', defaultMessage: 'Unknown' }) },
     { value: 'BANK_TRANSFER', label: intl.formatMessage({ defaultMessage: 'Bank Transfer' }) },
-    { value: 'CHECK', label: intl.formatMessage({ defaultMessage: 'Check' }) },
+    { value: 'CHECK', label: intl.formatMessage({ id: 'Check', defaultMessage: 'Check' }) },
   ];
 
   const hostFee = values.amount?.valueInCents && Math.round(values.amount.valueInCents * (values.hostFeePercent / 100));

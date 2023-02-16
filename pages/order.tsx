@@ -415,7 +415,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
               <Grid mt="24px" gridGap="20px 50px" gridTemplateColumns={['1fr', '1fr 1fr', `repeat(4, 1fr)`]}>
                 {order.pendingContributionData?.ponumber && (
                   <OrderDetails>
-                    <FormattedMessage defaultMessage="PO Number" />
+                    <FormattedMessage id="Fields.PONumber" defaultMessage="PO Number" />
                     {`#${order.pendingContributionData.ponumber}`}
                   </OrderDetails>
                 )}
@@ -450,7 +450,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                   </OrderDetails>
                 ) : (
                   <OrderDetails>
-                    <FormattedMessage defaultMessage="Payment Method" />
+                    <FormattedMessage id="paymentmethod.label" defaultMessage="Payment Method" />
                     {i18nPaymentMethodProviderType(
                       intl,
                       order.pendingContributionData?.paymentMethod || 'BANK_TRANSFER',
@@ -460,7 +460,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
 
                 {!isEmpty(order.pendingContributionData?.fromAccountInfo) && (
                   <OrderDetails>
-                    <FormattedMessage defaultMessage="Contact" />
+                    <FormattedMessage id="Contact" defaultMessage="Contact" />
                     <span>
                       {order.pendingContributionData.fromAccountInfo.name} (
                       <StyledLink href={`mailto:${order.pendingContributionData.fromAccountInfo.email}`} openInNewTab>

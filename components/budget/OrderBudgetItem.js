@@ -203,7 +203,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
               {order.pendingContributionData.ponumber && (
                 <Flex flexDirection="column" justifyContent="flex-end" mr={[3, 4]} minHeight={50}>
                   <DetailColumnHeader>
-                    <FormattedMessage defaultMessage="PO Number" />
+                    <FormattedMessage id="Fields.PONumber" defaultMessage="PO Number" />
                   </DetailColumnHeader>
                   {isLoading ? (
                     <LoadingPlaceholder height={16} />
