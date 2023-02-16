@@ -21,7 +21,6 @@ import Container from '../Container';
 import DateTime from '../DateTime';
 import DefinedTerm, { Terms } from '../DefinedTerm';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
-import ExpenseTags from '../expenses/ExpenseTags';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Link from '../Link';
@@ -30,6 +29,7 @@ import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import StyledTag from '../StyledTag';
 import StyledTooltip from '../StyledTooltip';
+import Tags from '../Tags';
 import { P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 import TransactionStatusTag from '../TransactionStatusTag';
@@ -321,7 +321,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
         )}
         {isExpense && (
           <Container display="flex" mt={3} pt={[2, 0]}>
-            <ExpenseTags expense={expense} />
+            <Tags expense={expense} />
             {transactionDetailsLink()}
           </Container>
         )}
