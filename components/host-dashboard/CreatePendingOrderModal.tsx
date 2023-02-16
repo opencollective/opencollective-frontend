@@ -4,16 +4,18 @@ import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import dayjs from 'dayjs';
 import { Form, Formik, useFormikContext } from 'formik';
-import { debounce } from 'lodash';
+import { debounce, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { requireFields, verifyEmailPattern } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { CreatePendingContributionModalQuery, OrderPageQuery } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../../lib/policies';
+import { omitDeep } from '../../lib/utils';
 
-import { DefaultCollectiveLabel } from '../CollectivePicker';
+import CollectivePicker, { DefaultCollectiveLabel } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Flex } from '../Grid';
@@ -32,6 +34,17 @@ import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { TwoFactorAuthRequiredMessage } from '../TwoFactorAuthRequiredMessage';
+
+const EDITABLE_FIELDS = [
+  'amount',
+  'customData',
+  'description',
+  'expectedAt',
+  'fromAccount',
+  'fromAccountInfo',
+  'hostFeePercent',
+  'tier',
+];
 
 const debouncedLazyQuery = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
@@ -61,7 +74,7 @@ AmountDetailsLine.propTypes = {
   isLargeAmount: PropTypes.bool,
 };
 
-const CreatePendingContributionModalQuery = gql`
+const createPendingContributionModalQuery = gql`
   query CreatePendingContributionModal($slug: String!) {
     host(slug: $slug) {
       id
@@ -142,6 +155,16 @@ const createPendingContributionMutation = gql`
   }
 `;
 
+const editPendingContributionMutation = gql`
+  mutation EditPendingContribution($order: PendingOrderEditInput!) {
+    editPendingOrder(order: $order) {
+      legacyId
+      id
+      status
+    }
+  }
+`;
+
 const validate = values => {
   const errors = requireFields(values, [
     'amount.valueInCents',
@@ -179,23 +202,12 @@ const getTiersOptions = (intl, tiers) => {
 };
 
 type CreatePendingContributionFormProps = {
-  host: {
-    id: string;
-    legacyId: number;
-    name: string;
-    type: string;
-    slug: string;
-    imageUrl: string;
-    currency: string;
-    plan: {
-      hostFees: number;
-    };
-    hostFeePercent: number;
-    settings: Record<string, any>;
-  };
-  handleClose: () => void;
-  loading: boolean;
-  error: any;
+  host: CreatePendingContributionModalQuery['host'];
+  edit?: Partial<OrderPageQuery['order']>;
+  onClose: () => void;
+  onSuccess?: () => void;
+  loading?: boolean;
+  error?: any;
 };
 
 const Field = styled(StyledInputFormikField).attrs({
@@ -203,11 +215,11 @@ const Field = styled(StyledInputFormikField).attrs({
   labelFontWeight: '700',
 })``;
 
-const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendingContributionFormProps) => {
+const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePendingContributionFormProps) => {
   const { values, isSubmitting, setFieldValue } = useFormikContext<any>();
   const intl = useIntl();
 
-  const [getCollectiveTiers, { data, loading: tierLoading }] = useLazyQuery(
+  const [getCollectiveInfo, { data, loading: collectiveLoading }] = useLazyQuery(
     createPendingContributionModalCollectiveQuery,
     {
       context: API_V2_CONTEXT,
@@ -217,7 +229,7 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
 
   React.useEffect(() => {
     if (values.toAccount?.slug) {
-      debouncedLazyQuery(getCollectiveTiers, { slug: values.toAccount.slug });
+      debouncedLazyQuery(getCollectiveInfo, { slug: values.toAccount.slug });
     }
   }, [values.toAccount]);
 
@@ -226,8 +238,15 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
   }, [data?.account]);
 
   const collective = data?.account;
+  const currency = collective?.currency || host.currency;
+  const childrenOptions = collective?.childrenAccounts?.nodes || [];
+  const childAccount = values.childAccount?.id && childrenOptions.find(option => option.id === values.childAccount?.id);
   const canAddHostFee = host?.plan?.hostFees;
   const hostFeePercent = host.hostFeePercent;
+  const tiersOptions = childAccount
+    ? getTiersOptions(intl, childAccount?.tiers?.nodes || [])
+    : getTiersOptions(intl, collective?.tiers?.nodes || []);
+
   const receiptTemplates = host?.settings?.invoice?.templates;
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
@@ -247,8 +266,6 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
     },
   ];
 
-  const currency = collective?.currency || host.currency;
-  const tiersOptions = data ? getTiersOptions(intl, collective.tiers.nodes) : [];
   const expectedAtOptions = [
     {
       value: dayjs().add(1, 'month'),
@@ -267,6 +284,15 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
       label: intl.formatMessage({ defaultMessage: 'Within {n} {n, plural, one {year} other {years}}' }, { n: 1 }),
     },
   ];
+  if (edit.pendingContributionData?.expectedAt) {
+    expectedAtOptions.push({
+      value: dayjs(edit.pendingContributionData.expectedAt),
+      label: intl.formatMessage(
+        { defaultMessage: 'Around {date}' },
+        { date: dayjs(edit.pendingContributionData.expectedAt).format('MMMM D, YYYY') },
+      ),
+    });
+  }
   const paymentMethodOptions = [
     { value: 'UNKNOWN', label: intl.formatMessage({ id: 'user.unknown', defaultMessage: 'Unknown' }) },
     { value: 'BANK_TRANSFER', label: intl.formatMessage({ defaultMessage: 'Bank Transfer' }) },
@@ -289,14 +315,42 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
             <CollectivePickerAsync
               inputId={field.id}
               data-cy="create-pending-contribution-to"
-              types={['COLLECTIVE', 'ORGANIZATION', 'EVENT', 'FUND', 'PROJECT']}
+              types={['COLLECTIVE', 'ORGANIZATION', 'FUND']}
               error={field.error}
               hostCollectiveIds={[host.legacyId]}
               onBlur={() => form.setFieldTouched(field.name, true)}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
+              collective={field.value}
+              disabled={edit}
             />
           )}
         </Field>
+        {!edit && (
+          <Field
+            name="childAccount"
+            htmlFor="CreatePendingContribution-childAccount"
+            label={<FormattedMessage defaultMessage="Select event or project:" />}
+            labelFontSize="16px"
+            labelFontWeight="700"
+            mt={3}
+          >
+            {({ form, field }) => (
+              <CollectivePicker
+                inputId={field.id}
+                data-cy="create-pending-contribution-child"
+                error={field.error}
+                onBlur={() => form.setFieldTouched(field.name, true)}
+                onChange={({ value }) => form.setFieldValue(field.name, value ? { id: value?.id } : null)}
+                isLoading={collectiveLoading}
+                collectives={childrenOptions}
+                customOptions={[{ value: null, label: intl.formatMessage({ defaultMessage: 'None' }) }]}
+                isSearchable={childrenOptions.length > 10}
+                collective={childAccount}
+                disabled={!values.toAccount}
+              />
+            )}
+          </Field>
+        )}
         <Field
           name="tier"
           htmlFor="CreatePendingContribution-tier"
@@ -310,7 +364,7 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
               error={field.error}
               onBlur={() => form.setFieldTouched(field.name, true)}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
-              isLoading={tierLoading}
+              isLoading={collectiveLoading}
               options={tiersOptions}
               disabled={!values.toAccount}
               isSearchable={tiersOptions.length > 10}
@@ -338,6 +392,7 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
               onBlur={() => form.setFieldTouched(field.name, true)}
               customOptions={defaultSources}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
+              collective={field.value}
             />
           )}
         </Field>
@@ -465,7 +520,7 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
               <FormattedMessage
                 id="Fields.expectedAt.date"
                 defaultMessage="Around {date}"
-                values={{ date: values.expectedAt.format('DD/MM/YYYY') }}
+                values={{ date: dayjs(values.expectedAt).format('DD/MM/YYYY') }}
               />
             )
           }
@@ -478,7 +533,7 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
               onBlur={() => form.setFieldTouched(field.name, true)}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               options={expectedAtOptions}
-              value={expectedAtOptions.find(option => option.value === values.expectedAt)}
+              value={expectedAtOptions.find(option => dayjs(values.expectedAt).isSame(option.value))}
             />
           )}
         </Field>
@@ -515,26 +570,6 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
             />
           )}
         </Field>
-
-        {/* {receiptTemplateTitles.length > 1 && (
-          <Container width="100%">
-            <StyledInputFormikField
-              name="invoiceTemplate"
-              htmlFor="CreatePendingContribution-invoiceTemplate"
-              label={<FormattedMessage defaultMessage="Choose receipt" />}
-              mt={3}
-            >
-              {({ form, field }) => (
-                <StyledSelect
-                  inputId={field.id}
-                  options={receiptTemplateTitles}
-                  defaultValue={receiptTemplateTitles[0]}
-                  onChange={value => form.setFieldValue(field.name, value)}
-                />
-              )}
-            </StyledInputFormikField>
-          </Container>
-        )} */}
         <P fontSize="14px" lineHeight="17px" fontWeight="500" mt={4}>
           <FormattedMessage id="Details" defaultMessage="Details" />
         </P>
@@ -567,7 +602,7 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
       </ModalBody>
       <ModalFooter>
         <Flex justifyContent="space-between" flexWrap="wrap">
-          <StyledButton mx={2} mb={1} minWidth={100} onClick={handleClose} type="button">
+          <StyledButton mx={2} mb={1} minWidth={100} onClick={onClose} type="button">
             <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
           </StyledButton>
           <StyledButton
@@ -579,7 +614,11 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
             minWidth={120}
             loading={isSubmitting}
           >
-            <FormattedMessage defaultMessage="Create pending contribution" />
+            {edit ? (
+              <FormattedMessage defaultMessage="Edit pending contribution" />
+            ) : (
+              <FormattedMessage defaultMessage="Create pending contribution" />
+            )}
           </StyledButton>
         </Flex>
       </ModalFooter>
@@ -587,17 +626,20 @@ const CreatePendingContributionForm = ({ host, handleClose, error }: CreatePendi
   );
 };
 
-const CreatePendingContributionModal = ({ host: _host, ...props }) => {
+const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreatePendingContributionFormProps) => {
   const { LoggedInUser } = useLoggedInUser();
   const { addToast } = useToasts();
 
-  const { data, loading } = useQuery(CreatePendingContributionModalQuery, {
+  const { data, loading } = useQuery<CreatePendingContributionModalQuery>(createPendingContributionModalQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: _host.slug },
   });
 
   const host = data?.host;
   const [createPendingOrder, { error: createOrderError }] = useMutation(createPendingContributionMutation, {
+    context: API_V2_CONTEXT,
+  });
+  const [editPendingOrder, { error: editOrderError }] = useMutation(editPendingContributionMutation, {
     context: API_V2_CONTEXT,
   });
 
@@ -610,10 +652,25 @@ const CreatePendingContributionModal = ({ host: _host, ...props }) => {
     props.onClose();
   };
 
+  const initialValues = edit
+    ? {
+        ...edit,
+        fromAccountInfo: edit.pendingContributionData?.fromAccountInfo,
+        expectedAt: edit.pendingContributionData?.expectedAt,
+        customData: edit.pendingContributionData,
+      }
+    : { hostFeePercent: host.hostFeePercent, customData: { paymentMethod: 'UNKNOWN' } };
+
+  const error = createOrderError || editOrderError;
+
   return (
     <CreatePendingContributionModalContainer {...props} trapFocus onClose={handleClose}>
       <ModalHeader>
-        <FormattedMessage defaultMessage="Create Pending Contribution" />
+        {edit ? (
+          <FormattedMessage defaultMessage="Edit Pending Contribution #{id}" values={{ id: edit.legacyId }} />
+        ) : (
+          <FormattedMessage defaultMessage="Create Pending Contribution" />
+        )}
       </ModalHeader>
       {loading ? (
         <LoadingPlaceholder mt={2} height={200} />
@@ -621,54 +678,70 @@ const CreatePendingContributionModal = ({ host: _host, ...props }) => {
         <TwoFactorAuthRequiredMessage borderWidth={0} noTitle />
       ) : (
         <Formik
-          initialValues={{ hostFeePercent: host.hostFeePercent, customData: { paymentMethod: 'UNKNOWN' } }}
+          initialValues={initialValues}
           enableReinitialize={true}
           validate={validate}
           onSubmit={async values => {
-            const order = {
-              ...values,
-              fromAccount: buildAccountReference(values.fromAccount),
-              toAccount: buildAccountReference(values.toAccount),
-              tier: !values.tier ? null : { id: values.tier.id },
-              expectedAt: values.expectedAt ? new Date(values.expectedAt) : null,
-            };
+            if (edit) {
+              const order = omitDeep(
+                {
+                  id: edit.id,
+                  ...pick(values, EDITABLE_FIELDS),
+                  fromAccount: buildAccountReference(values.fromAccount),
+                  tier: !values.tier ? null : { id: values.tier.id },
+                  expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
+                },
+                ['__typename'],
+              );
 
-            const result = await createPendingOrder({ variables: { order } });
+              const result = await editPendingOrder({ variables: { order } });
 
-            addToast({
-              type: TOAST_TYPE.SUCCESS,
-              message: (
-                <FormattedMessage
-                  defaultMessage="Pending order created with reference #{orderId}"
-                  values={{ orderId: result.data.createPendingOrder.legacyId }}
-                />
-              ),
-            });
+              addToast({
+                type: TOAST_TYPE.SUCCESS,
+                message: (
+                  <FormattedMessage
+                    defaultMessage="Pending order #{orderId} updated"
+                    values={{ orderId: result.data.editPendingOrder.legacyId }}
+                  />
+                ),
+              });
+            } else {
+              const order = {
+                ...values,
+                fromAccount: buildAccountReference(values.fromAccount),
+                toAccount: buildAccountReference(values.toAccount),
+                tier: !values.tier ? null : { id: values.tier.id },
+                expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
+              };
+
+              const result = await createPendingOrder({ variables: { order } });
+
+              addToast({
+                type: TOAST_TYPE.SUCCESS,
+                message: (
+                  <FormattedMessage
+                    defaultMessage="Pending order created with reference #{orderId}"
+                    values={{ orderId: result.data.createPendingOrder.legacyId }}
+                  />
+                ),
+              });
+            }
+
             props?.onSuccess?.();
             handleClose();
           }}
         >
           <CreatePendingContributionForm
             host={host}
-            handleClose={handleClose}
+            onClose={handleClose}
             loading={loading}
-            error={createOrderError}
+            error={error}
+            edit={edit}
           />
         </Formik>
       )}
     </CreatePendingContributionModalContainer>
   );
-};
-
-CreatePendingContributionModal.propTypes = {
-  host: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    hostFeePercent: PropTypes.number,
-    slug: PropTypes.string,
-    policies: PropTypes.object,
-  }).isRequired,
-  onClose: PropTypes.func,
-  onSuccess: PropTypes.func,
 };
 
 export default CreatePendingContributionModal;
