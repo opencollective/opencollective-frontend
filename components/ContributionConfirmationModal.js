@@ -43,8 +43,8 @@ const confirmContributionMutation = gql`
   }
 `;
 
-const ContributionConfirmationModal = ({ order, onClose }) => {
-  const defaultHostFeePercent = order.toAccount.bankTransfersHostFeePercent;
+const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
+  const defaultHostFeePercent = order.hostFeePercent || order.toAccount.bankTransfersHostFeePercent;
   const platformTipAmount = order.platformTipAmount?.valueInCents || 0;
   const amountInitiated = order.amount.valueInCents + platformTipAmount;
   const currency = order.amount.currency;
@@ -97,6 +97,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
         type: TOAST_TYPE.SUCCESS,
         message: intl.formatMessage({ defaultMessage: 'Order confirmed successfully' }),
       });
+      onSuccess?.();
       onClose();
     } catch (e) {
       addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
@@ -303,6 +304,8 @@ ContributionConfirmationModal.propTypes = {
   order: PropTypes.object,
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
+  /** Called if the action request is successfull */
+  onSuccess: PropTypes.func,
 };
 
 export default ContributionConfirmationModal;

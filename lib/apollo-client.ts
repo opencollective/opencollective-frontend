@@ -57,7 +57,7 @@ const getCustomAgent = () => {
   return customAgent;
 };
 
-const serverSideFetch = async (url, options = {}) => {
+const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?: string } = {}) => {
   const nodeFetch = require('node-fetch');
 
   options.agent = getCustomAgent();
@@ -213,7 +213,7 @@ function createInMemoryCache() {
   return inMemoryCache;
 }
 
-function createClient({ initialState, twoFactorAuthContext } = {}) {
+function createClient({ initialState, twoFactorAuthContext }: any = {}) {
   const cache = createInMemoryCache();
   if (initialState) {
     cache.restore(initialState);
@@ -230,7 +230,7 @@ function createClient({ initialState, twoFactorAuthContext } = {}) {
   });
 }
 
-export function initClient({ initialState, twoFactorAuthContext } = {}) {
+export function initClient({ initialState, twoFactorAuthContext }: any = {}): ReturnType<typeof createClient> {
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections (which would be bad)
   if (!process.browser) {
