@@ -10,6 +10,7 @@ import { Box, Grid } from '../components/Grid';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import AccountSettings from '../components/root-actions/AccountSettings';
+import AccountType from '../components/root-actions/AccountType';
 import BanAccounts from '../components/root-actions/BanAccounts';
 import BanAccountsWithSearch from '../components/root-actions/BanAccountsWithSearch';
 import ClearCacheForAccountForm from '../components/root-actions/ClearCacheForAccountForm';
@@ -41,6 +42,11 @@ const MENU = [
   },
   { id: 'Unhost account', Component: UnhostAccountForm },
   { id: 'Account Settings', Component: AccountSettings },
+  {
+    id: 'Account Type',
+    Component: AccountType,
+    description: `This tool is meant to convert a User account to an Organization type. The organization account will have the fields copied from the initial user account. Please notify the user to go through and update the organization account details after this is done.`,
+  },
   { id: 'Activity Log', Component: RootActivityLog, useCard: false },
   {
     id: 'Contributions & Expenses',
@@ -49,15 +55,12 @@ const MENU = [
   {
     id: 'Move authored contributions',
     Component: MoveAuthoredContributions,
-    description: `This tool is meant to edit the account that authored one or more contributions.
-    It can be used to mark contributions as "Incognito" by picking the contributor's incognito profile in "Move to".
-    The payment methods used for the contributions are re-affected to the new profile, so make sure they have the permission to use them.`,
+    description: `This tool is meant to edit the account that authored one or more contributions. It can be used to mark contributions as "Incognito" by picking the contributor's incognito profile in "Move to". The payment methods used for the contributions are re-affected to the new profile, so make sure they have the permission to use them.`,
   },
   {
     id: 'Move received contributions',
     Component: MoveReceivedContributions,
-    description: `This tool is meant to edit the account that received a contribution.
-    Use it to move contributions to different tiers, sub-projects, events, etc.`,
+    description: `This tool is meant to edit the account that received a contribution. Use it to move contributions to different tiers, sub-projects, events, etc.`,
   },
   {
     id: 'Move expenses',
