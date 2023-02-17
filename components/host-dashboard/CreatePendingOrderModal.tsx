@@ -284,7 +284,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
       label: intl.formatMessage({ defaultMessage: 'Within {n} {n, plural, one {year} other {years}}' }, { n: 1 }),
     },
   ];
-  if (edit.pendingContributionData?.expectedAt) {
+  if (edit?.pendingContributionData?.expectedAt) {
     expectedAtOptions.push({
       value: dayjs(edit.pendingContributionData.expectedAt),
       label: intl.formatMessage(
@@ -659,7 +659,7 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
         expectedAt: edit.pendingContributionData?.expectedAt,
         customData: edit.pendingContributionData,
       }
-    : { hostFeePercent: host.hostFeePercent, customData: { paymentMethod: 'UNKNOWN' } };
+    : { hostFeePercent: host?.hostFeePercent, customData: { paymentMethod: 'UNKNOWN' } };
 
   const error = createOrderError || editOrderError;
 
