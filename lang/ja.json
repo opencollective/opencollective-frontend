@@ -294,7 +294,7 @@
   "becomeAHost.benefit.easyExpense.description": "To withdraw funds, payees submit expenses through the platform, with associated invoices and receipts. Easily view and approve expenses through your admin dashboard—payment via bank transfer or Paypal is built-in, so you can pay in a single click.",
   "becomeAHost.benefit.inDepthReports": "詳細レポート",
   "becomeAHost.benefit.inDepthReports.description": "No need to spend time creating reports for funders—it’s all documented automatically and transparently as you go. In addition, you'll receive a consolidated report every month with all transactions and documentation included. Your accountant will thank you!",
-  "becomeAHost.benefit.keepTrack": "すべての{lineBreak}収支を管理",
+  "becomeAHost.benefit.keepTrack": "予算の {lineBreak} を追跡する",
   "becomeAHost.benefit.keepTrack.description": "追加費用なしで、数回のクリックで、必要な数のプロジェクトのコレクティブを作成できます。資金調達、収支管理、コミュニティ活性化などのために各コレクティブ専用のページが設けられます。入金されたお金は指定されたコレクティブの残高に追加されます。スプレッドシートでの面倒な計算は必要ありません。",
   "becomeAHost.caseStudies.allforclimate-collective": "A fiscal sponsor for your local climate justice group, we act as a shared administrative back office so that local groups can focus on their actions.",
   "becomeAHost.caseStudies.foundation": "The Open Collective Platform provides the tools to more effectively manage group finances. They can offer their donors tax-deductible status without needing to incorporate a legal entity.",
