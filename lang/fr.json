@@ -2849,6 +2849,7 @@
   "user.isArchived": "Le compte a été archivé.",
   "user.isArchived.edit.description": "This account has been archived and is no longer active.",
   "user.since.label": "Depuis",
+  "user.Unknown": "Unknown",
   "UserCollective.incognito.description": "This user has decided to remain incognito",
   "UserCollective.incognito.title": "Utilisateur anonyme",
   "UtDIxu": "Update app",

@@ -2804,7 +2804,7 @@
   "user.isArchived": "Account has been archived.",
   "user.isArchived.edit.description": "This account has been archived and is no longer active.",
   "user.since.label": "Since",
-  "Unknown": "Unknown",
+  "user.Unknown": "Unknown",
   "UserCollective.incognito.description": "This user has decided to remain incognito",
   "UserCollective.incognito.title": "Incognito user",
   "UtDIxu": "Update app",
