@@ -160,7 +160,7 @@ exports.REWRITES = [
   },
   {
     source:
-      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/(orders|contribution)/:OrderId([0-9]+)',
+      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/(orders|contributions)/:OrderId([0-9]+)',
     destination: '/order',
   },
   {
