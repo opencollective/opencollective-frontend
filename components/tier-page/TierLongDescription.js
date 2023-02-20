@@ -25,6 +25,7 @@ const TierLongDescription = ({ tier, editMutation, canEdit }) => {
               toolbarTop={NAVBAR_HEIGHT}
               toolbarOffsetY={-30}
               setUploading={setUploading}
+              kind="TIER_LONG_DESCRIPTION"
             />
           );
         } else if (isEmptyValue(tier.longDescription)) {
