@@ -58,6 +58,7 @@
   "3bLmoU": "Redes sociales",
   "3eueCA": "<FromAccount></FromAccount> se unió a <Account></Account> como <MemberRole></MemberRole>",
   "3I6uVw": "Eliminar la aplicación",
+  "3Il70r": "External reference code for this order. This is usually a reference number from the contributor accounting system.",
   "3IwVoe": "Token sin nombre",
   "3PZa76": "Este mes",
   "3RuqnL": "Ninguno de los proveedores de servicios de pago actualmente activos en tu cuenta admite contribuciones recurrentes. Puedes habilitarlas conectando Stripe o PayPal. También puedes eliminar la opción de contribuir recurrentemente desde la <TiersLink>configuración de niveles</TiersLink>.",

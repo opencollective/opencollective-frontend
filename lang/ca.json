@@ -58,6 +58,7 @@
   "3bLmoU": "Enllaços xarxes socials",
   "3eueCA": "<FromAccount></FromAccount> s'ha unit <Account></Account> com a <MemberRole></MemberRole>",
   "3I6uVw": "Esborra l'aplicació",
+  "3Il70r": "External reference code for this order. This is usually a reference number from the contributor accounting system.",
   "3IwVoe": "Token sense nom",
   "3PZa76": "Aquest Mes",
   "3RuqnL": "Cap dels proveïdors de pagaments actius actualment al vostre compte admet contribucions recurrents. Els podeu activar connectant Stripe o PayPal. Alternativament, podeu eliminar la capacitat de contribuir periòdicament de la configuració del <TiersLink>mosaic de paràmetres </TiersLink>.",

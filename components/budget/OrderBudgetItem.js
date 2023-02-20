@@ -23,6 +23,7 @@ import OrderStatusTag from '../orders/OrderStatusTag';
 import ProcessOrderButtons from '../orders/ProcessOrderButtons';
 import StyledLink from '../StyledLink';
 import StyledTag from '../StyledTag';
+import StyledTooltip from '../StyledTooltip';
 import { H3, P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 
@@ -203,7 +204,14 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
               {order.pendingContributionData.ponumber && (
                 <Flex flexDirection="column" justifyContent="flex-end" mr={[3, 4]} minHeight={50}>
                   <DetailColumnHeader>
-                    <FormattedMessage id="Fields.PONumber" defaultMessage="PO Number" />
+                    <StyledTooltip
+                      content={
+                        <FormattedMessage defaultMessage="External reference code for this order. This is usually a reference number from the contributor accounting system." />
+                      }
+                      containerCursor="default"
+                    >
+                      <FormattedMessage id="Fields.PONumber" defaultMessage="PO Number" />
+                    </StyledTooltip>
                   </DetailColumnHeader>
                   {isLoading ? (
                     <LoadingPlaceholder height={16} />

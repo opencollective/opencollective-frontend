@@ -37,6 +37,7 @@ import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
 import StyledLink from '../components/StyledLink';
 import StyledTag from '../components/StyledTag';
+import StyledTooltip from '../components/StyledTooltip';
 import Tags from '../components/Tags';
 import { H1, H4, H5, P, Span } from '../components/Text';
 import { getDisplayedAmount } from '../components/transactions/TransactionItem';
@@ -415,7 +416,14 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
               <Grid mt="24px" gridGap="20px 50px" gridTemplateColumns={['1fr', '1fr 1fr', `repeat(4, 1fr)`]}>
                 {order.pendingContributionData?.ponumber && (
                   <OrderDetails>
-                    <FormattedMessage id="Fields.PONumber" defaultMessage="PO Number" />
+                    <StyledTooltip
+                      content={
+                        <FormattedMessage defaultMessage="External reference code for this order. This is usually a reference number from the contributor accounting system." />
+                      }
+                      containerCursor="default"
+                    >
+                      <FormattedMessage id="Fields.PONumber" defaultMessage="PO Number" />
+                    </StyledTooltip>
                     {`#${order.pendingContributionData.ponumber}`}
                   </OrderDetails>
                 )}
@@ -497,7 +505,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                       <FormattedMessage
                         defaultMessage="Created on {date}"
                         values={{
-                          date: <DateTime value={order.createdAt} dateStyle={'short'} timeStyle="short" />,
+                          date: <DateTime value={order.createdAt} dateStyle={'medium'} timeStyle="short" />,
                         }}
                       />
                     </TransactionDetails>
@@ -514,10 +522,11 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                   </React.Fragment>
                 ) : (
                   orderBy(order?.transactions, ['legacyId'], ['desc']).map(transaction => {
-                    const useNetAmount = transaction.type === 'CREDIT' && transaction.netAmount;
-                    const displayedAmount = useNetAmount
-                      ? transaction.netAmount
-                      : getDisplayedAmount(transaction, account);
+                    const displayedAmount = getDisplayedAmount(transaction, account);
+                    const displayPaymentFees =
+                      transaction.type === 'CREDIT' &&
+                      transaction.netAmount?.valueInCents !== displayedAmount.valueInCents &&
+                      transaction.paymentProcessorFee?.valueInCents !== 0;
                     return (
                       <TransactionDetails key={transaction.id}>
                         <span>{transaction.description}</span>
@@ -526,7 +535,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                           precision={2}
                           amount={displayedAmount.valueInCents}
                         />
-                        {useNetAmount && transaction.paymentProcessorFee?.valueInCents !== 0 && (
+                        {displayPaymentFees && (
                           <Span>
                             <FormattedMessage
                               defaultMessage="{value} (Payment Processor Fee)"

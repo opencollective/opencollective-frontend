@@ -432,6 +432,9 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           htmlFor="CreatePendingContribution-ponumber"
           label={<FormattedMessage id="Fields.PONumber" defaultMessage="PO Number" />}
           mt={3}
+          hint={
+            <FormattedMessage defaultMessage="External reference code for this order. This is usually a reference number from the contributor accounting system." />
+          }
         >
           {({ field }) => <StyledInput type="text" data-cy="create-pending-contribution-ponumber" {...field} />}
         </Field>

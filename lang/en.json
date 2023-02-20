@@ -58,6 +58,7 @@
   "3bLmoU": "Social Links",
   "3eueCA": "<FromAccount></FromAccount> joined <Account></Account> as a <MemberRole></MemberRole>",
   "3I6uVw": "Delete app",
+  "3Il70r": "External reference code for this order. This is usually a reference number from the contributor accounting system.",
   "3IwVoe": "Unnamed token",
   "3PZa76": "This Month",
   "3RuqnL": "None of the payment providers currently active on your account supports recurring contributions. You can enable them by connecting Stripe or PayPal. Alternatively, you can remove the ability to contribute recurringly from the <TiersLink>tiers settings</TiersLink>.",

@@ -58,6 +58,7 @@
   "3bLmoU": "Linki społecznościowe",
   "3eueCA": "<FromAccount></FromAccount> dołączono do <Account></Account> jako <MemberRole></MemberRole>",
   "3I6uVw": "Usuń aplikacje",
+  "3Il70r": "External reference code for this order. This is usually a reference number from the contributor accounting system.",
   "3IwVoe": "Nienazwany token",
   "3PZa76": "W tym miesiącu",
   "3RuqnL": "Żadne z obecnie aktywnych na Twoim koncie dostawców płatności nie obsługują cyklicznych wpłat. Możesz je aktywować przez połączenie ze Stripe lub PayPal. Możesz również usunąć możliwość cyklicznych płatności w <TiersLink>ustawieniach progów</TiersLink>.",

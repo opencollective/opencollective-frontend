@@ -58,6 +58,7 @@
   "3bLmoU": "Social Links",
   "3eueCA": "<FromAccount></FromAccount> joined <Account></Account> as a <MemberRole></MemberRole>",
   "3I6uVw": "Eliminar a aplicação",
+  "3Il70r": "External reference code for this order. This is usually a reference number from the contributor accounting system.",
   "3IwVoe": "Unnamed token",
   "3PZa76": "Este mês",
   "3RuqnL": "Nenhum dos prestadores de serviço de pagamento, atualmente ativos na sua conta, suporta contribuições recorrentes. Pode ativá-los através da Stripe ou Paypal. Em alternativa, pode remover a funcionalidade de contribuir de forma recorrente, a partir das configurações de <TiersLink>tiers settings</TiersLink>.",

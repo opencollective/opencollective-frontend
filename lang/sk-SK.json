@@ -58,6 +58,7 @@
   "3bLmoU": "Social Links",
   "3eueCA": "<FromAccount></FromAccount> joined <Account></Account> as a <MemberRole></MemberRole>",
   "3I6uVw": "Vymazať aplikáciu",
+  "3Il70r": "External reference code for this order. This is usually a reference number from the contributor accounting system.",
   "3IwVoe": "Unnamed token",
   "3PZa76": "Tento mesiac",
   "3RuqnL": "Žiadny z poskytovateľov platieb, ktorí sú aktívni na vašom účte, nepodporuje opakované príspevky. Môžete ich aktivovať pripojením služby Stripe alebo PayPal. Prípadne môžete možnosť opakovaných príspevkov odstrániť z <TiersLink>nastavenia úrovní</TiersLink>.",
