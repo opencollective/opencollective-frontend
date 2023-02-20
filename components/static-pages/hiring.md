@@ -8,9 +8,9 @@ Do you want to get paid to work on your passion for open source, mutual aid, and
 
 Open Collective is a financial and legal toolbox for grassroots groups. We support 15,000 groups and 30+ nonprofits around the world with one shared backend solution for fundraising and money management. This year our Collectives are on track to raise and spend $35 million dollars in full transparency.
 
-<!-- <strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong> -->
+<strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>
 
-## [Open Source Collective](https://www.oscollective.org/): Operations Coordinator
+<!-- ## [Open Source Collective](https://www.oscollective.org/): Operations Coordinator
 
 $60 ~ $80k yearly salary for 40 hrs/wk. Salary range contingent on experience.
 Must live within 4 hrs of EST time zone. Applications open until February 17th.
@@ -67,7 +67,7 @@ An operations and community oriented person who is:
 
 Please fill out [this form](https://docs.google.com/forms/d/e/1FAIpQLSfRC2ZivuNQdklHlsABKhdXf42EweeNk9jJUXy02mjbftyWzA/viewform) to apply.
 
-If you have questions, reach out to [hello@oscollective.org](mailto:hello@oscollective.org)
+If you have questions, reach out to [hello@oscollective.org](mailto:hello@oscollective.org)-->
 
 <!--
 Right now, [Open Collective](https://opencollective.com) is hiring for a Senior UX Designer.
