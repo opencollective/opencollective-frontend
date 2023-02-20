@@ -898,9 +898,9 @@ type Order {
   processedAt: DateTime
 
   """
-  Date the funds should arrive.
+  Data about the pending contribution
   """
-  pendingContributionData: JSON
+  pendingContributionData: PendingOrderData
 
   """
   Whether the order needs confirmation (3DSecure/SCA)
@@ -5148,6 +5148,19 @@ type OrderPermissions {
   Whether the current user edit this pending order
   """
   canEdit: Boolean!
+}
+
+type PendingOrderData {
+  expectedAt: DateTime
+  paymentMethod: String
+  ponumber: String
+  memo: String
+  fromAccountInfo: PendingOrderFromAccountInfo
+}
+
+type PendingOrderFromAccountInfo {
+  name: String
+  email: String
 }
 
 enum TierType {
@@ -13561,11 +13574,6 @@ type Mutation {
     An Amount to update the order to
     """
     amount: AmountInput
-
-    """
-    Tags associated to the order
-    """
-    tags: [String]
   ): Order
 
   """
@@ -13621,7 +13629,7 @@ type Mutation {
   createPendingOrder(order: PendingOrderCreateInput!): Order!
 
   """
-  To submit a new order. Scope: "orders".
+  To edit a pending order. Scope: "orders".
   """
   editPendingOrder(order: PendingOrderEditInput!): Order!
 
@@ -15295,9 +15303,19 @@ input PendingOrderCreateInput {
   description: String
 
   """
-  Custom data related to the Pending Order
+  Private memo for the host
   """
-  customData: JSON
+  memo: String
+
+  """
+  External identifier for the order
+  """
+  ponumber: String
+
+  """
+  Payment method expected for this order
+  """
+  paymentMethod: String
 
   """
   When is the money expected?
@@ -15356,9 +15374,19 @@ input PendingOrderEditInput {
   description: String
 
   """
-  Custom data related to the Pending Order
+  Private memo for the host
   """
-  customData: JSON
+  memo: String
+
+  """
+  External identifier for the order
+  """
+  ponumber: String
+
+  """
+  Payment method expected for this order
+  """
+  paymentMethod: String
 
   """
   When is the money expected?

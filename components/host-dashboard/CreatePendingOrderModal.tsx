@@ -37,13 +37,15 @@ import { TwoFactorAuthRequiredMessage } from '../TwoFactorAuthRequiredMessage';
 
 const EDITABLE_FIELDS = [
   'amount',
-  'customData',
   'description',
   'expectedAt',
   'fromAccount',
   'fromAccountInfo',
   'hostFeePercent',
   'tier',
+  'memo',
+  'ponumber',
+  'paymentMethod',
 ];
 
 const debouncedLazyQuery = debounce((searchFunc, variables) => {
@@ -428,7 +430,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
 
         {/* Contribution */}
         <Field
-          name="customData.ponumber"
+          name="ponumber"
           htmlFor="CreatePendingContribution-ponumber"
           label={<FormattedMessage id="Fields.PONumber" defaultMessage="PO Number" />}
           mt={3}
@@ -439,7 +441,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           {({ field }) => <StyledInput type="text" data-cy="create-pending-contribution-ponumber" {...field} />}
         </Field>
         <Field
-          name="customData.memo"
+          name="memo"
           htmlFor="CreatePendingContribution-memo"
           label={<FormattedMessage id="Expense.PrivateNote" defaultMessage="Private note" />}
           required={false}
@@ -541,20 +543,20 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           )}
         </Field>
         <Field
-          name="customData.paymentMethod"
-          htmlFor="CreatePendingContribution-customData.paymentMethod"
+          name=".paymentMethod"
+          htmlFor="CreatePendingContribution-.paymentMethod"
           mt={3}
-          label={<FormattedMessage id="Fields.customData.paymentMethod" defaultMessage="Payment method" />}
+          label={<FormattedMessage id="Fields.paymentMethod" defaultMessage="Payment method" />}
         >
           {({ form, field }) => (
             <StyledSelect
               inputId={field.id}
-              data-cy="create-pending-contribution-customData.paymentMethod"
+              data-cy="create-pending-contribution-.paymentMethod"
               error={field.error}
               onBlur={() => form.setFieldTouched(field.name, true)}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               options={paymentMethodOptions}
-              value={paymentMethodOptions.find(option => option.value === values.customData?.paymentMethod)}
+              value={paymentMethodOptions.find(option => option.value === values.paymentMethod)}
             />
           )}
         </Field>
@@ -660,9 +662,11 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
         ...edit,
         fromAccountInfo: edit.pendingContributionData?.fromAccountInfo,
         expectedAt: edit.pendingContributionData?.expectedAt,
-        customData: edit.pendingContributionData,
+        ponumber: edit.pendingContributionData?.ponumber,
+        memo: edit.pendingContributionData?.memo,
+        paymentMethod: edit.pendingContributionData?.paymentMethod,
       }
-    : { hostFeePercent: host?.hostFeePercent, customData: { paymentMethod: 'UNKNOWN' } };
+    : { hostFeePercent: host?.hostFeePercent };
 
   const error = createOrderError || editOrderError;
 

@@ -84,7 +84,16 @@ const accountOrdersQuery = gql`
           name
           imageUrl
         }
-        pendingContributionData
+        pendingContributionData {
+          expectedAt
+          paymentMethod
+          ponumber
+          memo
+          fromAccountInfo {
+            name
+            email
+          }
+        }
         toAccount {
           id
           slug

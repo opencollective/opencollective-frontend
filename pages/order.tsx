@@ -65,7 +65,16 @@ const orderPageQuery = gql`
       createdAt
       processedAt
       hostFeePercent
-      pendingContributionData
+      pendingContributionData {
+        expectedAt
+        paymentMethod
+        ponumber
+        memo
+        fromAccountInfo {
+          name
+          email
+        }
+      }
       memo
       fromAccount {
         id
@@ -318,8 +327,8 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
   const isPending = order?.status === 'PENDING';
   const isOverdue =
     isPending &&
-    order.pendingContributionData?.expiresAt &&
-    dayjs().isAfter(dayjs(order.pendingContributionData.expiresAt));
+    order.pendingContributionData?.expectedAt &&
+    dayjs().isAfter(dayjs(order.pendingContributionData.expectedAt));
   const intl = useIntl();
 
   React.useEffect(() => {
